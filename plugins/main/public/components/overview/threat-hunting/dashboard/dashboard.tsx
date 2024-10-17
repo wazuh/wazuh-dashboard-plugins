@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { getPlugins, getWazuhCorePlugin } from '../../../../kibana-services';
+import React, { useState, useEffect } from 'react';
+import { getPlugins } from '../../../../kibana-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { SearchResponse } from '../../../../../../../src/core/server';
 import { IndexPattern } from '../../../../../../../src/plugins/data/common';
@@ -8,38 +8,13 @@ import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import { getKPIsPanel } from './dashboard_panels_kpis';
 import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiButtonIcon,
-  EuiDataGrid,
-  EuiToolTip,
-  EuiDataGridCellValueElementProps,
-  EuiFlyout,
-  EuiFlyoutBody,
-  EuiFlyoutHeader,
-  EuiTitle,
-  EuiButtonEmpty,
-} from '@elastic/eui';
-import {
   ErrorFactory,
   ErrorHandler,
   HttpError,
 } from '../../../../react-services/error-management';
-import {
-  MAX_ENTRIES_PER_QUERY,
-  exportSearchToCSV,
-  getAllCustomRenders,
-} from '../../../common/data-grid/data-grid-service';
-import { useDocViewer } from '../../../common/doc-viewer/use-doc-viewer';
-import { useDataGrid } from '../../../common/data-grid/use-data-grid';
-import DocViewer from '../../../common/doc-viewer/doc-viewer';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import './threat_hunting_dashboard.scss';
 import { SampleDataWarning } from '../../../visualize/components/sample-data-warning';
-import {
-  threatHuntingTableAgentColumns,
-  threatHuntingTableDefaultColumns,
-} from '../events/threat-hunting-columns';
 import {
   AlertsDataSourceRepository,
   ThreatHuntingDataSource,
@@ -51,11 +26,7 @@ import {
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
-import { wzDiscoverRenderColumns } from '../../../common/wazuh-discover/render-columns';
 import { WzSearchBar } from '../../../common/search-bar';
-import DiscoverDataGridAdditionalControls from '../../../common/wazuh-discover/components/data-grid-additional-controls';
-
-import DocDetailsHeader from '../../../common/wazuh-discover/components/doc-details-header';
 
 const plugins = getPlugins();
 
@@ -75,72 +46,17 @@ const DashboardTH: React.FC = () => {
     DataSource: ThreatHuntingDataSource,
     repository: AlertsRepository,
   });
-
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
   });
-  const { query, absoluteDateRange } = searchBarProps;
-
-  const [inspectedHit, setInspectedHit] = useState<any>(undefined);
-  const [isExporting, setIsExporting] = useState<boolean>(false);
-
-  const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
-
-  const onClickInspectDoc = useMemo(
-    () => (index: number) => {
-      const rowClicked = results.hits.hits[index];
-      setInspectedHit(rowClicked);
-    },
-    [results],
-  );
-
-  const DocViewInspectButton = ({
-    rowIndex,
-  }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect document details';
-    return (
-      <EuiToolTip content={inspectHintMsg}>
-        <EuiButtonIcon
-          onClick={() => onClickInspectDoc(rowIndex)}
-          iconType='inspect'
-          aria-label={inspectHintMsg}
-        />
-      </EuiToolTip>
-    );
-  };
-
-  const dataGridProps = useDataGrid({
-    ariaLabelledBy: 'Threat Hunting Table',
-    defaultColumns: threatHuntingTableDefaultColumns,
-    renderColumns: wzDiscoverRenderColumns,
-    results,
-    indexPattern: dataSource?.indexPattern as IndexPattern,
-    DocViewInspectButton,
-    filters,
-    setFilters,
-  });
-
-  const { pagination, sorting, columnVisibility } = dataGridProps;
-
-  const docViewerProps = useDocViewer({
-    doc: inspectedHit,
-    indexPattern: dataSource?.indexPattern as IndexPattern,
-  });
-
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
   const pinnedAgent =
     PatternDataSourceFilterManager.getPinnedAgentFilter(dataSource?.id!)
       .length > 0;
-
-  useEffect(() => {
-    const currentColumns = !pinnedAgent
-      ? threatHuntingTableDefaultColumns
-      : threatHuntingTableAgentColumns;
-    columnVisibility.setVisibleColumns(currentColumns.map(({ id }) => id));
-  }, [pinnedAgent]);
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -148,7 +64,7 @@ const DashboardTH: React.FC = () => {
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange,
+    time: { from: dateRangeFrom, to: dateRangeTo },
   });
 
   useEffect(() => {
@@ -157,9 +73,7 @@ const DashboardTH: React.FC = () => {
     }
     fetchData({
       query,
-      pagination,
-      sorting,
-      dateRange: absoluteDateRange,
+      dateRange: { from: dateRangeFrom, to: dateRangeTo },
     })
       .then(results => {
         setResults(results);
@@ -174,36 +88,11 @@ const DashboardTH: React.FC = () => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(pagination),
-    JSON.stringify(sorting),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
+    autoRefreshFingerprint,
+    fingerprint,
   ]);
-
-  const onClickExportResults = async () => {
-    const params = {
-      indexPattern: dataSource?.indexPattern,
-      filters: fetchFilters ?? [],
-      query,
-      fields: columnVisibility.visibleColumns,
-      pagination: {
-        pageIndex: 0,
-        pageSize: results.hits.total,
-      },
-      sorting,
-    };
-    try {
-      setIsExporting(true);
-      await exportSearchToCSV(params);
-    } catch (error) {
-      const searchError = ErrorFactory.create(HttpError, {
-        error,
-        message: 'Error downloading csv report',
-      });
-      ErrorHandler.handleError(searchError);
-    } finally {
-      setIsExporting(false);
-    }
-  };
 
   return (
     <I18nProvider>
@@ -242,7 +131,7 @@ const DashboardTH: React.FC = () => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'kpis-th-dashboard-tab',
-                  timeRange: absoluteDateRange,
+                  timeRange: { from: dateRangeFrom, to: dateRangeTo },
                   title: 'KPIs Threat Hunting dashboard',
                   description: 'KPIs Dashboard of the Threat Hunting',
                   query: query,
@@ -251,6 +140,7 @@ const DashboardTH: React.FC = () => {
                     value: 15,
                   },
                   hidePanelTitles: true,
+                  lastReloadRequestTime: fingerprint,
                 }}
               />
               <DashboardByRenderer
@@ -264,7 +154,7 @@ const DashboardTH: React.FC = () => {
                   filters: fetchFilters ?? [],
                   useMargins: true,
                   id: 'th-dashboard-tab',
-                  timeRange: absoluteDateRange,
+                  timeRange: { from: dateRangeFrom, to: dateRangeTo },
                   title: 'Threat Hunting dashboard',
                   description: 'Dashboard of the Threat Hunting',
                   query: query,
@@ -273,52 +163,9 @@ const DashboardTH: React.FC = () => {
                     value: 15,
                   },
                   hidePanelTitles: false,
+                  lastReloadRequestTime: fingerprint,
                 }}
               />
-              <div style={{ margin: '8px' }}>
-                {!isDataSourceLoading ? (
-                  <EuiDataGrid
-                    {...dataGridProps}
-                    className={sideNavDocked ? 'dataGridDockedNav' : ''}
-                    toolbarVisibility={{
-                      additionalControls: (
-                        <>
-                          <DiscoverDataGridAdditionalControls
-                            totalHits={results?.hits?.total || 0}
-                            isExporting={isExporting}
-                            onClickExportResults={onClickExportResults}
-                            maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                            dateRange={absoluteDateRange}
-                          />
-                        </>
-                      ),
-                    }}
-                  />
-                ) : null}
-              </div>
-              {inspectedHit && (
-                <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
-                  <EuiFlyoutHeader>
-                    <DocDetailsHeader
-                      doc={inspectedHit}
-                      indexPattern={dataSource?.indexPattern}
-                    />
-                  </EuiFlyoutHeader>
-                  <EuiFlyoutBody>
-                    <EuiFlexGroup direction='column'>
-                      <EuiFlexItem>
-                        <DocViewer
-                          {...docViewerProps}
-                          renderFields={getAllCustomRenders(
-                            threatHuntingTableDefaultColumns,
-                            wzDiscoverRenderColumns,
-                          )}
-                        />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiFlyoutBody>
-                </EuiFlyout>
-              )}
             </div>
           </div>
         </>

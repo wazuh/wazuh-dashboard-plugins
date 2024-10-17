@@ -1,27 +1,21 @@
 import { tDataGridColumn } from '../../../common/data-grid';
+import { commonColumns } from '../../common/data-grid-columns';
 
 export const dockerColumns: tDataGridColumn[] = [
-  {
-    id: 'timestamp',
-    isSortable: true,
-    defaultSortDirection: 'desc',
-  },
-  {
-    id: 'agent.name',
-  },
+  commonColumns.timestamp,
+  commonColumns['agent.name'],
   {
     id: 'data.docker.from',
+    initialWidth: 151,
   },
   {
     id: 'data.docker.Type',
+    initialWidth: 149,
   },
   {
     id: 'data.docker.Action',
+    initialWidth: 161,
   },
-  {
-    id: 'rule.description',
-  },
-  {
-    id: 'rule.level',
-  },
+  commonColumns['rule.description'],
+  commonColumns['rule.level'],
 ];
