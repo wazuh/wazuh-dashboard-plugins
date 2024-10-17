@@ -14,13 +14,11 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiTitle,
   EuiButtonEmpty,
   EuiTabs,
   EuiTab,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import '../../common/modules/module.scss';
 import store from '../../../redux/store';
 import { FilterHandler } from '../../../utils/filter-handler';
