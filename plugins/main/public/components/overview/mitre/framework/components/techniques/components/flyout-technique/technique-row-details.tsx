@@ -9,7 +9,7 @@ import {
 } from '../../../../../../../../../../../src/plugins/data/common';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
 
-type Props = {
+type TechniqueRowDetailsProps = {
   doc: any;
   item: any;
   indexPattern: IndexPattern;
@@ -25,7 +25,7 @@ const TechniqueRowDetails = ({
   onRuleItemClick,
   filters,
   setFilters,
-}) => {
+}: TechniqueRowDetailsProps) => {
   const docViewerProps = useDocViewer({
     doc,
     indexPattern: indexPattern as IndexPattern,
@@ -44,7 +44,7 @@ const TechniqueRowDetails = ({
   };
 
   const onAddFilter = (filter: { [key: string]: string }) => {
-    onRuleItemClick(filter, indexPattern);
+    onRuleItemClick?.(filter, indexPattern);
   };
 
   useEffect(() => {
