@@ -185,41 +185,6 @@ export class MainModuleAgent extends Component {
   }
 }
 
-export default compose(
-  withGlobalBreadcrumb(({ agent, section }) => {
-    if (section === 'welcome') {
-      return [
-        {
-          text: endpointSummary.breadcrumbLabel,
-          href: NavigationService.getInstance().getUrlForApp(
-            endpointSummary.id,
-            {
-              path: `#/agents-preview`,
-            },
-          ),
-        },
-        { text: agent.id },
-      ];
-    } else {
-      return [
-        {
-          text: endpointSummary.breadcrumbLabel,
-          href: NavigationService.getInstance().getUrlForApp(
-            endpointSummary.id,
-            {
-              path: `#/agents-preview`,
-            },
-          ),
-        },
-        { agent: agent },
-        {
-          text: WAZUH_MODULES[section].title,
-        },
-      ];
-    }
-  }),
-)(MainModuleAgent);
-
 export class AgentInventoryDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
     super(id, title);
