@@ -30,44 +30,53 @@
 
 import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
-import { EuiToolTip, EuiSmallButtonIcon } from '@elastic/eui';
+import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 
 export interface Props {
   onClick: () => void;
-  disabled: boolean;
+  disabled?: boolean;
+  scripted?: boolean;
 }
 
-export function DocViewTableRowBtnFilterAdd({
+export function DocViewTableRowBtnFilterExists({
   onClick,
   disabled = false,
+  scripted = false,
 }: Props) {
   const tooltipContent = disabled ? (
-    <FormattedMessage
-      id='discover.docViews.table.unindexedFieldsCanNotBeSearchedTooltip'
-      defaultMessage='Unindexed fields can not be searched'
-    />
+    scripted ? (
+      <FormattedMessage
+        id='discover.docViews.table.unableToFilterForPresenceOfScriptedFieldsTooltip'
+        defaultMessage='Unable to filter for presence of scripted fields'
+      />
+    ) : (
+      <FormattedMessage
+        id='discover.docViews.table.unableToFilterForPresenceOfMetaFieldsTooltip'
+        defaultMessage='Unable to filter for presence of meta fields'
+      />
+    )
   ) : (
     <FormattedMessage
-      id='discover.docViews.table.filterForValueButtonTooltip'
-      defaultMessage='Filter for value'
+      id='discover.docViews.table.filterForFieldPresentButtonTooltip'
+      defaultMessage='Filter for field present'
     />
   );
 
   return (
     <EuiToolTip content={tooltipContent}>
-      <EuiSmallButtonIcon
+      <EuiButtonIcon
         aria-label={i18n.translate(
-          'discover.docViews.table.filterForValueButtonAriaLabel',
+          'discover.docViews.table.filterForFieldPresentButtonAriaLabel',
           {
-            defaultMessage: 'Filter for value',
+            defaultMessage: 'Filter for field present',
           },
         )}
-        className='osdDocViewer__actionButton'
-        data-test-subj='addInclusiveFilterButton'
-        disabled={disabled}
         onClick={onClick}
-        iconType={'magnifyWithPlus'}
+        className='wzDocViewer__actionButton'
+        data-test-subj='addExistsFilterButton'
+        disabled={disabled}
+        iconType={'indexOpen'}
         iconSize={'s'}
       />
     </EuiToolTip>

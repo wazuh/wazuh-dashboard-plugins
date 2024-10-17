@@ -30,53 +30,44 @@
 
 import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
-import { EuiToolTip, EuiSmallButtonIcon } from '@elastic/eui';
+import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 
 export interface Props {
   onClick: () => void;
   disabled?: boolean;
-  scripted?: boolean;
 }
 
-export function DocViewTableRowBtnFilterExists({
+export function DocViewTableRowBtnFilterRemove({
   onClick,
   disabled = false,
-  scripted = false,
 }: Props) {
   const tooltipContent = disabled ? (
-    scripted ? (
-      <FormattedMessage
-        id='discover.docViews.table.unableToFilterForPresenceOfScriptedFieldsTooltip'
-        defaultMessage='Unable to filter for presence of scripted fields'
-      />
-    ) : (
-      <FormattedMessage
-        id='discover.docViews.table.unableToFilterForPresenceOfMetaFieldsTooltip'
-        defaultMessage='Unable to filter for presence of meta fields'
-      />
-    )
+    <FormattedMessage
+      id='discover.docViews.table.unindexedFieldsCanNotBeSearchedTooltip'
+      defaultMessage='Unindexed fields can not be searched'
+    />
   ) : (
     <FormattedMessage
-      id='discover.docViews.table.filterForFieldPresentButtonTooltip'
-      defaultMessage='Filter for field present'
+      id='discover.docViews.table.filterOutValueButtonTooltip'
+      defaultMessage='Filter out value'
     />
   );
 
   return (
     <EuiToolTip content={tooltipContent}>
-      <EuiSmallButtonIcon
+      <EuiButtonIcon
         aria-label={i18n.translate(
-          'discover.docViews.table.filterForFieldPresentButtonAriaLabel',
+          'discover.docViews.table.filterOutValueButtonAriaLabel',
           {
-            defaultMessage: 'Filter for field present',
+            defaultMessage: 'Filter out value',
           },
         )}
-        onClick={onClick}
-        className='osdDocViewer__actionButton'
-        data-test-subj='addExistsFilterButton'
+        className='wzDocViewer__actionButton'
+        data-test-subj='removeInclusiveFilterButton'
         disabled={disabled}
-        iconType={'indexOpen'}
+        onClick={onClick}
+        iconType={'magnifyWithMinus'}
         iconSize={'s'}
       />
     </EuiToolTip>

@@ -30,15 +30,16 @@
 
 import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
-import { EuiToolTip, EuiSmallButtonIcon } from '@elastic/eui';
+import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import styles from './doc-viewer.scss';
 
 export interface Props {
   onClick: () => void;
-  disabled?: boolean;
+  disabled: boolean;
 }
 
-export function DocViewTableRowBtnFilterRemove({
+export function DocViewTableRowBtnFilterAdd({
   onClick,
   disabled = false,
 }: Props) {
@@ -49,25 +50,25 @@ export function DocViewTableRowBtnFilterRemove({
     />
   ) : (
     <FormattedMessage
-      id='discover.docViews.table.filterOutValueButtonTooltip'
-      defaultMessage='Filter out value'
+      id='discover.docViews.table.filterForValueButtonTooltip'
+      defaultMessage='Filter for value'
     />
   );
 
   return (
     <EuiToolTip content={tooltipContent}>
-      <EuiSmallButtonIcon
+      <EuiButtonIcon
         aria-label={i18n.translate(
-          'discover.docViews.table.filterOutValueButtonAriaLabel',
+          'discover.docViews.table.filterForValueButtonAriaLabel',
           {
-            defaultMessage: 'Filter out value',
+            defaultMessage: 'Filter for value',
           },
         )}
-        className='osdDocViewer__actionButton'
-        data-test-subj='removeInclusiveFilterButton'
+        className='wzDocViewer__actionButton'
+        data-test-subj='addInclusiveFilterButton'
         disabled={disabled}
         onClick={onClick}
-        iconType={'magnifyWithMinus'}
+        iconType={'magnifyWithPlus'}
         iconSize={'s'}
       />
     </EuiToolTip>
