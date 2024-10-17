@@ -249,7 +249,7 @@ const GenerateSyscollectorReportButton = ({ agent }) => {
       (agent || store.getState().appStateReducers.currentAgentData || {}).id ||
       false;
     await reportingService.startVis2Png('syscollector', agentID, {
-      indexPattern: dataSource.indexPattern,
+      indexPattern: dataSource?.indexPattern,
       query: { query: '', language: 'kuery' },
       filters: fetchFilters,
       time: {
