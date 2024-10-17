@@ -85,11 +85,10 @@ export class MainModuleAgent extends Component {
               </EuiTabs>
             </EuiFlexItem>
             <EuiFlexItem />
-            {this.props.section === 'syscollector' && (
-              <EuiFlexItem
-                grow={false}
-                style={{ marginRight: 4, marginTop: 6 }}
-              >
+            {['syscollector', 'configuration', 'stats'].includes(
+              this.props.section,
+            ) && (
+              <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
                 <GenerateSyscollectorReportButton agent={this.props.agent} />
               </EuiFlexItem>
             )}
