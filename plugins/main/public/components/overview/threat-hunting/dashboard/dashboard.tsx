@@ -203,6 +203,8 @@ const DashboardTH: React.FC = () => {
     }
   };
 
+  const closeFlyoutHandler = () => setInspectedHit(undefined);
+
   return (
     <I18nProvider>
       {isDataSourceLoading && !dataSource ? (
@@ -295,7 +297,7 @@ const DashboardTH: React.FC = () => {
                 ) : null}
               </div>
               {inspectedHit && (
-                <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+                <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                   <EuiFlyoutHeader>
                     <DocDetailsHeader
                       doc={inspectedHit}
@@ -313,6 +315,7 @@ const DashboardTH: React.FC = () => {
                           )}
                           filters={filters}
                           setFilters={setFilters}
+                          onFilter={closeFlyoutHandler}
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
