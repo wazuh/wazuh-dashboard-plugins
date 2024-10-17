@@ -17,6 +17,7 @@ import {
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
 import { EuiDataGridPaginationProps } from '@opensearch-project/oui';
+import dompurify from 'dompurify';
 
 export interface PaginationOptions
   extends Pick<
@@ -64,15 +65,15 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     indexPattern,
     DocViewInspectButton,
     results,
-    defaultColumns: columns,
+    defaultColumns,
     renderColumns,
     useDefaultPagination = false,
     pagination: paginationProps = {},
     filters = [],
     setFilters = () => {},
   } = props;
-  const [columnVisibility, setVisibility] = useState(() =>
-    columns.map(({ id }) => id),
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
+    defaultColumns.map(({ id }) => id),
   );
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
@@ -80,7 +81,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   /** Sorting **/
   // get default sorting from default columns
   const getDefaultSorting = () => {
-    const defaultSort = columns.find(
+    const defaultSort = defaultColumns.find(
       column => column.isSortable || column.defaultSortDirection,
     );
     return defaultSort
@@ -108,6 +109,53 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
           ...paginationProps,
         },
   );
+
+  const sortFirstMatchedColumns = (
+    firstMatchedColumns: tDataGridColumn[],
+    visibleColumnsOrdered: string[],
+  ) => {
+    firstMatchedColumns.sort(
+      (a, b) =>
+        visibleColumnsOrdered.indexOf(a.id) -
+        visibleColumnsOrdered.indexOf(b.id),
+    );
+    return firstMatchedColumns;
+  };
+
+  const orderFirstMatchedColumns = (
+    columns: tDataGridColumn[],
+    visibleColumnsOrdered: string[],
+  ) => {
+    const firstMatchedColumns: tDataGridColumn[] = [];
+    const nonMatchedColumns: tDataGridColumn[] = [];
+    const visibleColumnsSet = new Set(visibleColumnsOrdered);
+
+    for (let i = 0; i < columns.length; i++) {
+      const column = columns[i];
+      if (visibleColumnsSet.has(column.id)) {
+        firstMatchedColumns.push(column);
+      } else {
+        nonMatchedColumns.push(column);
+      }
+    }
+
+    return [
+      ...sortFirstMatchedColumns(firstMatchedColumns, visibleColumnsOrdered),
+      ...nonMatchedColumns,
+    ];
+  };
+
+  const getColumns = useMemo(() => {
+    return parseColumns(
+      indexPattern?.fields || [],
+      defaultColumns,
+      indexPattern,
+      rows,
+      pagination.pageSize,
+      filters,
+      setFilters,
+    );
+  }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
 
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) =>
@@ -148,7 +196,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         rowsParsed,
       );
       // check if column have render method initialized
-      const column = columns.find(column => column.id === columnId);
+      const column = defaultColumns.find(column => column.id === columnId);
       if (column && column.render) {
         return column.render(fieldFormatted, rowsParsed[relativeRowIndex]);
       }
@@ -163,7 +211,21 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         );
       }
 
-      return fieldFormatted;
+      // Format the value using the field formatter
+      // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.16.0/src/plugins/discover/public/application/components/data_grid/data_grid_table_cell_value.tsx#L80-L89
+      const formattedValue = indexPattern.formatField(
+        rows[relativeRowIndex],
+        columnId,
+      );
+      if (typeof formattedValue === 'undefined') {
+        return <span>-</span>;
+      } else {
+        const sanitizedCellValue = dompurify.sanitize(formattedValue);
+        return (
+          // eslint-disable-next-line react/no-danger
+          <span dangerouslySetInnerHTML={{ __html: sanitizedCellValue }} />
+        );
+      }
     }
     return null;
   };
@@ -183,58 +245,22 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     ];
   }, [results]);
 
-  const filterColumns = () => {
-    const allColumns = parseColumns(
-      indexPattern?.fields || [],
-      columns,
-      indexPattern,
-      rows,
-      pagination.pageSize,
-      filters,
-      setFilters,
-    );
-    const columnMatch = [];
-    const columnNonMatch = [];
-
-    for (const item of allColumns) {
-      if (columnVisibility.includes(item.name)) {
-        columnMatch.push(item);
-      } else {
-        columnNonMatch.push(item);
-      }
-    }
-
-    return [...columnMatch, ...columnNonMatch];
-  };
-
-  const defaultColumnsPosition = (columnsVisibility, defaultColumns) => {
-    const defaults = defaultColumns
-      .map(item => item.id)
-      .filter(id => columnsVisibility.includes(id));
-
-    const nonDefaults = columnsVisibility.filter(
-      item => !defaultColumns.map(item => item.id).includes(item),
-    );
-
-    return [...defaults, ...nonDefaults];
-  };
-
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns: filterColumns(),
+    columns: orderFirstMatchedColumns(getColumns, visibleColumns),
     columnVisibility: {
-      visibleColumns: defaultColumnsPosition(columnVisibility, columns),
-      setVisibleColumns: setVisibility,
+      visibleColumns,
+      setVisibleColumns,
     },
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,
-    rowCount:
-      rowCount < MAX_ENTRIES_PER_QUERY ? rowCount : MAX_ENTRIES_PER_QUERY,
+    rowCount: Math.min(rowCount, MAX_ENTRIES_PER_QUERY),
     sorting: { columns: sortingColumns, onSort },
     pagination: {
       ...pagination,
       onChangeItemsPerPage: onChangeItemsPerPage,
       onChangePage: onChangePage,
     },
+    setPagination,
   } as EuiDataGridProps;
 };

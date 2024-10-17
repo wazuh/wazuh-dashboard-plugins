@@ -1439,7 +1439,6 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
 }
 
 .globalFilterGroup__wrapper {
-  max-height: 100px;
   height: auto !important;
 }
 
@@ -1831,5 +1830,28 @@ iframe.width-changed {
 
   .wz-welcome-page .euiIcon--app .euiIcon__fillSecondary {
     fill: #000000bb;
+  }
+}
+
+/* Vulnerabilities under evaluation filter */
+.button-group-filter {
+  border-radius: 2px;
+
+  .euiButton__content,
+  .euiButton__text {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .euiButtonGroup__buttons {
+    height: 30px;
+    border-radius: 2px;
+    box-shadow: 0 1px 1px -1px rgba(152, 162, 179, 0.2),
+      0 3px 2px -2px rgba(152, 162, 179, 0.2), inset 0 0 0 1px #bcc3ce !important;
+    border: none !important;
+
+    .euiButtonGroupButton {
+      line-height: 28px;
+    }
   }
 }

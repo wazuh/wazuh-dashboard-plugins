@@ -26,7 +26,7 @@ export const WAZUH_MODULES = {
     title: 'Malware detection',
     appId: 'malware-detection',
     description:
-      'Verify that your systems are configured according to your security policies baseline.',
+      'Check indicators of compromise triggered by malware infections or cyberattacks.',
   },
   vuls: {
     title: 'Vulnerability detection',
@@ -99,17 +99,11 @@ export const WAZUH_MODULES = {
     description:
       'Security events related to your Google Cloud Platform services, collected directly via GCP API.', // TODO GCP
   },
-  virustotal: {
-    title: 'VirusTotal',
-    appId: 'virustotal',
-    description:
-      'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
-  },
   mitre: {
     title: 'MITRE ATT&CK',
     appId: 'mitre-attack',
     description:
-      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations',
+      'Explore security alerts mapped to adversary tactics and techniques for better threat understanding.',
   },
   syscollector: {
     title: 'Inventory data',

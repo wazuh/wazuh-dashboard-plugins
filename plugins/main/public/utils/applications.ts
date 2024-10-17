@@ -112,7 +112,7 @@ export const malwareDetection = {
   }),
   description: i18n.translate('wz-app-malware-detection-description', {
     defaultMessage:
-      'Verify that your systems are configured according to your security policies baseline.',
+      'Check indicators of compromise triggered by malware infections or cyberattacks.',
   }),
   euiIconType: 'indexRollupApp',
   order: 201,
@@ -218,7 +218,7 @@ export const mitreAttack = {
   }),
   description: i18n.translate('wz-app-mitre-attack-description', {
     defaultMessage:
-      'Security events from the knowledge base of adversary tactics and techniques based on real-world observations.',
+      'Explore security alerts mapped to adversary tactics and techniques for better threat understanding.',
   }),
   euiIconType: 'grokApp',
   order: 302,
@@ -226,31 +226,6 @@ export const mitreAttack = {
   showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=mitre&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
-export const virustotal = {
-  category: 'wz-category-threat-intelligence',
-  id: 'virustotal',
-  title: i18n.translate('wz-app-virustotal-title', {
-    defaultMessage: 'VirusTotal',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-virustotal-breadcrumbLabel', {
-    defaultMessage: 'VirusTotal',
-  }),
-  description: i18n.translate('wz-app-virustotal-description', {
-    defaultMessage:
-      'Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.',
-  }),
-  euiIconType: 'monitoringApp',
-  order: 303,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=virustotal&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -841,7 +816,6 @@ export const Applications = [
   threatHunting,
   vulnerabilityDetection,
   mitreAttack,
-  virustotal,
   pciDss,
   hipaa,
   gdpr,
