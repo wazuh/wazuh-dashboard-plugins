@@ -24,9 +24,16 @@ import {
   Plugin,
   PluginInitializerContext,
   SharedGlobalConfig,
-} from 'opensearch_dashboards/server';
+  OpenSearchDashboardsRequest,
+} from '../../../src/core/server';
 
-import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
+import {
+  WazuhPluginSetup,
+  WazuhPluginStart,
+  PluginSetup,
+  ApiClient,
+  DashboardSecurity,
+} from './types';
 import { setupRoutes } from './routes';
 import {
   jobInitializeRun,
@@ -37,36 +44,32 @@ import {
   jobSanitizeUploadedFilesTasksRun,
 } from './start';
 import { first } from 'rxjs/operators';
+import { WazuhCore } from '../common/types';
 
-declare module 'opensearch_dashboards/server' {
+declare module '../../../src/core/server' {
   interface RequestHandlerContext {
     wazuh: {
       logger: Logger;
       plugins: PluginSetup;
-      security: any;
+      security: DashboardSecurity;
       api: {
-        client: {
-          asInternalUser: {
-            authenticate: (apiHostID: string) => Promise<string>;
-            request: (
-              method: string,
-              path: string,
-              data: any,
-              options: { apiHostID: string; forceRefresh?: boolean },
-            ) => Promise<any>;
-          };
-          asCurrentUser: {
-            authenticate: (apiHostID: string) => Promise<string>;
-            request: (
-              method: string,
-              path: string,
-              data: any,
-              options: { apiHostID: string; forceRefresh?: boolean },
-            ) => Promise<any>;
-          };
+        client: ApiClient;
+      };
+      server: {
+        info: {
+          name: string;
+          hostname: string;
+          port: number;
+          protocol: string;
         };
       };
     };
+    wazuhEndpointParams: {
+      pathFilename: string;
+      hashUsername: string;
+      filename: string;
+    };
+    wazuh_core: PluginSetup['wazuhCore'];
   }
 }
 
@@ -93,7 +96,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         },
         plugins,
         security: plugins.wazuhCore.dashboardSecurity,
-        api: context.wazuh_core.api,
+        api: context.wazuh_core?.api as WazuhCore['api'],
       };
     });
 
@@ -112,7 +115,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public async start(core: CoreStart, plugins: any) {
+  public async start(core: CoreStart, plugins: { wazuhCore: WazuhCore }) {
     const globalConfiguration: SharedGlobalConfig =
       await this.initializerContext.config.legacy.globalConfig$
         .pipe(first())

@@ -11,7 +11,7 @@
  */
 
 export const getCookieValueByName = (
-  cookie: string,
+  cookie: string | undefined,
   name: string,
 ): string | undefined => {
   if (!cookie) return;

@@ -10,9 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const getCookieValueByName = (cookie: string, name: string): (string | undefined) => {
+export const getCookieValueByName = (
+  cookie: string | undefined,
+  name: string,
+): string | undefined => {
   if (!cookie) return;
   const cookieRegExp = new RegExp(`.*${name}=([^;]+)`);
   const [_, cookieNameValue] = cookie.match(cookieRegExp) || [];
   return cookieNameValue;
-}
+};

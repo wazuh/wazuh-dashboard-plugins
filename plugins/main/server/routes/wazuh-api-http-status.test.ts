@@ -21,6 +21,15 @@ const context = {
       warn: jest.fn(),
       error: jest.fn(),
     },
+    api: {
+      client: {
+        asInternalUser: {
+          request: jest.fn().mockRejectedValue({
+            response: {},
+          }),
+        },
+      },
+    },
   },
   wazuh_core: {
     manageHosts: {
