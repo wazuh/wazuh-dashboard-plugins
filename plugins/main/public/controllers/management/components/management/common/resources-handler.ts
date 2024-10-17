@@ -63,9 +63,8 @@ export class ResourcesHandler {
 
   /**
    * Get the content of any type of file Rules, Decoders, CDB lists...
-   * @param {String} fileName
    */
-  async getFileContent(fileName, relativeDirname) {
+  async getFileContent(fileName: string, relativeDirname?: string) {
     try {
       const result: any = await WzRequest.apiReq(
         'GET',
