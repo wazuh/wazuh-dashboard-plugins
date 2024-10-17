@@ -1,17 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDocViewer } from '../../doc-viewer';
 import DocViewer from '../../doc-viewer/doc-viewer';
-import { IndexPattern } from '../../../../../../../src/plugins/data/common';
+import {
+  Filter,
+  IndexPattern,
+} from '../../../../../../../src/plugins/data/common';
 import { EuiCodeBlock, EuiFlexGroup, EuiTabbedContent } from '@elastic/eui';
 
-const DocDetails = ({ doc, item, indexPattern }) => {
+interface DocDetailsProps {
+  doc: any;
+  item: any;
+  indexPattern: IndexPattern;
+  filters: Filter[];
+  setFilters: (filters: Filter[]) => void;
+}
+
+const DocDetails = ({
+  doc,
+  item,
+  indexPattern,
+  filters,
+  setFilters,
+}: DocDetailsProps) => {
   const docViewerProps = useDocViewer({
     doc,
     indexPattern: indexPattern as IndexPattern,
   });
 
   return (
-    <EuiFlexGroup direction="column" style={{ width: '100%' }}>
+    <EuiFlexGroup direction='column' style={{ width: '100%' }}>
       <EuiTabbedContent
         tabs={[
           {
@@ -19,7 +36,11 @@ const DocDetails = ({ doc, item, indexPattern }) => {
             name: 'Table',
             content: (
               <>
-                <DocViewer {...docViewerProps} />
+                <DocViewer
+                  {...docViewerProps}
+                  filters={filters}
+                  setFilters={setFilters}
+                />
               </>
             ),
           },
@@ -29,9 +50,9 @@ const DocDetails = ({ doc, item, indexPattern }) => {
             content: (
               <EuiCodeBlock
                 aria-label={'Document details'}
-                language="json"
+                language='json'
                 isCopyable
-                paddingSize="s"
+                paddingSize='s'
               >
                 {JSON.stringify(item, null, 2)}
               </EuiCodeBlock>

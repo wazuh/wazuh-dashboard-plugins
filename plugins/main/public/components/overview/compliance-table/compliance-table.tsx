@@ -355,6 +355,8 @@ export const ComplianceTable = withAgentSupportModule(props => {
                             getRegulatoryComplianceRequirementFilter
                           }
                           {...complianceData}
+                          filters={filters}
+                          setFilters={setFilters}
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
