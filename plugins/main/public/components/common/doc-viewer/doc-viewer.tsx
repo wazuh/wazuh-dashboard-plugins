@@ -5,9 +5,9 @@ import { i18n } from '@osd/i18n';
 import { FieldIcon } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { FILTER_OPERATOR } from '../data-source';
-import { DocViewTableRowBtnFilterAdd } from './table_row_btn_filter_add';
-import { DocViewTableRowBtnFilterRemove } from './table_row_btn_filter_remove';
-import { DocViewTableRowBtnFilterExists } from './table_row_btn_filter_exists';
+import { DocViewTableRowBtnFilterAdd } from './table-row-btn-filter-add';
+import { DocViewTableRowBtnFilterRemove } from './table-row-btn-filter-remove';
+import { DocViewTableRowBtnFilterExists } from './table-row-btn-filter-exists';
 import './doc-viewer.scss';
 import { onFilterCellActions } from '../data-grid';
 import { Filter } from '../../../../../../src/plugins/data/common';
@@ -114,7 +114,7 @@ const DocViewer = (props: tDocViewerProps) => {
   return (
     <>
       {flattened && (
-        <table className='table table-condensed osdDocViewerTable'>
+        <table className='table table-condensed wzDocViewerTable'>
           <tbody>
             {Object.keys(flattened)
               .sort()
@@ -125,7 +125,7 @@ const DocViewer = (props: tDocViewerProps) => {
                 const isCollapsed = isCollapsible && !fieldRowOpen[field];
                 const valueClassName = classNames({
                   // eslint-disable-next-line @typescript-eslint/naming-convention
-                  osdDocViewer__value: true,
+                  wzDocViewer__value: true,
                   'truncate-by-height': isCollapsible && isCollapsed,
                 });
                 const isNestedField =
@@ -149,7 +149,7 @@ const DocViewer = (props: tDocViewerProps) => {
 
                 return (
                   <tr key={index} data-test-subj={`tableDocViewRow-${field}`}>
-                    <td className='osdDocViewer__field'>
+                    <td className='wzDocViewer__field'>
                       <EuiFlexGroup
                         alignItems='center'
                         gutterSize='s'
@@ -173,7 +173,7 @@ const DocViewer = (props: tDocViewerProps) => {
                       </EuiFlexGroup>
                     </td>
                     <td>
-                      <div className='osdDocViewer__buttons'>
+                      <div className='wzDocViewer__buttons'>
                         <DocViewTableRowBtnFilterAdd
                           disabled={!fieldMapping || !fieldMapping.filterable}
                           onClick={() =>
