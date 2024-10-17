@@ -1,5 +1,5 @@
 import { RequestHandlerContext } from 'opensearch-dashboards/server';
-import type { ManageHosts } from "../../wazuh-core/server/services";
+import type { ManageHosts } from '../../wazuh-core/server/services';
 import { OpenSearchDashboardsRequest } from 'src/core/server/http';
 
 export type UserAuthenticate = (apiHostID: string) => Promise<string>;
@@ -9,7 +9,7 @@ export type UserRequest = (
   method: string,
   path: string,
   data: any,
-  options: UserRequestOptions
+  options: UserRequestOptions,
 ) => Promise<any>;
 
 export type AsUser = {
@@ -31,11 +31,11 @@ export interface ISecurityFactory {
   platform?: string;
   getCurrentUser(
     request: OpenSearchDashboardsRequest,
-    context?: RequestHandlerContext
+    context?: RequestHandlerContext,
   ): Promise<CurrentUser>;
   isAdministratorUser(
     context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest
+    request: OpenSearchDashboardsRequest,
   ): Promise<{ administrator: any; administrator_requirements: any }>;
 }
 
