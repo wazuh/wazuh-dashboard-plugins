@@ -1,6 +1,9 @@
 import React from 'react';
 import { EuiFlexItem, EuiCodeBlock, EuiTabbedContent } from '@elastic/eui';
-import { IndexPattern, Filter } from '../../../../../../../src/plugins/data/common';
+import {
+  IndexPattern,
+  Filter,
+} from '../../../../../../../src/plugins/data/common';
 import DocViewer from '../../doc-viewer/doc-viewer';
 import { useDocViewer } from '../../doc-viewer';
 

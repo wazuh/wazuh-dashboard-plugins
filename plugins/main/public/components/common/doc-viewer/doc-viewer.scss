@@ -49,14 +49,18 @@
       }
 
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         display: block;
         right: 0;
         top: 0;
         height: 100%;
         width: 100%;
-        background-image: linear-gradient(to right, transparent 0, aliceblue 4px);
+        background-image: linear-gradient(
+          to right,
+          transparent 0,
+          aliceblue 4px
+        );
         z-index: 1;
       }
     }
