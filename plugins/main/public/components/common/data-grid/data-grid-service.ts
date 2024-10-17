@@ -198,13 +198,29 @@ export const onFilterCellActions = (
   setFilters: (filters: Filter[]) => void,
 ) => {
   return (field: string, operation: FILTER_OPERATOR, value?: any) => {
-    const newFilter = PatternDataSourceFilterManager.createFilter(
-      operation,
-      field,
-      value,
-      indexPatternId,
-    );
-    setFilters([...filters, newFilter]);
+    const newFilters: Filter[] = [];
+    if (Array.isArray(value)) {
+      value.forEach(item => {
+        newFilters.push(
+          PatternDataSourceFilterManager.createFilter(
+            operation,
+            field,
+            item,
+            indexPatternId,
+          ),
+        );
+      });
+    } else {
+      newFilters.push(
+        PatternDataSourceFilterManager.createFilter(
+          operation,
+          field,
+          value,
+          indexPatternId,
+        ),
+      );
+    }
+    setFilters([...filters, ...newFilters]);
   };
 };
 
