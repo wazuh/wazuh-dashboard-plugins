@@ -483,7 +483,7 @@ export const AgentsWelcome = compose(
                   >
                     {' '}
                     {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
-                    <WzDatePicker condensed={true} onTimeChange={() => { }} />
+                    <WzDatePicker condensed={true} onTimeChange={() => {}} />
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 {(this.state.widthWindow < 1150 && (
@@ -516,33 +516,33 @@ export const AgentsWelcome = compose(
                     </EuiFlexGroup>
                   </Fragment>
                 )) || (
-                    <Fragment>
-                      <EuiFlexGroup>
-                        <EuiFlexItem>
-                          <EuiFlexGroup>
-                            <EuiFlexItem
-                              key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                            >
-                              {this.renderMitrePanel()}
-                            </EuiFlexItem>
-                            {this.renderCompliancePanel()}
-                          </EuiFlexGroup>
-                        </EuiFlexItem>
-                        <FimEventsTable agent={this.props.agent} />
-                      </EuiFlexGroup>
-                      <EuiSpacer size='l' />
-                      <EuiFlexGroup>
-                        <EuiFlexItem
-                          key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                        >
-                          {' '}
-                          {/* Events count evolution */}
-                          {this.renderEventCountVisualization()}
-                        </EuiFlexItem>
-                        <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
-                      </EuiFlexGroup>
-                    </Fragment>
-                  )}
+                  <Fragment>
+                    <EuiFlexGroup>
+                      <EuiFlexItem>
+                        <EuiFlexGroup>
+                          <EuiFlexItem
+                            key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
+                          >
+                            {this.renderMitrePanel()}
+                          </EuiFlexItem>
+                          {this.renderCompliancePanel()}
+                        </EuiFlexGroup>
+                      </EuiFlexItem>
+                      <FimEventsTable agent={this.props.agent} />
+                    </EuiFlexGroup>
+                    <EuiSpacer size='l' />
+                    <EuiFlexGroup>
+                      <EuiFlexItem
+                        key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
+                      >
+                        {' '}
+                        {/* Events count evolution */}
+                        {this.renderEventCountVisualization()}
+                      </EuiFlexItem>
+                      <EuiFlexItem>{this.renderSCALastScan()}</EuiFlexItem>
+                    </EuiFlexGroup>
+                  </Fragment>
+                )}
               </EuiPageBody>
             </EuiPage>
           </div>

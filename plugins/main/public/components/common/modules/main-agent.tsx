@@ -131,14 +131,14 @@ export class MainModuleAgent extends Component {
                         : 'wz-welcome-page-agent-info wz-welcome-page-agent-info-gray'
                     }
                   >
-                  <EuiPanel grow paddingSize='s'>
-                    <AgentInfo
-                      agent={this.props.agent}
-                      isCondensed={false}
-                      hideActions={true}
-                      {...this.props}
-                    ></AgentInfo>
-                  </EuiPanel>
+                    <EuiPanel grow paddingSize='s'>
+                      <AgentInfo
+                        agent={this.props.agent}
+                        isCondensed={false}
+                        hideActions={true}
+                        {...this.props}
+                      ></AgentInfo>
+                    </EuiPanel>
                   </div>
                 )}
                 {this.props.tabs && this.props.tabs.length && (
