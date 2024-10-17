@@ -1,8 +1,17 @@
 import React from 'react';
 import { EuiFlexItem, EuiCodeBlock, EuiTabbedContent } from '@elastic/eui';
-import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
+import { IndexPattern, Filter } from '../../../../../../../src/plugins/data/common';
 import DocViewer from '../../doc-viewer/doc-viewer';
 import { useDocViewer } from '../../doc-viewer';
+
+interface DocumentViewTableAndJsonProps {
+  document: any;
+  indexPattern: IndexPattern;
+  renderFields?: any;
+  filters: Filter[];
+  setFilters: (filters: Filter[]) => void;
+  onFilter?: () => void;
+}
 
 export const DocumentViewTableAndJson = ({
   document,
@@ -10,7 +19,8 @@ export const DocumentViewTableAndJson = ({
   renderFields,
   filters,
   setFilters,
-}) => {
+  onFilter,
+}: DocumentViewTableAndJsonProps) => {
   const docViewerProps = useDocViewer({
     doc: document,
     indexPattern: indexPattern as IndexPattern,
@@ -29,6 +39,7 @@ export const DocumentViewTableAndJson = ({
                 renderFields={renderFields}
                 filters={filters}
                 setFilters={setFilters}
+                onFilter={onFilter}
               />
             ),
           },
