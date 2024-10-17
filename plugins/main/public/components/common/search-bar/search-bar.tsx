@@ -35,7 +35,7 @@ export const WzSearchBar = ({
 
   return (
     <EuiPanel
-      className='wz-search-bar wz-search-bar-no-padding'
+      className='wz-search-bar no-padding'
       paddingSize='s'
       hasShadow={false}
       hasBorder={false}
@@ -44,6 +44,7 @@ export const WzSearchBar = ({
     >
       {showQuery ? (
         <EuiFlexGroup
+          className='wz-search-bar-query'
           gutterSize='s'
           alignItems='center'
           responsive={false}
@@ -56,7 +57,7 @@ export const WzSearchBar = ({
         </EuiFlexGroup>
       ) : null}
       {showFilters ? (
-        <EuiFlexGroup gutterSize='s'>
+        <EuiFlexGroup className='wz-search-bar-filters' gutterSize='s'>
           {hideFixedFilters ? null : (
             <EuiFlexItem grow={false}>
               <EuiFlexGroup
