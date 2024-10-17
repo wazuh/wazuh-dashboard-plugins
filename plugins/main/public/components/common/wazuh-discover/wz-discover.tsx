@@ -188,6 +188,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     }
   };
 
+  const closeFlyoutHandler = () => setInspectedHit(undefined);
+
   return (
     <IntlProvider locale='en'>
       {isDataSourceLoading ? (
@@ -268,7 +270,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               </EuiFlexGroup>
             </EuiPanel>
             {inspectedHit && (
-              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+              <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                 <EuiFlyoutHeader>
                   <DocDetailsHeader
                     doc={inspectedHit}
@@ -287,6 +289,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                         )}
                         filters={filters}
                         setFilters={setFilters}
+                        onFilter={closeFlyoutHandler}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>

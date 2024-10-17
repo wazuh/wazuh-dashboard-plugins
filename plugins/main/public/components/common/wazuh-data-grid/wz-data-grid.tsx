@@ -149,6 +149,8 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     }
   };
 
+  const closeFlyoutHandler = () => setInspectedHit(undefined);
+
   return (
     <>
       {isLoading ? <LoadingSearchbarProgress /> : null}
@@ -177,7 +179,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
         </div>
       ) : null}
       {inspectedHit && (
-        <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+        <EuiFlyout onClose={closeFlyoutHandler} size='m'>
           <EuiFlyoutHeader>
             <EuiTitle>
               <DocDetailsHeader
@@ -198,6 +200,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
                   )}
                   filters={filters}
                   setFilters={setFilters}
+                  onFilter={closeFlyoutHandler}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>
