@@ -14,12 +14,14 @@ interface DashboardStatisticsProps {
   indexPatternId: string;
   filters: tFilter[];
   searchBarProps: any;
+  lastReloadRequestTime: number;
 }
 
 const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
   indexPatternId,
   filters,
   searchBarProps,
+  lastReloadRequestTime,
 }) => {
   return (
     <div className='server-management-statistics-dashboard-responsive'>
@@ -43,6 +45,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
             value: 15,
           },
           hidePanelTitles: false,
+          lastReloadRequestTime,
         }}
       />
     </div>

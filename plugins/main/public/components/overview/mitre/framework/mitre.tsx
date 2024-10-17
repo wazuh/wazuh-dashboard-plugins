@@ -68,13 +68,13 @@ const MitreComponent = props => {
     repository: new AlertsDataSourceRepository(),
   });
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters: setFilters,
   });
 
-  const { absoluteDateRange } = searchBarProps;
+  const { dateRangeFrom, dateRangeTo } = searchBarProps;
   const [mitreState, setMitreState] = useState<tMitreState>({
     tacticsObject: {},
     selectedTactics: {},
@@ -83,7 +83,10 @@ const MitreComponent = props => {
   const [filterParams, setFilterParams] = useState<tFilterParams>({
     filters: fetchFilters,
     query: searchBarProps?.query,
-    time: absoluteDateRange,
+    time: {
+      from: dateRangeFrom,
+      to: dateRangeTo,
+    },
   });
   const [indexPattern, setIndexPattern] = useState<any>(); //Todo: Add correct type
   const [isLoading, setIsLoading] = useState(true);
@@ -93,7 +96,10 @@ const MitreComponent = props => {
     let filterParams = {
       filters: fetchFilters, // pass the fetchFilters to use it as initial filters in the technique flyout
       query: searchBarProps?.query,
-      time: absoluteDateRange,
+      time: {
+        from: dateRangeFrom,
+        to: dateRangeTo,
+      },
     };
     setFilterParams(filterParams);
     setIsLoading(true);
@@ -108,7 +114,10 @@ const MitreComponent = props => {
     dataSource,
     searchBarProps.query,
     JSON.stringify(filters),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
+    fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   const buildTacticsObject = async () => {

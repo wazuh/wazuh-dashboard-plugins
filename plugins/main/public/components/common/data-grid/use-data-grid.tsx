@@ -268,5 +268,6 @@ export const useDataGrid = (props: tDataGridProps): DataGridProps => {
       onChangeItemsPerPage: onChangeItemsPerPage,
       onChangePage: onChangePage,
     },
+    setPagination,
   } as DataGridProps;
 };
