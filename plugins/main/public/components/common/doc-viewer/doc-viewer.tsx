@@ -24,6 +24,7 @@ export type tDocViewerProps = {
   docJSON: any;
   filters: Filter[];
   setFilters: (filters: Filter[]) => void;
+  onFilter?: () => void;
 };
 
 /**
@@ -100,6 +101,7 @@ const DocViewer = (props: tDocViewerProps) => {
     docJSON,
     filters,
     setFilters,
+    onFilter: onClose,
   } = props;
 
   const onFilter = (field: string, operation: FILTER_OPERATOR, value?: any) => {
@@ -109,6 +111,7 @@ const DocViewer = (props: tDocViewerProps) => {
       setFilters,
     );
     _onFilter(field, operation, value);
+    onClose?.();
   };
 
   return (
