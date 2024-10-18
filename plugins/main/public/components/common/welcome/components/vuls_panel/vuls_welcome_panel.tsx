@@ -27,6 +27,9 @@ import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { WzLink } from '../../../../../components/wz-link/wz-link';
+import { withErrorBoundary } from '../../../../common/hocs';
+import { compose } from 'redux';
+import { withVulnerabilitiesStateDataSource } from '../../../../../components/overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 
 export default function VulsPanel({ agent }) {
   const {
@@ -101,30 +104,57 @@ export default function VulsPanel({ agent }) {
     return (
       <EuiFlexItem key={index}>
         <EuiPanel paddingSize='s'>
-          <WzLink
-            appId={vulnerabilityDetection.id}
-            path={`/overview?tab=vuls&tabView=dashboard&agentId=${
-              agent.id
-            }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
-              PatternDataSourceFilterManager.createFilter(
-                FILTER_OPERATOR.IS,
-                `vulnerability.severity`,
-                severityLabel,
-                dataSource?.indexPattern?.id,
-              ),
-            ])}`}
-            style={{ color: severityColor }}
-          >
-            <VulsSeverityStat
-              value={`${getSeverityValue(severityLabel)}`}
-              color={severityColor}
-              isLoading={isLoading || isDataSourceLoading}
-            />
-          </WzLink>
+          <EuiFlexGroup className='h-100' gutterSize='none' alignItems='center'>
+            <EuiFlexItem>
+              <WzLink
+                appId={vulnerabilityDetection.id}
+                path={`/overview?tab=vuls&tabView=dashboard&agentId=${agent.id
+                  }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
+                    PatternDataSourceFilterManager.createFilter(
+                      FILTER_OPERATOR.IS,
+                      `vulnerability.severity`,
+                      severityLabel,
+                      dataSource?.indexPattern?.id,
+                    ),
+                  ])}`}
+                style={{ color: severityColor }}
+              >
+                <VulsSeverityStat
+                  value={`${getSeverityValue(severityLabel)}`}
+                  color={severityColor}
+                  isLoading={isLoading || isDataSourceLoading}
+                />
+              </WzLink>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiPanel>
       </EuiFlexItem>
     );
   };
+
+  const VulsPanelContent = () => {
+    return (
+      <>
+        <EuiFlexItem grow={2}>
+          <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
+            {Object.keys(severities).reverse().map(renderSeverityStats)}
+          </EuiFlexGroup>
+        </EuiFlexItem>
+        <EuiFlexItem grow={3}>
+          <VulsTopPackageTable
+            agentId={agent.id}
+            items={topPackagesData}
+            indexPatternId={dataSource?.indexPattern.id}
+          />
+        </EuiFlexItem>
+      </>
+    )
+  }
+
+  const PanelWithVulnerabilitiesState = compose(
+    withErrorBoundary,
+    withVulnerabilitiesStateDataSource,
+  )(VulsPanelContent);
 
   return (
     <Fragment>
@@ -161,18 +191,7 @@ export default function VulsPanel({ agent }) {
         </EuiText>
         <EuiSpacer size='s' />
         <EuiFlexGroup paddingSize='none'>
-          <EuiFlexItem grow={2}>
-            <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
-              {Object.keys(severities).reverse().map(renderSeverityStats)}
-            </EuiFlexGroup>
-          </EuiFlexItem>
-          <EuiFlexItem grow={3}>
-            <VulsTopPackageTable
-              agentId={agent.id}
-              items={topPackagesData}
-              indexPatternId={dataSource?.indexPattern.id}
-            />
-          </EuiFlexItem>
+          <PanelWithVulnerabilitiesState notRedirect={true} />
         </EuiFlexGroup>
       </EuiPanel>
     </Fragment>

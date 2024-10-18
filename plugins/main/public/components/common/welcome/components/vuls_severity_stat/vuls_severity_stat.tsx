@@ -28,6 +28,7 @@ export default function VulsSeverityStat({
       titleElement={statElement}
       isLoading={isLoading}
       titleColor={color}
+      titleSize='m'
       textAlign={textAlign}
     />
   );
