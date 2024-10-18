@@ -106,14 +106,14 @@ export class MainModuleAgent extends Component {
             <div>
               <div className={clsx({ 'wz-module-header-nav': hasTabs })}>
                 {this.state.showAgentInfo && (
-                    <EuiPanel grow paddingSize='s'>
-                      <AgentInfo
-                        agent={this.props.agent}
-                        isCondensed={false}
-                        hideActions={true}
-                        {...this.props}
-                      ></AgentInfo>
-                    </EuiPanel>
+                  <EuiPanel grow paddingSize='s'>
+                    <AgentInfo
+                      agent={this.props.agent}
+                      isCondensed={false}
+                      hideActions={true}
+                      {...this.props}
+                    ></AgentInfo>
+                  </EuiPanel>
                 )}
                 {hasTabs && (
                   <div className='wz-welcome-page-agent-tabs'>
