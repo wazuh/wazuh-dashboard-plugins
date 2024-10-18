@@ -50,14 +50,10 @@ export const SyscollectorInventory = compose(
   return (
     <div style={{ overflow: 'hidden', margin: '12px 16px 12px 16px' }}>
       {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
-        <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem>
             <EuiCallOut
               title='This agent is currently disconnected, the data may be outdated.'
               iconType='iInCircle'
             />
-          </EuiFlexItem>
-        </EuiFlexGroup>
       )}
       <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem>
@@ -85,17 +81,9 @@ export const SyscollectorInventory = compose(
         )}
       </EuiFlexGroup>
 
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem>
           <PackagesTable agent={agent} soPlatform={soPlatform} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
 
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem>
           <ProcessesTable agent={agent} soPlatform={soPlatform} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
     </div>
   );
 });
