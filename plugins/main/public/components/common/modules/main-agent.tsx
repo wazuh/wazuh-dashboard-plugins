@@ -26,7 +26,7 @@ import { FilterHandler } from '../../../utils/filter-handler';
 import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { AgentInfo } from '../../common/welcome/agents-info';
+import { AgentInfo } from '../welcome/agent-info/agents-info';
 import { compose } from 'redux';
 import { withGlobalBreadcrumb } from '../hocs';
 import { endpointSummary } from '../../../utils/applications';
