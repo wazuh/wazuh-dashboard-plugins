@@ -20,6 +20,7 @@ import {
 import { WazuhCheckUpdatesPluginStart } from '../../wazuh-check-updates/public';
 import { WazuhCorePluginStart } from '../../wazuh-core/public';
 import { DashboardStart } from '../../../src/plugins/dashboard/public';
+import { WazuhCore } from '../common/types';
 
 export interface AppPluginStartDependencies {
   navigation: NavigationPublicPluginStart;
@@ -46,6 +47,7 @@ export type WazuhSetupPlugins = {
   data: DataPublicPluginSetup;
   navigation: NavigationPublicPluginStart;
   telemetry: TelemetryPluginSetup;
+  wazuhCore: WazuhCore;
 };
 
 export type WazuhStartPlugins = AppPluginStartDependencies;
