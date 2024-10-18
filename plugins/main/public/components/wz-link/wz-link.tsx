@@ -49,7 +49,9 @@ export const WzLink = (props: tWzLinkProps) => {
     </EuiLink>
   );
 
-  const finalLink = isCurrentApp ? linkSameApp : linkDiferentApps;
+  const finalLink = (
+    isCurrentApp ? linkSameApp : linkDiferentApps
+  ) as EuiToolTipProps['children'];
 
   return toolTipProps ? (
     <EuiToolTip {...toolTipProps}>{finalLink}</EuiToolTip>
