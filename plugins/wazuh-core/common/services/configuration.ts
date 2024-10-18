@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 import { formatLabelValuePair } from './settings';
 import { formatBytes } from './file-size';
 
-export interface ILogger {
+export interface Logger {
   debug(message: string): void;
   info(message: string): void;
   warn(message: string): void;
@@ -180,7 +180,7 @@ export class Configuration implements IConfiguration {
   store: IConfigurationStore | null = null;
   _settings: Map<string, { [key: string]: TConfigurationSetting }>;
   _categories: Map<string, { [key: string]: any }>;
-  constructor(private logger: ILogger, store: IConfigurationStore) {
+  constructor(private logger: Logger, store: IConfigurationStore) {
     this._settings = new Map();
     this._categories = new Map();
     this.setStore(store);
