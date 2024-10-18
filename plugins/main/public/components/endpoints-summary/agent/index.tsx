@@ -96,13 +96,16 @@ export const AgentView = compose(
   return (
     <Switch>
       <Route path={`?tab=${AgentTabs.SOFTWARE}`}>
-        <MainModuleAgent agent={agentData} section={tab} />
+        <MainModuleAgent agent={agentData} section={tab} switchTab={switchTab} />
+        <MainSyscollector agent={agentData} section={tab} />
       </Route>
       <Route path={`?tab=${AgentTabs.NETWORK}`}>
-        <MainModuleAgent agent={agentData} section={tab} />
+        <MainModuleAgent agent={agentData} section={tab} switchTab={switchTab} />
+        <MainSyscollector agent={agentData} section={tab} />
       </Route>
       <Route path={`?tab=${AgentTabs.PROCESSES}`}>
-        <MainModuleAgent agent={agentData} section={tab} />
+        <MainModuleAgent agent={agentData} section={tab} switchTab={switchTab} />
+        <MainSyscollector agent={agentData} section={tab} />
       </Route>
       <Route path='?tab=syscollector'>
         <MainModuleAgent agent={agentData} section={tab} />
