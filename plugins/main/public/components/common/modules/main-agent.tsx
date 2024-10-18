@@ -41,6 +41,7 @@ import {
 import { useAsyncAction } from '../hooks';
 import NavigationService from '../../../react-services/navigation-service';
 import { toTitleCase } from '../util/change-case';
+import clsx from 'clsx';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -125,11 +126,10 @@ export class MainModuleAgent extends Component {
               >
                 {this.state.showAgentInfo && (
                   <div
-                    className={
-                      !this.props.tabs || !this.props.tabs.length
-                        ? 'wz-welcome-page-agent-info'
-                        : 'wz-welcome-page-agent-info wz-welcome-page-agent-info-gray'
-                    }
+                    className={clsx('wz-welcome-page-agent-info', {
+                      'wz-welcome-page-agent-info-gray':
+                        this.props.tabs && this.props.tabs.length,
+                    })}
                   >
                     <EuiPanel grow paddingSize='s'>
                       <AgentInfo
