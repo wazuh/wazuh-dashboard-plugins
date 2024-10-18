@@ -71,29 +71,28 @@ export class MainModuleAgent extends Component {
 
   renderTitle() {
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiTabs>
-                <EuiTab isSelected={true}>
-                  {toTitleCase(this.props.section)}&nbsp;
-                  {this.state.loadingReport === true && (
-                    <EuiLoadingSpinner size='s' />
-                  )}
-                </EuiTab>
-              </EuiTabs>
-            </EuiFlexItem>
-            <EuiFlexItem />
-            {['syscollector', 'configuration', 'stats'].includes(
-              this.props.section,
-            ) && (
-              <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
-                <GenerateSyscollectorReportButton agent={this.props.agent} />
-              </EuiFlexItem>
-            )}
-          </EuiFlexGroup>
+      <EuiFlexGroup style={{ marginInline: 8 }}>
+        <EuiFlexItem style={{ marginInline: 0 }} grow={false}>
+          <EuiTabs>
+            <EuiTab isSelected={true}>
+              {toTitleCase(this.props.section)}&nbsp;
+              {this.state.loadingReport === true && (
+                <EuiLoadingSpinner size='s' />
+              )}
+            </EuiTab>
+          </EuiTabs>
         </EuiFlexItem>
+        <EuiFlexItem />
+        {['syscollector', 'configuration', 'stats'].includes(
+          this.props.section,
+        ) && (
+          <EuiFlexItem
+            grow={false}
+            style={{ alignSelf: 'center', marginInline: 0 }}
+          >
+            <GenerateSyscollectorReportButton agent={this.props.agent} />
+          </EuiFlexItem>
+        )}
       </EuiFlexGroup>
     );
   }
