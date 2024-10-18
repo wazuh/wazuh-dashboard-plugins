@@ -76,20 +76,13 @@ export class MainModuleAgent extends Component {
           <EuiTabs>
             <EuiTab isSelected={true}>
               {toTitleCase(this.props.section)}&nbsp;
-              {this.state.loadingReport === true && (
-                <EuiLoadingSpinner size='s' />
-              )}
+              {this.state.loadingReport === true && <EuiLoadingSpinner size='s' />}
             </EuiTab>
           </EuiTabs>
         </EuiFlexItem>
         <EuiFlexItem />
-        {['syscollector', 'configuration', 'stats'].includes(
-          this.props.section,
-        ) && (
-          <EuiFlexItem
-            grow={false}
-            style={{ alignSelf: 'center', marginInline: 0 }}
-          >
+        {['syscollector', 'configuration', 'stats'].includes(this.props.section) && (
+          <EuiFlexItem grow={false} style={{ marginTop: 12.25, marginInline: 0 }}>
             <GenerateSyscollectorReportButton agent={this.props.agent} />
           </EuiFlexItem>
         )}
@@ -99,35 +92,23 @@ export class MainModuleAgent extends Component {
 
   render() {
     const { agent, section, selectView } = this.props;
-    const ModuleTabView = (this.props.tabs || []).find(
-      tab => tab.id === selectView,
-    );
+    const ModuleTabView = this.props.tabs?.find((tab) => tab.id === selectView);
+
+    const hasTabs = this.props.tabs?.length;
+
     return (
-      <div
-        className={
-          this.state.showAgentInfo
-            ? 'wz-module wz-module-showing-agent'
-            : 'wz-module'
-        }
-      >
-        {agent && agent.os && (
+      <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
+        {agent?.os && (
           <Fragment>
             <div className='wz-module-header-agent-wrapper'>
               <div className='wz-module-header-agent'>{this.renderTitle()}</div>
             </div>
             <div>
-              <div
-                className={
-                  this.props.tabs &&
-                  this.props.tabs.length &&
-                  'wz-module-header-nav'
-                }
-              >
+              <div className={clsx({ 'wz-module-header-nav': hasTabs })}>
                 {this.state.showAgentInfo && (
                   <div
                     className={clsx('wz-welcome-page-agent-info', {
-                      'wz-welcome-page-agent-info-gray':
-                        this.props.tabs && this.props.tabs.length,
+                      'wz-welcome-page-agent-info-gray': hasTabs,
                     })}
                   >
                     <EuiPanel grow paddingSize='s'>
@@ -140,31 +121,22 @@ export class MainModuleAgent extends Component {
                     </EuiPanel>
                   </div>
                 )}
-                {this.props.tabs && this.props.tabs.length && (
+                {hasTabs && (
                   <div className='wz-welcome-page-agent-tabs'>
                     <EuiFlexGroup>
                       {this.props.renderTabs()}
-                      <EuiFlexItem
-                        grow={false}
-                        style={{ marginTop: 6, marginRight: 5 }}
-                      >
+                      <EuiFlexItem grow={false} style={{ marginTop: 6, marginRight: 5 }}>
                         <EuiFlexGroup>
-                          {ModuleTabView &&
-                            ModuleTabView.buttons &&
-                            ModuleTabView.buttons.map(
-                              (ModuleViewButton, index) =>
-                                typeof ModuleViewButton !== 'string' ? (
-                                  <EuiFlexItem key={`module_button_${index}`}>
-                                    <ModuleViewButton
-                                      {...{
-                                        ...this.props,
-                                        ...this.props.agentsSelectionProps,
-                                      }}
-                                      moduleID={section}
-                                    />
-                                  </EuiFlexItem>
-                                ) : null,
-                            )}
+                          {ModuleTabView?.buttons?.map((ModuleViewButton, index) =>
+                            typeof ModuleViewButton !== 'string' ? (
+                              <EuiFlexItem key={`module_button_${index}`}>
+                                <ModuleViewButton
+                                  {...{ ...this.props, ...this.props.agentsSelectionProps }}
+                                  moduleID={section}
+                                />
+                              </EuiFlexItem>
+                            ) : null,
+                          )}
                         </EuiFlexGroup>
                       </EuiFlexItem>
                     </EuiFlexGroup>
@@ -172,11 +144,9 @@ export class MainModuleAgent extends Component {
                 )}
               </div>
             </div>
-            {!['syscollector', 'configuration'].includes(section) &&
-              ModuleTabView &&
-              ModuleTabView.component && (
-                <ModuleTabView.component {...this.props} moduleID={section} />
-              )}
+            {!['syscollector', 'configuration'].includes(section) && ModuleTabView?.component && (
+              <ModuleTabView.component {...this.props} moduleID={section} />
+            )}
           </Fragment>
         )}
       </div>
@@ -190,10 +160,7 @@ export class AgentInventoryDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-      ...super.getFixedFiltersClusterManager(),
-      ...super.getFixedFilters(),
-    ];
+    return [...super.getFixedFiltersClusterManager(), ...super.getFixedFilters()];
   }
 }
 
@@ -209,9 +176,7 @@ const GenerateSyscollectorReportButton = ({ agent }) => {
 
   const action = useAsyncAction(async () => {
     const reportingService = new ReportingService();
-    const agentID =
-      (agent || store.getState().appStateReducers.currentAgentData || {}).id ||
-      false;
+    const agentID = (agent || store.getState().appStateReducers.currentAgentData || {}).id || false;
     await reportingService.startVis2Png('syscollector', agentID, {
       indexPattern: dataSource?.indexPattern,
       query: { query: '', language: 'kuery' },
