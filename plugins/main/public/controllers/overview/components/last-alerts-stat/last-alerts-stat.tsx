@@ -5,6 +5,7 @@ import {
   EuiLink,
   EuiToolTip,
   EuiText,
+  EuiStatProps,
 } from '@elastic/eui';
 import { getLast24HoursAlerts } from './last-alerts-service';
 import { UI_COLOR_STATUS } from '../../../../../common/constants';
@@ -22,7 +23,7 @@ import {
 
 type SeverityKey = 'low' | 'medium' | 'high' | 'critical';
 
-const severities = {
+export const severities = {
   low: {
     label: 'Low',
     color: UI_COLOR_STATUS.success,
@@ -59,8 +60,14 @@ const severities = {
 
 export function LastAlertsStat({
   severity: severityKey,
+  hideBottomText,
+  direction = 'row',
+  textAlign = 'center',
 }: {
   severity: SeverityKey;
+  hideBottomText?: boolean;
+  direction: 'row' | 'column';
+  textAlign?: EuiStatProps['textAlign'];
 }) {
   const [countLastAlerts, setCountLastAlerts] = useState<number | null>(null);
   const [discoverLocation, setDiscoverLocation] = useState<string>('');
@@ -117,6 +124,13 @@ export function LastAlertsStat({
     getCountLastAlerts();
   }, []);
 
+  const statDescription =
+    direction === 'row' ? `${severity.label} severity` : '';
+  const statValue =
+    direction === 'row'
+      ? `${countLastAlerts ?? '-'}`
+      : ` ${countLastAlerts ?? '-'} ${severity.label}`;
+
   return (
     <EuiFlexItem>
       <RedirectAppLinks application={getCore().application}>
@@ -141,22 +155,24 @@ export function LastAlertsStat({
                 }}
                 href={discoverLocation}
               >
-                {countLastAlerts ?? '-'}
+                {statValue}
               </EuiLink>
             </EuiToolTip>
           }
-          description={`${severity.label} severity`}
+          description={statDescription}
           descriptionElement='h3'
           titleColor={severity.color}
-          textAlign='center'
+          textAlign={textAlign}
         />
-        <EuiText size='s' css='margin-top: 0.7vh'>
-          {'Rule level ' +
-            ruleLevelRange.minRuleLevel +
-            (ruleLevelRange.maxRuleLevel
-              ? ' to ' + ruleLevelRange.maxRuleLevel
-              : ' or higher')}
-        </EuiText>
+        {hideBottomText ? null : (
+          <EuiText size='s' css='margin-top: 0.7vh'>
+            {'Rule level ' +
+              ruleLevelRange.minRuleLevel +
+              (ruleLevelRange.maxRuleLevel
+                ? ' to ' + ruleLevelRange.maxRuleLevel
+                : ' or higher')}
+          </EuiText>
+        )}
       </RedirectAppLinks>
     </EuiFlexItem>
   );

@@ -24,7 +24,7 @@ export async function validateVulnerabilitiesStateDataSources({
     const existIndexPattern = await existsIndexPattern(indexPatternID);
     const indexPattern = existIndexPattern;
 
-    // If the idnex pattern does not exist, then check the existence of index
+    // If the index pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND) {
       // Check the existence of indices
       const { exist, fields } = await existsIndices(indexPatternID);
@@ -41,7 +41,7 @@ export async function validateVulnerabilitiesStateDataSources({
           },
         };
       }
-      // If the some index match the index pattern, then create the index pattern
+      // If some index matches the index pattern, then create the index pattern
       const resultCreateIndexPattern = await createIndexPattern(
         indexPatternID,
         fields,
@@ -57,14 +57,6 @@ export async function validateVulnerabilitiesStateDataSources({
           },
         };
       }
-      /* WORKAROUND: Redirect to the root of Vulnerabilities Detection application that should
-        redirects to the Dashboard tab. We want to redirect to this view, because we need the
-        component is visible (visualizations) to ensure the process that defines the filters for the
-        Events tab is run when the Dashboard component is unmounted. This workaround solves a
-        problem in the Events tabs related there are no implicit filters when accessing if the HOC
-        that protect the view is passed.
-      */
-      NavigationService.getInstance().navigateToApp(vulnerabilityDetection.id);
     }
     return {
       ok: false,
