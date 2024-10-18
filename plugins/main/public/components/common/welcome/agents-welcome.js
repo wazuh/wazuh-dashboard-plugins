@@ -325,7 +325,7 @@ export const AgentsWelcome = compose(
           </EuiFlexItem>
           <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
             <EuiFlexGroup responsive={false} gutterSize='none'>
-              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+              <EuiFlexItem grow={false} style={{ marginTop: 7, marginRight: '0.5rem' }}>
                 <ButtonExploreAgent />
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
