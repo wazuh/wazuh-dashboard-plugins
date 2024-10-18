@@ -16,7 +16,7 @@ import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
 import { connect } from 'react-redux';
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   agent: state.appStateReducers.currentAgentData,
 });
 
@@ -34,43 +34,22 @@ export const MainModuleOverview = connect(mapStateToProps)(
 
     async componentDidMount() {
       // Redirect to the initial tab view if the selected is not available for the module
-      if (
-        !this.props.module.tabs
-          .map(({ id }) => id)
-          .includes(this.props.selectView)
-      ) {
+      if (!this.props.module.tabs.map(({ id }) => id).includes(this.props.selectView)) {
         this.props.onSelectedTabChanged(this.props.module.init);
       }
     }
 
     render() {
       const { section, selectView } = this.props;
-      const ModuleTabView = (this.props.tabs || []).find(
-        tab => tab.id === selectView,
-      );
+      const ModuleTabView = (this.props.tabs || []).find((tab) => tab.id === selectView);
       return (
-        <div
-          className={
-            this.state.showAgentInfo
-              ? 'wz-module wz-module-showing-agent'
-              : 'wz-module'
-          }
-        >
-          <div
-            className={
-              this.props.tabs &&
-              this.props.tabs.length &&
-              'wz-module-header-nav'
-            }
-          >
+        <div className={this.state.showAgentInfo ? 'wz-module wz-module-showing-agent' : 'wz-module'}>
+          <div className={this.props.tabs && this.props.tabs.length && 'wz-module-header-nav'}>
             {this.props.tabs && this.props.tabs.length && (
               <div className='wz-welcome-page-agent-tabs'>
                 <EuiFlexGroup>
                   {this.props.renderTabs()}
-                  <EuiFlexItem
-                    grow={false}
-                    style={{ marginTop: 6.25, marginRight: 5 }}
-                  >
+                  <EuiFlexItem grow={false} style={{ marginTop: 6.25, marginRight: 5 }}>
                     <EuiFlexGroup>
                       {ModuleTabView &&
                         ModuleTabView.buttons &&

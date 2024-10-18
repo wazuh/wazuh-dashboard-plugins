@@ -29,8 +29,7 @@ html {
 }
 
 .wz-md-card:not(.wz-metric-color) {
-  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3),
-    0 1px 5px -2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3), 0 1px 5px -2px rgba(0, 0, 0, 0.3);
   background-color: #1d1e24;
   border: 1px solid #343741;
 }
@@ -112,8 +111,7 @@ md-content {
   color: white !important;
 }
 
-.euiBreadcrumbs--truncate
-  .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
+.euiBreadcrumbs--truncate .euiBreadcrumb:not(.euiBreadcrumb--collapsed).euiBreadcrumb--last,
 .euiNavDrawerGroup__item .euiListGroupItem__label,
 .euiNavDrawer .euiNavDrawer__expandButton .euiListGroupItem__button {
   color: #dfe5ef;
@@ -389,8 +387,8 @@ md-divider {
 
 .wz-search-bar > div > div > div.euiComboBox__inputWrap {
   background: #16171c !important;
-  box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2),
-    0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2), 0 3px 2px -2px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.1) !important;
 }
 
 .euiComboBoxPlaceholder {
@@ -448,7 +446,6 @@ svg .legend text {
 /* Vulnerabilities under evaluation filter */
 .button-group-filter {
   .euiButtonGroup__buttons {
-    box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2),
-      0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px #424752 !important;
+    box-shadow: 0 1px 1px -1px rgba(0, 0, 0, 0.2), 0 3px 2px -2px rgba(0, 0, 0, 0.2), inset 0 0 0 1px #424752 !important;
   }
 }

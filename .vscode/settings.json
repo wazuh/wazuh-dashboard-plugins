@@ -6,9 +6,7 @@
   "editor.inlineSuggest.enabled": true,
   "editor.insertSpaces": true,
   "editor.minimap.enabled": true,
-  "editor.rulers": [
-    110
-  ],
+  "editor.rulers": [110],
   "editor.tabSize": 2,
   "editor.trimAutoWhitespace": true,
   "editor.wordWrap": "on",

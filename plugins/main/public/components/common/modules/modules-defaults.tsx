@@ -18,10 +18,7 @@ import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import { withModuleNotForAgent } from '../hocs';
-import {
-  WazuhDiscover,
-  WazuhDiscoverProps,
-} from '../wazuh-discover/wz-discover';
+import { WazuhDiscover, WazuhDiscoverProps } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import React from 'react';
