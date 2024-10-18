@@ -53,6 +53,7 @@ import { EventsCount } from './dashboard/events-count';
 import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import NavigationService from '../../../react-services/navigation-service';
+import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 
 export const AgentsWelcome = compose(
   withErrorBoundary,
@@ -302,7 +303,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='inspect'
-                  onClick={() => this.props.switchTab('syscollector')}
+                  onClick={() => this.props.switchTab(AgentTabs.SOFTWARE)}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -317,7 +318,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='stats'
-                  onClick={() => this.props.switchTab('stats')}
+                  onClick={() => this.props.switchTab(AgentTabs.STATS)}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null ? { position: 'bottom', content: 'Stats' } : undefined
@@ -330,7 +331,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='gear'
-                  onClick={() => this.props.switchTab('configuration')}
+                  onClick={() => this.props.switchTab(AgentTabs.CONFIGURATION)}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
