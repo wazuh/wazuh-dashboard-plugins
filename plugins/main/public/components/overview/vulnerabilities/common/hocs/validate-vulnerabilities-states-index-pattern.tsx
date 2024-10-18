@@ -18,7 +18,7 @@ const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
 export async function validateVulnerabilitiesStateDataSources({
   vulnerabilitiesStatesindexPatternID: indexPatternID,
-  notRedirect = false,
+  redirect = true,
 }) {
   try {
     // Check the existence of related index pattern
@@ -65,7 +65,7 @@ export async function validateVulnerabilitiesStateDataSources({
         problem in the Events tabs related there are no implicit filters when accessing if the HOC
         that protect the view is passed.
       */
-      if (!notRedirect) {
+      if (redirect) {
         NavigationService.getInstance().navigateToApp(vulnerabilityDetection.id);
       }
     }
