@@ -13,12 +13,13 @@
  */
 import React, { Component, Fragment } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiBadge } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
-import { formatUIDate } from '../../../react-services/time-service';
-import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
-import { WzStat } from '../../wz-stat';
-import { GroupTruncate } from '../util/agent-group-truncate';
-import { AgentStatus } from '../../agents/agent-status';
+import { WzRequest } from '../../../../react-services/wz-request';
+import { formatUIDate } from '../../../../react-services/time-service';
+import WzTextWithTooltipIfTruncated from '../../wz-text-with-tooltip-if-truncated';
+import { WzStat } from '../../../wz-stat';
+import { GroupTruncate } from '../../util/agent-group-truncate';
+import { AgentStatus } from '../../../agents/agent-status';
+import './agent-info.scss';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -107,11 +108,11 @@ export class AgentInfo extends Component {
           ? { anchorClassName: 'wz-width-100' }
           : {};
       return (
-        <EuiFlexItem key={item.description} style={item.style || null}>
+        <EuiFlexItem className="wz-agent-info" key={item.description} style={item.style || null}>
           <WzStat
             title={
               item.description === 'Groups' &&
-              this.props.agent.group?.length ? (
+                this.props.agent.group?.length ? (
                 <GroupTruncate
                   agent={this.props.agent}
                   groups={this.props.agent.group}
