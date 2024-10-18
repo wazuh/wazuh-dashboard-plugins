@@ -11,11 +11,16 @@ import {
 } from '../common/constants';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
+import { CoreServerSecurity } from './services';
+import { BehaviorSubject } from 'rxjs';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
   _internal: { [key: string]: any } = {};
+  runtime: { [key: string]: any } = {
+    setup: {},
+  };
   services: { [key: string]: any } = {};
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     const noop = () => {};
@@ -46,12 +51,54 @@ export class WazuhCorePlugin
 
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
+    // TODO: replace by the current session data
+    let userSessionData = {
+      account: {
+        administrator: false,
+        administrator_requirements: '',
+      },
+      policies: { rbac_mode: 'white' },
+    };
+    const userSession$ = new BehaviorSubject(userSessionData);
+
+    this.services.serverSecurity = new CoreServerSecurity(logger, {
+      getUserPermissions: () => {}, // TODO: implement
+    });
+
     await this.services.dashboardSecurity.setup();
+
+    this.runtime.securityServer = this.services.serverSecurity.setup({
+      userSession$: userSession$, // TODO: replace
+      getUserSession: () => userSessionData, // TODO: replace
+      useLoadingLogo: () => {
+        // TODO: implement
+        // const {
+        //   ['customization.logo.app']: customlogoApp,
+        //   ['customization.enabled']: customizationEnabled,
+        // } = useConfiguration();
+        // const customImage = customizationEnabled && customlogoApp;
+        // const imageSrc = getHttp().basePath.prepend(
+        //   customImage
+        //     ? getAssetURL(customImage)
+        //     : getThemeAssetURL('logo.svg'),
+        // );
+      },
+    });
 
     return {
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
+      hooks: {
+        ...hooks,
+        ...this.runtime.setup.securityServer.hooks,
+      },
+      hocs: {
+        ...this.runtime.setup.securityServer.hocs,
+      },
+      ui: {
+        ...this.runtime.setup.securityServer.ui,
+      },
     };
   }
 
@@ -66,7 +113,16 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
-      hooks,
+      hooks: {
+        ...hooks,
+        ...this.runtime.setup.securityServer.hooks,
+      },
+      hocs: {
+        ...this.runtime.setup.securityServer.hocs,
+      },
+      ui: {
+        ...this.runtime.setup.securityServer.ui,
+      },
     };
   }
 
