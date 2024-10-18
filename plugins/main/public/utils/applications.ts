@@ -83,10 +83,10 @@ export const fileIntegrityMonitoring = {
 };
 
 export const endpointSummary = {
-  category: 'wz-category-server-management',
+  category: 'wz-category-agents-management',
   id: 'endpoints-summary',
   title: i18n.translate('wz-app-endpoints-summary-title', {
-    defaultMessage: 'Endpoints Summary',
+    defaultMessage: 'Summary',
   }),
   breadcrumbLabel: i18n.translate('wz-app-endpoints-summary-breadcrumbLabel', {
     defaultMessage: 'Endpoints',
@@ -542,7 +542,7 @@ export const cdbLists = {
 };
 
 export const endpointGroups = {
-  category: 'wz-category-server-management',
+  category: 'wz-category-agents-management',
   id: 'endpoint-groups',
   title: i18n.translate('wz-app-endpoint-groups-title', {
     defaultMessage: 'Endpoint Groups',
@@ -898,11 +898,19 @@ export const Categories = [
     euiIconType: 'watchesApp',
   },
   {
+    id: 'wz-category-agents-management',
+    label: i18n.translate('wz-app-category-agents-management', {
+      defaultMessage: 'Agents management',
+    }),
+    order: 600,
+    euiIconType: 'indexRollupApp',
+  },
+  {
     id: 'wz-category-server-management',
     label: i18n.translate('wz-app-category-server-management', {
       defaultMessage: 'Server management',
     }),
-    order: 600,
+    order: 700,
     euiIconType: 'indexRollupApp',
   },
   {
