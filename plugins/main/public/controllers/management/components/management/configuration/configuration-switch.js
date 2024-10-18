@@ -87,7 +87,7 @@ import { PromptNoActiveAgentWithoutSelect } from '../../../../../components/agen
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { endpointGroups } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { AgentInfo } from '../../../../../components/common/welcome/agents-info';
+import { AgentInfo } from '../../../../../components/common/welcome/agent-info/agents-info';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -216,7 +216,7 @@ class WzConfigurationSwitch extends Component {
               {...this.props}
             ></AgentInfo>
           </EuiPanel>
-          <EuiSpacer />
+          <EuiSpacer size="xxl" />
           <EuiPanel>
             {agent.id !== '000' && agent.group && agent.group.length ? (
               <Fragment>

@@ -46,7 +46,7 @@ import {
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
-import { AgentInfo } from '../../common/welcome/agents-info';
+import { AgentInfo } from '../../common/welcome/agent-info/agents-info';
 
 const tableColumns = [
   {
@@ -195,7 +195,7 @@ function AgentStats(props) {
             {...props}
           ></AgentInfo>
         </EuiPanel>
-        <EuiSpacer />
+        <EuiSpacer size='xxl' />
         <EuiFlexGroup>
           <EuiFlexItem>
             <AgentStatTable
