@@ -30,15 +30,14 @@ export class ApiCheck {
       const url = getHttp().basePath.prepend('/api/check-stored-api');
       const options = {
         method: 'POST',
-        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
+        headers: {
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+          'content-type': 'application/json',
+        },
         url: url,
         data: payload,
-        timeout: timeout || 20000
+        timeout: timeout || 20000,
       };
-
-      if (Object.keys(configuration).length) {
-        AppState.setPatternSelector(configuration['ip.selector']);
-      }
 
       const response = await request(options);
 
@@ -55,8 +54,10 @@ export class ApiCheck {
         return Promise.reject(this.returnErrorInstance(response));
       } else {
         return (err || {}).message || false
-          ? Promise.reject(this.returnErrorInstance(err,err.message))
-          : Promise.reject(this.returnErrorInstance(err,err || 'Server did not respond'));
+          ? Promise.reject(this.returnErrorInstance(err, err.message))
+          : Promise.reject(
+              this.returnErrorInstance(err, err || 'Server did not respond'),
+            );
       }
     }
   }
@@ -65,7 +66,7 @@ export class ApiCheck {
    * Check the status of an API entry
    * @param {String} apiObject
    */
-  static async checkApi(apiEntry, forceRefresh=false) {
+  static async checkApi(apiEntry, forceRefresh = false) {
     try {
       const wazuhConfig = new WazuhConfig();
       const { timeout } = wazuhConfig.getConfig();
@@ -73,10 +74,13 @@ export class ApiCheck {
 
       const options = {
         method: 'POST',
-        headers: { ...PLUGIN_PLATFORM_REQUEST_HEADERS, 'content-type': 'application/json' },
+        headers: {
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+          'content-type': 'application/json',
+        },
         url: url,
-        data: {...apiEntry, forceRefresh},
-        timeout: timeout || 20000
+        data: { ...apiEntry, forceRefresh },
+        timeout: timeout || 20000,
       };
 
       const response = await request(options);
@@ -92,23 +96,25 @@ export class ApiCheck {
         return Promise.reject(this.returnErrorInstance(response));
       } else {
         return (err || {}).message || false
-          ? Promise.reject(this.returnErrorInstance(err,err.message))
-          : Promise.reject(this.returnErrorInstance(err,err || 'Server did not respond'));
+          ? Promise.reject(this.returnErrorInstance(err, err.message))
+          : Promise.reject(
+              this.returnErrorInstance(err, err || 'Server did not respond'),
+            );
       }
     }
   }
 
-    /**
+  /**
    * Customize message and return an error object
-   * @param error 
-   * @param message 
+   * @param error
+   * @param message
    * @returns error
    */
-    static returnErrorInstance(error, message){
-      if(!error || typeof error === 'string'){
-        return new Error(message || error);
-      }
-      error.message = message
-      return error
+  static returnErrorInstance(error, message) {
+    if (!error || typeof error === 'string') {
+      return new Error(message || error);
     }
+    error.message = message;
+    return error;
+  }
 }

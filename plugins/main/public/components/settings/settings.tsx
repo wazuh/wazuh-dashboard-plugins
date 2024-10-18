@@ -299,8 +299,6 @@ class SettingsComponent extends React.Component {
       };
 
       this.setState({ load: false });
-      // TODO: this seems not to be used to display or not the index pattern selector
-      AppState.setPatternSelector(this.props.configurationIPSelector);
       const pattern = AppState.getCurrentPattern();
 
       this.getCurrentAPIIndex();
