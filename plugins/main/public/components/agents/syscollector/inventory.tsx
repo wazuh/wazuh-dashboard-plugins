@@ -11,8 +11,13 @@
  */
 
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiCallOut } from '@elastic/eui';
-import { InventoryMetrics } from './components/syscollector-metrics';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiCallOut,
+  EuiPanel,
+  EuiSpacer,
+} from '@elastic/eui';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { compose } from 'redux';
 import { withGuard } from '../../common/hocs';
@@ -25,6 +30,7 @@ import {
   ProcessesTable,
   PackagesTable,
 } from './components';
+import { AgentInfo } from '../../common/welcome/agent-info/agents-info';
 
 export const SyscollectorInventory = compose(
   withGuard(
@@ -33,7 +39,8 @@ export const SyscollectorInventory = compose(
       props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     PromptAgentNeverConnected,
   ),
-)(function SyscollectorInventory({ agent }) {
+)(function SyscollectorInventory(props) {
+  const { agent } = props;
   let soPlatform;
   if (agent?.os?.uname?.includes('Linux')) {
     soPlatform = 'linux';
@@ -50,16 +57,22 @@ export const SyscollectorInventory = compose(
   return (
     <div style={{ overflow: 'hidden', margin: '12px 16px 12px 16px' }}>
       {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
-            <EuiCallOut
-              title='This agent is currently disconnected, the data may be outdated.'
-              iconType='iInCircle'
-            />
+        <EuiCallOut
+          title='This agent is currently disconnected, the data may be outdated.'
+          iconType='iInCircle'
+        />
       )}
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem>
-          <InventoryMetrics agent={agent}></InventoryMetrics>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+
+      <EuiPanel grow paddingSize='s'>
+        <AgentInfo
+          agent={props.agent}
+          isCondensed={false}
+          hideActions={true}
+          {...props}
+        ></AgentInfo>
+      </EuiPanel>
+
+      <EuiSpacer size="xxl" />
 
       <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem grow={2}>
@@ -81,9 +94,9 @@ export const SyscollectorInventory = compose(
         )}
       </EuiFlexGroup>
 
-          <PackagesTable agent={agent} soPlatform={soPlatform} />
+      <PackagesTable agent={agent} soPlatform={soPlatform} />
 
-          <ProcessesTable agent={agent} soPlatform={soPlatform} />
+      <ProcessesTable agent={agent} soPlatform={soPlatform} />
     </div>
   );
 });
