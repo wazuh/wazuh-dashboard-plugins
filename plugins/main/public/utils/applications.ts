@@ -898,17 +898,17 @@ export const Categories = [
     euiIconType: 'watchesApp',
   },
   {
-    id: 'wz-category-server-management',
-    label: i18n.translate('wz-app-category-server-management', {
-      defaultMessage: 'Server management',
+    id: 'wz-category-agents-management',
+    label: i18n.translate('wz-app-category-agents-management', {
+      defaultMessage: 'Agents management',
     }),
     order: 600,
     euiIconType: 'indexRollupApp',
   },
   {
-    id: 'wz-category-agents-management',
-    label: i18n.translate('wz-app-category-agents-management', {
-      defaultMessage: 'Agents management',
+    id: 'wz-category-server-management',
+    label: i18n.translate('wz-app-category-server-management', {
+      defaultMessage: 'Server management',
     }),
     order: 700,
     euiIconType: 'indexRollupApp',
