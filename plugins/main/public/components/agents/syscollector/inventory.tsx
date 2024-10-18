@@ -11,14 +11,7 @@
  */
 
 import React from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiCallOut,
-  EuiPanel,
-  EuiSpacer,
-  EuiPage,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiPanel, EuiSpacer, EuiPage } from '@elastic/eui';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { compose } from 'redux';
 import { withGuard } from '../../common/hocs';
@@ -56,15 +49,23 @@ export const SyscollectorInventory = compose(
   return (
     <EuiPage paddingSize='m' direction='column' style={{ overflow: 'hidden' }}>
       {agent?.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
+        <EuiFlexGroup direction='column' gutterSize='s'>
+          <EuiFlexItem>
         <EuiCallOut
           title='This agent is currently disconnected, the data may be outdated.'
           iconType='iInCircle'
         />
+          </EuiFlexItem>
+        </EuiFlexGroup>
       )}
 
+      <EuiFlexGroup direction='column' gutterSize='s'>
+        <EuiFlexItem>
       <EuiPanel grow paddingSize='s'>
-        <AgentInfo agent={props.agent} isCondensed={false} hideActions={true} {...props}></AgentInfo>
-      </EuiPanel>
+            <AgentInfo agent={props.agent} isCondensed={false} hideActions={true} {...props}></AgentInfo>
+          </EuiPanel>
+        </EuiFlexItem>
+      </EuiFlexGroup>
 
       <EuiSpacer size='xxl' />
 
