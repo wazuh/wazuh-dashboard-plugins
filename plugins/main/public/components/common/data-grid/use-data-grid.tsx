@@ -261,5 +261,6 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       onChangeItemsPerPage: onChangeItemsPerPage,
       onChangePage: onChangePage,
     },
+    setPagination,
   } as EuiDataGridProps;
 };

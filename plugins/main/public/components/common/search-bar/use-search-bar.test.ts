@@ -16,6 +16,8 @@ import { getDataPlugin } from '../../../kibana-services';
 import * as timeFilterHook from '../hooks/use-time-filter';
 import * as queryManagerHook from '../hooks/use-query';
 import { AppState } from '../../../react-services/app-state';
+import NavigationService from '../../../react-services/navigation-service';
+import { createHashHistory, History } from 'history';
 
 /**
  * Mocking Data Plugin
@@ -23,8 +25,12 @@ import { AppState } from '../../../react-services/app-state';
 jest.mock('../../../kibana-services', () => {
   return {
     getDataPlugin: jest.fn(),
+    getUiSettings: jest.fn().mockImplementation(() => ({
+      get: () => true,
+    })),
   };
 });
+
 /* using osd mock utils */
 const mockDataPlugin = dataPluginMock.createStartContract();
 const mockedGetDataPlugin = getDataPlugin as jest.Mock<Start>;
@@ -42,10 +48,25 @@ mockedGetDataPlugin.mockImplementation(
               unsubscribe: jest.fn(),
             })),
           },
+          timefilter: {
+            ...mockDataPlugin.query.queryString.timefilter,
+            timefilter: {
+              getRefreshInterval: jest.fn().mockImplementation(() => ({
+                value: 0,
+                pause: false,
+              })),
+              getAutoRefreshFetch$: jest.fn().mockImplementation(() => ({
+                subscribe: jest
+                  .fn()
+                  .mockImplementation(() => ({ unsubscribe: jest.fn() })),
+              })),
+            },
+          },
         },
       },
     } as Start),
 );
+
 ///////////////////////////////////////////////////////////
 
 const mockedDefaultIndexPatternData: Partial<IndexPattern> = {
@@ -55,6 +76,9 @@ const mockedDefaultIndexPatternData: Partial<IndexPattern> = {
 };
 
 describe('[hook] useSearchBarConfiguration', () => {
+  let history: History;
+  let navigationService: NavigationService;
+
   beforeAll(() => {
     /***** mock use-time-filter hook *****/
     const spyUseTimeFilter = jest.spyOn(timeFilterHook, 'useTimeFilter');
@@ -76,6 +100,11 @@ describe('[hook] useSearchBarConfiguration', () => {
     spyUseQueryManager.mockImplementation(() => [mockQueryResult, jest.fn()]);
   });
 
+  beforeEach(() => {
+    history = createHashHistory();
+    navigationService = NavigationService.getInstance(history);
+  });
+
   it('should return default app index pattern when not receiving a default index pattern', async () => {
     jest
       .spyOn(AppState, 'getCurrentPattern')
@@ -87,7 +116,11 @@ describe('[hook] useSearchBarConfiguration', () => {
       .spyOn(mockDataPlugin.query.filterManager, 'getFilters')
       .mockReturnValue([]);
     // @ts-ignore
-    const { result, waitForNextUpdate } = renderHook(() => useSearchBar({}));
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useSearchBar({
+        setFilters: jest.fn(),
+      }),
+    );
     await waitForNextUpdate();
     expect(mockDataPlugin.indexPatterns.getDefault).toBeCalled();
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([
