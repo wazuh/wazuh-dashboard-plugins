@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress, EuiLink } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
-import { Agent } from '../types';
 import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
