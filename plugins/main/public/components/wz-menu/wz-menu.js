@@ -26,11 +26,7 @@ import { PatternHandler } from '../../react-services/pattern-handler';
 import { WazuhConfig } from '../../react-services/wazuh-config';
 import { connect } from 'react-redux';
 import store from '../../redux/store';
-import {
-  getToasts,
-  getDataPlugin,
-  getHeaderActionMenuMounter,
-} from '../../kibana-services';
+import { getToasts, getDataPlugin, getHeaderActionMenuMounter } from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
@@ -42,17 +38,6 @@ import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../react-services/navigation-service';
-
-const sections = {
-  overview: 'overview',
-  manager: 'manager',
-  'agents-preview': 'agents-preview',
-  agents: 'agents-preview',
-  settings: 'settings',
-  'wazuh-dev': 'wazuh-dev',
-  'health-check': 'health-check',
-  security: 'security',
-};
 
 export const WzMenu = withWindowSize(
   class WzMenu extends Component {
@@ -86,7 +71,7 @@ export const WzMenu = withWindowSize(
         this.setState({ APIlist: APIlist });
         if (APIlist.length) {
           const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
-          const filteredApi = APIlist.filter(api => api.id === apiId);
+          const filteredApi = APIlist.filter((api) => api.id === apiId);
           const selectedApi = filteredApi[0];
           if (selectedApi) {
             const apiData = await ApiCheck.checkStored(selectedApi.id);
@@ -136,10 +121,7 @@ export const WzMenu = withWindowSize(
         if (!list) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
           (list = list.filter(
-            indexPattern =>
-              !this.props?.appConfig?.data?.['ip.ignore'].includes(
-                indexPattern.title,
-              ),
+            (indexPattern) => !this.props?.appConfig?.data?.['ip.ignore'].includes(indexPattern.title),
           ));
 
         // When not exists patterns, not show the selector
@@ -151,15 +133,11 @@ export const WzMenu = withWindowSize(
           AppState.setCurrentPattern(list[0].id);
         } else {
           // Check if the current pattern cookie is valid
-          filtered = list.find(item =>
-            item.id.includes(AppState.getCurrentPattern()),
-          );
+          filtered = list.find((item) => item.id.includes(AppState.getCurrentPattern()));
           if (!filtered) AppState.setCurrentPattern(list[0].id);
         }
 
-        const data = filtered
-          ? filtered
-          : await this.indexPatterns.get(AppState.getCurrentPattern());
+        const data = filtered ? filtered : await this.indexPatterns.get(AppState.getCurrentPattern());
         newState = {
           ...newState,
           theresPattern: true,
@@ -198,20 +176,11 @@ export const WzMenu = withWindowSize(
       if ((!currentAPI && apiId) || apiId !== currentAPI) {
         newState = { ...newState, currentAPI: apiId };
       } else {
-        if (
-          currentAPI &&
-          this.props.state.currentAPI &&
-          currentAPI !== this.props.state.currentAPI
-        ) {
+        if (currentAPI && this.props.state.currentAPI && currentAPI !== this.props.state.currentAPI) {
           newState = { ...newState, currentAPI: this.props.state.currentAPI };
         }
       }
-      if (
-        !_.isEqual(
-          prevProps?.appConfig?.data?.['ip.ignore'],
-          this.props?.appConfig?.data?.['ip.ignore'],
-        )
-      ) {
+      if (!_.isEqual(prevProps?.appConfig?.data?.['ip.ignore'], this.props?.appConfig?.data?.['ip.ignore'])) {
         newState = { ...newState, ...(await this.loadIndexPatternsList()) };
       }
 
@@ -245,10 +214,7 @@ export const WzMenu = withWindowSize(
         if (!list || (list && !list.length)) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
           (list = list.filter(
-            indexPattern =>
-              !this.props?.appConfig?.data?.['ip.ignore'].includes(
-                indexPattern.title,
-              ),
+            (indexPattern) => !this.props?.appConfig?.data?.['ip.ignore'].includes(indexPattern.title),
           ));
 
         let filtered = false;
@@ -257,15 +223,11 @@ export const WzMenu = withWindowSize(
           AppState.setCurrentPattern(list[0].id);
         } else {
           // Check if the current pattern cookie is valid
-          filtered = list.filter(item =>
-            item.id.includes(AppState.getCurrentPattern()),
-          );
+          filtered = list.filter((item) => item.id.includes(AppState.getCurrentPattern()));
           if (!filtered.length) AppState.setCurrentPattern(list[0].id);
         }
 
-        const data = filtered
-          ? filtered
-          : await this.indexPatterns.get(AppState.getCurrentPattern());
+        const data = filtered ? filtered : await this.indexPatterns.get(AppState.getCurrentPattern());
         newState = {
           ...newState,
           theresPattern: true,
@@ -307,24 +269,22 @@ export const WzMenu = withWindowSize(
       });
     };
 
-    changeAPI = async event => {
+    changeAPI = async (event) => {
       try {
         const apiId = event.target[event.target.selectedIndex];
-        const apiEntry = this.state.APIlist.filter(item => {
+        const apiEntry = this.state.APIlist.filter((item) => {
           return item.id === apiId.value;
         });
         const response = await ApiCheck.checkApi(apiEntry[0]);
         const clusterInfo = response.data || {};
-        const apiData = this.state.APIlist.filter(item => {
+        const apiData = this.state.APIlist.filter((item) => {
           return item.id === apiId.value;
         });
 
         apiData[0].cluster_info = clusterInfo;
 
         AppState.setClusterInfo(apiData[0].cluster_info);
-        AppState.setCurrentAPI(
-          JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
-        );
+        AppState.setCurrentAPI(JSON.stringify({ name: apiData[0].manager, id: apiId.value }));
         const isPinnedAgent = this.pinnedAgentManager.isPinnedAgent();
         if (isPinnedAgent) {
           this.pinnedAgentManager.unPinAgent();
@@ -357,11 +317,7 @@ export const WzMenu = withWindowSize(
       const container = document.getElementsByClassName('wazuhNotReadyYet');
       return ReactDOM.createPortal(
         <EuiCallOut title={this.props.state.wazuhNotReadyYet} color='warning'>
-          <EuiFlexGroup
-            responsive={false}
-            direction='row'
-            style={{ maxHeight: '40px', marginTop: '-45px' }}
-          >
+          <EuiFlexGroup responsive={false} direction='row' style={{ maxHeight: '40px', marginTop: '-45px' }}>
             <EuiFlexItem>
               <p></p>
             </EuiFlexItem>
@@ -374,8 +330,7 @@ export const WzMenu = withWindowSize(
                   </p>
                 </EuiFlexItem>
               )}
-            {this.props.state.wazuhNotReadyYet ===
-              'Server could not be recovered.' && (
+            {this.props.state.wazuhNotReadyYet === 'Server could not be recovered.' && (
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
@@ -408,7 +363,7 @@ export const WzMenu = withWindowSize(
               <EuiSelect
                 id='selectAPIBar'
                 fullWidth={true}
-                options={this.state.APIlist.map(item => {
+                options={this.state.APIlist.map((item) => {
                   return { value: item.id, text: item.id };
                 })}
                 value={this.state.currentAPI}
@@ -421,7 +376,7 @@ export const WzMenu = withWindowSize(
       );
     }
 
-    onChangePattern = async pattern => {
+    onChangePattern = async (pattern) => {
       try {
         this.setState({ currentSelectedPattern: pattern.id });
         if (this.state.currentMenuTab !== 'wazuh-dev') {
@@ -464,10 +419,7 @@ export const WzMenu = withWindowSize(
           </EuiFlexItem>
           <EuiFlexItem grow={this.showSelectorsInPopover}>
             <div style={style}>
-              <WzDataSourceSelector
-                onChange={this.onChangePattern}
-                name='index pattern'
-              />
+              <WzDataSourceSelector onChange={this.onChangePattern} name='index pattern' />
             </div>
           </EuiFlexItem>
         </>
@@ -511,8 +463,7 @@ export const WzMenu = withWindowSize(
                 this.getApiSelectorComponent()}
 
               {this.showSelectorsInPopover &&
-                (this.state.patternList.length > 1 ||
-                  this.state.APIlist.length > 1) && (
+                (this.state.patternList.length > 1 || this.state.APIlist.length > 1) && (
                   <>
                     <EuiFlexItem grow={false}>
                       <EuiPopover
@@ -523,19 +474,12 @@ export const WzMenu = withWindowSize(
                         closePopover={() => this.switchSelectorsPopOver()}
                       >
                         {this.state.patternList.length > 1 && (
-                          <EuiFlexGroup
-                            alignItems='center'
-                            style={{ paddingTop: 5 }}
-                          >
+                          <EuiFlexGroup alignItems='center' style={{ paddingTop: 5 }}>
                             {this.getIndexPatternSelectorComponent()}
                           </EuiFlexGroup>
                         )}
                         {this.state.APIlist.length > 1 && (
-                          <EuiFlexGroup
-                            alignItems='center'
-                            style={{ paddingTop: 5 }}
-                            direction='row'
-                          >
+                          <EuiFlexGroup alignItems='center' style={{ paddingTop: 5 }} direction='row'>
                             {this.getApiSelectorComponent()}
                           </EuiFlexGroup>
                         )}
@@ -543,8 +487,7 @@ export const WzMenu = withWindowSize(
                     </EuiFlexItem>
                   </>
                 )}
-              {this.props.state.wazuhNotReadyYet &&
-                this.buildWazuhNotReadyYet()}
+              {this.props.state.wazuhNotReadyYet && this.buildWazuhNotReadyYet()}
             </EuiFlexGroup>
           </MountPointPortal>
         </>
@@ -553,7 +496,7 @@ export const WzMenu = withWindowSize(
   },
 );
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     state: state.appStateReducers,
     appConfig: state.appConfig,

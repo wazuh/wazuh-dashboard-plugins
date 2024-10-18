@@ -13,12 +13,13 @@
  */
 import React, { Component, Fragment } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiBadge } from '@elastic/eui';
-import { WzRequest } from '../../../react-services/wz-request';
-import { formatUIDate } from '../../../react-services/time-service';
-import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
-import { WzStat } from '../../wz-stat';
-import { GroupTruncate } from '../util/agent-group-truncate';
-import { AgentStatus } from '../../agents/agent-status';
+import { WzRequest } from '../../../../react-services/wz-request';
+import { formatUIDate } from '../../../../react-services/time-service';
+import WzTextWithTooltipIfTruncated from '../../wz-text-with-tooltip-if-truncated';
+import { WzStat } from '../../../wz-stat';
+import { GroupTruncate } from '../../util/agent-group-truncate';
+import { AgentStatus } from '../../../agents/agent-status';
+import './agent-info.scss';
 
 export class AgentInfo extends Component {
   constructor(props) {
@@ -30,8 +31,7 @@ export class AgentInfo extends Component {
   async componentDidMount() {
     const managerVersion = await WzRequest.apiReq('GET', '/', {});
     this.setState({
-      managerVersion:
-        (((managerVersion || {}).data || {}).data || {}).api_version || {},
+      managerVersion: (((managerVersion || {}).data || {}).data || {}).api_version || {},
     });
   }
 
@@ -56,14 +56,12 @@ export class AgentInfo extends Component {
   }
 
   addTextPlatformRender(agent, style) {
-    const checkField = field => {
+    const checkField = (field) => {
       return field !== undefined ? field : '-';
     };
 
     const os_name =
-      checkField(((agent || {}).os || {}).name) +
-      ' ' +
-      checkField(((agent || {}).os || {}).version);
+      checkField(((agent || {}).os || {}).name) + ' ' + checkField(((agent || {}).os || {}).version);
 
     const osName = os_name === '- -' ? '-' : os_name;
 
@@ -97,21 +95,17 @@ export class AgentInfo extends Component {
   }
 
   buildStats(items) {
-    const checkField = field => {
+    const checkField = (field) => {
       return field !== undefined || field ? field : '-';
     };
-    const stats = items.map(item => {
+    const stats = items.map((item) => {
       // We add tooltipProps, so that the ClusterNode and Operating System fields occupy their space and do not exceed this, overlapping with the one on the right
-      const tooltipProps =
-        item.description === 'Cluster node'
-          ? { anchorClassName: 'wz-width-100' }
-          : {};
+      const tooltipProps = item.description === 'Cluster node' ? { anchorClassName: 'wz-width-100' } : {};
       return (
-        <EuiFlexItem key={item.description} style={item.style || null}>
+        <EuiFlexItem className='wz-agent-info' key={item.description} style={item.style || null}>
           <WzStat
             title={
-              item.description === 'Groups' &&
-              this.props.agent.group?.length ? (
+              item.description === 'Groups' && this.props.agent.group?.length ? (
                 <GroupTruncate
                   agent={this.props.agent}
                   groups={this.props.agent.group}
@@ -195,10 +189,7 @@ export class AgentInfo extends Component {
           style: { minWidth: 150 },
         },
         {
-          title:
-            agent.node_name && agent.node_name !== 'unknown'
-              ? agent.node_name
-              : '-',
+          title: agent.node_name && agent.node_name !== 'unknown' ? agent.node_name : '-',
           description: 'Cluster node',
           style: { minWidth: 120 },
         },
@@ -219,11 +210,7 @@ export class AgentInfo extends Component {
 
     return (
       <Fragment>
-        <EuiFlexGroup
-          wrap
-          style={{ responsive: true }}
-          className='wz-welcome-page-agent-info-details'
-        >
+        <EuiFlexGroup wrap style={{ responsive: true }}>
           {stats}
         </EuiFlexGroup>
       </Fragment>
