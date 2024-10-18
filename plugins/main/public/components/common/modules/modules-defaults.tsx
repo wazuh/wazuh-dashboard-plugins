@@ -252,10 +252,7 @@ export const ModulesDefaults = {
         /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
         buttons: [
           ({ ...props }) => (
-            <ButtonExploreAgent
-              {...props}
-              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
-            />
+            <ButtonExploreAgent {...props} moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN} />
           ),
         ],
       },
@@ -266,10 +263,7 @@ export const ModulesDefaults = {
         /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index patternt wazuh-alerts-* */
         buttons: [
           ({ ...props }) => (
-            <ButtonExploreAgent
-              {...props}
-              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
-            />
+            <ButtonExploreAgent {...props} moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN} />
           ),
         ],
       },
@@ -337,9 +331,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
-          <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
-        ),
+        component: (props) => <ComplianceTable {...props} DataSource={PCIDSSDataSource} />,
       },
       renderDiscoverTab({
         tableColumns: pciColumns,
@@ -361,9 +353,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
-          <ComplianceTable {...props} DataSource={HIPAADataSource} />
-        ),
+        component: (props) => <ComplianceTable {...props} DataSource={HIPAADataSource} />,
       },
       renderDiscoverTab({
         tableColumns: hipaaColumns,
@@ -385,9 +375,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
-          <ComplianceTable {...props} DataSource={NIST80053DataSource} />
-        ),
+        component: (props) => <ComplianceTable {...props} DataSource={NIST80053DataSource} />,
       },
       renderDiscoverTab({
         tableColumns: nistColumns,
@@ -409,9 +397,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
-          <ComplianceTable {...props} DataSource={GDPRDataSource} />
-        ),
+        component: (props) => <ComplianceTable {...props} DataSource={GDPRDataSource} />,
       },
       renderDiscoverTab({
         tableColumns: gdprColumns,
@@ -433,9 +419,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
-          <ComplianceTable {...props} DataSource={TSCDataSource} />
-        ),
+        component: (props) => <ComplianceTable {...props} DataSource={TSCDataSource} />,
       },
       renderDiscoverTab({
         tableColumns: tscColumns,
@@ -444,7 +428,13 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  syscollector: {
+  software: {
+    notModule: true,
+  },
+  network: {
+    notModule: true,
+  },
+  processes: {
     notModule: true,
   },
   configuration: {
