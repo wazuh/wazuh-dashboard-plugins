@@ -27,21 +27,19 @@ import {
   NetworkInterfacesTable,
   NetworkPortsTable,
   NetworkSettingsTable,
-  WindowsUpdatesTable,
   ProcessesTable,
-  PackagesTable,
 } from './components';
 import { AgentInfo } from '../../common/welcome/agent-info/agents-info';
+import Software from './software';
+import Network from './network';
 
 export const SyscollectorInventory = compose(
   withGuard(
-    props =>
-      props.agent &&
-      props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    (props) => props.agent && props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     PromptAgentNeverConnected,
   ),
 )(function SyscollectorInventory(props) {
-  const { agent } = props;
+  const { agent, section } = props;
   let soPlatform;
   if (agent?.os?.uname?.includes('Linux')) {
     soPlatform = 'linux';
@@ -57,7 +55,7 @@ export const SyscollectorInventory = compose(
 
   return (
     <EuiPage paddingSize='m' direction='column' style={{ overflow: 'hidden' }}>
-      {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
+      {agent?.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
         <EuiCallOut
           title='This agent is currently disconnected, the data may be outdated.'
           iconType='iInCircle'
@@ -65,39 +63,14 @@ export const SyscollectorInventory = compose(
       )}
 
       <EuiPanel grow paddingSize='s'>
-        <AgentInfo
-          agent={props.agent}
-          isCondensed={false}
-          hideActions={true}
-          {...props}
-        ></AgentInfo>
+        <AgentInfo agent={props.agent} isCondensed={false} hideActions={true} {...props}></AgentInfo>
       </EuiPanel>
 
       <EuiSpacer size='xxl' />
 
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem grow={2}>
-          <NetworkInterfacesTable agent={agent} />
-        </EuiFlexItem>
-        <EuiFlexItem grow={2}>
-          <NetworkPortsTable agent={agent} soPlatform={soPlatform} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem grow={3}>
-          <NetworkSettingsTable agent={agent} />
-        </EuiFlexItem>
-        {agent && agent.os && agent.os.platform === 'windows' && (
-          <EuiFlexItem grow={1}>
-            <WindowsUpdatesTable agent={agent} />
-          </EuiFlexItem>
-        )}
-      </EuiFlexGroup>
-
-      <PackagesTable agent={agent} soPlatform={soPlatform} />
-
-      <ProcessesTable agent={agent} soPlatform={soPlatform} />
+      {section === 'software' && <Software agent={agent} soPlatform={soPlatform} />}
+      {section === 'network' && <Network agent={agent} soPlatform={soPlatform} />}
+      {section === 'processes' && <ProcessesTable agent={agent} soPlatform={soPlatform} />}
     </EuiPage>
   );
 });
