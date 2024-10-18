@@ -31,7 +31,7 @@ import {
   MitreTopTactics,
   RequirementVis,
 } from './components';
-import { AgentInfo } from './agents-info';
+import { AgentInfo } from './agent-info/agents-info';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker';
