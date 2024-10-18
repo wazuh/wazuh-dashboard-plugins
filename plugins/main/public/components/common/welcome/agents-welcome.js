@@ -273,7 +273,6 @@ export const AgentsWelcome = compose(
     }
 
     renderTitle() {
-      const thereAreAgentSelected = Boolean(this.props.agent?.id);
       // Calculate if the header buttons should display the name or only the icon to be responsive
 
       return (
