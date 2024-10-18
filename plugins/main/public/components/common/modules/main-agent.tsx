@@ -71,7 +71,7 @@ export class MainModuleAgent extends Component {
   renderTitle() {
     return (
       <EuiFlexGroup>
-        <EuiFlexItem className='wz-module-header-agent-title'>
+        <EuiFlexItem>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiTabs>
