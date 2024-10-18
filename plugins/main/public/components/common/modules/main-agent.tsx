@@ -42,6 +42,7 @@ import { useAsyncAction } from '../hooks';
 import NavigationService from '../../../react-services/navigation-service';
 import { toTitleCase } from '../util/change-case';
 import clsx from 'clsx';
+import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -73,17 +74,38 @@ export class MainModuleAgent extends Component {
     return (
       <EuiFlexGroup style={{ marginInline: 8 }}>
         <EuiFlexItem style={{ marginInline: 0 }} grow={false}>
-          <EuiTabs>
-            <EuiTab isSelected={true}>
-              {toTitleCase(this.props.section)}&nbsp;
-              {this.state.loadingReport === true && <EuiLoadingSpinner size='s' />}
-            </EuiTab>
-          </EuiTabs>
+          {this.state.loadingReport ? (
+            <EuiLoadingSpinner size='s' />
+          ) : (
+            <EuiTabs>
+              {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(this.props.section) ? (
+                <>
+                  <EuiTab isSelected={this.props.section === AgentTabs.SOFTWARE}>
+                    {toTitleCase(AgentTabs.SOFTWARE)}&nbsp;
+                  </EuiTab>
+                  <EuiTab isSelected={this.props.section === AgentTabs.NETWORK}>
+                    {toTitleCase(AgentTabs.NETWORK)}&nbsp;
+                  </EuiTab>
+                  <EuiTab isSelected={this.props.section === AgentTabs.PROCESSES}>
+                    {toTitleCase(AgentTabs.PROCESSES)}&nbsp;
+                  </EuiTab>
+                </>
+              ) : (
+                <EuiTab isSelected={true}>{toTitleCase(this.props.section)}&nbsp;</EuiTab>
+              )}
+            </EuiTabs>
+          )}
         </EuiFlexItem>
         <EuiFlexItem />
-        {['syscollector', 'configuration', 'stats'].includes(this.props.section) && (
+        {[
+          AgentTabs.SOFTWARE,
+          AgentTabs.NETWORK,
+          AgentTabs.PROCESSES,
+          AgentTabs.CONFIGURATION,
+          AgentTabs.STATS,
+        ].includes(this.props.section) && (
           <EuiFlexItem grow={false} style={{ marginTop: 13.25, marginInline: 0 }}>
-            <GenerateSyscollectorReportButton agent={this.props.agent} />
+            <GenerateReportButton agent={this.props.agent} />
           </EuiFlexItem>
         )}
       </EuiFlexGroup>
@@ -138,7 +160,7 @@ export class MainModuleAgent extends Component {
                 )}
               </div>
             </div>
-            {!['syscollector', 'configuration'].includes(section) && ModuleTabView?.component && (
+            {[AgentTabs.STATS].includes(section) && ModuleTabView?.component && (
               <ModuleTabView.component {...this.props} moduleID={section} />
             )}
           </Fragment>
@@ -158,7 +180,7 @@ export class AgentInventoryDataSource extends AlertsDataSource {
   }
 }
 
-const GenerateSyscollectorReportButton = ({ agent }) => {
+const GenerateReportButton = ({ agent }) => {
   const {
     dataSource,
     fetchFilters,
