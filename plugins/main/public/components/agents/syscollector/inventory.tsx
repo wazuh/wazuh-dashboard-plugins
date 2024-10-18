@@ -17,6 +17,7 @@ import {
   EuiCallOut,
   EuiPanel,
   EuiSpacer,
+  EuiPage,
 } from '@elastic/eui';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { compose } from 'redux';
@@ -55,7 +56,7 @@ export const SyscollectorInventory = compose(
   }
 
   return (
-    <div style={{ overflow: 'hidden', margin: '12px 16px 12px 16px' }}>
+    <EuiPage paddingSize='m' direction='column' style={{ overflow: 'hidden' }}>
       {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
         <EuiCallOut
           title='This agent is currently disconnected, the data may be outdated.'
@@ -72,7 +73,7 @@ export const SyscollectorInventory = compose(
         ></AgentInfo>
       </EuiPanel>
 
-      <EuiSpacer size="xxl" />
+      <EuiSpacer size='xxl' />
 
       <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem grow={2}>
@@ -97,6 +98,6 @@ export const SyscollectorInventory = compose(
       <PackagesTable agent={agent} soPlatform={soPlatform} />
 
       <ProcessesTable agent={agent} soPlatform={soPlatform} />
-    </div>
+    </EuiPage>
   );
 });
