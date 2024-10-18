@@ -8,7 +8,7 @@ interface NetworkProps {
   soPlatform?: string;
 }
 
-const Network = ({ agent, soPlatform }: NetworkProps) => {
+const NetworkTab = ({ agent, soPlatform }: NetworkProps) => {
   return (
     <EuiFlexGroup direction='column' gutterSize='s'>
       <EuiFlexGroup gutterSize='s'>
@@ -26,4 +26,4 @@ const Network = ({ agent, soPlatform }: NetworkProps) => {
   );
 };
 
-export default Network;
+export default NetworkTab;

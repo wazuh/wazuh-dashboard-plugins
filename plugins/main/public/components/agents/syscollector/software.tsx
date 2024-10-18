@@ -8,7 +8,7 @@ interface SoftwareProps {
   soPlatform?: string;
 }
 
-const Software = ({ agent, soPlatform }: SoftwareProps) => {
+const SoftwareTab = ({ agent, soPlatform }: SoftwareProps) => {
   return (
     <EuiFlexGroup direction='column' gutterSize='s'>
       {agent?.os?.platform === 'windows' && (
@@ -23,4 +23,4 @@ const Software = ({ agent, soPlatform }: SoftwareProps) => {
   );
 };
 
-export default Software;
+export default SoftwareTab;
