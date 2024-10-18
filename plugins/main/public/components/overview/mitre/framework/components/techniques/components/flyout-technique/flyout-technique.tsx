@@ -47,6 +47,7 @@ import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/
 import store from '../../../../../../../../redux/store';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
 import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
+import { setFilters } from '../../../../../../../common/search-bar/set-filters';
 
 type tFlyoutTechniqueProps = {
   currentTechnique: string;
@@ -227,7 +228,14 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   };
 
   const expandedRow = (props: { doc: any; item: any; indexPattern: any }) => {
-    return <TechniqueRowDetails {...props} onRuleItemClick={onItemClick} />;
+    return (
+      <TechniqueRowDetails
+        {...props}
+        onRuleItemClick={onItemClick}
+        filters={[]}
+        setFilters={setFilters(filterManager)}
+      />
+    );
   };
 
   const addRenderColumn = columns => {

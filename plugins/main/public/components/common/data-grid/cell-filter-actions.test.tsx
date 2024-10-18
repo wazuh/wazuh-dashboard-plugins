@@ -61,7 +61,7 @@ describe('cell-filter-actions', () => {
       fireEvent.click(component);
 
       expect(onFilter).toHaveBeenCalledTimes(1);
-      expect(onFilter).toHaveBeenCalledWith(TEST_COLUMN_ID, TEST_VALUE, 'is');
+      expect(onFilter).toHaveBeenCalledWith(TEST_COLUMN_ID, 'is', TEST_VALUE);
     });
   });
 
@@ -102,8 +102,8 @@ describe('cell-filter-actions', () => {
       expect(onFilter).toHaveBeenCalledTimes(1);
       expect(onFilter).toHaveBeenCalledWith(
         TEST_COLUMN_ID,
-        TEST_VALUE,
         'is not',
+        TEST_VALUE,
       );
     });
   });

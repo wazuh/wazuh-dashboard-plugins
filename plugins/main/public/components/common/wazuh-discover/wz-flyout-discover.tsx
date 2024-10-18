@@ -274,7 +274,13 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
         indexPattern,
       })
     ) : (
-      <DocDetails doc={doc} item={item} indexPattern={indexPattern} />
+      <DocDetails
+        doc={doc}
+        item={item}
+        indexPattern={indexPattern}
+        filters={filters}
+        setFilters={setFilters}
+      />
     );
   };
 
