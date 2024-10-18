@@ -8,7 +8,7 @@ import {
   ScopedHistory,
   ToastsStart,
   AppMountParameters,
-} from 'opensearch_dashboards/public';
+} from '../../../src/core/public';
 import { createGetterSetter } from '../../../src/plugins/opensearch_dashboards_utils/common';
 import { DataPublicPluginStart } from '../../../src/plugins/data/public';
 import { VisualizationsStart } from '../../../src/plugins/visualizations/public';

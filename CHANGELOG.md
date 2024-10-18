@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 02
+## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 03
 
 ## Fixed
 
@@ -42,7 +42,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed GET /elastic/statistics API endpoint [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 - Removed VirusTotal application in favor of Malware Detection [#7038](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7038)
 
-## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 03
+## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 04
 
 ### Added
 
@@ -65,6 +65,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed style when unnpinned an agent in endpoint summary section [#7015](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7015)
 - Fixed overflow style on a long value filter [#7021](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7021)
 - Fixed buttons enabled for a readonly user in `Endpoint groups` section [#7056](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7056)
+- Fixed the automatic page refresh in dashboards and prevent duplicate requests [#7090](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7090)
 
 ### Changed
 
@@ -80,6 +81,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Removed the PDF report footer year [#7023](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7023)
 - Removed the XML autoformat function group configuration due to performance [#6999](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6999)
+- Removed data grid tables from Threat hunting dashboard, GitHub panel and Office365 panel [#7086](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7086)
 
 ## Wazuh v4.9.0 - OpenSearch Dashboards 2.13.0 - Revision 07
 
