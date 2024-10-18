@@ -31,6 +31,34 @@ import { withErrorBoundary } from '../../../../common/hocs';
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../../../../components/overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 
+
+const VulsPanelContent = (
+  { agent, dataSource, topPackagesData, severities, renderSeverityStats },
+) => {
+  return (
+    <>
+      <EuiFlexItem grow={2}>
+        <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
+          {Object.keys(severities).reverse().map(renderSeverityStats)}
+        </EuiFlexGroup>
+      </EuiFlexItem>
+      <EuiFlexItem grow={3}>
+        <VulsTopPackageTable
+          agentId={agent.id}
+          items={topPackagesData}
+          indexPatternId={dataSource?.indexPattern.id}
+        />
+      </EuiFlexItem>
+    </>
+  )
+}
+
+const PanelWithVulnerabilitiesState = compose(
+  withErrorBoundary,
+  withVulnerabilitiesStateDataSource,
+)(VulsPanelContent);
+
+
 export default function VulsPanel({ agent }) {
   const {
     dataSource,
@@ -84,11 +112,15 @@ export default function VulsPanel({ agent }) {
     if (isDataSourceLoading) {
       return;
     }
+    setIsLoading(true);
     Promise.all([fetchSeverityStatsData(), fetchTopPackagesData()])
-      .then(() => setIsLoading(false))
       .catch(error => {
+        // ToDo: Handle error
+        console.error(error);
+      })
+      .finally(() => {
         setIsLoading(false);
-      });
+      })
   }, [isDataSourceLoading, agent.id]);
 
   const getSeverityValue = severity => {
@@ -132,29 +164,6 @@ export default function VulsPanel({ agent }) {
     );
   };
 
-  const VulsPanelContent = () => {
-    return (
-      <>
-        <EuiFlexItem grow={2}>
-          <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
-            {Object.keys(severities).reverse().map(renderSeverityStats)}
-          </EuiFlexGroup>
-        </EuiFlexItem>
-        <EuiFlexItem grow={3}>
-          <VulsTopPackageTable
-            agentId={agent.id}
-            items={topPackagesData}
-            indexPatternId={dataSource?.indexPattern.id}
-          />
-        </EuiFlexItem>
-      </>
-    )
-  }
-
-  const PanelWithVulnerabilitiesState = compose(
-    withErrorBoundary,
-    withVulnerabilitiesStateDataSource,
-  )(VulsPanelContent);
 
   return (
     <Fragment>
@@ -191,7 +200,7 @@ export default function VulsPanel({ agent }) {
         </EuiText>
         <EuiSpacer size='s' />
         <EuiFlexGroup paddingSize='none'>
-          <PanelWithVulnerabilitiesState notRedirect={true} />
+          <PanelWithVulnerabilitiesState redirect={false} agent={agent} dataSource={dataSource} topPackagesData={topPackagesData} severities={severities} renderSeverityStats={renderSeverityStats} />
         </EuiFlexGroup>
       </EuiPanel>
     </Fragment>
