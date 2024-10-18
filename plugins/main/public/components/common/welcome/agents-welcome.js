@@ -25,12 +25,7 @@ import {
   EuiButtonIcon,
   EuiPageBody,
 } from '@elastic/eui';
-import {
-  FimEventsTable,
-  ScaScan,
-  MitreTopTactics,
-  RequirementVis,
-} from './components';
+import { FimEventsTable, ScaScan, MitreTopTactics, RequirementVis } from './components';
 import { AgentInfo } from './agent-info/agents-info';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
@@ -80,7 +75,7 @@ export const AgentsWelcome = compose(
     ];
   }),
   withGuard(
-    props => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    (props) => props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     PromptAgentNeverConnected,
   ),
 )(
@@ -153,7 +148,7 @@ export const AgentsWelcome = compose(
 
       this.drawerLokedSubscribtion = getChrome()
         .getIsNavDrawerLocked$()
-        .subscribe(isLocked => {
+        .subscribe((isLocked) => {
           this.setState({ isLocked }, () => {
             this.updateWidth();
           });
@@ -171,9 +166,7 @@ export const AgentsWelcome = compose(
       if (applications) {
         pinnedApplications = applications;
       } else {
-        pinnedApplications = window.localStorage.getItem(
-          'wz-menu-agent-apps-pinned',
-        )
+        pinnedApplications = window.localStorage.getItem('wz-menu-agent-apps-pinned')
           ? JSON.parse(window.localStorage.getItem('wz-menu-agent-apps-pinned'))
           : [
               // Default pinned applications
@@ -186,14 +179,11 @@ export const AgentsWelcome = compose(
       }
 
       // Ensure the pinned applications are supported
-      pinnedApplications = pinnedApplications.filter(pinnedApplication =>
+      pinnedApplications = pinnedApplications.filter((pinnedApplication) =>
         Applications.some(({ id }) => id === pinnedApplication),
       );
 
-      window.localStorage.setItem(
-        'wz-menu-agent-apps-pinned',
-        JSON.stringify(pinnedApplications),
-      );
+      window.localStorage.setItem('wz-menu-agent-apps-pinned', JSON.stringify(pinnedApplications));
       this.setState({ menuAgent: pinnedApplications });
     }
 
@@ -202,30 +192,18 @@ export const AgentsWelcome = compose(
         <Fragment>
           {this.state.menuAgent.map((applicationId, i) => {
             const moduleID = Object.keys(WAZUH_MODULES).find(
-              key => WAZUH_MODULES[key]?.appId === applicationId,
+              (key) => WAZUH_MODULES[key]?.appId === applicationId,
             ).appId;
-            if (
-              i < this.state.maxModules &&
-              hasAgentSupportModule(this.props.agent, moduleID)
-            ) {
+            if (i < this.state.maxModules && hasAgentSupportModule(this.props.agent, moduleID)) {
               return (
-                <EuiFlexItem
-                  key={i}
-                  grow={false}
-                  style={{ marginLeft: 0, marginTop: 7 }}
-                >
+                <EuiFlexItem key={i} grow={false} style={{ marginLeft: 0, marginTop: 7 }}>
                   <RedirectAppLinks application={getCore().application}>
                     <EuiButtonEmpty
-                      href={NavigationService.getInstance().getUrlForApp(
-                        applicationId,
-                      )}
+                      href={NavigationService.getInstance().getUrlForApp(applicationId)}
                       style={{ cursor: 'pointer' }}
                     >
                       <span>
-                        {
-                          Applications.find(({ id }) => id === applicationId)
-                            .title
-                        }
+                        {Applications.find(({ id }) => id === applicationId).title}
                         &nbsp;
                       </span>
                     </EuiButtonEmpty>
@@ -240,9 +218,7 @@ export const AgentsWelcome = compose(
                 <EuiButtonEmpty
                   iconSide='right'
                   iconType='arrowDown'
-                  onClick={() =>
-                    this.setState({ switchModule: !this.state.switchModule })
-                  }
+                  onClick={() => this.setState({ switchModule: !this.state.switchModule })}
                 >
                   More...
                 </EuiButtonEmpty>
@@ -257,9 +233,7 @@ export const AgentsWelcome = compose(
                   <MenuAgent
                     isAgent={this.props.agent}
                     pinnedApplications={this.state.menuAgent}
-                    updatePinnedApplications={applications =>
-                      this.updatePinnedApplications(applications)
-                    }
+                    updatePinnedApplications={(applications) => this.updatePinnedApplications(applications)}
                     closePopover={() => {
                       this.setState({ switchModule: false });
                     }}
@@ -276,11 +250,7 @@ export const AgentsWelcome = compose(
       // Calculate if the header buttons should display the name or only the icon to be responsive
 
       return (
-        <EuiFlexGroup
-          justifyContent='spaceBetween'
-          responsive={false}
-          gutterSize='xs'
-        >
+        <EuiFlexGroup justifyContent='spaceBetween' responsive={false} gutterSize='xs'>
           <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
             <EuiFlexGroup responsive={false} gutterSize='xs'>
               {(this.state.maxModules !== null && this.renderModules()) || (
@@ -309,7 +279,7 @@ export const AgentsWelcome = compose(
                         <MenuAgent
                           isAgent={this.props.agent}
                           pinnedApplications={this.state.menuAgent}
-                          updatePinnedApplications={applications =>
+                          updatePinnedApplications={(applications) =>
                             this.updatePinnedApplications(applications)
                           }
                           closePopover={() => {
@@ -350,9 +320,7 @@ export const AgentsWelcome = compose(
                   onClick={() => this.props.switchTab('stats')}
                   className='wz-it-hygiene-header-button'
                   tooltip={
-                    this.state.maxModules === null
-                      ? { position: 'bottom', content: 'Stats' }
-                      : undefined
+                    this.state.maxModules === null ? { position: 'bottom', content: 'Stats' } : undefined
                   }
                 >
                   {this.state.maxModules !== null ? 'Stats' : ''}
@@ -379,7 +347,7 @@ export const AgentsWelcome = compose(
       );
     }
 
-    onTimeChange = datePicker => {
+    onTimeChange = (datePicker) => {
       const { start: from, end: to } = datePicker;
       this.setState({ datePicker: { from, to } });
     };
@@ -402,9 +370,7 @@ export const AgentsWelcome = compose(
                     <EuiButtonIcon
                       iconType='popout'
                       color='primary'
-                      href={`${NavigationService.getInstance().getUrlForApp(
-                        mitreAttack.id,
-                      )}`}
+                      href={`${NavigationService.getInstance().getUrlForApp(mitreAttack.id)}`}
                       aria-label='Open MITRE ATT&CK'
                     />
                   </RedirectAppLinks>
@@ -484,9 +450,7 @@ export const AgentsWelcome = compose(
                 {(this.state.widthWindow < 1150 && (
                   <Fragment>
                     <EuiFlexGroup wrap>
-                      <EuiFlexItem
-                        key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                      >
+                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}>
                         {this.renderMitrePanel()}
                       </EuiFlexItem>
                       {this.renderCompliancePanel()}
@@ -497,9 +461,7 @@ export const AgentsWelcome = compose(
                     </EuiFlexGroup>
                     <EuiSpacer size='m' />
                     <EuiFlexGroup>
-                      <EuiFlexItem
-                        key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                      >
+                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'}>
                         {' '}
                         {/* Events count evolution */}
                         {this.renderEventCountVisualization()}
@@ -515,9 +477,7 @@ export const AgentsWelcome = compose(
                     <EuiFlexGroup>
                       <EuiFlexItem>
                         <EuiFlexGroup>
-                          <EuiFlexItem
-                            key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                          >
+                          <EuiFlexItem key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}>
                             {this.renderMitrePanel()}
                           </EuiFlexItem>
                           {this.renderCompliancePanel()}
@@ -527,9 +487,7 @@ export const AgentsWelcome = compose(
                     </EuiFlexGroup>
                     <EuiSpacer size='l' />
                     <EuiFlexGroup>
-                      <EuiFlexItem
-                        key={'Wazuh-App-Agents-Welcome-Events-Evolution'}
-                      >
+                      <EuiFlexItem key={'Wazuh-App-Agents-Welcome-Events-Evolution'}>
                         {' '}
                         {/* Events count evolution */}
                         {this.renderEventCountVisualization()}
