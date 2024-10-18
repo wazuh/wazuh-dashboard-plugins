@@ -220,11 +220,7 @@ export class AgentInfo extends Component {
 
     return (
       <Fragment>
-        <EuiFlexGroup
-          wrap
-          style={{ responsive: true }}
-          className='wz-welcome-page-agent-info-details'
-        >
+        <EuiFlexGroup wrap style={{ responsive: true }}>
           {stats}
         </EuiFlexGroup>
       </Fragment>

@@ -459,11 +459,7 @@ export const AgentsWelcome = compose(
             <EuiPage>
               <EuiPageBody component='div'>
                 <div className='wz-module-header-nav'>
-                  <EuiPanel
-                    grow
-                    paddingSize='s'
-                    className='wz-welcome-page-agent-info'
-                  >
+                  <EuiPanel grow paddingSize='s'>
                     <AgentInfo
                       agent={this.props.agent}
                       isCondensed={false}
