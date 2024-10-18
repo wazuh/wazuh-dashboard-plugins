@@ -18,13 +18,14 @@ const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
 export async function validateVulnerabilitiesStateDataSources({
   vulnerabilitiesStatesindexPatternID: indexPatternID,
+  notRedirect = false,
 }) {
   try {
     // Check the existence of related index pattern
     const existIndexPattern = await existsIndexPattern(indexPatternID);
     const indexPattern = existIndexPattern;
 
-    // If the idnex pattern does not exist, then check the existence of index
+    // If the index pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND) {
       // Check the existence of indices
       const { exist, fields } = await existsIndices(indexPatternID);
@@ -41,7 +42,7 @@ export async function validateVulnerabilitiesStateDataSources({
           },
         };
       }
-      // If the some index match the index pattern, then create the index pattern
+      // If some index matches the index pattern, then create the index pattern
       const resultCreateIndexPattern = await createIndexPattern(
         indexPatternID,
         fields,
@@ -64,7 +65,9 @@ export async function validateVulnerabilitiesStateDataSources({
         problem in the Events tabs related there are no implicit filters when accessing if the HOC
         that protect the view is passed.
       */
-      NavigationService.getInstance().navigateToApp(vulnerabilityDetection.id);
+      if (!notRedirect) {
+        NavigationService.getInstance().navigateToApp(vulnerabilityDetection.id);
+      }
     }
     return {
       ok: false,
