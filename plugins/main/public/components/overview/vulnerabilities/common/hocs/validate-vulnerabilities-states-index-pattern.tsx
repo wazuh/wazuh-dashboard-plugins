@@ -17,7 +17,7 @@ import { HTTP_STATUS_CODES } from '../../../../../../common/constants';
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
 export async function validateVulnerabilitiesStateDataSources({
-  vulnerabilitiesStatesindexPatternID: indexPatternID
+  vulnerabilitiesStatesindexPatternID: indexPatternID,
 }) {
   try {
     // Check the existence of related index pattern

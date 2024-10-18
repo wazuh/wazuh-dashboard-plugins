@@ -143,7 +143,7 @@ describe('[hook] useSearchBarConfiguration', () => {
     const { result, waitForNextUpdate } = renderHook(() =>
       useSearchBar({
         indexPattern: mockedExampleIndexPatternData as IndexPattern,
-        setFilters: jest.fn()
+        setFilters: jest.fn(),
       }),
     );
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([
@@ -174,11 +174,11 @@ describe('[hook] useSearchBarConfiguration', () => {
       .mockReturnValue([]);
     const { result, waitForNextUpdate, rerender } = renderHook(
       // @ts-ignore
-      (props) => useSearchBar(props),
+      props => useSearchBar(props),
       {
         initialProps: {
           indexPattern: mockedExampleIndexPatternData as IndexPattern,
-          setFilters: jest.fn()
+          setFilters: jest.fn(),
         },
       },
     );
@@ -195,10 +195,10 @@ describe('[hook] useSearchBarConfiguration', () => {
       .mockResolvedValue(newExampleIndexPatternData);
     rerender({
       indexPattern: newExampleIndexPatternData as IndexPattern,
-      setFilters: jest.fn()
+      setFilters: jest.fn(),
     });
     expect(result.current.searchBarProps.indexPatterns).toMatchObject([
       newExampleIndexPatternData,
     ]);
-  })
+  });
 });
