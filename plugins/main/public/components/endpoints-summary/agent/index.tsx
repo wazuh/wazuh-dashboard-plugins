@@ -49,10 +49,8 @@ export const AgentView = compose(
                 <EuiLink
                   className='eui-textCenter'
                   aria-label='go to Endpoint summary'
-                  href={`${endpointSummary.id}#/agents-preview`}
-                  onClick={() =>
-                    NavigationService.getInstance().navigate(`/agents-preview`)
-                  }
+                  href={`${endpointSummary.id}#${SECTIONS.AGENTS_PREVIEW}`}
+                  onClick={() => NavigationService.getInstance().navigate(SECTIONS.AGENTS_PREVIEW)}
                 >
                   Endpoint summary
                 </EuiLink>
