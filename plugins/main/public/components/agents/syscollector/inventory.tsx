@@ -44,7 +44,7 @@ export const SyscollectorInventory = compose(
   return (
     <EuiPage paddingSize='m' direction='column' style={{ overflow: 'hidden' }}>
       {agent?.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
-        <EuiFlexGroup direction='column' gutterSize='s'>
+        <EuiFlexGroup gutterSize='s'>
           <EuiFlexItem>
             <EuiCallOut
               title='This agent is currently disconnected, the data may be outdated.'
@@ -54,7 +54,7 @@ export const SyscollectorInventory = compose(
         </EuiFlexGroup>
       )}
 
-      <EuiFlexGroup direction='column' gutterSize='s'>
+      <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem>
           <EuiPanel grow paddingSize='s'>
             <AgentInfo agent={props.agent} isCondensed={false} hideActions={true} {...props}></AgentInfo>
