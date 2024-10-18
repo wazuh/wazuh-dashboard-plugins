@@ -7,15 +7,6 @@
   background: #fafbfd;
 }
 
-.wz-module-header-agent {
-  padding: 6px;
-}
-
-.wz-module-header-agent .euiHealth svg {
-  width: 16px;
-  height: 24px;
-}
-
 .wzApp .euiFlyoutBody .euiFlyoutBody__overflowContent {
   padding: 0 !important;
 }
@@ -40,13 +31,6 @@
 
 .wz-font-weight-normal {
   font-weight: normal;
-}
-.wz-module-header-agent h1 {
-  font-weight: 400;
-}
-
-.wz-module-header-agent h1 b {
-  font-weight: 500;
 }
 
 .wz-module-header-nav .euiTabs {
@@ -91,11 +75,6 @@ discover-app-w .sidebar-container {
   @media only screen and (max-width: 767px) {
     .wz-module-header-agent {
       height: auto;
-      h1 {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
     }
     .wz-module-body {
       margin-top: -160px;
