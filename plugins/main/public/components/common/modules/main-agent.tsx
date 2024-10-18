@@ -48,6 +48,7 @@ export class MainModuleAgent extends Component {
   props!: {
     [key: string]: any;
     section: string;
+    switchTab?: (tab: string) => void;
   };
   state: {
     selectView: Boolean;
@@ -80,13 +81,22 @@ export class MainModuleAgent extends Component {
             <EuiTabs>
               {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(this.props.section) ? (
                 <>
-                  <EuiTab isSelected={this.props.section === AgentTabs.SOFTWARE}>
+                  <EuiTab
+                    isSelected={this.props.section === AgentTabs.SOFTWARE}
+                    onClick={() => this.props.switchTab?.(AgentTabs.SOFTWARE)}
+                  >
                     {toTitleCase(AgentTabs.SOFTWARE)}&nbsp;
                   </EuiTab>
-                  <EuiTab isSelected={this.props.section === AgentTabs.NETWORK}>
+                  <EuiTab
+                    isSelected={this.props.section === AgentTabs.NETWORK}
+                    onClick={() => this.props.switchTab?.(AgentTabs.NETWORK)}
+                  >
                     {toTitleCase(AgentTabs.NETWORK)}&nbsp;
                   </EuiTab>
-                  <EuiTab isSelected={this.props.section === AgentTabs.PROCESSES}>
+                  <EuiTab
+                    isSelected={this.props.section === AgentTabs.PROCESSES}
+                    onClick={() => this.props.switchTab?.(AgentTabs.PROCESSES)}
+                  >
                     {toTitleCase(AgentTabs.PROCESSES)}&nbsp;
                   </EuiTab>
                 </>
