@@ -397,7 +397,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
             DataSource={PatternDataSource}
             tableColumns={getDiscoverColumns()}
             filterManager={filterManager}
-            initialFetchFilters={filterParams.filters}
+            initialFetchFilters={filterParams?.filters || []}
             expandedRowComponent={expandedRow}
           />
         </EuiAccordion>
