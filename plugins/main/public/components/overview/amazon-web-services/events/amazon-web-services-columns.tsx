@@ -1,21 +1,13 @@
 import { tDataGridColumn } from '../../../common/data-grid';
+import { commonColumns } from '../../common/data-grid-columns';
 
 export const amazonWebServicesColumns: tDataGridColumn[] = [
-  {
-    id: 'timestamp',
-    isSortable: true,
-    defaultSortDirection: 'desc',
-  },
+  commonColumns.timestamp,
   {
     id: 'data.aws.source',
+    initialWidth: 144,
   },
-  {
-    id: 'rule.description',
-  },
-  {
-    id: 'rule.level',
-  },
-  {
-    id: 'rule.id',
-  },
+  commonColumns['rule.description'],
+  commonColumns['rule.level'],
+  commonColumns['rule.id'],
 ];

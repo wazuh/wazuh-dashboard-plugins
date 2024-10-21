@@ -1,24 +1,14 @@
 import { tDataGridColumn } from '../../../common/data-grid';
+import { commonColumns } from '../../common/data-grid-columns';
 
 export const gdprColumns: tDataGridColumn[] = [
-  {
-    id: 'timestamp',
-    isSortable: true,
-    defaultSortDirection: 'desc',
-  },
-  {
-    id: 'agent.name',
-  },
+  commonColumns.timestamp,
+  commonColumns['agent.name'],
   {
     id: 'rule.gdpr',
+    initialWidth: 138,
   },
-  {
-    id: 'rule.description',
-  },
-  {
-    id: 'rule.level',
-  },
-  {
-    id: 'rule.id',
-  },
+  commonColumns['rule.description'],
+  commonColumns['rule.level'],
+  commonColumns['rule.id'],
 ];

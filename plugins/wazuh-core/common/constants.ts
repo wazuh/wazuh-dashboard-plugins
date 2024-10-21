@@ -82,11 +82,11 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
     { audit: true },
     { openscap: true },
     { ciscat: true },
+    { virustotal: true },
     { yara: true },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
     { vulnerabilities: true },
-    { virustotal: true },
     { osquery: true },
     { docker: true },
     { mitre: true },
@@ -275,7 +275,7 @@ export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
 export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH =
   'images/logo_reports.png';
 export const REPORTS_PRIMARY_COLOR = '#256BD1';
-export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © 2023 Wazuh, Inc.';
+export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © Wazuh, Inc.';
 export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 
 // Plugin platform

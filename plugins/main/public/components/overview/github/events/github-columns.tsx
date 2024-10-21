@@ -1,30 +1,22 @@
 import { tDataGridColumn } from '../../../common/data-grid';
+import { commonColumns } from '../../common/data-grid-columns';
 
 export const githubColumns: tDataGridColumn[] = [
-  {
-    id: 'timestamp',
-    isSortable: true,
-    defaultSortDirection: 'desc',
-  },
-  {
-    id: 'agent.id',
-  },
+  commonColumns.timestamp,
+  commonColumns['agent.id'],
   {
     id: 'data.github.repo',
+    initialWidth: 200,
   },
   {
     id: 'data.github.actor',
+    initialWidth: 200,
   },
   {
     id: 'data.github.org',
+    initialWidth: 200,
   },
-  {
-    id: 'rule.description',
-  },
-  {
-    id: 'rule.level',
-  },
-  {
-    id: 'rule.id',
-  },
+  commonColumns['rule.description'],
+  commonColumns['rule.level'],
+  commonColumns['rule.id'],
 ];

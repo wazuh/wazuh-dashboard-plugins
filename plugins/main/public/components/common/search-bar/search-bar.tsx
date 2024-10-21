@@ -15,11 +15,15 @@ export interface WzSearchBarProps extends SearchBarProps {
   postFilters?: React.ReactElement;
   postFixedFilters?: () => React.ReactElement<any>[];
   hideFixedFilters?: boolean;
+  showSaveQueryButton?: boolean;
+  showSaveQuery?: boolean;
 }
 
 export const WzSearchBar = ({
   fixedFilters = [],
   postFixedFilters,
+  showSaveQueryButton = true,
+  showSaveQuery = true,
   preQueryBar,
   hideFixedFilters,
   postFilters,
@@ -35,7 +39,7 @@ export const WzSearchBar = ({
 
   return (
     <EuiPanel
-      className='wz-search-bar wz-search-bar-no-padding'
+      className='wz-search-bar no-padding'
       paddingSize='s'
       hasShadow={false}
       hasBorder={false}
@@ -44,6 +48,7 @@ export const WzSearchBar = ({
     >
       {showQuery ? (
         <EuiFlexGroup
+          className='wz-search-bar-query'
           gutterSize='s'
           alignItems='center'
           responsive={false}
@@ -51,12 +56,16 @@ export const WzSearchBar = ({
         >
           {preQueryBar ? <EuiFlexItem>{preQueryBar}</EuiFlexItem> : null}
           <EuiFlexItem grow={!preQueryBar}>
-            <SearchBar {...restProps} />
+            <SearchBar
+              {...restProps}
+              showFilterBar={showSaveQueryButton}
+              showSaveQuery={showSaveQuery}
+            />
           </EuiFlexItem>
         </EuiFlexGroup>
       ) : null}
       {showFilters ? (
-        <EuiFlexGroup gutterSize='s'>
+        <EuiFlexGroup className='wz-search-bar-filters' gutterSize='s'>
           {hideFixedFilters ? null : (
             <EuiFlexItem grow={false}>
               <EuiFlexGroup
