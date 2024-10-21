@@ -71,6 +71,8 @@ export class MainModuleAgent extends Component {
     };
   }
 
+  inventoryTabs = [AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES];
+
   renderTitle() {
     return (
       <EuiFlexGroup style={{ marginInline: 8 }}>
@@ -79,30 +81,16 @@ export class MainModuleAgent extends Component {
             <EuiLoadingSpinner size='s' />
           ) : (
             <EuiTabs>
-              {[
-                AgentTabs.SOFTWARE,
-                AgentTabs.NETWORK,
-                AgentTabs.PROCESSES,
-              ].includes(this.props.section) ? (
+              {this.inventoryTabs.includes(this.props.section) ? (
                 <>
-                  <EuiTab
-                    isSelected={this.props.section === AgentTabs.SOFTWARE}
-                    onClick={() => this.props.switchTab?.(AgentTabs.SOFTWARE)}
-                  >
-                    {toTitleCase(AgentTabs.SOFTWARE)}&nbsp;
-                  </EuiTab>
-                  <EuiTab
-                    isSelected={this.props.section === AgentTabs.NETWORK}
-                    onClick={() => this.props.switchTab?.(AgentTabs.NETWORK)}
-                  >
-                    {toTitleCase(AgentTabs.NETWORK)}&nbsp;
-                  </EuiTab>
-                  <EuiTab
-                    isSelected={this.props.section === AgentTabs.PROCESSES}
-                    onClick={() => this.props.switchTab?.(AgentTabs.PROCESSES)}
-                  >
-                    {toTitleCase(AgentTabs.PROCESSES)}&nbsp;
-                  </EuiTab>
+                  {this.inventoryTabs.map(tab => (
+                    <EuiTab
+                      isSelected={this.props.section === tab}
+                      onClick={() => this.props.switchTab?.(tab)}
+                    >
+                      {toTitleCase(tab)}&nbsp;
+                    </EuiTab>
+                  ))}
                 </>
               ) : (
                 <EuiTab isSelected={true}>
