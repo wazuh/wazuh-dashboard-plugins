@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from 'enzyme';
 import { SyscollectorInventory } from './inventory';
+import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 
 // TODO: Fix this test
 describe('Inventory component', () => {
@@ -11,7 +12,9 @@ describe('Inventory component', () => {
           'Linux |ip-10-0-1-106 |4.9.0-9-amd64 |1 SMP Debian 4.9.168-1+deb9u2 (2019-05-13) |x86_64',
       },
     };
-    const wrapper = render(<SyscollectorInventory agent={agent} />);
+    const wrapper = render(
+      <SyscollectorInventory agent={agent} section={AgentTabs.NETWORK} />,
+    );
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
     const networkPortsTitle = networkPortsCard
       .find('.euiTitle.euiTitle--small')
@@ -51,7 +54,9 @@ describe('Inventory component', () => {
         platform: 'windows',
       },
     };
-    const wrapper = render(<SyscollectorInventory agent={agent} />);
+    const wrapper = render(
+      <SyscollectorInventory agent={agent} section={AgentTabs.NETWORK} />,
+    );
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
     const networkPortsTitle = networkPortsCard
       .find('.euiTitle.euiTitle--small')
@@ -90,7 +95,9 @@ describe('Inventory component', () => {
         platform: 'darwin',
       },
     };
-    const wrapper = render(<SyscollectorInventory agent={agent} />);
+    const wrapper = render(
+      <SyscollectorInventory agent={agent} section={AgentTabs.NETWORK} />,
+    );
     const networkPortsCard = wrapper.find('.euiFlexItem--flexGrow2').last();
     const networkPortsTitle = networkPortsCard
       .find('.euiTitle.euiTitle--small')
