@@ -11,7 +11,14 @@
  */
 
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiCallOut, EuiPanel, EuiSpacer, EuiPage } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiCallOut,
+  EuiPanel,
+  EuiSpacer,
+  EuiPage,
+} from '@elastic/eui';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { compose } from 'redux';
 import { withGuard } from '../../common/hocs';
@@ -23,7 +30,9 @@ import ProcessesTab from './processes';
 
 export const SyscollectorInventory = compose(
   withGuard(
-    (props) => props.agent && props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
+    props =>
+      props.agent &&
+      props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     PromptAgentNeverConnected,
   ),
 )(function SyscollectorInventory(props) {
@@ -57,16 +66,27 @@ export const SyscollectorInventory = compose(
       <EuiFlexGroup gutterSize='s'>
         <EuiFlexItem>
           <EuiPanel grow paddingSize='s'>
-            <AgentInfo agent={props.agent} isCondensed={false} hideActions={true} {...props}></AgentInfo>
+            <AgentInfo
+              agent={props.agent}
+              isCondensed={false}
+              hideActions={true}
+              {...props}
+            ></AgentInfo>
           </EuiPanel>
         </EuiFlexItem>
       </EuiFlexGroup>
 
       <EuiSpacer size='xxl' />
 
-      {section === 'software' && <SoftwareTab agent={agent} soPlatform={soPlatform} />}
-      {section === 'network' && <NetworkTab agent={agent} soPlatform={soPlatform} />}
-      {section === 'processes' && <ProcessesTab agent={agent} soPlatform={soPlatform} />}
+      {section === 'software' && (
+        <SoftwareTab agent={agent} soPlatform={soPlatform} />
+      )}
+      {section === 'network' && (
+        <NetworkTab agent={agent} soPlatform={soPlatform} />
+      )}
+      {section === 'processes' && (
+        <ProcessesTab agent={agent} soPlatform={soPlatform} />
+      )}
     </EuiPage>
   );
 });

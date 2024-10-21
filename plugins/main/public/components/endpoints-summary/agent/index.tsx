@@ -4,11 +4,20 @@ import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
-import { withErrorBoundary, withGuard, withRouteResolvers } from '../../common/hocs';
+import {
+  withErrorBoundary,
+  withGuard,
+  withRouteResolvers,
+} from '../../common/hocs';
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 import { MainModuleAgent } from '../../common/modules/main-agent';
-import { enableMenu, ip, nestedResolve, savedSearch } from '../../../services/resolves';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../../services/resolves';
 import { useRouterSearch } from '../../common/hooks/use-router-search';
 import { Redirect, Route, Switch } from '../../router-search';
 import NavigationService from '../../../react-services/navigation-service';
@@ -21,7 +30,7 @@ import { withAgentSync } from '../../common/hocs/withAgentSync';
 import { AgentTabs } from './agent-tabs';
 import { SECTIONS } from '../../../sections';
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   agent: state.appStateReducers?.currentAgentData,
 });
 
@@ -31,7 +40,7 @@ export const AgentView = compose(
   connect(mapStateToProps),
   withAgentSync,
   withGuard(
-    (props) => !(props.agent && props.agent.id),
+    props => !(props.agent && props.agent.id),
     () => (
       <>
         <PromptNoSelectedAgent
@@ -43,7 +52,11 @@ export const AgentView = compose(
                   className='eui-textCenter'
                   aria-label='go to Endpoint summary'
                   href={`${endpointSummary.id}#${SECTIONS.AGENTS_PREVIEW}`}
-                  onClick={() => NavigationService.getInstance().navigate(SECTIONS.AGENTS_PREVIEW)}
+                  onClick={() =>
+                    NavigationService.getInstance().navigate(
+                      SECTIONS.AGENTS_PREVIEW,
+                    )
+                  }
                 >
                   Endpoint summary
                 </EuiLink>
@@ -96,15 +109,27 @@ export const AgentView = compose(
   return (
     <Switch>
       <Route path={`?tab=${AgentTabs.SOFTWARE}`}>
-        <MainModuleAgent agent={agentData} section={tab} switchTab={switchTab} />
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          switchTab={switchTab}
+        />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
       <Route path={`?tab=${AgentTabs.NETWORK}`}>
-        <MainModuleAgent agent={agentData} section={tab} switchTab={switchTab} />
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          switchTab={switchTab}
+        />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
       <Route path={`?tab=${AgentTabs.PROCESSES}`}>
-        <MainModuleAgent agent={agentData} section={tab} switchTab={switchTab} />
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          switchTab={switchTab}
+        />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
       <Route path='?tab=syscollector'>

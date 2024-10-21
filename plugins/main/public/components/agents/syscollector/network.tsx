@@ -1,6 +1,10 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { NetworkInterfacesTable, NetworkPortsTable, NetworkSettingsTable } from './components';
+import {
+  NetworkInterfacesTable,
+  NetworkPortsTable,
+  NetworkSettingsTable,
+} from './components';
 import { Agent } from '../../endpoints-summary/types';
 
 interface NetworkProps {

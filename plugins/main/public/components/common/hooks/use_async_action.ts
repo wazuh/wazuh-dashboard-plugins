@@ -11,7 +11,10 @@
  */
 import { useCallback, useState } from 'react';
 
-export function useAsyncAction(action: (...params: any[]) => any, dependencies: any[] = []) {
+export function useAsyncAction(
+  action: (...params: any[]) => any,
+  dependencies: any[] = [],
+) {
   const [running, setRunning] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);

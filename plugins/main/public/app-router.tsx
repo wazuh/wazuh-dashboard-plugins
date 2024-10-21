@@ -32,7 +32,7 @@ export function Application(props) {
     // Get the dashboard security
     getWazuhCorePlugin()
       .dashboardSecurity.fetchCurrentPlatform()
-      .then((item) => {
+      .then(item => {
         dispatch(updateCurrentPlatform(item));
       })
       .catch(() => {});
@@ -47,12 +47,15 @@ export function Application(props) {
 
     // TODO: Replace this with document insteat
     // Bind deleteExistentToken on Log out component.
-    $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on('mouseleave', function () {
-      // opendistro
-      $('button:contains(Log out)').on('click', function () {
-        WzAuthentication.deleteExistentToken();
-      });
-    });
+    $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
+      'mouseleave',
+      function () {
+        // opendistro
+        $('button:contains(Log out)').on('click', function () {
+          WzAuthentication.deleteExistentToken();
+        });
+      },
+    );
   }, []);
 
   return (
@@ -64,19 +67,43 @@ export function Application(props) {
       <WzAgentSelectorWrapper />
       <WzUpdatesNotification />
       <Switch>
-        <Route path={`/${SECTIONS.HEALTH_CHECK}`} exact render={HealthCheck}></Route>
-        <Route path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`} exact render={RegisterAgent}></Route>
+        <Route
+          path={`/${SECTIONS.HEALTH_CHECK}`}
+          exact
+          render={HealthCheck}
+        ></Route>
+        <Route
+          path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}
+          exact
+          render={RegisterAgent}
+        ></Route>
         <Route path={`/${SECTIONS.AGENTS}`} exact render={AgentView}></Route>
-        <Route path={`/${SECTIONS.AGENTS_PREVIEW}/`} exact render={MainEndpointsSummary}></Route>
-        <Route path={`/${SECTIONS.MANAGER}`} exact render={WzManagement}></Route>
-        <Route path={`/${SECTIONS.OVERVIEW}`} exact render={(props) => <Overview {...props} />}></Route>
+        <Route
+          path={`/${SECTIONS.AGENTS_PREVIEW}/`}
+          exact
+          render={MainEndpointsSummary}
+        ></Route>
+        <Route
+          path={`/${SECTIONS.MANAGER}`}
+          exact
+          render={WzManagement}
+        ></Route>
+        <Route
+          path={`/${SECTIONS.OVERVIEW}`}
+          exact
+          render={props => <Overview {...props} />}
+        ></Route>
         <Route path={`/${SECTIONS.SETTINGS}`} exact render={Settings}></Route>
         <Route path={`/${SECTIONS.SECURITY}`} exact render={WzSecurity}></Route>
-        <Route path={`/${SECTIONS.WAZUH_DEV}`} exact render={(props) => <ToolsRouter {...props} />}></Route>
+        <Route
+          path={`/${SECTIONS.WAZUH_DEV}`}
+          exact
+          render={props => <ToolsRouter {...props} />}
+        ></Route>
         <Route
           path={`/${SECTIONS.BLANK_SCREEN}`}
           exact
-          render={(props) => <WzBlankScreen {...props} />}
+          render={props => <WzBlankScreen {...props} />}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>
