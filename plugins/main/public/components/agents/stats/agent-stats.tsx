@@ -63,41 +63,6 @@ const tableColumns = [
     field: 'bytes',
     name: 'Bytes',
     sortable: true,
-  },
-];
-
-const statsAgents: { title: string; field: string; render?: (value) => any }[] =
-  [
-    {
-      title: 'Status',
-      field: 'status',
-    },
-    {
-      title: 'Buffer',
-      field: 'buffer_enabled',
-      render: value => (value ? 'enabled' : 'disabled'),
-    },
-    {
-      title: 'Message buffer',
-      field: 'msg_buffer',
-    },
-    {
-      title: 'Messages count',
-      field: 'msg_count',
-    },
-    {
-      title: 'Messages sent',
-      field: 'msg_sent',
-    },
-    {
-      title: 'Last ack',
-      field: 'last_ack',
-      render: formatUIDate,
-    },
-    {
-      title: 'Last keep alive',
-      field: 'last_keepalive',
-      render: formatUIDate,
     },
   ];
 
