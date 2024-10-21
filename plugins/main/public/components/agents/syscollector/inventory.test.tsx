@@ -121,138 +121,140 @@ const shouldRenderNetworkSettingsTableWithCorrectColumnsAndTitle = (
   );
 };
 
-describe('Network', () => {
-  describe(NETWORK_SETTINGS, () => {
-    it('A Linux agent should render network settings table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_SETTINGS_COLUMNS.INTERFACE,
-        NETWORK_SETTINGS_COLUMNS.ADDRESS,
-        NETWORK_SETTINGS_COLUMNS.NETMASK,
-        NETWORK_SETTINGS_COLUMNS.PROTOCOL,
-        NETWORK_SETTINGS_COLUMNS.BROADCAST,
-      ];
+describe('Inventory data', () => {
+  describe('Network', () => {
+    describe(NETWORK_SETTINGS, () => {
+      it('A Linux agent should render network settings table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_SETTINGS_COLUMNS.INTERFACE,
+          NETWORK_SETTINGS_COLUMNS.ADDRESS,
+          NETWORK_SETTINGS_COLUMNS.NETMASK,
+          NETWORK_SETTINGS_COLUMNS.PROTOCOL,
+          NETWORK_SETTINGS_COLUMNS.BROADCAST,
+        ];
 
-      shouldRenderNetworkSettingsTableWithCorrectColumnsAndTitle(
-        AGENT.DEBIAN,
-        columns,
-      );
+        shouldRenderNetworkSettingsTableWithCorrectColumnsAndTitle(
+          AGENT.DEBIAN,
+          columns,
+        );
+      });
+      it('A Windows agent should render network settings table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_SETTINGS_COLUMNS.INTERFACE,
+          NETWORK_SETTINGS_COLUMNS.ADDRESS,
+          NETWORK_SETTINGS_COLUMNS.NETMASK,
+          NETWORK_SETTINGS_COLUMNS.PROTOCOL,
+          NETWORK_SETTINGS_COLUMNS.BROADCAST,
+        ];
+
+        shouldRenderNetworkSettingsTableWithCorrectColumnsAndTitle(
+          AGENT.WINDOWS,
+          columns,
+        );
+      });
+      it('A Apple agent should render network settings table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_SETTINGS_COLUMNS.INTERFACE,
+          NETWORK_SETTINGS_COLUMNS.ADDRESS,
+          NETWORK_SETTINGS_COLUMNS.NETMASK,
+          NETWORK_SETTINGS_COLUMNS.PROTOCOL,
+          NETWORK_SETTINGS_COLUMNS.BROADCAST,
+        ];
+
+        shouldRenderNetworkSettingsTableWithCorrectColumnsAndTitle(
+          AGENT.DARWIN,
+          columns,
+        );
+      });
     });
-    it('A Windows agent should render network settings table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_SETTINGS_COLUMNS.INTERFACE,
-        NETWORK_SETTINGS_COLUMNS.ADDRESS,
-        NETWORK_SETTINGS_COLUMNS.NETMASK,
-        NETWORK_SETTINGS_COLUMNS.PROTOCOL,
-        NETWORK_SETTINGS_COLUMNS.BROADCAST,
-      ];
+    describe(NETWORK_INTERFACES, () => {
+      it('A Linux agent should render network interfaces table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_INTERFACES_COLUMNS.NAME,
+          NETWORK_INTERFACES_COLUMNS.MAC,
+          NETWORK_INTERFACES_COLUMNS.STATE,
+          NETWORK_INTERFACES_COLUMNS.MTU,
+          NETWORK_INTERFACES_COLUMNS.TYPE,
+        ];
 
-      shouldRenderNetworkSettingsTableWithCorrectColumnsAndTitle(
-        AGENT.WINDOWS,
-        columns,
-      );
+        shouldRenderNetworkInterfacesTableWithCorrectColumnsAndTitle(
+          AGENT.DEBIAN,
+          columns,
+        );
+      });
+      it('A Windows agent should render network interfaces table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_INTERFACES_COLUMNS.NAME,
+          NETWORK_INTERFACES_COLUMNS.MAC,
+          NETWORK_INTERFACES_COLUMNS.STATE,
+          NETWORK_INTERFACES_COLUMNS.MTU,
+          NETWORK_INTERFACES_COLUMNS.TYPE,
+        ];
+
+        shouldRenderNetworkInterfacesTableWithCorrectColumnsAndTitle(
+          AGENT.WINDOWS,
+          columns,
+        );
+      });
+      it('A Apple agent should render network interfaces table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_INTERFACES_COLUMNS.NAME,
+          NETWORK_INTERFACES_COLUMNS.MAC,
+          NETWORK_INTERFACES_COLUMNS.STATE,
+          NETWORK_INTERFACES_COLUMNS.MTU,
+          NETWORK_INTERFACES_COLUMNS.TYPE,
+        ];
+
+        shouldRenderNetworkInterfacesTableWithCorrectColumnsAndTitle(
+          AGENT.DARWIN,
+          columns,
+        );
+      });
     });
-    it('A Apple agent should render network settings table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_SETTINGS_COLUMNS.INTERFACE,
-        NETWORK_SETTINGS_COLUMNS.ADDRESS,
-        NETWORK_SETTINGS_COLUMNS.NETMASK,
-        NETWORK_SETTINGS_COLUMNS.PROTOCOL,
-        NETWORK_SETTINGS_COLUMNS.BROADCAST,
-      ];
+    describe(NETWORK_PORTS, () => {
+      it('A Linux agent should render network ports table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_PORTS_COLUMNS.LOCAL_PORT,
+          NETWORK_PORTS_COLUMNS.LOCAL_IP,
+          NETWORK_PORTS_COLUMNS.PROCESS,
+          NETWORK_PORTS_COLUMNS.PID,
+          NETWORK_PORTS_COLUMNS.STATE,
+          NETWORK_PORTS_COLUMNS.PROTOCOL,
+        ];
 
-      shouldRenderNetworkSettingsTableWithCorrectColumnsAndTitle(
-        AGENT.DARWIN,
-        columns,
-      );
-    });
-  });
-  describe(NETWORK_INTERFACES, () => {
-    it('A Linux agent should render network interfaces table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_INTERFACES_COLUMNS.NAME,
-        NETWORK_INTERFACES_COLUMNS.MAC,
-        NETWORK_INTERFACES_COLUMNS.STATE,
-        NETWORK_INTERFACES_COLUMNS.MTU,
-        NETWORK_INTERFACES_COLUMNS.TYPE,
-      ];
+        shouldRenderNetworkPortsTableWithCorrectColumnsAndTitle(
+          AGENT.DEBIAN,
+          columns,
+        );
+      });
 
-      shouldRenderNetworkInterfacesTableWithCorrectColumnsAndTitle(
-        AGENT.DEBIAN,
-        columns,
-      );
-    });
-    it('A Windows agent should render network interfaces table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_INTERFACES_COLUMNS.NAME,
-        NETWORK_INTERFACES_COLUMNS.MAC,
-        NETWORK_INTERFACES_COLUMNS.STATE,
-        NETWORK_INTERFACES_COLUMNS.MTU,
-        NETWORK_INTERFACES_COLUMNS.TYPE,
-      ];
+      it('A Windows agent should render network ports table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_PORTS_COLUMNS.LOCAL_PORT,
+          NETWORK_PORTS_COLUMNS.LOCAL_IP,
+          NETWORK_PORTS_COLUMNS.PROCESS,
+          NETWORK_PORTS_COLUMNS.STATE,
+          NETWORK_PORTS_COLUMNS.PROTOCOL,
+        ];
+        shouldRenderNetworkPortsTableWithCorrectColumnsAndTitle(
+          AGENT.WINDOWS,
+          columns,
+        );
+      });
 
-      shouldRenderNetworkInterfacesTableWithCorrectColumnsAndTitle(
-        AGENT.WINDOWS,
-        columns,
-      );
-    });
-    it('A Apple agent should render network interfaces table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_INTERFACES_COLUMNS.NAME,
-        NETWORK_INTERFACES_COLUMNS.MAC,
-        NETWORK_INTERFACES_COLUMNS.STATE,
-        NETWORK_INTERFACES_COLUMNS.MTU,
-        NETWORK_INTERFACES_COLUMNS.TYPE,
-      ];
+      it('A Apple agent should render network ports table with correct columns and title.', () => {
+        const columns = [
+          NETWORK_PORTS_COLUMNS.LOCAL_PORT,
+          NETWORK_PORTS_COLUMNS.LOCAL_IP,
+          NETWORK_PORTS_COLUMNS.STATE,
+          NETWORK_PORTS_COLUMNS.PROTOCOL,
+        ];
 
-      shouldRenderNetworkInterfacesTableWithCorrectColumnsAndTitle(
-        AGENT.DARWIN,
-        columns,
-      );
-    });
-  });
-  describe(NETWORK_PORTS, () => {
-    it('A Linux agent should render network ports table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_PORTS_COLUMNS.LOCAL_PORT,
-        NETWORK_PORTS_COLUMNS.LOCAL_IP,
-        NETWORK_PORTS_COLUMNS.PROCESS,
-        NETWORK_PORTS_COLUMNS.PID,
-        NETWORK_PORTS_COLUMNS.STATE,
-        NETWORK_PORTS_COLUMNS.PROTOCOL,
-      ];
-
-      shouldRenderNetworkPortsTableWithCorrectColumnsAndTitle(
-        AGENT.DEBIAN,
-        columns,
-      );
-    });
-
-    it('A Windows agent should render network ports table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_PORTS_COLUMNS.LOCAL_PORT,
-        NETWORK_PORTS_COLUMNS.LOCAL_IP,
-        NETWORK_PORTS_COLUMNS.PROCESS,
-        NETWORK_PORTS_COLUMNS.STATE,
-        NETWORK_PORTS_COLUMNS.PROTOCOL,
-      ];
-      shouldRenderNetworkPortsTableWithCorrectColumnsAndTitle(
-        AGENT.WINDOWS,
-        columns,
-      );
-    });
-
-    it('A Apple agent should render network ports table with correct columns and title.', () => {
-      const columns = [
-        NETWORK_PORTS_COLUMNS.LOCAL_PORT,
-        NETWORK_PORTS_COLUMNS.LOCAL_IP,
-        NETWORK_PORTS_COLUMNS.STATE,
-        NETWORK_PORTS_COLUMNS.PROTOCOL,
-      ];
-
-      shouldRenderNetworkPortsTableWithCorrectColumnsAndTitle(
-        AGENT.DARWIN,
-        columns,
-      );
+        shouldRenderNetworkPortsTableWithCorrectColumnsAndTitle(
+          AGENT.DARWIN,
+          columns,
+        );
+      });
     });
   });
 });
