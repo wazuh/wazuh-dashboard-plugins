@@ -208,11 +208,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     render: item => (
       <EuiButtonIcon
         onClick={() => onExpandRow(item)}
-        aria-label={
-          itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
-            ? 'Collapse'
-            : 'Expand'
-        }
+        aria-label={'Info'}
         iconType={
           itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
             ? 'arrowDown'

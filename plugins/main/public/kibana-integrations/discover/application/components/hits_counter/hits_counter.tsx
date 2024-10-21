@@ -84,8 +84,9 @@ export function HitsCounter({
               >
                 <EuiIcon
                   tabIndex={0}
+                  style={{ width: '19px', height: '19px', marginBottom: '2px' }}
                   type={tooltip.iconType || 'iInCircle'}
-                  aria-label={tooltip.ariaLabel || 'iInCircle'}
+                  aria-label={tooltip.ariaLabel || 'Info'}
                 />
               </EuiToolTip>
             )}
