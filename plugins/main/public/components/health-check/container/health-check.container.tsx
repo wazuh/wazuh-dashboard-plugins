@@ -131,7 +131,6 @@ function HealthCheckComponent() {
   useEffect(() => {
     if (appConfig.isReady && !checksInitiated.current) {
       checksInitiated.current = true;
-      AppState.setPatternSelector(appConfig.data['ip.selector']);
     }
   }, [appConfig]);
 
