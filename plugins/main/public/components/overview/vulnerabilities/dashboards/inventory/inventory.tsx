@@ -102,7 +102,7 @@ const InventoryVulsComponent = () => {
         <EuiButtonIcon
           onClick={() => onClickInspectDoc(rowIndex)}
           iconType='inspect'
-          aria-label='Info'
+          aria-label={inspectHintMsg}
         />
       </EuiToolTip>
     );
