@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, Fragment } from 'react';
 import $ from 'jquery';
 import {
   EuiFlyoutHeader,
@@ -286,7 +286,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         description: techniqueData.tactics
           ? techniqueData.tactics.map(tactic => {
               return (
-                <>
+                <Fragment key={tactic.id}>
                   <EuiToolTip
                     position='top'
                     content={`Open ${tactic.name} details in the Intelligence section`}
@@ -310,7 +310,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     </EuiLink>
                   </EuiToolTip>
                   <br />
-                </>
+                </Fragment>
               );
             })
           : '',
