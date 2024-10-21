@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Inventory component A Apple agent should be well rendered. 1`] = `
+exports[`NetworkPortsTable A Apple agent should render network ports table with correct columns and title. 1`] = `
 <div
   class="euiPage euiPage--paddingMedium euiPage--column euiPage--grow"
   style="overflow:hidden"
@@ -418,6 +418,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                     >
                       <h1
                         class="euiTitle euiTitle--small"
+                        data-test-subj="table-wz-api-title"
                       >
                         Network interfaces 
                         <span>
@@ -563,6 +564,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
               />
               <div
                 class="euiBasicTable"
+                data-test-subj="table-with-search-bar"
               >
                 <div>
                   <div
@@ -799,6 +801,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
       >
         <div
           class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+          data-test-subj="network-ports-table"
         >
           <div
             class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -820,6 +823,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                     >
                       <h1
                         class="euiTitle euiTitle--small"
+                        data-test-subj="table-wz-api-title"
                       >
                         Network ports 
                         <span>
@@ -965,6 +969,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
               />
               <div
                 class="euiBasicTable"
+                data-test-subj="table-with-search-bar"
               >
                 <div>
                   <div
@@ -1170,6 +1175,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
                   >
                     <h1
                       class="euiTitle euiTitle--small"
+                      data-test-subj="table-wz-api-title"
                     >
                       Network settings 
                       <span>
@@ -1315,6 +1321,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
             />
             <div
               class="euiBasicTable"
+              data-test-subj="table-with-search-bar"
             >
               <div>
                 <div
@@ -1550,7 +1557,7 @@ exports[`Inventory component A Apple agent should be well rendered. 1`] = `
 </div>
 `;
 
-exports[`Inventory component A Linux agent should be well rendered. 1`] = `
+exports[`NetworkPortsTable A Linux agent should render network ports table with correct columns and title. 1`] = `
 <div
   class="euiPage euiPage--paddingMedium euiPage--column euiPage--grow"
   style="overflow:hidden"
@@ -1966,6 +1973,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                     >
                       <h1
                         class="euiTitle euiTitle--small"
+                        data-test-subj="table-wz-api-title"
                       >
                         Network interfaces 
                         <span>
@@ -2111,6 +2119,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
               />
               <div
                 class="euiBasicTable"
+                data-test-subj="table-with-search-bar"
               >
                 <div>
                   <div
@@ -2346,6 +2355,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
       >
         <div
           class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+          data-test-subj="network-ports-table"
         >
           <div
             class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -2367,6 +2377,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                     >
                       <h1
                         class="euiTitle euiTitle--small"
+                        data-test-subj="table-wz-api-title"
                       >
                         Network ports 
                         <span>
@@ -2512,6 +2523,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
               />
               <div
                 class="euiBasicTable"
+                data-test-subj="table-with-search-bar"
               >
                 <div>
                   <div
@@ -2748,6 +2760,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
                   >
                     <h1
                       class="euiTitle euiTitle--small"
+                      data-test-subj="table-wz-api-title"
                     >
                       Network settings 
                       <span>
@@ -2893,6 +2906,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
             />
             <div
               class="euiBasicTable"
+              data-test-subj="table-with-search-bar"
             >
               <div>
                 <div
@@ -3127,7 +3141,7 @@ exports[`Inventory component A Linux agent should be well rendered. 1`] = `
 </div>
 `;
 
-exports[`Inventory component A Windows agent should be well rendered. 1`] = `
+exports[`NetworkPortsTable A Windows agent should render network ports table with correct columns and title. 1`] = `
 <div
   class="euiPage euiPage--paddingMedium euiPage--column euiPage--grow"
   style="overflow:hidden"
@@ -3545,6 +3559,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                     >
                       <h1
                         class="euiTitle euiTitle--small"
+                        data-test-subj="table-wz-api-title"
                       >
                         Network interfaces 
                         <span>
@@ -3690,6 +3705,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
               />
               <div
                 class="euiBasicTable"
+                data-test-subj="table-with-search-bar"
               >
                 <div>
                   <div
@@ -3926,6 +3942,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
       >
         <div
           class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+          data-test-subj="network-ports-table"
         >
           <div
             class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
@@ -3947,6 +3964,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                     >
                       <h1
                         class="euiTitle euiTitle--small"
+                        data-test-subj="table-wz-api-title"
                       >
                         Network ports 
                         <span>
@@ -4092,6 +4110,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
               />
               <div
                 class="euiBasicTable"
+                data-test-subj="table-with-search-bar"
               >
                 <div>
                   <div
@@ -4321,6 +4340,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
                   >
                     <h1
                       class="euiTitle euiTitle--small"
+                      data-test-subj="table-wz-api-title"
                     >
                       Network settings 
                       <span>
@@ -4466,6 +4486,7 @@ exports[`Inventory component A Windows agent should be well rendered. 1`] = `
             />
             <div
               class="euiBasicTable"
+              data-test-subj="table-with-search-bar"
             >
               <div>
                 <div
