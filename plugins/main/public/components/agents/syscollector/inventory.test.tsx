@@ -193,7 +193,118 @@ const shouldRenderProcessesTableWithCorrectColumnsAndTitle = (
   );
 };
 
+function findAgentInfo(wrapper: cheerio.Cheerio): any {
+  return wrapper.find('[data-test-subj="agent-info"]').html();
+}
+
 describe('Inventory data', () => {
+  describe('Agent info', () => {
+    it('A Linux agent should render agent info', () => {
+      let wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DEBIAN}
+          section={AgentTabs.SOFTWARE}
+        />,
+      );
+
+      let agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+
+      wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DEBIAN}
+          section={AgentTabs.NETWORK}
+        />,
+      );
+
+      agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+
+      wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DEBIAN}
+          section={AgentTabs.PROCESSES}
+        />,
+      );
+
+      agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+    });
+
+    it('A Windows agent should render agent info', () => {
+      let wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.WINDOWS}
+          section={AgentTabs.SOFTWARE}
+        />,
+      );
+
+      let agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+
+      wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.WINDOWS}
+          section={AgentTabs.NETWORK}
+        />,
+      );
+
+      agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+
+      wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.WINDOWS}
+          section={AgentTabs.PROCESSES}
+        />,
+      );
+
+      agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+    });
+
+    it('A Apple agent should render agent info', () => {
+      let wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DARWIN}
+          section={AgentTabs.SOFTWARE}
+        />,
+      );
+
+      let agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+
+      wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DARWIN}
+          section={AgentTabs.NETWORK}
+        />,
+      );
+
+      agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+
+      wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DARWIN}
+          section={AgentTabs.PROCESSES}
+        />,
+      );
+
+      agentInfo = findAgentInfo(wrapper);
+
+      expect(agentInfo).toBeTruthy();
+    });
+  });
+
   describe('Software', () => {
     describe(SOFTWARE_PACKAGES + ' table', () => {
       it('A Linux agent should render software table with correct columns and title.', () => {

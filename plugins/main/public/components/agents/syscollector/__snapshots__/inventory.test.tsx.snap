@@ -16,6 +16,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -1575,6 +1576,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -3166,6 +3168,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -4749,6 +4752,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -6308,6 +6312,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -7899,6 +7904,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -9482,6 +9488,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -11041,6 +11048,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -12632,6 +12640,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -14215,6 +14224,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -15063,6 +15073,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -16033,6 +16044,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -16881,6 +16893,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -17681,6 +17694,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -17754,7 +17768,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                         >
                           <svg
                             aria-hidden="true"
-                            class="euiIcon euiIcon--medium euiIcon--customColor euiIcon-isLoading"
+                            class="euiIcon euiIcon--medium euiIcon--customColor"
                             focusable="false"
                             height="16"
                             role="img"
@@ -17763,8 +17777,10 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                             width="16"
                             xmlns="http://www.w3.org/2000/svg"
                           >
-                            <path
-                              d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                            <circle
+                              cx="8"
+                              cy="8"
+                              r="4"
                             />
                           </svg>
                         </div>
@@ -17783,9 +17799,8 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                     class="euiToolTipAnchor wz-margin-left-10"
                   >
                     <svg
-                      aria-hidden="true"
                       aria-label="Description"
-                      class="euiIcon euiIcon--medium euiIcon--primary euiIcon-isLoading"
+                      class="euiIcon euiIcon--medium euiIcon--primary"
                       focusable="true"
                       height="16"
                       role="img"
@@ -17795,7 +17810,8 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                        d="M7.5 11.508 7.468 8H6.25V7h2.401l.03 3.508H9.8v1H7.5Zm-.25-6.202a.83.83 0 0 1 .207-.577c.137-.153.334-.229.59-.229.256 0 .454.076.594.23.14.152.209.345.209.576 0 .228-.07.417-.21.568-.14.15-.337.226-.593.226-.256 0-.453-.075-.59-.226a.81.81 0 0 1-.207-.568ZM8 13A5 5 0 1 0 8 3a5 5 0 0 0 0 10Zm0 1A6 6 0 1 1 8 2a6 6 0 0 1 0 12Z"
+                        fill-rule="evenodd"
                       />
                     </svg>
                   </span>
@@ -18107,7 +18123,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                          class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
                           focusable="false"
                           height="16"
                           role="img"
@@ -18116,7 +18132,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                            d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058ZM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0Z"
                           />
                         </svg>
                         <span
@@ -18140,7 +18156,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                       >
                         <svg
                           aria-hidden="true"
-                          class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                          class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
                           focusable="false"
                           height="16"
                           role="img"
@@ -18149,7 +18165,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                           xmlns="http://www.w3.org/2000/svg"
                         >
                           <path
-                            d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                            d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
                           />
                         </svg>
                         <span
@@ -18258,7 +18274,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                               >
                                 <svg
                                   aria-hidden="true"
-                                  class="euiIcon euiIcon--small euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                                  class="euiIcon euiIcon--small euiIcon--inherit euiButtonContent__icon"
                                   focusable="false"
                                   height="16"
                                   role="img"
@@ -18267,7 +18283,8 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                                   xmlns="http://www.w3.org/2000/svg"
                                 >
                                   <path
-                                    d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                                    d="M13.069 5.157 8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0Z"
+                                    fill-rule="non-zero"
                                   />
                                 </svg>
                                 <span
@@ -18316,7 +18333,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                             </span>
                             <svg
                               aria-hidden="true"
-                              class="euiIcon euiIcon--medium euiIcon-isLoading euiTableSortIcon"
+                              class="euiIcon euiIcon--medium euiTableSortIcon"
                               focusable="false"
                               height="16"
                               role="img"
@@ -18325,7 +18342,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                               xmlns="http://www.w3.org/2000/svg"
                             >
                               <path
-                                d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                                d="M8 4.207v8.237c0 .307-.224.556-.5.556s-.5-.249-.5-.556V4.207L2.904 8.303a.5.5 0 0 1-.707-.707l4.242-4.242a1.5 1.5 0 0 1 2.122 0l4.242 4.242a.5.5 0 1 1-.707.707L8 4.207Z"
                               />
                             </svg>
                           </span>
@@ -18479,6 +18496,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
@@ -19564,6 +19582,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
       >
         <div
           class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+          data-test-subj="agent-info"
           style="responsive:"
         >
           <div
