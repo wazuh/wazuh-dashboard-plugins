@@ -262,7 +262,7 @@ const InventoryVulsComponent = () => {
                               results?.hits?.total &&
                               results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                    ariaLabel: 'Warning',
+                                    ariaLabel: 'Info',
                                     content: `The query results has exceeded the limit of ${formatNumWithCommas(
                                       MAX_ENTRIES_PER_QUERY,
                                     )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(

@@ -41,7 +41,7 @@ const DiscoverDataGridAdditionalControls = (
         tooltip={
           totalHits && totalHits > maxEntriesPerQuery
             ? {
-                ariaLabel: 'Warning',
+                ariaLabel: 'Info',
                 content: `The query results exceeded the limit of ${formatNumWithCommas(
                   maxEntriesPerQuery,
                 )} hits. Please refine your search.`,

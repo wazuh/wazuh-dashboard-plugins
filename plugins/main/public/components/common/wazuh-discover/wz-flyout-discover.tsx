@@ -314,7 +314,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                       results?.hits?.total &&
                       results?.hits?.total > MAX_ENTRIES_PER_QUERY
                         ? {
-                            ariaLabel: 'Warning',
+                            ariaLabel: 'Info',
                             content: `The query results exceeded the limit of ${formatNumWithCommas(
                               MAX_ENTRIES_PER_QUERY,
                             )} hits. Please refine your search.`,
