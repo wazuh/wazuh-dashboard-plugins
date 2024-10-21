@@ -27,7 +27,7 @@ import {
   withErrorBoundary,
 } from '../../common/hocs';
 import { compose } from 'redux';
-import { WzRequest, formatUIDate } from '../../../react-services';
+import { WzRequest } from '../../../react-services';
 import { AgentStatTable } from './table';
 import {
   PromptNoActiveAgentWithoutSelect,
@@ -63,8 +63,8 @@ const tableColumns = [
     field: 'bytes',
     name: 'Bytes',
     sortable: true,
-    },
-  ];
+  },
+];
 
 export const MainAgentStats = compose(
   withErrorBoundary,
@@ -107,7 +107,7 @@ export const MainAgentStats = compose(
   ),
 )(AgentStats);
 
-function AgentStats(props) {
+export function AgentStats(props) {
   const { agent } = props;
   const [loading, setLoading] = useState();
   const [dataStatLogcollector, setDataStatLogcollector] = useState({});
