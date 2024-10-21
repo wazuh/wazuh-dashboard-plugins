@@ -223,7 +223,11 @@ export class AgentInfo extends Component {
     const stats = this.buildStats(arrayStats);
 
     return (
-      <EuiFlexGroup data-test-subj="agent-info" wrap style={{ responsive: true }}>
+      <EuiFlexGroup
+        data-test-subj='agent-info'
+        wrap
+        style={{ responsive: true }}
+      >
         {stats}
       </EuiFlexGroup>
     );
