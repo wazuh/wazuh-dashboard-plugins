@@ -228,11 +228,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     render: item => (
       <EuiButtonIcon
         onClick={() => onExpandRow(item)}
-        aria-label={
-          itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
-            ? 'Collapse'
-            : 'Expand'
-        }
+        aria-label='Info'
         iconType={
           itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
             ? 'arrowDown'
@@ -318,11 +314,11 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                       results?.hits?.total &&
                       results?.hits?.total > MAX_ENTRIES_PER_QUERY
                         ? {
-                            ariaLabel: 'Warning',
+                            ariaLabel: 'Info',
                             content: `The query results exceeded the limit of ${formatNumWithCommas(
                               MAX_ENTRIES_PER_QUERY,
                             )} hits. Please refine your search.`,
-                            iconType: 'alert',
+                            iconType: 'iInCircle',
                             position: 'top',
                           }
                         : undefined
