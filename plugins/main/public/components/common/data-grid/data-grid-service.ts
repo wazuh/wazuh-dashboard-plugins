@@ -198,6 +198,7 @@ export const onFilterCellActions = (
   setFilters: (filters: Filter[]) => void,
 ) => {
   return (field: string, operation: FILTER_OPERATOR, value?: any) => {
+    if (!value) return;
     const newFilters: Filter[] = [];
     if (Array.isArray(value)) {
       value.forEach(item => {
