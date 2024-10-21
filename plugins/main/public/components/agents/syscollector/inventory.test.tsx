@@ -9,6 +9,7 @@ const SOFTWARE_WINDOWS_UPDATES = 'Windows updates';
 const NETWORK_PORTS = 'Network ports';
 const NETWORK_INTERFACES = 'Network interfaces';
 const NETWORK_SETTINGS = 'Network settings';
+const PROCESSES = 'Processes';
 
 const AGENT = {
   DEBIAN: {
@@ -68,6 +69,22 @@ const SOFTWARE_WINDOWS_UPDATES_COLUMNS = {
   UPDATE_CODE: 'Update code',
 } as const;
 
+const PROCESSES_COLUMNS = {
+  NAME: 'Name',
+  EFFECTIVE_USER: 'Effective user',
+  EFFECTIVE_GROUP: 'Effective group',
+  PID: 'PID',
+  PARENT_PID: 'Parent PID',
+  COMMAND: 'Command',
+  ARGVS: 'Argvs',
+  SIZE: 'Size',
+  VM_SIZE: 'VM size',
+  SESSION: 'Session',
+  PRIORITY: 'Priority',
+  STATE: 'State',
+  NLWP: 'NLWP',
+} as const;
+
 const shouldRenderTableWithCorrectColumnsAndTitle = (
   dataTestId: string,
   title: string,
@@ -80,7 +97,9 @@ const shouldRenderTableWithCorrectColumnsAndTitle = (
   );
   const visTable = wrapper.find(`[data-test-subj=${dataTestId}]`).first();
   const visTitle = visTable.find('[data-test-subj=table-wz-api-title]').text();
-  const visColumns = visTable.find('[data-test-subj=table-with-search-bar] th');
+  const visColumns = visTable.find(
+    '[data-test-subj=table-with-search-bar] .euiTableHeaderCell',
+  );
 
   const visTables = wrapper.find('table');
 
@@ -156,6 +175,19 @@ const shouldRenderSoftwareWindowsUpdatesTableWithCorrectColumnsAndTitle = (
     'software-windows-updates-table',
     SOFTWARE_WINDOWS_UPDATES,
     AgentTabs.SOFTWARE,
+    agent,
+    columns,
+  );
+};
+
+const shouldRenderProcessesTableWithCorrectColumnsAndTitle = (
+  agent: (typeof AGENT)[keyof typeof AGENT],
+  columns: string[],
+) => {
+  shouldRenderTableWithCorrectColumnsAndTitle(
+    'processes-table',
+    PROCESSES,
+    AgentTabs.PROCESSES,
     agent,
     columns,
   );
@@ -382,6 +414,64 @@ describe('Inventory data', () => {
           columns,
         );
       });
+    });
+  });
+
+  describe('Processes', () => {
+    it('A Linux agent should render processes table with correct columns and title.', () => {
+      const columns = [
+        PROCESSES_COLUMNS.NAME,
+        PROCESSES_COLUMNS.EFFECTIVE_USER,
+        PROCESSES_COLUMNS.EFFECTIVE_GROUP,
+        PROCESSES_COLUMNS.PID,
+        PROCESSES_COLUMNS.PARENT_PID,
+        PROCESSES_COLUMNS.COMMAND,
+        PROCESSES_COLUMNS.ARGVS,
+        PROCESSES_COLUMNS.VM_SIZE,
+        PROCESSES_COLUMNS.SIZE,
+        PROCESSES_COLUMNS.SESSION,
+        PROCESSES_COLUMNS.PRIORITY,
+        PROCESSES_COLUMNS.STATE,
+      ];
+
+      shouldRenderProcessesTableWithCorrectColumnsAndTitle(
+        AGENT.DEBIAN,
+        columns,
+      );
+    });
+
+    it('A Windows agent should render processes table with correct columns and title.', () => {
+      const columns = [
+        PROCESSES_COLUMNS.NAME,
+        PROCESSES_COLUMNS.PID,
+        PROCESSES_COLUMNS.PARENT_PID,
+        PROCESSES_COLUMNS.VM_SIZE,
+        PROCESSES_COLUMNS.PRIORITY,
+        PROCESSES_COLUMNS.NLWP,
+        PROCESSES_COLUMNS.COMMAND,
+      ];
+
+      shouldRenderProcessesTableWithCorrectColumnsAndTitle(
+        AGENT.WINDOWS,
+        columns,
+      );
+    });
+
+    it('A Apple agent should render processes table with correct columns and title.', () => {
+      const columns = [
+        PROCESSES_COLUMNS.NAME,
+        PROCESSES_COLUMNS.EFFECTIVE_USER,
+        PROCESSES_COLUMNS.PID,
+        PROCESSES_COLUMNS.PARENT_PID,
+        PROCESSES_COLUMNS.VM_SIZE,
+        PROCESSES_COLUMNS.PRIORITY,
+        PROCESSES_COLUMNS.STATE,
+      ];
+
+      shouldRenderProcessesTableWithCorrectColumnsAndTitle(
+        AGENT.DARWIN,
+        columns,
+      );
     });
   });
 });
