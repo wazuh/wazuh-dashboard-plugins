@@ -51,18 +51,14 @@ export class MainModuleAgent extends Component {
   state: {
     selectView: Boolean;
     loadingReport: Boolean;
-    switchModule: Boolean;
     showAgentInfo: Boolean;
   };
-  reportingService: ReportingService;
-  filterHandler: FilterHandler;
 
   constructor(props) {
     super(props);
     this.state = {
       selectView: false,
       loadingReport: false,
-      switchModule: false,
       showAgentInfo: false,
     };
   }
