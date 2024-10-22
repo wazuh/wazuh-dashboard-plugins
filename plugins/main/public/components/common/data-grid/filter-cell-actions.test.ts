@@ -33,32 +33,67 @@ describe('onFilterCellActions', () => {
     setFilters = jest.fn();
   });
 
-  it('should add filter with given key (rule.level) and number value (3)', () => {
+  it('should add single filter with given key (rule.level) and number value (3)', () => {
     const key = 'rule.level';
     const value = 3;
+    const operation = FILTER_OPERATOR.IS;
+
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
       key,
-      FILTER_OPERATOR.IS,
+      operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(FILTER_OPERATOR.IS, key, value),
+      buildFilter(operation, key, value),
     ]);
   });
 
-  it('should add filter with is not operator for key and number value (3)', () => {
+  it('should add single filter with is not operator for key and number value (3)', () => {
     const key = 'rule.level';
     const value = 3;
+    const operation = FILTER_OPERATOR.IS_NOT;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
       key,
-      FILTER_OPERATOR.IS_NOT,
+      operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(FILTER_OPERATOR.IS_NOT, key, value),
+      buildFilter(operation, key, value),
+    ]);
+  });
+
+  it('should add single filter with key (rule.id) and string value (19003)', () => {
+    const key = 'rule.id';
+    const value = '19003';
+    const operation = FILTER_OPERATOR.IS;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      key,
+      operation,
+      value,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildFilter(operation, key, value),
+    ]);
+  });
+
+  it('should add single filter with key (rule.id) and string value (19003)', () => {
+    const key = 'rule.id';
+    const value = '19003';
+    const operation = FILTER_OPERATOR.IS_NOT;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      key,
+      operation,
+      value,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildFilter(operation, key, value),
     ]);
   });
 });
