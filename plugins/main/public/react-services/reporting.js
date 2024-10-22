@@ -34,7 +34,6 @@ import { getForceNow } from '../components/common/search-bar/search-bar-service'
 import NavigationService from './navigation-service';
 import { Agent } from '../components/endpoints-summary/types';
 
-
 export class ReportingService {
   constructor() {
     this.wazuhConfig = new WazuhConfig();
@@ -139,7 +138,11 @@ export class ReportingService {
     return store.getState().reportingReducers?.dataSourceSearchContext;
   }
 
-  async startVis2Png(tab, /** @type {Agent['id'] | false} */ agents = '', /** @type {any} */ searchContext = null) {
+  async startVis2Png(
+    tab,
+    /** @type {Agent['id'] | false} */ agents = '',
+    /** @type {any} */ searchContext = null,
+  ) {
     try {
       const dataSourceContext =
         searchContext || (await this.getDataSourceSearchContext());
