@@ -919,13 +919,13 @@ export const Categories = [
     label: i18n.translate('wz-app-category-dashboard-management', {
       defaultMessage: 'Dashboard management',
     }),
-    order: 6e3,
+    order: 5e3,
     euiIconType: 'dashboardApp',
   },
   {
     id: 'management',
     label: 'Indexer management',
-    order: 5e3,
+    order: 6e3,
     euiIconType: 'managementApp',
   },
 ];
