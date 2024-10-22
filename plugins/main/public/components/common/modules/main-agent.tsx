@@ -49,7 +49,6 @@ export class MainModuleAgent extends Component {
     agentsSelectionProps?: any;
   };
   state: {
-    selectView: Boolean;
     loadingReport: Boolean;
     showAgentInfo: Boolean;
   };
@@ -57,7 +56,6 @@ export class MainModuleAgent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectView: false,
       loadingReport: false,
       showAgentInfo: false,
     };
