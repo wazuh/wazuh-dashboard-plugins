@@ -104,7 +104,14 @@ const DocViewer = (props: tDocViewerProps) => {
     onFilter: onClose,
   } = props;
 
-  const onFilter = (field: string, operation: FILTER_OPERATOR, value?: any) => {
+  const onFilter = (
+    field: string,
+    operation:
+      | FILTER_OPERATOR.IS
+      | FILTER_OPERATOR.IS_NOT
+      | FILTER_OPERATOR.EXISTS,
+    value?: string | string[],
+  ) => {
     const _onFilter = onFilterCellActions(
       indexPattern?.id,
       filters,
