@@ -1,6 +1,7 @@
 import React from 'react';
-import { render } from 'enzyme';
+import { render } from '@testing-library/react';
 import WzConfigurationSwitch from './configuration-switch';
+import { queryDataTestAttr } from '../../../../../../test/public/query-attr';
 
 jest.mock('react-redux', () => ({
   connect: () => Component => Component,
@@ -133,16 +134,45 @@ jest.mock('../../../../../components/common/hocs', () => ({
 
 jest.mock('../../../../../react-services/wz-request', () => ({
   WzRequest: {
-    apiReq: () => Promise.resolve(),
+    apiReq: jest.fn().mockResolvedValue({
+      data: {
+        data: {
+          affected_items: [],
+        },
+      },
+    }),
     __esModule: true,
   },
 }));
 
+jest.mock('./utils/wz-fetch', () => ({
+  clusterReq: jest.fn().mockResolvedValue({
+    data: {
+      data: {
+        affected_items: [],
+      },
+    },
+  }),
+  clusterNodes: jest.fn().mockResolvedValue({
+    data: {
+      data: {
+        affected_items: [],
+      },
+    },
+  }),
+}));
+
 describe('WzConfigurationSwitch', () => {
   it('should render agent info', () => {
-    const wrapper = render(<WzConfigurationSwitch agent={{ id: '000' }} />);
+    const { container } = render(
+      <WzConfigurationSwitch
+        agent={{ id: '000' }}
+        updateClusterNodes={jest.fn()}
+        updateClusterNodeSelected={jest.fn()}
+      />,
+    );
 
-    const agentInfo = wrapper.find('[data-test-subj="agent-info"]').html();
+    const agentInfo = container.querySelector(queryDataTestAttr('agent-info'));
 
     expect(agentInfo).toBeTruthy();
   });
