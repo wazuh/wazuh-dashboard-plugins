@@ -171,7 +171,7 @@ describe('onFilterCellActions', () => {
     ]);
   });
 
-  it('should add single filter with given key and string value (10.0.2.2)', () => {
+  it('should add single filter with given key and ip value (10.0.2.2)', () => {
     const value = '10.0.2.2';
     const operation = FILTER_OPERATOR.IS;
 
@@ -186,7 +186,7 @@ describe('onFilterCellActions', () => {
     ]);
   });
 
-  it('should add single filter with is not operator for given key and string value (10.0.2.2)', () => {
+  it('should add single filter with is not operator for given key and ip value (10.0.2.2)', () => {
     const value = '10.0.2.2';
     const operation = FILTER_OPERATOR.IS_NOT;
 
@@ -201,7 +201,7 @@ describe('onFilterCellActions', () => {
     ]);
   });
 
-  it('should add two filters with given key and value (group1, group2) respectively', () => {
+  it('should add two filters with given key and values (group1, group2) respectively', () => {
     const values = ['group1', 'group2'];
     const operation = FILTER_OPERATOR.IS;
 
@@ -217,7 +217,7 @@ describe('onFilterCellActions', () => {
     ]);
   });
 
-  it('should add two filters with is not operator for given key and value (group1, group2) respectively', () => {
+  it('should add two filters with is not operator for given key and values (group1, group2) respectively', () => {
     const values = ['group1', 'group2'];
     const operation = FILTER_OPERATOR.IS_NOT;
 
