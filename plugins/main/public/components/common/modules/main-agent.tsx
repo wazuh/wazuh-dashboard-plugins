@@ -75,6 +75,7 @@ export class MainModuleAgent extends Component {
                 <>
                   {this.inventoryTabs.map(tab => (
                     <EuiTab
+                      key={`report-tab-${tab}`}
                       data-test-subj={`report-tab-${tab}`}
                       isSelected={this.props.section === tab}
                       onClick={() => this.props.switchTab?.(tab)}
