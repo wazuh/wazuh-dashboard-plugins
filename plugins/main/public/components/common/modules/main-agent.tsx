@@ -81,10 +81,12 @@ export class MainModuleAgent extends Component {
             <EuiLoadingSpinner size='s' />
           ) : (
             <EuiTabs>
+          <EuiTabs data-test-subj='report-tabs'>
               {this.inventoryTabs.includes(this.props.section) ? (
                 <>
                   {this.inventoryTabs.map(tab => (
                     <EuiTab
+                    data-test-subj={`report-tab-${tab}`}
                       isSelected={this.props.section === tab}
                       onClick={() => this.props.switchTab?.(tab)}
                     >
@@ -93,7 +95,7 @@ export class MainModuleAgent extends Component {
                   ))}
                 </>
               ) : (
-                <EuiTab isSelected={true}>
+              <EuiTab data-test-subj='report-tab-overview' isSelected={true}>
                   {toTitleCase(this.props.section)}&nbsp;
                 </EuiTab>
               )}
@@ -232,6 +234,7 @@ const GenerateReportButton = ({ agent }) => {
 
   return (
     <EuiButtonEmpty
+      data-test-subj='generate-report-button'
       iconType='document'
       isLoading={action.running}
       isDisabled={isDataSourceLoading}
