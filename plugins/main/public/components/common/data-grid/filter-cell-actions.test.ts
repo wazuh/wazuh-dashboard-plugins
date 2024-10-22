@@ -4,38 +4,41 @@ import { FILTER_OPERATOR } from '../data-source';
 
 const INDEX_PATTERN_ID = 'index-pattern-test';
 
-const buildFilter = (
+const buildMatchFilter = (
   key: string,
   operation: string,
   value: string | string[] | any,
 ) => {
-  const hasExists = operation.includes('exists');
-  const hasPhrase = !hasExists && value;
-
   return {
-    ...(hasExists && { exists: { field: key } }),
     meta: {
       alias: null,
       controlledBy: undefined,
       disabled: false,
       key: key,
-      ...(hasPhrase && { params: value }),
-      value: hasPhrase
-        ? Array.isArray(value)
-          ? value.join(', ')
-          : value
-        : 'exists',
+      params: value,
+      value: Array.isArray(value) ? value.join(', ') : value,
       negate: operation.includes('not'),
-      type: hasPhrase
-        ? Array.isArray(value)
-          ? 'phrases'
-          : 'phrase'
-        : 'exists',
+      type: Array.isArray(value) ? 'phrases' : 'phrase',
       index: INDEX_PATTERN_ID,
     },
-    ...(hasPhrase && {
-      query: { match_phrase: { [key]: { query: value } } },
-    }),
+    query: { match_phrase: { [key]: { query: value } } },
+    $state: { store: FilterStateStore.APP_STATE },
+  };
+};
+
+const buildExistsFilter = (key: string, operation: string) => {
+  return {
+    exists: { field: key },
+    meta: {
+      alias: null,
+      controlledBy: undefined,
+      disabled: false,
+      key: key,
+      value: 'exists',
+      negate: operation.includes('not'),
+      type: 'exists',
+      index: INDEX_PATTERN_ID,
+    },
     $state: { store: FilterStateStore.APP_STATE },
   };
 };
@@ -59,7 +62,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, value),
+      buildMatchFilter(key, operation, value),
     ]);
   });
 
@@ -75,7 +78,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, value),
+      buildMatchFilter(key, operation, value),
     ]);
   });
 
@@ -91,7 +94,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, value),
+      buildMatchFilter(key, operation, value),
     ]);
   });
 
@@ -107,7 +110,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, value),
+      buildMatchFilter(key, operation, value),
     ]);
   });
 
@@ -123,7 +126,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, value),
+      buildMatchFilter(key, operation, value),
     ]);
   });
 
@@ -139,7 +142,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, value),
+      buildMatchFilter(key, operation, value),
     ]);
   });
 
@@ -156,7 +159,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, value),
+      buildMatchFilter(key, operation, value),
     ]);
   });
 
@@ -173,7 +176,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, value),
+      buildMatchFilter(key, operation, value),
     ]);
   });
 
@@ -189,8 +192,8 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, values[0]),
-      buildFilter(key, operation, values[1]),
+      buildMatchFilter(key, operation, values[0]),
+      buildMatchFilter(key, operation, values[1]),
     ]);
   });
 
@@ -206,8 +209,8 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, operation, values[0]),
-      buildFilter(key, operation, values[1]),
+      buildMatchFilter(key, operation, values[0]),
+      buildMatchFilter(key, operation, values[1]),
     ]);
   });
 
@@ -224,7 +227,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, FILTER_OPERATOR.DOES_NOT_EXISTS, values),
+      buildExistsFilter(key, FILTER_OPERATOR.DOES_NOT_EXISTS),
     ]);
   });
 
@@ -241,7 +244,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(key, FILTER_OPERATOR.EXISTS, values),
+      buildExistsFilter(key, FILTER_OPERATOR.EXISTS),
     ]);
   });
 });
