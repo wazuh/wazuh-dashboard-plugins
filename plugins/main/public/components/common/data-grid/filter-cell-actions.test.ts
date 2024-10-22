@@ -128,4 +128,38 @@ describe('onFilterCellActions', () => {
       buildFilter(key, operation, value),
     ]);
   });
+
+  it('should add single filter with given key (data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress) and string value (10.0.2.2)', () => {
+    const key =
+      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress';
+    const value = '10.0.2.2';
+    const operation = FILTER_OPERATOR.IS;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      key,
+      operation,
+      value,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildFilter(key, operation, value),
+    ]);
+  });
+
+  it('should add single filter with is not operator for given key (data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress) and string value (10.0.2.2)', () => {
+    const key =
+      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress';
+    const value = '10.0.2.2';
+    const operation = FILTER_OPERATOR.IS_NOT;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      key,
+      operation,
+      value,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildFilter(key, operation, value),
+    ]);
+  });
 });
