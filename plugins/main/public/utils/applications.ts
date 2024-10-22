@@ -24,8 +24,9 @@ Endpoint security: 200
 Threat intelligence: 300
 Security operations: 400
 Cloud security: 500
-Server management: 600
-Dashboard management: 700
+Agents management: 600
+Server management: 700
+Dashboard management
 Indexer management (added to Wazuh dashboard default categories): 9000
 */
 
@@ -497,7 +498,7 @@ export const rules = {
     defaultMessage: 'Manage your cluster rules.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 602,
+  order: 700,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=ruleset',
@@ -516,7 +517,7 @@ export const decoders = {
     defaultMessage: 'Manage your cluster decoders.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 603,
+  order: 701,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=decoders',
@@ -535,7 +536,7 @@ export const cdbLists = {
     defaultMessage: 'Manage your cluster CDB list.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 604,
+  order: 702,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=lists',
@@ -573,7 +574,7 @@ export const serverStatus = {
     defaultMessage: 'Manage your cluster status.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 605,
+  order: 703,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=status',
@@ -592,7 +593,7 @@ export const cluster = {
     defaultMessage: 'Manage your cluster.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 606,
+  order: 704,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=monitoring',
@@ -611,7 +612,7 @@ export const statistics = {
     defaultMessage: 'Information about the enviroment.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 607,
+  order: 705,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=statistics',
@@ -630,7 +631,7 @@ export const logs = {
     defaultMessage: 'Logs from your cluster.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 608,
+  order: 706,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=logs',
@@ -668,7 +669,7 @@ export const settings = {
     defaultMessage: 'Manage your cluster configuration.',
   }),
   euiIconType: 'indexRollupApp',
-  order: 609,
+  order: 707,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/manager/?tab=configuration',
@@ -687,7 +688,7 @@ export const devTools = {
     defaultMessage: 'Test the API endpoints.',
   }),
   euiIconType: 'devToolsApp',
-  order: 610,
+  order: 708,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/wazuh-dev?tab=devTools',
@@ -706,7 +707,7 @@ export const rulesetTest = {
     defaultMessage: 'Check your ruleset testing logs.',
   }),
   euiIconType: 'visualizeApp',
-  order: 611,
+  order: 709,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/wazuh-dev?tab=logtest',
@@ -726,7 +727,7 @@ export const security = {
       'Manage permissions to system resources based on the roles and policies.',
   }),
   euiIconType: 'securityAnalyticsApp',
-  order: 612,
+  order: 710,
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/security?tab=users',
