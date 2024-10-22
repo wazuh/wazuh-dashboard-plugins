@@ -5,8 +5,8 @@ import { FILTER_OPERATOR } from '../data-source';
 const INDEX_PATTERN_ID = 'index-pattern-test';
 
 const buildFilter = (
-  type: string,
   key: string,
+  operation: string,
   value: string | string[] | any,
 ) => {
   return {
@@ -17,7 +17,7 @@ const buildFilter = (
       key: key,
       value: Array.isArray(value) ? value.join(', ') : value,
       params: value,
-      negate: type === 'is not',
+      negate: operation === 'is not',
       type: Array.isArray(value) ? 'phrases' : 'phrase',
       index: INDEX_PATTERN_ID,
     },
@@ -45,7 +45,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(operation, key, value),
+      buildFilter(key, operation, value),
     ]);
   });
 
@@ -61,7 +61,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(operation, key, value),
+      buildFilter(key, operation, value),
     ]);
   });
 
@@ -77,7 +77,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(operation, key, value),
+      buildFilter(key, operation, value),
     ]);
   });
 
@@ -93,7 +93,7 @@ describe('onFilterCellActions', () => {
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildFilter(operation, key, value),
+      buildFilter(key, operation, value),
     ]);
   });
 });
