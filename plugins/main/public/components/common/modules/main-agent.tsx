@@ -85,7 +85,10 @@ export class MainModuleAgent extends Component {
                   ))}
                 </>
               ) : (
-                <EuiTab data-test-subj='report-tab-overview' isSelected={true}>
+                <EuiTab
+                  data-test-subj={`report-tab-${this.props.section}`}
+                  isSelected={true}
+                >
                   {toTitleCase(this.props.section)}&nbsp;
                 </EuiTab>
               )}

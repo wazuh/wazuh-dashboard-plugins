@@ -38,8 +38,24 @@ describe('Main Agent', () => {
     );
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-overview"]').html(),
+      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
     ).toBeTruthy();
+
+    expect(
+      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.SOFTWARE}]`).html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.NETWORK}]`).html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
+    ).toBeFalsy();
   });
 
   it('should render report tab overview when section is configuration', () => {
@@ -52,8 +68,24 @@ describe('Main Agent', () => {
     );
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-overview"]').html(),
+      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
     ).toBeTruthy();
+
+    expect(
+      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.SOFTWARE}]`).html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.NETWORK}]`).html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
+    ).toBeFalsy();
   });
 
   it('should render report tab overview when section is software', () => {
@@ -76,6 +108,14 @@ describe('Main Agent', () => {
     expect(
       wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
     ).toBeTruthy();
+
+    expect(
+      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+    ).toBeFalsy();
   });
 
   it('should render report tab overview when section is network', () => {
@@ -98,6 +138,14 @@ describe('Main Agent', () => {
     expect(
       wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
     ).toBeTruthy();
+
+    expect(
+      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+    ).toBeFalsy();
   });
 
   it('should render report tab overview when section is processes', () => {
@@ -120,5 +168,13 @@ describe('Main Agent', () => {
     expect(
       wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
     ).toBeTruthy();
+
+    expect(
+      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+    ).toBeFalsy();
   });
 });
