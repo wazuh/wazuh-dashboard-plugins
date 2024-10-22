@@ -1,5 +1,4 @@
 import { FilterStateStore } from '../../../../common/constants';
-import { Filter } from '../../../../../../src/plugins/data/common';
 import { onFilterCellActions } from './filter-cell-actions';
 import { FILTER_OPERATOR } from '../data-source';
 
@@ -28,25 +27,22 @@ const buildFilter = (
 };
 
 describe('onFilterCellActions', () => {
-  let filters: Filter[];
   let setFilters: jest.Mock;
 
   beforeEach(() => {
-    filters = [];
     setFilters = jest.fn();
   });
 
   it('should add filter with given key (rule.level) and number value (3)', () => {
     const key = 'rule.level';
     const value = 3;
-    onFilterCellActions(INDEX_PATTERN_ID, filters, setFilters)(
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
       key,
       FILTER_OPERATOR.IS,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      ...filters,
       buildFilter(FILTER_OPERATOR.IS, key, value),
     ]);
   });
@@ -55,14 +51,13 @@ describe('onFilterCellActions', () => {
     const key = 'rule.level';
     const value = 3;
 
-    onFilterCellActions(INDEX_PATTERN_ID, filters, setFilters)(
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
       key,
       FILTER_OPERATOR.IS_NOT,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      ...filters,
       buildFilter(FILTER_OPERATOR.IS_NOT, key, value),
     ]);
   });
