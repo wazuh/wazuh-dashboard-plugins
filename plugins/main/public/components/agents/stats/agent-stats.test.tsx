@@ -1,6 +1,7 @@
 import React from 'react';
 import { render } from 'enzyme';
 import { AgentStats } from './agent-stats';
+import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
 const AGENT = {
   id: '10101',
@@ -10,7 +11,7 @@ describe('AgentStats', () => {
   it('should render agent info', () => {
     const wrapper = render(<AgentStats agent={AGENT} />);
 
-    const agentInfo = wrapper.find('[data-test-subj="agent-info"]').html();
+    const agentInfo = wrapper.find(queryDataTestAttr('agent-info')).html();
 
     expect(agentInfo).toBeTruthy();
   });
