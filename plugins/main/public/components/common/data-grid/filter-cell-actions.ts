@@ -16,7 +16,7 @@ export const onFilterCellActions = (
       | FILTER_OPERATOR.EXISTS
       | FILTER_OPERATOR.IS
       | FILTER_OPERATOR.IS_NOT,
-    values?: number | string | string[],
+    values?: boolean | number | string | string[],
   ) => {
     // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/4e34a7a5141d089f6c341a535be5a7ba2737d965/src/plugins/data/public/query/filter_manager/lib/generate_filters.ts#L89
     const negated = [FILTER_OPERATOR.IS_NOT].includes(operation);

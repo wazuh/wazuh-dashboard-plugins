@@ -111,6 +111,36 @@ describe('onFilterCellActions', () => {
     ]);
   });
 
+  it('should add single filter with given key and string value (true)', () => {
+    const value = true;
+    const operation = FILTER_OPERATOR.IS;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      KEY,
+      operation,
+      value,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildMatchFilter(KEY, operation, value),
+    ]);
+  });
+
+  it('should add single filter with is not operator for given key and string value (true)', () => {
+    const value = true;
+    const operation = FILTER_OPERATOR.IS_NOT;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      KEY,
+      operation,
+      value,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildMatchFilter(KEY, operation, value),
+    ]);
+  });
+
   it('should add single filter with given key and date value (2024-10-19T18:44:40.487Z)', () => {
     const value = '2024-10-19T18:44:40.487Z';
     const operation = FILTER_OPERATOR.IS;
