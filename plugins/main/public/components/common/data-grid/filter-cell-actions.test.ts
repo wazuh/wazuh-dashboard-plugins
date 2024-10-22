@@ -162,4 +162,38 @@ describe('onFilterCellActions', () => {
       buildFilter(key, operation, value),
     ]);
   });
+
+  it('should add two filters with given key (rule.groups) and value (group1, group2) respectively', () => {
+    const key = 'rule.groups';
+    const values = ['group1', 'group2'];
+    const operation = FILTER_OPERATOR.IS;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      key,
+      operation,
+      values,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildFilter(key, operation, values[0]),
+      buildFilter(key, operation, values[1]),
+    ]);
+  });
+
+  it('should add two filters with is not operator for given key (rule.groups) and value (group1, group2) respectively', () => {
+    const key = 'rule.groups';
+    const values = ['group1', 'group2'];
+    const operation = FILTER_OPERATOR.IS_NOT;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      key,
+      operation,
+      values,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildFilter(key, operation, values[0]),
+      buildFilter(key, operation, values[1]),
+    ]);
+  });
 });
