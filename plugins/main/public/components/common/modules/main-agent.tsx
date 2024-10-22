@@ -43,12 +43,17 @@ import NavigationService from '../../../react-services/navigation-service';
 import { toTitleCase } from '../util/change-case';
 import clsx from 'clsx';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
+import { Agent } from '../../endpoints-summary/types';
 
 export class MainModuleAgent extends Component {
   props!: {
-    [key: string]: any;
+    agent: Agent;
     section: string;
     switchTab?: (tab: string) => void;
+    selectView?: boolean;
+    tabs?: any[];
+    renderTabs?: () => JSX.Element;
+    agentsSelectionProps?: any;
   };
   state: {
     selectView: Boolean;
@@ -206,7 +211,7 @@ export class AgentInventoryDataSource extends AlertsDataSource {
   }
 }
 
-const GenerateReportButton = ({ agent }) => {
+const GenerateReportButton = ({ agent }: { agent: Agent }) => {
   const {
     dataSource,
     fetchFilters,
