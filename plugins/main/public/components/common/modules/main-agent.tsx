@@ -70,13 +70,12 @@ export class MainModuleAgent extends Component {
           {this.state.loadingReport ? (
             <EuiLoadingSpinner size='s' />
           ) : (
-            <EuiTabs>
-          <EuiTabs data-test-subj='report-tabs'>
+            <EuiTabs data-test-subj='report-tabs'>
               {this.inventoryTabs.includes(this.props.section) ? (
                 <>
                   {this.inventoryTabs.map(tab => (
                     <EuiTab
-                    data-test-subj={`report-tab-${tab}`}
+                      data-test-subj={`report-tab-${tab}`}
                       isSelected={this.props.section === tab}
                       onClick={() => this.props.switchTab?.(tab)}
                     >
@@ -85,7 +84,7 @@ export class MainModuleAgent extends Component {
                   ))}
                 </>
               ) : (
-              <EuiTab data-test-subj='report-tab-overview' isSelected={true}>
+                <EuiTab data-test-subj='report-tab-overview' isSelected={true}>
                   {toTitleCase(this.props.section)}&nbsp;
                 </EuiTab>
               )}
