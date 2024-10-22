@@ -25,7 +25,7 @@ const buildFilter = (
           ? value.join(', ')
           : value
         : 'exists',
-      negate: operation === 'is not' || !value,
+      negate: operation.includes('not'),
       type: hasPhrase
         ? Array.isArray(value)
           ? 'phrases'
@@ -225,6 +225,23 @@ describe('onFilterCellActions', () => {
 
     expect(setFilters).toHaveBeenCalledWith([
       buildFilter(key, FILTER_OPERATOR.DOES_NOT_EXISTS, values),
+    ]);
+  });
+
+  it('should add single filter with is not operator for given key (data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress) and undefined value', () => {
+    const key =
+      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress';
+    const values = undefined;
+    const operation = FILTER_OPERATOR.IS_NOT;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      key,
+      operation,
+      values,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildFilter(key, FILTER_OPERATOR.EXISTS, values),
     ]);
   });
 });
