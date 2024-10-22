@@ -23,11 +23,7 @@ import {
 import '../../common/modules/module.scss';
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../welcome/agent-info/agents-info';
-import { compose } from 'redux';
-import { withGlobalBreadcrumb } from '../hocs';
-import { endpointSummary } from '../../../utils/applications';
 import {
   AlertsDataSource,
   AlertsDataSourceRepository,
@@ -37,7 +33,6 @@ import {
   useDataSource,
 } from '../data-source';
 import { useAsyncAction } from '../hooks';
-import NavigationService from '../../../react-services/navigation-service';
 import { toTitleCase } from '../util/change-case';
 import clsx from 'clsx';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
