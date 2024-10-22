@@ -4,6 +4,14 @@ import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { fireEvent, render } from '@testing-library/react';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
+const REPORT_TAB = {
+  STATS: 'stats',
+  CONFIGURATION: 'configuration',
+  SOFTWARE: 'software',
+  NETWORK: 'network',
+  PROCESSES: 'processes',
+};
+
 jest.mock('../../../react-services/reporting', () => ({
   ReportingService: {
     startVis2Png: jest.fn(),
@@ -39,23 +47,23 @@ describe('Main Agent', () => {
     );
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-stats')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-configuration')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-software')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-network')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-processes')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeFalsy();
   });
 
@@ -69,23 +77,23 @@ describe('Main Agent', () => {
     );
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-configuration')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-stats')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-software')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-network')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-processes')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeFalsy();
   });
 
@@ -99,23 +107,23 @@ describe('Main Agent', () => {
     );
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-software')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-network')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-processes')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-configuration')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-stats')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
     ).toBeFalsy();
   });
 
@@ -129,23 +137,23 @@ describe('Main Agent', () => {
     );
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-software')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-network')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-processes')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-configuration')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-stats')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
     ).toBeFalsy();
   });
 
@@ -159,23 +167,23 @@ describe('Main Agent', () => {
     );
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-software')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-network')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-processes')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-configuration')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
     ).toBeFalsy();
 
     expect(
-      container.querySelector(queryDataTestAttr('report-tab-stats')),
+      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
     ).toBeFalsy();
   });
 
@@ -190,7 +198,7 @@ describe('Main Agent', () => {
 
     fireEvent.click(
       container.querySelector(
-        queryDataTestAttr('report-tab-software'),
+        queryDataTestAttr(REPORT_TAB.SOFTWARE),
       ) as Element,
     );
 
@@ -198,9 +206,7 @@ describe('Main Agent', () => {
     expect(switchTab).toHaveBeenCalledWith(AgentTabs.SOFTWARE);
 
     fireEvent.click(
-      container.querySelector(
-        queryDataTestAttr('report-tab-network'),
-      ) as Element,
+      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)) as Element,
     );
 
     expect(switchTab).toHaveBeenCalledTimes(2);
@@ -208,7 +214,7 @@ describe('Main Agent', () => {
 
     fireEvent.click(
       container.querySelector(
-        queryDataTestAttr('report-tab-processes'),
+        queryDataTestAttr(REPORT_TAB.PROCESSES),
       ) as Element,
     );
 
