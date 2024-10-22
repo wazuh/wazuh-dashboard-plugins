@@ -9,10 +9,8 @@ const AGENT = {
 
 describe('AgentStats', () => {
   it('should render agent info', () => {
-    const { container } = render(<AgentStats agent={AGENT} />);
+    const wrapper = render(<AgentStats agent={AGENT} />);
 
-    expect(
-      container.querySelector(queryDataTestAttr('agent-info')),
-    ).toBeTruthy();
+    expect(wrapper.find(queryDataTestAttr('agent-info')).html()).toBeTruthy();
   });
 });
