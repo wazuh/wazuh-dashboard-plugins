@@ -1,7 +1,8 @@
 import React from 'react';
-import { render } from 'enzyme';
 import { MainModuleAgent } from './main-agent';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
+import { fireEvent, render } from '@testing-library/react';
+import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
 jest.mock('../../../react-services/reporting', () => ({
   ReportingService: {
@@ -22,14 +23,14 @@ jest.mock('../data-source', () => ({
 }));
 
 describe('Main Agent', () => {
-  let switchTab;
+  let switchTab: jest.Mock;
 
   beforeEach(() => {
     switchTab = jest.fn();
   });
 
   it('should render report tab overview when section is stats', () => {
-    const wrapper = render(
+    const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
         section={AgentTabs.STATS}
@@ -38,28 +39,28 @@ describe('Main Agent', () => {
     );
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-stats')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-configuration')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.SOFTWARE}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-software')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.NETWORK}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-network')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-processes')),
     ).toBeFalsy();
   });
 
   it('should render report tab overview when section is configuration', () => {
-    const wrapper = render(
+    const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
         section={AgentTabs.CONFIGURATION}
@@ -68,28 +69,28 @@ describe('Main Agent', () => {
     );
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-configuration')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-stats')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.SOFTWARE}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-software')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.NETWORK}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-network')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-processes')),
     ).toBeFalsy();
   });
 
   it('should render report tab overview when section is software', () => {
-    const wrapper = render(
+    const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
         section={AgentTabs.SOFTWARE}
@@ -98,28 +99,28 @@ describe('Main Agent', () => {
     );
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.SOFTWARE}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-software')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.NETWORK}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-network')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-processes')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-configuration')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-stats')),
     ).toBeFalsy();
   });
 
   it('should render report tab overview when section is network', () => {
-    const wrapper = render(
+    const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
         section={AgentTabs.NETWORK}
@@ -128,28 +129,28 @@ describe('Main Agent', () => {
     );
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.SOFTWARE}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-software')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.NETWORK}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-network')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-processes')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-configuration')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-stats')),
     ).toBeFalsy();
   });
 
   it('should render report tab overview when section is processes', () => {
-    const wrapper = render(
+    const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
         section={AgentTabs.PROCESSES}
@@ -158,23 +159,60 @@ describe('Main Agent', () => {
     );
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.SOFTWARE}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-software')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.NETWORK}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-network')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find(`[data-test-subj=report-tab-${AgentTabs.PROCESSES}]`).html(),
+      container.querySelector(queryDataTestAttr('report-tab-processes')),
     ).toBeTruthy();
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-configuration"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-configuration')),
     ).toBeFalsy();
 
     expect(
-      wrapper.find('[data-test-subj="report-tab-stats"]').html(),
+      container.querySelector(queryDataTestAttr('report-tab-stats')),
     ).toBeFalsy();
+  });
+
+  it('should be call switchTab when click on tab', () => {
+    const { container } = render(
+      <MainModuleAgent
+        agent={{ os: { platform: 'windows' } }}
+        section={AgentTabs.SOFTWARE}
+        switchTab={switchTab}
+      />,
+    );
+
+    fireEvent.click(
+      container.querySelector(
+        queryDataTestAttr('report-tab-software'),
+      ) as Element,
+    );
+
+    expect(switchTab).toHaveBeenCalledTimes(1);
+    expect(switchTab).toHaveBeenCalledWith(AgentTabs.SOFTWARE);
+
+    fireEvent.click(
+      container.querySelector(
+        queryDataTestAttr('report-tab-network'),
+      ) as Element,
+    );
+
+    expect(switchTab).toHaveBeenCalledTimes(2);
+    expect(switchTab).toHaveBeenCalledWith(AgentTabs.NETWORK);
+
+    fireEvent.click(
+      container.querySelector(
+        queryDataTestAttr('report-tab-processes'),
+      ) as Element,
+    );
+
+    expect(switchTab).toHaveBeenCalledTimes(3);
+    expect(switchTab).toHaveBeenCalledWith(AgentTabs.PROCESSES);
   });
 });
