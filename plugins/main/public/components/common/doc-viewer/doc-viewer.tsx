@@ -9,7 +9,7 @@ import { DocViewTableRowBtnFilterAdd } from './table-row-btn-filter-add';
 import { DocViewTableRowBtnFilterRemove } from './table-row-btn-filter-remove';
 import { DocViewTableRowBtnFilterExists } from './table-row-btn-filter-exists';
 import './doc-viewer.scss';
-import { onFilterCellActions } from '../data-grid';
+import { onFilterCellActions } from '../data-grid/filter-cell-actions';
 import { Filter } from '../../../../../../src/plugins/data/common';
 
 const COLLAPSE_LINE_LENGTH = 350;
