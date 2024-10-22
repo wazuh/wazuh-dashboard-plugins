@@ -111,7 +111,7 @@ describe('onFilterCellActions', () => {
     ]);
   });
 
-  it('should add single filter with given key and string value (true)', () => {
+  it('should add single filter with given key and boolean value (true)', () => {
     const value = true;
     const operation = FILTER_OPERATOR.IS;
 
@@ -126,7 +126,7 @@ describe('onFilterCellActions', () => {
     ]);
   });
 
-  it('should add single filter with is not operator for given key and string value (true)', () => {
+  it('should add single filter with is not operator for given key and boolean value (true)', () => {
     const value = true;
     const operation = FILTER_OPERATOR.IS_NOT;
 
