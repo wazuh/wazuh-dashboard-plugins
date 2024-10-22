@@ -5,11 +5,11 @@ import { fireEvent, render } from '@testing-library/react';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
 const REPORT_TAB = {
-  STATS: 'stats',
-  CONFIGURATION: 'configuration',
-  SOFTWARE: 'software',
-  NETWORK: 'network',
-  PROCESSES: 'processes',
+  STATS: 'report-tab-stats',
+  CONFIGURATION: 'report-tab-configuration',
+  SOFTWARE: 'report-tab-software',
+  NETWORK: 'report-tab-network',
+  PROCESSES: 'report-tab-processes',
 };
 
 jest.mock('../../../react-services/reporting', () => ({
