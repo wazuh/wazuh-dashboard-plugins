@@ -9,19 +9,33 @@ const buildFilter = (
   operation: string,
   value: string | string[] | any,
 ) => {
+  const hasExists = operation.includes('exists');
+  const hasPhrase = !hasExists && value;
+
   return {
+    ...(hasExists && { exists: { field: key } }),
     meta: {
       alias: null,
       controlledBy: undefined,
       disabled: false,
       key: key,
-      value: Array.isArray(value) ? value.join(', ') : value,
-      params: value,
-      negate: operation === 'is not',
-      type: Array.isArray(value) ? 'phrases' : 'phrase',
+      ...(hasPhrase && { params: value }),
+      value: hasPhrase
+        ? Array.isArray(value)
+          ? value.join(', ')
+          : value
+        : 'exists',
+      negate: operation === 'is not' || !value,
+      type: hasPhrase
+        ? Array.isArray(value)
+          ? 'phrases'
+          : 'phrase'
+        : 'exists',
       index: INDEX_PATTERN_ID,
     },
-    query: { match_phrase: { [key]: { query: value } } },
+    ...(hasPhrase && {
+      query: { match_phrase: { [key]: { query: value } } },
+    }),
     $state: { store: FilterStateStore.APP_STATE },
   };
 };
@@ -194,6 +208,23 @@ describe('onFilterCellActions', () => {
     expect(setFilters).toHaveBeenCalledWith([
       buildFilter(key, operation, values[0]),
       buildFilter(key, operation, values[1]),
+    ]);
+  });
+
+  it('should add single filter with given key (data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress) and undefined value', () => {
+    const key =
+      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress';
+    const values = undefined;
+    const operation = FILTER_OPERATOR.IS;
+
+    onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
+      key,
+      operation,
+      values,
+    );
+
+    expect(setFilters).toHaveBeenCalledWith([
+      buildFilter(key, FILTER_OPERATOR.DOES_NOT_EXISTS, values),
     ]);
   });
 });
