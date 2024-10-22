@@ -2,6 +2,7 @@ import { FilterStateStore } from '../../../../common/constants';
 import { onFilterCellActions } from './filter-cell-actions';
 import { FILTER_OPERATOR } from '../data-source';
 
+const KEY = 'test-key';
 const INDEX_PATTERN_ID = 'index-pattern-test';
 
 const buildMatchFilter = (
@@ -50,201 +51,185 @@ describe('onFilterCellActions', () => {
     setFilters = jest.fn();
   });
 
-  it('should add single filter with given key (rule.level) and number value (3)', () => {
-    const key = 'rule.level';
+  it('should add single filter with given key and number value (3)', () => {
     const value = 3;
     const operation = FILTER_OPERATOR.IS;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, value),
+      buildMatchFilter(KEY, operation, value),
     ]);
   });
 
-  it('should add single filter with is not operator for given key (rule.level) and number value (3)', () => {
-    const key = 'rule.level';
+  it('should add single filter with is not operator for given key and number value (3)', () => {
     const value = 3;
     const operation = FILTER_OPERATOR.IS_NOT;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, value),
+      buildMatchFilter(KEY, operation, value),
     ]);
   });
 
-  it('should add single filter with given key (rule.id) and string value (19003)', () => {
-    const key = 'rule.id';
+  it('should add single filter with given key and string value (19003)', () => {
     const value = '19003';
     const operation = FILTER_OPERATOR.IS;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, value),
+      buildMatchFilter(KEY, operation, value),
     ]);
   });
 
-  it('should add single filter with is not operator for given key (rule.id) and string value (19003)', () => {
-    const key = 'rule.id';
+  it('should add single filter with is not operator for given key and string value (19003)', () => {
     const value = '19003';
     const operation = FILTER_OPERATOR.IS_NOT;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, value),
+      buildMatchFilter(KEY, operation, value),
     ]);
   });
 
-  it('should add single filter with given key (timestamp) and date value (2024-10-19T18:44:40.487Z)', () => {
-    const key = 'timestamp';
+  it('should add single filter with given key and date value (2024-10-19T18:44:40.487Z)', () => {
     const value = '2024-10-19T18:44:40.487Z';
     const operation = FILTER_OPERATOR.IS;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, value),
+      buildMatchFilter(KEY, operation, value),
     ]);
   });
 
-  it('should add single filter is not operator for given key (timestamp) and date value (2024-10-19T18:44:40.487Z)', () => {
-    const key = 'timestamp';
+  it('should add single filter is not operator for given key and date value (2024-10-19T18:44:40.487Z)', () => {
     const value = '2024-10-19T18:44:40.487Z';
     const operation = FILTER_OPERATOR.IS_NOT;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, value),
+      buildMatchFilter(KEY, operation, value),
     ]);
   });
 
-  it('should add single filter with given key (data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress) and string value (10.0.2.2)', () => {
-    const key =
-      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress';
+  it('should add single filter with given key and string value (10.0.2.2)', () => {
     const value = '10.0.2.2';
     const operation = FILTER_OPERATOR.IS;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, value),
+      buildMatchFilter(KEY, operation, value),
     ]);
   });
 
-  it('should add single filter with is not operator for given key (data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress) and string value (10.0.2.2)', () => {
-    const key =
-      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress';
+  it('should add single filter with is not operator for given key and string value (10.0.2.2)', () => {
     const value = '10.0.2.2';
     const operation = FILTER_OPERATOR.IS_NOT;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       value,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, value),
+      buildMatchFilter(KEY, operation, value),
     ]);
   });
 
-  it('should add two filters with given key (rule.groups) and value (group1, group2) respectively', () => {
-    const key = 'rule.groups';
+  it('should add two filters with given key and value (group1, group2) respectively', () => {
     const values = ['group1', 'group2'];
     const operation = FILTER_OPERATOR.IS;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       values,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, values[0]),
-      buildMatchFilter(key, operation, values[1]),
+      buildMatchFilter(KEY, operation, values[0]),
+      buildMatchFilter(KEY, operation, values[1]),
     ]);
   });
 
-  it('should add two filters with is not operator for given key (rule.groups) and value (group1, group2) respectively', () => {
-    const key = 'rule.groups';
+  it('should add two filters with is not operator for given key and value (group1, group2) respectively', () => {
     const values = ['group1', 'group2'];
     const operation = FILTER_OPERATOR.IS_NOT;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       values,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildMatchFilter(key, operation, values[0]),
-      buildMatchFilter(key, operation, values[1]),
+      buildMatchFilter(KEY, operation, values[0]),
+      buildMatchFilter(KEY, operation, values[1]),
     ]);
   });
 
-  it('should add single filter with given key (data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress) and undefined value', () => {
-    const key =
-      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress';
+  it('should add single filter with given key and undefined value', () => {
     const values = undefined;
     const operation = FILTER_OPERATOR.IS;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       values,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildExistsFilter(key, FILTER_OPERATOR.DOES_NOT_EXISTS),
+      buildExistsFilter(KEY, FILTER_OPERATOR.DOES_NOT_EXISTS),
     ]);
   });
 
-  it('should add single filter with is not operator for given key (data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress) and undefined value', () => {
-    const key =
-      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress';
+  it('should add single filter with is not operator for given key and undefined value', () => {
     const values = undefined;
     const operation = FILTER_OPERATOR.IS_NOT;
 
     onFilterCellActions(INDEX_PATTERN_ID, [], setFilters)(
-      key,
+      KEY,
       operation,
       values,
     );
 
     expect(setFilters).toHaveBeenCalledWith([
-      buildExistsFilter(key, FILTER_OPERATOR.EXISTS),
+      buildExistsFilter(KEY, FILTER_OPERATOR.EXISTS),
     ]);
   });
 });
