@@ -22,8 +22,6 @@ import {
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import store from '../../../redux/store';
-import { FilterHandler } from '../../../utils/filter-handler';
-import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { AgentInfo } from '../welcome/agent-info/agents-info';
@@ -66,8 +64,6 @@ export class MainModuleAgent extends Component {
 
   constructor(props) {
     super(props);
-    this.reportingService = new ReportingService();
-    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
     this.state = {
       selectView: false,
       loadingReport: false,
