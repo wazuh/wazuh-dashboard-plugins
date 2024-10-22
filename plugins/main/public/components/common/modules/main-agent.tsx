@@ -145,7 +145,7 @@ export class MainModuleAgent extends Component {
                 {hasTabs && (
                   <div className='wz-welcome-page-agent-tabs'>
                     <EuiFlexGroup>
-                      {this.props.renderTabs()}
+                      {this.props.renderTabs?.()}
                       <EuiFlexItem
                         grow={false}
                         style={{ marginTop: 6, marginRight: 5 }}
