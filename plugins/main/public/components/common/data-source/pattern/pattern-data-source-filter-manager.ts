@@ -10,11 +10,10 @@ import {
   tDataSource,
   tFilterManager,
 } from '../index';
-import {
-  DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
-  AUTHORIZED_AGENTS,
-} from '../../../../../common/constants';
+import { DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER } from '../../../../../common/constants';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
+import { FilterStateStore } from '../../../../../common/constants';
+
 const MANAGER_AGENT_ID = '000';
 const AGENT_ID_KEY = 'agent.id';
 
@@ -36,7 +35,7 @@ export function getFilterExcludeManager(indexPatternId: string) {
       controlledBy: DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
     },
     query: { match_phrase: { [AGENT_ID_KEY]: MANAGER_AGENT_ID } },
-    $state: { store: 'appState' },
+    $state: { store: FilterStateStore.APP_STATE },
   };
 }
 
@@ -278,7 +277,7 @@ export class PatternDataSourceFilterManager
     };
     //@ts-ignore
     managerFilter.$state = {
-      store: 'appState',
+      store: FilterStateStore.APP_STATE,
     };
     //@ts-ignore
     return [managerFilter] as tFilter[];
@@ -382,7 +381,7 @@ export class PatternDataSourceFilterManager
             controlledBy,
           },
           exists: { field: key },
-          $state: { store: 'appState' },
+          $state: { store: FilterStateStore.APP_STATE },
         };
       case FILTER_OPERATOR.IS_ONE_OF:
       case FILTER_OPERATOR.IS_NOT_ONE_OF:
@@ -429,7 +428,7 @@ export class PatternDataSourceFilterManager
               lte: value[1] || NaN,
             },
           },
-          $state: { store: 'appState' },
+          $state: { store: FilterStateStore.APP_STATE },
         };
       default:
         throw new Error('Invalid filter type');
@@ -484,7 +483,7 @@ export class PatternDataSourceFilterManager
         controlledBy,
       },
       ...query,
-      $state: { store: 'appState' },
+      $state: { store: FilterStateStore.APP_STATE },
     };
   }
 
