@@ -163,17 +163,41 @@ jest.mock('./utils/wz-fetch', () => ({
 }));
 
 describe('WzConfigurationSwitch', () => {
-  it('should render agent info', () => {
+  it('should render agent info when showAgentInfo is true', () => {
     const { container } = render(
       <WzConfigurationSwitch
         agent={{ id: '000' }}
         updateClusterNodes={jest.fn()}
         updateClusterNodeSelected={jest.fn()}
+        showAgentInfo
       />,
     );
 
     const agentInfo = container.querySelector(queryDataTestAttr('agent-info'));
+    const spacer = container.querySelector(
+      queryDataTestAttr('wz-agent-info-spacer'),
+    );
 
     expect(agentInfo).toBeTruthy();
+    expect(spacer).toBeTruthy();
+  });
+
+  it('should dont render agent info when showAgentInfo is false', () => {
+    const { container } = render(
+      <WzConfigurationSwitch
+        agent={{ id: '000' }}
+        updateClusterNodes={jest.fn()}
+        updateClusterNodeSelected={jest.fn()}
+        showAgentInfo={false}
+      />,
+    );
+
+    const agentInfo = container.querySelector(queryDataTestAttr('agent-info'));
+    const spacer = container.querySelector(
+      queryDataTestAttr('wz-agent-info-spacer'),
+    );
+
+    expect(agentInfo).toBeFalsy();
+    expect(spacer).toBeFalsy();
   });
 });

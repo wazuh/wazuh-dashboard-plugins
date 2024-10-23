@@ -218,7 +218,7 @@ class WzConfigurationSwitch extends Component {
                   {...this.props}
                 ></AgentInfo>
               </EuiPanel>
-              <EuiSpacer size='xxl' />
+              <EuiSpacer data-test-subj='wz-agent-info-spacer' size='xxl' />
             </>
           )}
           <EuiPanel>
