@@ -1,4 +1,16 @@
-import { KeyEquivalence } from "../../../../../common/csv-key-equivalence";
+import { KeyEquivalence } from '../../../../../common/csv-key-equivalence';
+
+const mapFieldName = ({
+  field,
+  ...rest
+}: {
+  field: string;
+  name?: string;
+}) => ({
+  ...rest,
+  field,
+  name: rest.name || KeyEquivalence[field] || field,
+});
 
 const windowsColumns = [
   { field: 'name', searchable: true, sortable: true, width: '10%' },
@@ -8,7 +20,8 @@ const windowsColumns = [
   { field: 'priority', searchable: true, sortable: true },
   { field: 'nlwp', searchable: true, sortable: true },
   { field: 'cmd', searchable: true, sortable: true, width: '30%' },
-].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
+].map(mapFieldName);
+
 const linuxColumns = [
   { field: 'name', searchable: true, sortable: true, width: '10%' },
   { field: 'euser', searchable: true, sortable: true },
@@ -22,7 +35,8 @@ const linuxColumns = [
   { field: 'session', searchable: true, sortable: true },
   { field: 'nice', searchable: true, sortable: true },
   { field: 'state', searchable: true, sortable: true, width: '15%' },
-].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
+].map(mapFieldName);
+
 const macColumns = [
   { field: 'name', searchable: true, sortable: true, width: '10%' },
   { field: 'euser', searchable: true, sortable: true },
@@ -30,8 +44,7 @@ const macColumns = [
   { field: 'ppid', searchable: true, sortable: true },
   { field: 'vm_size', searchable: true, sortable: true },
   { field: 'nice', searchable: true, sortable: true },
-  { field: 'state', searchable: true, sortable: true, width: '15%' },
-].map(({field, ...rest}) => ({...rest, field, name: rest.name || KeyEquivalence[field] || field}));
+].map(mapFieldName);
 
 export const processColumns = {
   windows: windowsColumns,
