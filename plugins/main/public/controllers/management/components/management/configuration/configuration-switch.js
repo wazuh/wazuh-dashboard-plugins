@@ -222,27 +222,6 @@ class WzConfigurationSwitch extends Component {
             </>
           )}
           <EuiPanel>
-            {agent.id !== '000' && agent.group && agent.group.length ? (
-              <Fragment>
-                <span>Groups:</span>
-                <RedirectAppLinks application={getCore().application}>
-                  {agent.group.map((group, key) => (
-                    <EuiButtonEmpty
-                      key={`agent-group-${key}`}
-                      href={NavigationService.getInstance().getUrlForApp(
-                        endpointGroups.id,
-                        {
-                          path: `#/manager/?tab=groups&group=${group}`,
-                        },
-                      )}
-                    >
-                      {group}
-                    </EuiButtonEmpty>
-                  ))}
-                  <EuiSpacer size='s' />
-                </RedirectAppLinks>
-              </Fragment>
-            ) : null}
             {view !== '' && view !== 'edit-configuration' && (
               <WzConfigurationPath
                 title={title}
