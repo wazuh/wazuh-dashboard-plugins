@@ -53,13 +53,13 @@ export class MainModuleAgent extends Component {
     return (
       <EuiFlexGroup style={{ marginInline: 8 }}>
         <EuiFlexItem style={{ marginInline: 0 }} grow={false}>
-          <EuiTabs data-test-subj='report-tabs'>
+          <EuiTabs data-test-subj='agent-tabs'>
             {this.inventoryTabs.includes(section) ? (
               <>
                 {this.inventoryTabs.map(tab => (
                   <EuiTab
-                    key={`report-tab-${tab}`}
-                    data-test-subj={`report-tab-${tab}`}
+                    key={`agent-tab-${tab}`}
+                    data-test-subj={`agent-tab-${tab}`}
                     isSelected={section === tab}
                     onClick={() => switchTab?.(tab)}
                   >
@@ -68,10 +68,7 @@ export class MainModuleAgent extends Component {
                 ))}
               </>
             ) : (
-              <EuiTab
-                data-test-subj={`report-tab-${section}`}
-                isSelected={true}
-              >
+              <EuiTab data-test-subj={`agent-tab-${section}`} isSelected={true}>
                 {toTitleCase(section)}
               </EuiTab>
             )}
