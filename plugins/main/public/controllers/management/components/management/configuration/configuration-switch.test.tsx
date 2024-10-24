@@ -162,4 +162,44 @@ jest.mock('./utils/wz-fetch', () => ({
   }),
 }));
 
-describe('WzConfigurationSwitch', () => {});
+describe('WzConfigurationSwitch', () => {
+  let updateClusterNodes: jest.Mock;
+  let updateClusterNodeSelected: jest.Mock;
+
+  beforeEach(() => {
+    updateClusterNodes = jest.fn();
+    updateClusterNodeSelected = jest.fn();
+  });
+
+  it('should dont render generate report button', () => {
+    const { container } = render(
+      <WzConfigurationSwitch
+        agent={{ id: '000' }}
+        updateClusterNodes={updateClusterNodes}
+        updateClusterNodeSelected={updateClusterNodeSelected}
+      />,
+    );
+
+    const generateReportButton = container.querySelector(
+      queryDataTestAttr('generate-report-button'),
+    );
+
+    expect(generateReportButton).toBeFalsy();
+  });
+
+  it('should dont render agent info ribbon', () => {
+    const { container } = render(
+      <WzConfigurationSwitch
+        agent={{ id: '000' }}
+        updateClusterNodes={updateClusterNodes}
+        updateClusterNodeSelected={updateClusterNodeSelected}
+      />,
+    );
+
+    const agentInfoRibbon = container.querySelector(
+      queryDataTestAttr('agent-info'),
+    );
+
+    expect(agentInfoRibbon).toBeFalsy();
+  });
+});
