@@ -1,6 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { render, act } from '@testing-library/react';
 import { AgentStats } from './agent-stats';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
