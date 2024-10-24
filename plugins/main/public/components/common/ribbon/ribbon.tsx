@@ -17,7 +17,7 @@ const WzRibbon = (props: RibbonProps) => {
         style={{ responsive: true }}
       >
         {items.map(item => (
-          <WzRibbonItem item={item} />
+          <WzRibbonItem key={item.key} item={item} />
         ))}
       </EuiFlexGroup>
     </EuiPanel>

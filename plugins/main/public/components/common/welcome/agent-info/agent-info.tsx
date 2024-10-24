@@ -44,21 +44,25 @@ export class AgentInfo extends Component<AgentInfoProps> {
     if (this.props.isCondensed) {
       arrayStats = [
         {
+          key: 'id',
           value: agent.id,
           label: 'ID',
           style: { maxWidth: 100 },
         },
         {
+          key: 'status',
           value: agent,
           label: RibbonItemLabel.STATUS,
           style: { maxWidth: 150 },
         },
         {
+          key: 'version',
           value: agent.version,
           label: 'Version',
           style: { maxWidth: 150 },
         },
         {
+          key: 'os',
           value: agent,
           label: RibbonItemLabel.OPERATING_SYSTEM,
           style: { minWidth: 200, maxWidth: 200 },
@@ -67,35 +71,42 @@ export class AgentInfo extends Component<AgentInfoProps> {
     } else {
       arrayStats = [
         {
+          key: 'id',
           value: agent.id,
           label: 'ID',
           style: { minWidth: 30 },
         },
         {
+          key: 'status',
           value: agent,
           label: RibbonItemLabel.STATUS,
           style: { minWidth: 100 },
         },
         {
+          key: 'ip',
           value: agent.ip,
           label: 'IP address',
           style: {},
         },
         {
+          key: 'version',
           value: agent.version,
           label: 'Version',
           style: { minWidth: 100 },
         },
         {
+          key: 'group',
           value: agent.group,
           label: RibbonItemLabel.GROUPS,
           style: { minWidth: 150 },
         },
         {
+          key: 'os',
           value: agent,
           label: RibbonItemLabel.OPERATING_SYSTEM,
         },
         {
+          key: 'cluster-node',
           value:
             agent.node_name && agent.node_name !== 'unknown'
               ? agent.node_name
@@ -104,11 +115,13 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { minWidth: 120 },
         },
         {
+          key: 'registration-date',
           value: formatUIDate(agent.dateAdd),
           label: 'Registration date',
           style: { minWidth: 180 },
         },
         {
+          key: 'last-keep-alive',
           value: formatUIDate(agent.lastKeepAlive),
           label: 'Last keep alive',
           style: { minWidth: 180 },
