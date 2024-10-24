@@ -17,7 +17,10 @@ import { WzRequest } from '../../../../react-services/wz-request';
 import { formatUIDate } from '../../../../react-services/time-service';
 import './agent-info.scss';
 import { Agent } from '../../../endpoints-summary/types';
-import RibbonItem, { type IRibbonItem } from '../../ribbon/ribbon-item';
+import RibbonItem, {
+  RibbonItemLabel,
+  type IRibbonItem,
+} from '../../ribbon/ribbon-item';
 
 interface AgentInfoProps {
   agent: Agent;
@@ -43,10 +46,14 @@ export class AgentInfo extends Component<AgentInfoProps> {
 
     if (this.props.isCondensed) {
       arrayStats = [
-        { value: agent.id, label: 'ID', style: { maxWidth: 100 } },
+        {
+          value: agent.id,
+          label: 'ID',
+          style: { maxWidth: 100 },
+        },
         {
           value: agent.status,
-          label: 'Status',
+          label: RibbonItemLabel.STATUS,
           style: { maxWidth: 150 },
         },
         {
@@ -56,16 +63,20 @@ export class AgentInfo extends Component<AgentInfoProps> {
         },
         {
           value: agent.name,
-          label: 'Operating system',
+          label: RibbonItemLabel.OPERATING_SYSTEM,
           style: { minWidth: 200, maxWidth: 200 },
         },
       ];
     } else {
       arrayStats = [
-        { value: agent.id, label: 'ID', style: { minWidth: 30 } },
+        {
+          value: agent.id,
+          label: 'ID',
+          style: { minWidth: 30 },
+        },
         {
           value: agent.status,
-          label: 'Status',
+          label: RibbonItemLabel.STATUS,
           style: { minWidth: 100 },
         },
         {
@@ -78,10 +89,14 @@ export class AgentInfo extends Component<AgentInfoProps> {
           label: 'Version',
           style: { minWidth: 100 },
         },
-        { value: agent.group, label: 'Groups', style: { minWidth: 150 } },
+        {
+          value: agent.group,
+          label: RibbonItemLabel.GROUPS,
+          style: { minWidth: 150 },
+        },
         {
           value: agent.name,
-          label: 'Operating system',
+          label: RibbonItemLabel.OPERATING_SYSTEM,
           style: { minWidth: 150 },
         },
         {
