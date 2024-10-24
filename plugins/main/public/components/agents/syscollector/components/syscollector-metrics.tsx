@@ -67,7 +67,7 @@ export function InventoryMetrics({ agent }) {
         label: 'CPU',
         value: syscollector?.data?.hardware?.cpu?.name,
         isLoading: syscollector.isLoading,
-        style: { maxWidth: 100 },
+        style: { maxWidth: 180 },
       },
       {
         label: 'Host name',
