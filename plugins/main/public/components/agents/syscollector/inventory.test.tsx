@@ -576,7 +576,6 @@ describe('Inventory data', () => {
         PROCESSES_COLUMNS.PARENT_PID,
         PROCESSES_COLUMNS.VM_SIZE,
         PROCESSES_COLUMNS.PRIORITY,
-        PROCESSES_COLUMNS.STATE,
       ];
 
       shouldRenderProcessesTableWithCorrectColumnsAndTitle(
