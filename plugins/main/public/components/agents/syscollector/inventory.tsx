@@ -15,15 +15,14 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiCallOut,
-  EuiPanel,
   EuiSpacer,
   EuiPage,
+  EuiPageBody,
 } from '@elastic/eui';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { compose } from 'redux';
 import { withGuard } from '../../common/hocs';
 import { PromptAgentNeverConnected } from '../prompts';
-import { AgentInfo } from '../../common/welcome/agent-info/agent-info';
 import SoftwareTab from './software';
 import NetworkTab from './network';
 import ProcessesTab from './processes';
@@ -53,30 +52,32 @@ export const SyscollectorInventory = compose(
 
   return (
     <EuiPage paddingSize='m' direction='column' style={{ overflow: 'hidden' }}>
-      {agent?.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
-        <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem>
-            <EuiCallOut
-              title='This agent is currently disconnected, the data may be outdated.'
-              iconType='iInCircle'
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      )}
+      <EuiPageBody>
+        {agent?.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
+          <EuiFlexGroup gutterSize='s'>
+            <EuiFlexItem>
+              <EuiCallOut
+                title='This agent is currently disconnected, the data may be outdated.'
+                iconType='iInCircle'
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        )}
 
-      <InventoryMetrics agent={agent}></InventoryMetrics>
+        <InventoryMetrics agent={agent}></InventoryMetrics>
 
-      <EuiSpacer size='xxl' />
+        <EuiSpacer size='xxl' />
 
-      {section === 'software' && (
-        <SoftwareTab agent={agent} soPlatform={soPlatform} />
-      )}
-      {section === 'network' && (
-        <NetworkTab agent={agent} soPlatform={soPlatform} />
-      )}
-      {section === 'processes' && (
-        <ProcessesTab agent={agent} soPlatform={soPlatform} />
-      )}
+        {section === 'software' && (
+          <SoftwareTab agent={agent} soPlatform={soPlatform} />
+        )}
+        {section === 'network' && (
+          <NetworkTab agent={agent} soPlatform={soPlatform} />
+        )}
+        {section === 'processes' && (
+          <ProcessesTab agent={agent} soPlatform={soPlatform} />
+        )}
+      </EuiPageBody>
     </EuiPage>
   );
 });
