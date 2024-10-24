@@ -7,10 +7,4 @@ const AGENT = {
   id: '10101',
 };
 
-describe('AgentStats', () => {
-  it('should render agent info', () => {
-    const wrapper = render(<AgentStats agent={AGENT} />);
-
-    expect(wrapper.find(queryDataTestAttr('agent-info')).html()).toBeTruthy();
-  });
-});
+describe('AgentStats', () => {});

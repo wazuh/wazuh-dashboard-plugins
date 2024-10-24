@@ -13,6 +13,7 @@ import React, { useState, useEffect } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
+  EuiLoadingSpinner,
   EuiPanel,
   EuiPage,
   EuiPageBody,
@@ -27,7 +28,7 @@ import {
   withErrorBoundary,
 } from '../../common/hocs';
 import { compose } from 'redux';
-import { WzRequest } from '../../../react-services';
+import { WzRequest, formatUIDate } from '../../../react-services';
 import { AgentStatTable } from './table';
 import {
   PromptNoActiveAgentWithoutSelect,
@@ -46,7 +47,6 @@ import {
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
-import { AgentInfo } from '../../common/welcome/agent-info/agents-info';
 
 const tableColumns = [
   {
@@ -65,6 +65,41 @@ const tableColumns = [
     sortable: true,
   },
 ];
+
+const statsAgents: { title: string; field: string; render?: (value) => any }[] =
+  [
+    {
+      title: 'Status',
+      field: 'status',
+    },
+    {
+      title: 'Buffer',
+      field: 'buffer_enabled',
+      render: value => (value ? 'enabled' : 'disabled'),
+    },
+    {
+      title: 'Message buffer',
+      field: 'msg_buffer',
+    },
+    {
+      title: 'Messages count',
+      field: 'msg_count',
+    },
+    {
+      title: 'Messages sent',
+      field: 'msg_sent',
+    },
+    {
+      title: 'Last ack',
+      field: 'last_ack',
+      render: formatUIDate,
+    },
+    {
+      title: 'Last keep alive',
+      field: 'last_keepalive',
+      render: formatUIDate,
+    },
+  ];
 
 export const MainAgentStats = compose(
   withErrorBoundary,
@@ -152,13 +187,27 @@ export function AgentStats(props) {
   return (
     <EuiPage>
       <EuiPageBody>
-        <EuiPanel grow paddingSize='s'>
-          <AgentInfo
-            agent={props.agent}
-            isCondensed={false}
-            hideActions={true}
-            {...props}
-          ></AgentInfo>
+        <EuiPanel paddingSize='m'>
+          <EuiFlexGroup>
+            {statsAgents.map(stat => (
+              <EuiFlexItem key={`agent-stat-${stat.field}`} grow={false}>
+                <EuiText>
+                  {stat.title}:{' '}
+                  {loading ? (
+                    <EuiLoadingSpinner size='s' />
+                  ) : (
+                    <strong>
+                      {dataStatAgent !== undefined
+                        ? stat.render
+                          ? stat.render(dataStatAgent[stat.field])
+                          : dataStatAgent?.[stat.field]
+                        : '-'}
+                    </strong>
+                  )}
+                </EuiText>
+              </EuiFlexItem>
+            ))}
+          </EuiFlexGroup>
         </EuiPanel>
         <EuiSpacer size='xxl' />
         <EuiFlexGroup>
