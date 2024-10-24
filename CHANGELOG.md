@@ -4,15 +4,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 03
 
-## Fixed
-
-- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
-
 ### Added
 
 - Support for Wazuh 4.10.0
 - Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 - Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968) [#7044](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7044) [#7046](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7046)
+- Added ability to filter from File Integrity Monitoring registry inventory [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
+- Added new field columns and ability to select the visible fields in the File Integrity Monitoring Files and Registry tables [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 
 ### Changed
 
@@ -35,6 +33,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed export formatted csv data with special characters from tables [#7048](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7048)
 - Fixed column reordering feature [#7072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7072)
 - Fixed filter management to prevent hiding when adding multiple filters [#7077](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7077)
+- Fixed vulnerabilities inventory table scroll [#7118](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7118)
+- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
+- Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Fixed the error while opening the panel Events in Github [#3408](https://github.com/wazuh/external-devel-requests/issues/3408)
 
 ### Removed
