@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiFlexGroup } from '@elastic/eui';
+import { EuiFlexGroup, EuiPanel } from '@elastic/eui';
 import WzRibbonItem, { type IRibbonItem } from './ribbon-item';
 
 interface RibbonProps {
@@ -10,15 +10,17 @@ interface RibbonProps {
 const WzRibbon = (props: RibbonProps) => {
   const { items, 'data-test-subj': dataTestSubj } = props;
   return (
-    <EuiFlexGroup
-      data-test-subj={dataTestSubj}
-      wrap
-      style={{ responsive: true }}
-    >
-      {items.map(item => (
-        <WzRibbonItem item={item} />
-      ))}
-    </EuiFlexGroup>
+    <EuiPanel paddingSize='s'>
+      <EuiFlexGroup
+        data-test-subj={dataTestSubj}
+        wrap
+        style={{ responsive: true }}
+      >
+        {items.map(item => (
+          <WzRibbonItem item={item} />
+        ))}
+      </EuiFlexGroup>
+    </EuiPanel>
   );
 };
 

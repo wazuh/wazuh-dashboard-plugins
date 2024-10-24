@@ -1,4 +1,4 @@
-import { EuiFlexItem } from '@elastic/eui';
+import { EuiFlexItem, EuiLoadingSpinner } from '@elastic/eui';
 import React from 'react';
 import { WAZUH_AGENTS_OS_TYPE } from '../../../../common/constants';
 import { AgentStatus } from '../../agents/agent-status';
@@ -17,6 +17,7 @@ export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   label: LABEL;
   value: VALUE;
   style: React.CSSProperties;
+  isLoading?: boolean;
 };
 
 const isGroups = (
@@ -85,7 +86,9 @@ const WzRibbonItem = (props: RibbonItemProps) => {
   };
 
   const renderValue = () => {
-    return isGroups(item) && item.value?.length ? (
+    return item.isLoading ? (
+      <EuiLoadingSpinner size='s' />
+    ) : isGroups(item) && item.value?.length ? (
       <GroupTruncate
         groups={item.value}
         length={40}
