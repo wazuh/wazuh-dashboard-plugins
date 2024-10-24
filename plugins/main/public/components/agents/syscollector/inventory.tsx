@@ -27,6 +27,7 @@ import { AgentInfo } from '../../common/welcome/agent-info/agent-info';
 import SoftwareTab from './software';
 import NetworkTab from './network';
 import ProcessesTab from './processes';
+import { InventoryMetrics } from './components';
 
 export const SyscollectorInventory = compose(
   withGuard(
@@ -63,18 +64,7 @@ export const SyscollectorInventory = compose(
         </EuiFlexGroup>
       )}
 
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem>
-          <EuiPanel grow paddingSize='s'>
-            <AgentInfo
-              agent={props.agent}
-              isCondensed={false}
-              hideActions={true}
-              {...props}
-            ></AgentInfo>
-          </EuiPanel>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      <InventoryMetrics agent={agent}></InventoryMetrics>
 
       <EuiSpacer size='xxl' />
 
