@@ -6,6 +6,7 @@ import { Agent } from '../../endpoints-summary/types';
 import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
+import './ribbon-item.scss';
 
 const FONT_SIZE = 12;
 

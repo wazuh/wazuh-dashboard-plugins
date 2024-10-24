@@ -14,7 +14,6 @@
 import React, { Component } from 'react';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { formatUIDate } from '../../../../react-services/time-service';
-import './agent-info.scss';
 import { Agent } from '../../../endpoints-summary/types';
 import { RibbonItemLabel, type IRibbonItem } from '../../ribbon/ribbon-item';
 import WzRibbon from '../../ribbon/ribbon';
