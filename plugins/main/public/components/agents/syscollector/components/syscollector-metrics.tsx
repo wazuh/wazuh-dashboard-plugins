@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { useGenericRequest } from '../../../common/hooks/useGenericRequest';
 import { formatUIDate } from '../../../../react-services/time-service';
 import WzRibbon from '../../../common/ribbon/ribbon';
+import { RibbonItemLabel } from '../../../common/ribbon/ribbon-item';
 
 export function InventoryMetrics({ agent }) {
   const [params, setParams] = useState({});
@@ -61,7 +62,6 @@ export function InventoryMetrics({ agent }) {
         label: RibbonItemLabel.OPERATING_SYSTEM,
         value: syscollector?.data?.os,
         isLoading: syscollector.isLoading,
-        style: { maxWidth: 100 },
       },
       {
         label: 'CPU',

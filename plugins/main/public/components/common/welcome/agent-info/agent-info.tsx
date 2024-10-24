@@ -94,7 +94,6 @@ export class AgentInfo extends Component<AgentInfoProps> {
         {
           value: agent,
           label: RibbonItemLabel.OPERATING_SYSTEM,
-          style: { minWidth: 150 },
         },
         {
           value:

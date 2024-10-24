@@ -7,6 +7,8 @@ import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 
+const FONT_SIZE = 12;
+
 export enum RibbonItemLabel {
   GROUPS = 'Groups',
   OPERATING_SYSTEM = 'Operating system',
@@ -16,7 +18,7 @@ export enum RibbonItemLabel {
 export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   label: LABEL;
   value: VALUE;
-  style: React.CSSProperties;
+  style?: React.CSSProperties;
   isLoading?: boolean;
 };
 
@@ -45,7 +47,7 @@ interface RibbonItemProps {
 const WzRibbonItem = (props: RibbonItemProps) => {
   const { item } = props;
 
-  const elementStyle = { maxWidth: item.style.maxWidth, fontSize: 12 };
+  const elementStyle = { ...(item.style || {}), fontSize: FONT_SIZE };
   const wzWidth100 = { anchorClassName: 'wz-width-100' };
   const tooltipProps = item.label === 'Cluster node' ? wzWidth100 : {};
 
@@ -102,7 +104,10 @@ const WzRibbonItem = (props: RibbonItemProps) => {
       <WzTextWithTooltipIfTruncated
         position='bottom'
         tooltipProps={wzWidth100}
-        elementStyle={elementStyle}
+        elementStyle={{
+          ...elementStyle,
+          maxWidth: item.style?.maxWidth || 150,
+        }}
       >
         {getPlatformIcon(item.value)} {getOsName(item.value)}
       </WzTextWithTooltipIfTruncated>
@@ -110,7 +115,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
       <AgentStatus
         status={item.value?.status}
         agent={item.value}
-        style={{ ...item.style, fontSize: 12 }}
+        style={elementStyle}
       />
     ) : (
       <WzTextWithTooltipIfTruncated
