@@ -96,13 +96,9 @@ export class MainModuleAgent extends Component {
           )}
         </EuiFlexItem>
         <EuiFlexItem />
-        {[
-          AgentTabs.SOFTWARE,
-          AgentTabs.NETWORK,
-          AgentTabs.PROCESSES,
-          AgentTabs.CONFIGURATION,
-          AgentTabs.STATS,
-        ].includes(this.props.section) && (
+        {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
+          this.props.section,
+        ) && (
           <EuiFlexItem
             grow={false}
             style={{ marginTop: 13.25, marginInline: 0 }}
