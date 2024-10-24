@@ -1,6 +1,7 @@
 import { UI_COLOR_AGENT_STATUS, UI_LABEL_NAME_AGENT_STATUS, API_NAME_AGENT_STATUS } from '../constants';
 
-type TAgentStatus = typeof API_NAME_AGENT_STATUS[keyof typeof API_NAME_AGENT_STATUS];
+export type TAgentStatus =
+  (typeof API_NAME_AGENT_STATUS)[keyof typeof API_NAME_AGENT_STATUS];
 
 type TAgentStatusColor = typeof UI_COLOR_AGENT_STATUS[keyof typeof UI_COLOR_AGENT_STATUS];
 type TAgentStatusLabel = typeof UI_LABEL_NAME_AGENT_STATUS[keyof typeof UI_LABEL_NAME_AGENT_STATUS];

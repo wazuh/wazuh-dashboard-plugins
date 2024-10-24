@@ -397,7 +397,7 @@ export const AGENT_STATUS_CODE = [
     STATUS_CODE: 5,
     STATUS_DESCRIPTION: 'Connection reset by manager',
   },
-];
+] as const;
 
 export const API_NAME_TASK_STATUS = {
   DONE: 'Done',
