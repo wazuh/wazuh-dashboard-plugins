@@ -21,18 +21,10 @@ import { withRouterSearch } from '../../../common/hocs';
 import { Route, Switch } from '../../../router-search';
 import NavigationService from '../../../../react-services/navigation-service';
 
-const searchBarWQLOptions = {
-  implicitQuery: {
-    query: 'type=registry_key',
-    conjunction: ';',
-  },
-};
-
-const searchBarWQLFilters = { default: { q: 'type=registry_key' } };
-
 export const RegistryTable = withRouterSearch(
   class RegistryTable extends Component {
     state: {
+      filters: {};
       syscheck: [];
       isFlyoutVisible: Boolean;
       currentFile: {
@@ -51,7 +43,7 @@ export const RegistryTable = withRouterSearch(
       super(props);
 
       this.state = {
-        syscheck: [],
+        filters: {},
         isFlyoutVisible: false,
         currentFile: {
           file: '',
@@ -73,12 +65,13 @@ export const RegistryTable = withRouterSearch(
           name: 'Registry',
           sortable: true,
           searchable: true,
+          show: true,
         },
         {
           field: 'mtime',
           name: (
             <span>
-              Last Modified{' '}
+              Last modified{' '}
               <EuiIconTip
                 content='This is not searchable through a search term.'
                 size='s'
@@ -92,9 +85,34 @@ export const RegistryTable = withRouterSearch(
           className: 'wz-white-space-nowrap',
           render: formatUIDate,
           searchable: false,
+          show: true,
+        },
+        {
+          field: 'date',
+          name: (
+            <span>
+              Last analysis{' '}
+              <EuiIconTip
+                content='This is not searchable through a search term.'
+                size='s'
+                color='subdued'
+                type='alert'
+              />
+            </span>
+          ),
+          sortable: true,
+          width: '100px',
+          render: formatUIDate,
+          searchable: false,
         },
       ];
     }
+
+    onFiltersChange = filters => {
+      this.setState({
+        filters,
+      });
+    };
 
     renderRegistryTable() {
       const getRowProps = item => {
@@ -111,6 +129,8 @@ export const RegistryTable = withRouterSearch(
 
       const columns = this.columns();
 
+      const APIendpoint = `/syscheck/${this.props.agent.id}?type=registry_key`;
+
       return (
         <EuiFlexGroup>
           <EuiFlexItem>
@@ -118,11 +138,11 @@ export const RegistryTable = withRouterSearch(
               title='Registry'
               tableColumns={columns}
               tableInitialSortingField='file'
-              endpoint={`/syscheck/${this.props.agent.id}`}
+              endpoint={APIendpoint}
               searchBarWQL={{
-                options: searchBarWQLOptions,
                 suggestions: {
                   field: () => [
+                    { label: 'date', description: 'filter by analysis time' },
                     { label: 'file', description: 'filter by file' },
                     {
                       label: 'mtime',
@@ -133,7 +153,7 @@ export const RegistryTable = withRouterSearch(
                     try {
                       const response = await WzRequest.apiReq(
                         'GET',
-                        `/syscheck/${this.props.agent.id}`,
+                        APIendpoint,
                         {
                           params: {
                             distinct: true,
@@ -142,12 +162,9 @@ export const RegistryTable = withRouterSearch(
                             sort: `+${field}`,
                             ...(currentValue
                               ? {
-                                  // Add the implicit query
-                                  q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                  q: `${field}~${currentValue}`,
                                 }
-                              : {
-                                  q: `${searchBarWQLOptions.implicitQuery.query}`,
-                                }),
+                              : {}),
                           },
                         },
                       );
@@ -174,11 +191,16 @@ export const RegistryTable = withRouterSearch(
                   },
                 },
               }}
-              filters={searchBarWQLFilters}
+              filters={this.state.filters}
               showReload
               downloadCsv={`fim-registry-${this.props.agent.id}`}
               searchTable={true}
               rowProps={getRowProps}
+              saveStateStorage={{
+                system: 'localStorage',
+                key: 'wz-fim-registry-key-table',
+              }}
+              showFieldSelector
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -201,6 +223,7 @@ export const RegistryTable = withRouterSearch(
                   view='inventory'
                   // showViewInEvents={true}
                   {...this.props}
+                  onFiltersChange={this.onFiltersChange}
                 />
               )}
             ></Route>
