@@ -12,18 +12,15 @@
 
 import React, { Component, Fragment } from 'react';
 import {
-  EuiPanel,
   EuiFlexGroup,
   EuiFlexItem,
   EuiButtonEmpty,
   EuiTabs,
   EuiTab,
-  EuiLoadingSpinner,
 } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
-import { AgentInfo } from '../welcome/agent-info/agent-info';
 import {
   AlertsDataSource,
   AlertsDataSourceRepository,
@@ -48,18 +45,6 @@ export class MainModuleAgent extends Component {
     renderTabs?: () => JSX.Element;
     agentsSelectionProps?: any;
   };
-  state: {
-    loadingReport: Boolean;
-    showAgentInfo: Boolean;
-  };
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      loadingReport: false,
-      showAgentInfo: false,
-    };
-  }
 
   inventoryTabs = [AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES];
 
@@ -68,33 +53,29 @@ export class MainModuleAgent extends Component {
     return (
       <EuiFlexGroup style={{ marginInline: 8 }}>
         <EuiFlexItem style={{ marginInline: 0 }} grow={false}>
-          {this.state.loadingReport ? (
-            <EuiLoadingSpinner size='s' />
-          ) : (
-            <EuiTabs data-test-subj='report-tabs'>
-              {this.inventoryTabs.includes(section) ? (
-                <>
-                  {this.inventoryTabs.map(tab => (
-                    <EuiTab
-                      key={`report-tab-${tab}`}
-                      data-test-subj={`report-tab-${tab}`}
-                      isSelected={section === tab}
-                      onClick={() => switchTab?.(tab)}
-                    >
-                      {toTitleCase(tab)}
-                    </EuiTab>
-                  ))}
-                </>
-              ) : (
-                <EuiTab
-                  data-test-subj={`report-tab-${section}`}
-                  isSelected={true}
-                >
-                  {toTitleCase(section)}
-                </EuiTab>
-              )}
-            </EuiTabs>
-          )}
+          <EuiTabs data-test-subj='report-tabs'>
+            {this.inventoryTabs.includes(section) ? (
+              <>
+                {this.inventoryTabs.map(tab => (
+                  <EuiTab
+                    key={`report-tab-${tab}`}
+                    data-test-subj={`report-tab-${tab}`}
+                    isSelected={section === tab}
+                    onClick={() => switchTab?.(tab)}
+                  >
+                    {toTitleCase(tab)}
+                  </EuiTab>
+                ))}
+              </>
+            ) : (
+              <EuiTab
+                data-test-subj={`report-tab-${section}`}
+                isSelected={true}
+              >
+                {toTitleCase(section)}
+              </EuiTab>
+            )}
+          </EuiTabs>
         </EuiFlexItem>
         <EuiFlexItem />
         {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
@@ -118,13 +99,7 @@ export class MainModuleAgent extends Component {
     const hasTabs = this.props.tabs?.length;
 
     return (
-      <div
-        className={
-          this.state.showAgentInfo
-            ? 'wz-module wz-module-showing-agent'
-            : 'wz-module'
-        }
-      >
+      <div className={'wz-module'}>
         {agent?.os && (
           <Fragment>
             <div className='wz-module-header-agent-wrapper'>
@@ -132,16 +107,6 @@ export class MainModuleAgent extends Component {
             </div>
             <div>
               <div className={clsx({ 'wz-module-header-nav': hasTabs })}>
-                {this.state.showAgentInfo && (
-                  <EuiPanel grow paddingSize='s'>
-                    <AgentInfo
-                      agent={this.props.agent}
-                      isCondensed={false}
-                      hideActions={true}
-                      {...this.props}
-                    ></AgentInfo>
-                  </EuiPanel>
-                )}
                 {hasTabs && (
                   <div className='wz-welcome-page-agent-tabs'>
                     <EuiFlexGroup>
