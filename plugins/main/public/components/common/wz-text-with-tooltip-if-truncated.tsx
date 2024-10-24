@@ -13,44 +13,42 @@
 
 import React, { Component } from 'react';
 
-import {
-  EuiToolTip
-} from '@elastic/eui';
+import { EuiToolTip } from '@elastic/eui';
 
-interface IWzTextWithTooltipIfTruncated{
-  children: JSX.Element
-  tooltip?: string
-  elementStyle?: object
-  tooltipProps?: object
-  position?: string // same options as EuiTooltip's position
+interface WzTextWithTooltipIfTruncatedProps extends React.PropsWithChildren {
+  tooltip?: string;
+  elementStyle?: React.CSSProperties;
+  tooltipProps?: object;
+  position?: string; // same options as EuiTooltip's position
 }
 
-export default class WzTextWithTooltipIfTruncated extends Component<IWzTextWithTooltipIfTruncated> {
+export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTooltipIfTruncatedProps> {
   state: {
     withTooltip: boolean;
   };
   static defaultProps = {
-    elementStyle: {}
-  }
-  timer?: ReturnType<typeof setTimeout>
-  reference: any
-  constructor(props) {
+    elementStyle: {},
+  };
+  timer?: ReturnType<typeof setTimeout>;
+  reference: any;
+  constructor(props: WzTextWithTooltipIfTruncatedProps) {
     super(props);
     this.reference = React.createRef<HTMLSpanElement>();
     this.state = {
-      withTooltip: false
+      withTooltip: false,
     };
   }
   componentDidMount() {
-    this.timer = setTimeout(() => { //TODO: remove timer and setTimeout function. It is needed while this component is mounted through the AngularJS react-component directive.
+    this.timer = setTimeout(() => {
+      //TODO: remove timer and setTimeout function. It is needed while this component is mounted through the AngularJS react-component directive.
       // HTML element reference with text (maybe truncated)
       const reference = this.reference.current;
       // HTML element clone of reference
       const clone = reference.cloneNode(true);
-      clone.style.display = "inline";
-      clone.style.width = "auto";
-      clone.style.visibility = "hidden";
-      clone.style.maxWidth = "none";
+      clone.style.display = 'inline';
+      clone.style.width = 'auto';
+      clone.style.visibility = 'hidden';
+      clone.style.maxWidth = 'none';
       // Insert clone in DOM appending as sibling of reference to measure both
       // reference.parentNode.appendChild(clone);
       // Insert clone in DOM as body child
@@ -62,23 +60,23 @@ export default class WzTextWithTooltipIfTruncated extends Component<IWzTextWithT
       }
       // Remove clone of DOM
       clone.remove();
-    })
+    });
   }
-  componentWillUnmount(){
+  componentWillUnmount() {
     this.timer && clearTimeout(this.timer);
   }
-  buildContent() {  
-    return (      
+  buildContent() {
+    return (
       <span
         ref={this.reference}
         style={{
-            display: "block",
-            overflow: "hidden",
-            paddingBottom: "3px",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            ...this.props.elementStyle
-          }}
+          display: 'block',
+          overflow: 'hidden',
+          paddingBottom: '3px',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+          ...this.props.elementStyle,
+        }}
       >
         {this.props.children || this.props.tooltip}
       </span>
@@ -96,4 +94,4 @@ export default class WzTextWithTooltipIfTruncated extends Component<IWzTextWithT
       this.buildContent()
     );
   }
-};
+}
