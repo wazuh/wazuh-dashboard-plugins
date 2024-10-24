@@ -47,6 +47,7 @@ import {
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
+import WzRibbon from '../../common/ribbon/ribbon';
 
 const tableColumns = [
   {
@@ -187,28 +188,19 @@ export function AgentStats(props) {
   return (
     <EuiPage>
       <EuiPageBody>
-        <EuiPanel paddingSize='m'>
-          <EuiFlexGroup>
-            {statsAgents.map(stat => (
-              <EuiFlexItem key={`agent-stat-${stat.field}`} grow={false}>
-                <EuiText>
-                  {stat.title}:{' '}
-                  {loading ? (
-                    <EuiLoadingSpinner size='s' />
-                  ) : (
-                    <strong>
-                      {dataStatAgent !== undefined
-                        ? stat.render
-                          ? stat.render(dataStatAgent[stat.field])
-                          : dataStatAgent?.[stat.field]
-                        : '-'}
-                    </strong>
-                  )}
-                </EuiText>
-              </EuiFlexItem>
-            ))}
-          </EuiFlexGroup>
-        </EuiPanel>
+        <WzRibbon
+          items={statsAgents.map(stat => ({
+            key: stat.field,
+            label: stat.title,
+            isLoading: loading,
+            value:
+              dataStatAgent !== undefined
+                ? stat.render
+                  ? stat.render(dataStatAgent[stat.field])
+                  : dataStatAgent?.[stat.field]
+                : '-',
+          }))}
+        />
         <EuiSpacer size='xxl' />
         <EuiFlexGroup>
           <EuiFlexItem>
