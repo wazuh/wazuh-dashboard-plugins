@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'enzyme';
 import { SyscollectorInventory } from './inventory';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
-import { queryDataTestAttr } from "../../../../test/public/query-attr";
+import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
 const TABLE_ID = '__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9';
 const SOFTWARE_PACKAGES = 'Packages';
@@ -97,7 +97,9 @@ const shouldRenderTableWithCorrectColumnsAndTitle = (
     <SyscollectorInventory agent={agent} section={agentTab} />,
   );
   const visTable = wrapper.find(queryDataTestAttr(dataTestId)).first();
-  const visTitle = visTable.find(queryDataTestAttr('table-wz-api-title')).text();
+  const visTitle = visTable
+    .find(queryDataTestAttr('table-wz-api-title'))
+    .text();
   const visColumns = visTable.find(
     queryDataTestAttr('table-with-search-bar') + ' .euiTableHeaderCell',
   );
@@ -200,7 +202,7 @@ function findAgentInfo(wrapper: cheerio.Cheerio): any {
 
 describe('Inventory data', () => {
   describe('Agent info', () => {
-    it('A Linux agent shouldn\'t render agent info', () => {
+    it("A Linux agent shouldn't render agent info", () => {
       let wrapper = render(
         <SyscollectorInventory
           agent={AGENT.DEBIAN}
@@ -235,7 +237,7 @@ describe('Inventory data', () => {
       expect(agentInfo).toBeFalsy();
     });
 
-    it('A Windows agent shouldn\'t render agent info', () => {
+    it("A Windows agent shouldn't render agent info", () => {
       let wrapper = render(
         <SyscollectorInventory
           agent={AGENT.WINDOWS}
@@ -270,7 +272,7 @@ describe('Inventory data', () => {
       expect(agentInfo).toBeFalsy();
     });
 
-    it('A Apple agent shouldn\'t render agent info', () => {
+    it("A Apple agent shouldn't render agent info", () => {
       let wrapper = render(
         <SyscollectorInventory
           agent={AGENT.DARWIN}
