@@ -119,7 +119,7 @@ const RibbonItem = (props: RibbonItemProps) => {
 
   return (
     <EuiFlexItem
-      className='wz-agent-info'
+      className='wz-ribbon-item'
       key={item.label}
       style={item.style || null}
     >
