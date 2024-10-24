@@ -23,7 +23,7 @@ import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { compose } from 'redux';
 import { withGuard } from '../../common/hocs';
 import { PromptAgentNeverConnected } from '../prompts';
-import { AgentInfo } from '../../common/welcome/agent-info/agents-info';
+import { AgentInfo } from '../../common/welcome/agent-info/agent-info';
 import SoftwareTab from './software';
 import NetworkTab from './network';
 import ProcessesTab from './processes';

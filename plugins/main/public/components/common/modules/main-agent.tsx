@@ -23,7 +23,7 @@ import {
 import '../../common/modules/module.scss';
 import store from '../../../redux/store';
 import { ReportingService } from '../../../react-services/reporting';
-import { AgentInfo } from '../welcome/agent-info/agents-info';
+import { AgentInfo } from '../welcome/agent-info/agent-info';
 import {
   AlertsDataSource,
   AlertsDataSourceRepository,
