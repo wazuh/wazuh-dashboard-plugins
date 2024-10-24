@@ -69,19 +69,15 @@ export class AgentInfo extends Component<AgentInfoProps> {
   }
 
   getOsName(agent?: Agent) {
-    if (agent?.os?.name && agent?.os?.version) {
-      return '-';
-    }
+    const { name, version } = agent?.os || {};
 
-    if (!agent?.os?.version) {
-      return agent?.os?.name;
-    }
+    if (!name && !version) return '-';
 
-    if (!agent?.os?.name) {
-      return agent?.os?.version;
-    }
+    if (!version) return name;
 
-    return agent?.os?.name + ' ' + agent?.os?.version;
+    if (!name) return version;
+
+    return `${name} ${version}`;
   }
 
   renderField = (field?: string) => {
