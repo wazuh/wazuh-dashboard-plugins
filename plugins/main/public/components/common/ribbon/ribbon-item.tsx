@@ -53,7 +53,10 @@ const WzRibbonItem = (props: RibbonItemProps) => {
     let icon = '';
     const { uname, platform } = agent?.os || {};
 
-    if (uname?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX)) {
+    if (
+      uname?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX) ||
+      platform?.toLowerCase().includes('ubuntu')
+    ) {
       icon = WAZUH_AGENTS_OS_TYPE.LINUX;
     } else if (platform === WAZUH_AGENTS_OS_TYPE.WINDOWS) {
       icon = WAZUH_AGENTS_OS_TYPE.WINDOWS;
