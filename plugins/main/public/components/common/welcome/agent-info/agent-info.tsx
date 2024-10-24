@@ -12,15 +12,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiFlexGroup } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { formatUIDate } from '../../../../react-services/time-service';
 import './agent-info.scss';
 import { Agent } from '../../../endpoints-summary/types';
-import RibbonItem, {
-  RibbonItemLabel,
-  type IRibbonItem,
-} from '../../ribbon/ribbon-item';
+import { RibbonItemLabel, type IRibbonItem } from '../../ribbon/ribbon-item';
+import Ribbon from '../../ribbon/ribbon';
 
 interface AgentInfoProps {
   agent: Agent;
@@ -120,16 +117,6 @@ export class AgentInfo extends Component<AgentInfoProps> {
       ];
     }
 
-    return (
-      <EuiFlexGroup
-        data-test-subj='agent-info'
-        wrap
-        style={{ responsive: true }}
-      >
-        {arrayStats.map(item => (
-          <RibbonItem item={item} />
-        ))}
-      </EuiFlexGroup>
-    );
+    return <Ribbon data-test-subj='agent-info' items={arrayStats} />;
   }
 }
