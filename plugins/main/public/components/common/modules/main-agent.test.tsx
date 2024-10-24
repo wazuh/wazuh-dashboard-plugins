@@ -5,11 +5,11 @@ import { fireEvent, render } from '@testing-library/react';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
 const REPORT_TAB = {
-  STATS: 'report-tab-stats',
-  CONFIGURATION: 'report-tab-configuration',
-  SOFTWARE: 'report-tab-software',
-  NETWORK: 'report-tab-network',
-  PROCESSES: 'report-tab-processes',
+  STATS: 'agent-tab-stats',
+  CONFIGURATION: 'agent-tab-configuration',
+  SOFTWARE: 'agent-tab-software',
+  NETWORK: 'agent-tab-network',
+  PROCESSES: 'agent-tab-processes',
 };
 
 jest.mock('../../../react-services/reporting', () => ({
@@ -37,7 +37,7 @@ describe('Main Agent', () => {
     switchTab = jest.fn();
   });
 
-  it('should render report tab overview when section is stats', () => {
+  it('should render agent tab overview when section is stats', () => {
     const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
@@ -47,7 +47,9 @@ describe('Main Agent', () => {
     );
 
     expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.STATS) + '[aria-selected="true"]',
+      ),
     ).toBeTruthy();
 
     expect(
@@ -67,7 +69,7 @@ describe('Main Agent', () => {
     ).toBeFalsy();
   });
 
-  it('should render report tab overview when section is configuration', () => {
+  it('should render agent tab overview when section is configuration', () => {
     const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
@@ -77,7 +79,9 @@ describe('Main Agent', () => {
     );
 
     expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.CONFIGURATION) + '[aria-selected="true"]',
+      ),
     ).toBeTruthy();
 
     expect(
@@ -97,7 +101,7 @@ describe('Main Agent', () => {
     ).toBeFalsy();
   });
 
-  it('should render report tab overview when section is software', () => {
+  it('should render agent tab overview when section is software', () => {
     const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
@@ -107,7 +111,9 @@ describe('Main Agent', () => {
     );
 
     expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.SOFTWARE) + '[aria-selected="true"]',
+      ),
     ).toBeTruthy();
 
     expect(
@@ -115,8 +121,20 @@ describe('Main Agent', () => {
     ).toBeTruthy();
 
     expect(
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.NETWORK) + '[aria-selected="true"]',
+      ),
+    ).toBeFalsy();
+
+    expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeTruthy();
+
+    expect(
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.PROCESSES) + '[aria-selected="true"]',
+      ),
+    ).toBeFalsy();
 
     expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
@@ -127,7 +145,7 @@ describe('Main Agent', () => {
     ).toBeFalsy();
   });
 
-  it('should render report tab overview when section is network', () => {
+  it('should render agent tab overview when section is network', () => {
     const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
@@ -141,12 +159,26 @@ describe('Main Agent', () => {
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.SOFTWARE) + '[aria-selected="true"]',
+      ),
+    ).toBeFalsy();
+
+    expect(
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.NETWORK) + '[aria-selected="true"]',
+      ),
     ).toBeTruthy();
 
     expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeTruthy();
+
+    expect(
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.PROCESSES) + '[aria-selected="true"]',
+      ),
+    ).toBeFalsy();
 
     expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
@@ -157,7 +189,7 @@ describe('Main Agent', () => {
     ).toBeFalsy();
   });
 
-  it('should render report tab overview when section is processes', () => {
+  it('should render agent tab overview when section is processes', () => {
     const { container } = render(
       <MainModuleAgent
         agent={{ os: { platform: 'windows' } }}
@@ -171,11 +203,25 @@ describe('Main Agent', () => {
     ).toBeTruthy();
 
     expect(
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.SOFTWARE) + '[aria-selected="true"]',
+      ),
+    ).toBeFalsy();
+
+    expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.NETWORK) + '[aria-selected="true"]',
+      ),
+    ).toBeFalsy();
+
+    expect(
+      container.querySelector(
+        queryDataTestAttr(REPORT_TAB.PROCESSES) + '[aria-selected="true"]',
+      ),
     ).toBeTruthy();
 
     expect(
