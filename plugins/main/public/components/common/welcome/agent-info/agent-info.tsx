@@ -17,7 +17,7 @@ import { formatUIDate } from '../../../../react-services/time-service';
 import './agent-info.scss';
 import { Agent } from '../../../endpoints-summary/types';
 import { RibbonItemLabel, type IRibbonItem } from '../../ribbon/ribbon-item';
-import Ribbon from '../../ribbon/ribbon';
+import WzRibbon from '../../ribbon/ribbon';
 
 interface AgentInfoProps {
   agent: Agent;
@@ -117,6 +117,6 @@ export class AgentInfo extends Component<AgentInfoProps> {
       ];
     }
 
-    return <Ribbon data-test-subj='agent-info' items={arrayStats} />;
+    return <WzRibbon data-test-subj='agent-info' items={arrayStats} />;
   }
 }

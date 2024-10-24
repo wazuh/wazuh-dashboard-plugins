@@ -1,13 +1,13 @@
 import React from 'react';
 import { EuiFlexGroup } from '@elastic/eui';
-import RibbonItem, { type IRibbonItem } from './ribbon-item';
+import WzRibbonItem, { type IRibbonItem } from './ribbon-item';
 
 interface RibbonProps {
   items: Array<IRibbonItem>;
   'data-test-subj'?: string;
 }
 
-const Ribbon = (props: RibbonProps) => {
+const WzRibbon = (props: RibbonProps) => {
   const { items, 'data-test-subj': dataTestSubj } = props;
   return (
     <EuiFlexGroup
@@ -16,10 +16,10 @@ const Ribbon = (props: RibbonProps) => {
       style={{ responsive: true }}
     >
       {items.map(item => (
-        <RibbonItem item={item} />
+        <WzRibbonItem item={item} />
       ))}
     </EuiFlexGroup>
   );
 };
 
-export default Ribbon;
+export default WzRibbon;

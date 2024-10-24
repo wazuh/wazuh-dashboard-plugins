@@ -41,7 +41,7 @@ interface RibbonItemProps {
   item: IRibbonItem;
 }
 
-const RibbonItem = (props: RibbonItemProps) => {
+const WzRibbonItem = (props: RibbonItemProps) => {
   const { item } = props;
 
   const elementStyle = { maxWidth: item.style.maxWidth, fontSize: 12 };
@@ -128,4 +128,4 @@ const RibbonItem = (props: RibbonItemProps) => {
   );
 };
 
-export default RibbonItem;
+export default WzRibbonItem;
