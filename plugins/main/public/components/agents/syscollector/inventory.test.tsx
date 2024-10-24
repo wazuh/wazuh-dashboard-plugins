@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from 'enzyme';
 import { SyscollectorInventory } from './inventory';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
+import { queryDataTestAttr } from "../../../../test/public/query-attr";
 
 const TABLE_ID = '__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9';
 const SOFTWARE_PACKAGES = 'Packages';
@@ -95,10 +96,10 @@ const shouldRenderTableWithCorrectColumnsAndTitle = (
   const wrapper = render(
     <SyscollectorInventory agent={agent} section={agentTab} />,
   );
-  const visTable = wrapper.find(`[data-test-subj=${dataTestId}]`).first();
-  const visTitle = visTable.find('[data-test-subj=table-wz-api-title]').text();
+  const visTable = wrapper.find(queryDataTestAttr(dataTestId)).first();
+  const visTitle = visTable.find(queryDataTestAttr('table-wz-api-title')).text();
   const visColumns = visTable.find(
-    '[data-test-subj=table-with-search-bar] .euiTableHeaderCell',
+    queryDataTestAttr('table-with-search-bar') + ' .euiTableHeaderCell',
   );
 
   const visTables = wrapper.find('table');
@@ -194,12 +195,12 @@ const shouldRenderProcessesTableWithCorrectColumnsAndTitle = (
 };
 
 function findAgentInfo(wrapper: cheerio.Cheerio): any {
-  return wrapper.find('[data-test-subj="agent-info"]').html();
+  return wrapper.find(queryDataTestAttr('agent-info')).html();
 }
 
 describe('Inventory data', () => {
   describe('Agent info', () => {
-    it('A Linux agent should render agent info', () => {
+    it('A Linux agent shouldn\'t render agent info', () => {
       let wrapper = render(
         <SyscollectorInventory
           agent={AGENT.DEBIAN}
@@ -209,7 +210,7 @@ describe('Inventory data', () => {
 
       let agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
 
       wrapper = render(
         <SyscollectorInventory
@@ -220,7 +221,7 @@ describe('Inventory data', () => {
 
       agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
 
       wrapper = render(
         <SyscollectorInventory
@@ -231,10 +232,10 @@ describe('Inventory data', () => {
 
       agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
     });
 
-    it('A Windows agent should render agent info', () => {
+    it('A Windows agent shouldn\'t render agent info', () => {
       let wrapper = render(
         <SyscollectorInventory
           agent={AGENT.WINDOWS}
@@ -244,7 +245,7 @@ describe('Inventory data', () => {
 
       let agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
 
       wrapper = render(
         <SyscollectorInventory
@@ -255,7 +256,7 @@ describe('Inventory data', () => {
 
       agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
 
       wrapper = render(
         <SyscollectorInventory
@@ -266,10 +267,10 @@ describe('Inventory data', () => {
 
       agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
     });
 
-    it('A Apple agent should render agent info', () => {
+    it('A Apple agent shouldn\'t render agent info', () => {
       let wrapper = render(
         <SyscollectorInventory
           agent={AGENT.DARWIN}
@@ -279,7 +280,7 @@ describe('Inventory data', () => {
 
       let agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
 
       wrapper = render(
         <SyscollectorInventory
@@ -290,7 +291,7 @@ describe('Inventory data', () => {
 
       agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
 
       wrapper = render(
         <SyscollectorInventory
@@ -301,7 +302,7 @@ describe('Inventory data', () => {
 
       agentInfo = findAgentInfo(wrapper);
 
-      expect(agentInfo).toBeTruthy();
+      expect(agentInfo).toBeFalsy();
     });
   });
 
@@ -359,7 +360,7 @@ describe('Inventory data', () => {
           />,
         );
         const visTable = wrapper
-          .find(`[data-test-subj=software-windows-updates-table]`)
+          .find(queryDataTestAttr('software-windows-updates-table]'))
           .first()
           .html();
 
@@ -383,7 +384,7 @@ describe('Inventory data', () => {
           />,
         );
         const visTable = wrapper
-          .find(`[data-test-subj=software-windows-updates-table]`)
+          .find(queryDataTestAttr('software-windows-updates-table'))
           .first()
           .html();
 
