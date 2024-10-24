@@ -84,7 +84,7 @@ const RibbonItem = (props: RibbonItemProps) => {
     return field !== undefined || field ? field : '-';
   };
 
-  const renderTitle = () => {
+  const renderValue = () => {
     return isGroups(item) && item.value?.length ? (
       <GroupTruncate
         groups={item.value}
@@ -123,7 +123,7 @@ const RibbonItem = (props: RibbonItemProps) => {
       key={item.label}
       style={item.style || null}
     >
-      <WzStat title={renderTitle()} description={item.label} titleSize='xs' />
+      <WzStat title={renderValue()} description={item.label} titleSize='xs' />
     </EuiFlexItem>
   );
 };
