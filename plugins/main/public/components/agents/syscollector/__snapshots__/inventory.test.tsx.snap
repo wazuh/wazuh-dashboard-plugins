@@ -14999,31 +14999,6 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                           </span>
                         </button>
                       </th>
-                      <th
-                        aria-live="polite"
-                        aria-sort="none"
-                        class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_state_6"
-                        role="columnheader"
-                        scope="col"
-                        style="width:15%"
-                      >
-                        <button
-                          class="euiTableHeaderButton"
-                          data-test-subj="tableHeaderSortButton"
-                          type="button"
-                        >
-                          <span
-                            class="euiTableCellContent"
-                          >
-                            <span
-                              class="euiTableCellContent__text"
-                            >
-                              State
-                            </span>
-                          </span>
-                        </button>
-                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -15032,7 +15007,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                     >
                       <td
                         class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                        colspan="7"
+                        colspan="6"
                       >
                         <div
                           class="euiTableCellContent euiTableCellContent--alignCenter"
