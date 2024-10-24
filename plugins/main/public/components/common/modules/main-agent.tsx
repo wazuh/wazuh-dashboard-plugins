@@ -64,6 +64,7 @@ export class MainModuleAgent extends Component {
   inventoryTabs = [AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES];
 
   renderTitle() {
+    const { agent, section, switchTab } = this.props;
     return (
       <EuiFlexGroup style={{ marginInline: 8 }}>
         <EuiFlexItem style={{ marginInline: 0 }} grow={false}>
@@ -71,25 +72,25 @@ export class MainModuleAgent extends Component {
             <EuiLoadingSpinner size='s' />
           ) : (
             <EuiTabs data-test-subj='report-tabs'>
-              {this.inventoryTabs.includes(this.props.section) ? (
+              {this.inventoryTabs.includes(section) ? (
                 <>
                   {this.inventoryTabs.map(tab => (
                     <EuiTab
                       key={`report-tab-${tab}`}
                       data-test-subj={`report-tab-${tab}`}
-                      isSelected={this.props.section === tab}
-                      onClick={() => this.props.switchTab?.(tab)}
+                      isSelected={section === tab}
+                      onClick={() => switchTab?.(tab)}
                     >
-                      {toTitleCase(tab)}&nbsp;
+                      {toTitleCase(tab)}
                     </EuiTab>
                   ))}
                 </>
               ) : (
                 <EuiTab
-                  data-test-subj={`report-tab-${this.props.section}`}
+                  data-test-subj={`report-tab-${section}`}
                   isSelected={true}
                 >
-                  {toTitleCase(this.props.section)}&nbsp;
+                  {toTitleCase(section)}
                 </EuiTab>
               )}
             </EuiTabs>
@@ -97,13 +98,13 @@ export class MainModuleAgent extends Component {
         </EuiFlexItem>
         <EuiFlexItem />
         {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
-          this.props.section,
+          section,
         ) && (
           <EuiFlexItem
             grow={false}
             style={{ marginTop: 13.25, marginInline: 0 }}
           >
-            <GenerateReportButton agent={this.props.agent} />
+            <GenerateReportButton agent={agent} />
           </EuiFlexItem>
         )}
       </EuiFlexGroup>
