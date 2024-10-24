@@ -33,8 +33,8 @@ export class GroupTruncate extends React.Component {
     groups?: string[];
     label: String;
     length: number;
-    action: String;
-    filterAction: (group: string) => void;
+    action: 'redirect' | 'filter';
+    filterAction?: (group: string) => void;
   };
 
   constructor(props) {
@@ -55,7 +55,7 @@ export class GroupTruncate extends React.Component {
           },
         );
       case 'filter':
-        return this.props.filterAction(group);
+        return this.props.filterAction?.(group);
       default:
         console.error('Wrong property in GroupTruncate component');
         break;
