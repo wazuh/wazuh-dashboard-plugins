@@ -34,7 +34,7 @@ export class GroupTruncate extends React.Component {
     label: String;
     length: number;
     action: String;
-    filterAction: any;
+    filterAction: (group: string) => void;
   };
 
   constructor(props) {
@@ -45,11 +45,7 @@ export class GroupTruncate extends React.Component {
     };
   }
 
-  filterAction(group) {
-    this.props.filterAction(group);
-  }
-
-  action(index, group) {
+  action(group: string) {
     switch (this.props.action) {
       case 'redirect':
         return NavigationService.getInstance().navigateToApp(
@@ -59,7 +55,7 @@ export class GroupTruncate extends React.Component {
           },
         );
       case 'filter':
-        return this.filterAction(group);
+        return this.props.filterAction(group);
       default:
         console.error('Wrong property in GroupTruncate component');
         break;
@@ -84,7 +80,7 @@ export class GroupTruncate extends React.Component {
     );
   }
 
-  renderBadge(group, index) {
+  renderBadge(group: string, index: number) {
     return (
       <EuiBadge
         color={'hollow'}
@@ -95,7 +91,7 @@ export class GroupTruncate extends React.Component {
         }}
         onClick={ev => {
           ev.stopPropagation();
-          this.action(index, group);
+          this.action(group);
         }}
       >
         {group}
