@@ -127,7 +127,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
         style={{ responsive: true }}
       >
         {arrayStats.map(item => (
-          <RibbonItem agent={agent} item={item} />
+          <RibbonItem item={item} />
         ))}
       </EuiFlexGroup>
     );
