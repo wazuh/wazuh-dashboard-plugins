@@ -52,7 +52,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { maxWidth: 100 },
         },
         {
-          value: agent.status,
+          value: agent,
           label: RibbonItemLabel.STATUS,
           style: { maxWidth: 150 },
         },
@@ -62,7 +62,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { maxWidth: 150 },
         },
         {
-          value: agent.name,
+          value: agent,
           label: RibbonItemLabel.OPERATING_SYSTEM,
           style: { minWidth: 200, maxWidth: 200 },
         },
@@ -75,7 +75,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { minWidth: 30 },
         },
         {
-          value: agent.status,
+          value: agent,
           label: RibbonItemLabel.STATUS,
           style: { minWidth: 100 },
         },
@@ -95,7 +95,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { minWidth: 150 },
         },
         {
-          value: agent.name,
+          value: agent,
           label: RibbonItemLabel.OPERATING_SYSTEM,
           style: { minWidth: 150 },
         },
