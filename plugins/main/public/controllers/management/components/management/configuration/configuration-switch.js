@@ -87,7 +87,6 @@ import { PromptNoActiveAgentWithoutSelect } from '../../../../../components/agen
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { endpointGroups } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { AgentInfo } from '../../../../../components/common/welcome/agent-info/agents-info';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -208,20 +207,26 @@ class WzConfigurationSwitch extends Component {
     return (
       <EuiPage>
         <EuiPageBody>
-          {this.props.showAgentInfo && (
-            <>
-              <EuiPanel grow paddingSize='s'>
-                <AgentInfo
-                  agent={this.props.agent}
-                  isCondensed={false}
-                  hideActions={true}
-                  {...this.props}
-                ></AgentInfo>
-              </EuiPanel>
-              <EuiSpacer data-test-subj='wz-agent-info-spacer' size='xxl' />
-            </>
-          )}
           <EuiPanel>
+            {agent.id !== '000' && agent.group && agent.group.length ? (
+              <Fragment>
+                <span>Groups:</span>
+                <RedirectAppLinks application={getCore().application}>
+                  {agent.group.map((group, key) => (
+                    <EuiButtonEmpty
+                      key={`agent-group-${key}`}
+                      href={NavigationService.getInstance().getUrlForApp(
+                        endpointGroups.id,
+                        { path: `#/manager/?tab=groups&group=${group}` },
+                      )}
+                    >
+                      {group}
+                    </EuiButtonEmpty>
+                  ))}
+                  <EuiSpacer size='s' />
+                </RedirectAppLinks>
+              </Fragment>
+            ) : null}
             {view !== '' && view !== 'edit-configuration' && (
               <WzConfigurationPath
                 title={title}
