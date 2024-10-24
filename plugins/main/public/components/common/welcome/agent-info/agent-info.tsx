@@ -84,7 +84,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
     return agent?.os?.name + ' ' + agent?.os?.version;
   }
 
-  checkField = (field?: string) => {
+  renderField = (field?: string) => {
     return field !== undefined || field ? field : '-';
   };
 
@@ -133,7 +133,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
                   tooltipProps={tooltipProps}
                   elementStyle={elementStyle}
                 >
-                  {this.checkField(item.title)}
+                  {this.renderField(item.title)}
                 </WzTextWithTooltipIfTruncated>
               )
             }
