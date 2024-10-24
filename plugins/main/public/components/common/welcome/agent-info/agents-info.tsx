@@ -11,7 +11,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiBadge } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { formatUIDate } from '../../../../react-services/time-service';
@@ -20,9 +20,22 @@ import { WzStat } from '../../../wz-stat';
 import { GroupTruncate } from '../../util/agent-group-truncate';
 import { AgentStatus } from '../../../agents/agent-status';
 import './agent-info.scss';
+import { Agent } from '../../../endpoints-summary/types';
 
-export class AgentInfo extends Component {
-  constructor(props) {
+interface AgentInfoProps {
+  agent: Agent;
+  goGroups?: (agent: Agent, key: number) => void;
+  isCondensed?: boolean;
+}
+
+interface Stats {
+  title: string;
+  description: string;
+  style: React.CSSProperties;
+}
+
+export class AgentInfo extends Component<AgentInfoProps> {
+  constructor(props: AgentInfoProps) {
     super(props);
 
     this.state = {};
@@ -31,20 +44,19 @@ export class AgentInfo extends Component {
   async componentDidMount() {
     const managerVersion = await WzRequest.apiReq('GET', '/', {});
     this.setState({
-      managerVersion:
-        (((managerVersion || {}).data || {}).data || {}).api_version || {},
+      managerVersion: managerVersion?.data?.data?.api_version || {},
     });
   }
 
-  getPlatformIcon(agent) {
-    let icon = false;
-    const os = (agent || {}).os;
+  getPlatformIcon(agent?: Agent) {
+    let icon = '';
+    const os = agent?.os;
 
-    if (((os || {}).uname || '').includes('Linux')) {
+    if (os?.uname?.includes('Linux')) {
       icon = 'linux';
-    } else if ((os || {}).platform === 'windows') {
+    } else if (os?.platform === 'windows') {
       icon = 'windows';
-    } else if ((os || {}).platform === 'darwin') {
+    } else if (os?.platform === 'darwin') {
       icon = 'apple';
     }
 
@@ -56,57 +68,33 @@ export class AgentInfo extends Component {
     );
   }
 
-  addTextPlatformRender(agent, style) {
-    const checkField = field => {
-      return field !== undefined ? field : '-';
-    };
+  getOsName(agent?: Agent) {
+    if (agent?.os?.name && agent?.os?.version) {
+      return '-';
+    }
 
-    const os_name =
-      checkField(((agent || {}).os || {}).name) +
-      ' ' +
-      checkField(((agent || {}).os || {}).version);
+    if (!agent?.os?.version) {
+      return agent?.os?.name;
+    }
 
-    const osName = os_name === '- -' ? '-' : os_name;
+    if (!agent?.os?.name) {
+      return agent?.os?.version;
+    }
 
-    return (
-      <WzTextWithTooltipIfTruncated
-        position='bottom'
-        tooltipProps={{ anchorClassName: 'wz-width-100' }}
-        elementStyle={{ maxWidth: style.maxWidth, fontSize: 12 }}
-      >
-        {this.getPlatformIcon(this.props.agent)} {osName}
-      </WzTextWithTooltipIfTruncated>
-    );
+    return agent?.os?.name + ' ' + agent?.os?.version;
   }
 
-  addGroupsRender(agent) {
-    // this was rendered with a EuiHealth, but EuiHealth has a div wrapper, and this section is rendered  within a <p> tag. <div> tags aren't allowed within <p> tags.
-    return (
-      <span>
-        {agent.group.map((group, key) => (
-          <EuiBadge
-            color={'hollow'}
-            key={`agent-group-${key}`}
-            onClickAriaLabel={`agent-group-${group}`}
-            onClick={() => this.props.goGroups(this.props.agent, key)}
-          >
-            {group}
-          </EuiBadge>
-        ))}
-      </span>
-    );
-  }
+  checkField = (field?: string) => {
+    return field !== undefined || field ? field : '-';
+  };
 
-  buildStats(items) {
-    const checkField = field => {
-      return field !== undefined || field ? field : '-';
-    };
+  buildStats(items: Stats[]) {
     const stats = items.map(item => {
+      const wzWidth100 = { anchorClassName: 'wz-width-100' };
+      const elementStyle = { maxWidth: item.style.maxWidth, fontSize: 12 };
       // We add tooltipProps, so that the ClusterNode and Operating System fields occupy their space and do not exceed this, overlapping with the one on the right
       const tooltipProps =
-        item.description === 'Cluster node'
-          ? { anchorClassName: 'wz-width-100' }
-          : {};
+        item.description === 'Cluster node' ? wzWidth100 : {};
       return (
         <EuiFlexItem
           className='wz-agent-info'
@@ -118,7 +106,6 @@ export class AgentInfo extends Component {
               item.description === 'Groups' &&
               this.props.agent.group?.length ? (
                 <GroupTruncate
-                  agent={this.props.agent}
                   groups={this.props.agent.group}
                   length={40}
                   label={'more'}
@@ -126,20 +113,27 @@ export class AgentInfo extends Component {
                   {...this.props}
                 />
               ) : item.description === 'Operating system' ? (
-                this.addTextPlatformRender(this.props.agent, item.style)
+                <WzTextWithTooltipIfTruncated
+                  position='bottom'
+                  tooltipProps={wzWidth100}
+                  elementStyle={elementStyle}
+                >
+                  {this.getPlatformIcon(this.props.agent)}{' '}
+                  {this.getOsName(this.props.agent)}
+                </WzTextWithTooltipIfTruncated>
               ) : item.description === 'Status' ? (
                 <AgentStatus
                   status={this.props.agent.status}
                   agent={this.props.agent}
-                  style={{ ...item.style, fontSize: '12px' }}
+                  style={{ ...item.style, fontSize: 12 }}
                 />
               ) : (
                 <WzTextWithTooltipIfTruncated
                   position='bottom'
                   tooltipProps={tooltipProps}
-                  elementStyle={{ maxWidth: item.style.maxWidth, fontSize: 12 }}
+                  elementStyle={elementStyle}
                 >
-                  {checkField(item.title)}
+                  {this.checkField(item.title)}
                 </WzTextWithTooltipIfTruncated>
               )
             }
@@ -154,7 +148,7 @@ export class AgentInfo extends Component {
 
   render() {
     const { agent } = this.props;
-    let arrayStats;
+    let arrayStats: Stats[];
 
     if (this.props.isCondensed) {
       arrayStats = [
