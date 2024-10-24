@@ -4,7 +4,10 @@ import _ from 'lodash';
 import { useGenericRequest } from '../../../common/hooks/useGenericRequest';
 import { formatUIDate } from '../../../../react-services/time-service';
 import WzRibbon from '../../../common/ribbon/ribbon';
-import { RibbonItemLabel } from '../../../common/ribbon/ribbon-item';
+import {
+  IRibbonItem,
+  RibbonItemLabel,
+} from '../../../common/ribbon/ribbon-item';
 
 export function InventoryMetrics({ agent }) {
   const [params, setParams] = useState({});
@@ -37,14 +40,16 @@ export function InventoryMetrics({ agent }) {
   }
 
   const render = () => {
-    const items = [
+    const items: IRibbonItem[] = [
       {
+        key: 'cores',
         label: 'Cores',
         value: syscollector?.data?.hardware?.cpu?.cores,
         isLoading: syscollector.isLoading,
         style: { maxWidth: 100 },
       },
       {
+        key: 'memory',
         label: 'Memory',
         value: syscollector?.data?.hardware?.ram?.total
           ? `${(syscollector?.data?.hardware?.ram?.total / 1024).toFixed(2)} MB`
@@ -53,35 +58,41 @@ export function InventoryMetrics({ agent }) {
         style: { maxWidth: 100 },
       },
       {
+        key: 'arch',
         label: 'Arch',
         value: syscollector?.data?.os?.architecture,
         isLoading: syscollector.isLoading,
         style: { maxWidth: 100 },
       },
       {
+        key: 'os',
         label: RibbonItemLabel.OPERATING_SYSTEM,
         value: syscollector?.data?.os,
         isLoading: syscollector.isLoading,
       },
       {
+        key: 'cpu',
         label: 'CPU',
         value: syscollector?.data?.hardware?.cpu?.name,
         isLoading: syscollector.isLoading,
         style: { maxWidth: 180 },
       },
       {
+        key: 'hostname',
         label: 'Host name',
         value: syscollector?.data?.os?.hostname,
         isLoading: syscollector.isLoading,
         style: { maxWidth: 100 },
       },
       {
+        key: 'board-serial',
         label: 'Board serial',
         value: syscollector?.data?.hardware?.board_serial,
         isLoading: syscollector.isLoading,
         style: { maxWidth: 100 },
       },
       {
+        key: 'last-scan',
         label: 'Last scan',
         value: syscollector?.data?.os?.scan?.time
           ? offsetTimestamp('', syscollector?.data?.os?.scan?.time)
