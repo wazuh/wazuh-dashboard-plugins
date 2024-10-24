@@ -203,6 +203,8 @@ const InventoryVulsComponent = () => {
     getUnderEvaluation(filters || []),
   );
 
+  const closeFlyoutHandler = () => setInspectedHit(undefined);
+
   return (
     <IntlProvider locale='en'>
       <>
@@ -296,7 +298,7 @@ const InventoryVulsComponent = () => {
               </EuiPanel>
             ) : null}
             {inspectedHit && (
-              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+              <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                 <EuiFlyoutHeader>
                   <EuiTitle>
                     <h2>Vulnerability details</h2>
@@ -311,6 +313,9 @@ const InventoryVulsComponent = () => {
                         inventoryTableDefaultColumns,
                         wzDiscoverRenderColumns,
                       )}
+                      filters={filters}
+                      setFilters={setFilters}
+                      onFilter={closeFlyoutHandler}
                     />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>

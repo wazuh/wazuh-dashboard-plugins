@@ -10,10 +10,7 @@ import {
 export const MAX_ENTRIES_PER_QUERY = 10000;
 import { tDataGridColumn } from './use-data-grid';
 import { cellFilterActions } from './cell-filter-actions';
-import {
-  FILTER_OPERATOR,
-  PatternDataSourceFilterManager,
-} from '../data-source/pattern/pattern-data-source-filter-manager';
+import { onFilterCellActions } from './filter-cell-actions';
 
 type ParseData<T> =
   | {
@@ -190,26 +187,6 @@ export const exportSearchToCSV = async (
     // @ts-ignore
     FileSaver?.saveAs(blobData, `events-${new Date().toISOString()}.csv`);
   }
-};
-
-const onFilterCellActions = (
-  indexPatternId: string,
-  filters: Filter[],
-  setFilters: (filters: Filter[]) => void,
-) => {
-  return (
-    columndId: string,
-    value: any,
-    operation: FILTER_OPERATOR.IS | FILTER_OPERATOR.IS_NOT,
-  ) => {
-    const newFilter = PatternDataSourceFilterManager.createFilter(
-      operation,
-      columndId,
-      value,
-      indexPatternId,
-    );
-    setFilters([...filters, newFilter]);
-  };
 };
 
 const mapToDataGridColumn = (
