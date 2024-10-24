@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
-import {
-  EuiPanel,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiText,
-  EuiLoadingSpinner,
-  EuiIcon,
-} from '@elastic/eui';
-import mapValues from 'lodash';
+import { EuiPanel, EuiIcon } from '@elastic/eui';
+import _ from 'lodash';
 import { useGenericRequest } from '../../../common/hooks/useGenericRequest';
 import { formatUIDate } from '../../../../react-services/time-service';
 import WzRibbon from '../../../common/ribbon/ribbon';
@@ -32,8 +25,7 @@ export function InventoryMetrics({ agent }) {
 
   if (
     !syscollector.isLoading &&
-    (mapValues.isEmpty(syscollector.data.hardware) ||
-      mapValues.isEmpty(syscollector.data.os))
+    (_.isEmpty(syscollector.data.hardware) || _.isEmpty(syscollector.data.os))
   ) {
     return (
       <EuiPanel paddingSize='s' style={{ margin: 16, textAlign: 'center' }}>
