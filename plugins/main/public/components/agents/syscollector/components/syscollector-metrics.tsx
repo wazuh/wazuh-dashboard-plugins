@@ -58,7 +58,7 @@ export function InventoryMetrics({ agent }) {
         style: { maxWidth: 100 },
       },
       {
-        label: 'Operating system',
+        label: RibbonItemLabel.OPERATING_SYSTEM,
         value: syscollector?.data?.os,
         isLoading: syscollector.isLoading,
         style: { maxWidth: 100 },
