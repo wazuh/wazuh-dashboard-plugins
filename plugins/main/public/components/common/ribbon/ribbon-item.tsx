@@ -20,6 +20,7 @@ export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   value: VALUE;
   style?: React.CSSProperties;
   isLoading?: boolean;
+  icon?: React.ReactNode;
 };
 
 const isGroups = (
@@ -123,7 +124,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
         tooltipProps={tooltipProps}
         elementStyle={elementStyle}
       >
-        {renderField(item.value)}
+        {item.icon} {renderField(item.value)}
       </WzTextWithTooltipIfTruncated>
     );
   };
