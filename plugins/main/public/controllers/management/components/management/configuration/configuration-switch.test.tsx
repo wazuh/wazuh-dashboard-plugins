@@ -2,6 +2,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import WzConfigurationSwitch from './configuration-switch';
 import { queryDataTestAttr } from '../../../../../../test/public/query-attr';
+import { CSS } from '../../../../../../test/utils/CSS';
 
 jest.mock('react-redux', () => ({
   connect: () => Component => Component,
@@ -171,7 +172,7 @@ describe('WzConfigurationSwitch', () => {
     updateClusterNodeSelected = jest.fn();
   });
 
-  it('should dont render generate report button', () => {
+  it("shouldn't render the generate report button", () => {
     const { container } = render(
       <WzConfigurationSwitch
         agent={{ id: '000' }}
@@ -187,7 +188,7 @@ describe('WzConfigurationSwitch', () => {
     expect(generateReportButton).toBeFalsy();
   });
 
-  it('should dont render agent info ribbon', () => {
+  it("shouldn't render the agent info ribbon", () => {
     const { container } = render(
       <WzConfigurationSwitch
         agent={{ id: '000' }}
@@ -201,5 +202,21 @@ describe('WzConfigurationSwitch', () => {
     );
 
     expect(agentInfoRibbon).toBeFalsy();
+  });
+
+  it("shouldn't render any ribbon items", () => {
+    const { container } = render(
+      <WzConfigurationSwitch
+        agent={{ id: '000' }}
+        updateClusterNodes={updateClusterNodes}
+        updateClusterNodeSelected={updateClusterNodeSelected}
+      />,
+    );
+
+    const ribbonItems = container.querySelectorAll(
+      queryDataTestAttr('ribbon-item', CSS.Attribute.Substring),
+    );
+
+    expect(ribbonItems.length).toBe(0);
   });
 });
