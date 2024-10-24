@@ -199,6 +199,7 @@ export class FileDetails extends Component {
         name: 'Last analysis',
         grow: 2,
         icon: 'clock',
+        link: true,
         transformValue: formatUIDate,
       },
       {
@@ -206,6 +207,7 @@ export class FileDetails extends Component {
         name: 'Last modified',
         grow: 2,
         icon: 'clock',
+        link: true,
         transformValue: formatUIDate,
       },
     ];
@@ -291,21 +293,19 @@ export class FileDetails extends Component {
   }
 
   addFilter(field, value) {
-    const { filters, onFiltersChange } = this.props;
-    const newBadge: ICustomBadges = { field: 'q', value: '' };
+    const { onFiltersChange } = this.props;
+    let filterUQL = '';
     if (field === 'date' || field === 'mtime') {
       const value_max = moment(value).add(1, 'day');
-      newBadge.value = `${field}>${moment(value).format(
+      filterUQL = `${field}>${moment(value).format(
         'YYYY-MM-DD',
-      )} AND ${field}<${value_max.format('YYYY-MM-DD')}`;
+      )};${field}<${value_max.format('YYYY-MM-DD')}`;
     } else {
-      newBadge.value = `${field}=${
+      filterUQL = `${field}=${
         field === 'size' ? this.props.currentFile[field] : value
       }`;
     }
-    !filters.some(
-      item => item.field === newBadge.field && item.value === newBadge.value,
-    ) && onFiltersChange([...filters, newBadge]);
+    onFiltersChange({ q: filterUQL });
     this.props.closeFlyout();
   }
 
