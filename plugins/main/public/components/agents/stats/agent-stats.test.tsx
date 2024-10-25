@@ -61,7 +61,7 @@ describe('AgentStats', () => {
       expect(
         container.querySelectorAll(
           queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
-        ).length,
+        ),
       ).toHaveLength(7);
     });
   });
