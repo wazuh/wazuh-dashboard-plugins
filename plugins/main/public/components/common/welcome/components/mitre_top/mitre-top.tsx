@@ -26,10 +26,15 @@ import { getMitreCount } from './lib';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { getWzCurrentAppID } from '../../../../../kibana-services';
+import { AppState } from '../../../../../react-services';
 import {
   mitreAttack,
   endpointSummary,
 } from '../../../../../utils/applications';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../../../data-source/pattern/pattern-data-source-filter-manager';
 
 const getTacticsData = async (agentId, timeFilter) => {
   return await getMitreCount(agentId, timeFilter, undefined);
@@ -121,6 +126,45 @@ const MitreTopTacticsTechniques = ({
       }
     };
     console.log(getWzCurrentAppID(), 'getWzCurrentAppID');
+
+    const goToDashboardWithFilter = async (e, techniqueID) => {
+      const indexPatternId = AppState.getCurrentPattern();
+      const filters = [
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS,
+          `rule.mitre.id`,
+          techniqueID,
+          indexPatternId,
+        ),
+      ];
+
+      const params = `tab=mitre&tabView=dashboard&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+        filters,
+      )}`;
+      NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+        path: `#/overview?${params}`,
+      });
+    };
+
+    const goToEventsWithFilter = async (e, techniqueID) => {
+      const indexPatternId = AppState.getCurrentPattern();
+      const filters = [
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS,
+          `rule.mitre.id`,
+          techniqueID,
+          indexPatternId,
+        ),
+      ];
+
+      const params = `tab=mitre&tabView=events&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+        filters,
+      )}`;
+      NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+        path: `#/overview?${params}`,
+      });
+    };
+
     const openDashboard = (e, techniqueID) => {
       if (getWzCurrentAppID() === endpointSummary.id) {
         console.log('entre');
@@ -138,8 +182,8 @@ const MitreTopTacticsTechniques = ({
     };
     return (
       <FlyoutTechnique
-        openDashboard={(e, itemId) => openDashboard(e, itemId)}
-        openDiscover={(e, itemId) => openDiscover(e, itemId)}
+        openDashboard={(e, itemId) => goToDashboardWithFilter(e, itemId)}
+        openDiscover={(e, itemId) => goToEventsWithFilter(e, itemId)}
         implicitFilters={[{ 'agent.id': agentId }]}
         agentId={agentId}
         onChangeFlyout={onChangeFlyout}
