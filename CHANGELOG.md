@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.9.2
 
+### Fixed
+
+- Fixed vulnerabilities inventory table scroll [#7128](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7128)
+
 ## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 04
 
 ### Added
