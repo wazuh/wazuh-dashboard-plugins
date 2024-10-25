@@ -109,14 +109,8 @@ const getDashboardPanels = (
 };
 
 export const DrilldownConfigAction = (drilldownProps: ModuleConfigProps) => {
-  const {
-    fetchData,
-    fetchFilters,
-    searchBarProps,
-    indexPattern,
-    filters,
-    setFilters,
-  } = drilldownProps;
+  const { fetchData, fetchFilters, searchBarProps, indexPattern } =
+    drilldownProps;
 
   return {
     rows: [

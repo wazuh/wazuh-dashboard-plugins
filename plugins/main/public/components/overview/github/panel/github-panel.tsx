@@ -104,8 +104,6 @@ export const GitHubPanel = withErrorBoundary(() => {
               fetchFilters: [...fetchFilters, ...selectedPanelFilter],
               searchBarProps,
               indexPattern: dataSource?.indexPattern,
-              filters,
-              setFilters,
             }}
             isLoading={isDataSourceLoading}
           />
