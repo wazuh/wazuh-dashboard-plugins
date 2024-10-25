@@ -81,11 +81,11 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
     { audit: true },
     { openscap: true },
     { ciscat: true },
+    { virustotal: true },
     { yara: true },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
     { vulnerabilities: true },
-    { virustotal: true },
     { osquery: true },
     { docker: true },
     { mitre: true },
@@ -243,8 +243,6 @@ export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE =
   'mitre-attack-rule';
 export const DATA_SOURCE_FILTER_CONTROLLED_MITRE_ATTACK_RULE_ID =
   'hidden-mitre-attack-rule-id';
-export const DATA_SOURCE_FILTER_CONTROLLED_VIRUSTOTAL_RULE_GROUP =
-  'virustotal-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_GOOGLE_CLOUD_RULE_GROUP =
   'gcp-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_MALWARE_DETECTION_RULE_GROUP =
@@ -303,7 +301,7 @@ export const ASSETS_PUBLIC_URL = '/plugins/wazuh/public/assets/';
 export const REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH =
   'images/logo_reports.png';
 export const REPORTS_PRIMARY_COLOR = '#256BD1';
-export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © 2024 Wazuh, Inc.';
+export const REPORTS_PAGE_FOOTER_TEXT = 'Copyright © Wazuh, Inc.';
 export const REPORTS_PAGE_HEADER_TEXT = 'info@wazuh.com\nhttps://wazuh.com';
 
 // Plugin platform
@@ -529,3 +527,6 @@ export const SEARCH_BAR_DEBOUNCE_UPDATE_TIME = 400;
 
 // ID used to refer the createOsdUrlStateStorage state
 export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
+
+export const APP_STATE_URL_KEY = '_a';
+export const GLOBAL_STATE_URL_KEY = '_g';

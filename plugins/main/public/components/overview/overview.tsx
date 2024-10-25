@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { EuiPage, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getDataPlugin, getUiSettings } from '../../kibana-services';
 import { Stats } from '../../controllers/overview/components/stats';
 import { AppState, WzRequest } from '../../react-services';
 import { OverviewWelcome } from '../common/welcome/overview-welcome';
 import { MainModule } from '../common/modules/main';
-import { OSD_URL_STATE_STORAGE_ID } from '../../../common/constants';
+import {
+  APP_STATE_URL_KEY,
+  OSD_URL_STATE_STORAGE_ID,
+} from '../../../common/constants';
 import { WzCurrentOverviewSectionWrapper } from '../common/modules/overview-current-section-wrapper';
 import {
   connectToQueryState,
@@ -36,6 +40,7 @@ export const Overview: React.FC = withRouteResolvers({
   savedSearch,
 })(() => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
+  const [isAgentsLoading, setIsAgentsLoading] = useState<boolean>(true);
   const { tab = 'welcome', tabView = 'dashboard', agentId } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
   const pinnedAgentManager = new PinnedAgentManager();
@@ -56,7 +61,9 @@ export const Overview: React.FC = withRouteResolvers({
       history: history,
     });
 
-    const appStateFromUrl = osdUrlStateStorage.get('_a') as AppState;
+    const appStateFromUrl = osdUrlStateStorage.get(
+      APP_STATE_URL_KEY,
+    ) as AppState;
     let initialAppState = {
       query: migrateLegacyQuery(data.query.queryString.getDefaultQuery()),
       ...appStateFromUrl,
@@ -73,11 +80,11 @@ export const Overview: React.FC = withRouteResolvers({
 
     const replaceUrlAppState = async (newPartial: AppState = {}) => {
       const state = { ...appStateContainer.getState(), ...newPartial };
-      await osdUrlStateStorage.set('_a', state, { replace: true });
+      await osdUrlStateStorage.set(APP_STATE_URL_KEY, state, { replace: true });
     };
 
     const { start, stop } = syncState({
-      storageKey: '_a',
+      storageKey: APP_STATE_URL_KEY,
       stateContainer: appStateContainerModified,
       stateStorage: osdUrlStateStorage,
     });
@@ -125,6 +132,7 @@ export const Overview: React.FC = withRouteResolvers({
         },
       } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
       setAgentsCounts(data);
+      setIsAgentsLoading(false);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -158,10 +166,16 @@ export const Overview: React.FC = withRouteResolvers({
         </>
       )}
       {tab === 'welcome' && (
-        <>
-          <Stats {...agentsCounts} />
-          <OverviewWelcome {...agentsCounts} />
-        </>
+        <EuiPage paddingSize='l'>
+          <EuiFlexGroup direction='column'>
+            <EuiFlexItem>
+              <Stats {...agentsCounts} isAgentsLoading={isAgentsLoading} />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <OverviewWelcome {...agentsCounts} />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPage>
       )}
     </>
   );

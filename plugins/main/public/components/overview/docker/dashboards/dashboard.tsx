@@ -48,13 +48,13 @@ const DashboardDockerComponent: React.FC = ({}) => {
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
   });
 
-  const { query, absoluteDateRange } = searchBarProps;
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   useReportingCommunicateSearchContext({
     isSearching: isDataSourceLoading,
@@ -62,7 +62,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
     indexPattern: dataSource?.indexPattern,
     filters: fetchFilters,
     query: query,
-    time: absoluteDateRange,
+    time: { from: dateRangeFrom, to: dateRangeTo },
   });
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
     }
     fetchData({
       query,
-      dateRange: absoluteDateRange,
+      dateRange: { from: dateRangeFrom, to: dateRangeTo },
     })
       .then(results => setResults(results))
       .catch(error => {
@@ -84,7 +84,10 @@ const DashboardDockerComponent: React.FC = ({}) => {
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
+    fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   return (
@@ -123,7 +126,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
                     filters: fetchFilters ?? [],
                     useMargins: true,
                     id: 'docker-dashboard-tab',
-                    timeRange: absoluteDateRange,
+                    timeRange: { from: dateRangeFrom, to: dateRangeTo },
                     title: 'Docker dashboard',
                     description: 'Dashboard of Docker',
                     query: query,
@@ -132,6 +135,7 @@ const DashboardDockerComponent: React.FC = ({}) => {
                       value: 15,
                     },
                     hidePanelTitles: false,
+                    lastReloadRequestTime: fingerprint,
                   }}
                 />
               </div>

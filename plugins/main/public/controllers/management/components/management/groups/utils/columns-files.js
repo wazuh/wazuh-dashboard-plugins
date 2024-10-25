@@ -74,9 +74,10 @@ export default class GroupsFilesColumns {
                   iconType='pencil'
                   permissions={[
                     {
-                      action: 'group:read',
+                      action: 'group:update_config',
                       resource: `group:id:${itemDetail.name}`,
                     },
+                    { action: 'cluster:status', resource: '*:*:*' },
                   ]}
                   tooltip={{
                     position: 'top',

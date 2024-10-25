@@ -11,7 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
+import { EuiFlexItem } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
@@ -20,6 +20,7 @@ import { updateShowAddAgents } from '../../../../../redux/actions/groupsActions'
 import GroupsHandler from './utils/groups-handler';
 import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
 import { ReportingService } from '../../../../../react-services/reporting';
+import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzGroupsActionButtonsAgents extends Component {
   _isMounted = false;
@@ -38,13 +39,21 @@ class WzGroupsActionButtonsAgents extends Component {
   render() {
     // Add new group button
     const manageAgentsButton = (
-      <EuiButtonEmpty
+      <WzButtonPermissions
+        buttonType='empty'
+        permissions={[
+          {
+            action: 'group:update_config',
+            resource: `group:id:${this.props.state.itemDetail.name}`,
+          },
+          { action: 'cluster:status', resource: '*:*:*' },
+        ]}
         iconSide='left'
         iconType='folderOpen'
         onClick={() => this.showManageAgents()}
       >
         Manage agents
-      </EuiButtonEmpty>
+      </WzButtonPermissions>
     );
 
     // Export PDF button

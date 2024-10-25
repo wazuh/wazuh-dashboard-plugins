@@ -16,7 +16,6 @@ import {
   EuiCard,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiPage,
   EuiToolTip,
   EuiEmptyPrompt,
 } from '@elastic/eui';
@@ -80,81 +79,94 @@ export const Stats = withErrorBoundary(
       );
     }
 
+    /**
+     * Calculate the size of the visualization evaluating if it renders the internal loading or the chart
+     * based on the viewport size
+     */
+    getVisualizationSize() {
+      const normalLoadingSize = { width: 377, height: '150px' };
+      const mobileLoadingSize = {
+        height: '150px',
+      };
+      const loadingSize =
+        window.innerWidth < 768 ? mobileLoadingSize : normalLoadingSize;
+      const size = this.props.isAgentsLoading
+        ? loadingSize
+        : { width: '100%', height: '150px' };
+      return size;
+    }
+
     render() {
+      const { isAgentsLoading } = this.props;
       const hasResults = this.agentStatus.some(
         ({ status }) => this.props[status],
       );
+      const showAgentsChart = isAgentsLoading || hasResults;
 
       return (
-        <EuiPage>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiCard betaBadgeLabel='Agents summary' title=''>
-                {hasResults ? (
-                  <VisualizationBasic
-                    isLoading={this.state.loadingSummary}
-                    type='donut'
-                    size={{ width: '100%', height: '150px' }}
-                    showLegend
-                    data={this.agentStatus.map(
-                      ({ status, label, color, onClick }) => ({
-                        onClick,
-                        label,
-                        value:
-                          typeof this.props[status] !== 'undefined'
-                            ? this.props[status]
-                            : 0,
-                        color,
-                      }),
-                    )}
-                  />
-                ) : (
-                  !hasResults &&
-                  this.props !== undefined && (
-                    <EuiEmptyPrompt
-                      body={
-                        <p>
-                          This instance has no agents registered.
-                          <br />
-                          Please deploy agents to begin monitoring your
-                          endpoints.
-                        </p>
-                      }
-                      actions={
-                        <WzButtonPermissions
-                          color='primary'
-                          fill
-                          permissions={[
-                            { action: 'agent:create', resource: '*:*:*' },
-                          ]}
-                          iconType='plusInCircle'
-                          href={NavigationService.getInstance().getUrlForApp(
-                            endpointSummary.id,
-                            {
-                              path: `#${endpointSummary.redirectTo()}deploy`,
-                            },
-                          )}
-                        >
-                          Deploy new agent
-                        </WzButtonPermissions>
-                      }
-                    />
-                  )
-                )}
-              </EuiCard>
-            </EuiFlexItem>
-            <EuiFlexItem>
-              <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
-                <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
-                  <LastAlertsStat severity='critical' />
-                  <LastAlertsStat severity='high' />
-                  <LastAlertsStat severity='medium' />
-                  <LastAlertsStat severity='low' />
-                </EuiFlexGroup>
-              </EuiCard>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPage>
+        <EuiFlexGroup gutterSize='l'>
+          <EuiFlexItem grow={false}>
+            <EuiCard betaBadgeLabel='Agents summary' title=''>
+              {showAgentsChart ? (
+                <VisualizationBasic
+                  isLoading={isAgentsLoading}
+                  type='donut'
+                  size={this.getVisualizationSize()}
+                  showLegend
+                  data={this.agentStatus.map(
+                    ({ status, label, color, onClick }) => ({
+                      onClick,
+                      label,
+                      value:
+                        typeof this.props[status] !== 'undefined'
+                          ? this.props[status]
+                          : 0,
+                      color,
+                    }),
+                  )}
+                />
+              ) : (
+                <EuiEmptyPrompt
+                  body={
+                    <p>
+                      This instance has no agents registered.
+                      <br />
+                      Please deploy agents to begin monitoring your endpoints.
+                    </p>
+                  }
+                  actions={
+                    <WzButtonPermissions
+                      color='primary'
+                      fill
+                      permissions={[
+                        { action: 'agent:create', resource: '*:*:*' },
+                      ]}
+                      iconType='plusInCircle'
+                      href={NavigationService.getInstance().getUrlForApp(
+                        endpointSummary.id,
+                        {
+                          path: `#${endpointSummary.redirectTo()}deploy`,
+                        },
+                      )}
+                    >
+                      Deploy new agent
+                    </WzButtonPermissions>
+                  }
+                />
+              )}
+            </EuiCard>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
+              <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
+                <LastAlertsStat severity='critical' />
+                <LastAlertsStat severity='high' />
+                <LastAlertsStat severity='medium' />
+                <LastAlertsStat severity='low' />
+              </EuiFlexGroup>
+            </EuiCard>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       );
     }
   },
