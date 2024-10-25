@@ -5,6 +5,7 @@ import { fireEvent, render } from '@testing-library/react';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
 const GENERATE_REPORT_BUTTON = 'generate-report-button';
+const ARIA_SELECTED = '[aria-selected="true"]';
 
 const REPORT_TAB = {
   STATS: 'agent-tab-stats',
@@ -50,7 +51,7 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.STATS) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.STATS) + ARIA_SELECTED,
       ),
     ).toBeTruthy();
 
@@ -88,7 +89,7 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.CONFIGURATION) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.CONFIGURATION) + ARIA_SELECTED,
       ),
     ).toBeTruthy();
 
@@ -126,7 +127,7 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.SOFTWARE) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
       ),
     ).toBeTruthy();
 
@@ -136,7 +137,7 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.NETWORK) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
       ),
     ).toBeFalsy();
 
@@ -146,7 +147,7 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.PROCESSES) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
       ),
     ).toBeFalsy();
 
@@ -180,13 +181,13 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.SOFTWARE) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
       ),
     ).toBeFalsy();
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.NETWORK) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
       ),
     ).toBeTruthy();
 
@@ -196,7 +197,7 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.PROCESSES) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
       ),
     ).toBeFalsy();
 
@@ -230,7 +231,7 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.SOFTWARE) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
       ),
     ).toBeFalsy();
 
@@ -240,13 +241,13 @@ describe('Main Agent', () => {
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.NETWORK) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
       ),
     ).toBeFalsy();
 
     expect(
       container.querySelector(
-        queryDataTestAttr(REPORT_TAB.PROCESSES) + '[aria-selected="true"]',
+        queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
       ),
     ).toBeTruthy();
 
