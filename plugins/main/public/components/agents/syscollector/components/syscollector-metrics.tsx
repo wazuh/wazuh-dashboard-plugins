@@ -65,17 +65,18 @@ export function InventoryMetrics({ agent }) {
         style: { maxWidth: 100 },
       },
       {
-        key: 'os',
-        label: RibbonItemLabel.OPERATING_SYSTEM,
+        key: RibbonItemLabel.OPERATING_SYSTEM,
         value: syscollector?.data?.os,
+        label: 'Operating system',
         isLoading: syscollector.isLoading,
+        style: { maxWidth: 200 },
       },
       {
         key: 'cpu',
         label: 'CPU',
         value: syscollector?.data?.hardware?.cpu?.name,
         isLoading: syscollector.isLoading,
-        style: { maxWidth: 180 },
+        style: { maxWidth: 250 },
       },
       {
         key: 'hostname',

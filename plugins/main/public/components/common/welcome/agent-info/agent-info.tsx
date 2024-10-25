@@ -49,9 +49,9 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { maxWidth: 100 },
         },
         {
-          key: 'status',
+          key: RibbonItemLabel.STATUS,
           value: agent,
-          label: RibbonItemLabel.STATUS,
+          label: 'Status',
           style: { maxWidth: 150 },
         },
         {
@@ -61,9 +61,9 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { maxWidth: 150 },
         },
         {
-          key: 'os',
+          key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
-          label: RibbonItemLabel.OPERATING_SYSTEM,
+          label: 'Operating system',
           style: { minWidth: 200, maxWidth: 200 },
         },
       ];
@@ -76,9 +76,9 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { minWidth: 30 },
         },
         {
-          key: 'status',
+          key: RibbonItemLabel.STATUS,
           value: agent,
-          label: RibbonItemLabel.STATUS,
+          label: 'status',
           style: { minWidth: 100 },
         },
         {
@@ -94,15 +94,16 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { minWidth: 100 },
         },
         {
-          key: 'group',
+          key: RibbonItemLabel.GROUPS,
           value: agent.group,
-          label: RibbonItemLabel.GROUPS,
+          label: 'group',
           style: { minWidth: 150 },
         },
         {
-          key: 'os',
+          key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
-          label: RibbonItemLabel.OPERATING_SYSTEM,
+          label: 'Operating system',
+          style: { maxWidth: 150 },
         },
         {
           key: 'cluster-node',
