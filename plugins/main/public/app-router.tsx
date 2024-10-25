@@ -21,6 +21,7 @@ import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
+import { SECTIONS } from './sections';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -66,33 +67,41 @@ export function Application(props) {
       <WzAgentSelectorWrapper />
       <WzUpdatesNotification />
       <Switch>
-        <Route path={'/health-check'} exact render={HealthCheck}></Route>
         <Route
-          path={'/agents-preview/deploy'}
+          path={`/${SECTIONS.HEALTH_CHECK}`}
+          exact
+          render={HealthCheck}
+        ></Route>
+        <Route
+          path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}
           exact
           render={RegisterAgent}
         ></Route>
-        <Route path={'/agents'} exact render={AgentView}></Route>
+        <Route path={`/${SECTIONS.AGENTS}`} exact render={AgentView}></Route>
         <Route
-          path={'/agents-preview/'}
+          path={`/${SECTIONS.AGENTS_PREVIEW}/`}
           exact
           render={MainEndpointsSummary}
         ></Route>
-        <Route path={'/manager'} exact render={WzManagement}></Route>
         <Route
-          path={'/overview'}
+          path={`/${SECTIONS.MANAGER}`}
+          exact
+          render={WzManagement}
+        ></Route>
+        <Route
+          path={`/${SECTIONS.OVERVIEW}`}
           exact
           render={props => <Overview {...props} />}
         ></Route>
-        <Route path={'/settings'} exact render={Settings}></Route>
-        <Route path={'/security'} exact render={WzSecurity}></Route>
+        <Route path={`/${SECTIONS.SETTINGS}`} exact render={Settings}></Route>
+        <Route path={`/${SECTIONS.SECURITY}`} exact render={WzSecurity}></Route>
         <Route
-          path={'/wazuh-dev'}
+          path={`/${SECTIONS.WAZUH_DEV}`}
           exact
           render={props => <ToolsRouter {...props} />}
         ></Route>
         <Route
-          path={'/blank-screen'}
+          path={`/${SECTIONS.BLANK_SCREEN}`}
           exact
           render={props => <WzBlankScreen {...props} />}
         ></Route>

@@ -75,10 +75,12 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                           className="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
                         >
                           <EuiTitle
+                            data-test-subj="table-wz-api-title"
                             size="s"
                           >
                             <h1
                               className="euiTitle euiTitle--small"
+                              data-test-subj="table-wz-api-title"
                             >
                               Table
                                

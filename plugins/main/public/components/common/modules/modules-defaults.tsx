@@ -444,7 +444,13 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  syscollector: {
+  software: {
+    notModule: true,
+  },
+  network: {
+    notModule: true,
+  },
+  processes: {
     notModule: true,
   },
   configuration: {

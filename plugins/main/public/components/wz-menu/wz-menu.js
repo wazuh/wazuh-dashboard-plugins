@@ -43,17 +43,6 @@ import WzDataSourceSelector from '../common/data-source/components/wz-data-sourc
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../react-services/navigation-service';
 
-const sections = {
-  overview: 'overview',
-  manager: 'manager',
-  'agents-preview': 'agents-preview',
-  agents: 'agents-preview',
-  settings: 'settings',
-  'wazuh-dev': 'wazuh-dev',
-  'health-check': 'health-check',
-  security: 'security',
-};
-
 export const WzMenu = withWindowSize(
   class WzMenu extends Component {
     constructor(props) {

@@ -69,7 +69,7 @@ export const MainModuleOverview = connect(mapStateToProps)(
                   {this.props.renderTabs()}
                   <EuiFlexItem
                     grow={false}
-                    style={{ marginTop: 6, marginRight: 5 }}
+                    style={{ marginTop: 6.25, marginRight: 5 }}
                   >
                     <EuiFlexGroup>
                       {ModuleTabView &&

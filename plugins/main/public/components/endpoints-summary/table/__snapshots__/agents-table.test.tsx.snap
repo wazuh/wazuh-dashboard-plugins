@@ -31,6 +31,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                   >
                     <h1
                       class="euiTitle euiTitle--small"
+                      data-test-subj="table-wz-api-title"
                     >
                       Agents 
                       <span>
@@ -299,6 +300,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
             />
             <div
               class="euiBasicTable"
+              data-test-subj="table-with-search-bar"
             >
               <div>
                 <div
@@ -697,6 +699,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                   >
                     <h1
                       class="euiTitle euiTitle--small"
+                      data-test-subj="table-wz-api-title"
                     >
                       Agents 
                       <span>
@@ -971,6 +974,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
             />
             <div
               class="euiBasicTable"
+              data-test-subj="table-with-search-bar"
             >
               <div>
                 <div
@@ -1322,6 +1326,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                   >
                     <h1
                       class="euiTitle euiTitle--small"
+                      data-test-subj="table-wz-api-title"
                     >
                       Agents 
                       <span>
@@ -1596,6 +1601,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
             />
             <div
               class="euiBasicTable"
+              data-test-subj="table-with-search-bar"
             >
               <div>
                 <div
