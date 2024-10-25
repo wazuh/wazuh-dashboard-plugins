@@ -4,6 +4,8 @@ import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { fireEvent, render } from '@testing-library/react';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
+const GENERATE_REPORT_BUTTON = 'generate-report-button';
+
 const REPORT_TAB = {
   STATS: 'agent-tab-stats',
   CONFIGURATION: 'agent-tab-configuration',
@@ -67,6 +69,12 @@ describe('Main Agent', () => {
     expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeFalsy();
+
+    const generateReportButton = container.querySelector(
+      queryDataTestAttr(GENERATE_REPORT_BUTTON),
+    );
+
+    expect(generateReportButton).toBeFalsy();
   });
 
   it('should render agent tab overview when section is configuration', () => {
@@ -99,6 +107,12 @@ describe('Main Agent', () => {
     expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
     ).toBeFalsy();
+
+    const generateReportButton = container.querySelector(
+      queryDataTestAttr(GENERATE_REPORT_BUTTON),
+    );
+
+    expect(generateReportButton).toBeFalsy();
   });
 
   it('should render agent tab overview when section is software', () => {
@@ -143,6 +157,12 @@ describe('Main Agent', () => {
     expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
     ).toBeFalsy();
+
+    const generateReportButton = container.querySelector(
+      queryDataTestAttr(GENERATE_REPORT_BUTTON),
+    );
+
+    expect(generateReportButton).toBeTruthy();
   });
 
   it('should render agent tab overview when section is network', () => {
@@ -187,6 +207,12 @@ describe('Main Agent', () => {
     expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
     ).toBeFalsy();
+
+    const generateReportButton = container.querySelector(
+      queryDataTestAttr(GENERATE_REPORT_BUTTON),
+    );
+
+    expect(generateReportButton).toBeTruthy();
   });
 
   it('should render agent tab overview when section is processes', () => {
@@ -231,6 +257,12 @@ describe('Main Agent', () => {
     expect(
       container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
     ).toBeFalsy();
+
+    const generateReportButton = container.querySelector(
+      queryDataTestAttr(GENERATE_REPORT_BUTTON),
+    );
+
+    expect(generateReportButton).toBeTruthy();
   });
 
   it('should be call switchTab when click on tab', () => {

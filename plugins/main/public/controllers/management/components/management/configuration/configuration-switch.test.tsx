@@ -172,22 +172,6 @@ describe('WzConfigurationSwitch', () => {
     updateClusterNodeSelected = jest.fn();
   });
 
-  it("shouldn't render the generate report button", () => {
-    const { container } = render(
-      <WzConfigurationSwitch
-        agent={{ id: '000' }}
-        updateClusterNodes={updateClusterNodes}
-        updateClusterNodeSelected={updateClusterNodeSelected}
-      />,
-    );
-
-    const generateReportButton = container.querySelector(
-      queryDataTestAttr('generate-report-button'),
-    );
-
-    expect(generateReportButton).toBeFalsy();
-  });
-
   it("shouldn't render the agent info ribbon", () => {
     const { container } = render(
       <WzConfigurationSwitch

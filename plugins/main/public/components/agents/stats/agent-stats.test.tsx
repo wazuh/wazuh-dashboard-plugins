@@ -10,19 +10,7 @@ jest.mock('../../../react-services', () => ({
 }));
 
 describe('AgentStats', () => {
-  it('should dont render generate report button', async () => {
-    await act(async () => {
-      const { container } = render(<AgentStats agent={{ id: '000' }} />);
-
-      const generateReportButton = container.querySelector(
-        queryDataTestAttr('generate-report-button'),
-      );
-
-      expect(generateReportButton).toBeFalsy();
-    });
-  });
-
-  it('should dont render agent info ribbon', async () => {
+  it('should not render agent info ribbon', async () => {
     await act(async () => {
       const { container } = render(<AgentStats agent={{ id: '000' }} />);
 
