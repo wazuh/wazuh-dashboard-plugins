@@ -40,264 +40,320 @@ describe('Main Agent', () => {
     switchTab = jest.fn();
   });
 
-  it('should render agent tab overview when section is stats', () => {
-    const { container } = render(
-      <MainModuleAgent
-        agent={{ os: { platform: 'windows' } }}
-        section={AgentTabs.STATS}
-        switchTab={switchTab}
-      />,
-    );
+  describe('Agent tabs', () => {
+    it('should render agent tab overview when section is stats', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.STATS}
+          switchTab={switchTab}
+        />,
+      );
 
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.STATS) + ARIA_SELECTED,
-      ),
-    ).toBeTruthy();
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.STATS) + ARIA_SELECTED,
+        ),
+      ).toBeTruthy();
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
-    ).toBeFalsy();
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
+      ).toBeFalsy();
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
-    ).toBeFalsy();
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
+      ).toBeFalsy();
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
-    ).toBeFalsy();
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
+      ).toBeFalsy();
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
-    ).toBeFalsy();
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
+      ).toBeFalsy();
+    });
 
-    const generateReportButton = container.querySelector(
-      queryDataTestAttr(GENERATE_REPORT_BUTTON),
-    );
+    it('should render agent tab overview when section is configuration', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.CONFIGURATION}
+          switchTab={switchTab}
+        />,
+      );
 
-    expect(generateReportButton).toBeFalsy();
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.CONFIGURATION) + ARIA_SELECTED,
+        ),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
+      ).toBeFalsy();
+    });
+
+    it('should render agent tab overview when section is software', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.SOFTWARE}
+          switchTab={switchTab}
+        />,
+      );
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
+        ),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
+        ),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
+        ),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
+      ).toBeFalsy();
+    });
+
+    it('should render agent tab overview when section is network', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.NETWORK}
+          switchTab={switchTab}
+        />,
+      );
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
+        ),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
+        ),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
+        ),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
+      ).toBeFalsy();
+    });
+
+    it('should render agent tab overview when section is processes', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.PROCESSES}
+          switchTab={switchTab}
+        />,
+      );
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
+        ),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
+        ),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
+        ),
+      ).toBeTruthy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
+      ).toBeFalsy();
+
+      expect(
+        container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
+      ).toBeFalsy();
+    });
+
+    it('should be call switchTab when click on tab', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.SOFTWARE}
+          switchTab={switchTab}
+        />,
+      );
+
+      fireEvent.click(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.SOFTWARE),
+        ) as Element,
+      );
+
+      expect(switchTab).toHaveBeenCalledTimes(1);
+      expect(switchTab).toHaveBeenCalledWith(AgentTabs.SOFTWARE);
+
+      fireEvent.click(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.NETWORK),
+        ) as Element,
+      );
+
+      expect(switchTab).toHaveBeenCalledTimes(2);
+      expect(switchTab).toHaveBeenCalledWith(AgentTabs.NETWORK);
+
+      fireEvent.click(
+        container.querySelector(
+          queryDataTestAttr(REPORT_TAB.PROCESSES),
+        ) as Element,
+      );
+
+      expect(switchTab).toHaveBeenCalledTimes(3);
+      expect(switchTab).toHaveBeenCalledWith(AgentTabs.PROCESSES);
+    });
   });
 
-  it('should render agent tab overview when section is configuration', () => {
-    const { container } = render(
-      <MainModuleAgent
-        agent={{ os: { platform: 'windows' } }}
-        section={AgentTabs.CONFIGURATION}
-        switchTab={switchTab}
-      />,
-    );
+  describe('Generate report button', () => {
+    it("shouldn't render generate report button when section is stats", () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.STATS}
+          switchTab={switchTab}
+        />,
+      );
 
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.CONFIGURATION) + ARIA_SELECTED,
-      ),
-    ).toBeTruthy();
+      const generateReportButton = container.querySelector(
+        queryDataTestAttr(GENERATE_REPORT_BUTTON),
+      );
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
-    ).toBeFalsy();
+      expect(generateReportButton).toBeFalsy();
+    });
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
-    ).toBeFalsy();
+    it("shouldn't render generate report button when section is configuration", () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.CONFIGURATION}
+          switchTab={switchTab}
+        />,
+      );
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
-    ).toBeFalsy();
+      const generateReportButton = container.querySelector(
+        queryDataTestAttr(GENERATE_REPORT_BUTTON),
+      );
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
-    ).toBeFalsy();
+      expect(generateReportButton).toBeFalsy();
+    });
 
-    const generateReportButton = container.querySelector(
-      queryDataTestAttr(GENERATE_REPORT_BUTTON),
-    );
+    it('should render generate report button when section is software', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.SOFTWARE}
+          switchTab={switchTab}
+        />,
+      );
 
-    expect(generateReportButton).toBeFalsy();
-  });
+      const generateReportButton = container.querySelector(
+        queryDataTestAttr(GENERATE_REPORT_BUTTON),
+      );
 
-  it('should render agent tab overview when section is software', () => {
-    const { container } = render(
-      <MainModuleAgent
-        agent={{ os: { platform: 'windows' } }}
-        section={AgentTabs.SOFTWARE}
-        switchTab={switchTab}
-      />,
-    );
+      expect(generateReportButton).toBeTruthy();
+    });
 
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
-      ),
-    ).toBeTruthy();
+    it('should render generate report button when section is network', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.NETWORK}
+          switchTab={switchTab}
+        />,
+      );
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
-    ).toBeTruthy();
+      const generateReportButton = container.querySelector(
+        queryDataTestAttr(GENERATE_REPORT_BUTTON),
+      );
 
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
-      ),
-    ).toBeFalsy();
+      expect(generateReportButton).toBeTruthy();
+    });
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
-    ).toBeTruthy();
+    it('should render generate report button when section is processes', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.PROCESSES}
+          switchTab={switchTab}
+        />,
+      );
 
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
-      ),
-    ).toBeFalsy();
+      const generateReportButton = container.querySelector(
+        queryDataTestAttr(GENERATE_REPORT_BUTTON),
+      );
 
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
-    ).toBeFalsy();
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
-    ).toBeFalsy();
-
-    const generateReportButton = container.querySelector(
-      queryDataTestAttr(GENERATE_REPORT_BUTTON),
-    );
-
-    expect(generateReportButton).toBeTruthy();
-  });
-
-  it('should render agent tab overview when section is network', () => {
-    const { container } = render(
-      <MainModuleAgent
-        agent={{ os: { platform: 'windows' } }}
-        section={AgentTabs.NETWORK}
-        switchTab={switchTab}
-      />,
-    );
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
-    ).toBeTruthy();
-
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
-      ),
-    ).toBeFalsy();
-
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
-      ),
-    ).toBeTruthy();
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
-    ).toBeTruthy();
-
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
-      ),
-    ).toBeFalsy();
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
-    ).toBeFalsy();
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
-    ).toBeFalsy();
-
-    const generateReportButton = container.querySelector(
-      queryDataTestAttr(GENERATE_REPORT_BUTTON),
-    );
-
-    expect(generateReportButton).toBeTruthy();
-  });
-
-  it('should render agent tab overview when section is processes', () => {
-    const { container } = render(
-      <MainModuleAgent
-        agent={{ os: { platform: 'windows' } }}
-        section={AgentTabs.PROCESSES}
-        switchTab={switchTab}
-      />,
-    );
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
-    ).toBeTruthy();
-
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
-      ),
-    ).toBeFalsy();
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
-    ).toBeTruthy();
-
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
-      ),
-    ).toBeFalsy();
-
-    expect(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
-      ),
-    ).toBeTruthy();
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
-    ).toBeFalsy();
-
-    expect(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
-    ).toBeFalsy();
-
-    const generateReportButton = container.querySelector(
-      queryDataTestAttr(GENERATE_REPORT_BUTTON),
-    );
-
-    expect(generateReportButton).toBeTruthy();
-  });
-
-  it('should be call switchTab when click on tab', () => {
-    const { container } = render(
-      <MainModuleAgent
-        agent={{ os: { platform: 'windows' } }}
-        section={AgentTabs.SOFTWARE}
-        switchTab={switchTab}
-      />,
-    );
-
-    fireEvent.click(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.SOFTWARE),
-      ) as Element,
-    );
-
-    expect(switchTab).toHaveBeenCalledTimes(1);
-    expect(switchTab).toHaveBeenCalledWith(AgentTabs.SOFTWARE);
-
-    fireEvent.click(
-      container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)) as Element,
-    );
-
-    expect(switchTab).toHaveBeenCalledTimes(2);
-    expect(switchTab).toHaveBeenCalledWith(AgentTabs.NETWORK);
-
-    fireEvent.click(
-      container.querySelector(
-        queryDataTestAttr(REPORT_TAB.PROCESSES),
-      ) as Element,
-    );
-
-    expect(switchTab).toHaveBeenCalledTimes(3);
-    expect(switchTab).toHaveBeenCalledWith(AgentTabs.PROCESSES);
+      expect(generateReportButton).toBeTruthy();
+    });
   });
 });
