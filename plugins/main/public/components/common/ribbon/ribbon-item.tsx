@@ -68,12 +68,15 @@ const WzRibbonItem = (props: RibbonItemProps) => {
       icon = osType;
     }
 
-    return (
-      <i
-        className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${osType}`}
-        aria-hidden='true'
-      ></i>
-    );
+    if (icon) {
+      return (
+        <i
+          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${osType}`}
+          aria-hidden='true'
+        ></i>
+      );
+    }
+    return <></>;
   };
 
   const getOsName = (agent?: Agent) => {
