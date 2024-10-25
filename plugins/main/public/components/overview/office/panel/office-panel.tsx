@@ -105,8 +105,6 @@ export const OfficePanel = withErrorBoundary(() => {
               fetchFilters: [...fetchFilters, ...selectedPanelFilter],
               searchBarProps,
               indexPattern: dataSource?.indexPattern,
-              filters,
-              setFilters,
             }}
             isLoading={isDataSourceLoading}
           />
