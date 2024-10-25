@@ -58,7 +58,9 @@ describe('Syscollector metrics', () => {
     ).toBeTruthy();
 
     expect(
-      container.querySelector(queryDataTestAttr('ribbon-item-os')),
+      container.querySelector(
+        queryDataTestAttr('ribbon-item-operating-system'),
+      ),
     ).toBeTruthy();
 
     expect(

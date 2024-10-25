@@ -9,10 +9,10 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -114,7 +114,8 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -146,7 +147,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1459,10 +1460,10 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -1564,7 +1565,8 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1596,7 +1598,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -2941,10 +2943,10 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -3046,7 +3048,8 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -3078,7 +3081,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4415,10 +4418,10 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -4520,7 +4523,8 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4552,7 +4556,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -5865,10 +5869,10 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -5970,7 +5974,8 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -6002,7 +6007,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7347,10 +7352,10 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -7452,7 +7457,8 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7484,7 +7490,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8821,10 +8827,10 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -8926,7 +8932,8 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8958,7 +8965,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10271,10 +10278,10 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -10376,7 +10383,8 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10408,7 +10416,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11753,10 +11761,10 @@ exports[`Inventory data Network Network settings table A Windows agent should re
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -11858,7 +11866,8 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11890,7 +11899,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13227,10 +13236,10 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -13332,7 +13341,8 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13364,7 +13374,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13941,10 +13951,10 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -14046,7 +14056,8 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14078,7 +14089,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14802,10 +14813,10 @@ exports[`Inventory data Processes A Windows agent should render processes table 
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -14907,7 +14918,8 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14939,7 +14951,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15541,10 +15553,10 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -15646,7 +15658,8 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15678,7 +15691,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16232,10 +16245,10 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -16337,7 +16350,8 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16369,7 +16383,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16924,10 +16938,10 @@ exports[`Inventory data Software Packages table A Windows agent should render so
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -17029,7 +17043,8 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17061,7 +17076,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17900,10 +17915,10 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
     class="euiPageBody euiPageBody--borderRadiusNone"
   >
     <div
-      class="euiPanel euiPanel--paddingSmall euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
+      class="euiPanel euiPanel--paddingMedium euiPanel--borderRadiusMedium euiPanel--plain euiPanel--hasShadow"
     >
       <div
-        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
+        class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap"
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
@@ -18005,7 +18020,8 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
-          data-test-subj="ribbon-item-os"
+          data-test-subj="ribbon-item-operating-system"
+          style="max-width:200px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -18037,7 +18053,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:180px"
+          style="max-width:250px"
         >
           <div
             class="euiStat euiStat--leftAligned"
