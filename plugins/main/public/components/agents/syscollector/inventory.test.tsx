@@ -309,6 +309,21 @@ describe('Inventory data', () => {
   });
 
   describe('Software', () => {
+    it('should render inventory metrics', () => {
+      const wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DEBIAN}
+          section={AgentTabs.SOFTWARE}
+        />,
+      );
+
+      const inventoryMetrics = wrapper.find(
+        queryDataTestAttr('syscollector-metrics'),
+      );
+
+      expect(inventoryMetrics).toBeTruthy();
+    });
+
     describe(SOFTWARE_PACKAGES + ' table', () => {
       it('A Linux agent should render software table with correct columns and title.', () => {
         const columns = [
@@ -396,6 +411,21 @@ describe('Inventory data', () => {
   });
 
   describe('Network', () => {
+    it('should render inventory metrics', () => {
+      const wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DEBIAN}
+          section={AgentTabs.SOFTWARE}
+        />,
+      );
+
+      const inventoryMetrics = wrapper.find(
+        queryDataTestAttr('syscollector-metrics'),
+      );
+
+      expect(inventoryMetrics).toBeTruthy();
+    });
+
     describe(NETWORK_SETTINGS + ' table', () => {
       it('A Linux agent should render network settings table with correct columns and title.', () => {
         const columns = [
@@ -532,6 +562,21 @@ describe('Inventory data', () => {
   });
 
   describe('Processes', () => {
+    it('should render inventory metrics', () => {
+      const wrapper = render(
+        <SyscollectorInventory
+          agent={AGENT.DEBIAN}
+          section={AgentTabs.SOFTWARE}
+        />,
+      );
+
+      const inventoryMetrics = wrapper.find(
+        queryDataTestAttr('syscollector-metrics'),
+      );
+
+      expect(inventoryMetrics).toBeTruthy();
+    });
+
     it('A Linux agent should render processes table with correct columns and title.', () => {
       const columns = [
         PROCESSES_COLUMNS.NAME,

@@ -18,6 +18,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -49,6 +50,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -80,6 +82,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -111,6 +114,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -141,6 +145,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -172,6 +177,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -203,6 +209,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -234,6 +241,7 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -1460,6 +1468,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -1491,6 +1500,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -1522,6 +1532,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -1553,6 +1564,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1583,6 +1595,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -1614,6 +1627,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -1645,6 +1659,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -1676,6 +1691,7 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -2934,6 +2950,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -2965,6 +2982,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -2996,6 +3014,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -3027,6 +3046,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -3057,6 +3077,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -3088,6 +3109,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -3119,6 +3141,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -3150,6 +3173,7 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -4400,6 +4424,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -4431,6 +4456,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -4462,6 +4488,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -4493,6 +4520,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4523,6 +4551,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -4554,6 +4583,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -4585,6 +4615,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -4616,6 +4647,7 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -5842,6 +5874,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -5873,6 +5906,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -5904,6 +5938,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -5935,6 +5970,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -5965,6 +6001,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -5996,6 +6033,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -6027,6 +6065,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -6058,6 +6097,7 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -7316,6 +7356,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -7347,6 +7388,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -7378,6 +7420,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -7409,6 +7452,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7439,6 +7483,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -7470,6 +7515,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -7501,6 +7547,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -7532,6 +7579,7 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -8782,6 +8830,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -8813,6 +8862,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -8844,6 +8894,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -8875,6 +8926,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8905,6 +8957,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -8936,6 +8989,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -8967,6 +9021,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -8998,6 +9053,7 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -10224,6 +10280,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -10255,6 +10312,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -10286,6 +10344,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -10317,6 +10376,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10347,6 +10407,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -10378,6 +10439,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -10409,6 +10471,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -10440,6 +10503,7 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -11698,6 +11762,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -11729,6 +11794,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -11760,6 +11826,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -11791,6 +11858,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11821,6 +11889,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -11852,6 +11921,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -11883,6 +11953,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -11914,6 +11985,7 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -13164,6 +13236,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -13195,6 +13268,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -13226,6 +13300,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -13257,6 +13332,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13287,6 +13363,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -13318,6 +13395,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -13349,6 +13427,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -13380,6 +13459,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -13870,6 +13950,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -13901,6 +13982,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -13932,6 +14014,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -13963,6 +14046,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13993,6 +14077,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -14024,6 +14109,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -14055,6 +14141,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -14086,6 +14173,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -14723,6 +14811,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -14754,6 +14843,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -14785,6 +14875,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -14816,6 +14907,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14846,6 +14938,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -14877,6 +14970,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -14908,6 +15002,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -14939,6 +15034,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -15454,6 +15550,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -15485,6 +15582,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -15516,6 +15614,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -15547,6 +15646,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15577,6 +15677,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -15608,6 +15709,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -15639,6 +15741,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -15670,6 +15773,7 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -16137,6 +16241,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -16168,6 +16273,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -16199,6 +16305,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -16230,6 +16337,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16260,6 +16368,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -16291,6 +16400,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -16322,6 +16432,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -16353,6 +16464,7 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -16821,6 +16933,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -16852,6 +16965,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -16883,6 +16997,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -16914,6 +17029,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16944,6 +17060,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -16975,6 +17092,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -17006,6 +17124,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -17037,6 +17156,7 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
@@ -17789,6 +17909,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
       >
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cores"
           style="max-width:100px"
         >
           <div
@@ -17820,6 +17941,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-memory"
           style="max-width:100px"
         >
           <div
@@ -17851,6 +17973,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-arch"
           style="max-width:100px"
         >
           <div
@@ -17882,6 +18005,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-os"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17912,6 +18036,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-cpu"
           style="max-width:180px"
         >
           <div
@@ -17943,6 +18068,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-hostname"
           style="max-width:100px"
         >
           <div
@@ -17974,6 +18100,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-board-serial"
           style="max-width:100px"
         >
           <div
@@ -18005,6 +18132,7 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         </div>
         <div
           class="euiFlexItem wz-ribbon-item"
+          data-test-subj="ribbon-item-last-scan"
           style="max-width:180px"
         >
           <div
