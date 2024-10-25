@@ -25,6 +25,11 @@ import { FlyoutTechnique } from '../../../../overview/mitre/framework/components
 import { getMitreCount } from './lib';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { getWzCurrentAppID } from '../../../../../kibana-services';
+import {
+  mitreAttack,
+  endpointSummary,
+} from '../../../../../utils/applications';
 
 const getTacticsData = async (agentId, timeFilter) => {
   return await getMitreCount(agentId, timeFilter, undefined);
@@ -107,21 +112,29 @@ const MitreTopTacticsTechniques = ({
     const onChangeFlyout = () => {
       setShowTechniqueDetails('');
     };
-
     const openDiscover = (e, techniqueID) => {
-      NavigationService.getInstance().navigateToModule(e, 'overview', {
-        tab: 'mitre',
-        tabView: 'discover',
-        filters: { 'rule.mitre.id': techniqueID },
-      });
+      if (getWzCurrentAppID() === endpointSummary.id) {
+        NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+          path: `#/overview?tab=mitre&tabView=dashboard&agentId=${agentId}`,
+          filters: { 'rule.mitre.id': techniqueID },
+        });
+      }
     };
-
+    console.log(getWzCurrentAppID(), 'getWzCurrentAppID');
     const openDashboard = (e, techniqueID) => {
-      NavigationService.getInstance().navigateToModule(e, 'overview', {
-        tab: 'mitre',
-        tabView: 'dashboard',
-        filters: { 'rule.mitre.id': techniqueID },
-      });
+      if (getWzCurrentAppID() === endpointSummary.id) {
+        console.log('entre');
+        NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+          path: `#/overview?tab=mitre&tabView=dashboard&agentId=${agentId}`,
+          filters: { 'rule.mitre.id': techniqueID },
+        });
+      } else {
+        NavigationService.getInstance().navigateToModule(e, 'overview', {
+          tab: 'mitre',
+          tabView: 'dashboard',
+          filters: { 'rule.mitre.id': techniqueID },
+        });
+      }
     };
     return (
       <FlyoutTechnique
