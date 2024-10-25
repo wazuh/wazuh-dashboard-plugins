@@ -7,13 +7,14 @@ import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import './ribbon-item.scss';
+import { getAgentOSType } from '../../../react-services';
 
 const FONT_SIZE = 12;
 
 export enum RibbonItemLabel {
-  GROUPS = 'Groups',
-  OPERATING_SYSTEM = 'Operating system',
-  STATUS = 'Status',
+  GROUPS = 'groups',
+  OPERATING_SYSTEM = 'operating-system',
+  STATUS = 'status',
 }
 
 export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
@@ -28,19 +29,19 @@ export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
 const isGroups = (
   item: IRibbonItem,
 ): item is IRibbonItem<RibbonItemLabel.GROUPS, string[]> => {
-  return item.label === RibbonItemLabel.GROUPS;
+  return item.key === RibbonItemLabel.GROUPS;
 };
 
 const isOperatingSystem = (
   item: IRibbonItem,
 ): item is IRibbonItem<RibbonItemLabel.OPERATING_SYSTEM, Agent> => {
-  return item.label === RibbonItemLabel.OPERATING_SYSTEM;
+  return item.key === RibbonItemLabel.OPERATING_SYSTEM;
 };
 
 const isStatus = (
   item: IRibbonItem,
 ): item is IRibbonItem<RibbonItemLabel.STATUS, Agent> => {
-  return item.label === RibbonItemLabel.STATUS;
+  return item.key === RibbonItemLabel.STATUS;
 };
 
 interface RibbonItemProps {
@@ -52,26 +53,24 @@ const WzRibbonItem = (props: RibbonItemProps) => {
 
   const elementStyle = { ...(item.style || {}), fontSize: FONT_SIZE };
   const wzWidth100 = { anchorClassName: 'wz-width-100' };
-  const tooltipProps = item.label === 'Cluster node' ? wzWidth100 : {};
+  const tooltipProps = item.key === 'cluster-node' ? wzWidth100 : {};
 
   const getPlatformIcon = (agent?: Agent) => {
     let icon = '';
-    const { uname, platform } = agent?.os || {};
-
-    if (
-      uname?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX) ||
-      platform?.toLowerCase().includes('ubuntu')
-    ) {
-      icon = WAZUH_AGENTS_OS_TYPE.LINUX;
-    } else if (platform === WAZUH_AGENTS_OS_TYPE.WINDOWS) {
-      icon = WAZUH_AGENTS_OS_TYPE.WINDOWS;
-    } else if (platform === WAZUH_AGENTS_OS_TYPE.DARWIN) {
+    let osType = getAgentOSType(agent);
+    if (osType === WAZUH_AGENTS_OS_TYPE.DARWIN) {
       icon = 'apple';
+    } else if (
+      [WAZUH_AGENTS_OS_TYPE.WINDOWS, WAZUH_AGENTS_OS_TYPE.LINUX].includes(
+        osType,
+      )
+    ) {
+      icon = osType;
     }
 
     return (
       <i
-        className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
+        className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${osType}`}
         aria-hidden='true'
       ></i>
     );
@@ -109,7 +108,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
         tooltipProps={wzWidth100}
         elementStyle={{
           ...elementStyle,
-          maxWidth: item.style?.maxWidth || 150,
+          maxWidth: item.style?.maxWidth,
         }}
       >
         {getPlatformIcon(item.value)} {getOsName(item.value)}
@@ -135,7 +134,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
     <EuiFlexItem
       className='wz-ribbon-item'
       data-test-subj={`ribbon-item-${item.key}`}
-      key={item.label}
+      key={item.key}
       style={item.style || null}
     >
       <WzStat title={renderValue()} description={item.label} titleSize='xs' />
