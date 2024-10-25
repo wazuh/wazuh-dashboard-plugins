@@ -10,10 +10,11 @@ interface RibbonProps {
 const WzRibbon = (props: RibbonProps) => {
   const { items, 'data-test-subj': dataTestSubj } = props;
   return (
-    <EuiPanel paddingSize='s'>
+    <EuiPanel paddingSize='m'>
       <EuiFlexGroup
         data-test-subj={dataTestSubj}
         wrap
+        justifyContent='spaceBetween'
         style={{ responsive: true }}
       >
         {items.map(item => (
