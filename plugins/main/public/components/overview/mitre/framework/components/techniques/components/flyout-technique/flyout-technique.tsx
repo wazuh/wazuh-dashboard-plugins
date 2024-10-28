@@ -259,9 +259,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       : addRenderColumn(techniquesColumns);
   };
 
-  const agentId = store.getState().appStateReducers?.currentAgentData?.id;
-
-  const goToDashboardWithFilter = async (e, currentTechnique) => {
+  const goToTechniqueInIntellicense = async (e, currentTechnique) => {
     const indexPatternId = AppState.getCurrentPattern();
     const filters = [
       PatternDataSourceFilterManager.createFilter(
@@ -271,10 +269,27 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         indexPatternId,
       ),
     ];
-    console.log(currentTechnique, 'currentTechnique');
     const params = `tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${currentTechnique}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
       filters,
     )}`;
+    NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+      path: `#/overview?${params}`,
+    });
+  };
+
+  const goToTacticInIntellicense = async (e, tactic) => {
+    const indexPatternId = AppState.getCurrentPattern();
+    const filters = [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        `rule.mitre.id`,
+        tactic,
+        indexPatternId,
+      ),
+    ];
+    const params = `tab=mitre&tabView=intelligence&tabRedirect=tactics&idToRedirect=${
+      tactic.id
+    }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
     NavigationService.getInstance().navigateToApp(mitreAttack.id, {
       path: `#/overview?${params}`,
     });
@@ -293,17 +308,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           >
             <EuiLink
               onClick={e => {
-                // NavigationService.getInstance().navigateToModule(
-                //   e,
-                //   'overview',
-                //   {
-                //     tab: 'mitre',
-                //     tabView: 'intelligence',
-                //     tabRedirect: 'techniques',
-                //     idToRedirect: currentTechnique,
-                //   },
-                // );
-                goToDashboardWithFilter(e, currentTechnique);
+                goToTechniqueInIntellicense(e, currentTechnique);
                 e.stopPropagation();
               }}
             >
@@ -324,16 +329,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                   >
                     <EuiLink
                       onClick={e => {
-                        NavigationService.getInstance().navigateToModule(
-                          e,
-                          'overview',
-                          {
-                            tab: 'mitre',
-                            tabView: 'intelligence',
-                            tabRedirect: 'tactics',
-                            idToRedirect: tactic.id,
-                          },
-                        );
+                        goToTacticInIntellicense(e, tactic);
                         e.stopPropagation();
                       }}
                     >
@@ -355,6 +351,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       <EuiFlyoutBody>
         <EuiAccordion
           id='details'
+          initialIsOpen={true}
           buttonContent={
             <EuiTitle size='s'>
               <h3>Technique details</h3>
