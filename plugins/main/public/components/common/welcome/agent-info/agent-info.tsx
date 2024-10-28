@@ -49,7 +49,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { maxWidth: 100 },
         },
         {
-          key: RibbonItemLabel.STATUS,
+          key: RibbonItemLabel.AGENT_STATUS,
           value: agent,
           label: 'Status',
           style: { maxWidth: 150 },
@@ -76,7 +76,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
           style: { minWidth: 30 },
         },
         {
-          key: RibbonItemLabel.STATUS,
+          key: RibbonItemLabel.AGENT_STATUS,
           value: agent,
           label: 'status',
           style: { minWidth: 100 },

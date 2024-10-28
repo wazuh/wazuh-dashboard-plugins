@@ -14,7 +14,7 @@ const FONT_SIZE = 12;
 export enum RibbonItemLabel {
   GROUPS = 'groups',
   OPERATING_SYSTEM = 'operating-system',
-  STATUS = 'status',
+  AGENT_STATUS = 'agent-status',
 }
 
 export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
@@ -40,8 +40,8 @@ const isOperatingSystem = (
 
 const isStatus = (
   item: IRibbonItem,
-): item is IRibbonItem<RibbonItemLabel.STATUS, Agent> => {
-  return item.key === RibbonItemLabel.STATUS;
+): item is IRibbonItem<RibbonItemLabel.AGENT_STATUS, Agent> => {
+  return item.key === RibbonItemLabel.AGENT_STATUS;
 };
 
 interface RibbonItemProps {
