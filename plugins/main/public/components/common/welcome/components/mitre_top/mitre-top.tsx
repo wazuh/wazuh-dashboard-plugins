@@ -166,7 +166,6 @@ const MitreTopTacticsTechniques = ({
 
     const openDashboard = (e, techniqueID) => {
       if (getWzCurrentAppID() === endpointSummary.id) {
-        console.log('entre');
         NavigationService.getInstance().navigateToApp(mitreAttack.id, {
           path: `#/overview?tab=mitre&tabView=dashboard&agentId=${agentId}`,
           filters: { 'rule.mitre.id': techniqueID },
