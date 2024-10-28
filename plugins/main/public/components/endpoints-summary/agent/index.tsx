@@ -142,7 +142,7 @@ export const AgentView = compose(
       </Route>
       <Route path={`?tab=${AgentTabs.CONFIGURATION}`}>
         <MainModuleAgent agent={agentData} section={tab} />
-        <WzManagementConfiguration showAgentInfo agent={agentData} />
+        <WzManagementConfiguration agent={agentData} />
       </Route>
       <Route path='?tab=welcome'>
         <AgentsWelcome
