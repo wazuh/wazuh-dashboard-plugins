@@ -78,7 +78,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
         {
           key: RibbonItemLabel.AGENT_STATUS,
           value: agent,
-          label: 'status',
+          label: 'Status',
           style: { minWidth: 100 },
         },
         {
@@ -96,7 +96,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
         {
           key: RibbonItemLabel.GROUPS,
           value: agent.group,
-          label: 'group',
+          label: 'Group',
           style: { minWidth: 150 },
         },
         {
