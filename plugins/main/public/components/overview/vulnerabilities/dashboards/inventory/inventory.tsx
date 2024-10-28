@@ -288,7 +288,7 @@ const InventoryVulsComponent = () => {
                             className='euiDataGrid__controlBtn'
                             onClick={onClickExportResults}
                           >
-                            Export Formated
+                            Export Formatted
                           </EuiButtonEmpty>
                         </>
                       ),
