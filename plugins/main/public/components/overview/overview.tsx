@@ -40,6 +40,7 @@ export const Overview: React.FC = withRouteResolvers({
   savedSearch,
 })(() => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});
+  const [isAgentsLoading, setIsAgentsLoading] = useState<boolean>(true);
   const { tab = 'welcome', tabView = 'dashboard', agentId } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
   const pinnedAgentManager = new PinnedAgentManager();
@@ -131,6 +132,7 @@ export const Overview: React.FC = withRouteResolvers({
         },
       } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
       setAgentsCounts(data);
+      setIsAgentsLoading(false);
     } catch (error) {
       return Promise.reject(error);
     }
@@ -167,7 +169,7 @@ export const Overview: React.FC = withRouteResolvers({
         <EuiPage paddingSize='l'>
           <EuiFlexGroup direction='column'>
             <EuiFlexItem>
-              <Stats {...agentsCounts} />
+              <Stats {...agentsCounts} isAgentsLoading={isAgentsLoading} />
             </EuiFlexItem>
             <EuiFlexItem>
               <OverviewWelcome {...agentsCounts} />
