@@ -125,7 +125,6 @@ const MitreTopTacticsTechniques = ({
         });
       }
     };
-    console.log(getWzCurrentAppID(), 'getWzCurrentAppID');
 
     const goToDashboardWithFilter = async (e, techniqueID) => {
       const indexPatternId = AppState.getCurrentPattern();
