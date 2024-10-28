@@ -30,27 +30,11 @@ import {
 } from '../../../data-source';
 import { WzLink } from '../../../../../components/wz-link/wz-link';
 
-export function useTimeFilter() {
-  const { timefilter } = getDataPlugin().query.timefilter;
-  const [timeFilter, setTimeFilter] = useState(timefilter.getTime());
-  useEffect(() => {
-    const subscription = timefilter
-      .getTimeUpdate$()
-      .subscribe(() => setTimeFilter(timefilter.getTime()));
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-  return timeFilter;
-}
-
 export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
   const [sort, setSort] = useState({
     field: 'doc_count',
     direction: 'desc',
   });
-  const [data, setData] = useState([]);
-  const timeFilter = useTimeFilter();
 
   const columns = [
     {

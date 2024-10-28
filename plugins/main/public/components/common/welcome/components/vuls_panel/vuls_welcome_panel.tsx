@@ -6,7 +6,6 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiSpacer,
-  EuiLink,
   EuiTitle,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -112,16 +111,15 @@ const VulsPanelContent = ({ agent }) => {
             <EuiFlexItem>
               <WzLink
                 appId={vulnerabilityDetection.id}
-                path={`/overview?tab=vuls&tabView=dashboard&agentId=${
-                  agent.id
-                }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
-                  PatternDataSourceFilterManager.createFilter(
-                    FILTER_OPERATOR.IS,
-                    `vulnerability.severity`,
-                    severityLabel,
-                    dataSource?.indexPattern?.id,
-                  ),
-                ])}`}
+                path={`/overview?tab=vuls&tabView=dashboard&agentId=${agent.id
+                  }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
+                    PatternDataSourceFilterManager.createFilter(
+                      FILTER_OPERATOR.IS,
+                      `vulnerability.severity`,
+                      severityLabel,
+                      dataSource?.indexPattern?.id,
+                    ),
+                  ])}`}
                 style={{ color: severityColor }}
               >
                 <VulsSeverityStat

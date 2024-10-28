@@ -4,7 +4,6 @@ import { EuiStat, EuiStatProps } from '@elastic/eui';
 type VulsSeverityStatProps = {
   value: string;
   color: string;
-  description?: string;
   textAlign?: EuiStatProps['textAlign'];
   statElement?: EuiStatProps['descriptionElement'];
   isLoading: boolean;
@@ -12,7 +11,6 @@ type VulsSeverityStatProps = {
 
 export default function VulsSeverityStat({
   value,
-  description,
   color,
   textAlign = 'center',
   statElement = 'h2',
