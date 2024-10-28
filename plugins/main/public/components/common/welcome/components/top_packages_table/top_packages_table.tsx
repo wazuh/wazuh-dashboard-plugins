@@ -12,17 +12,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiBasicTable,
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
   EuiText,
-  EuiButtonIcon,
   EuiFlexGroup,
-  EuiToolTip,
-  EuiLink,
 } from '@elastic/eui';
 // @ts-ignore
 import { getDataPlugin } from '../../../../../kibana-services';
