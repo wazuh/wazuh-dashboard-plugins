@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { EuiStat, EuiStatProps } from '@elastic/eui';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { tUseDataSourceLoadedReturns } from '../../../data-source/hooks/use-data-source';
 
 type VulsSeverityStatProps = {
   value: string;
