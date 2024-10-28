@@ -4,16 +4,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 03
 
-## Fixed
-
-- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
-
 ### Added
 
 - Support for Wazuh 4.10.0
 - Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 - Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968) [#7044](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7044) [#7046](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7046)
 - Add vulnerabilities card to agent details page [#7058](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7058)
+- Added an "Agents management" menu and moved the sections: "Endpoint Groups" and "Endpoint Summary" which changed its name to "Summary".[#7112](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7112)
+- Added ability to filter from File Integrity Monitoring registry inventory [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
+- Added new field columns and ability to select the visible fields in the File Integrity Monitoring Files and Registry tables [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 
 ### Changed
 
@@ -24,6 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the agents summary in overview with no results to an agent deployment help message. [#7041](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7041)
 - Changed malware feature description [#7036](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7036)
 - Changed the font size of the kpi subtitles and the features descriptions [#7033](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7033)
+- Changed the warning icon in events view to a info icon [#7057](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7057)
 - Changed feature container margins to ensure consistent separation and uniform design. [#7034](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7034)
 - Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
 
@@ -31,16 +31,22 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed read-only users could not access to Statistics application [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 - Fixed no-agent-alert spawn with selected agent in agent-welcome view [#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
+- Fixed loading state of the agents status chart in the home overview [#7120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7120)
 - Fixed security policy exception when it contained deprecated actions [#7042](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7042)
+- Fixed border on cells in events that disappear when clicked [#7075](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7075)
 - Fixed export formatted csv data with special characters from tables [#7048](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7048)
 - Fixed column reordering feature [#7072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7072)
 - Fixed filter management to prevent hiding when adding multiple filters [#7077](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7077)
+- Fixed vulnerabilities inventory table scroll [#7118](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7118)
+- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
+- Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 
 ### Removed
 
 - Removed agent RBAC filters from dashboard queries [#6945](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6945)
 - Removed GET /elastic/statistics API endpoint [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 - Removed VirusTotal application in favor of Malware Detection [#7038](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7038)
+- Removed processes state column in macOS agents [#7122](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7122)
 
 ## Wazuh v4.9.1 - OpenSearch Dashboards 2.13.0 - Revision 04
 
