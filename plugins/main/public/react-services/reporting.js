@@ -140,7 +140,7 @@ export class ReportingService {
 
   async startVis2Png(
     tab,
-    /** @type {Agent['id'] | false} */ agents = '',
+    /** @type {Agent['id'] | false} */ agents = false,
     /** @type {any} */ searchContext = null,
   ) {
     try {
