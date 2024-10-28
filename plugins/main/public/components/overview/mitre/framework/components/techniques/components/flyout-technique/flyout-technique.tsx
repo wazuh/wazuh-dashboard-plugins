@@ -52,10 +52,7 @@ import store from '../../../../../../../../redux/store';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
 import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
 import { AppState } from '../../../../../../../../react-services';
-import {
-  mitreAttack,
-  endpointSummary,
-} from '../../../../../../../../utils/applications';
+import { mitreAttack } from '../../../../../../../../utils/applications';
 
 type tFlyoutTechniqueProps = {
   currentTechnique: string;
@@ -295,7 +292,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     });
   };
 
-  const renderBody = (e, techniqueID) => {
+  const renderBody = e => {
     const { currentTechnique } = props;
     const { techniqueData } = state;
     const data = [

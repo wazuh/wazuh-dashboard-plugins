@@ -25,12 +25,8 @@ import { FlyoutTechnique } from '../../../../overview/mitre/framework/components
 import { getMitreCount } from './lib';
 import { useAsyncActionRunOnStart, useTimeFilter } from '../../../hooks';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { getWzCurrentAppID } from '../../../../../kibana-services';
 import { AppState } from '../../../../../react-services';
-import {
-  mitreAttack,
-  endpointSummary,
-} from '../../../../../utils/applications';
+import { mitreAttack } from '../../../../../utils/applications';
 import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
@@ -117,14 +113,6 @@ const MitreTopTacticsTechniques = ({
     const onChangeFlyout = () => {
       setShowTechniqueDetails('');
     };
-    const openDiscover = (e, techniqueID) => {
-      if (getWzCurrentAppID() === endpointSummary.id) {
-        NavigationService.getInstance().navigateToApp(mitreAttack.id, {
-          path: `#/overview?tab=mitre&tabView=dashboard&agentId=${agentId}`,
-          filters: { 'rule.mitre.id': techniqueID },
-        });
-      }
-    };
 
     const goToDashboardWithFilter = async (e, techniqueID) => {
       const indexPatternId = AppState.getCurrentPattern();
@@ -164,20 +152,6 @@ const MitreTopTacticsTechniques = ({
       });
     };
 
-    const openDashboard = (e, techniqueID) => {
-      if (getWzCurrentAppID() === endpointSummary.id) {
-        NavigationService.getInstance().navigateToApp(mitreAttack.id, {
-          path: `#/overview?tab=mitre&tabView=dashboard&agentId=${agentId}`,
-          filters: { 'rule.mitre.id': techniqueID },
-        });
-      } else {
-        NavigationService.getInstance().navigateToModule(e, 'overview', {
-          tab: 'mitre',
-          tabView: 'dashboard',
-          filters: { 'rule.mitre.id': techniqueID },
-        });
-      }
-    };
     return (
       <FlyoutTechnique
         openDashboard={(e, itemId) => goToDashboardWithFilter(e, itemId)}
