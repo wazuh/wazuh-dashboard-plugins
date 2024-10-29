@@ -86,7 +86,6 @@ const VulsPanelContent = ({ agent }) => {
     setIsLoading(true);
     Promise.all([fetchSeverityStatsData(), fetchTopPackagesData()])
       .catch(error => {
-        // ToDo: Handle error
         console.error(error);
       })
       .finally(() => {

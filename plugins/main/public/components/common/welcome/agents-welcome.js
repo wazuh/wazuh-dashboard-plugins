@@ -462,45 +462,15 @@ export const AgentsWelcome = compose(
             <div className='wz-module-header-agent-wrapper'>
               <div className='wz-module-header-agent-main'>{title}</div>
             </div>
-            <EuiPage>
-              <EuiPageBody component='div'>
-                <div className='wz-module-header-nav'>
+            <div className='wz-module-agents-padding-responsive'>
+              <EuiPage>
+                <EuiPageBody component='div'>
                   <AgentInfo
                     agent={this.props.agent}
                     isCondensed={false}
                     hideActions={true}
                     {...this.props}
                   ></AgentInfo>
-                </div>
-                <EuiFlexGroup>
-                  <EuiFlexItem />
-                  <EuiFlexItem
-                    style={{
-                      alignItems: 'flex-end',
-                      marginTop: 10,
-                      marginBottom: 10,
-                    }}
-                  >
-                    {' '}
-                    {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
-                    <WzDatePicker condensed={true} onTimeChange={() => {}} />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-                {(this.state.widthWindow < 1150 && (
-                  <Fragment>
-                    <EuiFlexGroup wrap>
-                      <EuiFlexItem
-                        key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
-                      >
-                        <AgentInfo
-                          agent={this.props.agent}
-                          isCondensed={false}
-                          hideActions={true}
-                          {...this.props}
-                        ></AgentInfo>
-                      </EuiPanel>
-                    </div>
-                  </div>
                   <EuiFlexGroup>
                     <EuiFlexItem />
                     <EuiFlexItem
