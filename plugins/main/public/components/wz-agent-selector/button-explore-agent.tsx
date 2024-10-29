@@ -15,6 +15,7 @@ const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
   const avaliableForAgent = module
     ? module?.availableFor && module?.availableFor.includes('agent')
     : true;
+
   return (
     <div
       data-test-subj='explore-agent-button'
