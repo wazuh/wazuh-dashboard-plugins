@@ -16,40 +16,41 @@ const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
     ? module?.availableFor && module?.availableFor.includes('agent')
     : true;
   return (
-    <>
-      <div style={{ display: 'inline-flex' }}>
-        <WzButton
-          buttonType={WzButtonType.empty}
-          color='primary'
-          isDisabled={!avaliableForAgent}
-          tooltip={{
-            position: 'bottom',
-            content: !avaliableForAgent
-              ? 'This module is not supported for agents.'
-              : agent
-              ? 'Change agent selected'
-              : 'Select an agent to explore its modules',
+    <div
+      data-test-subj='explore-agent-button'
+      style={{ display: 'inline-flex' }}
+    >
+      <WzButton
+        buttonType={WzButtonType.empty}
+        color='primary'
+        isDisabled={!avaliableForAgent}
+        tooltip={{
+          position: 'bottom',
+          content: !avaliableForAgent
+            ? 'This module is not supported for agents.'
+            : agent
+            ? 'Change agent selected'
+            : 'Select an agent to explore its modules',
         }}
         className={clsx({ 'wz-unpin-agent-bg': agent })}
-          iconType='watchesApp'
-          onClick={() => showExploreAgentModalGlobal(true)}
-        >
-          {agent ? `${agent.name} (${agent.id})` : 'Explore agent'}
-        </WzButton>
-        {agent ? (
-          <WzButton
-            buttonType={WzButtonType.icon}
+        iconType='watchesApp'
+        onClick={() => showExploreAgentModalGlobal(true)}
+      >
+        {agent ? `${agent.name} (${agent.id})` : 'Explore agent'}
+      </WzButton>
+      {agent ? (
+        <WzButton
+          buttonType={WzButtonType.icon}
           className='wz-unpin-agent wz-unpin-agent-bg'
-            iconType='pinFilled'
-            onClick={() => {
-              pinnedAgentManager.unPinAgent();
-            }}
-            tooltip={{ position: 'bottom', content: 'Unpin agent' }}
-            aria-label='Unpin agent'
-          />
-        ) : null}
-      </div>
-    </>
+          iconType='pinFilled'
+          onClick={() => {
+            pinnedAgentManager.unPinAgent();
+          }}
+          tooltip={{ position: 'bottom', content: 'Unpin agent' }}
+          aria-label='Unpin agent'
+        />
+      ) : null}
+    </div>
   );
 };
 
