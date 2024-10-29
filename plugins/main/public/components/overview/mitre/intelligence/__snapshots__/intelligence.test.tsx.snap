@@ -164,6 +164,7 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                   >
                     <h1
                       class="euiTitle euiTitle--small"
+                      data-test-subj="table-wz-api-title"
                     >
                       Groups 
                       <span>
@@ -243,6 +244,7 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
             />
             <div
               class="euiBasicTable"
+              data-test-subj="table-with-search-bar"
             >
               <div>
                 <div

@@ -26,6 +26,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the warning icon in events view to a info icon [#7057](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7057)
 - Changed feature container margins to ensure consistent separation and uniform design. [#7034](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7034)
 - Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
+- Changed inventory, stats and configuration page to use tabs [#7089](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7089)
 
 ### Fixed
 

@@ -10,7 +10,7 @@ const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
 export const WindowsUpdatesTable = ({ agent }) => {
   return (
-    <EuiPanel paddingSize='m'>
+    <EuiPanel data-test-subj='software-windows-updates-table' paddingSize='m'>
       <TableWzAPI
         title='Windows updates'
         tableColumns={windowsUpdatesColumns}

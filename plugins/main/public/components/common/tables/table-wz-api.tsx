@@ -200,7 +200,7 @@ export function TableWzAPI({
           <EuiFlexGroup wrap alignItems='center' responsive={false}>
             <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
               {rest.title && (
-                <EuiTitle size='s'>
+                <EuiTitle data-test-subj='table-wz-api-title' size='s'>
                   <h1>
                     {rest.title}{' '}
                     {isLoading ? (
