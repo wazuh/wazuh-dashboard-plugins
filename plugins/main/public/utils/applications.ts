@@ -904,7 +904,7 @@ export const Categories = [
       defaultMessage: 'Agents management',
     }),
     order: 600,
-    euiIconType: 'indexRollupApp',
+    euiIconType: 'graphApp',
   },
   {
     id: 'wz-category-server-management',
