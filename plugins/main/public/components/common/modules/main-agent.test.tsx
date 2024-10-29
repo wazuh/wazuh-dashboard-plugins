@@ -6,6 +6,7 @@ import { queryDataTestAttr } from '../../../../test/public/query-attr';
 
 const GENERATE_REPORT_BUTTON = 'generate-report-button';
 const ARIA_SELECTED = '[aria-selected="true"]';
+const EXPLORE_AGENT_BUTTON = 'explore-agent-button';
 
 const REPORT_TAB = {
   STATS: 'agent-tab-stats',
@@ -31,6 +32,19 @@ jest.mock('../data-source', () => ({
   AlertsDataSourceRepository: jest.fn(),
   AlertsDataSource: jest.fn(),
   __esModule: true,
+}));
+
+jest.mock('react-redux', () => ({
+  connect: () => Component => Component,
+  __esModule: true,
+}));
+
+jest.mock('../../../react-services/navigation-service', () => ({
+  getInstance: () => ({
+    getPathname: () => '',
+    getParams: () => new URLSearchParams(),
+    renewURL: jest.fn(),
+  }),
 }));
 
 describe('Main Agent', () => {
@@ -354,6 +368,83 @@ describe('Main Agent', () => {
       );
 
       expect(generateReportButton).toBeTruthy();
+    });
+  });
+  describe('ButtonExploreAgent', () => {
+    it('should render explore agent button in tab software', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.SOFTWARE}
+          switchTab={switchTab}
+        />,
+      );
+
+      const exploreAgentButton = container.querySelector(
+        queryDataTestAttr(EXPLORE_AGENT_BUTTON),
+      );
+
+      expect(exploreAgentButton).toBeTruthy();
+    });
+    it('should render explore agent button in tab network', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.NETWORK}
+          switchTab={switchTab}
+        />,
+      );
+
+      const exploreAgentButton = container.querySelector(
+        queryDataTestAttr(EXPLORE_AGENT_BUTTON),
+      );
+
+      expect(exploreAgentButton).toBeTruthy();
+    });
+    it('should render explore agent button in tab processes', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.PROCESSES}
+          switchTab={switchTab}
+        />,
+      );
+
+      const exploreAgentButton = container.querySelector(
+        queryDataTestAttr(EXPLORE_AGENT_BUTTON),
+      );
+
+      expect(exploreAgentButton).toBeTruthy();
+    });
+    it('should render explore agent button in tab stats', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.STATS}
+          switchTab={switchTab}
+        />,
+      );
+
+      const exploreAgentButton = container.querySelector(
+        queryDataTestAttr(EXPLORE_AGENT_BUTTON),
+      );
+
+      expect(exploreAgentButton).toBeTruthy();
+    });
+    it('should render explore agent button in tab configuration', () => {
+      const { container } = render(
+        <MainModuleAgent
+          agent={{ os: { platform: 'windows' } }}
+          section={AgentTabs.CONFIGURATION}
+          switchTab={switchTab}
+        />,
+      );
+
+      const exploreAgentButton = container.querySelector(
+        queryDataTestAttr(EXPLORE_AGENT_BUTTON),
+      );
+
+      expect(exploreAgentButton).toBeTruthy();
     });
   });
 });
