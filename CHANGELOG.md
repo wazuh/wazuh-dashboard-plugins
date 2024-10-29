@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added an "Agents management" menu and moved the sections: "Endpoint Groups" and "Endpoint Summary" which changed its name to "Summary".[#7112](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7112)
 - Added ability to filter from File Integrity Monitoring registry inventory [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Added new field columns and ability to select the visible fields in the File Integrity Monitoring Files and Registry tables [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
+- Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
 
 ### Changed
 
@@ -26,6 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the warning icon in events view to a info icon [#7057](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7057)
 - Changed feature container margins to ensure consistent separation and uniform design. [#7034](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7034)
 - Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
+- Changed inventory, stats and configuration page to use tabs [#7089](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7089)
 
 ### Fixed
 

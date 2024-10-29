@@ -31,7 +31,7 @@ import {
   MitreTopTactics,
   RequirementVis,
 } from './components';
-import { AgentInfo } from './agents-info';
+import { AgentInfo } from './agent-info/agent-info';
 import MenuAgent from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker';
@@ -59,6 +59,7 @@ import { IntlProvider } from 'react-intl';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import NavigationService from '../../../react-services/navigation-service';
 import VulsPanel from './components/vuls_panel/vuls_welcome_panel';
+import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 
 export const AgentsWelcome = compose(
   withErrorBoundary,
@@ -274,7 +275,6 @@ export const AgentsWelcome = compose(
     }
 
     renderTitle() {
-      const thereAreAgentSelected = Boolean(this.props.agent?.id);
       // Calculate if the header buttons should display the name or only the icon to be responsive
 
       return (
@@ -327,14 +327,17 @@ export const AgentsWelcome = compose(
           </EuiFlexItem>
           <EuiFlexItem grow={false} className='wz-module-header-agent-title'>
             <EuiFlexGroup responsive={false} gutterSize='none'>
-              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+              <EuiFlexItem
+                grow={false}
+                style={{ marginTop: 7, marginRight: '0.5rem' }}
+              >
                 <ButtonExploreAgent />
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <WzButton
                   buttonType='empty'
                   iconType='inspect'
-                  onClick={() => this.props.switchTab('syscollector')}
+                  onClick={() => this.props.switchTab(AgentTabs.SOFTWARE)}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -349,7 +352,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='stats'
-                  onClick={() => this.props.switchTab('stats')}
+                  onClick={() => this.props.switchTab(AgentTabs.STATS)}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -364,7 +367,7 @@ export const AgentsWelcome = compose(
                 <WzButton
                   buttonType='empty'
                   iconType='gear'
-                  onClick={() => this.props.switchTab('configuration')}
+                  onClick={() => this.props.switchTab(AgentTabs.CONFIGURATION)}
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.maxModules === null
@@ -459,15 +462,35 @@ export const AgentsWelcome = compose(
             <div className='wz-module-header-agent-wrapper'>
               <div className='wz-module-header-agent-main'>{title}</div>
             </div>
-            <div className='wz-module-agents-padding-responsive'>
-              <EuiPage>
-                <EuiPageBody component='div'>
-                  <div className='wz-module-header-nav'>
-                    <div>
-                      <EuiPanel
-                        grow
-                        paddingSize='s'
-                        className='wz-welcome-page-agent-info'
+            <EuiPage>
+              <EuiPageBody component='div'>
+                <div className='wz-module-header-nav'>
+                  <AgentInfo
+                    agent={this.props.agent}
+                    isCondensed={false}
+                    hideActions={true}
+                    {...this.props}
+                  ></AgentInfo>
+                </div>
+                <EuiFlexGroup>
+                  <EuiFlexItem />
+                  <EuiFlexItem
+                    style={{
+                      alignItems: 'flex-end',
+                      marginTop: 10,
+                      marginBottom: 10,
+                    }}
+                  >
+                    {' '}
+                    {/* TODO: Replace with SearchBar and replace implementation to get the time range in AgentView component*/}
+                    <WzDatePicker condensed={true} onTimeChange={() => {}} />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                {(this.state.widthWindow < 1150 && (
+                  <Fragment>
+                    <EuiFlexGroup wrap>
+                      <EuiFlexItem
+                        key={'Wazuh-App-Agents-Welcome-MITRE-Top-Tactics'}
                       >
                         <AgentInfo
                           agent={this.props.agent}

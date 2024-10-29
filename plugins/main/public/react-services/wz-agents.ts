@@ -9,14 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ErrorToastOptions } from 'opensearch_dashboards/public';
 import { WAZUH_AGENTS_OS_TYPE } from '../../common/constants';
-import { getToasts } from '../kibana-services';
+import { Agent } from '../components/endpoints-summary/types';
 import { UnsupportedComponents } from '../utils/components-os-support';
-import IApiResponse from './interfaces/api-response.interface';
-import { WzRequest } from './wz-request';
 
-export function getAgentOSType(agent) {
+export function getAgentOSType(agent?: Agent) {
   if (agent?.os?.uname?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX)) {
     return WAZUH_AGENTS_OS_TYPE.LINUX;
   } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.WINDOWS) {

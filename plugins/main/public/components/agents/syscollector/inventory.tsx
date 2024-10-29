@@ -11,20 +11,22 @@
  */
 
 import React from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiCallOut } from '@elastic/eui';
-import { InventoryMetrics } from './components/syscollector-metrics';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiCallOut,
+  EuiSpacer,
+  EuiPage,
+  EuiPageBody,
+} from '@elastic/eui';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
 import { compose } from 'redux';
 import { withGuard } from '../../common/hocs';
 import { PromptAgentNeverConnected } from '../prompts';
-import {
-  NetworkInterfacesTable,
-  NetworkPortsTable,
-  NetworkSettingsTable,
-  WindowsUpdatesTable,
-  ProcessesTable,
-  PackagesTable,
-} from './components';
+import SoftwareTab from './software';
+import NetworkTab from './network';
+import ProcessesTab from './processes';
+import { InventoryMetrics } from './components';
 
 export const SyscollectorInventory = compose(
   withGuard(
@@ -33,7 +35,8 @@ export const SyscollectorInventory = compose(
       props.agent.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     PromptAgentNeverConnected,
   ),
-)(function SyscollectorInventory({ agent }) {
+)(function SyscollectorInventory(props) {
+  const { agent, section } = props;
   let soPlatform;
   if (agent?.os?.uname?.includes('Linux')) {
     soPlatform = 'linux';
@@ -48,54 +51,33 @@ export const SyscollectorInventory = compose(
   }
 
   return (
-    <div style={{ overflow: 'hidden', margin: '12px 16px 12px 16px' }}>
-      {agent && agent.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
-        <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem>
-            <EuiCallOut
-              title='This agent is currently disconnected, the data may be outdated.'
-              iconType='iInCircle'
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      )}
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem>
-          <InventoryMetrics agent={agent}></InventoryMetrics>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem grow={2}>
-          <NetworkInterfacesTable agent={agent} />
-        </EuiFlexItem>
-        <EuiFlexItem grow={2}>
-          <NetworkPortsTable agent={agent} soPlatform={soPlatform} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem grow={3}>
-          <NetworkSettingsTable agent={agent} />
-        </EuiFlexItem>
-        {agent && agent.os && agent.os.platform === 'windows' && (
-          <EuiFlexItem grow={1}>
-            <WindowsUpdatesTable agent={agent} />
-          </EuiFlexItem>
+    <EuiPage paddingSize='m' direction='column' style={{ overflow: 'hidden' }}>
+      <EuiPageBody>
+        {agent?.status === API_NAME_AGENT_STATUS.DISCONNECTED && (
+          <EuiFlexGroup gutterSize='s'>
+            <EuiFlexItem>
+              <EuiCallOut
+                title='This agent is currently disconnected, the data may be outdated.'
+                iconType='iInCircle'
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
         )}
-      </EuiFlexGroup>
 
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem>
-          <PackagesTable agent={agent} soPlatform={soPlatform} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+        <InventoryMetrics agent={agent}></InventoryMetrics>
 
-      <EuiFlexGroup gutterSize='s'>
-        <EuiFlexItem>
-          <ProcessesTable agent={agent} soPlatform={soPlatform} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </div>
+        <EuiSpacer size='xxl' />
+
+        {section === 'software' && (
+          <SoftwareTab agent={agent} soPlatform={soPlatform} />
+        )}
+        {section === 'network' && (
+          <NetworkTab agent={agent} soPlatform={soPlatform} />
+        )}
+        {section === 'processes' && (
+          <ProcessesTab agent={agent} soPlatform={soPlatform} />
+        )}
+      </EuiPageBody>
+    </EuiPage>
   );
 });

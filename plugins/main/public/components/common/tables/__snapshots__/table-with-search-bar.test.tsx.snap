@@ -577,6 +577,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
         },
       ]
     }
+    data-test-subj="table-with-search-bar"
     items={Array []}
     loading={true}
     noItemsMessage="No items found"
@@ -608,6 +609,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
   >
     <div
       className="euiBasicTable euiBasicTable-loading"
+      data-test-subj="table-with-search-bar"
     >
       <div>
         <EuiTableHeaderMobile>
