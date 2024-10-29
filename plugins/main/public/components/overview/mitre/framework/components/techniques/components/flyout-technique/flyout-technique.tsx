@@ -282,7 +282,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     });
   };
 
-  const goToTacticInIntelligense = async (e, tactic) => {
+  const goToTacticInIntelligence = async (e, tactic) => {
     const indexPatternId = AppState.getCurrentPattern();
     const filters = [
       PatternDataSourceFilterManager.createFilter(
@@ -334,7 +334,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                   >
                     <EuiLink
                       onClick={e => {
-                        goToTacticInIntelligense(e, tactic);
+                        goToTacticInIntelligence(e, tactic);
                         e.stopPropagation();
                       }}
                     >
