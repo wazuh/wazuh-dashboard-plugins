@@ -109,60 +109,47 @@ const MitreTopTacticsTechniques = ({
 
   const [showTechniqueDetails, setShowTechniqueDetails] = useState<string>('');
 
-  if (showTechniqueDetails) {
-    const onChangeFlyout = () => {
-      setShowTechniqueDetails('');
-    };
+  const onChangeFlyout = () => {
+    setShowTechniqueDetails('');
+  };
 
-    const goToDashboardWithFilter = async (e, techniqueID) => {
-      const indexPatternId = AppState.getCurrentPattern();
-      const filters = [
-        PatternDataSourceFilterManager.createFilter(
-          FILTER_OPERATOR.IS,
-          `rule.mitre.id`,
-          techniqueID,
-          indexPatternId,
-        ),
-      ];
+  const goToDashboardWithFilter = async (e, techniqueID) => {
+    const indexPatternId = AppState.getCurrentPattern();
+    const filters = [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        `rule.mitre.id`,
+        techniqueID,
+        indexPatternId,
+      ),
+    ];
 
-      const params = `tab=mitre&tabView=dashboard&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
-        filters,
-      )}`;
-      NavigationService.getInstance().navigateToApp(mitreAttack.id, {
-        path: `#/overview?${params}`,
-      });
-    };
+    const params = `tab=mitre&tabView=dashboard&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+      filters,
+    )}`;
+    NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+      path: `#/overview?${params}`,
+    });
+  };
 
-    const goToEventsWithFilter = async (e, techniqueID) => {
-      const indexPatternId = AppState.getCurrentPattern();
-      const filters = [
-        PatternDataSourceFilterManager.createFilter(
-          FILTER_OPERATOR.IS,
-          `rule.mitre.id`,
-          techniqueID,
-          indexPatternId,
-        ),
-      ];
+  const goToEventsWithFilter = async (e, techniqueID) => {
+    const indexPatternId = AppState.getCurrentPattern();
+    const filters = [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        `rule.mitre.id`,
+        techniqueID,
+        indexPatternId,
+      ),
+    ];
 
-      const params = `tab=mitre&tabView=events&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
-        filters,
-      )}`;
-      NavigationService.getInstance().navigateToApp(mitreAttack.id, {
-        path: `#/overview?${params}`,
-      });
-    };
-
-    return (
-      <FlyoutTechnique
-        openDashboard={(e, itemId) => goToDashboardWithFilter(e, itemId)}
-        openDiscover={(e, itemId) => goToEventsWithFilter(e, itemId)}
-        implicitFilters={[{ 'agent.id': agentId }]}
-        agentId={agentId}
-        onChangeFlyout={onChangeFlyout}
-        currentTechnique={showTechniqueDetails}
-      />
-    );
-  }
+    const params = `tab=mitre&tabView=events&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+      filters,
+    )}`;
+    NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+      path: `#/overview?${params}`,
+    });
+  };
 
   if (getData.running) {
     return (
@@ -209,6 +196,16 @@ const MitreTopTacticsTechniques = ({
             </EuiFacetButton>
           ))}
         </EuiFlexItem>
+        {showTechniqueDetails && (
+          <FlyoutTechnique
+            openDashboard={(e, itemId) => goToDashboardWithFilter(e, itemId)}
+            openDiscover={(e, itemId) => goToEventsWithFilter(e, itemId)}
+            implicitFilters={[{ 'agent.id': agentId }]}
+            agentId={agentId}
+            onChangeFlyout={onChangeFlyout}
+            currentTechnique={showTechniqueDetails}
+          />
+        )}
       </EuiFlexGroup>
     </>
   );

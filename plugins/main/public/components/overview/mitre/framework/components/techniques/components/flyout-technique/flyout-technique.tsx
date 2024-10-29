@@ -300,7 +300,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     });
   };
 
-  const renderBody = e => {
+  const renderBody = () => {
     const { currentTechnique } = props;
     const { techniqueData } = state;
     const data = [
