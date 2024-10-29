@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import {
-  EuiPanel,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiText,
-  EuiLoadingSpinner,
-  EuiIcon,
-} from '@elastic/eui';
-import mapValues from 'lodash';
+import { EuiPanel, EuiIcon } from '@elastic/eui';
+import _ from 'lodash';
 import { useGenericRequest } from '../../../common/hooks/useGenericRequest';
 import { formatUIDate } from '../../../../react-services/time-service';
+import WzRibbon from '../../../common/ribbon/ribbon';
+import {
+  IRibbonItem,
+  RibbonItemLabel,
+} from '../../../common/ribbon/ribbon-item';
 
 export function InventoryMetrics({ agent }) {
   const [params, setParams] = useState({});
@@ -31,8 +29,7 @@ export function InventoryMetrics({ agent }) {
 
   if (
     !syscollector.isLoading &&
-    (mapValues.isEmpty(syscollector.data.hardware) ||
-      mapValues.isEmpty(syscollector.data.os))
+    (_.isEmpty(syscollector.data.hardware) || _.isEmpty(syscollector.data.os))
   ) {
     return (
       <EuiPanel paddingSize='s' style={{ margin: 16, textAlign: 'center' }}>
@@ -42,106 +39,72 @@ export function InventoryMetrics({ agent }) {
     );
   }
 
-  return (
-    <EuiPanel paddingSize='s'>
-      <EuiFlexGroup>
-        <EuiFlexItem grow={false}>
-          <EuiText>
-            Cores:{' '}
-            {syscollector.isLoading ? (
-              <EuiLoadingSpinner size='s' />
-            ) : syscollector.data.hardware.cpu?.cores ? (
-              <strong>{syscollector.data.hardware.cpu.cores}</strong>
-            ) : (
-              <strong>-</strong>
-            )}
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText>
-            Memory:{' '}
-            {syscollector.isLoading ? (
-              <EuiLoadingSpinner size='s' />
-            ) : syscollector.data.hardware.ram?.total ? (
-              <strong>
-                {(syscollector.data.hardware.ram.total / 1024).toFixed(2)} MB
-              </strong>
-            ) : (
-              <strong>-</strong>
-            )}
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText>
-            Arch:{' '}
-            {syscollector.isLoading ? (
-              <EuiLoadingSpinner size='s' />
-            ) : (
-              <strong>{syscollector.data.os.architecture}</strong>
-            )}
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText>
-            Operating system:{' '}
-            {syscollector.isLoading ? (
-              <EuiLoadingSpinner size='s' />
-            ) : (
-              <strong>
-                {syscollector.data.os.os.name} {syscollector.data.os.os.version}
-              </strong>
-            )}
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText>
-            CPU:{' '}
-            {syscollector.isLoading ? (
-              <EuiLoadingSpinner size='s' />
-            ) : syscollector.data.hardware.cpu?.name ? (
-              <strong>{syscollector.data.hardware.cpu.name}</strong>
-            ) : (
-              <strong>-</strong>
-            )}
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText>
-            Host name:{' '}
-            {syscollector.isLoading ? (
-              <EuiLoadingSpinner size='s' />
-            ) : syscollector.data.os.hostname ? (
-              <strong>{syscollector.data.os.hostname}</strong>
-            ) : (
-              <strong>-</strong>
-            )}
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={true}>
-          <EuiText>
-            Board serial:{' '}
-            {syscollector.isLoading ? (
-              <EuiLoadingSpinner size='s' />
-            ) : syscollector.data.hardware.board_serial ? (
-              <strong>{syscollector.data.hardware.board_serial}</strong>
-            ) : (
-              <strong>-</strong>
-            )}
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText>
-            Last scan:{' '}
-            {syscollector.isLoading ? (
-              <EuiLoadingSpinner size='s' />
-            ) : (
-              <strong>
-                {offsetTimestamp('', syscollector.data.os.scan.time)}
-              </strong>
-            )}
-          </EuiText>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </EuiPanel>
-  );
+  const render = () => {
+    const items: IRibbonItem[] = [
+      {
+        key: 'cores',
+        label: 'Cores',
+        value: syscollector?.data?.hardware?.cpu?.cores,
+        isLoading: syscollector.isLoading,
+        style: { maxWidth: 100 },
+      },
+      {
+        key: 'memory',
+        label: 'Memory',
+        value: syscollector?.data?.hardware?.ram?.total
+          ? `${(syscollector?.data?.hardware?.ram?.total / 1024).toFixed(2)} MB`
+          : '-',
+        isLoading: syscollector.isLoading,
+        style: { maxWidth: 100 },
+      },
+      {
+        key: 'arch',
+        label: 'Arch',
+        value: syscollector?.data?.os?.architecture,
+        isLoading: syscollector.isLoading,
+        style: { maxWidth: 100 },
+      },
+      {
+        key: RibbonItemLabel.OPERATING_SYSTEM,
+        value: syscollector?.data?.os,
+        label: 'Operating system',
+        isLoading: syscollector.isLoading,
+        style: { maxWidth: 200 },
+      },
+      {
+        key: 'cpu',
+        label: 'CPU',
+        value: syscollector?.data?.hardware?.cpu?.name,
+        isLoading: syscollector.isLoading,
+        style: { maxWidth: 250 },
+      },
+      {
+        key: 'hostname',
+        label: 'Host name',
+        value: syscollector?.data?.os?.hostname,
+        isLoading: syscollector.isLoading,
+        style: { maxWidth: 100 },
+      },
+      {
+        key: 'board-serial',
+        label: 'Board serial',
+        value: syscollector?.data?.hardware?.board_serial,
+        isLoading: syscollector.isLoading,
+        style: { maxWidth: 100 },
+      },
+      {
+        key: 'last-scan',
+        label: 'Last scan',
+        value: syscollector?.data?.os?.scan?.time
+          ? offsetTimestamp('', syscollector?.data?.os?.scan?.time)
+          : '-',
+        isLoading: syscollector.isLoading,
+        style: { maxWidth: 180 },
+      },
+    ];
+
+    return <WzRibbon data-test-subj='syscollector-metrics' items={items} />;
+  };
+
+  return render();
 }
