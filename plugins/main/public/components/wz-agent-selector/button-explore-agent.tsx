@@ -5,6 +5,7 @@ import { WzButtonType } from '../common/buttons/button';
 import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import './button-explore-agent.scss';
+import clsx from 'clsx';
 
 const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
   const pinnedAgentManager = new PinnedAgentManager();
@@ -28,8 +29,8 @@ const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
               : agent
               ? 'Change agent selected'
               : 'Select an agent to explore its modules',
-          }}
-          style={agent ? { background: 'rgba(0, 107, 180, 0.1)' } : undefined}
+        }}
+        className={clsx({ 'wz-unpin-agent-bg': agent })}
           iconType='watchesApp'
           onClick={() => showExploreAgentModalGlobal(true)}
         >
@@ -38,7 +39,7 @@ const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
         {agent ? (
           <WzButton
             buttonType={WzButtonType.icon}
-            className='wz-unpin-agent'
+          className='wz-unpin-agent wz-unpin-agent-bg'
             iconType='pinFilled'
             onClick={() => {
               pinnedAgentManager.unPinAgent();
