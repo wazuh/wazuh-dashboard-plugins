@@ -75,13 +75,21 @@ export class MainModuleAgent extends Component {
             )}
           </EuiTabs>
         </EuiFlexItem>
-        <EuiFlexItem grow={false}>
+        <EuiFlexItem
+          grow={false}
+          className='euiTabs'
+          style={{ marginInline: 0, paddingInline: 12 }}
+        >
           <ButtonExploreAgent />
         </EuiFlexItem>
         {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
           section,
         ) && (
-          <EuiFlexItem grow={false} style={{ marginTop: 13.25 }}>
+          <EuiFlexItem
+            grow={false}
+            style={{ marginTop: 13.25, marginInline: 0, paddingInline: 12 }}
+            className='euiTabs'
+          >
             <GenerateReportButton agent={agent} />
           </EuiFlexItem>
         )}
