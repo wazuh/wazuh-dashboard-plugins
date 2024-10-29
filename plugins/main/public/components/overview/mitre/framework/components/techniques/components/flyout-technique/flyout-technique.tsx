@@ -264,7 +264,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       : addRenderColumn(techniquesColumns);
   };
 
-  const goToTechniqueInIntellicense = async (e, currentTechnique) => {
+  const goToTechniqueInIntelligence = async (e, currentTechnique) => {
     const indexPatternId = AppState.getCurrentPattern();
     const filters = [
       PatternDataSourceFilterManager.createFilter(
@@ -313,7 +313,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           >
             <EuiLink
               onClick={e => {
-                goToTechniqueInIntellicense(e, currentTechnique);
+                goToTechniqueInIntelligence(e, currentTechnique);
                 e.stopPropagation();
               }}
             >
