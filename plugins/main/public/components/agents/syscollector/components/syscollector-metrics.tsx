@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { EuiPanel, EuiIcon } from '@elastic/eui';
 import _ from 'lodash';
 import { useGenericRequest } from '../../../common/hooks/useGenericRequest';
@@ -8,24 +8,26 @@ import {
   IRibbonItem,
   RibbonItemLabel,
 } from '../../../common/ribbon/ribbon-item';
+import { Agent } from '../../../endpoints-summary/types';
 
-export function InventoryMetrics({ agent }) {
-  const [params, setParams] = useState({});
-  const offsetTimestamp = (text, time) => {
-    try {
-      return text + formatUIDate(time);
-    } catch (error) {
-      return time !== '-' ? `${text}${time} (UTC)` : time;
-    }
-  };
-  const syscollector = useGenericRequest(
-    'GET',
-    `/api/syscollector/${agent.id}`,
-    params,
-    result => {
-      return (result || {}).data || {};
-    },
-  );
+interface SyscollectorMetricsProps {
+  agent: Agent;
+}
+
+const offsetTimestamp = (text: string, time: string) => {
+  try {
+    return text + formatUIDate(time);
+  } catch (error) {
+    return time !== '-' ? `${text}${time} (UTC)` : time;
+  }
+};
+
+export function InventoryMetrics({ agent }: SyscollectorMetricsProps) {
+  const syscollector = useGenericRequest({
+    method: 'GET',
+    path: `/api/syscollector/${agent.id}`,
+    resolveData: data => data?.data || {},
+  });
 
   if (
     !syscollector.isLoading &&
