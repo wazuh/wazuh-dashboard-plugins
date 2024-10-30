@@ -29,7 +29,9 @@ export class ErrorOrchestratorService {
     error,
   }: UIErrorLog) {
     const uiErrorLog = { context, level, severity, display, store, error };
-    const errorOrchestrator: ErrorOrchestrator = errorOrchestratorFactory(uiErrorLog.severity);
+    const errorOrchestrator: ErrorOrchestrator = errorOrchestratorFactory(
+      uiErrorLog.severity,
+    );
     errorOrchestrator.loadErrorLog(uiErrorLog);
   }
 }
