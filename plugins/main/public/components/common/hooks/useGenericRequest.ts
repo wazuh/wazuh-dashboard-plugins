@@ -9,36 +9,56 @@ import {
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
 
-export function useGenericRequest(method, path, params, formatFunction) {
-  const [items, setItems] = useState({});
-  const [isLoading, setisLoading] = useState(true);
-  const [error, setError] = useState("");
+interface UseGenericRequestProps {
+  method: string;
+  path: string;
+  params?: any;
+  resolveData?: (data: any) => any;
+}
 
-  useEffect( () => {
-    try{
-      setisLoading(true);
-      const fetchData = async() => {
-          const response = await GenericRequest.request(method, path, params);
-          setItems(response);
-          setisLoading(false);
-        }
-        fetchData();
-    } catch(error) {
-      setError(error);
-      setisLoading(false);
+export function useGenericRequest({
+  method,
+  path,
+  params = {},
+  resolveData = response => response,
+}: UseGenericRequestProps) {
+  const [response, setResponse] = useState<any>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error>();
+
+  useEffect(() => {
+    try {
+      setIsLoading(true);
+      const fetchData = async () => {
+        const response = await GenericRequest.request<any>(
+          method,
+          path,
+          params,
+        );
+        setResponse(response);
+      };
+      fetchData();
+    } catch (error) {
+      setError(error as Error);
       const options: UIErrorLog = {
         context: `${useGenericRequest.name}.fetchData`,
         level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
         severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
         error: {
           error: error,
-          message: error.message || error,
-          title: error.name || error,
+          message: (error as Error).message || (error as string),
+          title: (error as Error).name || (error as string),
         },
       };
       getErrorOrchestrator().handleError(options);
+    } finally {
+      setIsLoading(false);
     }
-  }, [params]);
+  }, [JSON.stringify(params), path, method]);
 
-  return {isLoading, data: formatFunction(items), error};
+  return {
+    isLoading,
+    data: resolveData(response),
+    error,
+  };
 }
