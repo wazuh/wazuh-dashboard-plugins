@@ -33,3 +33,7 @@ export class ErrorOrchestratorService {
     errorOrchestrator.loadErrorLog(uiErrorLog);
   }
 }
+
+export type ErrorService = ErrorOrchestratorService & {
+  handleError: (uiErrorLog: UIErrorLog) => void;
+};
