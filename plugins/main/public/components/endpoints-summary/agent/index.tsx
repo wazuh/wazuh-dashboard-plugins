@@ -106,6 +106,13 @@ export const AgentView = compose(
     );
   }
 
+  const unPinAgent = () => {
+    // navigate to the agents preview page
+    NavigationService.getInstance().navigateToApp(endpointSummary.id, {
+      path: `#${SECTIONS.AGENTS_PREVIEW}`,
+    });
+  };
+
   return (
     <Switch>
       <Route path={`?tab=${AgentTabs.SOFTWARE}`}>
@@ -113,6 +120,7 @@ export const AgentView = compose(
           agent={agentData}
           section={tab}
           switchTab={switchTab}
+          unPinAgent={unPinAgent}
         />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
@@ -121,6 +129,7 @@ export const AgentView = compose(
           agent={agentData}
           section={tab}
           switchTab={switchTab}
+          unPinAgent={unPinAgent}
         />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
@@ -129,19 +138,32 @@ export const AgentView = compose(
           agent={agentData}
           section={tab}
           switchTab={switchTab}
+          unPinAgent={unPinAgent}
         />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
       <Route path='?tab=syscollector'>
-        <MainModuleAgent agent={agentData} section={tab} />
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          unPinAgent={unPinAgent}
+        />
         <MainSyscollector agent={agentData} />
       </Route>
       <Route path={`?tab=${AgentTabs.STATS}`}>
-        <MainModuleAgent agent={agentData} section={tab} />
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          unPinAgent={unPinAgent}
+        />
         <MainAgentStats agent={agentData} />
       </Route>
       <Route path={`?tab=${AgentTabs.CONFIGURATION}`}>
-        <MainModuleAgent agent={agentData} section={tab} />
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          unPinAgent={unPinAgent}
+        />
         <WzManagementConfiguration agent={agentData} />
       </Route>
       <Route path='?tab=welcome'>
@@ -149,7 +171,7 @@ export const AgentView = compose(
           switchTab={switchTab}
           agent={agentData}
           pinAgent={pinnedAgentManager.pinAgent}
-          unPinAgent={pinnedAgentManager.unPinAgent}
+          unPinAgent={unPinAgent}
         />
       </Route>
       <Redirect to='?tab=welcome'></Redirect>

@@ -45,6 +45,7 @@ export class MainModuleAgent extends Component {
     tabs?: any[];
     renderTabs?: () => JSX.Element;
     agentsSelectionProps?: any;
+    unPinAgent?: () => void;
   };
 
   inventoryTabs = [AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES];
@@ -80,7 +81,7 @@ export class MainModuleAgent extends Component {
           className='euiTabs'
           style={{ marginInline: 0, paddingInline: 12 }}
         >
-          <ButtonExploreAgent />
+          <ButtonExploreAgent onUnpinAgent={this.props.unPinAgent} />
         </EuiFlexItem>
         {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
           section,

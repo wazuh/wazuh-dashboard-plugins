@@ -7,7 +7,19 @@ import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions
 import './button-explore-agent.scss';
 import clsx from 'clsx';
 
-const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
+interface ButtonPinnedAgentProps {
+  showExploreAgentModalGlobal: (shouldShow: boolean) => void;
+  module?: {
+    availableFor?: string[];
+  };
+  onUnpinAgent?: () => void;
+}
+
+const ButtonPinnedAgent = ({
+  showExploreAgentModalGlobal,
+  module,
+  onUnpinAgent,
+}: ButtonPinnedAgentProps) => {
   const pinnedAgentManager = new PinnedAgentManager();
   const agent = pinnedAgentManager.isPinnedAgent()
     ? pinnedAgentManager.getPinnedAgent()
@@ -15,6 +27,11 @@ const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
   const avaliableForAgent = module
     ? module?.availableFor && module?.availableFor.includes('agent')
     : true;
+
+  const unPinAgentHandler = () => {
+    pinnedAgentManager.unPinAgent();
+    onUnpinAgent?.();
+  };
 
   return (
     <div
@@ -44,9 +61,7 @@ const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
           buttonType={WzButtonType.icon}
           className='wz-unpin-agent wz-unpin-agent-bg'
           iconType='pinFilled'
-          onClick={() => {
-            pinnedAgentManager.unPinAgent();
-          }}
+          onClick={unPinAgentHandler}
           tooltip={{ position: 'bottom', content: 'Unpin agent' }}
           aria-label='Unpin agent'
         />
@@ -62,8 +77,8 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  showExploreAgentModalGlobal: data =>
-    dispatch(showExploreAgentModalGlobal(data)),
+  showExploreAgentModalGlobal: (shouldShow: boolean) =>
+    dispatch(showExploreAgentModalGlobal(shouldShow)),
 });
 
 export const ButtonExploreAgent = connect(

@@ -331,7 +331,7 @@ export const AgentsWelcome = compose(
                 grow={false}
                 style={{ marginTop: 7, marginRight: '0.5rem' }}
               >
-                <ButtonExploreAgent />
+                <ButtonExploreAgent onUnpinAgent={this.props.unPinAgent} />
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <WzButton
