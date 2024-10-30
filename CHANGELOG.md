@@ -14,7 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added ability to filter from File Integrity Monitoring registry inventory [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Added new field columns and ability to select the visible fields in the File Integrity Monitoring Files and Registry tables [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
-- Added pinned agent mechanic across all pages for consistent functionality [#7135](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7135)
+- Added pinned agent mechanic to inventory data, stats, and configuration for consistent functionality [#7135](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7135)
 
 ### Changed
 
