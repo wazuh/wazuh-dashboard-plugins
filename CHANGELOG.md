@@ -37,7 +37,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed vulnerabilities inventory table scroll [#7118](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7118)
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
-- Fixed loading speed [#7099](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7099)
+- Fixed backend endpoints to reduce initial load time by minimizing latency in network requests. [#7099](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7099)
 
 ### Removed
 
