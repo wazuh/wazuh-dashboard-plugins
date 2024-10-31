@@ -370,8 +370,8 @@ describe('Main Agent', () => {
       expect(generateReportButton).toBeTruthy();
     });
   });
-  describe('ButtonExploreAgent', () => {
-    it('should render explore agent button in tab software', () => {
+  describe('Verify the presence of the "Pinned Agent" button', () => {
+    it('should render "Pinned Agent" button in tab software', () => {
       const { container } = render(
         <MainModuleAgent
           agent={{ os: { platform: 'windows' } }}
@@ -386,7 +386,7 @@ describe('Main Agent', () => {
 
       expect(exploreAgentButton).toBeTruthy();
     });
-    it('should render explore agent button in tab network', () => {
+    it('should render "Pinned Agent" button in tab network', () => {
       const { container } = render(
         <MainModuleAgent
           agent={{ os: { platform: 'windows' } }}
@@ -401,7 +401,7 @@ describe('Main Agent', () => {
 
       expect(exploreAgentButton).toBeTruthy();
     });
-    it('should render explore agent button in tab processes', () => {
+    it('should render "Pinned Agent" button in tab processes', () => {
       const { container } = render(
         <MainModuleAgent
           agent={{ os: { platform: 'windows' } }}
@@ -416,7 +416,7 @@ describe('Main Agent', () => {
 
       expect(exploreAgentButton).toBeTruthy();
     });
-    it('should render explore agent button in tab stats', () => {
+    it('should render "Pinned Agent" button in tab stats', () => {
       const { container } = render(
         <MainModuleAgent
           agent={{ os: { platform: 'windows' } }}
@@ -431,7 +431,7 @@ describe('Main Agent', () => {
 
       expect(exploreAgentButton).toBeTruthy();
     });
-    it('should render explore agent button in tab configuration', () => {
+    it('should render "Pinned Agent" button in tab configuration', () => {
       const { container } = render(
         <MainModuleAgent
           agent={{ os: { platform: 'windows' } }}
