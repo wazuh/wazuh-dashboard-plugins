@@ -35,9 +35,13 @@ import { WazuhFlyoutDiscover } from '../../../../common/wazuh-discover/wz-flyout
 import { PatternDataSource } from '../../../../common/data-source';
 import { formatUIDate } from '../../../../../react-services';
 import TechniqueRowDetails from '../../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
-import { buildPhraseFilter } from '../../../../../../../../src/plugins/data/common';
+import {
+  buildPhraseFilter,
+  Filter,
+} from '../../../../../../../../src/plugins/data/common';
 import { connect } from 'react-redux';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
+import { setFilters } from '../../../../common/search-bar/set-filters';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
@@ -173,6 +177,8 @@ export const RequirementFlyout = connect(mapStateToProps)(
 
             this.filterManager.addFilters(newFilter);
           }}
+          filters={[]}
+          setFilters={setFilters(this.filterManager)}
         />
       );
     }

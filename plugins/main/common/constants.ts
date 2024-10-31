@@ -531,6 +531,11 @@ export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
 export const APP_STATE_URL_KEY = '_a';
 export const GLOBAL_STATE_URL_KEY = '_g';
 
+export enum FilterStateStore {
+  APP_STATE = 'appState',
+  GLOBAL_STATE = 'globalState',
+}
+
 export enum ERROR_CODES {
   EPROTO = 'EPROTO',
   ECONNREFUSED = 'ECONNREFUSED',

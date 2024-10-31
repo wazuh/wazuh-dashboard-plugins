@@ -39,7 +39,7 @@ export function FimEventsTable({ agent }) {
     <EuiFlexItem>
       <EuiPanel paddingSize='m'>
         <EuiFlexItem>
-          <EuiFlexGroup>
+          <EuiFlexGroup responsive={false}>
             <EuiFlexItem>
               <EuiText size='xs'>
                 <h2>FIM: Recent events</h2>

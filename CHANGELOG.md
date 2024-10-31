@@ -9,8 +9,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.10.0
 - Added sample data for YARA [#6964](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6964)
 - Added a custom filter and visualization for vulnerability.under_evaluation field [#6968](https://github.com/wazuh/wazuh-dashboard-plugins/issues/6968) [#7044](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7044) [#7046](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7046)
+- Add vulnerabilities card to agent details page [#7058](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7058)
+- Added an "Agents management" menu and moved the sections: "Endpoint Groups" and "Endpoint Summary" which changed its name to "Summary".[#7112](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7112)
 - Added ability to filter from File Integrity Monitoring registry inventory [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Added new field columns and ability to select the visible fields in the File Integrity Monitoring Files and Registry tables [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
+- Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
 
 ### Changed
 
@@ -24,6 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the warning icon in events view to a info icon [#7057](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7057)
 - Changed feature container margins to ensure consistent separation and uniform design. [#7034](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7034)
 - Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
+- Changed inventory, stats and configuration page to use tabs [#7089](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7089)
 
 ### Fixed
 
@@ -31,9 +35,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed no-agent-alert spawn with selected agent in agent-welcome view [#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
 - Fixed loading state of the agents status chart in the home overview [#7120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7120)
 - Fixed security policy exception when it contained deprecated actions [#7042](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7042)
+- Fixed border on cells in events that disappear when clicked [#7075](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7075)
 - Fixed export formatted csv data with special characters from tables [#7048](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7048)
 - Fixed column reordering feature [#7072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7072)
 - Fixed filter management to prevent hiding when adding multiple filters [#7077](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7077)
+- Fixed the Mitre ATT&CK exception in the agent view, the redirections of ID, Tactics, Dashboard Icon and Event Icon in the drop-down menu and the card not displaying information when the flyout was opened [#7116](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7116)
 - Fixed vulnerabilities inventory table scroll [#7118](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7118)
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)

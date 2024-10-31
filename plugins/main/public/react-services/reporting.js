@@ -32,6 +32,7 @@ import {
 } from '../../../../src/plugins/data/common';
 import { getForceNow } from '../components/common/search-bar/search-bar-service';
 import NavigationService from './navigation-service';
+import { Agent } from '../components/endpoints-summary/types';
 
 export class ReportingService {
   constructor() {
@@ -137,7 +138,11 @@ export class ReportingService {
     return store.getState().reportingReducers?.dataSourceSearchContext;
   }
 
-  async startVis2Png(tab, agents = false, searchContext = null) {
+  async startVis2Png(
+    tab,
+    /** @type {Agent['id'] | false} */ agents = false,
+    /** @type {any} */ searchContext = null,
+  ) {
     try {
       const dataSourceContext =
         searchContext || (await this.getDataSourceSearchContext());
