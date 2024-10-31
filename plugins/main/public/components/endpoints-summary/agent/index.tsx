@@ -142,14 +142,6 @@ export const AgentView = compose(
         />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
-      <Route path='?tab=syscollector'>
-        <MainModuleAgent
-          agent={agentData}
-          section={tab}
-          unPinAgent={unPinAgent}
-        />
-        <MainSyscollector agent={agentData} />
-      </Route>
       <Route path={`?tab=${AgentTabs.STATS}`}>
         <MainModuleAgent
           agent={agentData}
