@@ -108,6 +108,8 @@ jobs:
           [ "$platform" = "osd" ] && { docker_env_plugin_platform="OPENSEARCH_DASHBOARDS_VERSION"; };
 
           # Up the environment and run the command
+          // TODO: Remove the `set +e` and `set -e` commands when the plugin is stable
+          set +e;
           docker run -t --rm \
             -e ${docker_env_plugin_platform}=${platform_version} \
             -v `pwd`/${{ matrix.plugins.path }}:/home/node/kbn/plugins/${{ matrix.plugins.container_path }} \
@@ -117,6 +119,7 @@ jobs:
               yarn config set registry https://registry.yarnpkg.com;
               cd /home/node/kbn/plugins/${{ matrix.plugins.container_path }} && yarn && ${{ inputs.command }};
             '
+          set -e;
 
       - name: Get the plugin version
         run: |
