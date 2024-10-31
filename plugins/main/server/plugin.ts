@@ -64,7 +64,7 @@ declare module '../../../src/core/server' {
         };
       };
     };
-    wazuhEndpointParams: {
+    wazuhEndpointParams?: {
       pathFilename: string;
       hashUsername: string;
       filename: string;
