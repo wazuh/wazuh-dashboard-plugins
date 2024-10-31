@@ -106,7 +106,7 @@ describe('AgentStats', () => {
     });
   });
 
-  it('should call api with correct agent ids and endpoints', async () => {
+  it('should call api with correct agent ids and endpoints when changing agent', async () => {
     apiReqMock.mockReset();
     const agentId = '000';
     const agentId2 = '001';
