@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, act } from '@testing-library/react';
+import { render, act, RenderResult } from '@testing-library/react';
 import { AgentStats } from './agent-stats';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 import { CSS } from '../../../../test/utils/CSS';
@@ -106,12 +106,15 @@ describe('AgentStats', () => {
     });
   });
 
-  it('should call the API to fetch the agent stats', async () => {
+  it('should call api with correct agent ids and endpoints', async () => {
     apiReqMock.mockReset();
     const agentId = '000';
+    const agentId2 = '001';
+
+    let rerender: RenderResult['rerender'];
 
     await act(async () => {
-      render(<AgentStats agent={{ id: agentId }} />);
+      ({ rerender } = render(<AgentStats agent={{ id: agentId }} />));
     });
 
     expect(apiReqMock).toHaveBeenCalledTimes(2);
@@ -123,6 +126,22 @@ describe('AgentStats', () => {
     expect(apiReqMock.mock.calls[1]).toEqual([
       'GET',
       `/agents/${agentId}/stats/agent`,
+      {},
+    ]);
+
+    await act(async () => {
+      rerender(<AgentStats agent={{ id: agentId2 }} />);
+    });
+
+    expect(apiReqMock).toHaveBeenCalledTimes(4);
+    expect(apiReqMock.mock.calls[2]).toEqual([
+      'GET',
+      `/agents/${agentId2}/stats/logcollector`,
+      {},
+    ]);
+    expect(apiReqMock.mock.calls[3]).toEqual([
+      'GET',
+      `/agents/${agentId2}/stats/agent`,
       {},
     ]);
   });
