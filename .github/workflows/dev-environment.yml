@@ -115,6 +115,7 @@ jobs:
             quay.io/wazuh/${platform}-dev:${platform_version} \
             bash -c '
               yarn config set registry https://registry.yarnpkg.com;
+              curl --compressed -o- -L https://yarnpkg.com/install.sh | bash
               cd /home/node/kbn/plugins/${{ matrix.plugins.container_path }} && yarn && ${{ inputs.command }};
             '
 
