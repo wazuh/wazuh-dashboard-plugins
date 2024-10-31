@@ -108,7 +108,7 @@ jobs:
           [ "$platform" = "osd" ] && { docker_env_plugin_platform="OPENSEARCH_DASHBOARDS_VERSION"; };
 
           # Up the environment and run the command
-          // TODO: Remove the `set +e` and `set -e` commands when the plugin is stable
+          # TODO: Remove the `set +e` and `set -e` commands when the plugin is stable
           set +e;
           docker run -t --rm \
             -e ${docker_env_plugin_platform}=${platform_version} \
