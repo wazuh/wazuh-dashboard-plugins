@@ -15,11 +15,11 @@ export const PackagesTable = withSOPlatformGuard(({ agent, soPlatform }) => {
       <TableWzAPI
         title='Packages'
         tableColumns={packagesColumns[soPlatform]}
-        tableInitialSortingField={packagesColumns[soPlatform][0].field}
+        tableInitialSortingField={packagesColumns[soPlatform]?.[0].field}
         endpoint={`/syscollector/${agent.id}/packages?select=${packagesColumns[
           soPlatform
         ]
-          .map(({ field }) => field)
+          ?.map(({ field }) => field)
           .join(',')}`}
         searchTable
         downloadCsv
