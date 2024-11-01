@@ -6,6 +6,7 @@ import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
 import {
   withErrorBoundary,
+  withGlobalBreadcrumb,
   withGuard,
   withRouteResolvers,
 } from '../../common/hocs';
