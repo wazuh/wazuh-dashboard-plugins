@@ -117,10 +117,8 @@ export const AgentView = compose(
   }
 
   const unPinAgent = () => {
-    // navigate to the agents preview page
-    NavigationService.getInstance().navigateToApp(endpointSummary.id, {
-      path: `#${SECTIONS.AGENTS_PREVIEW}`,
-    });
+    // remove the pinned agent from the URL
+    navigationService.navigate(`/agents?tab=${tab}`);
   };
 
   return (
