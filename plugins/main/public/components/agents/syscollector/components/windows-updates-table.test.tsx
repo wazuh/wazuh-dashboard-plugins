@@ -39,7 +39,7 @@ describe('WindowsUpdatesTable', () => {
     rerender(<WindowsUpdatesTable agent={{ id: AGENT_001 }} />);
 
     expect(TableWzAPIMock.mock.calls[0][0].endpoint).toContain(
-      `/syscollector/${AGENT_001}/hotfixes `,
+      `/syscollector/${AGENT_001}/hotfixes`,
     );
   });
 });
