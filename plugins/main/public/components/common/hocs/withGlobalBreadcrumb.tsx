@@ -9,15 +9,25 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useEffect } from 'react';
-import { useGlobalBreadcrumb  } from '../hooks/useGlobalBreadcrumb';
+import React from 'react';
+import { Breadcrumb, useGlobalBreadcrumb } from '../hooks/useGlobalBreadcrumb';
 
-type TBreadcrumbSection = {text: string, href?: string} | { agent: any };
-type TBreadcrumb = TBreadcrumbSection[];
-type TBreadcrumbParameter = TBreadcrumb | ((props: any) => TBreadcrumb);
+type BreadcrumbParam = Breadcrumb | ((props: any) => Breadcrumb);
 
 // It returns user permissions
-export const withGlobalBreadcrumb = (breadcrumb : TBreadcrumbParameter) => WrappedComponent => props => {
-  useGlobalBreadcrumb(typeof breadcrumb === 'function' ? breadcrumb(props) : breadcrumb);
-  return <WrappedComponent {...props} />
-}
+export const withGlobalBreadcrumb =
+  (breadcrumbParam: BreadcrumbParam) =>
+  (WrappedComponent: React.JSX.Element) =>
+  (props: any) => {
+    const getBreadcrumb = () => {
+      if (typeof breadcrumbParam === 'function') {
+        return breadcrumbParam(props);
+      }
+      return breadcrumbParam;
+    };
+
+    useGlobalBreadcrumb(getBreadcrumb());
+
+    // @ts-expect-error
+    return <WrappedComponent {...props} />;
+  };
