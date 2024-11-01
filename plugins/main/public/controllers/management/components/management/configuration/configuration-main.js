@@ -40,7 +40,7 @@ export default compose(
         { text: 'Configuration' },
       ];
     }
-    $('#breadcrumbNoTitle').attr('title', '');
+    document.querySelector('#breadcrumbNoTitle')?.setAttribute('title', '');
     return breadcrumb;
   }),
 )(WzConfigurationSwitch);
