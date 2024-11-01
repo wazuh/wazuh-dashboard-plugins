@@ -151,7 +151,7 @@ describe('AgentStats', () => {
     ]);
   });
 
-  it('should maintain column structure across multiple renders', async () => {
+  it('should maintain column structure across multiple renders, either when changing agent or not', async () => {
     AgentStatTableMock.mockClear();
 
     const mockColumns = [
@@ -191,7 +191,7 @@ describe('AgentStats', () => {
     expect(AgentStatTableMock.mock.calls[1][0].columns).toEqual(mockColumns);
   });
 
-  it('should apply correct titles after render and rerender', async () => {
+  it('should apply correct titles after render and rerender, either when changing agent or not', async () => {
     AgentStatTableMock.mockClear();
 
     const mockDataStatLogcollectorTitle = 'Global';
@@ -224,7 +224,7 @@ describe('AgentStats', () => {
     );
   });
 
-  it('should update export csv filename correctly on rerender', async () => {
+  it('should update export csv filename correctly when changing agent', async () => {
     AgentStatTableMock.mockClear();
 
     const mockExportCSVFilename = (
