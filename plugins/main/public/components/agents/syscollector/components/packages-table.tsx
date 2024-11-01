@@ -29,7 +29,7 @@ export const PackagesTable = withSOPlatformGuard(({ agent, soPlatform }) => {
           suggestions: {
             field(currentValue) {
               return packagesColumns[soPlatform]
-                .map(item => ({
+                ?.map(item => ({
                   label: item.field,
                   description: `filter by ${item.name}`,
                 }))
