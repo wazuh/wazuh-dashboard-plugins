@@ -17,6 +17,7 @@ import {
 import { compose } from 'redux';
 import { endpointSummary, settings } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { SECTIONS } from '../../../../../sections';
 
 export default compose(
   withErrorBoundary,
@@ -31,7 +32,7 @@ export default compose(
           href: NavigationService.getInstance().getUrlForApp(
             endpointSummary.id,
             {
-              path: `#/agents-preview`,
+              path: `#/${SECTIONS.AGENTS_PREVIEW}`,
             },
           ),
         },
