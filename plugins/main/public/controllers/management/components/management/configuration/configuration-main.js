@@ -21,9 +21,9 @@ import { SECTIONS } from '../../../../../sections';
 
 export default compose(
   withErrorBoundary,
-  withGlobalBreadcrumb(props => {
+  withGlobalBreadcrumb(({ agent }) => {
     let breadcrumb = false;
-    if (props.agent?.id === '000') {
+    if (agent?.id === '000') {
       breadcrumb = [{ text: settings.breadcrumbLabel }];
     } else {
       breadcrumb = [
@@ -36,7 +36,7 @@ export default compose(
             },
           ),
         },
-        { agent: props.agent },
+        { agent },
         { text: 'Configuration' },
       ];
     }
