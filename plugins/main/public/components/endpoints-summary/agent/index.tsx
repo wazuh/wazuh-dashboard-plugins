@@ -39,6 +39,16 @@ export const AgentView = compose(
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   connect(mapStateToProps),
   withAgentSync,
+  withGlobalBreadcrumb(() => {
+    return [
+      {
+        text: endpointSummary.breadcrumbLabel,
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+          path: `#/${SECTIONS.AGENTS_PREVIEW}`,
+        }),
+      },
+    ];
+  }),
   withGuard(
     props => !(props.agent && props.agent.id),
     () => (
