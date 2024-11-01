@@ -34,7 +34,7 @@ jest.mock('./with-so-platform-guard', () => ({
 }));
 
 describe('PackagesTable', () => {
-  it('should render table with correct hotfixes endpoint for agent either when changing agent or not', async () => {
+  it('should render table with correct packages endpoint for agent either when changing agent or not', async () => {
     const { rerender } = render(<PackagesTable agent={{ id: AGENT_000 }} />);
 
     expect(TableWzAPIMock.mock.calls[0][0].endpoint).toContain(
@@ -50,7 +50,7 @@ describe('PackagesTable', () => {
     );
   });
 
-  it('should fetch syscollector data for given agent id either when changing agent or not', async () => {
+  it('should fetch packages data for given agent id either when changing agent or not', async () => {
     const { rerender } = render(<PackagesTable agent={{ id: AGENT_000 }} />);
 
     expect(apiReqMock.mock.calls[0][0]).toEqual('GET');

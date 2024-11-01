@@ -48,7 +48,7 @@ describe('WindowsUpdatesTable', () => {
     );
   });
 
-  it('should fetch syscollector data for given agent id either when changing agent or not', async () => {
+  it('should fetch hotfixes data for given agent id either when changing agent or not', async () => {
     const { rerender } = render(
       <WindowsUpdatesTable agent={{ id: AGENT_000 }} />,
     );
