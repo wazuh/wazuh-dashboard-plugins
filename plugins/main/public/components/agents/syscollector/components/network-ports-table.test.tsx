@@ -33,7 +33,7 @@ jest.mock('./with-so-platform-guard', () => ({
   withSOPlatformGuard: jest.fn(Component => Component),
 }));
 
-describe('NetworkInterfacesTable', () => {
+describe('NetworkPortsTable', () => {
   it('should render table with correct ports endpoint for agent either when changing agent or not', async () => {
     const { rerender } = render(
       <NetworkPortsTable agent={{ id: AGENT_000 }} />,
