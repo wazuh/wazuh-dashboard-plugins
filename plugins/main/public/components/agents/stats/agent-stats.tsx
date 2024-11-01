@@ -45,6 +45,7 @@ import { endpointSummary } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
 import WzRibbon from '../../common/ribbon/ribbon';
 import { Agent } from '../../endpoints-summary/types';
+import { SECTIONS } from '../../../sections';
 
 const tableColumns = [
   {
@@ -108,7 +109,7 @@ export const MainAgentStats = compose(
     {
       text: endpointSummary.breadcrumbLabel,
       href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
-        path: `#/agents-preview`,
+        path: `#/${SECTIONS.AGENTS_PREVIEW}`,
       }),
     },
     { agent },
