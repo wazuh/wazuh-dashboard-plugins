@@ -37,7 +37,7 @@ jobs:
         url-package: ${{ github.event.inputs.url-package }}"
 
      - name: Step 02 - Download Project wazuh-app-environments
-       uses: actions/checkout@v2
+       uses: actions/checkout@v4
        with:
         repository: matiasmoreno876/wazuh-app-environments
         ref: 'master'
