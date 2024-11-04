@@ -14,7 +14,7 @@ export const NetworkInterfacesTable = ({ agent }) => {
       <TableWzAPI
         title='Network interfaces'
         tableColumns={netifaceColumns}
-        tableInitialSortingField={netifaceColumns[0]?.field}
+        tableInitialSortingField={netifaceColumns[0].field}
         endpoint={`/syscollector/${agent.id}/netiface?select=${netifaceColumns
           .map(({ field }) => field)
           .join(',')}`}

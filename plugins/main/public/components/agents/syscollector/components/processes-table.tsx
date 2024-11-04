@@ -15,11 +15,11 @@ export const ProcessesTable = withSOPlatformGuard(({ agent, soPlatform }) => {
       <TableWzAPI
         title='Processes'
         tableColumns={processColumns[soPlatform]}
-        tableInitialSortingField={processColumns[soPlatform]?.[0].field}
+        tableInitialSortingField={processColumns[soPlatform][0].field}
         endpoint={`/syscollector/${agent.id}/processes?select=${processColumns[
           soPlatform
         ]
-          ?.map(({ field }) => field)
+          .map(({ field }) => field)
           .join(',')}`}
         searchTable
         downloadCsv
@@ -29,7 +29,7 @@ export const ProcessesTable = withSOPlatformGuard(({ agent, soPlatform }) => {
           suggestions: {
             field(currentValue) {
               return processColumns[soPlatform]
-                ?.map(item => ({
+                .map(item => ({
                   label: item.field,
                   description: `filter by ${item.name}`,
                 }))

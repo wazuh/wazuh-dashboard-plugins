@@ -16,11 +16,11 @@ export const NetworkPortsTable = withSOPlatformGuard(
         <TableWzAPI
           title='Network ports'
           tableColumns={portsColumns[soPlatform]}
-          tableInitialSortingField={portsColumns[soPlatform]?.[0].field}
+          tableInitialSortingField={portsColumns[soPlatform][0].field}
           endpoint={`/syscollector/${agent.id}/ports?select=${portsColumns[
             soPlatform
           ]
-            ?.map(({ field }) => field)
+            .map(({ field }) => field)
             .join(',')}`}
           searchTable
           downloadCsv
@@ -30,7 +30,7 @@ export const NetworkPortsTable = withSOPlatformGuard(
             suggestions: {
               field(currentValue) {
                 return portsColumns[soPlatform]
-                  ?.map(item => ({
+                  .map(item => ({
                     label: item.field,
                     description: `filter by ${item.name}`,
                   }))
