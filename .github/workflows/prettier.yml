@@ -14,7 +14,7 @@ jobs:
 
       # - https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#node-version-file
       - name: Install NodeJS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
