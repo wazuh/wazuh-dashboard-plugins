@@ -115,7 +115,7 @@ jobs:
 
       - name: Step 04 - Upload artifact to GitHub
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact_name }}_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
           path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
