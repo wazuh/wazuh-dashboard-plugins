@@ -40,7 +40,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed column reordering feature [#7072](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7072)
 - Fixed filter management to prevent hiding when adding multiple filters [#7077](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7077)
 - Fixed the Mitre ATT&CK exception in the agent view, the redirections of ID, Tactics, Dashboard Icon and Event Icon in the drop-down menu and the card not displaying information when the flyout was opened [#7116](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7116)
-- Fixed vulnerabilities inventory table scroll [#7118](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7118)
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 
