@@ -47,6 +47,7 @@ import {
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
+import WzRibbon from '../../common/ribbon/ribbon';
 
 const tableColumns = [
   {
@@ -142,7 +143,8 @@ export const MainAgentStats = compose(
   ),
 )(AgentStats);
 
-function AgentStats({ agent }) {
+export function AgentStats(props) {
+  const { agent } = props;
   const [loading, setLoading] = useState();
   const [dataStatLogcollector, setDataStatLogcollector] = useState({});
   const [dataStatAgent, setDataStatAgent] = useState();
@@ -186,33 +188,20 @@ function AgentStats({ agent }) {
   return (
     <EuiPage>
       <EuiPageBody>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiPanel paddingSize='m'>
-              <EuiFlexGroup>
-                {statsAgents.map(stat => (
-                  <EuiFlexItem key={`agent-stat-${stat.field}`} grow={false}>
-                    <EuiText>
-                      {stat.title}:{' '}
-                      {loading ? (
-                        <EuiLoadingSpinner size='s' />
-                      ) : (
-                        <strong>
-                          {dataStatAgent !== undefined
-                            ? stat.render
-                              ? stat.render(dataStatAgent[stat.field])
-                              : dataStatAgent?.[stat.field]
-                            : '-'}
-                        </strong>
-                      )}
-                    </EuiText>
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
-            </EuiPanel>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer />
+        <WzRibbon
+          items={statsAgents.map(stat => ({
+            key: stat.field,
+            label: stat.title,
+            isLoading: loading,
+            value:
+              dataStatAgent !== undefined
+                ? stat.render
+                  ? stat.render(dataStatAgent[stat.field])
+                  : dataStatAgent?.[stat.field]
+                : '-',
+          }))}
+        />
+        <EuiSpacer size='xxl' />
         <EuiFlexGroup>
           <EuiFlexItem>
             <AgentStatTable
