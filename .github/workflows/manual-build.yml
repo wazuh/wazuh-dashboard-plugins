@@ -57,6 +57,7 @@ jobs:
         with:
           name: wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          overwrite: true
 
       - name: Step 04 - Build the Docker image
         run: |

@@ -97,6 +97,7 @@ jobs:
        with:
         name: cypress-reports_ODFE_${{ github.event.inputs.wazuh-version }}-${{ github.event.inputs.odfe-version }}-${{ github.event.inputs.elastic-version }}
         path: ${{ env.PATH_TEMPLATE }}/report/*
+        overwrite: true
      - name: Step 10 - Log parsing
        run: |
         cd ${{ env.PATH_TEMPLATE }}

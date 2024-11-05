@@ -88,6 +88,7 @@ jobs:
        with:
         name: cypress-reports_WZD_${{ github.event.inputs.wazuh-stack-version }}
         path: ${{ env.PATH_TEMPLATE }}/report/*
+        overwrite: true
      - name: Step 10 - Log parsing
        run: |
         cd ${{ env.PATH_TEMPLATE }}

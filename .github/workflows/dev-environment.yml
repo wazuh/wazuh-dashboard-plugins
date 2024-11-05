@@ -120,6 +120,7 @@ jobs:
           name: ${{ inputs.artifact_name }}_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
           path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
           if-no-files-found: 'error'
+          overwrite: true
 
       - name: Step 05 - Upload coverage results to GitHub
         if: ${{ inputs.notify_jest_coverage_summary && github.event_name == 'pull_request' }}
