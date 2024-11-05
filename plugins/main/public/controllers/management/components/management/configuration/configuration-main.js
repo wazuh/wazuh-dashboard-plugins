@@ -17,12 +17,13 @@ import {
 import { compose } from 'redux';
 import { endpointSummary, settings } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { SECTIONS } from '../../../../../sections';
 
 export default compose(
   withErrorBoundary,
-  withGlobalBreadcrumb(props => {
+  withGlobalBreadcrumb(({ agent }) => {
     let breadcrumb = false;
-    if (props.agent?.id === '000') {
+    if (agent?.id === '000') {
       breadcrumb = [{ text: settings.breadcrumbLabel }];
     } else {
       breadcrumb = [
@@ -31,15 +32,15 @@ export default compose(
           href: NavigationService.getInstance().getUrlForApp(
             endpointSummary.id,
             {
-              path: `#/agents-preview`,
+              path: `#/${SECTIONS.AGENTS_PREVIEW}`,
             },
           ),
         },
-        { agent: props.agent },
+        { agent },
         { text: 'Configuration' },
       ];
     }
-    $('#breadcrumbNoTitle').attr('title', '');
+    document.querySelector('#breadcrumbNoTitle')?.setAttribute('title', '');
     return breadcrumb;
   }),
 )(WzConfigurationSwitch);
