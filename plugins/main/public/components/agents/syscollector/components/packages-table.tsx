@@ -11,7 +11,7 @@ const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
 export const PackagesTable = withSOPlatformGuard(({ agent, soPlatform }) => {
   return (
-    <EuiPanel paddingSize='m'>
+    <EuiPanel data-test-subj='software-packages-table' paddingSize='m'>
       <TableWzAPI
         title='Packages'
         tableColumns={packagesColumns[soPlatform]}

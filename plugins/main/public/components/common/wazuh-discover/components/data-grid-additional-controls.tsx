@@ -41,11 +41,11 @@ const DiscoverDataGridAdditionalControls = (
         tooltip={
           totalHits && totalHits > maxEntriesPerQuery
             ? {
-                ariaLabel: 'Warning',
+                ariaLabel: 'Info',
                 content: `The query results exceeded the limit of ${formatNumWithCommas(
                   maxEntriesPerQuery,
                 )} hits. Please refine your search.`,
-                iconType: 'alert',
+                iconType: 'iInCircle',
                 position: 'top',
               }
             : undefined
@@ -74,7 +74,7 @@ const DiscoverDataGridAdditionalControls = (
         className='euiDataGrid__controlBtn'
         onClick={onHandleExportResults}
       >
-        Export Formated
+        Export Formatted
       </EuiButtonEmpty>
     </>
   );

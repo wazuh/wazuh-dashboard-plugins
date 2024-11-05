@@ -28,7 +28,6 @@ import { InventoryTable, RegistryTable } from './inventory/';
 import { WzRequest } from '../../../react-services/wz-request';
 import { getToasts } from '../../../kibana-services';
 import { ICustomBadges } from '../../wz-search-bar/components';
-import { filtersToObject } from '../../wz-search-bar';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import {
   UI_ERROR_SEVERITIES,
@@ -42,7 +41,6 @@ import { webDocumentationLink } from '../../../../common/services/web_documentat
 export class Inventory extends Component {
   _isMount = false;
   state: {
-    filters: [];
     selectedTabId: 'files' | 'registry';
     totalItemsFile: number;
     totalItemsRegistry: number;
@@ -57,7 +55,6 @@ export class Inventory extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      filters: [],
       syscheck: [],
       selectedTabId: 'files',
       totalItemsFile: 0,
@@ -66,7 +63,6 @@ export class Inventory extends Component {
       customBadges: [],
       isConfigured: false,
     };
-    this.onFiltersChange.bind(this);
   }
 
   async componentDidMount() {
@@ -135,56 +131,20 @@ export class Inventory extends Component {
     return auxTabs;
   }
 
-  getStoreFilters(props) {
-    const { section, selectView, agent } = props;
-    const filters = JSON.parse(
-      window.localStorage.getItem(
-        `wazuh-${section}-${selectView}-${
-          this.state?.selectedTabId || 'files'
-        }-${agent['id']}`,
-      ) || '{}',
-    );
-    return filters;
-  }
-
-  setStoreFilters(filters) {
-    const { section, selectView, agent } = this.props;
-    window.localStorage.setItem(
-      `wazuh-${section}-${selectView}-${this.state?.selectedTabId || 'files'}-${
-        agent['id']
-      }`,
-      JSON.stringify(filters),
-    );
-  }
-
-  onFiltersChange = filters => {
-    this.setState({ filters });
-  };
-
-  onTotalItemsChange = (totalItems: number) => {
-    this.setState({ totalItemsFile: totalItems });
-  };
-
   onSelectedTabChanged = id => {
     this.setState({ selectedTabId: id });
   };
-
-  buildFilter(type) {
-    const filters = filtersToObject(this.state.filters);
-    const filter = {
-      ...filters,
-      limit: type === 'file' ? '15' : '1',
-      ...(type === 'registry' ? { q: 'type=registry_key' } : { type }),
-      ...(type === 'file' && { sort: '+file' }),
-    };
-    return filter;
-  }
 
   async getItemNumber(type: 'file' | 'registry') {
     try {
       const agentID = this.props.agent.id;
       const response = await WzRequest.apiReq('GET', `/syscheck/${agentID}`, {
-        params: this.buildFilter(type),
+        params: {
+          limit: 1, // reduce the size because only need the total items. 0 gives error
+          ...(type === 'registry'
+            ? { q: 'type=registry_key' }
+            : { q: 'type=file' }),
+        },
       });
       if (type === 'file') {
         return {
@@ -257,8 +217,6 @@ export class Inventory extends Component {
             filters={filters}
             items={syscheck}
             totalItems={totalItemsFile}
-            onFiltersChange={this.onFiltersChange}
-            onTotalItemsChange={this.onTotalItemsChange}
           />
         )}
         {selectedTabId === 'registry' && (
@@ -266,7 +224,6 @@ export class Inventory extends Component {
             {...this.props}
             filters={filters}
             totalItems={totalItemsRegistry}
-            onFiltersChange={this.onFiltersChange}
           />
         )}
       </>

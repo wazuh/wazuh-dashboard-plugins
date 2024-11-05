@@ -25,6 +25,9 @@ const { updatePluginManifest } = require('./lib/update-manifest-plugin');
 const { updateChangelog } = require('./lib/update-changelog');
 const path = require('path');
 const fs = require('fs');
+const {
+  updateImposterSpecificationReference,
+} = require('./lib/update-imposter');
 
 const cli = require('../lib/cli/cli')(
   cliName,
@@ -341,6 +344,8 @@ function run(configuration) {
     },
     logger,
   );
+
+  updateImposterSpecificationReference(configuration, logger);
 }
 
 function main() {

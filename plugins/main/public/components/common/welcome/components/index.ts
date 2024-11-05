@@ -16,3 +16,4 @@ export { FimEventsTable, useTimeFilter } from './fim_events_table';
 export { ScaScan } from './sca_scan';
 export { MitreTopTactics } from './mitre_top';
 export { RequirementVis } from './requirement_vis';
+export { VulsTopPackageTable } from './top_packages_table';

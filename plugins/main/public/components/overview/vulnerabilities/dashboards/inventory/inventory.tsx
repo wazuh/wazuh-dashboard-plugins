@@ -203,6 +203,8 @@ const InventoryVulsComponent = () => {
     getUnderEvaluation(filters || []),
   );
 
+  const closeFlyoutHandler = () => setInspectedHit(undefined);
+
   return (
     <IntlProvider locale='en'>
       <>
@@ -262,13 +264,13 @@ const InventoryVulsComponent = () => {
                               results?.hits?.total &&
                               results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                    ariaLabel: 'Warning',
+                                    ariaLabel: 'Info',
                                     content: `The query results has exceeded the limit of ${formatNumWithCommas(
                                       MAX_ENTRIES_PER_QUERY,
                                     )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
                                       MAX_ENTRIES_PER_QUERY,
                                     )} hits.`,
-                                    iconType: 'alert',
+                                    iconType: 'iInCircle',
                                     position: 'top',
                                   }
                                 : undefined
@@ -286,7 +288,7 @@ const InventoryVulsComponent = () => {
                             className='euiDataGrid__controlBtn'
                             onClick={onClickExportResults}
                           >
-                            Export Formated
+                            Export Formatted
                           </EuiButtonEmpty>
                         </>
                       ),
@@ -296,7 +298,7 @@ const InventoryVulsComponent = () => {
               </EuiPanel>
             ) : null}
             {inspectedHit && (
-              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+              <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                 <EuiFlyoutHeader>
                   <EuiTitle>
                     <h2>Vulnerability details</h2>
@@ -311,6 +313,9 @@ const InventoryVulsComponent = () => {
                         inventoryTableDefaultColumns,
                         wzDiscoverRenderColumns,
                       )}
+                      filters={filters}
+                      setFilters={setFilters}
+                      onFilter={closeFlyoutHandler}
                     />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>

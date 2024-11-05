@@ -21,19 +21,10 @@ import { withRouterSearch } from '../../../common/hocs';
 import { Route, Switch } from '../../../router-search';
 import NavigationService from '../../../../react-services/navigation-service';
 
-const searchBarWQLOptions = {
-  implicitQuery: {
-    query: 'type=file',
-    conjunction: ';',
-  },
-};
-
-const searchBarWQLFilters = { default: { q: 'type=file' } };
-
 export const InventoryTable = withRouterSearch(
   class InventoryTable extends Component {
     state: {
-      syscheck: [];
+      filters: any;
       isFlyoutVisible: Boolean;
       currentFile: {
         file: string;
@@ -46,14 +37,13 @@ export const InventoryTable = withRouterSearch(
       agent: any;
       items: [];
       totalItems: number;
-      onTotalItemsChange: Function;
     };
 
     constructor(props) {
       super(props);
 
       this.state = {
-        syscheck: props.items,
+        filters: {},
         isFlyoutVisible: false,
         currentFile: {
           file: '',
@@ -80,12 +70,76 @@ export const InventoryTable = withRouterSearch(
           sortable: true,
           width: '250px',
           searchable: true,
+          show: true,
         },
         {
           field: 'mtime',
           name: (
             <span>
-              Last Modified{' '}
+              Last modified{' '}
+              <EuiIconTip
+                content='This is not searchable through a search term.'
+                size='s'
+                color='subdued'
+                type='alert'
+              />
+            </span>
+          ),
+          sortable: true,
+          width: '100px',
+          render: formatUIDate,
+          searchable: false,
+          show: true,
+        },
+        {
+          field: 'uname',
+          name: 'User',
+          sortable: true,
+          truncateText: true,
+          width: `${width}`,
+          searchable: true,
+          show: true,
+        },
+        {
+          field: 'uid',
+          name: 'User ID',
+          sortable: true,
+          truncateText: true,
+          width: `${width}`,
+          searchable: true,
+          show: true,
+        },
+        {
+          field: 'gname',
+          name: 'Group',
+          sortable: true,
+          truncateText: true,
+          width: `${width}`,
+          searchable: true,
+          show: true,
+        },
+        {
+          field: 'gid',
+          name: 'Group ID',
+          sortable: true,
+          truncateText: true,
+          width: `${width}`,
+          searchable: true,
+          show: true,
+        },
+        {
+          field: 'size',
+          name: 'Size',
+          sortable: true,
+          width: `${width}`,
+          searchable: true,
+          show: true,
+        },
+        {
+          field: 'date',
+          name: (
+            <span>
+              Last analysis{' '}
               <EuiIconTip
                 content='This is not searchable through a search term.'
                 size='s'
@@ -100,46 +154,31 @@ export const InventoryTable = withRouterSearch(
           searchable: false,
         },
         {
-          field: 'uname',
-          name: 'User',
-          sortable: true,
-          truncateText: true,
-          width: `${width}`,
+          field: 'md5',
+          name: 'MD5',
           searchable: true,
+          sortable: true,
         },
         {
-          field: 'uid',
-          name: 'User ID',
-          sortable: true,
-          truncateText: true,
-          width: `${width}`,
+          field: 'sha1',
+          name: 'SHA1',
           searchable: true,
+          sortable: true,
         },
         {
-          field: 'gname',
-          name: 'Group',
-          sortable: true,
-          truncateText: true,
-          width: `${width}`,
+          field: 'sha256',
+          name: 'SHA256',
           searchable: true,
-        },
-        {
-          field: 'gid',
-          name: 'Group ID',
           sortable: true,
-          truncateText: true,
-          width: `${width}`,
-          searchable: true,
-        },
-        {
-          field: 'size',
-          name: 'Size',
-          sortable: true,
-          width: `${width}`,
-          searchable: true,
         },
       ];
     }
+
+    onFiltersChange = filters => {
+      this.setState({
+        filters,
+      });
+    };
 
     renderFilesTable() {
       const getRowProps = item => {
@@ -155,6 +194,8 @@ export const InventoryTable = withRouterSearch(
       };
       const columns = this.columns();
 
+      const APIendpoint = `/syscheck/${this.props.agent.id}?type=file`;
+
       return (
         <EuiFlexGroup>
           <EuiFlexItem>
@@ -162,17 +203,23 @@ export const InventoryTable = withRouterSearch(
               title='Files'
               tableColumns={columns}
               tableInitialSortingField='file'
-              endpoint={`/syscheck/${this.props.agent.id}`}
+              endpoint={APIendpoint}
               searchBarWQL={{
-                options: searchBarWQLOptions,
                 suggestions: {
                   field: currentValue => [
+                    { label: 'date', description: 'filter by analysis time' },
                     { label: 'file', description: 'filter by file' },
                     { label: 'gid', description: 'filter by group id' },
                     { label: 'gname', description: 'filter by group name' },
+                    { label: 'md5', description: 'filter by MD5 checksum' },
                     {
                       label: 'mtime',
                       description: 'filter by modification time',
+                    },
+                    { label: 'sha1', description: 'filter by SHA1 checksum' },
+                    {
+                      label: 'sha256',
+                      description: 'filter by SHA256 checksum',
                     },
                     { label: 'size', description: 'filter by size' },
                     { label: 'uname', description: 'filter by user name' },
@@ -182,7 +229,7 @@ export const InventoryTable = withRouterSearch(
                     try {
                       const response = await WzRequest.apiReq(
                         'GET',
-                        `/syscheck/${this.props.agent.id}`,
+                        APIendpoint,
                         {
                           params: {
                             distinct: true,
@@ -191,12 +238,9 @@ export const InventoryTable = withRouterSearch(
                             sort: `+${field}`,
                             ...(currentValue
                               ? {
-                                  // Add the implicit query
-                                  q: `${searchBarWQLOptions.implicitQuery.query}${searchBarWQLOptions.implicitQuery.conjunction}${field}~${currentValue}`,
+                                  q: `${field}~${currentValue}`,
                                 }
-                              : {
-                                  q: `${searchBarWQLOptions.implicitQuery.query}`,
-                                }),
+                              : {}),
                           },
                         },
                       );
@@ -223,11 +267,16 @@ export const InventoryTable = withRouterSearch(
                   },
                 },
               }}
-              filters={searchBarWQLFilters}
+              filters={this.state.filters}
               showReload
               downloadCsv={`fim-files-${this.props.agent.id}`}
               searchTable={true}
               rowProps={getRowProps}
+              saveStateStorage={{
+                system: 'localStorage',
+                key: 'wz-fim-files-table',
+              }}
+              showFieldSelector
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -251,6 +300,7 @@ export const InventoryTable = withRouterSearch(
                   view='inventory'
                   showViewInEvents={true}
                   {...this.props}
+                  onFiltersChange={this.onFiltersChange}
                 />
               )}
             ></Route>
