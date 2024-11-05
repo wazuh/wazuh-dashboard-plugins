@@ -22,7 +22,7 @@ export function useGenericRequest({
   params = {},
   resolveData = response => response,
 }: UseGenericRequestProps) {
-  const [response, setResponse] = useState<any>({});
+  const [data, setData] = useState<any>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error>();
 
@@ -35,7 +35,7 @@ export function useGenericRequest({
           path,
           params,
         );
-        setResponse(response);
+        setData(resolveData(response));
       };
       fetchData();
     } catch (error) {
@@ -58,7 +58,7 @@ export function useGenericRequest({
 
   return {
     isLoading,
-    data: resolveData(response),
+    data,
     error,
   };
 }
