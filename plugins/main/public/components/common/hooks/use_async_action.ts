@@ -11,23 +11,26 @@
  */
 import { useCallback, useState } from 'react';
 
-export function useAsyncAction(action, dependencies = []){
+export function useAsyncAction(
+  action: (...params: any[]) => any,
+  dependencies: any[] = [],
+) {
   const [running, setRunning] = useState(false);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   const run = useCallback(async (...params) => {
-    try{
+    try {
       setRunning(true);
       setError(null);
       setData(null);
       const data = await action(...params);
       setData(data);
-    }catch(error){
+    } catch (error) {
       setError(error);
-    }finally{
+    } finally {
       setRunning(false);
-    };
+    }
   }, dependencies);
 
   return { data, error, running, run };
