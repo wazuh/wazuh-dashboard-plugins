@@ -259,6 +259,7 @@ export function TableWithSearchBar<T>({
       />
       <EuiSpacer size='s' />
       <EuiBasicTable
+        data-test-subj='table-with-search-bar'
         ref={tableRef}
         columns={tableColumns.map(
           ({ searchable, show, composeField, ...rest }) => ({ ...rest }),

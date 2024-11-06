@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, Fragment } from 'react';
 import $ from 'jquery';
 import {
   EuiFlyoutHeader,
@@ -39,7 +39,11 @@ import {
   techniquesColumns,
   agentTechniquesColumns,
 } from './flyout-technique-columns';
-import { PatternDataSource } from '../../../../../../../../components/common/data-source';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+  PatternDataSource,
+} from '../../../../../../../../components/common/data-source';
 import { WazuhFlyoutDiscover } from '../../../../../../../common/wazuh-discover/wz-flyout-discover';
 import { tFilterParams } from '../../../../mitre';
 import TechniqueRowDetails from './technique-row-details';
@@ -47,6 +51,9 @@ import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/
 import store from '../../../../../../../../redux/store';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
 import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
+import { AppState } from '../../../../../../../../react-services';
+import { mitreAttack } from '../../../../../../../../utils/applications';
+import { setFilters } from '../../../../../../../common/search-bar/set-filters';
 
 type tFlyoutTechniqueProps = {
   currentTechnique: string;
@@ -227,7 +234,14 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
   };
 
   const expandedRow = (props: { doc: any; item: any; indexPattern: any }) => {
-    return <TechniqueRowDetails {...props} onRuleItemClick={onItemClick} />;
+    return (
+      <TechniqueRowDetails
+        {...props}
+        onRuleItemClick={onItemClick}
+        filters={[]}
+        setFilters={setFilters(filterManager)}
+      />
+    );
   };
 
   const addRenderColumn = columns => {
@@ -250,6 +264,42 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       : addRenderColumn(techniquesColumns);
   };
 
+  const goToTechniqueInIntelligence = async (e, currentTechnique) => {
+    const indexPatternId = AppState.getCurrentPattern();
+    const filters = [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        `rule.mitre.id`,
+        currentTechnique,
+        indexPatternId,
+      ),
+    ];
+    const params = `tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${currentTechnique}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
+      filters,
+    )}`;
+    NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+      path: `#/overview?${params}`,
+    });
+  };
+
+  const goToTacticInIntelligence = async (e, tactic) => {
+    const indexPatternId = AppState.getCurrentPattern();
+    const filters = [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        `rule.mitre.id`,
+        tactic,
+        indexPatternId,
+      ),
+    ];
+    const params = `tab=mitre&tabView=intelligence&tabRedirect=tactics&idToRedirect=${
+      tactic.id
+    }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
+    NavigationService.getInstance().navigateToApp(mitreAttack.id, {
+      path: `#/overview?${params}`,
+    });
+  };
+
   const renderBody = () => {
     const { currentTechnique } = props;
     const { techniqueData } = state;
@@ -263,16 +313,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           >
             <EuiLink
               onClick={e => {
-                NavigationService.getInstance().navigateToModule(
-                  e,
-                  'overview',
-                  {
-                    tab: 'mitre',
-                    tabView: 'intelligence',
-                    tabRedirect: 'techniques',
-                    idToRedirect: currentTechnique,
-                  },
-                );
+                goToTechniqueInIntelligence(e, currentTechnique);
                 e.stopPropagation();
               }}
             >
@@ -286,23 +327,14 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         description: techniqueData.tactics
           ? techniqueData.tactics.map(tactic => {
               return (
-                <>
+                <Fragment key={tactic.id}>
                   <EuiToolTip
                     position='top'
                     content={`Open ${tactic.name} details in the Intelligence section`}
                   >
                     <EuiLink
                       onClick={e => {
-                        NavigationService.getInstance().navigateToModule(
-                          e,
-                          'overview',
-                          {
-                            tab: 'mitre',
-                            tabView: 'intelligence',
-                            tabRedirect: 'tactics',
-                            idToRedirect: tactic.id,
-                          },
-                        );
+                        goToTacticInIntelligence(e, tactic);
                         e.stopPropagation();
                       }}
                     >
@@ -310,7 +342,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     </EuiLink>
                   </EuiToolTip>
                   <br />
-                </>
+                </Fragment>
               );
             })
           : '',
@@ -324,12 +356,12 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       <EuiFlyoutBody>
         <EuiAccordion
           id='details'
+          initialIsOpen={true}
           buttonContent={
             <EuiTitle size='s'>
               <h3>Technique details</h3>
             </EuiTitle>
           }
-          initialIsOpen={true}
         >
           <div className='flyout-row details-row'>
             <EuiFlexGroup direction='column' gutterSize='none'>

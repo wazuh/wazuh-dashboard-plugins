@@ -11,15 +11,16 @@
  */
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { updateGlobalBreadcrumb  } from '../../../redux/actions/globalBreadcrumbActions';
+import { updateGlobalBreadcrumb } from '../../../redux/actions/globalBreadcrumbActions';
+import { Agent } from '../../endpoints-summary/types';
 
-type TBreadcrumbSection = {text: string, href?: string} 
-type TBreadcrumb = TBreadcrumbSection[];
+export type BreadcrumbItem = { text: string; href?: string } | { agent: Agent };
+export type Breadcrumb = BreadcrumbItem[];
 
 // It updates global breadcrumb
-export const useGlobalBreadcrumb = (breadcrumb : TBreadcrumb = []) => {
+export const useGlobalBreadcrumb = (breadcrumb: Breadcrumb = []) => {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(updateGlobalBreadcrumb(breadcrumb))
+    dispatch(updateGlobalBreadcrumb(breadcrumb));
   });
-}
+};

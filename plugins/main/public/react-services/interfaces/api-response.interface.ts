@@ -1,4 +1,5 @@
 interface IData<T> {
+  api_version: string;
   affected_items: Array<T>;
   failed_items: Array<any>;
   total_affected_items: number;

@@ -12,11 +12,15 @@
 import React from 'react';
 import {
   EuiButton,
+  EuiButtonProps,
   EuiButtonEmpty,
   EuiButtonIcon,
   EuiLink,
   EuiToolTip,
   EuiSwitch,
+  EuiButtonEmptyProps,
+  EuiButtonIconProps,
+  EuiSwitchProps,
 } from '@elastic/eui';
 
 export enum WzButtonType {
@@ -27,14 +31,20 @@ export enum WzButtonType {
   switch = 'switch',
 }
 
-interface WzButtonProps {
-  buttonType?: WzButtonType;
-  tooltip?: any;
-  color?: any;
-  children?: any;
-  isDisabled?: any;
-  rest?: any;
-}
+type WzButtonProps =
+  | {
+      buttonType?: WzButtonType;
+      tooltip?: any;
+      color?: string;
+      children?: any;
+      isDisabled?: any;
+      className?: string;
+      rest?: any;
+    }
+  | Partial<EuiButtonProps>
+  | Partial<EuiButtonEmptyProps>
+  | Partial<EuiButtonIconProps>
+  | Partial<EuiSwitchProps>;
 
 const WzButtons: { [key in WzButtonType]: React.FunctionComponent } = {
   default: EuiButton,
