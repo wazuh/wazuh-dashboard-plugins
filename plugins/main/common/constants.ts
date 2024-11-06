@@ -527,3 +527,11 @@ export const SEARCH_BAR_DEBOUNCE_UPDATE_TIME = 400;
 
 // ID used to refer the createOsdUrlStateStorage state
 export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
+
+export const APP_STATE_URL_KEY = '_a';
+export const GLOBAL_STATE_URL_KEY = '_g';
+
+export enum FilterStateStore {
+  APP_STATE = 'appState',
+  GLOBAL_STATE = 'globalState',
+}

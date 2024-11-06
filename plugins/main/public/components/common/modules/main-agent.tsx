@@ -14,20 +14,13 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiTitle,
   EuiButtonEmpty,
+  EuiTabs,
+  EuiTab,
 } from '@elastic/eui';
-import { euiThemeVars } from '@osd/ui-shared-deps/theme';
 import '../../common/modules/module.scss';
 import store from '../../../redux/store';
-import { FilterHandler } from '../../../utils/filter-handler';
-import { AppState } from '../../../react-services/app-state';
 import { ReportingService } from '../../../react-services/reporting';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-import { AgentInfo } from '../../common/welcome/agents-info';
-import { compose } from 'redux';
-import { withGlobalBreadcrumb } from '../hocs';
-import { endpointSummary } from '../../../utils/applications';
 import {
   AlertsDataSource,
   AlertsDataSourceRepository,
@@ -37,140 +30,112 @@ import {
   useDataSource,
 } from '../data-source';
 import { useAsyncAction } from '../hooks';
-import NavigationService from '../../../react-services/navigation-service';
+import { toTitleCase } from '../util/change-case';
+import clsx from 'clsx';
+import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
+import { Agent } from '../../endpoints-summary/types';
+import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 
 export class MainModuleAgent extends Component {
   props!: {
-    [key: string]: any;
+    agent: Agent;
+    section: string;
+    switchTab?: (tab: string) => void;
+    selectView?: boolean;
+    tabs?: any[];
+    renderTabs?: () => JSX.Element;
+    agentsSelectionProps?: any;
+    unPinAgent?: () => void;
   };
-  state: {
-    selectView: Boolean;
-    loadingReport: Boolean;
-    switchModule: Boolean;
-    showAgentInfo: Boolean;
-  };
-  reportingService: ReportingService;
-  filterHandler: FilterHandler;
 
-  constructor(props) {
-    super(props);
-    this.reportingService = new ReportingService();
-    this.filterHandler = new FilterHandler(AppState.getCurrentPattern());
-    this.state = {
-      selectView: false,
-      loadingReport: false,
-      switchModule: false,
-      showAgentInfo: false,
-    };
-  }
+  inventoryTabs = [AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES];
 
   renderTitle() {
+    const { agent, section, switchTab } = this.props;
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem className='wz-module-header-agent-title'>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <span style={{ display: 'inline-flex' }}>
-                <EuiTitle size='s' className='wz-module-header-agent-title-btn'>
-                  <h1>
-                    <span
-                      style={{ color: euiThemeVars.euiColorPrimaryText }}
-                      onClick={() => {
-                        NavigationService.getInstance().navigate(
-                          `/agents?tab=welcome&agent=${this.props.agent.id}`,
-                        );
-                      }}
-                    >
-                      <span>
-                        &nbsp;{this.props.agent.name}&nbsp;&nbsp;&nbsp;
-                      </span>
-                    </span>
-                  </h1>
-                </EuiTitle>
-              </span>
-            </EuiFlexItem>
-            <EuiFlexItem />
-            {this.props.section === 'syscollector' && (
-              <EuiFlexItem
-                grow={false}
-                style={{ marginRight: 4, marginTop: 6 }}
-              >
-                <GenerateSyscollectorReportButton agent={this.props.agent} />
-              </EuiFlexItem>
+      <EuiFlexGroup style={{ marginInline: 8 }}>
+        <EuiFlexItem style={{ marginInline: 0 }}>
+          <EuiTabs data-test-subj='agent-tabs'>
+            {this.inventoryTabs.includes(section) ? (
+              <>
+                {this.inventoryTabs.map(tab => (
+                  <EuiTab
+                    key={`agent-tab-${tab}`}
+                    data-test-subj={`agent-tab-${tab}`}
+                    isSelected={section === tab}
+                    onClick={() => switchTab?.(tab)}
+                  >
+                    {toTitleCase(tab)}
+                  </EuiTab>
+                ))}
+              </>
+            ) : (
+              <EuiTab data-test-subj={`agent-tab-${section}`} isSelected={true}>
+                {toTitleCase(section)}
+              </EuiTab>
             )}
-          </EuiFlexGroup>
+          </EuiTabs>
         </EuiFlexItem>
+        <EuiFlexItem
+          grow={false}
+          className='euiTabs'
+          style={{ marginInline: 0, paddingInline: 12 }}
+        >
+          <ButtonExploreAgent onUnpinAgent={this.props.unPinAgent} />
+        </EuiFlexItem>
+        {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
+          section,
+        ) && (
+          <EuiFlexItem
+            grow={false}
+            style={{ marginTop: 13.25, marginInline: 0, paddingInline: 12 }}
+            className='euiTabs'
+          >
+            <GenerateReportButton agent={agent} />
+          </EuiFlexItem>
+        )}
       </EuiFlexGroup>
     );
   }
 
   render() {
     const { agent, section, selectView } = this.props;
-    const ModuleTabView = (this.props.tabs || []).find(
-      tab => tab.id === selectView,
-    );
+    const ModuleTabView = this.props.tabs?.find(tab => tab.id === selectView);
+
+    const hasTabs = this.props.tabs?.length;
+
     return (
-      <div
-        className={
-          this.state.showAgentInfo
-            ? 'wz-module wz-module-showing-agent'
-            : 'wz-module'
-        }
-      >
-        {agent && agent.os && (
+      <div className={'wz-module'}>
+        {agent?.os && (
           <Fragment>
             <div className='wz-module-header-agent-wrapper'>
               <div className='wz-module-header-agent'>{this.renderTitle()}</div>
             </div>
             <div>
-              <div
-                className={
-                  this.props.tabs &&
-                  this.props.tabs.length &&
-                  'wz-module-header-nav'
-                }
-              >
-                {this.state.showAgentInfo && (
-                  <div
-                    className={
-                      !this.props.tabs || !this.props.tabs.length
-                        ? 'wz-welcome-page-agent-info'
-                        : 'wz-welcome-page-agent-info wz-welcome-page-agent-info-gray'
-                    }
-                  >
-                    <AgentInfo
-                      agent={this.props.agent}
-                      isCondensed={false}
-                      hideActions={true}
-                      {...this.props}
-                    ></AgentInfo>
-                  </div>
-                )}
-                {this.props.tabs && this.props.tabs.length && (
+              <div className={clsx({ 'wz-module-header-nav': hasTabs })}>
+                {hasTabs && (
                   <div className='wz-welcome-page-agent-tabs'>
                     <EuiFlexGroup>
-                      {this.props.renderTabs()}
+                      {this.props.renderTabs?.()}
                       <EuiFlexItem
                         grow={false}
                         style={{ marginTop: 6, marginRight: 5 }}
                       >
                         <EuiFlexGroup>
-                          {ModuleTabView &&
-                            ModuleTabView.buttons &&
-                            ModuleTabView.buttons.map(
-                              (ModuleViewButton, index) =>
-                                typeof ModuleViewButton !== 'string' ? (
-                                  <EuiFlexItem key={`module_button_${index}`}>
-                                    <ModuleViewButton
-                                      {...{
-                                        ...this.props,
-                                        ...this.props.agentsSelectionProps,
-                                      }}
-                                      moduleID={section}
-                                    />
-                                  </EuiFlexItem>
-                                ) : null,
-                            )}
+                          {ModuleTabView?.buttons?.map(
+                            (ModuleViewButton, index) =>
+                              typeof ModuleViewButton !== 'string' ? (
+                                <EuiFlexItem key={`module_button_${index}`}>
+                                  <ModuleViewButton
+                                    {...{
+                                      ...this.props,
+                                      ...this.props.agentsSelectionProps,
+                                    }}
+                                    moduleID={section}
+                                  />
+                                </EuiFlexItem>
+                              ) : null,
+                          )}
                         </EuiFlexGroup>
                       </EuiFlexItem>
                     </EuiFlexGroup>
@@ -178,9 +143,8 @@ export class MainModuleAgent extends Component {
                 )}
               </div>
             </div>
-            {!['syscollector', 'configuration'].includes(section) &&
-              ModuleTabView &&
-              ModuleTabView.component && (
+            {[AgentTabs.STATS].includes(section) &&
+              ModuleTabView?.component && (
                 <ModuleTabView.component {...this.props} moduleID={section} />
               )}
           </Fragment>
@@ -189,41 +153,6 @@ export class MainModuleAgent extends Component {
     );
   }
 }
-
-export default compose(
-  withGlobalBreadcrumb(({ agent, section }) => {
-    if (section === 'welcome') {
-      return [
-        {
-          text: endpointSummary.breadcrumbLabel,
-          href: NavigationService.getInstance().getUrlForApp(
-            endpointSummary.id,
-            {
-              path: `#/agents-preview`,
-            },
-          ),
-        },
-        { text: agent.id },
-      ];
-    } else {
-      return [
-        {
-          text: endpointSummary.breadcrumbLabel,
-          href: NavigationService.getInstance().getUrlForApp(
-            endpointSummary.id,
-            {
-              path: `#/agents-preview`,
-            },
-          ),
-        },
-        { agent: agent },
-        {
-          text: WAZUH_MODULES[section].title,
-        },
-      ];
-    }
-  }),
-)(MainModuleAgent);
 
 export class AgentInventoryDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {
@@ -238,7 +167,7 @@ export class AgentInventoryDataSource extends AlertsDataSource {
   }
 }
 
-const GenerateSyscollectorReportButton = ({ agent }) => {
+const GenerateReportButton = ({ agent }: { agent: Agent }) => {
   const {
     dataSource,
     fetchFilters,
@@ -254,7 +183,7 @@ const GenerateSyscollectorReportButton = ({ agent }) => {
       (agent || store.getState().appStateReducers.currentAgentData || {}).id ||
       false;
     await reportingService.startVis2Png('syscollector', agentID, {
-      indexPattern: dataSource.indexPattern,
+      indexPattern: dataSource?.indexPattern,
       query: { query: '', language: 'kuery' },
       filters: fetchFilters,
       time: {
@@ -266,6 +195,7 @@ const GenerateSyscollectorReportButton = ({ agent }) => {
 
   return (
     <EuiButtonEmpty
+      data-test-subj='generate-report-button'
       iconType='document'
       isLoading={action.running}
       isDisabled={isDataSourceLoading}

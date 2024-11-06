@@ -12,12 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 
-import {
-  EuiTitle,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiButtonEmpty,
-} from '@elastic/eui';
+import { EuiTitle, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import WzConfigurationOverviewTable from './util-components/configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';

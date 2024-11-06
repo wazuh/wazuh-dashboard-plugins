@@ -9,6 +9,7 @@ import {
   EuiPanel,
   EuiText,
 } from '@elastic/eui';
+import { TimeRange } from '../../../../../../src/plugins/data/public';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
 import { IntlProvider } from 'react-intl';
@@ -36,6 +37,7 @@ import {
 } from '../data-source';
 import DocDetails from './components/doc-details';
 import { WzSearchBar } from '../search-bar/search-bar';
+import { transformDateRange } from '../search-bar/search-bar-service';
 import { MAX_ENTRIES_PER_QUERY } from '../data-grid/data-grid-service';
 export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export const DEFAULT_PAGE_SIZE = 20;
@@ -116,7 +118,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     to: timeFilter.to,
   });
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
@@ -124,7 +126,9 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setTimeFilter: setDateRange,
   } as tUseSearchBarProps);
 
-  const { absoluteDateRange } = searchBarProps;
+  const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
+    transformDateRange({ from: dateRange.from, to: dateRange.to }),
+  );
 
   const parseSorting = useMemo(() => {
     if (!sorting) {
@@ -142,11 +146,12 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
+
     fetchData({
       query,
-      dateRange: absoluteDateRange,
       pagination,
       sorting: parseSorting,
+      dateRange: absoluteDateRange,
     })
       .then((response: SearchResponse) => {
         setPagination({
@@ -154,20 +159,35 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
         });
         setResults(response);
       })
-      .catch((error: HttpError) => {
+      .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: 'Error fetching data',
         });
         ErrorHandler.handleError(searchError);
       });
+  }, [absoluteDateRange, JSON.stringify(sorting), JSON.stringify(pagination)]);
+
+  useEffect(() => {
+    if (isDataSourceLoading) {
+      return;
+    }
+
+    setPagination(pagination => ({
+      ...pagination,
+      pageIndex: 0,
+    }));
+    setAbsoluteDateRange(
+      transformDateRange({ from: dateRange.from, to: dateRange.to }),
+    );
   }, [
     isDataSourceLoading,
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(sorting),
-    JSON.stringify(pagination),
-    JSON.stringify(absoluteDateRange),
+    dateRange.from,
+    dateRange.to,
+    fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   const toggleDetails = item => {
@@ -208,11 +228,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     render: item => (
       <EuiButtonIcon
         onClick={() => onExpandRow(item)}
-        aria-label={
-          itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
-            ? 'Collapse'
-            : 'Expand'
-        }
+        aria-label='Info'
         iconType={
           itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
             ? 'arrowDown'
@@ -254,7 +270,13 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
         indexPattern,
       })
     ) : (
-      <DocDetails doc={doc} item={item} indexPattern={indexPattern} />
+      <DocDetails
+        doc={doc}
+        item={item}
+        indexPattern={indexPattern}
+        filters={filters}
+        setFilters={setFilters}
+      />
     );
   };
 
@@ -278,6 +300,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
               {...searchBarProps}
               useDefaultBehaviors={false}
               hideFixedFilters
+              showSaveQueryButton={false}
             />
             {!isDataSourceLoading && results?.hits?.total === 0 && (
               <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
@@ -297,31 +320,31 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                       results?.hits?.total &&
                       results?.hits?.total > MAX_ENTRIES_PER_QUERY
                         ? {
-                            ariaLabel: 'Warning',
+                            ariaLabel: 'Info',
                             content: `The query results exceeded the limit of ${formatNumWithCommas(
                               MAX_ENTRIES_PER_QUERY,
                             )} hits. Please refine your search.`,
-                            iconType: 'alert',
+                            iconType: 'iInCircle',
                             position: 'top',
                           }
                         : undefined
                     }
                   />
-                  {absoluteDateRange ? (
-                    <EuiFlexGroup
-                      gutterSize='s'
-                      responsive={false}
-                      justifyContent='center'
-                      alignItems='center'
-                    >
-                      <EuiFlexItem grow={false}>
-                        <EuiText size='s'>
-                          {formatUIDate(absoluteDateRange?.from)} -{' '}
-                          {formatUIDate(absoluteDateRange?.to)}
-                        </EuiText>
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  ) : null}
+
+                  <EuiFlexGroup
+                    gutterSize='s'
+                    responsive={false}
+                    justifyContent='center'
+                    alignItems='center'
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiText size='s'>
+                        {`${formatUIDate(
+                          absoluteDateRange?.from,
+                        )} - ${formatUIDate(absoluteDateRange?.to)}`}
+                      </EuiText>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                 </EuiPanel>
                 <EuiBasicTable
                   items={parsedItems}

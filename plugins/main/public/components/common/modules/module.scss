@@ -7,14 +7,9 @@
   background: #fafbfd;
 }
 
-.wz-module-header-agent {
-  height: 50px;
-  padding: 16px;
-}
-
-.wz-module-header-agent .euiHealth svg {
-  width: 16px;
-  height: 24px;
+.wz-module-header-agent .euiTab__content {
+  font-size: 16px !important;
+  font-weight: 400;
 }
 
 .wzApp .euiFlyoutBody .euiFlyoutBody__overflowContent {
@@ -23,6 +18,10 @@
 
 .wz-module-header-nav > .euiFlexGroup {
   margin-top: -16px;
+}
+
+.wz-module-header-agent > .euiFlexGroup {
+  margin-top: -6px;
 }
 
 .wz-module-header-nav > .euiFlexGroup .euiFlexItem {
@@ -39,19 +38,8 @@
   border-radius: 100px;
 }
 
-.wz-module-header-agent-title-btn {
-  cursor: pointer;
-}
-
 .wz-font-weight-normal {
   font-weight: normal;
-}
-.wz-module-header-agent h1 {
-  font-weight: 400;
-}
-
-.wz-module-header-agent h1 b {
-  font-weight: 500;
 }
 
 .wz-module-header-nav .euiTabs {
@@ -96,18 +84,9 @@ discover-app-w .sidebar-container {
   @media only screen and (max-width: 767px) {
     .wz-module-header-agent {
       height: auto;
-      h1 {
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-      }
     }
     .wz-module-body {
       margin-top: -160px;
-    }
-
-    .wz-module-header-nav {
-      padding-bottom: 16px;
     }
 
     .wz-module-body-agent-info > .euiFlexGroup > .euiFlexItem {

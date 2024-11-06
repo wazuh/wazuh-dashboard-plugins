@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress, EuiLink } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
-import { Agent } from '../types';
 import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
 import {
   withErrorBoundary,
+  withGlobalBreadcrumb,
   withGuard,
   withRouteResolvers,
 } from '../../common/hocs';
@@ -28,6 +28,8 @@ import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashb
 import { getCore } from '../../../kibana-services';
 import { endpointSummary } from '../../../utils/applications';
 import { withAgentSync } from '../../common/hocs/withAgentSync';
+import { AgentTabs } from './agent-tabs';
+import { SECTIONS } from '../../../sections';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers?.currentAgentData,
@@ -38,6 +40,16 @@ export const AgentView = compose(
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   connect(mapStateToProps),
   withAgentSync,
+  withGlobalBreadcrumb(() => {
+    return [
+      {
+        text: endpointSummary.breadcrumbLabel,
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+          path: `#/${SECTIONS.AGENTS_PREVIEW}`,
+        }),
+      },
+    ];
+  }),
   withGuard(
     props => !(props.agent && props.agent.id),
     () => (
@@ -50,9 +62,11 @@ export const AgentView = compose(
                 <EuiLink
                   className='eui-textCenter'
                   aria-label='go to Endpoint summary'
-                  href={`${endpointSummary.id}#/agents-preview`}
+                  href={`${endpointSummary.id}#${SECTIONS.AGENTS_PREVIEW}`}
                   onClick={() =>
-                    NavigationService.getInstance().navigate(`/agents-preview`)
+                    NavigationService.getInstance().navigate(
+                      SECTIONS.AGENTS_PREVIEW,
+                    )
                   }
                 >
                   Endpoint summary
@@ -65,7 +79,7 @@ export const AgentView = compose(
     ),
   ),
 )(({ agent: agentData }) => {
-  const { tab = 'welcome' } = useRouterSearch();
+  const { tab = AgentTabs.WELCOME } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
 
   //TODO: Replace with useDatasource and useSearchBar when replace WzDatePicker with SearchBar in AgentsWelcome component
@@ -103,18 +117,54 @@ export const AgentView = compose(
     );
   }
 
+  const unPinAgent = () => {
+    // remove the pinned agent from the URL
+    navigationService.navigate(`/agents?tab=${tab}`);
+  };
+
   return (
     <Switch>
-      <Route path='?tab=syscollector'>
-        <MainModuleAgent agent={agentData} section={tab} />
-        <MainSyscollector agent={agentData} />
+      <Route path={`?tab=${AgentTabs.SOFTWARE}`}>
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          switchTab={switchTab}
+          unPinAgent={unPinAgent}
+        />
+        <MainSyscollector agent={agentData} section={tab} />
       </Route>
-      <Route path='?tab=stats'>
-        <MainModuleAgent agent={agentData} section={tab} />
+      <Route path={`?tab=${AgentTabs.NETWORK}`}>
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          switchTab={switchTab}
+          unPinAgent={unPinAgent}
+        />
+        <MainSyscollector agent={agentData} section={tab} />
+      </Route>
+      <Route path={`?tab=${AgentTabs.PROCESSES}`}>
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          switchTab={switchTab}
+          unPinAgent={unPinAgent}
+        />
+        <MainSyscollector agent={agentData} section={tab} />
+      </Route>
+      <Route path={`?tab=${AgentTabs.STATS}`}>
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          unPinAgent={unPinAgent}
+        />
         <MainAgentStats agent={agentData} />
       </Route>
-      <Route path='?tab=configuration'>
-        <MainModuleAgent agent={agentData} section={tab} />
+      <Route path={`?tab=${AgentTabs.CONFIGURATION}`}>
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          unPinAgent={unPinAgent}
+        />
         <WzManagementConfiguration agent={agentData} />
       </Route>
       <Route path='?tab=welcome'>
@@ -122,7 +172,7 @@ export const AgentView = compose(
           switchTab={switchTab}
           agent={agentData}
           pinAgent={pinnedAgentManager.pinAgent}
-          unPinAgent={pinnedAgentManager.unPinAgent}
+          unPinAgent={unPinAgent}
         />
       </Route>
       <Redirect to='?tab=welcome'></Redirect>

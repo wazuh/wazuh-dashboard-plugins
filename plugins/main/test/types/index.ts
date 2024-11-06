@@ -5,10 +5,12 @@ export type RecordMock<T> = {
     ? RecordMock<T[K]>
     : T[K];
 };
-export type PartialRecordMock<T> = Partial<{
+export type DeepPartialRecordMock<T> = Partial<{
   [K in keyof T]: T[K] extends Function
     ? jest.Mock
+    : T[K] extends Date
+    ? T[K]
     : T[K] extends {}
-    ? PartialRecordMock<T[K]>
+    ? DeepPartialRecordMock<T[K]>
     : T[K];
 }>;

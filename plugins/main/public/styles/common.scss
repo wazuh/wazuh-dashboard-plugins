@@ -324,12 +324,6 @@ input[type='search'].euiFieldSearch {
   box-shadow: none;
 }
 
-:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput):not(
-    .euiTextArea
-  ):not(.euiPanel.euiPopover__panel.euiPopover__panel-isOpen) {
-  box-shadow: none !important;
-}
-
 /* Custom colors styles */
 .color-white {
   color: white;
@@ -1439,7 +1433,6 @@ div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu
 }
 
 .globalFilterGroup__wrapper {
-  max-height: 100px;
   height: auto !important;
 }
 

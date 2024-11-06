@@ -10,7 +10,7 @@ const sortFieldSuggestion = (a, b) => (a.label > b.label ? 1 : -1);
 
 export const NetworkInterfacesTable = ({ agent }) => {
   return (
-    <EuiPanel paddingSize='m'>
+    <EuiPanel data-test-subj='network-interfaces-table' paddingSize='m'>
       <TableWzAPI
         title='Network interfaces'
         tableColumns={netifaceColumns}

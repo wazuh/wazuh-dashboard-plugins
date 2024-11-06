@@ -361,6 +361,8 @@ export class ComplianceSubrequirements extends Component {
             ]}
             openDashboard={(e, itemId) => this.openDashboard(e, itemId)}
             openDiscover={(e, itemId) => this.openDiscover(e, itemId)}
+            filters={this.props.filters}
+            setFilters={this.props.setFilters}
           />
         )}
       </div>

@@ -12,6 +12,7 @@ import {
   EuiFlyoutHeader,
   EuiPanel,
 } from '@elastic/eui';
+import { TimeRange } from '../../../../../../src/plugins/data/public';
 import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
@@ -48,6 +49,7 @@ import {
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import { wzDiscoverRenderColumns } from './render-columns';
 import { WzSearchBar } from '../search-bar';
+import { transformDateRange } from '../search-bar/search-bar-service';
 import DocDetailsHeader from './components/doc-details-header';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
@@ -110,13 +112,15 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     );
   };
 
-  const { searchBarProps } = useSearchBar({
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
     indexPattern: dataSource?.indexPattern as IndexPattern,
     filters,
     setFilters,
   });
-  const { query, absoluteDateRange } = searchBarProps;
-
+  const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
+  const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
+    transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
+  );
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
@@ -129,13 +133,15 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     setFilters,
   });
 
-  const { pagination, sorting, columnVisibility } = dataGridProps;
+  const { pagination, setPagination, sorting, columnVisibility } =
+    dataGridProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
+
     fetchData({
       query,
       pagination,
@@ -150,12 +156,27 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         });
         ErrorHandler.handleError(searchError);
       });
+  }, [absoluteDateRange, JSON.stringify(sorting), JSON.stringify(pagination)]);
+
+  useEffect(() => {
+    if (isDataSourceLoading) {
+      return;
+    }
+    setIndexPattern(dataSource?.indexPattern);
+    setPagination(pagination => ({
+      ...pagination,
+      pageIndex: 0,
+    }));
+    setAbsoluteDateRange(
+      transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
+    );
   }, [
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
-    JSON.stringify(sorting),
-    JSON.stringify(pagination),
-    JSON.stringify(absoluteDateRange),
+    dateRangeFrom,
+    dateRangeTo,
+    fingerprint,
+    autoRefreshFingerprint,
   ]);
 
   const timeField = indexPattern?.timeFieldName
@@ -187,6 +208,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       setIsExporting(false);
     }
   };
+
+  const closeFlyoutHandler = () => setInspectedHit(undefined);
 
   return (
     <IntlProvider locale='en'>
@@ -239,8 +262,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           AlertsRepository.getStoreIndexPatternId(),
                           fetchFilters,
                           query,
-                          absoluteDateRange.from,
-                          absoluteDateRange.to,
+                          dateRangeFrom,
+                          dateRangeTo,
+                          fingerprint,
                         )}
                       />
                     </EuiPanel>
@@ -273,7 +297,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               </EuiFlexGroup>
             </EuiPanel>
             {inspectedHit && (
-              <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
+              <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                 <EuiFlyoutHeader>
                   <DocDetailsHeader
                     doc={inspectedHit}
@@ -290,6 +314,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                           defaultTableColumns,
                           wzDiscoverRenderColumns,
                         )}
+                        filters={filters}
+                        setFilters={setFilters}
+                        onFilter={closeFlyoutHandler}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
