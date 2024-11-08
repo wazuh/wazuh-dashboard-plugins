@@ -16,8 +16,8 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  UpdateRegistry,
   ConfigurationStore,
+  InitializationService,
 } from './services';
 import { Configuration } from '../common/services/configuration';
 import {
@@ -27,6 +27,7 @@ import {
   WAZUH_DATA_CONFIG_APP_PATH,
 } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
+import { initializationTaskCreatorServerAPIConnectionCompatibility } from './initialization/server-api';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -107,6 +108,18 @@ export class WazuhCorePlugin
 
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
 
+    this.services.initialization = new InitializationService(
+      this.logger.get('initialization'),
+      this.services,
+    );
+
+    // Register initialization tasks
+    this.services.initialization.register(
+      initializationTaskCreatorServerAPIConnectionCompatibility({
+        taskName: 'check-server-api-connection-compatibility',
+      }),
+    );
+
     // Register a property to the context parameter of the endpoint handlers
     core.http.registerRouteHandlerContext('wazuh_core', (context, request) => {
       return {
@@ -141,6 +154,7 @@ export class WazuhCorePlugin
 
     await this.services.configuration.start();
     await this.services.manageHosts.start();
+    await this.services.initialization.start({ core });
 
     return {
       ...this.services,

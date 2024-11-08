@@ -1,4 +1,5 @@
 import {
+  IInitializationService,
   ISecurityFactory,
   ManageHosts,
   ServerAPIClient,
@@ -13,6 +14,7 @@ export interface WazuhCorePluginSetup {
   configuration: IConfigurationEnhanced;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
+  initialization: IInitializationService;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
@@ -26,6 +28,7 @@ export interface WazuhCorePluginStart {
   configuration: IConfigurationEnhanced;
   manageHosts: ManageHosts;
   serverAPIClient: ServerAPIClient;
+  initialization: IInitializationService;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
