@@ -119,7 +119,6 @@ export const initializationTaskCreatorSetting = (
   async run(ctx) {
     try {
       ctx.logger.debug('Starting setting');
-      console.log({ ctx });
       const uiSettingsClient =
         ctx.uiSettingsClient ||
         ctx.core.uiSettings.asScopedToClient(ctx.savedObjectsClient);
