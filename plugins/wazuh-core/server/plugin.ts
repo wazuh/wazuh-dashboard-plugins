@@ -113,6 +113,8 @@ export class WazuhCorePlugin
       this.services,
     );
 
+    this.services.initialization.setup({ core });
+
     // Register initialization tasks
     this.services.initialization.register(
       initializationTaskCreatorServerAPIConnectionCompatibility({
@@ -124,6 +126,9 @@ export class WazuhCorePlugin
     core.http.registerRouteHandlerContext('wazuh_core', (context, request) => {
       return {
         ...this.services,
+        logger: this.logger.get(
+          `${request.route.method.toUpperCase()} ${request.route.path}`,
+        ),
         api: {
           client: {
             asInternalUser: this.services.serverAPIClient.asInternalUser,

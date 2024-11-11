@@ -1,54 +1,36 @@
 import { Logger } from 'opensearch-dashboards/server';
-import { IndexPatternsFetcher } from '../../../../../src/plugins/data/server';
 import {
   InitializationTaskDefinition,
   IInitializationService,
   InitializationTaskRunData,
+  IInitializationTask,
+  InitializationTaskContext,
 } from './types';
+import { addRoutes } from './routes';
 
 export class InitializationService implements IInitializationService {
   private items: Map<string, InitializationTaskDefinition>;
+  private _coreStart: any;
   constructor(private logger: Logger, private services: any) {
     this.items = new Map();
   }
-  async setup() {
-    this.logger.debug('Setup');
+  async setup({ core }) {
+    this.logger.debug('Setup starts');
+    this.logger.debug('Adding routes');
+    const router = core.http.createRouter();
+    addRoutes(router, { initialization: this });
+    this.logger.debug('Added routes');
+    this.logger.debug('Setup finished');
   }
   async start({ core }) {
-    try {
-      this.logger.debug('Starting');
-      const savedObjectsClient = core.savedObjects.createInternalRepository();
-      const indexPatternsClient = new IndexPatternsFetcher(
-        core.opensearch.legacy.client.callAsInternalUser,
-      );
-      if (this.items.size) {
-        await Promise.all(
-          Array.from(this.items.entries()).map(async ([name, item]) => {
-            const logger = this.logger.get(name);
-            try {
-              await item.run({
-                ...this.services,
-                core,
-                savedObjectsClient,
-                indexPatternsClient,
-                logger,
-              });
-            } catch (e) {
-              logger.error(`Error running task [${name}]: ${e.message}`);
-            }
-          }),
-        );
-
-        this.logger.info('Start finished');
-      } else {
-        this.logger.info('No tasks');
-      }
-    } catch (error) {
-      this.logger.error(`Error starting: ${error.message}`);
-    }
+    this.logger.debug('Start starts');
+    this._coreStart = core;
+    await this.runAsInternal();
+    this.logger.debug('Start finished');
   }
   async stop() {
-    this.logger.debug('Stop');
+    this.logger.debug('Stop starts');
+    this.logger.debug('Stop finished');
   }
   register(task: InitializationTaskDefinition) {
     this.logger.debug(`Registering ${task.name}`);
@@ -60,25 +42,74 @@ export class InitializationService implements IInitializationService {
     this.items.set(task.name, new InitializationTask(task));
     this.logger.debug(`Registered ${task.name}`);
   }
-  get(taskName?: string) {
-    this.logger.debug(`Getting tasks: ${taskName ? `[${taskName}]` : ''}`);
-    if (taskName) {
-      return this.items.get(taskName);
+  get(name?: string) {
+    this.logger.debug(`Getting tasks: ${name ? `[${name}]` : ''}`);
+    if (name) {
+      return this.items.get(name);
     }
     return Array.from(this.items.values());
   }
+  createRunContext(scope: InitializationTaskContext, context: any = {}) {
+    return { ...this.services, ...context, scope };
+  }
+  async runAsInternal(taskNames?: string[]) {
+    const ctx = this.createRunContext('internal', { core: this._coreStart });
+    return await this.run(ctx, taskNames);
+  }
+  createNewTaskFromRegisteredTask(name: string) {
+    const task = this.get(name) as InitializationTask;
+    if (!task) {
+      throw new Error(`Task [${name}] is not registered`);
+    }
+    return new InitializationTask({ name, run: task._run });
+  }
+  private async run(ctx, taskNames?: string[]) {
+    try {
+      if (this.items.size) {
+        const allTasks = Array.from(this.items.values());
+        const tasks = taskNames
+          ? allTasks.filter(({ name }) =>
+              taskNames.some(taskName => taskName === name),
+            )
+          : allTasks;
+        const results = await Promise.all(
+          tasks.map(async item => {
+            const logger = this.logger.get(item.name);
+
+            try {
+              return await item.run({
+                ...this.services,
+                ...ctx,
+                logger,
+              });
+            } catch (e) {
+              logger.error(`Error running task [${item.name}]: ${e.message}`);
+              return item.getInfo();
+            }
+          }),
+        );
+        return results;
+      } else {
+        this.logger.info('No tasks');
+      }
+    } catch (error) {
+      this.logger.error(`Error starting: ${error.message}`);
+    }
+  }
 }
 
-class InitializationTask implements InitializationTaskRunData {
+class InitializationTask implements IInitializationTask {
   public name: string;
   private _run: any;
   public status: InitializationTaskRunData['status'] = 'not_started';
   public result: InitializationTaskRunData['result'] = null;
   public data: any = null;
-  public startAt: number | null = null;
-  public endAt: number | null = null;
-  public duration: number | null = null;
-  public error: string | null = null;
+  public createdAt: InitializationTaskRunData['createdAt'] =
+    new Date().toISOString();
+  public startedAt: InitializationTaskRunData['startedAt'] = null;
+  public finishedAt: InitializationTaskRunData['finishedAt'] = null;
+  public duration: InitializationTaskRunData['duration'] = null;
+  public error = null;
   constructor(task: InitializationTaskDefinition) {
     this.name = task.name;
     this._run = task.run;
@@ -87,41 +118,46 @@ class InitializationTask implements InitializationTaskRunData {
     this.status = 'running';
     this.result = null;
     this.data = null;
-    this.startAt = Date.now();
-    this.endAt = null;
+    this.startedAt = new Date().toISOString();
+    this.finishedAt = null;
     this.duration = null;
     this.error = null;
   }
-  private setResult(result) {
-    this.result = result;
-  }
   async run(...params) {
+    if (this.status === 'running') {
+      throw new Error(`Another instance of task ${this.name} is running`);
+    }
     let error;
     try {
       this.init();
       this.data = await this._run(...params);
-      this.setResult('success');
+      this.result = 'success';
     } catch (e) {
       error = e;
-      this.setResult('fail');
+      this.result = 'fail';
       this.error = e.message;
     } finally {
       this.status = 'finished';
-      this.endAt = Date.now();
-      this.duration = this.endAt - (this.startAt as number);
+      this.finishedAt = new Date().toISOString();
+      const dateStartedAt = new Date(this.startedAt!);
+      const dateFinishedAt = new Date(this.finishedAt);
+      this.duration = ((dateFinishedAt - dateStartedAt) as number) / 1000;
     }
     if (error) {
       throw error;
     }
-    return this.data;
+    return this.getInfo();
   }
-  getStatus() {
+
+  getInfo() {
     return [
+      'name',
       'status',
       'result',
       'data',
-      'startAt',
-      'endAt',
+      'createdAt',
+      'startedAt',
+      'finishedAt',
       'duration',
       'error',
     ].reduce(
@@ -130,6 +166,6 @@ class InitializationTask implements InitializationTaskRunData {
         [item]: this[item],
       }),
       {},
-    );
+    ) as IInitializationTask;
   }
 }

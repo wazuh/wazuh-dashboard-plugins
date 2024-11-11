@@ -111,6 +111,36 @@ function stringifySetting(setting: any) {
   }
 }
 
+function getSavedObjectsClient(ctx: any, scope) {
+  switch (scope) {
+    case 'internal':
+      return ctx.core.savedObjects.createInternalRepository();
+      break;
+    case 'user':
+      return ctx.core.savedObjects.savedObjectsStart.getScopedClient(
+        ctx.request,
+      );
+      break;
+    default:
+      break;
+  }
+}
+
+function getUiSettingsClient(ctx, scope, client) {
+  switch (scope) {
+    case 'internal':
+      return ctx.core.uiSettings.asScopedToClient(client);
+      break;
+
+    case 'user':
+      return ctx.core.uiSettings.uiSettingsStart.asScopedToClient(client);
+      break;
+
+    default:
+      break;
+  }
+}
+
 export const initializationTaskCreatorSetting = (
   setting: { key: string; value: any; configurationSetting: string },
   taskName: string,
@@ -119,9 +149,14 @@ export const initializationTaskCreatorSetting = (
   async run(ctx) {
     try {
       ctx.logger.debug('Starting setting');
-      const uiSettingsClient =
-        ctx.uiSettingsClient ||
-        ctx.core.uiSettings.asScopedToClient(ctx.savedObjectsClient);
+
+      // Get clients depending on the scope
+      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
+      const uiSettingsClient = getUiSettingsClient(
+        ctx,
+        ctx.scope,
+        savedObjectsClient,
+      );
 
       const { key, value, configurationSetting } = setting;
 

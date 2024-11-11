@@ -1,3 +1,5 @@
+import { IndexPatternsFetcher } from '../../../../../src/plugins/data/server';
+
 interface ensureIndexPatternExistenceContextTask {
   indexPatternID: string;
   options: any;
@@ -131,6 +133,51 @@ async function createIndexPattern(
   }
 }
 
+function getSavedObjectsClient(ctx: any, scope) {
+  switch (scope) {
+    case 'internal':
+      return ctx.core.savedObjects.createInternalRepository();
+      break;
+    case 'user':
+      return ctx.core.savedObjects.savedObjectsStart.getScopedClient(
+        ctx.request,
+      );
+      break;
+    default:
+      break;
+  }
+}
+
+function getIndexPatternsClient(ctx: any, scope) {
+  switch (scope) {
+    case 'internal':
+      return new IndexPatternsFetcher(
+        ctx.core.opensearch.legacy.client.callAsCurrentUser,
+      );
+      break;
+    case 'user':
+      return new IndexPatternsFetcher(
+        ctx.core.opensearch.legacy.client.callAsCurrentUser,
+      );
+      break;
+    default:
+      break;
+  }
+}
+
+function getIndexPatternID(ctx: any, scope: string, rest: any) {
+  switch (scope) {
+    case 'internal':
+      return rest.getIndexPatternID(ctx);
+      break;
+    case 'user':
+      return ctx.getIndexPatternID(ctx);
+      break;
+    default:
+      break;
+  }
+}
+
 export const initializationTaskCreatorIndexPattern = ({
   taskName,
   options = {},
@@ -146,14 +193,20 @@ export const initializationTaskCreatorIndexPattern = ({
   async run(ctx) {
     try {
       ctx.logger.debug('Starting index pattern saved object');
-      const getIndexPatternID =
-        ctx?.getIndexPatternID || rest.getIndexPatternID;
-      const indexPatternID = await getIndexPatternID(ctx);
-      return await ensureIndexPatternExistence(ctx, {
-        indexPatternID,
-        options,
-        configurationSettingKey,
-      });
+      const indexPatternID = await getIndexPatternID(ctx, ctx.scope, rest);
+
+      // Get clients depending on the scope
+      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
+      const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
+
+      return await ensureIndexPatternExistence(
+        { ...ctx, indexPatternsClient, savedObjectsClient },
+        {
+          indexPatternID,
+          options,
+          configurationSettingKey,
+        },
+      );
     } catch (e) {
       throw new Error(`Error initilizating index pattern ${e.message}`);
     }
