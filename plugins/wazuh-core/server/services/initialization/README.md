@@ -8,6 +8,18 @@ The tasks run on parallel.
 
 Optionally the registered tasks could be retrieved to run in API endpoints or getting information about its status.
 
+There are 2 scopes:
+
+- `internal`: run through the internal user
+  - on plugin starts
+  - on demand
+- `user`: run through the logged (requester) user
+  - on demand
+
+The scopes can be used to get a specific context (clients, parameters) that is set in the `scope` property of the task context.
+
+The `internal` scoped tasks keep the same execution data (see [Task execution data](#task-execution-data)), and the `user` scoped task are newly created on demand.
+
 # InitializationService tasks
 
 A task can be defined with:
@@ -32,6 +44,24 @@ server    log   [11:57:39.648] [info][index-pattern-vulnerabilities-states][init
 
 the task name is `index-pattern-vulnerabilities-states`.
 
+## Task name convention
+
+- lowercase
+- kebab case (`word1-word2`)
+- use colon ( `:` ) for tasks related to some entity that have different subentities.
+
+```
+entity_identifier:entity_specific
+```
+
+For example:
+
+```
+index-pattern:alerts
+index-pattern:statistics
+index-pattern:vulnerabilities-states
+```
+
 ## Register a task
 
 ```ts
@@ -39,7 +69,7 @@ the task name is `index-pattern-vulnerabilities-states`.
 setup(){
 
   // Register a task
-  plugins.wazuhCore.register({
+  plugins.wazuhCore.initialization.register({
     name: 'custom-task',
     run: (ctx) => {
       console.log('Run from wazuhCore starts' )
@@ -49,18 +79,31 @@ setup(){
 }
 ```
 
-## Task data
+## Task execution data
 
 The task has the following data related to the execution:
 
 ```ts
 interface InitializationTaskRunData {
+  name: string;
   status: 'not_started' | 'running' | 'finished';
   result: 'success' | 'fail';
-  startAt: number | null;
-  endAt: number | null;
-  duration: number | null;
+  createdAt: string | null;
+  startedAt: string | null;
+  finishedAt: string | null;
+  duration: number | null; // seconds
   data: any;
   error: string | null;
 }
+```
+
+## Create a task instance
+
+This is used to create the user scoped tasks.
+
+```ts
+const newTask =
+  context.wazuh_core.initialization.createNewTaskFromRegisteredTask(
+    'example-task',
+  );
 ```
