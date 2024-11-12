@@ -8,16 +8,25 @@ import { API_UPDATES_STATUS } from '../../../common/types';
 import { getUpdates } from './get-updates';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 
-const mockedGetSavedObject = getSavedObject as jest.Mock;
-jest.mock('../saved-object/get-saved-object');
+jest.mock('../../plugin-services', () => ({
+  getInternalSavedObjectsClient: jest.fn(),
+  getWazuhCheckUpdatesServices: jest.fn(),
+  getWazuhCore: jest.fn(),
+}));
 
+jest.mock('../saved-object/get-saved-object', () => ({
+  getSavedObject: jest.fn(),
+}));
+jest.mock('../saved-object/set-saved-object', () => ({
+  setSavedObject: jest.fn(),
+}));
+
+const mockedGetSavedObject = getSavedObject as jest.Mock;
 const mockedSetSavedObject = setSavedObject as jest.Mock;
-jest.mock('../saved-object/set-saved-object');
 
 const mockedGetWazuhCore = getWazuhCore as jest.Mock;
 const mockedGetWazuhCheckUpdatesServices =
   getWazuhCheckUpdatesServices as jest.Mock;
-jest.mock('../../plugin-services');
 
 describe('getUpdates function', () => {
   afterEach(() => {
