@@ -94,7 +94,7 @@ async function createIndexPattern(
         indexPatternID,
       );
     } catch (e) {
-      if (options.fieldsNoIndices) {
+      if (e?.output?.statusCode === 404 && options.fieldsNoIndices) {
         const message = `Fields for index pattern with ID [${indexPatternID}] could not be obtained. This could indicate there are not matching indices because they were not generated or there is some error in the process that generates and indexes that data. The index pattern will be created with a set of pre-defined fields.`;
         logger.warn(message);
         fields = options.fieldsNoIndices;
@@ -152,7 +152,7 @@ function getIndexPatternsClient(ctx: any, scope) {
   switch (scope) {
     case 'internal':
       return new IndexPatternsFetcher(
-        ctx.core.opensearch.legacy.client.callAsCurrentUser,
+        ctx.core.opensearch.legacy.client.callAsInternalUser,
       );
       break;
     case 'user':
@@ -191,9 +191,10 @@ export const initializationTaskCreatorIndexPattern = ({
 }) => ({
   name: taskName,
   async run(ctx) {
+    let indexPatternID;
     try {
       ctx.logger.debug('Starting index pattern saved object');
-      const indexPatternID = await getIndexPatternID(ctx, ctx.scope, rest);
+      indexPatternID = await getIndexPatternID(ctx, ctx.scope, rest);
 
       // Get clients depending on the scope
       const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
