@@ -53,6 +53,7 @@ import {
 import { KnownFields } from '../public/utils/known-fields';
 import { FieldsStatistics } from '../public/utils/statistics-fields';
 import { FieldsMonitoring } from '../public/utils/monitoring-fields';
+import VulnerabilitiesStatesFields from '../public/utils/vulnerabibility-states-fields.json';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -165,7 +166,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           ctx.configuration.get('vulnerabilities.pattern'),
         taskName: 'index-pattern:vulnerabilities-states',
         options: {
-          // fieldsNoIndices: JSON.stringify(FieldsStatistics), // TODO: add fallback fields
+          fieldsNoIndices: VulnerabilitiesStatesFields,
         },
         configurationSettingKey: 'checks.monitoring',
       }),
