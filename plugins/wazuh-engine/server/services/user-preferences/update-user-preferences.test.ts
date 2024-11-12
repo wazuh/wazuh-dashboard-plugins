@@ -2,21 +2,26 @@ import { updateUserPreferences } from '.';
 import { getSavedObject } from '../saved-object/get-saved-object';
 import { setSavedObject } from '../saved-object/set-saved-object';
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../common/constants';
-import {
-  getWazuhCore,
-  getWazuhCheckUpdatesServices,
-} from '../../plugin-services';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+
+jest.mock('../saved-object/set-saved-object', () => ({
+  setSavedObject: jest.fn(),
+}));
+
+jest.mock('../saved-object/get-saved-object', () => ({
+  getSavedObject: jest.fn(),
+}));
+
+jest.mock('../../plugin-services', () => ({
+  getInternalSavedObjectsClient: jest.fn(),
+  getWazuhCheckUpdatesServices: jest.fn(),
+}));
 
 const mockedGetSavedObject = getSavedObject as jest.Mock;
-jest.mock('../saved-object/get-saved-object');
-
 const mockedSetSavedObject = setSavedObject as jest.Mock;
-jest.mock('../saved-object/set-saved-object');
 
-const mockedGetWazuhCore = getWazuhCore as jest.Mock;
 const mockedGetWazuhCheckUpdatesServices =
   getWazuhCheckUpdatesServices as jest.Mock;
-jest.mock('../../plugin-services');
 
 describe('updateUserPreferences function', () => {
   afterEach(() => {
