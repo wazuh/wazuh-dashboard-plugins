@@ -52,7 +52,7 @@ export const ensureIndexPatternExistence = async (
       );
     } else {
       throw new Error(
-        `Error checking the existence of index pattern with ID [${indexPatternID}]: ${e.message}`,
+        `index pattern with ID [${indexPatternID}] existence could not be checked due to: ${e.message}`,
       );
     }
   }
@@ -128,7 +128,7 @@ async function createIndexPattern(
     return response;
   } catch (e) {
     throw new Error(
-      `Error creating index pattern with ID [${indexPatternID}]: ${e.message}`,
+      `index pattern with ID [${indexPatternID}] could not be created due to: ${e.message}`,
     );
   }
 }
@@ -208,7 +208,9 @@ export const initializationTaskCreatorIndexPattern = ({
         },
       );
     } catch (e) {
-      throw new Error(`Error initilizating index pattern ${e.message}`);
+      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${e.message}`;
+      ctx.logger.error(message);
+      throw new Error(message);
     }
   },
 });

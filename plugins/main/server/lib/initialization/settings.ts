@@ -174,7 +174,9 @@ export const initializationTaskCreatorSetting = (
       );
       ctx.logger.info('Start setting finished');
     } catch (e) {
-      throw new Error(`Error initilizating setting ${e.message}`);
+      const message = `Error initilizating setting [${setting.key}]: ${e.message}`;
+      ctx.logger.error(message);
+      throw new Error(message);
     }
   },
 });

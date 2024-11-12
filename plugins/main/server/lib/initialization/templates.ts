@@ -71,18 +71,21 @@ export const initializationTaskCreatorExistTemplate = ({
 }) => ({
   name: taskName,
   async run(ctx) {
+    let indexPatternTitle;
     try {
       ctx.logger.debug('Starting check of existent template');
 
       const opensearchClient = getOpenSearchClient(ctx);
-      const indexPatternTitle = await getIndexPatternTitle(ctx);
+      indexPatternTitle = await getIndexPatternTitle(ctx);
       await checkIndexPatternHasTemplate(ctx, {
         opensearchClient,
         indexPatternTitle,
       });
       ctx.logger.info('Start check of existent template finished');
     } catch (e) {
-      ctx.logger.error(`Error checking of existent template: ${e.message}`);
+      const message = `Error checking of existent template for index pattern with title [${indexPatternTitle}]: ${e.message}`;
+      ctx.logger.error(message);
+      throw new Error(message);
     }
   },
 });
