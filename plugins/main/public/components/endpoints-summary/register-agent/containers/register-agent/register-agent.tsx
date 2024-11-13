@@ -4,12 +4,11 @@ import {
   EuiFlexItem,
   EuiPanel,
   EuiTitle,
-  EuiButtonEmpty,
   EuiPage,
   EuiPageBody,
   EuiSpacer,
   EuiProgress,
-  EuiButton,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -184,31 +183,30 @@ export const RegisterAgent = compose(
 
   return (
     <div>
-      <EuiPage restrictWidth='1000px' style={{ background: 'transparent' }}>
+      <EuiPage style={{ background: 'transparent' }}>
         <EuiPageBody>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiPanel className='register-agent-wizard-container'>
-                <div className='register-agent-wizard-close'>
-                  <EuiButtonEmpty
-                    size='s'
-                    href={NavigationService.getInstance().getUrlForApp(
-                      endpointSummary.id,
-                      {
-                        path: `#${endpointSummary.redirectTo()}`,
-                      },
-                    )}
-                    iconType='cross'
-                  >
-                    Close
-                  </EuiButtonEmpty>
-                </div>
                 <EuiFlexGroup>
+                  <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+                    <EuiButtonIcon
+                      aria-label='Back'
+                      color='primary'
+                      style={{ marginTop: 4 }}
+                      iconSize='l'
+                      iconType='arrowLeft'
+                      href={NavigationService.getInstance().getUrlForApp(
+                        endpointSummary.id,
+                        {
+                          path: `#${endpointSummary.redirectTo()}`,
+                        },
+                      )}
+                    />
+                  </EuiFlexItem>
                   <EuiFlexItem>
-                    <EuiTitle>
-                      <h2 className='register-agent-wizard-title'>
-                        Deploy new agent
-                      </h2>
+                    <EuiTitle size='s'>
+                      <h1>Deploy new agent</h1>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -233,26 +231,6 @@ export const RegisterAgent = compose(
                     />
                   </EuiFlexItem>
                 )}
-                <EuiFlexGroup
-                  justifyContent='flexEnd'
-                  style={{ marginRight: '0.3rem' }}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiButton
-                      className='close-button'
-                      fill
-                      color='primary'
-                      href={NavigationService.getInstance().getUrlForApp(
-                        endpointSummary.id,
-                        {
-                          path: `#${endpointSummary.redirectTo()}`,
-                        },
-                      )}
-                    >
-                      Close
-                    </EuiButton>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
               </EuiPanel>
             </EuiFlexItem>
           </EuiFlexGroup>
