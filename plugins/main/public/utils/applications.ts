@@ -489,10 +489,10 @@ export const endpointGroups = {
   category: 'wz-category-agents-management',
   id: 'endpoint-groups',
   title: i18n.translate('wz-app-endpoint-groups-title', {
-    defaultMessage: 'Endpoint Groups',
+    defaultMessage: 'Groups',
   }),
   breadcrumbLabel: i18n.translate('wz-app-endpoint-groups-breadcrumbLabel', {
-    defaultMessage: 'Endpoint Groups',
+    defaultMessage: 'Groups',
   }),
   description: i18n.translate('wz-app-endpoint-groups-description', {
     defaultMessage: 'Manage your agent groups.',
