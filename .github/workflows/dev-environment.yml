@@ -68,7 +68,7 @@ jobs:
 
     steps:
       - name: Step 01 - Download the plugin's source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: wazuh/wazuh-dashboard-plugins
           ref: ${{ inputs.reference }}
@@ -115,11 +115,12 @@ jobs:
 
       - name: Step 04 - Upload artifact to GitHub
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ inputs.artifact_name }}_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
           path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
           if-no-files-found: 'error'
+          overwrite: true
 
       - name: Step 05 - Upload coverage results to GitHub
         if: ${{ inputs.notify_jest_coverage_summary && github.event_name == 'pull_request' }}

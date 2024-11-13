@@ -56,7 +56,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Step 01 - Download wazuh-kibana-app
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: wazuh-kibana-app
       - name: Step 02 - Login to quay.io
@@ -80,7 +80,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Step 01 - Download wazuh-kibana-app
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: wazuh-kibana-app
       - name: Step 02 - Login to quay.io
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Step 01 - Download wazuh-kibana-app
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: wazuh-kibana-app
       - name: Step 02 - Login to quay.io
