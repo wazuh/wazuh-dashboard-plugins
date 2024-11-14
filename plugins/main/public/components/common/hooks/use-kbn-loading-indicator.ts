@@ -10,39 +10,28 @@
  * Find more information about this on the LICENSE file.
  */
 import { getHttp } from '../../../kibana-services';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { BehaviorSubject } from 'rxjs';
+import useObservable from 'react-use/lib/useObservable';
 
 export const useKbnLoadingIndicator = (): [
   boolean,
-  React.Dispatch<React.SetStateAction<boolean>>,
-  boolean
+  (value: boolean) => void,
 ] => {
-  const [loading, setLoading] = useState(false);
-  const [flag, setFlag] = useState(false);
-  const [visible, setVisible] = useState(0);
-  const loadingCount$ = useRef(new BehaviorSubject(0))
-  
+  const loadingCount$ = useRef(new BehaviorSubject(0));
+  const loading = Boolean(useObservable(loadingCount$.current, 0));
+
   useEffect(() => {
     getHttp().addLoadingCountSource(loadingCount$.current);
-    const subscriber = getHttp() 
-      .getLoadingCount$()
-      .subscribe((count) => {
-        setVisible(count);
-        !count && setFlag(false);
-      });
-    return () => subscriber.unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (loading && visible <= 0) {
+  const setLoading = (value: boolean) => {
+    if (value) {
       loadingCount$.current.next(loadingCount$.current.value + 1);
-      setFlag(true);
-    }
-
-    if (!loading && flag && visible > 0) {
+    } else {
       loadingCount$.current.next(loadingCount$.current.value - 1);
     }
-  }, [visible, loading]);
-  return [loading, setLoading, visible > 0];
+  };
+
+  return [loading, setLoading];
 };
