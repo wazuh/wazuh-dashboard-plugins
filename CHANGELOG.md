@@ -30,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed feature container margins to ensure consistent separation and uniform design. [#7034](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7034)
 - Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
 - Changed inventory, stats and configuration page to use tabs [#7089](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7089)
+- Changed styles in the register agent view for consistency of styles in the views. [#7149](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7149)
 
 ### Fixed
 
