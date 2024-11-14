@@ -10,7 +10,7 @@ jest.mock('../../kibana-services', () => ({
 }));
 
 describe('WzUpdatesNotification tests', () => {
-  test('should render a WzUpdatesNotification', () => {
+  test('should render a WzUpdatesNotification is enabled', () => {
     const { container } = renderWithProviders(<WzUpdatesNotification />, {
       preloadedState: {
         appConfig: {
@@ -20,6 +20,26 @@ describe('WzUpdatesNotification tests', () => {
         },
       },
     });
+
+    expect(container).toMatchSnapshot();
+  });
+
+  test('should not render a WzUpdatesNotification because is disabled', () => {
+    const { container } = renderWithProviders(<WzUpdatesNotification />, {
+      preloadedState: {
+        appConfig: {
+          data: {
+            'wazuh.updates.disabled': true,
+          },
+        },
+      },
+    });
+
+    expect(container).toMatchSnapshot();
+  });
+
+  test('should not render a WzUpdatesNotification is not defined', () => {
+    const { container } = renderWithProviders(<WzUpdatesNotification />);
 
     expect(container).toMatchSnapshot();
   });
