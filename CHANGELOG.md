@@ -15,7 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new field columns and ability to select the visible fields in the File Integrity Monitoring Files and Registry tables [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
 - Added pinned agent mechanic to inventory data, stats, and configuration for consistent functionality [#7135](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7135)
-- Added ability to edit the `wazuh.updates.disabled` configuration setting from UI [#7155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7155)
+- Added ability to edit the `wazuh.updates.disabled` configuration setting from UI [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
 
 ### Changed
 
@@ -44,7 +44,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the Mitre ATT&CK exception in the agent view, the redirections of ID, Tactics, Dashboard Icon and Event Icon in the drop-down menu and the card not displaying information when the flyout was opened [#7116](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7116)
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
-- Fixed the check updates UI was displayed despite it could be configured as disabled [#7155](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7155)
+- Fixed the check updates UI was displayed despite it could be configured as disabled [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
 
 ### Removed
 
