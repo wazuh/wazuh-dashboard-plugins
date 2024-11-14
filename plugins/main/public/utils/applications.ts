@@ -915,17 +915,17 @@ export const Categories = [
     euiIconType: 'indexRollupApp',
   },
   {
+    id: 'management',
+    label: 'Indexer management',
+    order: 5e3,
+    euiIconType: 'managementApp',
+  },
+  {
     id: 'wz-category-dashboard-management',
     label: i18n.translate('wz-app-category-dashboard-management', {
       defaultMessage: 'Dashboard management',
     }),
-    order: 5e3,
-    euiIconType: 'dashboardApp',
-  },
-  {
-    id: 'management',
-    label: 'Indexer management',
     order: 6e3,
-    euiIconType: 'managementApp',
+    euiIconType: 'dashboardApp',
   },
 ];
