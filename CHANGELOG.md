@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added new field columns and ability to select the visible fields in the File Integrity Monitoring Files and Registry tables [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
 - Added pinned agent mechanic to inventory data, stats, and configuration for consistent functionality [#7135](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7135)
+- Added ability to edit the `wazuh.updates.disabled` configuration setting from UI [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
 
 ### Changed
 
@@ -29,6 +30,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed feature container margins to ensure consistent separation and uniform design. [#7034](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7034)
 - Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
 - Changed inventory, stats and configuration page to use tabs [#7089](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7089)
+- Changed styles in the register agent view for consistency of styles in the views. [#7149](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7149)
 
 ### Fixed
 
@@ -44,6 +46,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Fixed endpoint group module name and indexer management order [#7150](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7150)
+- Fixed Invalid date filter applied on FIM details flyout [#7160](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7160)
+- Fixed the check updates UI was displayed despite it could be configured as disabled [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
 - Fixed filter by value in document details in safari [#7151](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7151)
 
 ### Removed

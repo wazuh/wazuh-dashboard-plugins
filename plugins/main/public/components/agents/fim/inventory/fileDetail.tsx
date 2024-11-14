@@ -309,6 +309,10 @@ export class FileDetails extends Component {
     this.props.closeFlyout();
   }
 
+  getFilterValue(fieldType, value, rawValue) {
+    return fieldType === 'date' || fieldType === 'mtime' ? rawValue : value;
+  }
+
   getDetails() {
     const { view } = this.props;
     const columns =
@@ -318,6 +322,7 @@ export class FileDetails extends Component {
         : this.details();
     const generalDetails = columns.map((item, idx) => {
       let value = this.props.currentFile[item.field] || '-';
+      let rawValue = value;
       if (item.transformValue) {
         value = item.transformValue(value, this.props);
       }
@@ -357,7 +362,10 @@ export class FileDetails extends Component {
                       >
                         <EuiButtonIcon
                           onClick={() => {
-                            this.addFilter(item.field, value);
+                            this.addFilter(
+                              item.field,
+                              this.getFilterValue(item.field, value, rawValue),
+                            );
                           }}
                           iconType='magnifyWithPlus'
                           aria-label='Next'
