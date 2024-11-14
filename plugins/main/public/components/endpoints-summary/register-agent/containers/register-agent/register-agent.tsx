@@ -8,7 +8,6 @@ import {
   EuiPageBody,
   EuiSpacer,
   EuiProgress,
-  EuiButtonIcon,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -43,7 +42,6 @@ import {
   nestedResolve,
   savedSearch,
 } from '../../../../../services/resolves';
-import NavigationService from '../../../../../react-services/navigation-service';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
@@ -189,21 +187,6 @@ export const RegisterAgent = compose(
             <EuiFlexItem>
               <EuiPanel className='register-agent-wizard-container'>
                 <EuiFlexGroup>
-                  <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-                    <EuiButtonIcon
-                      aria-label='Back'
-                      color='primary'
-                      style={{ marginTop: 4 }}
-                      iconSize='l'
-                      iconType='arrowLeft'
-                      href={NavigationService.getInstance().getUrlForApp(
-                        endpointSummary.id,
-                        {
-                          path: `#${endpointSummary.redirectTo()}`,
-                        },
-                      )}
-                    />
-                  </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiTitle size='s'>
                       <h1>Deploy new agent</h1>
