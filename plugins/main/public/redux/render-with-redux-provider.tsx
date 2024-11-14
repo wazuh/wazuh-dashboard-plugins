@@ -17,12 +17,11 @@ export function renderWithProviders(
 ) {
   const {
     preloadedState = {},
-    // Automatically create a store instance if no store was passed in
+    // Automatically create a store instance with the preloadedState
     store = setupStore(preloadedState),
     ...renderOptions
   } = options;
 
-  // const store = preloadedState ? setupStore(preloadedState) : _store;
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
     return <Provider store={store}>{children}</Provider>;
   }
