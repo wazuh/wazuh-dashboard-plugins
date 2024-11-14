@@ -309,6 +309,10 @@ export class FileDetails extends Component {
     this.props.closeFlyout();
   }
 
+  getFilterValue(fieldType, value, rawValue) {
+    return fieldType === 'date' || fieldType === 'mtime' ? rawValue : value;
+  }
+
   getDetails() {
     const { view } = this.props;
     const columns =
@@ -360,9 +364,7 @@ export class FileDetails extends Component {
                           onClick={() => {
                             this.addFilter(
                               item.field,
-                              item.field === 'date' || item.field === 'mtime'
-                                ? rawValue
-                                : value,
+                              this.getFilterValue(item.field, value, rawValue),
                             );
                           }}
                           iconType='magnifyWithPlus'
