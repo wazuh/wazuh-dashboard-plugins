@@ -45,6 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Fixed the check updates UI was displayed despite it could be configured as disabled [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
+- Fixed filter by value in document details in safari [#7151](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7151)
 
 ### Removed
 
