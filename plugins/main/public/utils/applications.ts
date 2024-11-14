@@ -26,8 +26,8 @@ Security operations: 400
 Cloud security: 500
 Agents management: 600
 Server management: 700
-Dashboard management
 Indexer management (added to Wazuh dashboard default categories): 9000
+Dashboard management
 */
 
 export const overview = {
@@ -489,10 +489,10 @@ export const endpointGroups = {
   category: 'wz-category-agents-management',
   id: 'endpoint-groups',
   title: i18n.translate('wz-app-endpoint-groups-title', {
-    defaultMessage: 'Endpoint Groups',
+    defaultMessage: 'Groups',
   }),
   breadcrumbLabel: i18n.translate('wz-app-endpoint-groups-breadcrumbLabel', {
-    defaultMessage: 'Endpoint Groups',
+    defaultMessage: 'Groups',
   }),
   description: i18n.translate('wz-app-endpoint-groups-description', {
     defaultMessage: 'Manage your agent groups.',
@@ -915,17 +915,17 @@ export const Categories = [
     euiIconType: 'indexRollupApp',
   },
   {
+    id: 'management',
+    label: 'Indexer management',
+    order: 5e3,
+    euiIconType: 'managementApp',
+  },
+  {
     id: 'wz-category-dashboard-management',
     label: i18n.translate('wz-app-category-dashboard-management', {
       defaultMessage: 'Dashboard management',
     }),
-    order: 5e3,
-    euiIconType: 'dashboardApp',
-  },
-  {
-    id: 'management',
-    label: 'Indexer management',
     order: 6e3,
-    euiIconType: 'managementApp',
+    euiIconType: 'dashboardApp',
   },
 ];

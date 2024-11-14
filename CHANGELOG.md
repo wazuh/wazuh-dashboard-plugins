@@ -43,6 +43,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the Mitre ATT&CK exception in the agent view, the redirections of ID, Tactics, Dashboard Icon and Event Icon in the drop-down menu and the card not displaying information when the flyout was opened [#7116](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7116)
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
+- Fixed endpoint group module name and indexer management order [#7150](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7150)
 
 ### Removed
 
