@@ -26,8 +26,8 @@ Security operations: 400
 Cloud security: 500
 Agents management: 600
 Server management: 700
-Dashboard management
 Indexer management (added to Wazuh dashboard default categories): 9000
+Dashboard management
 */
 
 export const overview = {
