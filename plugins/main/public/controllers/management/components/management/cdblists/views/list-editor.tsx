@@ -27,7 +27,11 @@ import {
 
 import { connect } from 'react-redux';
 
-import { resourceDictionary, ResourcesHandler, ResourcesConstants } from '../../common/resources-handler';
+import {
+  resourceDictionary,
+  ResourcesHandler,
+  ResourcesConstants,
+} from '../../common/resources-handler';
 
 import { getToasts } from '../../../../../../kibana-services';
 
@@ -61,7 +65,9 @@ class WzListEditor extends Component {
   }
 
   componentDidMount() {
-    const { listContent: { content } } = this.props;
+    const {
+      listContent: { content },
+    } = this.props;
     const obj = this.contentToObject(content);
     this.items = { ...obj };
     const items = this.contentToArray(obj);
@@ -88,9 +94,10 @@ class WzListEditor extends Component {
   contentToObject(content) {
     const items = {};
     const lines = content.split('\n');
-    lines.forEach((line) => {
+    lines.forEach(line => {
       const split = line.startsWith('"') ? line.split('":') : line.split(':');
-      const key = split[0];
+      // All keys with multiple colons (:) should end with a quotation mark (")
+      const key = split[0].startsWith('"') ? split[0] + '"' : split[0];
       const value = split[1] || '';
       if (key) items[key] = value; // Prevent add empty keys
     });
@@ -102,8 +109,10 @@ class WzListEditor extends Component {
    */
   itemsToRaw() {
     let raw = '';
-    Object.keys(this.items).forEach((key) => {
-      raw = raw ? `${raw}\n${key}:${this.items[key]}` : `${key}:${this.items[key]}`;
+    Object.keys(this.items).forEach(key => {
+      raw = raw
+        ? `${raw}\n${key}:${this.items[key]}`
+        : `${key}:${this.items[key]}`;
     });
     return raw;
   }
@@ -116,7 +125,12 @@ class WzListEditor extends Component {
   async saveList(name, path, addingNew = false) {
     try {
       if (!name) {
-        this.showToast('warning', 'Invalid name', 'CDB list name cannot be empty', 3000);
+        this.showToast(
+          'warning',
+          'Invalid name',
+          'CDB list name cannot be empty',
+          3000,
+        );
         return;
       }
       name = name.endsWith('.cdb') ? name.replace('.cdb', '') : name;
@@ -127,7 +141,7 @@ class WzListEditor extends Component {
           'warning',
           'Please insert at least one item',
           'Please insert at least one item, a CDB list cannot be empty',
-          3000
+          3000,
         );
         return;
       }
@@ -137,7 +151,12 @@ class WzListEditor extends Component {
         const file = { name: name, content: raw, path: path };
         this.props.updateListContent(file);
         this.setState({ showWarningRestart: true });
-        this.showToast('success', 'Success', 'CBD List successfully created', 3000);
+        this.showToast(
+          'success',
+          'Success',
+          'CBD List successfully created',
+          3000,
+        );
       } else {
         this.setState({ showWarningRestart: true });
         this.showToast('success', 'Success', 'CBD List updated', 3000);
@@ -180,44 +199,46 @@ class WzListEditor extends Component {
     });
   };
 
-  onChangeKey = (e) => {
+  onChangeKey = e => {
     this.setState({
       addingKey: e.target.value,
     });
   };
 
-  onChangeValue = (e) => {
+  onChangeValue = e => {
     this.setState({
       addingValue: e.target.value,
     });
   };
 
-  onChangeEditingValue = (e) => {
+  onChangeEditingValue = e => {
     this.setState({
       editingValue: e.target.value,
     });
   };
 
-  onNewListNameChange = (e) => {
+  onNewListNameChange = e => {
     this.setState({
       newListName: e.target.value,
     });
   };
 
-  getUpdatePermissions = (name) => {
+  getUpdatePermissions = name => {
     return [
       {
         action: `${ResourcesConstants.LISTS}:update`,
-        resource: resourceDictionary[ResourcesConstants.LISTS].permissionResource(name),
+        resource:
+          resourceDictionary[ResourcesConstants.LISTS].permissionResource(name),
       },
     ];
   };
 
-  getDeletePermissions = (name) => {
+  getDeletePermissions = name => {
     return [
       {
         action: `${ResourcesConstants.LISTS}:delete`,
-        resource: resourceDictionary[ResourcesConstants.LISTS].permissionResource(name),
+        resource:
+          resourceDictionary[ResourcesConstants.LISTS].permissionResource(name),
       },
     ];
   };
@@ -234,7 +255,7 @@ class WzListEditor extends Component {
         <Fragment>
           <strong>{addingKey}</strong> key already exists
         </Fragment>,
-        3000
+        3000,
       );
       return;
     }
@@ -282,12 +303,12 @@ class WzListEditor extends Component {
         <EuiFlexItem grow={false}>
           <EuiTitle>
             <h2>
-              <EuiToolTip position="right" content={'Back to lists'}>
+              <EuiToolTip position='right' content={'Back to lists'}>
                 <EuiButtonIcon
-                  aria-label="Back"
-                  color="primary"
-                  iconSize="l"
-                  iconType="arrowLeft"
+                  aria-label='Back'
+                  color='primary'
+                  iconSize='l'
+                  iconType='arrowLeft'
                   onClick={() => this.props.clearContent()}
                 />
               </EuiToolTip>
@@ -299,10 +320,10 @@ class WzListEditor extends Component {
           <EuiFieldText
             fullWidth={true}
             style={{ marginLeft: '-18px', width: 'calc(100% - 28px)' }}
-            placeholder="New CDB list name"
+            placeholder='New CDB list name'
             value={this.state.newListName}
             onChange={this.onNewListNameChange}
-            aria-label="Use aria labels when no actual label is in use"
+            aria-label='Use aria labels when no actual label is in use'
           />
         </EuiFlexItem>
       </Fragment>
@@ -320,7 +341,7 @@ class WzListEditor extends Component {
         permissions={this.getUpdatePermissions(name)}
         fill
         isDisabled={items.length === 0}
-        iconType="save"
+        iconType='save'
         isLoading={this.state.isSaving}
         onClick={async () => this.saveList(name, path, newList)}
       >
@@ -334,7 +355,7 @@ class WzListEditor extends Component {
           <EuiFlexItem grow={false}>
             <WzButtonPermissions
               permissions={this.getUpdatePermissions(name)}
-              iconType="plusInCircle"
+              iconType='plusInCircle'
               onClick={() => this.openAddEntry()}
             >
               Add new entry
@@ -354,32 +375,32 @@ class WzListEditor extends Component {
       <Fragment>
         {this.state.isPopoverOpen && (
           <div>
-            <EuiSpacer size="l" />
+            <EuiSpacer size='l' />
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFieldText
                   fullWidth={true}
-                  placeholder="Key"
+                  placeholder='Key'
                   value={addingKey}
                   onChange={this.onChangeKey}
-                  aria-label="Use aria labels when no actual label is in use"
+                  aria-label='Use aria labels when no actual label is in use'
                 />
               </EuiFlexItem>
 
               <EuiFlexItem>
                 <EuiFieldText
                   fullWidth={true}
-                  placeholder="Value"
+                  placeholder='Value'
                   value={addingValue}
                   onChange={this.onChangeValue}
-                  aria-label="Use aria labels when no actual label is in use"
+                  aria-label='Use aria labels when no actual label is in use'
                 />
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiFlexGroup>
                   <EuiFlexItem grow={false}>
                     <EuiButtonEmpty
-                      iconType="plusInCircle"
+                      iconType='plusInCircle'
                       isDisabled={!addingKey}
                       fill
                       onClick={() => this.addItem()}
@@ -388,7 +409,9 @@ class WzListEditor extends Component {
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
-                    <EuiButtonEmpty onClick={() => this.closeAddEntry()}>Close</EuiButtonEmpty>
+                    <EuiButtonEmpty onClick={() => this.closeAddEntry()}>
+                      Close
+                    </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
@@ -410,12 +433,12 @@ class WzListEditor extends Component {
         <EuiFlexItem grow={false}>
           <EuiTitle>
             <span style={{ fontSize: '22px' }}>
-              <EuiToolTip position="right" content={'Back to lists'}>
+              <EuiToolTip position='right' content={'Back to lists'}>
                 <EuiButtonIcon
-                  aria-label="Back"
-                  color="primary"
-                  iconSize="l"
-                  iconType="arrowLeft"
+                  aria-label='Back'
+                  color='primary'
+                  iconSize='l'
+                  iconType='arrowLeft'
                   onClick={() => this.props.clearContent()}
                 />
               </EuiToolTip>
@@ -424,7 +447,7 @@ class WzListEditor extends Component {
           </EuiTitle>
         </EuiFlexItem>
         <EuiFlexItem style={{ marginLeft: '-5px !important' }}>
-          <EuiText color="subdued" style={{ marginTop: '10px' }}>
+          <EuiText color='subdued' style={{ marginTop: '10px' }}>
             {path}
           </EuiText>
         </EuiFlexItem>
@@ -449,10 +472,10 @@ class WzListEditor extends Component {
           if (this.state.editing === item.key) {
             return (
               <EuiFieldText
-                placeholder="New value"
+                placeholder='New value'
                 value={this.state.editingValue}
                 onChange={this.onChangeEditingValue}
-                aria-label="Use aria labels when no actual label is in use"
+                aria-label='Use aria labels when no actual label is in use'
               />
             );
           } else {
@@ -463,26 +486,26 @@ class WzListEditor extends Component {
       {
         name: 'Actions',
         align: 'left',
-        render: (item) => {
+        render: item => {
           if (this.state.editing === item.key) {
             return (
               <Fragment>
-                <EuiToolTip position="top" content={'Save'}>
+                <EuiToolTip position='top' content={'Save'}>
                   <EuiButtonIcon
-                    aria-label="Confirm value"
-                    iconType="check"
+                    aria-label='Confirm value'
+                    iconType='check'
                     onClick={() => {
                       this.setEditedValue();
                     }}
-                    color="primary"
+                    color='primary'
                   />
                 </EuiToolTip>
-                <EuiToolTip position="top" content={'Discard'}>
+                <EuiToolTip position='top' content={'Discard'}>
                   <EuiButtonIcon
-                    aria-label="Cancel edition"
-                    iconType="cross"
+                    aria-label='Cancel edition'
+                    iconType='cross'
                     onClick={() => this.setState({ editing: false })}
-                    color="danger"
+                    color='danger'
                   />
                 </EuiToolTip>
               </Fragment>
@@ -491,9 +514,9 @@ class WzListEditor extends Component {
             return (
               <Fragment>
                 <WzButtonPermissions
-                  buttonType="icon"
-                  aria-label="Edit content"
-                  iconType="pencil"
+                  buttonType='icon'
+                  aria-label='Edit content'
+                  iconType='pencil'
                   permissions={this.getUpdatePermissions(fileName)}
                   tooltip={{ position: 'top', content: `Edit ${item.key}` }}
                   onClick={() => {
@@ -502,16 +525,16 @@ class WzListEditor extends Component {
                       editingValue: item.value,
                     });
                   }}
-                  color="primary"
+                  color='primary'
                 />
                 <WzButtonPermissions
-                  buttonType="icon"
-                  aria-label="Remove content"
-                  iconType="trash"
+                  buttonType='icon'
+                  aria-label='Remove content'
+                  iconType='trash'
                   permissions={this.getDeletePermissions(fileName)}
                   tooltip={{ position: 'top', content: `Remove ${item.key}` }}
                   onClick={() => this.deleteItem(item.key)}
-                  color="danger"
+                  color='danger'
                 />
               </Fragment>
             );
@@ -522,7 +545,10 @@ class WzListEditor extends Component {
   }
 
   render() {
-    const { listContent: { name, path }, isLoading } = this.props;
+    const {
+      listContent: { name, path },
+      isLoading,
+    } = this.props;
 
     const message = isLoading ? false : 'No results...';
 
@@ -546,7 +572,7 @@ class WzListEditor extends Component {
               value: name,
             },
           ],
-          name
+          name,
         );
         this.setState({ generatingCsv: false });
       } catch (error) {
@@ -563,7 +589,7 @@ class WzListEditor extends Component {
         getErrorOrchestrator().handleError(options);
         this.setState({ generatingCsv: false });
       }
-    }
+    };
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -580,7 +606,7 @@ class WzListEditor extends Component {
                 {!addingNew && (
                   <EuiFlexItem grow={false}>
                     <EuiButtonEmpty
-                      iconType="exportAction"
+                      iconType='exportAction'
                       isDisabled={this.state.generatingCsv}
                       isLoading={this.state.generatingCsv}
                       onClick={async () => exportToCsv()}
@@ -590,14 +616,23 @@ class WzListEditor extends Component {
                   </EuiFlexItem>
                 )}
                 {!this.state.editing &&
-                  this.renderAddAndSave(listName, path, !addingNew, this.state.items)}
+                  this.renderAddAndSave(
+                    listName,
+                    path,
+                    !addingNew,
+                    this.state.items,
+                  )}
               </EuiFlexGroup>
               {this.state.showWarningRestart && (
                 <Fragment>
-                  <EuiSpacer size="s" />
+                  <EuiSpacer size='s' />
                   <WzRestartClusterManagerCallout
-                    onRestarted={() => this.setState({ showWarningRestart: false })}
-                    onRestartedError={() => this.setState({ showWarningRestart: true })}
+                    onRestarted={() =>
+                      this.setState({ showWarningRestart: false })
+                    }
+                    onRestartedError={() =>
+                      this.setState({ showWarningRestart: true })
+                    }
                   />
                 </Fragment>
               )}
@@ -608,7 +643,7 @@ class WzListEditor extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem style={{ marginTop: '30px' }}>
                       <EuiInMemoryTable
-                        itemId="id"
+                        itemId='id'
                         items={this.state.items}
                         columns={this.buildTableColumns(name, path)}
                         pagination={{ pageSizeOptions: [10, 15] }}
@@ -628,9 +663,9 @@ class WzListEditor extends Component {
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    updateWazuhNotReadyYet: (wazuhNotReadyYet) =>
+    updateWazuhNotReadyYet: wazuhNotReadyYet =>
       dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
   };
 };
