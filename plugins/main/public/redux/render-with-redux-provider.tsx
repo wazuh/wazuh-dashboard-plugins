@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from 'react';
 import { render } from '@testing-library/react';
-import storeRedux from './store';
+import storeRedux, { setupStore } from './store';
 import { Provider } from 'react-redux';
 import type { RenderOptions } from '@testing-library/react';
 
@@ -13,13 +13,16 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, 'queries'> {
 
 export function renderWithProviders(
   ui: React.ReactElement,
-  {
+  options: ExtendedRenderOptions = {},
+) {
+  const {
     preloadedState = {},
     // Automatically create a store instance if no store was passed in
-    store = storeRedux,
+    store = setupStore(preloadedState),
     ...renderOptions
-  }: ExtendedRenderOptions = {},
-) {
+  } = options;
+
+  // const store = preloadedState ? setupStore(preloadedState) : _store;
   function Wrapper({ children }: PropsWithChildren<{}>): JSX.Element {
     return <Provider store={store}>{children}</Provider>;
   }

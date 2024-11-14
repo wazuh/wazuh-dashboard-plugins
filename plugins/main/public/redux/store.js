@@ -22,3 +22,8 @@ import rootReducer from './reducers/rootReducers';
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
 export default store;
+
+// This is used by some tests to preload a state
+export function setupStore(preloadedState) {
+  return createStore(rootReducer, preloadedState, applyMiddleware(thunk));
+}
