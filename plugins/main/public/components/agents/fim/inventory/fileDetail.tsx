@@ -22,10 +22,8 @@ import {
   EuiSpacer,
   EuiStat,
   EuiToolTip,
-  EuiCodeBlock,
   EuiLink,
 } from '@elastic/eui';
-import { ICustomBadges } from '../../../wz-search-bar/components';
 import {
   buildPhraseFilter,
   IIndexPattern,
@@ -53,6 +51,7 @@ import TechniqueRowDetails from '../../../overview/mitre/framework/components/te
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../common/constants';
 import NavigationService from '../../../../react-services/navigation-service';
 import { setFilters } from '../../../common/search-bar/set-filters';
+import { getProperties } from './fim-data';
 
 export class FileDetails extends Component {
   props!: {
@@ -101,95 +100,6 @@ export class FileDetails extends Component {
 
   componentDidMount() {
     getIndexPattern().then(idxPtn => (this.indexPattern = idxPtn));
-  }
-
-  details() {
-    return [
-      {
-        field: 'date',
-        name: 'Last analysis',
-        grow: 2,
-        icon: 'clock',
-        link: true,
-        transformValue: formatUIDate,
-      },
-      {
-        field: 'mtime',
-        name: 'Last modified',
-        grow: 2,
-        icon: 'clock',
-        link: true,
-        transformValue: formatUIDate,
-      },
-      {
-        field: 'uname',
-        name: 'User',
-        icon: 'user',
-        link: true,
-      },
-      {
-        field: 'uid',
-        name: 'User ID',
-        icon: 'user',
-        link: true,
-      },
-      {
-        field: 'gname',
-        name: 'Group',
-        icon: 'usersRolesApp',
-        onlyLinux: true,
-        link: true,
-      },
-      {
-        field: 'gid',
-        name: 'Group ID',
-        onlyLinux: true,
-        icon: 'usersRolesApp',
-        link: true,
-      },
-      {
-        field: 'size',
-        name: 'Size',
-        icon: 'nested',
-        link: true,
-        transformValue: value => this.renderFileDetailsSize(value),
-      },
-      {
-        field: 'inode',
-        name: 'Inode',
-        icon: 'link',
-        onlyLinux: true,
-        link: true,
-      },
-      {
-        field: 'md5',
-        name: 'MD5',
-        checksum: true,
-        icon: 'check',
-        link: true,
-      },
-      {
-        field: 'sha1',
-        name: 'SHA1',
-        checksum: true,
-        icon: 'check',
-        link: true,
-      },
-      {
-        field: 'sha256',
-        name: 'SHA256',
-        checksum: true,
-        icon: 'check',
-        link: true,
-      },
-      {
-        field: 'perm',
-        name: 'Permissions',
-        icon: 'lock',
-        link: false,
-        transformValue: value => this.renderFileDetailsPermissions(value),
-      },
-    ];
   }
 
   registryDetails() {
@@ -319,7 +229,8 @@ export class FileDetails extends Component {
       this.props.type === 'registry_key' ||
       this.props.currentFile.type === 'registry_key'
         ? this.registryDetails()
-        : this.details();
+        : getProperties(this.props.agent.os.platform, 'details');
+    console.log(columns);
     const generalDetails = columns.map((item, idx) => {
       let value = this.props.currentFile[item.field] || '-';
       let rawValue = value;
@@ -408,61 +319,6 @@ export class FileDetails extends Component {
       <div>
         <EuiFlexGrid columns={3}> {generalDetails} </EuiFlexGrid>
       </div>
-    );
-  }
-
-  renderFileDetailsPermissions(value) {
-    if (
-      ((this.props.agent || {}).os || {}).platform === 'windows' &&
-      value &&
-      value !== '-'
-    ) {
-      return (
-        <EuiAccordion
-          id={Math.random().toString()}
-          paddingSize='none'
-          initialIsOpen={false}
-          arrowDisplay='none'
-          buttonContent={
-            <EuiTitle size='s'>
-              <h3>
-                Permissions
-                <span style={{ marginLeft: 16 }}>
-                  <EuiToolTip position='top' content='Show'>
-                    <EuiIcon
-                      className='euiButtonIcon euiButtonIcon--primary'
-                      type='inspect'
-                      aria-label='show'
-                    />
-                  </EuiToolTip>
-                </span>
-              </h3>
-            </EuiTitle>
-          }
-        >
-          <EuiCodeBlock language='json' paddingSize='l'>
-            {JSON.stringify(value, null, 2)}
-          </EuiCodeBlock>
-        </EuiAccordion>
-      );
-    }
-    return value;
-  }
-
-  renderFileDetailsSize(value) {
-    if (isNaN(value)) {
-      return 0;
-    }
-    const b = 2;
-    if (0 === value) {
-      return '0 Bytes';
-    }
-    const c = 0 > b ? 0 : b,
-      d = Math.floor(Math.log(value) / Math.log(1024));
-    return (
-      parseFloat((value / Math.pow(1024, d)).toFixed(c)) +
-      ' ' +
-      ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'][d]
     );
   }
 

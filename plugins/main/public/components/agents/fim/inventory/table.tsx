@@ -11,15 +11,15 @@
  */
 
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiIconTip } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import { formatUIDate } from '../../../../react-services/time-service';
 import { TableWzAPI } from '../../../common/tables';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../common/constants';
 import { withRouterSearch } from '../../../common/hocs';
 import { Route, Switch } from '../../../router-search';
 import NavigationService from '../../../../react-services/navigation-service';
+import { getProperties } from './fim-data';
 
 export const InventoryTable = withRouterSearch(
   class InventoryTable extends Component {
@@ -58,122 +58,6 @@ export const InventoryTable = withRouterSearch(
       });
     };
 
-    columns() {
-      let width;
-      (((this.props.agent || {}).os || {}).platform || false) === 'windows'
-        ? (width = '60px')
-        : (width = '80px');
-      return [
-        {
-          field: 'file',
-          name: 'File',
-          sortable: true,
-          width: '250px',
-          searchable: true,
-          show: true,
-        },
-        {
-          field: 'mtime',
-          name: (
-            <span>
-              Last modified{' '}
-              <EuiIconTip
-                content='This is not searchable through a search term.'
-                size='s'
-                color='subdued'
-                type='alert'
-              />
-            </span>
-          ),
-          sortable: true,
-          width: '100px',
-          render: formatUIDate,
-          searchable: false,
-          show: true,
-        },
-        {
-          field: 'uname',
-          name: 'User',
-          sortable: true,
-          truncateText: true,
-          width: `${width}`,
-          searchable: true,
-          show: true,
-        },
-        {
-          field: 'uid',
-          name: 'User ID',
-          sortable: true,
-          truncateText: true,
-          width: `${width}`,
-          searchable: true,
-          show: true,
-        },
-        {
-          field: 'gname',
-          name: 'Group',
-          sortable: true,
-          truncateText: true,
-          width: `${width}`,
-          searchable: true,
-          show: true,
-        },
-        {
-          field: 'gid',
-          name: 'Group ID',
-          sortable: true,
-          truncateText: true,
-          width: `${width}`,
-          searchable: true,
-          show: true,
-        },
-        {
-          field: 'size',
-          name: 'Size',
-          sortable: true,
-          width: `${width}`,
-          searchable: true,
-          show: true,
-        },
-        {
-          field: 'date',
-          name: (
-            <span>
-              Last analysis{' '}
-              <EuiIconTip
-                content='This is not searchable through a search term.'
-                size='s'
-                color='subdued'
-                type='alert'
-              />
-            </span>
-          ),
-          sortable: true,
-          width: '100px',
-          render: formatUIDate,
-          searchable: false,
-        },
-        {
-          field: 'md5',
-          name: 'MD5',
-          searchable: true,
-          sortable: true,
-        },
-        {
-          field: 'sha1',
-          name: 'SHA1',
-          searchable: true,
-          sortable: true,
-        },
-        {
-          field: 'sha256',
-          name: 'SHA256',
-          searchable: true,
-          sortable: true,
-        },
-      ];
-    }
-
     onFiltersChange = filters => {
       this.setState({
         filters,
@@ -192,7 +76,7 @@ export const InventoryTable = withRouterSearch(
           },
         };
       };
-      const columns = this.columns();
+      const columns = getProperties(this.props.agent.os.platform, 'columns');
 
       const APIendpoint = `/syscheck/${this.props.agent.id}?type=file`;
 
@@ -206,25 +90,8 @@ export const InventoryTable = withRouterSearch(
               endpoint={APIendpoint}
               searchBarWQL={{
                 suggestions: {
-                  field: currentValue => [
-                    { label: 'date', description: 'filter by analysis time' },
-                    { label: 'file', description: 'filter by file' },
-                    { label: 'gid', description: 'filter by group id' },
-                    { label: 'gname', description: 'filter by group name' },
-                    { label: 'md5', description: 'filter by MD5 checksum' },
-                    {
-                      label: 'mtime',
-                      description: 'filter by modification time',
-                    },
-                    { label: 'sha1', description: 'filter by SHA1 checksum' },
-                    {
-                      label: 'sha256',
-                      description: 'filter by SHA256 checksum',
-                    },
-                    { label: 'size', description: 'filter by size' },
-                    { label: 'uname', description: 'filter by user name' },
-                    { label: 'uid', description: 'filter by user id' },
-                  ],
+                  field: currentValue =>
+                    getProperties(this.props.agent.os.platform, 'suggestions'),
                   value: async (currentValue, { field }) => {
                     try {
                       const response = await WzRequest.apiReq(

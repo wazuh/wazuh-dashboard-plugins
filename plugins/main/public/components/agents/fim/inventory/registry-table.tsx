@@ -14,12 +14,12 @@ import React, { Component } from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiIconTip } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { FlyoutDetail } from './flyout';
-import { formatUIDate } from '../../../../react-services/time-service';
 import { TableWzAPI } from '../../../common/tables';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../common/constants';
 import { withRouterSearch } from '../../../common/hocs';
 import { Route, Switch } from '../../../router-search';
 import NavigationService from '../../../../react-services/navigation-service';
+import { getProperties } from './fim-data';
 
 export const RegistryTable = withRouterSearch(
   class RegistryTable extends Component {
@@ -58,56 +58,6 @@ export const RegistryTable = withRouterSearch(
       });
     };
 
-    columns() {
-      return [
-        {
-          field: 'file',
-          name: 'Registry',
-          sortable: true,
-          searchable: true,
-          show: true,
-        },
-        {
-          field: 'mtime',
-          name: (
-            <span>
-              Last modified{' '}
-              <EuiIconTip
-                content='This is not searchable through a search term.'
-                size='s'
-                color='subdued'
-                type='alert'
-              />
-            </span>
-          ),
-          sortable: true,
-          width: '250px',
-          className: 'wz-white-space-nowrap',
-          render: formatUIDate,
-          searchable: false,
-          show: true,
-        },
-        {
-          field: 'date',
-          name: (
-            <span>
-              Last analysis{' '}
-              <EuiIconTip
-                content='This is not searchable through a search term.'
-                size='s'
-                color='subdued'
-                type='alert'
-              />
-            </span>
-          ),
-          sortable: true,
-          width: '100px',
-          render: formatUIDate,
-          searchable: false,
-        },
-      ];
-    }
-
     onFiltersChange = filters => {
       this.setState({
         filters,
@@ -127,7 +77,7 @@ export const RegistryTable = withRouterSearch(
         };
       };
 
-      const columns = this.columns();
+      const columns = getProperties(this.props.agent.os.platform, 'details');
 
       const APIendpoint = `/syscheck/${this.props.agent.id}?type=registry_key`;
 
