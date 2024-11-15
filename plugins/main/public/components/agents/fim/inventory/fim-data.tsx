@@ -71,6 +71,34 @@ const dataFIM = [
     suggestion: { description: 'filter by file' },
   },
   {
+    field: 'date',
+    columns: {
+      name: (
+        <span>
+          Last analysis{' '}
+          <EuiIconTip
+            content='This is not searchable through a search term.'
+            size='s'
+            color='subdued'
+            type='alert'
+          />
+        </span>
+      ),
+      sortable: true,
+      width: '130px',
+      render: formatUIDate,
+      searchable: false,
+    },
+    details: {
+      name: 'Last analysis',
+      grow: 2,
+      icon: 'clock',
+      link: true,
+      transformValue: formatUIDate,
+    },
+    suggestion: { description: 'filter by analysis time' },
+  },
+  {
     field: 'mtime',
     columns: {
       name: (
@@ -182,34 +210,6 @@ const dataFIM = [
       transformValue: value => renderFileDetailsSize(value),
     },
     suggestion: { description: 'filter by size' },
-  },
-  {
-    field: 'date',
-    columns: {
-      name: (
-        <span>
-          Last analysis{' '}
-          <EuiIconTip
-            content='This is not searchable through a search term.'
-            size='s'
-            color='subdued'
-            type='alert'
-          />
-        </span>
-      ),
-      sortable: true,
-      width: '130px',
-      render: formatUIDate,
-      searchable: false,
-    },
-    details: {
-      name: 'Last analysis',
-      grow: 2,
-      icon: 'clock',
-      link: true,
-      transformValue: formatUIDate,
-    },
-    suggestion: { description: 'filter by analysis time' },
   },
   {
     field: 'inode',
