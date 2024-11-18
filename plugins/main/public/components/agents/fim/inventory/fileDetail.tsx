@@ -230,7 +230,6 @@ export class FileDetails extends Component {
       this.props.currentFile.type === 'registry_key'
         ? this.registryDetails()
         : getProperties(this.props.agent.os.platform, 'details');
-    console.log(columns);
     const generalDetails = columns.map((item, idx) => {
       let value = this.props.currentFile[item.field] || '-';
       let rawValue = value;
