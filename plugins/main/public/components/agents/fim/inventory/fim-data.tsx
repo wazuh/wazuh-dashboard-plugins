@@ -69,6 +69,7 @@ const dataFIM = [
     },
     details: null,
     suggestion: { description: 'filter by file' },
+    registry: true,
   },
   {
     field: 'date',
@@ -97,6 +98,7 @@ const dataFIM = [
       transformValue: formatUIDate,
     },
     suggestion: { description: 'filter by analysis time' },
+    registry: true,
   },
   {
     field: 'mtime',
@@ -128,6 +130,7 @@ const dataFIM = [
     suggestion: {
       description: 'filter by modification time',
     },
+    registry: true,
   },
   {
     field: 'uname',
@@ -306,6 +309,12 @@ function getPropertiesColumnsType(items) {
     }));
 }
 
+function getPropertiesRegistryType(items) {
+  return items
+    .filter(item => item.registry)
+    .map(({ field, columns }) => ({ field, ...columns }));
+}
+
 function getPropertiesSuggestionsType(items) {
   return items.map(({ field, suggestion }) => ({
     label: field,
@@ -328,11 +337,12 @@ const mappersType = {
   columns: getPropertiesColumnsType,
   suggestions: getPropertiesSuggestionsType,
   details: getPropertiesDetailsType,
+  registry: getPropertiesRegistryType,
 };
 
 export function getProperties(
   agentInfo: string,
-  type: 'columns' | 'suggestions' | 'details',
+  type: 'columns' | 'suggestions' | 'details' | 'registry',
 ) {
   // Filter
   const filteredFields = filterByOS(dataFIM, agentInfo);

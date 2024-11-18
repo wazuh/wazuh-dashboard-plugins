@@ -49,6 +49,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Invalid date filter applied on FIM details flyout [#7160](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7160)
 - Fixed the check updates UI was displayed despite it could be configured as disabled [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
 - Fixed filter by value in document details in safari [#7151](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7151)
+- Fixed inode not be rendered in FIM inventory view [#7163](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7163)
 
 ### Removed
 
