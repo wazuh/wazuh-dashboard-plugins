@@ -69,7 +69,12 @@ const dataFIM = [
     },
     details: null,
     suggestion: { description: 'filter by file' },
-    registry: true,
+    registry: {
+      name: 'Registry',
+      sortable: true,
+      searchable: true,
+      show: true,
+    },
   },
   {
     field: 'date',
@@ -98,7 +103,23 @@ const dataFIM = [
       transformValue: formatUIDate,
     },
     suggestion: { description: 'filter by analysis time' },
-    registry: true,
+    registry: {
+      name: (
+        <span>
+          Last analysis{' '}
+          <EuiIconTip
+            content='This is not searchable through a search term.'
+            size='s'
+            color='subdued'
+            type='alert'
+          />
+        </span>
+      ),
+      sortable: true,
+      width: '100px',
+      render: formatUIDate,
+      searchable: false,
+    },
   },
   {
     field: 'mtime',
@@ -130,7 +151,25 @@ const dataFIM = [
     suggestion: {
       description: 'filter by modification time',
     },
-    registry: true,
+    registry: {
+      name: (
+        <span>
+          Last modified{' '}
+          <EuiIconTip
+            content='This is not searchable through a search term.'
+            size='s'
+            color='subdued'
+            type='alert'
+          />
+        </span>
+      ),
+      sortable: true,
+      width: '250px',
+      className: 'wz-white-space-nowrap',
+      render: formatUIDate,
+      searchable: false,
+      show: true,
+    },
   },
   {
     field: 'uname',
@@ -312,7 +351,7 @@ function getPropertiesColumnsType(items) {
 function getPropertiesRegistryType(items) {
   return items
     .filter(item => item.registry)
-    .map(({ field, columns }) => ({ field, ...columns }));
+    .map(({ field, registry }) => ({ field, ...registry }));
 }
 
 function getPropertiesSuggestionsType(items) {
