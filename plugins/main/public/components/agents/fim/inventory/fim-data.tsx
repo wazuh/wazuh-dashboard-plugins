@@ -10,34 +10,38 @@ import {
 } from '@elastic/eui';
 
 function renderFileDetailsPermissions(value) {
-  return (
-    <EuiAccordion
-      id={Math.random().toString()}
-      paddingSize='none'
-      initialIsOpen={false}
-      arrowDisplay='none'
-      buttonContent={
-        <EuiTitle size='s'>
-          <h3>
-            Permissions
-            <span style={{ marginLeft: 16 }}>
-              <EuiToolTip position='top' content='Show'>
-                <EuiIcon
-                  className='euiButtonIcon euiButtonIcon--primary'
-                  type='inspect'
-                  aria-label='show'
-                />
-              </EuiToolTip>
-            </span>
-          </h3>
-        </EuiTitle>
-      }
-    >
-      <EuiCodeBlock language='json' paddingSize='l'>
-        {JSON.stringify(value, null, 2)}
-      </EuiCodeBlock>
-    </EuiAccordion>
-  );
+  // Permisions in object form will get rendered in a EuiAccordion
+  if (typeof value !== 'string') {
+    return (
+      <EuiAccordion
+        id={Math.random().toString()}
+        paddingSize='none'
+        initialIsOpen={false}
+        arrowDisplay='none'
+        buttonContent={
+          <EuiTitle size='s'>
+            <h3>
+              Permissions
+              <span style={{ marginLeft: 16 }}>
+                <EuiToolTip position='top' content='Show'>
+                  <EuiIcon
+                    className='euiButtonIcon euiButtonIcon--primary'
+                    type='inspect'
+                    aria-label='show'
+                  />
+                </EuiToolTip>
+              </span>
+            </h3>
+          </EuiTitle>
+        }
+      >
+        <EuiCodeBlock language='json' paddingSize='l'>
+          {JSON.stringify(value, null, 2)}
+        </EuiCodeBlock>
+      </EuiAccordion>
+    );
+  }
+  return value;
 }
 
 function renderFileDetailsSize(value) {
@@ -78,6 +82,7 @@ const dataFIM = [
     details: null,
     suggestion: { description: 'filter by file' },
     registry: {
+      width: '250px',
       name: 'Registry',
       sortable: true,
       searchable: true,
@@ -202,7 +207,7 @@ const dataFIM = [
       searchable: true,
       show: true,
     },
-    details: { field: 'uid', name: 'User ID', icon: 'user', link: true },
+    details: { name: 'User ID', icon: 'user', link: true },
     suggestion: { description: 'filter by user name' },
   },
   {
@@ -216,12 +221,11 @@ const dataFIM = [
       show: true,
     },
     details: {
-      field: 'gname',
       name: 'Group',
       icon: 'usersRolesApp',
-      onlyLinux: true,
       link: true,
     },
+    onlyLinux: true,
     suggestion: { description: 'filter by group name' },
   },
   {
@@ -235,12 +239,11 @@ const dataFIM = [
       show: true,
     },
     details: {
-      field: 'gid',
       name: 'Group ID',
-      onlyLinux: true,
       icon: 'usersRolesApp',
       link: true,
     },
+    onlyLinux: true,
     suggestion: { description: 'filter by group id' },
   },
   {
@@ -253,7 +256,6 @@ const dataFIM = [
       show: true,
     },
     details: {
-      field: 'size',
       name: 'Size',
       icon: 'nested',
       link: true,
@@ -270,12 +272,11 @@ const dataFIM = [
       sortable: true,
     },
     details: {
-      field: 'inode',
       name: 'Inode',
       icon: 'link',
-      onlyLinux: true,
       link: true,
     },
+    onlyLinux: true,
     suggestion: { description: 'filter by Inode checksum' },
   },
   {
@@ -286,7 +287,6 @@ const dataFIM = [
       sortable: true,
     },
     details: {
-      field: 'md5',
       name: 'MD5',
       checksum: true,
       icon: 'check',
@@ -302,7 +302,6 @@ const dataFIM = [
       sortable: true,
     },
     details: {
-      field: 'sha1',
       name: 'SHA1',
       checksum: true,
       icon: 'check',
@@ -318,7 +317,6 @@ const dataFIM = [
       sortable: true,
     },
     details: {
-      field: 'sha256',
       name: 'SHA256',
       checksum: true,
       icon: 'check',
@@ -341,9 +339,7 @@ const dataFIM = [
 
 // Checks that OS is not windows
 function filterByOS(items, agentInfo: string) {
-  return items.filter(
-    item => item.details?.onlyLinux !== (agentInfo === 'windows'),
-  );
+  return items.filter(item => item.onlyLinux !== (agentInfo === 'windows'));
 }
 
 function getPropertiesColumnsType(items) {
