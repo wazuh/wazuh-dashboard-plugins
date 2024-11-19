@@ -57,6 +57,14 @@ function renderFileDetailsSize(value) {
   );
 }
 
+// dataFIM defines a configuration list for fields used in a File Integrity Monitoring (FIM) system.
+// Include:
+// - field: The identifier for the data field.
+// - columns: Defines how the field appears into file table
+// - details: Describes how the field is shown in detailed view
+// - suggestions: Defines the helps to searchbar
+// - registry: Defines how the field appears into windows registry table
+
 const dataFIM = [
   {
     field: 'file',
