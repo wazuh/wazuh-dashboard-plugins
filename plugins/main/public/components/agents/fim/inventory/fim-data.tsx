@@ -359,10 +359,13 @@ function getPropertiesRegistryType(items) {
 }
 
 function getPropertiesSuggestionsType(items) {
-  return items.map(({ field, suggestion }) => ({
-    label: field,
-    ...suggestion,
-  }));
+  return items
+    .filter(({ suggestion }) => suggestion)
+    .map(({ field, suggestion }) => ({
+      label: field,
+      ...suggestion,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 }
 
 function getPropertiesDetailsType(items) {
