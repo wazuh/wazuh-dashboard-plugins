@@ -77,7 +77,7 @@ export const RegistryTable = withRouterSearch(
         };
       };
 
-      const columns = getProperties(this.props.agent.os?.platform, 'registry');
+      const columns = getProperties(this.props.agent?.os?.platform, 'registry');
       const APIendpoint = `/syscheck/${this.props.agent.id}?type=registry_key`;
 
       return (

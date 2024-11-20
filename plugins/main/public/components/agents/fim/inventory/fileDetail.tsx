@@ -229,7 +229,7 @@ export class FileDetails extends Component {
       this.props.type === 'registry_key' ||
       this.props.currentFile.type === 'registry_key'
         ? this.registryDetails()
-        : getProperties(this.props.agent.os.platform, 'details');
+        : getProperties(this.props.agent?.os?.platform, 'details');
     const generalDetails = columns.map((item, idx) => {
       let value = this.props.currentFile[item.field] || '-';
       let rawValue = value;

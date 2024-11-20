@@ -10,8 +10,8 @@ import {
 } from '@elastic/eui';
 
 function renderFileDetailsPermissions(value) {
-  // Permisions in object form will get rendered in a EuiAccordion
-  if (typeof value !== 'string') {
+  // Permisions in string form will get rendered in a EuiAccordion
+  if (typeof value === 'object') {
     return (
       <EuiAccordion
         id={Math.random().toString()}

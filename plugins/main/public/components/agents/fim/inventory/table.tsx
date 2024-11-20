@@ -76,7 +76,7 @@ export const InventoryTable = withRouterSearch(
           },
         };
       };
-      const columns = getProperties(this.props.agent.os.platform, 'columns');
+      const columns = getProperties(this.props.agent?.os?.platform, 'columns');
 
       const APIendpoint = `/syscheck/${this.props.agent.id}?type=file`;
 
@@ -91,7 +91,10 @@ export const InventoryTable = withRouterSearch(
               searchBarWQL={{
                 suggestions: {
                   field: currentValue =>
-                    getProperties(this.props.agent.os.platform, 'suggestions'),
+                    getProperties(
+                      this.props.agent?.os?.platform,
+                      'suggestions',
+                    ),
                   value: async (currentValue, { field }) => {
                     try {
                       const response = await WzRequest.apiReq(
