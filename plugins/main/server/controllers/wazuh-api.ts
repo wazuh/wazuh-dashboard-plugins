@@ -29,6 +29,7 @@ import {
   version as pluginVersion,
   revision as pluginRevision,
 } from '../../package.json';
+import { extractErrorMessage } from '../lib/extract-error-message';
 
 export class WazuhApiCtrl {
   constructor() {}
@@ -94,9 +95,9 @@ export class WazuhApiCtrl {
         body: { token },
       });
     } catch (error) {
-      const errorMessage = `Error getting the authorization token: ${
-        ((error.response || {}).data || {}).detail || error.message || error
-      }`;
+      const errorMessage = `Error getting the authorization token: ${extractErrorMessage(
+        error,
+      )}`;
       context.wazuh.logger.error(errorMessage);
       return ErrorResponse(
         errorMessage,
@@ -624,11 +625,7 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the API');
     } catch (error) {
-      if (
-        error &&
-        error.response &&
-        error.response.status === HTTP_STATUS_CODES.UNAUTHORIZED
-      ) {
+      if (error?.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
         return ErrorResponse(
           error.message || error,
           error.code ? `API error: ${error.code}` : 3013,
@@ -636,18 +633,19 @@ export class WazuhApiCtrl {
           response,
         );
       }
-      const errorMsg = (error.response || {}).data || error.message;
-      context.wazuh.logger.error(errorMsg || error);
+      // when the error is an axios error the object will be always error.response.data
+      const errorMessage = extractErrorMessage(error);
+      context.wazuh.logger.error(errorMessage);
       if (devTools) {
         return response.ok({
-          body: { error: '3013', message: errorMsg || error },
+          body: { error: '3013', message: errorMessage },
         });
       } else {
         if ((error || {}).code && ApiErrorEquivalence[error.code]) {
           error.message = ApiErrorEquivalence[error.code];
         }
         return ErrorResponse(
-          errorMsg.detail || error,
+          errorMessage,
           error.code ? `API error: ${error.code}` : 3013,
           HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response,
