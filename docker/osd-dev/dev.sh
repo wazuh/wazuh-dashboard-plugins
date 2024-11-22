@@ -59,8 +59,8 @@ if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
   fi
 
   if [ -z "$os_version" ]; then
-    echo "[INFO] OS Version not received via flag, getting the version from $PACKAGE_PATH"
     os_version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
+    echo "[INFO] OS Version not received via flag, getting the version from $PACKAGE_PATH. Using: $os_version"
     if [ -z "$os_version" ]; then
       echo "[ERROR] Could not retrieve the OS version from package.json."
       exit 1
@@ -68,8 +68,8 @@ if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
   fi
 
   if [ -z "$osd_version" ]; then
-    echo "[INFO] OSD Version not received via flag, getting the version from $PACKAGE_PATH"
     osd_version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
+    echo "[INFO] OSD Version not received via flag, getting the version from $PACKAGE_PATH. Using: $osd_version"
     if [ -z "$osd_version" ]; then
       echo "[ERROR] Could not retrieve the OSD version from package.json."
       exit 1
