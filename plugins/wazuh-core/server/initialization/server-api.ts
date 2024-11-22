@@ -21,8 +21,8 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
         'Start check server API connection and compatibility finished',
       );
       return results;
-    } catch (e) {
-      const message = `Error checking server API connection and compatibility: ${e.message}`;
+    } catch (error) {
+      const message = `Error checking server API connection and compatibility: ${error.message}`;
       ctx.logger.error(message);
       throw new Error(message);
     }
@@ -90,9 +90,9 @@ export async function ServerAPIConnectionCompatibility(
         `Server API [${apiHostID}] version [${api_version}] is compatible with the ${PLUGIN_APP_NAME} version`,
       );
     }
-  } catch (e) {
+  } catch (error) {
     ctx.logger.warn(
-      `Error checking the connection and compatibility with server API [${apiHostID}]: ${e.message}`,
+      `Error checking the connection and compatibility with server API [${apiHostID}]: ${error.message}`,
     );
   } finally {
     return { connection, compatibility, api_version, id: apiHostID };

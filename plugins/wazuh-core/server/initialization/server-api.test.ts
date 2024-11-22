@@ -45,7 +45,7 @@ describe('ServerAPIConnectionCompatibility', () => {
     `Check server API connection and compatibility for the server API hosts`,
     async ({ apiHostID, apiVersionResponse, isCompatible }) => {
       const loggerMock = jest.fn();
-      const result = await ServerAPIConnectionCompatibility(
+      await ServerAPIConnectionCompatibility(
         {
           manageHosts: {
             get: () => hosts,

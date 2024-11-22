@@ -47,6 +47,8 @@ export class InitializationService implements IInitializationService {
     if (name) {
       return this.items.get(name);
     }
+  }
+  getAll() {
     return Array.from(this.items.values());
   }
   createRunContext(scope: InitializationTaskContext, context: any = {}) {

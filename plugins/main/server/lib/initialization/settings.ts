@@ -115,12 +115,10 @@ function getSavedObjectsClient(ctx: any, scope) {
   switch (scope) {
     case 'internal':
       return ctx.core.savedObjects.createInternalRepository();
-      break;
     case 'user':
       return ctx.core.savedObjects.savedObjectsStart.getScopedClient(
         ctx.request,
       );
-      break;
     default:
       break;
   }
@@ -130,11 +128,9 @@ function getUiSettingsClient(ctx, scope, client) {
   switch (scope) {
     case 'internal':
       return ctx.core.uiSettings.asScopedToClient(client);
-      break;
 
     case 'user':
       return ctx.core.uiSettings.uiSettingsStart.asScopedToClient(client);
-      break;
 
     default:
       break;

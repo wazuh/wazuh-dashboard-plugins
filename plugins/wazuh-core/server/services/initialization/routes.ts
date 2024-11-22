@@ -42,7 +42,7 @@ export function addRoutes(router, { initialization }) {
           ? tasksNames.map(taskName =>
               context.wazuh_core.initialization.get(taskName),
             )
-          : context.wazuh_core.initialization.get();
+          : context.wazuh_core.initialization.getAll();
 
         const tasksData = tasks.map(task => task.getInfo());
 
