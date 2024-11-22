@@ -91,16 +91,27 @@ class WzListEditor extends Component {
    * Save in the state as object the items for an easy modification by key-value
    * @param {String} content
    */
-  contentToObject(content) {
-    const items = {};
+  contentToObject(content: string) {
+    const items: {
+      [key: string]: string;
+    } = {};
     const lines = content.split('\n');
+
     lines.forEach(line => {
-      const split = line.startsWith('"') ? line.split('":') : line.split(':');
-      // All keys with multiple colons (:) should end with a quotation mark (")
-      const key = split[0].startsWith('"') ? split[0] + '"' : split[0];
-      const value = split[1] || '';
-      if (key) items[key] = value; // Prevent add empty keys
+      // Regex splitting the first : and ignoring the ones inside quotes
+      const match = line.match(/^((?:[^:"]*|"[^"]*")*):(.*)$/);
+
+      if (match) {
+        const [, key, value] = match;
+        const trimmedKey = key.trim();
+        const trimmedValue = value.trim();
+
+        if (trimmedKey) {
+          items[trimmedKey] = trimmedValue;
+        }
+      }
     });
+
     return items;
   }
 
