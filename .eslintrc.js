@@ -114,6 +114,7 @@ module.exports = {
           'static-private-properties': [
             { static: true, type: 'property', private: true },
             { static: true, type: 'property', accessibility: 'private' },
+            { static: true, type: 'property', name: '/_.+/' },
           ],
           'public-properties': [{ type: 'property', accessibility: 'public' }],
           'protected-properties': [
@@ -122,6 +123,7 @@ module.exports = {
           'private-properties': [
             { type: 'property', private: true },
             { type: 'property', accessibility: 'private' },
+            { type: 'property', name: '/_.+/' },
           ],
           'static-public-method': [
             { static: true, type: 'method', accessibility: 'public' },
@@ -156,6 +158,13 @@ module.exports = {
               propertyType: 'ArrowFunctionExpression',
               accessibility: 'private',
             },
+            { static: true, type: 'method', name: '/_.+/' },
+            {
+              static: true,
+              type: 'property',
+              propertyType: 'ArrowFunctionExpression',
+              name: '/_.+/',
+            },
           ],
           'public-method': [
             { type: 'method', accessibility: 'public' },
@@ -185,6 +194,12 @@ module.exports = {
               type: 'property',
               propertyType: 'ArrowFunctionExpression',
               accessibility: 'private',
+            },
+            { type: 'method', name: '/_.+/' },
+            {
+              type: 'property',
+              propertyType: 'ArrowFunctionExpression',
+              name: '/_.+/',
             },
           ],
         },
