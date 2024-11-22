@@ -101,12 +101,11 @@ Before starting the environment, check that the plugin is in the desired branch
 
 Example:
 
-This brings up a Dev environment for OpenSearch `1.2.4` and opensearch-dashboards
-`1.2.0`, with the `wazuh-dashboard-plugins` development branch set up at
+This brings up a Dev environment for the `wazuh-dashboard-plugins` development branch set up at
 `$WZ_HOME`:
 
 ```bash
-./dev.sh 1.2.4 1.2.0 $WZ_HOME up
+./dev.sh $WZ_HOME up
 ```
 
 Once the containers are up, **attach a shell to the development container**,

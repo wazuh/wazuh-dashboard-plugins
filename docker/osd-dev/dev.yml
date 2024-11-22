@@ -26,7 +26,7 @@ services:
       - '--es.all'
 
   imposter:
-    image: outofcoffee/imposter:3.44.1
+    image: outofcoffee/imposter:${IMPOSTER_VERSION}
 
     # <<: *logging
     hostname: imposter-osd-${OS_VERSION}
