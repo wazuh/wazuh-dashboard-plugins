@@ -12,7 +12,7 @@
  *
  */
 
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 
 const decoratorCheckIsEnabled = fn => {
   return async (
@@ -42,7 +42,7 @@ export const checkPluginPlatformSettings = decoratorCheckIsEnabled(
     const valuePluginPlatformSetting = await uiSettingsClient.get(
       pluginPlatformSettingName,
     );
-    const settingsAreDifferent = !_.isEqual(
+    const settingsAreDifferent = !isEqual(
       valuePluginPlatformSetting,
       defaultAppValue,
     );
