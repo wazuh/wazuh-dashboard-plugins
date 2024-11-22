@@ -26,6 +26,7 @@ module.exports = {
     'react',
     'react-hooks',
     '@typescript-eslint',
+    'unicorn',
     'prettier',
     '@stylistic',
   ],
@@ -34,6 +35,8 @@ module.exports = {
     'plugin:react/recommended',
     'plugin:@typescript-eslint/strict',
     'plugin:@typescript-eslint/stylistic',
+    // https://github.com/sindresorhus/eslint-plugin-unicorn?tab=readme-ov-file#rules
+    'plugin:unicorn/recommended',
     'prettier',
   ],
   rules: {
@@ -67,5 +70,9 @@ module.exports = {
         unusedExports: true,
       },
     ],
+    // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/custom-error-definition.md
+    'unicorn/custom-error-definition': 'error',
+    // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/better-regex.md
+    'unicorn/better-regex': 'error',
   },
 };
