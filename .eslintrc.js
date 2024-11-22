@@ -42,7 +42,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-function': 'off',
-    '@stylistic/spaced-comment': 'error',
+    '@stylistic/spaced-comment': ['error', 'always'],
     camelcase: 'error',
     'no-use-before-define': [
       'error',
