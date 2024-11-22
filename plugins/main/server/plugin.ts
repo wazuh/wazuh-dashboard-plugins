@@ -155,7 +155,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           },
           fieldsNoIndices: FieldsMonitoring,
         },
-        configurationSettingKey: 'checks.monitoring',
+        configurationSettingKey: 'checks.monitoring', // TODO: create new setting
       }),
     );
     // Index pattern: vulnerabilities
@@ -168,7 +168,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           fieldsNoIndices: VulnerabilitiesStatesFields,
         },
-        configurationSettingKey: 'checks.monitoring',
+        configurationSettingKey: 'checks.vulnerability', // TODO: create new setting
       }),
     );
 
@@ -194,7 +194,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           },
           fieldsNoIndices: FieldsStatistics,
         },
-        configurationSettingKey: 'checks.statistics',
+        configurationSettingKey: 'checks.statistics', // TODO: create new setting
       }),
     );
 
