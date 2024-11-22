@@ -21,8 +21,8 @@
     "jsx": "react-jsx"
   },
   "include": [
-    "public",
-    "server",
-    "common"
+    "plugins/**/public",
+    "plugins/**/server",
+    "plugins/**/common"
   ]
 }
