@@ -66,5 +66,21 @@ module.exports = {
     'unicorn/custom-error-definition': 'error',
     // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/better-regex.md
     'unicorn/better-regex': 'error',
+    'unicorn/no-null': 'off',
+    'unicorn/text-encoding-identifier-case': 'off',
+    'unicorn/prevent-abbreviations': [
+      'error',
+      {
+        extendDefaultReplacements: false,
+        replacements: {
+          e: {
+            error: true,
+          },
+          err: {
+            error: true,
+          },
+        },
+      },
+    ],
   },
 };
