@@ -83,6 +83,12 @@ module.exports = {
         },
       },
     ],
+    'unicorn/filename-case': [
+      'error',
+      {
+        case: 'kebabCase',
+      },
+    ],
     // https://github.com/bryanrsmith/eslint-plugin-sort-class-members?tab=readme-ov-file#configuration
     'sort-class-members/sort-class-members': [
       'error',
