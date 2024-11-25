@@ -27,7 +27,6 @@ module.exports = {
     'react-hooks',
     '@typescript-eslint',
     'unicorn',
-    'sort-class-members',
     'prettier',
     '@stylistic',
   ],
