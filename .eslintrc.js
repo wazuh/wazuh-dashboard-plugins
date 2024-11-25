@@ -44,6 +44,18 @@ module.exports = {
         'prettier',
       ],
       rules: {
+        'no-restricted-syntax': [
+          'error',
+          {
+            selector:
+              'ClassBody > PropertyDefinition > ArrowFunctionExpression',
+            message:
+              "Don't use arrow functions in class properties. Use a function instead.",
+          },
+        ],
+        'prefer-arrow-callback': 'error',
+        '@typescript-eslint/method-signature-style': ['error', 'property'],
+        'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
         'arrow-body-style': [
           'error',
           'as-needed',
