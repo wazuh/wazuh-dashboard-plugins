@@ -44,6 +44,11 @@ module.exports = {
         'prettier',
       ],
       rules: {
+        'arrow-body-style': [
+          'error',
+          'as-needed',
+          { requireReturnForObjectLiteral: true },
+        ],
         'no-unreachable': 'error',
         'no-fallthrough': [
           'error',
