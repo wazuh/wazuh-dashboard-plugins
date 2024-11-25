@@ -23,6 +23,7 @@ import {
   EuiFieldText,
   EuiSpacer,
   EuiPanel,
+  EuiFormRow,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -45,6 +46,9 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orch
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
+type FieldTypes = 'key' | 'value' | 'edit';
+type FieldStateTypes = 'addingKey' | 'addingValue' | 'editingValue';
+
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
@@ -58,6 +62,7 @@ class WzListEditor extends Component {
       editingValue: '',
       newListName: '',
       showWarningRestart: false,
+      isInvalid: [],
     };
     this.items = {};
 
@@ -97,9 +102,11 @@ class WzListEditor extends Component {
     } = {};
     const lines = content.split('\n');
 
+    const regex = /^((?:[^:"]*|"[^"]*")*):(.*)$/;
+
     lines.forEach(line => {
       // Regex splitting the first : and ignoring the ones inside quotes
-      const match = line.match(/^((?:[^:"]*|"[^"]*")*):(.*)$/);
+      const match = line.match(regex);
 
       if (match) {
         const [, key, value] = match;
@@ -211,18 +218,24 @@ class WzListEditor extends Component {
   };
 
   onChangeKey = e => {
+    this.validateQuotes(e.target.value, 'key');
+
     this.setState({
       addingKey: e.target.value,
     });
   };
 
   onChangeValue = e => {
+    this.validateQuotes(e.target.value, 'value');
+
     this.setState({
       addingValue: e.target.value,
     });
   };
 
   onChangeEditingValue = e => {
+    this.validateQuotes(e.target.value, 'edit');
+
     this.setState({
       editingValue: e.target.value,
     });
@@ -255,6 +268,28 @@ class WzListEditor extends Component {
   };
 
   /**
+   * Validate that the value has 0 or 2 quotes.
+   * @param {String} value
+   */
+  private validateQuotes(value: string, field: FieldTypes): boolean {
+    const quotes = value.split('"').length - 1;
+    const isValid = quotes === 0 || quotes === 2;
+    if (!isValid) {
+      this.setState({
+        isInvalid: [
+          ...this.state.isInvalid,
+          { field, message: 'Must have 0 or 2 quotes' },
+        ],
+      });
+    } else {
+      this.setState(prevState => ({
+        isInvalid: prevState.isInvalid.filter(error => error.field !== field),
+      }));
+    }
+    return isValid;
+  }
+
+  /**
    * Append a key value to this.items and after that if everything works ok re-create the array for the table
    */
   addItem() {
@@ -266,6 +301,15 @@ class WzListEditor extends Component {
         <Fragment>
           <strong>{addingKey}</strong> key already exists
         </Fragment>,
+        3000,
+      );
+      return;
+    }
+    if (this.state.isInvalid.length > 0) {
+      this.showToast(
+        'danger',
+        'Error',
+        'Key and value must have 0 or 2 quotes',
         3000,
       );
       return;
@@ -379,6 +423,38 @@ class WzListEditor extends Component {
     );
   }
 
+  inputValidation({
+    field,
+    value,
+    onChange,
+    placeholder,
+  }: {
+    field: FieldTypes;
+    value: FieldStateTypes;
+    onChange: (e: any) => void;
+    placeholder: string;
+  }) {
+    return (
+      <EuiFormRow
+        fullWidth={true}
+        isInvalid={this.state.isInvalid.some(error => error.field === field)}
+        error={
+          this.state.isInvalid.filter(error => error.field === field)?.[0]
+            ?.message
+        }
+      >
+        <EuiFieldText
+          fullWidth={true}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          aria-label='Use aria labels when no actual label is in use'
+          isInvalid={this.state.isInvalid.some(error => error.field === field)}
+        />
+      </EuiFormRow>
+    );
+  }
+
   renderAdd() {
     const { addingKey, addingValue } = this.state;
 
@@ -389,23 +465,21 @@ class WzListEditor extends Component {
             <EuiSpacer size='l' />
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiFieldText
-                  fullWidth={true}
-                  placeholder='Key'
-                  value={addingKey}
-                  onChange={this.onChangeKey}
-                  aria-label='Use aria labels when no actual label is in use'
-                />
+                {this.inputValidation({
+                  field: 'key',
+                  value: addingKey,
+                  onChange: this.onChangeKey,
+                  placeholder: 'Key',
+                })}
               </EuiFlexItem>
 
               <EuiFlexItem>
-                <EuiFieldText
-                  fullWidth={true}
-                  placeholder='Value'
-                  value={addingValue}
-                  onChange={this.onChangeValue}
-                  aria-label='Use aria labels when no actual label is in use'
-                />
+                {this.inputValidation({
+                  field: 'value',
+                  value: addingValue,
+                  onChange: this.onChangeValue,
+                  placeholder: 'Value',
+                })}
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiFlexGroup>
@@ -481,14 +555,12 @@ class WzListEditor extends Component {
         sortable: true,
         render: (value, item) => {
           if (this.state.editing === item.key) {
-            return (
-              <EuiFieldText
-                placeholder='New value'
-                value={this.state.editingValue}
-                onChange={this.onChangeEditingValue}
-                aria-label='Use aria labels when no actual label is in use'
-              />
-            );
+            return this.inputValidation({
+              field: 'edit',
+              value: this.state.editingValue,
+              onChange: this.onChangeEditingValue,
+              placeholder: 'New value',
+            });
           } else {
             return <span>{value}</span>;
           }
