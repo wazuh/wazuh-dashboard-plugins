@@ -53,8 +53,6 @@ module.exports = {
           },
         ],
         'prefer-arrow-callback': 'error',
-        '@typescript-eslint/no-extraneous-class': 'off',
-        '@typescript-eslint/method-signature-style': ['error', 'property'],
         'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
         'arrow-body-style': [
           'error',
@@ -68,9 +66,6 @@ module.exports = {
             allowEmptyCase: true,
           },
         ],
-        '@typescript-eslint/no-explicit-any': 'off',
-        '@typescript-eslint/no-empty-function': 'off',
-        '@stylistic/spaced-comment': ['error', 'always'],
         'no-use-before-define': [
           'error',
           {
@@ -89,33 +84,9 @@ module.exports = {
         'default-param-last': 'error',
         eqeqeq: ['error', 'always'],
         'no-var': 'error',
-        'unicorn/prefer-ternary': 'off',
-        // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/custom-error-definition.md
-        'unicorn/custom-error-definition': 'error',
-        // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/better-regex.md
-        'unicorn/better-regex': 'error',
-        'unicorn/no-null': 'off',
-        'unicorn/text-encoding-identifier-case': 'off',
-        'unicorn/prevent-abbreviations': [
-          'error',
-          {
-            extendDefaultReplacements: false,
-            replacements: {
-              e: {
-                error: true,
-              },
-              err: {
-                error: true,
-              },
-            },
-          },
-        ],
-        'unicorn/filename-case': [
-          'error',
-          {
-            case: 'kebabCase',
-          },
-        ],
+        /* -------------------------------------------------------------------------- */
+        /*                                 @stylistic                                 */
+        /* -------------------------------------------------------------------------- */
         '@stylistic/no-multiple-empty-lines': [
           'error',
           {
@@ -124,6 +95,7 @@ module.exports = {
             maxBOF: 0,
           },
         ],
+        '@stylistic/spaced-comment': ['error', 'always'],
         // https://eslint.style/rules/js/padding-line-between-statements
         '@stylistic/padding-line-between-statements': [
           'error',
@@ -168,6 +140,43 @@ module.exports = {
             ],
           },
         ],
+        /* -------------------------------------------------------------------------- */
+        /*                                   unicorn                                  */
+        /* -------------------------------------------------------------------------- */
+        'unicorn/prefer-ternary': 'off',
+        // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/custom-error-definition.md
+        'unicorn/custom-error-definition': 'error',
+        // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/better-regex.md
+        'unicorn/better-regex': 'error',
+        'unicorn/no-null': 'off',
+        'unicorn/text-encoding-identifier-case': 'off',
+        'unicorn/prevent-abbreviations': [
+          'error',
+          {
+            extendDefaultReplacements: false,
+            replacements: {
+              e: {
+                error: true,
+              },
+              err: {
+                error: true,
+              },
+            },
+          },
+        ],
+        'unicorn/filename-case': [
+          'error',
+          {
+            case: 'kebabCase',
+          },
+        ],
+        /* -------------------------------------------------------------------------- */
+        /*                             @typescript-eslint                             */
+        /* -------------------------------------------------------------------------- */
+        '@typescript-eslint/no-extraneous-class': 'off',
+        '@typescript-eslint/method-signature-style': ['error', 'property'],
+        '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-empty-function': 'off',
       },
     },
     {
