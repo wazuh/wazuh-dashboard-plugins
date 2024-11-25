@@ -39,7 +39,7 @@ jobs:
           echo "Listing branches"
           git branch -a
           echo "Getting diff files ignoring deleted and getting the changed or renamed files"
-          CHANGED_FILES=$(git diff --name-status --diff-filter d ${REMOTE_NAME}/${GITHUB_BASE_REF}..${REMOTE_NAME}/${GITHUB_HEAD_REF} | awk '{print $NF}' | grep -P '.*\\.[jt]sx?$')
+          CHANGED_FILES=$(git diff --name-status --diff-filter d ${REMOTE_NAME}/${GITHUB_BASE_REF}..${REMOTE_NAME}/${GITHUB_HEAD_REF} | awk '{print $NF}' | grep -E '.*\.[jt]sx?$')
           echo "Changed files:"
           echo "${CHANGED_FILES}"
           git checkout $GITHUB_HEAD_REF

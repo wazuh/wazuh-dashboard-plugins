@@ -23,7 +23,7 @@ printSuccess() {
 }
 
 files=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE "yarn.lock")
-eslint_files=$(echo "$files" | grep "plugins/" | grep -P ".*\.[jt]sx?$" || true)
+eslint_files=$(echo "$files" | grep "plugins/" | grep -E ".*\.[jt]sx?$" || true)
 
 printInfo "⏳ Checking for linting errors..."
 ./node_modules/.bin/eslint $eslint_files
