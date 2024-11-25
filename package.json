@@ -1,8 +1,8 @@
 {
   "type": "commonjs",
   "scripts": {
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix .",
+    "lint": "eslint $(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep 'plugins/' | grep -P '.*\\.[jt]sx?$')",
+    "lint:fix": "yarn lint --fix",
     "prepare": "husky",
     "format": "prettier --ignore-unknown --write $(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE 'yarn.lock')"
   },
