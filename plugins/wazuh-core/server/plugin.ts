@@ -27,6 +27,8 @@ import {
   WAZUH_DATA_CONFIG_APP_PATH,
 } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
+import { CorePluginConfigType } from '.';
+import { first } from 'rxjs/operators';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -46,9 +48,9 @@ export class WazuhCorePlugin
     plugins: PluginSetup,
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
-
+    const config$ = this.initializerContext.config.create<CorePluginConfigType>();
+    const config: CorePluginConfigType = await config$.pipe(first()).toPromise()
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
-
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-store'),
       {
