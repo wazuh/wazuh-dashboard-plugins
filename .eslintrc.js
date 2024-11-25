@@ -53,6 +53,7 @@ module.exports = {
           },
         ],
         'prefer-arrow-callback': 'error',
+        '@typescript-eslint/no-extraneous-class': 'off',
         '@typescript-eslint/method-signature-style': ['error', 'property'],
         'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
         'arrow-body-style': [
@@ -70,7 +71,6 @@ module.exports = {
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-empty-function': 'off',
         '@stylistic/spaced-comment': ['error', 'always'],
-        camelcase: 'error',
         'no-use-before-define': [
           'error',
           {
