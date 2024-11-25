@@ -2,7 +2,8 @@
   "type": "commonjs",
   "scripts": {
     "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
+    "lint:fix": "eslint --fix .",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^2.11.0",
@@ -19,6 +20,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-sort-class-members": "^1.21.0",
     "eslint-plugin-unicorn": "^56.0.1",
+    "husky": "^9.1.7",
     "prettier": "^3.3.3",
     "prettier-eslint": "^16.3.0",
     "typescript": "^5.6.3"

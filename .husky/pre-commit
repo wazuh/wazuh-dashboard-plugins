@@ -1,0 +1,36 @@
+#!/usr/bin/env sh
+
+set -x
+
+printBlue() {
+    printf "\033[34;1m%s\033[m" "$@"
+}
+
+printGreen() {
+    printf "\033[32;1m%s\033[m" "$@"
+}
+
+printFormat() {
+    local text="$1"
+    shift
+    printf "[ $text ] %s\n" "$@"
+}
+
+printInfo() {
+    printFormat "$(printBlue "INFO")" "$@"
+}
+
+printSuccess() {
+    printFormat "$(printGreen "SUCCESS")" "$@"
+}
+
+files=$(git diff-index --cached --name-only --diff-filter=aMR HEAD | grep -vE "yarn.lock")
+eslint_files=$(echo "$files" | grep "plugins/" | grep -P ".*\.[jt]sx?$" || true)
+
+printInfo "Checking for linting errors..."
+./node_modules/.bin/eslint $eslint_files
+printSuccess "ESLint passed"
+
+printInfo "Checking for formatting errors..."
+./node_modules/.bin/prettier --check --log-level error $files
+printSuccess "Prettier passed"
