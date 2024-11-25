@@ -6,7 +6,7 @@ FROM opensearchproject/opensearch-dashboards:${OSD_VERSION}
 
 ARG PACKAGE_NAME
 
-ADD ./${PACKAGE_NAME} /tmp/
+ADD ./plugins /tmp/
 # This is needed to run it local
 #
 # USER root
