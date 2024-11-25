@@ -30,7 +30,7 @@ export type InitializationTaskContext = 'internal' | 'user';
 export interface IInitializationService
   extends LifecycleService<any, any, any, any, any, any> {
   register(task: InitializationTaskDefinition): void;
-  get(taskName?: string): InitializationTaskRunData;
+  get(taskName: string): InitializationTaskRunData;
   getAll(): InitializationTaskRunData[];
   createRunContext<ContextType = any>(
     scope: InitializationTaskContext,
