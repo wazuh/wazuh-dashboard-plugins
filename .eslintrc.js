@@ -213,5 +213,55 @@ module.exports = {
         sortInterfaces: true,
       },
     ],
+    '@stylistic/no-multiple-empty-lines': [
+      'error',
+      {
+        max: 1,
+        maxEOF: 1,
+        maxBOF: 0,
+      },
+    ],
+    '@stylistic/padding-line-between-statements': [
+      'error',
+      // imports
+      { blankLine: 'always', prev: 'import', next: '*' },
+      { blankLine: 'never', prev: 'import', next: 'import' },
+
+      // var
+      { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' },
+      { blankLine: 'always', prev: '*', next: ['const', 'let', 'var'] },
+      {
+        blankLine: 'never',
+        prev: ['const', 'let', 'var'],
+        next: ['const', 'let', 'var'],
+      },
+
+      // function
+      { blankLine: 'always', prev: '*', next: 'function' },
+      { blankLine: 'always', prev: 'function', next: '*' },
+
+      // block-like
+      { blankLine: 'always', prev: '*', next: 'block-like' },
+      { blankLine: 'always', prev: 'block-like', next: '*' },
+
+      // return
+      { blankLine: 'always', prev: '*', next: 'return' },
+
+      // directive
+      { blankLine: 'always', prev: 'directive', next: '*' },
+      { blankLine: 'never', prev: 'directive', next: 'directive' },
+
+      // switch
+      { blankLine: 'always', prev: ['case', 'default'], next: '*' },
+    ],
+    '@stylistic/lines-between-class-members': [
+      'error',
+      {
+        enforce: [
+          { blankLine: 'always', prev: '*', next: '*' },
+          { blankLine: 'never', prev: 'field', next: 'field' },
+        ],
+      },
+    ],
   },
 };
