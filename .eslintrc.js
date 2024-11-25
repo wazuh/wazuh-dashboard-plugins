@@ -228,6 +228,7 @@ module.exports = {
         maxBOF: 0,
       },
     ],
+    // https://eslint.style/rules/js/padding-line-between-statements
     '@stylistic/padding-line-between-statements': [
       'error',
       // imports
@@ -261,6 +262,7 @@ module.exports = {
       // switch
       { blankLine: 'always', prev: ['case', 'default'], next: '*' },
     ],
+    // https://eslint.style/rules/js/lines-between-class-members
     '@stylistic/lines-between-class-members': [
       'error',
       {
