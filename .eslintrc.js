@@ -54,6 +54,24 @@ module.exports = {
           },
         ],
         'prefer-arrow-callback': 'error',
+        '@typescript-eslint/member-ordering': [
+          'error',
+          {
+            default: [
+              'static-field',
+              'static-set',
+              'static-get',
+              'static-method',
+              'abstract-field',
+              'instance-field',
+              ['abstract-set', 'abstract-get'],
+              ['instance-set', 'instance-get'],
+              'constructor',
+              'abstract-method',
+              'instance-method',
+            ],
+          },
+        ],
         '@typescript-eslint/method-signature-style': ['error', 'property'],
         'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
         'arrow-body-style': [
