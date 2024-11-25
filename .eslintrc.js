@@ -90,6 +90,7 @@ module.exports = {
         'default-param-last': 'error',
         eqeqeq: ['error', 'always'],
         'no-var': 'error',
+        'unicorn/prefer-ternary': 'off',
         // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/custom-error-definition.md
         'unicorn/custom-error-definition': 'error',
         // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/better-regex.md
