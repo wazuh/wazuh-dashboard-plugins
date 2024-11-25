@@ -11,8 +11,6 @@
 [Provide instructions to test this PR]
 
 ### Check List
-- [ ] All tests pass
-  - [ ] `yarn test:jest`
 - [ ] New functionality includes testing.
 - [ ] New functionality has been documented.
 - [ ] Update [CHANGELOG.md](./../CHANGELOG.md)
