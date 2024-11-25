@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 
-set -x
-
 printBlue() {
     printf "\033[34;1m%s\033[m" "$@"
 }
@@ -24,7 +22,7 @@ printSuccess() {
     printFormat "$(printGreen "SUCCESS")" "$@"
 }
 
-files=$(git diff-index --cached --name-only --diff-filter=aMR HEAD | grep -vE "yarn.lock")
+files=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE "yarn.lock")
 eslint_files=$(echo "$files" | grep "plugins/" | grep -P ".*\.[jt]sx?$" || true)
 
 printInfo "Checking for linting errors..."
