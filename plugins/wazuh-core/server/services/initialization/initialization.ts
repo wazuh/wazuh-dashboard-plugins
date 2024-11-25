@@ -7,6 +7,15 @@ import {
   InitializationTaskContext,
 } from './types';
 import { addRoutes } from './routes';
+import {
+  INITIALIZATION_TASK_CONTEXT_INTERNAL,
+  INITIALIZATION_TASK_RUN_RESULT_FAIL,
+  INITIALIZATION_TASK_RUN_RESULT_NULL,
+  INITIALIZATION_TASK_RUN_RESULT_SUCCESS,
+  INITIALIZATION_TASK_RUN_STATUS_FINISHED,
+  INITIALIZATION_TASK_RUN_STATUS_NOT_STARTED,
+  INITIALIZATION_TASK_RUN_STATUS_RUNNING,
+} from '../../../common/services/initialization/constants';
 
 export class InitializationService implements IInitializationService {
   private items: Map<string, InitializationTaskDefinition>;
@@ -55,7 +64,9 @@ export class InitializationService implements IInitializationService {
     return { ...this.services, ...context, scope };
   }
   async runAsInternal(taskNames?: string[]) {
-    const ctx = this.createRunContext('internal', { core: this._coreStart });
+    const ctx = this.createRunContext(INITIALIZATION_TASK_CONTEXT_INTERNAL, {
+      core: this._coreStart,
+    });
     return await this.run(ctx, taskNames);
   }
   createNewTaskFromRegisteredTask(name: string) {
@@ -103,8 +114,10 @@ export class InitializationService implements IInitializationService {
 class InitializationTask implements IInitializationTask {
   public name: string;
   private _run: any;
-  public status: InitializationTaskRunData['status'] = 'not_started';
-  public result: InitializationTaskRunData['result'] = null;
+  public status: InitializationTaskRunData['status'] =
+    INITIALIZATION_TASK_RUN_STATUS_NOT_STARTED;
+  public result: InitializationTaskRunData['result'] =
+    INITIALIZATION_TASK_RUN_RESULT_NULL;
   public data: any = null;
   public createdAt: InitializationTaskRunData['createdAt'] =
     new Date().toISOString();
@@ -117,7 +130,7 @@ class InitializationTask implements IInitializationTask {
     this._run = task.run;
   }
   private init() {
-    this.status = 'running';
+    this.status = INITIALIZATION_TASK_RUN_STATUS_RUNNING;
     this.result = null;
     this.data = null;
     this.startedAt = new Date().toISOString();
@@ -126,20 +139,20 @@ class InitializationTask implements IInitializationTask {
     this.error = null;
   }
   async run(...params) {
-    if (this.status === 'running') {
+    if (this.status === INITIALIZATION_TASK_RUN_STATUS_RUNNING) {
       throw new Error(`Another instance of task ${this.name} is running`);
     }
     let error;
     try {
       this.init();
       this.data = await this._run(...params);
-      this.result = 'success';
+      this.result = INITIALIZATION_TASK_RUN_RESULT_SUCCESS;
     } catch (e) {
       error = e;
-      this.result = 'fail';
+      this.result = INITIALIZATION_TASK_RUN_RESULT_FAIL;
       this.error = e.message;
     } finally {
-      this.status = 'finished';
+      this.status = INITIALIZATION_TASK_RUN_STATUS_FINISHED;
       this.finishedAt = new Date().toISOString();
       const dateStartedAt = new Date(this.startedAt!);
       const dateFinishedAt = new Date(this.finishedAt);

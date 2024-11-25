@@ -1,3 +1,7 @@
+import {
+  InitializationTaskRunResult,
+  InitializationTaskRunStatus,
+} from '../../../common/services/initialization/types';
 import { LifecycleService } from '../types';
 
 export interface InitializationTaskDefinition {
@@ -7,8 +11,8 @@ export interface InitializationTaskDefinition {
 
 export interface InitializationTaskRunData {
   name: InitializationTaskDefinition['name'];
-  status: 'not_started' | 'running' | 'finished';
-  result: 'success' | 'fail' | null;
+  status: InitializationTaskRunStatus;
+  result: InitializationTaskRunResult;
   createdAt: string | null;
   startedAt: string | null;
   finishedAt: string | null;
@@ -27,7 +31,7 @@ export interface IInitializationService
   extends LifecycleService<any, any, any, any, any, any> {
   register(task: InitializationTaskDefinition): void;
   get(taskName?: string): InitializationTaskRunData;
-  getAll(): InitializationTaskRunData[]; 
+  getAll(): InitializationTaskRunData[];
   createRunContext<ContextType = any>(
     scope: InitializationTaskContext,
     context: ContextType,
