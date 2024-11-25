@@ -177,6 +177,18 @@ module.exports = {
         '@typescript-eslint/method-signature-style': ['error', 'property'],
         '@typescript-eslint/no-explicit-any': 'off',
         '@typescript-eslint/no-empty-function': 'off',
+        '@typescript-eslint/naming-convention': [
+          'error',
+          { selector: 'default', format: ['camelCase'] },
+          {
+            selector: 'objectLiteralProperty',
+            format: ['camelCase', 'snake_case'],
+          },
+          {
+            selector: ['class', 'interface', 'typeLike'],
+            format: ['PascalCase'],
+          },
+        ],
       },
     },
     {
