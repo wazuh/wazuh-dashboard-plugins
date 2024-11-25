@@ -19,16 +19,16 @@ printInfo() {
 }
 
 printSuccess() {
-    printFormat "$(printGreen "SUCCESS")" "$@"
+    printFormat "$(printGreen "SUCCESS")" "✅ $@"
 }
 
 files=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE "yarn.lock")
 eslint_files=$(echo "$files" | grep "plugins/" | grep -P ".*\.[jt]sx?$" || true)
 
-printInfo "Checking for linting errors..."
+printInfo "⏳ Checking for linting errors..."
 ./node_modules/.bin/eslint $eslint_files
-printSuccess "ESLint passed"
+printSuccess "ESLint check passed!"
 
-printInfo "Checking for formatting errors..."
-./node_modules/.bin/prettier --check --log-level error $files
-printSuccess "Prettier passed"
+printInfo "⏳ Checking for formatting errors..."
+./node_modules/.bin/prettier --check --ignore-unknown $files
+printSuccess "Prettier check passed!"

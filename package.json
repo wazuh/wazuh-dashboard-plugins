@@ -3,7 +3,8 @@
   "scripts": {
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "format": "prettier --ignore-unknown --write $(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE 'yarn.lock')"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^2.11.0",

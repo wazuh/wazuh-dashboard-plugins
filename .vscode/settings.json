@@ -22,5 +22,11 @@
   },
   "[shellscript]": {
     "editor.defaultFormatter": "shakram02.bash-beautify"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
   }
 }
