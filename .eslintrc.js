@@ -41,6 +41,13 @@ module.exports = {
     'prettier',
   ],
   rules: {
+    'no-unreachable': 'error',
+    'no-fallthrough': [
+      'error',
+      {
+        allowEmptyCase: true,
+      },
+    ],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     '@stylistic/spaced-comment': ['error', 'always'],
