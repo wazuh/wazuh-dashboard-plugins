@@ -8,14 +8,13 @@ ARG PACKAGE_NAME
 
 ADD ./plugins /tmp/
 # This is needed to run it local
-#
-# USER root
-# RUN yum update -y  && yum install -y unzip
+
+USER root
+RUN yum update -y  && yum install -y unzip
 # RUN unzip /tmp/${PACKAGE_NAME} -d /tmp/
 # RUN rm /tmp/${PACKAGE_NAME}
-# USER opensearch-dashboards
-#
-RUN yum update -y  && yum install -y unzip
+USER opensearch-dashboards
+
 COPY --chown=opensearch-dashboards ./install-plugins.sh /
 RUN chmod +x /install-plugins.sh
 RUN /install-plugins.sh
