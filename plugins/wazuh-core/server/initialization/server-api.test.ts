@@ -29,7 +29,7 @@ describe('checkAppServerCompatibility', () => {
     `appVersion: $appVersion, serverAPIVersion: $serverAPIVersion, isCompatible: $isCompatible`,
     ({ appVersion, serverAPIVersion, isCompatible }) => {
       expect(checkAppServerCompatibility(appVersion, serverAPIVersion)).toBe(
-        result,
+        isCompatible,
       );
     },
   );
