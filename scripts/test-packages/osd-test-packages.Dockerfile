@@ -11,8 +11,18 @@ ADD ./plugins /tmp/
 
 USER root
 RUN yum update -y  && yum install -y unzip
-# RUN unzip /tmp/${PACKAGE_NAME} -d /tmp/
+RUN plugins=$(ls /tmp)
+RUN for plugin in $plugins; do \
+  echo $plugin; \
+  unzip /tmp/$plugin -d /tmp/unziped/; \
+done
 # RUN rm /tmp/${PACKAGE_NAME}
+# echo $plugins
+# for plugin in $plugins; do
+#   echo $plugin
+#   unzip /tmp/$plugin -d /tmp/unziped/
+# done
+
 USER opensearch-dashboards
 
 COPY --chown=opensearch-dashboards ./install-plugins.sh /
