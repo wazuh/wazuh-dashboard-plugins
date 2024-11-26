@@ -50,6 +50,10 @@ type FieldTypes = 'key' | 'value' | 'edit';
 type FieldStateTypes = 'addingKey' | 'addingValue' | 'editingValue';
 
 class WzListEditor extends Component {
+  messages = {
+    quotesError: 'Must start and end with quotes or have no quotes at all',
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -278,15 +282,17 @@ class WzListEditor extends Component {
     const endsWithQuote = value.endsWith('"');
 
     const isValid =
-      (startsWithQuote && endsWithQuote && !hasMiddleQuotes) ||
-      (!startsWithQuote && !endsWithQuote && !value.includes('"'));
+      !hasMiddleQuotes &&
+      ((startsWithQuote && endsWithQuote) ||
+        (!startsWithQuote && !endsWithQuote));
+
     if (!isValid) {
       this.setState({
         isInvalid: [
           ...this.state.isInvalid,
           {
             field,
-            message: 'Must start and end with quotes or have no quotes at all',
+            message: this.messages.quotesError,
           },
         ],
       });
@@ -318,7 +324,7 @@ class WzListEditor extends Component {
       this.showToast(
         'danger',
         'Error',
-        'Key and value must start and end with quotes or have no quotes at all',
+        `Key and value ${this.messages.quotesError.toLowerCase()}`,
         3000,
       );
       return;
@@ -443,22 +449,20 @@ class WzListEditor extends Component {
     onChange: (e: any) => void;
     placeholder: string;
   }) {
+    const isValid = this.state.isInvalid.some(error => error.field === field);
+    const errorMessage = this.state.isInvalid.filter(
+      error => error.field === field,
+    )?.[0]?.message;
+
     return (
-      <EuiFormRow
-        fullWidth={true}
-        isInvalid={this.state.isInvalid.some(error => error.field === field)}
-        error={
-          this.state.isInvalid.filter(error => error.field === field)?.[0]
-            ?.message
-        }
-      >
+      <EuiFormRow fullWidth={true} isInvalid={isValid} error={errorMessage}>
         <EuiFieldText
           fullWidth={true}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
           aria-label='Use aria labels when no actual label is in use'
-          isInvalid={this.state.isInvalid.some(error => error.field === field)}
+          isInvalid={isValid}
         />
       </EuiFormRow>
     );
@@ -466,6 +470,8 @@ class WzListEditor extends Component {
 
   renderAdd() {
     const { addingKey, addingValue } = this.state;
+
+    const hasInvalidState = this.state.isInvalid.length > 0;
 
     return (
       <Fragment>
@@ -498,7 +504,7 @@ class WzListEditor extends Component {
                       isDisabled={!addingKey}
                       fill
                       onClick={() => this.addItem()}
-                      disabled={this.state.isInvalid.length > 0}
+                      disabled={hasInvalidState}
                     >
                       Add
                     </EuiButtonEmpty>
