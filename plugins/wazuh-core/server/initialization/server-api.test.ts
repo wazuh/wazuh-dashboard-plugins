@@ -11,7 +11,7 @@ import {
 
 describe('checkAppServerCompatibility', () => {
   it.each`
-    appVersion | serverAPIVersion | result
+    appVersion | serverAPIVersion | isCompatible
     ${'5.0.0'} | ${'5.0.0'}       | ${true}
     ${'5.0.0'} | ${'5.0.1'}       | ${true}
     ${'5.0.0'} | ${'5.0.10'}      | ${true}
@@ -26,8 +26,8 @@ describe('checkAppServerCompatibility', () => {
     ${'5.0.0'} | ${'4.10.10'}     | ${false}
     ${'5.0.0'} | ${'4.10.100'}    | ${false}
   `(
-    `appVersion: $appVersion, serverAPIVersion: $serverAPIVersion, result: $result`,
-    ({ appVersion, serverAPIVersion, result }) => {
+    `appVersion: $appVersion, serverAPIVersion: $serverAPIVersion, isCompatible: $isCompatible`,
+    ({ appVersion, serverAPIVersion, isCompatible }) => {
       expect(checkAppServerCompatibility(appVersion, serverAPIVersion)).toBe(
         result,
       );
