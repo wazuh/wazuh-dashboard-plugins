@@ -37,23 +37,6 @@ import {
   jobSanitizeUploadedFilesTasksRun,
 } from './start';
 import { first } from 'rxjs/operators';
-import {
-  initializationTaskCreatorIndexPattern,
-  initializationTaskCreatorSetting,
-  initializationTaskCreatorExistTemplate,
-} from './lib/initialization';
-import {
-  PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
-  PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
-  PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
-  WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
-  WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
-  WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
-} from '../common/constants';
-import { KnownFields } from '../public/utils/known-fields';
-import { FieldsStatistics } from '../public/utils/statistics-fields';
-import { FieldsMonitoring } from '../public/utils/monitoring-fields';
-import VulnerabilitiesStatesFields from '../public/utils/vulnerabibility-states-fields.json';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -125,113 +108,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // Routes
     const router = core.http.createRouter();
     setupRoutes(router, plugins.wazuhCore);
-
-    // Register initialization
-    // Index pattern: alerts
-    // TODO: this task should be registered by the related plugin
-    plugins.wazuhCore.initialization.register(
-      initializationTaskCreatorIndexPattern({
-        getIndexPatternID: ctx => ctx.configuration.get('pattern'),
-        taskName: 'index-pattern:alerts',
-        options: {
-          savedObjectOverwrite: {
-            timeFieldName: 'timestamp',
-          },
-          fieldsNoIndices: KnownFields,
-        },
-        configurationSettingKey: 'checks.pattern',
-      }),
-    );
-    // Index pattern: monitoring
-    // TODO: this task should be registered by the related plugin
-    plugins.wazuhCore.initialization.register(
-      initializationTaskCreatorIndexPattern({
-        getIndexPatternID: ctx =>
-          ctx.configuration.get('wazuh.monitoring.pattern'),
-        taskName: 'index-pattern:monitoring',
-        options: {
-          savedObjectOverwrite: {
-            timeFieldName: 'timestamp',
-          },
-          fieldsNoIndices: FieldsMonitoring,
-        },
-        configurationSettingKey: 'checks.monitoring', // TODO: create new setting
-      }),
-    );
-    // Index pattern: vulnerabilities
-    // TODO: this task should be registered by the related plugin
-    plugins.wazuhCore.initialization.register(
-      initializationTaskCreatorIndexPattern({
-        getIndexPatternID: ctx =>
-          ctx.configuration.get('vulnerabilities.pattern'),
-        taskName: 'index-pattern:vulnerabilities-states',
-        options: {
-          fieldsNoIndices: VulnerabilitiesStatesFields,
-        },
-        configurationSettingKey: 'checks.vulnerability', // TODO: create new setting
-      }),
-    );
-
-    // Index pattern: statistics
-    // TODO: this task should be registered by the related plugin
-    plugins.wazuhCore.initialization.register(
-      initializationTaskCreatorIndexPattern({
-        getIndexPatternID: async ctx => {
-          const appConfig = await ctx.configuration.get(
-            'cron.prefix',
-            'cron.statistics.index.name',
-          );
-
-          const prefixTemplateName = appConfig['cron.prefix'];
-          const statisticsIndicesTemplateName =
-            appConfig['cron.statistics.index.name'];
-          return `${prefixTemplateName}-${statisticsIndicesTemplateName}-*`;
-        },
-        taskName: 'index-pattern:statistics',
-        options: {
-          savedObjectOverwrite: {
-            timeFieldName: 'timestamp',
-          },
-          fieldsNoIndices: FieldsStatistics,
-        },
-        configurationSettingKey: 'checks.statistics', // TODO: create new setting
-      }),
-    );
-
-    // Settings
-    // TODO: this task should be registered by the related plugin
-    [
-      {
-        key: PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
-        value: WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
-        configurationSetting: 'checks.maxBuckets',
-      },
-      {
-        key: PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
-        value: WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
-        configurationSetting: 'checks.metaFields',
-      },
-      {
-        key: PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
-        value: JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
-        configurationSetting: 'checks.timeFilter',
-      },
-    ].forEach(setting => {
-      plugins.wazuhCore.initialization.register(
-        initializationTaskCreatorSetting(setting, `setting:${setting.key}`),
-      );
-    });
-
-    // Index pattern templates
-    // Index pattern template: alerts
-    // TODO: this task should be registered by the related plugin
-    plugins.wazuhCore.initialization.register(
-      initializationTaskCreatorExistTemplate({
-        getOpenSearchClient: ctx => ctx.core.opensearch.client.asInternalUser,
-        getIndexPatternTitle: ctx => ctx.configuration.get('pattern'),
-        taskName: 'index-pattern-template:alerts',
-      }),
-    );
 
     return {};
   }

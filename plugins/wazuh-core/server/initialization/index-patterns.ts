@@ -1,4 +1,4 @@
-import { IndexPatternsFetcher } from '../../../../../src/plugins/data/server';
+import { IndexPatternsFetcher } from '../../../../src/plugins/data/server';
 
 interface ensureIndexPatternExistenceContextTask {
   indexPatternID: string;
