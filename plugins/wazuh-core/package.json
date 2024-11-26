@@ -27,10 +27,10 @@
     "node-cron": "^3.0.2"
   },
   "devDependencies": {
-    "@testing-library/user-event": "^14.5.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/": "testing-library/user-event",
-    "@types/md5": "^2.3.2",
-    "knip": "^5.22.0",
-    "typescript": "^5.5.2"
+    "@types/md5": "^2.3.5",
+    "knip": "^5.38.1",
+    "typescript": "^5.7.2"
   }
 }
