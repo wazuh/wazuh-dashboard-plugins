@@ -52,6 +52,7 @@ type FieldStateTypes = 'addingKey' | 'addingValue' | 'editingValue';
 class WzListEditor extends Component {
   messages = {
     quotesError: 'Must start and end with quotes or have no quotes at all',
+    colonError: 'Must start and end with quotes when using colon',
   };
 
   constructor(props) {
@@ -222,7 +223,7 @@ class WzListEditor extends Component {
   };
 
   onChangeKey = e => {
-    this.validateQuotes(e.target.value, 'key');
+    this.executeValidation(e.target.value, 'key');
 
     this.setState({
       addingKey: e.target.value,
@@ -230,7 +231,7 @@ class WzListEditor extends Component {
   };
 
   onChangeValue = e => {
-    this.validateQuotes(e.target.value, 'value');
+    this.executeValidation(e.target.value, 'value');
 
     this.setState({
       addingValue: e.target.value,
@@ -238,7 +239,7 @@ class WzListEditor extends Component {
   };
 
   onChangeEditingValue = e => {
-    this.validateQuotes(e.target.value, 'edit');
+    this.executeValidation(e.target.value, 'edit');
 
     this.setState({
       editingValue: e.target.value,
@@ -271,12 +272,65 @@ class WzListEditor extends Component {
     ];
   };
 
+  private executeValidation = (value: string, field: FieldTypes) => {
+    this.validateQuotes(value, field);
+    this.validateColonOutsideQuotes(value, field);
+  };
+
+  /**
+   * Validate that if the value has a colon it starts and ends with quotes
+   * @param {String} value
+   * @param {FieldTypes} field
+   */
+  private validateColonOutsideQuotes = (value: string, field: FieldTypes) => {
+    const hasColon = value.includes(':');
+    if (hasColon) {
+      const startsWithQuote = value.startsWith('"');
+      const endsWithQuote = value.endsWith('"');
+      const isValid = startsWithQuote && endsWithQuote;
+
+      if (!isValid) {
+        const existsError = this.state.isInvalid.some(
+          error =>
+            error.field === field && error.message === this.messages.colonError,
+        );
+
+        // Avoid adding the same error multiple times
+        if (existsError) {
+          return;
+        }
+
+        this.setState({
+          isInvalid: [
+            ...this.state.isInvalid,
+            {
+              field,
+              message: this.messages.colonError,
+            },
+          ],
+        });
+        return;
+      }
+
+      this.setState(prevState => ({
+        isInvalid: prevState.isInvalid.filter(
+          error =>
+            !(
+              error.field === field &&
+              error.message === this.messages.colonError
+            ),
+        ),
+      }));
+    }
+  };
+
   /**
    * Validate that if starts with a quote it ends with a quote and vice versa.
    * Validate that the value has 0 or 2 quotes.
    * @param {String} value
+   * @param {FieldTypes} field
    */
-  private validateQuotes(value: string, field: FieldTypes): boolean {
+  private validateQuotes(value: string, field: FieldTypes) {
     const hasMiddleQuotes = value.slice(1, -1).includes('"');
     const startsWithQuote = value.startsWith('"');
     const endsWithQuote = value.endsWith('"');
@@ -287,6 +341,16 @@ class WzListEditor extends Component {
         (!startsWithQuote && !endsWithQuote));
 
     if (!isValid) {
+      const existsError = this.state.isInvalid.some(
+        error =>
+          error.field === field && error.message === this.messages.quotesError,
+      );
+
+      // Avoid adding the same error multiple times
+      if (existsError) {
+        return;
+      }
+
       this.setState({
         isInvalid: [
           ...this.state.isInvalid,
@@ -298,10 +362,15 @@ class WzListEditor extends Component {
       });
     } else {
       this.setState(prevState => ({
-        isInvalid: prevState.isInvalid.filter(error => error.field !== field),
+        isInvalid: prevState.isInvalid.filter(
+          error =>
+            !(
+              error.field === field &&
+              error.message === this.messages.quotesError
+            ),
+        ),
       }));
     }
-    return isValid;
   }
 
   /**
@@ -450,12 +519,13 @@ class WzListEditor extends Component {
     placeholder: string;
   }) {
     const isValid = this.state.isInvalid.some(error => error.field === field);
-    const errorMessage = this.state.isInvalid.filter(
-      error => error.field === field,
-    )?.[0]?.message;
+    const errorMessages = this.state.isInvalid.map(error => {
+      const keyMatches = error.field === field;
+      return keyMatches ? error.message : '';
+    });
 
     return (
-      <EuiFormRow fullWidth={true} isInvalid={isValid} error={errorMessage}>
+      <EuiFormRow fullWidth={true} isInvalid={isValid} error={errorMessages}>
         <EuiFieldText
           fullWidth={true}
           placeholder={placeholder}
