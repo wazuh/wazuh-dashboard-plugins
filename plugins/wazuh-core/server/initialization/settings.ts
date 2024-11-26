@@ -37,7 +37,10 @@ const decoratorCheckIsEnabled = fn => {
 
 export const checkPluginPlatformSettings = decoratorCheckIsEnabled(
   async (
-    { logger, uiSettingsClient }: InitializationTaskRunContext & {uiSettingsClient: IUiSettingsClient},
+    {
+      logger,
+      uiSettingsClient,
+    }: InitializationTaskRunContext & { uiSettingsClient: IUiSettingsClient },
     {
       key: pluginPlatformSettingName,
       value: defaultAppValue,
