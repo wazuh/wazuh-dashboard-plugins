@@ -268,17 +268,26 @@ class WzListEditor extends Component {
   };
 
   /**
+   * Validate that if starts with a quote it ends with a quote and vice versa.
    * Validate that the value has 0 or 2 quotes.
    * @param {String} value
    */
   private validateQuotes(value: string, field: FieldTypes): boolean {
-    const quotes = value.split('"').length - 1;
-    const isValid = quotes === 0 || quotes === 2;
+    const hasMiddleQuotes = value.slice(1, -1).includes('"');
+    const startsWithQuote = value.startsWith('"');
+    const endsWithQuote = value.endsWith('"');
+
+    const isValid =
+      (startsWithQuote && endsWithQuote && !hasMiddleQuotes) ||
+      (!startsWithQuote && !endsWithQuote && !value.includes('"'));
     if (!isValid) {
       this.setState({
         isInvalid: [
           ...this.state.isInvalid,
-          { field, message: 'Must have 0 or 2 quotes' },
+          {
+            field,
+            message: 'Must start and end with quotes or have no quotes at all',
+          },
         ],
       });
     } else {
@@ -309,7 +318,7 @@ class WzListEditor extends Component {
       this.showToast(
         'danger',
         'Error',
-        'Key and value must have 0 or 2 quotes',
+        'Key and value must start and end with quotes or have no quotes at all',
         3000,
       );
       return;
@@ -489,6 +498,7 @@ class WzListEditor extends Component {
                       isDisabled={!addingKey}
                       fill
                       onClick={() => this.addItem()}
+                      disabled={this.state.isInvalid.length > 0}
                     >
                       Add
                     </EuiButtonEmpty>
