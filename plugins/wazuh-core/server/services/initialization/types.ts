@@ -45,4 +45,5 @@ export interface IInitializationService
 export interface InitializationTaskRunContext extends WazuhCoreServices {
   core: CoreStart;
   logger: Logger;
+  scope: InitializationTaskContext;
 }

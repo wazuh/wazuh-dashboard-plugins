@@ -1,4 +1,8 @@
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server';
+import {
+  InitializationTaskContext,
+  InitializationTaskRunContext,
+} from '../services';
 
 interface ensureIndexPatternExistenceContextTask {
   indexPatternID: string;
@@ -12,7 +16,7 @@ interface ensureIndexPatternExistenceContextTaskWithConfigurationSetting
 
 const decoratorCheckIsEnabled = fn => {
   return async (
-    ctx,
+    ctx: InitializationTaskRunContext,
     {
       configurationSettingKey,
       ...ctxTask
@@ -40,9 +44,9 @@ export const ensureIndexPatternExistence = async (
     );
     logger.debug(`Index pattern with ID [${indexPatternID}] exists`);
     return response;
-  } catch (e) {
+  } catch (error) {
     // Get not found saved object
-    if (e?.output?.statusCode === 404) {
+    if (error?.output?.statusCode === 404) {
       // Create index pattern
       logger.info(`Index pattern with ID [${indexPatternID}] does not exist`);
       return await createIndexPattern(
@@ -52,7 +56,7 @@ export const ensureIndexPatternExistence = async (
       );
     } else {
       throw new Error(
-        `index pattern with ID [${indexPatternID}] existence could not be checked due to: ${e.message}`,
+        `index pattern with ID [${indexPatternID}] existence could not be checked due to: ${error.message}`,
       );
     }
   }
@@ -126,14 +130,17 @@ async function createIndexPattern(
     const indexPatternCreatedMessage = `Created index pattern with ID [${response.id}] title [${response.attributes.title}]`;
     logger.info(indexPatternCreatedMessage);
     return response;
-  } catch (e) {
+  } catch (error) {
     throw new Error(
-      `index pattern with ID [${indexPatternID}] could not be created due to: ${e.message}`,
+      `index pattern with ID [${indexPatternID}] could not be created due to: ${error.message}`,
     );
   }
 }
 
-function getSavedObjectsClient(ctx: any, scope) {
+function getSavedObjectsClient(
+  ctx: InitializationTaskRunContext,
+  scope: InitializationTaskContext,
+) {
   switch (scope) {
     case 'internal':
       return ctx.core.savedObjects.createInternalRepository();
@@ -148,7 +155,10 @@ function getSavedObjectsClient(ctx: any, scope) {
   }
 }
 
-function getIndexPatternsClient(ctx: any, scope) {
+function getIndexPatternsClient(
+  ctx: InitializationTaskRunContext,
+  scope: InitializationTaskContext,
+) {
   switch (scope) {
     case 'internal':
       return new IndexPatternsFetcher(
@@ -165,7 +175,11 @@ function getIndexPatternsClient(ctx: any, scope) {
   }
 }
 
-function getIndexPatternID(ctx: any, scope: string, rest: any) {
+function getIndexPatternID(
+  ctx: InitializationTaskRunContext,
+  scope: string,
+  rest: any,
+) {
   switch (scope) {
     case 'internal':
       return rest.getIndexPatternID(ctx);
@@ -190,7 +204,7 @@ export const initializationTaskCreatorIndexPattern = ({
   configurationSettingKey: string;
 }) => ({
   name: taskName,
-  async run(ctx) {
+  async run(ctx: InitializationTaskRunContext) {
     let indexPatternID;
     try {
       ctx.logger.debug('Starting index pattern saved object');
@@ -208,8 +222,8 @@ export const initializationTaskCreatorIndexPattern = ({
           configurationSettingKey,
         },
       );
-    } catch (e) {
-      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${e.message}`;
+    } catch (error) {
+      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
       ctx.logger.error(message);
       throw new Error(message);
     }

@@ -13,10 +13,14 @@
  */
 
 import { isEqual } from 'lodash';
+import {
+  InitializationTaskContext,
+  InitializationTaskRunContext,
+} from '../services';
 
 const decoratorCheckIsEnabled = fn => {
   return async (
-    ctx,
+    ctx: InitializationTaskRunContext,
     {
       configurationSetting,
       ...ctxTask
@@ -111,7 +115,10 @@ function stringifySetting(setting: any) {
   }
 }
 
-function getSavedObjectsClient(ctx: any, scope) {
+function getSavedObjectsClient(
+  ctx: InitializationTaskRunContext,
+  scope: InitializationTaskContext,
+) {
   switch (scope) {
     case 'internal':
       return ctx.core.savedObjects.createInternalRepository();
@@ -124,7 +131,11 @@ function getSavedObjectsClient(ctx: any, scope) {
   }
 }
 
-function getUiSettingsClient(ctx, scope, client) {
+function getUiSettingsClient(
+  ctx: InitializationTaskRunContext,
+  scope: InitializationTaskContext,
+  client,
+) {
   switch (scope) {
     case 'internal':
       return ctx.core.uiSettings.asScopedToClient(client);
@@ -142,7 +153,7 @@ export const initializationTaskCreatorSetting = (
   taskName: string,
 ) => ({
   name: taskName,
-  async run(ctx) {
+  async run(ctx: InitializationTaskRunContext) {
     try {
       ctx.logger.debug('Starting setting');
 
@@ -169,8 +180,8 @@ export const initializationTaskCreatorSetting = (
         },
       );
       ctx.logger.info('Start setting finished');
-    } catch (e) {
-      const message = `Error initilizating setting [${setting.key}]: ${e.message}`;
+    } catch (error) {
+      const message = `Error initilizating setting [${setting.key}]: ${error.message}`;
       ctx.logger.error(message);
       throw new Error(message);
     }

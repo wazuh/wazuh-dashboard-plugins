@@ -1,6 +1,11 @@
+import { InitializationTaskRunContext } from '../services';
+
 export const checkIndexPatternHasTemplate = async (
-  { logger },
-  { indexPatternTitle, opensearchClient },
+  { logger }: InitializationTaskRunContext,
+  {
+    indexPatternTitle,
+    opensearchClient,
+  }: { indexPatternTitle: string; opensearchClient: any },
 ) => {
   logger.debug('Getting templates');
   const data = await opensearchClient.cat.templates({ format: 'json' });
@@ -65,12 +70,12 @@ export const initializationTaskCreatorExistTemplate = ({
   getIndexPatternTitle,
   taskName,
 }: {
-  getOpenSearchClient: (ctx: any) => any;
-  getIndexPatternTitle: (ctx: any) => Promise<string>;
+  getOpenSearchClient: (ctx: InitializationTaskRunContext) => any;
+  getIndexPatternTitle: (ctx: InitializationTaskRunContext) => Promise<string>;
   taskName: string;
 }) => ({
   name: taskName,
-  async run(ctx) {
+  async run(ctx: InitializationTaskRunContext) {
     let indexPatternTitle;
     try {
       ctx.logger.debug('Starting check of existent template');
@@ -82,8 +87,8 @@ export const initializationTaskCreatorExistTemplate = ({
         indexPatternTitle,
       });
       ctx.logger.info('Start check of existent template finished');
-    } catch (e) {
-      const message = `Error checking of existent template for index pattern with title [${indexPatternTitle}]: ${e.message}`;
+    } catch (error) {
+      const message = `Error checking of existent template for index pattern with title [${indexPatternTitle}]: ${error.message}`;
       ctx.logger.error(message);
       throw new Error(message);
     }

@@ -88,8 +88,10 @@ export class InitializationService implements IInitializationService {
                 ...ctx,
                 logger,
               });
-            } catch (e) {
-              logger.error(`Error running task [${item.name}]: ${e.message}`);
+            } catch (error) {
+              logger.error(
+                `Error running task [${item.name}]: ${error.message}`,
+              );
               return item.getInfo();
             }
           }),
