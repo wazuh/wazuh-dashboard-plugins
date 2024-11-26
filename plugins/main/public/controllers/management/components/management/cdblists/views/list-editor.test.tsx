@@ -44,6 +44,14 @@ describe('WzListEditor', () => {
       key: 'key3',
       value: '',
     },
+    {
+      key: '"a0:a0:a0:a0:a0:a0"',
+      value: '',
+    },
+    {
+      key: '"b1:b1:b1:b1:b1:b1"',
+      value: '"test:6"',
+    },
   ];
 
   it('should render the component', () => {
