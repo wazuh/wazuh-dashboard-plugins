@@ -17,6 +17,7 @@ import {
   InitializationTaskContext,
   InitializationTaskRunContext,
 } from '../services';
+import { IUiSettingsClient } from 'src/core/server';
 
 const decoratorCheckIsEnabled = fn => {
   return async (
@@ -36,7 +37,7 @@ const decoratorCheckIsEnabled = fn => {
 
 export const checkPluginPlatformSettings = decoratorCheckIsEnabled(
   async (
-    { logger, uiSettingsClient },
+    { logger, uiSettingsClient }: InitializationTaskRunContext & {uiSettingsClient: IUiSettingsClient},
     {
       key: pluginPlatformSettingName,
       value: defaultAppValue,
@@ -87,11 +88,11 @@ export const checkPluginPlatformSettings = decoratorCheckIsEnabled(
 );
 
 async function updateSetting(
-  uiSettingsClient,
-  pluginPlatformSettingName,
-  defaultAppValue,
-  retries = 3,
-) {
+  uiSettingsClient: IUiSettingsClient,
+  pluginPlatformSettingName: string,
+  defaultAppValue: any,
+  retries: number = 3,
+): Promise<any> {
   return await uiSettingsClient
     .set(pluginPlatformSettingName, defaultAppValue)
     .catch(async error => {
@@ -134,7 +135,7 @@ function getSavedObjectsClient(
 function getUiSettingsClient(
   ctx: InitializationTaskRunContext,
   scope: InitializationTaskContext,
-  client,
+  client: any,
 ) {
   switch (scope) {
     case 'internal':
