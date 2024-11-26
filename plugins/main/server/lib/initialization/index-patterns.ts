@@ -5,7 +5,7 @@ interface ensureIndexPatternExistenceContextTask {
   options: any;
 }
 
-interface ensureIndexPatternExistenceContextTaskWithCondifurationSetting
+interface ensureIndexPatternExistenceContextTaskWithConfigurationSetting
   extends ensureIndexPatternExistenceContextTask {
   configurationSettingKey: string;
 }
@@ -16,7 +16,7 @@ const decoratorCheckIsEnabled = fn => {
     {
       configurationSettingKey,
       ...ctxTask
-    }: ensureIndexPatternExistenceContextTaskWithCondifurationSetting,
+    }: ensureIndexPatternExistenceContextTaskWithConfigurationSetting,
   ) => {
     if (await ctx.configuration.get(configurationSettingKey)) {
       await fn(ctx, ctxTask);
