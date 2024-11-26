@@ -2,7 +2,8 @@ import {
   InitializationTaskRunResult,
   InitializationTaskRunStatus,
 } from '../../../common/services/initialization/types';
-import { LifecycleService } from '../types';
+import { LifecycleService, WazuhCoreServices } from '../types';
+import { CoreStart, Logger } from '../../../../../core/server';
 
 export interface InitializationTaskDefinition {
   name: string;
@@ -39,4 +40,9 @@ export interface IInitializationService
     scope: InitializationTaskContext;
   };
   runAsInternal<ReturnType = any>(tasks?: string[]): Promise<ReturnType>;
+}
+
+export interface InitializationTaskRunContext extends WazuhCoreServices {
+  core: CoreStart;
+  logger: Logger;
 }

@@ -4,6 +4,7 @@ import {
 } from '../../common/constants';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { version as appVersion } from '../../package.json';
+import { InitializationTaskRunContext } from '../services';
 
 export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
   taskName,
@@ -11,7 +12,7 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
   taskName: string;
 }) => ({
   name: taskName,
-  async run(ctx) {
+  async run(ctx: InitializationTaskRunContext) {
     try {
       ctx.logger.debug(
         'Starting check server API connection and compatibility',
@@ -29,7 +30,9 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
   },
 });
 
-async function ServersAPIConnectionCompatibility(ctx) {
+async function ServersAPIConnectionCompatibility(
+  ctx: InitializationTaskRunContext,
+) {
   if (ctx.scope === 'user' && ctx.request?.query?.apiHostID) {
     const host = await ctx.manageHosts.get(ctx.request.query.apiHostID, {
       excludePassword: true,
@@ -54,7 +57,7 @@ async function ServersAPIConnectionCompatibility(ctx) {
 }
 
 export async function ServerAPIConnectionCompatibility(
-  ctx: any,
+  ctx: InitializationTaskRunContext,
   apiHostID: string,
   appVersion: string,
 ) {
