@@ -502,7 +502,6 @@ class WzListEditor extends Component {
                     <EuiButtonEmpty
                       iconType='plusInCircle'
                       isDisabled={!addingKey}
-                      fill
                       onClick={() => this.addItem()}
                       disabled={hasInvalidState}
                     >

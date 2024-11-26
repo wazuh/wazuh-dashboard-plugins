@@ -54,7 +54,46 @@ describe('WzListEditor', () => {
     },
   ];
 
-  it('should render the component', () => {
+  const cdblistErrors = [
+    {
+      key: '":key',
+      value: 'value',
+    },
+    {
+      key: 'key',
+      value: '":value',
+    },
+    {
+      key: 'key"key',
+      value: 'value',
+    },
+    {
+      key: 'key',
+      value: 'value"value',
+    },
+    {
+      key: 'key',
+      value: 'value"',
+    },
+    {
+      key: 'key',
+      value: '"value',
+    },
+    {
+      key: '"key"key"',
+      value: 'value',
+    },
+    {
+      key: 'key',
+      value: '"value"value"',
+    },
+    {
+      key: 'key:"key',
+      value: 'value',
+    },
+  ];
+
+  beforeEach(() => {
     const cdblistMap = cdblist.map(item => {
       return `${item.key}:${item.value}`;
     });
@@ -68,13 +107,34 @@ describe('WzListEditor', () => {
         <WzListEditor listContent={listContent} />
       </Provider>,
     );
+  });
 
+  it('should render the component', () => {
     cdblist.forEach(item => {
       expect(screen.getByText(item.key)).toBeInTheDocument();
       if (!item.value === '') {
         expect(screen.getByText(item.value)).toBeInTheDocument();
       }
       expect(screen.queryByText(`${item.key}:${item.value}`)).toBeFalsy();
+    });
+  });
+
+  it('shoudl render the message when try to add invalid key or value', () => {
+    const button = screen.getByText('Add new entry');
+
+    fireEvent.click(button);
+
+    const keyInput = screen.getByPlaceholderText('Key');
+    const valueInput = screen.getByPlaceholderText('Value');
+
+    cdblistErrors.forEach(item => {
+      fireEvent.change(keyInput, { target: { value: item.key } });
+      fireEvent.change(valueInput, { target: { value: item.value } });
+      expect(
+        screen.getByText(
+          'Must start and end with quotes or have no quotes at all',
+        ),
+      ).toBeInTheDocument();
     });
   });
 });
