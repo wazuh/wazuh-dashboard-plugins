@@ -188,6 +188,15 @@ module.exports = {
             selector: ['class', 'interface', 'typeLike'],
             format: ['PascalCase'],
           },
+          {
+            selector: ['enum', 'enumMember'],
+            format: ['UPPER_CASE'],
+          },
+          {
+            selector: ['variable'],
+            modifiers: ['global'],
+            format: ['UPPER_CASE'],
+          },
         ],
       },
     },
