@@ -15,7 +15,7 @@ ADD ./plugins /tmp/
 # RUN rm /tmp/${PACKAGE_NAME}
 # USER opensearch-dashboards
 #
-RUN apt-get update && apt-get install -y unzip
+RUN yum update -y  && yum install -y unzip
 COPY --chown=opensearch-dashboards ./install-plugins.sh /
 RUN chmod +x /install-plugins.sh
 RUN /install-plugins.sh
