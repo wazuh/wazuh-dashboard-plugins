@@ -35,15 +35,18 @@ state.set('my_state', newMyState);
 ### Remove data of a state container
 
 ```ts
-state.remove('my_state', newMyState);
+state.remove('my_state');
 ```
 
 ### Subscribe to a state container
 
 ```ts
-state.subscribe('my_state', data => {
+const unsubscribe = state.subscribe('my_state', data => {
   // Do something with the data
 });
+
+// Unsubscribe
+unsubscribe();
 ```
 
 ### Hooks

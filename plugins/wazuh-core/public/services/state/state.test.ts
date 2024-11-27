@@ -1,4 +1,5 @@
 import { CoreState } from './state';
+import { BehaviorSubject } from 'rxjs';
 
 const noop = () => {};
 const logger = {
@@ -48,7 +49,7 @@ describe('State', () => {
       set(newValue) {
         this._value = newValue;
       },
-      remove: () => {},
+      remove() {},
       subscribe: subscribe,
     });
 
@@ -57,5 +58,40 @@ describe('State', () => {
     state.set('state_container', false);
 
     expect(state.get('state_container')).toBe(false);
+  });
+
+  it('Register a state container, subscribe, set new value and remove the subscription', () => {
+    const state = new CoreState(logger);
+
+    const subscriber = jest.fn();
+    state.register('state_container', {
+      _value: true, // mock state. This does not exist in the StateContainer type
+      get() {
+        return this._value;
+      },
+      set(newValue) {
+        this._value = newValue;
+        this.updater$.next(this._value);
+      },
+      remove() {},
+      updater$: new BehaviorSubject(),
+      subscribe(cb) {
+        return this.updater$.subscribe(cb);
+      },
+    });
+
+    expect(state._subscriptions._subscriptions).toEqual(null);
+
+    const unsubscribe = state.subscribe('state_container', subscriber);
+    expect(state._subscriptions._subscriptions).toHaveLength(1);
+
+    state.set('state_container', false);
+    expect(subscriber).toHaveBeenCalledTimes(2);
+
+    unsubscribe();
+    expect(state._subscriptions._subscriptions).toHaveLength(0);
+
+    state.set('state_container', false);
+    expect(subscriber).toHaveBeenCalledTimes(2);
   });
 });

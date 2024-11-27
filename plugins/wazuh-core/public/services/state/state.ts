@@ -55,11 +55,11 @@ export class CoreState implements State {
       this.getStateContainer(name)!.subscribe(callback);
 
     // Create a wrapper of the original subscription to remove all in the stop plugin lifecycle
-    const stateContainerSub = () => {
-      stateContainerSubscription();
+    const stateContainerUnsub = () => {
+      stateContainerSubscription.unsubscribe();
       this._subscriptions.remove(stateContainerSubscription);
     };
     this._subscriptions.add(stateContainerSubscription);
-    return stateContainerSub;
+    return stateContainerUnsub;
   }
 }
