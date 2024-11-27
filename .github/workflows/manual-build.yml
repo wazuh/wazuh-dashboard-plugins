@@ -45,8 +45,9 @@ jobs:
           ref: ${{ inputs.reference }}
           path: wazuh
 
-      - name: Step 02 - Get version and revision
+      - name: Step 02 - Set variables
         run: |
+          echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
           echo "currentDir=$(pwd -P)" >> $GITHUB_ENV
           echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
@@ -56,21 +57,21 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
       - name: Step 04 - Download the core plugin's artifact
         uses: actions/download-artifact@v4
         with:
           name: wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
       - name: Step 05 - Download the check-updates plugin's artifact
         uses: actions/download-artifact@v4
         with:
           name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
       - name: Step 06 - Build the Docker image
