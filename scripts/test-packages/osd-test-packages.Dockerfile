@@ -6,15 +6,16 @@ FROM opensearchproject/opensearch-dashboards:${OSD_VERSION}
 
 ARG PACKAGE_NAME
 
-ADD ./plugins /tmp/
+ADD ./plugins /tmp/plugins/
 # This is needed to run it local
 
+RUN mkdir /tmp/unziped
 USER root
 RUN yum update -y  && yum install -y unzip
 RUN ls -la /tmp
-RUN for plugin in $(ls /tmp); do \
+RUN for plugin in $(ls /tmp/plugins); do \
   echo $plugin; \
-  unzip /tmp/$plugin -d /tmp/unziped/; \
+  unzip /tmp/plugins/$plugin -d /tmp/unziped/; \
 done
 # RUN rm /tmp/${PACKAGE_NAME}
 # echo $plugins
