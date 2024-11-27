@@ -300,15 +300,15 @@ class WzListEditor extends Component {
           return;
         }
 
-        this.setState({
+        this.setState(prevState => ({
           isInvalid: [
-            ...this.state.isInvalid,
+            ...prevState.isInvalid,
             {
               field,
               message: this.messages.colonError,
             },
           ],
-        });
+        }));
         return;
       }
     }
@@ -332,10 +332,11 @@ class WzListEditor extends Component {
     const hasMiddleQuotes = value.slice(1, -1).includes('"');
     const startsWithQuote = value.startsWith('"');
     const endsWithQuote = value.endsWith('"');
+    const valueLength = value.length !== 1;
 
     const isValid =
       !hasMiddleQuotes &&
-      ((startsWithQuote && endsWithQuote) ||
+      ((startsWithQuote && endsWithQuote && valueLength) ||
         (!startsWithQuote && !endsWithQuote));
 
     if (!isValid) {
@@ -349,15 +350,15 @@ class WzListEditor extends Component {
         return;
       }
 
-      this.setState({
+      this.setState(prevState => ({
         isInvalid: [
-          ...this.state.isInvalid,
+          ...prevState.isInvalid,
           {
             field,
             message: this.messages.quotesError,
           },
         ],
-      });
+      }));
     } else {
       this.setState(prevState => ({
         isInvalid: prevState.isInvalid.filter(
@@ -693,6 +694,7 @@ class WzListEditor extends Component {
                     });
                   }}
                   color='primary'
+                  data-testid='editButton'
                 />
                 <WzButtonPermissions
                   buttonType='icon'
@@ -702,6 +704,7 @@ class WzListEditor extends Component {
                   tooltip={{ position: 'top', content: `Remove ${item.key}` }}
                   onClick={() => this.deleteItem(item.key)}
                   color='danger'
+                  data-testid='deleteButton'
                 />
               </Fragment>
             );
