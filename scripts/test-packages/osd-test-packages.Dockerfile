@@ -6,28 +6,15 @@ FROM opensearchproject/opensearch-dashboards:${OSD_VERSION}
 
 ARG PACKAGE_NAME
 
-ADD ./plugins /tmp/plugins/
+ADD ./plugins /tmp/
 # This is needed to run it local
-
-# RUN mkdir /tmp/unziped
+#
 # USER root
-# RUN mkdir /tmp/test
-# RUN cp /tmp/plugins/* /tmp/test
 # RUN yum update -y  && yum install -y unzip
-# RUN ls -la /tmp/test
-# RUN for plugin in $(ls /tmp/test); do \
-#   echo $plugin; \
-#   unzip /tmp/test/$plugin -d /tmp/unziped/; \
-# done
+# RUN unzip /tmp/${PACKAGE_NAME} -d /tmp/
 # RUN rm /tmp/${PACKAGE_NAME}
-# echo $plugins
-# for plugin in $plugins; do
-#   echo $plugin
-#   unzip /tmp/$plugin -d /tmp/unziped/
-# done
-
-USER opensearch-dashboards
-
+# USER opensearch-dashboards
+#
 COPY --chown=opensearch-dashboards ./install-plugins.sh /
 RUN chmod +x /install-plugins.sh
 RUN /install-plugins.sh

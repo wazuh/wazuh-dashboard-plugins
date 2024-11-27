@@ -1,11 +1,6 @@
-# plugins=$(ls /tmp)
-# echo $plugins
-# for plugin in $plugins; do
-#   echo $plugin
-#   unzip /tmp/$plugin -d /tmp/unziped/
-# done
-plugins=$(ls /tmp/plugins)
+plugins=$(ls /tmp)
 for plugin in $plugins; do
   echo $plugin
-  /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin install file:///tmp/plugins/$plugin/$(ls /tmp/plugins/$plugin)
+  /usr/share/opensearch-dashboards/bin/opensearch-dashboards-plugin install file:///tmp/$plugin/$(ls /tmp/$plugin)
 done
+echo "All plugins installed successfully"
