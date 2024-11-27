@@ -11,8 +11,7 @@ ADD ./plugins /tmp/
 
 USER root
 RUN yum update -y  && yum install -y unzip
-RUN sh -x \
-for plugin in $(ls /tmp); do \
+RUN for plugin in $(ls /tmp); do \
   echo $plugin; \
   unzip /tmp/$plugin -d /tmp/unziped/; \
 done
@@ -28,4 +27,3 @@ USER opensearch-dashboards
 COPY --chown=opensearch-dashboards ./install-plugins.sh /
 RUN chmod +x /install-plugins.sh
 RUN /install-plugins.sh
-
