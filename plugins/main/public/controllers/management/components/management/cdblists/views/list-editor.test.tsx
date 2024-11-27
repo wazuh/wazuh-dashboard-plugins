@@ -4,6 +4,31 @@ import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import WzListEditor from './list-editor';
+import {
+  ResourcesConstants,
+  ResourcesHandler,
+} from '../../common/resources-handler';
+
+jest.mock('../../../../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({
+    handleError: options => {},
+  }),
+}));
+
+jest.mock('../../common/resources-handler', () => ({
+  ResourcesHandler: jest.fn().mockImplementation(() => ({
+    updateFile: jest.fn().mockResolvedValue({ data: {} }),
+  })),
+  ResourcesConstants: {
+    LISTS: 'lists',
+  },
+  resourceDictionary: {
+    lists: {
+      resourcePath: '/lists',
+      permissionResource: value => `list:file:${value}`,
+    },
+  },
+}));
 
 const mockStore = configureMockStore();
 const store = mockStore({
@@ -86,6 +111,35 @@ describe('WzListEditor', () => {
     fireEvent.click(deleteButton[0].closest('button'));
 
     expect(screen.queryByText(cdblist[0].key)).toBeFalsy();
+  });
+
+  it('should update file correctly', async () => {
+    const button = screen.getByText('Add new entry');
+
+    fireEvent.click(button);
+
+    const keyInput = screen.getByPlaceholderText('Key');
+    const valueInput = screen.getByPlaceholderText('Value');
+
+    fireEvent.change(keyInput, { target: { value: 'newKey' } });
+    fireEvent.change(valueInput, { target: { value: 'newValue' } });
+
+    const addButton = screen.getByText('Add');
+
+    expect(addButton.closest('button')).not.toBeDisabled();
+
+    fireEvent.click(addButton);
+
+    const saveButton = screen.getByText('Save');
+
+    expect(saveButton.closest('button')).not.toBeDisabled();
+
+    fireEvent.click(saveButton);
+
+    expect(screen.getByText('newKey')).toBeInTheDocument();
+    expect(screen.getByText('newValue')).toBeInTheDocument();
+
+    // TODO: Add expect to check information message or Restart button
   });
 
   it.each`
