@@ -50,7 +50,7 @@ type FieldTypes = 'key' | 'value' | 'edit';
 type FieldStateTypes = 'addingKey' | 'addingValue' | 'editingValue';
 
 class WzListEditor extends Component {
-  messages = {
+  private readonly messages = {
     quotesError: 'Must start and end with quotes or have no quotes at all',
     colonError: 'Must start and end with quotes when using colon',
   };
@@ -311,17 +311,15 @@ class WzListEditor extends Component {
         });
         return;
       }
-
-      this.setState(prevState => ({
-        isInvalid: prevState.isInvalid.filter(
-          error =>
-            !(
-              error.field === field &&
-              error.message === this.messages.colonError
-            ),
-        ),
-      }));
     }
+    this.setState(prevState => ({
+      isInvalid: prevState.isInvalid.filter(
+        error =>
+          !(
+            error.field === field && error.message === this.messages.colonError
+          ),
+      ),
+    }));
   };
 
   /**
@@ -378,6 +376,7 @@ class WzListEditor extends Component {
    */
   addItem() {
     const { addingKey, addingValue } = this.state;
+    const hasinvalidState = this.state.isInvalid.length > 0;
     if (!addingKey || Object.keys(this.items).includes(addingKey)) {
       this.showToast(
         'danger',
@@ -389,7 +388,7 @@ class WzListEditor extends Component {
       );
       return;
     }
-    if (this.state.isInvalid.length > 0) {
+    if (hasinvalidState) {
       this.showToast(
         'danger',
         'Error',
@@ -518,21 +517,21 @@ class WzListEditor extends Component {
     onChange: (e: any) => void;
     placeholder: string;
   }) {
-    const isValid = this.state.isInvalid.some(error => error.field === field);
+    const isInvalid = this.state.isInvalid.some(error => error.field === field);
     const errorMessages = this.state.isInvalid.map(error => {
       const keyMatches = error.field === field;
       return keyMatches ? error.message : '';
     });
 
     return (
-      <EuiFormRow fullWidth={true} isInvalid={isValid} error={errorMessages}>
+      <EuiFormRow fullWidth={true} isInvalid={isInvalid} error={errorMessages}>
         <EuiFieldText
           fullWidth={true}
           placeholder={placeholder}
           value={value}
           onChange={onChange}
           aria-label='Use aria labels when no actual label is in use'
-          isInvalid={isValid}
+          isInvalid={isInvalid}
         />
       </EuiFormRow>
     );
