@@ -54,7 +54,7 @@ Use the state container.
 
 ```ts
 const [value, { set: setValue, remove: removeValue }] =
-  useStateContainter('my_state_container');
+  useStateContainer('my_state_container');
 ```
 
 ### HOCs

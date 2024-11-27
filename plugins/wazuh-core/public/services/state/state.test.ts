@@ -41,7 +41,7 @@ describe('State', () => {
 
     const subscribe = jest.fn();
     state.register('state_container', {
-      _value: true, // mock state. This is not exist in the StateContainer type
+      _value: true, // mock state. This does not exist in the StateContainer type
       get() {
         return this._value;
       },
