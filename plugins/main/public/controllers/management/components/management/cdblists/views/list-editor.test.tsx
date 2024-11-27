@@ -4,14 +4,10 @@ import { render, fireEvent, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import WzListEditor from './list-editor';
-import {
-  ResourcesConstants,
-  ResourcesHandler,
-} from '../../common/resources-handler';
 
 jest.mock('../../../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: options => {},
+    handleError: () => {},
   }),
 }));
 
@@ -111,6 +107,33 @@ describe('WzListEditor', () => {
     fireEvent.click(deleteButton[0].closest('button'));
 
     expect(screen.queryByText(cdblist[0].key)).toBeFalsy();
+  });
+
+  it('should edit the value correctly or cancel the edit', async () => {
+    expect(screen.queryByText('newValue')).toBeFalsy();
+
+    const editButton = screen.queryAllByTestId('editButton');
+    fireEvent.click(editButton[0]);
+
+    const valueInput = screen.getByPlaceholderText('New value');
+
+    fireEvent.change(valueInput, { target: { value: 'newValue' } });
+
+    const saveEditButton = screen.getByTestId('saveEditButton');
+
+    fireEvent.click(saveEditButton.closest('button'));
+
+    expect(screen.getByText('newValue')).toBeInTheDocument();
+
+    fireEvent.click(editButton[1]);
+
+    fireEvent.change(valueInput, { target: { value: 'newValue2' } });
+
+    const cancelButton = screen.getByTestId('cancelEditButton');
+
+    fireEvent.click(cancelButton.closest('button'));
+
+    expect(screen.queryByText('newValue2')).toBeFalsy();
   });
 
   it('should update file correctly', async () => {

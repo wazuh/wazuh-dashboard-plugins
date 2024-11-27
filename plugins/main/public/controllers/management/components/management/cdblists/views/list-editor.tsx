@@ -666,6 +666,7 @@ class WzListEditor extends Component {
                       this.setEditedValue();
                     }}
                     color='primary'
+                    data-testid='saveEditButton'
                   />
                 </EuiToolTip>
                 <EuiToolTip position='top' content={'Discard'}>
@@ -674,6 +675,7 @@ class WzListEditor extends Component {
                     iconType='cross'
                     onClick={() => this.setState({ editing: false })}
                     color='danger'
+                    data-testid='cancelEditButton'
                   />
                 </EuiToolTip>
               </Fragment>
