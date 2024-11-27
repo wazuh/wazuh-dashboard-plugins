@@ -56,21 +56,21 @@ jobs:
       - name: Step 03 - Download the main plugin's artifact
         uses: actions/download-artifact@v4
         with:
-          name: wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          name: wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
       - name: Step 04 - Download the core plugin's artifact
         uses: actions/download-artifact@v4
         with:
-          name: wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          name: wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
       - name: Step 05 - Download the check-updates plugin's artifact
         uses: actions/download-artifact@v4
         with:
-          name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
