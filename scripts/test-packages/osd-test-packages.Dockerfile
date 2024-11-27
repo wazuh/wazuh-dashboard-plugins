@@ -12,7 +12,7 @@ ADD ./plugins /tmp/plugins/
 RUN mkdir /tmp/unziped
 USER root
 RUN yum update -y  && yum install -y unzip
-RUN ls -la /tmp
+RUN ls -la /tmp/plugins
 RUN for plugin in $(ls /tmp/plugins); do \
   echo $plugin; \
   unzip /tmp/plugins/$plugin -d /tmp/unziped/; \
