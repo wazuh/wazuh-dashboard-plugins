@@ -9,16 +9,16 @@ ARG PACKAGE_NAME
 ADD ./plugins /tmp/plugins/
 # This is needed to run it local
 
-RUN mkdir /tmp/unziped
-USER root
-RUN mkdir /tmp/test
-RUN cp /tmp/plugins/* /tmp/test
-RUN yum update -y  && yum install -y unzip
-RUN ls -la /tmp/test
-RUN for plugin in $(ls /tmp/test); do \
-  echo $plugin; \
-  unzip /tmp/test/$plugin -d /tmp/unziped/; \
-done
+# RUN mkdir /tmp/unziped
+# USER root
+# RUN mkdir /tmp/test
+# RUN cp /tmp/plugins/* /tmp/test
+# RUN yum update -y  && yum install -y unzip
+# RUN ls -la /tmp/test
+# RUN for plugin in $(ls /tmp/test); do \
+#   echo $plugin; \
+#   unzip /tmp/test/$plugin -d /tmp/unziped/; \
+# done
 # RUN rm /tmp/${PACKAGE_NAME}
 # echo $plugins
 # for plugin in $plugins; do
