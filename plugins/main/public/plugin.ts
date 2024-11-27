@@ -49,6 +49,7 @@ import { Applications, Categories } from './utils/applications';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
+import { reportingDefinitions } from './react-services/reporting/reporting-definitions';
 
 export class WazuhPlugin
   implements

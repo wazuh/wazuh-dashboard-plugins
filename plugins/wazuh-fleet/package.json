@@ -3,7 +3,7 @@
   "version": "5.0.0",
   "revision": "00",
   "pluginPlatform": {
-    "version": "2.13.0"
+    "version": "2.18.0"
   },
   "description": "Wazuh Fleet",
   "private": true,
@@ -22,8 +22,16 @@
     "md5": "^2.3.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^13.0.0",
     "@testing-library/user-event": "^14.5.0",
     "@types/": "testing-library/user-event",
-    "@types/md5": "^2.3.2"
+    "@types/jest": "^29.5.14",
+    "@types/md5": "^2.3.2",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "jest": "^29.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   }
 }

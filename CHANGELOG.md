@@ -2,11 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 2.16.0 - Revision 00
+## Wazuh v5.0.0 - OpenSearch Dashboards 2.18.0 - Revision 00
 
 ### Added
 
 - Support for Wazuh 5.0.0
+- Added creation of report definition when creating dashboard by reference and the button to reset the report [#7091](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7091)
 
 ### Removed
 

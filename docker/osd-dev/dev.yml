@@ -26,7 +26,7 @@ services:
       - '--es.all'
 
   imposter:
-    image: outofcoffee/imposter:3.44.1
+    image: outofcoffee/imposter:${IMPOSTER_VERSION}
 
     # <<: *logging
     hostname: imposter-osd-${OS_VERSION}
@@ -239,10 +239,9 @@ services:
       - ${OSD_PORT}:5601
     environment:
       - 'LOGS=/proc/1/fd/1'
-    entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
-      - '${SRC}/main:/home/node/kbn/plugins/wazuh'
+      - '${SRC}/main:/home/node/kbn/plugins/main'
       - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
       - '${SRC}/wazuh-engine:/home/node/kbn/plugins/wazuh-engine'

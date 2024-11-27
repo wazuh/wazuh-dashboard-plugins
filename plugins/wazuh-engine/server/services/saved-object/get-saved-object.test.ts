@@ -1,9 +1,13 @@
 import {
   getInternalSavedObjectsClient,
-  getWazuhCore,
   getWazuhCheckUpdatesServices,
 } from '../../plugin-services';
 import { getSavedObject } from './get-saved-object';
+
+jest.mock('../../plugin-services', () => ({
+  getInternalSavedObjectsClient: jest.fn(),
+  getWazuhCheckUpdatesServices: jest.fn(),
+}));
 
 const mockedGetInternalObjectsClient =
   getInternalSavedObjectsClient as jest.Mock;
