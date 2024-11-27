@@ -45,8 +45,8 @@ describe('State', () => {
       get() {
         return this._value;
       },
-      set() {
-        this._value = false;
+      set(newValue) {
+        this._value = newValue;
       },
       remove: () => {},
       subscribe: subscribe,

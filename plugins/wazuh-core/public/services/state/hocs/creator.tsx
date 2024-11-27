@@ -2,7 +2,8 @@ import React from 'react';
 export const createHOCs = ({ useStateContainer }) => {
   return {
     withStateContainer: (name: string) => WrappedComponent => props => {
-      const [state, setState, removeValue] = useStateContainer(name);
+      const [state, { set: setState, remove: removeState }] =
+        useStateContainer(name);
       return (
         <WrappedComponent
           {...props}
@@ -10,7 +11,7 @@ export const createHOCs = ({ useStateContainer }) => {
             [`stateContainer:${name}`]: {
               value: state,
               set: setState,
-              remove: removeValue,
+              remove: removeState,
             },
           }}
         />

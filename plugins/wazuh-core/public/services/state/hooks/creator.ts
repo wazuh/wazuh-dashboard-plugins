@@ -11,7 +11,7 @@ export const createHooks = ({ state }: { state: State }) => {
       state.set(name, value);
     }
     function removeValue() {
-      state.remove(name, value);
+      state.remove(name);
     }
     return [value, { set: setValue, remove: removeValue }];
   }
