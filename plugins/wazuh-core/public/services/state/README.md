@@ -65,11 +65,19 @@ Use the state container.
 
 ```tsx
 const MyComponent = withStateContainer('my_state_container')(props => {
-  // access to state container value
-  props['stateContainer:my_state_container'].value;
-  // set a new value
-  props['stateContainer:my_state_container'].set(newValue);
-  // remove the value
-  props['stateContainer:my_state_container'].remove();
+  const getStateContainerValue = () => {
+    // access to state container value
+    return props['stateContainer:my_state_container'].value;
+  };
+
+  const setStateContainterValue = newValue => {
+    // set a new value
+    props['stateContainer:my_state_container'].set(newValue);
+  };
+
+  const removeStateContainerValue = () => {
+    // remove the value
+    props['stateContainer:my_state_container'].remove();
+  };
 });
 ```
