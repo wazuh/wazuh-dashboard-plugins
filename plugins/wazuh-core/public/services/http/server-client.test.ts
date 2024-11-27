@@ -13,7 +13,6 @@ const USER_TOKEN =
 
 function createClient() {
   const mockRequest = jest.fn(options => {
-    console.log({ options });
     if (options.url === '/api/login') {
       return {
         data: {

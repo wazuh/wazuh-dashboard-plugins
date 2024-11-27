@@ -34,6 +34,7 @@ exports[`Export Table Csv component renders correctly to match the snapshot when
         >
           <EuiButtonContent
             className="euiButtonEmpty__content"
+            iconGap="m"
             iconSide="left"
             iconSize="m"
             iconType="importAction"
@@ -124,6 +125,7 @@ exports[`Export Table Csv component renders correctly to match the snapshot when
         >
           <EuiButtonContent
             className="euiButtonEmpty__content"
+            iconGap="m"
             iconSide="left"
             iconSize="m"
             iconType="importAction"
