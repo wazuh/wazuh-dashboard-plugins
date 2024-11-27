@@ -47,3 +47,23 @@ export interface HTTPClient {
   generic: HTTPClientGeneric;
   server: HTTPClientServer;
 }
+
+export interface WzRequestServices {
+  request: HTTPClientRequestInterceptor['request'];
+  getURL(path: string): string;
+  getTimeout(): Promise<number>;
+  getServerAPI(): string;
+}
+
+export interface ServerAPIResponseItems<T> {
+  affected_items: Array<T>;
+  failed_items: Array<any>;
+  total_affected_items: number;
+  total_failed_items: number;
+}
+
+export interface ServerAPIResponseItemsData<T> {
+  data: ServerAPIResponseItems<T>;
+  message: string;
+  error: number;
+}

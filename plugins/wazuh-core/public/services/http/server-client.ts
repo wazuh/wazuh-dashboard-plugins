@@ -10,35 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 import {
-  HTTPClientRequestInterceptor,
   HTTPClientServer,
   HTTPVerb,
   HTTPClientServerUserData,
+  WzRequestServices,
+  ServerAPIResponseItemsData,
 } from './types';
 import { Logger } from '../../../common/services/configuration';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from './constants';
 import jwtDecode from 'jwt-decode';
 import { BehaviorSubject } from 'rxjs';
-
-interface WzRequestServices {
-  request: HTTPClientRequestInterceptor['request'];
-  getURL(path: string): string;
-  getTimeout(): Promise<number>;
-  getServerAPI(): string;
-}
-
-interface ServerAPIResponseItems<T> {
-  affected_items: Array<T>;
-  failed_items: Array<any>;
-  total_affected_items: number;
-  total_failed_items: number;
-}
-
-interface ServerAPIResponseItemsData<T> {
-  data: ServerAPIResponseItems<T>;
-  message: string;
-  error: number;
-}
 
 export interface ServerAPIResponseItemsDataHTTPClient<T> {
   data: ServerAPIResponseItemsData<T>;
