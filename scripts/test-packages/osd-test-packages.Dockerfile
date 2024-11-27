@@ -11,6 +11,7 @@ ADD ./plugins /tmp/
 
 USER root
 RUN yum update -y  && yum install -y unzip
+RUN ls -la /tmp
 RUN for plugin in $(ls /tmp); do \
   echo $plugin; \
   unzip /tmp/$plugin -d /tmp/unziped/; \
