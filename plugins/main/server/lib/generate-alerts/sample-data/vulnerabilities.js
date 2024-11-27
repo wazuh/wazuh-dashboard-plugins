@@ -51,7 +51,7 @@ module.exports.data = [
         updated: '2018-01-19',
         state: 'Fixed',
         cwe_reference: 'CWE-362',
-        references: [
+        reference: [
           'http://lists.gnu.org/archive/html/coreutils/2017-12/msg00045.html',
           'https://nvd.nist.gov/vuln/detail/CVE-2017-18018',
           'http://people.canonical.com/~ubuntu-security/cve/2017/CVE-2017-18018.html',
@@ -59,7 +59,7 @@ module.exports.data = [
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-18018',
           'https://lists.gnu.org/archive/html/coreutils/2017-12/msg00072.html',
           'https://lists.gnu.org/archive/html/coreutils/2017-12/msg00073.html',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -102,14 +102,14 @@ module.exports.data = [
         updated: '2019-10-23',
         state: 'Fixed',
         cwe_reference: 'CWE-120',
-        references: [
+        reference: [
           'https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15826',
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942578',
           'https://github.com/ImageMagick/ImageMagick/compare/7.0.8-53...7.0.8-54',
           'https://github.com/ImageMagick/ImageMagick/compare/master@%7B2019-07-15%7D...master@%7B2019-07-17%7D',
           'https://security-tracker.debian.org/tracker/CVE-2019-17540',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-17540',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -153,14 +153,14 @@ module.exports.data = [
         updated: '2019-10-23',
         state: 'Fixed',
         cwe_reference: 'CWE-120',
-        references: [
+        reference: [
           'https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15826',
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942578',
           'https://github.com/ImageMagick/ImageMagick/compare/7.0.8-53...7.0.8-54',
           'https://github.com/ImageMagick/ImageMagick/compare/master@%7B2019-07-15%7D...master@%7B2019-07-17%7D',
           'https://security-tracker.debian.org/tracker/CVE-2019-17540',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-17540',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -220,7 +220,7 @@ module.exports.data = [
         bugzilla_references: [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=889838',
         ],
-        references: [
+        reference: [
           'https://lists.debian.org/debian-lts-announce/2020/01/msg00026.html',
           'https://sec-consult.com/en/blog/advisories/multiple-vulnerabilities-in-infozip-unzip/index.html',
           'https://security.gentoo.org/glsa/202003-58',
@@ -228,7 +228,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-1000035.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-1000035',
           'https://www.sec-consult.com/en/blog/advisories/multiple-vulnerabilities-in-infozip-unzip/index.html',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -288,7 +288,7 @@ module.exports.data = [
         bugzilla_references: [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=889838',
         ],
-        references: [
+        reference: [
           'https://lists.debian.org/debian-lts-announce/2020/01/msg00026.html',
           'https://sec-consult.com/en/blog/advisories/multiple-vulnerabilities-in-infozip-unzip/index.html',
           'https://security.gentoo.org/glsa/202003-58',
@@ -296,7 +296,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-1000035.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-1000035',
           'https://www.sec-consult.com/en/blog/advisories/multiple-vulnerabilities-in-infozip-unzip/index.html',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -340,7 +340,7 @@ module.exports.data = [
         updated: '2020-05-11',
         state: 'Fixed',
         cwe_reference: 'CWE-20',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2020-04/msg00017.html',
           'http://lists.opensuse.org/opensuse-security-announce/2020-05/msg00017.html',
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2020-1747',
@@ -349,7 +349,7 @@ module.exports.data = [
           'https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/WORRFHPQVAFKKXXWLSSW6XKUYLWM6CSH/',
           'https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/ZBJA3SGNJKCAYPSHOHWY3KBCWNM5NYK2/',
           'https://nvd.nist.gov/vuln/detail/CVE-2020-1747',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -406,7 +406,7 @@ module.exports.data = [
         updated: '2019-08-23',
         state: 'Fixed',
         cwe_reference: 'CWE-295',
-        references: [
+        reference: [
           'https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=54aa9d51b09d67e90db443f682cface795f5af9e',
           'https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=b15a19c148384e73338aa7c5b12652138e35ed28',
           'https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=d333ebaf9c77332754a9d5e111e2f53e1de54fdd',
@@ -424,7 +424,7 @@ module.exports.data = [
           'https://www.tenable.com/security/tns-2019-08',
           'https://www.tenable.com/security/tns-2019-09',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-1552',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -468,7 +468,7 @@ module.exports.data = [
         updated: '2020-05-11',
         state: 'Fixed',
         cwe_reference: 'CWE-20',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2020-04/msg00017.html',
           'http://lists.opensuse.org/opensuse-security-announce/2020-05/msg00017.html',
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2020-1747',
@@ -477,7 +477,7 @@ module.exports.data = [
           'https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/WORRFHPQVAFKKXXWLSSW6XKUYLWM6CSH/',
           'https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/ZBJA3SGNJKCAYPSHOHWY3KBCWNM5NYK2/',
           'https://nvd.nist.gov/vuln/detail/CVE-2020-1747',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -520,10 +520,10 @@ module.exports.data = [
         updated: '2019-11-08',
         state: 'Fixed',
         cwe_reference: 'CWE-362',
-        references: [
+        reference: [
           'https://gist.github.com/oxagast/51171aa161074188a11d96cbef884bbd',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-18684',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -584,7 +584,7 @@ module.exports.data = [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=917377',
           'https://bugzilla.redhat.com/show_bug.cgi?id=1662346',
         ],
-        references: [
+        reference: [
           'http://git.savannah.gnu.org/cgit/tar.git/commit/?id=c15c42ccd1e2377945fd0414eca1a49294bff454',
           'http://lists.gnu.org/archive/html/bug-tar/2018-12/msg00023.html',
           'http://lists.opensuse.org/opensuse-security-announce/2019-04/msg00077.html',
@@ -597,7 +597,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2018-20482',
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-20482.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-20482',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -640,13 +640,13 @@ module.exports.data = [
         updated: '2015-08-31',
         state: 'Fixed',
         cwe_reference: 'CWE-17',
-        references: [
+        reference: [
           'http://jvn.jp/en/jp/JVN91474878/index.html',
           'http://jvndb.jvn.jp/jvndb/JVNDB-2015-000119',
           'http://type74.org/edman5-1.php',
           'http://type74org.blog14.fc2.com/blog-entry-1384.html',
           'https://nvd.nist.gov/vuln/detail/CVE-2015-2987',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -702,10 +702,10 @@ module.exports.data = [
         updated: '2019-10-03',
         state: 'Pending confirmation',
         cwe_reference: 'CWE-125',
-        references: [
+        reference: [
           'https://sourceware.org/bugzilla/show_bug.cgi?id=22976',
           'https://nvd.nist.gov/vuln/detail/CVE-2018-8769',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -762,7 +762,7 @@ module.exports.data = [
         updated: '2019-08-23',
         state: 'Fixed',
         cwe_reference: 'CWE-295',
-        references: [
+        reference: [
           'https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=54aa9d51b09d67e90db443f682cface795f5af9e',
           'https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=b15a19c148384e73338aa7c5b12652138e35ed28',
           'https://git.openssl.org/gitweb/?p=openssl.git;a=commitdiff;h=d333ebaf9c77332754a9d5e111e2f53e1de54fdd',
@@ -780,7 +780,7 @@ module.exports.data = [
           'https://www.tenable.com/security/tns-2019-08',
           'https://www.tenable.com/security/tns-2019-09',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-1552',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -825,7 +825,7 @@ module.exports.data = [
         updated: '2020-05-18',
         state: 'Fixed',
         cwe_reference: 'CWE-416',
-        references: [
+        reference: [
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2020-1752',
           'https://security.netapp.com/advisory/ntap-20200511-0005/',
           'https://sourceware.org/bugzilla/show_bug.cgi?id=25414',
@@ -834,7 +834,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2020/CVE-2020-1752.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-1752',
           'https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=263e6175999bc7f5adb8b32fd12fcfae3f0bb05a;hp=37db4539dd8b5c098d9235249c5d2aedaa67d7d1',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -879,7 +879,7 @@ module.exports.data = [
         updated: '2020-05-18',
         state: 'Fixed',
         cwe_reference: 'CWE-416',
-        references: [
+        reference: [
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2020-1752',
           'https://security.netapp.com/advisory/ntap-20200511-0005/',
           'https://sourceware.org/bugzilla/show_bug.cgi?id=25414',
@@ -888,7 +888,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2020/CVE-2020-1752.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-1752',
           'https://sourceware.org/git/?p=glibc.git;a=commitdiff;h=263e6175999bc7f5adb8b32fd12fcfae3f0bb05a;hp=37db4539dd8b5c098d9235249c5d2aedaa67d7d1',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -933,14 +933,14 @@ module.exports.data = [
         updated: '2019-12-23',
         state: 'Unfixed',
         cwe_reference: 'CWE-674',
-        references: [
+        reference: [
           'https://github.com/sqlite/sqlite/commit/38096961c7cd109110ac21d3ed7dad7e0cb0ae06',
           'https://security.netapp.com/advisory/ntap-20191223-0001/',
           'https://www.oracle.com/security-alerts/cpuapr2020.html',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-19645',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-19645.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-19645',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -984,14 +984,14 @@ module.exports.data = [
         updated: '2019-12-23',
         state: 'Unfixed',
         cwe_reference: 'CWE-674',
-        references: [
+        reference: [
           'https://github.com/sqlite/sqlite/commit/38096961c7cd109110ac21d3ed7dad7e0cb0ae06',
           'https://security.netapp.com/advisory/ntap-20191223-0001/',
           'https://www.oracle.com/security-alerts/cpuapr2020.html',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-19645',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-19645.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-19645',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1040,14 +1040,14 @@ module.exports.data = [
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=778950',
           'https://bugzilla.redhat.com/show_bug.cgi?id=884658',
         ],
-        references: [
+        reference: [
           'https://access.redhat.com/security/cve/cve-2013-4235',
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2013-4235',
           'https://security-tracker.debian.org/tracker/CVE-2013-4235',
           'https://nvd.nist.gov/vuln/detail/CVE-2013-4235',
           'http://people.canonical.com/~ubuntu-security/cve/2013/CVE-2013-4235.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2013-4235',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1096,14 +1096,14 @@ module.exports.data = [
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=778950',
           'https://bugzilla.redhat.com/show_bug.cgi?id=884658',
         ],
-        references: [
+        reference: [
           'https://access.redhat.com/security/cve/cve-2013-4235',
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2013-4235',
           'https://security-tracker.debian.org/tracker/CVE-2013-4235',
           'https://nvd.nist.gov/vuln/detail/CVE-2013-4235',
           'http://people.canonical.com/~ubuntu-security/cve/2013/CVE-2013-4235.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2013-4235',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1152,14 +1152,14 @@ module.exports.data = [
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=778950',
           'https://bugzilla.redhat.com/show_bug.cgi?id=884658',
         ],
-        references: [
+        reference: [
           'https://access.redhat.com/security/cve/cve-2013-4235',
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2013-4235',
           'https://security-tracker.debian.org/tracker/CVE-2013-4235',
           'https://nvd.nist.gov/vuln/detail/CVE-2013-4235',
           'http://people.canonical.com/~ubuntu-security/cve/2013/CVE-2013-4235.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2013-4235',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1215,12 +1215,12 @@ module.exports.data = [
         updated: '2019-04-26',
         state: 'Fixed',
         cwe_reference: 'CWE-352',
-        references: [
+        reference: [
           'https://access.redhat.com/errata/RHBA-2019:0326',
           'https://access.redhat.com/errata/RHBA-2019:0327',
           'https://jenkins.io/security/advisory/2019-01-28/#SECURITY-1095',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-1003010',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1263,13 +1263,13 @@ module.exports.data = [
         updated: '2020-03-30',
         state: 'Fixed',
         cwe_reference: 'CWE-120',
-        references: [
+        reference: [
           'http://www.openwall.com/lists/oss-security/2020/02/25/1',
           'https://lists.gnu.org/archive/html/screen-devel/2020-02/msg00007.html',
           'https://security.gentoo.org/glsa/202003-62',
           'https://www.openwall.com/lists/oss-security/2020/02/06/3',
           'https://nvd.nist.gov/vuln/detail/CVE-2020-9366',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1330,7 +1330,7 @@ module.exports.data = [
         bugzilla_references: [
           'https://gcc.gnu.org/bugzilla/show_bug.cgi?id=91481',
         ],
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2019-10/msg00056.html',
           'http://lists.opensuse.org/opensuse-security-announce/2019-10/msg00057.html',
           'http://lists.opensuse.org/opensuse-security-announce/2020-05/msg00058.html',
@@ -1338,7 +1338,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2019-15847',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-15847.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-15847',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1395,11 +1395,11 @@ module.exports.data = [
         updated: '2019-09-23',
         state: 'Pending confirmation',
         cwe_reference: 'CWE-400',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2019-08/msg00063.html',
           'https://github.com/openexr/openexr/issues/248',
           'https://nvd.nist.gov/vuln/detail/CVE-2017-14988',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1443,7 +1443,7 @@ module.exports.data = [
         updated: '2020-04-03',
         state: 'Unfixed',
         cwe_reference: 'CWE-601',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2020-05/msg00002.html',
           'http://www.openwall.com/lists/oss-security/2020/04/03/1',
           'http://www.openwall.com/lists/oss-security/2020/04/04/1',
@@ -1457,7 +1457,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2020/CVE-2020-1927.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-1927',
           'https://httpd.apache.org/security/vulnerabilities_24.html#CVE-2020-1927',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1502,7 +1502,7 @@ module.exports.data = [
         updated: '2020-04-03',
         state: 'Unfixed',
         cwe_reference: 'CWE-601',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2020-05/msg00002.html',
           'http://www.openwall.com/lists/oss-security/2020/04/03/1',
           'http://www.openwall.com/lists/oss-security/2020/04/04/1',
@@ -1516,7 +1516,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2020/CVE-2020-1927.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-1927',
           'https://httpd.apache.org/security/vulnerabilities_24.html#CVE-2020-1927',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1561,7 +1561,7 @@ module.exports.data = [
         updated: '2020-04-03',
         state: 'Unfixed',
         cwe_reference: 'CWE-601',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2020-05/msg00002.html',
           'http://www.openwall.com/lists/oss-security/2020/04/03/1',
           'http://www.openwall.com/lists/oss-security/2020/04/04/1',
@@ -1575,7 +1575,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2020/CVE-2020-1927.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-1927',
           'https://httpd.apache.org/security/vulnerabilities_24.html#CVE-2020-1927',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1620,7 +1620,7 @@ module.exports.data = [
         updated: '2020-04-03',
         state: 'Unfixed',
         cwe_reference: 'CWE-601',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2020-05/msg00002.html',
           'http://www.openwall.com/lists/oss-security/2020/04/03/1',
           'http://www.openwall.com/lists/oss-security/2020/04/04/1',
@@ -1634,7 +1634,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2020/CVE-2020-1927.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-1927',
           'https://httpd.apache.org/security/vulnerabilities_24.html#CVE-2020-1927',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1697,7 +1697,7 @@ module.exports.data = [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=907503',
           'https://bugzilla.novell.com/show_bug.cgi?id=CVE-2018-15919',
         ],
-        references: [
+        reference: [
           'http://seclists.org/oss-sec/2018/q3/180',
           'http://www.securityfocus.com/bid/105163',
           'https://security.netapp.com/advisory/ntap-20181221-0001/',
@@ -1705,7 +1705,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-15919.html',
           'http://www.openwall.com/lists/oss-security/2018/08/27/2',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-15919',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1768,7 +1768,7 @@ module.exports.data = [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=907503',
           'https://bugzilla.novell.com/show_bug.cgi?id=CVE-2018-15919',
         ],
-        references: [
+        reference: [
           'http://seclists.org/oss-sec/2018/q3/180',
           'http://www.securityfocus.com/bid/105163',
           'https://security.netapp.com/advisory/ntap-20181221-0001/',
@@ -1776,7 +1776,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-15919.html',
           'http://www.openwall.com/lists/oss-security/2018/08/27/2',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-15919',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1824,7 +1824,7 @@ module.exports.data = [
         bugzilla_references: [
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=942401',
         ],
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2019-11/msg00059.html',
           'http://lists.opensuse.org/opensuse-security-announce/2019-11/msg00061.html',
           'https://lists.gnu.org/archive/html/bug-ncurses/2019-10/msg00013.html',
@@ -1832,7 +1832,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2019-17595',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-17595.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-17595',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1881,7 +1881,7 @@ module.exports.data = [
           'https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15941',
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=943680',
         ],
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2019-10/msg00069.html',
           'http://lists.opensuse.org/opensuse-security-announce/2019-10/msg00070.html',
           'https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=15941',
@@ -1898,7 +1898,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2019-17543',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-17543.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-17543',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -1960,7 +1960,7 @@ module.exports.data = [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=917387',
           'http://krbdev.mit.edu/rt/Ticket/Display.html?id=8763',
         ],
-        references: [
+        reference: [
           'http://krbdev.mit.edu/rt/Ticket/Display.html?id=8763',
           'https://github.com/krb5/krb5/commit/5e6d1796106df8ba6bc1973ee0917c170d929086',
           'https://lists.debian.org/debian-lts-announce/2019/01/msg00020.html',
@@ -1969,7 +1969,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2018-20217',
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-20217.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-20217',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2030,7 +2030,7 @@ module.exports.data = [
           'https://bugs.freedesktop.org/show_bug.cgi?id=107085',
           'https://bugzilla.suse.com/show_bug.cgi?id=1099699',
         ],
-        references: [
+        reference: [
           'http://www.openwall.com/lists/oss-security/2018/07/02/2',
           'http://www.securityfocus.com/bid/104757',
           'https://bugs.freedesktop.org/show_bug.cgi?id=107085',
@@ -2039,7 +2039,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2018-14036',
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-14036.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-14036',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2102,7 +2102,7 @@ module.exports.data = [
           'https://bugs.exim.org/show_bug.cgi?id=2052',
           'https://bugs.exim.org/show_bug.cgi?id=2054',
         ],
-        references: [
+        reference: [
           'http://www.securityfocus.com/bid/97067',
           'https://access.redhat.com/errata/RHSA-2018:2486',
           'https://blogs.gentoo.org/ago/2017/03/20/libpcre-invalid-memory-read-in-_pcre32_xclass-pcre_xclass-c/',
@@ -2110,7 +2110,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2017-7244',
           'http://people.canonical.com/~ubuntu-security/cve/2017/CVE-2017-7244.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-7244',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2155,7 +2155,7 @@ module.exports.data = [
         updated: '2020-02-21',
         state: 'Fixed',
         cwe_reference: 'CWE-330',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2020-03/msg00042.html',
           'https://bugs.launchpad.net/ubuntu/+source/cloud-init/+bug/1860795',
           'https://github.com/canonical/cloud-init/pull/204',
@@ -2163,7 +2163,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2020-8631',
           'http://people.canonical.com/~ubuntu-security/cve/2020/CVE-2020-8631.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-8631',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2206,13 +2206,13 @@ module.exports.data = [
         updated: '2020-03-30',
         state: 'Fixed',
         cwe_reference: 'CWE-416',
-        references: [
+        reference: [
           'https://github.com/vim/vim/commit/ec66c41d84e574baf8009dbc0bd088d2bc5b2421',
           'https://github.com/vim/vim/compare/v8.1.2135...v8.1.2136',
           'https://packetstormsecurity.com/files/154898',
           'https://usn.ubuntu.com/4309-1/',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-20079',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2270,7 +2270,7 @@ module.exports.data = [
         state: 'Fixed',
         cwe_reference: 'CWE-287',
         bugzilla_references: ['https://launchpad.net/bugs/1660701'],
-        references: [
+        reference: [
           'http://hmarco.org/bugs/CVE-2016-4484/CVE-2016-4484_cryptsetup_initrd_shell.html',
           'http://www.openwall.com/lists/oss-security/2016/11/14/13',
           'http://www.openwall.com/lists/oss-security/2016/11/15/1',
@@ -2281,7 +2281,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2016-4484',
           'http://people.canonical.com/~ubuntu-security/cve/2016/CVE-2016-4484.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-4484',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2345,7 +2345,7 @@ module.exports.data = [
           'https://dev.gnupg.org/T4607',
           'https://dev.gnupg.org/T4628',
         ],
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2019-08/msg00039.html',
           'https://gist.github.com/rjhansen/67ab921ffb4084c865b3618d6955275f',
           'https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/AUK2YRO6QIH64WP2LRA5D4LACTXQPPU4/',
@@ -2357,7 +2357,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2019-13050',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-13050.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-13050',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2419,7 +2419,7 @@ module.exports.data = [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=892179',
           'https://github.com/karelzak/util-linux/issues/539',
         ],
-        references: [
+        reference: [
           'http://www.securityfocus.com/bid/103367',
           'https://bugs.debian.org/892179',
           'https://github.com/karelzak/util-linux/commit/75f03badd7ed9f1dd951863d75e756883d3acc55',
@@ -2428,7 +2428,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2018-7738',
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-7738.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-7738',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2489,7 +2489,7 @@ module.exports.data = [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=892179',
           'https://github.com/karelzak/util-linux/issues/539',
         ],
-        references: [
+        reference: [
           'http://www.securityfocus.com/bid/103367',
           'https://bugs.debian.org/892179',
           'https://github.com/karelzak/util-linux/commit/75f03badd7ed9f1dd951863d75e756883d3acc55',
@@ -2498,7 +2498,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2018-7738',
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-7738.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-7738',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2560,7 +2560,7 @@ module.exports.data = [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=892179',
           'https://github.com/karelzak/util-linux/issues/539',
         ],
-        references: [
+        reference: [
           'http://www.securityfocus.com/bid/103367',
           'https://bugs.debian.org/892179',
           'https://github.com/karelzak/util-linux/commit/75f03badd7ed9f1dd951863d75e756883d3acc55',
@@ -2569,7 +2569,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2018-7738',
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-7738.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-7738',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2615,7 +2615,7 @@ module.exports.data = [
         updated: '2019-09-12',
         state: 'Fixed',
         cwe_reference: 'CWE-311',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2019-09/msg00054.html',
           'http://lists.opensuse.org/opensuse-security-announce/2019-09/msg00072.html',
           'http://lists.opensuse.org/opensuse-security-announce/2019-10/msg00012.html',
@@ -2647,7 +2647,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-1547.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-1547',
           'https://usn.ubuntu.com/usn/usn-4376-1',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2703,14 +2703,14 @@ module.exports.data = [
         updated: '2019-06-19',
         state: 'Fixed',
         cwe_reference: 'CWE-264',
-        references: [
+        reference: [
           'http://www.securityfocus.com/bid/108116',
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2019-3843',
           'https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/5JXQAKSTMABZ46EVCRMW62DHWYHTTFES/',
           'https://security.netapp.com/advisory/ntap-20190619-0002/',
           'https://usn.ubuntu.com/4269-1/',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-3843',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2770,7 +2770,7 @@ module.exports.data = [
         bugzilla_references: [
           'https://bugzilla.mozilla.org/show_bug.cgi?id=1552208',
         ],
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2019-10/msg00009.html',
           'http://lists.opensuse.org/opensuse-security-announce/2019-10/msg00010.html',
           'http://lists.opensuse.org/opensuse-security-announce/2019-10/msg00011.html',
@@ -2786,7 +2786,7 @@ module.exports.data = [
           'https://usn.ubuntu.com/usn/usn-4054-1',
           'https://usn.ubuntu.com/usn/usn-4060-1',
           'https://www.mozilla.org/en-US/security/advisories/mfsa2019-21/#CVE-2019-11727',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2833,7 +2833,7 @@ module.exports.data = [
         bugzilla_references: [
           'https://bugzilla.suse.com/show_bug.cgi?id=1158028',
         ],
-        references: [
+        reference: [
           'http://packetstormsecurity.com/files/155498/Bash-5.0-Patch-11-Privilege-Escalation.html',
           'https://github.com/bminor/bash/commit/951bdaad7a18cc0dc1036bba86b18b90874d39ff',
           'https://security.netapp.com/advisory/ntap-20200430-0003/',
@@ -2841,7 +2841,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2019-18276',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-18276.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-18276',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2897,13 +2897,13 @@ module.exports.data = [
         updated: '2017-07-08',
         state: 'Fixed',
         cwe_reference: 'CWE-119',
-        references: [
+        reference: [
           'http://openwall.com/lists/oss-security/2017/06/14/1',
           'http://www.securityfocus.com/bid/99120',
           'http://www.securitytracker.com/id/1038697',
           'https://curl.haxx.se/docs/adv_20170614.html',
           'https://nvd.nist.gov/vuln/detail/CVE-2017-9502',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -2959,7 +2959,7 @@ module.exports.data = [
         updated: '2019-04-09',
         state: 'Fixed',
         cwe_reference: 'CWE-255',
-        references: [
+        reference: [
           'http://git.savannah.gnu.org/cgit/wget.git/tree/NEWS',
           'http://www.securityfocus.com/bid/106358',
           'https://access.redhat.com/errata/RHSA-2019:3701',
@@ -2968,7 +2968,7 @@ module.exports.data = [
           'https://twitter.com/marcan42/status/1077676739877232640',
           'https://usn.ubuntu.com/3943-1/',
           'https://nvd.nist.gov/vuln/detail/CVE-2018-20483',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3029,14 +3029,14 @@ module.exports.data = [
         bugzilla_references: [
           'https://sourceware.org/bugzilla/show_bug.cgi?id=23765',
         ],
-        references: [
+        reference: [
           'https://security.netapp.com/advisory/ntap-20190822-0001/',
           'https://sourceware.org/bugzilla/show_bug.cgi?id=23765',
           'https://support.f5.com/csp/article/K05032915?utm_source=f5support&amp;utm_medium=RSS',
           'https://nvd.nist.gov/vuln/detail/CVE-2019-1010204',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-1010204.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-1010204',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3082,7 +3082,7 @@ module.exports.data = [
         state: 'Unfixed',
         cwe_reference: 'CWE-327',
         bugzilla_references: ['https://dev.gnupg.org/T4755'],
-        references: [
+        reference: [
           'https://bugzilla.redhat.com/show_bug.cgi?id=CVE-2019-14855',
           'https://dev.gnupg.org/T4755',
           'https://lists.gnupg.org/pipermail/gnupg-announce/2019q4/000442.html',
@@ -3091,7 +3091,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-14855.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-14855',
           'https://eprint.iacr.org/2020/014.pdf',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3153,7 +3153,7 @@ module.exports.data = [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=830802',
           'https://bugzilla.redhat.com/show_bug.cgi?id=1349536',
         ],
-        references: [
+        reference: [
           'http://rhn.redhat.com/errata/RHSA-2016-2605.html',
           'http://www.openwall.com/lists/oss-security/2016/07/11/2',
           'http://www.securityfocus.com/bid/91683',
@@ -3164,7 +3164,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2016-5011',
           'http://people.canonical.com/~ubuntu-security/cve/2016/CVE-2016-5011.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-5011',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3224,14 +3224,14 @@ module.exports.data = [
         bugzilla_references: [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=869633',
         ],
-        references: [
+        reference: [
           'http://www.securityfocus.com/bid/100011',
           'http://www.securitytracker.com/id/1039013',
           'https://www.vmware.com/security/advisories/VMSA-2017-0013.html',
           'https://nvd.nist.gov/vuln/detail/CVE-2015-5191',
           'http://people.canonical.com/~ubuntu-security/cve/2015/CVE-2015-5191.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2015-5191',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3288,11 +3288,11 @@ module.exports.data = [
         updated: '2019-10-03',
         state: 'Fixed',
         cwe_reference: 'CWE-125',
-        references: [
+        reference: [
           'http://lists.opensuse.org/opensuse-security-announce/2019-04/msg00056.html',
           'https://github.com/xiaoqx/pocs/blob/master/netpbm',
           'https://nvd.nist.gov/vuln/detail/CVE-2018-8975',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3339,7 +3339,7 @@ module.exports.data = [
         bugzilla_references: [
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=947225',
         ],
-        references: [
+        reference: [
           'http://seclists.org/fulldisclosure/2020/Mar/31',
           'https://access.redhat.com/security/cve/cve-2019-19232',
           'https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/I6TKF36KOQUVJNBHSVJFA7BU3CCEYD2F/',
@@ -3361,7 +3361,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2019-19232',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-19232.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-19232',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3417,12 +3417,12 @@ module.exports.data = [
         updated: '2017-08-14',
         state: 'Fixed',
         cwe_reference: 'CWE-134',
-        references: [
+        reference: [
           'https://github.com/rsyslog/rsyslog/blob/master/ChangeLog',
           'https://github.com/rsyslog/rsyslog/commit/062d0c671a29f7c6f7dff4a2f1f35df375bbb30b',
           'https://github.com/rsyslog/rsyslog/pull/1565',
           'https://nvd.nist.gov/vuln/detail/CVE-2017-12588',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3483,7 +3483,7 @@ module.exports.data = [
         bugzilla_references: [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=902878',
         ],
-        references: [
+        reference: [
           'https://github.com/marshmallow-code/apispec/issues/278',
           'https://github.com/yaml/pyyaml/blob/master/CHANGES',
           'https://github.com/yaml/pyyaml/issues/193',
@@ -3496,7 +3496,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2017-18342',
           'http://people.canonical.com/~ubuntu-security/cve/2017/CVE-2017-18342.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-18342',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3552,12 +3552,12 @@ module.exports.data = [
         updated: '2019-10-03',
         state: 'Fixed',
         cwe_reference: 'CWE-354',
-        references: [
+        reference: [
           'https://git.samba.org/?p=rsync.git;a=commit;h=7b8a4ecd6ff9cdf4e5d3850ebf822f1e989255b3',
           'https://git.samba.org/?p=rsync.git;a=commit;h=9a480deec4d20277d8e20bc55515ef0640ca1e55',
           'https://git.samba.org/?p=rsync.git;a=commit;h=c252546ceeb0925eb8a4061315e3ff0a8c55b48b',
           'https://nvd.nist.gov/vuln/detail/CVE-2017-15994',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3620,7 +3620,7 @@ module.exports.data = [
           'https://debbugs.gnu.org/cgi/bugreport.cgi?bug=34142',
           'https://sourceware.org/bugzilla/show_bug.cgi?id=24114',
         ],
-        references: [
+        reference: [
           'http://www.securityfocus.com/bid/107160',
           'https://debbugs.gnu.org/cgi/bugreport.cgi?bug=34140',
           'https://debbugs.gnu.org/cgi/bugreport.cgi?bug=34142',
@@ -3632,7 +3632,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2019-9169',
           'http://people.canonical.com/~ubuntu-security/cve/2019/CVE-2019-9169.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-9169',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3693,7 +3693,7 @@ module.exports.data = [
         bugzilla_references: [
           'http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=871698',
         ],
-        references: [
+        reference: [
           'http://www.securityfocus.com/bid/101594',
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=871698',
           'https://bugzilla.redhat.com/show_bug.cgi?id=1504045',
@@ -3702,7 +3702,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2017-15088',
           'http://people.canonical.com/~ubuntu-security/cve/2017/CVE-2017-15088.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-15088',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3764,7 +3764,7 @@ module.exports.data = [
           'http://bugs.debian.org/878159',
           'https://sourceware.org/bugzilla/show_bug.cgi?id=22343',
         ],
-        references: [
+        reference: [
           'http://bugs.debian.org/878159',
           'http://www.securityfocus.com/bid/102912',
           'https://access.redhat.com/errata/RHBA-2019:0327',
@@ -3777,7 +3777,7 @@ module.exports.data = [
           'http://people.canonical.com/~ubuntu-security/cve/2018/CVE-2018-6485.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-6485',
           'https://usn.ubuntu.com/usn/usn-4218-1',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3838,7 +3838,7 @@ module.exports.data = [
         bugzilla_references: [
           'https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=840442',
         ],
-        references: [
+        reference: [
           'http://www.openwall.com/lists/oss-security/2016/10/04/2',
           'http://www.openwall.com/lists/oss-security/2016/10/04/4',
           'http://www.securityfocus.com/bid/93361',
@@ -3851,7 +3851,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2016-7944',
           'http://people.canonical.com/~ubuntu-security/cve/2016/CVE-2016-7944.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-7944',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3909,7 +3909,7 @@ module.exports.data = [
         updated: '2017-07-01',
         state: 'Fixed',
         cwe_reference: 'CWE-787',
-        references: [
+        reference: [
           'http://www.openwall.com/lists/oss-security/2016/10/04/2',
           'http://www.openwall.com/lists/oss-security/2016/10/04/4',
           'http://www.securityfocus.com/bid/93365',
@@ -3922,7 +3922,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2016-7947',
           'http://people.canonical.com/~ubuntu-security/cve/2016/CVE-2016-7947.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-7947',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
@@ -3980,7 +3980,7 @@ module.exports.data = [
         updated: '2017-07-01',
         state: 'Fixed',
         cwe_reference: 'CWE-787',
-        references: [
+        reference: [
           'http://www.openwall.com/lists/oss-security/2016/10/04/2',
           'http://www.openwall.com/lists/oss-security/2016/10/04/4',
           'http://www.securityfocus.com/bid/93373',
@@ -3993,7 +3993,7 @@ module.exports.data = [
           'https://nvd.nist.gov/vuln/detail/CVE-2016-7948',
           'http://people.canonical.com/~ubuntu-security/cve/2016/CVE-2016-7948.html',
           'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2016-7948',
-        ],
+        ].join(', '),
         assigner: 'cve@mitre.org',
         cve_version: '4.0',
         status: 'Active',
