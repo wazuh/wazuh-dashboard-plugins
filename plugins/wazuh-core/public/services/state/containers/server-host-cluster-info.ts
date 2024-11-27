@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 export class ServerHostClusterInfoStateContainer implements StateContainer {
   private store: any;
   private storeKey: string = 'clusterInfo';
-  updater$: BehaviorSubject;
+  updater$: BehaviorSubject<string>;
   constructor(private logger: ILogger, { store }) {
     this.store = store;
     this.updater$ = new BehaviorSubject(this.get());
@@ -17,7 +17,7 @@ export class ServerHostClusterInfoStateContainer implements StateContainer {
       let result = {};
       if (rawData) {
         this.logger.debug('Getting decoded data');
-        const decodedData = decodeURI(this.store.get(this.storeKey));
+        const decodedData = decodeURI(rawData);
         this.logger.debug(`Decoded data: ${decodedData}`);
         result = JSON.parse(decodedData);
       } else {

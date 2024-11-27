@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
 export class ServerHostStateContainer implements StateContainer {
   private store: any;
   private storeKey: string = 'currentApi';
-  updater$: BehaviorSubject;
+  updater$: BehaviorSubject<string>;
   constructor(private logger: ILogger, { store }) {
     this.store = store;
     this.updater$ = new BehaviorSubject(this.get());
