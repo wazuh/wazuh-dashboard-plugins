@@ -20,10 +20,10 @@ import { DataSourceAlertsStateContainer } from './services/state/containers/data
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
-  runtime: { [key: string]: any } = {
+  runtime: Record<string, any> = {
     state: {},
   };
-  _internal: { [key: string]: any } = {};
+  _internal: Record<string, any> = {};
   services: {
     [key: string]: any;
     dashboardSecurity?: DashboardSecurity;
@@ -102,7 +102,6 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
-      // hooks,
       hooks: {
         ...hooks,
         ...this.runtime.state.setup.hooks,
