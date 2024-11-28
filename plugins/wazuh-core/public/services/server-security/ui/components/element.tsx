@@ -35,7 +35,7 @@ export interface ServerElementPermissionsProps {
 
 export const ServerElementPermissions = ({
   children,
-  permissions = null,
+  permissions: Function | object | null = null,
   administrator = false,
   getAdditionalProps,
   tooltip,
