@@ -1,9 +1,16 @@
-export const INITIALIZATION_TASK_RUN_STATUS_NOT_STARTED = 'not_started';
-export const INITIALIZATION_TASK_RUN_STATUS_RUNNING = 'running';
-export const INITIALIZATION_TASK_RUN_STATUS_FINISHED = 'finished';
-export const INITIALIZATION_TASK_RUN_RESULT_NULL = null;
-export const INITIALIZATION_TASK_RUN_RESULT_SUCCESS = 'success';
-export const INITIALIZATION_TASK_RUN_RESULT_FAIL = 'fail';
-
-export const INITIALIZATION_TASK_CONTEXT_INTERNAL = 'internal';
-export const INITIALIZATION_TASK_CONTEXT_USER = 'user';
+export const INITIALIZATION_TASK = {
+  RUN_STATUS: {
+    NOT_STARTED: 'not_started',
+    RUNNING: 'running',
+    FINISHED: 'finished',
+  },
+  RUN_RESULT: {
+    NULL: null,
+    SUCCESS: 'success',
+    FAIL: 'fail',
+  },
+  CONTEXT: {
+    INTERNAL: 'internal',
+    USER: 'user',
+  },
+} as const;
