@@ -78,7 +78,6 @@ module.exports = {
           },
         ],
         'no-await-in-loop': 'error',
-        'no-duplicate-imports': 'error',
         curly: 'error',
         'block-scoped-var': 'error',
         'default-case': 'error',
@@ -142,6 +141,25 @@ module.exports = {
             ],
           },
         ],
+        /* -------------------------------------------------------------------------- */
+        /*                                   import                                   */
+        /* -------------------------------------------------------------------------- */
+        'import/order': [
+          'error',
+          {
+            groups: [
+              'builtin',
+              'external',
+              'internal',
+              'parent',
+              'sibling',
+              'index',
+              'object',
+              'type',
+            ],
+          },
+        ],
+        'import/no-duplicates': 'error',
         /* -------------------------------------------------------------------------- */
         /*                                   unicorn                                  */
         /* -------------------------------------------------------------------------- */
