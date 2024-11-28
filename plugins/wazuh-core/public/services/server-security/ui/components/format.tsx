@@ -13,7 +13,48 @@
 import React, { Fragment } from 'react';
 import { EuiSpacer } from '@elastic/eui';
 
-export const ServerPermissionsFormatted = permissions => {
+interface ServerSecurityPermission {
+  action: string;
+  resource: string;
+}
+
+type ServerSecurityPermissionAsString = string;
+
+type ServerSecurityPermissionRequirement =
+  | ServerSecurityPermission
+  | ServerSecurityPermissionAsString;
+
+type ServerSecurityPermissionComposed =
+  | ServerSecurityPermissionRequirement[]
+  | ServerSecurityPermission
+  | ServerSecurityPermissionAsString;
+
+const PermissionFormatter = (
+  permission: ServerSecurityPermissionRequirement,
+  key?: string,
+) =>
+  typeof permission === 'object' ? (
+    <Fragment {...(key ? { key } : {})}>
+      <strong>{permission.action}</strong> (
+      <span style={{ textDecoration: 'underline' }}>{permission.resource}</span>
+      )
+    </Fragment>
+  ) : (
+    <strong {...(key ? { key } : {})}>{permission}</strong>
+  );
+
+const getPermissionComponentKey = (
+  permission: ServerSecurityPermissionComposed,
+): string =>
+  Array.isArray(permission)
+    ? permission.map(p => getPermissionComponentKey(p)).join('-')
+    : typeof permission === 'object'
+    ? permission.action
+    : permission;
+
+export const ServerPermissionsFormatted = (
+  permissions: ServerSecurityPermissionComposed[],
+) => {
   return (
     <div>
       {permissions.map(permission => {
@@ -51,21 +92,3 @@ export const ServerPermissionsFormatted = permissions => {
     </div>
   );
 };
-
-const PermissionFormatter = (permission, key?: string) =>
-  typeof permission === 'object' ? (
-    <Fragment {...(key ? { key } : {})}>
-      <strong>{permission.action}</strong> (
-      <span style={{ textDecoration: 'underline' }}>{permission.resource}</span>
-      )
-    </Fragment>
-  ) : (
-    <strong {...(key ? { key } : {})}>{permission}</strong>
-  );
-
-const getPermissionComponentKey = permission =>
-  Array.isArray(permission)
-    ? permission.map(p => getPermissionComponentKey(p)).join('-')
-    : typeof permission === 'object'
-    ? permission.action
-    : permission;
