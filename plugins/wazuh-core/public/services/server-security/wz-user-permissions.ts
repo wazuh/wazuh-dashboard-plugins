@@ -13,6 +13,12 @@
 // Data extrated of /security/actions endpoint
 import wazuhPermissions from '../../../common/api-info/security-actions.json';
 
+// Constants
+const RESOURCE_ANY = '*:*:*';
+const RESOURCE_ANY_SHORT = '*:*';
+const RBAC_MODE_BLACK = 'black';
+const RBAC_MODE_WHITE = 'white';
+
 // Check the missing permissions of the required ones that the user does not have
 export const checkMissingUserPermissions = (
   requiredPermissions,
@@ -149,12 +155,6 @@ export const checkMissingUserRoles = (requiredRoles, userRoles) => {
   );
   return rolesUserNotOwn.length ? rolesUserNotOwn : false;
 };
-
-// Constants
-const RESOURCE_ANY = '*:*:*';
-const RESOURCE_ANY_SHORT = '*:*';
-const RBAC_MODE_BLACK = 'black';
-const RBAC_MODE_WHITE = 'white';
 
 // Utility functions
 const isAllow = value => value === 'allow';
