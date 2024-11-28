@@ -74,6 +74,8 @@ describe('WzListEditor', () => {
   const messagesError = {
     quotesError: 'Must start and end with quotes or have no quotes at all',
     colonError: 'Must start and end with quotes when using colon',
+    simbolsError:
+      'Must not contain simbols when using quotes(only letters, numbers and colon)',
   };
 
   beforeEach(() => {
@@ -204,19 +206,19 @@ describe('WzListEditor', () => {
   );
 
   it.each`
-    key            | value              | quotesError                  | colonError
-    ${'":key'}     | ${'value'}         | ${messagesError.quotesError} | ${messagesError.colonError}
-    ${'key'}       | ${'":value'}       | ${messagesError.quotesError} | ${messagesError.colonError}
-    ${'key"key'}   | ${'value'}         | ${messagesError.quotesError} | ${''}
-    ${'key'}       | ${'value"value'}   | ${messagesError.quotesError} | ${''}
-    ${'key'}       | ${'value"'}        | ${messagesError.quotesError} | ${''}
-    ${'key'}       | ${'"value'}        | ${messagesError.quotesError} | ${''}
-    ${'"key"key"'} | ${'value'}         | ${messagesError.quotesError} | ${''}
-    ${'key'}       | ${'"value"value"'} | ${messagesError.quotesError} | ${''}
-    ${'key:key'}   | ${'value'}         | ${''}                        | ${messagesError.colonError}
-    ${'key:"key"'} | ${'value'}         | ${messagesError.quotesError} | ${messagesError.colonError}
-    ${'key'}       | ${':value'}        | ${''}                        | ${messagesError.colonError}
-    ${'"key:key"'} | ${'"value":'}      | ${messagesError.quotesError} | ${messagesError.colonError}
+    key            | value              | quotesError                  | colonError                  | simbolsError
+    ${'":key'}     | ${'value'}         | ${messagesError.quotesError} | ${messagesError.colonError} | ${''}
+    ${'".key"'}    | ${'":value'}       | ${messagesError.quotesError} | ${messagesError.colonError} | ${messagesError.simbolsError}
+    ${'key"key'}   | ${'"value(*&"'}    | ${messagesError.quotesError} | ${''}                       | ${messagesError.simbolsError}
+    ${'key'}       | ${'value"value'}   | ${messagesError.quotesError} | ${''}                       | ${''}
+    ${'"key!@#"'}  | ${'value"'}        | ${messagesError.quotesError} | ${''}                       | ${messagesError.simbolsError}
+    ${'"key."'}    | ${'"value'}        | ${messagesError.quotesError} | ${''}                       | ${messagesError.simbolsError}
+    ${'"key"key"'} | ${'value'}         | ${messagesError.quotesError} | ${''}                       | ${messagesError.simbolsError}
+    ${'key'}       | ${'"value"value"'} | ${messagesError.quotesError} | ${''}                       | ${messagesError.simbolsError}
+    ${'key:key'}   | ${'"value;"'}      | ${''}                        | ${messagesError.colonError} | ${messagesError.simbolsError}
+    ${'key:"key"'} | ${'value'}         | ${messagesError.quotesError} | ${messagesError.colonError} | ${''}
+    ${'key'}       | ${':value'}        | ${''}                        | ${messagesError.colonError} | ${''}
+    ${'"key:key"'} | ${'"value":'}      | ${messagesError.quotesError} | ${messagesError.colonError} | ${''}
   `(
     'should render the message when try to add invalid key($key) or value($value)',
     ({
@@ -224,11 +226,13 @@ describe('WzListEditor', () => {
       value,
       quotesError,
       colonError,
+      simbolsError,
     }: {
       key: string;
       value: string;
       quotesError: string;
       colonError: string;
+      simbolsError: string;
     }) => {
       const button = screen.getByText('Add new entry');
       fireEvent.click(button);
@@ -253,6 +257,12 @@ describe('WzListEditor', () => {
         expect(screen.getByText(colonError)).toBeInTheDocument();
       } else {
         expect(screen.queryByText(messagesError.colonError)).toBeFalsy();
+      }
+
+      if (simbolsError) {
+        expect(screen.getByText(simbolsError)).toBeInTheDocument();
+      } else {
+        expect(screen.queryByText(messagesError.simbolsError)).toBeFalsy();
       }
     },
   );
