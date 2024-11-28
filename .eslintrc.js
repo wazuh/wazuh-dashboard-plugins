@@ -210,6 +210,12 @@ module.exports = {
             modifiers: ['global'],
             format: ['UPPER_CASE'],
           },
+          {
+            selector: ['memberLike'],
+            modifiers: ['readonly'],
+            types: ['number', 'string'],
+            format: ['UPPER_CASE'],
+          },
         ],
       },
     },
