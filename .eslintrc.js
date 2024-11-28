@@ -12,6 +12,8 @@ module.exports = {
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
+    projectService: true,
+    tsconfigRootDir: __dirname,
   },
   settings: {
     'import/resolver': {
