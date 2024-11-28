@@ -18,4 +18,3 @@ ADD ./${PACKAGE_NAME} /tmp/
 COPY --chown=opensearch-dashboards ./install-plugins.sh /
 RUN chmod +x /install-plugins.sh
 RUN /install-plugins.sh
-
