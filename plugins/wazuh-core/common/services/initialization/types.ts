@@ -1,21 +1,13 @@
-export type InitializationTaskRunStatusNotStarted = 'not_started';
-export type InitializationTaskRunStatusRunning = 'running';
-export type InitializationTaskRunStatusFinished = 'finished';
-export type InitializationTaskRunStatus =
-  | InitializationTaskRunStatusNotStarted
-  | InitializationTaskRunStatusRunning
-  | InitializationTaskRunStatusFinished;
+import { INITIALIZATION_TASK } from './constants';
 
-export type InitializationTaskRunResultNull = null;
-export type InitializationTaskRunResultSuccess = 'success';
-export type InitializationTaskRunResultFail = 'fail';
-export type InitializationTaskRunResult =
-  | InitializationTaskRunResultSuccess
-  | InitializationTaskRunResultFail
-  | InitializationTaskRunResultNull;
+type RunStatusEnum = (typeof INITIALIZATION_TASK)['RUN_STATUS'];
 
-export type InitializationTaskContextInternal = 'internal';
-export type InitializationTaskContextUser = 'user';
-export type InitializationTaskContext =
-  | InitializationTaskContextInternal
-  | InitializationTaskContextUser;
+export type InitializationTaskRunStatus = RunStatusEnum[keyof RunStatusEnum];
+
+type RunResultEnum = (typeof INITIALIZATION_TASK)['RUN_RESULT'];
+
+export type InitializationTaskRunResult = RunResultEnum[keyof RunResultEnum];
+
+type ContextEnum = (typeof INITIALIZATION_TASK)['CONTEXT'];
+
+export type InitializationTaskContext = ContextEnum[keyof ContextEnum];
