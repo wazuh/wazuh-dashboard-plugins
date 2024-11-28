@@ -67,3 +67,7 @@ export interface ServerAPIResponseItemsData<T> {
   message: string;
   error: number;
 }
+
+export interface ServerAPIResponseItemsDataHTTPClient<T> {
+  data: ServerAPIResponseItemsData<T>;
+}

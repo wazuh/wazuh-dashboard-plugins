@@ -14,16 +14,12 @@ import {
   HTTPVerb,
   HTTPClientServerUserData,
   WzRequestServices,
-  ServerAPIResponseItemsData,
+  ServerAPIResponseItemsDataHTTPClient,
 } from './types';
 import { Logger } from '../../../common/services/configuration';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from './constants';
 import jwtDecode from 'jwt-decode';
 import { BehaviorSubject } from 'rxjs';
-
-export interface ServerAPIResponseItemsDataHTTPClient<T> {
-  data: ServerAPIResponseItemsData<T>;
-}
 
 export class WzRequest implements HTTPClientServer {
   onErrorInterceptor?: (
