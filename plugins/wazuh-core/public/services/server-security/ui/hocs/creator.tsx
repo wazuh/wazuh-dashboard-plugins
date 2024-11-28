@@ -11,7 +11,7 @@ export const createServerSecurityHOCS = ({
 }) => {
   const withServerUserAuthorizationPromptChanged =
     (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
-    WrappedComponent =>
+    (WrappedComponent: React.ElementType) =>
     props => {
       const [userPermissionRequirements, userPermissions] =
         useServerUserPermissionsRequirements(
@@ -35,7 +35,7 @@ export const createServerSecurityHOCS = ({
       );
     };
 
-  const withServerUserLogged = WrappedComponent => props => {
+  const withServerUserLogged = (WrappedComponent: React.ElementType) => props => {
     const withServerUserLogged = useServerUserLogged();
 
     return withServerUserLogged ? (
@@ -47,7 +47,7 @@ export const createServerSecurityHOCS = ({
 
   const withServerUserAuthorizationPrompt =
     (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
-    WrappedComponent =>
+    (WrappedComponent: React.ElementType) =>
       compose(
         withServerUserLogged,
         withServerUserAuthorizationPromptChanged(
