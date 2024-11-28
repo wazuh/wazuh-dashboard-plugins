@@ -8,6 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 5.0.0
 - Added creation of report definition when creating dashboard by reference and the button to reset the report [#7091](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7091)
+- Added serverSecurity service to core plugin [#7026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7026)
 
 ### Removed
 
