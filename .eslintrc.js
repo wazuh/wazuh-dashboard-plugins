@@ -157,9 +157,19 @@ module.exports = {
             replacements: {
               e: {
                 error: true,
+                event: true,
               },
               err: {
                 error: true,
+              },
+              ev: {
+                event: true,
+              },
+              evt: {
+                event: true,
+              },
+              fn: {
+                callback: true,
               },
             },
           },
@@ -173,6 +183,7 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                             @typescript-eslint                             */
         /* -------------------------------------------------------------------------- */
+        '@typescript-eslint/prefer-readonly': 'error',
         '@typescript-eslint/no-extraneous-class': 'off',
         '@typescript-eslint/method-signature-style': ['error', 'property'],
         '@typescript-eslint/no-explicit-any': 'off',
