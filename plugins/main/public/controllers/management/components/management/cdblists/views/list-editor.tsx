@@ -515,9 +515,9 @@ class WzListEditor extends Component {
     placeholder: string;
   }) {
     const isInvalid = this.state.isInvalid.some(error => error.field === field);
-    const errorMessages = this.state.isInvalid.map(error => {
-      const keyMatches = error.field === field;
-      return keyMatches ? error.message : '';
+    const errorMessages: string[] = [];
+    this.state.isInvalid.forEach(error => {
+      error.field === field && errorMessages.push(error.message);
     });
 
     return (
