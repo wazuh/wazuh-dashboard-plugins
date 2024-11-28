@@ -25,32 +25,39 @@ import {
   ServerElementPermissions,
 } from './element';
 
+enum ServerButtonPermissionsTypes{
+  default = 'default',
+  empty = 'empty',
+  icon = 'icon',
+  link = 'link',
+  switch = 'switch'
+}
+
 interface IServerButtonPermissionsProps
   extends Omit<
     ServerElementPermissionsProps,
     'children' | 'additionalPropsFunction'
   > {
-  buttonType?: 'default' | 'empty' | 'icon' | 'link' | 'switch';
+  buttonType?: ServerButtonPermissionsTypes;
   rest: any;
 }
 
+const ButtonsMap = {
+  [ServerButtonPermissionsTypes.default]: EuiButton,
+  [ServerButtonPermissionsTypes.empty]: EuiButtonEmpty,
+  [ServerButtonPermissionsTypes.icon]: EuiButtonIcon,
+  [ServerButtonPermissionsTypes.link]: EuiLink,
+  [ServerButtonPermissionsTypes.switch]: EuiSwitch,
+}
+
 export const ServerButtonPermissions = ({
-  buttonType = 'default',
+  buttonType = ServerButtonPermissionsTypes.default,
   permissions,
   administrator,
   tooltip,
   ...rest
 }: IServerButtonPermissionsProps) => {
-  const Button =
-    buttonType === 'empty'
-      ? EuiButtonEmpty
-      : buttonType === 'icon'
-      ? EuiButtonIcon
-      : buttonType === 'link'
-      ? EuiLink
-      : buttonType === 'switch'
-      ? EuiSwitch
-      : EuiButton;
+  const Button = ButtonsMap[buttonType] || ButtonsMap['default'];
 
   return (
     <ServerElementPermissions
@@ -59,16 +66,16 @@ export const ServerButtonPermissions = ({
       tooltip={tooltip}
       getAdditionalProps={disabled => {
         const additionalProps = {
-          ...(!['link', 'switch'].includes(buttonType)
+          ...(![ServerButtonPermissionsTypes.link, ServerButtonPermissionsTypes.switch].includes(buttonType)
             ? { isDisabled: disabled }
             : { disabled }),
           onClick: disabled || !rest.onClick ? undefined : rest.onClick,
           onChange:
-            !disabled || rest.onChange || buttonType === 'switch'
+            !disabled || rest.onChange || buttonType === ServerButtonPermissionsTypes.switch
               ? rest.onChange
               : undefined,
         };
-        if (buttonType == 'switch') delete additionalProps.onClick;
+        if (buttonType == ServerButtonPermissionsTypes.switch) delete additionalProps.onClick;
 
         return additionalProps;
       }}
