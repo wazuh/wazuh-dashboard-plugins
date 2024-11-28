@@ -194,8 +194,8 @@ module.exports = {
           'error',
           { selector: 'default', format: ['camelCase'] },
           {
-            selector: 'objectLiteralProperty',
-            format: ['camelCase', 'snake_case'],
+            selector: ['objectLiteralProperty', 'typeProperty'],
+            format: null,
           },
           {
             selector: ['class', 'interface', 'typeLike'],
