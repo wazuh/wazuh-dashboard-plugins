@@ -11,7 +11,7 @@
 yarn install
 ```
 
-This command will install all the dependencies needed to lint and format the code on the changed files.
+This command will install all the dependencies needed to lint and format the code on the changed files. And prepare the environment to run the pre-commit hook.
 
 ## Linting
 
