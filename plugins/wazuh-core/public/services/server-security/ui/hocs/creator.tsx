@@ -35,15 +35,16 @@ export const createServerSecurityHOCS = ({
       );
     };
 
-  const withServerUserLogged = (WrappedComponent: React.ElementType) => props => {
-    const withServerUserLogged = useServerUserLogged();
+  const withServerUserLogged =
+    (WrappedComponent: React.ElementType) => props => {
+      const withServerUserLogged = useServerUserLogged();
 
-    return withServerUserLogged ? (
-      <WrappedComponent {...props} />
-    ) : (
-      <LoadingServerUserLogging useLoadingLogo={useLoadingLogo} />
-    );
-  };
+      return withServerUserLogged ? (
+        <WrappedComponent {...props} />
+      ) : (
+        <LoadingServerUserLogging useLoadingLogo={useLoadingLogo} />
+      );
+    };
 
   const withServerUserAuthorizationPrompt =
     (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
