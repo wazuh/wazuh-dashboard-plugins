@@ -48,11 +48,18 @@ import { getErrorOrchestrator } from '../../../../../../react-services/common-se
 
 type FieldTypes = 'key' | 'value' | 'edit';
 type FieldStateTypes = 'addingKey' | 'addingValue' | 'editingValue';
+type CheckingsTypes = 'quotes' | 'colon' | 'simbols';
+interface ValidationInterface {
+  condition: boolean;
+  checking: CheckingsTypes;
+}
 
 class WzListEditor extends Component {
-  private readonly messages = {
-    quotesError: 'Must start and end with quotes or have no quotes at all',
-    colonError: 'Must start and end with quotes when using colon',
+  private readonly messagesError = {
+    quotes: 'Must start and end with quotes or have no quotes at all',
+    colon: 'Must start and end with quotes when using colon',
+    simbols:
+      'Must not contain simbols when using quotes(only letters, numbers and colon)',
   };
 
   constructor(props) {
@@ -273,76 +280,65 @@ class WzListEditor extends Component {
   };
 
   private executeValidation = (value: string, field: FieldTypes) => {
-    this.validateQuotes(value, field);
-    this.validateColonOutsideQuotes(value, field);
-  };
-
-  /**
-   * Validate that if the value has a colon it starts and ends with quotes
-   * @param {String} value
-   * @param {FieldTypes} field
-   */
-  private validateColonOutsideQuotes = (value: string, field: FieldTypes) => {
-    const hasColon = value.includes(':');
-    if (hasColon) {
-      const startsWithQuote = value.startsWith('"');
-      const endsWithQuote = value.endsWith('"');
-      const isValid = startsWithQuote && endsWithQuote;
-
-      if (!isValid) {
-        const existsError = this.state.isInvalid.some(
-          error =>
-            error.field === field && error.message === this.messages.colonError,
-        );
-
-        // Avoid adding the same error multiple times
-        if (existsError) {
-          return;
-        }
-
-        this.setState(prevState => ({
-          isInvalid: [
-            ...prevState.isInvalid,
-            {
-              field,
-              message: this.messages.colonError,
-            },
-          ],
-        }));
-        return;
-      }
-    }
-    this.setState(prevState => ({
-      isInvalid: prevState.isInvalid.filter(
-        error =>
-          !(
-            error.field === field && error.message === this.messages.colonError
-          ),
-      ),
-    }));
-  };
-
-  /**
-   * Validate that if starts with a quote it ends with a quote and vice versa.
-   * Validate that the value has 0 or 2 quotes.
-   * @param {String} value
-   * @param {FieldTypes} field
-   */
-  private validateQuotes(value: string, field: FieldTypes) {
-    const hasMiddleQuotes = value.slice(1, -1).includes('"');
     const startsWithQuote = value.startsWith('"');
     const endsWithQuote = value.endsWith('"');
+    const valueWithoutQuotes = value.slice(1, -1);
+    // For the simbols validation
+    const hasNotSimbols = valueWithoutQuotes.match(/^[a-zA-Z0-9:]+$/);
+    // For the colon validation outside quotes
+    const hasColon = value.includes(':');
+    // If the value has a colon it starts and ends with quotes
+    const hasMiddleQuotes = valueWithoutQuotes.includes('"');
     const valueLength = value.length !== 1;
 
-    const isValid =
+    const quotesCondition =
       !hasMiddleQuotes &&
       ((startsWithQuote && endsWithQuote && valueLength) ||
         (!startsWithQuote && !endsWithQuote));
 
-    if (!isValid) {
+    const colonCondition = !(startsWithQuote && endsWithQuote) && hasColon;
+
+    const simbolsCondition =
+      !hasNotSimbols && startsWithQuote && endsWithQuote && valueLength;
+
+    const validationArray: ValidationInterface[] = [
+      {
+        checking: 'quotes',
+        condition: !quotesCondition,
+      },
+      {
+        checking: 'colon',
+        condition: colonCondition,
+      },
+      {
+        checking: 'simbols',
+        condition: simbolsCondition,
+      },
+    ];
+
+    validationArray.forEach(({ checking, condition }) => {
+      this.genericValidation({
+        field,
+        condition,
+        cheking: checking,
+      });
+    });
+  };
+
+  genericValidation = ({
+    field,
+    condition,
+    cheking,
+  }: {
+    field: FieldTypes;
+    condition: boolean;
+    cheking: CheckingsTypes;
+  }) => {
+    if (condition) {
       const existsError = this.state.isInvalid.some(
         error =>
-          error.field === field && error.message === this.messages.quotesError,
+          error.field === field &&
+          error.message === this.messagesError[cheking],
       );
 
       // Avoid adding the same error multiple times
@@ -355,22 +351,22 @@ class WzListEditor extends Component {
           ...prevState.isInvalid,
           {
             field,
-            message: this.messages.quotesError,
+            message: this.messagesError[cheking],
           },
         ],
       }));
-    } else {
-      this.setState(prevState => ({
-        isInvalid: prevState.isInvalid.filter(
-          error =>
-            !(
-              error.field === field &&
-              error.message === this.messages.quotesError
-            ),
-        ),
-      }));
+      return;
     }
-  }
+    this.setState(prevState => ({
+      isInvalid: prevState.isInvalid.filter(
+        error =>
+          !(
+            error.field === field &&
+            error.message === this.messagesError[cheking]
+          ),
+      ),
+    }));
+  };
 
   /**
    * Append a key value to this.items and after that if everything works ok re-create the array for the table
