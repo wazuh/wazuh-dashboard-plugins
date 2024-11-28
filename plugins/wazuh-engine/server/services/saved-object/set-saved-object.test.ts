@@ -1,15 +1,18 @@
 import {
   getInternalSavedObjectsClient,
-  getWazuhCore,
   getWazuhCheckUpdatesServices,
 } from '../../plugin-services';
 import { setSavedObject } from './set-saved-object';
+
+jest.mock('../../plugin-services', () => ({
+  getInternalSavedObjectsClient: jest.fn(),
+  getWazuhCheckUpdatesServices: jest.fn(),
+}));
 
 const mockedGetInternalObjectsClient =
   getInternalSavedObjectsClient as jest.Mock;
 const mockedGetWazuhCheckUpdatesServices =
   getWazuhCheckUpdatesServices as jest.Mock;
-jest.mock('../../plugin-services');
 
 describe('setSavedObject function', () => {
   afterEach(() => {

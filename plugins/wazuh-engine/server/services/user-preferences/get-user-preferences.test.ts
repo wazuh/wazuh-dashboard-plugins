@@ -6,13 +6,17 @@ import {
   getWazuhCheckUpdatesServices,
 } from '../../plugin-services';
 
+jest.mock('../../plugin-services', () => ({
+  getInternalSavedObjectsClient: jest.fn(),
+  getWazuhCheckUpdatesServices: jest.fn(),
+}));
+
 const mockedGetSavedObject = getSavedObject as jest.Mock;
 jest.mock('../saved-object/get-saved-object');
 
 const mockedGetWazuhCore = getWazuhCore as jest.Mock;
 const mockedGetWazuhCheckUpdatesServices =
   getWazuhCheckUpdatesServices as jest.Mock;
-jest.mock('../../plugin-services');
 
 describe('getUserPreferences function', () => {
   afterEach(() => {

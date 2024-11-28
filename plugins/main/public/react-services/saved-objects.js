@@ -27,6 +27,7 @@ import { webDocumentationLink } from '../../common/services/web_documentation';
 import { ErrorFactory } from './error-management';
 import { WarningError } from './error-management/error-factory/errors/WarningError';
 import { WzRequest } from '../react-services/wz-request';
+import { reportingDefinitions } from './reporting/reporting-definitions';
 
 export class SavedObject {
   /**
@@ -400,6 +401,15 @@ Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More inform
         formdata,
         { overwriteHeaders: { 'content-type': 'multipart/form-data' } },
       );
+
+      // Create Report definition
+      const detailsDashboard = postDashboard.data.successResults.filter(
+        result => result.type === 'dashboard',
+      );
+      reportingDefinitions.validateIfReportDefinitionExist(
+        detailsDashboard[0].id,
+      );
+
       return postDashboard;
     } catch (error) {
       throw ((error || {}).data || {}).message || false
