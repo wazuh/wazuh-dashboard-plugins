@@ -391,6 +391,26 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -796,6 +816,26 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1149,6 +1189,26 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1842,6 +1902,26 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -2247,6 +2327,26 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -2632,6 +2732,26 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -3325,6 +3445,26 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -3730,6 +3870,26 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -4107,6 +4267,26 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -4800,6 +4980,26 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -5205,6 +5405,26 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -5558,6 +5778,26 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -6251,6 +6491,26 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -6656,6 +6916,26 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -7041,6 +7321,26 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -7734,6 +8034,26 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -8139,6 +8459,26 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -8516,6 +8856,26 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -9209,6 +9569,26 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -9614,6 +9994,26 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -9967,6 +10367,26 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -10660,6 +11080,26 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -11065,6 +11505,26 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -11450,6 +11910,26 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -12143,6 +12623,26 @@ exports[`Inventory data Network Network settings table A Windows agent should re
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -12548,6 +13048,26 @@ exports[`Inventory data Network Network settings table A Windows agent should re
                           </span>
                         </button>
                       </div>
+                      <span
+                        class="euiToolTipAnchor"
+                      >
+                        <svg
+                          aria-label="Info"
+                          class="euiIcon euiIcon--small euiIcon--subdued"
+                          focusable="true"
+                          height="16"
+                          role="img"
+                          tabindex="0"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                            fill-rule="evenodd"
+                          />
+                        </svg>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -12925,6 +13445,26 @@ exports[`Inventory data Network Network settings table A Windows agent should re
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -13615,6 +14155,26 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -14330,6 +14890,26 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -15192,6 +15772,26 @@ exports[`Inventory data Processes A Windows agent should render processes table 
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -15932,6 +16532,26 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -16624,6 +17244,26 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -17317,6 +17957,26 @@ exports[`Inventory data Software Packages table A Windows agent should render so
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -17626,6 +18286,26 @@ exports[`Inventory data Software Packages table A Windows agent should render so
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -18294,6 +18974,26 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -18603,6 +19303,26 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
                         </span>
                       </button>
                     </div>
+                    <span
+                      class="euiToolTipAnchor"
+                    >
+                      <svg
+                        aria-label="Info"
+                        class="euiIcon euiIcon--small euiIcon--subdued"
+                        focusable="true"
+                        height="16"
+                        role="img"
+                        tabindex="0"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.59 10.059 7.35 5.18h1.3L8.4 10.06h-.81Zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184ZM2 14a1 1 0 0 1-.878-1.479l6-11a1 1 0 0 1 1.756 0l6 11A1 1 0 0 1 14 14H2Zm0-1h12L8 2 2 13Z"
+                          fill-rule="evenodd"
+                        />
+                      </svg>
+                    </span>
                   </div>
                 </div>
               </div>
