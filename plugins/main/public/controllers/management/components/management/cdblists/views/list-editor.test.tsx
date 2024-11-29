@@ -183,6 +183,9 @@ describe('WzListEditor', () => {
     });
 
     it('should render the component', () => {
+      expect(screen.getByText('testName')).toBeInTheDocument();
+      expect(screen.getByText('/lists/test')).toBeInTheDocument();
+
       cdblist.forEach(item => {
         expect(screen.getByText(item.key)).toBeInTheDocument();
         if (!(item.value === '')) {
