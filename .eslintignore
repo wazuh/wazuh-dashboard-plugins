@@ -1,0 +1,12 @@
+**/test/
+**/scripts/
+**/target/
+**/node_modules/
+**/dist/
+**/build/
+**/coverage/
+**/.nyc_output/
+**/.cache/
+**/.yarn/
+**/public/utils/codemirror
+**/public/kibana-integrations
