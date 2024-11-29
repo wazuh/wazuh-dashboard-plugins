@@ -179,7 +179,6 @@ class WzListEditor extends Component {
       await this.resourcesHandler.updateFile(name, raw, overwrite);
       if (!addingNew) {
         const file = { name: name, content: raw, path: path };
-        this.props.updateListContent(file);
         this.setState({ showWarningRestart: true });
         this.showToast(
           'success',
@@ -187,6 +186,7 @@ class WzListEditor extends Component {
           'CBD List successfully created',
           3000,
         );
+        this.props.updateListContent(file);
       } else {
         this.setState({ showWarningRestart: true });
         this.showToast('success', 'Success', 'CBD List updated', 3000);
@@ -208,7 +208,7 @@ class WzListEditor extends Component {
     this.setState({ isSaving: false });
   }
 
-  showToast = (color, title, text, time) => {
+  showToast = (color: string, title: string, text: string, time: number) => {
     getToasts().add({
       color: color,
       title: title,
