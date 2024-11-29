@@ -63,4 +63,4 @@ jobs:
         run: |
           echo "current=${{ env.currentDir }}"
           cd ./wazuh/scripts/test-packages
-          docker build --build-arg OSD_VERSION=${{ env.versionPlatform }} --build-arg PACKAGE_NAME=wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip -f osd-test-packages.Dockerfile ./
+          docker build --build-arg OSD_VERSION=${{ env.versionPlatform }} --build-arg PACKAGE_NAME=wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip -f osd-test-packages.Dockerfile ./
