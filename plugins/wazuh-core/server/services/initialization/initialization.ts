@@ -5,7 +5,7 @@ import {
   InitializationTaskContext,
 } from './types';
 import { addRoutes } from './routes';
-import { INITIALIZATION_TASK_CONTEXT_INTERNAL } from '../../../common/services/initialization/constants';
+import { INITIALIZATION_TASK } from '../../../common/services/initialization/constants';
 import { InitializationTask } from './lib/initialization-task';
 
 export class InitializationService implements IInitializationService {
@@ -57,7 +57,7 @@ export class InitializationService implements IInitializationService {
     return { ...this.services, ...context, scope };
   }
   async runAsInternal(taskNames?: string[]) {
-    const ctx = this.createRunContext(INITIALIZATION_TASK_CONTEXT_INTERNAL, {
+    const ctx = this.createRunContext(INITIALIZATION_TASK.CONTEXT.INTERNAL, {
       core: this._coreStart,
     });
     return await this.run(ctx, taskNames);
