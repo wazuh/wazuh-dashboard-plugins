@@ -7,6 +7,9 @@
 
 ## First time setup
 
+> [!IMPORTANT]
+> You must be stay at the root of the project.
+
 ```bash
 yarn install
 ```
