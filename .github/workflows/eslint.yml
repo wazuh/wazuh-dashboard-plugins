@@ -11,8 +11,10 @@ name: ESLint
 
 on:
   pull_request:
-    branches:
-      - master
+    branches-ignore:
+      - 2.*
+      - 3.*
+      - 4.*
 
 jobs:
   linter:
