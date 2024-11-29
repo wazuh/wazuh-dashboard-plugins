@@ -1,25 +1,25 @@
 #!/usr/bin/env sh
 
 printBlue() {
-    printf "\033[34;1m%s\033[m" "$@"
+  printf "\033[34;1m%s\033[m" "$@"
 }
 
 printGreen() {
-    printf "\033[32;1m%s\033[m" "$@"
+  printf "\033[32;1m%s\033[m" "$@"
 }
 
 printFormat() {
-    local text="$1"
-    shift
-    printf "[ $text ] %s\n" "$@"
+  local text="$1"
+  shift
+  printf "[ $text ] %s\n" "$@"
 }
 
 printInfo() {
-    printFormat "$(printBlue "INFO")" "$@"
+  printFormat "$(printBlue "INFO")" "$@"
 }
 
 printSuccess() {
-    printFormat "$(printGreen "SUCCESS")" "✅ $@"
+  printFormat "$(printGreen "SUCCESS")" "✅ $@"
 }
 
 files=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE "yarn.lock")

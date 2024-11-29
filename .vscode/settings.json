@@ -15,6 +15,6 @@
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "[shellscript]": {
-    "editor.defaultFormatter": "shakram02.bash-beautify"
+    "editor.defaultFormatter": "foxundermoon.shell-format"
   }
 }
