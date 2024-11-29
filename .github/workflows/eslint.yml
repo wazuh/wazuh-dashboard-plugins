@@ -10,7 +10,10 @@
 name: ESLint
 
 on:
-  pull_request:
+  pull_request_target:
+    types:
+      - opened
+      - edited
     branches-ignore:
       - 2.*
       - 3.*
