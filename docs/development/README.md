@@ -1,4 +1,4 @@
-# Development :)
+# Development
 
 ## Requirements
 
