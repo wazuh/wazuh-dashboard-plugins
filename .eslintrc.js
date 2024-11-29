@@ -12,8 +12,7 @@ module.exports = {
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
-    projectService: true,
-    tsconfigRootDir: __dirname,
+    project: ['./tsconfig.eslint.json'],
   },
   settings: {
     'import/resolver': {
