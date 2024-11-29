@@ -21,6 +21,7 @@ import {
   EuiToolTip,
   EuiIcon,
   EuiCheckboxGroup,
+  EuiIconTip,
 } from '@elastic/eui';
 import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
@@ -227,16 +228,24 @@ export function TableWzAPI({
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}
             {rest.downloadCsv && (
-              <ExportTableCsv
-                endpoint={rest.endpoint}
-                totalItems={totalItems}
-                filters={getFilters(filters)}
-                title={
-                  typeof rest.downloadCsv === 'string'
-                    ? rest.downloadCsv
-                    : rest.title
-                }
-              />
+              <>
+                <ExportTableCsv
+                  endpoint={rest.endpoint}
+                  totalItems={totalItems}
+                  filters={getFilters(filters)}
+                  title={
+                    typeof rest.downloadCsv === 'string'
+                      ? rest.downloadCsv
+                      : rest.title
+                  }
+                />
+                <EuiIconTip
+                  content='Exporting to CSV from multiple files can lead to errors.'
+                  size='s'
+                  color='subdued'
+                  type='alert'
+                />
+              </>
             )}
             {/* Render optional post custom action button */}
             {renderActionButtons(postActionButtons, filters)}
