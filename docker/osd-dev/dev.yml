@@ -239,6 +239,8 @@ services:
       - ${OSD_PORT}:5601
     environment:
       - 'LOGS=/proc/1/fd/1'
+      # https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/#interpolation-syntax
+      - WAZUH_CONFIG_PATH=${WAZUH_CONFIG_PATH:-/home/node/kbn/data/wazuh/config}
     entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
@@ -247,7 +249,7 @@ services:
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
-      - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
+      - ./config/${OSD_MAJOR}/osd/wazuh.yml:${WAZUH_CONFIG_PATH}/wazuh.yml
 
   idpsec:
     image: quay.io/keycloak/keycloak:19.0.1
