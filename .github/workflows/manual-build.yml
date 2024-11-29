@@ -45,8 +45,9 @@ jobs:
           ref: ${{ inputs.reference }}
           path: wazuh
 
-      - name: Step 02 - Get version and revision
+      - name: Step 02 - Set variables
         run: |
+          echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
           echo "currentDir=$(pwd -P)" >> $GITHUB_ENV
           echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
@@ -55,8 +56,8 @@ jobs:
       - name: Step 03 - Download the plugin's source code
         uses: actions/download-artifact@v3
         with:
-          name: wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          name: wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
 
       - name: Step 04 - Build the Docker image
         run: |
