@@ -240,7 +240,7 @@ export function TableWzAPI({
                   }
                 />
                 <EuiIconTip
-                  content='Exporting to CSV from multiple files can lead to errors.'
+                  content='Exporting to CSV from multiple entries can lead to errors.'
                   size='s'
                   color='subdued'
                   type='alert'
