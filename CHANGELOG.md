@@ -11,7 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Added ending quotes to CDB Lists keys [#7159](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7159)
+- Fixed rendering of rows in CDB list table when it starts with quotes. [#7171](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7171)
 
 ## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 00
 
