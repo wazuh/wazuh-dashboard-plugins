@@ -34,8 +34,7 @@ jobs:
           echo "Changed files:"
           echo "${CHANGED_FILES}"
           git checkout $GITHUB_HEAD_REF
-          plugin_package_json=$(ls -d plugins/* | head -n1)
-          echo "Installing dependencies from plugin: ${plugin_package_json}"
-          yarn --cwd "${plugin_package_json}" --modules-folder ../../node_modules
+          echo "Installing dependencies"
+          yarn
           echo "Running prettier on the changed files"
           npx prettier ${CHANGED_FILES} --check --ignore-unknown

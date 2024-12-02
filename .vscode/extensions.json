@@ -2,10 +2,14 @@
   // See http://go.microsoft.com/fwlink/?LinkId=827846
   // for the documentation about the extensions.json format
   "recommendations": [
+    // Shell Format
+    "foxundermoon.shell-format",
     // ESLint support.
     "dbaeumer.vscode-eslint",
     // Prettier support.
     "esbenp.prettier-vscode",
+    // Prettier ESLint
+    "rvest.vs-code-prettier-eslint",
     // JS/TS language support
     "ms-vscode.vscode-typescript-next",
     // VSCode Remote Dev Containers
@@ -15,6 +19,6 @@
     // GitLens — Git supercharged
     "eamodio.gitlens",
     // EditorConfig for VS Code
-    "editorconfig.editorconfig",
+    "editorconfig.editorconfig"
   ]
 }
