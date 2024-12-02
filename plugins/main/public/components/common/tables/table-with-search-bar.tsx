@@ -111,6 +111,8 @@ export function TableWithSearchBar<T>({
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState(rest.filters || {});
+  // Added a timestamp to track when the same filter is added multiple times
+  // after being manually removed.
   const [filtersTimeMark, setFiltersTimeMark] = useState<number>(Date.now());
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -180,7 +182,7 @@ export function TableWithSearchBar<T>({
         try {
           setLoading(true);
 
-          //Reset the table selection in case is enabled
+          // Reset the table selection in case is enabled
           tableRef.current.setSelection([]);
 
           const { items, totalItems } = await onSearch(
