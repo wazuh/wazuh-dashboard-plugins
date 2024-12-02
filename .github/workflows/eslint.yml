@@ -44,7 +44,7 @@ jobs:
           git branch -a
           echo "Getting diff files ignoring deleted and getting the changed or renamed files"
           CHANGED_FILES=$(git diff --name-status --diff-filter d ${REMOTE_NAME}/${GITHUB_BASE_REF}..${REMOTE_NAME}/${GITHUB_HEAD_REF} | awk '{print $NF}' | grep -E '.*\.[jt]sx?$' || echo "false")
-          if [CHANGED_FILES = "false"]; then
+          if [ $CHANGED_FILES = "false" ]; then
             echo "No changed files found with the extension .js, .jsx, .ts or .tsx"
             exit 0
           fi
