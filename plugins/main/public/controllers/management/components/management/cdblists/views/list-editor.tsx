@@ -23,6 +23,7 @@ import {
   EuiFieldText,
   EuiSpacer,
   EuiPanel,
+  EuiFormRow,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -45,7 +46,22 @@ import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orch
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
 
+type FieldTypes = 'key' | 'value' | 'edit';
+type FieldStateTypes = 'addingKey' | 'addingValue' | 'editingValue';
+type CheckingsTypes = 'quotes' | 'colon' | 'simbols';
+interface ValidationInterface {
+  condition: boolean;
+  checking: CheckingsTypes;
+}
+
 class WzListEditor extends Component {
+  private readonly messagesError = {
+    quotes: 'Must start and end with quotes or have no quotes at all',
+    colon: 'Must start and end with quotes when using colon',
+    simbols:
+      'Must not contain simbols when using quotes(only letters, numbers and colon)',
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -58,6 +74,7 @@ class WzListEditor extends Component {
       editingValue: '',
       newListName: '',
       showWarningRestart: false,
+      isInvalid: [],
     };
     this.items = {};
 
@@ -91,16 +108,29 @@ class WzListEditor extends Component {
    * Save in the state as object the items for an easy modification by key-value
    * @param {String} content
    */
-  contentToObject(content) {
-    const items = {};
+  contentToObject(content: string) {
+    const items: {
+      [key: string]: string;
+    } = {};
     const lines = content.split('\n');
+
+    const regex = /^((?:[^:"]*|"[^"]*")*):(.*)$/;
+
     lines.forEach(line => {
-      const split = line.startsWith('"') ? line.split('":') : line.split(':');
-      // All keys with multiple colons (:) should end with a quotation mark (")
-      const key = split[0].startsWith('"') ? split[0] + '"' : split[0];
-      const value = split[1] || '';
-      if (key) items[key] = value; // Prevent add empty keys
+      // Regex splitting the first : and ignoring the ones inside quotes
+      const match = line.match(regex);
+
+      if (match) {
+        const [, key, value] = match;
+        const trimmedKey = key.trim();
+        const trimmedValue = value.trim();
+
+        if (trimmedKey) {
+          items[trimmedKey] = trimmedValue;
+        }
+      }
     });
+
     return items;
   }
 
@@ -149,7 +179,6 @@ class WzListEditor extends Component {
       await this.resourcesHandler.updateFile(name, raw, overwrite);
       if (!addingNew) {
         const file = { name: name, content: raw, path: path };
-        this.props.updateListContent(file);
         this.setState({ showWarningRestart: true });
         this.showToast(
           'success',
@@ -157,6 +186,7 @@ class WzListEditor extends Component {
           'CBD List successfully created',
           3000,
         );
+        this.props.updateListContent(file);
       } else {
         this.setState({ showWarningRestart: true });
         this.showToast('success', 'Success', 'CBD List updated', 3000);
@@ -178,7 +208,7 @@ class WzListEditor extends Component {
     this.setState({ isSaving: false });
   }
 
-  showToast = (color, title, text, time) => {
+  showToast = (color: string, title: string, text: string, time: number) => {
     getToasts().add({
       color: color,
       title: title,
@@ -200,18 +230,24 @@ class WzListEditor extends Component {
   };
 
   onChangeKey = e => {
+    this.executeValidation(e.target.value, 'key');
+
     this.setState({
       addingKey: e.target.value,
     });
   };
 
   onChangeValue = e => {
+    this.executeValidation(e.target.value, 'value');
+
     this.setState({
       addingValue: e.target.value,
     });
   };
 
   onChangeEditingValue = e => {
+    this.executeValidation(e.target.value, 'edit');
+
     this.setState({
       editingValue: e.target.value,
     });
@@ -243,11 +279,101 @@ class WzListEditor extends Component {
     ];
   };
 
+  private executeValidation = (value: string, field: FieldTypes) => {
+    const startsWithQuote = value.startsWith('"');
+    const endsWithQuote = value.endsWith('"');
+    const valueWithoutQuotes = value.slice(1, -1);
+    // For the simbols validation
+    const hasNotSimbols = valueWithoutQuotes.match(/^[a-zA-Z0-9:]+$/);
+    // For the colon validation outside quotes
+    const hasColon = value.includes(':');
+    // If the value has a colon it starts and ends with quotes
+    const hasMiddleQuotes = valueWithoutQuotes.includes('"');
+    const valueLength = value.length !== 1;
+
+    const quotesCondition =
+      !hasMiddleQuotes &&
+      ((startsWithQuote && endsWithQuote && valueLength) ||
+        (!startsWithQuote && !endsWithQuote));
+
+    const colonCondition = !(startsWithQuote && endsWithQuote) && hasColon;
+
+    const simbolsCondition =
+      !hasNotSimbols && startsWithQuote && endsWithQuote && valueLength;
+
+    const validationArray: ValidationInterface[] = [
+      {
+        checking: 'quotes',
+        condition: !quotesCondition,
+      },
+      {
+        checking: 'colon',
+        condition: colonCondition,
+      },
+      {
+        checking: 'simbols',
+        condition: simbolsCondition,
+      },
+    ];
+
+    validationArray.forEach(({ checking, condition }) => {
+      this.genericValidation({
+        field,
+        condition,
+        cheking: checking,
+      });
+    });
+  };
+
+  genericValidation = ({
+    field,
+    condition,
+    cheking,
+  }: {
+    field: FieldTypes;
+    condition: boolean;
+    cheking: CheckingsTypes;
+  }) => {
+    if (condition) {
+      const existsError = this.state.isInvalid.some(
+        error =>
+          error.field === field &&
+          error.message === this.messagesError[cheking],
+      );
+
+      // Avoid adding the same error multiple times
+      if (existsError) {
+        return;
+      }
+
+      this.setState(prevState => ({
+        isInvalid: [
+          ...prevState.isInvalid,
+          {
+            field,
+            message: this.messagesError[cheking],
+          },
+        ],
+      }));
+      return;
+    }
+    this.setState(prevState => ({
+      isInvalid: prevState.isInvalid.filter(
+        error =>
+          !(
+            error.field === field &&
+            error.message === this.messagesError[cheking]
+          ),
+      ),
+    }));
+  };
+
   /**
    * Append a key value to this.items and after that if everything works ok re-create the array for the table
    */
   addItem() {
     const { addingKey, addingValue } = this.state;
+    const hasinvalidState = this.state.isInvalid.length > 0;
     if (!addingKey || Object.keys(this.items).includes(addingKey)) {
       this.showToast(
         'danger',
@@ -255,6 +381,15 @@ class WzListEditor extends Component {
         <Fragment>
           <strong>{addingKey}</strong> key already exists
         </Fragment>,
+        3000,
+      );
+      return;
+    }
+    if (hasinvalidState) {
+      this.showToast(
+        'danger',
+        'Error',
+        `Key and value ${this.messages.quotesError.toLowerCase()}`,
         3000,
       );
       return;
@@ -368,8 +503,41 @@ class WzListEditor extends Component {
     );
   }
 
+  inputValidation({
+    field,
+    value,
+    onChange,
+    placeholder,
+  }: {
+    field: FieldTypes;
+    value: FieldStateTypes;
+    onChange: (e: any) => void;
+    placeholder: string;
+  }) {
+    const isInvalid = this.state.isInvalid.some(error => error.field === field);
+    const errorMessages: string[] = [];
+    this.state.isInvalid.forEach(error => {
+      error.field === field && errorMessages.push(error.message);
+    });
+
+    return (
+      <EuiFormRow fullWidth={true} isInvalid={isInvalid} error={errorMessages}>
+        <EuiFieldText
+          fullWidth={true}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          aria-label='Use aria labels when no actual label is in use'
+          isInvalid={isInvalid}
+        />
+      </EuiFormRow>
+    );
+  }
+
   renderAdd() {
     const { addingKey, addingValue } = this.state;
+
+    const hasInvalidState = this.state.isInvalid.length > 0;
 
     return (
       <Fragment>
@@ -378,23 +546,21 @@ class WzListEditor extends Component {
             <EuiSpacer size='l' />
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiFieldText
-                  fullWidth={true}
-                  placeholder='Key'
-                  value={addingKey}
-                  onChange={this.onChangeKey}
-                  aria-label='Use aria labels when no actual label is in use'
-                />
+                {this.inputValidation({
+                  field: 'key',
+                  value: addingKey,
+                  onChange: this.onChangeKey,
+                  placeholder: 'Key',
+                })}
               </EuiFlexItem>
 
               <EuiFlexItem>
-                <EuiFieldText
-                  fullWidth={true}
-                  placeholder='Value'
-                  value={addingValue}
-                  onChange={this.onChangeValue}
-                  aria-label='Use aria labels when no actual label is in use'
-                />
+                {this.inputValidation({
+                  field: 'value',
+                  value: addingValue,
+                  onChange: this.onChangeValue,
+                  placeholder: 'Value',
+                })}
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiFlexGroup>
@@ -402,8 +568,8 @@ class WzListEditor extends Component {
                     <EuiButtonEmpty
                       iconType='plusInCircle'
                       isDisabled={!addingKey}
-                      fill
                       onClick={() => this.addItem()}
+                      disabled={hasInvalidState}
                     >
                       Add
                     </EuiButtonEmpty>
@@ -470,14 +636,12 @@ class WzListEditor extends Component {
         sortable: true,
         render: (value, item) => {
           if (this.state.editing === item.key) {
-            return (
-              <EuiFieldText
-                placeholder='New value'
-                value={this.state.editingValue}
-                onChange={this.onChangeEditingValue}
-                aria-label='Use aria labels when no actual label is in use'
-              />
-            );
+            return this.inputValidation({
+              field: 'edit',
+              value: this.state.editingValue,
+              onChange: this.onChangeEditingValue,
+              placeholder: 'New value',
+            });
           } else {
             return <span>{value}</span>;
           }
@@ -498,6 +662,7 @@ class WzListEditor extends Component {
                       this.setEditedValue();
                     }}
                     color='primary'
+                    data-testid='saveEditButton'
                   />
                 </EuiToolTip>
                 <EuiToolTip position='top' content={'Discard'}>
@@ -506,6 +671,7 @@ class WzListEditor extends Component {
                     iconType='cross'
                     onClick={() => this.setState({ editing: false })}
                     color='danger'
+                    data-testid='cancelEditButton'
                   />
                 </EuiToolTip>
               </Fragment>
@@ -526,6 +692,7 @@ class WzListEditor extends Component {
                     });
                   }}
                   color='primary'
+                  data-testid='editButton'
                 />
                 <WzButtonPermissions
                   buttonType='icon'
@@ -535,6 +702,7 @@ class WzListEditor extends Component {
                   tooltip={{ position: 'top', content: `Remove ${item.key}` }}
                   onClick={() => this.deleteItem(item.key)}
                   color='danger'
+                  data-testid='deleteButton'
                 />
               </Fragment>
             );
