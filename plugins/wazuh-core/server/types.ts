@@ -23,8 +23,8 @@ export interface WazuhCorePluginStart extends WazuhCoreServices {
   };
 }
 
-export type PluginSetup = {
-  securityDashboards?: {}; // TODO: Add OpenSearch Dashboards Security interface
-};
+export interface PluginSetup {
+  securityDashboards?: object; // TODO: Add OpenSearch Dashboards Security interface
+}
 
 export * from './services/initialization/types';

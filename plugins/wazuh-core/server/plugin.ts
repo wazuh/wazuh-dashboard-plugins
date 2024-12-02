@@ -6,19 +6,6 @@ import {
   Logger,
 } from 'opensearch-dashboards/server';
 import { validate as validateNodeCronInterval } from 'node-cron';
-import {
-  PluginSetup,
-  WazuhCorePluginSetup,
-  WazuhCorePluginStart,
-} from './types';
-import { setCore } from './plugin-services';
-import {
-  ManageHosts,
-  createDashboardSecurity,
-  ServerAPIClient,
-  ConfigurationStore,
-  InitializationService,
-} from './services';
 import { Configuration } from '../common/services/configuration';
 import {
   PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
@@ -32,6 +19,19 @@ import {
   WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
   WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
 } from '../common/constants';
+import {
+  PluginSetup,
+  WazuhCorePluginSetup,
+  WazuhCorePluginStart,
+} from './types';
+import { setCore } from './plugin-services';
+import {
+  ManageHosts,
+  createDashboardSecurity,
+  ServerAPIClient,
+  ConfigurationStore,
+  InitializationService,
+} from './services';
 import { enhanceConfiguration } from './services/enhance-configuration';
 import { initializationTaskCreatorServerAPIConnectionCompatibility } from './initialization/server-api';
 import {
@@ -39,19 +39,20 @@ import {
   initializationTaskCreatorIndexPattern,
   initializationTaskCreatorSetting,
 } from './initialization';
-import AlertsIndexPatternDefaultFields from './initialization/index-patterns-fields/alerts-fields.json';
-import MonitoringIndexPatternDefaultFields from './initialization/index-patterns-fields/monitoring-fields.json';
-import StatisticsIndexPatternDefaultFields from './initialization/index-patterns-fields/statistics-fields.json';
-import VulnerabilitiesStatesFields from './initialization/index-patterns-fields/vulnerabibility-states-fields.json';
+import alertsIndexPatternDefaultFields from './initialization/index-patterns-fields/alerts-fields.json';
+import monitoringIndexPatternDefaultFields from './initialization/index-patterns-fields/monitoring-fields.json';
+import statisticsIndexPatternDefaultFields from './initialization/index-patterns-fields/statistics-fields.json';
+import vulnerabilitiesStatesFields from './initialization/index-patterns-fields/vulnerabibility-states-fields.json';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
   private readonly logger: Logger;
-  private services: { [key: string]: any };
-  private _internal: { [key: string]: any };
+  private readonly services: Record<string, any>;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  private readonly _internal: Record<string, any>;
 
-  constructor(private initializerContext: PluginInitializerContext) {
+  constructor(private readonly initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
     this.services = {};
     this._internal = {};
@@ -81,14 +82,14 @@ export class WazuhCorePlugin
     enhanceConfiguration(this.services.configuration);
 
     // Register the plugin settings
-    Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
-      this.services.configuration.register(key, value),
-    );
+    for (const [key, value] of Object.entries(PLUGIN_SETTINGS)) {
+      this.services.configuration.register(key, value);
+    }
 
     // Add categories to the configuration
-    Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(PLUGIN_SETTINGS_CATEGORIES)) {
       this.services.configuration.registerCategory({ ...value, id: key });
-    });
+    }
 
     /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
       Because the settings are defined in the backend and frontend side using the same definitions,
@@ -97,16 +98,20 @@ export class WazuhCorePlugin
     const setting = this.services.configuration._settings.get(
       'cron.statistics.interval',
     );
-    !setting.validateUIForm &&
-      (setting.validateUIForm = function (value) {
+
+    if (!setting.validateUIForm) {
+      setting.validateUIForm = function (value) {
         return this.validate(value);
-      });
-    !setting.validate &&
-      (setting.validate = function (value: string) {
+      };
+    }
+
+    if (!setting.validate) {
+      setting.validate = function (value: string) {
         return validateNodeCronInterval(value)
           ? undefined
           : 'Interval is not valid.';
-      });
+      };
+    }
 
     this.services.configuration.setup();
 
@@ -147,7 +152,7 @@ export class WazuhCorePlugin
           savedObjectOverwrite: {
             timeFieldName: 'timestamp',
           },
-          fieldsNoIndices: AlertsIndexPatternDefaultFields,
+          fieldsNoIndices: alertsIndexPatternDefaultFields,
         },
         configurationSettingKey: 'checks.pattern',
       }),
@@ -163,7 +168,7 @@ export class WazuhCorePlugin
           savedObjectOverwrite: {
             timeFieldName: 'timestamp',
           },
-          fieldsNoIndices: MonitoringIndexPatternDefaultFields,
+          fieldsNoIndices: monitoringIndexPatternDefaultFields,
         },
         configurationSettingKey: 'checks.monitoring', // TODO: create new setting
       }),
@@ -176,7 +181,7 @@ export class WazuhCorePlugin
           ctx.configuration.get('vulnerabilities.pattern'),
         taskName: 'index-pattern:vulnerabilities-states',
         options: {
-          fieldsNoIndices: VulnerabilitiesStatesFields,
+          fieldsNoIndices: vulnerabilitiesStatesFields,
         },
         configurationSettingKey: 'checks.vulnerability', // TODO: create new setting
       }),
@@ -191,10 +196,10 @@ export class WazuhCorePlugin
             'cron.prefix',
             'cron.statistics.index.name',
           );
-
           const prefixTemplateName = appConfig['cron.prefix'];
           const statisticsIndicesTemplateName =
             appConfig['cron.statistics.index.name'];
+
           return `${prefixTemplateName}-${statisticsIndicesTemplateName}-*`;
         },
         taskName: 'index-pattern:statistics',
@@ -202,7 +207,7 @@ export class WazuhCorePlugin
           savedObjectOverwrite: {
             timeFieldName: 'timestamp',
           },
-          fieldsNoIndices: StatisticsIndexPatternDefaultFields,
+          fieldsNoIndices: statisticsIndexPatternDefaultFields,
         },
         configurationSettingKey: 'checks.statistics', // TODO: create new setting
       }),
@@ -210,7 +215,7 @@ export class WazuhCorePlugin
 
     // Settings
     // TODO: this task should be registered by the related plugin
-    [
+    for (const setting of [
       {
         key: PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
         value: WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
@@ -226,11 +231,11 @@ export class WazuhCorePlugin
         value: JSON.stringify(WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER),
         configurationSetting: 'checks.timeFilter',
       },
-    ].forEach(setting => {
+    ]) {
       this.services.initialization.register(
         initializationTaskCreatorSetting(setting, `setting:${setting.key}`),
       );
-    });
+    }
 
     // Index pattern templates
     // Index pattern template: alerts

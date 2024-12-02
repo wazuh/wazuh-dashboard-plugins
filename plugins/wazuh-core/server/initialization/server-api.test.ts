@@ -45,6 +45,7 @@ describe('ServerAPIConnectionCompatibility', () => {
     `Check server API connection and compatibility for the server API hosts`,
     async ({ apiHostID, apiVersionResponse, isCompatible }) => {
       const loggerMock = jest.fn();
+
       await ServerAPIConnectionCompatibility(
         {
           manageHosts: {
@@ -58,11 +59,13 @@ describe('ServerAPIConnectionCompatibility', () => {
           },
           serverAPIClient: {
             asInternalUser: {
-              request: () => ({
-                data: {
-                  data: apiVersionResponse,
-                },
-              }),
+              request: () => {
+                return {
+                  data: {
+                    data: apiVersionResponse,
+                  },
+                };
+              },
             },
           },
         },
@@ -72,6 +75,7 @@ describe('ServerAPIConnectionCompatibility', () => {
       expect(loggerMock).toHaveBeenCalledWith(
         `Checking the connection and compatibility with server API [${apiHostID}]`,
       );
+
       if (apiVersionResponse.api_version) {
         if (isCompatible === true) {
           expect(loggerMock).toHaveBeenCalledWith(

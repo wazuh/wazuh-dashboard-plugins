@@ -23,23 +23,23 @@ export interface InitializationTaskRunData {
 }
 
 export interface IInitializationTask extends InitializationTaskRunData {
-  run<Context = any, Result = any>(ctx: Context): Promise<Result>;
-  getInfo(): InitializationTaskRunData;
+  run: <Context = any, Result = any>(ctx: Context) => Promise<Result>;
+  getInfo: () => InitializationTaskRunData;
 }
 
 export type InitializationTaskContext = 'internal' | 'user';
 export interface IInitializationService
   extends LifecycleService<any, any, any, any, any, any> {
-  register(task: InitializationTaskDefinition): void;
-  get(taskName: string): InitializationTaskRunData;
-  getAll(): InitializationTaskRunData[];
-  createRunContext<ContextType = any>(
+  register: (task: InitializationTaskDefinition) => void;
+  get: (taskName: string) => InitializationTaskRunData;
+  getAll: () => InitializationTaskRunData[];
+  createRunContext: <ContextType = any>(
     scope: InitializationTaskContext,
     context: ContextType,
-  ): {
+  ) => {
     scope: InitializationTaskContext;
   };
-  runAsInternal<ReturnType = any>(tasks?: string[]): Promise<ReturnType>;
+  runAsInternal: <ReturnType = any>(tasks?: string[]) => Promise<ReturnType>;
 }
 
 export interface InitializationTaskRunContext extends WazuhCoreServices {

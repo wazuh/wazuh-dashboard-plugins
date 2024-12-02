@@ -1,8 +1,32 @@
 import { schema } from '@osd/config-schema';
 
-export function addRoutes(router, { initialization }) {
-  const getTaskList = (tasksAsString: string) => tasksAsString.split(',');
+const getTaskList = (tasksAsString: string) => tasksAsString.split(',');
 
+interface EnhancedLoggerLog {
+  timestamp: string;
+  level: string;
+  message: string;
+}
+
+function enhanceTaskLogger(logger) {
+  const logs: EnhancedLoggerLog[] = [];
+  const enhancedLogger = {
+    getLogs() {
+      return logs;
+    },
+  };
+
+  for (const level of ['debug', 'info', 'warn', 'error']) {
+    enhancedLogger[level] = (message: string) => {
+      logs.push({ timestamp: new Date().toISOString(), level, message });
+      logger[level](message);
+    };
+  }
+
+  return enhancedLogger;
+}
+
+export function addRoutes(router, { initialization }) {
   const validateTaskList = schema.maybe(
     schema.string({
       validate(value: string) {
@@ -11,14 +35,15 @@ export function addRoutes(router, { initialization }) {
         const invalidTasks = requestTasks.filter(requestTask =>
           tasks.every(({ name }) => requestTask !== name),
         );
-        if (invalidTasks.length) {
+
+        if (invalidTasks.length > 0) {
           return `Invalid tasks: ${invalidTasks.join(', ')}`;
         }
-        return undefined;
+
+        return;
       },
     }),
   );
-
   const apiEndpointBase = '/api/initialization';
 
   // Get the status of internal initialization tasks
@@ -37,13 +62,14 @@ export function addRoutes(router, { initialization }) {
           ? getTaskList(request.query.tasks)
           : undefined;
         const logger = context.wazuh_core.logger;
+
         logger.debug(`Getting initialization tasks related to internal scope`);
+
         const tasks = tasksNames
           ? tasksNames.map(taskName =>
               context.wazuh_core.initialization.get(taskName),
             )
           : context.wazuh_core.initialization.getAll();
-
         const tasksData = tasks.map(task => task.getInfo());
 
         logger.debug(
@@ -60,10 +86,10 @@ export function addRoutes(router, { initialization }) {
             tasks: tasksData,
           },
         });
-      } catch (e) {
+      } catch (error) {
         return response.internalError({
           body: {
-            message: `Error getting the internal initialization tasks: ${e.message}`,
+            message: `Error getting the internal initialization tasks: ${error.message}`,
           },
         });
       }
@@ -89,9 +115,10 @@ export function addRoutes(router, { initialization }) {
         const logger = context.wazuh_core.logger;
 
         logger.debug(`Running initialization tasks related to internal scope`);
-        const results = await context.wazuh_core.initialization.runAsInternal(
-          tasksNames,
-        );
+
+        const results =
+          await context.wazuh_core.initialization.runAsInternal(tasksNames);
+
         logger.info(
           `Initialization tasks related to internal scope were executed`,
         );
@@ -104,10 +131,10 @@ export function addRoutes(router, { initialization }) {
             tasks: results,
           },
         });
-      } catch (e) {
+      } catch (error) {
         return response.internalError({
           body: {
-            message: `Error running the internal initialization tasks: ${e.message}`,
+            message: `Error running the internal initialization tasks: ${error.message}`,
           },
         });
       }
@@ -132,11 +159,12 @@ export function addRoutes(router, { initialization }) {
         const logger = context.wazuh_core.logger;
         const username = ''; // TODO: get value
         const scope = 'user';
+
         logger.debug(
           `Getting initialization tasks related to user [${username}] scope [${scope}]`,
         );
-        const initializationTasks = context.wazuh_core.initialization.get();
 
+        const initializationTasks = context.wazuh_core.initialization.get();
         const indexPatternTasks = initializationTasks
           .filter(({ name }) => name.startsWith('index-pattern:'))
           .map(({ name }) =>
@@ -151,12 +179,9 @@ export function addRoutes(router, { initialization }) {
               name,
             ),
           );
-
         const allUserTasks = [...indexPatternTasks, ...settingsTasks];
         const tasks = tasksNames
-          ? allUserTasks.filter(({ name }) =>
-              tasksNames.some(taskName => taskName === name),
-            )
+          ? allUserTasks.filter(({ name }) => tasksNames.includes(name))
           : allUserTasks;
 
         logger.debug(
@@ -171,12 +196,13 @@ export function addRoutes(router, { initialization }) {
         );
 
         logger.debug(`Running tasks for user [${username}] scope [${scope}]`);
+
         const results = await Promise.all(
           tasks.map(async task => {
             const taskLogger = enhanceTaskLogger(logger);
-            let data;
+
             try {
-              data = await task.run({
+              await task.run({
                 ...taskContext,
                 // TODO: use user selection index patterns
                 logger: taskLogger,
@@ -187,8 +213,10 @@ export function addRoutes(router, { initialization }) {
                     }
                   : {}),
               });
-            } catch (e) {
+            } catch {
+              /* empty */
             } finally {
+              // eslint-disable-next-line no-unsafe-finally
               return {
                 logs: taskLogger.getLogs(),
                 ...task.getInfo(),
@@ -201,12 +229,11 @@ export function addRoutes(router, { initialization }) {
 
         const initialMessage =
           'All the initialization tasks related to user scope were executed.';
-
         const message = [
           initialMessage,
           results.some(({ error }) => error) && 'There was some errors.',
         ]
-          .filter(v => v)
+          .filter(Boolean)
           .join(' ');
 
         return response.ok({
@@ -215,28 +242,13 @@ export function addRoutes(router, { initialization }) {
             tasks: results,
           },
         });
-      } catch (e) {
+      } catch (error) {
         return response.internalError({
           body: {
-            message: `Error initializating the tasks: ${e.message}`,
+            message: `Error initializating the tasks: ${error.message}`,
           },
         });
       }
     },
-  );
-}
-
-function enhanceTaskLogger(logger) {
-  const logs = [];
-
-  return ['debug', 'info', 'warn', 'error'].reduce(
-    (accum, level) => ({
-      ...accum,
-      [level]: message => {
-        logs.push({ timestamp: new Date().toISOString(), level, message });
-        logger[level].message;
-      },
-    }),
-    { getLogs: () => logs },
   );
 }
