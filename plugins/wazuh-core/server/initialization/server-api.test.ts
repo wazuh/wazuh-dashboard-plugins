@@ -5,7 +5,7 @@ import {
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { version as appVersion } from '../../package.json';
 import {
-  ServerAPIConnectionCompatibility,
+  serverAPIConnectionCompatibility,
   checkAppServerCompatibility,
 } from './server-api';
 
@@ -35,7 +35,7 @@ describe('checkAppServerCompatibility', () => {
   );
 });
 
-describe('ServerAPIConnectionCompatibility', () => {
+describe('serverAPIConnectionCompatibility', () => {
   it.each`
     apiHostID    | apiVersionResponse                     | isCompatible
     ${'server1'} | ${{ api_version: '5.0.0' }}            | ${true}
@@ -46,7 +46,7 @@ describe('ServerAPIConnectionCompatibility', () => {
     async ({ apiHostID, apiVersionResponse, isCompatible }) => {
       const loggerMock = jest.fn();
 
-      await ServerAPIConnectionCompatibility(
+      await serverAPIConnectionCompatibility(
         {
           manageHosts: {
             get: () => hosts,
