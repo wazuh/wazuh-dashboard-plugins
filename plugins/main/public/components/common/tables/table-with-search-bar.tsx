@@ -111,6 +111,7 @@ export function TableWithSearchBar<T>({
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState(rest.filters || {});
+  const [filtersTimeMark, setFiltersTimeMark] = useState<number>(Date.now());
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: tablePageSizeOptions[0],
@@ -228,6 +229,10 @@ export function TableWithSearchBar<T>({
     isMounted.current = true;
   }, []);
 
+  useEffect(() => {
+    setFiltersTimeMark(Date.now());
+  }, [rest.filters]);
+
   const tablePagination = {
     ...pagination,
     totalItemCount: totalItems,
@@ -251,6 +256,7 @@ export function TableWithSearchBar<T>({
           },
         ]}
         input={rest?.filters?.q || ''}
+        inputTimeMark={filtersTimeMark}
         onSearch={({ apiQuery }) => {
           // Set the query, reset the page index and update the refresh
           setFilters(apiQuery);
