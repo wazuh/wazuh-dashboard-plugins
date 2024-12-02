@@ -219,8 +219,7 @@ export const initializationTaskCreatorIndexPattern = ({
 }: {
   getIndexPatternID: (ctx: any) => Promise<string>;
   taskName: string;
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  options: {};
+  options: object;
   configurationSettingKey: string;
 }) => {
   return {

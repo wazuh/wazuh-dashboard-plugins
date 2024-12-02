@@ -4,38 +4,39 @@ export function getTemplateForIndexPattern(
   indexPatternTitle: string,
   templates: { name: string; index_patterns: string }[],
 ) {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  return templates.filter(({ index_patterns }: { index_patterns: string }) => {
-    const [, cleanIndexPatterns] = index_patterns.match(/\[(.+)]/) || [
-      null,
-      null,
-    ];
+  return templates.filter(
+    ({ index_patterns: indexPatternsTemplate }: { index_patterns: string }) => {
+      const [, cleanIndexPatterns] = indexPatternsTemplate.match(/\[(.+)]/) || [
+        null,
+        null,
+      ];
 
-    if (!cleanIndexPatterns) {
-      return false;
-    }
+      if (!cleanIndexPatterns) {
+        return false;
+      }
 
-    const indexPatterns = cleanIndexPatterns.match(/([^\s,]+)/g);
+      const indexPatterns = cleanIndexPatterns.match(/([^\s,]+)/g);
 
-    if (!indexPatterns) {
-      return false;
-    }
+      if (!indexPatterns) {
+        return false;
+      }
 
-    const lastChar = indexPatternTitle.at(-1);
-    const indexPatternTitleCleaned =
-      lastChar === '*' ? indexPatternTitle.slice(0, -1) : indexPatternTitle;
+      const lastChar = indexPatternTitle.at(-1);
+      const indexPatternTitleCleaned =
+        lastChar === '*' ? indexPatternTitle.slice(0, -1) : indexPatternTitle;
 
-    return indexPatterns.some(indexPattern => {
-      const lastChar = indexPattern.at(-1);
-      const indexPatternCleaned =
-        lastChar === '*' ? indexPattern.slice(0, -1) : indexPattern;
+      return indexPatterns.some(indexPattern => {
+        const lastChar = indexPattern.at(-1);
+        const indexPatternCleaned =
+          lastChar === '*' ? indexPattern.slice(0, -1) : indexPattern;
 
-      return (
-        indexPatternCleaned.includes(indexPatternTitleCleaned) ||
-        indexPatternTitleCleaned.includes(indexPatternCleaned)
-      );
-    });
-  });
+        return (
+          indexPatternCleaned.includes(indexPatternTitleCleaned) ||
+          indexPatternTitleCleaned.includes(indexPatternCleaned)
+        );
+      });
+    },
+  );
 }
 
 export const checkIndexPatternHasTemplate = async (

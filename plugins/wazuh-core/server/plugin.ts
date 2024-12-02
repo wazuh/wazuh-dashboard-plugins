@@ -49,13 +49,12 @@ export class WazuhCorePlugin
 {
   private readonly logger: Logger;
   private readonly services: Record<string, any>;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  private readonly _internal: Record<string, any>;
+  private readonly internal: Record<string, any>;
 
   constructor(private readonly initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
     this.services = {};
-    this._internal = {};
+    this.internal = {};
   }
 
   public async setup(
@@ -66,7 +65,7 @@ export class WazuhCorePlugin
 
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
 
-    this._internal.configurationStore = new ConfigurationStore(
+    this.internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-store'),
       {
         cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
@@ -75,7 +74,7 @@ export class WazuhCorePlugin
     );
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
-      this._internal.configurationStore,
+      this.internal.configurationStore,
     );
 
     // Enhance configuration service

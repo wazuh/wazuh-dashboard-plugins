@@ -3,16 +3,15 @@ import {
   InitializationTaskRunData,
   IInitializationTask,
 } from '../types';
-import { INITIALIZATION_TASK } from '../../../../common/services/initialization/constants';
+import { initializationTask } from '../../../../common/services/initialization/constants';
 
 export class InitializationTask implements IInitializationTask {
   public name: string;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  private readonly _run: any;
+  private readonly runInternal: any;
   public status: InitializationTaskRunData['status'] =
-    INITIALIZATION_TASK.RUN_STATUS.NOT_STARTED;
+    initializationTask.RUN_STATUS.NOT_STARTED;
   public result: InitializationTaskRunData['result'] =
-    INITIALIZATION_TASK.RUN_RESULT.NULL;
+    initializationTask.RUN_RESULT.NULL;
   public data: any = null;
   public createdAt: InitializationTaskRunData['createdAt'] =
     new Date().toISOString();
@@ -23,11 +22,11 @@ export class InitializationTask implements IInitializationTask {
 
   constructor(task: InitializationTaskDefinition) {
     this.name = task.name;
-    this._run = task.run;
+    this.runInternal = task.run;
   }
 
   private init() {
-    this.status = INITIALIZATION_TASK.RUN_STATUS.RUNNING;
+    this.status = initializationTask.RUN_STATUS.RUNNING;
     this.result = null;
     this.data = null;
     this.startedAt = new Date().toISOString();
@@ -37,7 +36,7 @@ export class InitializationTask implements IInitializationTask {
   }
 
   async run(...params) {
-    if (this.status === INITIALIZATION_TASK.RUN_STATUS.RUNNING) {
+    if (this.status === initializationTask.RUN_STATUS.RUNNING) {
       throw new Error(`Another instance of task ${this.name} is running`);
     }
 
@@ -45,21 +44,21 @@ export class InitializationTask implements IInitializationTask {
 
     try {
       this.init();
-      this.data = await this._run(...params);
-      this.result = INITIALIZATION_TASK.RUN_RESULT.SUCCESS;
+      this.data = await this.runInternal(...params);
+      this.result = initializationTask.RUN_RESULT.SUCCESS;
     } catch (error_) {
       error = error_;
-      this.result = INITIALIZATION_TASK.RUN_RESULT.FAIL;
+      this.result = initializationTask.RUN_RESULT.FAIL;
       this.error = error_.message;
     } finally {
-      this.status = INITIALIZATION_TASK.RUN_STATUS.FINISHED;
+      this.status = initializationTask.RUN_STATUS.FINISHED;
       this.finishedAt = new Date().toISOString();
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const dateStartedAt = new Date(this.startedAt!);
+      const dateStartedAt = new Date(this.startedAt as string);
       const dateFinishedAt = new Date(this.finishedAt);
 
-      this.duration = ((dateFinishedAt - dateStartedAt) as number) / 1000;
+      this.duration =
+        ((dateFinishedAt.getTime() - dateStartedAt.getTime()) as number) / 1000;
     }
 
     if (error) {

@@ -68,15 +68,14 @@ export async function serverAPIConnectionCompatibility(
     ctx.logger.warn(
       `Error checking the connection and compatibility with server API [${apiHostID}]: ${error.message}`,
     );
-  } finally {
-    // eslint-disable-next-line no-unsafe-finally
-    return {
-      connection,
-      compatibility,
-      api_version: apiVersion,
-      id: apiHostID,
-    };
   }
+
+  return {
+    connection,
+    compatibility,
+    api_version: apiVersion,
+    id: apiHostID,
+  };
 }
 
 async function serversAPIConnectionCompatibility(
