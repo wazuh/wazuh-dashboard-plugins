@@ -23,11 +23,28 @@ import {
   EuiCheckboxGroup,
   EuiBasicTable,
 } from '@elastic/eui';
-import { useStateStorage } from '../../hooks';
 import { isEqual } from 'lodash';
+import { useStateStorage } from '../../hooks';
 import { TableDataProps } from './types';
 
 const getColumMetaField = item => item.field || item.name;
+
+const TableDataRenderElement = ({
+  render,
+  ...rest
+}: {
+  render: ((params: any) => React.JSXElement) | React.JSXElement;
+}) => {
+  if (typeof render === 'function') {
+    return <EuiFlexItem>{render(rest)}</EuiFlexItem>;
+  }
+
+  if (typeof render === 'object') {
+    return <EuiFlexItem>{render}</EuiFlexItem>;
+  }
+
+  return null;
+};
 
 export function TableData<T>({
   preActionButtons,
@@ -55,10 +72,8 @@ export function TableData<T>({
   });
   const [refresh, setRefresh] = useState(rest.reload || 0);
   const [fetchContext, setFetchContext] = useState(rest.fetchContext || {});
-
   const isMounted = useRef(false);
   const tableRef = useRef();
-
   const [selectedFields, setSelectedFields] = useStateStorage<string[]>(
     rest.tableColumns.some(({ show }) => show)
       ? rest.tableColumns.filter(({ show }) => show).map(({ field }) => field)
@@ -77,6 +92,7 @@ export function TableData<T>({
         sorting,
         fetchContext,
       };
+
       setIsLoading(true);
       rest?.onFetchContextChange?.(enhancedFetchContext);
 
@@ -87,7 +103,11 @@ export function TableData<T>({
       setTotalItems(totalItems);
 
       const result = {
-        items: rest.mapResponseItem ? items.map(rest.mapResponseItem) : items,
+        items: rest.mapResponseItem
+          ? items.map((element, index, array) =>
+              rest.mapResponseItem(element, index, array),
+            )
+          : items,
         totalItems,
       };
 
@@ -95,6 +115,7 @@ export function TableData<T>({
     } catch (error) {
       setIsLoading(false);
       setTotalItems(0);
+
       if (error?.name) {
         /* This replaces the error name. The intention is that an AxiosError
           doesn't appear in the toast message.
@@ -103,6 +124,7 @@ export function TableData<T>({
         */
         error.name = 'RequestError';
       }
+
       throw error;
     }
   };
@@ -141,6 +163,7 @@ export function TableData<T>({
    */
   const triggerReload = () => {
     setRefresh(Date.now());
+
     if (onReload) {
       onReload(Date.now());
     }
@@ -155,6 +178,7 @@ export function TableData<T>({
     if (isMounted.current) {
       const { index: pageIndex, size: pageSize } = page;
       const { field, direction } = sort;
+
       setPagination({
         pageIndex,
         pageSize,
@@ -194,7 +218,9 @@ export function TableData<T>({
   }, [rest?.fetchContext]);
 
   useEffect(() => {
-    if (rest.reload) triggerReload();
+    if (rest.reload) {
+      triggerReload();
+    }
   }, [rest.reload]);
 
   // It is required that this effect runs after other effects that use isMounted
@@ -209,7 +235,7 @@ export function TableData<T>({
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions,
   };
-
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   const ReloadButton = (
     <EuiFlexItem grow={false}>
       <EuiButtonEmpty iconType='refresh' onClick={() => triggerReload()}>
@@ -217,7 +243,6 @@ export function TableData<T>({
       </EuiButtonEmpty>
     </EuiFlexItem>
   );
-
   const header = (
     <>
       <EuiFlexGroup wrap alignItems='center' responsive={false}>
@@ -272,6 +297,7 @@ export function TableData<T>({
             <EuiCheckboxGroup
               options={rest.tableColumns.map(item => {
                 const metaField = getColumMetaField(item);
+
                 return {
                   id: metaField,
                   label: item.name,
@@ -284,8 +310,10 @@ export function TableData<T>({
                     if (state.length > 1) {
                       return state.filter(field => field !== optionID);
                     }
+
                     return state;
                   }
+
                   return [...state, optionID];
                 });
               }}
@@ -297,7 +325,6 @@ export function TableData<T>({
       )}
     </>
   );
-
   const tableDataRenderElementsProps = {
     ...rest,
     tableColumns,
@@ -330,7 +357,10 @@ export function TableData<T>({
         <EuiBasicTable
           ref={tableRef}
           columns={tableColumns.map(
-            ({ searchable, show, composeField, ...rest }) => ({ ...rest }),
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            ({ searchable, show, composeField, ...rest }) => {
+              return { ...rest };
+            },
           )}
           items={items}
           loading={isLoading}
@@ -348,13 +378,3 @@ export function TableData<T>({
     </EuiFlexGroup>
   );
 }
-
-const TableDataRenderElement = ({ render, ...rest }) => {
-  if (typeof render === 'function') {
-    return <EuiFlexItem>{render(rest)}</EuiFlexItem>;
-  }
-  if (typeof render === 'object') {
-    return <EuiFlexItem>{render}</EuiFlexItem>;
-  }
-  return null;
-};

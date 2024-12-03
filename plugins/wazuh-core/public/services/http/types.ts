@@ -2,32 +2,32 @@ import { AxiosRequestConfig } from 'axios';
 import { BehaviorSubject } from 'rxjs';
 
 export interface HTTPClientRequestInterceptor {
-  init(): void;
-  destroy(): void;
-  cancel(): void;
-  request(options: AxiosRequestConfig): Promise<any>;
+  init: () => void;
+  destroy: () => void;
+  cancel: () => void;
+  request: (options: AxiosRequestConfig) => Promise<any>;
 }
 
 export type HTTPVerb = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
 
 export interface HTTPClientGeneric {
-  request(
+  request: (
     method: HTTPVerb,
     path: string,
     payload?: any,
     returnError?: boolean,
-  ): Promise<any>;
+  ) => Promise<any>;
 }
 
-export type HTTPClientServerUserData = {
+export interface HTTPClientServerUserData {
   token: string | null;
   policies: any | null;
   account: any | null;
   logged: boolean;
-};
+}
 
 export interface HTTPClientServer {
-  request(
+  request: (
     method: HTTPVerb,
     path: string,
     body: any,
@@ -35,12 +35,12 @@ export interface HTTPClientServer {
       checkCurrentApiIsUp?: boolean;
       returnOriginalResponse?: boolean;
     },
-  ): Promise<any>;
-  csv(path: string, filters: any): Promise<any>;
-  auth(force: boolean): Promise<any>;
-  unauth(force: boolean): Promise<any>;
+  ) => Promise<any>;
+  csv: (path: string, filters: any) => Promise<any>;
+  auth: (force: boolean) => Promise<any>;
+  unauth: (force: boolean) => Promise<any>;
   userData$: BehaviorSubject<HTTPClientServerUserData>;
-  getUserData(): HTTPClientServerUserData;
+  getUserData: () => HTTPClientServerUserData;
 }
 
 export interface HTTPClient {
@@ -50,14 +50,14 @@ export interface HTTPClient {
 
 export interface WzRequestServices {
   request: HTTPClientRequestInterceptor['request'];
-  getURL(path: string): string;
-  getTimeout(): Promise<number>;
-  getServerAPI(): string;
+  getURL: (path: string) => string;
+  getTimeout: () => Promise<number>;
+  getServerAPI: () => string;
 }
 
 export interface ServerAPIResponseItems<T> {
-  affected_items: Array<T>;
-  failed_items: Array<any>;
+  affected_items: T[];
+  failed_items: any[];
   total_affected_items: number;
   total_failed_items: number;
 }

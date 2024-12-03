@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import React from 'react';
+import { render, waitFor } from '@testing-library/react';
+import { SearchBar } from '../index';
 import {
   getSuggestions,
   tokenizer,
   transformSpecificQLToUnifiedQL,
   WQL,
 } from './wql';
-import React from 'react';
-import { render, waitFor } from '@testing-library/react';
-import { SearchBar } from '../index';
 
 describe('SearchBar component', () => {
   const componentProps = {
@@ -22,9 +23,11 @@ describe('SearchBar component', () => {
           },
         },
         suggestions: {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           field(currentValue) {
             return [];
           },
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           value(currentValue, { field }) {
             return [];
           },
@@ -46,31 +49,26 @@ describe('SearchBar component', () => {
   });
 });
 
+// Tokenize the input
+function tokenCreator({ type, value, formattedValue }) {
+  return { type, value, ...(formattedValue ? { formattedValue } : {}) };
+}
+
 /* eslint-disable max-len */
 describe('Query language - WQL', () => {
-  // Tokenize the input
-  function tokenCreator({ type, value, formattedValue }) {
-    return { type, value, ...(formattedValue ? { formattedValue } : {}) };
-  }
-
   const t = {
-    opGroup: (value = undefined) =>
-      tokenCreator({ type: 'operator_group', value }),
-    opCompare: (value = undefined) =>
-      tokenCreator({ type: 'operator_compare', value }),
-    field: (value = undefined) => tokenCreator({ type: 'field', value }),
-    value: (value = undefined, formattedValue = undefined) =>
+    opGroup: (value?) => tokenCreator({ type: 'operator_group', value }),
+    opCompare: (value?) => tokenCreator({ type: 'operator_compare', value }),
+    field: (value?) => tokenCreator({ type: 'field', value }),
+    value: (value?, formattedValue?) =>
       tokenCreator({
         type: 'value',
         value,
         formattedValue: formattedValue ?? value,
       }),
-    whitespace: (value = undefined) =>
-      tokenCreator({ type: 'whitespace', value }),
-    conjunction: (value = undefined) =>
-      tokenCreator({ type: 'conjunction', value }),
+    whitespace: (value?) => tokenCreator({ type: 'whitespace', value }),
+    conjunction: (value?) => tokenCreator({ type: 'conjunction', value }),
   };
-
   // Token undefined
   const tu = {
     opGroup: tokenCreator({ type: 'operator_group', value: undefined }),
@@ -84,7 +82,6 @@ describe('Query language - WQL', () => {
     }),
     conjunction: tokenCreator({ type: 'conjunction', value: undefined }),
   };
-
   const tuBlankSerie = [
     tu.opGroup,
     tu.whitespace,
@@ -153,31 +150,41 @@ describe('Query language - WQL', () => {
       await getSuggestions(tokenizer(input), {
         id: 'aql',
         suggestions: {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           field(currentValue) {
             return [
               { label: 'field', description: 'Field' },
               { label: 'field2', description: 'Field2' },
-            ].map(({ label, description }) => ({
-              type: 'field',
-              label,
-              description,
-            }));
+            ].map(({ label, description }) => {
+              return {
+                type: 'field',
+                label,
+                description,
+              };
+            });
           },
+          // eslint-disable-next-line default-param-last
           value(currentValue = '', { field }) {
             switch (field) {
-              case 'field':
+              case 'field': {
                 return ['value', 'value2', 'value3', 'value4']
                   .filter(value => value.startsWith(currentValue))
-                  .map(value => ({ type: 'value', label: value }));
-                break;
-              case 'field2':
+                  .map(value => {
+                    return { type: 'value', label: value };
+                  });
+              }
+
+              case 'field2': {
                 return ['127.0.0.1', '127.0.0.2', '190.0.0.1', '190.0.0.2']
                   .filter(value => value.startsWith(currentValue))
-                  .map(value => ({ type: 'value', label: value }));
-                break;
-              default:
+                  .map(value => {
+                    return { type: 'value', label: value };
+                  });
+              }
+
+              default: {
                 return [];
-                break;
+              }
             }
           },
         },
@@ -208,8 +215,8 @@ describe('Query language - WQL', () => {
     ${'field="value > value2"'}                         | ${'field=value > value2'}
     ${'field="value < value2"'}                         | ${'field=value < value2'}
     ${'field="value ~ value2"'}                         | ${'field=value ~ value2' /** ~ character is not supported as value in the q query parameter */}
-    ${'field="custom \\"value"'}                        | ${'field=custom "value'}
-    ${'field="custom \\"value\\""'}                     | ${'field=custom "value"'}
+    ${String.raw`field="custom \"value"`}               | ${'field=custom "value'}
+    ${String.raw`field="custom \"value\""`}             | ${'field=custom "value"'}
     ${'field=value and'}                                | ${'field=value;'}
     ${'field="custom value" and'}                       | ${'field=custom value;'}
     ${'(field=value'}                                   | ${'(field=value'}
@@ -271,7 +278,7 @@ describe('Query language - WQL', () => {
     ${'field=value and '}              | ${{ type: { iconType: 'kqlField', color: 'tint4' }, label: 'field2' }}         | ${'field=value and field2'}
     ${'field=value and field2'}        | ${{ type: { iconType: 'kqlOperand', color: 'tint1' }, label: '>' }}            | ${'field=value and field2>'}
     ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with spaces' }}    | ${'field="with spaces"'}
-    ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with "spaces' }}   | ${'field="with \\"spaces"'}
+    ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with "spaces' }}   | ${String.raw`field="with \"spaces"`}
     ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with value()' }}   | ${'field="with value()"'}
     ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with and value' }} | ${'field="with and value"'}
     ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with or value' }}  | ${'field="with or value"'}
@@ -280,7 +287,7 @@ describe('Query language - WQL', () => {
     ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with > value' }}   | ${'field="with > value"'}
     ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with < value' }}   | ${'field="with < value"'}
     ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'with ~ value' }}   | ${'field="with ~ value"' /** ~ character is not supported as value in the q query parameter */}
-    ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: '"value' }}         | ${'field="\\"value"'}
+    ${'field='}                        | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: '"value' }}         | ${String.raw`field="\"value"`}
     ${'field="with spaces"'}           | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'value' }}          | ${'field=value'}
     ${'field="with spaces"'}           | ${{ type: { iconType: 'kqlValue', color: 'tint0' }, label: 'other spaces' }}   | ${'field="other spaces"'}
     ${''}                              | ${{ type: { iconType: 'tokenDenseVector', color: 'tint3' }, label: '(' }}      | ${'('}
@@ -305,7 +312,6 @@ describe('Query language - WQL', () => {
     async ({ WQL: currentInput, clikedSuggestion, changedInput }) => {
       // Mock input
       let input = currentInput;
-
       const qlOutput = await WQL.run(input, {
         setInput: (value: string): void => {
           input = value;
@@ -320,6 +326,7 @@ describe('Query language - WQL', () => {
           },
         },
       });
+
       qlOutput.searchBarProps.onItemClick('')(clikedSuggestion);
       expect(input).toEqual(changedInput);
     },
@@ -346,9 +353,9 @@ describe('Query language - WQL', () => {
     ${'field=value'}                 | ${'field=value'}
     ${'field=value;'}                | ${'field=value and '}
     ${'field=value;field2'}          | ${'field=value and field2'}
-    ${'field="'}                     | ${'field="\\""'}
+    ${'field="'}                     | ${String.raw`field="\""`}
     ${'field=with spaces'}           | ${'field="with spaces"'}
-    ${'field=with "spaces'}          | ${'field="with \\"spaces"'}
+    ${'field=with "spaces'}          | ${String.raw`field="with \"spaces"`}
     ${'field=value ()'}              | ${'field="value ()"'}
     ${'field=with and value'}        | ${'field="with and value"'}
     ${'field=with or value'}         | ${'field="with or value"'}
@@ -395,50 +402,50 @@ describe('Query language - WQL', () => {
   // Validate the tokens
   // Some examples of value tokens are based on this API test: https://github.com/wazuh/wazuh/blob/813595cf58d753c1066c3e7c2018dbb4708df088/framework/wazuh/core/tests/test_utils.py#L987-L1050
   it.each`
-    WQL                                               | validationError
-    ${''}                                             | ${undefined}
-    ${'field1'}                                       | ${undefined}
-    ${'field2'}                                       | ${undefined}
-    ${'field1='}                                      | ${['The value for field "field1" is missing.']}
-    ${'field2='}                                      | ${['The value for field "field2" is missing.']}
-    ${'field='}                                       | ${['"field" is not a valid field.']}
-    ${'custom='}                                      | ${['"custom" is not a valid field.']}
-    ${'field1=value'}                                 | ${undefined}
-    ${'field_not_number=1'}                           | ${['Numbers are not valid for field_not_number']}
-    ${'field_not_number=value1'}                      | ${['Numbers are not valid for field_not_number']}
-    ${'field2=value'}                                 | ${undefined}
-    ${'field=value'}                                  | ${['"field" is not a valid field.']}
-    ${'custom=value'}                                 | ${['"custom" is not a valid field.']}
-    ${'field1=value!test'}                            | ${['"value!test" is not a valid value. Invalid characters found: !']}
-    ${'field1=value&test'}                            | ${['"value&test" is not a valid value. Invalid characters found: &']}
-    ${'field1=value!value&test'}                      | ${['"value!value&test" is not a valid value. Invalid characters found: !&']}
-    ${'field1=value!value!test'}                      | ${['"value!value!test" is not a valid value. Invalid characters found: !']}
-    ${'field1=value!value!t$&st'}                     | ${['"value!value!t$&st" is not a valid value. Invalid characters found: !$&']}
-    ${'field1=value,'}                                | ${['"value," is not a valid value.']}
-    ${'field1="Mozilla Firefox 53.0 (x64 en-US)"'}    | ${undefined}
-    ${'field1="[\\"https://example-link@<>=,%?\\"]"'} | ${undefined}
-    ${'field1=value and'}                             | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
-    ${'field2=value and'}                             | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
-    ${'field=value and'}                              | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
-    ${'custom=value and'}                             | ${['"custom" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
-    ${'field1=value and '}                            | ${['There is no sentence after conjunction "and".']}
-    ${'field2=value and '}                            | ${['There is no sentence after conjunction "and".']}
-    ${'field=value and '}                             | ${['"field" is not a valid field.', 'There is no sentence after conjunction "and".']}
-    ${'custom=value and '}                            | ${['"custom" is not a valid field.', 'There is no sentence after conjunction "and".']}
-    ${'field1=value and field2'}                      | ${['The operator for field "field2" is missing.']}
-    ${'field2=value and field1'}                      | ${['The operator for field "field1" is missing.']}
-    ${'field1=value and field'}                       | ${['"field" is not a valid field.']}
-    ${'field2=value and field'}                       | ${['"field" is not a valid field.']}
-    ${'field=value and custom'}                       | ${['"field" is not a valid field.', '"custom" is not a valid field.']}
-    ${'('}                                            | ${undefined}
-    ${'(field'}                                       | ${undefined}
-    ${'(field='}                                      | ${['"field" is not a valid field.']}
-    ${'(field=value'}                                 | ${['"field" is not a valid field.']}
-    ${'(field=value or'}                              | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "or".', 'There is no sentence after conjunction "or".']}
-    ${'(field=value or '}                             | ${['"field" is not a valid field.', 'There is no sentence after conjunction "or".']}
-    ${'(field=value or field2'}                       | ${['"field" is not a valid field.', 'The operator for field "field2" is missing.']}
-    ${'(field=value or field2>'}                      | ${['"field" is not a valid field.', 'The value for field "field2" is missing.']}
-    ${'(field=value or field2>value2'}                | ${['"field" is not a valid field.']}
+    WQL                                                       | validationError
+    ${''}                                                     | ${undefined}
+    ${'field1'}                                               | ${undefined}
+    ${'field2'}                                               | ${undefined}
+    ${'field1='}                                              | ${['The value for field "field1" is missing.']}
+    ${'field2='}                                              | ${['The value for field "field2" is missing.']}
+    ${'field='}                                               | ${['"field" is not a valid field.']}
+    ${'custom='}                                              | ${['"custom" is not a valid field.']}
+    ${'field1=value'}                                         | ${undefined}
+    ${'field_not_number=1'}                                   | ${['Numbers are not valid for field_not_number']}
+    ${'field_not_number=value1'}                              | ${['Numbers are not valid for field_not_number']}
+    ${'field2=value'}                                         | ${undefined}
+    ${'field=value'}                                          | ${['"field" is not a valid field.']}
+    ${'custom=value'}                                         | ${['"custom" is not a valid field.']}
+    ${'field1=value!test'}                                    | ${['"value!test" is not a valid value. Invalid characters found: !']}
+    ${'field1=value&test'}                                    | ${['"value&test" is not a valid value. Invalid characters found: &']}
+    ${'field1=value!value&test'}                              | ${['"value!value&test" is not a valid value. Invalid characters found: !&']}
+    ${'field1=value!value!test'}                              | ${['"value!value!test" is not a valid value. Invalid characters found: !']}
+    ${'field1=value!value!t$&st'}                             | ${['"value!value!t$&st" is not a valid value. Invalid characters found: !$&']}
+    ${'field1=value,'}                                        | ${['"value," is not a valid value.']}
+    ${'field1="Mozilla Firefox 53.0 (x64 en-US)"'}            | ${undefined}
+    ${String.raw`field1="[\"https://example-link@<>=,%?\"]"`} | ${undefined}
+    ${'field1=value and'}                                     | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+    ${'field2=value and'}                                     | ${['There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+    ${'field=value and'}                                      | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+    ${'custom=value and'}                                     | ${['"custom" is not a valid field.', 'There is no whitespace after conjunction "and".', 'There is no sentence after conjunction "and".']}
+    ${'field1=value and '}                                    | ${['There is no sentence after conjunction "and".']}
+    ${'field2=value and '}                                    | ${['There is no sentence after conjunction "and".']}
+    ${'field=value and '}                                     | ${['"field" is not a valid field.', 'There is no sentence after conjunction "and".']}
+    ${'custom=value and '}                                    | ${['"custom" is not a valid field.', 'There is no sentence after conjunction "and".']}
+    ${'field1=value and field2'}                              | ${['The operator for field "field2" is missing.']}
+    ${'field2=value and field1'}                              | ${['The operator for field "field1" is missing.']}
+    ${'field1=value and field'}                               | ${['"field" is not a valid field.']}
+    ${'field2=value and field'}                               | ${['"field" is not a valid field.']}
+    ${'field=value and custom'}                               | ${['"field" is not a valid field.', '"custom" is not a valid field.']}
+    ${'('}                                                    | ${undefined}
+    ${'(field'}                                               | ${undefined}
+    ${'(field='}                                              | ${['"field" is not a valid field.']}
+    ${'(field=value'}                                         | ${['"field" is not a valid field.']}
+    ${'(field=value or'}                                      | ${['"field" is not a valid field.', 'There is no whitespace after conjunction "or".', 'There is no sentence after conjunction "or".']}
+    ${'(field=value or '}                                     | ${['"field" is not a valid field.', 'There is no sentence after conjunction "or".']}
+    ${'(field=value or field2'}                               | ${['"field" is not a valid field.', 'The operator for field "field2" is missing.']}
+    ${'(field=value or field2>'}                              | ${['"field" is not a valid field.', 'The value for field "field2" is missing.']}
+    ${'(field=value or field2>value2'}                        | ${['"field" is not a valid field.']}
   `(
     'validate the tokens - WQL $WQL => $validationError',
     async ({ WQL: currentInput, validationError }) => {
@@ -448,15 +455,19 @@ describe('Query language - WQL', () => {
             options: {},
             suggestions: {
               field: () =>
-                ['field1', 'field2', 'field_not_number'].map(label => ({
-                  label,
-                })),
+                ['field1', 'field2', 'field_not_number'].map(label => {
+                  return {
+                    label,
+                  };
+                }),
               value: () => [],
             },
             validate: {
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               value: (token, { field, operator_compare }) => {
                 if (field === 'field_not_number') {
                   const value = token.formattedValue || token.value;
+
                   return /\d/.test(value)
                     ? `Numbers are not valid for ${field}`
                     : undefined;
@@ -466,6 +477,7 @@ describe('Query language - WQL', () => {
           },
         },
       });
+
       expect(qlOutput.output.error).toEqual(validationError);
     },
   );

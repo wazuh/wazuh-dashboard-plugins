@@ -3,13 +3,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {
-  EuiFilterButton,
   EuiFieldText,
   EuiToolTip,
   EuiIcon,
-  EuiPopover,
+  EuiInputPopover,
 } from '@elastic/eui';
-import { EuiInputPopover } from '@elastic/eui';
 
 const statusMap = {
   unsaved: {
@@ -34,13 +32,13 @@ export class EuiSuggestInput extends Component {
     isPopoverOpen: false,
   };
 
-  onFieldChange = e => {
+  onFieldChange(event) {
     this.setState({
-      value: e.target.value,
-      isPopoverOpen: e.target.value !== '' ? true : false,
+      value: event.target.value,
+      isPopoverOpen: event.target.value === '' ? false : true,
     });
-    this.props.sendValue(e.target.value);
-  };
+    this.props.sendValue(event.target.value);
+  }
 
   render() {
     const {
@@ -56,7 +54,6 @@ export class EuiSuggestInput extends Component {
       disableFocusTrap = false,
       ...rest
     } = this.props;
-
     let icon;
     let color;
 
@@ -64,11 +61,10 @@ export class EuiSuggestInput extends Component {
       icon = statusMap[status].icon;
       color = statusMap[status].color;
     }
-    const classes = classNames('euiSuggestInput', className);
 
+    const classes = classNames('euiSuggestInput', className);
     // EuiFieldText's append accepts an array of elements so start by creating an empty array
     const appendArray = [];
-
     const statusElement = (status === 'saved' || status === 'unsaved') && (
       <EuiToolTip
         position='left'
@@ -83,10 +79,14 @@ export class EuiSuggestInput extends Component {
     );
 
     // Push the status element to the array if it is not undefined
-    if (statusElement) appendArray.push(statusElement);
+    if (statusElement) {
+      appendArray.push(statusElement);
+    }
 
     // Check to see if consumer passed an append item and if so, add it to the array
-    if (append) appendArray.push(append);
+    if (append) {
+      appendArray.push(append);
+    }
 
     const customInput = (
       <EuiFieldText
@@ -136,6 +136,9 @@ EuiSuggestInput.propTypes = {
   isOpen: PropTypes.bool,
   onClosePopover: PropTypes.func,
   onPopoverFocus: PropTypes.func,
+  isPopoverOpen: PropTypes.bool,
+  disableFocusTrap: PropTypes.bool,
+  sendValue: PropTypes.func,
 };
 
 EuiSuggestInput.defaultProps = {

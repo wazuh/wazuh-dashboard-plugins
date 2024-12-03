@@ -1,11 +1,12 @@
 import React, { useMemo } from 'react';
-import { SearchBar, TableData } from '../../../../components';
 import { EuiSpacer } from '@elastic/eui';
+import { SearchBar, TableData } from '../../../../components';
 import { ServerDataProps } from './types';
 
 export function ServerTableData<T>({
   showActionExportFormatted,
   postActionButtons,
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   ActionExportFormatted,
   ...props
 }: ServerDataProps<T>) {
@@ -29,21 +30,20 @@ export function ServerTableData<T>({
         props.showSearchBar &&
         (({ tableColumns, ...rest }) => {
           /* Render search bar*/
-          const searchBarWQLOptions = useMemo(
-            () => ({
+          const searchBarWQLOptions = useMemo(() => {
+            return {
               searchTermFields: tableColumns
                 .filter(
                   ({ field, searchable }) =>
                     searchable && rest.selectedFields.includes(field),
                 )
-                .map(({ field, composeField }) =>
+                .flatMap(({ field, composeField }) =>
                   [composeField || field].flat(),
-                )
-                .flat(),
-              ...(rest?.searchBarWQL?.options || {}),
-            }),
-            [rest?.searchBarWQL?.options, rest?.selectedFields],
-          );
+                ),
+              ...rest?.searchBarWQL?.options,
+            };
+          }, [rest?.searchBarWQL?.options, rest?.selectedFields]);
+
           return (
             <>
               <SearchBar

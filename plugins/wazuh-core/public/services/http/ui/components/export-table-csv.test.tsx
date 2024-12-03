@@ -15,7 +15,9 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { ExportTableCsv } from './export-table-csv';
+
 const noop = () => {};
+
 describe('Export Table Csv component', () => {
   it('renders correctly to match the snapshot when the button is disabled', () => {
     const wrapper = mount(
@@ -27,8 +29,10 @@ describe('Export Table Csv component', () => {
         title='example'
       />,
     );
+
     expect(wrapper).toMatchSnapshot();
   });
+
   it('renders correctly to match the snapshot when the button is enabled', () => {
     const wrapper = mount(
       <ExportTableCsv
@@ -39,6 +43,7 @@ describe('Export Table Csv component', () => {
         title='example'
       />,
     );
+
     expect(wrapper).toMatchSnapshot();
   });
 });

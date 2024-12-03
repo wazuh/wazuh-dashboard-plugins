@@ -3,35 +3,35 @@ import { formatLabelValuePair } from './settings';
 import { formatBytes } from './file-size';
 
 export interface Logger {
-  debug(message: string): void;
-  info(message: string): void;
-  warn(message: string): void;
-  error(message: string): void;
+  debug: (message: string) => void;
+  info: (message: string) => void;
+  warn: (message: string) => void;
+  error: (message: string) => void;
 }
 
-type TConfigurationSettingOptionsPassword = {
+interface TConfigurationSettingOptionsPassword {
   password: {
     dual?: 'text' | 'password' | 'dual';
   };
-};
+}
 
-type TConfigurationSettingOptionsTextArea = {
+interface TConfigurationSettingOptionsTextArea {
   maxRows?: number;
   minRows?: number;
   maxLength?: number;
-};
+}
 
-type TConfigurationSettingOptionsSelect = {
+interface TConfigurationSettingOptionsSelect {
   select: { text: string; value: any }[];
-};
+}
 
-type TConfigurationSettingOptionsEditor = {
+interface TConfigurationSettingOptionsEditor {
   editor: {
     language: string;
   };
-};
+}
 
-type TConfigurationSettingOptionsFile = {
+interface TConfigurationSettingOptionsFile {
   file: {
     type: 'image';
     extensions?: string[];
@@ -52,37 +52,46 @@ type TConfigurationSettingOptionsFile = {
       resolveStaticURL: (filename: string) => string;
     };
   };
-};
+}
 
-type TConfigurationSettingOptionsNumber = {
+interface TConfigurationSettingOptionsNumber {
   number: {
     min?: number;
     max?: number;
     integer?: boolean;
   };
-};
+}
 
-type TConfigurationSettingOptionsSwitch = {
+interface TConfigurationSettingOptionsSwitch {
   switch: {
     values: {
       disabled: { label?: string; value: any };
       enabled: { label?: string; value: any };
     };
   };
-};
+}
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export enum EpluginSettingType {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   text = 'text',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   password = 'password',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   textarea = 'textarea',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   switch = 'switch',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   number = 'number',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   editor = 'editor',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   select = 'select',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   filepicker = 'filepicker',
 }
 
-export type TConfigurationSetting = {
+export interface TConfigurationSetting {
   // Define the text displayed in the UI.
   title: string;
   // Description.
@@ -133,19 +142,19 @@ export type TConfigurationSetting = {
   validateUIForm?: (value: any) => string | undefined;
   // Validate function creator to validate the setting in the backend.
   validate?: (schema: any) => (value: unknown) => string | undefined;
-};
+}
 
 export type TConfigurationSettingWithKey = TConfigurationSetting & {
   key: string;
 };
-export type TConfigurationSettingCategory = {
+export interface TConfigurationSettingCategory {
   title: string;
   description?: string;
   documentationLink?: string;
   renderOrder?: number;
-};
+}
 
-type TConfigurationSettings = { [key: string]: any };
+type TConfigurationSettings = Record<string, any>;
 export interface IConfigurationStore {
   setup: () => Promise<any>;
   start: () => Promise<any>;
@@ -153,70 +162,79 @@ export interface IConfigurationStore {
   get: (...settings: string[]) => Promise<TConfigurationSettings>;
   set: (settings: TConfigurationSettings) => Promise<any>;
   clear: (...settings: string[]) => Promise<any>;
+  // eslint-disable-next-line no-use-before-define
   setConfiguration: (configuration: IConfiguration) => void;
 }
 
 export interface IConfiguration {
-  setStore(store: IConfigurationStore): void;
-  setup(): Promise<any>;
-  start(): Promise<any>;
-  stop(): Promise<any>;
-  register(id: string, value: any): void;
-  get(...settings: string[]): Promise<TConfigurationSettings>;
-  set(settings: TConfigurationSettings): Promise<any>;
-  clear(...settings: string[]): Promise<any>;
-  reset(...settings: string[]): Promise<any>;
-  _settings: Map<
-    string,
-    {
-      [key: string]: TConfigurationSetting;
-    }
-  >;
-  getSettingValue(settingKey: string, value?: any): any;
-  getSettingValueIfNotSet(settingKey: string, value?: any): any;
+  setStore: (store: IConfigurationStore) => void;
+  setup: () => Promise<any>;
+  start: () => Promise<any>;
+  stop: () => Promise<any>;
+  register: (id: string, value: any) => void;
+  get: (...settings: string[]) => Promise<TConfigurationSettings>;
+  set: (settings: TConfigurationSettings) => Promise<any>;
+  clear: (...settings: string[]) => Promise<any>;
+  reset: (...settings: string[]) => Promise<any>;
+  _settings: Map<string, Record<string, TConfigurationSetting>>;
+  getSettingValue: (settingKey: string, value?: any) => any;
+  getSettingValueIfNotSet: (settingKey: string, value?: any) => any;
 }
 
 export class Configuration implements IConfiguration {
   store: IConfigurationStore | null = null;
-  _settings: Map<string, { [key: string]: TConfigurationSetting }>;
-  _categories: Map<string, { [key: string]: any }>;
-  constructor(private logger: Logger, store: IConfigurationStore) {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _settings: Map<string, Record<string, TConfigurationSetting>>;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  _categories: Map<string, Record<string, any>>;
+
+  constructor(
+    private readonly logger: Logger,
+    store: IConfigurationStore,
+  ) {
     this._settings = new Map();
     this._categories = new Map();
     this.setStore(store);
   }
+
   setStore(store: IConfigurationStore) {
     this.store = store;
     this.store.setConfiguration(this);
   }
+
   async setup(dependencies: any = {}) {
     return this.store.setup(dependencies);
   }
+
   async start(dependencies: any = {}) {
     return this.store.start(dependencies);
   }
+
   async stop(dependencies: any = {}) {
     return this.store.stop(dependencies);
   }
+
   /**
    * Register a setting
    * @param id
    * @param value
    */
   register(id: string, value: any) {
-    if (!this._settings.has(id)) {
+    if (this._settings.has(id)) {
+      const message = `Setting ${id} exists`;
+
+      this.logger.error(message);
+      throw new Error(message);
+    } else {
       // Enhance the setting
       const enhancedValue = value;
+
       // Enhance the description
       enhancedValue._description = value.description;
       enhancedValue.description = this.enhanceSettingDescription(value);
       // Register the setting
       this._settings.set(id, enhancedValue);
       this.logger.debug(`Registered ${id}`);
-    } else {
-      const message = `Setting ${id} exists`;
-      this.logger.error(message);
-      throw new Error(message);
     }
   }
 
@@ -245,20 +263,25 @@ export class Configuration implements IConfiguration {
     this.logger.debug(
       `Getting value for [${settingKey}]: stored [${JSON.stringify(value)}]`,
     );
+
     if (!this._settings.has(settingKey)) {
       throw new Error(`${settingKey} is not registered`);
     }
-    if (typeof value !== 'undefined') {
+
+    if (value !== undefined) {
       return value;
     }
+
     const setting = this._settings.get(settingKey);
     const finalValue =
-      typeof setting.defaultValueIfNotSet !== 'undefined'
-        ? setting.defaultValueIfNotSet
-        : setting.defaultValue;
+      setting.defaultValueIfNotSet === undefined
+        ? setting.defaultValue
+        : setting.defaultValueIfNotSet;
+
     this.logger.debug(
       `Value for [${settingKey}]: [${JSON.stringify(finalValue)}]`,
     );
+
     return finalValue;
   }
 
@@ -273,19 +296,25 @@ export class Configuration implements IConfiguration {
     this.logger.debug(
       `Getting value for [${settingKey}]: stored [${JSON.stringify(value)}]`,
     );
+
     if (!this._settings.has(settingKey)) {
       throw new Error(`${settingKey} is not registered`);
     }
-    if (typeof value !== 'undefined') {
+
+    if (value !== undefined) {
       return value;
     }
+
     const setting = this._settings.get(settingKey);
     const finalValue = setting.defaultValue;
+
     this.logger.debug(
       `Value for [${settingKey}]: [${JSON.stringify(finalValue)}]`,
     );
+
     return finalValue;
   }
+
   /**
    * Get the value for all settings or a subset of them
    * @param rest
@@ -293,57 +322,60 @@ export class Configuration implements IConfiguration {
    */
   async get(...settings: string[]) {
     this.logger.debug(
-      settings.length
+      settings.length > 0
         ? `Getting settings [${settings.join(',')}]`
         : 'Getting settings',
     );
+
     const stored = await this.store.get(...settings);
+
     this.logger.debug(`configuration stored: ${JSON.stringify({ stored })}`);
 
     const result =
       settings && settings.length === 1
         ? this.getSettingValue(settings[0], stored[settings[0]])
-        : (settings.length > 1
-            ? settings
-            : Array.from(this._settings.keys())
-          ).reduce(
-            (accum, key) => ({
-              ...accum,
-              [key]: this.getSettingValue(key, stored[key]),
-            }),
-            {},
+        : Object.fromEntries(
+            (settings.length > 1 ? settings : [...this._settings.keys()]).map(
+              key => [key, this.getSettingValue(key, stored[key])],
+            ),
           );
 
     // Clone the result. This avoids the object reference can be changed when managing the result.
     return cloneDeep(result);
   }
+
   /**
    * Set a the value for a subset of settings
    * @param settings
    * @returns
    */
-  async set(settings: { [key: string]: any }) {
+  async set(settings: Record<string, any>) {
     const settingsAreRegistered = Object.entries(settings)
       .map(([key]) =>
         this._settings.has(key) ? null : `${key} is not registered`,
       )
-      .filter(value => value);
-    if (settingsAreRegistered.length) {
+      .filter(Boolean);
+
+    if (settingsAreRegistered.length > 0) {
       throw new Error(`${settingsAreRegistered.join(', ')} are not registered`);
     }
 
     const validationErrors = Object.entries(settings)
       .map(([key, value]) => {
         const validationError = this._settings.get(key)?.validate?.(value);
+
         return validationError
           ? `setting [${key}]: ${validationError}`
           : undefined;
       })
-      .filter(value => value);
-    if (validationErrors.length) {
+      .filter(Boolean);
+
+    if (validationErrors.length > 0) {
       throw new Error(`Validation errors: ${validationErrors.join('\n')}`);
     }
+
     const responseStore = await this.store.set(settings);
+
     return {
       requirements: this.checkRequirementsOnUpdatedSettings(
         Object.keys(responseStore),
@@ -358,10 +390,13 @@ export class Configuration implements IConfiguration {
    * @returns
    */
   async clear(...settings: string[]) {
-    if (settings.length) {
+    if (settings.length > 0) {
       this.logger.debug(`Clean settings: ${settings.join(', ')}`);
+
       const responseStore = await this.store.clear(...settings);
+
       this.logger.info('Settings were cleared');
+
       return {
         requirements: this.checkRequirementsOnUpdatedSettings(
           Object.keys(responseStore),
@@ -369,7 +404,7 @@ export class Configuration implements IConfiguration {
         update: responseStore,
       };
     } else {
-      return await this.clear(...Array.from(this._settings.keys()));
+      return await this.clear(...this._settings.keys());
     }
   }
 
@@ -379,8 +414,10 @@ export class Configuration implements IConfiguration {
    * @returns
    */
   async reset(...settings: string[]) {
-    if (settings.length) {
+    if (settings.length > 0) {
       this.logger.debug(`Reset settings: ${settings.join(', ')}`);
+
+      // eslint-disable-next-line unicorn/no-array-reduce
       const updatedSettings = settings.reduce((accum, settingKey: string) => {
         return {
           ...accum,
@@ -388,7 +425,9 @@ export class Configuration implements IConfiguration {
         };
       }, {});
       const responseStore = await this.store.set(updatedSettings);
+
       this.logger.info('Settings were reset');
+
       return {
         requirements: this.checkRequirementsOnUpdatedSettings(
           Object.keys(responseStore),
@@ -405,6 +444,7 @@ export class Configuration implements IConfiguration {
       this.logger.error(`Registered category [${id}]`);
       throw new Error(`Category exists [${id}]`);
     }
+
     this._categories.set(id, rest);
     this.logger.debug(`Registered category [${id}]`);
   }
@@ -412,7 +452,7 @@ export class Configuration implements IConfiguration {
   getUniqueCategories() {
     return [
       ...new Set(
-        Array.from(this._settings.entries())
+        [...this._settings.entries()]
           .filter(
             ([, { isConfigurableFromSettings }]) => isConfigurableFromSettings,
           )
@@ -426,11 +466,14 @@ export class Configuration implements IConfiguration {
         } else if (categoryA.title < categoryB.title) {
           return -1;
         }
+
         return 0;
       });
   }
+
   private enhanceSettingDescription(setting: TConfigurationSetting) {
     const { description, options } = setting;
+
     return [
       description,
       ...(options?.select
@@ -473,27 +516,27 @@ export class Configuration implements IConfiguration {
           ]
         : []),
       // File size
-      ...(options?.file?.size &&
-      typeof options.file.size.minBytes !== 'undefined'
+      ...(options?.file?.size && options.file.size.minBytes !== undefined
         ? [`Minimum file size: ${formatBytes(options.file.size.minBytes)}.`]
         : []),
-      ...(options?.file?.size &&
-      typeof options.file.size.maxBytes !== 'undefined'
+      ...(options?.file?.size && options.file.size.maxBytes !== undefined
         ? [`Maximum file size: ${formatBytes(options.file.size.maxBytes)}.`]
         : []),
       // Multi line text
-      ...(options?.maxRows && typeof options.maxRows !== 'undefined'
+      ...(options?.maxRows && options.maxRows !== undefined
         ? [`Maximum amount of lines: ${options.maxRows}.`]
         : []),
-      ...(options?.minRows && typeof options.minRows !== 'undefined'
+      ...(options?.minRows && options.minRows !== undefined
         ? [`Minimum amount of lines: ${options.minRows}.`]
         : []),
-      ...(options?.maxLength && typeof options.maxLength !== 'undefined'
+      ...(options?.maxLength && options.maxLength !== undefined
         ? [`Maximum lines length is ${options.maxLength} characters.`]
         : []),
     ].join(' ');
   }
+
   groupSettingsByCategory(
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     _settings: string[] | null = null,
     filterFunction:
       | ((setting: TConfigurationSettingWithKey) => boolean)
@@ -501,35 +544,40 @@ export class Configuration implements IConfiguration {
   ) {
     const settings = (
       _settings && Array.isArray(_settings)
-        ? Array.from(this._settings.entries()).filter(([key]) =>
+        ? [...this._settings.entries()].filter(([key]) =>
             _settings.includes(key),
           )
-        : Array.from(this._settings.entries())
-    ).map(([key, value]) => ({
-      ...value,
-      key,
-    }));
-
+        : [...this._settings.entries()]
+    ).map(([key, value]) => {
+      return {
+        ...value,
+        key,
+      };
+    });
     const settingsSortedByCategories = (
-      filterFunction ? settings.filter(filterFunction) : settings
+      filterFunction
+        ? settings.filter(element => filterFunction(element))
+        : settings
     )
       .sort((settingA, settingB) => settingA.key?.localeCompare?.(settingB.key))
-      .reduce(
-        (accum, pluginSettingConfiguration) => ({
+      // eslint-disable-next-line unicorn/no-array-reduce
+      .reduce((accum, pluginSettingConfiguration) => {
+        return {
           ...accum,
           [pluginSettingConfiguration.category]: [
             ...(accum[pluginSettingConfiguration.category] || []),
             { ...pluginSettingConfiguration },
           ],
-        }),
-        {},
-      );
+        };
+      }, {});
 
     return Object.entries(settingsSortedByCategories)
-      .map(([category, settings]) => ({
-        category: this._categories.get(String(category)),
-        settings,
-      }))
+      .map(([category, settings]) => {
+        return {
+          category: this._categories.get(String(category)),
+          settings,
+        };
+      })
       .filter(categoryEntry => categoryEntry.settings.length);
   }
 }

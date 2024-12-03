@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EuiSuggestItem } from '@elastic/eui';
-import { EuiSuggestInput } from './suggest_input';
+import { EuiSuggestInput } from './suggest-input';
 
 export class EuiSuggest extends Component {
   state = {
@@ -9,27 +9,25 @@ export class EuiSuggest extends Component {
     status: 'unsaved',
   };
 
-  getValue = val => {
+  getValue(val) {
     this.setState({
       value: val,
     });
-  };
+  }
 
-  onChange = e => {
-    this.props.onInputChange(e.target.value);
-  };
+  onChange(event) {
+    this.props.onInputChange(event.target.value);
+  }
 
   render() {
     const {
       onItemClick,
-      onInputChange,
       status,
       append,
       tooltipContent,
       suggestions,
       ...rest
     } = this.props;
-
     const suggestionList = suggestions.map((item, index) => (
       <EuiSuggestItem
         type={item.type}
@@ -39,7 +37,6 @@ export class EuiSuggest extends Component {
         description={item.description}
       />
     ));
-
     const suggestInput = (
       <EuiSuggestInput
         status={status}
@@ -50,6 +47,7 @@ export class EuiSuggest extends Component {
         {...rest}
       />
     );
+
     return <div onChange={this.onChange}>{suggestInput}</div>;
   }
 }

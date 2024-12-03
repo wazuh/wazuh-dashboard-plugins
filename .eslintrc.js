@@ -218,6 +218,10 @@ module.exports = {
             format: ['camelCase', 'PascalCase'],
           },
           {
+            selector: 'function',
+            format: ['camelCase', 'PascalCase'],
+          },
+          {
             selector: ['objectLiteralProperty', 'typeProperty'],
             format: null,
           },

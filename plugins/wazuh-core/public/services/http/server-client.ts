@@ -9,6 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import jwtDecode from 'jwt-decode';
+import { BehaviorSubject } from 'rxjs';
+import { Logger } from '../../../common/services/configuration';
 import {
   HTTPClientServer,
   HTTPVerb,
@@ -16,10 +19,7 @@ import {
   WzRequestServices,
   ServerAPIResponseItemsDataHTTPClient,
 } from './types';
-import { Logger } from '../../../common/services/configuration';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from './constants';
-import jwtDecode from 'jwt-decode';
-import { BehaviorSubject } from 'rxjs';
 
 export class WzRequest implements HTTPClientServer {
   onErrorInterceptor?: (
@@ -32,7 +32,11 @@ export class WzRequest implements HTTPClientServer {
   ) => Promise<void>;
   private userData: HTTPClientServerUserData;
   userData$: BehaviorSubject<HTTPClientServerUserData>;
-  constructor(private logger: Logger, private services: WzRequestServices) {
+
+  constructor(
+    private readonly logger: Logger,
+    private readonly services: WzRequestServices,
+  ) {
     this.userData = {
       logged: false,
       token: null,
@@ -48,10 +52,11 @@ export class WzRequest implements HTTPClientServer {
    * @param {String} path
    * @param {Object} payload
    */
-  private async _request(
+  private async requestInternal(
     method: HTTPVerb,
     path: string,
     payload: any = null,
+    // eslint-disable-next-line unicorn/no-object-as-default-parameter
     extraOptions: {
       shouldRetry?: boolean;
       checkCurrentApiIsUp?: boolean;
@@ -74,13 +79,13 @@ export class WzRequest implements HTTPClientServer {
       typeof extraOptions.overwriteHeaders === 'object'
         ? extraOptions.overwriteHeaders
         : {};
+
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
 
       const timeout = await this.services.getTimeout();
-
       const url = this.services.getURL(path);
       const options = {
         method: method,
@@ -93,19 +98,20 @@ export class WzRequest implements HTTPClientServer {
         data: payload,
         timeout: timeout,
       };
-
       const data = await this.services.request(options);
 
       if (data['error']) {
         throw new Error(data['error']);
       }
 
-      return Promise.resolve(data);
+      return data;
     } catch (error) {
-      //if the requests fails, we need to check if the API is down
+      // if the requests fails, we need to check if the API is down
       if (checkCurrentApiIsUp) {
         const currentApi = this.services.getServerAPI();
+
         if (currentApi) {
+          // eslint-disable-next-line no-useless-catch
           try {
             await this.checkAPIById(currentApi);
           } catch (error) {
@@ -123,18 +129,23 @@ export class WzRequest implements HTTPClientServer {
           }
         }
       }
+
       // if(this.onErrorInterceptor){
       //   await this.onErrorInterceptor(error, {checkCurrentApiIsUp, shouldRetry, overwriteHeaders})
       // }
       const errorMessage = error?.response?.data?.message || error?.message;
+
       if (
         typeof errorMessage === 'string' &&
         errorMessage.includes('status code 401') &&
         shouldRetry
       ) {
         try {
-          await this.auth(true); //await WzAuthentication.refresh(true);
-          return this._request(method, path, payload, { shouldRetry: false });
+          await this.auth(true); // await WzAuthentication.refresh(true);
+
+          return this.requestInternal(method, path, payload, {
+            shouldRetry: false,
+          });
         } catch (error) {
           throw this.returnErrorInstance(
             error,
@@ -142,6 +153,7 @@ export class WzRequest implements HTTPClientServer {
           );
         }
       }
+
       throw this.returnErrorInstance(
         error,
         errorMessage || 'Server did not respond',
@@ -159,6 +171,7 @@ export class WzRequest implements HTTPClientServer {
     method: HTTPVerb,
     path: string,
     body: any,
+    // eslint-disable-next-line unicorn/no-object-as-default-parameter
     options: {
       checkCurrentApiIsUp?: boolean;
       returnOriginalResponse?: boolean;
@@ -170,10 +183,9 @@ export class WzRequest implements HTTPClientServer {
       }
 
       const { returnOriginalResponse, ...optionsToGenericReq } = options;
-
       const id = this.services.getServerAPI();
       const requestData = { method, path, body, id };
-      const response = await this._request(
+      const response = await this.requestInternal(
         'POST',
         '/api/request',
         requestData,
@@ -195,8 +207,10 @@ export class WzRequest implements HTTPClientServer {
             ? ` Affected ids: ${failedIds} `
             : ''
         }`;
+
         throw this.returnErrorInstance(null, errorMessage);
       }
+
       return response;
     } catch (error) {
       throw this.returnErrorInstance(
@@ -216,10 +230,12 @@ export class WzRequest implements HTTPClientServer {
       if (!path || !filters) {
         throw new Error('Missing parameters');
       }
+
       const id = this.services.getServerAPI();
       const requestData = { path, id, filters };
-      const data = await this._request('POST', '/api/csv', requestData);
-      return Promise.resolve(data);
+      const data = await this.requestInternal('POST', '/api/csv', requestData);
+
+      return data;
     } catch (error) {
       throw this.returnErrorInstance(
         error,
@@ -238,7 +254,9 @@ export class WzRequest implements HTTPClientServer {
     if (!error || typeof error === 'string') {
       return new Error(message || error);
     }
+
     error.message = message;
+
     return error;
   }
 
@@ -255,19 +273,22 @@ export class WzRequest implements HTTPClientServer {
   private async login(force = false) {
     try {
       let idHost = this.services.getServerAPI();
+
       while (!idHost) {
+        // eslint-disable-next-line no-await-in-loop
         await new Promise(r => setTimeout(r, 500));
         idHost = this.services.getServerAPI();
       }
 
-      const response = await this._request('POST', '/api/login', {
+      const response = await this.requestInternal('POST', '/api/login', {
         idHost,
         force,
       });
-
       const token = ((response || {}).data || {}).token;
+
       return token as string;
     } catch (error) {
+      this.logger.error(`Error in the login: ${error.message}`);
       throw error;
     }
   }
@@ -282,6 +303,7 @@ export class WzRequest implements HTTPClientServer {
     try {
       // Get user token
       const token: string = await this.login(force);
+
       if (!token) {
         // Remove old existent token
         // await this.unauth();
@@ -289,15 +311,13 @@ export class WzRequest implements HTTPClientServer {
       }
 
       // Decode token and get expiration time
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const jwtPayload = jwtDecode(token);
-
       // Get user Policies
       const userPolicies = await this.getUserPolicies();
-
       // Dispatch actions to set permissions and administrator consideration
       // TODO: implement
       // store.dispatch(updateUserPermissions(userPolicies));
-
       // store.dispatch(
       //   updateUserAccount(
       //     getWazuhCorePlugin().dashboardSecurity.getAccountFromJWTAPIDecodedToken(
@@ -314,6 +334,7 @@ export class WzRequest implements HTTPClientServer {
       };
 
       this.updateUserData(data);
+
       return data;
     } catch (error) {
       // TODO: implement
@@ -354,17 +375,22 @@ export class WzRequest implements HTTPClientServer {
   private async getUserPolicies() {
     try {
       let idHost = this.services.getServerAPI();
+
       while (!idHost) {
+        // eslint-disable-next-line no-await-in-loop
         await new Promise(r => setTimeout(r, 500));
         idHost = this.services.getServerAPI();
       }
+
       const response = await this.request(
         'GET',
         '/security/users/me/policies',
         { idHost },
       );
+
       return response?.data?.data || {};
     } catch (error) {
+      this.logger.error(`Error getting the user policies: ${error.message}`);
       throw error;
     }
   }
@@ -388,6 +414,7 @@ export class WzRequest implements HTTPClientServer {
 
       return response?.data?.data || {};
     } catch (error) {
+      this.logger.error(`Error in the unauthentication: ${error.message}`);
       throw error;
     }
   }
@@ -405,6 +432,7 @@ export class WzRequest implements HTTPClientServer {
     try {
       const timeout = await this.services.getTimeout();
       const payload = { id: serverHostId };
+
       if (idChanged) {
         payload.idChanged = serverHostId;
       }
@@ -420,12 +448,6 @@ export class WzRequest implements HTTPClientServer {
         data: payload,
         timeout: timeout,
       };
-
-      // TODO: implement
-      // if (Object.keys(configuration).length) {
-      //   AppState.setPatternSelector(configuration['ip.selector']);
-      // }
-
       const response = await this.services.request(options);
 
       if (response.error) {
@@ -439,6 +461,7 @@ export class WzRequest implements HTTPClientServer {
         // const wzMisc = new WzMisc();
         // wzMisc.setApiIsDown(true);
         const response = (error.response.data || {}).message || error.message;
+
         throw this.returnErrorInstance(response);
       } else {
         throw this.returnErrorInstance(
@@ -457,7 +480,6 @@ export class WzRequest implements HTTPClientServer {
     try {
       const timeout = await this.services.getTimeout();
       const url = this.services.getURL('/api/check-api');
-
       const options = {
         method: 'POST',
         headers: {
@@ -468,7 +490,6 @@ export class WzRequest implements HTTPClientServer {
         data: { ...apiEntry, forceRefresh },
         timeout: timeout,
       };
-
       const response = await this.services.request(options);
 
       if (response.error) {
@@ -479,6 +500,7 @@ export class WzRequest implements HTTPClientServer {
     } catch (error) {
       if (error.response) {
         const response = (error.response.data || {}).message || error.message;
+
         throw this.returnErrorInstance(response);
       } else {
         throw this.returnErrorInstance(

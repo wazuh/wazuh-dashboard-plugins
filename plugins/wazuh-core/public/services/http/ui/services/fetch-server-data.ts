@@ -2,8 +2,10 @@ const getFilters = filters => {
   if (!filters) {
     return {};
   }
+
   const { default: defaultFilters, ...restFilters } = filters;
-  return Object.keys(restFilters).length ? restFilters : defaultFilters;
+
+  return Object.keys(restFilters).length > 0 ? restFilters : defaultFilters;
 };
 
 export const fetchServerTableDataCreator =
@@ -17,7 +19,6 @@ export const fetchServerTableDataCreator =
       limit: pageSize,
       sort: `${direction === 'asc' ? '+' : '-'}${field}`,
     };
-
     const response = await fetchData(
       fetchContext.method,
       fetchContext.endpoint,
@@ -25,6 +26,7 @@ export const fetchServerTableDataCreator =
         params,
       },
     );
+
     return {
       items: response?.data?.data?.affected_items,
       totalItems: response?.data?.data?.total_affected_items,

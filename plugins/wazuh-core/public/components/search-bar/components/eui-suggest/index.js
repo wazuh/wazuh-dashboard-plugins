@@ -1,3 +1,3 @@
-export { EuiSuggestInput } from './suggest_input';
+export { EuiSuggestInput } from './suggest-input';
 
 export { EuiSuggest } from './suggest';

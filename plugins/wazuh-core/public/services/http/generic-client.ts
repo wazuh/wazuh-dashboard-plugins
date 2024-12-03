@@ -1,5 +1,5 @@
-import { PLUGIN_PLATFORM_REQUEST_HEADERS } from './constants';
 import { Logger } from '../../../common/services/configuration';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from './constants';
 import {
   HTTPClientGeneric,
   HTTPClientRequestInterceptor,
@@ -8,19 +8,21 @@ import {
 
 interface GenericRequestServices {
   request: HTTPClientRequestInterceptor['request'];
-  getURL(path: string): string;
-  getTimeout(): Promise<number>;
-  getIndexPatternTitle(): Promise<string>;
-  getServerAPI(): string;
-  checkAPIById(apiId: string): Promise<any>;
+  getURL: (path: string) => string;
+  getTimeout: () => Promise<number>;
+  getIndexPatternTitle: () => Promise<string>;
+  getServerAPI: () => string;
+  checkAPIById: (apiId: string) => Promise<any>;
 }
 
 export class GenericRequest implements HTTPClientGeneric {
   onErrorInterceptor?: (error: any) => Promise<void>;
+
   constructor(
-    private logger: Logger,
-    private services: GenericRequestServices,
+    private readonly logger: Logger,
+    private readonly services: GenericRequestServices,
   ) {}
+
   async request(
     method: HTTPVerb,
     path: string,
@@ -31,6 +33,7 @@ export class GenericRequest implements HTTPClientGeneric {
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
+
       const timeout = await this.services.getTimeout();
       const requestHeaders = {
         ...PLUGIN_PLATFORM_REQUEST_HEADERS,
@@ -40,14 +43,17 @@ export class GenericRequest implements HTTPClientGeneric {
 
       try {
         requestHeaders.pattern = await this.services.getIndexPatternTitle();
-      } catch (error) {}
+      } catch {
+        /* empty */
+      }
 
       try {
         requestHeaders.id = this.services.getServerAPI();
-      } catch (error) {
+      } catch {
         // Intended
       }
-      var options = {};
+
+      let options = {};
 
       if (method === 'GET') {
         options = {
@@ -57,6 +63,7 @@ export class GenericRequest implements HTTPClientGeneric {
           timeout: timeout,
         };
       }
+
       if (method === 'PUT') {
         options = {
           method: method,
@@ -66,6 +73,7 @@ export class GenericRequest implements HTTPClientGeneric {
           timeout: timeout,
         };
       }
+
       if (method === 'POST') {
         options = {
           method: method,
@@ -75,6 +83,7 @@ export class GenericRequest implements HTTPClientGeneric {
           timeout: timeout,
         };
       }
+
       if (method === 'DELETE') {
         options = {
           method: method,
@@ -86,18 +95,20 @@ export class GenericRequest implements HTTPClientGeneric {
       }
 
       const data = await this.services.request(options);
+
       if (!data) {
         throw new Error(`Error doing a request to ${url}, method: ${method}.`);
       }
 
       return data;
     } catch (error) {
-      //if the requests fails, we need to check if the API is down
-      const currentApi = this.services.getServerAPI(); //JSON.parse(AppState.getCurrentAPI() || '{}');
+      // if the requests fails, we need to check if the API is down
+      const currentApi = this.services.getServerAPI(); // JSON.parse(AppState.getCurrentAPI() || '{}');
+
       if (currentApi) {
         try {
           await this.services.checkAPIById(currentApi);
-        } catch (err) {
+        } catch {
           // const wzMisc = new WzMisc();
           // wzMisc.setApiIsDown(true);
           // if (
@@ -112,15 +123,20 @@ export class GenericRequest implements HTTPClientGeneric {
           // }
         }
       }
+
       // if(this.onErrorInterceptor){
       //   await this.onErrorInterceptor(error)
       // }
-      if (returnError) return Promise.reject(error);
+      if (returnError) {
+        throw error;
+      }
+
       return (((error || {}).response || {}).data || {}).message || false
         ? Promise.reject(new Error(error.response.data.message))
         : Promise.reject(error || new Error('Server did not respond'));
     }
   }
+
   setOnErrorInterceptor(onErrorInterceptor: (error: any) => Promise<void>) {
     this.onErrorInterceptor = onErrorInterceptor;
   }

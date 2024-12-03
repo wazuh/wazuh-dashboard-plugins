@@ -1,14 +1,9 @@
+/* eslint-disable unicorn/no-await-expression-member */
 import React from 'react';
-import {
-  EuiButtonEmpty,
-  EuiButtonGroup,
-  EuiPopover,
-  EuiText,
-  EuiCode,
-} from '@elastic/eui';
-import { tokenizer as tokenizerUQL } from './aql';
+import { EuiButtonGroup } from '@elastic/eui';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { tokenizer as tokenizerUQL } from './aql';
 
 /* UI Query language
 https://documentation.wazuh.com/current/user-manual/api/queries.html
@@ -23,7 +18,11 @@ type ITokenType =
   | 'value'
   | 'conjunction'
   | 'whitespace';
-type IToken = { type: ITokenType; value: string; formattedValue?: string };
+interface IToken {
+  type: ITokenType;
+  value: string;
+  formattedValue?: string;
+}
 type ITokens = IToken[];
 
 /* API Query Language
@@ -78,7 +77,6 @@ const language = {
     },
   },
 };
-
 // Suggestion mapper by language token type
 const suggestionMappingLanguageTokenType = {
   field: { iconType: 'kqlField', color: 'tint4' },
@@ -107,7 +105,7 @@ function mapSuggestionCreator(type: ITokenType) {
       /* WORKAROUND: ensure the label is a string. If it is not a string, an warning is
       displayed in the console related to prop types
       */
-      ...(typeof label !== 'undefined' ? { label: String(label) } : {}),
+      ...(label === undefined ? {} : { label: String(label) }),
     };
   };
 }
@@ -134,9 +132,9 @@ function transformQLConjunction(conjunction: string): string {
  */
 function transformQLValue(value: string): string {
   // If the value has a whitespace or comma, then
-  return /[\s|"]/.test(value)
+  return /[\s"|]/.test(value)
     ? // Escape the commas (") => (\") and wraps the string with commas ("<string>")
-      `"${value.replace(/"/, '\\"')}"`
+      `"${value.replace(/"/, String.raw`\"`)}"`
     : // Raw value
       value;
 }
@@ -149,13 +147,13 @@ function transformQLValue(value: string): string {
 export function tokenizer(input: string): ITokens {
   const re = new RegExp(
     // A ( character.
-    '(?<operator_group_open>\\()?' +
+    String.raw`(?<operator_group_open>\()?` +
       // Whitespace
-      '(?<whitespace_1>\\s+)?' +
+      String.raw`(?<whitespace_1>\s+)?` +
       // Field name: name of the field to look on DB.
-      '(?<field>[\\w.]+)?' + // Added an optional find
+      String.raw`(?<field>[\w.]+)?` + // Added an optional find
       // Whitespace
-      '(?<whitespace_2>\\s+)?' +
+      String.raw`(?<whitespace_2>\s+)?` +
       // Operator: looks for '=', '!=', '<', '>' or '~'.
       // This seems to be a bug because is not searching the literal valid operators.
       // I guess the operator is validated after the regular expression matches
@@ -163,48 +161,48 @@ export function tokenizer(input: string): ITokens {
         language.tokens.operator_compare.literal,
       )}]{1,2})?` + // Added an optional find
       // Whitespace
-      '(?<whitespace_3>\\s+)?' +
+      String.raw`(?<whitespace_3>\s+)?` +
       // Value: A string.
       // Simple value
       // Quoted ", "value, "value", "escaped \"quote"
       // Escape quoted string with escaping quotes: https://stackoverflow.com/questions/249791/regex-for-quoted-string-with-escaping-quotes
-      '(?<value>(?:(?:[^"\\s]+|(?:"(?:[^"\\\\]|\\\\")*")|(?:"(?:[^"\\\\]|\\\\")*)|")))?' +
+      String.raw`(?<value>(?:(?:[^"\s]+|(?:"(?:[^"\\]|\\")*")|(?:"(?:[^"\\]|\\")*)|")))?` +
       // Whitespace
-      '(?<whitespace_4>\\s+)?' +
+      String.raw`(?<whitespace_4>\s+)?` +
       // A ) character.
-      '(?<operator_group_close>\\))?' +
+      String.raw`(?<operator_group_close>\))?` +
       // Whitespace
-      '(?<whitespace_5>\\s+)?' +
+      String.raw`(?<whitespace_5>\s+)?` +
       `(?<conjunction>${Object.keys(language.tokens.conjunction.literal).join(
         '|',
       )})?` +
       // Whitespace
-      '(?<whitespace_6>\\s+)?',
+      String.raw`(?<whitespace_6>\s+)?`,
     'g',
   );
 
-  return [...input.matchAll(re)]
-    .map(({ groups }) =>
-      Object.entries(groups).map(([key, value]) => ({
+  return [...input.matchAll(re)].flatMap(({ groups }) =>
+    Object.entries(groups).map(([key, value]) => {
+      return {
         type: key.startsWith('operator_group') // Transform operator_group group match
           ? 'operator_group'
           : key.startsWith('whitespace') // Transform whitespace group match
-          ? 'whitespace'
-          : key,
+            ? 'whitespace'
+            : key,
         value,
         ...(key === 'value' &&
-          (value && /^"([\s\S]+)"$/.test(value)
-            ? { formattedValue: value.match(/^"([\s\S]+)"$/)[1] }
+          (value && /^"([\S\s]+)"$/.test(value)
+            ? { formattedValue: value.match(/^"([\S\s]+)"$/)[1] }
             : { formattedValue: value })),
-      })),
-    )
-    .flat();
+      };
+    }),
+  );
 }
 
-type QLOptionSuggestionEntityItem = {
+interface QLOptionSuggestionEntityItem {
   description?: string;
   label: string;
-};
+}
 
 type QLOptionSuggestionEntityItemTyped = QLOptionSuggestionEntityItem & {
   type:
@@ -225,11 +223,11 @@ type QLOptionSuggestionHandler = (
   { field, operatorCompare }: { field: string; operatorCompare: string },
 ) => Promise<QLOptionSuggestionEntityItem[]>;
 
-type OptionsQLImplicitQuery = {
+interface OptionsQLImplicitQuery {
   query: string;
   conjunction: string;
-};
-type OptionsQL = {
+}
+interface OptionsQL {
   options?: {
     implicitQuery?: OptionsQLImplicitQuery;
     searchTermFields?: string[];
@@ -240,14 +238,15 @@ type OptionsQL = {
     value: QLOptionSuggestionHandler;
   };
   validate?: {
-    value?: {
-      [key: string]: (
+    value?: Record<
+      string,
+      (
         token: IToken,
         nearTokens: { field: string; operator: string },
-      ) => string | undefined;
-    };
+      ) => string | undefined
+    >;
   };
-};
+}
 
 export interface ISearchBarModeWQL extends OptionsQL {
   id: 'wql';
@@ -261,11 +260,12 @@ export interface ISearchBarModeWQL extends OptionsQL {
  */
 function getLastTokenDefined(tokens: ITokens): IToken | undefined {
   // Reverse the tokens array and use the Array.protorype.find method
-  const shallowCopyArray = Array.from([...tokens]);
+  const shallowCopyArray = [...tokens];
   const shallowCopyArrayReversed = shallowCopyArray.reverse();
   const tokenFound = shallowCopyArrayReversed.find(
     ({ type, value }) => type !== 'whitespace' && value,
   );
+
   return tokenFound;
 }
 
@@ -281,11 +281,12 @@ function getLastTokenDefinedByType(
 ): IToken | undefined {
   // Find the last token by type
   // Reverse the tokens array and use the Array.protorype.find method
-  const shallowCopyArray = Array.from([...tokens]);
+  const shallowCopyArray = [...tokens];
   const shallowCopyArrayReversed = shallowCopyArray.reverse();
   const tokenFound = shallowCopyArrayReversed.find(
     ({ type, value }) => type === tokenType && value,
   );
+
   return tokenFound;
 }
 
@@ -306,13 +307,17 @@ function getTokenNearTo(
     tokenFoundShouldHaveValue?: boolean;
   } = {},
 ): IToken | undefined {
-  const shallowCopyTokens = Array.from([...tokens]);
+  const shallowCopyTokens = [...tokens];
   const computedShallowCopyTokens =
     mode === 'previous'
       ? shallowCopyTokens
-          .slice(0, options?.tokenReferencePosition || tokens.length)
+          .slice(
+            0,
+            options?.tokenReferencePosition || (tokens.length as number),
+          )
           .reverse()
       : shallowCopyTokens.slice(options?.tokenReferencePosition || 0);
+
   return computedShallowCopyTokens.find(
     ({ type, value }) =>
       type === tokenType && (options?.tokenFoundShouldHaveValue ? value : true),
@@ -326,9 +331,9 @@ function getTokenNearTo(
 function getTokenValueRegularExpression() {
   return new RegExp(
     // Value: A string.
-    '^(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
-      '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|^[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-      '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)$',
+    String.raw`^(?<value>(?:(?:\((?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\/'"=@%<>{}]*)\))*` +
+      String.raw`(?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|^[\[\]\w _\-.:?\\/'"=@%<>{}]+)` +
+      String.raw`(?:\((?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\\/'"=@%<>{}]*)\))*)+)$`,
   );
 }
 
@@ -346,6 +351,7 @@ function filterTokenValueSuggestion(
     ? suggestions
         .filter(({ label }: QLOptionSuggestionEntityItemTyped) => {
           const re = getTokenValueRegularExpression();
+
           return re.test(label);
         })
         .slice(0, SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT)
@@ -363,7 +369,7 @@ export async function getSuggestions(
   tokens: ITokens,
   options: OptionsQL,
 ): Promise<QLOptionSuggestionEntityItemTyped[]> {
-  if (!tokens.length) {
+  if (tokens.length === 0) {
     return [];
   }
 
@@ -380,7 +386,9 @@ export async function getSuggestions(
         description: 'run the search query',
       },
       // fields
-      ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
+      ...(await options.suggestions.field()).map((element, index, array) =>
+        mapSuggestionCreatorField(element, index, array),
+      ),
       {
         type: 'operator_group',
         label: '(',
@@ -390,7 +398,7 @@ export async function getSuggestions(
   }
 
   switch (lastToken.type) {
-    case 'field':
+    case 'field': {
       return [
         // fields that starts with the input but is not equals
         ...(await options.suggestions.field())
@@ -398,24 +406,27 @@ export async function getSuggestions(
             ({ label }) =>
               label.startsWith(lastToken.value) && label !== lastToken.value,
           )
-          .map(mapSuggestionCreatorField),
+          .map((element, index, array) =>
+            mapSuggestionCreatorField(element, index, array),
+          ),
         // operators if the input field is exact
         ...((await options.suggestions.field()).some(
           ({ label }) => label === lastToken.value,
         )
-          ? [
-              ...Object.keys(language.tokens.operator_compare.literal).map(
-                operator => ({
+          ? Object.keys(language.tokens.operator_compare.literal).map(
+              operator => {
+                return {
                   type: 'operator_compare',
                   label: operator,
                   description:
                     language.tokens.operator_compare.literal[operator],
-                }),
-              ),
-            ]
+                };
+              },
+            )
           : []),
       ];
-      break;
+    }
+
     case 'operator_compare': {
       const field = getLastTokenDefinedByType(tokens, 'field')?.value;
       const operatorCompare = getLastTokenDefinedByType(
@@ -436,33 +447,35 @@ export async function getSuggestions(
               operator.startsWith(lastToken.value) &&
               operator !== lastToken.value,
           )
-          .map(operator => ({
-            type: 'operator_compare',
-            label: operator,
-            description: language.tokens.operator_compare.literal[operator],
-          })),
-        ...(Object.keys(language.tokens.operator_compare.literal).some(
-          operator => operator === lastToken.value,
+          .map(operator => {
+            return {
+              type: 'operator_compare',
+              label: operator,
+              description: language.tokens.operator_compare.literal[operator],
+            };
+          }),
+        ...(Object.keys(language.tokens.operator_compare.literal).includes(
+          lastToken.value,
         )
-          ? [
-              /*
+          ? /*
                 WORKAROUND: When getting suggestions for the distinct values for any field, the API
                 could reply some values that doesn't match the expected regular expression. If the
                 value is invalid, a validation message is displayed and avoid the search can be run.
                 The goal of this filter is that the suggested values can be used to search. This
                 causes some values could not be displayed as suggestions.
               */
-              ...filterTokenValueSuggestion(
-                await options.suggestions.value(undefined, {
-                  field,
-                  operatorCompare,
-                }),
-              ).map(mapSuggestionCreatorValue),
-            ]
+            filterTokenValueSuggestion(
+              await options.suggestions.value(undefined, {
+                field,
+                operatorCompare,
+              }),
+            ).map((element, index, array) =>
+              mapSuggestionCreatorValue(element, index, array),
+            )
           : []),
       ];
-      break;
     }
+
     case 'value': {
       const field = getLastTokenDefinedByType(tokens, 'field')?.value;
       const operatorCompare = getLastTokenDefinedByType(
@@ -498,13 +511,17 @@ export async function getSuggestions(
             field,
             operatorCompare,
           }),
-        ).map(mapSuggestionCreatorValue),
+        ).map((element, index, array) =>
+          mapSuggestionCreatorValue(element, index, array),
+        ),
         ...Object.entries(language.tokens.conjunction.literal).map(
-          ([conjunction, description]) => ({
-            type: 'conjunction',
-            label: conjunction,
-            description,
-          }),
+          ([conjunction, description]) => {
+            return {
+              type: 'conjunction',
+              label: conjunction,
+              description,
+            };
+          },
         ),
         {
           type: 'operator_group',
@@ -512,9 +529,9 @@ export async function getSuggestions(
           description: language.tokens.operator_group.literal[')'],
         },
       ];
-      break;
     }
-    case 'conjunction':
+
+    case 'conjunction': {
       return [
         ...Object.keys(language.tokens.conjunction.literal)
           .filter(
@@ -522,20 +539,20 @@ export async function getSuggestions(
               conjunction.startsWith(lastToken.value) &&
               conjunction !== lastToken.value,
           )
-          .map(conjunction => ({
-            type: 'conjunction',
-            label: conjunction,
-            description: language.tokens.conjunction.literal[conjunction],
-          })),
+          .map(conjunction => {
+            return {
+              type: 'conjunction',
+              label: conjunction,
+              description: language.tokens.conjunction.literal[conjunction],
+            };
+          }),
         // fields if the input field is exact
-        ...(Object.keys(language.tokens.conjunction.literal).some(
-          conjunction => conjunction === lastToken.value,
+        ...(Object.keys(language.tokens.conjunction.literal).includes(
+          lastToken.value,
         )
-          ? [
-              ...(await options.suggestions.field()).map(
-                mapSuggestionCreatorField,
-              ),
-            ]
+          ? (await options.suggestions.field()).map((element, index, array) =>
+              mapSuggestionCreatorField(element, index, array),
+            )
           : []),
         {
           type: 'operator_group',
@@ -543,29 +560,35 @@ export async function getSuggestions(
           description: language.tokens.operator_group.literal['('],
         },
       ];
-      break;
-    case 'operator_group':
+    }
+
+    case 'operator_group': {
       if (lastToken.value === '(') {
-        return [
+        return (
           // fields
-          ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
-        ];
+          (await options.suggestions.field()).map(element =>
+            mapSuggestionCreatorField(element),
+          )
+        );
       } else if (lastToken.value === ')') {
-        return [
+        return (
           // conjunction
-          ...Object.keys(language.tokens.conjunction.literal).map(
-            conjunction => ({
+          Object.keys(language.tokens.conjunction.literal).map(conjunction => {
+            return {
               type: 'conjunction',
               label: conjunction,
               description: language.tokens.conjunction.literal[conjunction],
-            }),
-          ),
-        ];
+            };
+          })
+        );
       }
+
       break;
-    default:
+    }
+
+    default: {
       return [];
-      break;
+    }
   }
 
   return [];
@@ -580,6 +603,7 @@ export function transformSuggestionToEuiSuggestItem(
   suggestion: QLOptionSuggestionEntityItemTyped,
 ): SuggestItem {
   const { type, ...rest } = suggestion;
+
   return {
     type: { ...suggestionMappingLanguageTokenType[type] },
     ...rest,
@@ -594,7 +618,9 @@ export function transformSuggestionToEuiSuggestItem(
 function transformSuggestionsToEuiSuggestItem(
   suggestions: QLOptionSuggestionEntityItemTyped[],
 ): SuggestItem[] {
-  return suggestions.map(transformSuggestionToEuiSuggestItem);
+  return suggestions.map(element =>
+    transformSuggestionToEuiSuggestItem(element),
+  );
 }
 
 /**
@@ -604,19 +630,22 @@ function transformSuggestionsToEuiSuggestItem(
  */
 export function transformUQLToQL(input: string) {
   const tokens = tokenizerUQL(input);
+
   return tokens
     .filter(({ value }) => value)
     .map(({ type, value }) => {
       switch (type) {
-        case 'conjunction':
+        case 'conjunction': {
           return transformQLConjunction(value);
-          break;
-        case 'value':
+        }
+
+        case 'value': {
           return transformQLValue(value);
-          break;
-        default:
+        }
+
+        default: {
           return value;
-          break;
+        }
       }
     })
     .join('');
@@ -665,20 +694,22 @@ export function transformSpecificQLToUnifiedQL(
           // by double quotation marks (")
           // WARN: This could cause a problem with value that contains this sequence \"
           const extractedValue =
-            formattedValue !== value
-              ? formattedValue.replace(/\\"/g, '"')
-              : formattedValue;
+            formattedValue === value
+              ? formattedValue
+              : formattedValue.replaceAll(String.raw`\"`, '"');
+
           return extractedValue || value;
-          break;
         }
-        case 'conjunction':
+
+        case 'conjunction': {
           return value === 'and'
             ? language.equivalencesToUQL.conjunction.literal['and']
             : language.equivalencesToUQL.conjunction.literal['or'];
-          break;
-        default:
+        }
+
+        default: {
           return value;
-          break;
+        }
       }
     })
     .join('');
@@ -693,14 +724,12 @@ function getOutput(input: string, options: OptionsQL) {
   // Implicit query
   const implicitQueryAsUQL = options?.options?.implicitQuery?.query ?? '';
   const implicitQueryAsQL = transformUQLToQL(implicitQueryAsUQL);
-
   // Implicit query conjunction
   const implicitQueryConjunctionAsUQL =
     options?.options?.implicitQuery?.conjunction ?? '';
   const implicitQueryConjunctionAsQL = transformUQLToQL(
     implicitQueryConjunctionAsUQL,
   );
-
   // User input query
   const inputQueryAsQL = input;
   const inputQueryAsUQL = transformSpecificQLToUnifiedQL(
@@ -709,6 +738,7 @@ function getOutput(input: string, options: OptionsQL) {
   );
 
   return {
+    // eslint-disable-next-line no-use-before-define
     language: WQL.id,
     apiQuery: {
       q: [
@@ -738,7 +768,6 @@ function getOutput(input: string, options: OptionsQL) {
  */
 function validateTokenValue(token: IToken): string | undefined {
   const re = getTokenValueRegularExpression();
-
   const value = token.formattedValue ?? token.value;
   const match = value.match(re);
 
@@ -746,19 +775,18 @@ function validateTokenValue(token: IToken): string | undefined {
     return undefined;
   }
 
-  const invalidCharacters: string[] = token.value
-    .split('')
+  const invalidCharacters: string[] = [...token.value]
     .filter((value, index, array) => array.indexOf(value) === index)
     .filter(
       character =>
-        !new RegExp('[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}\\(\\)]').test(
+        !new RegExp(String.raw`[\[\]\w _\-.,:?\\/'"=@%<>{}\(\)]`).test(
           character,
         ),
     );
 
   return [
     `"${value}" is not a valid value.`,
-    ...(invalidCharacters.length
+    ...(invalidCharacters.length > 0
       ? [`Invalid characters found: ${invalidCharacters.join('')}`]
       : []),
   ].join(' ');
@@ -768,6 +796,7 @@ type ITokenValidator = (
   tokenValue: IToken,
   proximityTokens: any,
 ) => string | undefined;
+
 /**
  * Validate the tokens while the user is building the query
  * @param tokens
@@ -796,10 +825,12 @@ function validatePartial(
                   tokenFoundShouldHaveValue: true,
                 },
               );
+
               return tokenOperatorNearToField
                 ? validate.field(token)
                 : undefined;
             }
+
             // Check if the value is allowed
             if (token.type === 'value') {
               const tokenFieldNearToValue = getTokenNearTo(
@@ -820,6 +851,7 @@ function validatePartial(
                   tokenFoundShouldHaveValue: true,
                 },
               );
+
               return (
                 validateTokenValue(token) ||
                 (tokenFieldNearToValue &&
@@ -834,7 +866,7 @@ function validatePartial(
             }
           }
         })
-        .filter(t => typeof t !== 'undefined')
+        .filter(t => t !== undefined)
         .join('\n') || undefined
     );
   }
@@ -854,6 +886,7 @@ function validate(
     const errors = tokens
       .map((token: IToken, index) => {
         const errors = [];
+
         if (token.value) {
           if (token.type === 'field') {
             const tokenOperatorNearToField = getTokenNearTo(
@@ -874,6 +907,7 @@ function validate(
                 tokenFoundShouldHaveValue: true,
               },
             );
+
             if (validate.field(token)) {
               errors.push(`"${token.value}" is not a valid field.`);
             } else if (!tokenOperatorNearToField) {
@@ -884,6 +918,7 @@ function validate(
               errors.push(`The value for field "${token.value}" is missing.`);
             }
           }
+
           // Check if the value is allowed
           if (token.type === 'value') {
             const tokenFieldNearToValue = getTokenNearTo(
@@ -915,7 +950,9 @@ function validate(
                   })
                 : undefined);
 
-            validationError && errors.push(validationError);
+            if (validationError) {
+              errors.push(validationError);
+            }
           }
 
           // Check if the value is allowed
@@ -935,25 +972,33 @@ function validate(
                 tokenFoundShouldHaveValue: true,
               },
             );
-            !tokenWhitespaceNearToFieldNext?.value?.length &&
+
+            if (!tokenWhitespaceNearToFieldNext?.value?.length) {
               errors.push(
                 `There is no whitespace after conjunction "${token.value}".`,
               );
-            !tokenFieldNearToFieldNext?.value?.length &&
+            }
+
+            if (!tokenFieldNearToFieldNext?.value?.length) {
               errors.push(
                 `There is no sentence after conjunction "${token.value}".`,
               );
+            }
           }
         }
-        return errors.length ? errors : undefined;
+
+        return errors.length > 0 ? errors : undefined;
       })
-      .filter(errors => errors)
+      .filter(Boolean)
       .flat();
-    return errors.length ? errors : undefined;
+
+    return errors.length > 0 ? errors : undefined;
   }
+
   return undefined;
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const WQL = {
   id: 'wql',
   label: 'WQL',
@@ -970,8 +1015,8 @@ export const WQL = {
   async run(input, params) {
     // Get the tokens from the input
     const tokens: ITokens = tokenizer(input);
-
     // Get the implicit query as query language syntax
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const implicitQueryAsQL = params.queryLanguage.parameters?.options
       ?.implicitQuery
       ? transformUQLToQL(
@@ -979,12 +1024,10 @@ export const WQL = {
             params.queryLanguage.parameters.options.implicitQuery.conjunction,
         )
       : '';
-
     const fieldsSuggestion: string[] =
       await params.queryLanguage.parameters.suggestions
         .field()
         .map(({ label }) => label);
-
     const validators = {
       field: ({ value }) =>
         fieldsSuggestion.includes(value)
@@ -996,12 +1039,9 @@ export const WQL = {
           }
         : {}),
     };
-
     // Validate the user input
     const validationPartial = validatePartial(tokens, validators);
-
     const validationStrict = validate(tokens, validators);
-
     // Get the output of query language
     const output = {
       ...getOutput(input, params.queryLanguage.parameters),
@@ -1010,20 +1050,24 @@ export const WQL = {
 
     const onSearch = output => {
       if (output?.error) {
-        params.setQueryLanguageOutput(state => ({
-          ...state,
-          searchBarProps: {
-            ...state.searchBarProps,
-            suggestions: transformSuggestionsToEuiSuggestItem(
-              output.error.map(error => ({
-                type: 'validation_error',
-                label: 'Invalid',
-                description: error,
-              })),
-            ),
-            isInvalid: true,
-          },
-        }));
+        params.setQueryLanguageOutput(state => {
+          return {
+            ...state,
+            searchBarProps: {
+              ...state.searchBarProps,
+              suggestions: transformSuggestionsToEuiSuggestItem(
+                output.error.map(error => {
+                  return {
+                    type: 'validation_error',
+                    label: 'Invalid',
+                    description: error,
+                  };
+                }),
+              ),
+              isInvalid: true,
+            },
+          };
+        });
       } else {
         params.onSearch(output);
       }
@@ -1036,7 +1080,9 @@ export const WQL = {
           name='textAlign'
           buttonSize='m'
           options={params.queryLanguage.parameters?.options?.filterButtons.map(
-            ({ id, label }) => ({ id, label }),
+            ({ id, label }) => {
+              return { id, label };
+            },
           )}
           idToSelectedMap={{}}
           type='multi'
@@ -1045,8 +1091,10 @@ export const WQL = {
               params.queryLanguage.parameters?.options?.filterButtons.find(
                 ({ id: buttonID }) => buttonID === id,
               );
+
             if (buttonParams) {
               params.setInput(buttonParams.input);
+
               const output = {
                 ...getOutput(
                   buttonParams.input,
@@ -1054,6 +1102,7 @@ export const WQL = {
                 ),
                 error: undefined,
               };
+
               params.onSearch(output);
             }
           }}
@@ -1079,14 +1128,13 @@ export const WQL = {
           if (item.type.iconType === 'alert') {
             return;
           }
+
           // When the clicked item has the `search` iconType, run the `onSearch` function
           if (item.type.iconType === 'search') {
             // Execute the search action
             // Get the tokens from the input
             const tokens: ITokens = tokenizer(currentInput);
-
             const validationStrict = validate(tokens, validators);
-
             // Get the output of query language
             const output = {
               ...getOutput(currentInput, params.queryLanguage.parameters),
@@ -1097,6 +1145,7 @@ export const WQL = {
           } else {
             // When the clicked item has another iconType
             const lastToken: IToken | undefined = getLastTokenDefined(tokens);
+
             // if the clicked suggestion is of same type of last token
             if (
               lastToken &&
@@ -1113,6 +1162,7 @@ export const WQL = {
             } else {
               // add a whitespace for conjunction <whitespace><conjunction>
               // add a whitespace for grouping operator <whitespace>)
+              // eslint-disable-next-line @typescript-eslint/no-unused-expressions
               !/\s$/.test(input) &&
                 (item.type.iconType ===
                   suggestionMappingLanguageTokenType.conjunction.iconType ||
@@ -1139,18 +1189,21 @@ export const WQL = {
               });
 
               // add a whitespace for conjunction <conjunction><whitespace>
-              item.type.iconType ===
-                suggestionMappingLanguageTokenType.conjunction.iconType &&
+              if (
+                item.type.iconType ===
+                suggestionMappingLanguageTokenType.conjunction.iconType
+              ) {
                 tokens.push({
                   type: 'whitespace',
                   value: ' ',
                 });
+              }
             }
 
             // Change the input
             params.setInput(
               tokens
-                .filter(value => value) // Ensure the input is rebuilt using tokens with value.
+                .filter(Boolean) // Ensure the input is rebuilt using tokens with value.
                 // The input tokenization can contain tokens with no value due to the used
                 // regular expression.
                 .map(({ value }) => value)
@@ -1171,9 +1224,7 @@ export const WQL = {
             // Get the tokens from the input
             const input = event.currentTarget.value;
             const tokens: ITokens = tokenizer(input);
-
             const validationStrict = validate(tokens, validators);
-
             // Get the output of query language
             const output = {
               ...getOutput(input, params.queryLanguage.parameters),

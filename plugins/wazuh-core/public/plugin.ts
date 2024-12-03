@@ -1,34 +1,29 @@
 import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
-import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
-import { setChrome, setCore, setUiSettings } from './plugin-services';
-import * as utils from './utils';
-import * as uiComponents from './components';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
-import { ConfigurationStore } from './utils/configuration-store';
 import {
   PLUGIN_SETTINGS,
   PLUGIN_SETTINGS_CATEGORIES,
 } from '../common/constants';
+import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
+import { setChrome, setCore, setUiSettings } from './plugin-services';
+import * as utils from './utils';
+import * as uiComponents from './components';
+import { ConfigurationStore } from './utils/configuration-store';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
 import { CoreHTTPClient } from './services/http/http-client';
+
+const noop = () => {};
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
   runtime = { setup: {} };
-  _internal: { [key: string]: any } = {};
-  services: { [key: string]: any } = {};
+  internal: Record<string, any> = {};
+  services: Record<string, any> = {};
+
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
-    const noop = () => {};
-    // Debug logger
-    const consoleLogger = {
-      info: console.log,
-      error: console.error,
-      debug: console.debug,
-      warn: console.warn,
-    };
     // No operation logger
     const noopLogger = {
       info: noop,
@@ -37,24 +32,25 @@ export class WazuhCorePlugin
       warn: noop,
     };
     const logger = noopLogger;
-    this._internal.configurationStore = new ConfigurationStore(
+
+    this.internal.configurationStore = new ConfigurationStore(
       logger,
       core.http,
     );
     this.services.configuration = new Configuration(
       logger,
-      this._internal.configurationStore,
+      this.internal.configurationStore,
     );
 
     // Register the plugin settings
-    Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
-      this.services.configuration.register(key, value),
-    );
+    for (const [key, value] of Object.entries(PLUGIN_SETTINGS)) {
+      this.services.configuration.register(key, value);
+    }
 
     // Add categories to the configuration
-    Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(PLUGIN_SETTINGS_CATEGORIES)) {
       this.services.configuration.registerCategory({ ...value, id: key });
-    });
+    }
 
     // Create dashboardSecurity
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);

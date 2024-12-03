@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/no-await-expression-member */
 import React from 'react';
 import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
@@ -8,7 +9,10 @@ type ITokenType =
   | 'operator_group'
   | 'value'
   | 'conjunction';
-type IToken = { type: ITokenType; value: string };
+interface IToken {
+  type: ITokenType;
+  value: string;
+}
 type ITokens = IToken[];
 
 /* API Query Language
@@ -116,9 +120,9 @@ export function tokenizer(input: string): ITokens {
     // and added the optional operator to allow matching the entities when the query is not
     // completed. This helps to tokenize the query and manage when the input is not completed.
     // A ( character.
-    '(?<operator_group_open>\\()?' +
+    String.raw`(?<operator_group_open>\()?` +
       // Field name: name of the field to look on DB.
-      '(?<field>[\\w.]+)?' + // Added an optional find
+      String.raw`(?<field>[\w.]+)?` + // Added an optional find
       // Operator: looks for '=', '!=', '<', '>' or '~'.
       // This seems to be a bug because is not searching the literal valid operators.
       // I guess the operator is validated after the regular expression matches
@@ -126,29 +130,29 @@ export function tokenizer(input: string): ITokens {
         language.tokens.operator_compare.literal,
       )}]{1,2})?` + // Added an optional find
       // Value: A string.
-      '(?<value>(?:(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\/\'"=@%<>{}]*)\\))*' +
-      '(?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]+)' +
-      '(?:\\((?:\\[[\\[\\]\\w _\\-.,:?\\\\/\'"=@%<>{}]*]|[\\[\\]\\w _\\-.:?\\\\/\'"=@%<>{}]*)\\))*)+)?' + // Added an optional find
+      String.raw`(?<value>(?:(?:\((?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\/'"=@%<>{}]*)\))*` +
+      String.raw`(?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\\/'"=@%<>{}]+)` +
+      String.raw`(?:\((?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\\/'"=@%<>{}]*)\))*)+)?` + // Added an optional find
       // A ) character.
-      '(?<operator_group_close>\\))?' +
+      String.raw`(?<operator_group_close>\))?` +
       `(?<conjunction>[${Object.keys(language.tokens.conjunction.literal)}])?`,
     'g',
   );
 
-  return [...input.matchAll(re)]
-    .map(({ groups }) =>
-      Object.entries(groups).map(([key, value]) => ({
+  return [...input.matchAll(re)].flatMap(({ groups }) =>
+    Object.entries(groups).map(([key, value]) => {
+      return {
         type: key.startsWith('operator_group') ? 'operator_group' : key,
         value,
-      })),
-    )
-    .flat();
+      };
+    }),
+  );
 }
 
-type QLOptionSuggestionEntityItem = {
+interface QLOptionSuggestionEntityItem {
   description?: string;
   label: string;
-};
+}
 
 type QLOptionSuggestionEntityItemTyped = QLOptionSuggestionEntityItem & {
   type:
@@ -171,12 +175,12 @@ type QLOptionSuggestionHandler = (
   }: { previousField: string; previousOperatorCompare: string },
 ) => Promise<QLOptionSuggestionEntityItem[]>;
 
-type optionsQL = {
+interface OptionsQL {
   suggestions: {
     field: QLOptionSuggestionHandler;
     value: QLOptionSuggestionHandler;
   };
-};
+}
 
 /**
  * Get the last token with value
@@ -186,9 +190,10 @@ type optionsQL = {
  */
 function getLastTokenWithValue(tokens: ITokens): IToken | undefined {
   // Reverse the tokens array and use the Array.protorype.find method
-  const shallowCopyArray = Array.from([...tokens]);
+  const shallowCopyArray = [...tokens];
   const shallowCopyArrayReversed = shallowCopyArray.reverse();
   const tokenFound = shallowCopyArrayReversed.find(({ value }) => value);
+
   return tokenFound;
 }
 
@@ -204,11 +209,12 @@ function getLastTokenWithValueByType(
 ): IToken | undefined {
   // Find the last token by type
   // Reverse the tokens array and use the Array.protorype.find method
-  const shallowCopyArray = Array.from([...tokens]);
+  const shallowCopyArray = [...tokens];
   const shallowCopyArrayReversed = shallowCopyArray.reverse();
   const tokenFound = shallowCopyArrayReversed.find(
     ({ type, value }) => type === tokenType && value,
   );
+
   return tokenFound;
 }
 
@@ -221,9 +227,9 @@ function getLastTokenWithValueByType(
  */
 export async function getSuggestions(
   tokens: ITokens,
-  options: optionsQL,
+  options: OptionsQL,
 ): Promise<QLOptionSuggestionEntityItemTyped[]> {
-  if (!tokens.length) {
+  if (tokens.length === 0) {
     return [];
   }
 
@@ -234,7 +240,9 @@ export async function getSuggestions(
   if (!lastToken?.type) {
     return [
       // fields
-      ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
+      ...(await options.suggestions.field()).map((element, index, array) =>
+        mapSuggestionCreatorField(element, index, array),
+      ),
       {
         type: 'operator_group',
         label: '(',
@@ -244,7 +252,7 @@ export async function getSuggestions(
   }
 
   switch (lastToken.type) {
-    case 'field':
+    case 'field': {
       return [
         // fields that starts with the input but is not equals
         ...(await options.suggestions.field())
@@ -252,25 +260,28 @@ export async function getSuggestions(
             ({ label }) =>
               label.startsWith(lastToken.value) && label !== lastToken.value,
           )
-          .map(mapSuggestionCreatorField),
+          .map((element, index, array) =>
+            mapSuggestionCreatorField(element, index, array),
+          ),
         // operators if the input field is exact
         ...((await options.suggestions.field()).some(
           ({ label }) => label === lastToken.value,
         )
-          ? [
-              ...Object.keys(language.tokens.operator_compare.literal).map(
-                operator => ({
+          ? Object.keys(language.tokens.operator_compare.literal).map(
+              operator => {
+                return {
                   type: 'operator_compare',
                   label: operator,
                   description:
                     language.tokens.operator_compare.literal[operator],
-                }),
-              ),
-            ]
+                };
+              },
+            )
           : []),
       ];
-      break;
-    case 'operator_compare':
+    }
+
+    case 'operator_compare': {
       return [
         ...Object.keys(language.tokens.operator_compare.literal)
           .filter(
@@ -278,30 +289,33 @@ export async function getSuggestions(
               operator.startsWith(lastToken.value) &&
               operator !== lastToken.value,
           )
-          .map(operator => ({
-            type: 'operator_compare',
-            label: operator,
-            description: language.tokens.operator_compare.literal[operator],
-          })),
-        ...(Object.keys(language.tokens.operator_compare.literal).some(
-          operator => operator === lastToken.value,
+          .map(operator => {
+            return {
+              type: 'operator_compare',
+              label: operator,
+              description: language.tokens.operator_compare.literal[operator],
+            };
+          }),
+        ...(Object.keys(language.tokens.operator_compare.literal).includes(
+          lastToken.value,
         )
-          ? [
-              ...(
-                await options.suggestions.value(undefined, {
-                  previousField: getLastTokenWithValueByType(tokens, 'field')!
-                    .value,
-                  previousOperatorCompare: getLastTokenWithValueByType(
-                    tokens,
-                    'operator_compare',
-                  )!.value,
-                })
-              ).map(mapSuggestionCreatorValue),
-            ]
+          ? (
+              await options.suggestions.value(undefined, {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                previousField: getLastTokenWithValueByType(tokens, 'field')!
+                  .value,
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                previousOperatorCompare: getLastTokenWithValueByType(
+                  tokens,
+                  'operator_compare',
+                )!.value,
+              })
+            ).map(element => mapSuggestionCreatorValue(element))
           : []),
       ];
-      break;
-    case 'value':
+    }
+
+    case 'value': {
       return [
         ...(lastToken.value
           ? [
@@ -314,19 +328,23 @@ export async function getSuggestions(
           : []),
         ...(
           await options.suggestions.value(lastToken.value, {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             previousOperatorCompare: getLastTokenWithValueByType(
               tokens,
               'operator_compare',
             )!.value,
           })
-        ).map(mapSuggestionCreatorValue),
+        ).map(element => mapSuggestionCreatorValue(element)),
         ...Object.entries(language.tokens.conjunction.literal).map(
-          ([conjunction, description]) => ({
-            type: 'conjunction',
-            label: conjunction,
-            description,
-          }),
+          ([conjunction, description]) => {
+            return {
+              type: 'conjunction',
+              label: conjunction,
+              description,
+            };
+          },
         ),
         {
           type: 'operator_group',
@@ -334,8 +352,9 @@ export async function getSuggestions(
           description: language.tokens.operator_group.literal[')'],
         },
       ];
-      break;
-    case 'conjunction':
+    }
+
+    case 'conjunction': {
       return [
         ...Object.keys(language.tokens.conjunction.literal)
           .filter(
@@ -343,20 +362,20 @@ export async function getSuggestions(
               conjunction.startsWith(lastToken.value) &&
               conjunction !== lastToken.value,
           )
-          .map(conjunction => ({
-            type: 'conjunction',
-            label: conjunction,
-            description: language.tokens.conjunction.literal[conjunction],
-          })),
+          .map(conjunction => {
+            return {
+              type: 'conjunction',
+              label: conjunction,
+              description: language.tokens.conjunction.literal[conjunction],
+            };
+          }),
         // fields if the input field is exact
-        ...(Object.keys(language.tokens.conjunction.literal).some(
-          conjunction => conjunction === lastToken.value,
+        ...(Object.keys(language.tokens.conjunction.literal).includes(
+          lastToken.value,
         )
-          ? [
-              ...(await options.suggestions.field()).map(
-                mapSuggestionCreatorField,
-              ),
-            ]
+          ? (await options.suggestions.field()).map(element =>
+              mapSuggestionCreatorField(element),
+            )
           : []),
         {
           type: 'operator_group',
@@ -364,29 +383,35 @@ export async function getSuggestions(
           description: language.tokens.operator_group.literal['('],
         },
       ];
-      break;
-    case 'operator_group':
+    }
+
+    case 'operator_group': {
       if (lastToken.value === '(') {
-        return [
+        return (
           // fields
-          ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
-        ];
+          (await options.suggestions.field()).map(element =>
+            mapSuggestionCreatorField(element),
+          )
+        );
       } else if (lastToken.value === ')') {
-        return [
+        return (
           // conjunction
-          ...Object.keys(language.tokens.conjunction.literal).map(
-            conjunction => ({
+          Object.keys(language.tokens.conjunction.literal).map(conjunction => {
+            return {
               type: 'conjunction',
               label: conjunction,
               description: language.tokens.conjunction.literal[conjunction],
-            }),
-          ),
-        ];
+            };
+          })
+        );
       }
+
       break;
-    default:
+    }
+
+    default: {
       return [];
-      break;
+    }
   }
 
   return [];
@@ -401,6 +426,7 @@ export function transformSuggestionToEuiSuggestItem(
   suggestion: QLOptionSuggestionEntityItemTyped,
 ): SuggestItem {
   const { type, ...rest } = suggestion;
+
   return {
     type: { ...suggestionMappingLanguageTokenType[type] },
     ...rest,
@@ -415,7 +441,9 @@ export function transformSuggestionToEuiSuggestItem(
 function transformSuggestionsToEuiSuggestItem(
   suggestions: QLOptionSuggestionEntityItemTyped[],
 ): SuggestItem[] {
-  return suggestions.map(transformSuggestionToEuiSuggestItem);
+  return suggestions.map(element =>
+    transformSuggestionToEuiSuggestItem(element),
+  );
 }
 
 /**
@@ -427,13 +455,16 @@ function getOutput(input: string, options: { implicitQuery?: string } = {}) {
   const unifiedQuery = `${options?.implicitQuery ?? ''}${
     options?.implicitQuery ? `(${input})` : input
   }`;
+
   return {
+    // eslint-disable-next-line no-use-before-define
     language: AQL.id,
     query: unifiedQuery,
     unifiedQuery,
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const AQL = {
   id: 'aql',
   label: 'AQL',
@@ -466,6 +497,7 @@ export const AQL = {
           } else {
             // When the clicked item has another iconType
             const lastToken: IToken = getLastTokenWithValue(tokens);
+
             // if the clicked suggestion is of same type of last token
             if (
               lastToken &&
@@ -500,11 +532,13 @@ export const AQL = {
             button={
               <EuiButtonEmpty
                 onClick={() =>
-                  params.setQueryLanguageConfiguration(state => ({
-                    ...state,
-                    isOpenPopoverImplicitFilter:
-                      !state.isOpenPopoverImplicitFilter,
-                  }))
+                  params.setQueryLanguageConfiguration(state => {
+                    return {
+                      ...state,
+                      isOpenPopoverImplicitFilter:
+                        !state.isOpenPopoverImplicitFilter,
+                    };
+                  })
                 }
                 iconType='filter'
               >
@@ -517,10 +551,12 @@ export const AQL = {
               params.queryLanguage.configuration.isOpenPopoverImplicitFilter
             }
             closePopover={() =>
-              params.setQueryLanguageConfiguration(state => ({
-                ...state,
-                isOpenPopoverImplicitFilter: false,
-              }))
+              params.setQueryLanguageConfiguration(state => {
+                return {
+                  ...state,
+                  isOpenPopoverImplicitFilter: false,
+                };
+              })
             }
           >
             <EuiText>

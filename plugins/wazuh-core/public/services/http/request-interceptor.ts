@@ -5,19 +5,25 @@ import { HTTPClientRequestInterceptor } from './types';
 
 export class RequestInterceptorClient implements HTTPClientRequestInterceptor {
   // define if the request is allowed to run
-  private _allow: boolean = true;
+  private allow = true;
   // store the cancel token to abort the requests
-  private _source: any;
+  private readonly cancelTokenSource: any;
   // unregister the interceptor
-  private unregisterInterceptor: () => void = () => {};
-  constructor(private logger: Logger, private http: any) {
+  private unregisterInterceptor: () => void = function () {};
+
+  constructor(
+    private readonly logger: Logger,
+    private readonly http: any,
+  ) {
     this.logger.debug('Creating');
-    this._source = axios.CancelToken.source();
+    this.cancelTokenSource = axios.CancelToken.source();
     this.logger.debug('Created');
   }
+
   private registerInterceptor() {
     this.logger.debug('Registering interceptor in core http');
     this.unregisterInterceptor = this.http.intercept({
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       responseError: (httpErrorResponse, controller) => {
         if (
           httpErrorResponse.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED
@@ -25,49 +31,59 @@ export class RequestInterceptorClient implements HTTPClientRequestInterceptor {
           this.cancel();
         }
       },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       request: (current, controller) => {
-        if (!this._allow) {
+        if (!this.allow) {
           throw new Error('Disable request');
         }
       },
     });
     this.logger.debug('Registered interceptor in core http');
   }
+
   init() {
     this.logger.debug('Initiating');
     this.registerInterceptor();
     this.logger.debug('Initiated');
   }
+
   destroy() {
     this.logger.debug('Destroying');
     this.logger.debug('Unregistering interceptor in core http');
     this.unregisterInterceptor();
+
     this.unregisterInterceptor = () => {};
+
     this.logger.debug('Unregistered interceptor in core http');
     this.logger.debug('Destroyed');
   }
+
   cancel() {
     this.logger.debug('Disabling requests');
-    this._allow = false;
-    this._source.cancel('Requests cancelled');
+    this.allow = false;
+    this.cancelTokenSource.cancel('Requests cancelled');
     this.logger.debug('Disabled requests');
   }
+
   async request(options: AxiosRequestConfig = {}) {
-    if (!this._allow) {
-      return Promise.reject('Requests are disabled');
+    if (!this.allow) {
+      throw 'Requests are disabled';
     }
+
     if (!options.method || !options.url) {
-      return Promise.reject('Missing parameters');
+      throw 'Missing parameters';
     }
+
     const optionsWithCancelToken = {
       ...options,
-      cancelToken: this._source?.token,
+      cancelToken: this.cancelTokenSource?.token,
     };
 
-    if (this._allow) {
+    if (this.allow) {
       try {
         const requestData = await axios(optionsWithCancelToken);
-        return Promise.resolve(requestData);
+
+        return requestData;
       } catch (error) {
         if (
           error.response?.data?.message === 'Unauthorized' ||
@@ -75,8 +91,9 @@ export class RequestInterceptorClient implements HTTPClientRequestInterceptor {
         ) {
           this.cancel();
           // To reduce the dependencies, we use window object instead of the NavigationService
-          window.location.reload();
+          globalThis.location.reload();
         }
+
         throw error;
       }
     }

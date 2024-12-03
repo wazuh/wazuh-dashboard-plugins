@@ -2,9 +2,12 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { getChrome } from '../plugin-services';
 
 export const useDockedSideNav = () => {
-  const [sideNavDocked, _setSideNavDocked] = useState<boolean>(false);
+  const [sideNavDocked, setSideNavDockedState] = useState<boolean>(false);
   const [isDockedSideNavVisible, setIsDockedSideNavVisible] =
     useState<boolean>(false);
+  // Create references so the event handler can read the latest values
+  const timeoutID = useRef(0);
+  const currentSideNavDocked = useRef(sideNavDocked);
 
   /*
      We have to create a reference to the state of the react component,
@@ -12,12 +15,8 @@ export const useDockedSideNav = () => {
   */
   const setSideNavDocked = (value: boolean) => {
     currentSideNavDocked.current = value;
-    _setSideNavDocked(value);
+    setSideNavDockedState(value);
   };
-
-  // Create references so the event handler can read the latest values
-  let timeoutID = useRef(0);
-  const currentSideNavDocked = useRef(sideNavDocked);
 
   // If the inner width of the window is less than 992px, the side nav is always hidden.
   // The use of useCallback is to keep the function reference the same so we can remove it in the event listener
@@ -43,6 +42,7 @@ export const useDockedSideNav = () => {
       });
 
     window.addEventListener('resize', onWindowResize, true);
+
     return () => {
       isNavDrawerSubscription.unsubscribe();
       window.removeEventListener('resize', onWindowResize, true);

@@ -1,7 +1,8 @@
-import { AQL, getSuggestions, tokenizer } from './aql';
+/* eslint-disable @typescript-eslint/naming-convention */
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { SearchBar } from '../index';
+import { AQL, getSuggestions, tokenizer } from './aql';
 
 describe('SearchBar component', () => {
   const componentProps = {
@@ -12,9 +13,11 @@ describe('SearchBar component', () => {
         id: AQL.id,
         implicitQuery: 'id!=000;',
         suggestions: {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           field(currentValue) {
             return [];
           },
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           value(currentValue, { previousField }) {
             return [];
           },
@@ -34,6 +37,7 @@ describe('SearchBar component', () => {
       const elementImplicitQuery = wrapper.container.querySelector(
         '.euiCodeBlock__code',
       );
+
       expect(elementImplicitQuery?.innerHTML).toEqual('id!=000;');
       expect(wrapper.container).toMatchSnapshot();
     });
@@ -91,31 +95,41 @@ describe('Query language - AQL', () => {
       await getSuggestions(tokenizer(input), {
         id: 'aql',
         suggestions: {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           field(currentValue) {
             return [
               { label: 'field', description: 'Field' },
               { label: 'field2', description: 'Field2' },
-            ].map(({ label, description }) => ({
-              type: 'field',
-              label,
-              description,
-            }));
+            ].map(({ label, description }) => {
+              return {
+                type: 'field',
+                label,
+                description,
+              };
+            });
           },
+          // eslint-disable-next-line default-param-last
           value(currentValue = '', { previousField }) {
             switch (previousField) {
-              case 'field':
+              case 'field': {
                 return ['value', 'value2', 'value3', 'value4']
                   .filter(value => value.startsWith(currentValue))
-                  .map(value => ({ type: 'value', label: value }));
-                break;
-              case 'field2':
+                  .map(value => {
+                    return { type: 'value', label: value };
+                  });
+              }
+
+              case 'field2': {
                 return ['127.0.0.1', '127.0.0.2', '190.0.0.1', '190.0.0.2']
                   .filter(value => value.startsWith(currentValue))
-                  .map(value => ({ type: 'value', label: value }));
-                break;
-              default:
+                  .map(value => {
+                    return { type: 'value', label: value };
+                  });
+              }
+
+              default: {
                 return [];
-                break;
+              }
             }
           },
         },
@@ -157,7 +171,6 @@ describe('Query language - AQL', () => {
     async ({ AQL: currentInput, clikedSuggestion, changedInput }) => {
       // Mock input
       let input = currentInput;
-
       const qlOutput = await AQL.run(input, {
         setInput: (value: string): void => {
           input = value;
@@ -172,6 +185,7 @@ describe('Query language - AQL', () => {
           },
         },
       });
+
       qlOutput.searchBarProps.onItemClick('')(clikedSuggestion);
       expect(input).toEqual(changedInput);
     },

@@ -1,7 +1,7 @@
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
 import { TableDataProps } from './components';
-import { UseStateStorage, UseStateStorageSystem } from './hooks';
+import { UseStateStorageHook } from './hooks';
 import { UseDockedSideNav } from './hooks/use-docked-side-nav';
 import { HTTPClient } from './services/http/types';
 import { ServerDataProps } from './services/http/ui/components/types';
@@ -14,20 +14,23 @@ export interface WazuhCorePluginSetup {
   dashboardSecurity: DashboardSecurity;
   http: HTTPClient;
   ui: {
-    TableData<T>(
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    TableData: <T>(
       prop: TableDataProps<T>,
-    ): React.ComponentType<TableDataProps<T>>;
-    SearchBar<T>(prop: any): React.ComponentType<any>;
-    ServerTable<T>(
+    ) => React.ComponentType<TableDataProps<T>>;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    SearchBar: (prop: any) => React.ComponentType<any>;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    ServerTable: <T>(
       prop: ServerDataProps<T>,
-    ): React.ComponentType<ServerDataProps<T>>;
+    ) => React.ComponentType<ServerDataProps<T>>;
   };
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginStart {
   hooks: {
     useDockedSideNav: UseDockedSideNav;
-    useStateStorage: UseStateStorage; // TODO: enhance
+    useStateStorage: UseStateStorageHook; // TODO: enhance
   };
   utils: { formatUIDate: (date: Date) => string };
   API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
@@ -35,14 +38,17 @@ export interface WazuhCorePluginStart {
   dashboardSecurity: DashboardSecurity;
   http: HTTPClient;
   ui: {
-    TableData<T>(
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    TableData: <T>(
       prop: TableDataProps<T>,
-    ): React.ComponentType<TableDataProps<T>>;
-    SearchBar<T>(prop: any): React.ComponentType<any>;
-    ServerTable<T>(
+    ) => React.ComponentType<TableDataProps<T>>;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    SearchBar: (prop: any) => React.ComponentType<any>;
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    ServerTable: <T>(
       prop: ServerDataProps<T>,
-    ): React.ComponentType<ServerDataProps<T>>;
+    ) => React.ComponentType<ServerDataProps<T>>;
   };
 }
 
-export interface AppPluginStartDependencies {}
+export type AppPluginStartDependencies = object;

@@ -19,16 +19,33 @@ export function ExportTableCsv({
   title,
   showToast,
   exportCSV,
+}: {
+  fetchContext: { endpoint: string; filters: Record<string, any> };
+  totalItems: number;
+  title: string;
+  showToast: (options: {
+    color: string;
+    title: string;
+    toastLifeTimeMs: number;
+  }) => any;
+  exportCSV: (
+    endpoint: string,
+    formattedFilters: any[],
+    title: string,
+  ) => Promise<any>;
 }) {
   const downloadCSV = async () => {
     try {
       const { endpoint, filters } = fetchContext;
       const formattedFilters = Object.entries(filters || []).map(
-        ([name, value]) => ({
-          name,
-          value,
-        }),
+        ([name, value]) => {
+          return {
+            name,
+            value,
+          };
+        },
       );
+
       showToast({
         color: 'success',
         title: 'Your download should begin automatically...',
@@ -36,7 +53,7 @@ export function ExportTableCsv({
       });
 
       await exportCSV(endpoint, formattedFilters, title.toLowerCase());
-    } catch (error) {
+    } catch {
       // TODO: implement
       // const options = {
       //   context: `${ExportTableCsv.name}.downloadCsv`,
