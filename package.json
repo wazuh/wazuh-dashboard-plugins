@@ -1,0 +1,27 @@
+{
+  "type": "commonjs",
+  "scripts": {
+    "lint": "eslint $(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep 'plugins/' | grep -E '.*\\.[jt]sx?$')",
+    "lint:fix": "yarn lint --fix",
+    "prepare": "husky",
+    "format": "prettier --ignore-unknown --write $(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE 'yarn.lock')"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^2.11.0",
+    "@typescript-eslint/eslint-plugin": "^8.16.0",
+    "@typescript-eslint/parser": "^8.16.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.6.3",
+    "eslint-plugin-cypress": "^3.6.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-unicorn": "^56.0.1",
+    "husky": "^9.1.7",
+    "prettier": "^3.4.1",
+    "prettier-eslint": "^16.3.0",
+    "typescript": "^5.7.2"
+  }
+}
