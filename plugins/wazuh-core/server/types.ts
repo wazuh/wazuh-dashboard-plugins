@@ -1,18 +1,11 @@
 import {
-  ISecurityFactory,
-  ManageHosts,
-  ServerAPIClient,
   ServerAPIInternalUserClient,
   ServerAPIScopedUserClient,
+  WazuhCoreServices,
 } from './services';
-import { IConfigurationEnhanced } from './services/enhance-configuration';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface WazuhCorePluginSetup {
-  dashboardSecurity: ISecurityFactory;
-  configuration: IConfigurationEnhanced;
-  manageHosts: ManageHosts;
-  serverAPIClient: ServerAPIClient;
+export interface WazuhCorePluginSetup extends WazuhCoreServices {
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
@@ -21,11 +14,7 @@ export interface WazuhCorePluginSetup {
   };
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface WazuhCorePluginStart {
-  dashboardSecurity: ISecurityFactory;
-  configuration: IConfigurationEnhanced;
-  manageHosts: ManageHosts;
-  serverAPIClient: ServerAPIClient;
+export interface WazuhCorePluginStart extends WazuhCoreServices {
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
@@ -34,6 +23,8 @@ export interface WazuhCorePluginStart {
   };
 }
 
-export type PluginSetup = {
-  securityDashboards?: {}; // TODO: Add OpenSearch Dashboards Security interface
-};
+export interface PluginSetup {
+  securityDashboards?: object; // TODO: Add OpenSearch Dashboards Security interface
+}
+
+export * from './services/initialization/types';
