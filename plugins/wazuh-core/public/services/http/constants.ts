@@ -1,5 +1,5 @@
-export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
+export const pluginPlatformRequestHeaders = {
   'osd-xsrf': 'kibana',
 };
 
-export const HTTP_CLIENT_DEFAULT_TIMEOUT = 20000;
+export const HTTP_CLIENT_DEFAULT_TIMEOUT = 20_000;
