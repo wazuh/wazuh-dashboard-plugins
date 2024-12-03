@@ -1018,8 +1018,6 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           type: 'value',
         },
       ],
-      row: false,
-      radiusRatio: 22,
     },
     uiState: {
       vis: {
@@ -1142,6 +1140,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
+            defaultYExtents: false,
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
@@ -1165,9 +1164,11 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
+            defaultYExtents: false,
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
+            min: 0,
             max: 100,
           },
           labels: {
@@ -1201,7 +1202,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           type: 'line',
           mode: 'normal',
           data: {
-            id: '3',
+            id: '2',
             label: 'Syscollector EDPS',
           },
           valueAxis: 'ValueAxis-1',
@@ -1215,7 +1216,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           type: 'line',
           mode: 'normal',
           data: {
-            id: '4',
+            id: '3',
             label: 'Queue Usage %',
           },
           valueAxis: 'ValueAxis-2',
@@ -1278,6 +1279,16 @@ const getVisStateSyscollector = (indexPatternId: string) => {
         {
           id: '2',
           enabled: true,
+          type: 'avg',
+          params: {
+            field: 'analysisd.syscollector_edps',
+            customLabel: 'Syscollector EDPS',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '3',
+          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'timestamp',
@@ -1285,6 +1296,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
               from: 'now-24h',
               to: 'now',
             },
+            json: '',
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
@@ -1294,16 +1306,6 @@ const getVisStateSyscollector = (indexPatternId: string) => {
             customLabel: 'timestamp',
           },
           schema: 'segment',
-        },
-        {
-          id: '3',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.syscollector_edps',
-            customLabel: 'Syscollector EDPS',
-          },
-          schema: 'metric',
         },
         {
           id: '4',
