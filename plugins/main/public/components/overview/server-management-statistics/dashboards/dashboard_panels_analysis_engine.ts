@@ -979,10 +979,10 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           name: 'LeftAxis-1',
           position: 'left',
           scale: {
-            defaultYExtents: false,
+            defaultYExtents: true,
             mode: 'normal',
+            setYExtents: false,
             type: 'linear',
-            setYExtents: true,
           },
           show: true,
           style: {},
@@ -1157,10 +1157,10 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            defaultYExtents: false,
-            type: 'linear',
+            defaultYExtents: true,
             mode: 'normal',
-            setYExtents: true,
+            setYExtents: false,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1395,10 +1395,10 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            defaultYExtents: false,
-            type: 'linear',
+            defaultYExtents: true,
             mode: 'normal',
-            setYExtents: true,
+            setYExtents: false,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1633,10 +1633,10 @@ const getVisStateSCA = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            defaultYExtents: false,
-            type: 'linear',
+            defaultYExtents: true,
             mode: 'normal',
-            setYExtents: true,
+            setYExtents: false,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1931,10 +1931,10 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           name: 'LeftAxis-1',
           position: 'left',
           scale: {
-            defaultYExtents: false,
+            defaultYExtents: true,
             mode: 'normal',
+            setYExtents: false,
             type: 'linear',
-            setYExtents: true,
           },
           show: true,
           style: {},
