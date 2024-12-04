@@ -1,4 +1,4 @@
-import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
+import { CoreSetup, CoreStart, Plugin, PluginInitializerContext } from 'opensearch-dashboards/public';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
 import * as utils from './utils';
@@ -17,6 +17,10 @@ export class WazuhCorePlugin
 {
   _internal: { [key: string]: any } = {};
   services: { [key: string]: any } = {};
+
+  constructor(private readonly initializerContext: PluginInitializerContext) {}
+
+
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     const noop = () => {};
     const logger = {
@@ -33,7 +37,6 @@ export class WazuhCorePlugin
       logger,
       this._internal.configurationStore,
     );
-
     // Register the plugin settings
     Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
       this.services.configuration.register(key, value),
@@ -61,7 +64,7 @@ export class WazuhCorePlugin
     setUiSettings(core.uiSettings);
 
     await this.services.configuration.start({ http: core.http });
-
+    
     return {
       ...this.services,
       utils,

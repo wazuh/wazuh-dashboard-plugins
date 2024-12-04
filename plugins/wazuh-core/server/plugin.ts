@@ -29,6 +29,7 @@ import {
 import { enhanceConfiguration } from './services/enhance-configuration';
 import { CorePluginConfigType } from '.';
 import { first } from 'rxjs/operators';
+import { uiSettings } from './ui_settings';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -108,6 +109,8 @@ export class WazuhCorePlugin
     );
 
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
+    // Register uiSettings
+    core.uiSettings.register(uiSettings);
 
     // Register a property to the context parameter of the endpoint handlers
     core.http.registerRouteHandlerContext('wazuh_core', (context, request) => {
