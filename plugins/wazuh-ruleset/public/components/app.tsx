@@ -11,7 +11,7 @@ import { Router, Route, Switch, Redirect } from 'react-router-dom';
 // import { CoreStart } from '../../../../src/core/public';
 // import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
 import { getCore, getHistory } from '../plugin-services';
-import { Steps } from './steps';
+import { Steps } from './steps/steps';
 import { FlyoutForm } from './flyout';
 
 // Commented because it gives linting error
@@ -102,7 +102,12 @@ export const WazuhRulesetApp = () => {
               <EuiSideNav aria-label='Ruleset' items={sideNav} />
             </EuiPageSideBar>
             <EuiPageBody component='main'>
-              <EuiPanel paddingSize='l'>
+              <EuiPanel
+                paddingSize='l'
+                color='transparent'
+                hasShadow={false}
+                hasBorder={false}
+              >
                 <Switch>
                   {views.map(view => (
                     <Route

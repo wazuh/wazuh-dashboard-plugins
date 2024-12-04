@@ -1,15 +1,15 @@
 import React from 'react';
 import {
-  EuiSpacer,
   EuiCode,
   EuiSteps,
   EuiText,
-  EuiCodeBlock,
   EuiSubSteps,
   EuiPanel,
   EuiAccordion,
 } from '@elastic/eui';
-import { PopoverMenu } from './popover-menu';
+import { PopoverMenu } from '../popover-menu';
+import mockDecoders from '../../../common/__mocks__/decoders';
+import { Settings } from './setting';
 
 const steps = [
   {
@@ -23,11 +23,7 @@ const steps = [
           extraAction={<PopoverMenu />}
           paddingSize='l'
         >
-          <EuiText>
-            <p>Run this code snippet to install things.</p>
-          </EuiText>
-          <EuiSpacer />
-          <EuiCodeBlock language='bash'>npm install</EuiCodeBlock>
+          <Settings step={mockDecoders[1].metadata} />
         </EuiAccordion>
       </EuiPanel>
     ),
