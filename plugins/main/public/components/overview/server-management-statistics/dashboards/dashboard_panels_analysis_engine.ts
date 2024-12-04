@@ -960,9 +960,9 @@ const getVisStateSyscheck = (indexPatternId: string) => {
       ],
       thresholdLine: {
         color: '#E24D42',
-        show: true,
+        show: false,
         style: 'dashed',
-        value: 16384 * 0.9, // TODO:
+        value: 100,
         width: 1,
       },
       times: [],
@@ -983,7 +983,6 @@ const getVisStateSyscheck = (indexPatternId: string) => {
             mode: 'normal',
             type: 'linear',
             setYExtents: true,
-            max: 16384, // TODO:
           },
           show: true,
           style: {},
@@ -1152,7 +1151,6 @@ const getVisStateSyscollector = (indexPatternId: string) => {
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
-            max: 16384, // TODO:
           },
           labels: {
             show: true,
@@ -1242,9 +1240,9 @@ const getVisStateSyscollector = (indexPatternId: string) => {
       labels: {},
       thresholdLine: {
         color: '#E24D42',
-        show: true,
+        show: false,
         style: 'dashed',
-        value: 16384 * 0.9, // TODO:
+        value: 100,
         width: 1,
       },
     },
@@ -1381,7 +1379,6 @@ const getVisStateRootcheck = (indexPatternId: string) => {
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
-            max: 16384, // TODO:
           },
           labels: {
             show: true,
@@ -1471,9 +1468,9 @@ const getVisStateRootcheck = (indexPatternId: string) => {
       labels: {},
       thresholdLine: {
         color: '#E24D42',
-        show: true,
+        show: false,
         style: 'dashed',
-        value: 16384 * 0.9, // TODO:
+        value: 100,
         width: 1,
       },
     },
@@ -1610,7 +1607,6 @@ const getVisStateSCA = (indexPatternId: string) => {
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
-            max: 16384, // TODO:
           },
           labels: {
             show: true,
@@ -1700,9 +1696,9 @@ const getVisStateSCA = (indexPatternId: string) => {
       labels: {},
       thresholdLine: {
         color: '#E24D42',
-        show: true,
+        show: false,
         style: 'dashed',
-        value: 16384 * 0.9, // TODO:
+        value: 100,
         width: 1,
       },
     },
@@ -1876,9 +1872,9 @@ const getVisStateHostInfo = (indexPatternId: string) => {
       ],
       thresholdLine: {
         color: '#E24D42',
-        show: true,
+        show: false,
         style: 'dashed',
-        value: 16384 * 0.9, // TODO:
+        value: 100,
         width: 1,
       },
       times: [],
@@ -1899,7 +1895,6 @@ const getVisStateHostInfo = (indexPatternId: string) => {
             mode: 'normal',
             type: 'linear',
             setYExtents: true,
-            max: 16384, // TODO:
           },
           show: true,
           style: {},
