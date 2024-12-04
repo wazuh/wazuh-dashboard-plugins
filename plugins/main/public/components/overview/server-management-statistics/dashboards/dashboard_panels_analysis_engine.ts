@@ -1088,7 +1088,7 @@ const getVisStateSyscheck = (indexPatternId: string) => {
         },
         {
           id: '4',
-          enabled: true,
+          enabled: false,
           type: 'avg',
           params: {
             field: 'analysisd.syscheck_queue_usage',
@@ -1309,7 +1309,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
         },
         {
           id: '4',
-          enabled: true,
+          enabled: false,
           type: 'avg',
           params: {
             field: 'analysisd.syscollector_queue_usage',
@@ -1530,7 +1530,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
         },
         {
           id: '4',
-          enabled: true,
+          enabled: false,
           type: 'avg',
           params: {
             field: 'analysisd.rootcheck_queue_usage',
