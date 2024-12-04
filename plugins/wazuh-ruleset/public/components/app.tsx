@@ -1,27 +1,17 @@
-import React, { useState } from 'react';
-import { i18n } from '@osd/i18n';
-import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
-import { BrowserRouter as Router } from 'react-router-dom';
-
+import React, { useState, useEffect } from 'react';
+import { I18nProvider } from '@osd/i18n/react';
 import {
-  EuiSmallButton,
-  EuiButton,
-  EuiHorizontalRule,
   EuiPage,
   EuiPageBody,
-  EuiPageContent,
-  EuiPageContentBody,
-  EuiPageContentHeader,
-  EuiPageHeader,
-  EuiTitle,
-  EuiText,
+  EuiSideNav,
+  EuiPageSideBar,
+  EuiPanel,
 } from '@elastic/eui';
-// import { Route, Switch, Redirect } from 'react-router-dom';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { CoreStart } from '../../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
-
+import { getCore, getHistory } from '../plugin-services';
 import { Steps } from './steps';
-import { PLUGIN_ID, PLUGIN_NAME } from '../../common';
 import { FlyoutForm } from './flyout';
 
 interface WazuhRulesetAppDeps {
@@ -31,24 +21,32 @@ interface WazuhRulesetAppDeps {
   navigation: NavigationPublicPluginStart;
 }
 
+interface ViewInterface {
+  name: string;
+  id: string;
+  render: () => React.ReactNode;
+}
 
-const views = [
+const views: ViewInterface[] = [
   {
     name: 'Integrations',
     id: 'integrations',
-    hasDetailsRoute: true,
-    render: (props: any) => <div>Integrations</div>,
+    render: Steps,
   },
   {
     name: 'Rules',
     id: 'rules',
-    hasDetailsRoute: true,
-    render: (props: any) => <div>Rules</div>,
+    render: () => <FlyoutForm title={'Metadata'} />,
   },
   {
     name: 'Decoders',
     id: 'decoders',
-    render: (props: any) => <div>Decoders</div>,
+    render: () => (
+      <>
+        <Steps />
+        <FlyoutForm title={'Metadata'} />
+      </>
+    ),
   },
   {
     name: 'KVDB',
@@ -63,32 +61,65 @@ export const WazuhRulesetApp = ({
   http,
   navigation,
 }: WazuhRulesetAppDeps) => {
-  // Use React hooks to manage state.
-  const [timestamp, setTimestamp] = useState<string | undefined>();
+  const history = getHistory();
+  const [currentTab, setCurrentTab] = useState('');
 
-  const onClickHandler = () => {
-    // Use the core http service to make a response to the server API.
-    http.get('/api/wazuh-ruleset/example').then((res) => {
-      setTimestamp(res.time);
-      // Use the core notifications service to display a success message.
-      notifications.toasts.addSuccess(
-        i18n.translate('wazuhRuleset.dataUpdated', {
-          defaultMessage: 'Data updated',
-        })
-      );
-    });
-  };
+  useEffect(() => {
+    setCurrentTab(history.location.pathname);
+  }, []);
+
+  const sideNav = [
+    {
+      name: 'Ruleset',
+      id: 'wazuhRuleset',
+      items: views.map(item => {
+        return {
+          ...item,
+          onClick: () => {
+            history.push(`${item.id}`);
+            setCurrentTab(item.id);
+          },
+          isSelected:
+            item.id === currentTab ||
+            history.location.pathname === `/${item.id}`,
+        };
+      }),
+    },
+  ];
 
   // Render the application DOM.
   // Note that `navigation.ui.TopNavMenu` is a stateful component exported on the `navigation` plugin's start contract.
   return (
-    <Router basename={basename}>
+    <Router history={history}>
       <I18nProvider>
         <>
-          <EuiPage restrictWidth="1000px">
-            <EuiPageBody component="main">
-              <Steps />
-              <FlyoutForm title={"Metadata"}/>
+          {/* <EuiPage restrictWidth='1000px'> */}
+          <EuiPage>
+            <EuiPageSideBar>
+              <EuiSideNav aria-label='Ruleset' items={sideNav} />
+            </EuiPageSideBar>
+            <EuiPageBody component='main'>
+              <EuiPanel paddingSize='l'>
+                <Switch>
+                  {views.map(view => (
+                    <Route
+                      key={view.id}
+                      path={`/${view.id}`}
+                      component={() => {
+                        getCore().chrome.setBreadcrumbs([
+                          {
+                            className: 'osdBreadcrumbs',
+                            text: view.name,
+                          },
+                        ]);
+
+                        return view.render();
+                      }}
+                    />
+                  ))}
+                  <Redirect to={`/${views[0].id}`} />
+                </Switch>
+              </EuiPanel>
             </EuiPageBody>
           </EuiPage>
         </>
