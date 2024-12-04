@@ -1092,7 +1092,15 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           type: 'avg',
           params: {
             field: 'analysisd.syscheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.syscheck_queue_size\'];def usage = doc[\'analysisd.syscheck_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
             customLabel: 'Queue Usage %',
           },
           schema: 'metric',
@@ -1313,7 +1321,15 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           type: 'avg',
           params: {
             field: 'analysisd.syscollector_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.syscollector_queue_size\'];def usage = doc[\'analysisd.syscollector_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
             customLabel: 'Queue Usage %',
           },
           schema: 'metric',
@@ -1534,7 +1550,15 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           type: 'avg',
           params: {
             field: 'analysisd.rootcheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.rootcheck_queue_size\'];def usage = doc[\'analysisd.rootcheck_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
             customLabel: 'Queue Usage %',
           },
           schema: 'metric',
@@ -1755,7 +1779,15 @@ const getVisStateSCA = (indexPatternId: string) => {
           type: 'avg',
           params: {
             field: 'analysisd.sca_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.sca_queue_size\'];def usage = doc[\'analysisd.sca_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
             customLabel: 'Queue Usage %',
           },
           schema: 'metric',
@@ -1976,7 +2008,15 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           type: 'avg',
           params: {
             field: 'analysisd.hostinfo_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.hostinfo_queue_size\'];def usage = doc[\'analysisd.hostinfo_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
             customLabel: 'Queue Usage %',
           },
           schema: 'metric',
