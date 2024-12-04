@@ -20,7 +20,7 @@ export class WazuhRulesetPlugin
   public setup(core: CoreSetup): WazuhRulesetPluginSetup {
     // Register an application into the side navigation menu
     core.application.register({
-      id: 'wazuhRuleset',
+      id: 'ruleset',
       title: PLUGIN_NAME,
       async mount(params: AppMountParameters) {
         // Load application bundle
