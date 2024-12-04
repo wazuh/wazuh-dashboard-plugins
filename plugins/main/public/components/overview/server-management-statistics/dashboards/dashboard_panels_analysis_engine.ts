@@ -1361,6 +1361,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
+            defaultYExtents: false,
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
@@ -1384,9 +1385,11 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
+            defaultYExtents: false,
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
+            min: 0,
             max: 100,
           },
           labels: {
@@ -1507,17 +1510,6 @@ const getVisStateRootcheck = (indexPatternId: string) => {
         {
           id: '3',
           enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.rootcheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.rootcheck_queue_size\'];def usage = doc[\'analysisd.rootcheck_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage %',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '6',
-          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'timestamp',
@@ -1525,6 +1517,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
               from: 'now-24h',
               to: 'now',
             },
+            json: '',
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
@@ -1534,6 +1527,17 @@ const getVisStateRootcheck = (indexPatternId: string) => {
             customLabel: 'timestamp',
           },
           schema: 'segment',
+        },
+        {
+          id: '4',
+          enabled: true,
+          type: 'avg',
+          params: {
+            field: 'analysisd.rootcheck_queue_usage',
+            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.rootcheck_queue_size\'];def usage = doc[\'analysisd.rootcheck_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            customLabel: 'Queue Usage %',
+          },
+          schema: 'metric',
         },
       ],
     },
