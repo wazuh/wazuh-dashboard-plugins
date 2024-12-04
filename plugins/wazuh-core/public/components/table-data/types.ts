@@ -19,7 +19,7 @@ export interface TableDataProps<T> {
    * Enable the action to reload the data
    */
   showActionReload?: boolean;
-  onDataChange?: Function;
+  onDataChange?: (data: any) => void;
   onReload?: (newValue: number) => void;
   /**
    * Fetch context
@@ -33,7 +33,7 @@ export interface TableDataProps<T> {
     pagination: EuiBasicTableProps<T>['pagination'];
     sorting: EuiBasicTableProps<T>['sorting'];
   }) => Promise<{ items: any[]; totalItems: number }>;
-  onFetchContextChange?: Function;
+  onFetchContextChange?: (context: any) => void;
   /**
    * Columns for the table
    */
