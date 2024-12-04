@@ -962,7 +962,7 @@ const getVisStateSyscheck = (indexPatternId: string) => {
         color: '#E24D42',
         show: true,
         style: 'dashed',
-        value: 14745.6, // TODO:
+        value: 16384 * 0.9, // TODO:
         width: 1,
       },
       times: [],
@@ -1236,7 +1236,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
         color: '#E24D42',
         show: true,
         style: 'dashed',
-        value: 14745.6, // TODO:
+        value: 16384 * 0.9, // TODO:
         width: 1,
       },
     },
@@ -1457,7 +1457,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
         color: '#E24D42',
         show: true,
         style: 'dashed',
-        value: 14745.6, // TODO:
+        value: 16384 * 0.9, // TODO:
         width: 1,
       },
     },
@@ -1678,7 +1678,7 @@ const getVisStateSCA = (indexPatternId: string) => {
         color: '#E24D42',
         show: true,
         style: 'dashed',
-        value: 14745.6, // TODO:
+        value: 16384 * 0.9, // TODO:
         width: 1,
       },
     },
@@ -1846,7 +1846,7 @@ const getVisStateHostInfo = (indexPatternId: string) => {
         color: '#E24D42',
         show: true,
         style: 'dashed',
-        value: 14745.6, // TODO:
+        value: 16384 * 0.9, // TODO:
         width: 1,
       },
       times: [],
