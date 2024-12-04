@@ -1,5 +1,11 @@
 import React from 'react';
-import { EuiForm, EuiFormRow, EuiCodeBlock } from '@elastic/eui';
+import {
+  EuiForm,
+  EuiFormRow,
+  EuiCodeBlock,
+  EuiSpacer,
+  EuiFieldText,
+} from '@elastic/eui';
 
 function parseObjectValue(value: object) {
   const listSettings = Object.entries(value).map(entry => {
@@ -15,6 +21,10 @@ function parseObjectValue(value: object) {
   });
 
   return listSettings;
+}
+
+function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 const SettingValue = ({
@@ -39,9 +49,18 @@ const SettingValue = ({
   }
 
   return (
-    <EuiFormRow label={title} fullWidth>
-      <EuiCodeBlock language='json'>{value}</EuiCodeBlock>
-    </EuiFormRow>
+    <>
+      {/* <EuiFormRow label={title} fullWidth>
+        <EuiCodeBlock>{value}</EuiCodeBlock>
+      </EuiFormRow> */}
+      <EuiFieldText
+        prepend={capitalizeFirstLetter(title)}
+        value={value}
+        fullWidth
+        readOnly
+      />
+      <EuiSpacer />
+    </>
   );
 };
 
