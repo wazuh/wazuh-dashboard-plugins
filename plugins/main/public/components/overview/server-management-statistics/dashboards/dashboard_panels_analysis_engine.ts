@@ -1582,6 +1582,7 @@ const getVisStateSCA = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
+            defaultYExtents: false,
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
@@ -1605,6 +1606,8 @@ const getVisStateSCA = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
+            defaultYExtents: false,
+            min: 0,
             type: 'linear',
             mode: 'normal',
             setYExtents: true,
@@ -1686,7 +1689,6 @@ const getVisStateSCA = (indexPatternId: string) => {
           'SCA EDPS': '#D683CE',
           'SCA Events Decoded': '#70DBED',
         },
-        legendOpen: true,
       },
     },
     data: {
@@ -1729,17 +1731,6 @@ const getVisStateSCA = (indexPatternId: string) => {
         {
           id: '3',
           enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.sca_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.sca_queue_size\'];def usage = doc[\'analysisd.sca_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage %',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '6',
-          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'timestamp',
@@ -1747,6 +1738,7 @@ const getVisStateSCA = (indexPatternId: string) => {
               from: 'now-24h',
               to: 'now',
             },
+            json: '',
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
@@ -1756,6 +1748,17 @@ const getVisStateSCA = (indexPatternId: string) => {
             customLabel: 'timestamp',
           },
           schema: 'segment',
+        },
+        {
+          id: '4',
+          enabled: false,
+          type: 'avg',
+          params: {
+            field: 'analysisd.sca_queue_usage',
+            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.sca_queue_size\'];def usage = doc[\'analysisd.sca_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            customLabel: 'Queue Usage %',
+          },
+          schema: 'metric',
         },
       ],
     },
