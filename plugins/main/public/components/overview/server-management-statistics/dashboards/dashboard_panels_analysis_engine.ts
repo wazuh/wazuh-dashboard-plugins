@@ -1794,19 +1794,19 @@ const getVisStateHostInfo = (indexPatternId: string) => {
       ],
       grid: {
         categoryLines: false,
+        valueAxis: '',
       },
       labels: {},
       legendPosition: 'right',
       seriesParams: [
         {
-          color: '#0000FF',
           data: {
             id: '1',
             label: 'Host info Events Decoded',
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: true,
@@ -1814,14 +1814,13 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           valueAxis: 'ValueAxis-1',
         },
         {
-          color: '#0000FF',
           data: {
             id: '2',
             label: 'Host info EDPS',
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: true,
@@ -1829,14 +1828,13 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           valueAxis: 'ValueAxis-1',
         },
         {
-          color: '#0000FF',
           data: {
             id: '3',
             label: 'Queue Usage %',
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: false,
@@ -1865,6 +1863,7 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           name: 'LeftAxis-1',
           position: 'left',
           scale: {
+            defaultYExtents: false,
             mode: 'normal',
             type: 'linear',
             setYExtents: true,
@@ -1888,6 +1887,8 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           name: 'RightAxis-1',
           position: 'right',
           scale: {
+            defaultYExtents: false,
+            min: 0,
             mode: 'normal',
             type: 'linear',
             setYExtents: true,
@@ -1951,17 +1952,6 @@ const getVisStateHostInfo = (indexPatternId: string) => {
         {
           id: '3',
           enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.hostinfo_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.hostinfo_queue_size\'];def usage = doc[\'analysisd.hostinfo_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage %',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '4',
-          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'timestamp',
@@ -1969,23 +1959,25 @@ const getVisStateHostInfo = (indexPatternId: string) => {
               from: 'now-24h',
               to: 'now',
             },
+            json: '',
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
+            customLabel: 'timestamp',
           },
           schema: 'segment',
         },
         {
-          id: '5',
+          id: '4',
           enabled: true,
           type: 'avg',
           params: {
             field: 'analysisd.hostinfo_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 70;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 70%',
+            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.hostinfo_queue_size\'];def usage = doc[\'analysisd.hostinfo_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            customLabel: 'Queue Usage %',
           },
           schema: 'metric',
         },
