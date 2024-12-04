@@ -19,10 +19,13 @@ const hostSchema = schema.object({
 
 // Define the schema for the hosts config with dynamic keys
 const hostsConfigSchema = schema.recordOf(schema.string(), hostSchema);
-
+const patternConfigSchema = schema.maybe(schema.string());
+const vulnerabilityPatternConfigSchema = schema.maybe(schema.string());
 
 export const configSchema = schema.object({
-  hosts: hostsConfigSchema
+  hosts: hostsConfigSchema,
+  pattern: patternConfigSchema,
+  vulnerabilityPattern: vulnerabilityPatternConfigSchema,
 });
 
 export type CorePluginConfigType = TypeOf<typeof configSchema>;
@@ -31,6 +34,8 @@ export type CorePluginConfigType = TypeOf<typeof configSchema>;
 export const config: PluginConfigDescriptor<CorePluginConfigType> = {
   exposeToBrowser: {
     hosts: true,
+    pattern: true,
+    vulnerabilityPattern: true,
   },
   schema: configSchema,
 }

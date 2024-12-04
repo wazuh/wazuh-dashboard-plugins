@@ -1,7 +1,7 @@
 import { UiSettingsParams } from "opensearch-dashboards/server";
 import { i18n } from '@osd/i18n';
 import { schema } from '@osd/config-schema';
-import { WAZUH_SAMPLE_ALERT_PREFIX } from "../common/constants";
+import { WAZUH_SAMPLE_ALERT_PREFIX, WAZUH_STATISTICS_DEFAULT_PREFIX } from "../common/constants";
 
 const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
 const ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
@@ -16,6 +16,22 @@ const CHECKS_TEMPLATE = 'checks.template';
 const CHECKS_TIMEFILTER = 'checks.timefilter';
 
 const CONFIG_UI_API_EDITABLE = 'configuration.ui_api_editable';
+
+const CRON_PREFIX = 'cron.prefix';
+
+const CUSTOMIZATION_ENABLED = 'customization.enabled';
+const CUSTOMIZATION_LOGO_APP = 'customization.logo.app';
+const CUSTOMIZATION_LOGO_HEALTH_CHECK = 'customization.logo.healthcheck';
+
+const ENROLLMENT_DNS = 'enrollment.dns';
+const ENROLLMENT_PASSWORD = 'enrollment.password';
+
+const IP_IGNORE = 'ip.ignore';
+const IP_SELECTOR = 'ip.selector';
+
+const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
+
+const REQUEST_TIMEOUT = 'timeout';
 
 export const uiSettings: Record<string, UiSettingsParams> = {
     [HIDE_MANAGER_ALERTS_SETTING]: {
@@ -149,5 +165,125 @@ export const uiSettings: Record<string, UiSettingsParams> = {
       }),
       category: ['wazuhCore'],
       schema: schema.boolean()
+    },
+    [CRON_PREFIX]: {
+      name: i18n.translate('wazuhCore.advancedSettings.cronPrefix', {
+        defaultMessage: 'Cron prefix',
+      }),
+      type: 'string',
+      value: WAZUH_STATISTICS_DEFAULT_PREFIX,
+      description: i18n.translate('wazuhCore.advancedSettings.cronPrefixText', {
+        defaultMessage: 'Define the index prefix of predefined jobs.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.string()
+    },
+    [CUSTOMIZATION_ENABLED]: {
+      name: i18n.translate('wazuhCore.advancedSettings.customizationEnabled', {
+        defaultMessage: 'Status',
+      }),
+      type: 'boolean',
+      value: true,
+      description: i18n.translate('wazuhCore.advancedSettings.customizationEnabledText', {
+        defaultMessage: 'Enable or disable the customization.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.boolean()
+    },
+    [CUSTOMIZATION_LOGO_APP]: {
+      name: i18n.translate('wazuhCore.advancedSettings.customizationLogoApp', {
+        defaultMessage: 'Logo',
+      }),
+      type: 'image',
+      value: '',
+      description: i18n.translate('wazuhCore.advancedSettings.customizationLogoAppText', {
+        defaultMessage: 'Define the logo of the app.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.string()
+    },
+    [CUSTOMIZATION_LOGO_HEALTH_CHECK]: {
+      name: i18n.translate('wazuhCore.advancedSettings.customizationLogoHealthCheck', {
+        defaultMessage: 'Healthcheck logo',
+      }),
+      type: 'image', 
+      value: '',
+      description: i18n.translate('wazuhCore.advancedSettings.customizationLogoHealthCheckText', {
+        defaultMessage: 'This logo is displayed during the Healthcheck routine of the app.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.string()
+    },
+    [ENROLLMENT_DNS]: {
+      name: i18n.translate('wazuhCore.advancedSettings.enrollmentDns', {
+        defaultMessage: 'Enrollment DNS',
+      }),
+      type: 'string',
+      value: '',
+      description: i18n.translate('wazuhCore.advancedSettings.enrollmentDnsText', {
+        defaultMessage: 'Specifies the Wazuh registration server, used for the agent enrollment.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.string()
+    },
+    [ENROLLMENT_PASSWORD]: {
+      name: i18n.translate('wazuhCore.advancedSettings.enrollmentPassword', {
+        defaultMessage: 'Enrollment password',
+      }),
+      type: 'string',
+      value: '',
+      description: i18n.translate('wazuhCore.advancedSettings.enrollmentPasswordText', {
+        defaultMessage: 'Specifies the password used to authenticate during the agent enrollment.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.string()
+    },
+    [IP_IGNORE]: {
+      name: i18n.translate('wazuhCore.advancedSettings.ipIgnore', {
+        defaultMessage: 'Index pattern ignore',
+      }),
+      type: 'array',
+      value: [],
+      description: i18n.translate('wazuhCore.advancedSettings.ipIgnoreText', {
+        defaultMessage: 'Disable certain index pattern names from being available in index pattern selector.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.arrayOf(schema.string())
+    },
+    [IP_SELECTOR]: {
+      name: i18n.translate('wazuhCore.advancedSettings.ipSelector', {
+        defaultMessage: 'IP selector',
+      }),
+      type: 'boolean',
+      value: true,
+      description: i18n.translate('wazuhCore.advancedSettings.ipSelectorText', {
+        defaultMessage: 'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.boolean()
+    },
+    [WAZUH_UPDATES_DISABLED]: {
+      name: i18n.translate('wazuhCore.advancedSettings.wazuhUpdatesDisabled', {
+        defaultMessage: 'Check updates',
+      }),
+      type: 'boolean',
+      value: false,
+      description: i18n.translate('wazuhCore.advancedSettings.wazuhUpdatesDisabledText', {
+        defaultMessage: 'Define if the check updates service is active.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.boolean()
+    },
+    [REQUEST_TIMEOUT]: {
+      name: i18n.translate('wazuhCore.advancedSettings.requestTimeout', {
+        defaultMessage: 'Request timeout',
+      }),
+      type: 'number',
+      value: 20000,
+      description: i18n.translate('wazuhCore.advancedSettings.requestTimeoutText', {
+        defaultMessage: 'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
+      }),
+      category: ['wazuhCore'],
+      schema: schema.number()
     }
 }
