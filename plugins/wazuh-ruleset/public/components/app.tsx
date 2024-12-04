@@ -8,18 +8,19 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
-import { CoreStart } from '../../../../src/core/public';
-import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
+// import { CoreStart } from '../../../../src/core/public';
+// import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
 import { getCore, getHistory } from '../plugin-services';
 import { Steps } from './steps';
 import { FlyoutForm } from './flyout';
 
-interface WazuhRulesetAppDeps {
-  basename: string;
-  notifications: CoreStart['notifications'];
-  http: CoreStart['http'];
-  navigation: NavigationPublicPluginStart;
-}
+// Commented because it gives linting error
+// interface WazuhRulesetAppDeps {
+//   basename: string;
+//   notifications: CoreStart['notifications'];
+//   http: CoreStart['http'];
+//   navigation: NavigationPublicPluginStart;
+// }
 
 interface ViewInterface {
   name: string;
@@ -55,12 +56,14 @@ const views: ViewInterface[] = [
   },
 ];
 
-export const WazuhRulesetApp = ({
-  basename,
-  notifications,
-  http,
-  navigation,
-}: WazuhRulesetAppDeps) => {
+// Commented because it gives linting error
+// export const WazuhRulesetApp = ({
+//   basename,
+//   notifications,
+//   http,
+//   navigation,
+// }: WazuhRulesetAppDeps) => {
+export const WazuhRulesetApp = () => {
   const history = getHistory();
   const [currentTab, setCurrentTab] = useState('');
 

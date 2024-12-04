@@ -1,4 +1,5 @@
 import { i18n } from '@osd/i18n';
+import { createHashHistory } from 'history';
 import {
   AppMountParameters,
   CoreSetup,
@@ -12,7 +13,6 @@ import {
   AppPluginStartDependencies,
 } from './types';
 import { setCore, setHistory } from './plugin-services';
-import { createHashHistory } from 'history';
 
 export class WazuhRulesetPlugin
   implements Plugin<WazuhRulesetPluginSetup, WazuhRulesetPluginStart>
