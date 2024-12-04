@@ -28,6 +28,7 @@ module.exports = {
     'react-hooks',
     '@typescript-eslint',
     'unicorn',
+    'import',
     'prettier',
     '@stylistic',
   ],
@@ -210,6 +211,12 @@ module.exports = {
         '@typescript-eslint/naming-convention': [
           'error',
           { selector: 'default', format: ['camelCase'] },
+          { selector: 'import', format: ['camelCase', 'PascalCase'] },
+          {
+            selector: 'variable',
+            types: ['function'],
+            format: ['camelCase', 'PascalCase'],
+          },
           {
             selector: ['objectLiteralProperty', 'typeProperty'],
             format: null,
@@ -225,6 +232,7 @@ module.exports = {
           {
             selector: ['variable'],
             modifiers: ['global'],
+            types: ['number', 'string'],
             format: ['UPPER_CASE'],
           },
           {
