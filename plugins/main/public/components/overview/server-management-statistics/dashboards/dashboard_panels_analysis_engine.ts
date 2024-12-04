@@ -1104,6 +1104,16 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           },
           schema: 'metric',
         },
+        {
+          id: '5',
+          enabled: true,
+          type: 'max',
+          params: {
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
+          },
+          schema: 'metric',
+        },
       ],
     },
   };
@@ -1329,6 +1339,16 @@ const getVisStateSyscollector = (indexPatternId: string) => {
               },
             }),
             customLabel: 'Queue Usage %',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '5',
+          enabled: true,
+          type: 'max',
+          params: {
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
           },
           schema: 'metric',
         },
@@ -1560,6 +1580,16 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           },
           schema: 'metric',
         },
+        {
+          id: '5',
+          enabled: true,
+          type: 'max',
+          params: {
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
+          },
+          schema: 'metric',
+        },
       ],
     },
   };
@@ -1788,6 +1818,16 @@ const getVisStateSCA = (indexPatternId: string) => {
           },
           schema: 'metric',
         },
+        {
+          id: '5',
+          enabled: true,
+          type: 'max',
+          params: {
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
+          },
+          schema: 'metric',
+        },
       ],
     },
   };
@@ -2013,6 +2053,16 @@ const getVisStateHostInfo = (indexPatternId: string) => {
               },
             }),
             customLabel: 'Queue Usage %',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '5',
+          enabled: true,
+          type: 'max',
+          params: {
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
           },
           schema: 'metric',
         },
