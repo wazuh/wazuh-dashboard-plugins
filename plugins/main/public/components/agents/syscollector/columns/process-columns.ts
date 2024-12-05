@@ -7,22 +7,22 @@ const mapColumns = ({ field, ...rest }: { field: string; name?: string }) => ({
 });
 
 const windowsColumns = [
+  { field: 'cmd', searchable: true, sortable: true, width: '30%' },
   { field: 'name', searchable: true, sortable: true, width: '10%' },
   { field: 'pid', searchable: true, sortable: true },
   { field: 'ppid', searchable: true, sortable: true },
   { field: 'vm_size', searchable: true, sortable: true },
   { field: 'priority', searchable: true, sortable: true },
   { field: 'nlwp', searchable: true, sortable: true },
-  { field: 'cmd', searchable: true, sortable: true, width: '30%' },
 ].map(mapColumns);
 
 const linuxColumns = [
+  { field: 'cmd', searchable: true, sortable: true, width: '15%' },
   { field: 'name', searchable: true, sortable: true, width: '10%' },
   { field: 'euser', searchable: true, sortable: true },
   { field: 'egroup', searchable: true, sortable: true },
   { field: 'pid', searchable: true, sortable: true },
   { field: 'ppid', searchable: true, sortable: true },
-  { field: 'cmd', searchable: true, sortable: true, width: '15%' },
   { field: 'argvs', searchable: true, sortable: true, width: '15%' },
   { field: 'vm_size', searchable: true, sortable: true },
   { field: 'size', searchable: true, sortable: true },
