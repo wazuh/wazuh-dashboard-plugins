@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import {
   EuiCheckboxGroup,
   EuiComboBox,
@@ -9,16 +8,13 @@ import {
   EuiRange,
   EuiSelect,
   EuiSwitch,
-  EuiPanel,
   EuiSpacer,
 } from '@elastic/eui';
-
 // import { htmlIdGenerator } from '@opensearch-project/Eui/lib/services';
 import { htmlIdGenerator } from '@elastic/eui/lib/services';
 
 export const MetadataForm = () => {
   const idPrefix = htmlIdGenerator()();
-
   const [checkboxes] = useState([
     {
       id: `${idPrefix}0`,
@@ -37,38 +33,37 @@ export const MetadataForm = () => {
   const [checkboxIdToSelectedMap, setCheckboxIdToSelectedMap] = useState({
     [`${idPrefix}1`]: true,
   });
-
   const [comboBoxSelectionOptions, setComboBoxSelectionOptions] = useState([]);
-
   const [value, setValue] = useState(20);
 
-  const onRangeChange = (e) => {
-    setValue(e.target.value);
+  const onRangeChange = (event: { target: { value: any } }) => {
+    setValue(event.target.value);
   };
 
   const onSwitchChange = () => {
     setIsSwitchChecked(!isSwitchChecked);
   };
 
-  const onCheckboxChange = (optionId) => {
+  const onCheckboxChange = (optionId: string | number) => {
     const newCheckboxIdToSelectedMap = {
       ...checkboxIdToSelectedMap,
-      ...{
-        [optionId]: !checkboxIdToSelectedMap[optionId],
-      },
+      [optionId]: !checkboxIdToSelectedMap[optionId],
     };
+
     setCheckboxIdToSelectedMap(newCheckboxIdToSelectedMap);
   };
+
   return (
     <>
       <EuiFormRow
-        label="Text field"
-        helpText="I am some friendly help text."
-        display="rowCompressed">
-        <EuiFieldText name="first" isLoading compressed />
+        label='Text field'
+        helpText='I am some friendly help text.'
+        display='rowCompressed'
+      >
+        <EuiFieldText name='first' isLoading compressed />
       </EuiFormRow>
 
-      <EuiFormRow label="Select" display="rowCompressed">
+      <EuiFormRow label='Select' display='rowCompressed'>
         <EuiSelect
           options={[
             { value: 'option_one', text: 'Option one' },
@@ -79,11 +74,11 @@ export const MetadataForm = () => {
         />
       </EuiFormRow>
 
-      <EuiFormRow label="File picker" display="rowCompressed">
-        <EuiFilePicker compressed display="default" />
+      <EuiFormRow label='File picker' display='rowCompressed'>
+        <EuiFilePicker compressed display='default' />
       </EuiFormRow>
 
-      <EuiFormRow label="Combobox" display="rowCompressed">
+      <EuiFormRow label='Combobox' display='rowCompressed'>
         <EuiComboBox
           options={[
             { label: 'Option one' },
@@ -92,18 +87,18 @@ export const MetadataForm = () => {
           ]}
           compressed
           selectedOptions={comboBoxSelectionOptions}
-          onChange={(comboBoxSelectionOptions) =>
+          onChange={(comboBoxSelectionOptions: any) =>
             setComboBoxSelectionOptions(comboBoxSelectionOptions)
           }
         />
       </EuiFormRow>
 
-      <EuiFormRow label="Range" display="rowCompressed">
+      <EuiFormRow label='Range' display='rowCompressed'>
         <EuiRange
           min={0}
           max={100}
-          name="range"
-          id="range"
+          name='range'
+          id='range'
           showInput
           compressed
           value={value}
@@ -111,17 +106,17 @@ export const MetadataForm = () => {
         />
       </EuiFormRow>
 
-      <EuiFormRow label="Switch" display="rowCompressed" hasChildLabel={false}>
+      <EuiFormRow label='Switch' display='rowCompressed' hasChildLabel={false}>
         <EuiSwitch
-          label="Should we do this?"
-          name="switch"
+          label='Should we do this?'
+          name='switch'
           checked={isSwitchChecked}
           onChange={onSwitchChange}
           compressed
         />
       </EuiFormRow>
 
-      <EuiSpacer size="m" />
+      <EuiSpacer size='m' />
 
       <EuiCheckboxGroup
         options={checkboxes}
@@ -132,6 +127,6 @@ export const MetadataForm = () => {
         }}
         compressed
       />
-      </>
+    </>
   );
 };

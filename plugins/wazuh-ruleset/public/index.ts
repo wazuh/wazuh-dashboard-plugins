@@ -1,5 +1,4 @@
 import './index.scss';
-
 import { WazuhRulesetPlugin } from './plugin';
 
 // This exports static code and TypeScript types,
@@ -7,4 +6,5 @@ import { WazuhRulesetPlugin } from './plugin';
 export function plugin() {
   return new WazuhRulesetPlugin();
 }
+
 export { WazuhRulesetPluginSetup, WazuhRulesetPluginStart } from './types';

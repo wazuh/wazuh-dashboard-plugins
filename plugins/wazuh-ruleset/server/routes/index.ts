@@ -6,12 +6,11 @@ export function defineRoutes(router: IRouter) {
       path: '/api/wazuh-ruleset/example',
       validate: false,
     },
-    async (context, request, response) => {
-      return response.ok({
+    async (context, request, response) =>
+      response.ok({
         body: {
           time: new Date().toISOString(),
         },
-      });
-    }
+      }),
   );
 }

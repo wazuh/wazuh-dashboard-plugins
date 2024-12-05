@@ -1,16 +1,15 @@
 import {
   PluginInitializerContext,
   CoreSetup,
-  CoreStart,
   Plugin,
   Logger,
 } from '../../../src/core/server';
-
 import { WazuhRulesetPluginSetup, WazuhRulesetPluginStart } from './types';
 import { defineRoutes } from './routes';
 
 export class WazuhRulesetPlugin
-  implements Plugin<WazuhRulesetPluginSetup, WazuhRulesetPluginStart> {
+  implements Plugin<WazuhRulesetPluginSetup, WazuhRulesetPluginStart>
+{
   private readonly logger: Logger;
 
   constructor(initializerContext: PluginInitializerContext) {
@@ -27,8 +26,9 @@ export class WazuhRulesetPlugin
     return {};
   }
 
-  public start(core: CoreStart) {
+  public start() {
     this.logger.debug('wazuh-ruleset: Started');
+
     return {};
   }
 
