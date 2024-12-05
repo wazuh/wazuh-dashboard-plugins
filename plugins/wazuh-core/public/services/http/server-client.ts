@@ -21,6 +21,16 @@ import {
 } from './types';
 import { pluginPlatformRequestHeaders } from './constants';
 
+interface RequestInternalOptions {
+  shouldRetry?: boolean;
+  checkCurrentApiIsUp?: boolean;
+  overwriteHeaders?: any;
+}
+
+type RequestOptions = RequestInternalOptions & {
+  returnOriginalResponse?: boolean;
+};
+
 export class WzRequest implements HTTPClientServer {
   onErrorInterceptor?: (
     error: any,
@@ -55,31 +65,14 @@ export class WzRequest implements HTTPClientServer {
   private async requestInternal(
     method: HTTPVerb,
     path: string,
+    // eslint-disable-next-line default-param-last
     payload: any = null,
-    // eslint-disable-next-line unicorn/no-object-as-default-parameter
-    extraOptions: {
-      shouldRetry?: boolean;
-      checkCurrentApiIsUp?: boolean;
-      overwriteHeaders?: any;
-    } = {
-      shouldRetry: true,
-      checkCurrentApiIsUp: true,
-      overwriteHeaders: {},
-    },
+    {
+      shouldRetry = true,
+      checkCurrentApiIsUp = true,
+      overwriteHeaders = {},
+    }: RequestInternalOptions,
   ): Promise<any> {
-    const shouldRetry =
-      typeof extraOptions.shouldRetry === 'boolean'
-        ? extraOptions.shouldRetry
-        : true;
-    const checkCurrentApiIsUp =
-      typeof extraOptions.checkCurrentApiIsUp === 'boolean'
-        ? extraOptions.checkCurrentApiIsUp
-        : true;
-    const overwriteHeaders =
-      typeof extraOptions.overwriteHeaders === 'object'
-        ? extraOptions.overwriteHeaders
-        : {};
-
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -171,25 +164,24 @@ export class WzRequest implements HTTPClientServer {
     method: HTTPVerb,
     path: string,
     body: any,
-    // eslint-disable-next-line unicorn/no-object-as-default-parameter
-    options: {
-      checkCurrentApiIsUp?: boolean;
-      returnOriginalResponse?: boolean;
-    } = { checkCurrentApiIsUp: true, returnOriginalResponse: false },
+    {
+      checkCurrentApiIsUp = true,
+      returnOriginalResponse = false,
+      ...restRequestInternalOptions
+    }: RequestOptions,
   ): Promise<ServerAPIResponseItemsDataHTTPClient<any>> {
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
       }
 
-      const { returnOriginalResponse, ...optionsToGenericReq } = options;
       const id = this.services.getServerAPI();
       const requestData = { method, path, body, id };
       const response = await this.requestInternal(
         'POST',
         '/api/request',
         requestData,
-        optionsToGenericReq,
+        { ...restRequestInternalOptions, checkCurrentApiIsUp },
       );
 
       if (returnOriginalResponse) {
@@ -451,7 +443,7 @@ export class WzRequest implements HTTPClientServer {
       const response = await this.services.request(options);
 
       if (response.error) {
-        throw this.returnErrorInstance(response);
+        throw this.returnErrorInstance(response); // FIXME: this could cause an expected error due to missing message argument or wrong response argument when this should be a string according to the implementation of returnErrorInstance
       }
 
       return response;
@@ -460,7 +452,8 @@ export class WzRequest implements HTTPClientServer {
         // TODO: implement
         // const wzMisc = new WzMisc();
         // wzMisc.setApiIsDown(true);
-        const response = (error.response.data || {}).message || error.message;
+        const response: string =
+          (error.response.data || {}).message || error.message;
 
         throw this.returnErrorInstance(response);
       } else {
@@ -493,7 +486,7 @@ export class WzRequest implements HTTPClientServer {
       const response = await this.services.request(options);
 
       if (response.error) {
-        throw this.returnErrorInstance(response);
+        throw this.returnErrorInstance(response); // FIXME: this could cause an expected error due to missing message argument or wrong response argument when this should be a string according to the implementation of returnErrorInstance
       }
 
       return response;
