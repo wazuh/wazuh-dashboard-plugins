@@ -47,7 +47,7 @@ export class WzRequest implements HTTPClientServer {
   }
 
   /**
-   * Permorn a generic request
+   * Perform a generic request
    * @param {String} method
    * @param {String} path
    * @param {Object} payload
