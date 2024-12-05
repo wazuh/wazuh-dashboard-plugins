@@ -67,12 +67,15 @@ export class WzRequest implements HTTPClientServer {
     path: string,
     // eslint-disable-next-line default-param-last
     payload: any = null,
-    {
-      shouldRetry = true,
-      checkCurrentApiIsUp = true,
-      overwriteHeaders = {},
-    }: RequestInternalOptions,
+    options: RequestInternalOptions,
   ): Promise<any> {
+    const { shouldRetry, checkCurrentApiIsUp, overwriteHeaders } = {
+      shouldRetry: true,
+      checkCurrentApiIsUp: true,
+      overwriteHeaders: {},
+      ...options,
+    };
+
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -164,12 +167,18 @@ export class WzRequest implements HTTPClientServer {
     method: HTTPVerb,
     path: string,
     body: any,
-    {
-      checkCurrentApiIsUp = true,
-      returnOriginalResponse = false,
-      ...restRequestInternalOptions
-    }: RequestOptions,
+    options: RequestOptions,
   ): Promise<ServerAPIResponseItemsDataHTTPClient<any>> {
+    const {
+      checkCurrentApiIsUp,
+      returnOriginalResponse,
+      ...restRequestInternalOptions
+    } = {
+      checkCurrentApiIsUp: true,
+      returnOriginalResponse: false,
+      ...options,
+    };
+
     try {
       if (!method || !path || !body) {
         throw new Error('Missing parameters');
