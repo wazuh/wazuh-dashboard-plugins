@@ -1,5 +1,4 @@
-/* eslint-disable unicorn/no-abusive-eslint-disable */
-/* eslint-disable */
+/* eslint-disable no-await-in-loop */
 /*
  * Wazuh app - Class for Wazuh-API functions
  * Copyright (C) 2015-2022 Wazuh, Inc.
@@ -52,7 +51,7 @@ export class WazuhApiCtrl {
         request.headers.cookie &&
         username ===
           decodeURIComponent(
-            getCookieValueByName(request.headers.cookie, 'wz-user'),
+            getCookieValueByName(request.headers.cookie, 'wz-user') as string,
           ) &&
         idHost === getCookieValueByName(request.headers.cookie, 'wz-api')
       ) {
@@ -305,7 +304,9 @@ export class WazuhApiCtrl {
 
                 return await this.checkStoredAPI(context, request, response);
               }
-            } catch (error) {} // eslint-disable-line
+            } catch {
+              /* empty */
+            }
           }
         } catch (error) {
           context.wazuh.logger.error(error.message || error);
@@ -371,8 +372,6 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      let apiAvailable = null;
-
       // const notValid = this.validateCheckApiParams(request.body);
       // if (notValid) return ErrorResponse(notValid, 3003, HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR, response);
       context.wazuh.logger.debug(`${request.body.id} is valid`);
@@ -382,9 +381,7 @@ export class WazuhApiCtrl {
         excludePassword: true,
       });
 
-      if (data) {
-        apiAvailable = data;
-      } else {
+      if (!data) {
         const errorMessage = `The server API host entry with ID ${request.body.id} was not found`;
 
         context.wazuh.logger.debug(errorMessage);
@@ -492,10 +489,11 @@ export class WazuhApiCtrl {
       const status = (response.data || {}).status || 1;
       const isDown = socketErrorCodes.includes(status);
 
-      isDown &&
+      if (isDown) {
         context.wazuh.logger.error(
           'Server API is online but the server is not ready yet',
         );
+      }
 
       return isDown;
     }
@@ -532,7 +530,9 @@ export class WazuhApiCtrl {
         : true;
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
-      isValid && context.wazuh.logger.debug('Wazuh is ready');
+      if (isValid) {
+        context.wazuh.logger.debug('Wazuh is ready');
+      }
 
       if (path === '/ping') {
         return { isValid };
@@ -544,13 +544,12 @@ export class WazuhApiCtrl {
     } catch (error) {
       context.wazuh.logger.error(error.message || error);
 
-      return Promise.reject(error);
+      throw error;
     }
   }
 
-  sleep(timeMs) {
-    // eslint-disable-next-line
-    return new Promise((resolve, reject) => {
+  sleep(timeMs: number) {
+    return new Promise(resolve => {
       setTimeout(resolve, timeMs);
     });
   }
@@ -899,7 +898,7 @@ export class WazuhApiCtrl {
       const isList =
         request.body.path.includes('/lists') &&
         request.body.filters &&
-        request.body.filters.length &&
+        request.body.filters.length > 0 &&
         request.body.filters.find(filter => filter._isCDBList);
       const totalItems = (((output || {}).data || {}).data || {})
         .total_affected_items;
@@ -923,7 +922,7 @@ export class WazuhApiCtrl {
       }
 
       if (totalItems) {
-        const { path, filters } = request.body;
+        const { path, filters: filtersIgnored } = request.body;
         const isArrayOfLists = path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
         const isAgentsOfGroup = path.startsWith('/agents/groups/');
@@ -962,16 +961,14 @@ export class WazuhApiCtrl {
           const flatLists = [];
 
           for (const list of itemsArray) {
-            const { relative_dirname, items } = list;
+            const { relative_dirname: relativeDirname, items } = list;
 
             flatLists.push(
-              ...items.map(item => {
-                return {
-                  relative_dirname,
-                  key: item.key,
-                  value: item.value,
-                };
-              }),
+              ...items.map(item => ({
+                relative_dirname: relativeDirname,
+                key: item.key,
+                value: item.value,
+              })),
             );
           }
 
@@ -984,9 +981,7 @@ export class WazuhApiCtrl {
           itemsArray = output.data.data.affected_items[0].items;
         }
 
-        fields = fields.map(item => {
-          return { value: item, default: '-' };
-        });
+        fields = fields.map(item => ({ value: item, default: '-' }));
 
         const json2csvParser = new Parser({ fields });
         let csv = json2csvParser.parse(itemsArray);
@@ -1156,16 +1151,16 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const APP_LOGO = 'customization.logo.app';
-      const HEALTHCHECK_LOGO = 'customization.logo.healthcheck';
+      const appLogo = 'customization.logo.app';
+      const healthcheckLogo = 'customization.logo.healthcheck';
       const logos = {
-        [APP_LOGO]:
+        [appLogo]:
           await context.wazuh_core.configuration.getCustomizationSetting(
-            APP_LOGO,
+            appLogo,
           ),
-        [HEALTHCHECK_LOGO]:
+        [healthcheckLogo]:
           await context.wazuh_core.configuration.getCustomizationSetting(
-            HEALTHCHECK_LOGO,
+            healthcheckLogo,
           ),
       };
 
