@@ -122,7 +122,7 @@ export const getDashboardPanels = (
     '1': {
       gridData: {
         w: 48,
-        h: 12,
+        h: 7,
         x: 0,
         y: 0,
         i: '1',
