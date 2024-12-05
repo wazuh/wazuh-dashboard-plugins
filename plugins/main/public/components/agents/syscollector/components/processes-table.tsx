@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiIcon, EuiPanel } from '@elastic/eui';
+import { EuiPanel } from '@elastic/eui';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../common/constants';
 import { TableWzAPI } from '../../../common/tables';
 import { WzRequest } from '../../../../react-services';
