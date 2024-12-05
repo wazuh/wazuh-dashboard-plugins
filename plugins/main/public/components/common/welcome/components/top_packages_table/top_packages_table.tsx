@@ -69,7 +69,7 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
   ];
 
   return (
-    <EuiPanel paddingSize='s'>
+    <EuiPanel paddingSize='m'>
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiText size='xs'>

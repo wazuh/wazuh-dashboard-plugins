@@ -1,0 +1,18 @@
+.wz-ribbon-condensed > .wz-ribbon-item {
+  margin-block: 24px;
+
+  @media (max-width: 767px) {
+    margin-block: 12px;
+  }
+}
+
+.wz-ribbon-condensed {
+  margin-inline-start: 0;
+  margin-inline-end: 12px;
+  flex-grow: 0;
+
+  @media (max-width: 767px) {
+    margin-block: 0;
+    margin-inline-start: 0;
+  }
+}

@@ -126,6 +126,7 @@ const VulsPanelContent = ({ agent }) => {
                   value={`${getSeverityValue(severityLabel)}`}
                   color={severityColor}
                   isLoading={isLoading || isDataSourceLoading}
+                  textAlign='left'
                 />
               </WzLink>
             </EuiFlexItem>
