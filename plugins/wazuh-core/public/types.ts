@@ -26,7 +26,7 @@ export interface WazuhCorePluginSetup {
     ) => React.ComponentType<ServerDataProps<T>>;
   };
 }
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+
 export interface WazuhCorePluginStart {
   hooks: {
     useDockedSideNav: UseDockedSideNav;

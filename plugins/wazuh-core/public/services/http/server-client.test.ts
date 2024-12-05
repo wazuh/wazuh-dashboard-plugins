@@ -87,7 +87,7 @@ describe('Create client', () => {
     });
   });
 
-  it.only('Unauthentication', done => {
+  it('Unauthentication', done => {
     const { client } = createClient();
 
     client.unauth().then(data => {
