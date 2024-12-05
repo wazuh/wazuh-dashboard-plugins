@@ -159,6 +159,7 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                                   unicorn                                  */
         /* -------------------------------------------------------------------------- */
+        'unicorn/prefer-module': 'off',
         'unicorn/prefer-ternary': 'off',
         // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/custom-error-definition.md
         'unicorn/custom-error-definition': 'error',
@@ -199,6 +200,31 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                             @typescript-eslint                             */
         /* -------------------------------------------------------------------------- */
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {
+            // Whether to check all, some, or no arguments.
+            args: 'after-used',
+            // Regular expressions of argument names to not check for usage.
+            argsIgnorePattern: '^_',
+            // Whether to check catch block arguments.
+            caughtErrors: 'all',
+            // Regular expressions of catch block argument names to not check for usage.
+            caughtErrorsIgnorePattern: '^_',
+            // Regular expressions of destructured array variable names to not check for usage.
+            destructuredArrayIgnorePattern: '^_',
+            // Whether to ignore classes with at least one static initialization block.
+            ignoreClassWithStaticInitBlock: false,
+            // Whether to ignore sibling properties in `...` destructurings.
+            ignoreRestSiblings: false,
+            // Whether to report variables that match any of the valid ignore pattern options if they have been used.
+            reportUsedIgnorePattern: true,
+            // Whether to check all variables or only locally-declared variables.
+            vars: 'all',
+            // Regular expressions of variable names to not check for usage.
+            varsIgnorePattern: '[iI]gnored$',
+          },
+        ],
         '@typescript-eslint/prefer-readonly': 'error',
         '@typescript-eslint/no-extraneous-class': 'off',
         '@typescript-eslint/method-signature-style': ['error', 'property'],
@@ -206,7 +232,11 @@ module.exports = {
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/naming-convention': [
           'error',
-          { selector: 'default', format: ['camelCase'] },
+          {
+            selector: 'default',
+            format: ['camelCase'],
+            leadingUnderscore: 'allow',
+          },
           { selector: 'import', format: ['camelCase', 'PascalCase'] },
           {
             selector: 'variable',
