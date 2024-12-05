@@ -56,11 +56,7 @@ module.exports = {
         ],
         'prefer-arrow-callback': 'error',
         'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
-        'arrow-body-style': [
-          'error',
-          'as-needed',
-          { requireReturnForObjectLiteral: true },
-        ],
+        'arrow-body-style': ['error', 'as-needed'],
         'no-unreachable': 'error',
         'no-fallthrough': [
           'error',
