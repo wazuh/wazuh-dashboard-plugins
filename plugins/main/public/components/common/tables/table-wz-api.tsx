@@ -78,7 +78,7 @@ export function TableWzAPI({
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
+  const [sort, setSort] = useState({ field: 'file', direction: 'asc' });
   const onFiltersChange = filters =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
@@ -87,6 +87,9 @@ export function TableWzAPI({
   const onDataChange = data =>
     typeof rest.onDataChange === 'function' ? rest.onDataChange(data) : null;
 
+  const formatSorting = sorting => {
+    return `${sorting.direction === 'asc' ? '+' : '-'}${sorting.field}`;
+  };
   /**
    * Changing the reloadFootprint timestamp will trigger reloading the table
    */
@@ -111,7 +114,7 @@ export function TableWzAPI({
   ) {
     try {
       const { pageIndex, pageSize } = pagination;
-      const { field, direction } = sorting.sort;
+      setSort(sorting.sort);
       setIsLoading(true);
       setFilters(filters);
       onFiltersChange(filters);
@@ -119,9 +122,8 @@ export function TableWzAPI({
         ...getFilters(filters),
         offset: pageIndex * pageSize,
         limit: pageSize,
-        sort: `${direction === 'asc' ? '+' : '-'}${field}`,
+        sort: formatSorting(sorting.sort),
       };
-
       const response = await WzRequest.apiReq('GET', endpoint, { params });
 
       const { affected_items: items, total_affected_items: totalItems } = (
@@ -232,19 +234,24 @@ export function TableWzAPI({
                 <ExportTableCsv
                   endpoint={rest.endpoint}
                   totalItems={totalItems}
-                  filters={getFilters(filters)}
+                  filters={getFilters({
+                    ...filters,
+                    sort: formatSorting(sort),
+                  })}
                   title={
                     typeof rest.downloadCsv === 'string'
                       ? rest.downloadCsv
                       : rest.title
                   }
                 />
-                <EuiIconTip
-                  content='Exporting to CSV from multiple entries can lead to errors.'
-                  size='s'
-                  color='subdued'
-                  type='alert'
-                />
+                {totalItems > 10000 && (
+                  <EuiIconTip
+                    content='The exported CSV will be limited to the first 10000 lines.'
+                    size='m'
+                    color='warning'
+                    type='alert'
+                  />
+                )}
               </>
             )}
             {/* Render optional post custom action button */}
