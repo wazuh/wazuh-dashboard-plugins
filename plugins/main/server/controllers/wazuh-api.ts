@@ -783,7 +783,10 @@ export class WazuhApiCtrl {
       if (totalItems && !isList) {
         params.offset = 0;
         itemsArray.push(...output.data.data.affected_items);
-        while (itemsArray.length < totalItems && params.offset < totalItems) {
+        while (
+          itemsArray.length < Math.min(totalItems, 10000) &&
+          params.offset < Math.min(totalItems, 10000)
+        ) {
           params.offset += params.limit;
           const tmpData = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
