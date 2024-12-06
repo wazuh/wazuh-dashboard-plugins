@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash';
+import { EpluginSettingType } from '../constants';
 import { formatLabelValuePair } from './settings';
 import { formatBytes } from './file-size';
 
@@ -69,26 +70,6 @@ interface TConfigurationSettingOptionsSwitch {
       enabled: { label?: string; value: any };
     };
   };
-}
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-export enum EpluginSettingType {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  text = 'text',
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  password = 'password',
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  textarea = 'textarea',
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  switch = 'switch',
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  number = 'number',
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  editor = 'editor',
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  select = 'select',
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  filepicker = 'filepicker',
 }
 
 export interface TConfigurationSetting {
