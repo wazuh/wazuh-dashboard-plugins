@@ -28,6 +28,7 @@ import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
 import { useStateStorage } from '../hooks';
+import { TABLE_EXPORT_MAX_ROWS } from '../../../../common/constants';
 
 /**
  * Search input custom filter button
@@ -244,9 +245,9 @@ export function TableWzAPI({
                       : rest.title
                   }
                 />
-                {totalItems > 10000 && (
+                {totalItems > TABLE_EXPORT_MAX_ROWS && (
                   <EuiIconTip
-                    content='The exported CSV will be limited to the first 10000 lines.'
+                    content={`The exported CSV will be limited to the first ${TABLE_EXPORT_MAX_ROWS} lines.`}
                     size='m'
                     color='warning'
                     type='alert'
