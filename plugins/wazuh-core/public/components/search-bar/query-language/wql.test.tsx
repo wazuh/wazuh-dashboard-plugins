@@ -161,7 +161,6 @@ describe('Query language - WQL', () => {
               description,
             }));
           },
-          // eslint-disable-next-line default-param-last
           value(currentValue = '', { field }) {
             switch (field) {
               case 'field': {

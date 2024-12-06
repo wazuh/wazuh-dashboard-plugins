@@ -100,7 +100,6 @@ describe('Query language - AQL', () => {
               description,
             }));
           },
-          // eslint-disable-next-line default-param-last
           value(currentValue = '', { previousField }) {
             switch (previousField) {
               case 'field': {

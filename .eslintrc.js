@@ -88,7 +88,7 @@ module.exports = {
         'block-scoped-var': 'error',
         'default-case': 'error',
         'default-case-last': 'error',
-        'default-param-last': 'error',
+        'default-param-last': 'off',
         eqeqeq: ['error', 'always'],
         'no-var': 'error',
         /* -------------------------------------------------------------------------- */
