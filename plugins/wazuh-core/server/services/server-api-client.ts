@@ -185,7 +185,7 @@ export class ServerAPIClient {
       ...(options?.authContext ? { data: options?.authContext } : {}),
     };
     const response: AxiosResponse = await this.client(optionsRequest);
-    const token: string = (((response || {}).data || {}).data || {}).token;
+    const token: string = response?.data?.data?.token;
 
     return token;
   }
