@@ -6,7 +6,6 @@ import { ServerDataProps } from './types';
 export function ServerTableData<T>({
   showActionExportFormatted,
   postActionButtons,
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   ActionExportFormatted,
   ...props
 }: ServerDataProps<T>) {
