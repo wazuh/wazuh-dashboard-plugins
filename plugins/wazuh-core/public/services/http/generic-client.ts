@@ -131,7 +131,7 @@ export class GenericRequest implements HTTPClientGeneric {
         throw error;
       }
 
-      return (((error || {}).response || {}).data || {}).message || false
+      return error?.response?.data?.message || false
         ? Promise.reject(new Error(error.response.data.message))
         : Promise.reject(error || new Error('Server did not respond'));
     }
