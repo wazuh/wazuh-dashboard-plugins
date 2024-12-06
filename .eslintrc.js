@@ -262,6 +262,10 @@ module.exports = {
             format: null,
           },
           {
+            selector: ['objectLiteralMethod', 'typeMethod'],
+            format: ['camelCase', 'PascalCase'],
+          },
+          {
             selector: ['class', 'interface', 'typeLike'],
             format: ['PascalCase'],
           },

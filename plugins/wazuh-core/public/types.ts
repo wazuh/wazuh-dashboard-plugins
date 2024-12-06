@@ -1,3 +1,4 @@
+import React from 'react';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
 import { TableDataProps } from './components';
@@ -14,13 +15,10 @@ export interface WazuhCorePluginSetup {
   dashboardSecurity: DashboardSecurity;
   http: HTTPClient;
   ui: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     TableData: <T>(
       prop: TableDataProps<T>,
     ) => React.ComponentType<TableDataProps<T>>;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     SearchBar: (prop: any) => React.ComponentType<any>;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     ServerTable: <T>(
       prop: ServerDataProps<T>,
     ) => React.ComponentType<ServerDataProps<T>>;
@@ -38,13 +36,10 @@ export interface WazuhCorePluginStart {
   dashboardSecurity: DashboardSecurity;
   http: HTTPClient;
   ui: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     TableData: <T>(
       prop: TableDataProps<T>,
     ) => React.ComponentType<TableDataProps<T>>;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     SearchBar: (prop: any) => React.ComponentType<any>;
-    // eslint-disable-next-line @typescript-eslint/naming-convention
     ServerTable: <T>(
       prop: ServerDataProps<T>,
     ) => React.ComponentType<ServerDataProps<T>>;
