@@ -182,20 +182,18 @@ export function tokenizer(input: string): ITokens {
   );
 
   return [...input.matchAll(re)].flatMap(({ groups }) =>
-    Object.entries(groups).map(([key, value]) => {
-      return {
-        type: key.startsWith('operator_group') // Transform operator_group group match
-          ? 'operator_group'
-          : key.startsWith('whitespace') // Transform whitespace group match
-            ? 'whitespace'
-            : key,
-        value,
-        ...(key === 'value' &&
-          (value && /^"([\S\s]+)"$/.test(value)
-            ? { formattedValue: value.match(/^"([\S\s]+)"$/)[1] }
-            : { formattedValue: value })),
-      };
-    }),
+    Object.entries(groups).map(([key, value]) => ({
+      type: key.startsWith('operator_group') // Transform operator_group group match
+        ? 'operator_group'
+        : key.startsWith('whitespace') // Transform whitespace group match
+          ? 'whitespace'
+          : key,
+      value,
+      ...(key === 'value' &&
+        (value && /^"([\S\s]+)"$/.test(value)
+          ? { formattedValue: value.match(/^"([\S\s]+)"$/)[1] }
+          : { formattedValue: value })),
+    })),
   );
 }
 
@@ -414,14 +412,11 @@ export async function getSuggestions(
           ({ label }) => label === lastToken.value,
         )
           ? Object.keys(language.tokens.operator_compare.literal).map(
-              operator => {
-                return {
-                  type: 'operator_compare',
-                  label: operator,
-                  description:
-                    language.tokens.operator_compare.literal[operator],
-                };
-              },
+              operator => ({
+                type: 'operator_compare',
+                label: operator,
+                description: language.tokens.operator_compare.literal[operator],
+              }),
             )
           : []),
       ];
@@ -447,13 +442,11 @@ export async function getSuggestions(
               operator.startsWith(lastToken.value) &&
               operator !== lastToken.value,
           )
-          .map(operator => {
-            return {
-              type: 'operator_compare',
-              label: operator,
-              description: language.tokens.operator_compare.literal[operator],
-            };
-          }),
+          .map(operator => ({
+            type: 'operator_compare',
+            label: operator,
+            description: language.tokens.operator_compare.literal[operator],
+          })),
         ...(Object.keys(language.tokens.operator_compare.literal).includes(
           lastToken.value,
         )
@@ -515,13 +508,11 @@ export async function getSuggestions(
           mapSuggestionCreatorValue(element, index, array),
         ),
         ...Object.entries(language.tokens.conjunction.literal).map(
-          ([conjunction, description]) => {
-            return {
-              type: 'conjunction',
-              label: conjunction,
-              description,
-            };
-          },
+          ([conjunction, description]) => ({
+            type: 'conjunction',
+            label: conjunction,
+            description,
+          }),
         ),
         {
           type: 'operator_group',
@@ -539,13 +530,11 @@ export async function getSuggestions(
               conjunction.startsWith(lastToken.value) &&
               conjunction !== lastToken.value,
           )
-          .map(conjunction => {
-            return {
-              type: 'conjunction',
-              label: conjunction,
-              description: language.tokens.conjunction.literal[conjunction],
-            };
-          }),
+          .map(conjunction => ({
+            type: 'conjunction',
+            label: conjunction,
+            description: language.tokens.conjunction.literal[conjunction],
+          })),
         // fields if the input field is exact
         ...(Object.keys(language.tokens.conjunction.literal).includes(
           lastToken.value,
@@ -573,13 +562,11 @@ export async function getSuggestions(
       } else if (lastToken.value === ')') {
         return (
           // conjunction
-          Object.keys(language.tokens.conjunction.literal).map(conjunction => {
-            return {
-              type: 'conjunction',
-              label: conjunction,
-              description: language.tokens.conjunction.literal[conjunction],
-            };
-          })
+          Object.keys(language.tokens.conjunction.literal).map(conjunction => ({
+            type: 'conjunction',
+            label: conjunction,
+            description: language.tokens.conjunction.literal[conjunction],
+          }))
         );
       }
 
@@ -1050,24 +1037,20 @@ export const WQL = {
 
     const onSearch = output => {
       if (output?.error) {
-        params.setQueryLanguageOutput(state => {
-          return {
-            ...state,
-            searchBarProps: {
-              ...state.searchBarProps,
-              suggestions: transformSuggestionsToEuiSuggestItem(
-                output.error.map(error => {
-                  return {
-                    type: 'validation_error',
-                    label: 'Invalid',
-                    description: error,
-                  };
-                }),
-              ),
-              isInvalid: true,
-            },
-          };
-        });
+        params.setQueryLanguageOutput(state => ({
+          ...state,
+          searchBarProps: {
+            ...state.searchBarProps,
+            suggestions: transformSuggestionsToEuiSuggestItem(
+              output.error.map(error => ({
+                type: 'validation_error',
+                label: 'Invalid',
+                description: error,
+              })),
+            ),
+            isInvalid: true,
+          },
+        }));
       } else {
         params.onSearch(output);
       }
@@ -1080,9 +1063,7 @@ export const WQL = {
           name='textAlign'
           buttonSize='m'
           options={params.queryLanguage.parameters?.options?.filterButtons.map(
-            ({ id, label }) => {
-              return { id, label };
-            },
+            ({ id, label }) => ({ id, label }),
           )}
           idToSelectedMap={{}}
           type='multi'

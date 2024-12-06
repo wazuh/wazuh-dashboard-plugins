@@ -155,13 +155,11 @@ describe('Query language - WQL', () => {
             return [
               { label: 'field', description: 'Field' },
               { label: 'field2', description: 'Field2' },
-            ].map(({ label, description }) => {
-              return {
-                type: 'field',
-                label,
-                description,
-              };
-            });
+            ].map(({ label, description }) => ({
+              type: 'field',
+              label,
+              description,
+            }));
           },
           // eslint-disable-next-line default-param-last
           value(currentValue = '', { field }) {
@@ -169,17 +167,13 @@ describe('Query language - WQL', () => {
               case 'field': {
                 return ['value', 'value2', 'value3', 'value4']
                   .filter(value => value.startsWith(currentValue))
-                  .map(value => {
-                    return { type: 'value', label: value };
-                  });
+                  .map(value => ({ type: 'value', label: value }));
               }
 
               case 'field2': {
                 return ['127.0.0.1', '127.0.0.2', '190.0.0.1', '190.0.0.2']
                   .filter(value => value.startsWith(currentValue))
-                  .map(value => {
-                    return { type: 'value', label: value };
-                  });
+                  .map(value => ({ type: 'value', label: value }));
               }
 
               default: {
@@ -455,11 +449,9 @@ describe('Query language - WQL', () => {
             options: {},
             suggestions: {
               field: () =>
-                ['field1', 'field2', 'field_not_number'].map(label => {
-                  return {
-                    label,
-                  };
-                }),
+                ['field1', 'field2', 'field_not_number'].map(label => ({
+                  label,
+                })),
               value: () => [],
             },
             validate: {
