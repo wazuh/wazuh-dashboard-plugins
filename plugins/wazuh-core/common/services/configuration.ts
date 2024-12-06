@@ -535,19 +535,18 @@ export class Configuration implements IConfiguration {
       filterFunction
         ? settingsMapped.filter(element => filterFunction(element))
         : settingsMapped
-    )
-      .sort((settingA, settingB) => settingA.key?.localeCompare?.(settingB.key))
-      // eslint-disable-next-line unicorn/no-array-reduce
-      .reduce(
-        (accum, pluginSettingConfiguration) => ({
-          ...accum,
-          [pluginSettingConfiguration.category]: [
-            ...(accum[pluginSettingConfiguration.category] || []),
-            { ...pluginSettingConfiguration },
-          ],
-        }),
-        {},
-      );
+    ).sort((settingA, settingB) => settingA.key?.localeCompare?.(settingB.key));
+    const result: any = {};
+
+    for (const pluginSettingConfiguration of settingsSortedByCategories) {
+      const category = pluginSettingConfiguration.category;
+
+      if (!result[category]) {
+        result[category] = [];
+      }
+
+      result[category].push({ ...pluginSettingConfiguration });
+    }
 
     return Object.entries(settingsSortedByCategories)
       .map(([category, settings]) => ({
