@@ -101,7 +101,7 @@ export class WazuhApiCtrl {
       });
     } catch (error) {
       const errorMessage = `Error getting the authorization token: ${
-        ((error.response || {}).data || {}).detail || error.message || error
+        error.response?.data?.detail || error.message || error
       }`;
 
       context.wazuh.logger.error(errorMessage);
@@ -486,7 +486,7 @@ export class WazuhApiCtrl {
     if (response.status !== HTTP_STATUS_CODES.OK) {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
-      const status = (response.data || {}).status || 1;
+      const status = response.data?.status || 1;
       const isDown = socketErrorCodes.includes(status);
 
       if (isDown) {
@@ -515,11 +515,9 @@ export class WazuhApiCtrl {
         {},
         { apiHostID: api.id },
       );
-      const daemons =
-        ((((response || {}).data || {}).data || {}).affected_items || [])[0] ||
-        {};
+      const daemons = response?.data?.data?.affected_items?.[0] || {};
       const isCluster =
-        ((api || {}).cluster_info || {}).status === 'enabled' &&
+        api?.cluster_info?.status === 'enabled' &&
         daemons['wazuh-clusterd'] !== undefined;
       const wazuhdbExists = daemons['wazuh-db'] !== undefined;
       const execd = daemons['wazuh-execd'] === 'running';
@@ -564,7 +562,7 @@ export class WazuhApiCtrl {
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(context, method, path, data, id, response) {
-    const devTools = !!(data || {}).devTools;
+    const devTools = !!data?.devTools;
 
     try {
       let api;
@@ -602,31 +600,22 @@ export class WazuhApiCtrl {
       };
 
       // Set content type application/xml if needed
-      if (
-        typeof (data || {}).body === 'string' &&
-        (data || {}).origin === 'xmleditor'
-      ) {
+      if (typeof data?.body === 'string' && data?.origin === 'xmleditor') {
         data.headers['content-type'] = 'application/xml';
         delete data.origin;
       }
 
-      if (
-        typeof (data || {}).body === 'string' &&
-        (data || {}).origin === 'json'
-      ) {
+      if (typeof data?.body === 'string' && data?.origin === 'json') {
         data.headers['content-type'] = 'application/json';
         delete data.origin;
       }
 
-      if (
-        typeof (data || {}).body === 'string' &&
-        (data || {}).origin === 'raw'
-      ) {
+      if (typeof data?.body === 'string' && data?.origin === 'raw') {
         data.headers['content-type'] = 'application/octet-stream';
         delete data.origin;
       }
 
-      const delay = (data || {}).delay || 0;
+      const delay = data?.delay || 0;
 
       if (delay) {
         // Remove the delay parameter that is used to add the sever API request to the queue job.
@@ -665,7 +654,7 @@ export class WazuhApiCtrl {
 
           return check;
         } catch (error) {
-          const isDown = (error || {}).code === 'ECONNREFUSED';
+          const isDown = error?.code === 'ECONNREFUSED';
 
           if (!isDown) {
             context.wazuh.logger.error(
@@ -702,7 +691,7 @@ export class WazuhApiCtrl {
         );
       }
 
-      let responseBody = (responseToken || {}).data || {};
+      let responseBody = responseToken?.data || {};
 
       if (!responseBody) {
         responseBody =
@@ -746,7 +735,7 @@ export class WazuhApiCtrl {
         );
       }
 
-      const errorMsg = (error.response || {}).data || error.message;
+      const errorMsg = error.response?.data || error.message;
 
       context.wazuh.logger.error(errorMsg || error);
 
@@ -755,7 +744,7 @@ export class WazuhApiCtrl {
           body: { error: '3013', message: errorMsg || error },
         });
       } else {
-        if ((error || {}).code && ApiErrorEquivalence[error.code]) {
+        if (error?.code && ApiErrorEquivalence[error.code]) {
           error.message = ApiErrorEquivalence[error.code];
         }
 
@@ -860,7 +849,7 @@ export class WazuhApiCtrl {
         throw new Error('Field id is required');
       }
 
-      const filters = Array.isArray(((request || {}).body || {}).filters)
+      const filters = Array.isArray(request?.body?.filters)
         ? request.body.filters
         : [];
       let tmpPath = request.body.path;
@@ -900,8 +889,7 @@ export class WazuhApiCtrl {
         request.body.filters &&
         request.body.filters.length > 0 &&
         request.body.filters.find(filter => filter._isCDBList);
-      const totalItems = (((output || {}).data || {}).data || {})
-        .total_affected_items;
+      const totalItems = output?.data?.data?.total_affected_items;
 
       if (totalItems && !isList) {
         params.offset = 0;
@@ -1109,7 +1097,7 @@ export class WazuhApiCtrl {
           { apiHostID },
         ),
       ]);
-      const result = data.map(item => (item.data || {}).data || []);
+      const result = data.map(item => item.data?.data || []);
       const [hardwareResponse, osResponse] = result;
       // Fill syscollector object
       const syscollector = {

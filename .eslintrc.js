@@ -53,6 +53,11 @@ module.exports = {
             message:
               "Don't use arrow functions in class properties. Use a function instead.",
           },
+          {
+            selector:
+              'MemberExpression > LogicalExpression[operator="||"]:has(Identifier)',
+            message: 'Use optional chaining operator instead (?.).',
+          },
         ],
         'prefer-arrow-callback': 'error',
         'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
