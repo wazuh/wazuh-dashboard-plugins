@@ -58,6 +58,11 @@ module.exports = {
               'MemberExpression > LogicalExpression[operator="||"]:has(Identifier):has(ObjectExpression[properties.length=0])',
             message: 'Use optional chaining operator instead (?.).',
           },
+          {
+            selector:
+              'MemberExpression > LogicalExpression[operator="||"]:has(Identifier):has(ArrayExpression[elements.length=0])',
+            message: 'Use optional chaining operator instead (?.).',
+          },
         ],
         'prefer-arrow-callback': 'error',
         'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
