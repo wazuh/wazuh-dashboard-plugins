@@ -90,7 +90,6 @@ export class ConfigurationStore implements IConfigurationStore {
       };
 
       for (const setting of settings) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
         delete updatedSettings[setting];
       }
 
