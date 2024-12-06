@@ -235,7 +235,6 @@ export function TableData<T>({
     totalItemCount: totalItems,
     pageSizeOptions: tablePageSizeOptions,
   };
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const ReloadButton = (
     <EuiFlexItem grow={false}>
       <EuiButtonEmpty iconType='refresh' onClick={() => triggerReload()}>

@@ -250,6 +250,10 @@ module.exports = {
           { selector: 'import', format: ['camelCase', 'PascalCase'] },
           {
             selector: 'variable',
+            format: ['camelCase', 'PascalCase'],
+          },
+          {
+            selector: 'variable',
             types: ['function'],
             format: ['camelCase', 'PascalCase'],
           },
