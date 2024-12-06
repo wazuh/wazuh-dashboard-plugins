@@ -276,6 +276,7 @@ module.exports = {
           {
             selector: ['variable'],
             modifiers: ['global'],
+            types: ['boolean', 'number', 'string'],
             format: ['UPPER_CASE'],
           },
           {
