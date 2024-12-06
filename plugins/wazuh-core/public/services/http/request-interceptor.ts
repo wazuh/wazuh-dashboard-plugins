@@ -23,16 +23,14 @@ export class RequestInterceptorClient implements HTTPClientRequestInterceptor {
   private registerInterceptor() {
     this.logger.debug('Registering interceptor in core http');
     this.unregisterInterceptor = this.http.intercept({
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      responseError: (httpErrorResponse, controller) => {
+      responseError: (httpErrorResponse, _controller) => {
         if (
           httpErrorResponse.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED
         ) {
           this.cancel();
         }
       },
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      request: (current, controller) => {
+      request: (_current, _controller) => {
         if (!this.allow) {
           throw new Error('Disable request');
         }
