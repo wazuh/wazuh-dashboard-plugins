@@ -447,7 +447,6 @@ describe('Query language - WQL', () => {
               value: () => [],
             },
             validate: {
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               value: (token, { field, operator_compare: operatorCompare }) => {
                 if (field === 'field_not_number') {
                   const value = token.formattedValue || token.value;
