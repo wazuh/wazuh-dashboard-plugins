@@ -257,11 +257,7 @@ module.exports = {
             format: ['PascalCase'],
           },
           {
-            selector: ['enum'],
-            format: ['PascalCase'],
-          },
-          {
-            selector: ['enumMember'],
+            selector: ['enum', 'enumMember'],
             format: ['UPPER_CASE'],
           },
           {
@@ -347,6 +343,20 @@ module.exports = {
                 'componentWillUnmount',
               ],
             },
+          },
+        ],
+      },
+    },
+    {
+      // constants files
+      files: ['plugins/**/constants.{ts,js}'],
+      rules: {
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'variable',
+            modifiers: ['global'],
+            format: ['UPPER_CASE'],
           },
         ],
       },
