@@ -1,0 +1,183 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Export Table Csv component renders correctly to match the snapshot when the button is disabled 1`] = `
+<ExportTableCsv
+  endpoint="/"
+  exportCSV={[Function]}
+  fetchContext={
+    Object {
+      "endpoint": "",
+      "filters": Object {},
+    }
+  }
+  filters={Array []}
+  showToast={[Function]}
+  title="example"
+  totalItems={0}
+>
+  <EuiFlexItem
+    grow={false}
+  >
+    <div
+      className="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <EuiButtonEmpty
+        iconType="importAction"
+        isDisabled={true}
+        onClick={[Function]}
+      >
+        <button
+          className="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty-isDisabled"
+          disabled={true}
+          onClick={[Function]}
+          type="button"
+        >
+          <EuiButtonContent
+            className="euiButtonEmpty__content"
+            iconGap="m"
+            iconSide="left"
+            iconSize="m"
+            iconType="importAction"
+            textProps={
+              Object {
+                "className": "euiButtonEmpty__text",
+              }
+            }
+          >
+            <span
+              className="euiButtonContent euiButtonEmpty__content"
+            >
+              <EuiIcon
+                className="euiButtonContent__icon"
+                color="inherit"
+                size="m"
+                type="importAction"
+              >
+                <EuiIconBeaker
+                  aria-hidden={true}
+                  className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                  focusable="false"
+                  role="img"
+                  style={null}
+                >
+                  <svg
+                    aria-hidden={true}
+                    className="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
+                    focusable="false"
+                    height={16}
+                    role="img"
+                    style={null}
+                    viewBox="0 0 16 16"
+                    width={16}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
+                    />
+                  </svg>
+                </EuiIconBeaker>
+              </EuiIcon>
+              <span
+                className="euiButtonEmpty__text"
+              >
+                Export formatted
+              </span>
+            </span>
+          </EuiButtonContent>
+        </button>
+      </EuiButtonEmpty>
+    </div>
+  </EuiFlexItem>
+</ExportTableCsv>
+`;
+
+exports[`Export Table Csv component renders correctly to match the snapshot when the button is enabled 1`] = `
+<ExportTableCsv
+  endpoint="/"
+  exportCSV={[Function]}
+  fetchContext={
+    Object {
+      "endpoint": "",
+      "filters": Object {},
+    }
+  }
+  filters={Array []}
+  showToast={[Function]}
+  title="example"
+  totalItems={1}
+>
+  <EuiFlexItem
+    grow={false}
+  >
+    <div
+      className="euiFlexItem euiFlexItem--flexGrowZero"
+    >
+      <EuiButtonEmpty
+        iconType="importAction"
+        isDisabled={false}
+        onClick={[Function]}
+      >
+        <button
+          className="euiButtonEmpty euiButtonEmpty--primary"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        >
+          <EuiButtonContent
+            className="euiButtonEmpty__content"
+            iconGap="m"
+            iconSide="left"
+            iconSize="m"
+            iconType="importAction"
+            textProps={
+              Object {
+                "className": "euiButtonEmpty__text",
+              }
+            }
+          >
+            <span
+              className="euiButtonContent euiButtonEmpty__content"
+            >
+              <EuiIcon
+                className="euiButtonContent__icon"
+                color="inherit"
+                size="m"
+                type="importAction"
+              >
+                <EuiIconImport
+                  aria-hidden={true}
+                  className="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                  focusable="false"
+                  role="img"
+                  style={null}
+                >
+                  <svg
+                    aria-hidden={true}
+                    className="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
+                    focusable="false"
+                    height={16}
+                    role="img"
+                    style={null}
+                    viewBox="0 0 16 16"
+                    width={16}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="m9 10.114 1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558ZM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18ZM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6Z"
+                    />
+                  </svg>
+                </EuiIconImport>
+              </EuiIcon>
+              <span
+                className="euiButtonEmpty__text"
+              >
+                Export formatted
+              </span>
+            </span>
+          </EuiButtonContent>
+        </button>
+      </EuiButtonEmpty>
+    </div>
+  </EuiFlexItem>
+</ExportTableCsv>
+`;
