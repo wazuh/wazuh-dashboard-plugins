@@ -266,13 +266,16 @@ module.exports = {
             format: ['PascalCase'],
           },
           {
-            selector: ['enum', 'enumMember'],
+            selector: ['enum'],
+            format: ['PascalCase'],
+          },
+          {
+            selector: ['enumMember'],
             format: ['UPPER_CASE'],
           },
           {
             selector: ['variable'],
             modifiers: ['global'],
-            types: ['number', 'string'],
             format: ['UPPER_CASE'],
           },
           {
