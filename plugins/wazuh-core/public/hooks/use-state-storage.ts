@@ -16,7 +16,7 @@ function transformValueFromStorage(value: any) {
   return typeof value === 'string' ? JSON.parse(value) : value;
 }
 
-export type UseStateStorageHook<T> = (
+export type UseStateStorageHook<T = any> = (
   initialValue: T,
   storageSystem?: UseStateStorageSystem,
   storageKey?: string,
