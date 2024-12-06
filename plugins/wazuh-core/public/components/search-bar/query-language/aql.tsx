@@ -140,12 +140,10 @@ export function tokenizer(input: string): ITokens {
   );
 
   return [...input.matchAll(re)].flatMap(({ groups }) =>
-    Object.entries(groups).map(([key, value]) => {
-      return {
-        type: key.startsWith('operator_group') ? 'operator_group' : key,
-        value,
-      };
-    }),
+    Object.entries(groups).map(([key, value]) => ({
+      type: key.startsWith('operator_group') ? 'operator_group' : key,
+      value,
+    })),
   );
 }
 
@@ -268,14 +266,11 @@ export async function getSuggestions(
           ({ label }) => label === lastToken.value,
         )
           ? Object.keys(language.tokens.operator_compare.literal).map(
-              operator => {
-                return {
-                  type: 'operator_compare',
-                  label: operator,
-                  description:
-                    language.tokens.operator_compare.literal[operator],
-                };
-              },
+              operator => ({
+                type: 'operator_compare',
+                label: operator,
+                description: language.tokens.operator_compare.literal[operator],
+              }),
             )
           : []),
       ];
@@ -289,13 +284,11 @@ export async function getSuggestions(
               operator.startsWith(lastToken.value) &&
               operator !== lastToken.value,
           )
-          .map(operator => {
-            return {
-              type: 'operator_compare',
-              label: operator,
-              description: language.tokens.operator_compare.literal[operator],
-            };
-          }),
+          .map(operator => ({
+            type: 'operator_compare',
+            label: operator,
+            description: language.tokens.operator_compare.literal[operator],
+          })),
         ...(Object.keys(language.tokens.operator_compare.literal).includes(
           lastToken.value,
         )
@@ -338,13 +331,11 @@ export async function getSuggestions(
           })
         ).map(element => mapSuggestionCreatorValue(element)),
         ...Object.entries(language.tokens.conjunction.literal).map(
-          ([conjunction, description]) => {
-            return {
-              type: 'conjunction',
-              label: conjunction,
-              description,
-            };
-          },
+          ([conjunction, description]) => ({
+            type: 'conjunction',
+            label: conjunction,
+            description,
+          }),
         ),
         {
           type: 'operator_group',
@@ -362,13 +353,11 @@ export async function getSuggestions(
               conjunction.startsWith(lastToken.value) &&
               conjunction !== lastToken.value,
           )
-          .map(conjunction => {
-            return {
-              type: 'conjunction',
-              label: conjunction,
-              description: language.tokens.conjunction.literal[conjunction],
-            };
-          }),
+          .map(conjunction => ({
+            type: 'conjunction',
+            label: conjunction,
+            description: language.tokens.conjunction.literal[conjunction],
+          })),
         // fields if the input field is exact
         ...(Object.keys(language.tokens.conjunction.literal).includes(
           lastToken.value,
@@ -396,13 +385,11 @@ export async function getSuggestions(
       } else if (lastToken.value === ')') {
         return (
           // conjunction
-          Object.keys(language.tokens.conjunction.literal).map(conjunction => {
-            return {
-              type: 'conjunction',
-              label: conjunction,
-              description: language.tokens.conjunction.literal[conjunction],
-            };
-          })
+          Object.keys(language.tokens.conjunction.literal).map(conjunction => ({
+            type: 'conjunction',
+            label: conjunction,
+            description: language.tokens.conjunction.literal[conjunction],
+          }))
         );
       }
 
@@ -532,13 +519,11 @@ export const AQL = {
             button={
               <EuiButtonEmpty
                 onClick={() =>
-                  params.setQueryLanguageConfiguration(state => {
-                    return {
-                      ...state,
-                      isOpenPopoverImplicitFilter:
-                        !state.isOpenPopoverImplicitFilter,
-                    };
-                  })
+                  params.setQueryLanguageConfiguration(state => ({
+                    ...state,
+                    isOpenPopoverImplicitFilter:
+                      !state.isOpenPopoverImplicitFilter,
+                  }))
                 }
                 iconType='filter'
               >
@@ -551,12 +536,10 @@ export const AQL = {
               params.queryLanguage.configuration.isOpenPopoverImplicitFilter
             }
             closePopover={() =>
-              params.setQueryLanguageConfiguration(state => {
-                return {
-                  ...state,
-                  isOpenPopoverImplicitFilter: false,
-                };
-              })
+              params.setQueryLanguageConfiguration(state => ({
+                ...state,
+                isOpenPopoverImplicitFilter: false,
+              }))
             }
           >
             <EuiText>
