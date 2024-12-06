@@ -1,19 +1,52 @@
-/* eslint-disable unicorn/no-await-expression-member */
 import React from 'react';
 import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
-type ITokenType =
-  | 'field'
-  | 'operator_compare'
-  | 'operator_group'
-  | 'value'
-  | 'conjunction';
-interface IToken {
-  type: ITokenType;
-  value: string;
+const AQL_ID = 'aql';
+const QUERY_TOKEN_KEYS = {
+  FIELD: 'field',
+  OPERATOR_COMPARE: 'operator_compare',
+  OPERATOR_GROUP: 'operator_group',
+  VALUE: 'value',
+  CONJUNCTION: 'conjunction',
+  FUNCTION_SEARCH: 'function_search',
+} as const;
+
+type TokenTypeEnum = (typeof QUERY_TOKEN_KEYS)[keyof typeof QUERY_TOKEN_KEYS];
+
+const GROUP_OPERATOR_BOUNDARY = {
+  OPEN: 'operator_group_open',
+  CLOSE: 'operator_group_close',
+};
+const OPERATOR_COMPARE = {
+  EQUALITY: '=',
+  NOT_EQUALITY: '!=',
+  BIGGER: '>',
+  SMALLER: '<',
+  LIKE_AS: '~',
+} as const;
+
+type OperatorCompare = (typeof OPERATOR_COMPARE)[keyof typeof OPERATOR_COMPARE];
+
+const OPERATOR_GROUP = {
+  OPEN: '(',
+  CLOSE: ')',
+} as const;
+
+type OperatorGroup = (typeof OPERATOR_GROUP)[keyof typeof OPERATOR_GROUP];
+
+const CONJUNCTION = {
+  AND: ';',
+  OR: ',',
+} as const;
+
+type Conjunction = (typeof CONJUNCTION)[keyof typeof CONJUNCTION];
+
+interface TokenDescriptor {
+  type: TokenTypeEnum;
+  value: OperatorCompare | OperatorGroup | Conjunction;
 }
-type ITokens = IToken[];
+type TokenList = TokenDescriptor[];
 
 /* API Query Language
 Define the API Query Language to use in the search bar.
@@ -31,49 +64,61 @@ Implemented schema:
 */
 
 // Language definition
-export const language = {
+export const LANGUAGE = {
   // Tokens
   tokens: {
-    operator_compare: {
+    [QUERY_TOKEN_KEYS.OPERATOR_COMPARE]: {
       literal: {
-        '=': 'equality',
-        '!=': 'not equality',
-        '>': 'bigger',
-        '<': 'smaller',
-        '~': 'like as',
+        [OPERATOR_COMPARE.EQUALITY]: 'equality',
+        [OPERATOR_COMPARE.NOT_EQUALITY]: 'not equality',
+        [OPERATOR_COMPARE.BIGGER]: 'bigger',
+        [OPERATOR_COMPARE.SMALLER]: 'smaller',
+        [OPERATOR_COMPARE.LIKE_AS]: 'like as',
       },
     },
-    conjunction: {
+    [QUERY_TOKEN_KEYS.CONJUNCTION]: {
       literal: {
-        ';': 'and',
-        ',': 'or',
+        [CONJUNCTION.AND]: 'and',
+        [CONJUNCTION.OR]: 'or',
       },
     },
-    operator_group: {
+    [QUERY_TOKEN_KEYS.OPERATOR_GROUP]: {
       literal: {
-        '(': 'open group',
-        ')': 'close group',
+        [OPERATOR_GROUP.OPEN]: 'open group',
+        [OPERATOR_GROUP.CLOSE]: 'close group',
       },
     },
   },
-};
+} as const;
 
+const OPERATORS = Object.keys(
+  LANGUAGE.tokens.operator_compare.literal,
+) as OperatorCompare[];
+const CONJUNCTIONS = Object.keys(
+  LANGUAGE.tokens.conjunction.literal,
+) as Conjunction[];
 // Suggestion mapper by language token type
-const suggestionMappingLanguageTokenType = {
-  field: { iconType: 'kqlField', color: 'tint4' },
-  operator_compare: { iconType: 'kqlOperand', color: 'tint1' },
-  value: { iconType: 'kqlValue', color: 'tint0' },
-  conjunction: { iconType: 'kqlSelector', color: 'tint3' },
-  operator_group: { iconType: 'tokenDenseVector', color: 'tint3' },
-  function_search: { iconType: 'search', color: 'tint5' },
-};
+const SUGGESTION_MAPPING_LANGUAGE_TOKEN_TYPE = {
+  [QUERY_TOKEN_KEYS.FIELD]: { iconType: 'kqlField', color: 'tint4' },
+  [QUERY_TOKEN_KEYS.OPERATOR_COMPARE]: {
+    iconType: 'kqlOperand',
+    color: 'tint1',
+  },
+  [QUERY_TOKEN_KEYS.VALUE]: { iconType: 'kqlValue', color: 'tint0' },
+  [QUERY_TOKEN_KEYS.CONJUNCTION]: { iconType: 'kqlSelector', color: 'tint3' },
+  [QUERY_TOKEN_KEYS.OPERATOR_GROUP]: {
+    iconType: 'tokenDenseVector',
+    color: 'tint3',
+  },
+  [QUERY_TOKEN_KEYS.FUNCTION_SEARCH]: { iconType: 'search', color: 'tint5' },
+} as const;
 
 /**
  * Creator of intermediate interface of EuiSuggestItem
  * @param type
  * @returns
  */
-function mapSuggestionCreator(type: ITokenType) {
+function mapSuggestionCreator(type: TokenTypeEnum) {
   return function ({ ...params }) {
     return {
       type,
@@ -82,15 +127,15 @@ function mapSuggestionCreator(type: ITokenType) {
   };
 }
 
-const mapSuggestionCreatorField = mapSuggestionCreator('field');
-const mapSuggestionCreatorValue = mapSuggestionCreator('value');
+const mapSuggestionCreatorField = mapSuggestionCreator(QUERY_TOKEN_KEYS.FIELD);
+const mapSuggestionCreatorValue = mapSuggestionCreator(QUERY_TOKEN_KEYS.VALUE);
 
 /**
  * Tokenize the input string. Returns an array with the tokens.
  * @param input
  * @returns
  */
-export function tokenizer(input: string): ITokens {
+export function tokenizer(input: string): TokenList {
   // API regular expression
   // https://github.com/wazuh/wazuh/blob/v4.4.0-rc1/framework/wazuh/core/utils.py#L1242-L1257
   //   self.query_regex = re.compile(
@@ -115,45 +160,42 @@ export function tokenizer(input: string): ITokens {
     // and added the optional operator to allow matching the entities when the query is not
     // completed. This helps to tokenize the query and manage when the input is not completed.
     // A ( character.
-    String.raw`(?<operator_group_open>\()?` +
+    String.raw`(?<${GROUP_OPERATOR_BOUNDARY.OPEN}>\()?` +
       // Field name: name of the field to look on DB.
-      String.raw`(?<field>[\w.]+)?` + // Added an optional find
+      String.raw`(?<${QUERY_TOKEN_KEYS.FIELD}>[\w.]+)?` + // Added an optional find
       // Operator: looks for '=', '!=', '<', '>' or '~'.
       // This seems to be a bug because is not searching the literal valid operators.
       // I guess the operator is validated after the regular expression matches
-      `(?<operator_compare>[${Object.keys(
-        language.tokens.operator_compare.literal,
+      `(?<${QUERY_TOKEN_KEYS.OPERATOR_COMPARE}>[${Object.keys(
+        LANGUAGE.tokens.operator_compare.literal,
       )}]{1,2})?` + // Added an optional find
       // Value: A string.
-      String.raw`(?<value>(?:(?:\((?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\/'"=@%<>{}]*)\))*` +
+      String.raw`(?<${QUERY_TOKEN_KEYS.VALUE}>(?:(?:\((?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\/'"=@%<>{}]*)\))*` +
       String.raw`(?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\\/'"=@%<>{}]+)` +
       String.raw`(?:\((?:\[[\[\]\w _\-.,:?\\/'"=@%<>{}]*]|[\[\]\w _\-.:?\\/'"=@%<>{}]*)\))*)+)?` + // Added an optional find
       // A ) character.
-      String.raw`(?<operator_group_close>\))?` +
-      `(?<conjunction>[${Object.keys(language.tokens.conjunction.literal)}])?`,
+      String.raw`(?<${GROUP_OPERATOR_BOUNDARY.CLOSE}>\))?` +
+      `(?<${QUERY_TOKEN_KEYS.CONJUNCTION}>[${CONJUNCTIONS}])?`,
     'g',
   );
 
   return [...input.matchAll(re)].flatMap(({ groups }) =>
-    Object.entries(groups).map(([key, value]) => ({
-      type: key.startsWith('operator_group') ? 'operator_group' : key,
+    Object.entries(groups || {}).map(([key, value]) => ({
+      type: key.startsWith(QUERY_TOKEN_KEYS.OPERATOR_GROUP)
+        ? QUERY_TOKEN_KEYS.OPERATOR_GROUP
+        : key,
       value,
     })),
-  );
+  ) as TokenList;
 }
 
 interface QLOptionSuggestionEntityItem {
   description?: string;
-  label: string;
+  label?: string;
 }
 
 type QLOptionSuggestionEntityItemTyped = QLOptionSuggestionEntityItem & {
-  type:
-    | 'operator_group'
-    | 'field'
-    | 'operator_compare'
-    | 'value'
-    | 'conjunction';
+  type: TokenTypeEnum;
 };
 
 type SuggestItem = QLOptionSuggestionEntityItem & {
@@ -161,11 +203,8 @@ type SuggestItem = QLOptionSuggestionEntityItem & {
 };
 
 type QLOptionSuggestionHandler = (
-  currentValue: string | undefined,
-  {
-    previousField,
-    previousOperatorCompare,
-  }: { previousField: string; previousOperatorCompare: string },
+  currentValue?: string | undefined,
+  options?: { previousField: string; previousOperatorCompare: string },
 ) => Promise<QLOptionSuggestionEntityItem[]>;
 
 interface OptionsQL {
@@ -181,7 +220,7 @@ interface OptionsQL {
  * @param tokenType token type to search
  * @returns
  */
-function getLastTokenWithValue(tokens: ITokens): IToken | undefined {
+function getLastTokenWithValue(tokens: TokenList): TokenDescriptor | undefined {
   // Reverse the tokens array and use the Array.protorype.find method
   const shallowCopyArray = [...tokens];
   const shallowCopyArrayReversed = shallowCopyArray.reverse();
@@ -197,9 +236,9 @@ function getLastTokenWithValue(tokens: ITokens): IToken | undefined {
  * @returns
  */
 function getLastTokenWithValueByType(
-  tokens: ITokens,
-  tokenType: ITokenType,
-): IToken | undefined {
+  tokens: TokenList,
+  tokenType: TokenTypeEnum,
+): TokenDescriptor | undefined {
   // Find the last token by type
   // Reverse the tokens array and use the Array.protorype.find method
   const shallowCopyArray = [...tokens];
@@ -211,6 +250,31 @@ function getLastTokenWithValueByType(
   return tokenFound;
 }
 
+const getValueSuggestions = async (
+  tokens: TokenDescriptor[],
+  options: OptionsQL,
+  suggestionValue?: string,
+) => {
+  const previousField = (
+    getLastTokenWithValueByType(
+      tokens,
+      QUERY_TOKEN_KEYS.FIELD,
+    ) as TokenDescriptor
+  ).value;
+  const previousOperatorCompare = (
+    getLastTokenWithValueByType(
+      tokens,
+      QUERY_TOKEN_KEYS.OPERATOR_COMPARE,
+    ) as TokenDescriptor
+  ).value;
+  const suggestions = await options.suggestions.value(suggestionValue, {
+    previousField,
+    previousOperatorCompare,
+  });
+
+  return suggestions.map(element => mapSuggestionCreatorValue(element));
+};
+
 /**
  * Get the suggestions from the tokens
  * @param tokens
@@ -219,13 +283,14 @@ function getLastTokenWithValueByType(
  * @returns
  */
 export async function getSuggestions(
-  tokens: ITokens,
+  tokens: TokenList,
   options: OptionsQL,
 ): Promise<QLOptionSuggestionEntityItemTyped[]> {
   if (tokens.length === 0) {
     return [];
   }
 
+  const suggestions = await options.suggestions.field();
   // Get last token
   const lastToken = getLastTokenWithValue(tokens);
 
@@ -233,157 +298,124 @@ export async function getSuggestions(
   if (!lastToken?.type) {
     return [
       // fields
-      ...(await options.suggestions.field()).map((element, index, array) =>
-        mapSuggestionCreatorField(element, index, array),
-      ),
+      ...suggestions.map(element => mapSuggestionCreatorField(element)),
       {
-        type: 'operator_group',
-        label: '(',
-        description: language.tokens.operator_group.literal['('],
+        type: QUERY_TOKEN_KEYS.OPERATOR_GROUP,
+        label: OPERATOR_GROUP.OPEN,
+        description:
+          LANGUAGE.tokens.operator_group.literal[OPERATOR_GROUP.OPEN],
       },
     ];
   }
 
   switch (lastToken.type) {
-    case 'field': {
+    case QUERY_TOKEN_KEYS.FIELD: {
       return [
         // fields that starts with the input but is not equals
-        ...(await options.suggestions.field())
+        ...suggestions
           .filter(
             ({ label }) =>
-              label.startsWith(lastToken.value) && label !== lastToken.value,
+              label?.startsWith(lastToken.value) && label !== lastToken.value,
           )
-          .map((element, index, array) =>
-            mapSuggestionCreatorField(element, index, array),
-          ),
+          .map(element => mapSuggestionCreatorField(element)),
         // operators if the input field is exact
-        ...((await options.suggestions.field()).some(
-          ({ label }) => label === lastToken.value,
-        )
-          ? Object.keys(language.tokens.operator_compare.literal).map(
-              operator => ({
-                type: 'operator_compare',
-                label: operator,
-                description: language.tokens.operator_compare.literal[operator],
-              }),
-            )
+        ...(suggestions.some(({ label }) => label === lastToken.value)
+          ? OPERATORS.map(operator => ({
+              type: QUERY_TOKEN_KEYS.OPERATOR_COMPARE,
+              label: operator,
+              description: LANGUAGE.tokens.operator_compare.literal[operator],
+            }))
           : []),
       ];
     }
 
-    case 'operator_compare': {
+    case QUERY_TOKEN_KEYS.OPERATOR_COMPARE: {
+      const getOperatorSuggestions = async (lastToken: TokenDescriptor) => {
+        const compareOperatorSuggestions = OPERATORS.filter(
+          operator =>
+            operator.startsWith(lastToken.value) &&
+            operator !== lastToken.value,
+        ).map(operator => ({
+          type: QUERY_TOKEN_KEYS.OPERATOR_COMPARE,
+          label: operator,
+          description: LANGUAGE.tokens.operator_compare.literal[operator],
+        }));
+
+        return compareOperatorSuggestions;
+      };
+
       return [
-        ...Object.keys(language.tokens.operator_compare.literal)
-          .filter(
-            operator =>
-              operator.startsWith(lastToken.value) &&
-              operator !== lastToken.value,
-          )
-          .map(operator => ({
-            type: 'operator_compare',
-            label: operator,
-            description: language.tokens.operator_compare.literal[operator],
-          })),
-        ...(Object.keys(language.tokens.operator_compare.literal).includes(
-          lastToken.value,
-        )
-          ? (
-              await options.suggestions.value(undefined, {
-                previousField: (
-                  getLastTokenWithValueByType(tokens, 'field') as IToken
-                ).value,
-                previousOperatorCompare: (
-                  getLastTokenWithValueByType(
-                    tokens,
-                    'operator_compare',
-                  ) as IToken
-                ).value,
-              })
-            ).map(element => mapSuggestionCreatorValue(element))
+        ...(await getOperatorSuggestions(lastToken)),
+        ...(OPERATORS.includes(lastToken.value as OperatorCompare)
+          ? await getValueSuggestions(tokens, options)
           : []),
       ];
     }
 
-    case 'value': {
+    case QUERY_TOKEN_KEYS.VALUE: {
       return [
         ...(lastToken.value
           ? [
               {
-                type: 'function_search',
+                type: QUERY_TOKEN_KEYS.FUNCTION_SEARCH,
                 label: 'Search',
                 description: 'run the search query',
               },
             ]
           : []),
-        ...(
-          await options.suggestions.value(lastToken.value, {
-            previousField: (
-              getLastTokenWithValueByType(tokens, 'field') as IToken
-            ).value,
-            previousOperatorCompare: (
-              getLastTokenWithValueByType(tokens, 'operator_compare') as IToken
-            ).value,
-          })
-        ).map(element => mapSuggestionCreatorValue(element)),
-        ...Object.entries(language.tokens.conjunction.literal).map(
+        ...(await getValueSuggestions(tokens, options, lastToken.value)),
+        ...Object.entries(LANGUAGE.tokens.conjunction.literal).map(
           ([conjunction, description]) => ({
-            type: 'conjunction',
+            type: QUERY_TOKEN_KEYS.CONJUNCTION,
             label: conjunction,
             description,
           }),
         ),
         {
-          type: 'operator_group',
+          type: QUERY_TOKEN_KEYS.OPERATOR_GROUP,
           label: ')',
-          description: language.tokens.operator_group.literal[')'],
+          description: LANGUAGE.tokens.operator_group.literal[')'],
         },
       ];
     }
 
-    case 'conjunction': {
+    case QUERY_TOKEN_KEYS.CONJUNCTION: {
       return [
-        ...Object.keys(language.tokens.conjunction.literal)
-          .filter(
-            conjunction =>
-              conjunction.startsWith(lastToken.value) &&
-              conjunction !== lastToken.value,
-          )
-          .map(conjunction => ({
-            type: 'conjunction',
-            label: conjunction,
-            description: language.tokens.conjunction.literal[conjunction],
-          })),
+        ...CONJUNCTIONS.filter(
+          conjunction =>
+            conjunction.startsWith(lastToken.value) &&
+            conjunction !== lastToken.value,
+        ).map(conjunction => ({
+          type: QUERY_TOKEN_KEYS.CONJUNCTION,
+          label: conjunction,
+          description: LANGUAGE.tokens.conjunction.literal[conjunction],
+        })),
         // fields if the input field is exact
-        ...(Object.keys(language.tokens.conjunction.literal).includes(
-          lastToken.value,
-        )
-          ? (await options.suggestions.field()).map(element =>
-              mapSuggestionCreatorField(element),
-            )
+        ...(CONJUNCTIONS.includes(lastToken.value as Conjunction)
+          ? suggestions.map(element => mapSuggestionCreatorField(element))
           : []),
         {
-          type: 'operator_group',
-          label: '(',
-          description: language.tokens.operator_group.literal['('],
+          type: QUERY_TOKEN_KEYS.OPERATOR_GROUP,
+          label: OPERATOR_GROUP.OPEN,
+          description:
+            LANGUAGE.tokens.operator_group.literal[OPERATOR_GROUP.OPEN],
         },
       ];
     }
 
-    case 'operator_group': {
-      if (lastToken.value === '(') {
+    case QUERY_TOKEN_KEYS.OPERATOR_GROUP: {
+      if (lastToken.value === OPERATOR_GROUP.OPEN) {
         return (
           // fields
-          (await options.suggestions.field()).map(element =>
-            mapSuggestionCreatorField(element),
-          )
+          suggestions.map(element => mapSuggestionCreatorField(element))
         );
       } else if (lastToken.value === ')') {
         return (
           // conjunction
-          Object.keys(language.tokens.conjunction.literal).map(conjunction => ({
-            type: 'conjunction',
+          CONJUNCTIONS.map(conjunction => ({
+            type: QUERY_TOKEN_KEYS.CONJUNCTION,
             label: conjunction,
-            description: language.tokens.conjunction.literal[conjunction],
+            description: LANGUAGE.tokens.conjunction.literal[conjunction],
           }))
         );
       }
@@ -410,7 +442,7 @@ export function transformSuggestionToEuiSuggestItem(
   const { type, ...rest } = suggestion;
 
   return {
-    type: { ...suggestionMappingLanguageTokenType[type] },
+    type: { ...SUGGESTION_MAPPING_LANGUAGE_TOKEN_TYPE[type] },
     ...rest,
   };
 }
@@ -439,16 +471,14 @@ function getOutput(input: string, options: { implicitQuery?: string } = {}) {
   }`;
 
   return {
-    // eslint-disable-next-line no-use-before-define
-    language: AQL.id,
+    language: AQL_ID,
     query: unifiedQuery,
     unifiedQuery,
   };
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const AQL = {
-  id: 'aql',
+  id: AQL_ID,
   label: 'AQL',
   description: 'API Query Language (AQL) allows to do queries.',
   documentationLink: webDocumentationLink('user-manual/api/queries.html'),
@@ -457,9 +487,9 @@ export const AQL = {
       isOpenPopoverImplicitFilter: false,
     };
   },
-  async run(input, params) {
+  async run(input: string, params) {
     // Get the tokens from the input
-    const tokens: ITokens = tokenizer(input);
+    const tokens: TokenList = tokenizer(input);
 
     return {
       searchBarProps: {
@@ -469,7 +499,7 @@ export const AQL = {
           await getSuggestions(tokens, params.queryLanguage.parameters),
         ),
         // Handler to manage when clicking in a suggestion item
-        onItemClick: currentInput => item => {
+        onItemClick: (currentInput: string) => item => {
           // When the clicked item has the `search` iconType, run the `onSearch` function
           if (item.type.iconType === 'search') {
             // Execute the search action
@@ -478,22 +508,26 @@ export const AQL = {
             );
           } else {
             // When the clicked item has another iconType
-            const lastToken: IToken = getLastTokenWithValue(tokens);
+            const lastToken = getLastTokenWithValue(tokens);
 
             // if the clicked suggestion is of same type of last token
             if (
               lastToken &&
-              suggestionMappingLanguageTokenType[lastToken.type].iconType ===
-                item.type.iconType
+              SUGGESTION_MAPPING_LANGUAGE_TOKEN_TYPE[lastToken.type]
+                .iconType === item.type.iconType
             ) {
               // replace the value of last token
               lastToken.value = item.label;
             } else {
               // add a new token of the selected type and value
+              const type = Object.entries(
+                SUGGESTION_MAPPING_LANGUAGE_TOKEN_TYPE,
+              ).find(
+                ([, { iconType }]) => iconType === item.type.iconType,
+              )?.[0] as TokenTypeEnum;
+
               tokens.push({
-                type: Object.entries(suggestionMappingLanguageTokenType).find(
-                  ([, { iconType }]) => iconType === item.type.iconType,
-                )[0],
+                type,
                 value: item.label,
               });
             }
