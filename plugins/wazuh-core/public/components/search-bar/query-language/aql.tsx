@@ -34,7 +34,6 @@ Implemented schema:
 export const language = {
   // Tokens
   tokens: {
-    // eslint-disable-next-line camelcase
     operator_compare: {
       literal: {
         '=': 'equality',
@@ -50,7 +49,6 @@ export const language = {
         ',': 'or',
       },
     },
-    // eslint-disable-next-line camelcase
     operator_group: {
       literal: {
         '(': 'open group',
@@ -63,13 +61,10 @@ export const language = {
 // Suggestion mapper by language token type
 const suggestionMappingLanguageTokenType = {
   field: { iconType: 'kqlField', color: 'tint4' },
-  // eslint-disable-next-line camelcase
   operator_compare: { iconType: 'kqlOperand', color: 'tint1' },
   value: { iconType: 'kqlValue', color: 'tint0' },
   conjunction: { iconType: 'kqlSelector', color: 'tint3' },
-  // eslint-disable-next-line camelcase
   operator_group: { iconType: 'tokenDenseVector', color: 'tint3' },
-  // eslint-disable-next-line camelcase
   function_search: { iconType: 'search', color: 'tint5' },
 };
 
@@ -294,14 +289,15 @@ export async function getSuggestions(
         )
           ? (
               await options.suggestions.value(undefined, {
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                previousField: getLastTokenWithValueByType(tokens, 'field')!
-                  .value,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                previousOperatorCompare: getLastTokenWithValueByType(
-                  tokens,
-                  'operator_compare',
-                )!.value,
+                previousField: (
+                  getLastTokenWithValueByType(tokens, 'field') as IToken
+                ).value,
+                previousOperatorCompare: (
+                  getLastTokenWithValueByType(
+                    tokens,
+                    'operator_compare',
+                  ) as IToken
+                ).value,
               })
             ).map(element => mapSuggestionCreatorValue(element))
           : []),
@@ -321,13 +317,12 @@ export async function getSuggestions(
           : []),
         ...(
           await options.suggestions.value(lastToken.value, {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            previousField: getLastTokenWithValueByType(tokens, 'field')!.value,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            previousOperatorCompare: getLastTokenWithValueByType(
-              tokens,
-              'operator_compare',
-            )!.value,
+            previousField: (
+              getLastTokenWithValueByType(tokens, 'field') as IToken
+            ).value,
+            previousOperatorCompare: (
+              getLastTokenWithValueByType(tokens, 'operator_compare') as IToken
+            ).value,
           })
         ).map(element => mapSuggestionCreatorValue(element)),
         ...Object.entries(language.tokens.conjunction.literal).map(
