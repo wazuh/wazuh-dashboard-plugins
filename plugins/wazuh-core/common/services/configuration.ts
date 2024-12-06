@@ -164,9 +164,7 @@ export interface IConfiguration {
 
 export class Configuration implements IConfiguration {
   store: IConfigurationStore | null = null;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   _settings: Map<string, Record<string, TConfigurationSetting>>;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   _categories: Map<string, Record<string, any>>;
 
   constructor(

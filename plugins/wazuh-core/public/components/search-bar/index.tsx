@@ -68,7 +68,6 @@ export const SearchBar = ({
   const debounceUpdateSearchBarTimer = useRef();
 
   // Handler when searching
-  // eslint-disable-next-line @typescript-eslint/naming-convention
   const _onSearch = (output: any) => {
     // TODO: fix when searching
     onSearch(output);
