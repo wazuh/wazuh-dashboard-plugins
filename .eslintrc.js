@@ -356,5 +356,14 @@ module.exports = {
         ],
       },
     },
+    {
+      files: ['plugins/**/*.test.{js,jsx,ts,tsx}'],
+      rules: {
+        '@typescript-eslint/no-empty-function': [
+          'error',
+          { allow: ['arrowFunctions'] },
+        ],
+      },
+    },
   ],
 };
