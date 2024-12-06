@@ -23,21 +23,17 @@ describe('SearchBar component', () => {
           },
         },
         suggestions: {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          field(currentValue) {
+          field(_currentValue) {
             return [];
           },
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          value(currentValue, { field }) {
+          value(_currentValue, { field: _field }) {
             return [];
           },
         },
       },
     ],
-    /* eslint-disable @typescript-eslint/no-empty-function */
     onChange: () => {},
     onSearch: () => {},
-    /* eslint-enable @typescript-eslint/no-empty-function */
   };
 
   it('Renders correctly to match the snapshot of query language', async () => {
@@ -54,7 +50,6 @@ function tokenCreator({ type, value, formattedValue }) {
   return { type, value, ...(formattedValue ? { formattedValue } : {}) };
 }
 
-/* eslint-disable max-len */
 describe('Query language - WQL', () => {
   const t = {
     opGroup: (value?) => tokenCreator({ type: 'operator_group', value }),
@@ -150,8 +145,7 @@ describe('Query language - WQL', () => {
       await getSuggestions(tokenizer(input), {
         id: 'aql',
         suggestions: {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          field(currentValue) {
+          field(_currentValue) {
             return [
               { label: 'field', description: 'Field' },
               { label: 'field2', description: 'Field2' },
