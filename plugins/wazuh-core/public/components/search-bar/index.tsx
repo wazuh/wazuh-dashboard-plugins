@@ -168,7 +168,6 @@ export const SearchBar = ({
         value={input}
         onChange={onChangeInput}
         onKeyPress={onKeyPressHandler}
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         onInputChange={() => {}} /* This method is run by EuiSuggest when there is a change in
                                   a div wrapper of the input and should be defined. Defining this
                                   property prevents an error. */
