@@ -263,6 +263,11 @@ module.exports = {
           {
             selector: ['variable'],
             modifiers: ['global'],
+            format: ['UPPER_CASE', 'camelCase', 'PascalCase'],
+          },
+          {
+            selector: ['variable'],
+            modifiers: ['global'],
             types: ['boolean', 'number', 'string'],
             format: ['UPPER_CASE'],
           },
