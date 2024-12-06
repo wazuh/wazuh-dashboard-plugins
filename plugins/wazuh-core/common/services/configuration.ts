@@ -153,8 +153,8 @@ export interface TConfigurationSettingCategory {
   documentationLink?: string;
   renderOrder?: number;
 }
-
 type TConfigurationSettings = Record<string, any>;
+
 export interface IConfigurationStore {
   setup: () => Promise<any>;
   start: () => Promise<any>;
@@ -417,13 +417,12 @@ export class Configuration implements IConfiguration {
     if (settings.length > 0) {
       this.logger.debug(`Reset settings: ${settings.join(', ')}`);
 
-      // eslint-disable-next-line unicorn/no-array-reduce
-      const updatedSettings = settings.reduce((accum, settingKey: string) => {
-        return {
-          ...accum,
-          [settingKey]: this.getSettingValue(settingKey),
-        };
-      }, {});
+      const updatedSettings = Object.fromEntries(
+        settings.map((settingKey: string) => [
+          settingKey,
+          this.getSettingValue(settingKey),
+        ]),
+      );
       const responseStore = await this.store.set(updatedSettings);
 
       this.logger.info('Settings were reset');
@@ -536,48 +535,44 @@ export class Configuration implements IConfiguration {
   }
 
   groupSettingsByCategory(
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    _settings: string[] | null = null,
+    settings: string[] | null = null,
     filterFunction:
       | ((setting: TConfigurationSettingWithKey) => boolean)
       | null = null,
   ) {
-    const settings = (
-      _settings && Array.isArray(_settings)
+    const settingsMapped = (
+      settings && Array.isArray(settings)
         ? [...this._settings.entries()].filter(([key]) =>
-            _settings.includes(key),
+            settings.includes(key),
           )
         : [...this._settings.entries()]
-    ).map(([key, value]) => {
-      return {
-        ...value,
-        key,
-      };
-    });
+    ).map(([key, value]) => ({
+      ...value,
+      key,
+    }));
     const settingsSortedByCategories = (
       filterFunction
-        ? settings.filter(element => filterFunction(element))
-        : settings
+        ? settingsMapped.filter(element => filterFunction(element))
+        : settingsMapped
     )
       .sort((settingA, settingB) => settingA.key?.localeCompare?.(settingB.key))
       // eslint-disable-next-line unicorn/no-array-reduce
-      .reduce((accum, pluginSettingConfiguration) => {
-        return {
+      .reduce(
+        (accum, pluginSettingConfiguration) => ({
           ...accum,
           [pluginSettingConfiguration.category]: [
             ...(accum[pluginSettingConfiguration.category] || []),
             { ...pluginSettingConfiguration },
           ],
-        };
-      }, {});
+        }),
+        {},
+      );
 
     return Object.entries(settingsSortedByCategories)
-      .map(([category, settings]) => {
-        return {
-          category: this._categories.get(String(category)),
-          settings,
-        };
-      })
+      .map(([category, settings]) => ({
+        category: this._categories.get(String(category)),
+        settings,
+      }))
       .filter(categoryEntry => categoryEntry.settings.length);
   }
 }
