@@ -61,7 +61,6 @@ const language = {
         or: 'or',
       },
     },
-    // eslint-disable-next-line camelcase
     operator_group: {
       literal: {
         '(': 'open group',
@@ -81,15 +80,11 @@ const language = {
 // Suggestion mapper by language token type
 const suggestionMappingLanguageTokenType = {
   field: { iconType: 'kqlField', color: 'tint4' },
-  // eslint-disable-next-line camelcase
   operator_compare: { iconType: 'kqlOperand', color: 'tint1' },
   value: { iconType: 'kqlValue', color: 'tint0' },
   conjunction: { iconType: 'kqlSelector', color: 'tint3' },
-  // eslint-disable-next-line camelcase
   operator_group: { iconType: 'tokenDenseVector', color: 'tint3' },
-  // eslint-disable-next-line camelcase
   function_search: { iconType: 'search', color: 'tint5' },
-  // eslint-disable-next-line camelcase
   validation_error: { iconType: 'alert', color: 'tint2' },
 };
 
