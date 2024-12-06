@@ -11,6 +11,8 @@ https://documentation.wazuh.com/current/user-manual/api/queries.html
 // Example of another query language definition
 */
 
+const WQL_ID = 'wql';
+
 type ITokenType =
   | 'field'
   | 'operator_compare'
@@ -725,8 +727,7 @@ function getOutput(input: string, options: OptionsQL) {
   );
 
   return {
-    // eslint-disable-next-line no-use-before-define
-    language: WQL.id,
+    language: WQL_ID,
     apiQuery: {
       q: [
         implicitQueryAsUQL,
