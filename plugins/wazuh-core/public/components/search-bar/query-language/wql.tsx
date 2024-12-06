@@ -1137,19 +1137,21 @@ export const WQL = {
             } else {
               // add a whitespace for conjunction <whitespace><conjunction>
               // add a whitespace for grouping operator <whitespace>)
-              // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-              !/\s$/.test(input) &&
+              if (
+                !/\s$/.test(input) &&
                 (item.type.iconType ===
                   suggestionMappingLanguageTokenType.conjunction.iconType ||
                   lastToken?.type === 'conjunction' ||
                   (item.type.iconType ===
                     suggestionMappingLanguageTokenType.operator_group
                       .iconType &&
-                    item.label === ')')) &&
+                    item.label === ')'))
+              ) {
                 tokens.push({
                   type: 'whitespace',
                   value: ' ',
                 });
+              }
 
               // add a new token of the selected type and value
               tokens.push({
