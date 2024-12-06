@@ -38,12 +38,10 @@ export function ExportTableCsv({
     try {
       const { endpoint, filters } = fetchContext;
       const formattedFilters = Object.entries(filters || []).map(
-        ([name, value]) => {
-          return {
-            name,
-            value,
-          };
-        },
+        ([name, value]) => ({
+          name,
+          value,
+        }),
       );
 
       showToast({

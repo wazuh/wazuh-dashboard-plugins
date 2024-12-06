@@ -30,8 +30,8 @@ export function ServerTableData<T>({
         props.showSearchBar &&
         (({ tableColumns, ...rest }) => {
           /* Render search bar*/
-          const searchBarWQLOptions = useMemo(() => {
-            return {
+          const searchBarWQLOptions = useMemo(
+            () => ({
               searchTermFields: tableColumns
                 .filter(
                   ({ field, searchable }) =>
@@ -41,8 +41,9 @@ export function ServerTableData<T>({
                   [composeField || field].flat(),
                 ),
               ...rest?.searchBarWQL?.options,
-            };
-          }, [rest?.searchBarWQL?.options, rest?.selectedFields]);
+            }),
+            [rest?.searchBarWQL?.options, rest?.selectedFields],
+          );
 
           return (
             <>
