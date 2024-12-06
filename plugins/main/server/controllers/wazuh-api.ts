@@ -32,6 +32,7 @@ import {
   version as pluginVersion,
   revision as pluginRevision,
 } from '../../package.json';
+import { WAZUH_ERROR_DAEMONS_NOT_READY } from '../../../wazuh-core/common/constants';
 
 export class WazuhApiCtrl {
   async getToken(
@@ -156,7 +157,7 @@ export class WazuhApiCtrl {
       // Look for socket-related errors
       if (this.checkResponseIsDown(context, responseManagerInfo)) {
         return ErrorResponse(
-          `ERROR3099 - ${
+          `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
             responseManagerInfo.data.detail || 'Server not ready yet'
           }`,
           3099,
@@ -289,7 +290,7 @@ export class WazuhApiCtrl {
 
               if (this.checkResponseIsDown(context, responseManagerInfo)) {
                 return ErrorResponse(
-                  `ERROR3099 - ${
+                  `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
                     response.data.detail || 'Server not ready yet'
                   }`,
                   3099,
@@ -412,7 +413,7 @@ export class WazuhApiCtrl {
           );
       } catch (error) {
         return ErrorResponse(
-          `ERROR3099 - ${
+          `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${
             error.response?.data?.detail || 'Server not ready yet'
           }`,
           3099,
@@ -662,7 +663,7 @@ export class WazuhApiCtrl {
             );
 
             return ErrorResponse(
-              `ERROR3099 - ${error.message || 'Server not ready yet'}`,
+              `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${error.message || 'Server not ready yet'}`,
               3099,
               HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
               response,
@@ -684,7 +685,7 @@ export class WazuhApiCtrl {
 
       if (responseIsDown) {
         return ErrorResponse(
-          `ERROR3099 - ${response.body.message || 'Server not ready yet'}`,
+          `${WAZUH_ERROR_DAEMONS_NOT_READY} - ${response.body.message || 'Server not ready yet'}`,
           3099,
           HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
           response,
