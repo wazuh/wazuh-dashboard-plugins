@@ -1,6 +1,12 @@
 import React from 'react';
 
-// eslint-disable-next-line @typescript-eslint/naming-convention, react/display-name
-export const withServices = services => WrappedComponent => props => (
-  <WrappedComponent {...props} {...services} />
-);
+export const withServices =
+  services => (WrappedComponent: React.ElementType) => {
+    const ComponentWithServices = (props: any) => (
+      <WrappedComponent {...props} {...services} />
+    );
+
+    ComponentWithServices.displayName = `WithServices(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+
+    return ComponentWithServices;
+  };
