@@ -55,7 +55,7 @@ module.exports = {
           },
           {
             selector:
-              'MemberExpression > LogicalExpression[operator="||"]:has(Identifier)',
+              'MemberExpression > LogicalExpression[operator="||"]:has(Identifier):has(ObjectExpression[properties.length=0])',
             message: 'Use optional chaining operator instead (?.).',
           },
         ],
