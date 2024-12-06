@@ -202,7 +202,7 @@ export class WzRequest implements HTTPClientServer {
       if (hasFailed) {
         const error = response?.data?.data?.failed_items?.[0]?.error || {};
         const failedIds = response?.data?.data?.failed_items?.[0]?.id || {};
-        const message = (response.data || {}).message || 'Unexpected error';
+        const message = response.data?.message || 'Unexpected error';
         const errorMessage = `${message} (${error.code}) - ${error.message} ${
           failedIds && failedIds.length > 1
             ? ` Affected ids: ${failedIds} `
@@ -285,7 +285,7 @@ export class WzRequest implements HTTPClientServer {
         idHost,
         force,
       });
-      const token = ((response || {}).data || {}).token;
+      const token = response?.data?.token;
 
       return token as string;
     } catch (error) {
@@ -461,8 +461,7 @@ export class WzRequest implements HTTPClientServer {
         // TODO: implement
         // const wzMisc = new WzMisc();
         // wzMisc.setApiIsDown(true);
-        const response: string =
-          (error.response.data || {}).message || error.message;
+        const response: string = error.response.data?.message || error.message;
 
         throw this.returnErrorInstance(response);
       } else {
@@ -501,7 +500,7 @@ export class WzRequest implements HTTPClientServer {
       return response;
     } catch (error) {
       if (error.response) {
-        const response = (error.response.data || {}).message || error.message;
+        const response = error.response.data?.message || error.message;
 
         throw this.returnErrorInstance(response);
       } else {
