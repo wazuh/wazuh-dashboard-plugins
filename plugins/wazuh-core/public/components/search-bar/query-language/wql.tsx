@@ -980,7 +980,6 @@ function validate(
   return undefined;
 }
 
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export const WQL = {
   id: 'wql',
   label: 'WQL',
