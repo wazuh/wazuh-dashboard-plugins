@@ -126,13 +126,11 @@ export const SearchBar = ({
           closeSuggestionPopover: () => setIsOpenSuggestionPopover(false),
           openSuggestionPopover: () => setIsOpenSuggestionPopover(true),
           setQueryLanguageConfiguration: (configuration: any) =>
-            setQueryLanguage(state => {
-              return {
-                ...state,
-                configuration:
-                  configuration?.(state.configuration) || configuration,
-              };
-            }),
+            setQueryLanguage(state => ({
+              ...state,
+              configuration:
+                configuration?.(state.configuration) || configuration,
+            })),
           setQueryLanguageOutput: setQueryLanguageOutputRun,
           inputRef,
           queryLanguage: {
@@ -221,12 +219,10 @@ export const SearchBar = ({
                   <EuiFormRow label='Select a query language' fullWidth>
                     <EuiSelect
                       id='query-language-selector'
-                      options={modes.map(({ id }) => {
-                        return {
-                          value: id,
-                          text: searchBarQueryLanguages[id].label,
-                        };
-                      })}
+                      options={modes.map(({ id }) => ({
+                        value: id,
+                        text: searchBarQueryLanguages[id].label,
+                      }))}
                       value={queryLanguage.id}
                       onChange={(
                         event: React.ChangeEvent<HTMLSelectElement>,
