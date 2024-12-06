@@ -46,7 +46,6 @@ Implemented schema:
 const language = {
   // Tokens
   tokens: {
-    // eslint-disable-next-line camelcase
     operator_compare: {
       literal: {
         '=': 'equality',

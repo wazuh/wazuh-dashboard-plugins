@@ -65,7 +65,6 @@ export class WzRequest implements HTTPClientServer {
   private async requestInternal(
     method: HTTPVerb,
     path: string,
-    // eslint-disable-next-line default-param-last
     payload: any = null,
     options: RequestInternalOptions,
   ): Promise<any> {
