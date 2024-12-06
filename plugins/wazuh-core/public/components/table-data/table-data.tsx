@@ -358,9 +358,7 @@ export function TableData<T>({
           ref={tableRef}
           columns={tableColumns.map(
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            ({ searchable, show, composeField, ...rest }) => {
-              return { ...rest };
-            },
+            ({ searchable, show, composeField, ...rest }) => ({ ...rest }),
           )}
           items={items}
           loading={isLoading}
