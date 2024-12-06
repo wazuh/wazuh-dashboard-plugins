@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { SearchBar } from '../index';
@@ -13,21 +12,17 @@ describe('SearchBar component', () => {
         id: AQL.id,
         implicitQuery: 'id!=000;',
         suggestions: {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          field(currentValue) {
+          field(_currentValue) {
             return [];
           },
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          value(currentValue, { previousField }) {
+          value(_currentValue, { previousField: _previousField }) {
             return [];
           },
         },
       },
     ],
-    /* eslint-disable @typescript-eslint/no-empty-function */
     onChange: () => {},
     onSearch: () => {},
-    /* eslint-enable @typescript-eslint/no-empty-function */
   };
 
   it('Renders correctly to match the snapshot of query language', async () => {
@@ -95,8 +90,7 @@ describe('Query language - AQL', () => {
       await getSuggestions(tokenizer(input), {
         id: 'aql',
         suggestions: {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          field(currentValue) {
+          field(_currentValue) {
             return [
               { label: 'field', description: 'Field' },
               { label: 'field2', description: 'Field2' },
@@ -212,8 +206,8 @@ describe('Query language - AQL', () => {
     ${'(field=value,field2>value2)'} | ${'(field=value,field2>value2)'}
   `(
     'Transform the external input UQL to QL - UQL $UQL => $AQL',
-    async ({ UQL, AQL: changedInput }) => {
-      expect(AQL.transformUQLToQL(UQL)).toEqual(changedInput);
+    async ({ UQL: uql, AQL: changedInput }) => {
+      expect(AQL.transformUQLToQL(uql)).toEqual(changedInput);
     },
   );
 });

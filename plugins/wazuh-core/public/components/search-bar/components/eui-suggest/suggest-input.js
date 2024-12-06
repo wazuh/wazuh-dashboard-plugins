@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
@@ -47,7 +46,6 @@ export class EuiSuggestInput extends Component {
       append,
       tooltipContent,
       suggestions,
-      sendValue,
       onPopoverFocus,
       isPopoverOpen,
       onClosePopover,
