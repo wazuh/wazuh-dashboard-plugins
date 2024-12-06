@@ -243,7 +243,7 @@ interface OptionsQL {
 }
 
 export interface ISearchBarModeWQL extends OptionsQL {
-  id: 'wql';
+  id: typeof WQL_ID;
 }
 
 /**
