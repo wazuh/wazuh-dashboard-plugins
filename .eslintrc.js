@@ -210,6 +210,7 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                             @typescript-eslint                             */
         /* -------------------------------------------------------------------------- */
+        '@typescript-eslint/no-dynamic-delete': 'off',
         '@typescript-eslint/no-unused-vars': [
           'error',
           {
@@ -244,30 +245,12 @@ module.exports = {
           'error',
           {
             selector: 'default',
-            format: ['camelCase'],
+            format: ['camelCase', 'PascalCase'],
             leadingUnderscore: 'allow',
-          },
-          { selector: 'import', format: ['camelCase', 'PascalCase'] },
-          {
-            selector: 'variable',
-            format: ['camelCase', 'PascalCase'],
-          },
-          {
-            selector: 'variable',
-            types: ['function'],
-            format: ['camelCase', 'PascalCase'],
-          },
-          {
-            selector: 'function',
-            format: ['camelCase', 'PascalCase'],
           },
           {
             selector: ['objectLiteralProperty', 'typeProperty'],
             format: null,
-          },
-          {
-            selector: ['objectLiteralMethod', 'typeMethod'],
-            format: ['camelCase', 'PascalCase'],
           },
           {
             selector: ['class', 'interface', 'typeLike'],
@@ -375,6 +358,7 @@ module.exports = {
           'error',
           { allow: ['arrowFunctions'] },
         ],
+        '@typescript-eslint/no-unused-vars': 'off',
       },
     },
   ],

@@ -356,8 +356,12 @@ export function TableData<T>({
         <EuiBasicTable
           ref={tableRef}
           columns={tableColumns.map(
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            ({ searchable, show, composeField, ...rest }) => ({ ...rest }),
+            ({
+              searchable: _searchable,
+              show: _show,
+              composeField: _composeField,
+              ...rest
+            }) => ({ ...rest }),
           )}
           items={items}
           loading={isLoading}
