@@ -90,7 +90,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
           key: 'ip',
           value: agent.ip,
           label: 'IP address',
-          style: { minWidth: 80 },
+          style: { minWidth: 100, maxWidth: 100 },
           condensed: true,
         },
         {
