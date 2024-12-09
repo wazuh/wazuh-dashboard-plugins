@@ -105,7 +105,7 @@ const VulsPanelContent = ({ agent }) => {
     const severityColor = severities[severity].color;
     return (
       <EuiFlexItem key={index}>
-        <EuiPanel paddingSize='s'>
+        <EuiPanel paddingSize='m'>
           <EuiFlexGroup className='h-100' gutterSize='none' alignItems='center'>
             <EuiFlexItem>
               <WzLink
@@ -126,6 +126,7 @@ const VulsPanelContent = ({ agent }) => {
                   value={`${getSeverityValue(severityLabel)}`}
                   color={severityColor}
                   isLoading={isLoading || isDataSourceLoading}
+                  textAlign='left'
                 />
               </WzLink>
             </EuiFlexItem>

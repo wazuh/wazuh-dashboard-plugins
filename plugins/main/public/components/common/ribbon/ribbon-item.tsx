@@ -24,6 +24,7 @@ export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   style?: React.CSSProperties;
   isLoading?: boolean;
   icon?: React.ReactNode;
+  condensed?: boolean;
 };
 
 const isGroups = (

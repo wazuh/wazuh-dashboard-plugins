@@ -17,6 +17,9 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -1467,6 +1470,9 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
@@ -2951,6 +2957,9 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -4426,6 +4435,9 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -5876,6 +5888,9 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
@@ -7360,6 +7375,9 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -8835,6 +8853,9 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -10285,6 +10306,9 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
@@ -11769,6 +11793,9 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -13244,6 +13271,9 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -13958,6 +13988,9 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
@@ -14821,6 +14854,9 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -15561,6 +15597,9 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         style="responsive:"
       >
         <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
           style="max-width:100px"
@@ -16252,6 +16291,9 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
@@ -16945,6 +16987,9 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
@@ -17922,6 +17967,9 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         data-test-subj="syscollector-metrics"
         style="responsive:"
       >
+        <div
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
         <div
           class="euiFlexItem wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
