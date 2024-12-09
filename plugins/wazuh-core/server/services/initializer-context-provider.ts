@@ -16,6 +16,19 @@ export class InitializerConfigProvider implements IConfigurationProvider {
   }
 
   async get(key: keyof CorePluginConfigType): Promise<CorePluginConfigType[keyof CorePluginConfigType]> {
+    if (!this.config){
+      await this.initializeConfig();
+    }
+    if (!this.config[key]) {
+      throw new Error(`Key ${key} not found`);
+    }
     return this.config[key];
+  }
+
+  async getAll(): Promise<CorePluginConfigType> {
+    if (!this.config){
+      await this.initializeConfig();
+    }
+    return this.config;
   }
 }
