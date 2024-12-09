@@ -1,4 +1,4 @@
-export const pluginPlatformRequestHeaders = {
+export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'osd-xsrf': 'kibana',
 };
 

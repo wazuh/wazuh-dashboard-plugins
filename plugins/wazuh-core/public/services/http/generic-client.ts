@@ -1,5 +1,5 @@
 import { Logger } from '../../../common/services/configuration';
-import { pluginPlatformRequestHeaders } from './constants';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from './constants';
 import {
   HTTPClientGeneric,
   HTTPClientRequestInterceptor,
@@ -36,7 +36,7 @@ export class GenericRequest implements HTTPClientGeneric {
 
       const timeout = await this.services.getTimeout();
       const requestHeaders = {
-        ...pluginPlatformRequestHeaders,
+        ...PLUGIN_PLATFORM_REQUEST_HEADERS,
         'content-type': 'application/json',
       };
       const url = this.services.getURL(path);

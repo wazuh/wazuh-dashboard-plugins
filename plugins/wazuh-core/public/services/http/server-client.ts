@@ -19,7 +19,7 @@ import {
   WzRequestServices,
   ServerAPIResponseItemsDataHTTPClient,
 } from './types';
-import { pluginPlatformRequestHeaders } from './constants';
+import { PLUGIN_PLATFORM_REQUEST_HEADERS } from './constants';
 
 interface RequestInternalOptions {
   shouldRetry?: boolean;
@@ -85,7 +85,7 @@ export class WzRequest implements HTTPClientServer {
       const options = {
         method: method,
         headers: {
-          ...pluginPlatformRequestHeaders,
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
           'content-type': 'application/json',
           ...overwriteHeaders,
         },
@@ -441,7 +441,7 @@ export class WzRequest implements HTTPClientServer {
       const options = {
         method: 'POST',
         headers: {
-          ...pluginPlatformRequestHeaders,
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
           'content-type': 'application/json',
         },
         url: url,
@@ -483,7 +483,7 @@ export class WzRequest implements HTTPClientServer {
       const options = {
         method: 'POST',
         headers: {
-          ...pluginPlatformRequestHeaders,
+          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
           'content-type': 'application/json',
         },
         url: url,
