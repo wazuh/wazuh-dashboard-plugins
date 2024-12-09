@@ -1,6 +1,17 @@
 import React from 'react';
 import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { OmitStrict } from '../../../../common/types';
+import {
+  CONJUNCTION,
+  Conjunction,
+  GROUP_OPERATOR_BOUNDARY,
+  ICON_TYPE,
+  OPERATOR_COMPARE,
+  OPERATOR_GROUP,
+  OperatorCompare,
+  OperatorGroup,
+} from './constants';
 
 const AQL_ID = 'aql';
 const QUERY_TOKEN_KEYS = {
@@ -12,35 +23,10 @@ const QUERY_TOKEN_KEYS = {
   FUNCTION_SEARCH: 'function_search',
 } as const;
 
-type TokenTypeEnum = (typeof QUERY_TOKEN_KEYS)[keyof typeof QUERY_TOKEN_KEYS];
-
-const GROUP_OPERATOR_BOUNDARY = {
-  OPEN: 'operator_group_open',
-  CLOSE: 'operator_group_close',
-};
-const OPERATOR_COMPARE = {
-  EQUALITY: '=',
-  NOT_EQUALITY: '!=',
-  BIGGER: '>',
-  SMALLER: '<',
-  LIKE_AS: '~',
-} as const;
-
-type OperatorCompare = (typeof OPERATOR_COMPARE)[keyof typeof OPERATOR_COMPARE];
-
-const OPERATOR_GROUP = {
-  OPEN: '(',
-  CLOSE: ')',
-} as const;
-
-type OperatorGroup = (typeof OPERATOR_GROUP)[keyof typeof OPERATOR_GROUP];
-
-const CONJUNCTION = {
-  AND: ';',
-  OR: ',',
-} as const;
-
-type Conjunction = (typeof CONJUNCTION)[keyof typeof CONJUNCTION];
+type TokenTypeEnum = (typeof QUERY_TOKEN_KEYS)[keyof OmitStrict<
+  typeof QUERY_TOKEN_KEYS,
+  'FUNCTION_SEARCH'
+>];
 
 interface TokenDescriptor {
   type: TokenTypeEnum;
@@ -99,18 +85,24 @@ const CONJUNCTIONS = Object.keys(
 ) as Conjunction[];
 // Suggestion mapper by language token type
 const SUGGESTION_MAPPING_LANGUAGE_TOKEN_TYPE = {
-  [QUERY_TOKEN_KEYS.FIELD]: { iconType: 'kqlField', color: 'tint4' },
+  [QUERY_TOKEN_KEYS.FIELD]: { iconType: ICON_TYPE.KQL_FIELD, color: 'tint4' },
   [QUERY_TOKEN_KEYS.OPERATOR_COMPARE]: {
-    iconType: 'kqlOperand',
+    iconType: ICON_TYPE.KQL_OPERAND,
     color: 'tint1',
   },
-  [QUERY_TOKEN_KEYS.VALUE]: { iconType: 'kqlValue', color: 'tint0' },
-  [QUERY_TOKEN_KEYS.CONJUNCTION]: { iconType: 'kqlSelector', color: 'tint3' },
-  [QUERY_TOKEN_KEYS.OPERATOR_GROUP]: {
-    iconType: 'tokenDenseVector',
+  [QUERY_TOKEN_KEYS.VALUE]: { iconType: ICON_TYPE.KQL_VALUE, color: 'tint0' },
+  [QUERY_TOKEN_KEYS.CONJUNCTION]: {
+    iconType: ICON_TYPE.KQL_SELECTOR,
     color: 'tint3',
   },
-  [QUERY_TOKEN_KEYS.FUNCTION_SEARCH]: { iconType: 'search', color: 'tint5' },
+  [QUERY_TOKEN_KEYS.OPERATOR_GROUP]: {
+    iconType: ICON_TYPE.TOKEN_DENSE_VECTOR,
+    color: 'tint3',
+  },
+  [QUERY_TOKEN_KEYS.FUNCTION_SEARCH]: {
+    iconType: ICON_TYPE.SEARCH,
+    color: 'tint5',
+  },
 } as const;
 
 /**
@@ -373,8 +365,9 @@ export async function getSuggestions(
         ),
         {
           type: QUERY_TOKEN_KEYS.OPERATOR_GROUP,
-          label: ')',
-          description: LANGUAGE.tokens.operator_group.literal[')'],
+          label: OPERATOR_GROUP.CLOSE,
+          description:
+            LANGUAGE.tokens.operator_group.literal[OPERATOR_GROUP.CLOSE],
         },
       ];
     }
@@ -409,7 +402,7 @@ export async function getSuggestions(
           // fields
           suggestions.map(element => mapSuggestionCreatorField(element))
         );
-      } else if (lastToken.value === ')') {
+      } else if (lastToken.value === OPERATOR_GROUP.CLOSE) {
         return (
           // conjunction
           CONJUNCTIONS.map(conjunction => ({
@@ -487,7 +480,7 @@ export const AQL = {
       isOpenPopoverImplicitFilter: false,
     };
   },
-  async run(input: string, params) {
+  async run(input: string, params: any) {
     // Get the tokens from the input
     const tokens: TokenList = tokenizer(input);
 
@@ -501,7 +494,7 @@ export const AQL = {
         // Handler to manage when clicking in a suggestion item
         onItemClick: (currentInput: string) => item => {
           // When the clicked item has the `search` iconType, run the `onSearch` function
-          if (item.type.iconType === 'search') {
+          if (item.type.iconType === ICON_TYPE.SEARCH) {
             // Execute the search action
             params.onSearch(
               getOutput(currentInput, params.queryLanguage.parameters),
