@@ -81,7 +81,7 @@ export class ManageHosts {
       const hosts = await this.configuration.get('hosts');
       this.logger.debug(`API connections: [${JSON.stringify(hosts)}]`);
       if (hostID) {
-        const host = hosts.find(({ id }: { id: string }) => id === hostID);
+        const host = hosts[hostID];
         if (host) {
           this.logger.debug(`API connection with ID [${hostID}] found`);
           return this.filterAPIHostData(
@@ -93,7 +93,8 @@ export class ManageHosts {
         this.logger.debug(APIConnectionNotFound);
         throw new Error(APIConnectionNotFound);
       }
-      return hosts.map(host =>
+      
+      return Object.values(hosts).map(host =>
         this.filterAPIHostData(
           host,
           options.excludePassword ? ['password'] : undefined,

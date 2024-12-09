@@ -5,7 +5,6 @@ import {
   Plugin,
   Logger,
 } from 'opensearch-dashboards/server';
-import { validate as validateNodeCronInterval } from 'node-cron';
 import {
   PluginSetup,
   WazuhCorePluginSetup,
@@ -16,7 +15,6 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  UpdateRegistry,
   ConfigurationStore,
 } from './services';
 import { Configuration } from '../common/services/configuration';
@@ -27,9 +25,9 @@ import {
   WAZUH_DATA_CONFIG_APP_PATH,
 } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
-import { CorePluginConfigType } from '.';
-import { first } from 'rxjs/operators';
 import { uiSettings } from './ui_settings';
+import { InitializerConfigProvider } from './services/initializer-context-provider';
+import { UISettingsConfigProvider } from './services/ui-settings-provider';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -49,8 +47,10 @@ export class WazuhCorePlugin
     plugins: PluginSetup,
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
-    const config$ = this.initializerContext.config.create<CorePluginConfigType>();
-    const config: CorePluginConfigType = await config$.pipe(first()).toPromise()
+    // configurations
+    core.uiSettings.register(uiSettings);
+   
+   
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-store'),
@@ -59,6 +59,19 @@ export class WazuhCorePlugin
         file: WAZUH_DATA_CONFIG_APP_PATH,
       },
     );
+
+
+    this._internal.configurationStore.registerProvider(
+      'initializerContext',
+      new InitializerConfigProvider(this.initializerContext)
+    )
+  
+
+    this._internal.configurationStore.registerProvider(
+      'uiSettings',
+      new UISettingsConfigProvider(core.uiSettings, uiSettings)
+    );
+
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
       this._internal.configurationStore,
@@ -76,25 +89,7 @@ export class WazuhCorePlugin
     Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
       this.services.configuration.registerCategory({ ...value, id: key });
     });
-
-    /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
-      Because the settings are defined in the backend and frontend side using the same definitions,
-      the validation funtions are not defined there and has to be defined in the frontend side and backend side
-      */
-    const setting = this.services.configuration._settings.get(
-      'cron.statistics.interval',
-    );
-    !setting.validateUIForm &&
-      (setting.validateUIForm = function (value) {
-        return this.validate(value);
-      });
-    !setting.validate &&
-      (setting.validate = function (value: string) {
-        return validateNodeCronInterval(value)
-          ? undefined
-          : 'Interval is not valid.';
-      });
-
+    
     this.services.configuration.setup();
 
     this.services.manageHosts = new ManageHosts(
@@ -109,8 +104,6 @@ export class WazuhCorePlugin
     );
 
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
-    // Register uiSettings
-    core.uiSettings.register(uiSettings);
 
     // Register a property to the context parameter of the endpoint handlers
     core.http.registerRouteHandlerContext('wazuh_core', (context, request) => {
@@ -127,7 +120,7 @@ export class WazuhCorePlugin
         },
       };
     });
-
+ 
     return {
       ...this.services,
       api: {
