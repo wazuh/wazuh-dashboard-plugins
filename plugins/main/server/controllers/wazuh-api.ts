@@ -16,7 +16,10 @@ import { Parser } from 'json2csv';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
-import { HTTP_STATUS_CODES } from '../../common/constants';
+import {
+  HTTP_STATUS_CODES,
+  TABLE_EXPORT_MAX_ROWS,
+} from '../../common/constants';
 import { addJobToQueue } from '../start/queue';
 import jwtDecode from 'jwt-decode';
 import {
@@ -783,7 +786,10 @@ export class WazuhApiCtrl {
       if (totalItems && !isList) {
         params.offset = 0;
         itemsArray.push(...output.data.data.affected_items);
-        while (itemsArray.length < totalItems && params.offset < totalItems) {
+        while (
+          itemsArray.length < Math.min(totalItems, TABLE_EXPORT_MAX_ROWS) &&
+          params.offset < Math.min(totalItems, TABLE_EXPORT_MAX_ROWS)
+        ) {
           params.offset += params.limit;
           const tmpData = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
