@@ -10,12 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Changed agent details page [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
-  - Adjusted the height of the event count evolution visualization for better readability.
-  - Standardized padding for the "Top 5 Packages" table to align with other tables.
-  - Reduced the width of small fields in the Agent Info ribbon for a more compact layout.
-  - Replaced "Malware Detection" with "Vulnerability Detection" in the agent's pinned navigation menu.
-  - Aligned "Vulnerability Detection" KPIs to the left for consistency.
+- Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 03
 
