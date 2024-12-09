@@ -22,7 +22,7 @@ const mapColumns = (
 });
 
 const windowsColumns = [
-  { field: 'name', searchable: true, sortable: true },
+  { field: 'name', searchable: true, sortable: true, width: '10%' },
   { field: 'pid', searchable: true, sortable: true },
   { field: 'ppid', searchable: true, sortable: true },
   { field: 'vm_size', searchable: true, sortable: true },
@@ -47,7 +47,7 @@ const linuxColumns = [
 ].map(column => mapColumns(column, true));
 
 const macColumns = [
-  { field: 'name', searchable: true, sortable: true },
+  { field: 'name', searchable: true, sortable: true, width: '10%' },
   { field: 'euser', searchable: true, sortable: true },
   { field: 'pid', searchable: true, sortable: true },
   { field: 'ppid', searchable: true, sortable: true },
