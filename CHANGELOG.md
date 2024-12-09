@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.1
 
+### Changed
+
+- Expand and move the command column and move the argvs column in the processes table [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
+
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 03
 
 ### Added
