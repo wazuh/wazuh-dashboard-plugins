@@ -2193,3 +2193,5 @@ export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
 
 // ID used to refer the createOsdUrlStateStorage state
 export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
+
+export const TABLE_EXPORT_MAX_ROWS = 10000;
