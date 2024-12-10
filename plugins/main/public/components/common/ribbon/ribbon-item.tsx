@@ -138,6 +138,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
   return (
     <EuiFlexItem
       className='wz-ribbon-item'
+      grow={false}
       data-test-subj={`ribbon-item-${item.key}`}
       key={item.key}
       style={item.style || null}
