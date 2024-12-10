@@ -11,6 +11,10 @@ name: ESLint
 
 on:
   pull_request:
+    branches-ignore:
+      - 2.*
+      - 3.*
+      - 4.*
 
 jobs:
   linter:
@@ -39,12 +43,11 @@ jobs:
           echo "Listing branches"
           git branch -a
           echo "Getting diff files ignoring deleted and getting the changed or renamed files"
-          CHANGED_FILES=$(git diff --name-status --diff-filter d ${REMOTE_NAME}/${GITHUB_BASE_REF}..${REMOTE_NAME}/${GITHUB_HEAD_REF} | awk '{print $2}')
+          CHANGED_FILES=$(git diff --name-status --diff-filter d ${REMOTE_NAME}/${GITHUB_BASE_REF}..${REMOTE_NAME}/${GITHUB_HEAD_REF} | awk '{print $NF}' | grep -E '.*\.[jt]sx?$')
           echo "Changed files:"
           echo "${CHANGED_FILES}"
           git checkout $GITHUB_HEAD_REF
-          plugin_package_json=$(ls -d plugins/* | head -n1)
-          echo "Installing dependencies from plugin: ${plugin_package_json}"
-          yarn --cwd "${plugin_package_json}" --modules-folder ../../node_modules
+          echo "Installing dependencies"
+          yarn
           echo "Running eslint on the changed files"
           npx eslint ${CHANGED_FILES}
