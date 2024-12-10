@@ -21,12 +21,14 @@ import {
   EuiToolTip,
   EuiIcon,
   EuiCheckboxGroup,
+  EuiIconTip,
 } from '@elastic/eui';
 import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
 import { useStateStorage } from '../hooks';
+import { TABLE_EXPORT_MAX_ROWS } from '../../../../common/constants';
 
 /**
  * Search input custom filter button
@@ -77,7 +79,7 @@ export function TableWzAPI({
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
+  const [sort, setSort] = useState({ field: 'file', direction: 'asc' });
   const onFiltersChange = filters =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
@@ -86,6 +88,9 @@ export function TableWzAPI({
   const onDataChange = data =>
     typeof rest.onDataChange === 'function' ? rest.onDataChange(data) : null;
 
+  const formatSorting = sorting => {
+    return `${sorting.direction === 'asc' ? '+' : '-'}${sorting.field}`;
+  };
   /**
    * Changing the reloadFootprint timestamp will trigger reloading the table
    */
@@ -110,7 +115,7 @@ export function TableWzAPI({
   ) {
     try {
       const { pageIndex, pageSize } = pagination;
-      const { field, direction } = sorting.sort;
+      setSort(sorting.sort);
       setIsLoading(true);
       setFilters(filters);
       onFiltersChange(filters);
@@ -118,9 +123,8 @@ export function TableWzAPI({
         ...getFilters(filters),
         offset: pageIndex * pageSize,
         limit: pageSize,
-        sort: `${direction === 'asc' ? '+' : '-'}${field}`,
+        sort: formatSorting(sorting.sort),
       };
-
       const response = await WzRequest.apiReq('GET', endpoint, { params });
 
       const { affected_items: items, total_affected_items: totalItems } = (
@@ -227,16 +231,29 @@ export function TableWzAPI({
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}
             {rest.downloadCsv && (
-              <ExportTableCsv
-                endpoint={rest.endpoint}
-                totalItems={totalItems}
-                filters={getFilters(filters)}
-                title={
-                  typeof rest.downloadCsv === 'string'
-                    ? rest.downloadCsv
-                    : rest.title
-                }
-              />
+              <>
+                <ExportTableCsv
+                  endpoint={rest.endpoint}
+                  totalItems={totalItems}
+                  filters={getFilters({
+                    ...filters,
+                    sort: formatSorting(sort),
+                  })}
+                  title={
+                    typeof rest.downloadCsv === 'string'
+                      ? rest.downloadCsv
+                      : rest.title
+                  }
+                />
+                {totalItems > TABLE_EXPORT_MAX_ROWS && (
+                  <EuiIconTip
+                    content={`The exported CSV will be limited to the first ${TABLE_EXPORT_MAX_ROWS} lines.`}
+                    size='m'
+                    color='warning'
+                    type='alert'
+                  />
+                )}
+              </>
             )}
             {/* Render optional post custom action button */}
             {renderActionButtons(postActionButtons, filters)}
