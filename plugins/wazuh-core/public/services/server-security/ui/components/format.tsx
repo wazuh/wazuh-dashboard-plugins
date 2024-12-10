@@ -42,53 +42,47 @@ const PermissionFormatter = (
   ) : (
     <strong {...(key ? { key } : {})}>{permission}</strong>
   );
-
 const getPermissionComponentKey = (
   permission: ServerSecurityPermissionComposed,
 ): string =>
   Array.isArray(permission)
     ? permission.map(p => getPermissionComponentKey(p)).join('-')
     : typeof permission === 'object'
-    ? permission.action
-    : permission;
+      ? permission.action
+      : permission;
 
 export const ServerPermissionsFormatted = (
   permissions: ServerSecurityPermissionComposed[],
-) => {
-  return (
-    <div>
-      {permissions.map(permission => {
-        if (Array.isArray(permission)) {
-          return (
-            <div
-              key={`no-permissions-${getPermissionComponentKey(permission)}`}
-            >
-              <div>
-                - One of:{' '}
-                {permission
-                  .map(p =>
-                    PermissionFormatter(
-                      p,
-                      `no-permissions-${getPermissionComponentKey(
-                        permission,
-                      )}-${getPermissionComponentKey(p)}`,
-                    ),
-                  )
-                  .reduce((prev, cur) => [prev, ', ', cur])}
-              </div>
-              <EuiSpacer size='s' />
+) => (
+  <div>
+    {permissions.map(permission => {
+      if (Array.isArray(permission)) {
+        return (
+          <div key={`no-permissions-${getPermissionComponentKey(permission)}`}>
+            <div>
+              - One of:{' '}
+              {permission
+                .map(p =>
+                  PermissionFormatter(
+                    p,
+                    `no-permissions-${getPermissionComponentKey(
+                      permission,
+                    )}-${getPermissionComponentKey(p)}`,
+                  ),
+                )
+                // eslint-disable-next-line unicorn/no-array-reduce
+                .reduce((prev, cur) => [prev, ', ', cur])}
             </div>
-          );
-        } else {
-          return (
-            <div
-              key={`no-permissions-${getPermissionComponentKey(permission)}`}
-            >
-              - {PermissionFormatter(permission)}
-            </div>
-          );
-        }
-      })}
-    </div>
-  );
-};
+            <EuiSpacer size='s' />
+          </div>
+        );
+      } else {
+        return (
+          <div key={`no-permissions-${getPermissionComponentKey(permission)}`}>
+            - {PermissionFormatter(permission)}
+          </div>
+        );
+      }
+    })}
+  </div>
+);

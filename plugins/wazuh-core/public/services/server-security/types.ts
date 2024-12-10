@@ -9,6 +9,10 @@ export type ServerSecurityCombinedPermission =
   | ServerSecurityPermission
   | ServerSecurityPermission[];
 
+export type ServerSecurityCombinedPermissionWithFunction =
+  | ServerSecurityCombinedPermission
+  | ((props: any) => ServerSecurityPermission);
+
 export interface ServerSecuritySetupDeps {
   userSession$: any;
   getUserSession: any;
@@ -20,13 +24,13 @@ export interface ServerSecuritySetupReturn {
     useServerUserLogged: () => boolean;
     useServerUserPermissions: () => any;
     useServerUserPermissionsRequirements: (
-      permissions: ServerSecurityCombinedPermission,
+      permissions: ServerSecurityCombinedPermissionWithFunction,
     ) => [ServerSecurityCombinedPermission, any];
     useServerUserPermissionsIsAdminRequirements: () => [string, any];
   };
   hocs: {
     withServerUserAuthorizationPrompt: (
-      permissions: ServerSecurityCombinedPermission | null,
+      permissions: ServerSecurityCombinedPermissionWithFunction | null,
       otherPermissions: { isAdmininistrator: boolean | null },
     ) => (WrappedComponent: React.Component) => React.ReactElement;
     withServerUserLogged: (

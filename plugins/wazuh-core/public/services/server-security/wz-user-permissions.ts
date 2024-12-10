@@ -16,8 +16,9 @@ import wazuhPermissions from '../../../common/api-info/security-actions.json';
 // Constants
 const RESOURCE_ANY = '*:*:*';
 const RESOURCE_ANY_SHORT = '*:*';
-const RBAC_MODE_BLACK = 'black';
 const RBAC_MODE_WHITE = 'white';
+// Utility functions
+const isAllow = (value: string) => value === 'allow';
 
 // Check the missing permissions of the required ones that the user does not have
 export const checkMissingUserPermissions = (
@@ -30,50 +31,39 @@ export const checkMissingUserPermissions = (
         permission,
         userPermissions,
       );
+
       return Array.isArray(missingOrPermissions)
         ? missingOrPermissions.length === permission.length
         : missingOrPermissions;
     }
 
     const isGenericResource =
-      (permission.resource.match(':\\*') || []).index ===
+      permission.resource.match(String.raw`:\*`)?.index ===
       permission.resource.length - 2;
-
     const actionName =
       typeof permission === 'string' ? permission : permission.action;
-    let actionResource =
+    const actionResource =
       typeof permission === 'string' &&
       wazuhPermissions[actionName].resources.length === 1
         ? wazuhPermissions[actionName].resources[0] + ':*'
         : permission.resource;
     const actionResourceAll = actionResource
       .split('&')
-      .map(function (str) {
-        return str
+      .map(str =>
+        str
           .split(':')
-          .map(function (str, index) {
-            return index === 2 ? '*' : str;
-          })
-          .join(':');
-      })
+          .map((str, index) => (index === 2 ? '*' : str))
+          .join(':'),
+      )
       .join('&');
-
-    const multiplePermission = (resource: string) => {
-      return (
-        ![actionResource, actionResourceAll].includes(resource) &&
-        (resource.match(`/${actionResource}/`) ||
-          resource.match(`/${actionResourceAll}/`))
-      );
-    };
-
-    const simplePermission = (resource: string) => {
-      return (
-        ![actionResource, actionResourceAll].includes(resource) &&
-        (resource.match(actionResource.replace(/\*/g, '.+')) ||
-          resource.match(actionResourceAll.replace(/\*/g, '.+')))
-      );
-    };
-
+    const multiplePermission = (resource: string) =>
+      ![actionResource, actionResourceAll].includes(resource) &&
+      (resource.match(`/${actionResource}/`) ||
+        resource.match(`/${actionResourceAll}/`));
+    const simplePermission = (resource: string) =>
+      ![actionResource, actionResourceAll].includes(resource) &&
+      (resource.match(actionResource.replaceAll('*', '.+')) ||
+        resource.match(actionResourceAll.replaceAll('*', '.+')));
     const userPartialResources: string[] | undefined = userPermissions[
       actionName
     ]
@@ -88,64 +78,59 @@ export const checkMissingUserPermissions = (
       return userPermissions.rbac_mode === RBAC_MODE_WHITE;
     }
 
-    const existInWazuhPermissions = userResource => {
-      return !!wazuhPermissions[actionName].resources.find(function (resource) {
-        return (
-          resource ===
-          userResource
-            .split('&')
-            .map(str => {
-              return str
-                .split(':')
-                .map(function (str, index) {
-                  return index === 2 ? '*' : str;
-                })
-                .join(':');
-            })
-            .join('&')
-            .replace(/:\*/g, '')
-        );
-      });
-    };
+    const existInWazuhPermissions = userResource =>
+      !!wazuhPermissions[actionName].resources.includes(
+        userResource
+          .split('&')
+          .map(str =>
+            str
+              .split(':')
+              .map((str, index) => (index === 2 ? '*' : str))
+              .join(':'),
+          )
+          .join('&')
+          .replaceAll(':*', ''),
+      );
 
     const notAllowInWazuhPermissions = userResource => {
-      if (userResource !== RESOURCE_ANY) {
+      if (userResource === RESOURCE_ANY) {
+        return !isAllow(userPermissions[actionName][userResource]);
+      } else {
         return existInWazuhPermissions(userResource)
           ? !isAllow(userPermissions[actionName][userResource])
           : true;
-      } else {
-        return !isAllow(userPermissions[actionName][userResource]);
       }
     };
 
-    const partialResourceIsAllow = resource => {
-      return isGenericResource
+    const partialResourceIsAllow = resource =>
+      isGenericResource
         ? !isAllow(userPermissions[actionName][resource])
         : isAllow(userPermissions[actionName][resource]);
-    };
 
     return userPermissions[actionName][actionResource]
       ? notAllowInWazuhPermissions(actionResource)
-      : Object.keys(userPermissions[actionName]).some(resource => {
-          return (
-            resource.match(actionResourceAll.replace(/\*/g, '.+')) !== null
-          );
-        })
-      ? Object.keys(userPermissions[actionName]).some(resource => {
-          if (resource.match(actionResourceAll.replace(/\*/g, '.+'))) {
-            return notAllowInWazuhPermissions(resource);
-          }
-        })
-      : (userPartialResources || []).length
-      ? userPartialResources.some(resource => partialResourceIsAllow(resource))
-      : wazuhPermissions[actionName].resources.find(
-          resource => resource === RESOURCE_ANY_SHORT,
-        ) && userPermissions[actionName][RESOURCE_ANY]
-      ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
-      : userPermissions.rbac_mode === RBAC_MODE_WHITE;
+      : Object.keys(userPermissions[actionName]).some(
+            resource =>
+              resource.match(actionResourceAll.replaceAll('*', '.+')) !== null,
+          )
+        ? Object.keys(userPermissions[actionName]).some(resource => {
+            // eslint-disable-next-line unicorn/prefer-regexp-test
+            if (resource.match(actionResourceAll.replaceAll('*', '.+'))) {
+              return notAllowInWazuhPermissions(resource);
+            }
+          })
+        : userPartialResources?.length > 0
+          ? userPartialResources.some(resource =>
+              partialResourceIsAllow(resource),
+            )
+          : wazuhPermissions[actionName].resources.includes(
+                RESOURCE_ANY_SHORT,
+              ) && userPermissions[actionName][RESOURCE_ANY]
+            ? !isAllow(userPermissions[actionName][RESOURCE_ANY])
+            : userPermissions.rbac_mode === RBAC_MODE_WHITE;
   });
 
-  return filtered.length ? filtered : false;
+  return filtered.length > 0 ? filtered : false;
 };
 
 // Check the missing roles of the required ones that the user does not have
@@ -153,8 +138,6 @@ export const checkMissingUserRoles = (requiredRoles, userRoles) => {
   const rolesUserNotOwn = requiredRoles.filter(
     requiredRole => !userRoles.includes(requiredRole),
   );
-  return rolesUserNotOwn.length ? rolesUserNotOwn : false;
-};
 
-// Utility functions
-const isAllow = value => value === 'allow';
+  return rolesUserNotOwn.length > 0 ? rolesUserNotOwn : false;
+};

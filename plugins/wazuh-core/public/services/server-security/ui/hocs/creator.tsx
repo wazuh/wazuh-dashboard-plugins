@@ -10,33 +10,38 @@ export const createServerSecurityHOCS = ({
   LoadingServerUserLogging,
 }) => {
   const withServerUserAuthorizationPromptChanged =
-    (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
+    (
+      permissions = null,
+      othersPermissions: { isAdmininistrator: boolean | null },
+    ) =>
     (WrappedComponent: React.ElementType) =>
-    props => {
-      const [userPermissionRequirements, userPermissions] =
-        useServerUserPermissionsRequirements(
-          typeof permissions === 'function' ? permissions(props) : permissions,
+      function withServerUserAuthorizationPromptChanged(props) {
+        const [userPermissionRequirements] =
+          useServerUserPermissionsRequirements(
+            typeof permissions === 'function'
+              ? permissions(props)
+              : permissions,
+          );
+        const [userPermissionIsAdminRequirementsState] =
+          useServerUserPermissionsIsAdminRequirements();
+        const userPermissionIsAdminRequirements =
+          othersPermissions?.isAdmininistrator
+            ? userPermissionIsAdminRequirementsState
+            : null;
+
+        return userPermissionRequirements ||
+          userPermissionIsAdminRequirements ? (
+          <PromptNoPermissions
+            permissions={userPermissionRequirements}
+            administrator={userPermissionIsAdminRequirements}
+          />
+        ) : (
+          <WrappedComponent {...props} />
         );
-      const [_userPermissionIsAdminRequirements] =
-        useServerUserPermissionsIsAdminRequirements();
+      };
 
-      const userPermissionIsAdminRequirements =
-        othersPermissions?.isAdmininistrator
-          ? _userPermissionIsAdminRequirements
-          : null;
-
-      return userPermissionRequirements || userPermissionIsAdminRequirements ? (
-        <PromptNoPermissions
-          permissions={userPermissionRequirements}
-          administrator={userPermissionIsAdminRequirements}
-        />
-      ) : (
-        <WrappedComponent {...props} />
-      );
-    };
-
-  const withServerUserLogged =
-    (WrappedComponent: React.ElementType) => props => {
+  const withServerUserLogged = (WrappedComponent: React.ElementType) =>
+    function WithServerUserLogged(props) {
       const withServerUserLogged = useServerUserLogged();
 
       return withServerUserLogged ? (
@@ -47,7 +52,10 @@ export const createServerSecurityHOCS = ({
     };
 
   const withServerUserAuthorizationPrompt =
-    (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
+    (
+      permissions = null,
+      othersPermissions: { isAdmininistrator: boolean | null },
+    ) =>
     (WrappedComponent: React.ElementType) =>
       compose(
         withServerUserLogged,

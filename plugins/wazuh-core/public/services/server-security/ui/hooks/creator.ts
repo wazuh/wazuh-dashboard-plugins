@@ -11,11 +11,13 @@ export const createServerSecurityHooks = (services: {
       services.userSession$,
       services.getUserSession(),
     );
+
     return policies;
   };
 
   const useServerUserPermissionsRequirements = requiredPermissions => {
     const userPermissions = useServerUserPermissions();
+
     if (requiredPermissions === null) {
       return [false, userPermissions];
     }
@@ -28,8 +30,12 @@ export const createServerSecurityHooks = (services: {
       typeof requiredPermissions === 'function'
         ? requiredPermissions()
         : requiredPermissions;
+
     return [
-      checkMissingUserPermissions(requiredPermissionsArray, userPermissions),
+      services.checkMissingUserPermissions(
+        requiredPermissionsArray,
+        userPermissions,
+      ),
       userPermissions,
     ];
   };
@@ -39,6 +45,7 @@ export const createServerSecurityHooks = (services: {
       services.userSession$,
       services.getUserSession(),
     );
+
     return [account?.administrator_requirements, account];
   };
 
@@ -47,6 +54,7 @@ export const createServerSecurityHooks = (services: {
       services.userSession$,
       services.getUserSession(),
     );
+
     return logged;
   };
 

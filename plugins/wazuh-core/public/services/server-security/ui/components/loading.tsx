@@ -7,6 +7,7 @@ export const LoadingServerUserLogging = ({
   useLoadingLogo: () => string;
 }) => {
   const imageSrc = useLoadingLogo();
+
   return (
     <div className='withServerUserLogged'>
       <img src={imageSrc} className='withServerUserLogged-logo' alt=''></img>

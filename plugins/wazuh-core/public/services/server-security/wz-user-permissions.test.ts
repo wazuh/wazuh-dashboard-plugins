@@ -22,7 +22,6 @@ const requiredPermissionsCluster = [
     resource: `node:id:*&file:path:*`,
   },
 ];
-
 const requiredPermissionsManager = [
   {
     action: 'cluster:status',
@@ -41,7 +40,6 @@ const requiredPermissionsManager = [
     resource: 'file:path:/etc/lists',
   },
 ];
-
 const userClusterTest = {
   'lists:read': {
     '*:*:*': 'allow',
@@ -78,7 +76,6 @@ const userClusterTest = {
   },
   rbac_mode: 'white',
 };
-
 const userManagerTest = [
   {
     'manager:read': {
@@ -96,7 +93,6 @@ const userManagerTest = [
     rbac_mode: 'white',
   },
 ];
-
 const missingPermissionsForClusterUser = [
   {
     action: 'list:delete',
@@ -107,7 +103,6 @@ const missingPermissionsForClusterUser = [
     resource: 'node:id:*&file:path:*',
   },
 ];
-
 const missingPermissionsForManagerUser = [
   {
     action: 'manager:read_file',
@@ -139,6 +134,7 @@ describe('Wazuh User Permissions', () => {
           },
           rbac_mode: 'white',
         });
+
         expect(result).toEqual(simplePermission);
       });
 
@@ -155,6 +151,7 @@ describe('Wazuh User Permissions', () => {
           },
           rbac_mode: 'white',
         });
+
         expect(result).toEqual(simplePermission);
       });
     });
@@ -171,6 +168,7 @@ describe('Wazuh User Permissions', () => {
           simplePermission,
           userManagerTest,
         );
+
         expect(result).toEqual(false); // false === all permissions OK
       });
 
@@ -185,6 +183,7 @@ describe('Wazuh User Permissions', () => {
           simplePermission,
           userClusterTest,
         );
+
         expect(result).toEqual(false);
       });
     });
@@ -197,11 +196,11 @@ describe('Wazuh User Permissions', () => {
             resource: 'group:id:*',
           },
         ];
-
         const result = checkMissingUserPermissions(
           simplePermission,
           userClusterTest,
         );
+
         expect(result).toEqual(false); // false === all permissions OK
       });
     });
@@ -212,6 +211,7 @@ describe('Wazuh User Permissions', () => {
           requiredPermissionsManager,
           userClusterTest,
         );
+
         expect(result).toEqual(missingPermissionsForManagerUser);
       });
 
@@ -220,6 +220,7 @@ describe('Wazuh User Permissions', () => {
           requiredPermissionsCluster,
           userClusterTest,
         );
+
         expect(result).toEqual(missingPermissionsForClusterUser);
       });
     });
@@ -244,11 +245,13 @@ describe('Wazuh User Permissions', () => {
         },
         rbac_mode: 'white',
       };
+
       it('Should return OK for particular agent and group id', () => {
         const result = checkMissingUserPermissions(
           requiredAgentView,
           userAgent1,
         );
+
         expect(result).toEqual(false);
       });
     });
@@ -273,11 +276,13 @@ describe('Wazuh User Permissions', () => {
         },
         rbac_mode: 'white',
       };
+
       it('Should return OK for all agents and groups', () => {
         const result = checkMissingUserPermissions(
           requiredAgentView,
           userAgent1,
         );
+
         expect(result).toEqual(false);
       });
     });
@@ -315,6 +320,7 @@ describe('Wazuh User Permissions', () => {
           requiredMitreView,
           userMitre1,
         );
+
         expect(result).toEqual(false);
       });
 
@@ -338,11 +344,13 @@ describe('Wazuh User Permissions', () => {
           },
           rbac_mode: 'white',
         };
+
         it('Should return OK for all agents and groups', () => {
           const result = checkMissingUserPermissions(
             requiredAgentView,
             userAgent1,
           );
+
           expect(result).toEqual(false);
         });
       });

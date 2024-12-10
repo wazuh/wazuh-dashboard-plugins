@@ -11,7 +11,6 @@
  */
 
 import React from 'react';
-
 import {
   EuiSwitch,
   EuiButton,
@@ -19,18 +18,17 @@ import {
   EuiButtonIcon,
   EuiLink,
 } from '@elastic/eui';
-
 import {
   ServerElementPermissionsProps,
   ServerElementPermissions,
 } from './element';
 
-enum ServerButtonPermissionsTypes{
-  default = 'default',
-  empty = 'empty',
-  icon = 'icon',
-  link = 'link',
-  switch = 'switch'
+enum SERVER_BUTTON_PERMISSIONS_TYPES {
+  DEFAULT = 'default',
+  EMPTY = 'empty',
+  ICON = 'icon',
+  LINK = 'link',
+  SWTICH = 'switch',
 }
 
 interface IServerButtonPermissionsProps
@@ -38,20 +36,20 @@ interface IServerButtonPermissionsProps
     ServerElementPermissionsProps,
     'children' | 'additionalPropsFunction'
   > {
-  buttonType?: ServerButtonPermissionsTypes;
+  buttonType?: SERVER_BUTTON_PERMISSIONS_TYPES;
   rest: any;
 }
 
 const ButtonsMap = {
-  [ServerButtonPermissionsTypes.default]: EuiButton,
-  [ServerButtonPermissionsTypes.empty]: EuiButtonEmpty,
-  [ServerButtonPermissionsTypes.icon]: EuiButtonIcon,
-  [ServerButtonPermissionsTypes.link]: EuiLink,
-  [ServerButtonPermissionsTypes.switch]: EuiSwitch,
-}
+  [SERVER_BUTTON_PERMISSIONS_TYPES.DEFAULT]: EuiButton,
+  [SERVER_BUTTON_PERMISSIONS_TYPES.EMPTY]: EuiButtonEmpty,
+  [SERVER_BUTTON_PERMISSIONS_TYPES.ICON]: EuiButtonIcon,
+  [SERVER_BUTTON_PERMISSIONS_TYPES.LINK]: EuiLink,
+  [SERVER_BUTTON_PERMISSIONS_TYPES.SWTICH]: EuiSwitch,
+};
 
 export const ServerButtonPermissions = ({
-  buttonType = ServerButtonPermissionsTypes.default,
+  buttonType = SERVER_BUTTON_PERMISSIONS_TYPES.DEFAULT,
   permissions,
   administrator,
   tooltip,
@@ -66,16 +64,24 @@ export const ServerButtonPermissions = ({
       tooltip={tooltip}
       getAdditionalProps={disabled => {
         const additionalProps = {
-          ...(![ServerButtonPermissionsTypes.link, ServerButtonPermissionsTypes.switch].includes(buttonType)
-            ? { isDisabled: disabled }
-            : { disabled }),
+          ...([
+            SERVER_BUTTON_PERMISSIONS_TYPES.LINK,
+            SERVER_BUTTON_PERMISSIONS_TYPES.SWTICH,
+          ].includes(buttonType)
+            ? { disabled }
+            : { isDisabled: disabled }),
           onClick: disabled || !rest.onClick ? undefined : rest.onClick,
           onChange:
-            !disabled || rest.onChange || buttonType === ServerButtonPermissionsTypes.switch
+            !disabled ||
+            rest.onChange ||
+            buttonType === SERVER_BUTTON_PERMISSIONS_TYPES.SWTICH
               ? rest.onChange
               : undefined,
         };
-        if (buttonType == ServerButtonPermissionsTypes.switch) delete additionalProps.onClick;
+
+        if (buttonType === SERVER_BUTTON_PERMISSIONS_TYPES.SWTICH) {
+          delete additionalProps.onClick;
+        }
 
         return additionalProps;
       }}

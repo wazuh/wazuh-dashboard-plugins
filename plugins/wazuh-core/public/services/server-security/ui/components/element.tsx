@@ -12,13 +12,15 @@
 
 import React, { Fragment } from 'react';
 import { EuiToolTip, EuiSpacer } from '@elastic/eui';
+import { ServerSecuritySetupReturn } from '../../types';
 import { ServerPermissionsFormatted } from './format';
+
 export interface IUserPermissionsObject {
   action: string;
   resource: string;
 }
-export type TUserPermissionsFunction = (props: any) => TUserPermissions;
 export type TUserPermissions = (string | IUserPermissionsObject)[] | null;
+export type TUserPermissionsFunction = (props: any) => TUserPermissions;
 export type TUserRoles = string[] | null;
 export type TUserIsAdministrator = string | null;
 export type TUserRolesFunction = (props: any) => TUserRoles;
@@ -28,9 +30,9 @@ export interface ServerElementPermissionsProps {
   administrator?: boolean;
   tooltip?: any;
   children: React.ReactElement;
-  getAdditionalProps?: (disabled: boolean) => {
-    [prop: string]: any;
-  };
+  getAdditionalProps?: (disabled: boolean) => Record<string, any>;
+  useServerUserPermissionsRequirements: ServerSecuritySetupReturn['hooks']['useServerUserPermissionsRequirements'];
+  useServerUserPermissionsIsAdminRequirements: ServerSecuritySetupReturn['hooks']['useServerUserPermissionsIsAdminRequirements'];
 }
 
 export const ServerElementPermissions = ({
@@ -46,26 +48,20 @@ export const ServerElementPermissions = ({
   const [userPermissionRequirements] = useServerUserPermissionsRequirements(
     typeof permissions === 'function' ? permissions(rest) : permissions,
   );
-
   const [userRequireAdministratorRequirements] =
     useServerUserPermissionsIsAdminRequirements();
-
   const isDisabledByPermissions =
     userPermissionRequirements ||
     (administrator && userRequireAdministratorRequirements);
-
   const disabled = Boolean(
     isDisabledByPermissions || rest?.isDisabled || rest?.disabled,
   );
-
   const additionalProps = getAdditionalProps
     ? getAdditionalProps(disabled)
     : {};
-
   const childrenWithAdditionalProps = React.cloneElement(children, {
     ...additionalProps,
   });
-
   const contentTextRequirements = isDisabledByPermissions && (
     <Fragment>
       {userPermissionRequirements && (
@@ -91,6 +87,7 @@ export const ServerElementPermissions = ({
       )}
     </Fragment>
   );
+
   return isDisabledByPermissions ? (
     <EuiToolTip {...tooltip} content={contentTextRequirements}>
       {childrenWithAdditionalProps}
