@@ -12,44 +12,50 @@
 
 import React from 'react';
 import { EuiEmptyPrompt, EuiSpacer } from '@elastic/eui';
-import { TUserPermissions, TUserIsAdministrator } from '../permissions/element';
 import { ServerPermissionsFormatted } from './format';
+
+interface IUserPermissionsObject {
+  action: string;
+  resource: string;
+}
+
+type TUserPermissions = (string | IUserPermissionsObject)[] | null;
+type TUserIsAdministrator = string | null;
 
 interface IEmptyPromptNoPermissions {
   permissions?: TUserPermissions;
   administrator?: TUserIsAdministrator;
   actions?: React.ReactNode;
 }
+
 export const WzEmptyPromptNoPermissions = ({
   permissions,
   administrator,
   actions,
-}: IEmptyPromptNoPermissions) => {
-  return (
-    <EuiEmptyPrompt
-      iconType='securityApp'
-      title={<h2>You have no permissions</h2>}
-      body={
-        <>
-          {permissions && (
-            <div>
-              This section requires the{' '}
-              {permissions.length > 1 ? 'permissions' : 'permission'}:
-              {ServerPermissionsFormatted(permissions)}
-            </div>
-          )}
-          {permissions && administrator && <EuiSpacer />}
-          {administrator && (
-            <div>
-              This section requires administrator privilegies:{' '}
-              <strong key={`empty-prompt-no-roles-administrator`}>
-                {administrator}
-              </strong>
-            </div>
-          )}
-        </>
-      }
-      actions={actions}
-    />
-  );
-};
+}: IEmptyPromptNoPermissions) => (
+  <EuiEmptyPrompt
+    iconType='securityApp'
+    title={<h2>You have no permissions</h2>}
+    body={
+      <>
+        {permissions && (
+          <div>
+            This section requires the{' '}
+            {permissions.length > 1 ? 'permissions' : 'permission'}:
+            {ServerPermissionsFormatted(permissions)}
+          </div>
+        )}
+        {permissions && administrator && <EuiSpacer />}
+        {administrator && (
+          <div>
+            This section requires administrator privilegies:{' '}
+            <strong key={`empty-prompt-no-roles-administrator`}>
+              {administrator}
+            </strong>
+          </div>
+        )}
+      </>
+    }
+    actions={actions}
+  />
+);
