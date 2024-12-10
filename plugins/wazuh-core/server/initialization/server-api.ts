@@ -108,28 +108,26 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
   taskName,
 }: {
   taskName: string;
-}) => {
-  return {
-    name: taskName,
-    async run(ctx: InitializationTaskRunContext) {
-      try {
-        ctx.logger.debug(
-          'Starting check server API connection and compatibility',
-        );
+}) => ({
+  name: taskName,
+  async run(ctx: InitializationTaskRunContext) {
+    try {
+      ctx.logger.debug(
+        'Starting check server API connection and compatibility',
+      );
 
-        const results = await serversAPIConnectionCompatibility(ctx);
+      const results = await serversAPIConnectionCompatibility(ctx);
 
-        ctx.logger.info(
-          'Start check server API connection and compatibility finished',
-        );
+      ctx.logger.info(
+        'Start check server API connection and compatibility finished',
+      );
 
-        return results;
-      } catch (error) {
-        const message = `Error checking server API connection and compatibility: ${error.message}`;
+      return results;
+    } catch (error) {
+      const message = `Error checking server API connection and compatibility: ${error.message}`;
 
-        ctx.logger.error(message);
-        throw new Error(message);
-      }
-    },
-  };
-};
+      ctx.logger.error(message);
+      throw new Error(message);
+    }
+  },
+});
