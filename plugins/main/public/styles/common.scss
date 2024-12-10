@@ -1593,7 +1593,7 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
   display: flex;
 }
 
-@media only screen and (max-width: 1200px) {
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
   .hide-agent-status {
     display: none;
   }
