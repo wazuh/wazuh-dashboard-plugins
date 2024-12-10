@@ -36,6 +36,10 @@ export class AgentInfo extends Component<AgentInfoProps> {
     });
   }
 
+  isIPv6(ip: string) {
+    return ip.includes(':');
+  }
+
   render() {
     const { agent } = this.props;
     let arrayStats: IRibbonItem[];
@@ -89,7 +93,12 @@ export class AgentInfo extends Component<AgentInfoProps> {
           key: 'ip',
           value: agent.ip,
           label: 'IP address',
-          style: { minWidth: 100, maxWidth: 100 },
+          style: {
+            // IPv4: minWidth: 100, maxWidth: 100
+            // IPv6: minWidth: 150, maxWidth: 150
+            minWidth: this.isIPv6(agent.ip) ? 150 : 100,
+            maxWidth: this.isIPv6(agent.ip) ? 150 : 100,
+          },
           condensed: true,
         },
         {
