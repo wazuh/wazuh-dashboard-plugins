@@ -42,8 +42,8 @@ const linuxColumns = [
   { field: 'session', searchable: true, sortable: true },
   { field: 'nice', searchable: true, sortable: true },
   { field: 'state', searchable: true, sortable: true },
-  { field: 'argvs', searchable: true, sortable: true },
   { field: 'cmd', searchable: true, sortable: true },
+  { field: 'argvs', searchable: true, sortable: true },
 ].map(column => mapColumns(column, true));
 
 const macColumns = [
