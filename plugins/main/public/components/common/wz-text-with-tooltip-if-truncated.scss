@@ -6,5 +6,7 @@
 
   @media (max-width: 767px) {
     max-width: none !important;
+    word-break: break-word;
+    white-space: normal;
   }
 }
