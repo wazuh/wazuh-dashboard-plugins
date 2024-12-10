@@ -58,6 +58,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
   <SearchBar
     defaultMode="wql"
     input=""
+    inputTimeMark={1733150110123}
     modes={
       Array [
         Object {
