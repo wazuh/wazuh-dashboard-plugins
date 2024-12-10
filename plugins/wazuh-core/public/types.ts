@@ -10,7 +10,6 @@ import { ServerDataProps } from './services/http/ui/components/types';
 import { DashboardSecurity } from './utils/dashboard-security';
 
 export interface WazuhCorePluginSetup {
-  // hooks: { useDockedSideNav: () => boolean };
   utils: { formatUIDate: (date: Date) => string };
   API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
   configuration: Configuration;
