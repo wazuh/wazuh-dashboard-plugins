@@ -14737,32 +14737,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                           aria-live="polite"
                           aria-sort="none"
                           class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_argvs_10"
-                          role="columnheader"
-                          scope="col"
-                          style="width:15%"
-                        >
-                          <button
-                            class="euiTableHeaderButton"
-                            data-test-subj="tableHeaderSortButton"
-                            type="button"
-                          >
-                            <span
-                              class="euiTableCellContent"
-                            >
-                              <span
-                                class="euiTableCellContent__text"
-                              >
-                                Argvs
-                              </span>
-                            </span>
-                          </button>
-                        </th>
-                        <th
-                          aria-live="polite"
-                          aria-sort="none"
-                          class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_cmd_11"
+                          data-test-subj="tableHeaderCell_cmd_10"
                           role="columnheader"
                           scope="col"
                           style="width:15%"
@@ -14779,6 +14754,31 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                                 class="euiTableCellContent__text"
                               >
                                 Command
+                              </span>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_argvs_11"
+                          role="columnheader"
+                          scope="col"
+                          style="width:15%"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                              >
+                                Argvs
                               </span>
                             </span>
                           </button>
