@@ -86,6 +86,7 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
       <EuiToolTip
         content={this.props.tooltip || this.props.children}
         {...this.props.tooltipProps}
+        anchorClassName='wz-width-100'
       >
         {this.buildContent()}
       </EuiToolTip>
