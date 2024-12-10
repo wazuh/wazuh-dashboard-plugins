@@ -1,0 +1,10 @@
+.wz-text-content {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  @media (max-width: 767px) {
+    max-width: none !important;
+  }
+}

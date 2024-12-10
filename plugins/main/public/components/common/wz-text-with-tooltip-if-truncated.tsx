@@ -12,39 +12,39 @@
  */
 
 import React, { Component } from 'react';
-
 import { EuiToolTip } from '@elastic/eui';
+import './wz-text-with-tooltip-if-truncated.scss';
 
 interface WzTextWithTooltipIfTruncatedProps extends React.PropsWithChildren {
   tooltip?: string;
   elementStyle?: React.CSSProperties;
   tooltipProps?: object;
-  position?: string; // same options as EuiTooltip's position
 }
 
 export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTooltipIfTruncatedProps> {
-  state: {
-    withTooltip: boolean;
-  };
   static defaultProps = {
     elementStyle: {},
   };
+  state: {
+    withTooltip: boolean;
+  };
   timer?: ReturnType<typeof setTimeout>;
-  reference: any;
+  contentReference: React.RefObject<HTMLElement>;
+
   constructor(props: WzTextWithTooltipIfTruncatedProps) {
     super(props);
-    this.reference = React.createRef<HTMLSpanElement>();
+    this.contentReference = React.createRef<HTMLElement>();
     this.state = {
       withTooltip: false,
     };
   }
+
   componentDidMount() {
     this.timer = setTimeout(() => {
-      //TODO: remove timer and setTimeout function. It is needed while this component is mounted through the AngularJS react-component directive.
       // HTML element reference with text (maybe truncated)
-      const reference = this.reference.current;
+      const reference = this.contentReference.current as HTMLElement;
       // HTML element clone of reference
-      const clone = reference.cloneNode(true);
+      const clone = reference.cloneNode(true) as HTMLElement;
       clone.style.display = 'inline';
       clone.style.width = 'auto';
       clone.style.visibility = 'hidden';
@@ -62,26 +62,25 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
       clone.remove();
     });
   }
+
   componentWillUnmount() {
-    this.timer && clearTimeout(this.timer);
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
   }
+
   buildContent() {
     return (
       <span
-        ref={this.reference}
-        style={{
-          display: 'block',
-          overflow: 'hidden',
-          paddingBottom: '3px',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis',
-          ...this.props.elementStyle,
-        }}
+        ref={this.contentReference}
+        className='wz-text-content'
+        style={this.props.elementStyle}
       >
         {this.props.children || this.props.tooltip}
       </span>
     );
   }
+
   render() {
     return this.state.withTooltip ? (
       <EuiToolTip
