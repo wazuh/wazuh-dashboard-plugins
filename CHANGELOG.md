@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Changed the width of the columns and moved the command and argvs columns in the process table. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
+- Changed the width of the command column, relocate argvs column and change the width of the rest of the columns in the table processes. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 03
 
