@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Fragment } from 'react';
+import React from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -23,38 +23,51 @@ import {
 import { endpointGroups } from '../../../../utils/applications';
 import NavigationService from '../../../../react-services/navigation-service';
 
-export class GroupTruncate extends React.Component {
-  _isMount = false;
+const ACTION = {
+  REDIRECT: 'redirect',
+  FILTER: 'filter',
+} as const;
+
+type ACTION = (typeof ACTION)[keyof typeof ACTION];
+
+interface GroupTruncateProps {
+  groups?: string[];
+  label: string;
+  length: number;
+  action: ACTION;
+  filterAction?: (group: string) => void;
+}
+
+export class GroupTruncate extends React.Component<GroupTruncateProps> {
   state: {
-    groups: any;
     popoverOpen: boolean;
   };
-  props!: {
-    groups?: string[];
-    label: String;
-    length: number;
-    action: 'redirect' | 'filter';
-    filterAction?: (group: string) => void;
-  };
 
-  constructor(props) {
+  constructor(props: GroupTruncateProps) {
     super(props);
     this.state = {
-      groups: '',
       popoverOpen: false,
     };
   }
 
+  togglePopover() {
+    this.setState({ popoverOpen: !this.state.popoverOpen });
+  }
+
+  stopPropagation(event: Event) {
+    event.stopPropagation();
+  }
+
   action(group: string) {
     switch (this.props.action) {
-      case 'redirect':
+      case ACTION.REDIRECT:
         return NavigationService.getInstance().navigateToApp(
           endpointGroups.id,
           {
             path: `#/manager/?tab=groups&group=${group}`,
           },
         );
-      case 'filter':
+      case ACTION.FILTER:
         return this.props.filterAction?.(group);
       default:
         console.error('Wrong property in GroupTruncate component');
@@ -62,20 +75,18 @@ export class GroupTruncate extends React.Component {
     }
   }
 
-  renderButton(auxIndex) {
+  renderButton(quantity: number) {
     return (
       <EuiLink
         style={{ textDecoration: 'none', fontWeight: '400', fontSize: 'small' }}
         className={'no-focus'}
-        onMouseDown={ev => {
-          ev.stopPropagation();
-        }}
-        onClick={ev => {
-          ev.stopPropagation();
-          this.setState({ popoverOpen: !this.state.popoverOpen });
+        onMouseDown={this.stopPropagation}
+        onClick={(event: Event) => {
+          event.stopPropagation();
+          this.togglePopover();
         }}
       >
-        &nbsp;{`+${auxIndex} ${this.props.label}`}
+        &nbsp;{`+${quantity} ${this.props.label}`}
       </EuiLink>
     );
   }
@@ -86,11 +97,9 @@ export class GroupTruncate extends React.Component {
         color={'hollow'}
         key={`agent-group-${index}`}
         onClickAriaLabel={`agent-group-${index}`}
-        onMouseDown={ev => {
-          ev.stopPropagation();
-        }}
-        onClick={ev => {
-          ev.stopPropagation();
+        onMouseDown={this.stopPropagation}
+        onClick={(event: Event) => {
+          event.stopPropagation();
           this.action(group);
         }}
       >
@@ -101,16 +110,16 @@ export class GroupTruncate extends React.Component {
 
   renderGroups(groups: string[] = []) {
     const { length } = this.props;
-    let auxGroups: Array<React.ReactNode> = [];
-    let tooltipGroups: Array<React.ReactNode> = [];
+    const auxGroups: React.ReactNode[] = [];
+    const tooltipGroups: React.ReactNode[] = [];
     let auxLength = 0;
     let auxIndex = 0;
     if (groups.length >= 2 && groups.toString().length >= length) {
-      groups.map((group, index) => {
-        auxLength = auxLength + group.length;
+      groups.forEach((group, index) => {
+        auxLength += group.length;
         if (auxLength >= length) {
           tooltipGroups.push(
-            <EuiFlexItem grow={1} key={`agent-group-${index}`}>
+            <EuiFlexItem grow={false} key={`agent-group-${index}`}>
               {this.renderBadge(group, index)}
             </EuiFlexItem>,
           );
@@ -120,14 +129,14 @@ export class GroupTruncate extends React.Component {
         }
       });
     } else {
-      groups.map((group, index) => {
+      groups.forEach((group, index) => {
         auxGroups.push(this.renderBadge(group, index));
       });
     }
     const button = this.renderButton(auxIndex);
     return (
       <span style={{ display: 'inline' }}>
-        <Fragment>{auxGroups}</Fragment>
+        {auxGroups}
         {auxIndex > 0 && (
           <EuiPopover
             button={button}
@@ -148,7 +157,6 @@ export class GroupTruncate extends React.Component {
   }
 
   render() {
-    const groups = this.renderGroups(this.props.groups);
-    return groups;
+    return this.renderGroups(this.props.groups);
   }
 }

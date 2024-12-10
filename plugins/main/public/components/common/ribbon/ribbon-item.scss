@@ -2,3 +2,9 @@
   font-size: 12px;
   font-family: sans-serif;
 }
+
+@media (max-width: 767px) {
+  .wz-ribbon-item {
+    max-width: none !important;
+  }
+}

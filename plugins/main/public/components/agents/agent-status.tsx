@@ -9,6 +9,7 @@ import { EuiIconTip } from '@elastic/eui';
 import { AGENT_STATUS_CODE } from '../../../common/constants';
 import '../../styles/common.scss';
 import { Agent } from '../endpoints-summary/types';
+import './agent-status.scss';
 
 interface AgentStatusProps {
   status: TAgentStatus;
@@ -37,7 +38,7 @@ export const AgentStatus = ({
         tooltip={agentStatusLabelByAgentStatus(status).toLowerCase()}
       />
       <EuiIconTip
-        anchorClassName='wz-margin-left-10'
+        anchorClassName='wz-agent-icon-tip'
         aria-label='Description'
         size='m'
         type='iInCircle'

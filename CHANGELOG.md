@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.1
 
+### Changed
+
+- Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
+
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 03
 
 ### Added
