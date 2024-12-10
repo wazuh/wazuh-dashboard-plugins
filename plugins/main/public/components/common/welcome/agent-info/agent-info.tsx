@@ -119,7 +119,7 @@ export class AgentInfo extends Component<AgentInfoProps> {
               ? agent.node_name
               : '-',
           label: 'Cluster node',
-          style: { minWidth: 120 },
+          style: { minWidth: 100, maxWidth: 100 },
         },
         {
           key: 'registration-date',
