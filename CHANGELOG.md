@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.2
 
+### Changed
+
+- Refined queue usage visualizations in Statistics [#7192](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7192)
+
 ### Fixed
 
 - Fixed adding the same filter twice doesn't show it in the search bar [#7185](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7185)
