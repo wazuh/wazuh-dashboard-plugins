@@ -1,15 +1,15 @@
 import React from 'react';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { withGuardAsync } from '../../../../common/hocs';
 import { getSavedObjects } from '../../../../../kibana-services';
 import { SavedObject } from '../../../../../react-services';
 import { NOT_TIME_FIELD_NAME_INDEX_PATTERN } from '../../../../../../common/constants';
-import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
-import NavigationService from '../../../../../react-services/navigation-service';
+import { NavigationService } from '../../../../../react-services/navigation-service';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
@@ -20,15 +20,16 @@ async function checkExistenceIndexPattern(indexPatternID: string) {
 async function checkExistenceIndices(indexPatternId: string) {
   try {
     const fields = await SavedObject.getIndicesFields(indexPatternId);
+
     return { exist: true, fields };
-  } catch (error) {
+  } catch {
     return { exist: false };
   }
 }
 
 async function createIndexPattern(indexPattern, fields: any) {
   try {
-    await SavedObject.createSavedObjectIndexPattern(
+    await SavedObject.createSavedObject(
       'index-pattern',
       indexPattern,
       {
@@ -51,7 +52,7 @@ export async function validateVulnerabilitiesStateDataSources({
   try {
     // Check the existence of related index pattern
     const existIndexPattern = await checkExistenceIndexPattern(indexPatternID);
-    let indexPattern = existIndexPattern;
+    const indexPattern = existIndexPattern;
 
     // If the idnex pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === 404) {
@@ -70,11 +71,13 @@ export async function validateVulnerabilitiesStateDataSources({
           },
         };
       }
+
       // If the some index match the index pattern, then create the index pattern
       const resultCreateIndexPattern = await createIndexPattern(
         indexPatternID,
         fields,
       );
+
       if (resultCreateIndexPattern?.error) {
         return {
           ok: true,
@@ -86,6 +89,7 @@ export async function validateVulnerabilitiesStateDataSources({
           },
         };
       }
+
       /* WORKAROUND: Redirect to the root of Vulnerabilities Detection application that should
         redirects to the Dashboard tab. We want to redirect to this view, because we need the
         component is visible (visualizations) to ensure the process that defines the filters for the
@@ -95,6 +99,7 @@ export async function validateVulnerabilitiesStateDataSources({
       */
       NavigationService.getInstance().navigateToApp(vulnerabilityDetection.id);
     }
+
     return {
       ok: false,
       data: { indexPattern },
@@ -127,10 +132,13 @@ const errorPromptBody = {
   ),
 };
 
-export const PromptCheckIndex = props => {
+export const PromptCheckIndex = (props: {
+  error: { title: string; message: string; type?: string };
+  refresh: () => void;
+}) => {
   const { refresh } = props;
-  const { title, message } = props?.error;
-  const body = errorPromptBody?.[props?.error?.type] || <p>{message}</p>;
+  const { title, message } = props.error;
+  const body = errorPromptBody?.[props.error?.type] || <p>{message}</p>;
 
   return (
     <EuiEmptyPrompt
@@ -146,10 +154,12 @@ export const PromptCheckIndex = props => {
   );
 };
 
-const mapStateToProps = state => ({
-  vulnerabilitiesStatesindexPatternID:
-    state.appConfig.data['vulnerabilities.pattern'],
-});
+const mapStateToProps = state => {
+  return {
+    vulnerabilitiesStatesindexPatternID:
+      state.appConfig.data['vulnerabilities.pattern'],
+  };
+};
 
 export const withVulnerabilitiesStateDataSource = compose(
   connect(mapStateToProps),
