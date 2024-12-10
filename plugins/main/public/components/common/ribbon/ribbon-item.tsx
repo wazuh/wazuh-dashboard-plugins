@@ -112,7 +112,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
     ) : isGroups(item) && item.value?.length ? (
       <GroupTruncate
         groups={item.value}
-        length={40}
+        length={20}
         label={'more'}
         action={'redirect'}
       />
