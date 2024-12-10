@@ -8,6 +8,7 @@ import { GroupTruncate } from '../util/agent-group-truncate';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import './ribbon-item.scss';
 import { getAgentOSType } from '../../../react-services';
+import { TAgentStatus } from '../../../../common/services/wz_agent_status';
 
 const FONT_SIZE = 12;
 
@@ -25,6 +26,7 @@ export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   isLoading?: boolean;
   icon?: React.ReactNode;
   condensed?: boolean;
+  render?: () => React.ReactNode;
 };
 
 const isGroups = (
@@ -52,9 +54,7 @@ interface RibbonItemProps {
 const WzRibbonItem = (props: RibbonItemProps) => {
   const { item } = props;
 
-  const elementStyle = { ...(item.style || {}), fontSize: FONT_SIZE };
-  const wzWidth100 = { anchorClassName: 'wz-width-100' };
-  const tooltipProps = item.key === 'cluster-node' ? wzWidth100 : {};
+  item.style = { ...item.style, fontSize: FONT_SIZE };
 
   const getPlatformIcon = (agent?: Agent) => {
     let icon = '';
@@ -92,9 +92,19 @@ const WzRibbonItem = (props: RibbonItemProps) => {
     return `${name} ${version}`;
   };
 
-  const renderField = function <T>(field?: T): T | string {
+  const renderOptionalField = function <T>(field?: T): T | string {
     return field !== undefined || field ? field : '-';
   };
+
+  if (isOperatingSystem(item)) {
+    item.render = () => {
+      return (
+        <>
+          {getPlatformIcon(item.value)} {getOsName(item.value)}
+        </>
+      );
+    };
+  }
 
   const renderValue = () => {
     return item.isLoading ? (
@@ -106,30 +116,21 @@ const WzRibbonItem = (props: RibbonItemProps) => {
         label={'more'}
         action={'redirect'}
       />
-    ) : isOperatingSystem(item) ? (
-      <WzTextWithTooltipIfTruncated
-        position='bottom'
-        tooltipProps={wzWidth100}
-        elementStyle={{
-          ...elementStyle,
-          maxWidth: item.style?.maxWidth,
-        }}
-      >
-        {getPlatformIcon(item.value)} {getOsName(item.value)}
-      </WzTextWithTooltipIfTruncated>
     ) : isStatus(item) ? (
       <AgentStatus
-        status={item.value?.status}
+        status={item.value?.status as TAgentStatus}
         agent={item.value}
-        style={elementStyle}
+        style={item.style}
       />
     ) : (
-      <WzTextWithTooltipIfTruncated
-        position='bottom'
-        tooltipProps={tooltipProps}
-        elementStyle={elementStyle}
-      >
-        {item.icon} {renderField(item.value)}
+      <WzTextWithTooltipIfTruncated elementStyle={item.style}>
+        {item.render ? (
+          item.render()
+        ) : (
+          <>
+            {item.icon} {renderOptionalField(item.value)}
+          </>
+        )}
       </WzTextWithTooltipIfTruncated>
     );
   };
