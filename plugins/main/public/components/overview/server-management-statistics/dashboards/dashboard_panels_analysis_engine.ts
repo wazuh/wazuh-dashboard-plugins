@@ -739,7 +739,7 @@ const getVisStateEventsDecodedSummary = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: true,
         },
