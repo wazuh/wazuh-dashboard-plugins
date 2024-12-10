@@ -1,10 +1,16 @@
-import { suggestItem } from '../../wz-search-bar';
+import React from 'react';
 import { AQL } from './aql';
 import { WQL } from './wql';
 
+export interface SuggestItem {
+  type: { iconType: string; color: string };
+  label: string;
+  description?: string;
+}
+
 interface SearchBarProps {
-  suggestions: suggestItem[];
-  onItemClick: (currentInput: string) => (item: suggestItem) => void;
+  suggestions: SuggestItem[];
+  onItemClick: (currentInput: string) => (item: SuggestItem) => void;
   prepend?: React.ReactNode;
   disableFocusTrap?: boolean;
   isInvalid?: boolean;
