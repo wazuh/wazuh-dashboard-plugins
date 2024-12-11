@@ -39,26 +39,33 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
     };
   }
 
+  /**
+   * The function `createClone` creates a clone of an HTML element with specific
+   * styling properties.
+   * @param {HTMLElement} reference - The `reference` parameter in the `createClone`
+   * function is an HTMLElement that serves as the reference element from which a
+   * clone will be created.
+   * @returns The function `createClone` returns a clone of the provided
+   * `HTMLElement` reference with specific styles applied.
+   */
+  createClone(reference: HTMLElement) {
+    // HTML element clone of reference
+    const clone = reference.cloneNode(true) as HTMLElement;
+    clone.style.display = 'inline';
+    clone.style.width = 'auto';
+    clone.style.visibility = 'hidden';
+    clone.style.maxWidth = 'none';
+    return clone;
+  }
+
   componentDidUpdate() {
     this.timer = setTimeout(() => {
-      // HTML element reference with text (maybe truncated)
       const reference = this.contentReference.current as HTMLElement;
-      // HTML element clone of reference
-      const clone = reference.cloneNode(true) as HTMLElement;
-      clone.style.display = 'inline';
-      clone.style.width = 'auto';
-      clone.style.visibility = 'hidden';
-      clone.style.maxWidth = 'none';
-      // Insert clone in DOM appending as sibling of reference to measure both
-      // reference.parentNode.appendChild(clone);
-      // Insert clone in DOM as body child
+      const clone = this.createClone(reference);
       document.body.appendChild(clone);
-      // Compare widths
-      if (reference.offsetWidth < clone.offsetWidth) {
-        // Set withTooltip to true to render truncated element with a tooltip
-        this.setState({ withTooltip: true });
-      }
-      // Remove clone of DOM
+      this.setState({
+        withTooltip: reference.offsetWidth < clone.offsetWidth,
+      });
       clone.remove();
     });
   }
