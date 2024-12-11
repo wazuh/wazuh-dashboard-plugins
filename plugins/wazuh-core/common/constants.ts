@@ -9,13 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import path from 'path';
+import path from 'node:path';
 import { version } from '../package.json';
 // import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
 
 // Plugin
-export const PLUGIN_VERSION = version;
+
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 
 // Index patterns - Wazuh alerts
@@ -101,7 +101,7 @@ export const WAZUH_SECURITY_PLUGINS = [
 ];
 
 // App configuration
-export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
+export const WAZUH_CONFIGURATION_CACHE_TIME = 10_000; // time in ms;
 
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
@@ -109,6 +109,7 @@ export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
 // Wazuh data path
 const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
+
 export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = path.join(
   __dirname,
   '../../../',
@@ -148,7 +149,9 @@ export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
 
 // Wazuh errors
-export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
+export enum WAZUH_ERROR_CODES {
+  DAEMONS_NOT_READY = 3099,
+}
 
 // Agents
 export enum WAZUH_AGENTS_OS_TYPE {
@@ -234,7 +237,7 @@ export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
 export const HEALTH_CHECK = 'health-check';
 
 // Health check
-export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
+export const HEALTH_CHECK_REDIRECTION_TIME = 300; // ms
 
 // Plugin platform settings
 // Default timeFilter set by the app
@@ -246,7 +249,7 @@ export const PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER =
   'timepicker:timeDefaults';
 
 // Default maxBuckets set by the app
-export const WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS = 200000;
+export const WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS = 200_000;
 export const PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS = 'timeline:max_buckets';
 
 // Default metaFields set by the app
@@ -386,7 +389,7 @@ export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
   'not_time_field_name_index_pattern';
 
 // Customization
-export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
+export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1_048_576;
 
 // Plugin settings
 export enum SettingCategory {
@@ -400,23 +403,27 @@ export enum SettingCategory {
   API_CONNECTION,
 }
 
-type TPluginSettingOptionsTextArea = {
+interface TPluginSettingOptionsArrayOf {
+  arrayOf: Record<string, any>;
+}
+
+interface TPluginSettingOptionsTextArea {
   maxRows?: number;
   minRows?: number;
   maxLength?: number;
-};
+}
 
-type TPluginSettingOptionsSelect = {
+interface TPluginSettingOptionsSelect {
   select: { text: string; value: any }[];
-};
+}
 
-type TPluginSettingOptionsEditor = {
+interface TPluginSettingOptionsEditor {
   editor: {
     language: string;
   };
-};
+}
 
-type TPluginSettingOptionsFile = {
+interface TPluginSettingOptionsFile {
   file: {
     type: 'image';
     extensions?: string[];
@@ -437,24 +444,24 @@ type TPluginSettingOptionsFile = {
       resolveStaticURL: (filename: string) => string;
     };
   };
-};
+}
 
-type TPluginSettingOptionsNumber = {
+interface TPluginSettingOptionsNumber {
   number: {
     min?: number;
     max?: number;
     integer?: boolean;
   };
-};
+}
 
-type TPluginSettingOptionsSwitch = {
+interface TPluginSettingOptionsSwitch {
   switch: {
     values: {
       disabled: { label?: string; value: any };
       enabled: { label?: string; value: any };
     };
   };
-};
+}
 
 export enum EpluginSettingType {
   text = 'text',
@@ -469,7 +476,7 @@ export enum EpluginSettingType {
   custom = 'custom',
 }
 
-export type TPluginSetting = {
+export interface TPluginSetting {
   // Define the text displayed in the UI.
   title: string;
   // Description.
@@ -509,7 +516,8 @@ export type TPluginSetting = {
     | TPluginSettingOptionsNumber
     | TPluginSettingOptionsSelect
     | TPluginSettingOptionsSwitch
-    | TPluginSettingOptionsTextArea;
+    | TPluginSettingOptionsTextArea
+    | TPluginSettingOptionsArrayOf;
   // Transform the input value. The result is saved in the form global state of Settings/Configuration
   uiFormTransformChangedInputValue?: (value: any) => any;
   // Transform the configuration value or default as initial value for the input in Settings/Configuration
@@ -520,68 +528,8 @@ export type TPluginSetting = {
   validateUIForm?: (value: any) => string | undefined;
   // Validate function creator to validate the setting in the backend.
   validate?: (value: unknown) => string | undefined;
-};
-
-export type TPluginSettingWithKey = TPluginSetting & { key: TPluginSettingKey };
-export type TPluginSettingCategory = {
-  title: string;
-  description?: string;
-  documentationLink?: string;
-  renderOrder?: number;
-};
-
-export const PLUGIN_SETTINGS_CATEGORIES: {
-  [category: number]: TPluginSettingCategory;
-} = {
-  [SettingCategory.HEALTH_CHECK]: {
-    title: 'Health check',
-    description: "Checks will be executed by the app's Healthcheck.",
-    renderOrder: SettingCategory.HEALTH_CHECK,
-  },
-  [SettingCategory.GENERAL]: {
-    title: 'General',
-    description:
-      'Basic app settings related to alerts index pattern, hide the manager alerts in the dashboards, logs level and more.',
-    renderOrder: SettingCategory.GENERAL,
-  },
-  [SettingCategory.SECURITY]: {
-    title: 'Security',
-    description: 'Application security options such as unauthorized roles.',
-    renderOrder: SettingCategory.SECURITY,
-  },
-  [SettingCategory.MONITORING]: {
-    title: 'Task:Monitoring',
-    description:
-      'Options related to the agent status monitoring job and its storage in indexes.',
-    renderOrder: SettingCategory.MONITORING,
-  },
-  [SettingCategory.STATISTICS]: {
-    title: 'Task:Statistics',
-    description:
-      'Options related to the daemons manager monitoring job and their storage in indexes.',
-    renderOrder: SettingCategory.STATISTICS,
-  },
-  [SettingCategory.VULNERABILITIES]: {
-    title: 'Vulnerabilities',
-    description:
-      'Options related to the agent vulnerabilities monitoring job and its storage in indexes.',
-    renderOrder: SettingCategory.VULNERABILITIES,
-  },
-  [SettingCategory.CUSTOMIZATION]: {
-    title: 'Custom branding',
-    description:
-      'If you want to use custom branding elements such as logos, you can do so by editing the settings below.',
-    documentationLink: 'user-manual/wazuh-dashboard/white-labeling.html',
-    renderOrder: SettingCategory.CUSTOMIZATION,
-  },
-  [SettingCategory.API_CONNECTION]: {
-    title: 'API connections',
-    description: 'Options related to the API connections.',
-    renderOrder: SettingCategory.API_CONNECTION,
-  },
-};
-
-export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
+}
+export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
   'alerts.sample.prefix': {
     title: 'Sample alerts prefix',
     description:
@@ -597,7 +545,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
@@ -639,15 +587,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'checks.fields': {
     title: 'Known fields',
@@ -670,15 +616,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'checks.maxBuckets': {
     title: 'Set max buckets to 200000',
@@ -701,15 +645,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'checks.metaFields': {
     title: 'Remove meta fields',
@@ -732,15 +674,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'checks.pattern': {
     title: 'Index pattern',
@@ -763,15 +703,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'checks.setup': {
     title: 'API version',
@@ -794,15 +732,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'checks.template': {
     title: 'Index template',
@@ -825,15 +761,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'checks.timeFilter': {
     title: 'Set time filter to 24h',
@@ -856,15 +790,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'configuration.ui_api_editable': {
     title: 'Configuration UI editable',
@@ -888,15 +820,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'cron.prefix': {
     title: 'Cron prefix',
@@ -911,7 +841,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: WAZUH_STATISTICS_DEFAULT_PREFIX,
     isConfigurableFromSettings: true,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validate: SettingsValidator.compose(
@@ -959,12 +889,14 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     ): any {
       try {
         return JSON.parse(value);
-      } catch (error) {
+      } catch {
         return value;
       }
     },
     validateUIForm: function (value) {
-      return SettingsValidator.json(this.validate)(value);
+      return SettingsValidator.json(
+        this.validate as (value: unknown) => string | undefined,
+      )(value);
     },
     validate: SettingsValidator.compose(
       SettingsValidator.array(
@@ -1010,11 +942,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     validate: function (value) {
       return SettingsValidator.literal(
-        this.options.select.map(({ value }) => value),
+        this.options?.select.map(({ value }) => value),
       )(value);
     },
   },
@@ -1075,24 +1007,16 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         integer: true,
       },
     },
-    uiFormTransformConfigurationValueToInputValue: function (
-      value: number,
-    ): string {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
+    uiFormTransformConfigurationValueToInputValue: String,
+    uiFormTransformInputValueToConfigurationValue: Number,
     validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
+      return this.validate?.(
+        this.uiFormTransformInputValueToConfigurationValue?.(value),
       );
     },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
+    validate: function (value: number) {
+      return SettingsValidator.number(this.options?.number)(value);
+    } as (value: unknown) => string | undefined,
   },
   'cron.statistics.index.shards': {
     title: 'Index shards',
@@ -1114,22 +1038,16 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         integer: true,
       },
     },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
+    uiFormTransformConfigurationValueToInputValue: String,
+    uiFormTransformInputValueToConfigurationValue: Number,
     validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
+      return this.validate?.(
+        this.uiFormTransformInputValueToConfigurationValue?.(value),
       );
     },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
+    validate: function (value: number) {
+      return SettingsValidator.number(this.options?.number)(value);
+    } as (value: unknown) => string | undefined,
   },
   'cron.statistics.interval': {
     title: 'Interval',
@@ -1171,15 +1089,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'customization.enabled': {
     title: 'Status',
@@ -1202,15 +1118,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'customization.logo.app': {
     title: 'App main logo',
@@ -1251,11 +1165,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     validateUIForm: function (value) {
       return SettingsValidator.compose(
         SettingsValidator.filePickerFileSize({
-          ...this.options.file.size,
+          ...(this.options as TPluginSettingOptionsFile)?.file.size,
           meaningfulUnit: true,
         }),
         SettingsValidator.filePickerSupportedExtensions(
-          this.options.file.extensions,
+          (this.options as TPluginSettingOptionsFile)?.file.extensions ?? [],
         ),
       )(value);
     },
@@ -1299,11 +1213,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     validateUIForm: function (value) {
       return SettingsValidator.compose(
         SettingsValidator.filePickerFileSize({
-          ...this.options.file.size,
+          ...(this.options as TPluginSettingOptionsFile)?.file.size,
           meaningfulUnit: true,
         }),
         SettingsValidator.filePickerSupportedExtensions(
-          this.options.file.extensions,
+          (this.options as TPluginSettingOptionsFile)?.file.extensions ?? [],
         ),
       )(value);
     },
@@ -1346,11 +1260,11 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     validateUIForm: function (value) {
       return SettingsValidator.compose(
         SettingsValidator.filePickerFileSize({
-          ...this.options.file.size,
+          ...(this.options as TPluginSettingOptionsFile)?.file.size,
           meaningfulUnit: true,
         }),
         SettingsValidator.filePickerSupportedExtensions(
-          this.options.file.extensions,
+          (this.options as TPluginSettingOptionsFile)?.file.extensions ?? [],
         ),
       )(value);
     },
@@ -1370,14 +1284,14 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromSettings: true,
     options: { maxRows: 2, maxLength: 50 },
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     validate: function (value) {
       return SettingsValidator.compose(
         SettingsValidator.isString,
         SettingsValidator.multipleLinesString({
-          maxRows: this.options?.maxRows,
-          maxLength: this.options?.maxLength,
+          maxRows: (this.options as TPluginSettingOptionsTextArea)?.maxRows,
+          maxLength: (this.options as TPluginSettingOptionsTextArea)?.maxLength,
         }),
       )(value);
     },
@@ -1397,14 +1311,14 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     isConfigurableFromSettings: true,
     options: { maxRows: 3, maxLength: 40 },
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     validate: function (value) {
       return SettingsValidator.compose(
         SettingsValidator.isString,
         SettingsValidator.multipleLinesString({
-          maxRows: this.options?.maxRows,
-          maxLength: this.options?.maxLength,
+          maxRows: (this.options as TPluginSettingOptionsTextArea)?.maxRows,
+          maxLength: (this.options as TPluginSettingOptionsTextArea)?.maxLength,
         }),
       )(value);
     },
@@ -1423,7 +1337,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: '',
     isConfigurableFromSettings: true,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     validate: SettingsValidator.compose(
       SettingsValidator.isString,
@@ -1444,7 +1358,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: '',
     isConfigurableFromSettings: false,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     validate: SettingsValidator.compose(
       SettingsValidator.isString,
@@ -1472,15 +1386,13 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   hosts: {
     title: 'Server hosts',
@@ -1520,12 +1432,12 @@ hosts:
       username: wazuh-wui
       password: wazuh-wui
       run_as: false`,
-        transformFrom: value => {
-          return value.map(hostData => {
+        transformFrom: value =>
+          value.map((hostData: Record<string, any>) => {
             const key = Object.keys(hostData)?.[0];
+
             return { ...hostData[key], id: key };
-          });
-        },
+          }),
       },
     },
     options: {
@@ -1536,7 +1448,7 @@ hosts:
           type: EpluginSettingType.text,
           defaultValue: 'default',
           isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
+          validateUIForm: function (value: string) {
             return this.validate(value);
           },
           validate: SettingsValidator.compose(
@@ -1550,7 +1462,7 @@ hosts:
           type: EpluginSettingType.text,
           defaultValue: 'https://localhost',
           isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
+          validateUIForm: function (value: string) {
             return this.validate(value);
           },
           validate: SettingsValidator.compose(
@@ -1562,31 +1474,23 @@ hosts:
           title: 'Port',
           description: 'Port',
           type: EpluginSettingType.number,
-          defaultValue: 55000,
+          defaultValue: 55_000,
           isConfigurableFromSettings: true,
           options: {
             number: {
               min: 0,
-              max: 65535,
+              max: 65_535,
               integer: true,
             },
           },
-          uiFormTransformConfigurationValueToInputValue: function (
-            value: number,
-          ) {
-            return String(value);
-          },
-          uiFormTransformInputValueToConfigurationValue: function (
-            value: string,
-          ): number {
-            return Number(value);
-          },
-          validateUIForm: function (value) {
+          uiFormTransformConfigurationValueToInputValue: String,
+          uiFormTransformInputValueToConfigurationValue: Number,
+          validateUIForm: function (value: number) {
             return this.validate(
               this.uiFormTransformInputValueToConfigurationValue(value),
             );
           },
-          validate: function (value) {
+          validate: function (value: number) {
             return SettingsValidator.number(this.options.number)(value);
           },
         },
@@ -1596,7 +1500,7 @@ hosts:
           type: EpluginSettingType.text,
           defaultValue: 'wazuh-wui',
           isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
+          validateUIForm: function (value: string) {
             return this.validate(value);
           },
           validate: SettingsValidator.compose(
@@ -1610,7 +1514,7 @@ hosts:
           type: EpluginSettingType.password,
           defaultValue: 'wazuh-wui',
           isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
+          validateUIForm: function (value: string) {
             return this.validate(value);
           },
           validate: SettingsValidator.compose(
@@ -1632,12 +1536,8 @@ hosts:
               },
             },
           },
-          uiFormTransformChangedInputValue: function (
-            value: boolean | string,
-          ): boolean {
-            return Boolean(value);
-          },
-          validateUIForm: function (value) {
+          uiFormTransformChangedInputValue: Boolean,
+          validateUIForm: function (value: string) {
             return this.validate(value);
           },
           validate: SettingsValidator.isBoolean,
@@ -1645,11 +1545,7 @@ hosts:
       },
     },
     isConfigurableFromSettings: false,
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     // TODO: add validation
     // validate: SettingsValidator.isBoolean,
     // validate: function (schema) {
@@ -1682,13 +1578,15 @@ hosts:
     ): any {
       try {
         return JSON.parse(value);
-      } catch (error) {
+      } catch {
         return value;
       }
     },
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validateUIForm: function (value) {
-      return SettingsValidator.json(this.validate)(value);
+      return SettingsValidator.json(
+        this.validate as (value: unknown) => string | undefined,
+      )(value);
     },
     validate: SettingsValidator.compose(
       SettingsValidator.array(
@@ -1734,15 +1632,13 @@ hosts:
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'wazuh.updates.disabled': {
     title: 'Check updates',
@@ -1764,12 +1660,10 @@ hosts:
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validate: SettingsValidator.isBoolean,
+    uiFormTransformChangedInputValue: Boolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   pattern: {
     title: 'Index pattern',
@@ -1787,7 +1681,7 @@ hosts:
     requiresRunningHealthCheck: true,
     // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     validate: SettingsValidator.compose(
       SettingsValidator.isString,
@@ -1819,7 +1713,7 @@ hosts:
       'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.number,
-    defaultValue: 20000,
+    defaultValue: 20_000,
     isConfigurableFromSettings: true,
     options: {
       number: {
@@ -1827,22 +1721,16 @@ hosts:
         integer: true,
       },
     },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
+    uiFormTransformConfigurationValueToInputValue: String,
+    uiFormTransformInputValueToConfigurationValue: Number,
     validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
+      return this.validate?.(
+        this.uiFormTransformInputValueToConfigurationValue?.(value),
       );
     },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
+    validate: function (value: number) {
+      return SettingsValidator.number(this.options?.number)(value);
+    } as (value: unknown) => string | undefined,
   },
   'wazuh.monitoring.creation': {
     title: 'Index creation',
@@ -1879,11 +1767,11 @@ hosts:
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     validate: function (value) {
       return SettingsValidator.literal(
-        this.options.select.map(({ value }) => value),
+        this.options?.select.map(({ value }) => value),
       )(value);
     },
   },
@@ -1909,15 +1797,13 @@ hosts:
         },
       },
     },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
+    uiFormTransformChangedInputValue: Boolean,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
-    validate: SettingsValidator.isBoolean,
+    validate: SettingsValidator.isBoolean as (
+      value: unknown,
+    ) => string | undefined,
   },
   'wazuh.monitoring.frequency': {
     title: 'Frequency',
@@ -1939,22 +1825,16 @@ hosts:
         integer: true,
       },
     },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
+    uiFormTransformConfigurationValueToInputValue: String,
+    uiFormTransformInputValueToConfigurationValue: Number,
     validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
+      return this.validate?.(
+        this.uiFormTransformInputValueToConfigurationValue?.(value),
       );
     },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
+    validate: function (value: number) {
+      return SettingsValidator.number(this.options?.number)(value);
+    } as (value: unknown) => string | undefined,
   },
   'wazuh.monitoring.pattern': {
     title: 'Index pattern',
@@ -1970,7 +1850,7 @@ hosts:
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validateUIForm: function (value) {
-      return this.validate(value);
+      return this.validate?.(value);
     },
     validate: SettingsValidator.compose(
       SettingsValidator.isString,
@@ -2011,22 +1891,16 @@ hosts:
         integer: true,
       },
     },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
+    uiFormTransformConfigurationValueToInputValue: String,
+    uiFormTransformInputValueToConfigurationValue: Number,
     validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
+      return this.validate?.(
+        this.uiFormTransformInputValueToConfigurationValue?.(value),
       );
     },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
+    validate: function (value: number) {
+      return SettingsValidator.number(this.options?.number)(value);
+    } as (value: unknown) => string | undefined,
   },
   'wazuh.monitoring.shards': {
     title: 'Index shards',
@@ -2048,22 +1922,16 @@ hosts:
         integer: true,
       },
     },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
+    uiFormTransformConfigurationValueToInputValue: String,
+    uiFormTransformInputValueToConfigurationValue: Number,
     validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
+      return this.validate?.(
+        this.uiFormTransformInputValueToConfigurationValue?.(value),
       );
     },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
+    validate: function (value: number) {
+      return SettingsValidator.number(this.options?.number)(value);
+    } as (value: unknown) => string | undefined,
   },
   'vulnerabilities.pattern': {
     title: 'Index pattern',
@@ -2101,8 +1969,66 @@ hosts:
     ),
   },
 };
-
 export type TPluginSettingKey = keyof typeof PLUGIN_SETTINGS;
+export type TPluginSettingWithKey = TPluginSetting & { key: TPluginSettingKey };
+export interface TPluginSettingCategory {
+  title: string;
+  description?: string;
+  documentationLink?: string;
+  renderOrder?: number;
+}
+
+export const PLUGIN_SETTINGS_CATEGORIES: Record<
+  number,
+  TPluginSettingCategory
+> = {
+  [SettingCategory.HEALTH_CHECK]: {
+    title: 'Health check',
+    description: "Checks will be executed by the app's Healthcheck.",
+    renderOrder: SettingCategory.HEALTH_CHECK,
+  },
+  [SettingCategory.GENERAL]: {
+    title: 'General',
+    description:
+      'Basic app settings related to alerts index pattern, hide the manager alerts in the dashboards, logs level and more.',
+    renderOrder: SettingCategory.GENERAL,
+  },
+  [SettingCategory.SECURITY]: {
+    title: 'Security',
+    description: 'Application security options such as unauthorized roles.',
+    renderOrder: SettingCategory.SECURITY,
+  },
+  [SettingCategory.MONITORING]: {
+    title: 'Task:Monitoring',
+    description:
+      'Options related to the agent status monitoring job and its storage in indexes.',
+    renderOrder: SettingCategory.MONITORING,
+  },
+  [SettingCategory.STATISTICS]: {
+    title: 'Task:Statistics',
+    description:
+      'Options related to the daemons manager monitoring job and their storage in indexes.',
+    renderOrder: SettingCategory.STATISTICS,
+  },
+  [SettingCategory.VULNERABILITIES]: {
+    title: 'Vulnerabilities',
+    description:
+      'Options related to the agent vulnerabilities monitoring job and its storage in indexes.',
+    renderOrder: SettingCategory.VULNERABILITIES,
+  },
+  [SettingCategory.CUSTOMIZATION]: {
+    title: 'Custom branding',
+    description:
+      'If you want to use custom branding elements such as logos, you can do so by editing the settings below.',
+    documentationLink: 'user-manual/wazuh-dashboard/white-labeling.html',
+    renderOrder: SettingCategory.CUSTOMIZATION,
+  },
+  [SettingCategory.API_CONNECTION]: {
+    title: 'API connections',
+    description: 'Options related to the API connections.',
+    renderOrder: SettingCategory.API_CONNECTION,
+  },
+};
 
 export enum HTTP_STATUS_CODES {
   CONTINUE = 100,
@@ -2192,3 +2118,5 @@ export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
 
 // ID used to refer the createOsdUrlStateStorage state
 export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
+
+export { version as PLUGIN_VERSION } from '../package.json';
