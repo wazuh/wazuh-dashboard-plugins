@@ -1,6 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiPanel } from '@elastic/eui';
 import WzRibbonItem, { type IRibbonItem } from './ribbon-item';
+import './ribbon.scss';
 
 interface RibbonProps {
   items: Array<IRibbonItem>;
@@ -9,6 +10,10 @@ interface RibbonProps {
 
 const WzRibbon = (props: RibbonProps) => {
   const { items, 'data-test-subj': dataTestSubj } = props;
+
+  const condensedItems = items.filter(item => item.condensed);
+  const nonCondensedItems = items.filter(item => !item.condensed);
+
   return (
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup
@@ -17,7 +22,12 @@ const WzRibbon = (props: RibbonProps) => {
         justifyContent='spaceBetween'
         style={{ responsive: true }}
       >
-        {items.map(item => (
+        <EuiFlexGroup gutterSize='l' className='wz-ribbon-condensed'>
+          {condensedItems.map(item => (
+            <WzRibbonItem key={item.key} item={item} />
+          ))}
+        </EuiFlexGroup>
+        {nonCondensedItems.map(item => (
           <WzRibbonItem key={item.key} item={item} />
         ))}
       </EuiFlexGroup>
