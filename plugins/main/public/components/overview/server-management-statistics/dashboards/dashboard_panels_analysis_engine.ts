@@ -739,7 +739,7 @@ const getVisStateEventsDecodedSummary = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: true,
         },
@@ -910,6 +910,7 @@ const getVisStateSyscheck = (indexPatternId: string) => {
       ],
       grid: {
         categoryLines: false,
+        valueAxis: '',
       },
       labels: {},
       legendPosition: 'right',
@@ -921,7 +922,7 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: true,
@@ -935,7 +936,7 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: true,
@@ -945,67 +946,11 @@ const getVisStateSyscheck = (indexPatternId: string) => {
         {
           data: {
             id: '3',
-            label: 'Queue size',
-          },
-          drawLinesBetweenPoints: true,
-          interpolate: 'linear',
-          lineWidth: 2,
-          mode: 'normal',
-          show: true,
-          showCircles: true,
-          type: 'line',
-          valueAxis: 'ValueAxis-1',
-        },
-        {
-          data: {
-            id: '4',
-            label: 'Queue Usage',
-          },
-          drawLinesBetweenPoints: true,
-          interpolate: 'linear',
-          lineWidth: 2,
-          mode: 'normal',
-          show: true,
-          showCircles: false,
-          type: 'line',
-          valueAxis: 'ValueAxis-1',
-        },
-        {
-          data: {
-            id: '6',
             label: 'Queue Usage %',
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
-          mode: 'normal',
-          show: true,
-          showCircles: false,
-          type: 'line',
-          valueAxis: 'ValueAxis-2',
-        },
-        {
-          data: {
-            id: '8',
-            label: 'Queue Usage 70%',
-          },
-          drawLinesBetweenPoints: true,
-          interpolate: 'linear',
-          lineWidth: 2,
-          mode: 'normal',
-          show: true,
-          showCircles: false,
-          type: 'line',
-          valueAxis: 'ValueAxis-2',
-        },
-        {
-          data: {
-            id: '7',
-            label: 'Queue Usage 90%',
-          },
-          drawLinesBetweenPoints: true,
-          interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: false,
@@ -1014,10 +959,10 @@ const getVisStateSyscheck = (indexPatternId: string) => {
         },
       ],
       thresholdLine: {
-        color: '#E7664C',
+        color: '#E24D42',
         show: false,
-        style: 'full',
-        value: 14000,
+        style: 'dashed',
+        value: 100,
         width: 1,
       },
       times: [],
@@ -1034,8 +979,9 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           name: 'LeftAxis-1',
           position: 'left',
           scale: {
-            defaultYExtents: false,
+            defaultYExtents: true,
             mode: 'normal',
+            setYExtents: false,
             type: 'linear',
           },
           show: true,
@@ -1057,29 +1003,25 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           position: 'right',
           scale: {
             defaultYExtents: false,
-            mode: 'normal',
-            type: 'linear',
-            setYExtents: true,
-            min: 0,
             max: 100,
+            min: 0,
+            mode: 'normal',
+            setYExtents: true,
+            type: 'linear',
           },
           show: true,
           style: {},
           title: {
-            text: '%',
+            text: 'Queue usage %',
           },
           type: 'value',
         },
       ],
-      row: false,
-      radiusRatio: 22,
     },
     uiState: {
       vis: {
         colors: {
           'Queue Usage %': '#7EB26D',
-          'Queue Usage 70%': '#EAB839',
-          'Queue Usage 90%': '#E24D42',
           'Syscheck EDPS': '#D683CE',
           'Syscheck Events Decoded': '#70DBED',
         },
@@ -1124,26 +1066,6 @@ const getVisStateSyscheck = (indexPatternId: string) => {
         },
         {
           id: '3',
-          enabled: false,
-          type: 'avg',
-          params: {
-            field: 'analysisd.syscheck_queue_size',
-            customLabel: 'Queue size',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '4',
-          enabled: false,
-          type: 'avg',
-          params: {
-            field: 'analysisd.syscheck_queue_usage',
-            customLabel: 'Queue Usage',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '5',
           enabled: true,
           type: 'date_histogram',
           params: {
@@ -1164,35 +1086,31 @@ const getVisStateSyscheck = (indexPatternId: string) => {
           schema: 'segment',
         },
         {
-          id: '6',
+          id: '4',
           enabled: true,
           type: 'avg',
           params: {
             field: 'analysisd.syscheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.syscheck_queue_size\'];def usage = doc[\'analysisd.syscheck_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
             customLabel: 'Queue Usage %',
           },
           schema: 'metric',
         },
         {
-          id: '8',
+          id: '5',
           enabled: true,
-          type: 'avg',
+          type: 'max',
           params: {
-            field: 'analysisd.syscheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 70;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 70%',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '7',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.syscheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 90;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 90%',
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
           },
           schema: 'metric',
         },
@@ -1210,6 +1128,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
       type: 'line',
       grid: {
         categoryLines: false,
+        valueAxis: '',
       },
       categoryAxes: [
         {
@@ -1238,8 +1157,10 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            type: 'linear',
+            defaultYExtents: true,
             mode: 'normal',
+            setYExtents: false,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1259,10 +1180,12 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            type: 'linear',
+            defaultYExtents: false,
+            max: 100,
+            min: 0,
             mode: 'normal',
             setYExtents: true,
-            max: 100,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1271,7 +1194,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
             truncate: 100,
           },
           title: {
-            text: '%',
+            text: 'Queue usage %',
           },
         },
       ],
@@ -1286,7 +1209,21 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
+          interpolate: 'linear',
+          showCircles: true,
+        },
+        {
+          show: true,
+          type: 'line',
+          mode: 'normal',
+          data: {
+            id: '2',
+            label: 'Syscollector EDPS',
+          },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: true,
         },
@@ -1296,83 +1233,13 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           mode: 'normal',
           data: {
             id: '3',
-            label: 'Syscollector EDPS',
-          },
-          valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: true,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '4',
-            label: 'Queue Usage',
-          },
-          valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: true,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '7',
             label: 'Queue Usage %',
           },
           valueAxis: 'ValueAxis-2',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: false,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '5',
-            label: 'Queue Usage 70%',
-          },
-          valueAxis: 'ValueAxis-2',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: false,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '6',
-            label: 'Queue Usage 90%',
-          },
-          valueAxis: 'ValueAxis-2',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: false,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '8',
-            label: 'analysisd.syscollector_queue_size',
-          },
-          valueAxis: 'ValueAxis-2',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: true,
         },
       ],
       addTooltip: true,
@@ -1382,19 +1249,17 @@ const getVisStateSyscollector = (indexPatternId: string) => {
       addTimeMarker: false,
       labels: {},
       thresholdLine: {
+        color: '#E24D42',
         show: false,
-        value: 10,
+        style: 'dashed',
+        value: 100,
         width: 1,
-        style: 'full',
-        color: '#E7664C',
       },
     },
     uiState: {
       vis: {
         colors: {
           'Queue Usage %': '#7EB26D',
-          'Queue Usage 70%': '#EAB839',
-          'Queue Usage 90%': '#E24D42',
           'Syscollector EDPS': '#D683CE',
           'Syscollector Events Decoded': '#70DBED',
         },
@@ -1430,6 +1295,16 @@ const getVisStateSyscollector = (indexPatternId: string) => {
         {
           id: '2',
           enabled: true,
+          type: 'avg',
+          params: {
+            field: 'analysisd.syscollector_edps',
+            customLabel: 'Syscollector EDPS',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '3',
+          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'timestamp',
@@ -1437,6 +1312,7 @@ const getVisStateSyscollector = (indexPatternId: string) => {
               from: 'now-24h',
               to: 'now',
             },
+            json: '',
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
@@ -1448,32 +1324,20 @@ const getVisStateSyscollector = (indexPatternId: string) => {
           schema: 'segment',
         },
         {
-          id: '3',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.syscollector_edps',
-            customLabel: 'Syscollector EDPS',
-          },
-          schema: 'metric',
-        },
-        {
           id: '4',
-          enabled: false,
-          type: 'avg',
-          params: {
-            field: 'analysisd.syscollector_queue_usage',
-            customLabel: 'Queue Usage',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '7',
           enabled: true,
           type: 'avg',
           params: {
             field: 'analysisd.syscollector_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.syscollector_queue_size\'];def usage = doc[\'analysisd.syscollector_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
             customLabel: 'Queue Usage %',
           },
           schema: 'metric',
@@ -1481,32 +1345,10 @@ const getVisStateSyscollector = (indexPatternId: string) => {
         {
           id: '5',
           enabled: true,
-          type: 'avg',
+          type: 'max',
           params: {
-            field: 'analysisd.syscollector_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 70;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 70%',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '6',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.syscollector_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 90;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 90%',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '8',
-          enabled: false,
-          type: 'avg',
-          params: {
-            field: 'analysisd.syscollector_queue_size',
-            customLabel: 'analysisd.syscollector_queue_size',
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
           },
           schema: 'metric',
         },
@@ -1524,6 +1366,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
       type: 'line',
       grid: {
         categoryLines: false,
+        valueAxis: '',
       },
       categoryAxes: [
         {
@@ -1552,8 +1395,10 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            type: 'linear',
+            defaultYExtents: true,
             mode: 'normal',
+            setYExtents: false,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1573,10 +1418,12 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            type: 'linear',
+            defaultYExtents: false,
+            max: 100,
+            min: 0,
             mode: 'normal',
             setYExtents: true,
-            max: 100,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1585,7 +1432,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
             truncate: 100,
           },
           title: {
-            text: '%',
+            text: 'Queue usage %',
           },
         },
       ],
@@ -1600,7 +1447,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: true,
         },
@@ -1614,7 +1461,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: true,
         },
@@ -1628,35 +1475,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-2',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: false,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '4',
-            label: 'Queue usage 70%',
-          },
-          valueAxis: 'ValueAxis-2',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: false,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '5',
-            label: 'Queue usage 90%',
-          },
-          valueAxis: 'ValueAxis-2',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: false,
         },
@@ -1668,19 +1487,17 @@ const getVisStateRootcheck = (indexPatternId: string) => {
       addTimeMarker: false,
       labels: {},
       thresholdLine: {
+        color: '#E24D42',
         show: false,
-        value: 10,
+        style: 'dashed',
+        value: 100,
         width: 1,
-        style: 'full',
-        color: '#E7664C',
       },
     },
     uiState: {
       vis: {
         colors: {
           'Queue Usage %': '#7EB26D',
-          'Queue usage 70%': '#EAB839',
-          'Queue usage 90%': '#E24D42',
           'Rootcheck EDPS': '#D683CE',
           'Rootcheck Events Decoded': '#70DBED',
         },
@@ -1726,39 +1543,6 @@ const getVisStateRootcheck = (indexPatternId: string) => {
         {
           id: '3',
           enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.rootcheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.rootcheck_queue_size\'];def usage = doc[\'analysisd.rootcheck_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage %',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '4',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.rootcheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 70;"\r\n  }\r\n}',
-            customLabel: 'Queue usage 70%',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '5',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.rootcheck_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 90;"\r\n  }\r\n}',
-            customLabel: 'Queue usage 90%',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '6',
-          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'timestamp',
@@ -1766,6 +1550,7 @@ const getVisStateRootcheck = (indexPatternId: string) => {
               from: 'now-24h',
               to: 'now',
             },
+            json: '',
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
@@ -1775,6 +1560,35 @@ const getVisStateRootcheck = (indexPatternId: string) => {
             customLabel: 'timestamp',
           },
           schema: 'segment',
+        },
+        {
+          id: '4',
+          enabled: true,
+          type: 'avg',
+          params: {
+            field: 'analysisd.rootcheck_queue_usage',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
+            customLabel: 'Queue Usage %',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '5',
+          enabled: true,
+          type: 'max',
+          params: {
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
+          },
+          schema: 'metric',
         },
       ],
     },
@@ -1790,6 +1604,7 @@ const getVisStateSCA = (indexPatternId: string) => {
       type: 'line',
       grid: {
         categoryLines: false,
+        valueAxis: '',
       },
       categoryAxes: [
         {
@@ -1818,8 +1633,10 @@ const getVisStateSCA = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            type: 'linear',
+            defaultYExtents: true,
             mode: 'normal',
+            setYExtents: false,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1839,10 +1656,12 @@ const getVisStateSCA = (indexPatternId: string) => {
           show: true,
           style: {},
           scale: {
-            type: 'linear',
+            defaultYExtents: false,
+            max: 100,
+            min: 0,
             mode: 'normal',
             setYExtents: true,
-            max: 100,
+            type: 'linear',
           },
           labels: {
             show: true,
@@ -1851,7 +1670,7 @@ const getVisStateSCA = (indexPatternId: string) => {
             truncate: 100,
           },
           title: {
-            text: '%',
+            text: 'Queue usage %',
           },
         },
       ],
@@ -1866,7 +1685,7 @@ const getVisStateSCA = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: true,
         },
@@ -1880,7 +1699,7 @@ const getVisStateSCA = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-1',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: true,
         },
@@ -1894,35 +1713,7 @@ const getVisStateSCA = (indexPatternId: string) => {
           },
           valueAxis: 'ValueAxis-2',
           drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: false,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '4',
-            label: 'Queue Usage 70%',
-          },
-          valueAxis: 'ValueAxis-2',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          interpolate: 'linear',
-          showCircles: false,
-        },
-        {
-          show: true,
-          type: 'line',
-          mode: 'normal',
-          data: {
-            id: '5',
-            label: 'Queue Usage 90%',
-          },
-          valueAxis: 'ValueAxis-2',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
+          lineWidth: 4,
           interpolate: 'linear',
           showCircles: false,
         },
@@ -1934,23 +1725,20 @@ const getVisStateSCA = (indexPatternId: string) => {
       addTimeMarker: false,
       labels: {},
       thresholdLine: {
+        color: '#E24D42',
         show: false,
-        value: 10,
+        style: 'dashed',
+        value: 100,
         width: 1,
-        style: 'full',
-        color: '#E7664C',
       },
     },
     uiState: {
       vis: {
         colors: {
           'Queue Usage %': '#7EB26D',
-          'Queue Usage 70%': '#EAB839',
-          'Queue Usage 90%': '#E24D42',
           'SCA EDPS': '#D683CE',
           'SCA Events Decoded': '#70DBED',
         },
-        legendOpen: true,
       },
     },
     data: {
@@ -1993,39 +1781,6 @@ const getVisStateSCA = (indexPatternId: string) => {
         {
           id: '3',
           enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.sca_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.sca_queue_size\'];def usage = doc[\'analysisd.sca_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage %',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '4',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.sca_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 70;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 70%',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '5',
-          enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.sca_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 90;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 90%',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '6',
-          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'timestamp',
@@ -2033,6 +1788,7 @@ const getVisStateSCA = (indexPatternId: string) => {
               from: 'now-24h',
               to: 'now',
             },
+            json: '',
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
@@ -2042,6 +1798,35 @@ const getVisStateSCA = (indexPatternId: string) => {
             customLabel: 'timestamp',
           },
           schema: 'segment',
+        },
+        {
+          id: '4',
+          enabled: true,
+          type: 'avg',
+          params: {
+            field: 'analysisd.sca_queue_usage',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
+            customLabel: 'Queue Usage %',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '5',
+          enabled: true,
+          type: 'max',
+          params: {
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
+          },
+          schema: 'metric',
         },
       ],
     },
@@ -2077,19 +1862,19 @@ const getVisStateHostInfo = (indexPatternId: string) => {
       ],
       grid: {
         categoryLines: false,
+        valueAxis: '',
       },
       labels: {},
       legendPosition: 'right',
       seriesParams: [
         {
-          color: '#0000FF',
           data: {
             id: '1',
             label: 'Host info Events Decoded',
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: true,
@@ -2097,14 +1882,13 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           valueAxis: 'ValueAxis-1',
         },
         {
-          color: '#0000FF',
           data: {
             id: '2',
             label: 'Host info EDPS',
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: true,
@@ -2112,65 +1896,25 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           valueAxis: 'ValueAxis-1',
         },
         {
-          color: '#0000FF',
           data: {
             id: '3',
             label: 'Queue Usage %',
           },
           drawLinesBetweenPoints: true,
           interpolate: 'linear',
-          lineWidth: 2,
+          lineWidth: 4,
           mode: 'normal',
           show: true,
           showCircles: false,
-          type: 'line',
-          valueAxis: 'ValueAxis-2',
-        },
-        {
-          color: '#FFCC11',
-          data: {
-            id: '5',
-            label: 'Queue Usage 70%',
-            style: {
-              color: '#FFCC11',
-            },
-          },
-          drawLinesBetweenPoints: true,
-          interpolate: 'linear',
-          lineWidth: 2,
-          mode: 'normal',
-          show: true,
-          showCircles: false,
-          style: {
-            color: '#FFCC11',
-          },
-          type: 'line',
-          valueAxis: 'ValueAxis-2',
-        },
-        {
-          color: '#E7664C',
-          data: {
-            id: '6',
-            label: 'Queue Usage 90%',
-          },
-          drawLinesBetweenPoints: true,
-          interpolate: 'linear',
-          lineWidth: 2,
-          mode: 'normal',
-          show: true,
-          showCircles: false,
-          style: {
-            color: '#E7664C',
-          },
           type: 'line',
           valueAxis: 'ValueAxis-2',
         },
       ],
       thresholdLine: {
-        color: '#E7664C',
+        color: '#E24D42',
         show: false,
-        style: 'full',
-        value: 10,
+        style: 'dashed',
+        value: 100,
         width: 1,
       },
       times: [],
@@ -2187,7 +1931,9 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           name: 'LeftAxis-1',
           position: 'left',
           scale: {
+            defaultYExtents: true,
             mode: 'normal',
+            setYExtents: false,
             type: 'linear',
           },
           show: true,
@@ -2208,15 +1954,17 @@ const getVisStateHostInfo = (indexPatternId: string) => {
           name: 'RightAxis-1',
           position: 'right',
           scale: {
-            mode: 'normal',
-            type: 'linear',
-            setYExtents: true,
+            defaultYExtents: false,
             max: 100,
+            min: 0,
+            mode: 'normal',
+            setYExtents: true,
+            type: 'linear',
           },
           show: true,
           style: {},
           title: {
-            text: '%',
+            text: 'Queue usage %',
           },
           type: 'value',
         },
@@ -2225,11 +1973,9 @@ const getVisStateHostInfo = (indexPatternId: string) => {
     uiState: {
       vis: {
         colors: {
+          'Queue Usage %': '#7EB26D',
           'Host info EDPS': '#D683CE',
           'Host info Events Decoded': '#70DBED',
-          'Queue Usage %': '#7EB26D',
-          'Queue Usage 70%': '#EAB839',
-          'Queue Usage 90%': '#E24D42',
         },
       },
     },
@@ -2273,17 +2019,6 @@ const getVisStateHostInfo = (indexPatternId: string) => {
         {
           id: '3',
           enabled: true,
-          type: 'avg',
-          params: {
-            field: 'analysisd.hostinfo_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "def size = doc[\'analysisd.hostinfo_queue_size\'];def usage = doc[\'analysisd.hostinfo_queue_usage\'];def finalSize = size.size() > 0 ? size.value : 0;def finalUsage = usage.size() > 0 ? usage.value : 0;return finalUsage/finalSize * 100;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage %',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '4',
-          enabled: true,
           type: 'date_histogram',
           params: {
             field: 'timestamp',
@@ -2291,34 +2026,43 @@ const getVisStateHostInfo = (indexPatternId: string) => {
               from: 'now-24h',
               to: 'now',
             },
+            json: '',
             useNormalizedOpenSearchInterval: true,
             scaleMetricValues: false,
             interval: 'auto',
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
+            customLabel: 'timestamp',
           },
           schema: 'segment',
         },
         {
-          id: '5',
+          id: '4',
           enabled: true,
           type: 'avg',
           params: {
             field: 'analysisd.hostinfo_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 70;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 70%',
+            json: JSON.stringify({
+              script: {
+                source: /* python */ `
+                  def usage = doc['analysisd.syscheck_queue_usage'];
+                  def finalUsage = usage.size() > 0 ? usage.value : 0;
+                  return finalUsage * 100;
+                `,
+              },
+            }),
+            customLabel: 'Queue Usage %',
           },
           schema: 'metric',
         },
         {
-          id: '6',
+          id: '5',
           enabled: true,
-          type: 'avg',
+          type: 'max',
           params: {
-            field: 'analysisd.hostinfo_queue_usage',
-            json: '{\r\n  "script": {\r\n      "source": "return 90;"\r\n  }\r\n}',
-            customLabel: 'Queue Usage 90%',
+            field: 'analysisd.syscheck_queue_size',
+            customLabel: 'Queue Size',
           },
           schema: 'metric',
         },
