@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { EuiToolTip } from '@elastic/eui';
 import './wz-text-with-tooltip-if-truncated.scss';
 
@@ -21,23 +21,12 @@ interface WzTextWithTooltipIfTruncatedProps extends React.PropsWithChildren {
   tooltipProps?: object;
 }
 
-export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTooltipIfTruncatedProps> {
-  static defaultProps = {
-    contentStyle: {},
-  };
-  state: {
-    withTooltip: boolean;
-  };
-  timer?: ReturnType<typeof setTimeout>;
-  contentReference: React.RefObject<HTMLElement>;
-
-  constructor(props: WzTextWithTooltipIfTruncatedProps) {
-    super(props);
-    this.contentReference = React.createRef<HTMLElement>();
-    this.state = {
-      withTooltip: false,
-    };
-  }
+const WzTextWithTooltipIfTruncated = (
+  props: WzTextWithTooltipIfTruncatedProps,
+) => {
+  const { contentStyle = {}, tooltip, tooltipProps, children } = props;
+  const [withTooltip, setWithTooltip] = useState(false);
+  const contentReference = useRef<HTMLElement>(null);
 
   /**
    * The function `createClone` creates a clone of an HTML element with specific
@@ -48,7 +37,7 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
    * @returns The function `createClone` returns a clone of the provided
    * `HTMLElement` reference with specific styles applied.
    */
-  createClone(reference: HTMLElement) {
+  const createClone = (reference: HTMLElement) => {
     // HTML element clone of reference
     const clone = reference.cloneNode(true) as HTMLElement;
     clone.style.display = 'inline';
@@ -56,49 +45,47 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
     clone.style.visibility = 'hidden';
     clone.style.maxWidth = 'none';
     return clone;
-  }
+  };
 
-  componentDidUpdate() {
-    this.timer = setTimeout(() => {
-      const reference = this.contentReference.current as HTMLElement;
-      const clone = this.createClone(reference);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const reference = contentReference.current as HTMLElement;
+      const clone = createClone(reference);
       document.body.appendChild(clone);
-      this.setState({
-        withTooltip: reference.offsetWidth < clone.offsetWidth,
-      });
+      setWithTooltip(reference.offsetWidth < clone.offsetWidth);
       clone.remove();
     });
-  }
 
-  componentWillUnmount() {
-    if (this.timer) {
-      clearTimeout(this.timer);
-    }
-  }
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [children]);
 
-  renderContent() {
+  const renderContent = () => {
     return (
       <span
-        ref={this.contentReference}
+        ref={contentReference}
         className='wz-text-content'
-        style={this.props.contentStyle}
+        style={contentStyle}
       >
-        {this.props.children || this.props.tooltip}
+        {children || tooltip}
       </span>
     );
-  }
+  };
 
-  render() {
-    return this.state.withTooltip ? (
-      <EuiToolTip
-        content={this.props.tooltip || this.props.children}
-        {...this.props.tooltipProps}
-        anchorClassName='wz-width-100'
-      >
-        {this.renderContent()}
-      </EuiToolTip>
-    ) : (
-      this.renderContent()
-    );
-  }
-}
+  return withTooltip ? (
+    <EuiToolTip
+      content={tooltip || children}
+      {...tooltipProps}
+      anchorClassName='wz-width-100'
+    >
+      {renderContent()}
+    </EuiToolTip>
+  ) : (
+    renderContent()
+  );
+};
+
+export default React.memo(WzTextWithTooltipIfTruncated);
