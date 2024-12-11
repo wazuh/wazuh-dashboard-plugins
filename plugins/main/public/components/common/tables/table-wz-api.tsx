@@ -79,7 +79,7 @@ export function TableWzAPI({
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [sort, setSort] = useState({ field: 'file', direction: 'asc' });
+  const [sort, setSort] = useState({});
   const onFiltersChange = filters =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
@@ -89,6 +89,9 @@ export function TableWzAPI({
     typeof rest.onDataChange === 'function' ? rest.onDataChange(data) : null;
 
   const formatSorting = sorting => {
+    if (!sorting.field || !sorting.direction) {
+      return '';
+    }
     return `${sorting.direction === 'asc' ? '+' : '-'}${sorting.field}`;
   };
   /**
