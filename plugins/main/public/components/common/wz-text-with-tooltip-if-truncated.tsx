@@ -69,7 +69,7 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
     }
   }
 
-  buildContent() {
+  renderContent() {
     return (
       <span
         ref={this.contentReference}
@@ -88,10 +88,10 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
         {...this.props.tooltipProps}
         anchorClassName='wz-width-100'
       >
-        {this.buildContent()}
+        {this.renderContent()}
       </EuiToolTip>
     ) : (
-      this.buildContent()
+      this.renderContent()
     );
   }
 }
