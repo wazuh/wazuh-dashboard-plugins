@@ -39,7 +39,7 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
     };
   }
 
-  componentDidMount() {
+  componentDidUpdate() {
     this.timer = setTimeout(() => {
       // HTML element reference with text (maybe truncated)
       const reference = this.contentReference.current as HTMLElement;
