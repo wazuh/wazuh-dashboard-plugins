@@ -23,7 +23,7 @@ export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   style?: React.CSSProperties;
   isLoading?: boolean;
   condensed?: boolean;
-  render?: () => React.ReactNode;
+  render?: (value: any) => React.ReactNode;
 };
 
 const isGroups = (
@@ -68,14 +68,13 @@ const WzRibbonItem = (props: RibbonItemProps) => {
         style={item.style}
       />
     ) : (
-      <WzTextWithTooltipIfTruncated contentStyle={contentStyle}>
-        {item.render ? (
-          item.render()
-        ) : (
-          <>
-            {item.icon} {renderOptionalField(item.value)}
-          </>
-        )}
+      <WzTextWithTooltipIfTruncated
+        contentStyle={contentStyle}
+        icon={item.icon}
+      >
+        {item.render
+          ? item.render(item.value)
+          : renderOptionalField(item.value)}
       </WzTextWithTooltipIfTruncated>
     );
   };

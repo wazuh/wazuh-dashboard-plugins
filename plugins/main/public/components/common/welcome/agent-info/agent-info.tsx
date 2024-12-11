@@ -17,6 +17,7 @@ import { formatUIDate } from '../../../../react-services/time-service';
 import { Agent } from '../../../endpoints-summary/types';
 import { RibbonItemLabel, type IRibbonItem } from '../../ribbon/ribbon-item';
 import WzRibbon from '../../ribbon/ribbon';
+import { getOsName, getPlatformIcon } from '../../platform';
 
 interface AgentInfoProps {
   agent: Agent;
@@ -115,6 +116,12 @@ export class AgentInfo extends Component<AgentInfoProps> {
           key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
           label: 'Operating system',
+          render: (value: Agent) => (
+            <>
+              {getPlatformIcon(value)}
+              {getOsName(value)}
+            </>
+          ),
         },
         {
           key: 'cluster-node',

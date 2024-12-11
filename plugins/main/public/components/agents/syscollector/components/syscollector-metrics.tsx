@@ -8,6 +8,8 @@ import {
   IRibbonItem,
   RibbonItemLabel,
 } from '../../../common/ribbon/ribbon-item';
+import { getOsName, getPlatformIcon } from '../../../common/platform';
+import { Agent } from '../../../endpoints-summary/types';
 
 export function InventoryMetrics({ agent }) {
   const [params, setParams] = useState({});
@@ -70,6 +72,12 @@ export function InventoryMetrics({ agent }) {
         label: 'Operating system',
         isLoading: syscollector.isLoading,
         style: { maxWidth: 200 },
+        render: (value: Agent) => (
+          <>
+            {getPlatformIcon(value)}
+            {getOsName(value)}
+          </>
+        ),
       },
       {
         key: 'cpu',
