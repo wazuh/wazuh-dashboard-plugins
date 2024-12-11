@@ -65,13 +65,10 @@ const WzRibbonItem = (props: RibbonItemProps) => {
       <AgentStatus
         status={item.value?.status as TAgentStatus}
         agent={item.value}
-        style={item.style}
+        style={contentStyle}
       />
     ) : (
-      <WzTextWithTooltipIfTruncated
-        contentStyle={contentStyle}
-        icon={item.icon}
-      >
+      <WzTextWithTooltipIfTruncated contentStyle={contentStyle}>
         {item.render
           ? item.render(item.value)
           : renderOptionalField(item.value)}
