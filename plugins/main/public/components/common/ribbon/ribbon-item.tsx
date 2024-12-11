@@ -123,7 +123,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
         style={item.style}
       />
     ) : (
-      <WzTextWithTooltipIfTruncated elementStyle={item.style}>
+      <WzTextWithTooltipIfTruncated contentStyle={item.style}>
         {item.render ? (
           item.render()
         ) : (

@@ -17,13 +17,13 @@ import './wz-text-with-tooltip-if-truncated.scss';
 
 interface WzTextWithTooltipIfTruncatedProps extends React.PropsWithChildren {
   tooltip?: string;
-  elementStyle?: React.CSSProperties;
+  contentStyle?: React.CSSProperties;
   tooltipProps?: object;
 }
 
 export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTooltipIfTruncatedProps> {
   static defaultProps = {
-    elementStyle: {},
+    contentStyle: {},
   };
   state: {
     withTooltip: boolean;
@@ -74,7 +74,7 @@ export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTo
       <span
         ref={this.contentReference}
         className='wz-text-content'
-        style={this.props.elementStyle}
+        style={this.props.contentStyle}
       >
         {this.props.children || this.props.tooltip}
       </span>
