@@ -109,12 +109,12 @@ export class AgentInfo extends Component<AgentInfoProps> {
           key: RibbonItemLabel.GROUPS,
           value: agent.group,
           label: 'Group',
+          condensed: true,
         },
         {
           key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
           label: 'Operating system',
-          style: { maxWidth: 150 },
         },
         {
           key: 'cluster-node',
