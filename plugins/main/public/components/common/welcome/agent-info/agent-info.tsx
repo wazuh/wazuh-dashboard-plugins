@@ -136,11 +136,13 @@ export class AgentInfo extends Component<AgentInfoProps> {
           key: 'registration-date',
           value: formatUIDate(agent.dateAdd),
           label: 'Registration date',
+          style: { minWidth: 165 },
         },
         {
           key: 'last-keep-alive',
           value: formatUIDate(agent.lastKeepAlive),
           label: 'Last keep alive',
+          style: { minWidth: 165 },
         },
       ];
     }
