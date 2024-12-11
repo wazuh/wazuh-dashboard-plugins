@@ -54,7 +54,7 @@ interface RibbonItemProps {
 const WzRibbonItem = (props: RibbonItemProps) => {
   const { item } = props;
 
-  item.style = { ...item.style, fontSize: FONT_SIZE };
+  const contentStyle = { ...item.style, fontSize: FONT_SIZE };
 
   const getPlatformIcon = (agent?: Agent) => {
     let icon = '';
@@ -123,7 +123,7 @@ const WzRibbonItem = (props: RibbonItemProps) => {
         style={item.style}
       />
     ) : (
-      <WzTextWithTooltipIfTruncated contentStyle={item.style}>
+      <WzTextWithTooltipIfTruncated contentStyle={contentStyle}>
         {item.render ? (
           item.render()
         ) : (
