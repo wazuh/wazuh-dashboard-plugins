@@ -17,10 +17,12 @@ import {
   EuiCallOut,
   EuiDescriptionList,
   EuiSpacer,
+  EuiFlexGroup,
+  EuiFlexItem,
 } from '@elastic/eui';
 import React, { Fragment, useState, useEffect, useRef } from 'react';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { AppState, ErrorHandler } from '../../../react-services';
+import { compose } from 'redux';
+import { ErrorHandler } from '../../../react-services';
 import {
   useAppConfig,
   useRouterSearch,
@@ -33,7 +35,7 @@ import {
 } from '../services';
 import { CheckResult } from '../components/check-result';
 import { withErrorBoundary, withRouteResolvers } from '../../common/hocs';
-import { getCore, getHttp, getWzCurrentAppID } from '../../../kibana-services';
+import { getCore, getHttp } from '../../../kibana-services';
 import {
   HEALTH_CHECK_REDIRECTION_TIME,
   WAZUH_INDEX_TYPE_MONITORING,
@@ -43,7 +45,6 @@ import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 import { serverApis } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { ip, wzConfig } from '../../../services/resolves';
-import { compose } from 'redux';
 import NavigationService from '../../../react-services/navigation-service';
 
 const checks = {
@@ -94,12 +95,51 @@ const checks = {
   },
 };
 
+const addTagsToUrl = (error: string) => {
+  const words = error.split(' ');
+
+  for (const [index, word] of words.entries()) {
+    if (word.includes('http://') || word.includes('https://')) {
+      if (words[index - 1] === 'guide:') {
+        if (word.endsWith('.') || word.endsWith(',')) {
+          words[index - 2] = `<a href="${word.slice(
+            0,
+            -1,
+          )}" rel="noopener noreferrer" target="_blank">${
+            words[index - 2]
+          } ${words[index - 1].slice(0, -1)}</a>${word.slice(-1)}`;
+        } else {
+          words[index - 2] =
+            `<a href="${word}" rel="noopener noreferrer" target="_blank">${
+              words[index - 2]
+            } ${words[index - 1].slice(0, -1)}</a> `;
+        }
+
+        words.splice(index - 1, 2);
+      } else {
+        if (word.endsWith('.') || word.endsWith(',')) {
+          words[index] = `<a href="${word.slice(
+            0,
+            -1,
+          )}" rel="noopener noreferrer" target="_blank">${word.slice(
+            0,
+            -1,
+          )}</a>${word.slice(-1)}`;
+        } else {
+          words[index] =
+            `<a href="${word}" rel="noopener noreferrer" target="_blank">${word}</a>`;
+        }
+      }
+    }
+  }
+
+  return words.join(' ');
+};
+
 function HealthCheckComponent() {
-  const [checkWarnings, setCheckWarnings] = useState<{ [key: string]: [] }>({});
-  const [checkErrors, setCheckErrors] = useState<{ [key: string]: [] }>({});
-  const [checksReady, setChecksReady] = useState<{ [key: string]: boolean }>(
-    {},
-  );
+  const [checkWarnings, setCheckWarnings] = useState<Record<string, []>>({});
+  const [checkErrors, setCheckErrors] = useState<Record<string, []>>({});
+  const [checksReady, setChecksReady] = useState<Record<string, boolean>>({});
   const [isDebugMode, setIsDebugMode] = useState<boolean>(false);
   const appConfig = useAppConfig();
   const checksInitiated = useRef(false);
@@ -119,6 +159,7 @@ function HealthCheckComponent() {
           .pathname +
         '?' +
         searchParams;
+
       NavigationService.getInstance().navigate(relativePath);
     } else {
       NavigationService.getInstance().navigate('/');
@@ -136,19 +177,18 @@ function HealthCheckComponent() {
 
   useEffect(() => {
     // Redirect to app when all checks are ready
-    Object.keys(checks).every(check => checksReady[check]) &&
+    if (
+      Object.keys(checks).every(check => checksReady[check]) &&
       !isDebugMode &&
-      !thereAreWarnings &&
-      (() =>
-        setTimeout(
-          redirectionPassHealthcheck,
-          HEALTH_CHECK_REDIRECTION_TIME,
-        ))();
+      !thereAreWarnings
+    ) {
+      setTimeout(redirectionPassHealthcheck, HEALTH_CHECK_REDIRECTION_TIME);
+    }
   }, [checksReady]);
 
   useEffect(() => {
     // Check if Health should not redirect automatically (Debug mode)
-    setIsDebugMode(typeof search.debug !== 'undefined');
+    setIsDebugMode(search.debug !== undefined);
   }, []);
 
   const handleWarnings = (checkID, warnings, parsed) => {
@@ -160,6 +200,7 @@ function HealthCheckComponent() {
           }),
         )
       : warnings;
+
     setCheckWarnings(prev => ({ ...prev, [checkID]: newWarnings }));
   };
 
@@ -172,6 +213,7 @@ function HealthCheckComponent() {
           }),
         )
       : errors;
+
     setCheckErrors(prev => ({ ...prev, [checkID]: newErrors }));
   };
 
@@ -198,73 +240,32 @@ function HealthCheckComponent() {
 
   const renderChecks = () => {
     const showLogButton = thereAreErrors || thereAreWarnings || isDebugMode;
-    return Object.keys(checks).map((check, index) => {
-      return (
-        <CheckResult
-          showLogButton={showLogButton}
-          key={`health_check_check_${check}`}
-          name={check}
-          title={checks[check].title}
-          awaitFor={checks[check].awaitFor}
-          shouldCheck={
-            checks[check].shouldCheck || appConfig.data[`checks.${check}`]
-          }
-          validationService={checks[check].validator(appConfig)}
-          handleWarnings={handleWarnings}
-          handleErrors={handleErrors}
-          cleanWarnings={cleanWarnings}
-          cleanErrors={cleanErrors}
-          isLoading={appConfig.isLoading}
-          handleCheckReady={handleCheckReady}
-          checksReady={checksReady}
-          canRetry={checks[check].canRetry}
-        />
-      );
-    });
-  };
 
-  const addTagsToUrl = error => {
-    const words = error.split(' ');
-    words.forEach((word, index) => {
-      if (word.includes('http://') || word.includes('https://')) {
-        if (words[index - 1] === 'guide:') {
-          if (word.endsWith('.') || word.endsWith(',')) {
-            words[index - 2] = `<a href="${word.slice(
-              0,
-              -1,
-            )}" rel="noopener noreferrer" target="_blank">${
-              words[index - 2]
-            } ${words[index - 1].slice(0, -1)}</a>${word.slice(-1)}`;
-          } else {
-            words[
-              index - 2
-            ] = `<a href="${word}" rel="noopener noreferrer" target="_blank">${
-              words[index - 2]
-            } ${words[index - 1].slice(0, -1)}</a> `;
-          }
-          words.splice(index - 1, 2);
-        } else {
-          if (word.endsWith('.') || word.endsWith(',')) {
-            words[index] = `<a href="${word.slice(
-              0,
-              -1,
-            )}" rel="noopener noreferrer" target="_blank">${word.slice(
-              0,
-              -1,
-            )}</a>${word.slice(-1)}`;
-          } else {
-            words[
-              index
-            ] = `<a href="${word}" rel="noopener noreferrer" target="_blank">${word}</a>`;
-          }
+    return Object.keys(checks).map(check => (
+      <CheckResult
+        showLogButton={showLogButton}
+        key={`health_check_check_${check}`}
+        name={check}
+        title={checks[check].title}
+        awaitFor={checks[check].awaitFor}
+        shouldCheck={
+          checks[check].shouldCheck || appConfig.data[`checks.${check}`]
         }
-      }
-    });
-    return words.join(' ');
+        validationService={checks[check].validator(appConfig)}
+        handleWarnings={handleWarnings}
+        handleErrors={handleErrors}
+        cleanWarnings={cleanWarnings}
+        cleanErrors={cleanErrors}
+        isLoading={appConfig.isLoading}
+        handleCheckReady={handleCheckReady}
+        checksReady={checksReady}
+        canRetry={checks[check].canRetry}
+      />
+    ));
   };
 
-  const renderWarnings = () => {
-    return Object.keys(checkWarnings).map(checkID =>
+  const renderWarnings = () =>
+    Object.keys(checkWarnings).map(checkID =>
       checkWarnings[checkID].map((warning, index) => (
         <Fragment key={index}>
           <EuiCallOut
@@ -285,10 +286,8 @@ function HealthCheckComponent() {
         </Fragment>
       )),
     );
-  };
-
-  const renderErrors = () => {
-    return Object.keys(checkErrors).map(checkID =>
+  const renderErrors = () =>
+    Object.keys(checkErrors).map(checkID =>
       checkErrors[checkID].map((error, index) => (
         <Fragment key={index}>
           <EuiCallOut
@@ -309,7 +308,6 @@ function HealthCheckComponent() {
         </Fragment>
       )),
     );
-  };
 
   return (
     <div className='health-check'>

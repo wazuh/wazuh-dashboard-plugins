@@ -1,24 +1,32 @@
-import { ILogger } from '../../../../common/services/configuration';
-import { StateContainer } from '../types';
 import { BehaviorSubject } from 'rxjs';
+import { Logger } from '../../../../common/services/configuration';
+import { StateContainer } from '../types';
 
 export class DataSourceAlertsStateContainer implements StateContainer {
-  private store: any;
-  private storeKey: string = 'currentPattern';
+  private readonly store: any;
+  private readonly STORE_KEY = 'currentPattern';
   updater$: BehaviorSubject<string>;
-  constructor(private logger: ILogger, { store }) {
+
+  constructor(
+    private readonly logger: Logger,
+    { store },
+  ) {
     this.store = store;
     this.updater$ = new BehaviorSubject(this.get());
   }
+
   get() {
     try {
       this.logger.debug('Getting data');
-      const rawData = this.store.get(this.storeKey);
 
+      const rawData = this.store.get(this.STORE_KEY);
       let result = '';
+
       if (rawData) {
         this.logger.debug('Getting decoded data');
+
         let decodedData = decodeURI(rawData);
+
         this.logger.debug(`Decoded data: ${decodedData}`);
 
         /* I assume in previous versions, the selected index pattern could be wrapped with " characters.
@@ -27,9 +35,10 @@ export class DataSourceAlertsStateContainer implements StateContainer {
         if (
           decodedData &&
           decodedData[0] === '"' &&
-          decodedData[decodedData.length - 1] === '"'
+          decodedData.at(-1) === '"'
         ) {
-          const newPattern = decodedData.substring(1, decodedData.length - 1);
+          const newPattern = decodedData.slice(1, -1);
+
           this.set(newPattern);
           decodedData = decodeURI(this.store.get('currentPattern'));
         }
@@ -39,29 +48,37 @@ export class DataSourceAlertsStateContainer implements StateContainer {
         this.logger.debug('No raw data');
         result = '';
       }
+
       this.logger.debug(`Data: ${result}`);
+
       return result;
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(`Error getting data: ${error.message}`);
       throw error;
     }
   }
-  set(data) {
+
+  set(data: any) {
     try {
       this.logger.debug(`Setting data: ${data}`);
+
       const encodedData = encodeURI(data);
+
       this.logger.debug(`Setting encoded data: ${encodedData}`);
+
       const exp = new Date();
+
       exp.setDate(exp.getDate() + 365);
+
       if (data) {
-        this.store.set(this.storeKey, encodedData, {
+        this.store.set(this.STORE_KEY, encodedData, {
           expires: exp,
         });
         this.updater$.next(encodedData);
         this.logger.debug(`Encoded data was set: ${encodedData}`);
       }
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error(`Error setting data: ${error.message}`);
       // TODO: implement
       // const options = {
       //   context: `${AppState.name}.setClusterInfo`,
@@ -77,22 +94,30 @@ export class DataSourceAlertsStateContainer implements StateContainer {
       throw error;
     }
   }
+
   remove() {
     try {
       this.logger.debug('Removing');
-      const result = this.store.remove(this.storeKey);
-      this.updater$.next(undefined);
+
+      const result = this.store.remove(this.STORE_KEY);
+
+      this.updater$.next();
       this.logger.debug('Removed');
+
       return result;
     } catch (error) {
       this.logger.error(error.message);
       throw error;
     }
   }
-  subscribe(callback) {
+
+  subscribe(callback: (value: any) => void) {
     this.logger.debug('Subscribing');
+
     const subscription = this.updater$.subscribe(callback);
+
     this.logger.debug('Subscribed');
+
     return subscription;
   }
 }
