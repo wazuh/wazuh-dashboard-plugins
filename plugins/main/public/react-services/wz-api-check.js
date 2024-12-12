@@ -15,7 +15,6 @@ import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import { WazuhConfig } from './wazuh-config';
 
-// eslint-disable-next-line unicorn/no-static-only-class
 export class ApiCheck {
   static async checkStored(data, idChanged = false) {
     try {
