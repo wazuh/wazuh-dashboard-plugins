@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 /*
  * Wazuh app - Settings controller
  * Copyright (C) 2015-2022 Wazuh, Inc.
@@ -58,7 +57,14 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateGlobalBreadcrumb(breadcrumb)),
 });
 
-class SettingsComponent extends React.Component {
+interface SettingsComponentProps {
+  configurationUIEditable: boolean;
+  configurationIPSelector: string;
+  updateGlobalBreadcrumb: (breadcrumb: string) => void;
+  tab: string;
+}
+
+class SettingsComponent extends React.Component<SettingsComponentProps> {
   state: {
     tabs: { id: string; name: string }[] | null;
     load: boolean;
@@ -67,7 +73,7 @@ class SettingsComponent extends React.Component {
     apiEntries;
   };
 
-  constructor(props) {
+  constructor(props: SettingsComponentProps) {
     super(props);
 
     this.wzMisc = new WzMisc();
