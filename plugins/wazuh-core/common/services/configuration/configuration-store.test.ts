@@ -1,4 +1,4 @@
-import { ConfigurationStore } from './configuration-store';
+import { ConfigurationStore } from '../../../server/services/configuration/configuration-store';
 import fs from 'fs';
 
 function createMockLogger() {

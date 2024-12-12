@@ -1,22 +1,13 @@
 import { Logger } from 'opensearch-dashboards/server';
 import {
   IConfigurationStore,
-} from '../../common/services/configuration';
-import { CacheTTL } from '../../common/services/cache';
+} from './configuration';
 import { IConfigurationProvider } from './configuration-provider';
 
-interface IConfigurationStoreOptions {
-  cache_seconds: number;
-  file: string;
-}
-
-interface IStoreGetOptions {
-  ignoreCache: boolean;
-}
 
 export class ConfigurationStore implements IConfigurationStore {
   private providers: Map<string, IConfigurationProvider>;
-  constructor(private logger: Logger, options: IConfigurationStoreOptions) {
+  constructor(private logger: Logger) {
     this.providers = new Map();
   }
 
@@ -33,18 +24,14 @@ export class ConfigurationStore implements IConfigurationStore {
       const configuration = await provider.getAll();
       return configuration;
     } catch (error) {
+      let err = error as Error;
       const enhancedError = new Error(
-        `Error getting configuration: ${error.message}`,
+        `Error getting configuration: ${err?.message}`,
       );
       this.logger.error(enhancedError.message);
       throw enhancedError;
     }
   }
-  
-  private async storeGet(params?: IStoreGetOptions) {}
-
-  private async storeSet(attributes: any) {}
-    
 
   async setup() {
     this.logger.debug('Setup');
@@ -53,7 +40,8 @@ export class ConfigurationStore implements IConfigurationStore {
     try {
       this.logger.debug('Start');
     } catch (error) {
-      this.logger.error(`Error starting: ${error?.message}`);
+      let err = error as Error;
+      this.logger.error(`Error starting: ${err?.message}`);
     }
   }
   async stop() {
@@ -69,15 +57,20 @@ export class ConfigurationStore implements IConfigurationStore {
           return settings[configName];
         }
       } catch (error) {
+        let err = error as Error;
         this.logger.error(
-          `Error getting configuration from ${provider.constructor.name}: ${error.message}`,
+          `Error getting configuration from ${provider.constructor.name}: ${err?.message}`,
         );
       }
     }
     throw new Error(`Configuration ${configName} not found`);
   }
-  async set(settings: { [key: string]: any }): Promise<any> {}
+  async set(settings: { [key: string]: any }): Promise<any> {
+    throw new Error('Method not implemented yet.');
+  }
 
-  async clear(...settings: string[]): Promise<any> {}
+  async clear(...settings: string[]): Promise<any> {
+    throw new Error('Method not implemented yet.');
+  }
 
 }
