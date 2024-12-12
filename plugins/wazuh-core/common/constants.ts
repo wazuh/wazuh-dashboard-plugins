@@ -1845,6 +1845,41 @@ hosts:
       return SettingsValidator.number(this.options.number)(value);
     },
   },
+  'reports.csv.maxRows': {
+    title: 'Max rows in csv reports',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    description:
+      'Maximum rows that will be included in csv reports. If the number of rows exceeds this value, the report will be truncated. Setting a high value can cause instability of the report generating process.',
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.number,
+    defaultValue: 10000,
+    isConfigurableFromSettings: true,
+    options: {
+      number: {
+        integer: true,
+      },
+    },
+    uiFormTransformConfigurationValueToInputValue: function (value: number) {
+      return String(value);
+    },
+    uiFormTransformInputValueToConfigurationValue: function (
+      value: string,
+    ): number {
+      return Number(value);
+    },
+    validateUIForm: function (value) {
+      return this.validate(
+        this.uiFormTransformInputValueToConfigurationValue(value),
+      );
+    },
+    validate: function (value) {
+      return SettingsValidator.number(this.options.number)(value);
+    },
+  },
   'wazuh.monitoring.creation': {
     title: 'Index creation',
     description:
