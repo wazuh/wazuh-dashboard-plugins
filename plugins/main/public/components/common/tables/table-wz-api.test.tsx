@@ -15,6 +15,12 @@
 import React from 'react';
 import { mount } from 'enzyme';
 import { TableWzAPI } from './table-wz-api';
+import { useAppConfig, useStateStorage } from '../hooks';
+
+jest.mock('../hooks', () => ({
+  useAppConfig: jest.fn(),
+  useStateStorage: jest.fn(),
+}));
 
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
@@ -64,6 +70,13 @@ const columns = [
 
 describe('Table WZ API component', () => {
   it('renders correctly to match the snapshot', () => {
+    (useAppConfig as jest.Mock).mockReturnValue({
+      data: {
+        'reports.csv.maxRows': 10000,
+      },
+    });
+    (useStateStorage as jest.Mock).mockReturnValue([[], jest.fn()]);
+
     const wrapper = mount(
       <TableWzAPI
         title='Table'
