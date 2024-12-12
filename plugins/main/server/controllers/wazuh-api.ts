@@ -16,10 +16,7 @@ import { Parser } from 'json2csv';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
-import {
-  HTTP_STATUS_CODES,
-  TABLE_EXPORT_MAX_ROWS,
-} from '../../common/constants';
+import { HTTP_STATUS_CODES } from '../../common/constants';
 import { addJobToQueue } from '../start/queue';
 import jwtDecode from 'jwt-decode';
 import {
@@ -737,6 +734,8 @@ export class WazuhApiCtrl {
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
+    const appConfig = await context.wazuh_core.configuration.get();
+    const reportMaxRows = appConfig['reports.csv.maxRows'] || 10000;
     try {
       if (!request.body || !request.body.path)
         throw new Error('Field path is required');
@@ -785,19 +784,25 @@ export class WazuhApiCtrl {
 
       if (totalItems && !isList) {
         params.offset = 0;
-        itemsArray.push(...output.data.data.affected_items);
         while (
-          itemsArray.length < Math.min(totalItems, TABLE_EXPORT_MAX_ROWS) &&
-          params.offset < Math.min(totalItems, TABLE_EXPORT_MAX_ROWS)
+          itemsArray.length < Math.min(totalItems, reportMaxRows) &&
+          params.offset < Math.min(totalItems, reportMaxRows)
         ) {
-          params.offset += params.limit;
           const tmpData = await context.wazuh.api.client.asCurrentUser.request(
             'GET',
             `/${tmpPath}`,
             { params: params },
             { apiHostID: request.body.id },
           );
-          itemsArray.push(...tmpData.data.data.affected_items);
+
+          const affectedItems = tmpData.data.data.affected_items;
+          const remainingItems = reportMaxRows - itemsArray.length;
+          if (itemsArray.length + affectedItems.length > reportMaxRows) {
+            itemsArray.push(...affectedItems.slice(0, remainingItems));
+            break;
+          }
+          itemsArray.push(...affectedItems);
+          params.offset += params.limit;
         }
       }
 
