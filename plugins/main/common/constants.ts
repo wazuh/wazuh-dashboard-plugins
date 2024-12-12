@@ -535,5 +535,3 @@ export enum FilterStateStore {
   APP_STATE = 'appState',
   GLOBAL_STATE = 'globalState',
 }
-
-export const TABLE_EXPORT_MAX_ROWS = 10000;
