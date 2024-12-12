@@ -53,7 +53,7 @@ export class DataSourceAlertsStateContainer implements StateContainer {
 
       return result;
     } catch (error) {
-      this.logger.error(`Error getting data: ${error.message}`);
+      this.logger.error(`Error getting data: ${(error as Error).message}`);
       throw error;
     }
   }
@@ -78,7 +78,7 @@ export class DataSourceAlertsStateContainer implements StateContainer {
         this.logger.debug(`Encoded data was set: ${encodedData}`);
       }
     } catch (error) {
-      this.logger.error(`Error setting data: ${error.message}`);
+      this.logger.error(`Error setting data: ${(error as Error).message}`);
       // TODO: implement
       // const options = {
       //   context: `${AppState.name}.setClusterInfo`,
@@ -106,7 +106,7 @@ export class DataSourceAlertsStateContainer implements StateContainer {
 
       return result;
     } catch (error) {
-      this.logger.error(error.message);
+      this.logger.error((error as Error).message);
       throw error;
     }
   }
