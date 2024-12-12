@@ -41,8 +41,7 @@ export class ApiCheck {
       const response = await request(options);
 
       if (response.error) {
-        // eslint-disable-next-line unicorn/no-useless-promise-resolve-reject
-        return Promise.reject(this.returnErrorInstance(response));
+        throw this.returnErrorInstance(response);
       }
 
       return response;
@@ -54,8 +53,7 @@ export class ApiCheck {
 
         const response = error.response.data?.message || error.message;
 
-        // eslint-disable-next-line unicorn/no-useless-promise-resolve-reject
-        return Promise.reject(this.returnErrorInstance(response));
+        throw this.returnErrorInstance(response);
       } else {
         return error?.message || false
           ? Promise.reject(this.returnErrorInstance(error, error.message))
@@ -91,8 +89,7 @@ export class ApiCheck {
       const response = await request(options);
 
       if (response.error) {
-        // eslint-disable-next-line unicorn/no-useless-promise-resolve-reject
-        return Promise.reject(this.returnErrorInstance(response));
+        throw this.returnErrorInstance(response);
       }
 
       return response;
@@ -100,8 +97,7 @@ export class ApiCheck {
       if (error.response) {
         const response = error.response?.data?.message || error.message;
 
-        // eslint-disable-next-line unicorn/no-useless-promise-resolve-reject
-        return Promise.reject(this.returnErrorInstance(response));
+        throw this.returnErrorInstance(response);
       } else {
         return error?.message || false
           ? Promise.reject(this.returnErrorInstance(error, error.message))
