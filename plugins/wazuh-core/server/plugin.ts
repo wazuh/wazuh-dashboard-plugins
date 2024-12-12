@@ -15,19 +15,11 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  ConfigurationStore,
 } from './services';
-import { Configuration } from '../common/services/configuration';
-import {
-  PLUGIN_SETTINGS,
-  PLUGIN_SETTINGS_CATEGORIES,
-  WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-  WAZUH_DATA_CONFIG_APP_PATH,
-} from '../common/constants';
-import { enhanceConfiguration } from './services/enhance-configuration';
-import { uiSettings } from './ui_settings';
-import { InitializerConfigProvider } from './services/initializer-context-provider';
-import { UISettingsConfigProvider } from './services/ui-settings-provider';
+// configuration common
+import { Configuration, ConfigurationStore } from '../common/services/configuration';
+// configuration server
+import { uiSettings, InitializerConfigProvider } from './services/configuration';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -47,49 +39,26 @@ export class WazuhCorePlugin
     plugins: PluginSetup,
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
-    // configurations
+    // register the uiSetting to use in the public context (advanced settings)
     core.uiSettings.register(uiSettings);
-   
    
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
     this._internal.configurationStore = new ConfigurationStore(
-      this.logger.get('configuration-store'),
-      {
-        cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-        file: WAZUH_DATA_CONFIG_APP_PATH,
-      },
+      this.logger.get('configuration-store')
     );
 
-
+    // add the initializer context config to the configuration store
     this._internal.configurationStore.registerProvider(
       'initializerContext',
       new InitializerConfigProvider(this.initializerContext)
     )
   
-
-    this._internal.configurationStore.registerProvider(
-      'uiSettings',
-      new UISettingsConfigProvider(core.uiSettings, uiSettings)
-    );
-
+    // create the configuration service to use like a facede pattern
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
       this._internal.configurationStore,
     );
 
-    // Enhance configuration service
-    enhanceConfiguration(this.services.configuration);
-
-    // Register the plugin settings
-    Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
-      this.services.configuration.register(key, value),
-    );
-
-    // Add categories to the configuration
-    Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
-      this.services.configuration.registerCategory({ ...value, id: key });
-    });
-    
     this.services.configuration.setup();
 
     this.services.manageHosts = new ManageHosts(
@@ -106,6 +75,8 @@ export class WazuhCorePlugin
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
 
     // Register a property to the context parameter of the endpoint handlers
+    // @ts-ignore
+    // ToDo: check type of registerRouteHandlerContext "Argument of type '"wazuh_core"' is not assignable to parameter of type '"core""
     core.http.registerRouteHandlerContext('wazuh_core', (context, request) => {
       return {
         ...this.services,
@@ -129,7 +100,7 @@ export class WazuhCorePlugin
           asScoped: this.services.serverAPIClient.asScoped,
         },
       },
-    };
+    } as WazuhCorePluginSetup;
   }
 
   public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
@@ -148,7 +119,7 @@ export class WazuhCorePlugin
           asScoped: this.services.serverAPIClient.asScoped,
         },
       },
-    };
+    } as WazuhCorePluginSetup;
   }
 
   public stop() {}

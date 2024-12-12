@@ -42,4 +42,4 @@ export const config: PluginConfigDescriptor<CorePluginConfigType> = {
 
 
 export type { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
-export type { IConfigurationEnhanced } from './services/enhance-configuration';
+export type { IConfigurationEnhanced } from './services/configuration/enhance-configuration';
