@@ -1,7 +1,8 @@
-import { CoreState } from './state';
 import { BehaviorSubject } from 'rxjs';
+import { CoreState } from './state';
 
 const noop = () => {};
+
 const logger = {
   info: noop,
   warn: noop,
@@ -12,6 +13,7 @@ const logger = {
 describe('State', () => {
   it('Throw error accessing to non-existent state container', () => {
     const state = new CoreState(logger);
+
     expect(() => {
       state.get('no_existent_state_container');
     }).toThrow(
@@ -39,8 +41,8 @@ describe('State', () => {
 
   it('Register a state container, get value, set new value and get new value', () => {
     const state = new CoreState(logger);
-
     const subscribe = jest.fn();
+
     state.register('state_container', {
       _value: true, // mock state. This does not exist in the StateContainer type
       get() {
@@ -49,7 +51,9 @@ describe('State', () => {
       set(newValue) {
         this._value = newValue;
       },
-      remove() {},
+      remove() {
+        /* empty */
+      },
       subscribe: subscribe,
     });
 
@@ -62,8 +66,8 @@ describe('State', () => {
 
   it('Register a state container, subscribe, set new value and remove the subscription', () => {
     const state = new CoreState(logger);
-
     const subscriber = jest.fn();
+
     state.register('state_container', {
       _value: true, // mock state. This does not exist in the StateContainer type
       get() {
@@ -73,7 +77,9 @@ describe('State', () => {
         this._value = newValue;
         this.updater$.next(this._value);
       },
-      remove() {},
+      remove() {
+        /* empty */
+      },
       updater$: new BehaviorSubject(),
       subscribe(cb) {
         return this.updater$.subscribe(cb);
@@ -83,6 +89,7 @@ describe('State', () => {
     expect(state._subscriptions._subscriptions).toEqual(null);
 
     const unsubscribe = state.subscribe('state_container', subscriber);
+
     expect(state._subscriptions._subscriptions).toHaveLength(1);
 
     state.set('state_container', false);

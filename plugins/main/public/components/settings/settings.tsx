@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /*
  * Wazuh app - Settings controller
  * Copyright (C) 2015-2022 Wazuh, Inc.
@@ -11,6 +12,8 @@
  */
 import React from 'react';
 import { EuiProgress, EuiTabs, EuiTab } from '@elastic/eui';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
 import { AppState } from '../../react-services/app-state';
 import { GenericRequest } from '../../react-services/generic-request';
 import { WzMisc } from '../../factories/misc';
@@ -33,9 +36,7 @@ import {
   serverApis,
   appSettings,
 } from '../../utils/applications';
-import { compose } from 'redux';
 import { withErrorBoundary, withRouteResolvers } from '../common/hocs';
-import { connect } from 'react-redux';
 import {
   enableMenu,
   ip,
@@ -46,26 +47,15 @@ import { Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
 
-const configurationTabID = 'configuration';
-
+const CONFIGURATION_TAB_ID = 'configuration';
 const mapStateToProps = state => ({
   configurationUIEditable:
     state.appConfig.data['configuration.ui_api_editable'],
   configurationIPSelector: state.appConfig.data['ip.selector'],
 });
-
 const mapDispatchToProps = dispatch => ({
   updateGlobalBreadcrumb: breadcrumb =>
     dispatch(updateGlobalBreadcrumb(breadcrumb)),
-});
-
-export const Settings = compose(
-  withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
-  connect(mapStateToProps, mapDispatchToProps),
-)(props => {
-  const { tab } = useRouterSearch();
-  return <SettingsComponent {...props} tab={tab} />;
 });
 
 class SettingsComponent extends React.Component {
@@ -76,12 +66,6 @@ class SettingsComponent extends React.Component {
     indexPatterns;
     apiEntries;
   };
-  wzMisc: WzMisc;
-  tabsConfiguration: { id: string; name: string }[];
-  apiIsDown;
-  googleGroupsSVG;
-  currentDefault;
-  appInfo;
 
   constructor(props) {
     super(props);
@@ -89,9 +73,10 @@ class SettingsComponent extends React.Component {
     this.wzMisc = new WzMisc();
 
     if (this.wzMisc.getWizard()) {
-      window.sessionStorage.removeItem('healthCheck');
+      globalThis.sessionStorage.removeItem('healthCheck');
       this.wzMisc.setWizard(false);
     }
+
     this.apiIsDown = this.wzMisc.getApiIsDown();
     this.state = {
       currentApiEntryIndex: false,
@@ -105,7 +90,7 @@ class SettingsComponent extends React.Component {
       getAssetURL('images/icons/google_groups.svg'),
     );
     this.tabsConfiguration = [
-      { id: configurationTabID, name: 'Configuration' },
+      { id: CONFIGURATION_TAB_ID, name: 'Configuration' },
       { id: 'miscellaneous', name: 'Miscellaneous' },
     ];
   }
@@ -119,9 +104,11 @@ class SettingsComponent extends React.Component {
           ({ id }) => getWzCurrentAppID() === id,
         ).breadcrumbLabel;
         const breadcrumb = [{ text: tabActiveName }];
+
         this.props.updateGlobalBreadcrumb(breadcrumb);
       } else {
         const breadcrumb = [{ text: serverApis.breadcrumbLabel }];
+
         this.props.updateGlobalBreadcrumb(breadcrumb);
       }
 
@@ -134,6 +121,7 @@ class SettingsComponent extends React.Component {
       await this.getAppInfo();
     } catch (error) {
       const options = {
+        // eslint-disable-next-line no-use-before-define
         context: `${Settings.name}.onInit`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
@@ -144,32 +132,44 @@ class SettingsComponent extends React.Component {
           title: `${error.name}: Cannot initialize Settings`,
         },
       };
+
       getErrorOrchestrator().handleError(options);
     }
   }
 
+  wzMisc: WzMisc;
+  tabsConfiguration: { id: string; name: string }[];
+  apiIsDown;
+  googleGroupsSVG;
+  currentDefault;
+  appInfo;
+
   isConfigurationUIEditable() {
     return this.props.configurationUIEditable;
   }
+
   /**
    * Sets the component props
    */
-  setComponentProps(currentTab: string = 'api') {
+  setComponentProps(currentTab = 'api') {
     const isConfigurationUIEditable = this.isConfigurationUIEditable();
-    if (currentTab === configurationTabID && !isConfigurationUIEditable) {
+
+    if (currentTab === CONFIGURATION_TAB_ID && !isConfigurationUIEditable) {
       // Change the inaccessible configuration to another accessible
       NavigationService.getInstance().replace(
         `/settings?tab=${
-          this.tabsConfiguration.find(({ id }) => id !== configurationTabID)!.id
+          this.tabsConfiguration.find(({ id }) => id !== CONFIGURATION_TAB_ID)
+            .id
         }`,
       );
     }
+
     this.setState({
       tabs:
         getWzCurrentAppID() === appSettings.id
           ? // WORKAROUND: This avoids the configuration tab is displayed
             this.tabsConfiguration.filter(({ id }) =>
-              !isConfigurationUIEditable ? id !== configurationTabID : true,
+              isConfigurationUIEditable ? true : id !== CONFIGURATION_TAB_ID,
             )
           : null,
     });
@@ -177,10 +177,11 @@ class SettingsComponent extends React.Component {
 
   // Get current API index
   getCurrentAPIIndex() {
-    if (this.state.apiEntries.length) {
+    if (this.state.apiEntries.length > 0) {
       const idx = this.state.apiEntries
         .map(entry => entry.id)
         .indexOf(this.currentDefault);
+
       this.setState({ currentApiEntryIndex: idx });
     }
   }
@@ -200,9 +201,10 @@ class SettingsComponent extends React.Component {
         this.setState({
           indexPatterns: await SavedObject.getListOfWazuhValidIndexPatterns(),
         });
-      } catch (error) {
+      } catch {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         NavigationService.getInstance().navigate('/blank-screen');
+
         return;
       }
 
@@ -212,8 +214,10 @@ class SettingsComponent extends React.Component {
 
       if (currentApi) {
         const { id } = JSON.parse(currentApi);
+
         this.currentDefault = id;
       }
+
       this.getCurrentAPIIndex();
 
       // TODO: what is the purpose of this?
@@ -225,6 +229,7 @@ class SettingsComponent extends React.Component {
       }
     } catch (error) {
       const options = {
+        // eslint-disable-next-line no-use-before-define
         context: `${Settings.name}.getSettings`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
@@ -234,8 +239,10 @@ class SettingsComponent extends React.Component {
           title: `${error.name}: Error getting API entries`,
         },
       };
+
       getErrorOrchestrator().handleError(options);
     }
+
     return;
   }
 
@@ -244,7 +251,6 @@ class SettingsComponent extends React.Component {
     try {
       // Get the index of the API in the entries
       const index = isIndex ? item : this.getApiIndex(item);
-
       // Get the Api information
       const api = this.state.apiEntries[index];
       const { username, url, port, id } = api;
@@ -256,21 +262,31 @@ class SettingsComponent extends React.Component {
         insecure: 'true',
         id: id,
       };
-
       // Test the connection
       const data = await ApiCheck.checkApi(tmpData, true);
+
       tmpData.cluster_info = data?.data;
-      const { cluster_info } = tmpData;
+
+      const { cluster_info: clusterInfo } = tmpData;
+
       // Updates the cluster-information in the registry
-      this.state.apiEntries[index].cluster_info = cluster_info;
+      // eslint-disable-next-line react/no-direct-mutation-state
+      this.state.apiEntries[index].cluster_info = clusterInfo;
+      // eslint-disable-next-line react/no-direct-mutation-state
       this.state.apiEntries[index].status = 'online';
+      // eslint-disable-next-line react/no-direct-mutation-state
       this.state.apiEntries[index].allow_run_as = data.data.allow_run_as;
       this.wzMisc.setApiIsDown(false);
-      !silent && ErrorHandler.info('Connection success', 'Settings');
+
+      if (!silent) {
+        ErrorHandler.info('Connection success', 'Settings');
+      }
     } catch (error) {
       this.setState({ load: false });
+
       if (!silent) {
         const options = {
+          // eslint-disable-next-line no-use-before-define
           context: `${Settings.name}.checkManager`,
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
@@ -280,9 +296,11 @@ class SettingsComponent extends React.Component {
             title: error.name || error,
           },
         };
+
         getErrorOrchestrator().handleError(options);
       }
-      return Promise.reject(error);
+
+      throw error;
     }
   }
 
@@ -293,15 +311,18 @@ class SettingsComponent extends React.Component {
     try {
       const data = await GenericRequest.request('GET', '/api/setup');
       const response = data.data.data;
+
       this.appInfo = {
         'app-version': response['app-version'],
         revision: response['revision'],
       };
 
       this.setState({ load: false });
-      const pattern = AppState.getCurrentPattern();
+
+      AppState.getCurrentPattern();
 
       this.getCurrentAPIIndex();
+
       if (
         (this.state.currentApiEntryIndex ||
           this.state.currentApiEntryIndex === 0) &&
@@ -311,7 +332,9 @@ class SettingsComponent extends React.Component {
       }
     } catch (error) {
       AppState.removeNavigation();
+
       const options = {
+        // eslint-disable-next-line no-use-before-define
         context: `${Settings.name}.getAppInfo`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
@@ -321,6 +344,7 @@ class SettingsComponent extends React.Component {
           title: error.name || error,
         },
       };
+
       getErrorOrchestrator().handleError(options);
     }
   }
@@ -329,26 +353,25 @@ class SettingsComponent extends React.Component {
    * Get the API hosts
    */
   async getHosts() {
-    try {
-      const result = await GenericRequest.request('GET', '/hosts/apis', {});
-      const hosts = result.data || [];
-      this.setState({
-        apiEntries: hosts,
-      });
-      return hosts;
-    } catch (error) {
-      return Promise.reject(error);
-    }
+    const result = await GenericRequest.request('GET', '/hosts/apis', {});
+    const hosts = result.data || [];
+
+    this.setState({
+      apiEntries: hosts,
+    });
+
+    return hosts;
   }
 
   renderView() {
     // WORKAROUND: This avoids the configuration view is displayed
     if (
-      this.props.tab === configurationTabID &&
+      this.props.tab === CONFIGURATION_TAB_ID &&
       !this.isConfigurationUIEditable()
     ) {
       return null;
     }
+
     return (
       <Switch>
         <Route path='?tab=api'>
@@ -419,3 +442,13 @@ class SettingsComponent extends React.Component {
     );
   }
 }
+
+export const Settings = compose(
+  withErrorBoundary,
+  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  connect(mapStateToProps, mapDispatchToProps),
+)(props => {
+  const { tab } = useRouterSearch();
+
+  return <SettingsComponent {...props} tab={tab} />;
+});

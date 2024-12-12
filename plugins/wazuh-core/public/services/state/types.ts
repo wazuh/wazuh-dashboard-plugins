@@ -1,5 +1,5 @@
-import { LifecycleService } from '../types';
 import { Subscription, BehaviourSubject } from 'rxjs';
+import { LifecycleService } from '../types';
 
 export interface StateContainer<T = any> {
   get: () => T;
@@ -28,5 +28,8 @@ export interface State<
   set: (name: string, value: any) => any;
   remove: (name: string) => any;
   register: (name: string, value: StateContainer) => any;
-  subscribe(name: string, callback: StateContainer['subscribe']): () => {};
+  subscribe: (
+    name: string,
+    callback: StateContainer['subscribe'],
+  ) => () => void;
 }

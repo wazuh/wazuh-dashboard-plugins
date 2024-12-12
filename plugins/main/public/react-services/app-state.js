@@ -18,11 +18,12 @@ import {
 import { CSVRequest } from '../services/csv-request';
 import { getToasts, getCookies } from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
+import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { WzAuthentication } from './wz-authentication';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { getErrorOrchestrator } from './common-services';
 
+// eslint-disable-next-line unicorn/no-static-only-class
 export class AppState {
   /**
    * Cluster setters and getters
@@ -32,6 +33,7 @@ export class AppState {
       const clusterInfo = getCookies().get('clusterInfo')
         ? decodeURI(getCookies().get('clusterInfo'))
         : false;
+
       return clusterInfo ? JSON.parse(clusterInfo) : {};
     } catch (error) {
       const options = {
@@ -44,6 +46,7 @@ export class AppState {
           title: `${error.name}: Error get cluster info`,
         },
       };
+
       getErrorOrchestrator().handleError(options);
       throw error;
     }
@@ -51,14 +54,16 @@ export class AppState {
 
   /**
    * Sets a new value to the cookie 'clusterInfo' object
-   * @param {*} cluster_info
+   * @param {*} clusterInfo
    */
-  static setClusterInfo(cluster_info) {
+  static setClusterInfo(clusterInfo) {
     try {
-      const encodedClusterInfo = encodeURI(JSON.stringify(cluster_info));
+      const encodedClusterInfo = encodeURI(JSON.stringify(clusterInfo));
       const exp = new Date();
+
       exp.setDate(exp.getDate() + 365);
-      if (cluster_info) {
+
+      if (clusterInfo) {
         getCookies().set('clusterInfo', encodedClusterInfo, {
           expires: exp,
         });
@@ -74,6 +79,7 @@ export class AppState {
           title: `${error.name}: Error set cluster info`,
         },
       };
+
       getErrorOrchestrator().handleError(options);
       throw error;
     }
@@ -83,12 +89,9 @@ export class AppState {
    * Get 'API' value
    */
   static getCurrentAPI() {
-    try {
-      const currentAPI = getCookies().get('currentApi');
-      return currentAPI ? decodeURI(currentAPI) : false;
-    } catch (error) {
-      throw error;
-    }
+    const currentAPI = getCookies().get('currentApi');
+
+    return currentAPI ? decodeURI(currentAPI) : false;
   }
 
   /**
@@ -96,7 +99,9 @@ export class AppState {
    */
   static removeCurrentAPI() {
     const updateApiMenu = updateCurrentApi(false);
+
     store.dispatch(updateApiMenu);
+
     return getCookies().remove('currentApi');
   }
 
@@ -108,18 +113,18 @@ export class AppState {
     try {
       const encodedApi = encodeURI(API);
       const exp = new Date();
+
       exp.setDate(exp.getDate() + 365);
+
       if (API) {
         getCookies().set('currentApi', encodedApi, {
           expires: exp,
         });
-        try {
-          const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
-          store.dispatch(updateApiMenu);
-          WzAuthentication.refresh();
-        } catch (error) {
-          throw error;
-        }
+
+        const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
+
+        store.dispatch(updateApiMenu);
+        WzAuthentication.refresh();
       }
     } catch (error) {
       const options = {
@@ -132,6 +137,7 @@ export class AppState {
           title: `${error.name}: Error set current API`,
         },
       };
+
       getErrorOrchestrator().handleError(options);
       throw error;
     }
@@ -144,7 +150,9 @@ export class AppState {
   static setCurrentPattern(newPattern) {
     const encodedPattern = encodeURI(newPattern);
     const exp = new Date();
+
     exp.setDate(exp.getDate() + 365);
+
     if (newPattern) {
       getCookies().set('currentPattern', encodedPattern, {
         expires: exp,
@@ -159,15 +167,18 @@ export class AppState {
     const currentPattern = getCookies().get('currentPattern')
       ? decodeURI(getCookies().get('currentPattern'))
       : '';
+
     // check if the current Cookie has the format of 3.11 and previous versions, in that case we remove the extra " " characters
     if (
       currentPattern &&
       currentPattern[0] === '"' &&
-      currentPattern[currentPattern.length - 1] === '"'
+      currentPattern.at(-1) === '"'
     ) {
-      const newPattern = currentPattern.substring(1, currentPattern.length - 1);
+      const newPattern = currentPattern.slice(1, -1);
+
       this.setCurrentPattern(newPattern);
     }
+
     return getCookies().get('currentPattern')
       ? decodeURI(getCookies().get('currentPattern'))
       : '';
@@ -185,14 +196,14 @@ export class AppState {
    * @param {*} current
    **/
   static setCurrentDevTools(current) {
-    window.localStorage.setItem('currentDevTools', current);
+    globalThis.localStorage.setItem('currentDevTools', current);
   }
 
   /**
    * Get 'currentDevTools' value
    **/
   static getCurrentDevTools() {
-    return window.localStorage.getItem('currentDevTools');
+    return globalThis.localStorage.getItem('currentDevTools');
   }
 
   /**
@@ -201,7 +212,7 @@ export class AppState {
    * @param {*} value
    */
   static setSessionStorageItem(key, value) {
-    window.sessionStorage.setItem(key, value);
+    globalThis.sessionStorage.setItem(key, value);
   }
 
   /**
@@ -209,7 +220,7 @@ export class AppState {
    * @param {*} key
    */
   static getSessionStorageItem(key) {
-    return window.sessionStorage.getItem(key);
+    return globalThis.sessionStorage.getItem(key);
   }
 
   /**
@@ -217,19 +228,22 @@ export class AppState {
    * @param {*} key
    */
   static removeSessionStorageItem(key) {
-    window.sessionStorage.removeItem(key);
+    globalThis.sessionStorage.removeItem(key);
   }
 
   static setNavigation(params) {
     const decodedNavigation = getCookies().get('navigate')
       ? decodeURI(getCookies().get('navigate'))
       : false;
-    var navigate = decodedNavigation ? JSON.parse(decodedNavigation) : {};
-    for (var key in params) {
+    let navigate = decodedNavigation ? JSON.parse(decodedNavigation) : {};
+
+    for (let key in params) {
       navigate[key] = params[key];
     }
+
     if (navigate) {
       const encodedURI = encodeURI(JSON.stringify(navigate));
+
       getCookies().set('navigate', encodedURI);
     }
   }
@@ -239,6 +253,7 @@ export class AppState {
       ? decodeURI(getCookies().get('navigate'))
       : false;
     const navigation = decodedNavigation ? JSON.parse(decodedNavigation) : {};
+
     return navigation;
   }
 
@@ -248,21 +263,24 @@ export class AppState {
 
   static setWzMenu(isVisible = true) {
     const showMenu = updateShowMenu(isVisible);
+
     store.dispatch(showMenu);
   }
 
   static async downloadCsv(path, fileName, filters = []) {
     try {
       const csvReq = new CSVRequest();
+
       getToasts().add({
         color: 'success',
         title: 'CSV',
         text: 'Your download should begin automatically...',
         toastLifeTimeMs: 4000,
       });
+
       const currentApi = JSON.parse(this.getCurrentAPI()).id;
       const output = await csvReq.fetch(path, currentApi, filters);
-      const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
+      const blob = new Blob([output], { type: 'text/csv' });
 
       FileSaver.saveAs(blob, fileName);
     } catch (error) {
@@ -276,12 +294,14 @@ export class AppState {
           title: `${error.name}: Error generating CSV`,
         },
       };
+
       getErrorOrchestrator().handleError(options);
     }
   }
 
   static checkCookies() {
     getCookies().set('appName', 'wazuh');
+
     return !!getCookies().get('appName');
   }
 }

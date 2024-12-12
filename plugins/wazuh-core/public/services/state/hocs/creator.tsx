@@ -1,9 +1,11 @@
 import React from 'react';
-export const createHOCs = ({ useStateContainer }) => {
-  return {
-    withStateContainer: (name: string) => WrappedComponent => props => {
+
+export const createHOCs = ({ useStateContainer }) => ({
+  withStateContainer: (name: string) => WrappedComponent =>
+    function WithStateContainer(props: any) {
       const [state, { set: setState, remove: removeState }] =
         useStateContainer(name);
+
       return (
         <WrappedComponent
           {...props}
@@ -17,5 +19,4 @@ export const createHOCs = ({ useStateContainer }) => {
         />
       );
     },
-  };
-};
+});

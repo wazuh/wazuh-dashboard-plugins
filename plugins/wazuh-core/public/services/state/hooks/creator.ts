@@ -7,14 +7,18 @@ export const createHooks = ({ state }: { state: State }) => {
       state.getStateContainer(name).updater$,
       state.get(name),
     );
-    function setValue(value) {
+
+    function setValue(value: any) {
       state.set(name, value);
     }
+
     function removeValue() {
       state.remove(name);
     }
+
     return [value, { set: setValue, remove: removeValue }];
   }
+
   return {
     useStateContainer,
   };
