@@ -169,6 +169,7 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                                   unicorn                                  */
         /* -------------------------------------------------------------------------- */
+        'unicorn/no-static-only-class': 'off',
         'unicorn/prefer-module': 'off',
         'unicorn/prefer-ternary': 'off',
         // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/custom-error-definition.md
