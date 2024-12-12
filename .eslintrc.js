@@ -169,6 +169,12 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                                   unicorn                                  */
         /* -------------------------------------------------------------------------- */
+        'unicorn/consistent-function-scoping': [
+          'error',
+          {
+            checkArrowFunctions: false,
+          },
+        ],
         'unicorn/no-static-only-class': 'off',
         'unicorn/prefer-module': 'off',
         'unicorn/prefer-ternary': 'off',

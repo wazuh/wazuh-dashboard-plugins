@@ -1,4 +1,3 @@
-/* eslint-disable unicorn/consistent-function-scoping */
 /*
  * Wazuh app - Health Check Component - Test
  *
