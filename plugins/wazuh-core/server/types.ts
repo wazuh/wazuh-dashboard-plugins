@@ -5,7 +5,7 @@ import {
   ServerAPIInternalUserClient,
   ServerAPIScopedUserClient,
 } from './services';
-import { IConfigurationEnhanced } from './services/enhance-configuration';
+import { IConfigurationEnhanced } from './services/configuration/enhance-configuration';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginSetup {

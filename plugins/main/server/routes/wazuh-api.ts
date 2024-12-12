@@ -128,7 +128,8 @@ export function WazuhApiRoutes(router: IRouter) {
       ctrl.getSyscollector(context, request, response),
   );
 
-  // Return app logos configuration
+  /* Return app logos configuration
+  ToDo: Change (maybe) to get the opensearch logo settings
   router.get(
     {
       path: '/api/logos',
@@ -138,6 +139,7 @@ export function WazuhApiRoutes(router: IRouter) {
     async (context, request, response) =>
       ctrl.getAppLogos(context, request, response),
   );
+  */
 
   // Return binary dashboard
   router.get(
