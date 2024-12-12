@@ -27,9 +27,7 @@ import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
-import { useStateStorage } from '../hooks';
-import { TABLE_EXPORT_MAX_ROWS } from '../../../../common/constants';
-
+import { useStateStorage, useAppConfig } from '../hooks';
 /**
  * Search input custom filter button
  */
@@ -39,9 +37,20 @@ interface CustomFilterButton {
   value: string;
 }
 
-const getFilters = filters => {
+interface Filters {
+  [key: string]: string;
+}
+
+const getFilters = (filters: Filters) => {
   const { default: defaultFilters, ...restFilters } = filters;
   return Object.keys(restFilters).length ? restFilters : defaultFilters;
+};
+
+const formatSorting = sorting => {
+  if (!sorting.field || !sorting.direction) {
+    return '';
+  }
+  return `${sorting.direction === 'asc' ? '+' : '-'}${sorting.field}`;
 };
 
 export function TableWzAPI({
@@ -55,12 +64,11 @@ export function TableWzAPI({
   actionButtons?:
     | ReactNode
     | ReactNode[]
-    | (({ filters }: { filters }) => ReactNode);
+    | (({ filters }: { filters: Filters }) => ReactNode);
   postActionButtons?:
     | ReactNode
     | ReactNode[]
-    | (({ filters }: { filters }) => ReactNode);
-
+    | (({ filters }: { filters: Filters }) => ReactNode);
   title?: string;
   addOnTitle?: ReactNode;
   description?: string;
@@ -69,7 +77,7 @@ export function TableWzAPI({
   searchTable?: boolean;
   endpoint: string;
   buttonOptions?: CustomFilterButton[];
-  onFiltersChange?: Function;
+  onFiltersChange?: (filters: Filters) => void;
   showReload?: boolean;
   searchBarProps?: any;
   reload?: boolean;
@@ -77,10 +85,10 @@ export function TableWzAPI({
   setReload?: (newValue: number) => void;
 }) {
   const [totalItems, setTotalItems] = useState(0);
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<Filters>({});
   const [isLoading, setIsLoading] = useState(false);
   const [sort, setSort] = useState({});
-  const onFiltersChange = filters =>
+  const onFiltersChange = (filters: Filters) =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
       : null;
@@ -88,12 +96,6 @@ export function TableWzAPI({
   const onDataChange = data =>
     typeof rest.onDataChange === 'function' ? rest.onDataChange(data) : null;
 
-  const formatSorting = sorting => {
-    if (!sorting.field || !sorting.direction) {
-      return '';
-    }
-    return `${sorting.direction === 'asc' ? '+' : '-'}${sorting.field}`;
-  };
   /**
    * Changing the reloadFootprint timestamp will trigger reloading the table
    */
@@ -109,10 +111,12 @@ export function TableWzAPI({
       : undefined,
   );
   const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
+  const appConfig = useAppConfig();
 
+  const maxRows = appConfig.data['reports.csv.maxRows'] || 10000;
   const onSearch = useCallback(async function (
     endpoint,
-    filters,
+    filters: Filters,
     pagination,
     sorting,
   ) {
@@ -189,7 +193,9 @@ export function TableWzAPI({
   };
 
   useEffect(() => {
-    if (rest.reload) triggerReload();
+    if (rest.reload) {
+      triggerReload();
+    }
   }, [rest.reload]);
 
   const ReloadButton = (
@@ -248,9 +254,9 @@ export function TableWzAPI({
                       : rest.title
                   }
                 />
-                {totalItems > TABLE_EXPORT_MAX_ROWS && (
+                {totalItems > maxRows && (
                   <EuiIconTip
-                    content={`The exported CSV will be limited to the first ${TABLE_EXPORT_MAX_ROWS} lines.`}
+                    content={`The exported CSV will be limited to the first ${maxRows} lines. You can change this limit in Dashboard management > App Settings`}
                     size='m'
                     color='warning'
                     type='alert'
