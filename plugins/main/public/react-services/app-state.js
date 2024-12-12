@@ -23,7 +23,6 @@ import { WzAuthentication } from './wz-authentication';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 
-// eslint-disable-next-line unicorn/no-static-only-class
 export class AppState {
   /**
    * Cluster setters and getters
