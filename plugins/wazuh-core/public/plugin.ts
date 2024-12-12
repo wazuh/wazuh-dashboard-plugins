@@ -1,25 +1,20 @@
-import { CoreSetup, CoreStart, Plugin, PluginInitializerContext } from 'opensearch-dashboards/public';
+import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
 import * as utils from './utils';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
 import { ConfigurationStore } from './utils/configuration-store';
-import {
-  PLUGIN_SETTINGS,
-  PLUGIN_SETTINGS_CATEGORIES,
-} from '../common/constants';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
+import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
+import { uiSettings } from '../server/services/configuration/ui_settings';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
   _internal: { [key: string]: any } = {};
   services: { [key: string]: any } = {};
-
-  constructor(private readonly initializerContext: PluginInitializerContext) {}
-
 
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     const noop = () => {};
@@ -33,19 +28,18 @@ export class WazuhCorePlugin
       logger,
       core.http,
     );
+
+    // register the uiSettins on the configuration store to avoid the use inside of configuration service
+    this._internal.configurationStore.registerProvider(
+      'uiSettings',
+      new UISettingsConfigProvider(core.uiSettings, uiSettings)
+    );
+
+
     this.services.configuration = new Configuration(
       logger,
       this._internal.configurationStore,
     );
-    // Register the plugin settings
-    Object.entries(PLUGIN_SETTINGS).forEach(([key, value]) =>
-      this.services.configuration.register(key, value),
-    );
-
-    // Add categories to the configuration
-    Object.entries(PLUGIN_SETTINGS_CATEGORIES).forEach(([key, value]) => {
-      this.services.configuration.registerCategory({ ...value, id: key });
-    });
 
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
@@ -55,7 +49,7 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
-    };
+    } as WazuhCorePluginSetup;
   }
 
   public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
@@ -70,7 +64,7 @@ export class WazuhCorePlugin
       utils,
       API_USER_STATUS_RUN_AS,
       hooks,
-    };
+    } as WazuhCorePluginStart;
   }
 
   public stop() {}
