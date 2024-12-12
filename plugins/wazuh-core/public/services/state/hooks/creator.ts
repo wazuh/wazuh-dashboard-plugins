@@ -4,7 +4,7 @@ import { State } from '../types';
 export const createHooks = ({ state }: { state: State }) => {
   function useStateContainer<T>(name: string) {
     const value: T = useObservable(
-      state.getStateContainer(name).updater$,
+      state.getStateContainer(name)?.updater$,
       state.get(name),
     );
 

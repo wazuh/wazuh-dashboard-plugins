@@ -27,6 +27,7 @@ export interface State<
   get: (name: string) => any;
   set: (name: string, value: any) => any;
   remove: (name: string) => any;
+  getStateContainer: (name: string) => StateContainer | undefined;
   register: (name: string, value: StateContainer) => any;
   subscribe: (
     name: string,
