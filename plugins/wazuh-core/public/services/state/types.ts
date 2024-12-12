@@ -4,7 +4,7 @@ import { LifecycleService } from '../types';
 export interface StateContainer<T = any> {
   get: () => T;
   set: (value: T) => T;
-  remove: () => any;
+  remove: () => T;
   updater$: BehaviourSubject<T>;
   subscribe: (callback: (value: T) => void) => Subscription;
 }
