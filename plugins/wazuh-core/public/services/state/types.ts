@@ -10,12 +10,12 @@ export interface StateContainer<T = any> {
 }
 
 export interface State<
-  SetupDeps,
-  SetupReturn,
-  StartDeps,
-  StartReturn,
-  StopDeps,
-  StopReturn,
+  SetupDeps = any,
+  SetupReturn = any,
+  StartDeps = any,
+  StartReturn = any,
+  StopDeps = any,
+  StopReturn = any,
 > extends LifecycleService<
     SetupDeps,
     SetupReturn,
