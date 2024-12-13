@@ -735,7 +735,7 @@ export class WazuhApiCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     const appConfig = await context.wazuh_core.configuration.get();
-    const reportMaxRows = appConfig['reports.csv.maxRows'] || 10000;
+    const reportMaxRows = appConfig['reports.csv.maxRows'];
     try {
       if (!request.body || !request.body.path)
         throw new Error('Field path is required');
@@ -797,6 +797,7 @@ export class WazuhApiCtrl {
 
           const affectedItems = tmpData.data.data.affected_items;
           const remainingItems = reportMaxRows - itemsArray.length;
+          console.log(affectedItems[0]);
           if (itemsArray.length + affectedItems.length > reportMaxRows) {
             itemsArray.push(...affectedItems.slice(0, remainingItems));
             break;
