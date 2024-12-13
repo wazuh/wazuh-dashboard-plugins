@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.10.2
+- Add setting to limit the number of rows in csv reports [#7182](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7182)
 
 ### Changed
 
