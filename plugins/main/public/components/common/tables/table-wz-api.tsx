@@ -253,7 +253,6 @@ export function TableWzAPI({
                   }
                   maxRows={maxRows}
                 />
-
               </>
             )}
             {/* Render optional post custom action button */}
