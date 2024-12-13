@@ -12,12 +12,20 @@ export class ConfigurationStore implements IConfigurationStore {
   }
 
   registerProvider(name: string, provider: IConfigurationProvider) {
+    if(!provider){
+      throw new Error('Provider is required');
+    }
+    
     provider.setName(name);
     this.providers.set(name, provider);
   }
 
-  getProvider(name: string): IConfigurationProvider | undefined {
-    return this.providers.get(name);
+  getProvider(name: string): IConfigurationProvider {
+    const provider = this.providers.get(name);
+    if (!provider) {
+      throw new Error(`Provider ${name} not found`);
+    }
+    return provider;
   }
 
   async getProviderConfiguration(key: string): Promise<Record<string, any>> {
@@ -55,7 +63,8 @@ export class ConfigurationStore implements IConfigurationStore {
   async get(configName: string): Promise<any | { [key: string]: any }> {
      // get all the providers and check if the setting is in any of them
     const configuration = await this.getAll();
-    if (configuration[configName]) {
+    // check if the configName exist in the object
+    if (Object.keys(configuration).includes(configName)) {
       return configuration[configName];
     }
     throw new Error(`Configuration ${configName} not found`);

@@ -1,15 +1,29 @@
-import { ConfigurationStore } from '../../../server/services/configuration/configuration-store';
-import fs from 'fs';
+import { IConfigurationProvider } from './configuration-provider';
+import { ConfigurationStore } from './configuration-store';
 
 function createMockLogger() {
-  return {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    get: () => createMockLogger(),
-  };
+  const noop = () => {};
+
+  const logger = {
+      info: noop,
+      error: noop,
+      debug: noop,
+      warn: noop,
+      trace: noop,
+      fatal: noop,
+      log: noop,
+      get: () => logger,
+    };
+  return logger;
 }
+
+const mockedProvider = jest.mocked<IConfigurationProvider>({
+  getAll: jest.fn(),
+  get: jest.fn(),
+  set: jest.fn(),
+  setName: jest.fn(),
+  getName: jest.fn(),
+})
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -21,107 +35,82 @@ afterEach(() => {
 
 describe(`[service] ConfigurationStore`, () => {
   // Create instance
-  it.each`
-    title                                               | file            | shouldThrowError
-    ${'Give an error due to missing parameter of file'} | ${undefined}    | ${true}
-    ${'Give an error due to missing parameter of file'} | ${''}           | ${true}
-    ${'Create instance successful'}                     | ${'config.yml'} | ${false}
-  `('$title', ({ file, shouldThrowError }) => {
-    if (shouldThrowError) {
-      expect(
-        () =>
-          new ConfigurationStore(createMockLogger(), {
-            file,
-            cache_seconds: 10,
-          }),
-      ).toThrow('File is not defined');
-    } else {
-      expect(
-        () =>
-          new ConfigurationStore(createMockLogger(), {
-            file,
-            cache_seconds: 10,
-          }),
-      ).not.toThrow();
+  it('should create an instance of ConfigurationStore', () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    expect(configurationStore).toBeInstanceOf(ConfigurationStore);
+  });
+
+  it('should register a provider', () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    configurationStore.registerProvider('test', mockedProvider);
+    expect(mockedProvider.setName).toBeCalledWith('test');
+  })
+
+  it('should return error if provider is not defined when registering', () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    // @ts-ignore
+    expect(() => configurationStore.registerProvider('test', null)).toThrowError('Provider is required');
+  })
+
+
+  it('should return a configuration from a provider', () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    configurationStore.registerProvider('test', mockedProvider);
+    (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
+    expect(configurationStore.getProviderConfiguration('test')).resolves.toEqual({ test: 'test' });
+  })
+
+  it('should return error if provider is not defined when getting configuration', () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    expect(configurationStore.getProviderConfiguration('test')).rejects.toThrowError('Provider test not found');
+  })
+
+  it('should return the provider', () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    configurationStore.registerProvider('test', mockedProvider);
+    expect(configurationStore.getProvider('test')).toBe(mockedProvider);
+  })
+
+  it('should return error if provider is not defined when getting provider', () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    expect(() => configurationStore.getProvider('test')).toThrowError('Provider test not found');
+  })
+
+  it('should return a configuration value by key', async () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
+    (mockedProvider.get as jest.Mock).mockResolvedValue('test');
+    configurationStore.registerProvider('test', mockedProvider);
+    expect(await configurationStore.get('test')).toEqual('test');
+  })
+
+  it('should return error if the configuration key is not found', async () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
+    configurationStore.registerProvider('test', mockedProvider);
+    (mockedProvider.get as jest.Mock).mockRejectedValue(new Error('test error'));
+    try { 
+      await configurationStore.get('test')
+    } catch (error) {
+      expect(error).toEqual(new Error('test error'));
     }
-  });
+  })
 
-  // Ensure the configuration file is created
-  describe('Ensure the file is created', () => {
-    it.each`
-      title                                          | file            | createFile
-      ${'Ensure the file is created'}                | ${'config.yml'} | ${false}
-      ${'Ensure the file is created. Already exist'} | ${'config.yml'} | ${true}
-    `('$title', ({ file, createFile }) => {
-      const configurationStore = new ConfigurationStore(createMockLogger(), {
-        file,
-        cache_seconds: 10,
-      });
+  it('should return all the configuration from the registered providers', () => {
+    const logger = createMockLogger();
+    const configurationStore = new ConfigurationStore(logger);
+    configurationStore.registerProvider('test', mockedProvider);
+    (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
+    expect(configurationStore.getAll()).resolves.toEqual({ test: 'test' });
+  })
 
-      // Mock configuration
-      configurationStore.setConfiguration({
-        groupSettingsByCategory: () => [],
-      });
-
-      if (createFile) {
-        fs.writeFileSync(configurationStore.file, '', { encoding: 'utf8' });
-      }
-      expect(fs.existsSync(configurationStore.file)).toBe(createFile);
-      configurationStore.ensureConfigurationFileIsCreated();
-      expect(fs.existsSync(configurationStore.file)).toBe(true);
-
-      // Cleaning
-      if (fs.existsSync(configurationStore.file)) {
-        fs.unlinkSync(configurationStore.file);
-      }
-    });
-  });
-
-  // Update the configuration
-  describe('Update the configuration', () => {
-    it.each`
-      title                         | updateSettings                      | prevContent                        | postContent
-      ${'Update the configuration'} | ${{ key1: 'value' }}                | ${''}                              | ${'\nkey1: "value"'}
-      ${'Update the configuration'} | ${{ key1: 'value' }}                | ${'key1: default'}                 | ${'key1: "value"'}
-      ${'Update the configuration'} | ${{ key1: 1 }}                      | ${'key1: 0'}                       | ${'key1: 1'}
-      ${'Update the configuration'} | ${{ key1: true }}                   | ${'key1: false'}                   | ${'key1: true'}
-      ${'Update the configuration'} | ${{ key1: ['value'] }}              | ${'key1: ["default"]'}             | ${'key1: ["value"]'}
-      ${'Update the configuration'} | ${{ key1: 'value' }}                | ${'key1: "default"\nkey2: 1'}      | ${'key1: "value"\nkey2: 1'}
-      ${'Update the configuration'} | ${{ key2: 2 }}                      | ${'key1: "default"\nkey2: 1'}      | ${'key1: "default"\nkey2: 2'}
-      ${'Update the configuration'} | ${{ key1: 'value', key2: 2 }}       | ${'key1: "default"\nkey2: 1'}      | ${'key1: "value"\nkey2: 2'}
-      ${'Update the configuration'} | ${{ key1: ['value'] }}              | ${'key1: ["default"]\nkey2: 1'}    | ${'key1: ["value"]\nkey2: 1'}
-      ${'Update the configuration'} | ${{ key1: ['value'], key2: false }} | ${'key1: ["default"]\nkey2: true'} | ${'key1: ["value"]\nkey2: false'}
-    `('$title', async ({ prevContent, postContent, updateSettings }) => {
-      const configurationStore = new ConfigurationStore(createMockLogger(), {
-        file: 'config.yml',
-        cache_seconds: 10,
-      });
-
-      // Mock configuration
-      configurationStore.setConfiguration({
-        groupSettingsByCategory: () => [],
-        _settings: new Map([
-          ['key1', { store: { file: { configurableManaged: true } } }],
-          ['key2', { store: { file: { configurableManaged: true } } }],
-        ]),
-      });
-
-      fs.writeFileSync(configurationStore.file, prevContent, {
-        encoding: 'utf8',
-      });
-
-      await configurationStore.set(updateSettings);
-
-      const content = fs.readFileSync(configurationStore.file, {
-        encoding: 'utf8',
-      });
-
-      expect(content).toBe(postContent);
-
-      // Cleaning
-      if (fs.existsSync(configurationStore.file)) {
-        fs.unlinkSync(configurationStore.file);
-      }
-    });
-  });
 });

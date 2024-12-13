@@ -153,7 +153,7 @@ export interface IConfigurationStore {
   set: (settings: TConfigurationSettings) => Promise<any>;
   getProviderConfiguration: (key: string) => Promise<Record<string, any>>;
   registerProvider: (name: string, provider: IConfigurationProvider) => void;
-  getProvider: (name: string) => IConfigurationProvider | undefined;
+  getProvider: (name: string) => IConfigurationProvider;
 }
 
 export interface IConfiguration {
