@@ -151,8 +151,9 @@ export interface IConfigurationStore {
   get: (...settings: string[]) => Promise<TConfigurationSettings>;
   getAll(): Promise<{[key: string]: any}>;
   set: (settings: TConfigurationSettings) => Promise<any>;
-  getConfiguration: (key: string) => Promise<IConfigurationProvider>;
+  getProviderConfiguration: (key: string) => Promise<Record<string, any>>;
   registerProvider: (name: string, provider: IConfigurationProvider) => void;
+  getProvider: (name: string) => IConfigurationProvider | undefined;
 }
 
 export interface IConfiguration {
@@ -191,6 +192,6 @@ export class Configuration implements IConfiguration {
   }
 
   async getAll() {
-    return await this.store?.getAll();
+    return await this.store?.getAll() || {};
   }
 }

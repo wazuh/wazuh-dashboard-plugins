@@ -12,10 +12,15 @@ export class ConfigurationStore implements IConfigurationStore {
   }
 
   registerProvider(name: string, provider: IConfigurationProvider) {
+    provider.setName(name);
     this.providers.set(name, provider);
   }
 
-  async getConfiguration(key: string): Promise<IConfigurationProvider> {
+  getProvider(name: string): IConfigurationProvider | undefined {
+    return this.providers.get(name);
+  }
+
+  async getProviderConfiguration(key: string): Promise<Record<string, any>> {
     try {
       const provider = this.providers.get(key);
       if (!provider) {

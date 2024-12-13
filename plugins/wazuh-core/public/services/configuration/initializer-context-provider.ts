@@ -1,7 +1,6 @@
-import { PluginInitializerContext } from "opensearch-dashboards/server";
-import { CorePluginConfigType } from "../../index";
+import { PluginInitializerContext } from "opensearch-dashboards/public";
+import { CorePluginConfigType } from "../../../server/index";
 import { IConfigurationProvider } from "../../../common/services/configuration/configuration-provider";
-import { first } from 'rxjs/operators';
 import { EConfigurationProviders } from "../../../common/constants";
 
 export class InitializerConfigProvider implements IConfigurationProvider {
@@ -12,17 +11,16 @@ export class InitializerConfigProvider implements IConfigurationProvider {
     this.initializeConfig();
   }
 
-  private async initializeConfig(): Promise<void> {
-    const config$ = this.initializerContext.config.create<CorePluginConfigType>();
-    this.config = await config$.pipe(first()).toPromise();
-  }
-
   setName(name: string): void {
     this.name = name;
   }
 
   getName(): string {
     return this.name;
+  }
+
+  private async initializeConfig(): Promise<void> {
+    this.config = this.initializerContext.config.get<CorePluginConfigType>();
   }
 
   async get(key: keyof CorePluginConfigType): Promise<CorePluginConfigType[keyof CorePluginConfigType]> {
