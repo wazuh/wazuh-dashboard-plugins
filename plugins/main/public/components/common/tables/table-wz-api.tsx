@@ -21,7 +21,6 @@ import {
   EuiToolTip,
   EuiIcon,
   EuiCheckboxGroup,
-  EuiIconTip,
 } from '@elastic/eui';
 import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
@@ -252,15 +251,9 @@ export function TableWzAPI({
                       ? rest.downloadCsv
                       : rest.title
                   }
+                  maxRows={maxRows}
                 />
-                {totalItems > maxRows && (
-                  <EuiIconTip
-                    content={`The exported CSV will be limited to the first ${maxRows} lines. You can change this limit in Dashboard management > App Settings`}
-                    size='m'
-                    color='primary'
-                    type='iInCircle'
-                  />
-                )}
+
               </>
             )}
             {/* Render optional post custom action button */}
