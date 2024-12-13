@@ -34,6 +34,7 @@ import { toTitleCase } from '../util/change-case';
 import clsx from 'clsx';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { Agent } from '../../endpoints-summary/types';
+import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -44,6 +45,7 @@ export class MainModuleAgent extends Component {
     tabs?: any[];
     renderTabs?: () => JSX.Element;
     agentsSelectionProps?: any;
+    unPinAgent?: () => void;
   };
 
   inventoryTabs = [AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES];
@@ -52,7 +54,7 @@ export class MainModuleAgent extends Component {
     const { agent, section, switchTab } = this.props;
     return (
       <EuiFlexGroup style={{ marginInline: 8 }}>
-        <EuiFlexItem style={{ marginInline: 0 }} grow={false}>
+        <EuiFlexItem style={{ marginInline: 0 }}>
           <EuiTabs data-test-subj='agent-tabs'>
             {this.inventoryTabs.includes(section) ? (
               <>
@@ -74,13 +76,20 @@ export class MainModuleAgent extends Component {
             )}
           </EuiTabs>
         </EuiFlexItem>
-        <EuiFlexItem />
+        <EuiFlexItem
+          grow={false}
+          className='euiTabs'
+          style={{ marginInline: 0, paddingInline: 12 }}
+        >
+          <ButtonExploreAgent onUnpinAgent={this.props.unPinAgent} />
+        </EuiFlexItem>
         {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
           section,
         ) && (
           <EuiFlexItem
             grow={false}
-            style={{ marginTop: 13.25, marginInline: 0 }}
+            style={{ marginTop: 13.25, marginInline: 0, paddingInline: 12 }}
+            className='euiTabs'
           >
             <GenerateReportButton agent={agent} />
           </EuiFlexItem>

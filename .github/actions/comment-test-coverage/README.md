@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Run Jasmine tests
         run: npm run test -- --no-watch --no-progress --browsers=ChromeHeadlessCI

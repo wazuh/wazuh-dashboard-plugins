@@ -11,9 +11,8 @@
  * Find more information about this on the LICENSE file.
  *
  */
-import { ErrorOrchestratorService } from './error-orchestrator/error-orchestrator.service';
+import { ErrorService } from './error-orchestrator/error-orchestrator.service';
 import { createGetterSetter } from '../utils/create-getter-setter';
 
-export const [getErrorOrchestrator, setErrorOrchestrator] = createGetterSetter<
-  ErrorOrchestratorService
->('ErrorOrchestratorService');
+export const [getErrorOrchestrator, setErrorOrchestrator] =
+  createGetterSetter<ErrorService>('ErrorOrchestratorService');

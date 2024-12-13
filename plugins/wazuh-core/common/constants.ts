@@ -1747,16 +1747,16 @@ hosts:
   },
   'wazuh.updates.disabled': {
     title: 'Check updates',
-    description: 'Define if the check updates service is active.',
+    description: 'Define if the check updates service is disabled.',
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
     defaultValue: false,
     store: {
       file: {
-        configurableManaged: false,
+        configurableManaged: true,
       },
     },
-    isConfigurableFromSettings: false,
+    isConfigurableFromSettings: true,
     options: {
       switch: {
         values: {

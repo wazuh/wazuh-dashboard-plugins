@@ -33,6 +33,7 @@ const windowsColumns = [
   { field: 'priority', searchable: true, sortable: true },
   { field: 'nlwp', searchable: true, sortable: true },
   { field: 'cmd', searchable: true, sortable: true, width: '30%' },
+  // TODO: review if this is working as expected
 ].map(mapColumns);
 
 const linuxColumns = [
@@ -57,6 +58,7 @@ const macColumns = [
   { field: 'ppid', searchable: true, sortable: true },
   { field: 'vm_size', searchable: true, sortable: true },
   { field: 'nice', searchable: true, sortable: true },
+  // TODO: review if this is working as expected
 ].map(mapColumns);
 
 export const processColumns = {
