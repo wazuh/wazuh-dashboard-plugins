@@ -3,6 +3,7 @@ import { render } from 'enzyme';
 import { SyscollectorInventory } from './inventory';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
+import { AGENT } from '../../../../test/__mocks__/agent';
 
 const TABLE_ID = '__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9';
 const SOFTWARE_PACKAGES = 'Packages';
@@ -11,25 +12,6 @@ const NETWORK_PORTS = 'Network ports';
 const NETWORK_INTERFACES = 'Network interfaces';
 const NETWORK_SETTINGS = 'Network settings';
 const PROCESSES = 'Processes';
-
-const AGENT = {
-  DEBIAN: {
-    os: {
-      uname:
-        'Linux |ip-10-0-1-106 |4.9.0-9-amd64 |1 SMP Debian 4.9.168-1+deb9u2 (2019-05-13) |x86_64',
-    },
-  },
-  WINDOWS: {
-    os: {
-      platform: 'windows',
-    },
-  },
-  DARWIN: {
-    os: {
-      platform: 'darwin',
-    },
-  },
-} as const;
 
 const NETWORK_PORTS_COLUMNS = {
   LOCAL_PORT: 'Local port',

@@ -13,7 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
 - Changed the width of the command column, relocate argvs column and change the width of the rest of the columns in the table processes. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
 
-## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 03
+## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 06
 
 ### Added
 
@@ -25,6 +25,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added ability to filter from File Integrity Monitoring registry inventory [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Added new field columns and ability to select the visible fields in the File Integrity Monitoring Files and Registry tables [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
 - Added filter by value to document details fields [#7081](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7081)
+- Added pinned agent mechanic to inventory data, stats, and configuration for consistent functionality [#7135](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7135)
+- Added ability to edit the `wazuh.updates.disabled` configuration setting from UI [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
 
 ### Changed
 
@@ -39,6 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed feature container margins to ensure consistent separation and uniform design. [#7034](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7034)
 - Changed the initial width to the default columns on each selected field [#7059](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7059)
 - Changed inventory, stats and configuration page to use tabs [#7089](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7089)
+- Changed styles in the register agent view for consistency of styles in the views. [#7149](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7149)
 
 ### Fixed
 
@@ -53,7 +56,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed filter management to prevent hiding when adding multiple filters [#7077](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7077)
 - Fixed the Mitre ATT&CK exception in the agent view, the redirections of ID, Tactics, Dashboard Icon and Event Icon in the drop-down menu and the card not displaying information when the flyout was opened [#7116](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7116)
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
-- Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119)
+- Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119) [#7163](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7163)
+- Fixed endpoint group module name and indexer management order [#7150](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7150)
+- Fixed Invalid date filter applied on FIM details flyout [#7160](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7160)
+- Fixed the check updates UI was displayed despite it could be configured as disabled [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
+- Fixed filter by value in document details in safari [#7151](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7151)
+- Fixed error message to prevent pass no strings to the wazuh logger [#7167](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7167)
+- Fixed the rendering of the `data.vunerability.reference` in the table and flyout [#7177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7177)
 
 ### Removed
 

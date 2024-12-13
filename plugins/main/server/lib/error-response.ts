@@ -10,6 +10,21 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { HTTP_STATUS_CODES } from '../../common/constants';
+
+enum ERROR_TYPE {
+  ENOTFOUND = 'ENOTFOUND',
+  EHOSTUNREACH = 'EHOSTUNREACH',
+  EINVAL = 'EINVAL',
+  EAI_AGAIN = 'EAI_AGAIN',
+  ECONNREFUSED = 'ECONNREFUSED',
+  ENOENT = 'ENOENT',
+}
+
+enum WAZUH_STATUS_CODES {
+  UNKNOWN = 1000,
+}
+
 /**
  * Error codes:
  * wazuh-api-elastic 20XX
@@ -21,55 +36,66 @@
 /**
  * Returns a suitable error message
  * @param {String} message Error message
- * @param {Number} code Error code
+ * @param {Number} wazuhStatusCode Error code
  * @param {Number} statusCode Error status code
  * @returns {Object} Error response object
  */
-export function ErrorResponse(message = null, code = null, statusCode = null, response) {
-  message.includes('password: ')
+export function ErrorResponse(
+  message: string | null = null,
+  wazuhStatusCode: number | null = null,
+  statusCode: number | null = null,
+  response: any,
+) {
+  message?.includes('password: ')
     ? (message = message.split('password: ')[0] + ' password: ***')
     : false;
   let filteredMessage = '';
-  if (code) {
-    const isString = typeof message === 'string';
-    if (isString && message === 'socket hang up' && code === 3005) {
+  if (wazuhStatusCode && typeof message === 'string') {
+    if (message === 'socket hang up' && wazuhStatusCode === 3005) {
       filteredMessage = 'Wrong protocol being used to connect to the API';
     } else if (
-      isString &&
-      (message.includes('ENOTFOUND') ||
-        message.includes('EHOSTUNREACH') ||
-        message.includes('EINVAL') ||
-        message.includes('EAI_AGAIN')) &&
-      code === 3005
+      (message?.includes(ERROR_TYPE.ENOTFOUND) ||
+        message?.includes(ERROR_TYPE.EHOSTUNREACH) ||
+        message?.includes(ERROR_TYPE.EINVAL) ||
+        message?.includes(ERROR_TYPE.EAI_AGAIN)) &&
+      wazuhStatusCode === 3005
     ) {
       filteredMessage = 'API is not reachable. Please check your url and port.';
-    } else if (isString && message.includes('ECONNREFUSED') && code === 3005) {
+    } else if (
+      message?.includes(ERROR_TYPE.ECONNREFUSED) &&
+      wazuhStatusCode === 3005
+    ) {
       filteredMessage = 'API is not reachable. Please check your url and port.';
-    } else if (isString && message.toLowerCase().includes('not found') && code === 3002) {
+    } else if (
+      message?.toLowerCase().includes('not found') &&
+      wazuhStatusCode === 3002
+    ) {
       filteredMessage = 'It seems the selected API was deleted.';
     } else if (
-      isString &&
-      message.includes('ENOENT') &&
-      message.toLowerCase().includes('no such file or directory') &&
-      message.toLowerCase().includes('data') &&
-      code === 5029 || code === 5030 || code === 5031 || code === 5032
+      message?.includes(ERROR_TYPE.ENOENT) &&
+      message?.toLowerCase().includes('no such file or directory') &&
+      message?.toLowerCase().includes('data') &&
+      [5029, 5030, 5031, 5032].includes(wazuhStatusCode)
     ) {
       filteredMessage = 'Reporting was aborted - no such file or directory';
-    } else if (isString && code === 5029) {
+    } else if (wazuhStatusCode === 5029) {
       filteredMessage = `Reporting was aborted (${message})`;
+    } else {
+      filteredMessage = message;
     }
+  } else {
+    filteredMessage = 'Unexpected error';
   }
 
-  const statusCodeResponse = statusCode || 500;
+  const statusCodeResponse =
+    statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
   return response.custom({
     statusCode: statusCodeResponse,
     body: {
-      message: filteredMessage
-        ? `${code || 1000} - ${filteredMessage}`
-        : typeof message === 'string'
-        ? `${code || 1000} - ${message}`
-        : `${code || 1000} - Unexpected error`,
-      code: code || 1000,
+      message: `${
+        wazuhStatusCode || WAZUH_STATUS_CODES.UNKNOWN
+      } - ${filteredMessage}`,
+      code: wazuhStatusCode || WAZUH_STATUS_CODES.UNKNOWN,
       statusCode: statusCodeResponse,
     },
   });
