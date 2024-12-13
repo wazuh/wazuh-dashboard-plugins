@@ -257,8 +257,8 @@ export function TableWzAPI({
                   <EuiIconTip
                     content={`The exported CSV will be limited to the first ${maxRows} lines. You can change this limit in Dashboard management > App Settings`}
                     size='m'
-                    color='warning'
-                    type='alert'
+                    color='primary'
+                    type='iInCircle'
                   />
                 )}
               </>
