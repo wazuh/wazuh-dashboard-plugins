@@ -6,6 +6,7 @@ import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
 import {
   withErrorBoundary,
+  withGlobalBreadcrumb,
   withGuard,
   withRouteResolvers,
 } from '../../common/hocs';
@@ -39,6 +40,16 @@ export const AgentView = compose(
   withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
   connect(mapStateToProps),
   withAgentSync,
+  withGlobalBreadcrumb(() => {
+    return [
+      {
+        text: endpointSummary.breadcrumbLabel,
+        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+          path: `#/${SECTIONS.AGENTS_PREVIEW}`,
+        }),
+      },
+    ];
+  }),
   withGuard(
     props => !(props.agent && props.agent.id),
     () => (
@@ -106,6 +117,11 @@ export const AgentView = compose(
     );
   }
 
+  const unPinAgent = () => {
+    // remove the pinned agent from the URL
+    navigationService.navigate(`/agents?tab=${tab}`);
+  };
+
   return (
     <Switch>
       <Route path={`?tab=${AgentTabs.SOFTWARE}`}>
@@ -113,6 +129,7 @@ export const AgentView = compose(
           agent={agentData}
           section={tab}
           switchTab={switchTab}
+          unPinAgent={unPinAgent}
         />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
@@ -121,6 +138,7 @@ export const AgentView = compose(
           agent={agentData}
           section={tab}
           switchTab={switchTab}
+          unPinAgent={unPinAgent}
         />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
@@ -129,19 +147,24 @@ export const AgentView = compose(
           agent={agentData}
           section={tab}
           switchTab={switchTab}
+          unPinAgent={unPinAgent}
         />
         <MainSyscollector agent={agentData} section={tab} />
       </Route>
-      <Route path='?tab=syscollector'>
-        <MainModuleAgent agent={agentData} section={tab} />
-        <MainSyscollector agent={agentData} />
-      </Route>
       <Route path={`?tab=${AgentTabs.STATS}`}>
-        <MainModuleAgent agent={agentData} section={tab} />
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          unPinAgent={unPinAgent}
+        />
         <MainAgentStats agent={agentData} />
       </Route>
       <Route path={`?tab=${AgentTabs.CONFIGURATION}`}>
-        <MainModuleAgent agent={agentData} section={tab} />
+        <MainModuleAgent
+          agent={agentData}
+          section={tab}
+          unPinAgent={unPinAgent}
+        />
         <WzManagementConfiguration agent={agentData} />
       </Route>
       <Route path='?tab=welcome'>
@@ -149,7 +172,7 @@ export const AgentView = compose(
           switchTab={switchTab}
           agent={agentData}
           pinAgent={pinnedAgentManager.pinAgent}
-          unPinAgent={pinnedAgentManager.unPinAgent}
+          unPinAgent={unPinAgent}
         />
       </Route>
       <Redirect to='?tab=welcome'></Redirect>

@@ -51,7 +51,7 @@ import {
   endpointSummary,
   mitreAttack,
   threatHunting,
-  malwareDetection,
+  vulnerabilityDetection,
 } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EventsCount } from './dashboard/events-count';
@@ -183,7 +183,7 @@ export const AgentsWelcome = compose(
               fileIntegrityMonitoring.id,
               configurationAssessment.id,
               mitreAttack.id,
-              malwareDetection.id,
+              vulnerabilityDetection.id,
             ];
       }
 
@@ -331,7 +331,7 @@ export const AgentsWelcome = compose(
                 grow={false}
                 style={{ marginTop: 7, marginRight: '0.5rem' }}
               >
-                <ButtonExploreAgent />
+                <ButtonExploreAgent onUnpinAgent={this.props.unPinAgent} />
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <WzButton

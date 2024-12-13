@@ -3,6 +3,12 @@ import { render } from '@testing-library/react';
 import { InventoryMetrics } from './syscollector-metrics';
 import { queryDataTestAttr } from '../../../../../test/public/query-attr';
 import { CSS } from '../../../../../test/utils/CSS';
+import { useGenericRequest } from '../../../common/hooks/useGenericRequest';
+
+const AGENT_000 = '000';
+const AGENT_001 = '001';
+
+let useGenericRequestMock = useGenericRequest as jest.Mock;
 
 jest.mock('../../../../react-services/time-service', () => ({
   formatUIDate: jest.fn().mockReturnValue('2022-06-27T16:09:49+00:00'),
@@ -33,7 +39,10 @@ jest.mock('../../../common/hooks/useGenericRequest', () => ({
 
 describe('Syscollector metrics', () => {
   it('should render inventory metrics', () => {
-    const { container } = render(<InventoryMetrics agent={{ id: '000' }} />);
+    const { container } = render(
+      // @ts-expect-error
+      <InventoryMetrics agent={{ id: AGENT_000 }} />,
+    );
 
     const inventoryMetrics = container.querySelector(
       queryDataTestAttr('syscollector-metrics'),
@@ -43,7 +52,10 @@ describe('Syscollector metrics', () => {
   });
 
   it('should render syscollector ribbon items', () => {
-    const { container } = render(<InventoryMetrics agent={{ id: '000' }} />);
+    const { container } = render(
+      // @ts-expect-error
+      <InventoryMetrics agent={{ id: AGENT_000 }} />,
+    );
 
     expect(
       container.querySelector(queryDataTestAttr('ribbon-item-cores')),
@@ -84,5 +96,25 @@ describe('Syscollector metrics', () => {
         queryDataTestAttr('ribbon-item-', CSS.Attribute.Substring),
       ),
     ).toHaveLength(8);
+  });
+
+  it('should fetch syscollector data for given agent id either when changing agent or not', () => {
+    // @ts-expect-error
+    let { rerender } = render(<InventoryMetrics agent={{ id: AGENT_000 }} />);
+
+    expect(useGenericRequestMock.mock.calls[0][0].method).toEqual('GET');
+    expect(useGenericRequestMock.mock.calls[0][0].path).toEqual(
+      `/api/syscollector/${AGENT_000}`,
+    );
+
+    useGenericRequestMock.mockClear();
+
+    // @ts-expect-error
+    rerender(<InventoryMetrics agent={{ id: AGENT_001 }} />);
+
+    expect(useGenericRequestMock.mock.calls[0][0].method).toEqual('GET');
+    expect(useGenericRequestMock.mock.calls[0][0].path).toEqual(
+      `/api/syscollector/${AGENT_001}`,
+    );
   });
 });

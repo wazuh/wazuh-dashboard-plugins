@@ -5,8 +5,21 @@ import { WzButtonType } from '../common/buttons/button';
 import { connect } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../redux/actions/appStateActions';
 import './button-explore-agent.scss';
+import clsx from 'clsx';
 
-const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
+interface ButtonPinnedAgentProps {
+  showExploreAgentModalGlobal: (shouldShow: boolean) => void;
+  module?: {
+    availableFor?: string[];
+  };
+  onUnpinAgent?: () => void;
+}
+
+const ButtonPinnedAgent = ({
+  showExploreAgentModalGlobal,
+  module,
+  onUnpinAgent,
+}: ButtonPinnedAgentProps) => {
   const pinnedAgentManager = new PinnedAgentManager();
   const agent = pinnedAgentManager.isPinnedAgent()
     ? pinnedAgentManager.getPinnedAgent()
@@ -14,41 +27,46 @@ const ButtonPinnedAgent = ({ showExploreAgentModalGlobal, module }) => {
   const avaliableForAgent = module
     ? module?.availableFor && module?.availableFor.includes('agent')
     : true;
+
+  const unPinAgentHandler = () => {
+    pinnedAgentManager.unPinAgent();
+    onUnpinAgent?.();
+  };
+
   return (
-    <>
-      <div style={{ display: 'inline-flex' }}>
+    <div
+      data-test-subj='explore-agent-button'
+      style={{ display: 'inline-flex' }}
+    >
+      <WzButton
+        buttonType={WzButtonType.empty}
+        color='primary'
+        isDisabled={!avaliableForAgent}
+        tooltip={{
+          position: 'bottom',
+          content: !avaliableForAgent
+            ? 'This module is not supported for agents.'
+            : agent
+            ? 'Change agent selected'
+            : 'Select an agent to explore its modules',
+        }}
+        className={clsx({ 'wz-unpin-agent-bg': agent })}
+        iconType='watchesApp'
+        onClick={() => showExploreAgentModalGlobal(true)}
+      >
+        {agent ? `${agent.name} (${agent.id})` : 'Explore agent'}
+      </WzButton>
+      {agent ? (
         <WzButton
-          buttonType={WzButtonType.empty}
-          color='primary'
-          isDisabled={!avaliableForAgent}
-          tooltip={{
-            position: 'bottom',
-            content: !avaliableForAgent
-              ? 'This module is not supported for agents.'
-              : agent
-              ? 'Change agent selected'
-              : 'Select an agent to explore its modules',
-          }}
-          style={agent ? { background: 'rgba(0, 107, 180, 0.1)' } : undefined}
-          iconType='watchesApp'
-          onClick={() => showExploreAgentModalGlobal(true)}
-        >
-          {agent ? `${agent.name} (${agent.id})` : 'Explore agent'}
-        </WzButton>
-        {agent ? (
-          <WzButton
-            buttonType={WzButtonType.icon}
-            className='wz-unpin-agent'
-            iconType='pinFilled'
-            onClick={() => {
-              pinnedAgentManager.unPinAgent();
-            }}
-            tooltip={{ position: 'bottom', content: 'Unpin agent' }}
-            aria-label='Unpin agent'
-          />
-        ) : null}
-      </div>
-    </>
+          buttonType={WzButtonType.icon}
+          className='wz-unpin-agent wz-unpin-agent-bg'
+          iconType='pinFilled'
+          onClick={unPinAgentHandler}
+          tooltip={{ position: 'bottom', content: 'Unpin agent' }}
+          aria-label='Unpin agent'
+        />
+      ) : null}
+    </div>
   );
 };
 
@@ -59,8 +77,8 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = dispatch => ({
-  showExploreAgentModalGlobal: data =>
-    dispatch(showExploreAgentModalGlobal(data)),
+  showExploreAgentModalGlobal: (shouldShow: boolean) =>
+    dispatch(showExploreAgentModalGlobal(shouldShow)),
 });
 
 export const ButtonExploreAgent = connect(

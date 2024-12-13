@@ -53,7 +53,7 @@ import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-b
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
 import {
-  clusterNodes,
+  clusterNodes as requestClusterNodes,
   clusterReq,
   agentIsSynchronized,
 } from './utils/wz-fetch';
@@ -99,103 +99,120 @@ class WzConfigurationSwitch extends Component {
       loadingOverview: this.props.agent.id === '000',
     };
   }
+
   componentWillUnmount() {
-    this.props.updateClusterNodes(false);
-    this.props.updateClusterNodeSelected(false);
+    this.resetClusterState();
   }
+
   updateConfigurationSection = (view, title, description) => {
     this.setState({ view, viewProps: { title: title, description } });
   };
+
   updateBadge = badgeStatus => {
     // default value false?
     this.setState({
       viewProps: { ...this.state.viewProps, badge: badgeStatus },
     });
   };
-  async componentDidMount() {
+
+  catchError = (error, context) => {
+    const options = {
+      context: `${WzConfigurationSwitch.name}.${context}`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: error.name || error,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
+  };
+
+  updateAgentSynchronization = async (/** @type {string} */ context) => {
     // If agent, check if is synchronized or not
-    if (this.props.agent.id !== '000') {
-      try {
-        const agentSynchronized = await agentIsSynchronized(this.props.agent);
-        this.setState({ agentSynchronized });
-      } catch (error) {
-        const options = {
-          context: `${WzConfigurationSwitch.name}.componentDidMount`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    } else {
-      try {
-        // try if it is a cluster
-        const clusterStatus = await clusterReq();
-        const isCluster =
-          clusterStatus.data.data.enabled === 'yes' &&
-          clusterStatus.data.data.running === 'yes';
-        if (isCluster) {
-          const nodes = await clusterNodes();
-          // set cluster nodes in Redux Store
-          this.props.updateClusterNodes(nodes.data.data.affected_items);
-          // set cluster node selected in Redux Store
-          this.props.updateClusterNodeSelected(
-            nodes.data.data.affected_items.find(node => node.type === 'master')
-              .name,
-          );
-        } else {
-          // do nothing if it isn't a cluster
-          this.props.updateClusterNodes(false);
-          this.props.updateClusterNodeSelected(false);
-        }
-      } catch (error) {
+    try {
+      const agentSynchronized = await agentIsSynchronized(this.props.agent);
+      this.setState({ agentSynchronized });
+    } catch (error) {
+      this.catchError(error, context);
+    }
+  };
+
+  handleClusterNodes = async () => {
+    const nodes = await requestClusterNodes();
+    const clusterNodes = nodes.data.data.affected_items;
+
+    this.props.updateClusterNodes(clusterNodes);
+    const masterNode = clusterNodes.find(node => node.type === 'master');
+    if (masterNode) {
+      this.props.updateClusterNodeSelected(masterNode.name);
+    }
+  };
+
+  resetClusterState = () => {
+    this.props.updateClusterNodes(false);
+    this.props.updateClusterNodeSelected(false);
+  };
+
+  updateClusterInformation = async (/** @type {string} */ context) => {
+    try {
+      // try if it is a cluster
+      const clusterStatus = await clusterReq();
+      const isCluster =
+        clusterStatus.data.data.enabled === 'yes' &&
+        clusterStatus.data.data.running === 'yes';
+
+      if (isCluster) {
+        await this.handleClusterNodes();
+      } else {
         // do nothing if it isn't a cluster
-        this.props.updateClusterNodes(false);
-        this.props.updateClusterNodeSelected(false);
-        const options = {
-          context: `${WzConfigurationSwitch.name}.componentDidMount`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
+        this.resetClusterState();
       }
-      // If manager/cluster require agent platform info to filter sections in overview. It isn't coming from props for Management/Configuration
-      try {
-        this.setState({ loadingOverview: true });
-        const masterNodeInfo = await WzRequest.apiReq(
-          'GET',
-          '/agents?agents_list=000',
-          {},
-        );
-        this.setState({
-          masterNodeInfo: masterNodeInfo.data.data.affected_items[0],
-        });
-        this.setState({ loadingOverview: false });
-      } catch (error) {
-        this.setState({ loadingOverview: false });
-        const options = {
-          context: `${WzConfigurationSwitch.name}.componentDidMount`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
+    } catch (error) {
+      // do nothing if it isn't a cluster
+      this.resetClusterState();
+      this.catchError(error, context);
+    }
+  };
+
+  fetchMasterNodeInfo = async (/** @type {string} */ context) => {
+    this.setState({ loadingOverview: true });
+
+    try {
+      const masterNodeInfo = await WzRequest.apiReq(
+        'GET',
+        '/agents?agents_list=000',
+        {},
+      );
+      const masterNode = masterNodeInfo.data.data.affected_items[0];
+      this.setState({ masterNodeInfo: masterNode });
+    } catch (error) {
+      this.catchError(error, context);
+    } finally {
+      this.setState({ loadingOverview: false });
+    }
+  };
+
+  handleAgentOrClusterUpdate = (/** @type {string} */ context) => {
+    if (this.props.agent.id !== '000') {
+      this.updateAgentSynchronization(context);
+    } else {
+      this.updateClusterInformation(context);
+      this.fetchMasterNodeInfo();
+    }
+  };
+
+  async componentDidMount() {
+    this.handleAgentOrClusterUpdate('componentDidMount');
+  }
+
+  async componentDidUpdate(prevProps) {
+    if (this.props.agent.id !== prevProps.agent.id) {
+      this.handleAgentOrClusterUpdate('componentDidUpdate');
     }
   }
+
   render() {
     const {
       view,
@@ -208,7 +225,7 @@ class WzConfigurationSwitch extends Component {
       <EuiPage>
         <EuiPageBody>
           <EuiPanel>
-            {agent.id !== '000' && agent.group && agent.group.length ? (
+            {agent.id !== '000' && agent.group?.length ? (
               <Fragment>
                 <span>Groups:</span>
                 <RedirectAppLinks application={getCore().application}>
