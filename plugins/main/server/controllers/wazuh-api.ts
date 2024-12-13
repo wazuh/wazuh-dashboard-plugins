@@ -797,7 +797,6 @@ export class WazuhApiCtrl {
 
           const affectedItems = tmpData.data.data.affected_items;
           const remainingItems = reportMaxRows - itemsArray.length;
-          console.log(affectedItems[0]);
           if (itemsArray.length + affectedItems.length > reportMaxRows) {
             itemsArray.push(...affectedItems.slice(0, remainingItems));
             break;

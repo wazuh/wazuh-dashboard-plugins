@@ -112,7 +112,6 @@ export function TableWzAPI({
   );
   const [isOpenFieldSelector, setIsOpenFieldSelector] = useState(false);
   const appConfig = useAppConfig();
-  console.log(rest.tableColumns);
   const maxRows = appConfig.data['reports.csv.maxRows'];
   const onSearch = useCallback(async function (
     endpoint,
