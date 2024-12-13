@@ -19,7 +19,8 @@ import {
 // configuration common
 import { Configuration, ConfigurationStore } from '../common/services/configuration';
 // configuration server
-import { uiSettings, InitializerConfigProvider } from './services/configuration';
+import { InitializerConfigProvider } from './services/configuration';
+import { uiSettings } from './services/configuration/ui_settings';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
