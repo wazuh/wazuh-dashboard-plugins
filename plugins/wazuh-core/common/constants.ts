@@ -2192,3 +2192,42 @@ export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
 
 // ID used to refer the createOsdUrlStateStorage state
 export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
+
+
+export enum EConfigurationProviders {
+  INITIALIZER_CONTEXT = 'initializerContext',
+  PLUGIN_UI_SETTINGS = 'uiSettings',
+}
+
+// uiSettings
+
+export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
+export const ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
+// Checks
+export const CHECKS_API = 'checks.api';
+export const CHECKS_FIELDS = 'checks.fields';
+export const CHECKS_MAX_BUCKETS = 'checks.max_buckets';
+export const CHECKS_META_FIELDS = 'checks.meta_fields';
+export const CHECKS_PATTERN = 'checks.pattern';
+export const CHECKS_SETUP = 'checks.setup';
+export const CHECKS_TEMPLATE = 'checks.template';
+export const CHECKS_TIMEFILTER = 'checks.timefilter';
+
+export const CONFIG_UI_API_EDITABLE = 'configuration.ui_api_editable';
+
+export const CRON_PREFIX = 'cron.prefix';
+
+export const CUSTOMIZATION_ENABLED = 'customization.enabled';
+
+export const ENROLLMENT_DNS = 'enrollment.dns';
+export const ENROLLMENT_PASSWORD = 'enrollment.password';
+
+export const IP_IGNORE = 'ip.ignore';
+export const IP_SELECTOR = 'ip.selector';
+
+export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
+
+export const REQUEST_TIMEOUT = 'timeout';
+
+
+export const DEFAULT_COLUMNS_SETTING = 'defaultColumns2';
