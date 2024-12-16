@@ -248,23 +248,21 @@ export class WazuhCorePlugin
     );
 
     // Register a property to the context parameter of the endpoint handlers
-    core.http.registerRouteHandlerContext('wazuh_core', (context, request) => {
-      return {
-        ...this.services,
-        logger: this.logger.get(
-          `${request.route.method.toUpperCase()} ${request.route.path}`,
-        ),
-        api: {
-          client: {
-            asInternalUser: this.services.serverAPIClient.asInternalUser,
-            asCurrentUser: this.services.serverAPIClient.asScoped(
-              context,
-              request,
-            ),
-          },
+    core.http.registerRouteHandlerContext('wazuh_core', (context, request) => ({
+      ...this.services,
+      logger: this.logger.get(
+        `${request.route.method.toUpperCase()} ${request.route.path}`,
+      ),
+      api: {
+        client: {
+          asInternalUser: this.services.serverAPIClient.asInternalUser,
+          asCurrentUser: this.services.serverAPIClient.asScoped(
+            context,
+            request,
+          ),
         },
-      };
-    });
+      },
+    }));
 
     return {
       ...this.services,

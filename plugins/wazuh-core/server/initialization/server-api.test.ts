@@ -59,13 +59,11 @@ describe('serverAPIConnectionCompatibility', () => {
           },
           serverAPIClient: {
             asInternalUser: {
-              request: () => {
-                return {
-                  data: {
-                    data: apiVersionResponse,
-                  },
-                };
-              },
+              request: () => ({
+                data: {
+                  data: apiVersionResponse,
+                },
+              }),
             },
           },
         },
