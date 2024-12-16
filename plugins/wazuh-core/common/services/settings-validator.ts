@@ -1,4 +1,4 @@
-import path from 'node:path';
+import path from 'path';
 import { formatBytes } from './file-size';
 
 export const SettingsValidator = {
