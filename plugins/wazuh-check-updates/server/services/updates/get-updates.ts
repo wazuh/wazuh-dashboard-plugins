@@ -9,6 +9,7 @@ import {
   getWazuhCheckUpdatesServices,
   getWazuhCore,
 } from '../../plugin-services';
+import { IAPIHost } from "../../../../wazuh-core/server/services";
 
 export const getUpdates = async (
   queryApi = false,
@@ -25,7 +26,7 @@ export const getUpdates = async (
 
     const { manageHosts, api: wazuhApiClient } = getWazuhCore();
 
-    const hosts: { id: string }[] = await manageHosts.get();
+    const hosts = await manageHosts.get() as IAPIHost[];
 
     const apisAvailableUpdates = await Promise.all(
       hosts?.map(async api => {
