@@ -6,7 +6,7 @@ FROM opensearchproject/opensearch-dashboards:${OSD_VERSION}
 
 ARG PACKAGE_NAME
 
-ADD ./${PACKAGE_NAME} /tmp/
+ADD ./plugins /tmp/
 # This is needed to run it local
 #
 # USER root
@@ -18,4 +18,3 @@ ADD ./${PACKAGE_NAME} /tmp/
 COPY --chown=opensearch-dashboards ./install-plugins.sh /
 RUN chmod +x /install-plugins.sh
 RUN /install-plugins.sh
-
