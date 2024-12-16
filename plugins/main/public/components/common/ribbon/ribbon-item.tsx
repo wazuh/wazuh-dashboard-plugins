@@ -7,6 +7,7 @@ import { WzStat } from '../../wz-stat';
 import { GroupTruncate } from '../util/agent-group-truncate';
 import WzTextWithTooltipIfTruncated from '../wz-text-with-tooltip-if-truncated';
 import './ribbon-item.scss';
+import { TAgentStatus } from '../../../../common/services/wz_agent_status';
 import { getAgentOSType } from '../../../react-services';
 
 const FONT_SIZE = 12;
@@ -23,19 +24,14 @@ export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   value: VALUE;
   style?: React.CSSProperties;
   isLoading?: boolean;
-  icon?: React.ReactNode;
+  condensed?: boolean;
+  render?: (value: any) => React.ReactNode;
 };
 
 const isGroups = (
   item: IRibbonItem,
 ): item is IRibbonItem<RibbonItemLabel.GROUPS, string[]> => {
   return item.key === RibbonItemLabel.GROUPS;
-};
-
-const isOperatingSystem = (
-  item: IRibbonItem,
-): item is IRibbonItem<RibbonItemLabel.OPERATING_SYSTEM, Agent> => {
-  return item.key === RibbonItemLabel.OPERATING_SYSTEM;
 };
 
 const isStatus = (
@@ -51,47 +47,9 @@ interface RibbonItemProps {
 const WzRibbonItem = (props: RibbonItemProps) => {
   const { item } = props;
 
-  const elementStyle = { ...(item.style || {}), fontSize: FONT_SIZE };
-  const wzWidth100 = { anchorClassName: 'wz-width-100' };
-  const tooltipProps = item.key === 'cluster-node' ? wzWidth100 : {};
+  const contentStyle = { ...item.style, fontSize: FONT_SIZE };
 
-  const getPlatformIcon = (agent?: Agent) => {
-    let icon = '';
-    let osType = getAgentOSType(agent);
-    if (osType === WAZUH_AGENTS_OS_TYPE.DARWIN) {
-      icon = 'apple';
-    } else if (
-      [WAZUH_AGENTS_OS_TYPE.WINDOWS, WAZUH_AGENTS_OS_TYPE.LINUX].includes(
-        osType,
-      )
-    ) {
-      icon = osType;
-    }
-
-    if (icon) {
-      return (
-        <i
-          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${osType}`}
-          aria-hidden='true'
-        ></i>
-      );
-    }
-    return <></>;
-  };
-
-  const getOsName = (agent?: Agent) => {
-    const { name, version } = agent?.os || {};
-
-    if (!name && !version) return '-';
-
-    if (!version) return name;
-
-    if (!name) return version;
-
-    return `${name} ${version}`;
-  };
-
-  const renderField = function <T>(field?: T): T | string {
+  const renderOptionalField = function <T>(field?: T): T | string {
     return field !== undefined || field ? field : '-';
   };
 
@@ -101,34 +59,21 @@ const WzRibbonItem = (props: RibbonItemProps) => {
     ) : isGroups(item) && item.value?.length ? (
       <GroupTruncate
         groups={item.value}
-        length={40}
+        length={30}
         label={'more'}
         action={'redirect'}
       />
-    ) : isOperatingSystem(item) ? (
-      <WzTextWithTooltipIfTruncated
-        position='bottom'
-        tooltipProps={wzWidth100}
-        elementStyle={{
-          ...elementStyle,
-          maxWidth: item.style?.maxWidth,
-        }}
-      >
-        {getPlatformIcon(item.value)} {getOsName(item.value)}
-      </WzTextWithTooltipIfTruncated>
     ) : isStatus(item) ? (
       <AgentStatus
-        status={item.value?.status}
+        status={item.value?.status as TAgentStatus}
         agent={item.value}
-        style={elementStyle}
+        style={contentStyle}
       />
     ) : (
-      <WzTextWithTooltipIfTruncated
-        position='bottom'
-        tooltipProps={tooltipProps}
-        elementStyle={elementStyle}
-      >
-        {item.icon} {renderField(item.value)}
+      <WzTextWithTooltipIfTruncated contentStyle={contentStyle}>
+        {item.render
+          ? item.render(item.value)
+          : renderOptionalField(item.value)}
       </WzTextWithTooltipIfTruncated>
     );
   };
@@ -136,9 +81,10 @@ const WzRibbonItem = (props: RibbonItemProps) => {
   return (
     <EuiFlexItem
       className='wz-ribbon-item'
+      grow={false}
       data-test-subj={`ribbon-item-${item.key}`}
       key={item.key}
-      style={item.style || null}
+      style={contentStyle || null}
     >
       <WzStat title={renderValue()} description={item.label} titleSize='xs' />
     </EuiFlexItem>

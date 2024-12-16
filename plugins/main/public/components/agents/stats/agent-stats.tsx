@@ -13,14 +13,10 @@ import React, { useState, useEffect } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiLoadingSpinner,
-  EuiPanel,
   EuiPage,
   EuiPageBody,
   EuiSpacer,
-  EuiText,
 } from '@elastic/eui';
-
 import {
   withGlobalBreadcrumb,
   withGuard,
@@ -48,6 +44,8 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { endpointSummary } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
 import WzRibbon from '../../common/ribbon/ribbon';
+import { Agent } from '../../endpoints-summary/types';
+import { SECTIONS } from '../../../sections';
 
 const tableColumns = [
   {
@@ -67,40 +65,43 @@ const tableColumns = [
   },
 ];
 
-const statsAgents: { title: string; field: string; render?: (value) => any }[] =
-  [
-    {
-      title: 'Status',
-      field: 'status',
-    },
-    {
-      title: 'Buffer',
-      field: 'buffer_enabled',
-      render: value => (value ? 'enabled' : 'disabled'),
-    },
-    {
-      title: 'Message buffer',
-      field: 'msg_buffer',
-    },
-    {
-      title: 'Messages count',
-      field: 'msg_count',
-    },
-    {
-      title: 'Messages sent',
-      field: 'msg_sent',
-    },
-    {
-      title: 'Last ack',
-      field: 'last_ack',
-      render: formatUIDate,
-    },
-    {
-      title: 'Last keep alive',
-      field: 'last_keepalive',
-      render: formatUIDate,
-    },
-  ];
+const statsAgents: {
+  title: string;
+  field: string;
+  render?: (value: any) => any;
+}[] = [
+  {
+    title: 'Status',
+    field: 'status',
+  },
+  {
+    title: 'Buffer',
+    field: 'buffer_enabled',
+    render: value => (value ? 'enabled' : 'disabled'),
+  },
+  {
+    title: 'Message buffer',
+    field: 'msg_buffer',
+  },
+  {
+    title: 'Messages count',
+    field: 'msg_count',
+  },
+  {
+    title: 'Messages sent',
+    field: 'msg_sent',
+  },
+  {
+    title: 'Last ack',
+    field: 'last_ack',
+    render: formatUIDate,
+  },
+  {
+    title: 'Last keep alive',
+    field: 'last_keepalive',
+    render: formatUIDate,
+  },
+];
 
 export const MainAgentStats = compose(
   withErrorBoundary,
@@ -108,7 +109,7 @@ export const MainAgentStats = compose(
     {
       text: endpointSummary.breadcrumbLabel,
       href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
-        path: `#/agents-preview`,
+        path: `#/${SECTIONS.AGENTS_PREVIEW}`,
       }),
     },
     { agent },
@@ -143,9 +144,13 @@ export const MainAgentStats = compose(
   ),
 )(AgentStats);
 
-export function AgentStats(props) {
+interface AgentStatsProps {
+  agent: Agent;
+}
+
+export function AgentStats(props: AgentStatsProps) {
   const { agent } = props;
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
   const [dataStatLogcollector, setDataStatLogcollector] = useState({});
   const [dataStatAgent, setDataStatAgent] = useState();
   useEffect(() => {
@@ -175,8 +180,8 @@ export function AgentStats(props) {
           severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
           error: {
             error: error,
-            message: error.message || error,
-            title: error.name || error,
+            message: (error as Error).message || (error as string),
+            title: (error as Error).name || (error as string),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -184,7 +189,7 @@ export function AgentStats(props) {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [agent.id]);
   return (
     <EuiPage>
       <EuiPageBody>

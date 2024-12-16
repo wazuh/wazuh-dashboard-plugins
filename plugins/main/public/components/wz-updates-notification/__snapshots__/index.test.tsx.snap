@@ -1,6 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`WzUpdatesNotification tests should render a WzUpdatesNotification 1`] = `
+exports[`WzUpdatesNotification tests should not render a WzUpdatesNotification because is disabled 1`] = `<div />`;
+
+exports[`WzUpdatesNotification tests should not render a WzUpdatesNotification is not defined 1`] = `<div />`;
+
+exports[`WzUpdatesNotification tests should render a WzUpdatesNotification is enabled 1`] = `
 <div>
   <div>
     Updates notification

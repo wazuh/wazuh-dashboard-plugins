@@ -20,6 +20,15 @@ import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
 
 export class GenericRequest {
+  /**
+   * Generic request
+   * @template T
+   * @param {string} method
+   * @param {string} path
+   * @param {any} payload
+   * @param {boolean} returnError
+   * @returns {Promise<T>}
+   */
   static async request(method, path, payload = null, returnError = false) {
     try {
       if (!method || !path) {

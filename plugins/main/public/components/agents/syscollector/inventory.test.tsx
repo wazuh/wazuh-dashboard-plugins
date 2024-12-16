@@ -3,6 +3,7 @@ import { render } from 'enzyme';
 import { SyscollectorInventory } from './inventory';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
+import { AGENT } from '../../../../test/__mocks__/agent';
 
 jest.mock('../../common/hooks/use-app-config', () => ({
   useAppConfig: () => ({
@@ -21,25 +22,6 @@ const NETWORK_PORTS = 'Network ports';
 const NETWORK_INTERFACES = 'Network interfaces';
 const NETWORK_SETTINGS = 'Network settings';
 const PROCESSES = 'Processes';
-
-const AGENT = {
-  DEBIAN: {
-    os: {
-      uname:
-        'Linux |ip-10-0-1-106 |4.9.0-9-amd64 |1 SMP Debian 4.9.168-1+deb9u2 (2019-05-13) |x86_64',
-    },
-  },
-  WINDOWS: {
-    os: {
-      platform: 'windows',
-    },
-  },
-  DARWIN: {
-    os: {
-      platform: 'darwin',
-    },
-  },
-} as const;
 
 const NETWORK_PORTS_COLUMNS = {
   LOCAL_PORT: 'Local port',
@@ -594,13 +576,13 @@ describe('Inventory data', () => {
         PROCESSES_COLUMNS.EFFECTIVE_GROUP,
         PROCESSES_COLUMNS.PID,
         PROCESSES_COLUMNS.PARENT_PID,
-        PROCESSES_COLUMNS.COMMAND,
-        PROCESSES_COLUMNS.ARGVS,
         PROCESSES_COLUMNS.VM_SIZE,
         PROCESSES_COLUMNS.SIZE,
         PROCESSES_COLUMNS.SESSION,
         PROCESSES_COLUMNS.PRIORITY,
         PROCESSES_COLUMNS.STATE,
+        PROCESSES_COLUMNS.COMMAND,
+        PROCESSES_COLUMNS.ARGVS,
       ];
 
       shouldRenderProcessesTableWithCorrectColumnsAndTitle(

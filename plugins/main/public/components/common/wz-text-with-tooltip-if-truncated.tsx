@@ -11,87 +11,81 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component } from 'react';
-
+import React, { useEffect, useRef, useState } from 'react';
 import { EuiToolTip } from '@elastic/eui';
+import './wz-text-with-tooltip-if-truncated.scss';
 
 interface WzTextWithTooltipIfTruncatedProps extends React.PropsWithChildren {
   tooltip?: string;
-  elementStyle?: React.CSSProperties;
+  contentStyle?: React.CSSProperties;
   tooltipProps?: object;
-  position?: string; // same options as EuiTooltip's position
 }
 
-export default class WzTextWithTooltipIfTruncated extends Component<WzTextWithTooltipIfTruncatedProps> {
-  state: {
-    withTooltip: boolean;
+const WzTextWithTooltipIfTruncated = (
+  props: WzTextWithTooltipIfTruncatedProps,
+) => {
+  const { contentStyle = {}, tooltip, tooltipProps, children } = props;
+  const [withTooltip, setWithTooltip] = useState(false);
+  const contentReference = useRef<HTMLElement>(null);
+
+  /**
+   * The function `createClone` creates a clone of an HTML element with specific
+   * styling properties.
+   * @param {HTMLElement} reference - The `reference` parameter in the `createClone`
+   * function is an HTMLElement that serves as the reference element from which a
+   * clone will be created.
+   * @returns The function `createClone` returns a clone of the provided
+   * `HTMLElement` reference with specific styles applied.
+   */
+  const createClone = (reference: HTMLElement) => {
+    // HTML element clone of reference
+    const clone = reference.cloneNode(true) as HTMLElement;
+    clone.style.display = 'inline';
+    clone.style.width = 'auto';
+    clone.style.visibility = 'hidden';
+    clone.style.maxWidth = 'none';
+    return clone;
   };
-  static defaultProps = {
-    elementStyle: {},
-  };
-  timer?: ReturnType<typeof setTimeout>;
-  reference: any;
-  constructor(props: WzTextWithTooltipIfTruncatedProps) {
-    super(props);
-    this.reference = React.createRef<HTMLSpanElement>();
-    this.state = {
-      withTooltip: false,
-    };
-  }
-  componentDidMount() {
-    this.timer = setTimeout(() => {
-      //TODO: remove timer and setTimeout function. It is needed while this component is mounted through the AngularJS react-component directive.
-      // HTML element reference with text (maybe truncated)
-      const reference = this.reference.current;
-      // HTML element clone of reference
-      const clone = reference.cloneNode(true);
-      clone.style.display = 'inline';
-      clone.style.width = 'auto';
-      clone.style.visibility = 'hidden';
-      clone.style.maxWidth = 'none';
-      // Insert clone in DOM appending as sibling of reference to measure both
-      // reference.parentNode.appendChild(clone);
-      // Insert clone in DOM as body child
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const reference = contentReference.current as HTMLElement;
+      const clone = createClone(reference);
       document.body.appendChild(clone);
-      // Compare widths
-      if (reference.offsetWidth < clone.offsetWidth) {
-        // Set withTooltip to true to render truncated element with a tooltip
-        this.setState({ withTooltip: true });
-      }
-      // Remove clone of DOM
+      setWithTooltip(reference.offsetWidth < clone.offsetWidth);
       clone.remove();
     });
-  }
-  componentWillUnmount() {
-    this.timer && clearTimeout(this.timer);
-  }
-  buildContent() {
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [children]);
+
+  const renderContent = () => {
     return (
       <span
-        ref={this.reference}
-        style={{
-          display: 'block',
-          overflow: 'hidden',
-          paddingBottom: '3px',
-          whiteSpace: 'nowrap',
-          textOverflow: 'ellipsis',
-          ...this.props.elementStyle,
-        }}
+        ref={contentReference}
+        className='wz-text-content'
+        style={contentStyle}
       >
-        {this.props.children || this.props.tooltip}
+        {children || tooltip}
       </span>
     );
-  }
-  render() {
-    return this.state.withTooltip ? (
-      <EuiToolTip
-        content={this.props.tooltip || this.props.children}
-        {...this.props.tooltipProps}
-      >
-        {this.buildContent()}
-      </EuiToolTip>
-    ) : (
-      this.buildContent()
-    );
-  }
-}
+  };
+
+  return withTooltip ? (
+    <EuiToolTip
+      content={tooltip || children}
+      {...tooltipProps}
+      anchorClassName='wz-width-100'
+    >
+      {renderContent()}
+    </EuiToolTip>
+  ) : (
+    renderContent()
+  );
+};
+
+export default React.memo(WzTextWithTooltipIfTruncated);
