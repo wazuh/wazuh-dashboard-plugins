@@ -1,13 +1,14 @@
 import { Location, Action, History } from 'history';
+import rison from 'rison-node';
 import { getCore } from '../kibana-services';
 import { NavigateToAppOptions } from '../../../../src/core/public';
-import { getIndexPattern } from './elastic_helpers';
 import { buildPhraseFilter } from '../../../../src/plugins/data/common';
-import rison from 'rison-node';
+import { getIndexPattern } from './elastic_helpers';
 
 class NavigationService {
+  // eslint-disable-next-line no-use-before-define
   private static instance: NavigationService;
-  private history: History;
+  private readonly history: History;
 
   private constructor(history: History) {
     this.history = history;
@@ -19,6 +20,7 @@ class NavigationService {
     } else if (!NavigationService.instance) {
       throw new Error('NavigationService must be initialized with a history.');
     }
+
     return NavigationService.instance;
   }
 
@@ -56,30 +58,31 @@ class NavigationService {
       ? this.buildSearch(params)
       : this.buildSearch(this.getParams());
     const locationHash = this.getHash();
+
     this.navigate(
       `${newPath}${queryParams ? `?${queryParams}` : ''}${locationHash}`,
     );
   }
 
   public navigate(path: string, state?: any): void {
-    if (!state) {
-      this.history.push(path);
-    } else {
+    if (state) {
       this.history.push({
         pathname: path,
         state,
       });
+    } else {
+      this.history.push(path);
     }
   }
 
   public replace(path: string, state?: any): void {
-    if (!state) {
-      this.history.replace(path);
-    } else {
+    if (state) {
       this.history.replace({
         pathname: path,
         state,
       });
+    } else {
+      this.history.replace(path);
     }
   }
 
@@ -96,13 +99,14 @@ class NavigationService {
   }
 
   public reload(): void {
-    window.location.reload();
+    globalThis.location.reload();
   }
 
   public listen(
     listener: (location: Location, action: Action) => void,
   ): () => void {
     const unlisten = this.history.listen(listener);
+
     return unlisten;
   }
 
@@ -125,26 +129,27 @@ class NavigationService {
   }
 
   public buildSearch(search: URLSearchParams) {
-    return Array.from(search.entries())
+    return [...search.entries()]
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
   }
 
-  public updateAndNavigateSearchParams(params: {
-    [key: string]: string | null;
-  }): void {
+  public updateAndNavigateSearchParams(
+    params: Record<string, string | null>,
+  ): void {
     const urlParams = this.getParams();
 
     // Update or delete parameters according to their value
-    Object.entries(params).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(params)) {
       if (value === null) {
         urlParams.delete(key);
       } else {
         urlParams.set(key, value);
       }
-    });
+    }
 
     const queryString = this.buildSearch(urlParams);
+
     this.navigate(`${this.getPathname()}?${queryString}`);
   }
 
@@ -152,16 +157,17 @@ class NavigationService {
     this.updateAndNavigateSearchParams({ tab: newTab });
   }
 
-  public switchSubTab = (subTab: string): void => {
+  public switchSubTab(subTab: string): void {
     this.updateAndNavigateSearchParams({ tabView: subTab });
-  };
+  }
 
   /*
-  TODO: Analyze and improve this function taking into account whether buildFilter_w is still used and whether the implementation with respect to the middle button is correct in navigateToModule
+  TODO: Analyze and improve this function taking into account whether buildFilterW is still used and whether the implementation with respect to the middle button is correct in navigateToModule
   */
-  private buildFilter_w(filters, indexPattern) {
+  private buildFilterW(filters, indexPattern) {
     const filtersArray: any[] = [];
-    Object.keys(filters).forEach(currentFilter => {
+
+    for (const currentFilter of Object.keys(filters)) {
       filtersArray.push({
         ...buildPhraseFilter(
           { name: currentFilter, type: 'text' },
@@ -170,41 +176,51 @@ class NavigationService {
         ),
         $state: { isImplicit: false, store: 'appState' },
       });
-    });
+    }
+
     return rison.encode({ filters: filtersArray });
   }
 
-  navigateToModule(e: any, section: string, params: any, navigateMethod?: any) {
-    e.persist(); // needed to access this event asynchronously
-    if (e.button == 0) {
-      // left button clicked
-      if (navigateMethod) {
-        navigateMethod();
-        return;
-      }
+  navigateToModule(
+    event: any,
+    section: string,
+    params: any,
+    navigateMethod?: any,
+  ) {
+    event.persist(); // needed to access this event asynchronously
+
+    if (
+      event.button === 0 && // left button clicked
+      navigateMethod
+    ) {
+      navigateMethod();
+
+      return;
     }
+
     getIndexPattern().then(indexPattern => {
       const urlParams = {};
 
-      if (Object.keys(params).length) {
-        Object.keys(params).forEach(key => {
+      if (Object.keys(params).length > 0) {
+        for (const key of Object.keys(params)) {
           if (key === 'filters') {
-            urlParams['_w'] = this.buildFilter_w(params[key], indexPattern);
+            urlParams['_w'] = this.buildFilterW(params[key], indexPattern);
           } else {
             urlParams[key] = params[key];
           }
-        });
+        }
       }
+
       const url = Object.entries(urlParams)
-        .map(e => e.join('='))
+        .map(urlParam => urlParam.join('='))
         .join('&');
-      const currentUrl = window.location.href.split('#/')[0];
+      const currentUrl = globalThis.location.href.split('#/')[0];
       const newUrl = currentUrl + `#/${section}?` + url;
 
-      if (e && (e.which == 2 || e.button == 1)) {
+      if (event && (event.which === 2 || event.button === 1)) {
         // middlebutton clicked
         window.open(newUrl, '_blank', 'noreferrer');
-      } else if (e.button == 0) {
+      } else if (event.button === 0) {
         // left button clicked
         if (navigateMethod) {
           navigateMethod();
@@ -217,3 +233,4 @@ class NavigationService {
 }
 
 export default NavigationService;
+export { NavigationService };

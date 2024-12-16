@@ -113,8 +113,9 @@ jobs:
               cd /home/node/kbn/plugins/${{ matrix.plugins.container_path }} && yarn && ${{ inputs.command }};
             '
 
-      - name: Get the plugin version
+      - name: Get the plugin version and and format reference name
         run: |
+          echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
           echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
 
@@ -122,7 +123,7 @@ jobs:
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ inputs.artifact_name }}_${{ env.version }}-${{ env.revision }}_${{ inputs.reference }}.zip
+          name: ${{ inputs.artifact_name }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
           if-no-files-found: 'error'
 

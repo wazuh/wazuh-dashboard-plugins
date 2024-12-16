@@ -16,3 +16,5 @@ export * from './filesystem';
 export * from './manage-hosts';
 export * from './security-factory';
 export * from './server-api-client';
+export * from './initialization';
+export * from './types';
