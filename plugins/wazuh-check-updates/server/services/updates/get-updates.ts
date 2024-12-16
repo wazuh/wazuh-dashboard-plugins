@@ -15,6 +15,8 @@ export const getUpdates = async (
   queryApi = false,
   forceQuery = false,
 ): Promise<AvailableUpdates> => {
+  const { logger } = getWazuhCheckUpdatesServices();
+
   try {
     if (!queryApi) {
       const availableUpdates = (await getSavedObject(
@@ -83,6 +85,7 @@ export const getUpdates = async (
             status: getStatus(),
           };
         } catch (error: any) {
+          logger.debug('[ERROR]: Cannot get the API status');
           const errorResponse = {
             title: error.response?.data?.title,
             detail: error.response?.data?.detail ?? error.message,
@@ -112,8 +115,6 @@ export const getUpdates = async (
         : typeof error === 'string'
           ? error
           : 'Error trying to get available updates';
-
-    const { logger } = getWazuhCheckUpdatesServices();
 
     logger.error(message);
     return Promise.reject(error);
