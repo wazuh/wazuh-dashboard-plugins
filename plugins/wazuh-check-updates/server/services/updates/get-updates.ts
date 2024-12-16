@@ -81,16 +81,16 @@ export const getUpdates = async (
             api_id: api.id,
             status: getStatus(),
           };
-        } catch (e: any) {
-          const error = {
-            title: e.response?.data?.title,
-            detail: e.response?.data?.detail ?? e.message,
+        } catch (error: any) {
+          const errorResponse = {
+            title: error.response?.data?.title,
+            detail: error.response?.data?.detail ?? error.message,
           };
 
           return {
             api_id: api.id,
             status: API_UPDATES_STATUS.ERROR,
-            error,
+            error: errorResponse,
           };
         }
       }),
@@ -109,8 +109,8 @@ export const getUpdates = async (
       error instanceof Error
         ? error.message
         : typeof error === 'string'
-        ? error
-        : 'Error trying to get available updates';
+          ? error
+          : 'Error trying to get available updates';
 
     const { logger } = getWazuhCheckUpdatesServices();
 
