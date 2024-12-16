@@ -74,6 +74,20 @@ jobs:
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
+      - name: Step 06 - Download the engine plugin's artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wazuh-dashboard-plugins_wazuh-engine_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-engine_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          overwrite: true
+
+      - name: Step 07 - Download the fleet plugin's artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wazuh-dashboard-plugins_wazuh-fleet${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-fleet${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          overwrite: true
+
       - name: Step 06 - Build the Docker image
         run: |
           echo "current=${{ env.currentDir }}"
