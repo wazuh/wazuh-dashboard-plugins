@@ -128,7 +128,7 @@ jobs:
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.artifact_name }}_${{ matrix.plugins.container_path }}_${{ matrix.plugins.container_path }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          name: ${{ inputs.artifact_name }}_${{ matrix.plugins.container_path }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
           if-no-files-found: 'error'
           overwrite: true

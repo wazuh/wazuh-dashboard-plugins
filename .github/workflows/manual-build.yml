@@ -84,7 +84,7 @@ jobs:
       - name: Step 07 - Download the fleet plugin's artifact
         uses: actions/download-artifact@v4
         with:
-          name: wazuh-dashboard-plugins_wazuh-fleet${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          name: wazuh-dashboard-plugins_wazuh-fleet_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-fleet${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
