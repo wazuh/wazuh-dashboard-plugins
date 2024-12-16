@@ -172,6 +172,7 @@ module.exports = {
         'unicorn/prefer-module': 'off',
         'unicorn/prefer-ternary': 'off',
         'unicorn/numeric-separators-style': 'off',
+        'unicorn/prefer-node-protocol': 'off',
         // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/custom-error-definition.md
         'unicorn/custom-error-definition': 'error',
         // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/better-regex.md

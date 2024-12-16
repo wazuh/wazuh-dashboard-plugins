@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import path from 'node:path';
+import path from 'path';
 import { version } from '../package.json';
 // import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
