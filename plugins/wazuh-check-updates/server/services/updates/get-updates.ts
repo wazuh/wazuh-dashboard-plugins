@@ -9,7 +9,7 @@ import {
   getWazuhCheckUpdatesServices,
   getWazuhCore,
 } from '../../plugin-services';
-import { IAPIHost } from "../../../../wazuh-core/server/services";
+import { IAPIHost } from '../../../../wazuh-core/server/services';
 
 export const getUpdates = async (
   queryApi = false,
@@ -26,9 +26,30 @@ export const getUpdates = async (
       return availableUpdates;
     }
 
+    const getStatus = ({
+      update_check,
+      last_available_major,
+      last_available_minor,
+      last_available_patch,
+    }: ResponseApiAvailableUpdates) => {
+      if (update_check === false) {
+        return API_UPDATES_STATUS.DISABLED;
+      }
+
+      if (
+        last_available_major?.tag ||
+        last_available_minor?.tag ||
+        last_available_patch?.tag
+      ) {
+        return API_UPDATES_STATUS.AVAILABLE_UPDATES;
+      }
+
+      return API_UPDATES_STATUS.UP_TO_DATE;
+    };
+
     const { manageHosts, api: wazuhApiClient } = getWazuhCore();
 
-    const hosts = await manageHosts.get() as IAPIHost[];
+    const hosts = (await manageHosts.get()) as IAPIHost[];
 
     const apisAvailableUpdates = await Promise.all(
       hosts?.map(async api => {
@@ -39,6 +60,25 @@ export const getUpdates = async (
           apiHostID: api.id,
           forceRefresh: true,
         };
+        let currentVersion: string | undefined = undefined;
+        let availableUpdates: ResponseApiAvailableUpdates = {};
+
+        try {
+          const {
+            data: {
+              data: { api_version },
+            },
+          } = await wazuhApiClient.client.asInternalUser.request(
+            'GET',
+            '/',
+            {},
+            options,
+          );
+          currentVersion = `v${api_version}`;
+        } catch {
+          logger.debug('[ERROR]: Cannot get the API version');
+        }
+
         try {
           const response = await wazuhApiClient.client.asInternalUser.request(
             method,
@@ -47,42 +87,30 @@ export const getUpdates = async (
             options,
           );
 
-          const update = response.data.data as ResponseApiAvailableUpdates;
+          availableUpdates = response.data.data as ResponseApiAvailableUpdates;
 
           const {
-            current_version,
             update_check,
             last_available_major,
             last_available_minor,
             last_available_patch,
             last_check_date,
-          } = update;
+          } = availableUpdates;
 
-          const getStatus = () => {
-            if (update_check === false) {
-              return API_UPDATES_STATUS.DISABLED;
-            }
-
-            if (
-              last_available_major?.tag ||
-              last_available_minor?.tag ||
-              last_available_patch?.tag
-            ) {
-              return API_UPDATES_STATUS.AVAILABLE_UPDATES;
-            }
-
-            return API_UPDATES_STATUS.UP_TO_DATE;
-          };
+          // If for some reason, the previous request fails
+          if (currentVersion === undefined) {
+            currentVersion = availableUpdates.current_version;
+          }
 
           return {
-            current_version,
+            current_version: currentVersion,
             update_check,
             last_available_major,
             last_available_minor,
             last_available_patch,
             last_check_date: last_check_date || undefined,
             api_id: api.id,
-            status: getStatus(),
+            status: getStatus(availableUpdates),
           };
         } catch (error: any) {
           logger.debug('[ERROR]: Cannot get the API status');
@@ -94,6 +122,7 @@ export const getUpdates = async (
           return {
             api_id: api.id,
             status: API_UPDATES_STATUS.ERROR,
+            current_version: currentVersion,
             error: errorResponse,
           };
         }
