@@ -12,8 +12,8 @@
  */
 
 // Require some libraries
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from 'fs';
+import path from 'path';
 import { Parser } from 'json2csv';
 import jwtDecode from 'jwt-decode';
 import {
