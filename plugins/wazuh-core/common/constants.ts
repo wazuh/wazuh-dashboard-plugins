@@ -101,7 +101,7 @@ export const WAZUH_SECURITY_PLUGINS = [
 ];
 
 // App configuration
-export const WAZUH_CONFIGURATION_CACHE_TIME = 10_000; // time in ms;
+export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
@@ -249,7 +249,7 @@ export const PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER =
   'timepicker:timeDefaults';
 
 // Default maxBuckets set by the app
-export const WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS = 200_000;
+export const WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS = 200000;
 export const PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS = 'timeline:max_buckets';
 
 // Default metaFields set by the app
@@ -389,7 +389,7 @@ export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
   'not_time_field_name_index_pattern';
 
 // Customization
-export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1_048_576;
+export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
 
 // Plugin settings
 export enum SettingCategory {
@@ -1474,12 +1474,12 @@ hosts:
           title: 'Port',
           description: 'Port',
           type: EpluginSettingType.number,
-          defaultValue: 55_000,
+          defaultValue: 55000,
           isConfigurableFromSettings: true,
           options: {
             number: {
               min: 0,
-              max: 65_535,
+              max: 65535,
               integer: true,
             },
           },
@@ -1713,7 +1713,7 @@ hosts:
       'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.number,
-    defaultValue: 20_000,
+    defaultValue: 20000,
     isConfigurableFromSettings: true,
     options: {
       number: {
