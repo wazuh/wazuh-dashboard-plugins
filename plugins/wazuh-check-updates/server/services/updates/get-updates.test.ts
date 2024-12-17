@@ -255,6 +255,42 @@ describe('getUpdates function', () => {
       ],
     });
   });
+  it('should return available updates from api when the second request fail', async () => {
+    const semver = {
+      major: 4,
+      minor: 3,
+      patch: 1,
+    };
+    const version = `${semver.major}.${semver.minor}.${semver.patch}`;
+    mockRequest
+      .mockImplementationOnce(() => ({
+        data: {
+          data: {
+            api_version: version,
+          },
+        },
+      }))
+      .mockImplementationOnce(() => {
+        throw new Error('Error');
+      });
+
+    const updates = await getUpdates(true);
+
+    expect(updates).toEqual({
+      last_check_date: expect.any(Date),
+      apis_available_updates: [
+        {
+          api_id: API_ID,
+          current_version: `v${version}`,
+          status: API_UPDATES_STATUS.ERROR,
+          error: {
+            detail: 'Error',
+            title: 'Error',
+          },
+        },
+      ],
+    });
+  });
   it('should return error from api when both requests fail', async () => {
     mockRequest
       .mockImplementationOnce(() => {
