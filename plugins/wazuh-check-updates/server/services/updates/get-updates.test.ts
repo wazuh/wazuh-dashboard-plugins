@@ -23,7 +23,7 @@ const mockManageHosts = {
   get: jest.fn(() => [{ id: API_ID }]),
 };
 const mockGetHostsEntries = jest.fn(() => []);
-mockGetWazuhCore.mockImplementationOnce(() => {
+mockGetWazuhCore.mockImplementation(() => {
   return {
     api: {
       client: {
@@ -116,6 +116,113 @@ describe('getUpdates function', () => {
           },
         },
       }))
+      .mockImplementationOnce(() => ({
+        data: {
+          data: {
+            uuid: '7f828fd6-ef68-4656-b363-247b5861b84c',
+            current_version: `v${version}`,
+            update_check: undefined,
+            last_available_major: undefined,
+            last_available_minor: undefined,
+            last_available_patch,
+            last_check_date: undefined,
+          },
+        },
+      }));
+
+    const updates = await getUpdates(true);
+
+    expect(updates).toEqual({
+      last_check_date: expect.any(Date),
+      apis_available_updates: [
+        {
+          api_id: API_ID,
+          current_version: `v${version}`,
+          status: API_UPDATES_STATUS.AVAILABLE_UPDATES,
+          update_check: undefined,
+          last_available_major: undefined,
+          last_available_minor: undefined,
+          last_available_patch,
+          last_check_date: undefined,
+        },
+      ],
+    });
+  });
+
+  it('should return available updates from api when in the first request, api_version is undefined', async () => {
+    const semver = {
+      major: 4,
+      minor: 3,
+      patch: 1,
+    };
+    const version = `${semver.major}.${semver.minor}.${semver.patch}`;
+    const last_available_patch = {
+      description:
+        '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+      published_date: '2022-05-18T10:12:43Z',
+      semver,
+      tag: `v${version}`,
+      title: `Wazuh v${version}`,
+    };
+    mockRequest
+      .mockImplementationOnce(() => ({
+        data: {
+          data: {
+            api_version: undefined,
+          },
+        },
+      }))
+      .mockImplementationOnce(() => ({
+        data: {
+          data: {
+            uuid: '7f828fd6-ef68-4656-b363-247b5861b84c',
+            current_version: `v${version}`,
+            update_check: undefined,
+            last_available_major: undefined,
+            last_available_minor: undefined,
+            last_available_patch,
+            last_check_date: undefined,
+          },
+        },
+      }));
+
+    const updates = await getUpdates(true);
+
+    expect(updates).toEqual({
+      last_check_date: expect.any(Date),
+      apis_available_updates: [
+        {
+          api_id: API_ID,
+          current_version: `v${version}`,
+          status: API_UPDATES_STATUS.AVAILABLE_UPDATES,
+          update_check: undefined,
+          last_available_major: undefined,
+          last_available_minor: undefined,
+          last_available_patch,
+          last_check_date: undefined,
+        },
+      ],
+    });
+  });
+  it('should return available updates from api when the first request fail', async () => {
+    const semver = {
+      major: 4,
+      minor: 3,
+      patch: 1,
+    };
+    const version = `${semver.major}.${semver.minor}.${semver.patch}`;
+    const last_available_patch = {
+      description:
+        '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+      published_date: '2022-05-18T10:12:43Z',
+      semver,
+      tag: `v${version}`,
+      title: `Wazuh v${version}`,
+    };
+    mockRequest
+      .mockImplementationOnce(() => {
+        throw new Error('Error');
+      })
       .mockImplementationOnce(() => ({
         data: {
           data: {

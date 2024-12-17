@@ -74,7 +74,9 @@ export const getUpdates = async (
             {},
             options,
           );
-          currentVersion = `v${api_version}`;
+          if (api_version !== undefined) {
+            currentVersion = `v${api_version}`;
+          }
         } catch {
           logger.debug('[ERROR]: Cannot get the API version');
         }
@@ -142,8 +144,8 @@ export const getUpdates = async (
       error instanceof Error
         ? error.message
         : typeof error === 'string'
-          ? error
-          : 'Error trying to get available updates';
+        ? error
+        : 'Error trying to get available updates';
 
     logger.error(message);
     return Promise.reject(error);
