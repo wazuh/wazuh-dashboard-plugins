@@ -1,10 +1,11 @@
-import { getSavedObject } from '../saved-object/get-saved-object';
-import { setSavedObject } from '../saved-object/set-saved-object';
+import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
+import { API_UPDATES_STATUS } from '../../../common/types';
 import {
   getWazuhCheckUpdatesServices,
   getWazuhCore,
 } from '../../plugin-services';
-import { API_UPDATES_STATUS } from '../../../common/types';
+import { getSavedObject } from '../saved-object/get-saved-object';
+import { setSavedObject } from '../saved-object/set-saved-object';
 import { getUpdates } from './get-updates';
 import { SAVED_OBJECT_UPDATES } from '../../../common/constants';
 
