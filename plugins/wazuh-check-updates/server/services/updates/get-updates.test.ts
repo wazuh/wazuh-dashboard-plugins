@@ -8,6 +8,8 @@ import { getSavedObject } from '../saved-object/get-saved-object';
 import { setSavedObject } from '../saved-object/set-saved-object';
 import { getUpdates } from './get-updates';
 
+const API_ID = 'api id';
+
 const mockGetSavedObject = getSavedObject as jest.Mock;
 jest.mock('../saved-object/get-saved-object');
 
@@ -18,7 +20,7 @@ jest.mock('../saved-object/set-saved-object');
 const mockGetWazuhCore = getWazuhCore as jest.Mock;
 const mockRequest = jest.fn();
 const mockManageHosts = {
-  get: jest.fn(() => [{ id: 'api id' }]),
+  get: jest.fn(() => [{ id: API_ID }]),
 };
 const mockGetHostsEntries = jest.fn(() => []);
 mockGetWazuhCore.mockImplementationOnce(() => {
@@ -55,25 +57,27 @@ describe('getUpdates function', () => {
   });
 
   test('should return available updates from saved object', async () => {
+    const semver = {
+      major: 4,
+      minor: 3,
+      patch: 1,
+    };
+    const version = `${semver.major}.${semver.minor}.${semver.patch}`;
     const last_available_patch = {
       description:
         '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
       published_date: '2022-05-18T10:12:43Z',
-      semver: {
-        major: 4,
-        minor: 3,
-        patch: 8,
-      },
-      tag: 'v4.3.8',
-      title: 'Wazuh v4.3.8',
+      semver,
+      tag: `v${version}`,
+      title: `Wazuh v${version}`,
     };
     const last_check_date = '2023-09-30T14:00:00.000Z';
     const savedObject = {
       last_check_date,
       apis_available_updates: [
         {
-          api_id: 'api id',
-          current_version: 'v4.3.1',
+          api_id: API_ID,
+          current_version: `v${version}`,
           status: API_UPDATES_STATUS.UP_TO_DATE,
           last_available_patch,
         },
@@ -90,23 +94,25 @@ describe('getUpdates function', () => {
   });
 
   test('should return available updates from api', async () => {
+    const semver = {
+      major: 4,
+      minor: 3,
+      patch: 1,
+    };
+    const version = `${semver.major}.${semver.minor}.${semver.patch}`;
     const last_available_patch = {
       description:
         '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
       published_date: '2022-05-18T10:12:43Z',
-      semver: {
-        major: 4,
-        minor: 3,
-        patch: 8,
-      },
-      tag: 'v4.3.8',
-      title: 'Wazuh v4.3.8',
+      semver,
+      tag: `v${version}`,
+      title: `Wazuh v${version}`,
     };
     mockRequest
       .mockImplementationOnce(() => ({
         data: {
           data: {
-            api_version: '4.3.1',
+            api_version: version,
           },
         },
       }))
@@ -114,7 +120,7 @@ describe('getUpdates function', () => {
         data: {
           data: {
             uuid: '7f828fd6-ef68-4656-b363-247b5861b84c',
-            current_version: 'v4.3.1',
+            current_version: `v${version}`,
             update_check: undefined,
             last_available_major: undefined,
             last_available_minor: undefined,
@@ -130,8 +136,8 @@ describe('getUpdates function', () => {
       last_check_date: expect.any(Date),
       apis_available_updates: [
         {
-          api_id: 'api id',
-          current_version: 'v4.3.1',
+          api_id: API_ID,
+          current_version: `v${version}`,
           status: API_UPDATES_STATUS.AVAILABLE_UPDATES,
           update_check: undefined,
           last_available_major: undefined,
