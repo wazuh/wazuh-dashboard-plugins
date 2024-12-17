@@ -93,7 +93,7 @@ describe('getUpdates function', () => {
     expect(updates).toEqual(savedObject);
   });
 
-  it('should return available updates from api', async () => {
+  it('should return available updates from api when both requests succeed', async () => {
     const semver = {
       major: 4,
       minor: 3,
@@ -204,7 +204,7 @@ describe('getUpdates function', () => {
       ],
     });
   });
-  it('should return updates when api version undefined first request and second request fails', async () => {
+  it('should return updates when api version undefined on first request and second request fails', async () => {
     const semver = {
       major: 4,
       minor: 3,
