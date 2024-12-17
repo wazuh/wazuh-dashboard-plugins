@@ -19,13 +19,9 @@ const hostSchema = schema.object({
 
 // Define the schema for the hosts config with dynamic keys
 const hostsConfigSchema = schema.recordOf(schema.string(), hostSchema);
-const patternConfigSchema = schema.maybe(schema.string());
-const vulnerabilityPatternConfigSchema = schema.maybe(schema.string());
 
 export const configSchema = schema.object({
   hosts: hostsConfigSchema,
-  pattern: patternConfigSchema,
-  vulnerabilityPattern: vulnerabilityPatternConfigSchema,
 });
 
 export type CorePluginConfigType = TypeOf<typeof configSchema>;

@@ -20,7 +20,8 @@ import {
 import { Configuration, ConfigurationStore } from '../common/services/configuration';
 // configuration server
 import { InitializerConfigProvider } from './services/configuration';
-import { uiSettings } from './services/configuration/ui_settings';
+import { EConfigurationProviders, PLUGIN_SETTINGS } from '../common/constants';
+import { getUiSettingsDefinitions } from '../common/settings-adapter';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -41,7 +42,8 @@ export class WazuhCorePlugin
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
     // register the uiSetting to use in the public context (advanced settings)
-    core.uiSettings.register(uiSettings);
+    const uiSettingsDefs = getUiSettingsDefinitions(PLUGIN_SETTINGS)
+    core.uiSettings.register(uiSettingsDefs);
    
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
     this._internal.configurationStore = new ConfigurationStore(
@@ -50,7 +52,7 @@ export class WazuhCorePlugin
 
     // add the initializer context config to the configuration store
     this._internal.configurationStore.registerProvider(
-      'initializerContext',
+      EConfigurationProviders.PLUGIN_UI_SETTINGS,
       new InitializerConfigProvider(this.initializerContext)
     )
   
