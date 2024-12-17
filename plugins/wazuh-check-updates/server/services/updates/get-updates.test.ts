@@ -56,7 +56,7 @@ describe('getUpdates function', () => {
     jest.clearAllMocks();
   });
 
-  test('should return available updates from saved object', async () => {
+  it('should return available updates from saved object', async () => {
     const semver = {
       major: 4,
       minor: 3,
@@ -93,7 +93,7 @@ describe('getUpdates function', () => {
     expect(updates).toEqual(savedObject);
   });
 
-  test('should return available updates from api', async () => {
+  it('should return available updates from api', async () => {
     const semver = {
       major: 4,
       minor: 3,
