@@ -256,20 +256,6 @@ describe('getUpdates function', () => {
     });
   });
   it('should return error from api when both requests fail', async () => {
-    const semver = {
-      major: 4,
-      minor: 3,
-      patch: 1,
-    };
-    const version = `${semver.major}.${semver.minor}.${semver.patch}`;
-    const last_available_patch = {
-      description:
-        '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-      published_date: '2022-05-18T10:12:43Z',
-      semver,
-      tag: `v${version}`,
-      title: `Wazuh v${version}`,
-    };
     mockRequest
       .mockImplementationOnce(() => {
         throw new Error('Error');
