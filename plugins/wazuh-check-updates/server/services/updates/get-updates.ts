@@ -117,7 +117,7 @@ export const getUpdates = async (
         } catch (error: any) {
           logger.debug('[ERROR]: Cannot get the API status');
           const errorResponse = {
-            title: error.response?.data?.title,
+            title: error.response?.data?.title ?? error.message,
             detail: error.response?.data?.detail ?? error.message,
           };
 
