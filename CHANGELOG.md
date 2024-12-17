@@ -50,7 +50,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the check updates UI was displayed despite it could be configured as disabled [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
 - Fixed filter by value in document details in safari [#7151](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7151)
 - Fixed error message to prevent pass no strings to the wazuh logger [#7167](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7167)
-- Fixed the rendering of the `data.vunerability.reference` in the table and flyout [#7177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7177)\
+- Fixed the rendering of the `data.vunerability.reference` in the table and flyout [#7177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7177)
 - Fixed incorrect or empty Wazuh API version displayed after upgrade [#440](https://github.com/wazuh/wazuh-dashboard/issues/440)
 
 ### Removed
