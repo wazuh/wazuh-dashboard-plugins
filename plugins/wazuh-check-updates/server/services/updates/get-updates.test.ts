@@ -12,6 +12,7 @@ const mockedGetSavedObject = getSavedObject as jest.Mock;
 jest.mock('../saved-object/get-saved-object');
 
 const mockedSetSavedObject = setSavedObject as jest.Mock;
+mockedSetSavedObject.mockImplementation(() => ({}));
 jest.mock('../saved-object/set-saved-object');
 
 const mockedGetWazuhCore = getWazuhCore as jest.Mock;
@@ -92,7 +93,18 @@ describe('getUpdates function', () => {
   });
 
   test('should return available updates from api', async () => {
-    mockedSetSavedObject.mockImplementation(() => ({}));
+    const last_available_patch = {
+      description:
+        '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
+      published_date: '2022-05-18T10:12:43Z',
+      semver: {
+        major: 4,
+        minor: 3,
+        patch: 8,
+      },
+      tag: 'v4.3.8',
+      title: 'Wazuh v4.3.8',
+    };
     mockedGetWazuhCore.mockImplementationOnce(() => {
       return {
         api: {
@@ -115,18 +127,7 @@ describe('getUpdates function', () => {
                       update_check: undefined,
                       last_available_major: undefined,
                       last_available_minor: undefined,
-                      last_available_patch: {
-                        description:
-                          '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-                        published_date: '2022-05-18T10:12:43Z',
-                        semver: {
-                          major: 4,
-                          minor: 3,
-                          patch: 8,
-                        },
-                        tag: 'v4.3.8',
-                        title: 'Wazuh v4.3.8',
-                      },
+                      last_available_patch,
                       last_check_date: undefined,
                     },
                   },
@@ -152,18 +153,7 @@ describe('getUpdates function', () => {
           update_check: undefined,
           last_available_major: undefined,
           last_available_minor: undefined,
-          last_available_patch: {
-            description:
-              '## Manager\r\n\r\n### Fixed\r\n\r\n- Fixed a crash when overwrite rules are triggered...',
-            published_date: '2022-05-18T10:12:43Z',
-            semver: {
-              major: 4,
-              minor: 3,
-              patch: 8,
-            },
-            tag: 'v4.3.8',
-            title: 'Wazuh v4.3.8',
-          },
+          last_available_patch,
           last_check_date: undefined,
         },
       ],
