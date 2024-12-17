@@ -149,7 +149,7 @@ describe('getUpdates function', () => {
     });
   });
 
-  it('should return available updates from api when in the first request, api_version is undefined', async () => {
+  it('should return updates when api version undefined on first request', async () => {
     const semver = {
       major: 4,
       minor: 3,
@@ -204,7 +204,7 @@ describe('getUpdates function', () => {
       ],
     });
   });
-  it('should return available updates from api when in the first request, api_version is undefined and the second request fail', async () => {
+  it('should return updates when api version undefined first request and second request fails', async () => {
     const semver = {
       major: 4,
       minor: 3,
@@ -240,7 +240,7 @@ describe('getUpdates function', () => {
       ],
     });
   });
-  it('should return available updates from api when the first request fail', async () => {
+  it('should return updates when first request fails', async () => {
     const semver = {
       major: 4,
       minor: 3,
@@ -291,7 +291,7 @@ describe('getUpdates function', () => {
       ],
     });
   });
-  it('should return available updates from api when the second request fail', async () => {
+  it('should return updates when second request fails', async () => {
     const semver = {
       major: 4,
       minor: 3,
@@ -327,7 +327,7 @@ describe('getUpdates function', () => {
       ],
     });
   });
-  it('should return error from api when both requests fail', async () => {
+  it('should return error when both requests fail', async () => {
     mockRequest
       .mockImplementationOnce(() => {
         throw new Error('Error');
