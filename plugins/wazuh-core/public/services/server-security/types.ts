@@ -16,7 +16,7 @@ export type ServerSecurityCombinedPermissionWithFunction =
 export interface ServerSecuritySetupDeps {
   userSession$: any;
   getUserSession: any;
-  useLoadingLogo: any;
+  useLoadingLogo: () => { url: string; type: string };
 }
 
 export interface ServerSecuritySetupReturn {
