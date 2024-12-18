@@ -274,7 +274,12 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   <EuiDataGrid
                     {...dataGridProps}
                     className={sideNavDocked ? 'dataGridDockedNav' : ''}
+                    gridStyle={{
+                      fontSize: 's',
+                      cellPadding: 's',
+                    }}
                     toolbarVisibility={{
+                      showStyleSelector: false,
                       additionalControls: (
                         <>
                           <DiscoverDataGridAdditionalControls
