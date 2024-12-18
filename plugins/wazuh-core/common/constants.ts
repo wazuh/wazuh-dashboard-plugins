@@ -405,23 +405,23 @@ export enum SettingCategory {
   API_CONNECTION,
 }
 
-type TPluginSettingOptionsTextArea = {
+export type TPluginSettingOptionsTextArea = {
   maxRows?: number;
   minRows?: number;
   maxLength?: number;
 };
 
-type TPluginSettingOptionsSelect = {
+export type TPluginSettingOptionsSelect = {
   select: { text: string; value: any }[];
 };
 
-type TPluginSettingOptionsEditor = {
+export type TPluginSettingOptionsEditor = {
   editor: {
     language: string;
   };
 };
 
-type TPluginSettingOptionsFile = {
+export type TPluginSettingOptionsFile = {
   file: {
     type: 'image';
     extensions?: string[];
@@ -444,7 +444,7 @@ type TPluginSettingOptionsFile = {
   };
 };
 
-type TPluginSettingOptionsNumber = {
+export type TPluginSettingOptionsNumber = {
   number: {
     min?: number;
     max?: number;
@@ -452,7 +452,7 @@ type TPluginSettingOptionsNumber = {
   };
 };
 
-type TPluginSettingOptionsSwitch = {
+export type TPluginSettingOptionsSwitch = {
   switch: {
     values: {
       disabled: { label?: string; value: any };
@@ -460,6 +460,16 @@ type TPluginSettingOptionsSwitch = {
     };
   };
 };
+
+export type TPlugginSettingOptionsObjectOf = {
+  objectOf: {
+    [key: string]: TPluginSetting;
+  };
+}
+
+type TPluginSettingOptionsArrayOf = {
+  arrayOf: TPluginSetting;
+}
 
 export enum EpluginSettingType {
   text = 'text',
@@ -472,6 +482,7 @@ export enum EpluginSettingType {
   password = 'password',
   arrayOf = 'arrayOf',
   custom = 'custom',
+  objectOf = 'objectOf',
 }
 
 export type TPluginSetting = {
@@ -484,7 +495,14 @@ export type TPluginSetting = {
   // Type.
   type: EpluginSettingType;
   source: EConfigurationProviders;
-  options?: TPluginSettingOptionsTextArea | TPluginSettingOptionsSelect | TPluginSettingOptionsEditor | TPluginSettingOptionsFile | TPluginSettingOptionsNumber | TPluginSettingOptionsSwitch;
+  options?: TPluginSettingOptionsTextArea 
+    | TPluginSettingOptionsSelect 
+    | TPluginSettingOptionsEditor 
+    | TPluginSettingOptionsFile 
+    | TPluginSettingOptionsNumber 
+    | TPluginSettingOptionsSwitch
+    | TPlugginSettingOptionsObjectOf
+    | TPluginSettingOptionsArrayOf;
   // Default value.
   defaultValue: any;
   validate?: (value: any) => string | undefined;
@@ -639,17 +657,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: false,
     validate: SettingsValidator.isBoolean,
   },
-  hosts: {
-    title: 'Server hosts',
-    description: 'Configure the API connections.',
-    source: EConfigurationProviders.INITIALIZER_CONTEXT,
-    category: SettingCategory.API_CONNECTION,
-    type: EpluginSettingType.arrayOf,
-    defaultValue: [],
-    store: {
-      file: {
-        configurableManaged: false,
-        defaultBlock: `# The following configuration is the default structure to define a host.
+  /*`# The following configuration is the default structure to define a host.
 #
 # hosts:
 #   # Host ID / name,
@@ -678,39 +686,21 @@ hosts:
       username: wazuh-wui
       password: wazuh-wui
       run_as: false`,
-        transformFrom: value => {
-          return value.map(hostData => {
-            const key = Object.keys(hostData)?.[0];
-            return { ...hostData[key], id: key };
-          });
-        },
-      },
-    },
+  */
+  hosts: {
+    title: 'Server hosts',
+    description: 'Configure the API connections.',
+    source: EConfigurationProviders.INITIALIZER_CONTEXT,
+    category: SettingCategory.API_CONNECTION,
+    type: EpluginSettingType.objectOf,
+    defaultValue: [],
     options: {
-      arrayOf: {
-        id: {
-          title: 'Identifier',
-          description: 'Identifier of the API connection. This must be unique.',
-          type: EpluginSettingType.text,
-          defaultValue: 'default',
-          isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
-          validate: SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-          ),
-        },
+      objectOf: {
         url: {
           title: 'URL',
           description: 'Server URL address',
           type: EpluginSettingType.text,
           defaultValue: 'https://localhost',
-          isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,
@@ -721,7 +711,6 @@ hosts:
           description: 'Port',
           type: EpluginSettingType.number,
           defaultValue: 55000,
-          isConfigurableFromSettings: true,
           options: {
             number: {
               min: 0,
@@ -729,23 +718,8 @@ hosts:
               integer: true,
             },
           },
-          uiFormTransformConfigurationValueToInputValue: function (
-            value: number,
-          ) {
-            return String(value);
-          },
-          uiFormTransformInputValueToConfigurationValue: function (
-            value: string,
-          ): number {
-            return Number(value);
-          },
-          validateUIForm: function (value) {
-            return this.validate(
-              this.uiFormTransformInputValueToConfigurationValue(value),
-            );
-          },
           validate: function (value) {
-            return SettingsValidator.number(this.options.number)(value);
+            return SettingsValidator.number(this.options?.number)(value);
           },
         },
         username: {
@@ -753,10 +727,6 @@ hosts:
           description: 'Server API username',
           type: EpluginSettingType.text,
           defaultValue: 'wazuh-wui',
-          isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,
@@ -767,10 +737,6 @@ hosts:
           description: "User's Password",
           type: EpluginSettingType.password,
           defaultValue: 'wazuh-wui',
-          isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,
@@ -781,7 +747,6 @@ hosts:
           description: 'Use the authentication context.',
           type: EpluginSettingType.switch,
           defaultValue: false,
-          isConfigurableFromSettings: true,
           options: {
             switch: {
               values: {
@@ -790,24 +755,11 @@ hosts:
               },
             },
           },
-          uiFormTransformChangedInputValue: function (
-            value: boolean | string,
-          ): boolean {
-            return Boolean(value);
-          },
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
           validate: SettingsValidator.isBoolean,
         },
       },
     },
     isConfigurableFromSettings: false,
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
     // TODO: add validation
     // validate: SettingsValidator.isBoolean,
     // validate: function (schema) {

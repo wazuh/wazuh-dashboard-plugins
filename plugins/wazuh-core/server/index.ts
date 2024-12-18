@@ -1,4 +1,6 @@
 import { PluginConfigDescriptor, PluginInitializerContext } from '../../../src/core/server';
+import { PLUGIN_SETTINGS } from '../common/constants';
+import { getConfigSettingsDefinitions } from '../common/settings-adapter';
 import { WazuhCorePlugin } from './plugin';
 import { schema, TypeOf } from '@osd/config-schema';
 
@@ -17,25 +19,16 @@ const hostSchema = schema.object({
   run_as: schema.boolean()
 });
 
-// Define the schema for the hosts config with dynamic keys
-const hostsConfigSchema = schema.recordOf(schema.string(), hostSchema);
-
-export const configSchema = schema.object({
-  hosts: hostsConfigSchema,
-});
-
+const initiliazerConfig = getConfigSettingsDefinitions(PLUGIN_SETTINGS);
+export const configSchema = schema.object(initiliazerConfig);
 export type CorePluginConfigType = TypeOf<typeof configSchema>;
-
 
 export const config: PluginConfigDescriptor<CorePluginConfigType> = {
   exposeToBrowser: {
     hosts: true,
-    pattern: true,
-    vulnerabilityPattern: true,
   },
   schema: configSchema,
 }
 
 
 export type { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
-export type { IConfigurationEnhanced } from './services/configuration/enhance-configuration';
