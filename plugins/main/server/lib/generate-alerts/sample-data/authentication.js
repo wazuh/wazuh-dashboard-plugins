@@ -104,7 +104,8 @@ module.exports.windowsInvalidLoginPassword = {
       channel: 'Security',
       keywords: '0x8010000000000000',
       level: '0',
-      message: '',
+      message:
+        '"Network connection detected:\r\nRuleName: technique_id=T1218,technique_name=Signed Binary Proxy Execution\r\nUtcTime: 2024-12-17 18:19:07.118\r\nProcessGuid: {1d283861-07bb-6753-7500-000000001102}\r\nProcessId: 3800\r\nImage: C:\\Windows\\System32\\svchost.exe\r\nUser: NT AUTHORITY\\NETWORK SERVICE\r\nProtocol: tcp\r\nInitiated: false\r\nSourceIsIpv6: false\r\nSourceIp: 45.131.195.204\r\nSourceHostname: -\r\nSourcePort: 49057\r\nSourcePortName: -\r\nDestinationIsIpv6: false\r\nDestinationIp: 10.0.1.38\r\nDestinationHostname: us-west-1.compute.internal\r\nDestinationPort: 3389\r\nDestinationPortName: ms-server"',
       opcode: '0',
       providerGuid: '{54849625-5478-4994-a5ba-3e3b0328c30d}',
       providerName: 'Microsoft-Windows-Security-Auditing',
