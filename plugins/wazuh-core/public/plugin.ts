@@ -1,27 +1,30 @@
-import { CoreSetup, CoreStart, Plugin, PluginInitializerContext } from 'opensearch-dashboards/public';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
-import * as utils from './utils';
-import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
-import { Configuration } from '../common/services/configuration';
 import { ConfigurationStore } from '../common/services/configuration/configuration-store';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
 import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
 import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
 import { EConfigurationProviders } from '../common/constants';
+import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
+import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
+import { Configuration } from '../common/services/configuration';
+import * as utils from './utils';
+import * as uiComponents from './components';
+import { CoreHTTPClient } from './services/http/http-client';
+
+const noop = () => {};
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
-  _internal: { [key: string]: any } = {};
-  services: { [key: string]: any } = {};
-
-  constructor(private readonly initializerContext: PluginInitializerContext) {}
+  runtime = { setup: {} };
+  internal: Record<string, any> = {};
+  services: Record<string, any> = {};
 
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
-    const noop = () => {};
-    const logger = {
+    // No operation logger
+    const noopLogger = {
       info: noop,
       error: noop,
       debug: noop,
@@ -54,21 +57,38 @@ export class WazuhCorePlugin
 
     this.services.configuration = new Configuration(
       logger,
-      this._internal.configurationStore,
+      this.internal.configurationStore,
     );
 
     console.log('all config defined on wazuh core', await this.services.configuration.getAll());
 
 
+    // Create dashboardSecurity
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
+    // Create http
+    this.services.http = new CoreHTTPClient(logger, {
+      getTimeout: async () =>
+        (await this.services.configuration.get('timeout')) as number,
+      getURL: (path: string) => core.http.basePath.prepend(path),
+      getServerAPI: () => 'imposter', // TODO: implement
+      getIndexPatternTitle: async () => 'wazuh-alerts-*', // TODO: implement
+      http: core.http,
+    });
+
+    // Setup services
     await this.services.dashboardSecurity.setup();
+    this.runtime.setup.http = await this.services.http.setup({ core });
 
     return {
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
-    } as WazuhCorePluginSetup;
+      ui: {
+        ...uiComponents,
+        ...this.runtime.setup.http.ui,
+      },
+    };
   }
 
   public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
@@ -76,14 +96,21 @@ export class WazuhCorePlugin
     setCore(core);
     setUiSettings(core.uiSettings);
 
+    // Start services
     await this.services.configuration.start({ http: core.http });
-    
+    await this.services.dashboardSecurity.start();
+    await this.services.http.start();
+
     return {
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
       hooks,
-    } as WazuhCorePluginStart;
+      ui: {
+        ...uiComponents,
+        ...this.runtime.setup.http.ui,
+      },
+    };
   }
 
   public stop() {}

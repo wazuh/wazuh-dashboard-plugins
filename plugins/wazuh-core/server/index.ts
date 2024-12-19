@@ -32,3 +32,4 @@ export const config: PluginConfigDescriptor<CorePluginConfigType> = {
 
 
 export type { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
+export * from './types';

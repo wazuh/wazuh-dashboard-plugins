@@ -28,6 +28,7 @@ module.exports = {
     'react-hooks',
     '@typescript-eslint',
     'unicorn',
+    'import',
     'prettier',
     '@stylistic',
   ],
@@ -52,14 +53,20 @@ module.exports = {
             message:
               "Don't use arrow functions in class properties. Use a function instead.",
           },
+          {
+            selector:
+              'MemberExpression > LogicalExpression[operator="||"]:has(Identifier):has(ObjectExpression[properties.length=0])',
+            message: 'Use optional chaining operator instead (?.).',
+          },
+          {
+            selector:
+              'MemberExpression > LogicalExpression[operator="||"]:has(Identifier):has(ArrayExpression[elements.length=0])',
+            message: 'Use optional chaining operator instead (?.).',
+          },
         ],
         'prefer-arrow-callback': 'error',
         'func-style': ['error', 'declaration', { allowArrowFunctions: true }],
-        'arrow-body-style': [
-          'error',
-          'as-needed',
-          { requireReturnForObjectLiteral: true },
-        ],
+        'arrow-body-style': ['error', 'as-needed'],
         'no-unreachable': 'error',
         'no-fallthrough': [
           'error',
@@ -81,7 +88,7 @@ module.exports = {
         'block-scoped-var': 'error',
         'default-case': 'error',
         'default-case-last': 'error',
-        'default-param-last': 'error',
+        'default-param-last': 'off',
         eqeqeq: ['error', 'always'],
         'no-var': 'error',
         /* -------------------------------------------------------------------------- */
@@ -162,7 +169,10 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                                   unicorn                                  */
         /* -------------------------------------------------------------------------- */
+        'unicorn/prefer-module': 'off',
         'unicorn/prefer-ternary': 'off',
+        'unicorn/numeric-separators-style': 'off',
+        'unicorn/prefer-node-protocol': 'off',
         // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/custom-error-definition.md
         'unicorn/custom-error-definition': 'error',
         // https://github.com/sindresorhus/eslint-plugin-unicorn/blob/main/docs/rules/better-regex.md
@@ -202,6 +212,32 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                             @typescript-eslint                             */
         /* -------------------------------------------------------------------------- */
+        '@typescript-eslint/no-dynamic-delete': 'off',
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {
+            // Whether to check all, some, or no arguments.
+            args: 'after-used',
+            // Regular expressions of argument names to not check for usage.
+            argsIgnorePattern: '^_',
+            // Whether to check catch block arguments.
+            caughtErrors: 'all',
+            // Regular expressions of catch block argument names to not check for usage.
+            caughtErrorsIgnorePattern: '^_',
+            // Regular expressions of destructured array variable names to not check for usage.
+            destructuredArrayIgnorePattern: '^_',
+            // Whether to ignore classes with at least one static initialization block.
+            ignoreClassWithStaticInitBlock: false,
+            // Whether to ignore sibling properties in `...` destructurings.
+            ignoreRestSiblings: false,
+            // Whether to report variables that match any of the valid ignore pattern options if they have been used.
+            reportUsedIgnorePattern: true,
+            // Whether to check all variables or only locally-declared variables.
+            vars: 'all',
+            // Regular expressions of variable names to not check for usage.
+            varsIgnorePattern: '[iI]gnored$',
+          },
+        ],
         '@typescript-eslint/prefer-readonly': 'error',
         '@typescript-eslint/no-extraneous-class': 'off',
         '@typescript-eslint/method-signature-style': ['error', 'property'],
@@ -209,7 +245,11 @@ module.exports = {
         '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/naming-convention': [
           'error',
-          { selector: 'default', format: ['camelCase'] },
+          {
+            selector: 'default',
+            format: ['camelCase', 'PascalCase'],
+            leadingUnderscore: 'allow',
+          },
           {
             selector: ['objectLiteralProperty', 'typeProperty'],
             format: null,
@@ -225,6 +265,12 @@ module.exports = {
           {
             selector: ['variable'],
             modifiers: ['global'],
+            format: ['UPPER_CASE', 'camelCase', 'PascalCase'],
+          },
+          {
+            selector: ['variable'],
+            modifiers: ['global'],
+            types: ['boolean', 'number', 'string'],
             format: ['UPPER_CASE'],
           },
           {
@@ -306,6 +352,30 @@ module.exports = {
             },
           },
         ],
+      },
+    },
+    {
+      // constants files
+      files: ['plugins/**/constants.{ts,js}'],
+      rules: {
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'variable',
+            modifiers: ['global'],
+            format: ['UPPER_CASE'],
+          },
+        ],
+      },
+    },
+    {
+      files: ['plugins/**/*.test.{js,jsx,ts,tsx}'],
+      rules: {
+        '@typescript-eslint/no-empty-function': [
+          'error',
+          { allow: ['arrowFunctions'] },
+        ],
+        '@typescript-eslint/no-unused-vars': 'off',
       },
     },
   ],

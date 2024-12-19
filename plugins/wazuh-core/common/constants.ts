@@ -15,7 +15,7 @@ import { version } from '../package.json';
 import { SettingsValidator } from '../common/services/settings-validator';
 
 // Plugin
-export const PLUGIN_VERSION = version;
+
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 
 // Index patterns - Wazuh alerts
@@ -109,6 +109,7 @@ export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
 // Wazuh data path
 const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
+
 export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = path.join(
   __dirname,
   '../../../',
@@ -148,7 +149,9 @@ export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
 
 // Wazuh errors
-export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
+export enum WAZUH_ERROR_CODES {
+  DAEMONS_NOT_READY = 3099,
+}
 
 // Agents
 export enum WAZUH_AGENTS_OS_TYPE {
@@ -234,7 +237,7 @@ export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
 export const HEALTH_CHECK = 'health-check';
 
 // Health check
-export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
+export const HEALTH_CHECK_REDIRECTION_TIME = 300; // ms
 
 // Plugin platform settings
 // Default timeFilter set by the app
@@ -409,17 +412,17 @@ export type TPluginSettingOptionsTextArea = {
   maxRows?: number;
   minRows?: number;
   maxLength?: number;
-};
+}
 
 export type TPluginSettingOptionsSelect = {
   select: { text: string; value: any }[];
-};
+}
 
 export type TPluginSettingOptionsEditor = {
   editor: {
     language: string;
   };
-};
+}
 
 export type TPluginSettingOptionsFile = {
   file: {
@@ -442,7 +445,7 @@ export type TPluginSettingOptionsFile = {
       resolveStaticURL: (filename: string) => string;
     };
   };
-};
+}
 
 export type TPluginSettingOptionsNumber = {
   number: {
@@ -450,7 +453,7 @@ export type TPluginSettingOptionsNumber = {
     max?: number;
     integer?: boolean;
   };
-};
+}
 
 export type TPluginSettingOptionsSwitch = {
   switch: {
@@ -459,7 +462,7 @@ export type TPluginSettingOptionsSwitch = {
       enabled: { label?: string; value: any };
     };
   };
-};
+}
 
 export type TPlugginSettingOptionsObjectOf = {
   objectOf: {
@@ -485,7 +488,7 @@ export enum EpluginSettingType {
   objectOf = 'objectOf',
 }
 
-export type TPluginSetting = {
+export interface TPluginSetting {
   // Define the text displayed in the UI.
   title: string;
   // Description.
@@ -888,8 +891,66 @@ hosts:
     ),
   },
 };
-
 export type TPluginSettingKey = keyof typeof PLUGIN_SETTINGS;
+export type TPluginSettingWithKey = TPluginSetting & { key: TPluginSettingKey };
+export interface TPluginSettingCategory {
+  title: string;
+  description?: string;
+  documentationLink?: string;
+  renderOrder?: number;
+}
+
+export const PLUGIN_SETTINGS_CATEGORIES: Record<
+  number,
+  TPluginSettingCategory
+> = {
+  [SettingCategory.HEALTH_CHECK]: {
+    title: 'Health check',
+    description: "Checks will be executed by the app's Healthcheck.",
+    renderOrder: SettingCategory.HEALTH_CHECK,
+  },
+  [SettingCategory.GENERAL]: {
+    title: 'General',
+    description:
+      'Basic app settings related to alerts index pattern, hide the manager alerts in the dashboards, logs level and more.',
+    renderOrder: SettingCategory.GENERAL,
+  },
+  [SettingCategory.SECURITY]: {
+    title: 'Security',
+    description: 'Application security options such as unauthorized roles.',
+    renderOrder: SettingCategory.SECURITY,
+  },
+  [SettingCategory.MONITORING]: {
+    title: 'Task:Monitoring',
+    description:
+      'Options related to the agent status monitoring job and its storage in indexes.',
+    renderOrder: SettingCategory.MONITORING,
+  },
+  [SettingCategory.STATISTICS]: {
+    title: 'Task:Statistics',
+    description:
+      'Options related to the daemons manager monitoring job and their storage in indexes.',
+    renderOrder: SettingCategory.STATISTICS,
+  },
+  [SettingCategory.VULNERABILITIES]: {
+    title: 'Vulnerabilities',
+    description:
+      'Options related to the agent vulnerabilities monitoring job and its storage in indexes.',
+    renderOrder: SettingCategory.VULNERABILITIES,
+  },
+  [SettingCategory.CUSTOMIZATION]: {
+    title: 'Custom branding',
+    description:
+      'If you want to use custom branding elements such as logos, you can do so by editing the settings below.',
+    documentationLink: 'user-manual/wazuh-dashboard/white-labeling.html',
+    renderOrder: SettingCategory.CUSTOMIZATION,
+  },
+  [SettingCategory.API_CONNECTION]: {
+    title: 'API connections',
+    description: 'Options related to the API connections.',
+    renderOrder: SettingCategory.API_CONNECTION,
+  },
+};
 
 export enum HTTP_STATUS_CODES {
   CONTINUE = 100,
