@@ -63,11 +63,6 @@ export class WazuhPlugin
   ): Promise<WazuhSetup> {
     // Get custom logos configuration to start up the app with the correct logos
     let logosInitialState = {};
-    try {
-      logosInitialState = await core.http.get(`/api/logos`);
-    } catch (error) {
-      console.error('plugin.ts: Error getting logos configuration', error);
-    }
 
     // Redefine the mapKeys method to change the properties sent to euiPaletteColorBlind.
     // This is a workaround until the issue reported in Opensearch Dashboards is fixed.
@@ -128,32 +123,10 @@ export class WazuhPlugin
         order,
         mount: async (params: AppMountParameters) => {
           try {
-            /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
-            There is an optimization error of the frontend side source code due to some modules can
-            not be loaded
-            */
-            const setting = plugins.wazuhCore.configuration._settings.get(
-              'cron.statistics.interval',
-            );
-            !setting.validateUIForm &&
-              (setting.validateUIForm = function (value) {
-                return this.validate(value);
-              });
-            !setting.validate &&
-              (setting.validate = function (value: string) {
-                return validateNodeCronInterval(value)
-                  ? undefined
-                  : 'Interval is not valid.';
-              });
             setWzCurrentAppID(id);
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
             initializeInterceptor(core);
-
-            // Update redux app state logos with the custom logos
-            if (logosInitialState?.logos) {
-              store.dispatch(updateAppConfig(logosInitialState.logos));
-            }
             // hide the telemetry banner.
             // Set the flag in the telemetry saved object as the notice was seen and dismissed
             this.hideTelemetryBanner && (await this.hideTelemetryBanner());

@@ -9,8 +9,9 @@ import { ServerDataProps } from './services/http/ui/components/types';
 import { DashboardSecurity } from './utils/dashboard-security';
 
 export interface WazuhCorePluginSetup {
+  _internal: any;
   utils: { formatUIDate: (date: Date) => string };
-  API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
+  API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurity;
   http: HTTPClient;
@@ -26,12 +27,13 @@ export interface WazuhCorePluginSetup {
 }
 
 export interface WazuhCorePluginStart {
+  _internal: any;
   hooks: {
     useDockedSideNav: UseDockedSideNav;
     useStateStorage: UseStateStorageHook; // TODO: enhance
   };
   utils: { formatUIDate: (date: Date) => string };
-  API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
+  API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurity;
   http: HTTPClient;

@@ -134,6 +134,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     });
 
     // Sanitize uploaded files tasks
+    // error: [error][plugins][sanitize-uploaded-files-task][wazuh] sanitize:sanitizeUploadedSVG: Error: Configuration undefined not found
+    /*
     jobSanitizeUploadedFilesTasksRun({
       core,
       wazuh: {
@@ -143,7 +145,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
-
+    */
+   
     // Migration tasks
     jobMigrationTasksRun({
       core,
@@ -155,7 +158,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       server: contextServer,
     });
 
-    // Monitoring
+    /* Monitoring
     jobMonitoringRun({
       core,
       wazuh: {
@@ -165,8 +168,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
+    */
 
-    // Scheduler
+    /* Scheduler
     jobSchedulerRun({
       core,
       wazuh: {
@@ -176,6 +180,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
+    */
 
     // Queue
     jobQueueRun({
