@@ -1,26 +1,19 @@
 import { BehaviorSubject } from 'rxjs';
 import jwtDecode from 'jwt-decode';
-import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../common/constants';
-import { Logger } from '../../common/services/configuration';
+import { Logger } from '../../../common/services/configuration';
+import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../../common/constants';
+import { createDashboardSecurityHooks } from './ui/hooks/creator';
+import { createDashboardSecurityHOCs } from './ui/hocs/creator';
+import {
+  DashboardSecurityServiceAccount,
+  DashboardSecurityService,
+  DashboardSecurityServiceSetupDeps,
+  DashboardSecurityServiceSetupReturn,
+} from './types';
 
-function createDashboardSecurityHooks({ getAccount, getAccount$ }) {
-  return {
-    useDashboardSecurityAccount: function useDashboardSecurityAccount() {
-      return [getAccount(), getAccount$()];
-    },
-    useDashboardSecurityIsAdmin: function useDashboardSecurityIsAdmin() {
-      return getAccount()?.administrator;
-    },
-  };
-}
-
-export interface DashboardSecurityAccount {
-  administrator: boolean;
-  administrator_requirements: string | null;
-}
-export class DashboardSecurity {
+export class DashboardSecurity implements DashboardSecurityService {
   private securityPlatform = '';
-  public account$: BehaviorSubject<DashboardSecurityAccount>;
+  public account$: BehaviorSubject<DashboardSecurityServiceAccount>;
 
   constructor(
     private readonly logger: Logger,
@@ -57,28 +50,22 @@ export class DashboardSecurity {
 
   async setup({
     updateData$,
-  }: {
-    updateData$: BehaviorSubject<{ token: string }>;
-  }): Promise<{
-    hooks: {
-      useDashboardSecurityAccount: () => [DashboardSecurityAccount];
-      useDashboardSecurityIsAdmin: () => boolean;
-    };
-  }> {
+  }: DashboardSecurityServiceSetupDeps): Promise<DashboardSecurityServiceSetupReturn> {
     this.logger.debug('Setup');
 
-    let hooks;
+    let hooks, hocs;
 
     try {
-      this.logger.debug('Creating hooks');
+      this.logger.debug('Creating ui utilities');
 
       hooks = createDashboardSecurityHooks({
-        getAccount: () => this.account$.getValue(),
-        getAccount$: () => this.account$,
+        account$: this.account$,
       });
+
+      hocs = createDashboardSecurityHOCs(hooks);
       this.logger.debug('Created hooks');
     } catch (error) {
-      this.logger.error(`Error creating the hooks: ${error.message}`);
+      this.logger.error(`Error creating the ui utilities: ${error.message}`);
       throw error;
     }
 
@@ -94,13 +81,16 @@ export class DashboardSecurity {
 
     // Update the dashboard security account information based on server API token
     updateData$.subscribe(({ token }: { token: string }) => {
-      const jwtPayload = token ? jwtDecode(token) : null;
+      const jwtPayload: {
+        rbac_roles?: number[];
+      } | null = token ? jwtDecode(token) : null;
 
       this.account$.next(this.getAccountFromJWTAPIDecodedToken(jwtPayload));
     });
 
     return {
       hooks,
+      hocs,
     };
   }
 
