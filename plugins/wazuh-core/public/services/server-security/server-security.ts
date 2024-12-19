@@ -22,7 +22,7 @@ export class CoreServerSecurity implements ServerSecurity {
 
   constructor(private readonly logger: Logger) {
     this.serverSecurityUserData$ = new BehaviorSubject({
-      logged: true,
+      logged: false,
       policies: null,
       token: null,
     });

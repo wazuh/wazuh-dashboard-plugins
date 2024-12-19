@@ -10,7 +10,7 @@ import { setChrome, setCore, setUiSettings } from './plugin-services';
 import * as utils from './utils';
 import * as uiComponents from './components';
 import { ConfigurationStore } from './utils/configuration-store';
-import { DashboardSecurity } from './utils/dashboard-security';
+import { DashboardSecurity } from './services/dashboard-security';
 import * as hooks from './hooks';
 import { CoreServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';

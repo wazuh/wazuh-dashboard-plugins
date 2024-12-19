@@ -15,6 +15,8 @@ export const LoadingServerUserLogging = ({
     <div
       className='osdWelcomeView'
       id='osd_loading_message'
+      /* width and height properties were add to simulate that wraps all screen minus header.
+      This could cause problems depeding on the wrapped view and it could need to be adjusted */
       style={{ display: 'flex', width: '100%', height: 'calc(100vh - 48px)' }}
       data-test-subj='osdLoadingMessage'
     >
