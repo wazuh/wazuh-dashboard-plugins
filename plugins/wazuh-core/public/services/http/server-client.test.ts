@@ -53,7 +53,7 @@ describe('Create client', () => {
   it('Ensure the initial userData value', done => {
     const { client } = createClient();
 
-    client.userData$.subscribe(userData => {
+    client.auth$.subscribe(userData => {
       expect(userData).toEqual({
         logged: false,
         token: null,
@@ -75,7 +75,7 @@ describe('Create client', () => {
         logged: true,
       });
 
-      client.userData$.subscribe(userData => {
+      client.auth$.subscribe(userData => {
         expect(userData).toEqual({
           token: USER_TOKEN,
           policies: {},

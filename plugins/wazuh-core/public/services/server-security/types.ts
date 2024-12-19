@@ -1,4 +1,5 @@
 import React from 'react';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 export interface ServerSecurityPermission {
   action: string;
@@ -14,8 +15,10 @@ export type ServerSecurityCombinedPermissionWithFunction =
   | ((props: any) => ServerSecurityPermission);
 
 export interface ServerSecuritySetupDeps {
-  userSession$: any;
-  getUserSession: any;
+  auth$: Subject;
+  useDashboardSecurityAccount: () => {
+    administrator_requirements: string | null;
+  };
   useLoadingLogo: () => { url: string; type: string };
 }
 
@@ -26,7 +29,6 @@ export interface ServerSecuritySetupReturn {
     useServerUserPermissionsRequirements: (
       permissions: ServerSecurityCombinedPermissionWithFunction,
     ) => [ServerSecurityCombinedPermission, any];
-    useServerUserPermissionsIsAdminRequirements: () => [string, any];
   };
   hocs: {
     withServerUserAuthorizationPrompt: (
@@ -43,7 +45,14 @@ export interface ServerSecuritySetupReturn {
   };
 }
 
+export interface ServerSecurityUserData {
+  logged: boolean;
+  policies: any;
+  token: string;
+}
+
 export interface ServerSecurity {
+  serverSecurityUserData$: BehaviorSubject<ServerSecurityUserData>;
   setup: (deps: ServerSecuritySetupDeps) => ServerSecuritySetupReturn;
   start: () => void;
   stop: () => void;
@@ -54,9 +63,4 @@ export interface ServerSecurity {
   getMissingUserPermissions: (
     requiredPermissions: ServerSecurityCombinedPermission[],
   ) => ServerSecurityCombinedPermission[] | false;
-}
-
-export interface ServerSecurityUserSession {
-  logged: boolean;
-  policies: any;
 }

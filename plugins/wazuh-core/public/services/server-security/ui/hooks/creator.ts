@@ -1,15 +1,13 @@
 import useObservable from 'react-use/lib/useObservable';
-import { ServerSecurityUserSession } from '../../types';
 
 export const createServerSecurityHooks = (services: {
-  userSession$: any;
-  getUserSession: () => ServerSecurityUserSession;
+  serverSecurityUserData$: any;
   checkMissingUserPermissions;
 }) => {
   const useServerUserPermissions = () => {
     const { policies } = useObservable(
-      services.userSession$,
-      services.getUserSession(),
+      services.serverSecurityUserData$,
+      services.serverSecurityUserData$.getValue(),
     );
 
     return policies;
@@ -40,19 +38,10 @@ export const createServerSecurityHooks = (services: {
     ];
   };
 
-  const useServerUserPermissionsIsAdminRequirements = () => {
-    const { account } = useObservable(
-      services.userSession$,
-      services.getUserSession(),
-    );
-
-    return [account?.administrator_requirements, account];
-  };
-
   const useServerUserLogged = () => {
     const { logged } = useObservable(
-      services.userSession$,
-      services.getUserSession(),
+      services.serverSecurityUserData$,
+      services.serverSecurityUserData$.getValue(),
     );
 
     return logged;
@@ -62,6 +51,5 @@ export const createServerSecurityHooks = (services: {
     useServerUserLogged,
     useServerUserPermissions,
     useServerUserPermissionsRequirements,
-    useServerUserPermissionsIsAdminRequirements,
   };
 };

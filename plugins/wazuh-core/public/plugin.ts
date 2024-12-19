@@ -1,5 +1,4 @@
 import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
-import { BehaviorSubject } from 'rxjs';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
 import {
@@ -57,20 +56,7 @@ export class WazuhCorePlugin
     // Create dashboardSecurity
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
-    // TODO: replace by the current session data
-    const userSessionData = {
-      logged: false,
-      account: {
-        administrator: false,
-        administrator_requirements: '',
-      },
-      policies: { rbac_mode: 'white' },
-    };
-    const userSession$ = new BehaviorSubject(userSessionData);
-
-    this.services.serverSecurity = new CoreServerSecurity(logger, {
-      getUserPermissions: () => {}, // TODO: implement
-    });
+    this.services.serverSecurity = new CoreServerSecurity(logger);
 
     // Create http
     this.services.http = new CoreHTTPClient(logger, {
@@ -83,12 +69,16 @@ export class WazuhCorePlugin
     });
 
     // Setup services
-    await this.services.dashboardSecurity.setup();
+    this.runtime.setup.dashboardSecurity =
+      await this.services.dashboardSecurity.setup({
+        updateData$: this.services.http.server.auth$,
+      });
     this.runtime.setup.http = await this.services.http.setup({ core });
 
     this.runtime.setup.serverSecurity = this.services.serverSecurity.setup({
-      userSession$: userSession$, // TODO: replace
-      getUserSession: () => userSessionData, // TODO: replace
+      useDashboardSecurityAccount:
+        this.runtime.setup.dashboardSecurity.hooks.useDashboardSecurityIsAdmin,
+      auth$: this.services.http.server.auth$,
       useLoadingLogo: () =>
         this.runtime.start.serverSecurityDeps.chrome.logos.AnimatedMark,
     });
@@ -99,6 +89,7 @@ export class WazuhCorePlugin
       API_USER_STATUS_RUN_AS,
       hooks: {
         ...hooks,
+        ...this.runtime.setup.dashboardSecurity.hooks,
         ...this.runtime.setup.serverSecurity.hooks,
       },
       hocs: {
@@ -132,6 +123,7 @@ export class WazuhCorePlugin
       API_USER_STATUS_RUN_AS,
       hooks: {
         ...hooks,
+        ...this.runtime.setup.dashboardSecurity.hooks,
         ...this.runtime.setup.serverSecurity.hooks,
       },
       hocs: {

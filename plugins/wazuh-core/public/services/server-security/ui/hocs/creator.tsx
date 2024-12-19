@@ -3,7 +3,7 @@ import { compose } from 'redux';
 
 export const createServerSecurityHOCS = ({
   useServerUserPermissionsRequirements,
-  useServerUserPermissionsIsAdminRequirements,
+  useDashboardSecurityAccount,
   useServerUserLogged,
   useLoadingLogo,
   PromptNoPermissions,
@@ -22,8 +22,8 @@ export const createServerSecurityHOCS = ({
               ? permissions(props)
               : permissions,
           );
-        const [userPermissionIsAdminRequirementsState] =
-          useServerUserPermissionsIsAdminRequirements();
+        const userPermissionIsAdminRequirementsState =
+          useDashboardSecurityAccount()?.administrator_requirements;
         const userPermissionIsAdminRequirements =
           othersPermissions?.isAdmininistrator
             ? userPermissionIsAdminRequirementsState

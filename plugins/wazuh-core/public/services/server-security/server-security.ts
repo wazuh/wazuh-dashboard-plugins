@@ -1,3 +1,4 @@
+import { BehaviorSubject } from 'rxjs';
 import { Logger } from '../../../common/services/configuration';
 import { checkMissingUserPermissions } from './wz-user-permissions';
 import {
@@ -13,13 +14,18 @@ import { LoadingServerUserLogging } from './ui/components/loading';
 import { WzEmptyPromptNoPermissions } from './ui/components/prompt';
 
 export class CoreServerSecurity implements ServerSecurity {
-  private readonly getUserPermissions: any;
+  public serverSecurityUserData$: BehaviorSubject<{
+    logged: boolean;
+    policies: any;
+    token: string;
+  }>;
 
-  constructor(
-    private readonly logger: Logger,
-    { getUserPermissions },
-  ) {
-    this.getUserPermissions = getUserPermissions;
+  constructor(private readonly logger: Logger) {
+    this.serverSecurityUserData$ = new BehaviorSubject({
+      logged: true,
+      policies: null,
+      token: null,
+    });
   }
 
   setup(deps: ServerSecuritySetupDeps): ServerSecuritySetupReturn {
@@ -27,8 +33,12 @@ export class CoreServerSecurity implements ServerSecurity {
 
     this.logger.debug('Creating runtime hooks');
 
+    // Update the user server security information based on the authentication
+    deps.auth$.subscribe(data => this.serverSecurityUserData$.next(data));
+
     const hooks = createServerSecurityHooks({
       ...deps,
+      serverSecurityUserData$: this.serverSecurityUserData$,
       checkMissingUserPermissions: this.checkMissingUserPermissions,
     });
 
@@ -76,7 +86,7 @@ export class CoreServerSecurity implements ServerSecurity {
   ) {
     return checkMissingUserPermissions(
       requiredPermissions,
-      this.getUserPermissions(),
+      this.serverSecurityUserData$.getValue(),
     );
   }
 }
