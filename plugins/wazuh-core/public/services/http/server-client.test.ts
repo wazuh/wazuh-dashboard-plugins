@@ -50,39 +50,23 @@ function createClient() {
 }
 
 describe('Create client', () => {
-  it('Ensure the initial userData value', done => {
+  it('Authentication', done => {
     const { client } = createClient();
 
-    client.userData$.subscribe(userData => {
+    client.auth$.subscribe(userData => {
       expect(userData).toEqual({
-        logged: false,
-        token: null,
-        account: null,
-        policies: null,
+        token: USER_TOKEN,
+        policies: {},
+        logged: true,
       });
       done();
     });
-  });
-
-  it('Authentication', done => {
-    const { client } = createClient();
 
     client.auth().then(data => {
       expect(data).toEqual({
         token: USER_TOKEN,
         policies: {},
-        account: null,
         logged: true,
-      });
-
-      client.userData$.subscribe(userData => {
-        expect(userData).toEqual({
-          token: USER_TOKEN,
-          policies: {},
-          account: null,
-          logged: true,
-        });
-        done();
       });
     });
   });

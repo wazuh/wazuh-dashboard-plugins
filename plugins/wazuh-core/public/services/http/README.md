@@ -18,7 +18,7 @@ This client provides a method to run the request that injects some properties re
 #### Request
 
 ```ts
-plugins.wazuhCore.http.request('GET', '/api/check-api', {});
+plugins.wazuhCore.http.generic.request('GET', '/api/check-api', {});
 ```
 
 ## Server
@@ -34,50 +34,48 @@ This client provides:
 #### Authentication
 
 ```ts
-plugins.wazuhCore.http.auth();
+plugins.wazuhCore.http.server.auth();
 ```
 
 #### Unauthentication
 
 ```ts
-plugins.wazuhCore.http.unauth();
+plugins.wazuhCore.http.server.unauth();
 ```
 
 #### Request
 
 ```ts
-plugins.wazuhCore.http.request('GET', '/agents', {});
+plugins.wazuhCore.http.server.request('GET', '/agents', {});
 ```
 
 #### CSV
 
 ```ts
-plugins.wazuhCore.http.csv('GET', '/agents', {});
+plugins.wazuhCore.http.server.csv('GET', '/agents', {});
 ```
 
 #### Check API id
 
 ```ts
-plugins.wazuhCore.http.checkApiById('api-host-id');
+plugins.wazuhCore.http.server.checkApiById('api-host-id');
 ```
 
 #### Check API
 
 ```ts
-plugins.wazuhCore.http.checkApi(apiHostData);
+plugins.wazuhCore.http.server.checkApi(apiHostData);
 ```
 
-#### Get user data
+#### Get authentication data
+
+The changes in the user authentication can be retrieved through the `auth$` observable.
+
+> This is used by the `serverSecurity` and `dashboardSecurity` services to update own states.
 
 ```ts
-plugins.wazuhCore.http.getUserData();
-```
-
-The changes in the user data can be retrieved thourgh the `userData$` observable.
-
-```ts
-plugins.wazuhCore.http.userData$.subscribe(userData => {
-  // do something with the data
+plugins.wazuhCore.http.server.auth$.subscribe(authenticationData => {
+  // do something with the authentication data
 });
 ```
 
