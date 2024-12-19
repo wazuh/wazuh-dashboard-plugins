@@ -69,12 +69,12 @@ export class WazuhCorePlugin
     core.uiSettings.register(uiSettingsDefs);
    
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
-    this._internal.configurationStore = new ConfigurationStore(
+    this.internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-store')
     );
 
     // add the initializer context config to the configuration store
-    this._internal.configurationStore.registerProvider(
+    this.internal.configurationStore.registerProvider(
       EConfigurationProviders.PLUGIN_UI_SETTINGS,
       new InitializerConfigProvider(this.initializerContext)
     )

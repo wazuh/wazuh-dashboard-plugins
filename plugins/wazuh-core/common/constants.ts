@@ -511,46 +511,6 @@ export interface TPluginSetting {
   validate?: (value: any) => string | undefined;
 };
 
-export type TPluginSettingWithKey = TPluginSetting & { key: TPluginSettingKey };
-export type TPluginSettingCategory = {
-  title: string;
-  description?: string;
-  documentationLink?: string;
-  renderOrder?: number;
-};
-
-export const PLUGIN_SETTINGS_CATEGORIES: {
-  [category: number]: TPluginSettingCategory;
-} = {
-  [SettingCategory.HEALTH_CHECK]: {
-    title: 'Health check',
-    description: "Checks will be executed by the app's Healthcheck.",
-    renderOrder: SettingCategory.HEALTH_CHECK,
-  },
-  [SettingCategory.GENERAL]: {
-    title: 'General',
-    description:
-      'Basic app settings related to alerts index pattern, hide the manager alerts in the dashboards, logs level and more.',
-    renderOrder: SettingCategory.GENERAL,
-  },
-  [SettingCategory.SECURITY]: {
-    title: 'Security',
-    description: 'Application security options such as unauthorized roles.',
-    renderOrder: SettingCategory.SECURITY,
-  },
-  [SettingCategory.VULNERABILITIES]: {
-    title: 'Vulnerabilities',
-    description:
-      'Options related to the agent vulnerabilities monitoring job and its storage in indexes.',
-    renderOrder: SettingCategory.VULNERABILITIES,
-  },
-  [SettingCategory.API_CONNECTION]: {
-    title: 'API connections',
-    description: 'Options related to the API connections.',
-    renderOrder: SettingCategory.API_CONNECTION,
-  },
-};
-
 export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'alerts.sample.prefix': {
     title: 'Sample alerts prefix',

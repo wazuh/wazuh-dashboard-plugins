@@ -6,7 +6,7 @@ import * as hooks from './hooks';
 import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
 import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
 import { EConfigurationProviders } from '../common/constants';
-import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
+import { CoreSetup, CoreStart, Plugin, PluginInitializerContext } from 'opensearch-dashboards/public';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
 import * as utils from './utils';
@@ -22,9 +22,15 @@ export class WazuhCorePlugin
   internal: Record<string, any> = {};
   services: Record<string, any> = {};
 
+  constructor(private initializerContext: PluginInitializerContext){
+    this.services = {};
+    this.internal = {};
+  }
+
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     // No operation logger
-    const noopLogger = {
+
+    const logger = {
       info: noop,
       error: noop,
       debug: noop,
@@ -34,26 +40,26 @@ export class WazuhCorePlugin
       log: noop,
       get: () => logger,
     };
-    this._internal.configurationStore = new ConfigurationStore(
+    this.internal.configurationStore = new ConfigurationStore(
       logger
     );
 
-    this._internal.configurationStore.registerProvider(
+    this.internal.configurationStore.registerProvider(
       EConfigurationProviders.INITIALIZER_CONTEXT,
       new InitializerConfigProvider(this.initializerContext)
     );
 
     // register the uiSettins on the configuration store to avoid the use inside of configuration service
-    this._internal.configurationStore.registerProvider(
+    this.internal.configurationStore.registerProvider(
       EConfigurationProviders.PLUGIN_UI_SETTINGS,
       new UISettingsConfigProvider(core.uiSettings)
     );
 
-    console.log('uiSettings', await this._internal.configurationStore.getProviderConfiguration(EConfigurationProviders.INITIALIZER_CONTEXT));
+    console.log('uiSettings', await this.internal.configurationStore.getProviderConfiguration(EConfigurationProviders.INITIALIZER_CONTEXT));
 
     console.log('uiSettings core', core.uiSettings.getAll())
 
-    console.log('uiSettings from configuration', await this._internal.configurationStore.getProviderConfiguration(EConfigurationProviders.PLUGIN_UI_SETTINGS));
+    console.log('uiSettings from configuration', await this.internal.configurationStore.getProviderConfiguration(EConfigurationProviders.PLUGIN_UI_SETTINGS));
 
     this.services.configuration = new Configuration(
       logger,
