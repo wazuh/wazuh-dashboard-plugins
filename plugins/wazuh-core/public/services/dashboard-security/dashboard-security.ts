@@ -56,16 +56,20 @@ export class DashboardSecurity implements DashboardSecurityService {
     let hooks, hocs;
 
     try {
-      this.logger.debug('Creating ui utilities');
+      this.logger.debug('Creating the UI utilities');
 
+      this.logger.debug('Creating hooks');
       hooks = createDashboardSecurityHooks({
         account$: this.account$,
       });
-
-      hocs = createDashboardSecurityHOCs(hooks);
       this.logger.debug('Created hooks');
+
+      this.logger.debug('Creating HOCs');
+      hocs = createDashboardSecurityHOCs(hooks);
+      this.logger.debug('Created HOCs');
+      this.logger.debug('Created the UI utilities');
     } catch (error) {
-      this.logger.error(`Error creating the ui utilities: ${error.message}`);
+      this.logger.error(`Error creating the UI utilities: ${error.message}`);
       throw error;
     }
 

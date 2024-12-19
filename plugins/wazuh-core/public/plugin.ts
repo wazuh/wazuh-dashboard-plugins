@@ -93,6 +93,7 @@ export class WazuhCorePlugin
         ...this.runtime.setup.serverSecurity.hooks,
       },
       hocs: {
+        ...this.runtime.setup.dashboardSecurity.hocs,
         ...this.runtime.setup.serverSecurity.hocs,
       },
       ui: {
@@ -127,6 +128,7 @@ export class WazuhCorePlugin
         ...this.runtime.setup.serverSecurity.hooks,
       },
       hocs: {
+        ...this.runtime.setup.dashboardSecurity.hocs,
         ...this.runtime.setup.serverSecurity.hocs,
       },
       ui: {
