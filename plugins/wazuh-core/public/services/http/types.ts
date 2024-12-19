@@ -22,7 +22,6 @@ export interface HTTPClientGeneric {
 export interface HTTPClientServerUserData {
   token: string | null;
   policies: any | null;
-  account: any | null;
   logged: boolean;
 }
 
@@ -39,7 +38,7 @@ export interface HTTPClientServer {
   csv: (path: string, filters: any) => Promise<any>;
   auth: (force: boolean) => Promise<any>;
   unauth: (force: boolean) => Promise<any>;
-  userData$: BehaviorSubject<HTTPClientServerUserData>;
+  auth$: BehaviorSubject<HTTPClientServerUserData>;
   getUserData: () => HTTPClientServerUserData;
 }
 
