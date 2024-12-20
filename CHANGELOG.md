@@ -2,11 +2,11 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.10.3 - OpenSearch Dashboards 2.16.0 - Revision 00
+## Wazuh v4.12.0 - OpenSearch Dashboards 2.16.0 - Revision 00
 
 ### Added
 
-- Support for Wazuh 4.10.3
+- Support for Wazuh 4.12.0
 - Add setting to limit the number of rows in csv reports [#7182](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7182)
 
 ### Changed
@@ -19,22 +19,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed rendering of rows in CDB list table when it starts with quotes [#7171](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7171)
 - Fixed width of long fields in the document detail flyout [#7206](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7206)
 
-## Wazuh v4.10.2 - OpenSearch Dashboards 2.16.0 - Revision 00
+## Wazuh v4.11.0 - OpenSearch Dashboards 2.16.0 - Revision 00
 
 ### Added
 
-- Support for Wazuh 4.10.2
+- Support for Wazuh 4.11.0
 
 ### Changed
 
 - Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
 - Changed the width of the command column, relocate argvs column and change the width of the rest of the columns in the table processes. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
-
-## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 00
-
-### Added
-
-- Support for Wazuh 4.10.1
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 06
 
