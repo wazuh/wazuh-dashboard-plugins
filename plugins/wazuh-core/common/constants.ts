@@ -412,17 +412,17 @@ export type TPluginSettingOptionsTextArea = {
   maxRows?: number;
   minRows?: number;
   maxLength?: number;
-}
+};
 
 export type TPluginSettingOptionsSelect = {
   select: { text: string; value: any }[];
-}
+};
 
 export type TPluginSettingOptionsEditor = {
   editor: {
     language: string;
   };
-}
+};
 
 export type TPluginSettingOptionsFile = {
   file: {
@@ -445,7 +445,7 @@ export type TPluginSettingOptionsFile = {
       resolveStaticURL: (filename: string) => string;
     };
   };
-}
+};
 
 export type TPluginSettingOptionsNumber = {
   number: {
@@ -453,7 +453,7 @@ export type TPluginSettingOptionsNumber = {
     max?: number;
     integer?: boolean;
   };
-}
+};
 
 export type TPluginSettingOptionsSwitch = {
   switch: {
@@ -462,17 +462,17 @@ export type TPluginSettingOptionsSwitch = {
       enabled: { label?: string; value: any };
     };
   };
-}
+};
 
 export type TPlugginSettingOptionsObjectOf = {
   objectOf: {
     [key: string]: TPluginSetting;
   };
-}
+};
 
 type TPluginSettingOptionsArrayOf = {
   arrayOf: TPluginSetting;
-}
+};
 
 export enum EpluginSettingType {
   text = 'text',
@@ -498,18 +498,19 @@ export interface TPluginSetting {
   // Type.
   type: EpluginSettingType;
   source: EConfigurationProviders;
-  options?: TPluginSettingOptionsTextArea 
-    | TPluginSettingOptionsSelect 
-    | TPluginSettingOptionsEditor 
-    | TPluginSettingOptionsFile 
-    | TPluginSettingOptionsNumber 
+  options?:
+    | TPluginSettingOptionsTextArea
+    | TPluginSettingOptionsSelect
+    | TPluginSettingOptionsEditor
+    | TPluginSettingOptionsFile
+    | TPluginSettingOptionsNumber
     | TPluginSettingOptionsSwitch
     | TPlugginSettingOptionsObjectOf
     | TPluginSettingOptionsArrayOf;
   // Default value.
   defaultValue: any;
   validate?: (value: any) => string | undefined;
-};
+}
 
 export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'alerts.sample.prefix': {
@@ -606,10 +607,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      //SettingsValidator.isNotEmptyString, // ToDo: get the default password
-    ),
+    validate: SettingsValidator.compose(SettingsValidator.isString),
   },
   hideManagerAlerts: {
     title: 'Hide manager alerts',
@@ -733,7 +731,7 @@ hosts:
     title: 'Index pattern ignore',
     description:
       'Disable certain index pattern names from being available in index pattern selector.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,  
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.editor,
     defaultValue: [],
@@ -1031,7 +1029,4 @@ export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
 
 export const REQUEST_TIMEOUT = 'timeout';
 
-
 export const DEFAULT_COLUMNS_SETTING = 'defaultColumns2';
-
-
