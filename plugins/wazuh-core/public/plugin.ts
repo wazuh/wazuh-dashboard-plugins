@@ -1,4 +1,5 @@
 import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
+import { Cookies } from 'react-cookie';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
 import {
@@ -12,6 +13,10 @@ import * as uiComponents from './components';
 import { ConfigurationStore } from './utils/configuration-store';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
+import { CoreState, State } from './services/state';
+import { ServerHostClusterInfoStateContainer } from './services/state/containers/server-host-cluster-info';
+import { ServerHostStateContainer } from './services/state/containers/server-host';
+import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
 import { CoreHTTPClient } from './services/http/http-client';
 
 const noop = () => {};
@@ -19,9 +24,16 @@ const noop = () => {};
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
-  runtime = { setup: {} };
+  runtime: Record<string, any> = {
+    setup: {},
+    start: {},
+  };
   internal: Record<string, any> = {};
-  services: Record<string, any> = {};
+  services: {
+    [key: string]: any;
+    dashboardSecurity?: DashboardSecurity;
+    state?: State;
+  } = {};
 
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     // No operation logger
@@ -55,6 +67,29 @@ export class WazuhCorePlugin
     // Create dashboardSecurity
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
+    // Create state
+    this.services.state = new CoreState(logger);
+
+    this.runtime.setup.state = this.services.state.setup();
+
+    const cookiesStore = new Cookies();
+
+    this.services.state.register(
+      'server_host_cluster_info',
+      new ServerHostClusterInfoStateContainer(logger, { store: cookiesStore }),
+    );
+    this.services.state.register(
+      'server_host',
+      new ServerHostStateContainer(logger, { store: cookiesStore }),
+    );
+    this.services.state.subscribe('server_host', (_value: string) => {
+      // TODO: refresh the auth when the server_host data changed and there is value
+    });
+    this.services.state.register(
+      'data_source_alerts',
+      new DataSourceAlertsStateContainer(logger, { store: cookiesStore }),
+    );
+
     // Create http
     this.services.http = new CoreHTTPClient(logger, {
       getTimeout: async () =>
@@ -73,6 +108,10 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
+      hooks: {
+        ...hooks,
+        ...this.runtime.setup.state.hooks,
+      },
       ui: {
         ...uiComponents,
         ...this.runtime.setup.http.ui,
@@ -87,6 +126,7 @@ export class WazuhCorePlugin
 
     // Start services
     await this.services.configuration.start({ http: core.http });
+    this.services.state.start();
     await this.services.dashboardSecurity.start();
     await this.services.http.start();
 
@@ -94,7 +134,10 @@ export class WazuhCorePlugin
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
-      hooks,
+      hooks: {
+        ...hooks,
+        ...this.runtime.setup.state.hooks,
+      },
       ui: {
         ...uiComponents,
         ...this.runtime.setup.http.ui,
@@ -102,5 +145,7 @@ export class WazuhCorePlugin
     };
   }
 
-  public stop() {}
+  public stop() {
+    this.services.state.stop();
+  }
 }

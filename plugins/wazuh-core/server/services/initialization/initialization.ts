@@ -1,5 +1,5 @@
 import { Logger } from 'opensearch-dashboards/server';
-import { initializationTask } from '../../../common/services/initialization/constants';
+import { INITIALIZATION_TASK } from '../../../common/services/initialization/constants';
 import {
   InitializationTaskDefinition,
   IInitializationService,
@@ -76,7 +76,7 @@ export class InitializationService implements IInitializationService {
   }
 
   async runAsInternal(taskNames?: string[]) {
-    const ctx = this.createRunContext(initializationTask.CONTEXT.INTERNAL, {
+    const ctx = this.createRunContext(INITIALIZATION_TASK.CONTEXT.INTERNAL, {
       core: this.coreStart,
     });
 

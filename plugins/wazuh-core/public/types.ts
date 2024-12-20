@@ -1,6 +1,7 @@
 import React from 'react';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
+import { State } from './services/state';
 import { TableDataProps } from './components';
 import { UseStateStorageHook } from './hooks';
 import { UseDockedSideNav } from './hooks/use-docked-side-nav';
@@ -13,6 +14,7 @@ export interface WazuhCorePluginSetup {
   API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurity;
+  state: State;
   http: HTTPClient;
   ui: {
     TableData: <T>(
@@ -34,6 +36,7 @@ export interface WazuhCorePluginStart {
   API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurity;
+  state: State;
   http: HTTPClient;
   ui: {
     TableData: <T>(

@@ -167,41 +167,39 @@ function getUiSettingsClient(
 export const initializationTaskCreatorSetting = (
   setting: { key: string; value: any; configurationSetting: string },
   taskName: string,
-) => {
-  return {
-    name: taskName,
-    async run(ctx: InitializationTaskRunContext) {
-      try {
-        ctx.logger.debug('Starting setting');
+) => ({
+  name: taskName,
+  async run(ctx: InitializationTaskRunContext) {
+    try {
+      ctx.logger.debug('Starting setting');
 
-        // Get clients depending on the scope
-        const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
-        const uiSettingsClient = getUiSettingsClient(
-          ctx,
-          ctx.scope,
-          savedObjectsClient,
-        );
-        const { key, value, configurationSetting } = setting;
+      // Get clients depending on the scope
+      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
+      const uiSettingsClient = getUiSettingsClient(
+        ctx,
+        ctx.scope,
+        savedObjectsClient,
+      );
+      const { key, value, configurationSetting } = setting;
 
-        await checkPluginPlatformSettings(
-          {
-            logger: ctx.logger,
-            uiSettingsClient,
-            configuration: ctx.configuration,
-          },
-          {
-            key,
-            value,
-            configurationSetting,
-          },
-        );
-        ctx.logger.info('Start setting finished');
-      } catch (error) {
-        const message = `Error initilizating setting [${setting.key}]: ${error.message}`;
+      await checkPluginPlatformSettings(
+        {
+          logger: ctx.logger,
+          uiSettingsClient,
+          configuration: ctx.configuration,
+        },
+        {
+          key,
+          value,
+          configurationSetting,
+        },
+      );
+      ctx.logger.info('Start setting finished');
+    } catch (error) {
+      const message = `Error initilizating setting [${setting.key}]: ${error.message}`;
 
-        ctx.logger.error(message);
-        throw new Error(message);
-      }
-    },
-  };
-};
+      ctx.logger.error(message);
+      throw new Error(message);
+    }
+  },
+});

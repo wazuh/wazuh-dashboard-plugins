@@ -53,14 +53,14 @@ jest.mock('../../../components/common/hooks', () => ({
 }));
 
 jest.mock('../services', () => ({
-  checkPatternService: appInfo => () => undefined,
-  checkTemplateService: appInfo => () => undefined,
-  checkApiService: appInfo => () => undefined,
-  checkSetupService: appInfo => () => undefined,
-  checkFieldsService: appInfo => () => undefined,
-  checkPluginPlatformSettings: appInfo => () => undefined,
-  checkPatternSupportService: appInfo => () => undefined,
-  checkIndexPatternService: appInfo => () => undefined,
+  checkPatternService: appInfo => () => {},
+  checkTemplateService: appInfo => () => {},
+  checkApiService: appInfo => () => {},
+  checkSetupService: appInfo => () => {},
+  checkFieldsService: appInfo => () => {},
+  checkPluginPlatformSettings: appInfo => () => {},
+  checkPatternSupportService: appInfo => () => {},
+  checkIndexPatternService: appInfo => () => {},
 }));
 
 jest.mock('../components/check-result', () => ({
@@ -68,9 +68,7 @@ jest.mock('../components/check-result', () => ({
 }));
 
 jest.mock('../../../react-services', () => ({
-  AppState: {
-    setPatternSelector: () => {},
-  },
+  AppState: {},
   ErrorHandler: {
     handle: error => error,
   },
@@ -123,6 +121,7 @@ describe('Health Check container', () => {
     ]); // invoke is wrapped with act to await for setState
 
     const callOutError = component.find('EuiCallOut');
+
     expect(callOutError.text()).toBe('[API version] Test error');
   });
 
@@ -134,6 +133,7 @@ describe('Health Check container', () => {
     ]);
 
     const callOutWarning = component.find('EuiCallOut');
+
     expect(callOutWarning.text()).toBe('[API version] Test warning');
   });
 });
