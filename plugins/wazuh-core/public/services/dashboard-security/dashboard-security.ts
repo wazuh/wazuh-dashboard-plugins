@@ -33,9 +33,8 @@ export class DashboardSecurity implements DashboardSecurityService {
         '/elastic/security/current-platform',
       );
 
-      this.logger.debug(`Security platform: ${this.securityPlatform}`);
-
       this.securityPlatform = response.platform;
+      this.logger.debug(`Security platform: ${this.securityPlatform}`);
 
       return this.securityPlatform;
     } catch (error) {
@@ -76,7 +75,6 @@ export class DashboardSecurity implements DashboardSecurityService {
     try {
       this.logger.debug('Getting security platform');
       this.securityPlatform = await this.fetchCurrentPlatform();
-      this.logger.debug(`Security platform: ${this.securityPlatform}`);
     } catch (error) {
       this.logger.error(
         `Error fetching the current platform: ${error.message}`,
