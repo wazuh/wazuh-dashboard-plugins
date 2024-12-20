@@ -8,7 +8,18 @@ The `dashboardSecurity` service is created in the core plugin and manage the sec
   - administrator requirements
 - Expose hooks and HOCs for using with ReactJS
 
+## Account data
+
+```ts
+export interface DashboardSecurityServiceAccount {
+  administrator: boolean; // user is considered as administrator of Wazuh dashboard. This can be used for some Wazuh plugin features with no dependency of Wazuh indexer permissions
+  administrator_requirements: string | null; // display a message about the requirements to be administrator if the user has not an administrator
+}
+```
+
 ## Get account data
+
+See the [account data](#account-data).
 
 ### Using the service
 
@@ -38,6 +49,10 @@ const MyComponent = getWazuhCorePlugin().hocs.withDashboardSecurityAccount(
 ```
 
 ## Get if the user is an administrator
+
+Get if the user is considered as an administrator for Wazuh plugins.
+
+> NOTE: this consideration is not related to Wazuh indexer permissions.
 
 ### Using the service
 
