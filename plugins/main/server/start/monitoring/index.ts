@@ -34,7 +34,7 @@ let MONITORING_ENABLED,
 async function initMonitoringConfiguration(context) {
   try {
     context.wazuh.logger.debug('Reading configuration');
-    const appConfig = await context.wazuh_core.configuration.get();
+    const appConfig = await context.wazuh_core.configuration.getAll();
     MONITORING_ENABLED =
       (appConfig['wazuh.monitoring.enabled'] &&
         appConfig['wazuh.monitoring.enabled'] !== 'worker') ||
@@ -90,6 +90,7 @@ async function initMonitoringConfiguration(context) {
  */
 async function init(context) {
   try {
+    const config = await context.wazuh_core.configuration.getAll();
     if (MONITORING_ENABLED) {
       await checkTemplate(context);
     }
@@ -519,7 +520,7 @@ async function fetchAllAgentsFromApiHost(context, apiHost) {
 export async function jobMonitoringRun(context) {
   context.wazuh.logger.debug('Task:Monitoring initializing');
   // Init the monitoring variables
-  await initMonitoringConfiguration(context);
+  //await initMonitoringConfiguration(context);
   // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
   await checkPluginPlatformStatus(context);
   // // Run the cron job only it it's enabled

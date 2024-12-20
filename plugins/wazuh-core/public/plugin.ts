@@ -1,17 +1,21 @@
-import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
-import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
-import { Configuration } from '../common/services/configuration';
-import {
-  PLUGIN_SETTINGS,
-  PLUGIN_SETTINGS_CATEGORIES,
-} from '../common/constants';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
-import * as utils from './utils';
-import * as uiComponents from './components';
-import { ConfigurationStore } from './utils/configuration-store';
+import { ConfigurationStore } from '../common/services/configuration/configuration-store';
 import { DashboardSecurity } from './utils/dashboard-security';
 import * as hooks from './hooks';
+import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
+import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
+import { EConfigurationProviders } from '../common/constants';
+import {
+  CoreSetup,
+  CoreStart,
+  Plugin,
+  PluginInitializerContext,
+} from 'opensearch-dashboards/public';
+import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
+import { Configuration } from '../common/services/configuration';
+import * as utils from './utils';
+import * as uiComponents from './components';
 import { CoreHTTPClient } from './services/http/http-client';
 
 const noop = () => {};
@@ -23,34 +27,62 @@ export class WazuhCorePlugin
   internal: Record<string, any> = {};
   services: Record<string, any> = {};
 
+  constructor(private initializerContext: PluginInitializerContext) {
+    this.services = {};
+    this.internal = {};
+  }
+
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     // No operation logger
-    const noopLogger = {
+
+    const logger = {
       info: noop,
       error: noop,
       debug: noop,
       warn: noop,
+      trace: noop,
+      fatal: noop,
+      log: noop,
+      get: () => logger,
     };
-    const logger = noopLogger;
+    this.internal.configurationStore = new ConfigurationStore(logger);
 
-    this.internal.configurationStore = new ConfigurationStore(
-      logger,
-      core.http,
+    this.internal.configurationStore.registerProvider(
+      EConfigurationProviders.INITIALIZER_CONTEXT,
+      new InitializerConfigProvider(this.initializerContext),
     );
+
+    // register the uiSettins on the configuration store to avoid the use inside of configuration service
+    this.internal.configurationStore.registerProvider(
+      EConfigurationProviders.PLUGIN_UI_SETTINGS,
+      new UISettingsConfigProvider(core.uiSettings),
+    );
+
+    console.log(
+      'uiSettings',
+      await this.internal.configurationStore.getProviderConfiguration(
+        EConfigurationProviders.INITIALIZER_CONTEXT,
+      ),
+    );
+
+    console.log('uiSettings core', core.uiSettings.getAll());
+
+    console.log(
+      'uiSettings from configuration',
+      await this.internal.configurationStore.getProviderConfiguration(
+        EConfigurationProviders.PLUGIN_UI_SETTINGS,
+      ),
+    );
+
     this.services.configuration = new Configuration(
       logger,
       this.internal.configurationStore,
     );
 
-    // Register the plugin settings
-    for (const [key, value] of Object.entries(PLUGIN_SETTINGS)) {
-      this.services.configuration.register(key, value);
-    }
-
-    // Add categories to the configuration
-    for (const [key, value] of Object.entries(PLUGIN_SETTINGS_CATEGORIES)) {
-      this.services.configuration.registerCategory({ ...value, id: key });
-    }
+    console.log(
+      'all config defined on wazuh core',
+      await this.services.configuration.getAll(),
+    );
 
     // Create dashboardSecurity
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);

@@ -44,7 +44,10 @@ interface IAPIHostRegistry {
 export class ManageHosts {
   public serverAPIClient: ServerAPIClient | null = null;
   private cacheRegistry: Map<string, IAPIHostRegistry> = new Map();
-  constructor(private logger: Logger, private configuration: IConfiguration) {}
+  constructor(
+    private logger: Logger,
+    private configuration: IConfiguration,
+  ) {}
 
   setServerAPIClient(client: ServerAPIClient) {
     this.serverAPIClient = client;
@@ -81,7 +84,7 @@ export class ManageHosts {
       const hosts = await this.configuration.get('hosts');
       this.logger.debug(`API connections: [${JSON.stringify(hosts)}]`);
       if (hostID) {
-        const host = hosts.find(({ id }: { id: string }) => id === hostID);
+        const host = hosts[hostID];
         if (host) {
           this.logger.debug(`API connection with ID [${hostID}] found`);
           return this.filterAPIHostData(
@@ -93,7 +96,8 @@ export class ManageHosts {
         this.logger.debug(APIConnectionNotFound);
         throw new Error(APIConnectionNotFound);
       }
-      return hosts.map(host =>
+
+      return Object.values(hosts).map(host =>
         this.filterAPIHostData(
           host,
           options.excludePassword ? ['password'] : undefined,
@@ -191,7 +195,10 @@ export class ManageHosts {
           { apiHostID },
         );
 
-      if (this.isServerAPIClientResponseOk(responseClusterStatus) && responseClusterStatus.data?.data?.enabled === 'yes') {
+      if (
+        this.isServerAPIClientResponseOk(responseClusterStatus) &&
+        responseClusterStatus.data?.data?.enabled === 'yes'
+      ) {
         status = 'enabled';
 
         const responseClusterLocal =
