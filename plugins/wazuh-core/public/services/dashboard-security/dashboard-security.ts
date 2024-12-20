@@ -12,7 +12,7 @@ import {
 } from './types';
 
 export class DashboardSecurity implements DashboardSecurityService {
-  private securityPlatform = '';
+  private _securityPlatform = '';
   public account$: BehaviorSubject<DashboardSecurityServiceAccount>;
 
   constructor(
@@ -25,6 +25,10 @@ export class DashboardSecurity implements DashboardSecurityService {
     });
   }
 
+  get securityPlatform() {
+    return this._securityPlatform;
+  }
+
   private async fetchCurrentPlatform() {
     try {
       this.logger.debug('Fetching the security platform');
@@ -33,8 +37,8 @@ export class DashboardSecurity implements DashboardSecurityService {
         '/elastic/security/current-platform',
       );
 
-      this.securityPlatform = response.platform;
-      this.logger.debug(`Security platform: ${this.securityPlatform}`);
+      this._securityPlatform = response.platform;
+      this.logger.debug(`Security platform: ${this._securityPlatform}`);
 
       return this.securityPlatform;
     } catch (error) {
@@ -74,7 +78,7 @@ export class DashboardSecurity implements DashboardSecurityService {
 
     try {
       this.logger.debug('Getting security platform');
-      this.securityPlatform = await this.fetchCurrentPlatform();
+      await this.fetchCurrentPlatform();
     } catch (error) {
       this.logger.error(
         `Error fetching the current platform: ${error.message}`,
