@@ -1,5 +1,6 @@
 import React from 'react';
 import { BehaviorSubject } from 'rxjs';
+import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../common/constants';
 
 export interface DashboardSecurityServiceAccount {
   administrator: boolean;
@@ -30,6 +31,9 @@ export interface DashboardSecurityServiceSetupDeps {
 }
 
 export interface DashboardSecurityService {
+  securityPlatform:
+    | typeof WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY
+    | '';
   account: DashboardSecurityServiceAccount;
   account$: BehaviorSubject<DashboardSecurityServiceAccount>;
   setup: (
