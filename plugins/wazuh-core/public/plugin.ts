@@ -25,7 +25,8 @@ export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
   runtime: Record<string, any> = {
-    state: {},
+    setup: {},
+    start: {},
   };
   internal: Record<string, any> = {};
   services: {
@@ -69,7 +70,7 @@ export class WazuhCorePlugin
     // Create state
     this.services.state = new CoreState(logger);
 
-    this.runtime.state.setup = this.services.state.setup();
+    this.runtime.setup.state = this.services.state.setup();
 
     const cookiesStore = new Cookies();
 
@@ -109,7 +110,7 @@ export class WazuhCorePlugin
       API_USER_STATUS_RUN_AS,
       hooks: {
         ...hooks,
-        ...this.runtime.state.setup.hooks,
+        ...this.runtime.setup.state.hooks,
       },
       ui: {
         ...uiComponents,
@@ -135,7 +136,7 @@ export class WazuhCorePlugin
       API_USER_STATUS_RUN_AS,
       hooks: {
         ...hooks,
-        ...this.runtime.state.setup.hooks,
+        ...this.runtime.setup.state.hooks,
       },
       ui: {
         ...uiComponents,

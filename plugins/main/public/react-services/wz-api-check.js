@@ -20,7 +20,7 @@ export class ApiCheck {
     try {
       const wazuhConfig = new WazuhConfig();
       const configuration = wazuhConfig.getConfig();
-      const timeout = configuration ? configuration.timeout : 20_000;
+      const timeout = configuration ? configuration.timeout : 20000;
       const payload = { id: data };
 
       if (idChanged) {
@@ -36,7 +36,7 @@ export class ApiCheck {
         },
         url: url,
         data: payload,
-        timeout: timeout || 20_000,
+        timeout: timeout || 20000,
       };
       const response = await request(options);
 
@@ -84,7 +84,7 @@ export class ApiCheck {
         },
         url: url,
         data: { ...apiEntry, forceRefresh },
-        timeout: timeout || 20_000,
+        timeout: timeout || 20000,
       };
       const response = await request(options);
 
