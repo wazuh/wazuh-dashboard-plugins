@@ -17,8 +17,9 @@ import wazuhPermissions from '../../../common/api-info/security-actions.json';
 const RESOURCE_ANY = '*:*:*';
 const RESOURCE_ANY_SHORT = '*:*';
 const RBAC_MODE_WHITE = 'white';
+const ALLOW = 'allow';
 // Utility functions
-const isAllow = (value: string) => value === 'allow';
+const isAllow = (value: string) => value === ALLOW;
 
 // Check the missing permissions of the required ones that the user does not have
 export const checkMissingUserPermissions = (

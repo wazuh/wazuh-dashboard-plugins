@@ -34,14 +34,14 @@ export interface ServerSecuritySetupReturn {
     withServerUserAuthorizationPrompt: (
       permissions: ServerSecurityCombinedPermissionWithFunction | null,
       otherPermissions: { isAdmininistrator: boolean | null },
-    ) => (WrappedComponent: React.Component) => React.ReactElement;
+    ) => (WrappedComponent: React.ComponentType) => React.ReactElement;
     withServerUserLogged: (
-      WrappedComponent: React.Component,
+      WrappedComponent: React.ComponentType,
     ) => React.ReactElement;
   };
   ui: {
-    ServerButtonPermissions: React.Component;
-    ServerElementPermissions: React.Component;
+    ServerButtonPermissions: React.ComponentType;
+    ServerElementPermissions: React.ComponentType;
   };
 }
 

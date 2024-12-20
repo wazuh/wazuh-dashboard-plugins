@@ -28,7 +28,7 @@ enum SERVER_BUTTON_PERMISSIONS_TYPES {
   EMPTY = 'empty',
   ICON = 'icon',
   LINK = 'link',
-  SWTICH = 'switch',
+  SWITCH = 'switch',
 }
 
 interface IServerButtonPermissionsProps
@@ -45,7 +45,7 @@ const ButtonsMap = {
   [SERVER_BUTTON_PERMISSIONS_TYPES.EMPTY]: EuiButtonEmpty,
   [SERVER_BUTTON_PERMISSIONS_TYPES.ICON]: EuiButtonIcon,
   [SERVER_BUTTON_PERMISSIONS_TYPES.LINK]: EuiLink,
-  [SERVER_BUTTON_PERMISSIONS_TYPES.SWTICH]: EuiSwitch,
+  [SERVER_BUTTON_PERMISSIONS_TYPES.SWITCH]: EuiSwitch,
 };
 
 export const ServerButtonPermissions = ({
@@ -66,7 +66,7 @@ export const ServerButtonPermissions = ({
         const additionalProps = {
           ...([
             SERVER_BUTTON_PERMISSIONS_TYPES.LINK,
-            SERVER_BUTTON_PERMISSIONS_TYPES.SWTICH,
+            SERVER_BUTTON_PERMISSIONS_TYPES.SWITCH,
           ].includes(buttonType)
             ? { disabled }
             : { isDisabled: disabled }),
@@ -74,12 +74,12 @@ export const ServerButtonPermissions = ({
           onChange:
             !disabled ||
             rest.onChange ||
-            buttonType === SERVER_BUTTON_PERMISSIONS_TYPES.SWTICH
+            buttonType === SERVER_BUTTON_PERMISSIONS_TYPES.SWITCH
               ? rest.onChange
               : undefined,
         };
 
-        if (buttonType === SERVER_BUTTON_PERMISSIONS_TYPES.SWTICH) {
+        if (buttonType === SERVER_BUTTON_PERMISSIONS_TYPES.SWITCH) {
           delete additionalProps.onClick;
         }
 
