@@ -44,7 +44,10 @@ interface IAPIHostRegistry {
 export class ManageHosts {
   public serverAPIClient: ServerAPIClient | null = null;
   private cacheRegistry: Map<string, IAPIHostRegistry> = new Map();
-  constructor(private logger: Logger, private configuration: IConfiguration) {}
+  constructor(
+    private logger: Logger,
+    private configuration: IConfiguration,
+  ) {}
 
   setServerAPIClient(client: ServerAPIClient) {
     this.serverAPIClient = client;
@@ -93,7 +96,7 @@ export class ManageHosts {
         this.logger.debug(APIConnectionNotFound);
         throw new Error(APIConnectionNotFound);
       }
-      
+
       return Object.values(hosts).map(host =>
         this.filterAPIHostData(
           host,
@@ -192,7 +195,10 @@ export class ManageHosts {
           { apiHostID },
         );
 
-      if (this.isServerAPIClientResponseOk(responseClusterStatus) && responseClusterStatus.data?.data?.enabled === 'yes') {
+      if (
+        this.isServerAPIClientResponseOk(responseClusterStatus) &&
+        responseClusterStatus.data?.data?.enabled === 'yes'
+      ) {
         status = 'enabled';
 
         const responseClusterLocal =

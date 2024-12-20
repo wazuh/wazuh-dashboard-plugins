@@ -1,19 +1,22 @@
-import { PluginInitializerContext } from "opensearch-dashboards/server";
-import { CorePluginConfigType } from "../../index";
-import { IConfigurationProvider } from "../../../common/services/configuration/configuration-provider";
+import { PluginInitializerContext } from 'opensearch-dashboards/server';
+import { CorePluginConfigType } from '../../index';
+import { IConfigurationProvider } from '../../../common/services/configuration/configuration-provider';
 import { first } from 'rxjs/operators';
-import { EConfigurationProviders } from "../../../common/constants";
+import { EConfigurationProviders } from '../../../common/constants';
 
 export class InitializerConfigProvider implements IConfigurationProvider {
   private config: CorePluginConfigType = {} as CorePluginConfigType;
   private name: string = EConfigurationProviders.INITIALIZER_CONTEXT;
 
-  constructor(private initializerContext: PluginInitializerContext<CorePluginConfigType>) {
+  constructor(
+    private initializerContext: PluginInitializerContext<CorePluginConfigType>,
+  ) {
     this.initializeConfig();
   }
 
   private async initializeConfig(): Promise<void> {
-    const config$ = this.initializerContext.config.create<CorePluginConfigType>();
+    const config$ =
+      this.initializerContext.config.create<CorePluginConfigType>();
     this.config = await config$.pipe(first()).toPromise();
   }
 
@@ -25,8 +28,10 @@ export class InitializerConfigProvider implements IConfigurationProvider {
     return this.name;
   }
 
-  async get(key: keyof CorePluginConfigType): Promise<CorePluginConfigType[keyof CorePluginConfigType]> {
-    if (!this.config){
+  async get(
+    key: keyof CorePluginConfigType,
+  ): Promise<CorePluginConfigType[keyof CorePluginConfigType]> {
+    if (!this.config) {
       await this.initializeConfig();
     }
     if (!this.config[key]) {
@@ -36,7 +41,7 @@ export class InitializerConfigProvider implements IConfigurationProvider {
   }
 
   async getAll(): Promise<CorePluginConfigType> {
-    if (!this.config){
+    if (!this.config) {
       await this.initializeConfig();
     }
     return this.config;

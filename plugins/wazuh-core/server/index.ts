@@ -1,4 +1,7 @@
-import { PluginConfigDescriptor, PluginInitializerContext } from '../../../src/core/server';
+import {
+  PluginConfigDescriptor,
+  PluginInitializerContext,
+} from '../../../src/core/server';
 import { PLUGIN_SETTINGS } from '../common/constants';
 import { getConfigSettingsDefinitions } from '../common/settings-adapter';
 import { WazuhCorePlugin } from './plugin';
@@ -16,7 +19,7 @@ const hostSchema = schema.object({
   port: schema.number(),
   username: schema.string(),
   password: schema.string(),
-  run_as: schema.boolean()
+  run_as: schema.boolean(),
 });
 
 const initiliazerConfig = getConfigSettingsDefinitions(PLUGIN_SETTINGS);
@@ -28,8 +31,7 @@ export const config: PluginConfigDescriptor<CorePluginConfigType> = {
     hosts: true,
   },
   schema: configSchema,
-}
-
+};
 
 export type { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 export * from './types';

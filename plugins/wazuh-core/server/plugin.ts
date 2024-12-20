@@ -30,7 +30,10 @@ import {
   InitializationService,
 } from './services';
 // configuration common
-import { Configuration, ConfigurationStore } from '../common/services/configuration';
+import {
+  Configuration,
+  ConfigurationStore,
+} from '../common/services/configuration';
 // configuration server
 import { InitializerConfigProvider } from './services/configuration';
 import { EConfigurationProviders, PLUGIN_SETTINGS } from '../common/constants';
@@ -65,20 +68,20 @@ export class WazuhCorePlugin
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
     // register the uiSetting to use in the public context (advanced settings)
-    const uiSettingsDefs = getUiSettingsDefinitions(PLUGIN_SETTINGS)
+    const uiSettingsDefs = getUiSettingsDefinitions(PLUGIN_SETTINGS);
     core.uiSettings.register(uiSettingsDefs);
-   
+
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
     this.internal.configurationStore = new ConfigurationStore(
-      this.logger.get('configuration-store')
+      this.logger.get('configuration-store'),
     );
 
     // add the initializer context config to the configuration store
     this.internal.configurationStore.registerProvider(
       EConfigurationProviders.PLUGIN_UI_SETTINGS,
-      new InitializerConfigProvider(this.initializerContext)
-    )
-  
+      new InitializerConfigProvider(this.initializerContext),
+    );
+
     // create the configuration service to use like a facede pattern
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
@@ -240,7 +243,7 @@ export class WazuhCorePlugin
         },
       };
     });
- 
+
     return {
       ...this.services,
       api: {

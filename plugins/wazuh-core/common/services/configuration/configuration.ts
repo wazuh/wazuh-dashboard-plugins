@@ -1,4 +1,4 @@
-import { IConfigurationProvider } from "./configuration-provider";
+import { IConfigurationProvider } from './configuration-provider';
 
 export interface ILogger {
   debug(message: string): void;
@@ -149,7 +149,7 @@ export interface IConfigurationStore {
   start: () => Promise<any>;
   stop: () => Promise<any>;
   get: (...settings: string[]) => Promise<TConfigurationSettings>;
-  getAll(): Promise<{[key: string]: any}>;
+  getAll(): Promise<{ [key: string]: any }>;
   set: (settings: TConfigurationSettings) => Promise<any>;
   getProviderConfiguration: (key: string) => Promise<Record<string, any>>;
   registerProvider: (name: string, provider: IConfigurationProvider) => void;
@@ -162,12 +162,15 @@ export interface IConfiguration {
   start(): Promise<any>;
   stop(): Promise<any>;
   get(settingsKey: string): Promise<any>;
-  getAll(): Promise<{[key: string]: any}>;
+  getAll(): Promise<{ [key: string]: any }>;
 }
 
 export class Configuration implements IConfiguration {
   store: IConfigurationStore | null = null;
-  constructor(private logger: ILogger, store: IConfigurationStore) {
+  constructor(
+    private logger: ILogger,
+    store: IConfigurationStore,
+  ) {
     this.setStore(store);
   }
   setStore(store: IConfigurationStore) {
@@ -192,6 +195,6 @@ export class Configuration implements IConfiguration {
   }
 
   async getAll() {
-    return await this.store?.getAll() || {};
+    return (await this.store?.getAll()) || {};
   }
 }

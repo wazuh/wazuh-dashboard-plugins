@@ -1,9 +1,6 @@
 import { Logger } from 'opensearch-dashboards/server';
-import {
-  IConfigurationStore,
-} from './configuration';
+import { IConfigurationStore } from './configuration';
 import { IConfigurationProvider } from './configuration-provider';
-
 
 export class ConfigurationStore implements IConfigurationStore {
   private providers: Map<string, IConfigurationProvider>;
@@ -12,10 +9,10 @@ export class ConfigurationStore implements IConfigurationStore {
   }
 
   registerProvider(name: string, provider: IConfigurationProvider) {
-    if(!provider){
+    if (!provider) {
       throw new Error('Provider is required');
     }
-    
+
     provider.setName(name);
     this.providers.set(name, provider);
   }
@@ -61,7 +58,7 @@ export class ConfigurationStore implements IConfigurationStore {
     this.logger.debug('Stop');
   }
   async get(configName: string): Promise<any | { [key: string]: any }> {
-     // get all the providers and check if the setting is in any of them
+    // get all the providers and check if the setting is in any of them
     const configuration = await this.getAll();
     // check if the configName exist in the object
     if (Object.keys(configuration).includes(configName)) {
@@ -70,7 +67,7 @@ export class ConfigurationStore implements IConfigurationStore {
     throw new Error(`Configuration ${configName} not found`);
   }
 
-  async getAll(): Promise<{[key: string]: any}> {
+  async getAll(): Promise<{ [key: string]: any }> {
     const providers = Array.from(this.providers.values());
     let configuration = {};
     for (const provider of providers) {
@@ -79,7 +76,7 @@ export class ConfigurationStore implements IConfigurationStore {
         configuration = {
           ...configuration,
           ...settings,
-        }
+        };
       } catch (error) {
         let err = error as Error;
         this.logger.error(
@@ -98,5 +95,4 @@ export class ConfigurationStore implements IConfigurationStore {
   async clear(...settings: string[]): Promise<any> {
     throw new Error('Method not implemented yet.');
   }
-
 }

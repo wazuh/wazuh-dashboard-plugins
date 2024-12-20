@@ -146,7 +146,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       server: contextServer,
     });
     */
-   
+
     // Migration tasks
     jobMigrationTasksRun({
       core,
