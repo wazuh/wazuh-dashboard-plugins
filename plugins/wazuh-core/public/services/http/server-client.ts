@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import jwtDecode from 'jwt-decode';
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { Logger } from '../../../common/services/configuration';
 import {
   HTTPClientServer,
@@ -40,20 +39,13 @@ export class WzRequest implements HTTPClientServer {
       overwriteHeaders?: any;
     },
   ) => Promise<void>;
-  private userData: HTTPClientServerUserData;
-  userData$: BehaviorSubject<HTTPClientServerUserData>;
+  auth$: Subject<HTTPClientServerUserData>;
 
   constructor(
     private readonly logger: Logger,
     private readonly services: WzRequestServices,
   ) {
-    this.userData = {
-      logged: false,
-      token: null,
-      account: null,
-      policies: null,
-    };
-    this.userData$ = new BehaviorSubject(this.userData);
+    this.auth$ = new Subject();
   }
 
   /**
@@ -66,7 +58,7 @@ export class WzRequest implements HTTPClientServer {
     method: HTTPVerb,
     path: string,
     payload: any = null,
-    options: RequestInternalOptions,
+    options?: RequestInternalOptions,
   ): Promise<any> {
     const { shouldRetry, checkCurrentApiIsUp, overwriteHeaders } = {
       shouldRetry: true,
@@ -166,7 +158,7 @@ export class WzRequest implements HTTPClientServer {
     method: HTTPVerb,
     path: string,
     body: any,
-    options: RequestOptions,
+    options?: RequestOptions,
   ): Promise<ServerAPIResponseItemsDataHTTPClient<any>> {
     const {
       checkCurrentApiIsUp,
@@ -312,28 +304,15 @@ export class WzRequest implements HTTPClientServer {
 
       // Decode token and get expiration time
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const jwtPayload = jwtDecode(token);
       // Get user Policies
       const userPolicies = await this.getUserPolicies();
-      // Dispatch actions to set permissions and administrator consideration
-      // TODO: implement
-      // store.dispatch(updateUserPermissions(userPolicies));
-      // store.dispatch(
-      //   updateUserAccount(
-      //     getWazuhCorePlugin().dashboardSecurity.getAccountFromJWTAPIDecodedToken(
-      //       jwtPayload,
-      //     ),
-      //   ),
-      // );
-      // store.dispatch(updateWithUserLogged(true));
       const data = {
         token,
         policies: userPolicies,
-        account: null, // TODO: implement
         logged: true,
       };
 
-      this.updateUserData(data);
+      this.auth$.next(data);
 
       return data;
     } catch (error) {
@@ -349,19 +328,11 @@ export class WzRequest implements HTTPClientServer {
       //   },
       // };
       // getErrorOrchestrator().handleError(options);
-      // store.dispatch(
-      //   updateUserAccount(
-      //     getWazuhCorePlugin().dashboardSecurity.getAccountFromJWTAPIDecodedToken(
-      //       {}, // This value should cause the user is not considered as an administrator
-      //     ),
-      //   ),
-      // );
-      // store.dispatch(updateWithUserLogged(true));
-      this.updateUserData({
+      this.auth$.next({
         token: null,
         policies: null,
-        account: null, // TODO: implement
         logged: true,
+        error,
       });
       throw error;
     }
@@ -417,15 +388,6 @@ export class WzRequest implements HTTPClientServer {
       this.logger.error(`Error in the unauthentication: ${error.message}`);
       throw error;
     }
-  }
-
-  /**
-   * Update the internal user data and emit the value to the subscribers of userData$
-   * @param data
-   */
-  private updateUserData(data: HTTPClientServerUserData) {
-    this.userData = data;
-    this.userData$.next(this.getUserData());
   }
 
   async checkAPIById(serverHostId: string, idChanged = false) {

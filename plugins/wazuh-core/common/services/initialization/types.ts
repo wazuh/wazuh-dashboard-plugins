@@ -1,13 +1,13 @@
-import { initializationTask } from './constants';
+import { INITIALIZATION_TASK } from './constants';
 
-type RunStatusEnum = (typeof initializationTask)['RUN_STATUS'];
+type RunStatusEnum = (typeof INITIALIZATION_TASK)['RUN_STATUS'];
 
 export type InitializationTaskRunStatus = RunStatusEnum[keyof RunStatusEnum];
 
-type RunResultEnum = (typeof initializationTask)['RUN_RESULT'];
+type RunResultEnum = (typeof INITIALIZATION_TASK)['RUN_RESULT'];
 
 export type InitializationTaskRunResult = RunResultEnum[keyof RunResultEnum];
 
-type ContextEnum = (typeof initializationTask)['CONTEXT'];
+type ContextEnum = (typeof INITIALIZATION_TASK)['CONTEXT'];
 
 export type InitializationTaskContext = ContextEnum[keyof ContextEnum];
