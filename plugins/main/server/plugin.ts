@@ -25,18 +25,10 @@ import {
   PluginInitializerContext,
   SharedGlobalConfig,
 } from 'opensearch_dashboards/server';
-
+import { first } from 'rxjs/operators';
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
-import {
-  jobInitializeRun,
-  jobMonitoringRun,
-  jobSchedulerRun,
-  jobQueueRun,
-  jobMigrationTasksRun,
-  jobSanitizeUploadedFilesTasksRun,
-} from './start';
-import { first } from 'rxjs/operators';
+import { jobInitializeRun, jobQueueRun, jobMigrationTasksRun } from './start';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -82,31 +74,31 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     const serverInfo = core.http.getServerInfo();
 
-    core.http.registerRouteHandlerContext('wazuh', (context, request) => {
-      return {
-        // Create a custom logger with a tag composed of HTTP method and path endpoint
-        logger: this.logger.get(
-          `${request.route.method.toUpperCase()} ${request.route.path}`,
-        ),
-        server: {
-          info: serverInfo,
-        },
-        plugins,
-        security: plugins.wazuhCore.dashboardSecurity,
-        api: context.wazuh_core.api,
-      };
-    });
+    core.http.registerRouteHandlerContext('wazuh', (context, request) => ({
+      // Create a custom logger with a tag composed of HTTP method and path endpoint
+      logger: this.logger.get(
+        `${request.route.method.toUpperCase()} ${request.route.path}`,
+      ),
+      server: {
+        info: serverInfo,
+      },
+      plugins,
+      security: plugins.wazuhCore.dashboardSecurity,
+      api: context.wazuh_core.api,
+    }));
 
     // Add custom headers to the responses
     core.http.registerOnPreResponse((request, response, toolkit) => {
       const additionalHeaders = {
         'x-frame-options': 'sameorigin',
       };
+
       return toolkit.next({ headers: additionalHeaders });
     });
 
     // Routes
     const router = core.http.createRouter();
+
     setupRoutes(router, plugins.wazuhCore);
 
     return {};
@@ -117,7 +109,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       await this.initializerContext.config.legacy.globalConfig$
         .pipe(first())
         .toPromise();
-
     const contextServer = {
       config: globalConfiguration,
     };
@@ -192,6 +183,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       wazuh_core: plugins.wazuhCore,
       server: contextServer,
     });
+
     return {};
   }
 

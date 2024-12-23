@@ -1,9 +1,9 @@
 import { IConfigurationProvider } from './configuration-provider';
 import { ConfigurationStore } from './configuration-store';
 
-function createMockLogger() {
-  const noop = () => {};
+const noop = () => {};
 
+function createMockLogger() {
   const logger = {
     info: noop,
     error: noop,
@@ -14,6 +14,7 @@ function createMockLogger() {
     log: noop,
     get: () => logger,
   };
+
   return logger;
 }
 
@@ -38,12 +39,14 @@ describe(`[service] ConfigurationStore`, () => {
   it('should create an instance of ConfigurationStore', () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     expect(configurationStore).toBeInstanceOf(ConfigurationStore);
   });
 
   it('should register a provider', () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     configurationStore.registerProvider('test', mockedProvider);
     expect(mockedProvider.setName).toBeCalledWith('test');
   });
@@ -51,7 +54,8 @@ describe(`[service] ConfigurationStore`, () => {
   it('should return error if provider is not defined when registering', () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
-    // @ts-ignore
+
+    // @ts-expect-error Testing error case
     expect(() =>
       configurationStore.registerProvider('test', null),
     ).toThrowError('Provider is required');
@@ -60,6 +64,7 @@ describe(`[service] ConfigurationStore`, () => {
   it('should return a configuration from a provider', () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     configurationStore.registerProvider('test', mockedProvider);
     (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
     expect(
@@ -70,6 +75,7 @@ describe(`[service] ConfigurationStore`, () => {
   it('should return error if provider is not defined when getting configuration', () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     expect(
       configurationStore.getProviderConfiguration('test'),
     ).rejects.toThrowError('Provider test not found');
@@ -78,6 +84,7 @@ describe(`[service] ConfigurationStore`, () => {
   it('should return the provider', () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     configurationStore.registerProvider('test', mockedProvider);
     expect(configurationStore.getProvider('test')).toBe(mockedProvider);
   });
@@ -85,6 +92,7 @@ describe(`[service] ConfigurationStore`, () => {
   it('should return error if provider is not defined when getting provider', () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     expect(() => configurationStore.getProvider('test')).toThrowError(
       'Provider test not found',
     );
@@ -93,6 +101,7 @@ describe(`[service] ConfigurationStore`, () => {
   it('should return a configuration value by key', async () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
     (mockedProvider.get as jest.Mock).mockResolvedValue('test');
     configurationStore.registerProvider('test', mockedProvider);
@@ -102,11 +111,13 @@ describe(`[service] ConfigurationStore`, () => {
   it('should return error if the configuration key is not found', async () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
     configurationStore.registerProvider('test', mockedProvider);
     (mockedProvider.get as jest.Mock).mockRejectedValue(
       new Error('test error'),
     );
+
     try {
       await configurationStore.get('test');
     } catch (error) {
@@ -117,6 +128,7 @@ describe(`[service] ConfigurationStore`, () => {
   it('should return all the configuration from the registered providers', () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
+
     configurationStore.registerProvider('test', mockedProvider);
     (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
     expect(configurationStore.getAll()).resolves.toEqual({ test: 'test' });

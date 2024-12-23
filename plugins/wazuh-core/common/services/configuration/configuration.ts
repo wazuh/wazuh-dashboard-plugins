@@ -1,35 +1,35 @@
 import { IConfigurationProvider } from './configuration-provider';
 
 export interface ILogger {
-  debug(message: string): void;
-  info(message: string): void;
-  warn(message: string): void;
-  error(message: string): void;
+  debug: (message: string) => void;
+  info: (message: string) => void;
+  warn: (message: string) => void;
+  error: (message: string) => void;
 }
 
-type TConfigurationSettingOptionsPassword = {
+interface TConfigurationSettingOptionsPassword {
   password: {
     dual?: 'text' | 'password' | 'dual';
   };
-};
+}
 
-type TConfigurationSettingOptionsTextArea = {
+interface TConfigurationSettingOptionsTextArea {
   maxRows?: number;
   minRows?: number;
   maxLength?: number;
-};
+}
 
-type TConfigurationSettingOptionsSelect = {
+interface TConfigurationSettingOptionsSelect {
   select: { text: string; value: any }[];
-};
+}
 
-type TConfigurationSettingOptionsEditor = {
+interface TConfigurationSettingOptionsEditor {
   editor: {
     language: string;
   };
-};
+}
 
-type TConfigurationSettingOptionsFile = {
+interface TConfigurationSettingOptionsFile {
   file: {
     type: 'image';
     extensions?: string[];
@@ -50,37 +50,37 @@ type TConfigurationSettingOptionsFile = {
       resolveStaticURL: (filename: string) => string;
     };
   };
-};
+}
 
-type TConfigurationSettingOptionsNumber = {
+interface TConfigurationSettingOptionsNumber {
   number: {
     min?: number;
     max?: number;
     integer?: boolean;
   };
-};
+}
 
-type TConfigurationSettingOptionsSwitch = {
+interface TConfigurationSettingOptionsSwitch {
   switch: {
     values: {
       disabled: { label?: string; value: any };
       enabled: { label?: string; value: any };
     };
   };
-};
-
-export enum EpluginSettingType {
-  text = 'text',
-  password = 'password',
-  textarea = 'textarea',
-  switch = 'switch',
-  number = 'number',
-  editor = 'editor',
-  select = 'select',
-  filepicker = 'filepicker',
 }
 
-export type TConfigurationSetting = {
+export enum E_PLUGIN_SETTING_TYPE {
+  TEXT = 'text',
+  PASSWORD = 'password',
+  TEXTAREA = 'textarea',
+  SWITCH = 'switch',
+  NUMBER = 'number',
+  EDITOR = 'editor',
+  SELECT = 'select',
+  FILEPICKER = 'filepicker',
+}
+
+export interface TConfigurationSetting {
   // Define the text displayed in the UI.
   title: string;
   // Description.
@@ -131,25 +131,25 @@ export type TConfigurationSetting = {
   validateUIForm?: (value: any) => string | undefined;
   // Validate function creator to validate the setting in the backend.
   validate?: (schema: any) => (value: unknown) => string | undefined;
-};
+}
 
 export type TConfigurationSettingWithKey = TConfigurationSetting & {
   key: string;
 };
-export type TConfigurationSettingCategory = {
+export interface TConfigurationSettingCategory {
   title: string;
   description?: string;
   documentationLink?: string;
   renderOrder?: number;
-};
+}
 
-type TConfigurationSettings = { [key: string]: any };
+type TConfigurationSettings = Record<string, any>;
 export interface IConfigurationStore {
   setup: () => Promise<any>;
   start: () => Promise<any>;
   stop: () => Promise<any>;
   get: (...settings: string[]) => Promise<TConfigurationSettings>;
-  getAll(): Promise<{ [key: string]: any }>;
+  getAll: () => Promise<Record<string, any>>;
   set: (settings: TConfigurationSettings) => Promise<any>;
   getProviderConfiguration: (key: string) => Promise<Record<string, any>>;
   registerProvider: (name: string, provider: IConfigurationProvider) => void;
@@ -157,36 +157,44 @@ export interface IConfigurationStore {
 }
 
 export interface IConfiguration {
-  setStore(store: IConfigurationStore): void;
-  setup(): Promise<any>;
-  start(): Promise<any>;
-  stop(): Promise<any>;
-  get(settingsKey: string): Promise<any>;
-  getAll(): Promise<{ [key: string]: any }>;
+  setStore: (store: IConfigurationStore) => void;
+  setup: () => Promise<any>;
+  start: () => Promise<any>;
+  stop: () => Promise<any>;
+  get: (settingsKey: string) => Promise<any>;
+  getAll: () => Promise<Record<string, any>>;
 }
 
 export class Configuration implements IConfiguration {
   store: IConfigurationStore | null = null;
+
   constructor(
-    private logger: ILogger,
+    private readonly logger: ILogger,
     store: IConfigurationStore,
   ) {
     this.setStore(store);
   }
+
   setStore(store: IConfigurationStore) {
     this.logger.debug('Setting store');
     this.store = store;
   }
-  async setup(dependencies: any = {}) {
+
+  async setup(_dependencies: any = {}) {
     this.logger.debug('Setup configuration service');
+
     return this.store?.setup();
   }
-  async start(dependencies: any = {}) {
+
+  async start(_dependencies: any = {}) {
     this.logger.debug('Start configuration service');
+
     return this.store?.start();
   }
-  async stop(dependencies: any = {}) {
+
+  async stop(_dependencies: any = {}) {
     this.logger.debug('Stop configuration service');
+
     return this.store?.stop();
   }
 

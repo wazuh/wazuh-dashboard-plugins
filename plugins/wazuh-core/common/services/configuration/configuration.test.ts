@@ -2,8 +2,6 @@ import { Configuration, IConfigurationStore } from './configuration';
 import { ConfigurationStore } from './configuration-store';
 
 function createMockLogger() {
-  const noop = () => {};
-
   const logger = {
     info: noop,
     error: noop,
@@ -14,6 +12,7 @@ function createMockLogger() {
     log: noop,
     get: () => logger,
   };
+
   return logger;
 }
 
@@ -37,20 +36,23 @@ describe('Configuration service', () => {
   it('should create an instance of Configuration', () => {
     const logger = createMockLogger();
     const configuration = new Configuration(logger, mockConfigurationStore);
+
     expect(configuration).toBeInstanceOf(Configuration);
   });
 
   it('should set store', () => {
     const logger = createMockLogger();
     const configuration = new Configuration(logger, mockConfigurationStore);
+
     configuration.setStore(mockConfigurationStore);
     expect(configuration.store).toBe(mockConfigurationStore);
   });
 
   it('should return error if store is not provided', () => {
     const logger = createMockLogger();
+
     try {
-      // @ts-ignore
+      // @ts-expect-error Testing error case
       new Configuration(logger, null);
     } catch (error) {
       expect(error).toEqual(new Error('Configuration store is required'));
@@ -60,6 +62,7 @@ describe('Configuration service', () => {
   it('should return a configuration setting value', () => {
     const logger = createMockLogger();
     const configuration = new Configuration(logger, mockConfigurationStore);
+
     configuration.get('key');
     expect(mockConfigurationStore.get).toBeCalledWith('key');
     expect(mockConfigurationStore.get).toBeCalledTimes(1);
@@ -68,9 +71,11 @@ describe('Configuration service', () => {
   it('should return error if the configuration setting key not exists', async () => {
     const logger = createMockLogger();
     const configuration = new Configuration(logger, mockConfigurationStore);
+
     (mockConfigurationStore.get as jest.Mock).mockRejectedValue(
       new Error('Configuration setting not found'),
     );
+
     try {
       await configuration.get('key');
     } catch (error) {
@@ -82,6 +87,7 @@ describe('Configuration service', () => {
   it('should return all configuration settings', () => {
     const logger = createMockLogger();
     const configuration = new Configuration(logger, mockConfigurationStore);
+
     configuration.getAll();
     expect(mockConfigurationStore.getAll).toBeCalledTimes(1);
   });
@@ -89,9 +95,11 @@ describe('Configuration service', () => {
   it('should return error if the configuration settings not exists', async () => {
     const logger = createMockLogger();
     const configuration = new Configuration(logger, mockConfigurationStore);
+
     (mockConfigurationStore.getAll as jest.Mock).mockRejectedValue(
       new Error('Configuration settings not found'),
     );
+
     try {
       await configuration.getAll();
     } catch (error) {
