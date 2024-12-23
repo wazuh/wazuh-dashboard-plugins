@@ -29,17 +29,19 @@ export class ServerHostStateContainer implements StateContainer {
 
       this.logger.debug(`Decoded data: ${decodedData}`);
 
-      return decodedData;
+      return decodedData ? JSON.parse(decodedData) : {};
     }
 
     return false;
   }
 
-  set(data: any) {
+  set(data: object) {
     try {
-      this.logger.debug(`Setting data: ${data}`);
+      const stringifyData = JSON.stringify(data);
 
-      const encodedData = encodeURI(data);
+      this.logger.debug(`Setting data: ${stringifyData}`);
+
+      const encodedData = encodeURI(stringifyData);
 
       this.logger.debug(`Setting encoded data: ${encodedData}`);
 
@@ -51,23 +53,13 @@ export class ServerHostStateContainer implements StateContainer {
         this.store.set(this.STORE_KEY, encodedData, {
           expires: exp,
         });
-        this.updater$.next(encodedData);
+        this.updater$.next(data);
         this.logger.debug(`Encoded data was set: ${encodedData}`);
       }
     } catch (error) {
       this.logger.error(`Error setting data: ${(error as Error).message}`);
-      // TODO: implement
-      // const options = {
-      //   context: `${AppState.name}.setCurrentAPI`,
-      //   level: UI_LOGGER_LEVELS.ERROR,
-      //   severity: UI_ERROR_SEVERITIES.UI,
-      //   error: {
-      //     error: error,
-      //     message: error.message || error,
-      //     title: `${error.name}: Error set current API`,
-      //   },
-      // };
-      // getErrorOrchestrator().handleError(options);
+      // Emit the error
+      this.updater$.next({ error, method: 'set' });
       throw error;
     }
   }

@@ -39,27 +39,19 @@ export class ServerHostClusterInfoStateContainer implements StateContainer {
       return result;
     } catch (error) {
       this.logger.error(`Error getting data: ${(error as Error).message}`);
-      // TODO: implement
-      // const options = {
-      //   context: `${AppState.name}.getClusterInfo`,
-      //   level: UI_LOGGER_LEVELS.ERROR,
-      //   severity: UI_ERROR_SEVERITIES.UI,
-      //   error: {
-      //     error: error,
-      //     message: error.message || error,
-      //     title: `${error.name}: Error get cluster info`,
-      //   },
-      // };
-      // getErrorOrchestrator().handleError(options);
+      // Emit the error
+      this.updater$.next({ error, method: 'get' });
       throw error;
     }
   }
 
-  set(data: any) {
+  set(data: object) {
     try {
-      this.logger.debug(`Setting data: ${data}`);
+      const stringifyData = JSON.stringify(data);
 
-      const encodedData = encodeURI(JSON.stringify(data));
+      this.logger.debug(`Setting data: ${stringifyData}`);
+
+      const encodedData = encodeURI(stringifyData);
 
       this.logger.debug(`Setting encoded data: ${encodedData}`);
 
@@ -71,23 +63,13 @@ export class ServerHostClusterInfoStateContainer implements StateContainer {
         this.store.set(this.STORE_KEY, encodedData, {
           expires: exp,
         });
-        this.updater$.next(encodedData);
+        this.updater$.next(data);
         this.logger.debug(`Encoded data was set: ${encodedData}`);
       }
     } catch (error) {
       this.logger.error(`Error setting data: ${(error as Error).message}`);
-      // TODO: implement
-      // const options = {
-      //   context: `${AppState.name}.setClusterInfo`,
-      //   level: UI_LOGGER_LEVELS.ERROR,
-      //   severity: UI_ERROR_SEVERITIES.UI,
-      //   error: {
-      //     error: error,
-      //     message: error.message || error,
-      //     title: `${error.name}: Error set cluster info`,
-      //   },
-      // };
-      // getErrorOrchestrator().handleError(options);
+      // Emit the error
+      this.updater$.next({ error, method: 'set' });
       throw error;
     }
   }

@@ -54,6 +54,8 @@ export class DataSourceAlertsStateContainer implements StateContainer {
       return result;
     } catch (error) {
       this.logger.error(`Error getting data: ${(error as Error).message}`);
+      // Emit the error
+      this.updater$.next({ error, method: 'get' });
       throw error;
     }
   }
@@ -79,18 +81,8 @@ export class DataSourceAlertsStateContainer implements StateContainer {
       }
     } catch (error) {
       this.logger.error(`Error setting data: ${(error as Error).message}`);
-      // TODO: implement
-      // const options = {
-      //   context: `${AppState.name}.setClusterInfo`,
-      //   level: UI_LOGGER_LEVELS.ERROR,
-      //   severity: UI_ERROR_SEVERITIES.UI,
-      //   error: {
-      //     error: error,
-      //     message: error.message || error,
-      //     title: `${error.name}: Error set cluster info`,
-      //   },
-      // };
-      // getErrorOrchestrator().handleError(options);
+      // Emit the error
+      this.updater$.next({ error, method: 'set' });
       throw error;
     }
   }
@@ -107,6 +99,7 @@ export class DataSourceAlertsStateContainer implements StateContainer {
       return result;
     } catch (error) {
       this.logger.error((error as Error).message);
+      this.updater$.next({ error, method: 'remove' });
       throw error;
     }
   }
