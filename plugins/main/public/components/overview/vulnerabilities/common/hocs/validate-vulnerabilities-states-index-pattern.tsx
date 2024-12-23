@@ -154,12 +154,10 @@ export const PromptCheckIndex = (props: {
   );
 };
 
-const mapStateToProps = state => {
-  return {
-    vulnerabilitiesStatesindexPatternID:
-      state.appConfig.data['vulnerabilities.pattern'],
-  };
-};
+const mapStateToProps = state => ({
+  vulnerabilitiesStatesindexPatternID:
+    state.appConfig.data['vulnerabilities.pattern'],
+});
 
 export const withVulnerabilitiesStateDataSource = compose(
   connect(mapStateToProps),

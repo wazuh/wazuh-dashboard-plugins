@@ -3,15 +3,15 @@ import {
   InitializationTaskRunData,
   IInitializationTask,
 } from '../types';
-import { initializationTask } from '../../../../common/services/initialization/constants';
+import { INITIALIZATION_TASK } from '../../../../common/services/initialization/constants';
 
 export class InitializationTask implements IInitializationTask {
   public name: string;
   private readonly runInternal: any;
   public status: InitializationTaskRunData['status'] =
-    initializationTask.RUN_STATUS.NOT_STARTED;
+    INITIALIZATION_TASK.RUN_STATUS.NOT_STARTED;
   public result: InitializationTaskRunData['result'] =
-    initializationTask.RUN_RESULT.NULL;
+    INITIALIZATION_TASK.RUN_RESULT.NULL;
   public data: any = null;
   public createdAt: InitializationTaskRunData['createdAt'] =
     new Date().toISOString();
@@ -26,7 +26,7 @@ export class InitializationTask implements IInitializationTask {
   }
 
   private init() {
-    this.status = initializationTask.RUN_STATUS.RUNNING;
+    this.status = INITIALIZATION_TASK.RUN_STATUS.RUNNING;
     this.result = null;
     this.data = null;
     this.startedAt = new Date().toISOString();
@@ -36,7 +36,7 @@ export class InitializationTask implements IInitializationTask {
   }
 
   async run(...params) {
-    if (this.status === initializationTask.RUN_STATUS.RUNNING) {
+    if (this.status === INITIALIZATION_TASK.RUN_STATUS.RUNNING) {
       throw new Error(`Another instance of task ${this.name} is running`);
     }
 
@@ -45,13 +45,13 @@ export class InitializationTask implements IInitializationTask {
     try {
       this.init();
       this.data = await this.runInternal(...params);
-      this.result = initializationTask.RUN_RESULT.SUCCESS;
+      this.result = INITIALIZATION_TASK.RUN_RESULT.SUCCESS;
     } catch (error_) {
       error = error_;
-      this.result = initializationTask.RUN_RESULT.FAIL;
+      this.result = INITIALIZATION_TASK.RUN_RESULT.FAIL;
       this.error = error_.message;
     } finally {
-      this.status = initializationTask.RUN_STATUS.FINISHED;
+      this.status = INITIALIZATION_TASK.RUN_STATUS.FINISHED;
       this.finishedAt = new Date().toISOString();
 
       const dateStartedAt = new Date(this.startedAt as string);

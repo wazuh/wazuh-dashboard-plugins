@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import https from 'node:https';
+import https from 'https';
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { Logger } from 'opensearch-dashboards/server';
 import { getCookieValueByName } from './cookie';
