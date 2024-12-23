@@ -1,4 +1,4 @@
-export const initializationTask = {
+export const INITIALIZATION_TASK = {
   RUN_STATUS: {
     NOT_STARTED: 'not_started',
     RUNNING: 'running',
