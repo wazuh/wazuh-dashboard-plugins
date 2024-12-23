@@ -1,0 +1,7 @@
+{
+  "prefix": "wazuhRuleset",
+  "paths": {
+    "wazuhRuleset": "."
+  },
+  "translations": ["translations/ja-JP.json"]
+}
