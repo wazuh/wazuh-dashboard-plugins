@@ -157,7 +157,11 @@ export function addRoutes(router, { initialization }) {
           ? getTaskList(request.query.tasks)
           : undefined;
         const logger = context.wazuh_core.logger;
-        const username = ''; // TODO: get value
+        const { username } =
+          await context.wazuh_core.dashboardSecurity.getCurrentUser(
+            request,
+            context,
+          );
         const scope = 'user';
 
         logger.debug(
