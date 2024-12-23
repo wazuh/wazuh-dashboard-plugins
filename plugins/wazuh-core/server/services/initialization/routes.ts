@@ -185,7 +185,7 @@ export function addRoutes(router, { initialization }) {
           : allUserTasks;
 
         logger.debug(
-          `Initialzation tasks related to user [${username}] scope [${scope}]: [${tasks
+          `Initialization tasks related to user [${username}] scope [${scope}]: [${tasks
             .map(({ name }) => name)
             .join(', ')}]`,
         );
