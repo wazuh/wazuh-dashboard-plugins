@@ -1,7 +1,7 @@
 import React from 'react';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
-import { State } from './services/state';
+import { State, StateSetupReturn } from './services/state';
 import { ServerSecurity, ServerSecuritySetupReturn } from './services';
 import { TableDataProps } from './components';
 import { UseStateStorageHook } from './hooks';
@@ -24,9 +24,11 @@ export interface WazuhCorePluginSetup {
   hooks: {
     useDockedSideNav: () => boolean;
   } & DashboardSecurityServiceSetupReturn['hooks'] &
-    ServerSecuritySetupReturn['hooks'];
+    ServerSecuritySetupReturn['hooks'] &
+    StateSetupReturn['hooks'];
   hocs: {} & DashboardSecurityServiceSetupReturn['hocs'] &
-    ServerSecuritySetupReturn['hocs'];
+    ServerSecuritySetupReturn['hocs'] &
+    StateSetupReturn['hocs'];
   ui: {
     TableData: <T>(
       prop: TableDataProps<T>,
@@ -50,9 +52,11 @@ export interface WazuhCorePluginStart {
     useDockedSideNav: UseDockedSideNav;
     useStateStorage: UseStateStorageHook; // TODO: enhance
   } & DashboardSecurityServiceSetupReturn['hooks'] &
-    ServerSecuritySetupReturn['hooks'];
+    ServerSecuritySetupReturn['hooks'] &
+    StateSetupReturn['hooks'];
   hocs: {} & DashboardSecurityServiceSetupReturn['hocs'] &
-    ServerSecuritySetupReturn['hocs'];
+    ServerSecuritySetupReturn['hocs'] &
+    StateSetupReturn['hocs'];
   ui: {
     TableData: <T>(
       prop: TableDataProps<T>,

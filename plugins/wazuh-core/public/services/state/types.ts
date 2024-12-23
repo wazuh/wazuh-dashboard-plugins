@@ -9,9 +9,24 @@ export interface StateContainer<T = any> {
   subscribe: (callback: (value: T) => void) => Subscription;
 }
 
+export interface StateSetupReturn {
+  hooks: {
+    useStateContainer: (
+      name: string,
+    ) => [any, { set: (value: any) => void; remove: () => void }];
+  };
+  hocs: {
+    withStateContainer: (
+      name: string,
+    ) => (
+      WrappedComponent: React.ComponentType,
+    ) => (props: any) => React.ElementType;
+  };
+}
+
 export interface State<
   SetupDeps = any,
-  SetupReturn = any,
+  SetupReturn = StateSetupReturn,
   StartDeps = any,
   StartReturn = any,
   StopDeps = any,
