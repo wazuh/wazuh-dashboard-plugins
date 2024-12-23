@@ -81,13 +81,11 @@ export class WazuhCorePlugin
       'server_host',
       new ServerHostStateContainer(logger, { store: cookiesStore }),
     );
-    this.services.state.subscribe('server_host', (_value: string) => {
-      // TODO: refresh the auth when the server_host data changed and there is value
-    });
     this.services.state.register(
       'data_source_alerts',
       new DataSourceAlertsStateContainer(logger, { store: cookiesStore }),
     );
+
     this.services.serverSecurity = new CoreServerSecurity(logger);
 
     // Create http
@@ -95,8 +93,9 @@ export class WazuhCorePlugin
       getTimeout: async () =>
         (await this.services.configuration.get('timeout')) as number,
       getURL: (path: string) => core.http.basePath.prepend(path),
-      getServerAPI: () => 'imposter', // TODO: implement
-      getIndexPatternTitle: async () => 'wazuh-alerts-*', // TODO: implement
+      getServerAPI: () => this.services.state.get('server_host').id,
+      getIndexPatternTitle: async () =>
+        this.services.state.get('data_source_alerts'),
       http: core.http,
     });
 
