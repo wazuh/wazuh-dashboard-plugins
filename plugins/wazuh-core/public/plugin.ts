@@ -11,12 +11,13 @@ import { setChrome, setCore, setUiSettings } from './plugin-services';
 import * as utils from './utils';
 import * as uiComponents from './components';
 import { ConfigurationStore } from './utils/configuration-store';
-import { DashboardSecurity } from './utils/dashboard-security';
+import { DashboardSecurity } from './services/dashboard-security';
 import * as hooks from './hooks';
 import { CoreState, State } from './services/state';
 import { ServerHostClusterInfoStateContainer } from './services/state/containers/server-host-cluster-info';
 import { ServerHostStateContainer } from './services/state/containers/server-host';
 import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
+import { CoreServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';
 
 const noop = () => {};
@@ -70,8 +71,6 @@ export class WazuhCorePlugin
     // Create state
     this.services.state = new CoreState(logger);
 
-    this.runtime.setup.state = this.services.state.setup();
-
     const cookiesStore = new Cookies();
 
     this.services.state.register(
@@ -89,6 +88,7 @@ export class WazuhCorePlugin
       'data_source_alerts',
       new DataSourceAlertsStateContainer(logger, { store: cookiesStore }),
     );
+    this.services.serverSecurity = new CoreServerSecurity(logger);
 
     // Create http
     this.services.http = new CoreHTTPClient(logger, {
@@ -101,8 +101,20 @@ export class WazuhCorePlugin
     });
 
     // Setup services
-    await this.services.dashboardSecurity.setup();
+    this.runtime.setup.state = this.services.state.setup();
+    this.runtime.setup.dashboardSecurity =
+      await this.services.dashboardSecurity.setup({
+        updateData$: this.services.http.server.auth$,
+      });
     this.runtime.setup.http = await this.services.http.setup({ core });
+
+    this.runtime.setup.serverSecurity = this.services.serverSecurity.setup({
+      useDashboardSecurityAccount:
+        this.runtime.setup.dashboardSecurity.hooks.useDashboardSecurityIsAdmin,
+      auth$: this.services.http.server.auth$,
+      useLoadingLogo: () =>
+        this.runtime.start.serverSecurityDeps.chrome.logos.AnimatedMark,
+    });
 
     return {
       ...this.services,
@@ -110,11 +122,18 @@ export class WazuhCorePlugin
       API_USER_STATUS_RUN_AS,
       hooks: {
         ...hooks,
+        ...this.runtime.setup.dashboardSecurity.hooks,
+        ...this.runtime.setup.serverSecurity.hooks,
         ...this.runtime.setup.state.hooks,
+      },
+      hocs: {
+        ...this.runtime.setup.dashboardSecurity.hocs,
+        ...this.runtime.setup.serverSecurity.hocs,
       },
       ui: {
         ...uiComponents,
         ...this.runtime.setup.http.ui,
+        ...this.runtime.setup.serverSecurity.ui,
       },
     };
   }
@@ -130,17 +149,28 @@ export class WazuhCorePlugin
     await this.services.dashboardSecurity.start();
     await this.services.http.start();
 
+    this.runtime.start.serverSecurityDeps = {
+      chrome: core.chrome,
+    };
+
     return {
       ...this.services,
       utils,
       API_USER_STATUS_RUN_AS,
       hooks: {
         ...hooks,
+        ...this.runtime.setup.dashboardSecurity.hooks,
+        ...this.runtime.setup.serverSecurity.hooks,
         ...this.runtime.setup.state.hooks,
+      },
+      hocs: {
+        ...this.runtime.setup.dashboardSecurity.hocs,
+        ...this.runtime.setup.serverSecurity.hocs,
       },
       ui: {
         ...uiComponents,
         ...this.runtime.setup.http.ui,
+        ...this.runtime.setup.serverSecurity.ui,
       },
     };
   }
