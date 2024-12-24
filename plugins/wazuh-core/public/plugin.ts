@@ -1,17 +1,17 @@
-import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
-import { setChrome, setCore, setUiSettings } from './plugin-services';
-import { ConfigurationStore } from '../common/services/configuration/configuration-store';
-import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
-import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
-import { EConfigurationProviders } from '../common/constants';
 import {
   CoreSetup,
   CoreStart,
   Plugin,
   PluginInitializerContext,
 } from 'opensearch-dashboards/public';
+import { ConfigurationStore } from '../common/services/configuration/configuration-store';
+import { EConfigurationProviders } from '../common/constants';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
+import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
+import { setChrome, setCore, setUiSettings } from './plugin-services';
+import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
+import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
 import * as utils from './utils';
 import * as uiComponents from './components';
 import { DashboardSecurity } from './services/dashboard-security';
@@ -28,7 +28,7 @@ export class WazuhCorePlugin
   internal: Record<string, any> = {};
   services: Record<string, any> = {};
 
-  constructor(private initializerContext: PluginInitializerContext) {
+  constructor(private readonly initializerContext: PluginInitializerContext) {
     this.services = {};
     this.internal = {};
   }
@@ -46,6 +46,7 @@ export class WazuhCorePlugin
       log: noop,
       get: () => logger,
     };
+
     this.internal.configurationStore = new ConfigurationStore(logger);
 
     this.internal.configurationStore.registerProvider(

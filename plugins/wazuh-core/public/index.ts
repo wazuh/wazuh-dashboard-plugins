@@ -6,4 +6,5 @@ import { WazuhCorePlugin } from './plugin';
 export function plugin(initializerContext: PluginInitializerContext) {
   return new WazuhCorePlugin(initializerContext);
 }
+
 export { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';

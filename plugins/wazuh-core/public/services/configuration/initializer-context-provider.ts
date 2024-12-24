@@ -8,7 +8,7 @@ export class InitializerConfigProvider implements IConfigurationProvider {
   private name: string = EConfigurationProviders.INITIALIZER_CONTEXT;
 
   constructor(
-    private initializerContext: PluginInitializerContext<CorePluginConfigType>,
+    private readonly initializerContext: PluginInitializerContext<CorePluginConfigType>,
   ) {
     this.initializeConfig();
   }
@@ -31,9 +31,11 @@ export class InitializerConfigProvider implements IConfigurationProvider {
     if (!this.config) {
       await this.initializeConfig();
     }
+
     if (!this.config[key]) {
       throw new Error(`Key ${key} not found`);
     }
+
     return this.config[key];
   }
 
@@ -41,6 +43,7 @@ export class InitializerConfigProvider implements IConfigurationProvider {
     if (!this.config) {
       await this.initializeConfig();
     }
+
     return this.config;
   }
 }
