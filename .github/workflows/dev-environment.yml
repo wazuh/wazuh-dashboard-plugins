@@ -50,11 +50,6 @@ jobs:
         plugins:
           [
             {
-              name: 'Main',
-              path: 'wazuh/plugins/main',
-              container_path: 'wazuh',
-            },
-            {
               name: 'Wazuh Check Updates',
               path: 'wazuh/plugins/wazuh-check-updates',
               container_path: 'wazuh-check-updates',
@@ -63,16 +58,6 @@ jobs:
               name: 'Wazuh Core',
               path: 'wazuh/plugins/wazuh-core',
               container_path: 'wazuh-core',
-            },
-            {
-              name: 'Wazuh Engine',
-              path: 'wazuh/plugins/wazuh-engine',
-              container_path: 'wazuh-engine',
-            },
-            {
-              name: 'Wazuh Fleet',
-              path: 'wazuh/plugins/wazuh-fleet',
-              container_path: 'wazuh-fleet',
             },
           ]
 

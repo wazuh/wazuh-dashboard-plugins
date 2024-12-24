@@ -6,19 +6,19 @@ opensearch.ssl.verificationMode: certificate
 # opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
 #
 # osd 2.0
-opensearch.requestHeadersAllowlist: ["securitytenant", "Authorization"]
+opensearch.requestHeadersAllowlist: ['securitytenant', 'Authorization']
 #
 opensearch_security.multitenancy.enabled: false
-opensearch_security.readonly_mode.roles: ["kibana_read_only"]
+opensearch_security.readonly_mode.roles: ['kibana_read_only']
 server.ssl.enabled: true
-server.ssl.key: "/home/node/kbn/certs/osd.key"
-server.ssl.certificate: "/home/node/kbn/certs/osd.pem"
-opensearch.ssl.certificateAuthorities: ["/home/node/kbn/certs/ca.pem"]
-uiSettings.overrides.defaultRoute: /app/wazuh
-opensearch.username: "kibanaserver"
-opensearch.password: "kibanaserver"
+server.ssl.key: '/home/node/kbn/certs/osd.key'
+server.ssl.certificate: '/home/node/kbn/certs/osd.pem'
+opensearch.ssl.certificateAuthorities: ['/home/node/kbn/certs/ca.pem']
+uiSettings.overrides.defaultRoute: /app/home
+opensearch.username: 'kibanaserver'
+opensearch.password: 'kibanaserver'
 
-opensearch_security.auth.type: "saml"
+opensearch_security.auth.type: 'saml'
 server.xsrf.allowlist:
   [
     /_plugins/_security/saml/acs,
