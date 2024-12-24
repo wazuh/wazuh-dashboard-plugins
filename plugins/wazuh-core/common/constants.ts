@@ -408,23 +408,23 @@ export enum SettingCategory {
   API_CONNECTION,
 }
 
-export type TPluginSettingOptionsTextArea = {
+export interface TPluginSettingOptionsTextArea {
   maxRows?: number;
   minRows?: number;
   maxLength?: number;
-};
+}
 
-export type TPluginSettingOptionsSelect = {
+export interface TPluginSettingOptionsSelect {
   select: { text: string; value: any }[];
-};
+}
 
-export type TPluginSettingOptionsEditor = {
+export interface TPluginSettingOptionsEditor {
   editor: {
     language: string;
   };
-};
+}
 
-export type TPluginSettingOptionsFile = {
+export interface TPluginSettingOptionsFile {
   file: {
     type: 'image';
     extensions?: string[];
@@ -445,34 +445,24 @@ export type TPluginSettingOptionsFile = {
       resolveStaticURL: (filename: string) => string;
     };
   };
-};
+}
 
-export type TPluginSettingOptionsNumber = {
+export interface TPluginSettingOptionsNumber {
   number: {
     min?: number;
     max?: number;
     integer?: boolean;
   };
-};
+}
 
-export type TPluginSettingOptionsSwitch = {
+export interface TPluginSettingOptionsSwitch {
   switch: {
     values: {
       disabled: { label?: string; value: any };
       enabled: { label?: string; value: any };
     };
   };
-};
-
-export type TPlugginSettingOptionsObjectOf = {
-  objectOf: {
-    [key: string]: TPluginSetting;
-  };
-};
-
-type TPluginSettingOptionsArrayOf = {
-  arrayOf: TPluginSetting;
-};
+}
 
 export enum EpluginSettingType {
   text = 'text',
@@ -488,6 +478,24 @@ export enum EpluginSettingType {
   objectOf = 'objectOf',
 }
 
+export interface TPluginSettingOptionsObjectOf {
+  /* eslint-disable no-use-before-define */
+  objectOf: Record<string, TPluginSetting>;
+}
+
+interface TPluginSettingOptionsArrayOf {
+  arrayOf: TPluginSetting;
+}
+
+type TPlugingSettingOptions =
+  | TPluginSettingOptionsTextArea
+  | TPluginSettingOptionsSelect
+  | TPluginSettingOptionsEditor
+  | TPluginSettingOptionsFile
+  | TPluginSettingOptionsNumber
+  | TPluginSettingOptionsSwitch
+  | TPluginSettingOptionsObjectOf
+  | TPluginSettingOptionsArrayOf;
 export interface TPluginSetting {
   // Define the text displayed in the UI.
   title: string;
@@ -498,21 +506,13 @@ export interface TPluginSetting {
   // Type.
   type: EpluginSettingType;
   source: EConfigurationProviders;
-  options?:
-    | TPluginSettingOptionsTextArea
-    | TPluginSettingOptionsSelect
-    | TPluginSettingOptionsEditor
-    | TPluginSettingOptionsFile
-    | TPluginSettingOptionsNumber
-    | TPluginSettingOptionsSwitch
-    | TPlugginSettingOptionsObjectOf
-    | TPluginSettingOptionsArrayOf;
+  options?: TPlugingSettingOptions;
   // Default value.
   defaultValue: any;
   validate?: (value: any) => string | undefined;
 }
 
-export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
+export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
   'alerts.sample.prefix': {
     title: 'Sample alerts prefix',
     description:
@@ -618,7 +618,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     defaultValue: false,
     validate: SettingsValidator.isBoolean,
   },
-  /*`# The following configuration is the default structure to define a host.
+  /* `# The following configuration is the default structure to define a host.
 #
 # hosts:
 #   # Host ID / name,

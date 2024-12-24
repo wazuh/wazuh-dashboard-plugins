@@ -8,7 +8,8 @@ import { EConfigurationProviders } from '../../../common/constants';
 
 export class UISettingsConfigProvider implements IConfigurationProvider {
   private name: string = EConfigurationProviders.PLUGIN_UI_SETTINGS;
-  constructor(private uiSettings: IUiSettingsClient) {}
+
+  constructor(private readonly uiSettings: IUiSettingsClient) {}
 
   setName(name: string): void {
     this.name = name;
@@ -28,19 +29,20 @@ export class UISettingsConfigProvider implements IConfigurationProvider {
 
   async getAll() {
     const settings = this.uiSettings.getAll();
-    // loop and get all settings that have the category wazuhCore
-    const wazuhCoreSettings = Object.keys(settings).reduce(
-      (acc, key) => {
-        if (
-          settings[key].category &&
-          settings[key].category.includes('wazuhCore')
-        ) {
-          acc[key] = settings[key];
-        }
-        return acc;
-      },
-      {} as Record<string, PublicUiSettingsParams & UserProvidedValues>,
-    );
+    const wazuhCoreSettings: Record<
+      string,
+      PublicUiSettingsParams & UserProvidedValues
+    > = {};
+
+    for (const key in settings) {
+      if (
+        settings[key].category &&
+        settings[key].category.includes('wazuhCore')
+      ) {
+        wazuhCoreSettings[key] = settings[key];
+      }
+    }
+
     return wazuhCoreSettings;
   }
 }
