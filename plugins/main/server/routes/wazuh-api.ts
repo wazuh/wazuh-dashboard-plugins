@@ -1,6 +1,6 @@
 import { IRouter } from 'opensearch_dashboards/server';
-import { WazuhApiCtrl } from '../controllers';
 import { schema } from '@osd/config-schema';
+import { WazuhApiCtrl } from '../controllers';
 
 export function WazuhApiRoutes(router: IRouter) {
   const ctrl = new WazuhApiCtrl();
@@ -28,11 +28,11 @@ export function WazuhApiRoutes(router: IRouter) {
       validate: {
         body: schema.any({
           // TODO: not ready
-          //id: schema.string(),
+          // id: schema.string(),
           // url: schema.string(),
           // port: schema.number(),
           // username: schema.string(),
-          //forceRefresh: schema.boolean({defaultValue:false}),
+          // forceRefresh: schema.boolean({defaultValue:false}),
           // cluster_info: schema.object({
           //   status: schema.string(),
           //   manager: schema.string(),
@@ -128,7 +128,8 @@ export function WazuhApiRoutes(router: IRouter) {
       ctrl.getSyscollector(context, request, response),
   );
 
-  // Return app logos configuration
+  /* Return app logos configuration
+  ToDo: Change (maybe) to get the opensearch logo settings
   router.get(
     {
       path: '/api/logos',
@@ -138,6 +139,7 @@ export function WazuhApiRoutes(router: IRouter) {
     async (context, request, response) =>
       ctrl.getAppLogos(context, request, response),
   );
+  */
 
   // Return binary dashboard
   router.get(

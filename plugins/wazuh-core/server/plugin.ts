@@ -5,20 +5,21 @@ import {
   Plugin,
   Logger,
 } from 'opensearch-dashboards/server';
-import { validate as validateNodeCronInterval } from 'node-cron';
-import { Configuration } from '../common/services/configuration';
 import {
   PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
   PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
   PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
-  PLUGIN_SETTINGS,
-  PLUGIN_SETTINGS_CATEGORIES,
-  WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-  WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
   WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
   WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
+  EConfigurationProviders,
+  PLUGIN_SETTINGS,
 } from '../common/constants';
+import {
+  Configuration,
+  ConfigurationStore,
+} from '../common/services/configuration';
+import { getUiSettingsDefinitions } from '../common/settings-adapter';
 import {
   PluginSetup,
   WazuhCorePluginSetup,
@@ -29,10 +30,11 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  ConfigurationStore,
   InitializationService,
 } from './services';
-import { enhanceConfiguration } from './services/enhance-configuration';
+// configuration common
+// configuration server
+import { InitializerConfigProvider } from './services/configuration';
 import { initializationTaskCreatorServerAPIConnectionCompatibility } from './initialization/server-api';
 import {
   initializationTaskCreatorExistTemplate,
@@ -63,54 +65,27 @@ export class WazuhCorePlugin
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
 
-    this.services.dashboardSecurity = createDashboardSecurity(plugins);
+    // register the uiSetting to use in the public context (advanced settings)
+    const uiSettingsDefs = getUiSettingsDefinitions(PLUGIN_SETTINGS);
 
+    core.uiSettings.register(uiSettingsDefs);
+
+    this.services.dashboardSecurity = createDashboardSecurity(plugins);
     this.internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-store'),
-      {
-        cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-        file: WAZUH_DATA_CONFIG_APP_PATH,
-      },
     );
+
+    // add the initializer context config to the configuration store
+    this.internal.configurationStore.registerProvider(
+      EConfigurationProviders.PLUGIN_UI_SETTINGS,
+      new InitializerConfigProvider(this.initializerContext),
+    );
+
+    // create the configuration service to use like a facede pattern
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),
       this.internal.configurationStore,
     );
-
-    // Enhance configuration service
-    enhanceConfiguration(this.services.configuration);
-
-    // Register the plugin settings
-    for (const [key, value] of Object.entries(PLUGIN_SETTINGS)) {
-      this.services.configuration.register(key, value);
-    }
-
-    // Add categories to the configuration
-    for (const [key, value] of Object.entries(PLUGIN_SETTINGS_CATEGORIES)) {
-      this.services.configuration.registerCategory({ ...value, id: key });
-    }
-
-    /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
-      Because the settings are defined in the backend and frontend side using the same definitions,
-      the validation funtions are not defined there and has to be defined in the frontend side and backend side
-      */
-    const setting = this.services.configuration._settings.get(
-      'cron.statistics.interval',
-    );
-
-    if (!setting.validateUIForm) {
-      setting.validateUIForm = function (value) {
-        return this.validate(value);
-      };
-    }
-
-    if (!setting.validate) {
-      setting.validate = function (value: string) {
-        return validateNodeCronInterval(value)
-          ? undefined
-          : 'Interval is not valid.';
-      };
-    }
 
     this.services.configuration.setup();
 
@@ -272,7 +247,7 @@ export class WazuhCorePlugin
           asScoped: this.services.serverAPIClient.asScoped,
         },
       },
-    };
+    } as WazuhCorePluginSetup;
   }
 
   public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
@@ -292,7 +267,7 @@ export class WazuhCorePlugin
           asScoped: this.services.serverAPIClient.asScoped,
         },
       },
-    };
+    } as WazuhCorePluginSetup;
   }
 
   public stop() {}

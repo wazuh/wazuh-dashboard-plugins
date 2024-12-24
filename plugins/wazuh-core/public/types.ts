@@ -13,8 +13,9 @@ import {
 } from './services/dashboard-security';
 
 export interface WazuhCorePluginSetup {
+  _internal: any;
   utils: { formatUIDate: (date: Date) => string };
-  API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
+  API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurityService;
   http: HTTPClient;
@@ -38,7 +39,7 @@ export interface WazuhCorePluginSetup {
 
 export interface WazuhCorePluginStart {
   utils: { formatUIDate: (date: Date) => string };
-  API_USER_STATUS_RUN_AS: API_USER_STATUS_RUN_AS;
+  API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurityService;
   http: HTTPClient;
