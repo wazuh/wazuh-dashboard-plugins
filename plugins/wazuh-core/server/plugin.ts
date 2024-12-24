@@ -5,18 +5,21 @@ import {
   Plugin,
   Logger,
 } from 'opensearch-dashboards/server';
-import { validate as validateNodeCronInterval } from 'node-cron';
 import {
   PLUGIN_PLATFORM_SETTING_NAME_MAX_BUCKETS,
   PLUGIN_PLATFORM_SETTING_NAME_METAFIELDS,
   PLUGIN_PLATFORM_SETTING_NAME_TIME_FILTER,
-  PLUGIN_SETTINGS_CATEGORIES,
-  WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-  WAZUH_DATA_CONFIG_APP_PATH,
   WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
   WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
   WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
+  EConfigurationProviders,
+  PLUGIN_SETTINGS,
 } from '../common/constants';
+import {
+  Configuration,
+  ConfigurationStore,
+} from '../common/services/configuration';
+import { getUiSettingsDefinitions } from '../common/settings-adapter';
 import {
   PluginSetup,
   WazuhCorePluginSetup,
@@ -30,14 +33,8 @@ import {
   InitializationService,
 } from './services';
 // configuration common
-import {
-  Configuration,
-  ConfigurationStore,
-} from '../common/services/configuration';
 // configuration server
 import { InitializerConfigProvider } from './services/configuration';
-import { EConfigurationProviders, PLUGIN_SETTINGS } from '../common/constants';
-import { getUiSettingsDefinitions } from '../common/settings-adapter';
 import { initializationTaskCreatorServerAPIConnectionCompatibility } from './initialization/server-api';
 import {
   initializationTaskCreatorExistTemplate,
@@ -67,8 +64,10 @@ export class WazuhCorePlugin
     plugins: PluginSetup,
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
+
     // register the uiSetting to use in the public context (advanced settings)
     const uiSettingsDefs = getUiSettingsDefinitions(PLUGIN_SETTINGS);
+
     core.uiSettings.register(uiSettingsDefs);
 
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
