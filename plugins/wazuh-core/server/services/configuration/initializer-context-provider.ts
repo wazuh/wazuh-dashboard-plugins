@@ -1,7 +1,7 @@
 import { PluginInitializerContext } from 'opensearch-dashboards/server';
+import { first } from 'rxjs/operators';
 import { CorePluginConfigType } from '../../index';
 import { IConfigurationProvider } from '../../../common/services/configuration/configuration-provider';
-import { first } from 'rxjs/operators';
 import { EConfigurationProviders } from '../../../common/constants';
 
 export class InitializerConfigProvider implements IConfigurationProvider {
@@ -9,7 +9,7 @@ export class InitializerConfigProvider implements IConfigurationProvider {
   private name: string = EConfigurationProviders.INITIALIZER_CONTEXT;
 
   constructor(
-    private initializerContext: PluginInitializerContext<CorePluginConfigType>,
+    private readonly initializerContext: PluginInitializerContext<CorePluginConfigType>,
   ) {
     this.initializeConfig();
   }
@@ -17,6 +17,7 @@ export class InitializerConfigProvider implements IConfigurationProvider {
   private async initializeConfig(): Promise<void> {
     const config$ =
       this.initializerContext.config.create<CorePluginConfigType>();
+
     this.config = await config$.pipe(first()).toPromise();
   }
 
@@ -34,9 +35,11 @@ export class InitializerConfigProvider implements IConfigurationProvider {
     if (!this.config) {
       await this.initializeConfig();
     }
+
     if (!this.config[key]) {
       throw new Error(`Key ${key} not found`);
     }
+
     return this.config[key];
   }
 
@@ -44,6 +47,7 @@ export class InitializerConfigProvider implements IConfigurationProvider {
     if (!this.config) {
       await this.initializeConfig();
     }
+
     return this.config;
   }
 }

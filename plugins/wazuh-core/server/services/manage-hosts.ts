@@ -11,9 +11,9 @@
  */
 import { Logger } from 'opensearch-dashboards/server';
 import { IConfiguration } from '../../common/services/configuration';
-import { ServerAPIClient } from './server-api-client';
 import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
 import { HTTP_STATUS_CODES } from '../../common/constants';
+import { ServerAPIClient } from './server-api-client';
 
 interface IAPIHost {
   id: string;
@@ -28,7 +28,7 @@ interface IAPIHostRegistry {
   node: string | null;
   status: string;
   cluster: string;
-  allow_run_as: API_USER_STATUS_RUN_AS;
+  allowRunAs: API_USER_STATUS_RUN_AS;
 }
 
 /**
@@ -43,15 +43,17 @@ interface IAPIHostRegistry {
  */
 export class ManageHosts {
   public serverAPIClient: ServerAPIClient | null = null;
-  private cacheRegistry: Map<string, IAPIHostRegistry> = new Map();
+  private readonly cacheRegistry = new Map<string, IAPIHostRegistry>();
+
   constructor(
-    private logger: Logger,
-    private configuration: IConfiguration,
+    private readonly logger: Logger,
+    private readonly configuration: IConfiguration,
   ) {}
 
   setServerAPIClient(client: ServerAPIClient) {
     this.serverAPIClient = client;
   }
+
   /**
    * Exclude fields from an API host data
    * @param host
@@ -59,15 +61,19 @@ export class ManageHosts {
    * @returns
    */
   private filterAPIHostData(host: IAPIHost, exclude: string[]) {
-    return exclude?.length
-      ? Object.entries(host).reduce(
-          (accum, [key, value]) => ({
-            ...accum,
-            ...(!exclude.includes(key) ? { [key]: value } : {}),
-          }),
-          {},
-        )
-      : host;
+    if (!exclude?.length) {
+      return host;
+    }
+
+    const filteredHost: Partial<IAPIHost> = {};
+
+    for (const key in host) {
+      if (!exclude.includes(key)) {
+        filteredHost[key] = host[key];
+      }
+    }
+
+    return filteredHost;
   }
 
   /**
@@ -75,24 +81,35 @@ export class ManageHosts {
    */
   async get(
     hostID?: string,
-    options: { excludePassword: boolean } = { excludePassword: false },
+    options?: { excludePassword: boolean },
   ): Promise<IAPIHost[] | IAPIHost> {
     try {
-      hostID
-        ? this.logger.debug(`Getting API connection with ID [${hostID}]`)
-        : this.logger.debug('Getting API connections');
+      const { excludePassword = false } = options || {};
+
+      if (hostID) {
+        this.logger.debug(`Getting API connection with ID [${hostID}]`);
+      } else {
+        this.logger.debug('Getting API connections');
+      }
+
       const hosts = await this.configuration.get('hosts');
+
       this.logger.debug(`API connections: [${JSON.stringify(hosts)}]`);
+
       if (hostID) {
         const host = hosts[hostID];
+
         if (host) {
           this.logger.debug(`API connection with ID [${hostID}] found`);
+
           return this.filterAPIHostData(
             host,
-            options.excludePassword ? ['password'] : undefined,
+            excludePassword ? ['password'] : undefined,
           );
         }
+
         const APIConnectionNotFound = `API connection with ID [${hostID}] not found`;
+
         this.logger.debug(APIConnectionNotFound);
         throw new Error(APIConnectionNotFound);
       }
@@ -116,16 +133,19 @@ export class ManageHosts {
    * @param {Object} response
    * API entries
    */
-  async getEntries(
-    options: { excludePassword: boolean } = { excludePassword: false },
-  ) {
+  async getEntries(options?: { excludePassword: boolean }) {
     try {
       this.logger.debug('Getting the API connections');
+
       const hosts = (await this.get(undefined, options)) as IAPIHost[];
+
       this.logger.debug('Getting registry');
-      const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
+
+      const registry = Object.fromEntries(this.cacheRegistry.entries());
+
       return hosts.map(host => {
         const { id } = host;
+
         return { ...host, cluster_info: registry[id] };
       });
     } catch (error) {
@@ -139,7 +159,7 @@ export class ManageHosts {
   }
 
   /**
-   * Get the cluster info and allow_run_as values for the API host and store into the registry cache
+   * Get the cluster info and allowRunAs values for the API host and store into the registry cache
    * @param host
    * @returns
    */
@@ -147,6 +167,7 @@ export class ManageHosts {
     host: IAPIHost,
   ): Promise<IAPIHostRegistry> {
     const apiHostID = host.id;
+
     this.logger.debug(`Getting registry data from host [${apiHostID}]`);
     // Get cluster info data
 
@@ -154,7 +175,7 @@ export class ManageHosts {
       node = null,
       status = 'disabled',
       cluster = 'Disabled',
-      allow_run_as = API_USER_STATUS_RUN_AS.ALL_DISABLED;
+      allowRunAs = API_USER_STATUS_RUN_AS.ALL_DISABLED;
 
     try {
       const responseAgents = await this.serverAPIClient.asInternalUser.request(
@@ -168,10 +189,8 @@ export class ManageHosts {
         manager = responseAgents.data.data.affected_items[0].manager;
       }
 
-      // Get allow_run_as
-      if (!host.run_as) {
-        allow_run_as = API_USER_STATUS_RUN_AS.HOST_DISABLED;
-      } else {
+      // Get allowRunAs
+      if (host.run_as) {
         const responseAllowRunAs =
           await this.serverAPIClient.asInternalUser.request(
             'GET',
@@ -179,12 +198,14 @@ export class ManageHosts {
             {},
             { apiHostID },
           );
+
         if (this.isServerAPIClientResponseOk(responseAllowRunAs)) {
-          allow_run_as = responseAllowRunAs.data.data.affected_items[0]
-            .allow_run_as
+          allowRunAs = responseAllowRunAs.data.data.affected_items[0].allowRunAs
             ? API_USER_STATUS_RUN_AS.ENABLED
             : API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
         }
+      } else {
+        allowRunAs = API_USER_STATUS_RUN_AS.HOST_DISABLED;
       }
 
       const responseClusterStatus =
@@ -214,16 +235,22 @@ export class ManageHosts {
           cluster = responseClusterLocal.data.data.affected_items[0].cluster;
         }
       }
-    } catch (error) {}
+    } catch {
+      this.logger.debug(
+        `Error getting the cluster info and allowRunAs values for the API host [${apiHostID}]`,
+      );
+    }
 
     const data = {
       manager,
       node,
       status,
       cluster,
-      allow_run_as,
+      allowRunAs,
     };
+
     this.updateRegistryByHost(apiHostID, data);
+
     return data;
   }
 
@@ -235,11 +262,14 @@ export class ManageHosts {
   async start() {
     try {
       this.logger.debug('Start');
+
       const hosts = (await this.get(undefined, {
         excludePassword: true,
       })) as IAPIHost[];
-      if (!hosts.length) {
+
+      if (hosts.length === 0) {
         this.logger.debug('No hosts found. Skip.');
+
         return;
       }
 
@@ -257,22 +287,31 @@ export class ManageHosts {
 
   private getRegistryByHost(hostID: string) {
     this.logger.debug(`Getting cache for API host [${hostID}]`);
+
     const result = this.cacheRegistry.get(hostID);
+
     this.logger.debug(`Get cache for APIhost [${hostID}]`);
+
     return result;
   }
 
   private updateRegistryByHost(hostID: string, data: any) {
     this.logger.debug(`Updating cache for APIhost [${hostID}]`);
+
     const result = this.cacheRegistry.set(hostID, data);
+
     this.logger.debug(`Updated cache for APIhost [${hostID}]`);
+
     return result;
   }
 
   private deleteRegistryByHost(hostID: string) {
     this.logger.debug(`Deleting cache for API host [${hostID}]`);
+
     const result = this.cacheRegistry.delete(hostID);
+
     this.logger.debug(`Deleted cache for API host [${hostID}]`);
+
     return result;
   }
 
@@ -285,16 +324,19 @@ export class ManageHosts {
     this.logger.debug(`Checking if the API host [${apiId}] can use the run_as`);
 
     const registryHost = this.getRegistryByHost(apiId);
+
     if (!registryHost) {
       throw new Error(
         `API host with ID [${apiId}] was not found in the registry. This could be caused by a problem getting and storing the registry data or the API host was removed.`,
       );
     }
-    if (registryHost.allow_run_as === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED) {
+
+    if (registryHost.allowRunAs === API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED) {
       throw new Error(
         `API host with host ID [${apiId}] misconfigured. The configurated API user is not allowed to use [run_as]. Allow it in the API user configuration or set [run_as] host setting with [false] value.`,
       );
     }
-    return registryHost.allow_run_as === API_USER_STATUS_RUN_AS.ENABLED;
+
+    return registryHost.allowRunAs === API_USER_STATUS_RUN_AS.ENABLED;
   }
 }
