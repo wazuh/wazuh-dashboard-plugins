@@ -81,7 +81,9 @@ export class WazuhPlugin
         }
 
         // If this key is mapped to a color used by the config color mapping, we need to remap it
-        if (_.includes(configColors, this._mapping[key])) {keysToMap.push(key);}
+        if (_.includes(configColors, this._mapping[key])) {
+          keysToMap.push(key);
+        }
 
         // if key exist in oldMap, move it to mapping
         if (this._oldMap[key]) {
@@ -90,7 +92,9 @@ export class WazuhPlugin
         }
 
         // If this key isn't mapped, we need to map it
-        if (this.get(key) === null) {keysToMap.push(key);}
+        if (this.get(key) === null) {
+          keysToMap.push(key);
+        }
       });
 
       alreadyUsedColors.push(...Object.values(this._mapping));
