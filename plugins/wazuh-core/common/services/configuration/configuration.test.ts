@@ -1,6 +1,8 @@
 import { Configuration, IConfigurationStore } from './configuration';
 import { ConfigurationStore } from './configuration-store';
 
+const noop = () => {};
+
 function createMockLogger() {
   const logger = {
     info: noop,
