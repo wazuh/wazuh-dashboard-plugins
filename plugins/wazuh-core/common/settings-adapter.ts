@@ -17,6 +17,7 @@ import {
  */
 const schemaMapper = (setting: TPluginSetting) => {
   if (!setting) {
+    // ToDo: Create custom error and implement error handling
     throw new Error('Invalid setting');
   }
 
@@ -30,6 +31,7 @@ const schemaMapper = (setting: TPluginSetting) => {
   switch (type) {
     case EpluginSettingType.objectOf: {
       if (!setting?.options?.objectOf) {
+        // ToDo: Create custom error and implement error handling
         throw new Error('Invalid objectOf setting');
       }
 
@@ -115,6 +117,7 @@ export const getSettingsByType = (
   type: EConfigurationProviders,
 ): Record<string, TPluginSetting> => {
   if (!settings || !type) {
+    // ToDo: Create custom error and implement error handling
     throw new Error('Invalid settings or type');
   }
 

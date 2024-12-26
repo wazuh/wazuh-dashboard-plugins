@@ -1,22 +1,6 @@
-import { Configuration, IConfigurationStore } from './configuration';
-import { ConfigurationStore } from './configuration-store';
-
-const noop = () => {};
-
-function createMockLogger() {
-  const logger = {
-    info: noop,
-    error: noop,
-    debug: noop,
-    warn: noop,
-    trace: noop,
-    fatal: noop,
-    log: noop,
-    get: () => logger,
-  };
-
-  return logger;
-}
+import { createMockLogger } from '../../../test/mocks/logger-mocked';
+import { Configuration } from './configuration';
+import { IConfigurationStore } from './types';
 
 const mockConfigurationStore: IConfigurationStore = {
   setup: jest.fn(),
@@ -74,7 +58,7 @@ describe('Configuration service', () => {
     const logger = createMockLogger();
     const configuration = new Configuration(logger, mockConfigurationStore);
 
-    (mockConfigurationStore.get as jest.Mock).mockRejectedValue(
+    mockConfigurationStore.get.mockRejectedValue(
       new Error('Configuration setting not found'),
     );
 
@@ -98,7 +82,7 @@ describe('Configuration service', () => {
     const logger = createMockLogger();
     const configuration = new Configuration(logger, mockConfigurationStore);
 
-    (mockConfigurationStore.getAll as jest.Mock).mockRejectedValue(
+    mockConfigurationStore.getAll.mockRejectedValue(
       new Error('Configuration settings not found'),
     );
 

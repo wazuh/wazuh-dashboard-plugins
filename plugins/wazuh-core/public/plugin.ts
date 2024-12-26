@@ -60,30 +60,9 @@ export class WazuhCorePlugin
       new UISettingsConfigProvider(core.uiSettings),
     );
 
-    console.log(
-      'uiSettings',
-      await this.internal.configurationStore.getProviderConfiguration(
-        EConfigurationProviders.INITIALIZER_CONTEXT,
-      ),
-    );
-
-    console.log('uiSettings core', core.uiSettings.getAll());
-
-    console.log(
-      'uiSettings from configuration',
-      await this.internal.configurationStore.getProviderConfiguration(
-        EConfigurationProviders.PLUGIN_UI_SETTINGS,
-      ),
-    );
-
     this.services.configuration = new Configuration(
       logger,
       this.internal.configurationStore,
-    );
-
-    console.log(
-      'all config defined on wazuh core',
-      await this.services.configuration.getAll(),
     );
 
     // Create dashboardSecurity

@@ -1,5 +1,5 @@
 import { Logger } from 'opensearch-dashboards/server';
-import { IConfigurationStore } from './configuration';
+import { IConfigurationStore } from './types';
 import { IConfigurationProvider } from './configuration-provider';
 
 export class ConfigurationStore implements IConfigurationStore {
@@ -11,6 +11,7 @@ export class ConfigurationStore implements IConfigurationStore {
 
   registerProvider(name: string, provider: IConfigurationProvider) {
     if (!provider) {
+      // ToDo: Create custom error and implement error handling
       throw new Error('Provider is required');
     }
 
@@ -22,6 +23,7 @@ export class ConfigurationStore implements IConfigurationStore {
     const provider = this.providers.get(name);
 
     if (!provider) {
+      // ToDo: Create custom error and implement error handling
       throw new Error(`Provider ${name} not found`);
     }
 
@@ -33,6 +35,7 @@ export class ConfigurationStore implements IConfigurationStore {
       const provider = this.providers.get(key);
 
       if (!provider) {
+        // ToDo: Create custom error and implement error handling
         throw new Error(`Provider ${key} not found`);
       }
 
@@ -41,6 +44,7 @@ export class ConfigurationStore implements IConfigurationStore {
       return configuration;
     } catch (error) {
       const errorCasted = error as Error;
+      // ToDo: Create custom error and implement error handling
       const enhancedError = new Error(
         `Error getting configuration: ${errorCasted?.message}`,
       );
@@ -77,6 +81,7 @@ export class ConfigurationStore implements IConfigurationStore {
       return configuration[configName];
     }
 
+    // ToDo: Create custom error and implement error handling
     throw new Error(`Configuration ${configName} not found`);
   }
 
@@ -108,13 +113,5 @@ export class ConfigurationStore implements IConfigurationStore {
     }
 
     return result;
-  }
-
-  async set(_settings: Record<string, any>): Promise<any> {
-    throw new Error('Method not implemented yet.');
-  }
-
-  async clear(_settings: string[]): Promise<any> {
-    throw new Error('Method not implemented yet.');
   }
 }

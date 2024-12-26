@@ -200,7 +200,8 @@ export class ManageHosts {
           );
 
         if (this.isServerAPIClientResponseOk(responseAllowRunAs)) {
-          allowRunAs = responseAllowRunAs.data.data.affected_items[0].allowRunAs
+          allowRunAs = responseAllowRunAs.data.data.affected_items[0]
+            .allow_run_as
             ? API_USER_STATUS_RUN_AS.ENABLED
             : API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED;
         }

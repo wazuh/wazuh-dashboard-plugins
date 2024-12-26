@@ -1,30 +1,14 @@
+import { createMockLogger } from '../../../test/mocks/logger-mocked';
 import { IConfigurationProvider } from './configuration-provider';
 import { ConfigurationStore } from './configuration-store';
 
-const noop = () => {};
-
-function createMockLogger() {
-  const logger = {
-    info: noop,
-    error: noop,
-    debug: noop,
-    warn: noop,
-    trace: noop,
-    fatal: noop,
-    log: noop,
-    get: () => logger,
-  };
-
-  return logger;
-}
-
-const mockedProvider = jest.mocked<IConfigurationProvider>({
+const mockedProvider: IConfigurationProvider = {
   getAll: jest.fn(),
   get: jest.fn(),
   set: jest.fn(),
   setName: jest.fn(),
   getName: jest.fn(),
-});
+};
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -55,8 +39,8 @@ describe(`[service] ConfigurationStore`, () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
 
-    // @ts-expect-error Testing error case
     expect(() =>
+      // @ts-expect-error Testing error case
       configurationStore.registerProvider('test', null),
     ).toThrowError('Provider is required');
   });
@@ -66,7 +50,7 @@ describe(`[service] ConfigurationStore`, () => {
     const configurationStore = new ConfigurationStore(logger);
 
     configurationStore.registerProvider('test', mockedProvider);
-    (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
+    mockedProvider.getAll.mockResolvedValue({ test: 'test' });
     expect(
       configurationStore.getProviderConfiguration('test'),
     ).resolves.toEqual({ test: 'test' });
@@ -102,8 +86,8 @@ describe(`[service] ConfigurationStore`, () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
 
-    (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
-    (mockedProvider.get as jest.Mock).mockResolvedValue('test');
+    mockedProvider.getAll.mockResolvedValue({ test: 'test' });
+    mockedProvider.get.mockResolvedValue('test');
     configurationStore.registerProvider('test', mockedProvider);
     expect(await configurationStore.get('test')).toEqual('test');
   });
@@ -112,11 +96,9 @@ describe(`[service] ConfigurationStore`, () => {
     const logger = createMockLogger();
     const configurationStore = new ConfigurationStore(logger);
 
-    (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
+    mockedProvider.getAll.mockResolvedValue({ test: 'test' });
     configurationStore.registerProvider('test', mockedProvider);
-    (mockedProvider.get as jest.Mock).mockRejectedValue(
-      new Error('test error'),
-    );
+    mockedProvider.get.mockRejectedValue(new Error('test error'));
 
     try {
       await configurationStore.get('test');
@@ -130,7 +112,7 @@ describe(`[service] ConfigurationStore`, () => {
     const configurationStore = new ConfigurationStore(logger);
 
     configurationStore.registerProvider('test', mockedProvider);
-    (mockedProvider.getAll as jest.Mock).mockResolvedValue({ test: 'test' });
+    mockedProvider.getAll.mockResolvedValue({ test: 'test' });
     expect(configurationStore.getAll()).resolves.toEqual({ test: 'test' });
   });
 });
