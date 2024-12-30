@@ -1,11 +1,13 @@
 import { UiSettingsParams } from 'opensearch-dashboards/public';
 import { schema, Schema } from '@osd/config-schema';
-import { TypeOptions } from 'packages/osd-config-schema/target/types/types';
+import {
+  NumberOptions,
+  TypeOptions,
+} from 'packages/osd-config-schema/target/types/types';
 import {
   EConfigurationProviders,
   EpluginSettingType,
   SettingCategory,
-  TPlugginSettingOptionsObjectOf,
   TPluginSetting,
 } from './constants';
 
@@ -55,7 +57,15 @@ const schemaMapper = (setting: TPluginSetting) => {
     }
 
     case EpluginSettingType.number: {
-      schemaConfig = schema.number(schemaDef);
+      // add options for min and max
+      const numberOptions: NumberOptions = {
+        min: setting?.options?.number?.min,
+        max: setting?.options?.number?.max,
+        validate: validate,
+      };
+
+      schemaConfig = schema.number(numberOptions);
+
       break;
     }
 
