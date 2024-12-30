@@ -1,15 +1,19 @@
-import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
+import {
+  CoreSetup,
+  CoreStart,
+  Plugin,
+  PluginInitializerContext,
+} from 'opensearch-dashboards/public';
+import { ConfigurationStore } from '../common/services/configuration/configuration-store';
+import { EConfigurationProviders } from '../common/constants';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
-import {
-  PLUGIN_SETTINGS,
-  PLUGIN_SETTINGS_CATEGORIES,
-} from '../common/constants';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
+import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
+import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
 import * as utils from './utils';
 import * as uiComponents from './components';
-import { ConfigurationStore } from './utils/configuration-store';
 import { DashboardSecurity } from './services/dashboard-security';
 import * as hooks from './hooks';
 import { CoreServerSecurity } from './services';
@@ -24,34 +28,42 @@ export class WazuhCorePlugin
   internal: Record<string, any> = {};
   services: Record<string, any> = {};
 
+  constructor(private readonly initializerContext: PluginInitializerContext) {
+    this.services = {};
+    this.internal = {};
+  }
+
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     // No operation logger
-    const noopLogger = {
+
+    const logger = {
       info: noop,
       error: noop,
       debug: noop,
       warn: noop,
+      trace: noop,
+      fatal: noop,
+      log: noop,
+      get: () => logger,
     };
-    const logger = noopLogger;
 
-    this.internal.configurationStore = new ConfigurationStore(
-      logger,
-      core.http,
+    this.internal.configurationStore = new ConfigurationStore(logger);
+
+    this.internal.configurationStore.registerProvider(
+      EConfigurationProviders.INITIALIZER_CONTEXT,
+      new InitializerConfigProvider(this.initializerContext),
     );
+
+    // register the uiSettins on the configuration store to avoid the use inside of configuration service
+    this.internal.configurationStore.registerProvider(
+      EConfigurationProviders.PLUGIN_UI_SETTINGS,
+      new UISettingsConfigProvider(core.uiSettings),
+    );
+
     this.services.configuration = new Configuration(
       logger,
       this.internal.configurationStore,
     );
-
-    // Register the plugin settings
-    for (const [key, value] of Object.entries(PLUGIN_SETTINGS)) {
-      this.services.configuration.register(key, value);
-    }
-
-    // Add categories to the configuration
-    for (const [key, value] of Object.entries(PLUGIN_SETTINGS_CATEGORIES)) {
-      this.services.configuration.registerCategory({ ...value, id: key });
-    }
 
     // Create dashboardSecurity
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
