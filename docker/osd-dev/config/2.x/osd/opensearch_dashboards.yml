@@ -14,7 +14,7 @@ server.ssl.enabled: true
 server.ssl.key: '/home/node/kbn/certs/osd.key'
 server.ssl.certificate: '/home/node/kbn/certs/osd.pem'
 opensearch.ssl.certificateAuthorities: ['/home/node/kbn/certs/ca.pem']
-uiSettings.overrides.defaultRoute: /app/wz-home
+uiSettings.overrides.defaultRoute: /app/home
 opensearch.username: 'kibanaserver'
 opensearch.password: 'kibanaserver'
 opensearchDashboards.branding:
