@@ -53,13 +53,6 @@ jobs:
           echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
           echo "versionPlatform=$(jq -r '.pluginPlatform.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
 
-      - name: Step 03 - Download the main plugin's artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
-
       - name: Step 04 - Download the core plugin's artifact
         uses: actions/download-artifact@v4
         with:
@@ -72,20 +65,6 @@ jobs:
         with:
           name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
-
-      - name: Step 06 - Download the engine plugin's artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: wazuh-dashboard-plugins_wazuh-engine_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-engine_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
-
-      - name: Step 07 - Download the fleet plugin's artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: wazuh-dashboard-plugins_wazuh-fleet_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-fleet${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           overwrite: true
 
       - name: Step 06 - Build the Docker image
