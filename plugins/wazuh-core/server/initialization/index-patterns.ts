@@ -16,7 +16,12 @@ interface EnsureIndexPatternExistenceContextTaskWithConfigurationSetting
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const decoratorCheckIsEnabled =
-  callback =>
+  (
+    callback: (
+      ctx: InitializationTaskRunContext,
+      ctxTask: EnsureIndexPatternExistenceContextTask,
+    ) => Promise<void>,
+  ) =>
   async (
     ctx: InitializationTaskRunContext,
     {

@@ -4,6 +4,7 @@ import {
   Plugin,
   PluginInitializerContext,
 } from 'opensearch-dashboards/public';
+import { Cookies } from 'react-cookie';
 import { ConfigurationStore } from '../common/services/configuration/configuration-store';
 import { EConfigurationProviders } from '../common/constants';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
@@ -16,6 +17,10 @@ import * as utils from './utils';
 import * as uiComponents from './components';
 import { DashboardSecurity } from './services/dashboard-security';
 import * as hooks from './hooks';
+import { CoreState, State } from './services/state';
+import { ServerHostClusterInfoStateContainer } from './services/state/containers/server-host-cluster-info';
+import { ServerHostStateContainer } from './services/state/containers/server-host';
+import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
 import { CoreServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';
 
@@ -24,9 +29,16 @@ const noop = () => {};
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
-  runtime: Record<string, any> = { setup: {}, start: {} };
+  runtime: Record<string, any> = {
+    setup: {},
+    start: {},
+  };
   internal: Record<string, any> = {};
-  services: Record<string, any> = {};
+  services: {
+    [key: string]: any;
+    dashboardSecurity?: DashboardSecurity;
+    state?: State;
+  } = {};
 
   constructor(private readonly initializerContext: PluginInitializerContext) {
     this.services = {};
@@ -68,6 +80,24 @@ export class WazuhCorePlugin
     // Create dashboardSecurity
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
+    // Create state
+    this.services.state = new CoreState(logger);
+
+    const cookiesStore = new Cookies();
+
+    this.services.state.register(
+      'server_host_cluster_info',
+      new ServerHostClusterInfoStateContainer(logger, { store: cookiesStore }),
+    );
+    this.services.state.register(
+      'server_host',
+      new ServerHostStateContainer(logger, { store: cookiesStore }),
+    );
+    this.services.state.register(
+      'data_source_alerts',
+      new DataSourceAlertsStateContainer(logger, { store: cookiesStore }),
+    );
+
     this.services.serverSecurity = new CoreServerSecurity(logger);
 
     // Create http
@@ -75,12 +105,14 @@ export class WazuhCorePlugin
       getTimeout: async () =>
         (await this.services.configuration.get('timeout')) as number,
       getURL: (path: string) => core.http.basePath.prepend(path),
-      getServerAPI: () => 'imposter', // TODO: implement
-      getIndexPatternTitle: async () => 'wazuh-alerts-*', // TODO: implement
+      getServerAPI: () => this.services.state.get('server_host').id,
+      getIndexPatternTitle: async () =>
+        this.services.state.get('data_source_alerts'),
       http: core.http,
     });
 
     // Setup services
+    this.runtime.setup.state = this.services.state.setup();
     this.runtime.setup.dashboardSecurity =
       await this.services.dashboardSecurity.setup({
         updateData$: this.services.http.server.auth$,
@@ -103,6 +135,7 @@ export class WazuhCorePlugin
         ...hooks,
         ...this.runtime.setup.dashboardSecurity.hooks,
         ...this.runtime.setup.serverSecurity.hooks,
+        ...this.runtime.setup.state.hooks,
       },
       hocs: {
         ...this.runtime.setup.dashboardSecurity.hocs,
@@ -123,6 +156,7 @@ export class WazuhCorePlugin
 
     // Start services
     await this.services.configuration.start({ http: core.http });
+    this.services.state.start();
     await this.services.dashboardSecurity.start();
     await this.services.http.start();
 
@@ -138,6 +172,7 @@ export class WazuhCorePlugin
         ...hooks,
         ...this.runtime.setup.dashboardSecurity.hooks,
         ...this.runtime.setup.serverSecurity.hooks,
+        ...this.runtime.setup.state.hooks,
       },
       hocs: {
         ...this.runtime.setup.dashboardSecurity.hocs,
@@ -151,5 +186,7 @@ export class WazuhCorePlugin
     };
   }
 
-  public stop() {}
+  public stop() {
+    this.services.state.stop();
+  }
 }

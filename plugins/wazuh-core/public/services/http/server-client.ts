@@ -316,18 +316,6 @@ export class WzRequest implements HTTPClientServer {
 
       return data;
     } catch (error) {
-      // TODO: implement
-      // const options: UIErrorLog = {
-      //   context: `${WzAuthentication.name}.refresh`,
-      //   level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
-      //   severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
-      //   error: {
-      //     error: error,
-      //     message: error.message || error,
-      //     title: `${error.name}: Error getting the authorization token`,
-      //   },
-      // };
-      // getErrorOrchestrator().handleError(options);
       this.auth$.next({
         token: null,
         policies: null,
@@ -419,9 +407,6 @@ export class WzRequest implements HTTPClientServer {
       return response;
     } catch (error) {
       if (error.response) {
-        // TODO: implement
-        // const wzMisc = new WzMisc();
-        // wzMisc.setApiIsDown(true);
         const response: string = error.response.data?.message || error.message;
 
         throw this.returnErrorInstance(response);
