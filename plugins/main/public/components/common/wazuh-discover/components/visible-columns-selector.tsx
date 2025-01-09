@@ -4,7 +4,6 @@ import classNames from 'classnames';
 import {
   EuiPopover,
   EuiPopoverTitle,
-  EuiPopoverFooter,
   EuiButtonEmpty,
   EuiFieldText,
   EuiFlexGroup,
@@ -58,7 +57,11 @@ export const DataGridVisibleColumnsSelector = ({
         />
       }
     >
-      <EuiIcon type='iInCircle' aria-label='Info' />
+      <EuiIcon
+        className='wz-margin-left-4'
+        type='iInCircle'
+        aria-label='Info'
+      />
     </EuiToolTip>
   );
 
@@ -145,40 +148,6 @@ export const DataGridVisibleColumnsSelector = ({
           );
         })}
       </div>
-      <EuiPopoverFooter>
-        <EuiFlexGroup
-          gutterSize='s'
-          responsive={false}
-          justifyContent='spaceBetween'
-        >
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
-              size='xs'
-              flush='left'
-              onClick={() =>
-                setVisibleColumns(availableColumns.map(({ id }) => id).sort())
-              }
-            >
-              <FormattedMessage
-                id='euiColumnSelector.selectAll'
-                defaultMessage='Show all'
-              />
-            </EuiButtonEmpty>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
-              size='xs'
-              flush='right'
-              onClick={() => setVisibleColumns([])}
-            >
-              <FormattedMessage
-                id='euiColumnSelector.hideAll'
-                defaultMessage='Hide all'
-              />
-            </EuiButtonEmpty>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiPopoverFooter>
     </EuiPopover>
   );
 };
