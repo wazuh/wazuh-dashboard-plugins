@@ -12,6 +12,8 @@ import {
   EuiSwitch,
   EuiDataGridColumn,
   EuiDataGridColumnVisibility,
+  EuiToolTip,
+  EuiIcon,
 } from '@elastic/eui';
 
 // Based on https://github.com/opensearch-project/oui/blob/1.8.1/src/components/datagrid/column_selector.tsx
@@ -27,21 +29,38 @@ export const DataGridVisibleColumnsSelector = ({
   const [searchValue, setSearchValue] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
+  const maxAvailableColumns = 500;
+
   const { visibleColumns, setVisibleColumns } = columnVisibility;
 
   const searchValueLowerCase = searchValue.toLocaleLowerCase();
 
   const filteredColumns = searchValue
-    ? availableColumns.filter(({ name }) =>
-        name.toLowerCase().includes(searchValueLowerCase),
-      )
-    : availableColumns;
+    ? availableColumns
+        .filter(({ name }) => name.toLowerCase().includes(searchValueLowerCase))
+        .slice(0, maxAvailableColumns)
+    : availableColumns.slice(0, maxAvailableColumns);
 
   const controlBtnClasses = classNames('euiDataGrid__controlBtn', {
     // TODO: research if this is required
     // 'euiDataGrid__controlBtn--active':
     //   availableColumns.length - visibleColumns.length > 0,
   });
+
+  const warningTooltip = (
+    <EuiToolTip
+      position='top'
+      content={
+        <FormattedMessage
+          id='wz.discover.availableFields.warningTooltip'
+          defaultMessage='The number of columns exceeds the limit of {maxAvailableColumns}. Only the first {maxAvailableColumns} columns are displayed but you can still search on all columns.'
+          values={{ maxAvailableColumns }}
+        />
+      }
+    >
+      <EuiIcon type='iInCircle' aria-label='Info' />
+    </EuiToolTip>
+  );
 
   return (
     <EuiPopover
@@ -65,6 +84,7 @@ export const DataGridVisibleColumnsSelector = ({
             id='wz.discover.availableFields'
             defaultMessage='Available fields'
           />
+          {availableColumns.length > maxAvailableColumns && warningTooltip}
         </EuiButtonEmpty>
       }
     >
