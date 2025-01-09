@@ -363,17 +363,6 @@ services:
       - '1515:1515'
       - '1516:1516'
       - '55000:55000'
-  python:
-    image: python:3.10.12-alpine3.18
-    profiles:
-      - 'server'
-      - 'saml'
-      - 'standard'
-    networks:
-      - os-dev
-    volumes:
-      - '../../scripts/vulnerabilities-events-injector:/app'
-    entrypoint: ['tail', '-f', '/dev/null']
 
 networks:
   os-dev:
