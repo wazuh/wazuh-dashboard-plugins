@@ -51,6 +51,7 @@ import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { wzDiscoverRenderColumns } from '../../../../common/wazuh-discover/render-columns';
 import { DocumentViewTableAndJson } from '../../../../common/wazuh-discover/components/document-view-table-and-json';
 import { WzSearchBar } from '../../../../common/search-bar';
+import { DataGridVisibleColumnsSelector } from '../../../../common/wazuh-discover/components/visible-columns-selector';
 
 const InventoryVulsComponent = () => {
   const {
@@ -213,6 +214,7 @@ const InventoryVulsComponent = () => {
                     {...dataGridProps}
                     className={sideNavDocked ? 'dataGridDockedNav' : ''}
                     toolbarVisibility={{
+                      showColumnSelector: { allowHide: false },
                       additionalControls: (
                         <>
                           <HitsCounter
@@ -239,13 +241,18 @@ const InventoryVulsComponent = () => {
                             }
                             size='xs'
                             iconType='exportAction'
-                            color='primary'
+                            color='text'
                             isLoading={isExporting}
                             className='euiDataGrid__controlBtn'
                             onClick={onClickExportResults}
                           >
                             Export Formated
                           </EuiButtonEmpty>
+
+                          <DataGridVisibleColumnsSelector
+                            availableColumns={dataGridProps.columnsAvailable}
+                            columnVisibility={dataGridProps.columnVisibility}
+                          />
                         </>
                       ),
                     }}

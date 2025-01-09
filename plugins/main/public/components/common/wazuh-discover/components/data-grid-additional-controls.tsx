@@ -4,11 +4,14 @@ import {
   EuiFlexItem,
   EuiFlexGroup,
   EuiText,
+  EuiDataGridColumn,
+  EuiDataGridColumnVisibility,
 } from '@elastic/eui';
 import { HitsCounter } from '../../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../../kibana-integrations/discover/application/helpers';
 import { MAX_ENTRIES_PER_QUERY } from '../../data-grid/data-grid-service';
 import { formatUIDate } from '../../../../react-services/time-service';
+import { DataGridVisibleColumnsSelector } from './visible-columns-selector';
 
 type tDiscoverDataGridAdditionalControlsProps = {
   totalHits: number;
@@ -16,6 +19,8 @@ type tDiscoverDataGridAdditionalControlsProps = {
   onClickExportResults: () => void;
   maxEntriesPerQuery?: number;
   dateRange: TimeRange;
+  columnsAvailable: EuiDataGridColumn[];
+  columnVisibility: EuiDataGridColumnVisibility;
 };
 
 const DiscoverDataGridAdditionalControls = (
@@ -27,8 +32,9 @@ const DiscoverDataGridAdditionalControls = (
     maxEntriesPerQuery = MAX_ENTRIES_PER_QUERY,
     onClickExportResults,
     dateRange,
+    columnsAvailable,
+    columnVisibility,
   } = props;
-
   const onHandleExportResults = () => {
     onClickExportResults && onClickExportResults();
   };
@@ -69,13 +75,18 @@ const DiscoverDataGridAdditionalControls = (
         disabled={totalHits === 0 || isExporting}
         size='xs'
         iconType='exportAction'
-        color='primary'
+        color='text'
         isLoading={isExporting}
         className='euiDataGrid__controlBtn'
         onClick={onHandleExportResults}
       >
         Export Formated
       </EuiButtonEmpty>
+
+      <DataGridVisibleColumnsSelector
+        availableColumns={columnsAvailable}
+        columnVisibility={columnVisibility}
+      />
     </>
   );
 };

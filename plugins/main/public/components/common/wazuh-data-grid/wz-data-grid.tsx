@@ -159,6 +159,10 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
       {!isLoading && results?.hits?.total > 0 ? (
         <div className='wazuhDataGridContainer'>
           <EuiDataGrid
+            /* TODO: this component is not used in the current plugins so this could be removed.
+              If this is used in future versions, we should add the functionality to manage the
+              visibility of columns thorugh the Available fields button.
+            */
             {...dataGridProps}
             className={sideNavDocked ? 'dataGridDockedNav' : ''}
             toolbarVisibility={{

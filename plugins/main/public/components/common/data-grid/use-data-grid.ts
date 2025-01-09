@@ -219,11 +219,17 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     return [...defaults, ...nonDefaults];
   };
 
+  const columnsAvailable = filterColumns();
+
+  const visibleColumns = defaultColumnsPosition(columnVisibility, columns);
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns: filterColumns(),
+    columnsAvailable, // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
+    columns: visibleColumns.map(columnId =>
+      columnsAvailable.find(({ id }) => id === columnId),
+    ),
     columnVisibility: {
-      visibleColumns: defaultColumnsPosition(columnVisibility, columns),
+      visibleColumns,
       setVisibleColumns: setVisibility,
     },
     renderCellValue: renderCellValue,

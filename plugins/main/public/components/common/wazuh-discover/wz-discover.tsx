@@ -273,11 +273,14 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                     {...dataGridProps}
                     className={sideNavDocked ? 'dataGridDockedNav' : ''}
                     toolbarVisibility={{
+                      showColumnSelector: { allowHide: false },
                       additionalControls: (
                         <>
                           <DiscoverDataGridAdditionalControls
                             totalHits={results?.hits?.total || 0}
                             isExporting={isExporting}
+                            columnsAvailable={dataGridProps.columnsAvailable}
+                            columnVisibility={dataGridProps.columnVisibility}
                             onClickExportResults={onClickExportResults}
                             maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
                             dateRange={absoluteDateRange}
