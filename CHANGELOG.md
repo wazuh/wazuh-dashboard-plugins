@@ -8,6 +8,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.1
 
+### Changed
+
+- Move the ability to manage the visibility of fields in `Events` and `Vulnerability Detection` > `Inventory` tables from `Columns` button to a new `Available fields` button enhancing the performance of the view [#7226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7226)
+- Change the color of `Export formatted` button of data grid tables to match the color of the rest of table buttons [#7226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7226)
+
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 07
 
 ### Added
