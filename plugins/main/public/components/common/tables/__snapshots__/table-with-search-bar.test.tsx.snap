@@ -110,7 +110,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
               <EuiSpacer />
               <div>
                 <EuiLink
-                  href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                  href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                   rel="noopener noreferrer"
                   target="__blank"
                 >
@@ -179,7 +179,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                   <EuiSpacer />
                   <div>
                     <EuiLink
-                      href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                      href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                       rel="noopener noreferrer"
                       target="__blank"
                     >
@@ -259,7 +259,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                             <EuiSpacer />
                             <div>
                               <EuiLink
-                                href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                                href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                                 rel="noopener noreferrer"
                                 target="__blank"
                               >
@@ -369,7 +369,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                                       <EuiSpacer />
                                       <div>
                                         <EuiLink
-                                          href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                                          href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                                           rel="noopener noreferrer"
                                           target="__blank"
                                         >
@@ -435,7 +435,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                                         <EuiSpacer />
                                         <div>
                                           <EuiLink
-                                            href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                                            href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                                             rel="noopener noreferrer"
                                             target="__blank"
                                           >
