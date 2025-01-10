@@ -15,7 +15,7 @@ import { ServerAPIClient } from './server-api-client';
 import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
 import { HTTP_STATUS_CODES } from '../../common/constants';
 
-interface IAPIHost {
+export interface IAPIHost {
   id: string;
   url: string;
   username: string;
