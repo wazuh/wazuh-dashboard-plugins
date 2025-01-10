@@ -85,7 +85,8 @@ export const DataGridVisibleColumnsSelector = ({
         >
           <FormattedMessage
             id='wz.discover.availableFields'
-            defaultMessage='Available fields'
+            defaultMessage='{availableColumns} available fields'
+            values={{ availableColumns: availableColumns?.length ?? 0 }}
           />
           {availableColumns.length > maxAvailableColumns && warningTooltip}
         </EuiButtonEmpty>
