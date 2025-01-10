@@ -13,7 +13,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
 - Changed the width of the command column, relocate argvs column and change the width of the rest of the columns in the table processes. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
 
-## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 06
+## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.10.1
+
+## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 08
 
 ### Added
 
@@ -57,12 +63,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the Mitre ATT&CK exception in the agent view, the redirections of ID, Tactics, Dashboard Icon and Event Icon in the drop-down menu and the card not displaying information when the flyout was opened [#7116](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7116)
 - Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed ability to filter from files inventory details flyout of File Integrity Monitoring [#7119](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7119) [#7163](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7163)
-- Fixed endpoint group module name and indexer management order [#7150](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7150)
+- Fixed endpoint group module name and indexer management order [#7161](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7161)
 - Fixed Invalid date filter applied on FIM details flyout [#7160](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7160)
 - Fixed the check updates UI was displayed despite it could be configured as disabled [#7156](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7156)
 - Fixed filter by value in document details in safari [#7151](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7151)
 - Fixed error message to prevent pass no strings to the wazuh logger [#7167](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7167)
 - Fixed the rendering of the `data.vunerability.reference` in the table and flyout [#7177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7177)
+- Fixed incorrect or empty Wazuh API version displayed after upgrade [#440](https://github.com/wazuh/wazuh-dashboard/issues/440)
 
 ### Removed
 
