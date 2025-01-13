@@ -32,7 +32,7 @@ export const DataGridVisibleColumnsSelector = ({
 
   const { visibleColumns, setVisibleColumns } = columnVisibility;
 
-  const searchValueLowerCase = searchValue.toLocaleLowerCase();
+  const searchValueLowerCase = searchValue.toLowerCase();
 
   const filteredColumns = searchValue
     ? availableColumns
