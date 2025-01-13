@@ -155,7 +155,7 @@ export const OverviewCards = ({
                         onClick={goNodes}
                         style={{ height: 'auto' }}
                       >
-                        {nodesCount}
+                        {Number(nodesCount).toLocaleString('en-US')}
                       </EuiButtonEmpty>
                     </EuiToolTip>
                   ),
@@ -187,7 +187,7 @@ export const OverviewCards = ({
                         onClick={goAgents}
                         style={{ height: 'auto' }}
                       >
-                        {agentsCount}
+                        {Number(agentsCount).toLocaleString('en-US')}
                       </EuiButtonEmpty>
                     </EuiToolTip>
                   ),

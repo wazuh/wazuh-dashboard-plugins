@@ -206,7 +206,9 @@ export function TableWzAPI({
                     {isLoading ? (
                       <EuiLoadingSpinner size='s' />
                     ) : (
-                      <span>({totalItems})</span>
+                      <span>
+                        ({Number(totalItems).toLocaleString('en-US')})
+                      </span>
                     )}
                   </h1>
                 </EuiTitle>

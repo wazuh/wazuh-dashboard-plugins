@@ -24,7 +24,7 @@ export function ChartLegend({ data }: ChartLegendProps) {
           textOverflow: 'ellipsis',
           overflow: 'hidden',
         }}
-      >{`${label} (${value})`}</div>
+      >{`${label} (${Number(value).toLocaleString('en-US')})`}</div>
     ),
     icon: <EuiIcon type='dot' size='l' color={labelColor} />,
     ...rest,
