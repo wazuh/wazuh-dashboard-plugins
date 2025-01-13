@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.10.1
+- Added comma separators to numbers [#7233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7233)
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 08
 
