@@ -34,36 +34,19 @@ export const DataGridVisibleColumnsSelector = ({
 
   const searchValueLowerCase = searchValue.toLowerCase();
 
-  const filteredColumns = searchValue
-    ? availableColumns
-        .filter(({ name }) => name.toLowerCase().includes(searchValueLowerCase))
-        .slice(0, maxAvailableColumns)
-    : availableColumns.slice(0, maxAvailableColumns);
+  const filteredColumns = (
+    searchValue
+      ? availableColumns.filter(({ name }) =>
+          name.toLowerCase().includes(searchValueLowerCase),
+        )
+      : availableColumns
+  ).slice(0, maxAvailableColumns);
 
   const controlBtnClasses = classNames('euiDataGrid__controlBtn', {
     // TODO: research if this is required
     // 'euiDataGrid__controlBtn--active':
     //   availableColumns.length - visibleColumns.length > 0,
   });
-
-  const warningTooltip = (
-    <EuiToolTip
-      position='top'
-      content={
-        <FormattedMessage
-          id='wz.discover.availableFields.warningTooltip'
-          defaultMessage='The number of columns exceeds the limit of {maxAvailableColumns}. Only the first {maxAvailableColumns} columns are displayed but you can still search on all columns.'
-          values={{ maxAvailableColumns }}
-        />
-      }
-    >
-      <EuiIcon
-        className='wz-margin-left-4'
-        type='iInCircle'
-        aria-label='Info'
-      />
-    </EuiToolTip>
-  );
 
   return (
     <EuiPopover
@@ -88,7 +71,24 @@ export const DataGridVisibleColumnsSelector = ({
             defaultMessage='{availableColumns} available fields'
             values={{ availableColumns: availableColumns?.length ?? 0 }}
           />
-          {availableColumns.length > maxAvailableColumns && warningTooltip}
+          {availableColumns.length > maxAvailableColumns && (
+            <EuiToolTip
+              position='top'
+              content={
+                <FormattedMessage
+                  id='wz.discover.availableFields.warningTooltip'
+                  defaultMessage='The number of columns exceeds the limit of {maxAvailableColumns}. Only the first {maxAvailableColumns} columns are displayed but you can still search on all columns.'
+                  values={{ maxAvailableColumns }}
+                />
+              }
+            >
+              <EuiIcon
+                className='wz-margin-left-4'
+                type='iInCircle'
+                aria-label='Info'
+              />
+            </EuiToolTip>
+          )}
         </EuiButtonEmpty>
       }
     >
