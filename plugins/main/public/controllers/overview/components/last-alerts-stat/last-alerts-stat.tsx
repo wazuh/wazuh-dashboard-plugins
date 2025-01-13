@@ -155,7 +155,7 @@ export function LastAlertsStat({
                 }}
                 href={discoverLocation}
               >
-                {statValue}
+                {Number(statValue).toLocaleString('en-US')}
               </EuiLink>
             </EuiToolTip>
           }
