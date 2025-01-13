@@ -107,7 +107,7 @@ export const DataGridVisibleColumnsSelector = ({
       <div className='euiDataGrid__controlScroll'>
         {filteredColumns.map(({ name, id }) => {
           return (
-            <div key={id} className='ouiDataGridColumnSelector__item'>
+            <div key={id} className='euiDataGridColumnSelector__item'>
               <EuiFlexGroup
                 responsive={false}
                 gutterSize='m'
