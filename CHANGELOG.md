@@ -59,6 +59,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error message to prevent pass no strings to the wazuh logger [#7167](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7167)
 - Fixed the rendering of the `data.vunerability.reference` in the table and flyout [#7177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7177)
 - Fixed incorrect or empty Wazuh API version displayed after upgrade [#440](https://github.com/wazuh/wazuh-dashboard/issues/440)
+- Fixed typo in flyout title for available updates [#7235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7235)
 
 ### Removed
 
