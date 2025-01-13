@@ -583,7 +583,7 @@ export const ApiTable = compose(withErrorBoundary)(
                   <EuiFlexItem grow={false}>
                     <WzButtonOpenFlyout
                       tooltip={{ content: 'View available updates' }}
-                      flyoutTitle={'Availabe updates'}
+                      flyoutTitle={'Available updates'}
                       flyoutBody={() => {
                         return <AvailableUpdatesFlyout api={api} />;
                       }}
