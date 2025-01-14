@@ -1,7 +1,9 @@
 import { i18n } from '@osd/i18n';
+import { createHashHistory } from 'history';
 import {
   AppMountParameters,
   CoreSetup,
+  CoreStart,
   Plugin,
 } from '../../../src/core/public';
 import { PLUGIN_NAME } from '../common';
@@ -10,6 +12,7 @@ import {
   WazuhSecurityPoliciesPluginStart,
   AppPluginStartDependencies,
 } from './types';
+import { setCore, setHistory } from './plugin-services';
 
 export class WazuhSecurityPoliciesPlugin
   implements
@@ -34,6 +37,8 @@ export class WazuhSecurityPoliciesPlugin
         // Get start services as specified in opensearch_dashboards.json
         const [coreStart, depsStart] = await core.getStartServices();
 
+        setHistory(createHashHistory());
+
         // Render the application
         return renderApp(
           coreStart,
@@ -56,7 +61,8 @@ export class WazuhSecurityPoliciesPlugin
     };
   }
 
-  public start(): WazuhSecurityPoliciesPluginStart {
+  public start(core: CoreStart): WazuhSecurityPoliciesPluginStart {
+    setCore(core);
     return {};
   }
 

@@ -1,112 +1,112 @@
-import React, { useState } from 'react';
-import { i18n } from '@osd/i18n';
+import React, { useState, useEffect } from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
-import { BrowserRouter as Router } from 'react-router-dom';
 import {
-  EuiHorizontalRule,
   EuiPage,
   EuiPageBody,
-  EuiPageContent,
-  EuiPageContentBody,
-  EuiPageContentHeader,
-  EuiPageHeader,
-  EuiTitle,
-  EuiText,
-  EuiButton,
+  EuiSideNav,
+  EuiPageSideBar,
+  EuiPanel,
 } from '@elastic/eui';
-import { CoreStart } from '../../../../src/core/public';
-import { NavigationPublicPluginStart } from '../../../../src/plugins/navigation/public';
-import { PLUGIN_ID, PLUGIN_NAME } from '../../common';
+import { Router, Route, Switch, Redirect } from 'react-router-dom';
+import { getCore, getHistory } from '../plugin-services';
 
-interface WazuhSecurityPoliciesAppDeps {
-  basename: string;
-  notifications: CoreStart['notifications'];
-  http: CoreStart['http'];
-  navigation: NavigationPublicPluginStart;
+interface ViewInterface {
+  name: string;
+  id: string;
+  render: () => React.ReactNode;
 }
 
-export const WazuhSecurityPoliciesApp = ({
-  basename,
-  notifications,
-  http,
-  navigation,
-}: WazuhSecurityPoliciesAppDeps) => {
-  // Use React hooks to manage state.
-  const [timestamp, setTimestamp] = useState<string | undefined>();
+const views: ViewInterface[] = [
+  {
+    name: 'Integrations',
+    id: 'integrations',
+    render: () => <div>Integrations</div>,
+  },
+  {
+    name: 'Rules',
+    id: 'rules',
+    render: () => <div>Rules</div>,
+  },
+  {
+    name: 'Decoders',
+    id: 'decoders',
+    render: () => <div>Decoders</div>,
+  },
+  {
+    name: 'KVDB',
+    id: 'kvdb',
+    render: () => <div>KVDBs</div>,
+  },
+];
 
-  const onClickHandler = () => {
-    // Use the core http service to make a response to the server API.
-    http.get('/api/wazuh_security_policies/example').then(res => {
-      setTimestamp(res.time);
-      // Use the core notifications service to display a success message.
-      notifications.toasts.addSuccess(
-        i18n.translate('wazuhSecurityPolicies.dataUpdated', {
-          defaultMessage: 'Data updated',
-        }),
-      );
-    });
-  };
+export const WazuhSecurityPoliciesApp = () => {
+  const history = getHistory();
+  const [currentTab, setCurrentTab] = useState('');
+
+  useEffect(() => {
+    setCurrentTab(history.location.pathname);
+  }, []);
+
+  const sideNav = [
+    {
+      name: 'Ruleset',
+      id: 'wazuhRuleset',
+      items: views.map(item => ({
+        id: item.id,
+        name: item.name,
+        onClick: () => {
+          history.push(`${item.id}`);
+          setCurrentTab(item.id);
+        },
+        isSelected:
+          item.id === currentTab || history.location.pathname === `/${item.id}`,
+      })),
+    },
+  ];
 
   // Render the application DOM.
   // Note that `navigation.ui.TopNavMenu` is a stateful component exported on the `navigation` plugin's start contract.
   return (
-    <Router basename={basename}>
+    <Router history={history}>
       <I18nProvider>
         <>
-          <navigation.ui.TopNavMenu
-            appName={PLUGIN_ID}
-            showSearchBar={true}
-            useDefaultBehaviors={true}
-          />
-          <EuiPage restrictWidth='1000px'>
+          {/* <EuiPage restrictWidth='1000px'> */}
+          <EuiPage>
+            <EuiPageSideBar>
+              <EuiSideNav aria-label='Ruleset' items={sideNav} />
+            </EuiPageSideBar>
             <EuiPageBody component='main'>
-              <EuiPageHeader>
-                <EuiTitle size='l'>
-                  <h1>
-                    <FormattedMessage
-                      id='wazuhSecurityPolicies.helloWorldText'
-                      defaultMessage='{name}'
-                      values={{ name: PLUGIN_NAME }}
+              <EuiPanel
+                paddingSize='l'
+                color='transparent'
+                hasShadow={false}
+                hasBorder={false}
+              >
+                <Switch>
+                  {views.map(view => (
+                    <Route
+                      key={view.id}
+                      path={`/${view.id}`}
+                      component={() => {
+                        getCore().chrome.setBreadcrumbs([
+                          {
+                            className: 'osdBreadcrumbs',
+                            text: (
+                              <FormattedMessage
+                                id={`wazuhSecurityPolicies.breadcrumbs.${view.id}`}
+                                defaultMessage={view.name}
+                              />
+                            ),
+                          },
+                        ]);
+
+                        return view.render();
+                      }}
                     />
-                  </h1>
-                </EuiTitle>
-              </EuiPageHeader>
-              <EuiPageContent>
-                <EuiPageContentHeader>
-                  <EuiTitle>
-                    <h2>
-                      <FormattedMessage
-                        id='wazuhSecurityPolicies.congratulationsTitle'
-                        defaultMessage='Congratulations, you have successfully created a new OpenSearch Dashboards Plugin!'
-                      />
-                    </h2>
-                  </EuiTitle>
-                </EuiPageContentHeader>
-                <EuiPageContentBody>
-                  <EuiText>
-                    <p>
-                      <FormattedMessage
-                        id='wazuhSecurityPolicies.content'
-                        defaultMessage='Look through the generated code and check out the plugin development documentation.'
-                      />
-                    </p>
-                    <EuiHorizontalRule />
-                    <p>
-                      <FormattedMessage
-                        id='wazuhSecurityPolicies.timestampText'
-                        defaultMessage='Last timestamp: {time}'
-                        values={{ time: timestamp ?? 'Unknown' }}
-                      />
-                    </p>
-                    <EuiButton type='primary' size='s' onClick={onClickHandler}>
-                      <FormattedMessage
-                        id='wazuhSecurityPolicies.buttonText'
-                        defaultMessage='Get data'
-                      />
-                    </EuiButton>
-                  </EuiText>
-                </EuiPageContentBody>
-              </EuiPageContent>
+                  ))}
+                  <Redirect to={`/${views[0].id}`} />
+                </Switch>
+              </EuiPanel>
             </EuiPageBody>
           </EuiPage>
         </>
