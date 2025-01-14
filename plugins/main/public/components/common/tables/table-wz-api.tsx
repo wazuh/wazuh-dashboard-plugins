@@ -27,6 +27,7 @@ import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
 import { useStateStorage } from '../hooks';
+import { formatUINumber } from '../../../react-services/format-number';
 
 /**
  * Search input custom filter button
@@ -206,9 +207,7 @@ export function TableWzAPI({
                     {isLoading ? (
                       <EuiLoadingSpinner size='s' />
                     ) : (
-                      <span>
-                        ({Number(totalItems).toLocaleString('en-US')})
-                      </span>
+                      <span>({formatUINumber(totalItems)})</span>
                     )}
                   </h1>
                 </EuiTitle>

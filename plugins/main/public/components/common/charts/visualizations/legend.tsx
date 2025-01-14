@@ -2,6 +2,7 @@ import React from 'react';
 import { EuiIcon } from '@elastic/eui';
 import { EuiListGroup } from '@elastic/eui';
 import './legend.scss';
+import { formatUINumber } from '../../../../react-services/format-number';
 
 type ChartLegendProps = {
   data: {
@@ -24,7 +25,7 @@ export function ChartLegend({ data }: ChartLegendProps) {
           textOverflow: 'ellipsis',
           overflow: 'hidden',
         }}
-      >{`${label} (${Number(value).toLocaleString('en-US')})`}</div>
+      >{`${label} (${formatUINumber(value)})`}</div>
     ),
     icon: <EuiIcon type='dot' size='l' color={labelColor} />,
     ...rest,

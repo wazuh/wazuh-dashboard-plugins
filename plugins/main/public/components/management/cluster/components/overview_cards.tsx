@@ -15,6 +15,7 @@ import '../dashboard/cluster_dashboard.scss';
 import { getPlugins } from '../../../../kibana-services';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { tFilter, tParsedIndexPattern } from '../../../common/data-source';
+import { formatUINumber } from '../../../../react-services/format-number';
 
 interface OverviewCardsProps {
   goAgents: () => void;
@@ -155,7 +156,7 @@ export const OverviewCards = ({
                         onClick={goNodes}
                         style={{ height: 'auto' }}
                       >
-                        {Number(nodesCount).toLocaleString('en-US')}
+                        {formatUINumber(nodesCount)}
                       </EuiButtonEmpty>
                     </EuiToolTip>
                   ),
@@ -187,7 +188,7 @@ export const OverviewCards = ({
                         onClick={goAgents}
                         style={{ height: 'auto' }}
                       >
-                        {Number(agentsCount).toLocaleString('en-US')}
+                        {formatUINumber(agentsCount)}
                       </EuiButtonEmpty>
                     </EuiToolTip>
                   ),

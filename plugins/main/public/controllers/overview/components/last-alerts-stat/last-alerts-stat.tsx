@@ -20,6 +20,7 @@ import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
 } from '../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
+import { formatUINumber } from '../../../../react-services/format-number';
 
 type SeverityKey = 'low' | 'medium' | 'high' | 'critical';
 
@@ -158,7 +159,7 @@ export function LastAlertsStat({
                 {
                   // statValue can take the value of "-" if countLastAlerts does not exist.
                   typeof countLastAlerts === 'number'
-                    ? Number(statValue).toLocaleString('en-US')
+                    ? formatUINumber(Number(statValue))
                     : statValue
                 }
               </EuiLink>
