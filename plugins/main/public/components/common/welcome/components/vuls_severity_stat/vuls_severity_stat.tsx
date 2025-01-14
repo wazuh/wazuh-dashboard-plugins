@@ -1,6 +1,5 @@
 import React from 'react';
 import { EuiStat, EuiStatProps } from '@elastic/eui';
-import { formatUINumber } from '../../../../../react-services/format-number';
 
 type VulsSeverityStatProps = {
   value: string;

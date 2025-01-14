@@ -156,7 +156,7 @@ export function LastAlertsStat({
                 }}
                 href={discoverLocation}
               >
-                {formatUINumber(Number(statValue))}
+                {formatUINumber(statValue)}
               </EuiLink>
             </EuiToolTip>
           }
