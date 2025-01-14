@@ -63,6 +63,7 @@ export class WazuhSecurityPoliciesPlugin
 
   public start(core: CoreStart): WazuhSecurityPoliciesPluginStart {
     setCore(core);
+
     return {};
   }
 
