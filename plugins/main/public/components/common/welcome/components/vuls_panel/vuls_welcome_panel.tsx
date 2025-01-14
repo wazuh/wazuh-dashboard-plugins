@@ -29,6 +29,7 @@ import { WzLink } from '../../../../../components/wz-link/wz-link';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../../../../components/overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
+import { formatUINumber } from '../../../../../react-services/format-number';
 
 const VulsPanelContent = ({ agent }) => {
   const {
@@ -97,7 +98,7 @@ const VulsPanelContent = ({ agent }) => {
     const value =
       severityStats?.find(v => v.key.toUpperCase() === severity.toUpperCase())
         ?.doc_count || '0';
-    return value ? `${value} ${severity}` : '0';
+    return value ? `${formatUINumber(value)} ${severity}` : '0';
   };
 
   const renderSeverityStats = (severity, index) => {

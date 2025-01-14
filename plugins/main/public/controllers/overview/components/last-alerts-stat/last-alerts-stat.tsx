@@ -156,12 +156,7 @@ export function LastAlertsStat({
                 }}
                 href={discoverLocation}
               >
-                {
-                  // statValue can take the value of "-" if countLastAlerts does not exist.
-                  typeof countLastAlerts === 'number'
-                    ? formatUINumber(Number(statValue))
-                    : statValue
-                }
+                {formatUINumber(Number(statValue))}
               </EuiLink>
             </EuiToolTip>
           }

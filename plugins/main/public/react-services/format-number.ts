@@ -10,19 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-export function formatUINumber(number: number) {
-  if (typeof number !== 'number') {
-    return '-';
+export function formatUINumber(value) {
+  if (Number.isNaN(Number(value))) {
+    return value;
   }
-  return Number(number).toLocaleString('en-US');
-}
-
-export function formatUIStringWithNumbers(value: string) {
-  if (typeof value !== 'string') {
-    return '-';
-  }
-
-  return value.replace(/\d+/g, match => {
-    return Number(match).toLocaleString('en-US');
-  });
+  return Number(value).toLocaleString('en-US');
 }
