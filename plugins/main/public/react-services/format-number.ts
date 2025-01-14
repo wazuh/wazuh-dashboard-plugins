@@ -16,3 +16,13 @@ export function formatUINumber(number: number) {
   }
   return Number(number).toLocaleString('en-US');
 }
+
+export function formatUIStringWithNumbers(value: string) {
+  if (typeof value !== 'string') {
+    return '-';
+  }
+
+  return value.replace(/\d+/g, match => {
+    return Number(match).toLocaleString('en-US');
+  });
+}

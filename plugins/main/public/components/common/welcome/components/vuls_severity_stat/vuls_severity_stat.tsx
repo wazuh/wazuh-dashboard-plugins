@@ -1,8 +1,9 @@
 import React from 'react';
 import { EuiStat, EuiStatProps } from '@elastic/eui';
+import { formatUIStringWithNumbers } from '../../../../../react-services/format-number';
 
 type VulsSeverityStatProps = {
-  value: string;
+  value: number;
   color: string;
   textAlign?: EuiStatProps['textAlign'];
   statElement?: EuiStatProps['descriptionElement'];
@@ -19,7 +20,7 @@ export default function VulsSeverityStat({
   return (
     <EuiStat
       className='vuls-severity-stat'
-      title={value}
+      title={formatUIStringWithNumbers(value)}
       description={''}
       titleElement={statElement}
       isLoading={isLoading}
