@@ -135,7 +135,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           rel="noreferrer"
                           style="font-weight: normal; color: rgb(189, 39, 30);"
                         >
-                          NaN
+                          -
                         </a>
                       </span>
                     </p>
@@ -180,7 +180,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           rel="noreferrer"
                           style="font-weight: normal; color: rgb(254, 197, 20);"
                         >
-                          NaN
+                          -
                         </a>
                       </span>
                     </p>
@@ -225,7 +225,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           rel="noreferrer"
                           style="font-weight: normal; color: rgb(96, 146, 192);"
                         >
-                          NaN
+                          -
                         </a>
                       </span>
                     </p>
@@ -270,7 +270,7 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
                           rel="noreferrer"
                           style="font-weight: normal; color: rgb(0, 120, 113);"
                         >
-                          NaN
+                          -
                         </a>
                       </span>
                     </p>

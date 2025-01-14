@@ -155,7 +155,12 @@ export function LastAlertsStat({
                 }}
                 href={discoverLocation}
               >
-                {Number(statValue).toLocaleString('en-US')}
+                {
+                  // statValue can take the value of "-" if countLastAlerts does not exist.
+                  typeof countLastAlerts === 'number'
+                    ? Number(statValue).toLocaleString('en-US')
+                    : statValue
+                }
               </EuiLink>
             </EuiToolTip>
           }
