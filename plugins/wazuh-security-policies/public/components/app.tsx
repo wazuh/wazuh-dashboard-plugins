@@ -9,6 +9,7 @@ import {
 } from '@elastic/eui';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { getCore, getHistory } from '../plugin-services';
+import { IntegrationOverview } from './integretions/overview';
 
 interface ViewInterface {
   name: string;
@@ -20,7 +21,7 @@ const views: ViewInterface[] = [
   {
     name: 'Integrations',
     id: 'integrations',
-    render: () => <div>Integrations</div>,
+    render: () => <IntegrationOverview />,
   },
   {
     name: 'Rules',
@@ -70,14 +71,13 @@ export const WazuhSecurityPoliciesApp = () => {
     <Router history={history}>
       <I18nProvider>
         <>
-          {/* <EuiPage restrictWidth='1000px'> */}
-          <EuiPage>
+          <EuiPage paddingSize='m'>
             <EuiPageSideBar>
               <EuiSideNav aria-label='Ruleset' items={sideNav} />
             </EuiPageSideBar>
             <EuiPageBody component='main'>
               <EuiPanel
-                paddingSize='l'
+                paddingSize='none'
                 color='transparent'
                 hasShadow={false}
                 hasBorder={false}
