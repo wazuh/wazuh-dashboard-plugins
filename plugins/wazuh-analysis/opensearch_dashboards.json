@@ -1,0 +1,8 @@
+{
+  "id": "wazuhAnalysis",
+  "version": "5.0.0-00",
+  "opensearchDashboardsVersion": "opensearchDashboards",
+  "server": true,
+  "ui": true,
+  "requiredPlugins": []
+}
