@@ -7,7 +7,7 @@ import {
   EuiPageSideBar,
   EuiPanel,
 } from '@elastic/eui';
-import { Router, Route, Switch, Redirect } from 'react-router-dom';
+import { Router, Route, Switch, Redirect, useParams } from 'react-router-dom';
 import { getCore, getHistory } from '../plugin-services';
 import { IntegrationOverview } from './integretions/overview';
 
@@ -15,6 +15,7 @@ interface ViewInterface {
   name: string;
   id: string;
   render: () => React.ReactNode;
+  renderDetails?: () => React.ReactNode;
 }
 
 const views: ViewInterface[] = [
@@ -22,6 +23,7 @@ const views: ViewInterface[] = [
     name: 'Integrations',
     id: 'integrations',
     render: () => <IntegrationOverview />,
+    renderDetails: () => <div>Details</div>,
   },
   {
     name: 'Rules',
@@ -56,7 +58,7 @@ export const WazuhSecurityPoliciesApp = () => {
         id: item.id,
         name: item.name,
         onClick: () => {
-          history.push(`${item.id}`);
+          history.push(`/${item.id}`);
           setCurrentTab(item.id);
         },
         isSelected:
@@ -83,7 +85,39 @@ export const WazuhSecurityPoliciesApp = () => {
                 hasBorder={false}
               >
                 <Switch>
-                  {views.map(view => (
+                  {views.map(view => [
+                    view.renderDetails && (
+                      <Route
+                        key={`${view.id}-details`}
+                        path={`/${view.id}/:id`}
+                        component={() => {
+                          const { id } = useParams();
+
+                          getCore().chrome.setBreadcrumbs([
+                            {
+                              text: (
+                                <FormattedMessage
+                                  id={`wazuhSecurityPolicies.breadcrumbs.${view.id}`}
+                                  defaultMessage={view.name}
+                                />
+                              ),
+                              href: getCore().application.getUrlForApp(
+                                'wazuhSecurityPolicies',
+                                {
+                                  path: `#/${view.id}`,
+                                },
+                              ),
+                            },
+                            {
+                              className: 'osdBreadcrumbs',
+                              text: id,
+                            },
+                          ]);
+
+                          return view.renderDetails();
+                        }}
+                      />
+                    ),
                     <Route
                       key={view.id}
                       path={`/${view.id}`}
@@ -102,8 +136,8 @@ export const WazuhSecurityPoliciesApp = () => {
 
                         return view.render();
                       }}
-                    />
-                  ))}
+                    />,
+                  ])}
                   <Redirect to={`/${views[0].id}`} />
                 </Switch>
               </EuiPanel>

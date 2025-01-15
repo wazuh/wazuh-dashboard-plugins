@@ -6,6 +6,7 @@ import {
   EuiHorizontalRule,
 } from '@elastic/eui';
 import { PopoverIconButton } from '../../common/popover';
+import { getHistory } from '../../../plugin-services';
 
 interface CardIntegrationProps {
   image: string;
@@ -15,6 +16,7 @@ interface CardIntegrationProps {
 }
 
 export const CardIntegration = (props: CardIntegrationProps) => {
+  const history = getHistory();
   const { image = 'logoOpenSearch', title, description, isEnable } = props;
   const buttonIntegrations = [
     {
@@ -39,6 +41,10 @@ export const CardIntegration = (props: CardIntegrationProps) => {
     },
   ];
 
+  const handleNavigation = (path: string) => {
+    history.push(path);
+  };
+
   return (
     <div style={{ position: 'relative' }}>
       <EuiCard
@@ -46,6 +52,7 @@ export const CardIntegration = (props: CardIntegrationProps) => {
         description={description}
         icon={<EuiIcon type={image} size='xl' />}
         paddingSize='m'
+        onClick={() => handleNavigation(`/integrations/${title}`)}
       />
       <PopoverIconButton
         styles={{
