@@ -156,11 +156,14 @@ up)
  down)
    docker compose --profile $profile -f dev.yml down -v --remove-orphans
    ;;
+ start)
+   docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} start
+   ;;
  stop)
    docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
    ;;
  *)
-   echo "[ERROR] Action must be up | down | stop: "
+   echo "[ERROR] Action must be up | down | stop | start: "
    echo
    usage
    ;;
