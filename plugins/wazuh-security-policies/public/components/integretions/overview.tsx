@@ -1,86 +1,27 @@
 import React, { useState } from 'react';
 import {
-  EuiPageHeader,
   EuiLink,
   EuiButton,
   EuiHealth,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiSearchBar,
-  EuiCallOut,
   EuiText,
+  Query,
 } from '@elastic/eui';
 import './integrations.scss';
+import { SearchBar } from '../common/searchbar';
+import { HeaderPage } from '../common/header-page';
 import { CardIntegration } from './components/card-integration';
-
-const integrations = [
-  {
-    image: 'advancedSettingsApp',
-    title: 'Integration 1',
-    description: 'Description for integration 1',
-    isEnable: true,
-  },
-  {
-    image: 'grokApp',
-    title: 'Integration 2',
-    description: 'Description for integration 2',
-    isEnable: false,
-  },
-  {
-    image: 'grokApp',
-    title: 'Integration 3',
-    description: 'Description for integration 3',
-    isEnable: true,
-  },
-  {
-    image: 'reportingApp',
-    title: 'Integration 4',
-    description: 'Description for integration 4',
-    isEnable: false,
-  },
-  {
-    image: 'heartbeatApp',
-    title: 'Integration 5',
-    description: 'Description for integration 5',
-    isEnable: true,
-  },
-  {
-    image: 'appSearchApp',
-    title: 'Integration 6',
-    description: 'Description for integration 6',
-    isEnable: false,
-  },
-  {
-    image: 'indexRollupApp',
-    title: 'Integration 7',
-    description: 'Description for integration 7',
-    isEnable: true,
-  },
-  {
-    image: 'canvasApp',
-    title: 'Integration 8',
-    description: 'Description for integration 8',
-    isEnable: false,
-  },
-  {
-    image: 'securityApp',
-    title: 'Integration 9',
-    description: 'Description for integration 9',
-    isEnable: true,
-  },
-  {
-    image: 'lensApp',
-    title: 'Integration 10',
-    description: 'Description for integration 10',
-    isEnable: false,
-  },
-];
+import { integrations } from './mock-data-integrations';
 
 export const IntegrationOverview = () => {
+  const [query, setQuery] = useState({ text: '' });
+  const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState({
     lastUpdateDate: '12/18/2024',
     status: 'Success',
   });
+  // Header page start
   const titleHeader = (
     <span className='integration-title-header'>
       <h1>Integrations</h1>
@@ -99,13 +40,29 @@ export const IntegrationOverview = () => {
     });
   };
 
-  // Search bar
+  const descriptionHeader = (
+    <>
+      Last update of the content manager was {lastUpdate.lastUpdateDate} (
+      {lastUpdate.status}).{' '}
+      <EuiLink href='link-documentation' target='_blank'>
+        Learn more
+      </EuiLink>
+    </>
+  );
+  const rightSideItems = [
+    <EuiButton
+      key={`${lastUpdate.lastUpdateDate}-${lastUpdate.status}`}
+      fill
+      onClick={updateContentManager}
+    >
+      Update
+    </EuiButton>,
+  ];
 
-  const initialQuery = EuiSearchBar.Query.MATCH_ALL;
-  const [query, setQuery] = useState(initialQuery);
-  const [error, setError] = useState(null);
+  // Header page end
+  // Search bar start
 
-  const onChange = ({ query, error }) => {
+  const onChange = ({ query, error }: { query: Query; error: Error }) => {
     if (error) {
       setError(error);
     } else {
@@ -137,61 +94,33 @@ export const IntegrationOverview = () => {
     },
   };
 
-  const renderError = () => {
-    if (!error) {
-      return;
-    }
-
-    return (
-      <>
-        <EuiCallOut
-          iconType='faceSad'
-          color='danger'
-          title={`Invalid search: ${error.message}`}
-        />
-      </>
-    );
-  };
+  // Search bar end
 
   return (
     <>
-      <EuiPageHeader
-        pageTitle={titleHeader}
-        description={
-          <>
-            Last update of the content manager was {lastUpdate.lastUpdateDate} (
-            {lastUpdate.status}).{' '}
-            <EuiLink href='link-documentation' target='_blank'>
-              Learn more
-            </EuiLink>
-          </>
-        }
-        rightSideItems={[
-          <EuiButton
-            key={`${lastUpdate.lastUpdateDate}-${lastUpdate.status}`}
-            fill
-            onClick={updateContentManager}
-          >
-            Update
-          </EuiButton>,
-        ]}
+      <HeaderPage
+        titleHeader={titleHeader}
+        descriptionHeader={descriptionHeader}
+        rightSideItems={rightSideItems}
       />
-      <div style={{ margin: '20px 0' }}>
-        <EuiSearchBar
-          defaultQuery={initialQuery}
-          box={{
-            placeholder: 'Search...',
-            schema,
-          }}
-          filters={filters}
-          onChange={onChange}
-        />
-      </div>
-      {renderError()}
+      <SearchBar
+        schema={schema}
+        filters={filters}
+        onChange={onChange}
+        error={error}
+      />
       <EuiFlexGroup gutterSize='m' wrap>
         {query.text === ''
           ? integrations.map((integration, index) => (
-              <EuiFlexItem key={index}>
+              <EuiFlexItem
+                style={{
+                  position: 'relative',
+                  minWidth: '200px',
+                  maxWidth: '250px',
+                }}
+                grow={1}
+                key={index}
+              >
                 <CardIntegration {...integration} />
               </EuiFlexItem>
             ))
@@ -202,7 +131,15 @@ export const IntegrationOverview = () => {
                   .includes(integration.title.toLocaleLowerCase()),
               )
               .map((integration, index) => (
-                <EuiFlexItem key={index}>
+                <EuiFlexItem
+                  style={{
+                    position: 'relative',
+                    minWidth: '200px',
+                    maxWidth: '250px',
+                  }}
+                  grow={1}
+                  key={index}
+                >
                   <CardIntegration {...integration} />
                 </EuiFlexItem>
               ))}

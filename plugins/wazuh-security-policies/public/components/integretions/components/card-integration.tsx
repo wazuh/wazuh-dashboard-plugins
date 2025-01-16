@@ -46,7 +46,7 @@ export const CardIntegration = (props: CardIntegrationProps) => {
   };
 
   return (
-    <div style={{ position: 'relative' }}>
+    <>
       <EuiCard
         title={title}
         description={description}
@@ -74,6 +74,6 @@ export const CardIntegration = (props: CardIntegrationProps) => {
           ))}
         </div>
       </PopoverIconButton>
-    </div>
+    </>
   );
 };

@@ -10,6 +10,7 @@ import {
 import { Router, Route, Switch, Redirect, useParams } from 'react-router-dom';
 import { getCore, getHistory } from '../plugin-services';
 import { IntegrationOverview } from './integretions/overview';
+import { IntegrationView } from './integretions/integration';
 
 interface ViewInterface {
   name: string;
@@ -23,7 +24,7 @@ const views: ViewInterface[] = [
     name: 'Integrations',
     id: 'integrations',
     render: () => <IntegrationOverview />,
-    renderDetails: () => <div>Details</div>,
+    renderDetails: () => <IntegrationView />,
   },
   {
     name: 'Rules',
