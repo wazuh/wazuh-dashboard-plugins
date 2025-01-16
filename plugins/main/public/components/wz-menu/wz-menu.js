@@ -179,8 +179,7 @@ export const WzMenu = withWindowSize(
       if (
         !this.isLoading &&
         (prevProps.state.showMenu !== this.props.state.showMenu ||
-          (this.props.state.showMenu === true &&
-            prevProps.state.showMenu === false))
+          (this.props.state.showMenu === true && this.state.showMenu === false))
       ) {
         this.isLoading = true;
         newState = {
@@ -228,7 +227,6 @@ export const WzMenu = withWindowSize(
 
     async loadIndexPatternsList() {
       try {
-        // this.isLoading = true;
         let newState = {};
 
         let list = await PatternHandler.getPatternList('api');
