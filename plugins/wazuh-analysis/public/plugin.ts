@@ -4,7 +4,6 @@ import { App, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AnalysisSetup, AnalysisStart } from './types';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AnalysisSetupDependencies {}
 
 interface AnalysisStartDependencies {
