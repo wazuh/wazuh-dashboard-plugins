@@ -68,8 +68,6 @@ export const WzMenu = withWindowSize(
         currentPattern: '',
         patternList: [],
         currentSelectedPattern: '',
-        isManagementPopoverOpen: false,
-        isOverviewPopoverOpen: false,
       };
       this.store = store;
       this.genericReq = GenericRequest;
@@ -129,7 +127,7 @@ export const WzMenu = withWindowSize(
       return APIlist;
     };
 
-    loadIndexPatternsList = async () => {
+    loadIndexPatternsList2 = async () => {
       try {
         let newState = {};
         let list = await PatternHandler.getPatternList('api');
@@ -190,10 +188,17 @@ export const WzMenu = withWindowSize(
       }
 
       if (
-        prevProps.state.showMenu !== this.props.state.showMenu ||
-        (this.props.state.showMenu === true && this.state.showMenu === false)
+        !this.isLoading &&
+        (prevProps.state.showMenu !== this.props.state.showMenu ||
+          (this.props.state.showMenu === true &&
+            prevProps.state.showMenu === false))
       ) {
-        newState = { ...newState, ...(await this.load()) };
+        this.isLoading = true;
+        newState = {
+          ...newState,
+          ...(await this.loadIndexPatternsList()),
+          isSelectorsPopoverOpen: false,
+        };
       }
       if ((!currentAPI && apiId) || apiId !== currentAPI) {
         newState = { ...newState, currentAPI: apiId };
@@ -207,11 +212,13 @@ export const WzMenu = withWindowSize(
         }
       }
       if (
+        !this.isLoading &&
         !_.isEqual(
           prevProps?.appConfig?.data?.['ip.ignore'],
           this.props?.appConfig?.data?.['ip.ignore'],
         )
       ) {
+        this.isLoading = true;
         newState = { ...newState, ...(await this.loadIndexPatternsList()) };
       }
 
@@ -223,7 +230,6 @@ export const WzMenu = withWindowSize(
       ) {
         setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       }
-
       newState = { ...prevProps.state, ...newState };
       if (!_.isEqual(newState, prevProps.state)) {
         // and the state is different from the previous one
@@ -231,15 +237,10 @@ export const WzMenu = withWindowSize(
       }
     }
 
-    async load() {
+    async loadIndexPatternsList() {
       try {
+        // this.isLoading = true;
         let newState = {};
-        newState = {
-          showMenu: true,
-          isOverviewPopoverOpen: false,
-          isManagementPopoverOpen: false,
-          isSelectorsPopoverOpen: false,
-        };
 
         let list = await PatternHandler.getPatternList('api');
         if (!list || (list && !list.length)) return;
@@ -257,10 +258,10 @@ export const WzMenu = withWindowSize(
           AppState.setCurrentPattern(list[0].id);
         } else {
           // Check if the current pattern cookie is valid
-          filtered = list.filter(item =>
+          filtered = list.find(item =>
             item.id.includes(AppState.getCurrentPattern()),
           );
-          if (!filtered.length) AppState.setCurrentPattern(list[0].id);
+          if (!filtered) AppState.setCurrentPattern(list[0].id);
         }
 
         const data = filtered
@@ -280,8 +281,10 @@ export const WzMenu = withWindowSize(
             currentSelectedPattern: AppState.getCurrentPattern(),
           };
         }
+        this.isLoading = false;
         return newState;
       } catch (error) {
+        this.isLoading = false;
         const options = {
           context: `${WzMenu.name}.load`,
           level: UI_LOGGER_LEVELS.ERROR,
@@ -296,7 +299,6 @@ export const WzMenu = withWindowSize(
         };
         getErrorOrchestrator().handleError(options);
       }
-      this.isLoading = false;
     }
 
     updatePatternAndApi = async () => {
