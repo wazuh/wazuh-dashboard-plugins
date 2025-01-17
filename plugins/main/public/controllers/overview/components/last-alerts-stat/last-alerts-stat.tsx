@@ -20,6 +20,7 @@ import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
 } from '../../../../components/common/data-source/pattern/pattern-data-source-filter-manager';
+import { formatUINumber } from '../../../../react-services/format-number';
 
 type SeverityKey = 'low' | 'medium' | 'high' | 'critical';
 
@@ -155,7 +156,7 @@ export function LastAlertsStat({
                 }}
                 href={discoverLocation}
               >
-                {statValue}
+                {formatUINumber(statValue)}
               </EuiLink>
             </EuiToolTip>
           }
