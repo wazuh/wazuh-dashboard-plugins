@@ -55,6 +55,7 @@ import VulsEvaluationFilter, {
   excludeUnderEvaluationFilter,
   getUnderEvaluationFilterValue,
 } from '../../common/components/vuls-evaluation-filter';
+import { DataGridVisibleColumnsSelector } from '../../../../common/wazuh-discover/components/visible-columns-selector';
 
 const InventoryVulsComponent = () => {
   const {
@@ -255,6 +256,7 @@ const InventoryVulsComponent = () => {
                     {...dataGridProps}
                     className={sideNavDocked ? 'dataGridDockedNav' : ''}
                     toolbarVisibility={{
+                      showColumnSelector: { allowHide: false },
                       additionalControls: (
                         <>
                           <HitsCounter
@@ -283,13 +285,18 @@ const InventoryVulsComponent = () => {
                             }
                             size='xs'
                             iconType='exportAction'
-                            color='primary'
+                            color='text'
                             isLoading={isExporting}
                             className='euiDataGrid__controlBtn'
                             onClick={onClickExportResults}
                           >
                             Export Formatted
                           </EuiButtonEmpty>
+
+                          <DataGridVisibleColumnsSelector
+                            availableColumns={dataGridProps.columnsAvailable}
+                            columnVisibility={dataGridProps.columnVisibility}
+                          />
                         </>
                       ),
                     }}
