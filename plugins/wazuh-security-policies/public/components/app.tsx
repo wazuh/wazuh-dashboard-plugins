@@ -10,7 +10,9 @@ import {
 import { Router, Route, Switch, Redirect, useParams } from 'react-router-dom';
 import { getCore, getHistory } from '../plugin-services';
 import { IntegrationOverview } from './integretions/overview';
-import { IntegrationView } from './integretions/integration';
+import { IntegrationView } from './integretions/integration-details';
+import { RulesOverview } from './rules/overview';
+import { RuleDetails } from './rules/rule-details';
 
 interface ViewInterface {
   name: string;
@@ -29,7 +31,8 @@ const views: ViewInterface[] = [
   {
     name: 'Rules',
     id: 'rules',
-    render: () => <div>Rules</div>,
+    render: () => <RulesOverview />,
+    renderDetails: () => <RuleDetails />,
   },
   {
     name: 'Decoders',
@@ -46,6 +49,11 @@ const views: ViewInterface[] = [
 export const WazuhSecurityPoliciesApp = () => {
   const history = getHistory();
   const [currentTab, setCurrentTab] = useState('');
+  const [isSideNavOpenOnMobile, setIsSideNavOpenOnMobile] = useState(false);
+
+  const toggleOpenOnMobile = () => {
+    setIsSideNavOpenOnMobile(!isSideNavOpenOnMobile);
+  };
 
   useEffect(() => {
     setCurrentTab(history.location.pathname);
@@ -76,7 +84,13 @@ export const WazuhSecurityPoliciesApp = () => {
         <>
           <EuiPage paddingSize='m'>
             <EuiPageSideBar>
-              <EuiSideNav aria-label='Ruleset' items={sideNav} />
+              <EuiSideNav
+                mobileTitle='Ruleset'
+                toggleOpenOnMobile={() => toggleOpenOnMobile()}
+                isOpenOnMobile={isSideNavOpenOnMobile}
+                aria-label='Ruleset'
+                items={sideNav}
+              />
             </EuiPageSideBar>
             <EuiPageBody component='main'>
               <EuiPanel
