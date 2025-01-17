@@ -239,6 +239,7 @@ services:
       - ${OSD_PORT}:5601
     environment:
       - 'LOGS=/proc/1/fd/1'
+    tty: true
     volumes:
       - osd_cache:/home/node/.cache
       - '${SRC}/main:/home/node/kbn/plugins/main'
