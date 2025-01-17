@@ -13,11 +13,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
 - Changed the width of the command column, relocate argvs column and change the width of the rest of the columns in the table processes. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
 
-## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 00
+## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ### Added
 
 - Support for Wazuh 4.10.1
+- Added comma separators to numbers [#7233](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7233)
+
+### Changed
+
+- Move the ability to manage the visibility of fields in `Events` and `Vulnerability Detection` > `Inventory` tables from `Columns` button to a new `Available fields` button enhancing the performance of the view [#7226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7226)
+- Change the color of `Export formatted` button of data grid tables to match the color of the rest of table buttons [#7226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7226)
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 08
 
@@ -70,6 +76,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error message to prevent pass no strings to the wazuh logger [#7167](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7167)
 - Fixed the rendering of the `data.vunerability.reference` in the table and flyout [#7177](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7177)
 - Fixed incorrect or empty Wazuh API version displayed after upgrade [#440](https://github.com/wazuh/wazuh-dashboard/issues/440)
+- Fixed typo in flyout title for available updates [#7235](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7235)
 
 ### Removed
 
