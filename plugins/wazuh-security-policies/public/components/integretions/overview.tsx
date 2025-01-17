@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
 import {
-  EuiLink,
   EuiButton,
   EuiHealth,
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
-  Query,
 } from '@elastic/eui';
 import './integrations.scss';
 import { SearchBar } from '../common/searchbar';
 import { HeaderPage } from '../common/header-page';
+import { LastUpdateContentManagerText } from '../common/last-update-content-manager-text.tsx';
+import { NoResultsData } from '../common/no-results';
 import { CardIntegration } from './components/card-integration';
 import { integrations } from './mock-data-integrations';
 
 export const IntegrationOverview = () => {
   const [query, setQuery] = useState({ text: '' });
-  const [error, setError] = useState(null);
   const [lastUpdate, setLastUpdate] = useState({
     lastUpdateDate: '12/18/2024',
     status: 'Success',
@@ -40,14 +39,8 @@ export const IntegrationOverview = () => {
     });
   };
 
-  const descriptionHeader = (
-    <>
-      Last update of the content manager was {lastUpdate.lastUpdateDate} (
-      {lastUpdate.status}).{' '}
-      <EuiLink href='link-documentation' target='_blank'>
-        Learn more
-      </EuiLink>
-    </>
+  const descriptionHeader = LastUpdateContentManagerText(
+    integrations[0].lastUpdate,
   );
   const rightSideItems = [
     <EuiButton
@@ -58,19 +51,8 @@ export const IntegrationOverview = () => {
       Update
     </EuiButton>,
   ];
-
   // Header page end
   // Search bar start
-
-  const onChange = ({ query, error }: { query: Query; error: Error }) => {
-    if (error) {
-      setError(error);
-    } else {
-      setError(null);
-      setQuery(query);
-    }
-  };
-
   const filters = [
     {
       type: 'field_value_selection',
@@ -93,8 +75,39 @@ export const IntegrationOverview = () => {
       },
     },
   };
-
   // Search bar end
+  const listAllIntegrationsComponent = integrations.map(
+    (integration, index) => (
+      <EuiFlexItem
+        style={{
+          position: 'relative',
+          minWidth: '200px',
+        }}
+        grow={1}
+        key={index}
+      >
+        <CardIntegration {...integration} />
+      </EuiFlexItem>
+    ),
+  );
+  const integrationFilter = integrations
+    .filter(integration =>
+      query.text
+        .toLocaleLowerCase()
+        .includes(integration.title.toLocaleLowerCase()),
+    )
+    .map((integration, index) => (
+      <EuiFlexItem
+        style={{
+          position: 'relative',
+          minWidth: '200px',
+        }}
+        grow={1}
+        key={index}
+      >
+        <CardIntegration {...integration} />
+      </EuiFlexItem>
+    ));
 
   return (
     <>
@@ -103,46 +116,14 @@ export const IntegrationOverview = () => {
         descriptionHeader={descriptionHeader}
         rightSideItems={rightSideItems}
       />
-      <SearchBar
-        schema={schema}
-        filters={filters}
-        onChange={onChange}
-        error={error}
-      />
+      <SearchBar schema={schema} filters={filters} setQuery={setQuery} />
       <EuiFlexGroup gutterSize='m' wrap>
-        {query.text === ''
-          ? integrations.map((integration, index) => (
-              <EuiFlexItem
-                style={{
-                  position: 'relative',
-                  minWidth: '200px',
-                  maxWidth: '250px',
-                }}
-                grow={1}
-                key={index}
-              >
-                <CardIntegration {...integration} />
-              </EuiFlexItem>
-            ))
-          : integrations
-              .filter(integration =>
-                query.text
-                  .toLocaleLowerCase()
-                  .includes(integration.title.toLocaleLowerCase()),
-              )
-              .map((integration, index) => (
-                <EuiFlexItem
-                  style={{
-                    position: 'relative',
-                    minWidth: '200px',
-                    maxWidth: '250px',
-                  }}
-                  grow={1}
-                  key={index}
-                >
-                  <CardIntegration {...integration} />
-                </EuiFlexItem>
-              ))}
+        {!query.text && listAllIntegrationsComponent}
+        {query.text && integrationFilter.length === 0 ? (
+          <NoResultsData query={query} />
+        ) : (
+          integrationFilter
+        )}
       </EuiFlexGroup>
     </>
   );

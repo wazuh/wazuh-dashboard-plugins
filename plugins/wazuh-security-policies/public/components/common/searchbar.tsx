@@ -1,10 +1,25 @@
-import React from 'react';
-import { EuiCallOut, EuiSearchBar, EuiSearchBarProps } from '@elastic/eui';
+import React, { useState } from 'react';
+import {
+  EuiCallOut,
+  EuiSearchBar,
+  EuiSearchBarProps,
+  Query,
+} from '@elastic/eui';
 
 const initialQuery = EuiSearchBar.Query.MATCH_ALL;
 
 export const SearchBar = (props: EuiSearchBarProps) => {
-  const { schema, filters, onChange, error } = props;
+  const { schema, filters, setQuery } = props;
+  const [error, setError] = useState(null);
+
+  const onChange = ({ query, error }: { query: Query; error: Error }) => {
+    if (error) {
+      setError(error);
+    } else {
+      setError(null);
+      setQuery(query);
+    }
+  };
 
   const renderError = () => {
     if (!error) {

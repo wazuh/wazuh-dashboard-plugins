@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import {
   EuiHealth,
   EuiIcon,
-  EuiLink,
   EuiButton,
   EuiDescriptionList,
   EuiPanel,
 } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
 import { HeaderPage } from '../common/header-page';
+import { LastUpdateContentManagerText } from '../common/last-update-content-manager-text.tsx';
 import { integrations } from './mock-data-integrations';
 import './integrations.scss';
 import { IntegrationDescription } from './components/integration-description';
@@ -31,9 +31,11 @@ export const IntegrationView = () => {
       date: string;
     };
     references: string[];
+    module: string;
   }>({
     image: '',
     title: '',
+    module: '',
     description: '',
     isEnable: false,
     lastUpdate: { lastUpdateDate: '', status: '' },
@@ -74,15 +76,8 @@ export const IntegrationView = () => {
       </EuiHealth>
     </span>
   );
-  const descriptionHeader = (
-    <>
-      Last update of the content manager was{' '}
-      {integrationData.lastUpdate.lastUpdateDate} (
-      {integrationData.lastUpdate.status}).{' '}
-      <EuiLink href='link-documentation' target='_blank'>
-        Learn more
-      </EuiLink>
-    </>
+  const descriptionHeader = LastUpdateContentManagerText(
+    integrationData.lastUpdate,
   );
 
   const toggleEnableOrDisable = () => {
