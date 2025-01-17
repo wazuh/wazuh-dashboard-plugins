@@ -2,6 +2,7 @@ import { i18n } from '@osd/i18n';
 import { AppCategory, AppMountParameters } from 'opensearch-dashboards/public';
 import { App, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
+import { OmitStrict } from '../../wazuh-core/common/types';
 import { AnalysisSetup, AnalysisStart } from './types';
 
 interface AnalysisSetupDependencies {}
@@ -14,6 +15,11 @@ export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
+  private readonly PLUGIN_ID = 'analysis';
+  private readonly ENDPOINT_SECURITY_ID = 'endpoint_security';
+  private readonly THREAT_INTELLIGENCE_ID = 'threat_intelligence';
+  private readonly SECURITY_OPERATIONS_ID = 'security_operations';
+  private readonly CLOUD_SECURITY_ID = 'cloud_security';
   private readonly translationMessages = {
     ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
       defaultMessage: 'Analysis',
@@ -32,7 +38,7 @@ export class AnalysisPlugin
     }),
   };
   private readonly CATEGORY: AppCategory = {
-    id: 'analysis',
+    id: this.PLUGIN_ID,
     label: this.translationMessages.ANALYSIS_PLUGIN_TITLE,
     order: 5000,
   };
@@ -43,7 +49,7 @@ export class AnalysisPlugin
   ): AnalysisSetup | Promise<AnalysisSetup> {
     console.debug('AnalysisPlugin started');
 
-    const ApplicationsMap: Record<string, Omit<App, 'id'>> = {
+    const ApplicationsMap: Record<string, OmitStrict<App, 'id'>> = {
       endpoint_security: {
         title: this.translationMessages.ENDPOINT_SECURITY,
         category: this.CATEGORY,
