@@ -4,6 +4,7 @@ import {
   AppMountParameters,
   CoreSetup,
   CoreStart,
+  DEFAULT_NAV_GROUPS,
   Plugin,
 } from '../../../src/core/public';
 import { PLUGIN_NAME } from '../common';
@@ -19,16 +20,18 @@ export class WazuhSecurityPoliciesPlugin
     Plugin<WazuhSecurityPoliciesPluginSetup, WazuhSecurityPoliciesPluginStart>
 {
   public setup(core: CoreSetup): WazuhSecurityPoliciesPluginSetup {
+    const pluginId = 'wazuhSecurityPolicies';
+
     // Register an application into the side navigation menu
     core.application.register({
-      id: 'wazuhSecurityPolicies',
+      id: pluginId,
       title: PLUGIN_NAME,
       category: {
         id: 'wz-category-security-policies',
         label: i18n.translate('wz-app-category-security-policies', {
           defaultMessage: 'Security Policies',
         }),
-        order: 200,
+        order: 1000,
         euiIconType: 'indexRollupApp',
       },
       async mount(params: AppMountParameters) {
@@ -48,17 +51,22 @@ export class WazuhSecurityPoliciesPlugin
       },
     });
 
-    // Return methods that should be available to other plugins
-    return {
-      getGreeting() {
-        return i18n.translate('wazuhSecurityPolicies.greetingText', {
-          defaultMessage: 'Hello from {name}!',
-          values: {
-            name: PLUGIN_NAME,
-          },
-        });
+    core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
+      {
+        id: pluginId,
+        category: {
+          id: 'wz-category-security-policies',
+          label: i18n.translate('wz-app-category-security-policies', {
+            defaultMessage: 'Security Policies',
+          }),
+          order: 1000,
+          euiIconType: 'indexRollupApp',
+        },
       },
-    };
+    ]);
+
+    // Return methods that should be available to other plugins
+    return {};
   }
 
   public start(core: CoreStart): WazuhSecurityPoliciesPluginStart {
