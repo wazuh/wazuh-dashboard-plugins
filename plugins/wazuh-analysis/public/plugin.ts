@@ -33,25 +33,25 @@ export class AnalysisPlugin
     ENDPOINT_SECURITY: i18n.translate(
       `analysis.category.${this.ENDPOINT_SECURITY_ID}`,
       {
-      defaultMessage: 'Endpoint Security',
+        defaultMessage: 'Endpoint Security',
       },
     ),
     THREAT_INTELLIGENCE: i18n.translate(
       `analysis.category.${this.THREAT_INTELLIGENCE_ID}`,
       {
-      defaultMessage: 'Threat Intelligence',
+        defaultMessage: 'Threat Intelligence',
       },
     ),
     SECURITY_OPERATIONS: i18n.translate(
       `analysis.category.${this.SECURITY_OPERATIONS_ID}`,
       {
-      defaultMessage: 'Security Operations',
+        defaultMessage: 'Security Operations',
       },
     ),
     CLOUD_SECURITY: i18n.translate(
       `analysis.category.${this.CLOUD_SECURITY_ID}`,
       {
-      defaultMessage: 'Cloud Security',
+        defaultMessage: 'Cloud Security',
       },
     ),
   };
