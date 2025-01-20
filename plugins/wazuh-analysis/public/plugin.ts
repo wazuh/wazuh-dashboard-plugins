@@ -204,46 +204,48 @@ export class AnalysisPlugin
         },
       },
     ];
-    const endpointSecurityApps: App[] = [
-      {
-        id: this.CONFIGURATION_ASSESSMENT_ID,
-        title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
-        navLinkStatus: AppNavLinkStatus.hidden,
-        updater$: this.endpointSecurityAppsStatusUpdater$,
-        mount: async (params: AppMountParameters) => {
-          // TODO: Implement the configuration assessment application
-          const { renderApp } = await import('./application');
+    const subApps: Record<string, App[]> = {
+      [this.ENDPOINT_SECURITY_ID]: [
+        {
+          id: this.CONFIGURATION_ASSESSMENT_ID,
+          title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.endpointSecurityAppsStatusUpdater$,
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the configuration assessment application
+            const { renderApp } = await import('./application');
 
-          return await renderApp(params, {});
+            return await renderApp(params, {});
+          },
         },
-      },
-      {
-        id: this.MALWARE_DETECTION_ID,
-        title: this.translationMessages.MALWARE_DETECTION_TITLE,
-        navLinkStatus: AppNavLinkStatus.hidden,
-        updater$: this.endpointSecurityAppsStatusUpdater$,
-        mount: async (params: AppMountParameters) => {
-          // TODO: Implement the malware detection application
-          const { renderApp } = await import('./application');
+        {
+          id: this.MALWARE_DETECTION_ID,
+          title: this.translationMessages.MALWARE_DETECTION_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.endpointSecurityAppsStatusUpdater$,
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the malware detection application
+            const { renderApp } = await import('./application');
 
-          return await renderApp(params, {});
+            return await renderApp(params, {});
+          },
         },
-      },
-      {
-        id: this.FIM_ID,
-        title: this.translationMessages.FIM_TITLE,
-        navLinkStatus: AppNavLinkStatus.hidden,
-        updater$: this.endpointSecurityAppsStatusUpdater$,
-        mount: async (params: AppMountParameters) => {
-          // TODO: Implement the fim application
-          const { renderApp } = await import('./application');
+        {
+          id: this.FIM_ID,
+          title: this.translationMessages.FIM_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.endpointSecurityAppsStatusUpdater$,
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the fim application
+            const { renderApp } = await import('./application');
 
-          return await renderApp(params, {});
+            return await renderApp(params, {});
+          },
         },
-      },
-    ];
+      ],
+    };
 
-    for (const app of endpointSecurityApps) {
+    for (const app of subApps[this.ENDPOINT_SECURITY_ID]) {
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
