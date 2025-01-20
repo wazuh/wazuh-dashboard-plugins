@@ -31,25 +31,25 @@ export class AnalysisPlugin
       defaultMessage: 'Analysis',
     }),
     ENDPOINT_SECURITY: i18n.translate(
-      `analysis.category.${this.ENDPOINT_SECURITY_ID}`,
+      `${this.PLUGIN_ID}.category.${this.ENDPOINT_SECURITY_ID}`,
       {
         defaultMessage: 'Endpoint Security',
       },
     ),
     THREAT_INTELLIGENCE: i18n.translate(
-      `analysis.category.${this.THREAT_INTELLIGENCE_ID}`,
+      `${this.PLUGIN_ID}.category.${this.THREAT_INTELLIGENCE_ID}`,
       {
         defaultMessage: 'Threat Intelligence',
       },
     ),
     SECURITY_OPERATIONS: i18n.translate(
-      `analysis.category.${this.SECURITY_OPERATIONS_ID}`,
+      `${this.PLUGIN_ID}.category.${this.SECURITY_OPERATIONS_ID}`,
       {
         defaultMessage: 'Security Operations',
       },
     ),
     CLOUD_SECURITY: i18n.translate(
-      `analysis.category.${this.CLOUD_SECURITY_ID}`,
+      `${this.PLUGIN_ID}.category.${this.CLOUD_SECURITY_ID}`,
       {
         defaultMessage: 'Cloud Security',
       },
