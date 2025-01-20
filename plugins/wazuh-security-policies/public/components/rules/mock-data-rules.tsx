@@ -1,5 +1,6 @@
 export const decoder = [
   {
+    id: 1,
     name: 'decoder/syslog/0',
     provider: 'native',
     status: 'enable',
@@ -62,6 +63,7 @@ export const decoder = [
     ],
   },
   {
+    id: 2,
     name: 'decoder/syslog/1',
     provider: 'native',
     status: 'disable',
@@ -124,6 +126,7 @@ export const decoder = [
     ],
   },
   {
+    id: 3,
     name: 'decoder/syslog/2',
     provider: 'native',
     status: 'disable',
@@ -186,6 +189,7 @@ export const decoder = [
     ],
   },
   {
+    id: 4,
     name: 'decoder/syslog/0',
     provider: 'native',
     status: 'disable',
@@ -248,6 +252,7 @@ export const decoder = [
     ],
   },
   {
+    id: 5,
     name: 'decoder/syslog/1',
     provider: 'native',
     status: 'disable',
@@ -310,6 +315,7 @@ export const decoder = [
     ],
   },
   {
+    id: 6,
     name: 'decoder/syslog/2',
     provider: 'native',
     status: 'draft',
@@ -372,6 +378,7 @@ export const decoder = [
     ],
   },
   {
+    id: 7,
     name: 'decoder/syslog/0',
     provider: 'custom',
     status: 'enable',
@@ -434,6 +441,7 @@ export const decoder = [
     ],
   },
   {
+    id: 8,
     name: 'decoder/syslog/1',
     provider: 'custom',
     status: 'enable',
@@ -496,6 +504,7 @@ export const decoder = [
     ],
   },
   {
+    id: 9,
     name: 'decoder/syslog/2',
     provider: 'custom',
     status: 'enable',
@@ -558,6 +567,7 @@ export const decoder = [
     ],
   },
   {
+    id: 10,
     name: 'decoder/syslog/0',
     provider: 'custom',
     status: 'draft',
@@ -620,6 +630,7 @@ export const decoder = [
     ],
   },
   {
+    id: 11,
     name: 'decoder/syslog/1',
     provider: 'custom',
     status: 'draft',
@@ -682,6 +693,7 @@ export const decoder = [
     ],
   },
   {
+    id: 12,
     name: 'decoder/syslog/2',
     provider: 'custom',
     status: 'draft',
