@@ -149,12 +149,7 @@ export class AnalysisPlugin
     order: 5000,
   };
 
-  public setup(
-    core: CoreSetup,
-    _plugins: AnalysisSetupDependencies,
-  ): AnalysisSetup | Promise<AnalysisSetup> {
-    console.debug('AnalysisPlugin started');
-
+  private registerApps(core: CoreSetup) {
     const applications: App[] = [
       {
         id: this.ENDPOINT_SECURITY_ID,
@@ -261,6 +256,15 @@ export class AnalysisPlugin
     for (const app of applications) {
       core.application.register(app);
     }
+  }
+
+  public setup(
+    core: CoreSetup,
+    _plugins: AnalysisSetupDependencies,
+  ): AnalysisSetup | Promise<AnalysisSetup> {
+    console.debug('AnalysisPlugin started');
+
+    this.registerApps(core);
 
     const navGroups = {
       [this.ENDPOINT_SECURITY_ID]: {
