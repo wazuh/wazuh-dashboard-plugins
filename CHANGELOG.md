@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.2
 
+### Fixed
+
+- Fixed documentation URL related to the usage of authentication password in the agent deployment [#7251](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7251)
+
 ## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ### Added
