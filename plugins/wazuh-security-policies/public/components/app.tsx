@@ -13,6 +13,10 @@ import { IntegrationOverview } from './integretions/overview';
 import { IntegrationView } from './integretions/integration-details';
 import { RulesOverview } from './rules/overview';
 import { RuleDetails } from './rules/rule-details';
+import { DecodersOverview } from './decoders/overview';
+import { DecoderDetails } from './decoders/decoder-details';
+import { KVDBOverview } from './kvdb/overview';
+import { KVDBDetails } from './kvdb/kvdb-details';
 
 interface ViewInterface {
   name: string;
@@ -37,12 +41,14 @@ const views: ViewInterface[] = [
   {
     name: 'Decoders',
     id: 'decoders',
-    render: () => <div>Decoders</div>,
+    render: () => <DecodersOverview />,
+    renderDetails: () => <DecoderDetails />,
   },
   {
     name: 'KVDB',
     id: 'kvdb',
-    render: () => <div>KVDBs</div>,
+    render: () => <KVDBOverview />,
+    renderDetails: () => <KVDBDetails />,
   },
 ];
 
@@ -125,7 +131,7 @@ export const WazuhSecurityPoliciesApp = () => {
                             },
                             {
                               className: 'osdBreadcrumbs',
-                              text: id,
+                              text: decodeURIComponent(id),
                             },
                           ]);
 
