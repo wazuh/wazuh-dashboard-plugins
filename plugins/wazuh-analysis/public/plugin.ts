@@ -17,7 +17,6 @@ import {
   DEFAULT_NAV_GROUPS,
 } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
-import { OmitStrict } from '../../wazuh-core/common/types';
 import { AnalysisSetup, AnalysisStart } from './types';
 
 interface AnalysisSetupDependencies {}
@@ -156,8 +155,9 @@ export class AnalysisPlugin
   ): AnalysisSetup | Promise<AnalysisSetup> {
     console.debug('AnalysisPlugin started');
 
-    const ApplicationsMap: Record<string, OmitStrict<App, 'id'>> = {
-      [this.ENDPOINT_SECURITY_ID]: {
+    const applications: App[] = [
+      {
+        id: this.ENDPOINT_SECURITY_ID,
         title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
         mount: async (_params: AppMountParameters) => {
           this.endpointSecurityAppsStatusUpdater$.next(
@@ -169,7 +169,8 @@ export class AnalysisPlugin
           return () => {};
         },
       },
-      [this.THREAT_INTELLIGENCE_ID]: {
+      {
+        id: this.THREAT_INTELLIGENCE_ID,
         title: this.translationMessages.THREAT_INTELLIGENCE_TITLE,
         mount: async (params: AppMountParameters) => {
           // TODO: Implement the threat intelligence application
@@ -178,7 +179,8 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      [this.SECURITY_OPERATIONS_ID]: {
+      {
+        id: this.SECURITY_OPERATIONS_ID,
         title: this.translationMessages.SECURITY_OPERATIONS_TITLE,
         category: this.CATEGORY,
         mount: async (params: AppMountParameters) => {
@@ -188,7 +190,8 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      [this.CLOUD_SECURITY_ID]: {
+      {
+        id: this.CLOUD_SECURITY_ID,
         title: this.translationMessages.CLOUD_SECURITY_TITLE,
         category: this.CATEGORY,
         mount: async (params: AppMountParameters) => {
@@ -198,7 +201,7 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-    };
+    ];
     const endpointSecurityApps: App[] = [
       {
         id: this.CONFIGURATION_ASSESSMENT_ID,
@@ -252,15 +255,10 @@ export class AnalysisPlugin
         };
       };
 
-      ApplicationsMap[app.id] = app;
+      applications.push(app);
     }
 
-    const APPLICATIONS = Object.entries(ApplicationsMap).map(([id, app]) => ({
-      ...app,
-      id,
-    }));
-
-    for (const app of APPLICATIONS) {
+    for (const app of applications) {
       core.application.register(app);
     }
 
