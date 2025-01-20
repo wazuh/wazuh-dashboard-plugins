@@ -287,8 +287,13 @@ export class AnalysisPlugin
     _plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
     this.appStartup$.subscribe({
-      next: (navGroupId: string) =>
-        navigateToFirstAppInNavGroup(core, navGroupId),
+      next: async (navGroupId: string) => {
+        core.chrome.navGroup.setCurrentNavGroup(navGroupId);
+
+        const currentNavGroup = await getCurrentNavGroup(core);
+
+        navigateToFirstAppInNavGroup(core, currentNavGroup);
+      },
     });
 
     return {};
