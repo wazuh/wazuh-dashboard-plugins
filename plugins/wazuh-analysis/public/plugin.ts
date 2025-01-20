@@ -25,14 +25,118 @@ interface AnalysisStartDependencies {
   navigation: NavigationPublicPluginStart;
 }
 
-const makeNavLinkStatusVisible = (): Partial<App> => ({
-  navLinkStatus: AppNavLinkStatus.visible,
+/**
+ * The function `generateSubAppId` takes a parent app ID and a sub app ID, and
+ * returns a combined ID with the sub app ID URL-encoded.
+ * @param {string} parentAppId - The `parentAppId` parameter is a string
+ * representing the ID of the parent application.
+ * @param {string} subAppId - The `subAppId` parameter is a string representing the
+ * ID of a sub-application within a parent application.
+ */
+function generateSubAppId(parentAppId: string, subAppId: string) {
+  return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
+}
+
+const PLUGIN_ID = 'analysis';
+const ENDPOINT_SECURITY_ID = 'endpoint_security';
+const THREAT_INTELLIGENCE_ID = 'threat_intelligence';
+const SECURITY_OPERATIONS_ID = 'security_operations';
+const CLOUD_SECURITY_ID = 'cloud_security';
+
+type ParentAppId =
+  | typeof ENDPOINT_SECURITY_ID
+  | typeof THREAT_INTELLIGENCE_ID
+  | typeof SECURITY_OPERATIONS_ID
+  | typeof CLOUD_SECURITY_ID;
+
+const CONFIGURATION_ASSESSMENT_ID = generateSubAppId(
+  ENDPOINT_SECURITY_ID,
+  'configuration_assessment',
+);
+const MALWARE_DETECTION_ID = generateSubAppId(
+  ENDPOINT_SECURITY_ID,
+  'malware_detection',
+);
+const FIM_ID = generateSubAppId(ENDPOINT_SECURITY_ID, 'fim');
+const TRANSLATION_MESSAGES = Object.freeze({
+  ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
+    defaultMessage: 'Analysis',
+  }),
+  ENDPOINT_SECURITY_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${ENDPOINT_SECURITY_ID}`,
+    {
+      defaultMessage: 'Endpoint Security',
+    },
+  ),
+  ENDPOINT_SECURITY_DESCRIPTION: i18n.translate(
+    `${PLUGIN_ID}.category.${ENDPOINT_SECURITY_ID}.description`,
+    {
+      defaultMessage:
+        'Advanced monitoring and protection for devices against security threats.',
+    },
+  ),
+  THREAT_INTELLIGENCE_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${THREAT_INTELLIGENCE_ID}`,
+    {
+      defaultMessage: 'Threat Intelligence',
+    },
+  ),
+  SECURITY_OPERATIONS_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${SECURITY_OPERATIONS_ID}`,
+    {
+      defaultMessage: 'Security Operations',
+    },
+  ),
+  CLOUD_SECURITY_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${CLOUD_SECURITY_ID}`,
+    {
+      defaultMessage: 'Cloud Security',
+    },
+  ),
+  CONFIGURATION_ASSESSMENT_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${CONFIGURATION_ASSESSMENT_ID}`,
+    {
+      defaultMessage: 'Configuration Assessment',
+    },
+  ),
+  MALWARE_DETECTION_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${MALWARE_DETECTION_ID}`,
+    {
+      defaultMessage: 'Malware Detection',
+    },
+  ),
+  FIM_TITLE: i18n.translate(`${PLUGIN_ID}.category.${FIM_ID}`, {
+    defaultMessage: 'File Integrity Monitoring',
+  }),
 });
-const makeNavLinkStatusHidden = (): Partial<App> => ({
-  navLinkStatus: AppNavLinkStatus.hidden,
+const CATEGORY: AppCategory = Object.freeze({
+  id: PLUGIN_ID,
+  label: TRANSLATION_MESSAGES.ANALYSIS_PLUGIN_TITLE,
+  order: 5000,
 });
-const getCurrentNavGroup = async (core: CoreStart) =>
-  core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
+const NAV_GROUPS = Object.freeze({
+  [ENDPOINT_SECURITY_ID]: {
+    id: ENDPOINT_SECURITY_ID,
+    title: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_TITLE,
+    description: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_DESCRIPTION,
+  },
+} satisfies Partial<Record<ParentAppId, ChromeNavGroup>>);
+
+function makeNavLinkStatusVisible(): Partial<App> {
+  return {
+    navLinkStatus: AppNavLinkStatus.visible,
+  };
+}
+
+function makeNavLinkStatusHidden(): Partial<App> {
+  return {
+    navLinkStatus: AppNavLinkStatus.hidden,
+  };
+}
+
+async function getCurrentNavGroup(core: CoreStart) {
+  return core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
+}
 
 /**
  * The function `navigateToFirstAppInNavGroup` navigates to the first app in a
@@ -59,121 +163,35 @@ const navigateToFirstAppInNavGroup = async (
   }
 };
 
-/**
- * The function `generateSubAppId` takes a parent app ID and a sub app ID, and
- * returns a combined ID with the sub app ID URL-encoded.
- * @param {string} parentAppId - The `parentAppId` parameter is a string
- * representing the ID of the parent application.
- * @param {string} subAppId - The `subAppId` parameter is a string representing the
- * ID of a sub-application within a parent application.
- */
-const generateSubAppId = (parentAppId: string, subAppId: string) =>
-  `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
-
 export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
   private readonly appStartup$ = new Subject<string>();
-  private readonly endpointSecurityAppsStatusUpdater$ = new Subject<
-    () => object
-  >();
-  private readonly PLUGIN_ID = 'analysis';
-  private readonly ENDPOINT_SECURITY_ID = 'endpoint_security';
-  private readonly THREAT_INTELLIGENCE_ID = 'threat_intelligence';
-  private readonly SECURITY_OPERATIONS_ID = 'security_operations';
-  private readonly CLOUD_SECURITY_ID = 'cloud_security';
-  private readonly CONFIGURATION_ASSESSMENT_ID = generateSubAppId(
-    this.ENDPOINT_SECURITY_ID,
-    'configuration_assessment',
-  );
-  private readonly MALWARE_DETECTION_ID = generateSubAppId(
-    this.ENDPOINT_SECURITY_ID,
-    'malware_detection',
-  );
-  private readonly FIM_ID = generateSubAppId(this.ENDPOINT_SECURITY_ID, 'fim');
-  private readonly translationMessages = Object.freeze({
-    ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
-      defaultMessage: 'Analysis',
-    }),
-    ENDPOINT_SECURITY_TITLE: i18n.translate(
-      `${this.PLUGIN_ID}.category.${this.ENDPOINT_SECURITY_ID}`,
-      {
-        defaultMessage: 'Endpoint Security',
-      },
-    ),
-    ENDPOINT_SECURITY_DESCRIPTION: i18n.translate(
-      `${this.PLUGIN_ID}.category.${this.ENDPOINT_SECURITY_ID}.description`,
-      {
-        defaultMessage:
-          'Advanced monitoring and protection for devices against security threats.',
-      },
-    ),
-    THREAT_INTELLIGENCE_TITLE: i18n.translate(
-      `${this.PLUGIN_ID}.category.${this.THREAT_INTELLIGENCE_ID}`,
-      {
-        defaultMessage: 'Threat Intelligence',
-      },
-    ),
-    SECURITY_OPERATIONS_TITLE: i18n.translate(
-      `${this.PLUGIN_ID}.category.${this.SECURITY_OPERATIONS_ID}`,
-      {
-        defaultMessage: 'Security Operations',
-      },
-    ),
-    CLOUD_SECURITY_TITLE: i18n.translate(
-      `${this.PLUGIN_ID}.category.${this.CLOUD_SECURITY_ID}`,
-      {
-        defaultMessage: 'Cloud Security',
-      },
-    ),
-    CONFIGURATION_ASSESSMENT_TITLE: i18n.translate(
-      `${this.PLUGIN_ID}.category.${this.CONFIGURATION_ASSESSMENT_ID}`,
-      {
-        defaultMessage: 'Configuration Assessment',
-      },
-    ),
-    MALWARE_DETECTION_TITLE: i18n.translate(
-      `${this.PLUGIN_ID}.category.${this.MALWARE_DETECTION_ID}`,
-      {
-        defaultMessage: 'Malware Detection',
-      },
-    ),
-    FIM_TITLE: i18n.translate(`${this.PLUGIN_ID}.category.${this.FIM_ID}`, {
-      defaultMessage: 'File Integrity Monitoring',
-    }),
-  });
-  private readonly CATEGORY: AppCategory = Object.freeze({
-    id: this.PLUGIN_ID,
-    label: this.translationMessages.ANALYSIS_PLUGIN_TITLE,
-    order: 5000,
-  });
-  private readonly navGroups = Object.freeze({
-    [this.ENDPOINT_SECURITY_ID]: {
-      id: this.ENDPOINT_SECURITY_ID,
-      title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
-      description: this.translationMessages.ENDPOINT_SECURITY_DESCRIPTION,
-    },
-  } satisfies Record<string, ChromeNavGroup>);
+  private readonly appStatusUpdater$: Partial<
+    Record<ParentAppId, Subject<object>>
+  > = {
+    [ENDPOINT_SECURITY_ID]: new Subject<object>(),
+  };
 
   private registerApps(core: CoreSetup) {
     const applications: App[] = [
       {
-        id: this.ENDPOINT_SECURITY_ID,
-        title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
+        id: ENDPOINT_SECURITY_ID,
+        title: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_TITLE,
         mount: async (_params: AppMountParameters) => {
-          this.endpointSecurityAppsStatusUpdater$.next(
+          this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
             makeNavLinkStatusVisible,
           );
-          this.appStartup$.next(this.ENDPOINT_SECURITY_ID);
+          this.appStartup$.next(ENDPOINT_SECURITY_ID);
 
           // TODO: Implement the endpoint security landing page
           return () => {};
         },
       },
       {
-        id: this.THREAT_INTELLIGENCE_ID,
-        title: this.translationMessages.THREAT_INTELLIGENCE_TITLE,
+        id: THREAT_INTELLIGENCE_ID,
+        title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
         mount: async (params: AppMountParameters) => {
           // TODO: Implement the threat intelligence application
           const { renderApp } = await import('./application');
@@ -182,9 +200,9 @@ export class AnalysisPlugin
         },
       },
       {
-        id: this.SECURITY_OPERATIONS_ID,
-        title: this.translationMessages.SECURITY_OPERATIONS_TITLE,
-        category: this.CATEGORY,
+        id: SECURITY_OPERATIONS_ID,
+        title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
+        category: CATEGORY,
         mount: async (params: AppMountParameters) => {
           // TODO: Implement the security operations application
           const { renderApp } = await import('./application');
@@ -193,9 +211,9 @@ export class AnalysisPlugin
         },
       },
       {
-        id: this.CLOUD_SECURITY_ID,
-        title: this.translationMessages.CLOUD_SECURITY_TITLE,
-        category: this.CATEGORY,
+        id: CLOUD_SECURITY_ID,
+        title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
+        category: CATEGORY,
         mount: async (params: AppMountParameters) => {
           // TODO: Implement the cloud security application
           const { renderApp } = await import('./application');
@@ -204,13 +222,13 @@ export class AnalysisPlugin
         },
       },
     ];
-    const subApps: Record<string, App[]> = {
-      [this.ENDPOINT_SECURITY_ID]: [
+    const subApps = {
+      [ENDPOINT_SECURITY_ID]: [
         {
-          id: this.CONFIGURATION_ASSESSMENT_ID,
-          title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
+          id: CONFIGURATION_ASSESSMENT_ID,
+          title: TRANSLATION_MESSAGES.CONFIGURATION_ASSESSMENT_TITLE,
           navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.endpointSecurityAppsStatusUpdater$,
+          updater$: this.appStatusUpdater$[ENDPOINT_SECURITY_ID],
           mount: async (params: AppMountParameters) => {
             // TODO: Implement the configuration assessment application
             const { renderApp } = await import('./application');
@@ -219,10 +237,10 @@ export class AnalysisPlugin
           },
         },
         {
-          id: this.MALWARE_DETECTION_ID,
-          title: this.translationMessages.MALWARE_DETECTION_TITLE,
+          id: MALWARE_DETECTION_ID,
+          title: TRANSLATION_MESSAGES.MALWARE_DETECTION_TITLE,
           navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.endpointSecurityAppsStatusUpdater$,
+          updater$: this.appStatusUpdater$[ENDPOINT_SECURITY_ID],
           mount: async (params: AppMountParameters) => {
             // TODO: Implement the malware detection application
             const { renderApp } = await import('./application');
@@ -231,10 +249,10 @@ export class AnalysisPlugin
           },
         },
         {
-          id: this.FIM_ID,
-          title: this.translationMessages.FIM_TITLE,
+          id: FIM_ID,
+          title: TRANSLATION_MESSAGES.FIM_TITLE,
           navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.endpointSecurityAppsStatusUpdater$,
+          updater$: this.appStatusUpdater$[ENDPOINT_SECURITY_ID],
           mount: async (params: AppMountParameters) => {
             // TODO: Implement the fim application
             const { renderApp } = await import('./application');
@@ -243,18 +261,22 @@ export class AnalysisPlugin
           },
         },
       ],
-    };
+    } satisfies Partial<Record<ParentAppId, App[]>>;
 
-    for (const app of subApps[this.ENDPOINT_SECURITY_ID]) {
+    for (const app of subApps[ENDPOINT_SECURITY_ID]) {
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
-        this.endpointSecurityAppsStatusUpdater$.next(makeNavLinkStatusVisible);
+        this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
+          makeNavLinkStatusVisible,
+        );
 
         const unmount = await mount(params);
 
         return () => {
-          this.endpointSecurityAppsStatusUpdater$.next(makeNavLinkStatusHidden);
+          this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
+            makeNavLinkStatusHidden,
+          );
           unmount();
         };
       };
@@ -268,51 +290,48 @@ export class AnalysisPlugin
   }
 
   private registerNavGroups(core: CoreSetup) {
-    core.chrome.navGroup.addNavLinksToGroup(
-      this.navGroups[this.ENDPOINT_SECURITY_ID],
-      [
-        {
-          // Configuration assessment
-          id: this.CONFIGURATION_ASSESSMENT_ID,
-          title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
-        },
-        {
-          // Malware detection
-          id: this.MALWARE_DETECTION_ID,
-          title: this.translationMessages.MALWARE_DETECTION_TITLE,
-        },
-        {
-          // FIM
-          id: this.FIM_ID,
-          title: this.translationMessages.FIM_TITLE,
-        },
-      ],
-    );
+    core.chrome.navGroup.addNavLinksToGroup(NAV_GROUPS[ENDPOINT_SECURITY_ID], [
+      {
+        // Configuration assessment
+        id: CONFIGURATION_ASSESSMENT_ID,
+        title: TRANSLATION_MESSAGES.CONFIGURATION_ASSESSMENT_TITLE,
+      },
+      {
+        // Malware detection
+        id: MALWARE_DETECTION_ID,
+        title: TRANSLATION_MESSAGES.MALWARE_DETECTION_TITLE,
+      },
+      {
+        // FIM
+        id: FIM_ID,
+        title: TRANSLATION_MESSAGES.FIM_TITLE,
+      },
+    ]);
 
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       {
-        id: this.ENDPOINT_SECURITY_ID,
-        title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
+        id: ENDPOINT_SECURITY_ID,
+        title: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_TITLE,
         order: 0,
-        category: this.CATEGORY,
+        category: CATEGORY,
       },
       {
-        id: this.THREAT_INTELLIGENCE_ID,
-        title: this.translationMessages.THREAT_INTELLIGENCE_TITLE,
+        id: THREAT_INTELLIGENCE_ID,
+        title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
         order: 1,
-        category: this.CATEGORY,
+        category: CATEGORY,
       },
       {
-        id: this.SECURITY_OPERATIONS_ID,
-        title: this.translationMessages.SECURITY_OPERATIONS_TITLE,
+        id: SECURITY_OPERATIONS_ID,
+        title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
         order: 2,
-        category: this.CATEGORY,
+        category: CATEGORY,
       },
       {
-        id: this.CLOUD_SECURITY_ID,
-        title: this.translationMessages.CLOUD_SECURITY_TITLE,
+        id: CLOUD_SECURITY_ID,
+        title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
         order: 3,
-        category: this.CATEGORY,
+        category: CATEGORY,
       },
     ]);
   }
