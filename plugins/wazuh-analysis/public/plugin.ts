@@ -1,5 +1,9 @@
 import { i18n } from '@osd/i18n';
-import { AppCategory, AppMountParameters } from 'opensearch-dashboards/public';
+import {
+  AppCategory,
+  AppMountParameters,
+  ChromeNavGroup,
+} from 'opensearch-dashboards/public';
 import {
   App,
   CoreSetup,
@@ -162,6 +166,35 @@ export class AnalysisPlugin
     for (const app of APPLICATIONS) {
       core.application.register(app);
     }
+
+    const navGroups = {
+      [this.ENDPOINT_SECURITY_ID]: {
+        id: this.ENDPOINT_SECURITY_ID,
+        title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
+        description: this.translationMessages.ENDPOINT_SECURITY_DESCRIPTION,
+      },
+    } satisfies Record<string, ChromeNavGroup>;
+
+    core.chrome.navGroup.addNavLinksToGroup(
+      navGroups[this.ENDPOINT_SECURITY_ID],
+      [
+        {
+          // Configuration assessment
+          id: this.CONFIGURATION_ASSESSMENT_ID,
+          title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
+        },
+        {
+          // Malware detection
+          id: this.MALWARE_DETECTION_ID,
+          title: this.translationMessages.MALWARE_DETECTION_TITLE,
+        },
+        {
+          // FIM
+          id: this.FIM_ID,
+          title: this.translationMessages.FIM_TITLE,
+        },
+      ],
+    );
 
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       {
