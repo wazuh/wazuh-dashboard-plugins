@@ -138,7 +138,6 @@ export class AnalysisPlugin
       },
       [this.THREAT_INTELLIGENCE_ID]: {
         title: this.translationMessages.THREAT_INTELLIGENCE_TITLE,
-        category: this.CATEGORY,
         async mount(params: AppMountParameters) {
           // TODO: Implement the threat intelligence application
           const { renderApp } = await import('./application');
