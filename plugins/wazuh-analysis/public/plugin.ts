@@ -79,6 +79,13 @@ export class AnalysisPlugin
         defaultMessage: 'Endpoint Security',
       },
     ),
+    ENDPOINT_SECURITY_DESCRIPTION: i18n.translate(
+      `${this.PLUGIN_ID}.category.${this.ENDPOINT_SECURITY_ID}.description`,
+      {
+        defaultMessage:
+          'Advanced monitoring and protection for devices against security threats.',
+      },
+    ),
     THREAT_INTELLIGENCE_TITLE: i18n.translate(
       `${this.PLUGIN_ID}.category.${this.THREAT_INTELLIGENCE_ID}`,
       {
