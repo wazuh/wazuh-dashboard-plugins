@@ -327,10 +327,7 @@ export class AnalysisPlugin
     return {};
   }
 
-  start(
-    core: CoreStart,
-    _plugins: AnalysisStartDependencies,
-  ): AnalysisStart | Promise<AnalysisStart> {
+  private subscribeToAppStartup(core: CoreStart) {
     this.appStartup$.subscribe({
       next: async (navGroupId: string) => {
         core.chrome.navGroup.setCurrentNavGroup(navGroupId);
@@ -340,6 +337,13 @@ export class AnalysisPlugin
         navigateToFirstAppInNavGroup(core, currentNavGroup);
       },
     });
+  }
+
+  start(
+    core: CoreStart,
+    _plugins: AnalysisStartDependencies,
+  ): AnalysisStart | Promise<AnalysisStart> {
+    this.subscribeToAppStartup(core);
 
     return {};
   }
