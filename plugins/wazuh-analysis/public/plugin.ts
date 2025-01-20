@@ -135,7 +135,6 @@ export class AnalysisPlugin
     const ApplicationsMap: Record<string, OmitStrict<App, 'id'>> = {
       [this.ENDPOINT_SECURITY_ID]: {
         title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
-        category: this.CATEGORY,
         async mount(params: AppMountParameters) {
           // TODO: Implement the endpoint security application
           const { renderApp } = await import('./application');
