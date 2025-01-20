@@ -1,6 +1,7 @@
 import { i18n } from '@osd/i18n';
 import {
   AppCategory,
+  AppMount,
   AppMountParameters,
   ChromeNavGroup,
   NavGroupItemInMap,
@@ -197,70 +198,63 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      [this.CONFIGURATION_ASSESSMENT_ID]: {
+    };
+    const endpointSecurityApps: App[] = [
+      {
+        id: this.CONFIGURATION_ASSESSMENT_ID,
         title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
         navLinkStatus: AppNavLinkStatus.hidden,
         updater$: this.endpointSecurityAppsStatusUpdater$,
         mount: async (params: AppMountParameters) => {
-          this.endpointSecurityAppsStatusUpdater$.next(
-            makeNavLinkStatusVisible,
-          );
-
           // TODO: Implement the configuration assessment application
           const { renderApp } = await import('./application');
-          const unmount = await renderApp(params, {});
 
-          return () => {
-            this.endpointSecurityAppsStatusUpdater$.next(
-              makeNavLinkStatusHidden,
-            );
-            unmount();
-          };
+          return await renderApp(params, {});
         },
       },
-      [this.MALWARE_DETECTION_ID]: {
+      {
+        id: this.MALWARE_DETECTION_ID,
         title: this.translationMessages.MALWARE_DETECTION_TITLE,
         navLinkStatus: AppNavLinkStatus.hidden,
         updater$: this.endpointSecurityAppsStatusUpdater$,
         mount: async (params: AppMountParameters) => {
-          this.endpointSecurityAppsStatusUpdater$.next(
-            makeNavLinkStatusVisible,
-          );
-
           // TODO: Implement the malware detection application
           const { renderApp } = await import('./application');
-          const unmount = await renderApp(params, {});
 
-          return () => {
-            this.endpointSecurityAppsStatusUpdater$.next(
-              makeNavLinkStatusHidden,
-            );
-            unmount();
-          };
+          return await renderApp(params, {});
         },
       },
-      [this.FIM_ID]: {
+      {
+        id: this.FIM_ID,
         title: this.translationMessages.FIM_TITLE,
         navLinkStatus: AppNavLinkStatus.hidden,
         updater$: this.endpointSecurityAppsStatusUpdater$,
         mount: async (params: AppMountParameters) => {
-          this.endpointSecurityAppsStatusUpdater$.next(
-            makeNavLinkStatusVisible,
-          );
-
           // TODO: Implement the fim application
           const { renderApp } = await import('./application');
-          const unmount = await renderApp(params, {});
 
-          return () => {
-            this.endpointSecurityAppsStatusUpdater$.next(
-              makeNavLinkStatusHidden,
-            );
-            unmount();
-          };
+          return await renderApp(params, {});
         },
       },
-    };
+    ];
+
+    for (const app of endpointSecurityApps) {
+      const mount = app.mount.bind(app) as AppMount;
+
+      app.mount = async (params: AppMountParameters) => {
+        this.endpointSecurityAppsStatusUpdater$.next(makeNavLinkStatusVisible);
+
+        const unmount = await mount(params);
+
+        return () => {
+          this.endpointSecurityAppsStatusUpdater$.next(makeNavLinkStatusHidden);
+          unmount();
+        };
+      };
+
+      ApplicationsMap[app.id] = app;
+    }
+
     const APPLICATIONS = Object.entries(ApplicationsMap).map(([id, app]) => ({
       ...app,
       id,
