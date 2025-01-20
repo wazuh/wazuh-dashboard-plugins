@@ -54,6 +54,9 @@ const navigateToFirstAppInNavGroup = async (
   }
 };
 
+const generateSubAppId = (parentAppId: string, subAppId: string) =>
+  `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
+
 export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
@@ -63,12 +66,15 @@ export class AnalysisPlugin
   private readonly THREAT_INTELLIGENCE_ID = 'threat_intelligence';
   private readonly SECURITY_OPERATIONS_ID = 'security_operations';
   private readonly CLOUD_SECURITY_ID = 'cloud_security';
-  private readonly CONFIGURATION_ASSESSMENT_ID =
-    this.ENDPOINT_SECURITY_ID + encodeURIComponent('/configuration_assessment');
-  private readonly MALWARE_DETECTION_ID =
-    this.ENDPOINT_SECURITY_ID + encodeURIComponent('/malware_detection');
-  private readonly FIM_ID =
-    this.ENDPOINT_SECURITY_ID + encodeURIComponent('/fim');
+  private readonly CONFIGURATION_ASSESSMENT_ID = generateSubAppId(
+    this.ENDPOINT_SECURITY_ID,
+    'configuration_assessment',
+  );
+  private readonly MALWARE_DETECTION_ID = generateSubAppId(
+    this.ENDPOINT_SECURITY_ID,
+    'malware_detection',
+  );
+  private readonly FIM_ID = generateSubAppId(this.ENDPOINT_SECURITY_ID, 'fim');
   private readonly translationMessages = {
     ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
       defaultMessage: 'Analysis',
