@@ -4,6 +4,7 @@ import {
   AppMountParameters,
   ChromeNavGroup,
 } from 'opensearch-dashboards/public';
+import { first } from 'rxjs/operators';
 import {
   App,
   CoreSetup,
@@ -20,6 +21,38 @@ interface AnalysisSetupDependencies {}
 interface AnalysisStartDependencies {
   navigation: NavigationPublicPluginStart;
 }
+
+/**
+ * The function `navigateToFirstAppInNavGroup` sets the current navigation group,
+ * retrieves the first navigation item within that group, and navigates to the
+ * corresponding application if it exists.
+ * @param {CoreStart} coreStart
+ * @param {string} navGroupId - The `navGroupId` parameter is a string that
+ * represents the unique identifier of a navigation group within the application.
+ */
+const navigateToFirstAppInNavGroup = async (
+  coreStart: CoreStart,
+  navGroupId: string,
+) => {
+  // Set the current nav group
+  coreStart.chrome.navGroup.setCurrentNavGroup(navGroupId);
+
+  // Get the current nav group
+  const navGroupMap = await coreStart.chrome.navGroup
+    .getNavGroupsMap$()
+    .pipe(first())
+    .toPromise();
+
+  // Get the first nav item, if it exists navigate to the app
+  if (navGroupMap) {
+    const navGroup = navGroupMap[navGroupId];
+    const firstNavItem = navGroup?.navLinks[0];
+
+    if (firstNavItem?.id) {
+      coreStart.application.navigateToApp(firstNavItem.id);
+    }
+  }
+};
 
 export class AnalysisPlugin
   implements
