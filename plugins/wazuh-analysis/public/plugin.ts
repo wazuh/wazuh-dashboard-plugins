@@ -132,10 +132,17 @@ export class AnalysisPlugin
   ): AnalysisSetup | Promise<AnalysisSetup> {
     console.debug('AnalysisPlugin started');
 
+    // eslint-disable-next-line unicorn/no-this-assignment, @typescript-eslint/no-this-alias
+    const that = this;
     const ApplicationsMap: Record<string, OmitStrict<App, 'id'>> = {
       [this.ENDPOINT_SECURITY_ID]: {
         title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
         async mount(params: AppMountParameters) {
+          // @ts-expect-error Property '_coreStart' does not exist on type 'AnalysisPlugin'.
+          const coreStart = that._coreStart as CoreStart;
+
+          navigateToFirstAppInNavGroup(coreStart, that.ENDPOINT_SECURITY_ID);
+
           // TODO: Implement the endpoint security application
           const { renderApp } = await import('./application');
 
@@ -268,9 +275,12 @@ export class AnalysisPlugin
   }
 
   start(
-    _core: CoreStart,
+    core: CoreStart,
     _plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
+    // @ts-expect-error Property '_coreStart' does not exist on type 'AnalysisPlugin'.
+    this._coreStart = core;
+
     return {};
   }
 
