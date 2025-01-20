@@ -265,14 +265,7 @@ export class AnalysisPlugin
     }
   }
 
-  public setup(
-    core: CoreSetup,
-    _plugins: AnalysisSetupDependencies,
-  ): AnalysisSetup | Promise<AnalysisSetup> {
-    console.debug('AnalysisPlugin started');
-
-    this.registerApps(core);
-
+  private registerNavGroups(core: CoreSetup) {
     core.chrome.navGroup.addNavLinksToGroup(
       this.navGroups[this.ENDPOINT_SECURITY_ID],
       [
@@ -320,6 +313,16 @@ export class AnalysisPlugin
         category: this.CATEGORY,
       },
     ]);
+  }
+
+  public setup(
+    core: CoreSetup,
+    _plugins: AnalysisSetupDependencies,
+  ): AnalysisSetup | Promise<AnalysisSetup> {
+    console.debug('AnalysisPlugin started');
+
+    this.registerApps(core);
+    this.registerNavGroups(core);
 
     return {};
   }
