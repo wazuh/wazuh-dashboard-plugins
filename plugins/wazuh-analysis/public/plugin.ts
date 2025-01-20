@@ -146,16 +146,14 @@ export class AnalysisPlugin
   ): AnalysisSetup | Promise<AnalysisSetup> {
     console.debug('AnalysisPlugin started');
 
-    // eslint-disable-next-line unicorn/no-this-assignment, @typescript-eslint/no-this-alias
-    const that = this;
     const ApplicationsMap: Record<string, OmitStrict<App, 'id'>> = {
       [this.ENDPOINT_SECURITY_ID]: {
         title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
-        async mount(params: AppMountParameters) {
+        mount: async (params: AppMountParameters) => {
           // @ts-expect-error Property '_coreStart' does not exist on type 'AnalysisPlugin'.
-          const coreStart = that._coreStart as CoreStart;
+          const coreStart = this._coreStart as CoreStart;
 
-          navigateToFirstAppInNavGroup(coreStart, that.ENDPOINT_SECURITY_ID);
+          navigateToFirstAppInNavGroup(coreStart, this.ENDPOINT_SECURITY_ID);
 
           // TODO: Implement the endpoint security application
           const { renderApp } = await import('./application');
@@ -165,7 +163,7 @@ export class AnalysisPlugin
       },
       [this.THREAT_INTELLIGENCE_ID]: {
         title: this.translationMessages.THREAT_INTELLIGENCE_TITLE,
-        async mount(params: AppMountParameters) {
+        mount: async (params: AppMountParameters) => {
           // TODO: Implement the threat intelligence application
           const { renderApp } = await import('./application');
 
@@ -175,7 +173,7 @@ export class AnalysisPlugin
       [this.SECURITY_OPERATIONS_ID]: {
         title: this.translationMessages.SECURITY_OPERATIONS_TITLE,
         category: this.CATEGORY,
-        async mount(params: AppMountParameters) {
+        mount: async (params: AppMountParameters) => {
           // TODO: Implement the security operations application
           const { renderApp } = await import('./application');
 
@@ -185,7 +183,7 @@ export class AnalysisPlugin
       [this.CLOUD_SECURITY_ID]: {
         title: this.translationMessages.CLOUD_SECURITY_TITLE,
         category: this.CATEGORY,
-        async mount(params: AppMountParameters) {
+        mount: async (params: AppMountParameters) => {
           // TODO: Implement the cloud security application
           const { renderApp } = await import('./application');
 
@@ -194,7 +192,7 @@ export class AnalysisPlugin
       },
       [this.CONFIGURATION_ASSESSMENT_ID]: {
         title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
-        async mount(params: AppMountParameters) {
+        mount: async (params: AppMountParameters) => {
           // TODO: Implement the configuration assessment application
           const { renderApp } = await import('./application');
 
@@ -203,7 +201,7 @@ export class AnalysisPlugin
       },
       [this.MALWARE_DETECTION_ID]: {
         title: this.translationMessages.MALWARE_DETECTION_TITLE,
-        async mount(params: AppMountParameters) {
+        mount: async (params: AppMountParameters) => {
           // TODO: Implement the malware detection application
           const { renderApp } = await import('./application');
 
@@ -212,7 +210,7 @@ export class AnalysisPlugin
       },
       [this.FIM_ID]: {
         title: this.translationMessages.FIM_TITLE,
-        async mount(params: AppMountParameters) {
+        mount: async (params: AppMountParameters) => {
           // TODO: Implement the fim application
           const { renderApp } = await import('./application');
 
