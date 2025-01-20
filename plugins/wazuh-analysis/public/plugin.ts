@@ -9,6 +9,7 @@ import { first } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import {
   App,
+  AppNavLinkStatus,
   CoreSetup,
   CoreStart,
   Plugin,
@@ -24,6 +25,12 @@ interface AnalysisStartDependencies {
   navigation: NavigationPublicPluginStart;
 }
 
+const makeNavLinkStatusVisible = (): Partial<App> => ({
+  navLinkStatus: AppNavLinkStatus.visible,
+});
+const makeNavLinkStatusHidden = (): Partial<App> => ({
+  navLinkStatus: AppNavLinkStatus.hidden,
+});
 const getCurrentNavGroup = async (core: CoreStart) =>
   core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
 
@@ -68,6 +75,9 @@ export class AnalysisPlugin
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
   private readonly appStartup$ = new Subject<string>();
+  private readonly endpointSecurityAppsStatusUpdater$ = new Subject<
+    () => object
+  >();
   private readonly PLUGIN_ID = 'analysis';
   private readonly ENDPOINT_SECURITY_ID = 'endpoint_security';
   private readonly THREAT_INTELLIGENCE_ID = 'threat_intelligence';
@@ -148,13 +158,14 @@ export class AnalysisPlugin
     const ApplicationsMap: Record<string, OmitStrict<App, 'id'>> = {
       [this.ENDPOINT_SECURITY_ID]: {
         title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
-        mount: async (params: AppMountParameters) => {
+        mount: async (_params: AppMountParameters) => {
+          this.endpointSecurityAppsStatusUpdater$.next(
+            makeNavLinkStatusVisible,
+          );
           this.appStartup$.next(this.ENDPOINT_SECURITY_ID);
 
-          // TODO: Implement the endpoint security application
-          const { renderApp } = await import('./application');
-
-          return renderApp(params, {});
+          // TODO: Implement the endpoint security landing page
+          return () => {};
         },
       },
       [this.THREAT_INTELLIGENCE_ID]: {
@@ -188,29 +199,65 @@ export class AnalysisPlugin
       },
       [this.CONFIGURATION_ASSESSMENT_ID]: {
         title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
+        navLinkStatus: AppNavLinkStatus.hidden,
+        updater$: this.endpointSecurityAppsStatusUpdater$,
         mount: async (params: AppMountParameters) => {
+          this.endpointSecurityAppsStatusUpdater$.next(
+            makeNavLinkStatusVisible,
+          );
+
           // TODO: Implement the configuration assessment application
           const { renderApp } = await import('./application');
+          const unmount = await renderApp(params, {});
 
-          return renderApp(params, {});
+          return () => {
+            this.endpointSecurityAppsStatusUpdater$.next(
+              makeNavLinkStatusHidden,
+            );
+            unmount();
+          };
         },
       },
       [this.MALWARE_DETECTION_ID]: {
         title: this.translationMessages.MALWARE_DETECTION_TITLE,
+        navLinkStatus: AppNavLinkStatus.hidden,
+        updater$: this.endpointSecurityAppsStatusUpdater$,
         mount: async (params: AppMountParameters) => {
+          this.endpointSecurityAppsStatusUpdater$.next(
+            makeNavLinkStatusVisible,
+          );
+
           // TODO: Implement the malware detection application
           const { renderApp } = await import('./application');
+          const unmount = await renderApp(params, {});
 
-          return renderApp(params, {});
+          return () => {
+            this.endpointSecurityAppsStatusUpdater$.next(
+              makeNavLinkStatusHidden,
+            );
+            unmount();
+          };
         },
       },
       [this.FIM_ID]: {
         title: this.translationMessages.FIM_TITLE,
+        navLinkStatus: AppNavLinkStatus.hidden,
+        updater$: this.endpointSecurityAppsStatusUpdater$,
         mount: async (params: AppMountParameters) => {
+          this.endpointSecurityAppsStatusUpdater$.next(
+            makeNavLinkStatusVisible,
+          );
+
           // TODO: Implement the fim application
           const { renderApp } = await import('./application');
+          const unmount = await renderApp(params, {});
 
-          return renderApp(params, {});
+          return () => {
+            this.endpointSecurityAppsStatusUpdater$.next(
+              makeNavLinkStatusHidden,
+            );
+            unmount();
+          };
         },
       },
     };
