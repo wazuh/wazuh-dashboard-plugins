@@ -5,6 +5,7 @@ import {
   ChromeNavGroup,
 } from 'opensearch-dashboards/public';
 import { first } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import {
   App,
   CoreSetup,
@@ -69,6 +70,7 @@ export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
+  private readonly appStartup$ = new Subject<string>();
   private readonly PLUGIN_ID = 'analysis';
   private readonly ENDPOINT_SECURITY_ID = 'endpoint_security';
   private readonly THREAT_INTELLIGENCE_ID = 'threat_intelligence';
@@ -150,10 +152,7 @@ export class AnalysisPlugin
       [this.ENDPOINT_SECURITY_ID]: {
         title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
         mount: async (params: AppMountParameters) => {
-          // @ts-expect-error Property '_coreStart' does not exist on type 'AnalysisPlugin'.
-          const coreStart = this._coreStart as CoreStart;
-
-          navigateToFirstAppInNavGroup(coreStart, this.ENDPOINT_SECURITY_ID);
+          this.appStartup$.next(this.ENDPOINT_SECURITY_ID);
 
           // TODO: Implement the endpoint security application
           const { renderApp } = await import('./application');
@@ -290,8 +289,10 @@ export class AnalysisPlugin
     core: CoreStart,
     _plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
-    // @ts-expect-error Property '_coreStart' does not exist on type 'AnalysisPlugin'.
-    this._coreStart = core;
+    this.appStartup$.subscribe({
+      next: (navGroupId: string) =>
+        navigateToFirstAppInNavGroup(core, navGroupId),
+    });
 
     return {};
   }
