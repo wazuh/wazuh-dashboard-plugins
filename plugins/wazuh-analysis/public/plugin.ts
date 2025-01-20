@@ -54,6 +54,14 @@ const navigateToFirstAppInNavGroup = async (
   }
 };
 
+/**
+ * The function `generateSubAppId` takes a parent app ID and a sub app ID, and
+ * returns a combined ID with the sub app ID URL-encoded.
+ * @param {string} parentAppId - The `parentAppId` parameter is a string
+ * representing the ID of the parent application.
+ * @param {string} subAppId - The `subAppId` parameter is a string representing the
+ * ID of a sub-application within a parent application.
+ */
 const generateSubAppId = (parentAppId: string, subAppId: string) =>
   `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
 
