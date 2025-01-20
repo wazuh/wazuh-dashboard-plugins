@@ -92,7 +92,7 @@ export class AnalysisPlugin
     'malware_detection',
   );
   private readonly FIM_ID = generateSubAppId(this.ENDPOINT_SECURITY_ID, 'fim');
-  private readonly translationMessages = {
+  private readonly translationMessages = Object.freeze({
     ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
       defaultMessage: 'Analysis',
     }),
@@ -142,7 +142,7 @@ export class AnalysisPlugin
     FIM_TITLE: i18n.translate(`${this.PLUGIN_ID}.category.${this.FIM_ID}`, {
       defaultMessage: 'File Integrity Monitoring',
     }),
-  };
+  });
   private readonly CATEGORY: AppCategory = {
     id: this.PLUGIN_ID,
     label: this.translationMessages.ANALYSIS_PLUGIN_TITLE,
