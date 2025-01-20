@@ -23,6 +23,9 @@ interface AnalysisStartDependencies {
   navigation: NavigationPublicPluginStart;
 }
 
+const getCurrentNavGroup = async (core: CoreStart) =>
+  core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
+
 /**
  * The function `navigateToFirstAppInNavGroup` sets the current navigation group,
  * retrieves the first navigation item within that group, and navigates to the
