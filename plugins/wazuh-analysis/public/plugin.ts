@@ -86,7 +86,7 @@ export class AnalysisPlugin
     console.debug('AnalysisPlugin started');
 
     const ApplicationsMap: Record<string, OmitStrict<App, 'id'>> = {
-      endpoint_security: {
+      [this.ENDPOINT_SECURITY_ID]: {
         title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
         category: this.CATEGORY,
         async mount(params: AppMountParameters) {
@@ -96,7 +96,7 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      threat_intelligence: {
+      [this.THREAT_INTELLIGENCE_ID]: {
         title: this.translationMessages.THREAT_INTELLIGENCE_TITLE,
         category: this.CATEGORY,
         async mount(params: AppMountParameters) {
@@ -106,7 +106,7 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      security_operations: {
+      [this.SECURITY_OPERATIONS_ID]: {
         title: this.translationMessages.SECURITY_OPERATIONS_TITLE,
         category: this.CATEGORY,
         async mount(params: AppMountParameters) {
@@ -116,7 +116,7 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      cloud_security: {
+      [this.CLOUD_SECURITY_ID]: {
         title: this.translationMessages.CLOUD_SECURITY_TITLE,
         category: this.CATEGORY,
         async mount(params: AppMountParameters) {
@@ -126,7 +126,7 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      configuration_assessment: {
+      [this.CONFIGURATION_ASSESSMENT_ID]: {
         title: this.translationMessages.CONFIGURATION_ASSESSMENT_TITLE,
         async mount(params: AppMountParameters) {
           // TODO: Implement the configuration assessment application
@@ -135,7 +135,7 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      malware_detection: {
+      [this.MALWARE_DETECTION_ID]: {
         title: this.translationMessages.MALWARE_DETECTION_TITLE,
         async mount(params: AppMountParameters) {
           // TODO: Implement the malware detection application
@@ -144,7 +144,7 @@ export class AnalysisPlugin
           return renderApp(params, {});
         },
       },
-      fim: {
+      [this.FIM_ID]: {
         title: this.translationMessages.FIM_TITLE,
         async mount(params: AppMountParameters) {
           // TODO: Implement the fim application
