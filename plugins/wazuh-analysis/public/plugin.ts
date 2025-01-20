@@ -3,6 +3,7 @@ import {
   AppCategory,
   AppMountParameters,
   ChromeNavGroup,
+  NavGroupItemInMap,
 } from 'opensearch-dashboards/public';
 import { first } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -27,34 +28,27 @@ const getCurrentNavGroup = async (core: CoreStart) =>
   core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
 
 /**
- * The function `navigateToFirstAppInNavGroup` sets the current navigation group,
- * retrieves the first navigation item within that group, and navigates to the
- * corresponding application if it exists.
- * @param {CoreStart} coreStart
- * @param {string} navGroupId - The `navGroupId` parameter is a string that
- * represents the unique identifier of a navigation group within the application.
+ * The function `navigateToFirstAppInNavGroup` navigates to the first app in a
+ * specified navigation group if it exists.
+ * @param {CoreStart} core - The `core` parameter is an object that provides access
+ * to core services in Kibana, such as application navigation, HTTP requests, and
+ * more. It is typically provided by the Kibana platform to plugins and can be used
+ * to interact with various functionalities within the Kibana application.
+ * @param {NavGroupItemInMap | undefined} navGroup - The `navGroup` parameter is
+ * expected to be an object that represents a navigation group item in a map. It
+ * should have a property `navLinks` which is an array of navigation links. Each
+ * navigation link in the `navLinks` array should have an `id` property that
+ * represents the ID
  */
 const navigateToFirstAppInNavGroup = async (
-  coreStart: CoreStart,
-  navGroupId: string,
+  core: CoreStart,
+  navGroup: NavGroupItemInMap | undefined,
 ) => {
-  // Set the current nav group
-  coreStart.chrome.navGroup.setCurrentNavGroup(navGroupId);
-
-  // Get the current nav group
-  const navGroupMap = await coreStart.chrome.navGroup
-    .getNavGroupsMap$()
-    .pipe(first())
-    .toPromise();
-
   // Get the first nav item, if it exists navigate to the app
-  if (navGroupMap) {
-    const navGroup = navGroupMap[navGroupId];
-    const firstNavItem = navGroup?.navLinks[0];
+  const firstNavItem = navGroup?.navLinks[0];
 
-    if (firstNavItem?.id) {
-      coreStart.application.navigateToApp(firstNavItem.id);
-    }
+  if (firstNavItem?.id) {
+    core.application.navigateToApp(firstNavItem.id);
   }
 };
 
