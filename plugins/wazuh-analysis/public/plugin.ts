@@ -148,6 +148,13 @@ export class AnalysisPlugin
     label: this.translationMessages.ANALYSIS_PLUGIN_TITLE,
     order: 5000,
   };
+  private readonly navGroups = Object.freeze({
+    [this.ENDPOINT_SECURITY_ID]: {
+      id: this.ENDPOINT_SECURITY_ID,
+      title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
+      description: this.translationMessages.ENDPOINT_SECURITY_DESCRIPTION,
+    },
+  } satisfies Record<string, ChromeNavGroup>);
 
   private registerApps(core: CoreSetup) {
     const applications: App[] = [
@@ -266,16 +273,8 @@ export class AnalysisPlugin
 
     this.registerApps(core);
 
-    const navGroups = {
-      [this.ENDPOINT_SECURITY_ID]: {
-        id: this.ENDPOINT_SECURITY_ID,
-        title: this.translationMessages.ENDPOINT_SECURITY_TITLE,
-        description: this.translationMessages.ENDPOINT_SECURITY_DESCRIPTION,
-      },
-    } satisfies Record<string, ChromeNavGroup>;
-
     core.chrome.navGroup.addNavLinksToGroup(
-      navGroups[this.ENDPOINT_SECURITY_ID],
+      this.navGroups[this.ENDPOINT_SECURITY_ID],
       [
         {
           // Configuration assessment
