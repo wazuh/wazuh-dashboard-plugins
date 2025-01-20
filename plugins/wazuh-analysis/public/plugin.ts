@@ -143,11 +143,11 @@ export class AnalysisPlugin
       defaultMessage: 'File Integrity Monitoring',
     }),
   });
-  private readonly CATEGORY: AppCategory = {
+  private readonly CATEGORY: AppCategory = Object.freeze({
     id: this.PLUGIN_ID,
     label: this.translationMessages.ANALYSIS_PLUGIN_TITLE,
     order: 5000,
-  };
+  });
   private readonly navGroups = Object.freeze({
     [this.ENDPOINT_SECURITY_ID]: {
       id: this.ENDPOINT_SECURITY_ID,
