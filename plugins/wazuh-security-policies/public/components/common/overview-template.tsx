@@ -25,7 +25,7 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
   const [decoderList, setDecoderList] = useState(decoder);
   const [query, setQuery] = useState({ text: '' });
   // Header start
-  const titleHeader = view;
+  const titleHeader = <h1 style={{ textTransform: 'capitalize' }}>{view}</h1>;
   const descriptionHeader = LastUpdateContentManagerText({
     status: 'Updated',
     lastUpdateDate: '31/01/2025',
@@ -38,7 +38,7 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
   // Header end
   // Searchbar start
   const isActiveOption = [
-    { value: 'enable', name: 'Enabla' },
+    { value: 'enable', name: 'Enable' },
     { value: 'disable', name: 'Disable' },
     { value: 'draft', name: 'Draft' },
   ];
@@ -244,7 +244,7 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
 
   const getRowProps = item => ({
     onClick: () =>
-      handleNavigation(`/${titleHeader}/${encodeURIComponent(item.name)}`),
+      handleNavigation(`/${view}/${encodeURIComponent(item.name)}`),
   });
 
   // Table end
