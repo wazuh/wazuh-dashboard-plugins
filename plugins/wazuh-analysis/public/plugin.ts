@@ -71,6 +71,20 @@ const MITRE_ATTACK_ID = generateSubAppId(
   THREAT_INTELLIGENCE_ID,
   'mitre_attack',
 );
+const REGULATORY_COMPLIANCE_ID = generateSubAppId(
+  SECURITY_OPERATIONS_ID,
+  'regulatory_compliance',
+);
+const IT_HYGIENE_ID = generateSubAppId(SECURITY_OPERATIONS_ID, 'it_hygiene');
+const INCIDENT_RESPONSE_ID = generateSubAppId(
+  SECURITY_OPERATIONS_ID,
+  'incident_response',
+);
+const DOCKER_ID = generateSubAppId(CLOUD_SECURITY_ID, 'docker');
+const AWS_ID = generateSubAppId(CLOUD_SECURITY_ID, 'aws');
+const GOOGLE_CLOUD_ID = generateSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
+const GITHUB_ID = generateSubAppId(CLOUD_SECURITY_ID, 'github');
+const OFFICE365_ID = generateSubAppId(CLOUD_SECURITY_ID, 'office365');
 const TRANSLATION_MESSAGES = Object.freeze({
   ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
     defaultMessage: 'Analysis',
@@ -107,10 +121,24 @@ const TRANSLATION_MESSAGES = Object.freeze({
       defaultMessage: 'Security Operations',
     },
   ),
+  SECURITY_OPERATIONS_DESCRIPTION: i18n.translate(
+    `${PLUGIN_ID}.category.${SECURITY_OPERATIONS_ID}.description`,
+    {
+      defaultMessage:
+        'Advanced monitoring and protection for devices against security threats.',
+    },
+  ),
   CLOUD_SECURITY_TITLE: i18n.translate(
     `${PLUGIN_ID}.category.${CLOUD_SECURITY_ID}`,
     {
       defaultMessage: 'Cloud Security',
+    },
+  ),
+  CLOUD_SECURITY_DESCRIPTION: i18n.translate(
+    `${PLUGIN_ID}.category.${CLOUD_SECURITY_ID}.description`,
+    {
+      defaultMessage:
+        'Monitoring and protection for cloud environments against security threats.',
     },
   ),
   CONFIGURATION_ASSESSMENT_TITLE: i18n.translate(
@@ -146,6 +174,39 @@ const TRANSLATION_MESSAGES = Object.freeze({
       defaultMessage: 'MITRE ATT&CK',
     },
   ),
+  REGULATORY_COMPLIANCE_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${REGULATORY_COMPLIANCE_ID}`,
+    {
+      defaultMessage: 'Regulatory Compliance',
+    },
+  ),
+  IT_HYGIENE_TITLE: i18n.translate(`${PLUGIN_ID}.category.${IT_HYGIENE_ID}`, {
+    defaultMessage: 'IT Hygiene',
+  }),
+  INCIDENT_RESPONSE_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${INCIDENT_RESPONSE_ID}`,
+    {
+      defaultMessage: 'Incident Response',
+    },
+  ),
+  DOCKER_TITLE: i18n.translate(`${PLUGIN_ID}.category.${DOCKER_ID}`, {
+    defaultMessage: 'Docker',
+  }),
+  AWS_TITLE: i18n.translate(`${PLUGIN_ID}.category.${AWS_ID}`, {
+    defaultMessage: 'AWS',
+  }),
+  GOOGLE_CLOUD_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${GOOGLE_CLOUD_ID}`,
+    {
+      defaultMessage: 'Google Cloud',
+    },
+  ),
+  GITHUB_TITLE: i18n.translate(`${PLUGIN_ID}.category.${GITHUB_ID}`, {
+    defaultMessage: 'Github',
+  }),
+  OFFICE365_TITLE: i18n.translate(`${PLUGIN_ID}.category.${OFFICE365_ID}`, {
+    defaultMessage: 'Office 365',
+  }),
 });
 const CATEGORY: AppCategory = Object.freeze({
   id: PLUGIN_ID,
@@ -162,6 +223,16 @@ const NAV_GROUPS = Object.freeze({
     id: THREAT_INTELLIGENCE_ID,
     title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
     description: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_DESCRIPTION,
+  },
+  [SECURITY_OPERATIONS_ID]: {
+    id: SECURITY_OPERATIONS_ID,
+    title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
+    description: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_DESCRIPTION,
+  },
+  [CLOUD_SECURITY_ID]: {
+    id: CLOUD_SECURITY_ID,
+    title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
+    description: TRANSLATION_MESSAGES.CLOUD_SECURITY_DESCRIPTION,
   },
 } satisfies Partial<Record<ParentAppId, ChromeNavGroup>>);
 
@@ -259,6 +330,13 @@ export class AnalysisPlugin
         title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
         category: CATEGORY,
         mount: async (params: AppMountParameters) => {
+          if (core.chrome.navGroup.getNavGroupEnabled()) {
+            this.appStatusUpdater$[SECURITY_OPERATIONS_ID].next(
+              makeNavLinkStatusVisible,
+            );
+            this.appStartup$.next(SECURITY_OPERATIONS_ID);
+          }
+
           // TODO: Implement the security operations application
           const { renderApp } = await import('./application');
 
@@ -270,6 +348,13 @@ export class AnalysisPlugin
         title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
         category: CATEGORY,
         mount: async (params: AppMountParameters) => {
+          if (core.chrome.navGroup.getNavGroupEnabled()) {
+            this.appStatusUpdater$[CLOUD_SECURITY_ID].next(
+              makeNavLinkStatusVisible,
+            );
+            this.appStartup$.next(CLOUD_SECURITY_ID);
+          }
+
           // TODO: Implement the cloud security application
           const { renderApp } = await import('./application');
 
@@ -354,10 +439,112 @@ export class AnalysisPlugin
           },
         },
       ],
+      [SECURITY_OPERATIONS_ID]: [
+        {
+          id: REGULATORY_COMPLIANCE_ID,
+          title: TRANSLATION_MESSAGES.REGULATORY_COMPLIANCE_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the regulatory compliance application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+        {
+          id: IT_HYGIENE_ID,
+          title: TRANSLATION_MESSAGES.IT_HYGIENE_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the it hygiene application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+        {
+          id: INCIDENT_RESPONSE_ID,
+          title: TRANSLATION_MESSAGES.INCIDENT_RESPONSE_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the incident response application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+      ],
+      [CLOUD_SECURITY_ID]: [
+        {
+          id: DOCKER_ID,
+          title: TRANSLATION_MESSAGES.DOCKER_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the docker application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+        {
+          id: AWS_ID,
+          title: TRANSLATION_MESSAGES.AWS_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the aws application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+        {
+          id: GOOGLE_CLOUD_ID,
+          title: TRANSLATION_MESSAGES.GOOGLE_CLOUD_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the google cloud application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+        {
+          id: GITHUB_ID,
+          title: TRANSLATION_MESSAGES.GITHUB_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the github application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+        {
+          id: OFFICE365_ID,
+          title: TRANSLATION_MESSAGES.OFFICE365_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the office365 application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+      ],
     } satisfies Partial<Record<ParentAppId, App[]>>;
 
     this.setupAppMounts(subApps, ENDPOINT_SECURITY_ID, core, applications);
     this.setupAppMounts(subApps, THREAT_INTELLIGENCE_ID, core, applications);
+    this.setupAppMounts(subApps, SECURITY_OPERATIONS_ID, core, applications);
+    this.setupAppMounts(subApps, CLOUD_SECURITY_ID, core, applications);
 
     for (const app of applications) {
       core.application.register(app);
@@ -434,6 +621,55 @@ export class AnalysisPlugin
         },
       ],
     );
+
+    core.chrome.navGroup.addNavLinksToGroup(
+      NAV_GROUPS[SECURITY_OPERATIONS_ID],
+      [
+        {
+          // Regulatory compliance
+          id: REGULATORY_COMPLIANCE_ID,
+          title: TRANSLATION_MESSAGES.REGULATORY_COMPLIANCE_TITLE,
+        },
+        {
+          // IT hygiene
+          id: IT_HYGIENE_ID,
+          title: TRANSLATION_MESSAGES.IT_HYGIENE_TITLE,
+        },
+        {
+          // Incident response
+          id: INCIDENT_RESPONSE_ID,
+          title: TRANSLATION_MESSAGES.INCIDENT_RESPONSE_TITLE,
+        },
+      ],
+    );
+
+    core.chrome.navGroup.addNavLinksToGroup(NAV_GROUPS[CLOUD_SECURITY_ID], [
+      {
+        // Docker
+        id: DOCKER_ID,
+        title: TRANSLATION_MESSAGES.DOCKER_TITLE,
+      },
+      {
+        // AWS
+        id: AWS_ID,
+        title: TRANSLATION_MESSAGES.AWS_TITLE,
+      },
+      {
+        // Google Cloud
+        id: GOOGLE_CLOUD_ID,
+        title: TRANSLATION_MESSAGES.GOOGLE_CLOUD_TITLE,
+      },
+      {
+        // Github
+        id: GITHUB_ID,
+        title: TRANSLATION_MESSAGES.GITHUB_TITLE,
+      },
+      {
+        // Office 365
+        id: OFFICE365_ID,
+        title: TRANSLATION_MESSAGES.OFFICE365_TITLE,
+      },
+    ]);
 
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       {
