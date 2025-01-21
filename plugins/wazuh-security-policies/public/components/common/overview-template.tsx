@@ -253,7 +253,7 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
     <EuiPanel>
       <EuiPageHeader
         pageTitle={titleHeader}
-        descriptionHeader={descriptionHeader}
+        description={descriptionHeader}
         rightSideItems={rightSideItems}
       />
       <SearchBar schema={schema} filters={filters} setQuery={setQuery} />

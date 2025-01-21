@@ -20,35 +20,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -83,35 +64,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -146,35 +108,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -209,35 +152,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -272,35 +196,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -335,35 +240,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -398,35 +284,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -461,35 +328,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -524,35 +372,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -587,35 +416,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -650,35 +460,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {
@@ -713,35 +504,16 @@ export const decoder = [
       ],
     },
     'parse|event.original': [
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 standard',
-      },
-      {
-        pattern:
-          '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-        description: 'BSD Syslog RFC 3164 no pid',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-        description: 'BSD Syslog RFC 3164 standard ISO8601',
-      },
-      {
-        pattern:
-          '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-        description: 'BSD Syslog RFC 3164 no pid ISO8601',
-      },
-      {
-        pattern: '<event.start/SYSLOG> <host.hostname> <message>',
-        description: 'RFC3164 example 2 section 5.4',
-      },
-      {
-        pattern:
-          '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-        description: 'RFC3164 example 4 section 5.4',
-      },
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
+
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
+
+      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
+      '<event.start/SYSLOG> <host.hostname> <message>',
+
+      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
       {

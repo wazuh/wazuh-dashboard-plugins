@@ -110,7 +110,7 @@ export const IntegrationView = () => {
     <>
       <EuiPageHeader
         pageTitle={headerTitle}
-        descriptionHeader={descriptionHeader}
+        description={descriptionHeader}
         rightSideItems={rightSideItems}
       />
       <EuiPanel>

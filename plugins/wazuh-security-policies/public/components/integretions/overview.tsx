@@ -113,7 +113,7 @@ export const IntegrationOverview = () => {
     <>
       <EuiPageHeader
         pageTitle={titleHeader}
-        descriptionHeader={descriptionHeader}
+        description={descriptionHeader}
         rightSideItems={rightSideItems}
       />
       <SearchBar schema={schema} filters={filters} setQuery={setQuery} />

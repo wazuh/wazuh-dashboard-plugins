@@ -5,9 +5,17 @@ import {
   EuiButtonEmpty,
   EuiText,
   EuiButtonIcon,
+  EuiSteps,
+  EuiPanel,
+  EuiAccordion,
+  EuiHorizontalRule,
+  EuiForm,
+  EuiFormRow,
+  EuiFieldText,
 } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
 import { decoder } from './mock-data-rules';
+import { renderInputs } from '../common/render-inputs';
 
 export const RuleDetails = () => {
   const { id: name } = useParams();
@@ -54,6 +62,63 @@ export const RuleDetails = () => {
     </EuiButtonEmpty>,
   ];
 
+  const step = item => {
+    const removeEntries = ['id', 'name', 'provider', 'status'];
+    const arraySteps = Object.entries(item)
+      .filter(([key]) => !removeEntries.includes(key))
+      .map(([key, value]) => ({
+        key,
+        value,
+      }));
+    const steps = arraySteps.map(step => ({
+      title: 'Better step',
+      children: (
+        <EuiPanel>
+          <EuiAccordion
+            id='accordion1'
+            paddingSize='s'
+            buttonContent={step.key}
+          >
+            <EuiHorizontalRule margin='s' />
+
+            <EuiForm component='form'>
+              {Object.entries(step.value)
+                .map(([key, value]) => ({ key, value }))
+                .map((item, index) => {
+                  if (Array.isArray(item.value)) {
+                    return renderInputs(item.value);
+                  }
+
+                  if (typeof item.value !== 'string') {
+                    return null;
+                  }
+
+                  return (
+                    <EuiFormRow
+                      key={`${item.key}-${index}`}
+                      label={item.key}
+                      fullWidth
+                      display='columnCompressed'
+                    >
+                      <EuiFieldText
+                        value={item.value}
+                        name='username'
+                        fullWidth
+                        compressed
+                        readOnly
+                      />
+                    </EuiFormRow>
+                  );
+                })}
+            </EuiForm>
+          </EuiAccordion>
+        </EuiPanel>
+      ),
+    }));
+
+    return steps;
+  };
+
   return (
     <>
       <EuiPageHeader
@@ -65,6 +130,7 @@ export const RuleDetails = () => {
         }}
         rightSideItems={buttons}
       />
+      <EuiSteps steps={step(item)} />
     </>
   );
 };
