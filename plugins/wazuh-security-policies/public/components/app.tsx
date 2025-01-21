@@ -14,6 +14,7 @@ import { views } from './common/views';
 export const WazuhSecurityPoliciesApp = () => {
   const history = getHistory();
   const [currentTab, setCurrentTab] = useState('');
+  const [renderMenu, setRenderMenu] = useState(true);
   const [isSideNavOpenOnMobile, setIsSideNavOpenOnMobile] = useState(false);
 
   const toggleOpenOnMobile = () => {
@@ -22,7 +23,7 @@ export const WazuhSecurityPoliciesApp = () => {
 
   useEffect(() => {
     setCurrentTab(history.location.pathname);
-  }, []);
+  }, [history.location.pathname]);
 
   const sideNav = [
     {
@@ -51,16 +52,18 @@ export const WazuhSecurityPoliciesApp = () => {
       <I18nProvider>
         <>
           <EuiPage paddingSize='m'>
-            <EuiPageSideBar>
-              {}
-              <EuiSideNav
-                mobileTitle='Ruleset'
-                toggleOpenOnMobile={() => toggleOpenOnMobile()}
-                isOpenOnMobile={isSideNavOpenOnMobile}
-                aria-label='Ruleset'
-                items={sideNav}
-              />
-            </EuiPageSideBar>
+            {renderMenu && (
+              <EuiPageSideBar>
+                <EuiSideNav
+                  mobileTitle='Ruleset'
+                  toggleOpenOnMobile={() => toggleOpenOnMobile()}
+                  isOpenOnMobile={isSideNavOpenOnMobile}
+                  aria-label='Ruleset'
+                  items={sideNav}
+                />
+              </EuiPageSideBar>
+            )}
+
             <EuiPageBody component='main'>
               <EuiPanel
                 paddingSize='none'
@@ -83,6 +86,12 @@ export const WazuhSecurityPoliciesApp = () => {
                           );
                         } else {
                           getCore().chrome.setBreadcrumbs(view.breadcrumb());
+                        }
+
+                        if (view.renderMenu) {
+                          setRenderMenu(true);
+                        } else {
+                          setRenderMenu(false);
                         }
 
                         return view.render();

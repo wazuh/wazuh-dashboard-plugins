@@ -52,7 +52,7 @@ export const views: ViewInterface[] = [
     id: 'integrationsDetails',
     path: '/integrations/:id',
     renderOnMenu: false,
-    renderMenu: false,
+    renderMenu: true,
     render: () => <IntegrationView />,
     breadcrumb: (name?: string) => [
       {
