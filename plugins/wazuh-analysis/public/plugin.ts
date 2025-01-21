@@ -179,6 +179,7 @@ export class AnalysisPlugin
       {
         id: ENDPOINT_SECURITY_ID,
         title: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_TITLE,
+        category: CATEGORY,
         mount: async (_params: AppMountParameters) => {
           this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
             makeNavLinkStatusVisible,
@@ -192,6 +193,7 @@ export class AnalysisPlugin
       {
         id: THREAT_INTELLIGENCE_ID,
         title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
+        category: CATEGORY,
         mount: async (params: AppMountParameters) => {
           // TODO: Implement the threat intelligence application
           const { renderApp } = await import('./application');
