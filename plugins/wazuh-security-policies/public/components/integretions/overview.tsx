@@ -5,10 +5,10 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
+  EuiPageHeader,
 } from '@elastic/eui';
 import './integrations.scss';
 import { SearchBar } from '../common/searchbar';
-import { HeaderPage } from '../common/header-page';
 import { LastUpdateContentManagerText } from '../common/last-update-content-manager-text.tsx';
 import { NoResultsData } from '../common/no-results';
 import { CardIntegration } from './components/card-integration';
@@ -111,8 +111,8 @@ export const IntegrationOverview = () => {
 
   return (
     <>
-      <HeaderPage
-        titleHeader={titleHeader}
+      <EuiPageHeader
+        pageTitle={titleHeader}
         descriptionHeader={descriptionHeader}
         rightSideItems={rightSideItems}
       />

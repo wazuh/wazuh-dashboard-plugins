@@ -5,10 +5,10 @@ import {
   EuiText,
   EuiBasicTable,
   EuiHealth,
+  EuiPageHeader,
 } from '@elastic/eui';
 import { decoder } from '../rules/mock-data-rules';
 import { getHistory } from '../../plugin-services';
-import { HeaderPage } from './header-page';
 import { LastUpdateContentManagerText } from './last-update-content-manager-text.tsx';
 import { SearchBar } from './searchbar';
 import { NoResultsData } from './no-results';
@@ -251,8 +251,8 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
 
   return (
     <EuiPanel>
-      <HeaderPage
-        titleHeader={titleHeader}
+      <EuiPageHeader
+        pageTitle={titleHeader}
         descriptionHeader={descriptionHeader}
         rightSideItems={rightSideItems}
       />

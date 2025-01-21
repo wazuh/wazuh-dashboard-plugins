@@ -5,9 +5,9 @@ import {
   EuiButton,
   EuiDescriptionList,
   EuiPanel,
+  EuiPageHeader,
 } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
-import { HeaderPage } from '../common/header-page';
 import { LastUpdateContentManagerText } from '../common/last-update-content-manager-text.tsx';
 import { integrations } from './mock-data-integrations';
 import './integrations.scss';
@@ -108,8 +108,8 @@ export const IntegrationView = () => {
 
   return (
     <>
-      <HeaderPage
-        titleHeader={headerTitle}
+      <EuiPageHeader
+        pageTitle={headerTitle}
         descriptionHeader={descriptionHeader}
         rightSideItems={rightSideItems}
       />
