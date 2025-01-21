@@ -169,11 +169,9 @@ export class AnalysisPlugin
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
   private readonly appStartup$ = new Subject<string>();
-  private readonly appStatusUpdater$: Partial<
-    Record<ParentAppId, Subject<AppUpdater>>
-  > = {
+  private readonly appStatusUpdater$ = {
     [ENDPOINT_SECURITY_ID]: new Subject(),
-  };
+  } satisfies Partial<Record<ParentAppId, Subject<AppUpdater>>>;
 
   private registerApps(core: CoreSetup) {
     const applications: App[] = [
@@ -183,7 +181,7 @@ export class AnalysisPlugin
         category: CATEGORY,
         mount: async (_params: AppMountParameters) => {
           if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[ENDPOINT_SECURITY_ID]?.next(
+            this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
               makeNavLinkStatusVisible,
             );
             this.appStartup$.next(ENDPOINT_SECURITY_ID);
@@ -273,7 +271,7 @@ export class AnalysisPlugin
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.appStatusUpdater$[ENDPOINT_SECURITY_ID]?.next(
+          this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
             makeNavLinkStatusVisible,
           );
         }
@@ -282,7 +280,7 @@ export class AnalysisPlugin
 
         return () => {
           if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[ENDPOINT_SECURITY_ID]?.next(
+            this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
               makeNavLinkStatusHidden,
             );
           }
