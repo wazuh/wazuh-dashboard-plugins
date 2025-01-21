@@ -288,6 +288,8 @@ export class AnalysisPlugin
           }
 
           unmount();
+
+          return true;
         };
       };
 
