@@ -182,10 +182,12 @@ export class AnalysisPlugin
         title: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_TITLE,
         category: CATEGORY,
         mount: async (_params: AppMountParameters) => {
-          this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
-            makeNavLinkStatusVisible,
-          );
-          this.appStartup$.next(ENDPOINT_SECURITY_ID);
+          if (core.chrome.navGroup.getNavGroupEnabled()) {
+            this.appStatusUpdater$[ENDPOINT_SECURITY_ID]?.next(
+              makeNavLinkStatusVisible,
+            );
+            this.appStartup$.next(ENDPOINT_SECURITY_ID);
+          }
 
           // TODO: Implement the endpoint security landing page
           return () => {};
@@ -270,16 +272,21 @@ export class AnalysisPlugin
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
-        this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
-          makeNavLinkStatusVisible,
-        );
+        if (core.chrome.navGroup.getNavGroupEnabled()) {
+          this.appStatusUpdater$[ENDPOINT_SECURITY_ID]?.next(
+            makeNavLinkStatusVisible,
+          );
+        }
 
         const unmount = await mount(params);
 
         return () => {
-          this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
-            makeNavLinkStatusHidden,
-          );
+          if (core.chrome.navGroup.getNavGroupEnabled()) {
+            this.appStatusUpdater$[ENDPOINT_SECURITY_ID]?.next(
+              makeNavLinkStatusHidden,
+            );
+          }
+
           unmount();
         };
       };
@@ -354,11 +361,13 @@ export class AnalysisPlugin
   private subscribeToAppStartup(core: CoreStart) {
     this.appStartup$.subscribe({
       next: async (navGroupId: string) => {
-        core.chrome.navGroup.setCurrentNavGroup(navGroupId);
+        if (core.chrome.navGroup.getNavGroupEnabled()) {
+          core.chrome.navGroup.setCurrentNavGroup(navGroupId);
 
-        const currentNavGroup = await getCurrentNavGroup(core);
+          const currentNavGroup = await getCurrentNavGroup(core);
 
-        navigateToFirstAppInNavGroup(core, currentNavGroup);
+          navigateToFirstAppInNavGroup(core, currentNavGroup);
+        }
       },
     });
   }
