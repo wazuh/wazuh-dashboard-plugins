@@ -116,57 +116,6 @@ export const WzMenu = withWindowSize(
       return APIlist;
     };
 
-    loadIndexPatternsList2 = async () => {
-      try {
-        let newState = {};
-        let list = await PatternHandler.getPatternList('api');
-        if (!list) return;
-        this.props?.appConfig?.data?.['ip.ignore']?.length &&
-          (list = list.filter(
-            indexPattern =>
-              !this.props?.appConfig?.data?.['ip.ignore'].includes(
-                indexPattern.title,
-              ),
-          ));
-
-        // When not exists patterns, not show the selector
-        if (list.length === 1) return;
-
-        let filtered = false;
-        // If there is no current pattern, fetch it
-        if (!AppState.getCurrentPattern()) {
-          AppState.setCurrentPattern(list[0].id);
-        } else {
-          // Check if the current pattern cookie is valid
-          filtered = list.find(item =>
-            item.id.includes(AppState.getCurrentPattern()),
-          );
-          if (!filtered) AppState.setCurrentPattern(list[0].id);
-        }
-
-        const data = filtered
-          ? filtered
-          : await this.indexPatterns.get(AppState.getCurrentPattern());
-        newState = {
-          ...newState,
-          theresPattern: true,
-          currentPattern: data.title,
-        };
-
-        // Getting the list of index patterns
-        if (list) {
-          newState = {
-            ...newState,
-            patternList: list,
-            currentSelectedPattern: AppState.getCurrentPattern(),
-          };
-        }
-        return newState;
-      } catch (error) {
-        throw error;
-      }
-    };
-
     async componentDidUpdate(prevProps) {
       let newState = {};
       const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
