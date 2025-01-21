@@ -59,6 +59,18 @@ const MALWARE_DETECTION_ID = generateSubAppId(
   'malware_detection',
 );
 const FIM_ID = generateSubAppId(ENDPOINT_SECURITY_ID, 'fim');
+const THREAT_HUNTING_ID = generateSubAppId(
+  THREAT_INTELLIGENCE_ID,
+  'threat_hunting',
+);
+const VULNERABILITY_DETECTION_ID = generateSubAppId(
+  THREAT_INTELLIGENCE_ID,
+  'vulnerability_detection',
+);
+const MITRE_ATTACK_ID = generateSubAppId(
+  THREAT_INTELLIGENCE_ID,
+  'mitre_attack',
+);
 const TRANSLATION_MESSAGES = Object.freeze({
   ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
     defaultMessage: 'Analysis',
@@ -80,6 +92,13 @@ const TRANSLATION_MESSAGES = Object.freeze({
     `${PLUGIN_ID}.category.${THREAT_INTELLIGENCE_ID}`,
     {
       defaultMessage: 'Threat Intelligence',
+    },
+  ),
+  THREAT_INTELLIGENCE_DESCRIPTION: i18n.translate(
+    `${PLUGIN_ID}.category.${THREAT_INTELLIGENCE_ID}.description`,
+    {
+      defaultMessage:
+        'Collect and analyze information about potential threats to inform security decisions.',
     },
   ),
   SECURITY_OPERATIONS_TITLE: i18n.translate(
@@ -109,6 +128,24 @@ const TRANSLATION_MESSAGES = Object.freeze({
   FIM_TITLE: i18n.translate(`${PLUGIN_ID}.category.${FIM_ID}`, {
     defaultMessage: 'File Integrity Monitoring',
   }),
+  THREAT_HUNTING_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${THREAT_HUNTING_ID}`,
+    {
+      defaultMessage: 'Threat Hunting',
+    },
+  ),
+  VULNERABILITY_DETECTION_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${VULNERABILITY_DETECTION_ID}`,
+    {
+      defaultMessage: 'Vulnerability Detection',
+    },
+  ),
+  MITRE_ATTACK_TITLE: i18n.translate(
+    `${PLUGIN_ID}.category.${MITRE_ATTACK_ID}`,
+    {
+      defaultMessage: 'MITRE ATT&CK',
+    },
+  ),
 });
 const CATEGORY: AppCategory = Object.freeze({
   id: PLUGIN_ID,
@@ -120,6 +157,11 @@ const NAV_GROUPS = Object.freeze({
     id: ENDPOINT_SECURITY_ID,
     title: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_TITLE,
     description: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_DESCRIPTION,
+  },
+  [THREAT_INTELLIGENCE_ID]: {
+    id: THREAT_INTELLIGENCE_ID,
+    title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
+    description: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_DESCRIPTION,
   },
 } satisfies Partial<Record<ParentAppId, ChromeNavGroup>>);
 
@@ -171,6 +213,9 @@ export class AnalysisPlugin
   private readonly appStartup$ = new Subject<string>();
   private readonly appStatusUpdater$ = {
     [ENDPOINT_SECURITY_ID]: new Subject(),
+    [THREAT_INTELLIGENCE_ID]: new Subject(),
+    [SECURITY_OPERATIONS_ID]: new Subject(),
+    [CLOUD_SECURITY_ID]: new Subject(),
   } satisfies Partial<Record<ParentAppId, Subject<AppUpdater>>>;
 
   private registerApps(core: CoreSetup) {
@@ -196,6 +241,13 @@ export class AnalysisPlugin
         title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
         category: CATEGORY,
         mount: async (params: AppMountParameters) => {
+          if (core.chrome.navGroup.getNavGroupEnabled()) {
+            this.appStatusUpdater$[THREAT_INTELLIGENCE_ID].next(
+              makeNavLinkStatusVisible,
+            );
+            this.appStartup$.next(THREAT_INTELLIGENCE_ID);
+          }
+
           // TODO: Implement the threat intelligence application
           const { renderApp } = await import('./application');
 
@@ -264,25 +316,73 @@ export class AnalysisPlugin
           },
         },
       ],
+      [THREAT_INTELLIGENCE_ID]: [
+        {
+          id: THREAT_HUNTING_ID,
+          title: TRANSLATION_MESSAGES.THREAT_HUNTING_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the threat hunting application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+        {
+          id: VULNERABILITY_DETECTION_ID,
+          title: TRANSLATION_MESSAGES.VULNERABILITY_DETECTION_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the vulnerability detection application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+        {
+          id: MITRE_ATTACK_ID,
+          title: TRANSLATION_MESSAGES.MITRE_ATTACK_TITLE,
+          navLinkStatus: AppNavLinkStatus.hidden,
+          updater$: this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
+          mount: async (params: AppMountParameters) => {
+            // TODO: Implement the mitre attack application
+            const { renderApp } = await import('./application');
+
+            return await renderApp(params, {});
+          },
+        },
+      ],
     } satisfies Partial<Record<ParentAppId, App[]>>;
 
-    for (const app of subApps[ENDPOINT_SECURITY_ID]) {
+    this.setupAppMounts(subApps, ENDPOINT_SECURITY_ID, core, applications);
+    this.setupAppMounts(subApps, THREAT_INTELLIGENCE_ID, core, applications);
+
+    for (const app of applications) {
+      core.application.register(app);
+    }
+  }
+
+  private setupAppMounts(
+    subApps: Partial<Record<ParentAppId, App[]>>,
+    navGroupId: ParentAppId,
+    core: CoreSetup,
+    applications: App[],
+  ) {
+    for (const app of subApps[navGroupId] ?? []) {
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
-            makeNavLinkStatusVisible,
-          );
+          this.appStatusUpdater$[navGroupId].next(makeNavLinkStatusVisible);
         }
 
         const unmount = await mount(params);
 
         return () => {
           if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
-              makeNavLinkStatusHidden,
-            );
+            this.appStatusUpdater$[navGroupId].next(makeNavLinkStatusHidden);
           }
 
           unmount();
@@ -292,10 +392,6 @@ export class AnalysisPlugin
       };
 
       applications.push(app);
-    }
-
-    for (const app of applications) {
-      core.application.register(app);
     }
   }
 
@@ -317,6 +413,27 @@ export class AnalysisPlugin
         title: TRANSLATION_MESSAGES.FIM_TITLE,
       },
     ]);
+
+    core.chrome.navGroup.addNavLinksToGroup(
+      NAV_GROUPS[THREAT_INTELLIGENCE_ID],
+      [
+        {
+          // Threat hunting
+          id: THREAT_HUNTING_ID,
+          title: TRANSLATION_MESSAGES.THREAT_HUNTING_TITLE,
+        },
+        {
+          // Vulnerability detection
+          id: VULNERABILITY_DETECTION_ID,
+          title: TRANSLATION_MESSAGES.VULNERABILITY_DETECTION_TITLE,
+        },
+        {
+          // MITRE ATT&CK
+          id: MITRE_ATTACK_ID,
+          title: TRANSLATION_MESSAGES.MITRE_ATTACK_TITLE,
+        },
+      ],
+    );
 
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       {
