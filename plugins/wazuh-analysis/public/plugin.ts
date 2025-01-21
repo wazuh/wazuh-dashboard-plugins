@@ -3,6 +3,7 @@ import {
   AppCategory,
   AppMount,
   AppMountParameters,
+  AppUpdater,
   ChromeNavGroup,
   NavGroupItemInMap,
 } from 'opensearch-dashboards/public';
@@ -169,9 +170,9 @@ export class AnalysisPlugin
 {
   private readonly appStartup$ = new Subject<string>();
   private readonly appStatusUpdater$: Partial<
-    Record<ParentAppId, Subject<object>>
+    Record<ParentAppId, Subject<AppUpdater>>
   > = {
-    [ENDPOINT_SECURITY_ID]: new Subject<object>(),
+    [ENDPOINT_SECURITY_ID]: new Subject(),
   };
 
   private registerApps(core: CoreSetup) {
