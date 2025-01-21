@@ -14,8 +14,8 @@ import {
   EuiFieldText,
 } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
-import { decoder } from './mock-data-rules';
 import { renderInputs } from '../common/render-inputs';
+import { decoder } from './mock-data-rules';
 
 export const RuleDetails = () => {
   const { id: name } = useParams();
@@ -63,9 +63,9 @@ export const RuleDetails = () => {
   ];
 
   const step = item => {
-    const removeEntries = ['id', 'name', 'provider', 'status'];
+    const removeEntries = new Set(['id', 'name', 'provider', 'status']);
     const arraySteps = Object.entries(item)
-      .filter(([key]) => !removeEntries.includes(key))
+      .filter(([key]) => !removeEntries.has(key))
       .map(([key, value]) => ({
         key,
         value,
