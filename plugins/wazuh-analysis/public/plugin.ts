@@ -281,7 +281,7 @@ export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
-  private readonly appStartup$ = new Subject<string>();
+  private readonly appStartup$ = new Subject<ParentAppId>();
   private readonly appStatusUpdater$ = {
     [ENDPOINT_SECURITY_ID]: new Subject(),
     [THREAT_INTELLIGENCE_ID]: new Subject(),
@@ -295,30 +295,16 @@ export class AnalysisPlugin
         id: ENDPOINT_SECURITY_ID,
         title: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_TITLE,
         category: CATEGORY,
-        mount: async (_params: AppMountParameters) => {
-          if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[ENDPOINT_SECURITY_ID].next(
-              makeNavLinkStatusVisible,
-            );
-            this.appStartup$.next(ENDPOINT_SECURITY_ID);
-          }
-
+        mount:
+          async (_params: AppMountParameters) =>
           // TODO: Implement the endpoint security landing page
-          return () => {};
-        },
+          () => {},
       },
       {
         id: THREAT_INTELLIGENCE_ID,
         title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
         category: CATEGORY,
         mount: async (params: AppMountParameters) => {
-          if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[THREAT_INTELLIGENCE_ID].next(
-              makeNavLinkStatusVisible,
-            );
-            this.appStartup$.next(THREAT_INTELLIGENCE_ID);
-          }
-
           // TODO: Implement the threat intelligence application
           const { renderApp } = await import('./application');
 
@@ -330,13 +316,6 @@ export class AnalysisPlugin
         title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
         category: CATEGORY,
         mount: async (params: AppMountParameters) => {
-          if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[SECURITY_OPERATIONS_ID].next(
-              makeNavLinkStatusVisible,
-            );
-            this.appStartup$.next(SECURITY_OPERATIONS_ID);
-          }
-
           // TODO: Implement the security operations application
           const { renderApp } = await import('./application');
 
@@ -348,13 +327,6 @@ export class AnalysisPlugin
         title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
         category: CATEGORY,
         mount: async (params: AppMountParameters) => {
-          if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[CLOUD_SECURITY_ID].next(
-              makeNavLinkStatusVisible,
-            );
-            this.appStartup$.next(CLOUD_SECURITY_ID);
-          }
-
           // TODO: Implement the cloud security application
           const { renderApp } = await import('./application');
 
@@ -362,6 +334,22 @@ export class AnalysisPlugin
         },
       },
     ];
+
+    for (const app of applications) {
+      const mount = app.mount.bind(app) as AppMount;
+
+      app.mount = async (params: AppMountParameters) => {
+        if (core.chrome.navGroup.getNavGroupEnabled()) {
+          this.appStatusUpdater$[app.id as ParentAppId].next(
+            makeNavLinkStatusVisible,
+          );
+          this.appStartup$.next(app.id as ParentAppId);
+        }
+
+        return await mount(params);
+      };
+    }
+
     const subApps = {
       [ENDPOINT_SECURITY_ID]: [
         {
