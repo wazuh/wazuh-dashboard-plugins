@@ -529,10 +529,14 @@ export class AnalysisPlugin
       ],
     } satisfies Partial<Record<ParentAppId, App[]>>;
 
-    this.setupAppMounts(subApps, ENDPOINT_SECURITY_ID, core, applications);
-    this.setupAppMounts(subApps, THREAT_INTELLIGENCE_ID, core, applications);
-    this.setupAppMounts(subApps, SECURITY_OPERATIONS_ID, core, applications);
-    this.setupAppMounts(subApps, CLOUD_SECURITY_ID, core, applications);
+    for (const parentAppId of Object.keys(subApps)) {
+      this.setupAppMounts(
+        subApps,
+        parentAppId as ParentAppId,
+        core,
+        applications,
+      );
+    }
 
     for (const app of applications) {
       core.application.register(app);
