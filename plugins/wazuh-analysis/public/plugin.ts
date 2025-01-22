@@ -348,6 +348,8 @@ export class AnalysisPlugin
 
         return await mount(params);
       };
+
+      core.application.register(app);
     }
 
     const subApps = {
@@ -530,24 +532,15 @@ export class AnalysisPlugin
     } satisfies Partial<Record<ParentAppId, App[]>>;
 
     for (const parentAppId of Object.keys(subApps)) {
-      this.setupAppMounts(
-        subApps,
-        parentAppId as ParentAppId,
-        core,
-        applications,
-      );
+      this.setupAppMounts(subApps, parentAppId as ParentAppId, core);
     }
 
-    for (const app of applications) {
-      core.application.register(app);
-    }
   }
 
   private setupAppMounts(
     subApps: Partial<Record<ParentAppId, App[]>>,
     navGroupId: ParentAppId,
     core: CoreSetup,
-    applications: App[],
   ) {
     for (const app of subApps[navGroupId] ?? []) {
       const mount = app.mount.bind(app) as AppMount;
@@ -570,7 +563,7 @@ export class AnalysisPlugin
         };
       };
 
-      applications.push(app);
+      core.application.register(app);
     }
   }
 
