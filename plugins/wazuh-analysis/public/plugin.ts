@@ -18,6 +18,7 @@ import {
   DEFAULT_NAV_GROUPS,
 } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
+import { PLUGIN_ID } from '../common/constants';
 import { AnalysisSetup, AnalysisStart } from './types';
 import { searchPages } from './components/global_search/search-pages-command';
 
