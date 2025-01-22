@@ -20,6 +20,7 @@ import {
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { PLUGIN_ID } from '../common/constants';
 import { AnalysisSetup, AnalysisStart } from './types';
+import { CATEGORY } from './applications/category';
 import { searchPages } from './components/global_search/search-pages-command';
 
 interface AnalysisSetupDependencies {}
@@ -40,7 +41,6 @@ function buildSubAppId(parentAppId: string, subAppId: string) {
   return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
 }
 
-const PLUGIN_ID = 'analysis';
 const ENDPOINT_SECURITY_ID = 'endpoint_security';
 const THREAT_INTELLIGENCE_ID = 'threat_intelligence';
 const SECURITY_OPERATIONS_ID = 'security_operations';
