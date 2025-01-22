@@ -27,6 +27,11 @@ import {
   EndpointSecurityApp,
 } from './applications/endpoint-security/endpoint-security';
 import { searchPages } from './components/global_search/search-pages-command';
+import {
+  THREAT_INTELLIGENCE_ID,
+  THREAT_INTELLIGENCE_TITLE,
+  THREAT_INTELLIGENCE_DESCRIPTION,
+} from './applications/threat-intelligence/threat-intelligence';
 
 interface AnalysisSetupDependencies {}
 
@@ -46,7 +51,6 @@ function buildSubAppId(parentAppId: string, subAppId: string) {
   return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
 }
 
-const THREAT_INTELLIGENCE_ID = 'threat_intelligence';
 const SECURITY_OPERATIONS_ID = 'security_operations';
 const CLOUD_SECURITY_ID = 'cloud_security';
 
@@ -89,19 +93,6 @@ const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
 const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
 const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
 const TRANSLATION_MESSAGES = Object.freeze({
-  THREAT_INTELLIGENCE_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${THREAT_INTELLIGENCE_ID}`,
-    {
-      defaultMessage: 'Threat Intelligence',
-    },
-  ),
-  THREAT_INTELLIGENCE_DESCRIPTION: i18n.translate(
-    `${PLUGIN_ID}.category.${THREAT_INTELLIGENCE_ID}.description`,
-    {
-      defaultMessage:
-        'Collect and analyze information about potential threats to inform security decisions.',
-    },
-  ),
   SECURITY_OPERATIONS_TITLE: i18n.translate(
     `${PLUGIN_ID}.category.${SECURITY_OPERATIONS_ID}`,
     {
@@ -203,8 +194,8 @@ const NAV_GROUPS = Object.freeze({
   },
   [THREAT_INTELLIGENCE_ID]: {
     id: THREAT_INTELLIGENCE_ID,
-    title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
-    description: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_DESCRIPTION,
+    title: THREAT_INTELLIGENCE_TITLE,
+    description: THREAT_INTELLIGENCE_DESCRIPTION,
   },
   [SECURITY_OPERATIONS_ID]: {
     id: SECURITY_OPERATIONS_ID,
@@ -277,7 +268,7 @@ export class AnalysisPlugin
       EndpointSecurityApp(core),
       {
         id: THREAT_INTELLIGENCE_ID,
-        title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
+        title: THREAT_INTELLIGENCE_TITLE,
         category: CATEGORY,
         mount: async (params: AppMountParameters) => {
           // TODO: Implement the threat intelligence application
@@ -651,7 +642,7 @@ export class AnalysisPlugin
       },
       {
         id: THREAT_INTELLIGENCE_ID,
-        title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
+        title: THREAT_INTELLIGENCE_TITLE,
         order: 1,
         category: CATEGORY,
       },
