@@ -31,6 +31,7 @@ import {
   THREAT_INTELLIGENCE_ID,
   THREAT_INTELLIGENCE_TITLE,
   THREAT_INTELLIGENCE_DESCRIPTION,
+  ThreatIntelligenceApp,
 } from './applications/threat-intelligence/threat-intelligence';
 
 interface AnalysisSetupDependencies {}
@@ -266,17 +267,7 @@ export class AnalysisPlugin
   private registerApps(core: CoreSetup) {
     const applications: App[] = [
       EndpointSecurityApp(core),
-      {
-        id: THREAT_INTELLIGENCE_ID,
-        title: THREAT_INTELLIGENCE_TITLE,
-        category: CATEGORY,
-        mount: async (params: AppMountParameters) => {
-          // TODO: Implement the threat intelligence application
-          const { renderApp } = await import('./application');
-
-          return renderApp(params, {});
-        },
-      },
+      ThreatIntelligenceApp(core),
       {
         id: SECURITY_OPERATIONS_ID,
         title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
