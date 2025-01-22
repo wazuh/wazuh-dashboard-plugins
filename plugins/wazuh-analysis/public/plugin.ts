@@ -38,6 +38,7 @@ import {
 import {
   CLOUD_SECURITY_ID,
   CLOUD_SECURITY_TITLE,
+  CloudSecurityApp,
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
 
@@ -225,17 +226,7 @@ export class AnalysisPlugin
       EndpointSecurityApp(core),
       ThreatIntelligenceApp(core),
       SecurityOperationsApp(core),
-      {
-        id: CLOUD_SECURITY_ID,
-        title: CLOUD_SECURITY_TITLE,
-        category: CATEGORY,
-        mount: async (params: AppMountParameters) => {
-          // TODO: Implement the cloud security application
-          const { renderApp } = await import('./application');
-
-          return renderApp(params, {});
-        },
-      },
+      CloudSecurityApp(core),
     ];
 
     for (const app of applications) {
