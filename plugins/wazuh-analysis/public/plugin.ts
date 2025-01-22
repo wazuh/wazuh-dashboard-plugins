@@ -20,6 +20,10 @@ import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/pub
 import { PLUGIN_ID } from '../common/constants';
 import { AnalysisSetup, AnalysisStart } from './types';
 import { CATEGORY } from './applications/category';
+import {
+  ENDPOINT_SECURITY_ID,
+  EndpointSecurityApp,
+} from './applications/endpoint-security/endpoint-security';
 import { searchPages } from './components/global_search/search-pages-command';
 
 interface AnalysisSetupDependencies {}
@@ -40,7 +44,6 @@ function buildSubAppId(parentAppId: string, subAppId: string) {
   return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
 }
 
-const ENDPOINT_SECURITY_ID = 'endpoint_security';
 const THREAT_INTELLIGENCE_ID = 'threat_intelligence';
 const SECURITY_OPERATIONS_ID = 'security_operations';
 const CLOUD_SECURITY_ID = 'cloud_security';
@@ -285,15 +288,7 @@ export class AnalysisPlugin
 
   private registerApps(core: CoreSetup) {
     const applications: App[] = [
-      {
-        id: ENDPOINT_SECURITY_ID,
-        title: TRANSLATION_MESSAGES.ENDPOINT_SECURITY_TITLE,
-        category: CATEGORY,
-        mount:
-          async (_params: AppMountParameters) =>
-          // TODO: Implement the endpoint security landing page
-          () => {},
-      },
+      EndpointSecurityApp(core),
       {
         id: THREAT_INTELLIGENCE_ID,
         title: TRANSLATION_MESSAGES.THREAT_INTELLIGENCE_TITLE,
