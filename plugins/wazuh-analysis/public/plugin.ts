@@ -1,6 +1,5 @@
 import { i18n } from '@osd/i18n';
 import {
-  AppCategory,
   AppMount,
   AppMountParameters,
   AppUpdater,
@@ -206,11 +205,6 @@ const TRANSLATION_MESSAGES = Object.freeze({
   OFFICE365_TITLE: i18n.translate(`${PLUGIN_ID}.category.${OFFICE365_ID}`, {
     defaultMessage: 'Office 365',
   }),
-});
-const CATEGORY: AppCategory = Object.freeze({
-  id: PLUGIN_ID,
-  label: TRANSLATION_MESSAGES.ANALYSIS_PLUGIN_TITLE,
-  order: 5000,
 });
 const NAV_GROUPS = Object.freeze({
   [ENDPOINT_SECURITY_ID]: {
