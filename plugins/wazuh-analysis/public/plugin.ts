@@ -33,6 +33,12 @@ import {
   THREAT_INTELLIGENCE_DESCRIPTION,
   ThreatIntelligenceApp,
 } from './groups/threat-intelligence/threat-intelligence';
+import {
+  SECURITY_OPERATIONS_ID,
+  SECURITY_OPERATIONS_TITLE,
+  SECURITY_OPERATIONS_DESCRIPTION,
+  SecurityOperationsApp,
+} from './groups/security-operations/security-operations';
 
 interface AnalysisSetupDependencies {}
 
@@ -52,7 +58,6 @@ function buildSubAppId(parentAppId: string, subAppId: string) {
   return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
 }
 
-const SECURITY_OPERATIONS_ID = 'security_operations';
 const CLOUD_SECURITY_ID = 'cloud_security';
 
 type ParentAppId =
@@ -94,19 +99,6 @@ const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
 const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
 const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
 const TRANSLATION_MESSAGES = Object.freeze({
-  SECURITY_OPERATIONS_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${SECURITY_OPERATIONS_ID}`,
-    {
-      defaultMessage: 'Security Operations',
-    },
-  ),
-  SECURITY_OPERATIONS_DESCRIPTION: i18n.translate(
-    `${PLUGIN_ID}.category.${SECURITY_OPERATIONS_ID}.description`,
-    {
-      defaultMessage:
-        'Advanced monitoring and protection for devices against security threats.',
-    },
-  ),
   CLOUD_SECURITY_TITLE: i18n.translate(
     `${PLUGIN_ID}.category.${CLOUD_SECURITY_ID}`,
     {
@@ -200,8 +192,8 @@ const NAV_GROUPS = Object.freeze({
   },
   [SECURITY_OPERATIONS_ID]: {
     id: SECURITY_OPERATIONS_ID,
-    title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
-    description: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_DESCRIPTION,
+    title: SECURITY_OPERATIONS_TITLE,
+    description: SECURITY_OPERATIONS_DESCRIPTION,
   },
   [CLOUD_SECURITY_ID]: {
     id: CLOUD_SECURITY_ID,
@@ -268,17 +260,7 @@ export class AnalysisPlugin
     const applications: App[] = [
       EndpointSecurityApp(core),
       ThreatIntelligenceApp(core),
-      {
-        id: SECURITY_OPERATIONS_ID,
-        title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
-        category: CATEGORY,
-        mount: async (params: AppMountParameters) => {
-          // TODO: Implement the security operations application
-          const { renderApp } = await import('./application');
-
-          return renderApp(params, {});
-        },
-      },
+      SecurityOperationsApp(core),
       {
         id: CLOUD_SECURITY_ID,
         title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
@@ -639,7 +621,7 @@ export class AnalysisPlugin
       },
       {
         id: SECURITY_OPERATIONS_ID,
-        title: TRANSLATION_MESSAGES.SECURITY_OPERATIONS_TITLE,
+        title: SECURITY_OPERATIONS_TITLE,
         order: 2,
         category: CATEGORY,
       },
