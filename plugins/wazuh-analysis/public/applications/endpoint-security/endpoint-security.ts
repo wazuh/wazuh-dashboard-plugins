@@ -14,6 +14,13 @@ export const ENDPOINT_SECURITY_TITLE = i18n.translate(
     defaultMessage: 'Endpoint Security',
   },
 );
+export const ENDPOINT_SECURITY_DESCRIPTION = i18n.translate(
+  `${PLUGIN_ID}.category.${ENDPOINT_SECURITY_ID}.description`,
+  {
+    defaultMessage:
+      'Advanced monitoring and protection for devices against security threats.',
+  },
+);
 
 export const EndpointSecurityApp = (_core: CoreSetup): App => ({
   id: ENDPOINT_SECURITY_ID,
