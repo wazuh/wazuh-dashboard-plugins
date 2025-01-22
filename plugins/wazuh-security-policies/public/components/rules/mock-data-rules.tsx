@@ -19,6 +19,8 @@ export const decoder = [
         'https://www.ietf.org/rfc/rfc5424.txt',
       ],
     },
+    check:
+      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     'parse|event.original': [
       '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
 
@@ -221,7 +223,7 @@ export const decoder = [
   },
   {
     id: 6,
-    name: 'decoder/syslog/2',
+    name: 'check/string',
     provider: 'native',
     status: 'draft',
     metadata: {
@@ -239,18 +241,8 @@ export const decoder = [
         'https://www.ietf.org/rfc/rfc5424.txt',
       ],
     },
-    'parse|event.original': [
+    check:
       '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-
-      '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-
-      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-
-      '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
-      '<event.start/SYSLOG> <host.hostname> <message>',
-
-      '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-    ],
     normalize: [
       {
         map: [
@@ -265,7 +257,7 @@ export const decoder = [
   },
   {
     id: 7,
-    name: 'decoder/syslog/0',
+    name: 'check/array',
     provider: 'custom',
     status: 'enable',
     metadata: {
@@ -295,16 +287,12 @@ export const decoder = [
 
       '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
-    normalize: [
-      {
-        map: [
-          { 'event.kind': 'event' },
-          { 'wazuh.decoders': 'array_append(syslog)' },
-          { 'related.hosts': 'array_append($host.hostname)' },
-          { 'process.name': 'rename($TAG)' },
-          { 'host.ip': 'array_append($tmp.host_ip)' },
-        ],
-      },
+    check: [
+      { 'event.kind': 'event' },
+      { 'wazuh.decoders': 'array_append(syslog)' },
+      { 'related.hosts': 'array_append($host.hostname)' },
+      { 'process.name': 'rename($TAG)' },
+      { 'host.ip': 'array_append($tmp.host_ip)' },
     ],
   },
   {
