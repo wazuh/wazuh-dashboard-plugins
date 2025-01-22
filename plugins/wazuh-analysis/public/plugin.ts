@@ -236,13 +236,13 @@ const NAV_GROUPS = Object.freeze({
   },
 } satisfies Partial<Record<ParentAppId, ChromeNavGroup>>);
 
-function makeNavLinkStatusVisible(): Partial<App> {
+function setNavLinkVisible(): Partial<App> {
   return {
     navLinkStatus: AppNavLinkStatus.visible,
   };
 }
 
-function makeNavLinkStatusHidden(): Partial<App> {
+function setNavLinkHidden(): Partial<App> {
   return {
     navLinkStatus: AppNavLinkStatus.hidden,
   };
@@ -340,9 +340,7 @@ export class AnalysisPlugin
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.appStatusUpdater$[app.id as ParentAppId].next(
-            makeNavLinkStatusVisible,
-          );
+          this.appStatusUpdater$[app.id as ParentAppId].next(setNavLinkVisible);
           this.appStartup$.next(app.id as ParentAppId);
         }
 
@@ -534,7 +532,6 @@ export class AnalysisPlugin
     for (const parentAppId of Object.keys(subApps)) {
       this.setupAppMounts(subApps, parentAppId as ParentAppId, core);
     }
-
   }
 
   private setupAppMounts(
@@ -547,14 +544,14 @@ export class AnalysisPlugin
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.appStatusUpdater$[navGroupId].next(makeNavLinkStatusVisible);
+          this.appStatusUpdater$[navGroupId].next(setNavLinkVisible);
         }
 
         const unmount = await mount(params);
 
         return () => {
           if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[navGroupId].next(makeNavLinkStatusHidden);
+            this.appStatusUpdater$[navGroupId].next(setNavLinkHidden);
           }
 
           unmount();
