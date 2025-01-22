@@ -3,7 +3,6 @@ import {
   AppMount,
   AppMountParameters,
   AppUpdater,
-  ChromeNavGroup,
   NavGroupItemInMap,
 } from 'opensearch-dashboards/public';
 import { first } from 'rxjs/operators';
@@ -23,26 +22,24 @@ import { CATEGORY } from './groups/category';
 import {
   ENDPOINT_SECURITY_ID,
   ENDPOINT_SECURITY_TITLE,
-  ENDPOINT_SECURITY_DESCRIPTION,
   EndpointSecurityApp,
 } from './groups/endpoint-security/endpoint-security';
 import { searchPages } from './components/global_search/search-pages-command';
 import {
   THREAT_INTELLIGENCE_ID,
   THREAT_INTELLIGENCE_TITLE,
-  THREAT_INTELLIGENCE_DESCRIPTION,
   ThreatIntelligenceApp,
 } from './groups/threat-intelligence/threat-intelligence';
 import {
   SECURITY_OPERATIONS_ID,
   SECURITY_OPERATIONS_TITLE,
-  SECURITY_OPERATIONS_DESCRIPTION,
   SecurityOperationsApp,
 } from './groups/security-operations/security-operations';
 import {
   CLOUD_SECURITY_ID,
   CLOUD_SECURITY_TITLE,
 } from './groups/cloud-security/cloud-security';
+import { NAV_GROUPS } from './groups/nav-groups';
 
 interface AnalysisSetupDependencies {}
 
@@ -168,28 +165,6 @@ const TRANSLATION_MESSAGES = Object.freeze({
     defaultMessage: 'Office 365',
   }),
 });
-const NAV_GROUPS = Object.freeze({
-  [ENDPOINT_SECURITY_ID]: {
-    id: ENDPOINT_SECURITY_ID,
-    title: ENDPOINT_SECURITY_TITLE,
-    description: ENDPOINT_SECURITY_DESCRIPTION,
-  },
-  [THREAT_INTELLIGENCE_ID]: {
-    id: THREAT_INTELLIGENCE_ID,
-    title: THREAT_INTELLIGENCE_TITLE,
-    description: THREAT_INTELLIGENCE_DESCRIPTION,
-  },
-  [SECURITY_OPERATIONS_ID]: {
-    id: SECURITY_OPERATIONS_ID,
-    title: SECURITY_OPERATIONS_TITLE,
-    description: SECURITY_OPERATIONS_DESCRIPTION,
-  },
-  [CLOUD_SECURITY_ID]: {
-    id: CLOUD_SECURITY_ID,
-    title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
-    description: TRANSLATION_MESSAGES.CLOUD_SECURITY_DESCRIPTION,
-  },
-} satisfies Partial<Record<ParentAppId, ChromeNavGroup>>);
 
 function setNavLinkVisible(): Partial<App> {
   return {

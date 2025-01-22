@@ -1,0 +1,45 @@
+import { ChromeNavGroup } from 'opensearch-dashboards/public';
+import {
+  ENDPOINT_SECURITY_ID,
+  ENDPOINT_SECURITY_TITLE,
+  ENDPOINT_SECURITY_DESCRIPTION,
+} from './endpoint-security/endpoint-security';
+import {
+  SECURITY_OPERATIONS_ID,
+  SECURITY_OPERATIONS_TITLE,
+  SECURITY_OPERATIONS_DESCRIPTION,
+} from './security-operations/security-operations';
+import {
+  THREAT_INTELLIGENCE_ID,
+  THREAT_INTELLIGENCE_TITLE,
+  THREAT_INTELLIGENCE_DESCRIPTION,
+} from './threat-intelligence/threat-intelligence';
+import {
+  CLOUD_SECURITY_ID,
+  CLOUD_SECURITY_TITLE,
+  CLOUD_SECURITY_DESCRIPTION,
+} from './cloud-security/cloud-security';
+import { GroupsId } from './types';
+
+export const NAV_GROUPS = Object.freeze({
+  [ENDPOINT_SECURITY_ID]: {
+    id: ENDPOINT_SECURITY_ID,
+    title: ENDPOINT_SECURITY_TITLE,
+    description: ENDPOINT_SECURITY_DESCRIPTION,
+  },
+  [THREAT_INTELLIGENCE_ID]: {
+    id: THREAT_INTELLIGENCE_ID,
+    title: THREAT_INTELLIGENCE_TITLE,
+    description: THREAT_INTELLIGENCE_DESCRIPTION,
+  },
+  [SECURITY_OPERATIONS_ID]: {
+    id: SECURITY_OPERATIONS_ID,
+    title: SECURITY_OPERATIONS_TITLE,
+    description: SECURITY_OPERATIONS_DESCRIPTION,
+  },
+  [CLOUD_SECURITY_ID]: {
+    id: CLOUD_SECURITY_ID,
+    title: CLOUD_SECURITY_TITLE,
+    description: CLOUD_SECURITY_DESCRIPTION,
+  },
+} satisfies Partial<Record<GroupsId, ChromeNavGroup>>);
