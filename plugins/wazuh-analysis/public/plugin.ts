@@ -35,7 +35,7 @@ interface AnalysisStartDependencies {
  * @param {string} subAppId - The `subAppId` parameter is a string representing the
  * ID of a sub-application within a parent application.
  */
-function generateSubAppId(parentAppId: string, subAppId: string) {
+function buildSubAppId(parentAppId: string, subAppId: string) {
   return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
 }
 
@@ -51,41 +51,38 @@ type ParentAppId =
   | typeof SECURITY_OPERATIONS_ID
   | typeof CLOUD_SECURITY_ID;
 
-const CONFIGURATION_ASSESSMENT_ID = generateSubAppId(
+const CONFIGURATION_ASSESSMENT_ID = buildSubAppId(
   ENDPOINT_SECURITY_ID,
   'configuration_assessment',
 );
-const MALWARE_DETECTION_ID = generateSubAppId(
+const MALWARE_DETECTION_ID = buildSubAppId(
   ENDPOINT_SECURITY_ID,
   'malware_detection',
 );
-const FIM_ID = generateSubAppId(ENDPOINT_SECURITY_ID, 'fim');
-const THREAT_HUNTING_ID = generateSubAppId(
+const FIM_ID = buildSubAppId(ENDPOINT_SECURITY_ID, 'fim');
+const THREAT_HUNTING_ID = buildSubAppId(
   THREAT_INTELLIGENCE_ID,
   'threat_hunting',
 );
-const VULNERABILITY_DETECTION_ID = generateSubAppId(
+const VULNERABILITY_DETECTION_ID = buildSubAppId(
   THREAT_INTELLIGENCE_ID,
   'vulnerability_detection',
 );
-const MITRE_ATTACK_ID = generateSubAppId(
-  THREAT_INTELLIGENCE_ID,
-  'mitre_attack',
-);
-const REGULATORY_COMPLIANCE_ID = generateSubAppId(
+const MITRE_ATTACK_ID = buildSubAppId(THREAT_INTELLIGENCE_ID, 'mitre_attack');
+const REGULATORY_COMPLIANCE_ID = buildSubAppId(
   SECURITY_OPERATIONS_ID,
   'regulatory_compliance',
 );
-const IT_HYGIENE_ID = generateSubAppId(SECURITY_OPERATIONS_ID, 'it_hygiene');
-const INCIDENT_RESPONSE_ID = generateSubAppId(
+const IT_HYGIENE_ID = buildSubAppId(SECURITY_OPERATIONS_ID, 'it_hygiene');
+const INCIDENT_RESPONSE_ID = buildSubAppId(
   SECURITY_OPERATIONS_ID,
   'incident_response',
 );
-const DOCKER_ID = generateSubAppId(CLOUD_SECURITY_ID, 'docker');
-const AWS_ID = generateSubAppId(CLOUD_SECURITY_ID, 'aws');
-const GOOGLE_CLOUD_ID = generateSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
-const GITHUB_ID = generateSubAppId(CLOUD_SECURITY_ID, 'github');
-const OFFICE365_ID = generateSubAppId(CLOUD_SECURITY_ID, 'office365');
+const DOCKER_ID = buildSubAppId(CLOUD_SECURITY_ID, 'docker');
+const AWS_ID = buildSubAppId(CLOUD_SECURITY_ID, 'aws');
+const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
+const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
+const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
 const TRANSLATION_MESSAGES = Object.freeze({
   ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
     defaultMessage: 'Analysis',
