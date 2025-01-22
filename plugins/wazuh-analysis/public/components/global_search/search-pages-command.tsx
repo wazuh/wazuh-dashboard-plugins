@@ -5,7 +5,7 @@ import {
 } from 'opensearch-dashboards/public';
 import { first } from 'rxjs/operators';
 import React, { ReactNode } from 'react';
-import { GlobalSearchPageItem } from './page-item';
+import { GlobalSearchPageItem } from './global-search-page-item';
 
 function match(title: string | undefined, query: string) {
   return title && title.toLowerCase().includes(query.toLowerCase());
