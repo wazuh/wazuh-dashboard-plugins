@@ -87,9 +87,6 @@ const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
 const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
 const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
 const TRANSLATION_MESSAGES = Object.freeze({
-  ANALYSIS_PLUGIN_TITLE: i18n.translate('analysis.title', {
-    defaultMessage: 'Analysis',
-  }),
   ENDPOINT_SECURITY_TITLE: i18n.translate(
     `${PLUGIN_ID}.category.${ENDPOINT_SECURITY_ID}`,
     {

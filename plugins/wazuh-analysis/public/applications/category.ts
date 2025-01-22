@@ -1,6 +1,5 @@
 import { AppCategory } from 'opensearch-dashboards/public';
-import { PLUGIN_ID } from '../../common/constants';
-import { ANALYSIS_PLUGIN_TITLE } from '../../common/i18n';
+import { ANALYSIS_PLUGIN_TITLE, PLUGIN_ID } from '../../common/constants';
 
 export const CATEGORY: AppCategory = Object.freeze({
   id: PLUGIN_ID,
