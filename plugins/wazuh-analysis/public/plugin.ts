@@ -39,6 +39,10 @@ import {
   SECURITY_OPERATIONS_DESCRIPTION,
   SecurityOperationsApp,
 } from './groups/security-operations/security-operations';
+import {
+  CLOUD_SECURITY_ID,
+  CLOUD_SECURITY_TITLE,
+} from './groups/cloud-security/cloud-security';
 
 interface AnalysisSetupDependencies {}
 
@@ -57,8 +61,6 @@ interface AnalysisStartDependencies {
 function buildSubAppId(parentAppId: string, subAppId: string) {
   return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
 }
-
-const CLOUD_SECURITY_ID = 'cloud_security';
 
 type ParentAppId =
   | typeof ENDPOINT_SECURITY_ID
@@ -99,19 +101,6 @@ const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
 const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
 const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
 const TRANSLATION_MESSAGES = Object.freeze({
-  CLOUD_SECURITY_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${CLOUD_SECURITY_ID}`,
-    {
-      defaultMessage: 'Cloud Security',
-    },
-  ),
-  CLOUD_SECURITY_DESCRIPTION: i18n.translate(
-    `${PLUGIN_ID}.category.${CLOUD_SECURITY_ID}.description`,
-    {
-      defaultMessage:
-        'Monitoring and protection for cloud environments against security threats.',
-    },
-  ),
   CONFIGURATION_ASSESSMENT_TITLE: i18n.translate(
     `${PLUGIN_ID}.category.${CONFIGURATION_ASSESSMENT_ID}`,
     {
@@ -263,7 +252,7 @@ export class AnalysisPlugin
       SecurityOperationsApp(core),
       {
         id: CLOUD_SECURITY_ID,
-        title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
+        title: CLOUD_SECURITY_TITLE,
         category: CATEGORY,
         mount: async (params: AppMountParameters) => {
           // TODO: Implement the cloud security application
@@ -627,7 +616,7 @@ export class AnalysisPlugin
       },
       {
         id: CLOUD_SECURITY_ID,
-        title: TRANSLATION_MESSAGES.CLOUD_SECURITY_TITLE,
+        title: CLOUD_SECURITY_TITLE,
         order: 3,
         category: CATEGORY,
       },
