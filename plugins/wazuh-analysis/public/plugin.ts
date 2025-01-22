@@ -19,20 +19,20 @@ import {
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { PLUGIN_ID } from '../common/constants';
 import { AnalysisSetup, AnalysisStart } from './types';
-import { CATEGORY } from './applications/category';
+import { CATEGORY } from './groups/category';
 import {
   ENDPOINT_SECURITY_ID,
   ENDPOINT_SECURITY_TITLE,
   ENDPOINT_SECURITY_DESCRIPTION,
   EndpointSecurityApp,
-} from './applications/endpoint-security/endpoint-security';
+} from './groups/endpoint-security/endpoint-security';
 import { searchPages } from './components/global_search/search-pages-command';
 import {
   THREAT_INTELLIGENCE_ID,
   THREAT_INTELLIGENCE_TITLE,
   THREAT_INTELLIGENCE_DESCRIPTION,
   ThreatIntelligenceApp,
-} from './applications/threat-intelligence/threat-intelligence';
+} from './groups/threat-intelligence/threat-intelligence';
 
 interface AnalysisSetupDependencies {}
 
