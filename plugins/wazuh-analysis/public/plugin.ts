@@ -19,6 +19,7 @@ import {
 } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AnalysisSetup, AnalysisStart } from './types';
+import { searchPages } from './components/search-pages-command';
 
 interface AnalysisSetupDependencies {}
 
@@ -281,6 +282,7 @@ export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
+  private coreStart?: CoreStart;
   private readonly appStartup$ = new Subject<ParentAppId>();
   private readonly appStatusUpdater$ = {
     [ENDPOINT_SECURITY_ID]: new Subject(),
@@ -348,6 +350,20 @@ export class AnalysisPlugin
       };
 
       core.application.register(app);
+    }
+
+    if (core.chrome.navGroup.getNavGroupEnabled()) {
+      core.chrome.globalSearch.registerSearchCommand({
+        id: 'analysis',
+        type: 'PAGES',
+        run: async (query: string, done?: () => void) =>
+          searchPages(
+            query,
+            applications.map(app => app.id),
+            this.coreStart,
+            done,
+          ),
+      });
     }
 
     const subApps = {
@@ -711,6 +727,7 @@ export class AnalysisPlugin
     core: CoreStart,
     _plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
+    this.coreStart = core;
     this.subscribeToAppStartup(core);
 
     return {};
