@@ -354,7 +354,7 @@ export class AnalysisPlugin
 
     if (core.chrome.navGroup.getNavGroupEnabled()) {
       core.chrome.globalSearch.registerSearchCommand({
-        id: 'analysis',
+        id: 'wz-analysis',
         type: 'PAGES',
         run: async (query: string, done?: () => void) =>
           searchPages(
