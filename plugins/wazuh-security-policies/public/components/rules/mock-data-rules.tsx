@@ -7,6 +7,7 @@ export const decoder = [
     metadata: {
       module: 'syslog',
       title: 'Syslog Decoder event',
+      versions: ['4.3', '4.4'],
       description: 'Syslog header',
       compatibility: 'This decoder has been tested on Wazuh version 4.3',
       author: {
@@ -23,14 +24,10 @@ export const decoder = [
       '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     'parse|event.original': [
       '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-
       '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
-
       '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
-
       '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->: <message>',
       '<event.start/SYSLOG> <host.hostname> <message>',
-
       '<event.start/%Y %b %d %T> <timezone> <host.hostname> <tmp.host_ip> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
     ],
     normalize: [
@@ -54,6 +51,7 @@ export const decoder = [
       module: 'syslog2',
       title: 'Syslog Decoder event',
       description: 'Syslog header',
+      versions: ['4.3', '4.4'],
       compatibility: 'This decoder has been tested on Wazuh version 4.3',
       author: {
         name: 'Wazuh, Inc.',
@@ -67,7 +65,6 @@ export const decoder = [
     },
     'parse|event.original': [
       '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->[<process.pid>]:<~/ignore/ ><message>',
-
       '<event.start/Jun 14 15:16:01> <host.hostname> <TAG/alphanumeric/->:<~/ignore/ ><message>',
 
       '<event.start/2018-08-14T14:30:02.203151+02:00> <host.hostname> <TAG/alphanumeric/->[<process.pid>]: <message>',
