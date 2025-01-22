@@ -19,7 +19,7 @@ import {
 } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AnalysisSetup, AnalysisStart } from './types';
-import { searchPages } from './components/search-pages-command';
+import { searchPages } from './components/global_search/search-pages-command';
 
 interface AnalysisSetupDependencies {}
 
