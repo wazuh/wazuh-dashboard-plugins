@@ -13,7 +13,7 @@
  // Amazon AWS services
 export const source = ["guardduty", "cloudtrail", "vpcflow", "config"];
 export const accountId = ["186157501624", "117521235382", "150447125201", "18773455640", "186154171780", "250141701015"];
-export const region = ["eu-west-1", "eu-west-2", "eu-west-3", "eu-north-1", "eu-central-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2", "me-south-1", "ap-east-1", "ap-east-2", "ap-northeast-2", "ap-northeast-3", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ca-central-1"]; // https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-regions
+export const region = ["eu-west-1", "eu-west-2", "eu-west-3", "eu-north-1", "eu-central-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2", "me-south-1", "me-central-1", "ap-east-1", "ap-east-2", "ap-northeast-2", "ap-northeast-3", "ap-south-1", "ap-southeast-1", "ap-southeast-2", "ap-northeast-1", "ca-central-1"]; // https://docs.aws.amazon.com/es_es/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-regions
 export const buckets = ["aws-sample-bucket-1", "aws-sample-bucket-2", "aws-sample-bucket-3", "aws-sample-bucket-4", "aws-sample-bucket-5", "aws-sample-bucket-6", "aws-sample-bucket-7", "aws-sample-bucket-8", "aws-sample-bucket-9"];
 
 export const instanceId = ['i-060bb01699dddc20c','i-060bb020479bedc20w', 'i-070eb020479bebf20a', 'i-070eb015479befb15d', 'i-057eb060779fdae15b'];
