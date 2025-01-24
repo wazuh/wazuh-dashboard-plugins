@@ -90,12 +90,13 @@ export const RuleDetails = () => {
       }
 
       case stepName === possibleSteps.normalize: {
-        return `${capitalizeFirstLetter(stepName)} fields: ${item.value.map(
-          (obj: any) =>
-            Object.values(
-              obj.map.map((subObj: any) => Object.keys(subObj)[0]),
-            ).join(', '),
-        )}`;
+        return `${capitalizeFirstLetter(stepName)} fields: `;
+        // ${item.value.map(
+        //   (obj: any) =>
+        //     Object.values(
+        //       obj.map.map((subObj: any) => Object.keys(subObj)[0]),
+        //     ).join(', '),
+        // )}`;
       }
 
       case stepName === possibleSteps.allow: {

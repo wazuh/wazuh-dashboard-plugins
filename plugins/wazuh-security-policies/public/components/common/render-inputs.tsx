@@ -4,6 +4,7 @@ import {
   EuiFormRow,
   EuiFieldText,
   EuiComboBox,
+  EuiToolTip,
 } from '@elastic/eui';
 
 const possibleSteps = new Set([
@@ -14,41 +15,76 @@ const possibleSteps = new Set([
   'output',
   'definitions',
 ]);
+const renderArrayTable = new Set(['check', 'parse|', 'normalize']);
+const renderWithoutLabel = new Set(['check']);
 
-const inputArray = (input: any) => {
-  let onTable = false;
-  const inputs = input.value.map((item: any) => {
-    if (!Number.isNaN(Number.parseInt(input.key))) {
-      onTable = true;
+const inputString = (input: { key: string; value: any }) => {
+  if (renderWithoutLabel.has(input.key)) {
+    return (
+      <EuiToolTip display='block' delay='long' content={input.value}>
+        <EuiFieldText
+          className='eui-textTruncate'
+          value={input.value || '-'}
+          fullWidth
+          compressed
+          readOnly
+        />
+      </EuiToolTip>
+    );
+  }
 
-      return item;
-    }
-
-    if (typeof item === 'string') {
-      onTable = true;
-
-      return { label: item, value: item };
-    }
-
-    return Object.entries(item).map(([key, value]) => ({ key, value }));
-  });
-  const comboBoxInput = (
+  return (
     <EuiFormRow
       key={`${input.key}`}
       label={input.key}
       fullWidth
       display='columnCompressed'
     >
-      <EuiComboBox
-        label={input.key}
-        fullWidth
-        noSuggestions
-        selectedOptions={inputs}
-        compressed
-        isDisabled
-      />
+      <EuiToolTip display='block' delay='long' content={input.value}>
+        <EuiFieldText
+          className='eui-textTruncate'
+          value={input.value || '-'}
+          fullWidth
+          compressed
+          readOnly
+        />
+      </EuiToolTip>
     </EuiFormRow>
   );
+};
+
+const inputArray = (input: any) => {
+  const inputs = input.value.map((item: any) => {
+    if (!Number.isNaN(Number.parseInt(input.key))) {
+      return item;
+    }
+
+    if (typeof item === 'string') {
+      return { label: item, value: item };
+    }
+
+    return Object.entries(item).map(([key, value]) => ({ key, value }));
+  });
+  const comboBoxInput =
+    inputs.length === 1 && inputs[0].value === '' ? (
+      inputString({ key: input.key, value: inputs[0].value })
+    ) : (
+      <EuiFormRow
+        key={`${input.key}`}
+        label={input.key}
+        fullWidth
+        display='columnCompressed'
+      >
+        <EuiComboBox
+          label={input.key}
+          fullWidth
+          noSuggestions
+          selectedOptions={inputs}
+          compressed
+          isDisabled
+        />
+      </EuiFormRow>
+    );
   const tableInput = (
     <EuiBasicTable
       items={inputs}
@@ -61,25 +97,8 @@ const inputArray = (input: any) => {
     />
   );
 
-  return onTable ? tableInput : comboBoxInput;
+  return renderArrayTable.has(input.key) ? tableInput : comboBoxInput;
 };
-
-const inputString = (input: { key: string; value: any }) => (
-  <EuiFormRow
-    key={`${input.key}`}
-    label={input.key}
-    fullWidth
-    display='columnCompressed'
-  >
-    <EuiFieldText
-      value={input.value}
-      name='username'
-      fullWidth
-      compressed
-      readOnly
-    />
-  </EuiFormRow>
-);
 
 const inputObject = (input: { key: string; value: any }) => {
   const inputsList = Object.entries(input.value).map(([key, value]) => ({
@@ -91,7 +110,7 @@ const inputObject = (input: { key: string; value: any }) => {
 };
 
 export const renderInputs = (input: { key: string; value: any }) => {
-  if (possibleSteps.has(input.key)) {
+  if (possibleSteps.has(input.key) && typeof input.value !== 'string') {
     const inputsSteps = Object.entries(input.value).map(([key, value]) => ({
       key,
       value,
