@@ -15,7 +15,7 @@ import { version } from '../package.json';
 import { SettingsValidator } from '../common/services/settings-validator';
 
 // Plugin
-export const PLUGIN_VERSION = version;
+
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 
 // Index patterns - Wazuh alerts
@@ -109,6 +109,7 @@ export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
 // Wazuh data path
 const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
+
 export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = path.join(
   __dirname,
   '../../../',
@@ -148,7 +149,9 @@ export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
 
 // Wazuh errors
-export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
+export enum WAZUH_ERROR_CODES {
+  DAEMONS_NOT_READY = 3099,
+}
 
 // Agents
 export enum WAZUH_AGENTS_OS_TYPE {
@@ -234,7 +237,7 @@ export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
 export const HEALTH_CHECK = 'health-check';
 
 // Health check
-export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
+export const HEALTH_CHECK_REDIRECTION_TIME = 300; // ms
 
 // Plugin platform settings
 // Default timeFilter set by the app
@@ -388,6 +391,11 @@ export const NOT_TIME_FIELD_NAME_INDEX_PATTERN =
 // Customization
 export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1048576;
 
+export enum EConfigurationProviders {
+  INITIALIZER_CONTEXT = 'initializerContext',
+  PLUGIN_UI_SETTINGS = 'uiSettings',
+}
+
 // Plugin settings
 export enum SettingCategory {
   GENERAL,
@@ -400,23 +408,23 @@ export enum SettingCategory {
   API_CONNECTION,
 }
 
-type TPluginSettingOptionsTextArea = {
+export interface TPluginSettingOptionsTextArea {
   maxRows?: number;
   minRows?: number;
   maxLength?: number;
-};
+}
 
-type TPluginSettingOptionsSelect = {
+export interface TPluginSettingOptionsSelect {
   select: { text: string; value: any }[];
-};
+}
 
-type TPluginSettingOptionsEditor = {
+export interface TPluginSettingOptionsEditor {
   editor: {
     language: string;
   };
-};
+}
 
-type TPluginSettingOptionsFile = {
+export interface TPluginSettingOptionsFile {
   file: {
     type: 'image';
     extensions?: string[];
@@ -437,24 +445,24 @@ type TPluginSettingOptionsFile = {
       resolveStaticURL: (filename: string) => string;
     };
   };
-};
+}
 
-type TPluginSettingOptionsNumber = {
+export interface TPluginSettingOptionsNumber {
   number: {
     min?: number;
     max?: number;
     integer?: boolean;
   };
-};
+}
 
-type TPluginSettingOptionsSwitch = {
+export interface TPluginSettingOptionsSwitch {
   switch: {
     values: {
       disabled: { label?: string; value: any };
       enabled: { label?: string; value: any };
     };
   };
-};
+}
 
 export enum EpluginSettingType {
   text = 'text',
@@ -467,9 +475,28 @@ export enum EpluginSettingType {
   password = 'password',
   arrayOf = 'arrayOf',
   custom = 'custom',
+  objectOf = 'objectOf',
 }
 
-export type TPluginSetting = {
+export interface TPluginSettingOptionsObjectOf {
+  /* eslint-disable no-use-before-define */
+  objectOf: Record<string, TPluginSetting>;
+}
+
+interface TPluginSettingOptionsArrayOf {
+  arrayOf: TPluginSetting;
+}
+
+type TPlugingSettingOptions =
+  | TPluginSettingOptionsTextArea
+  | TPluginSettingOptionsSelect
+  | TPluginSettingOptionsEditor
+  | TPluginSettingOptionsFile
+  | TPluginSettingOptionsNumber
+  | TPluginSettingOptionsSwitch
+  | TPluginSettingOptionsObjectOf
+  | TPluginSettingOptionsArrayOf;
+export interface TPluginSetting {
   // Define the text displayed in the UI.
   title: string;
   // Description.
@@ -478,61 +505,363 @@ export type TPluginSetting = {
   category: SettingCategory;
   // Type.
   type: EpluginSettingType;
-  // Store
-  store: {
-    file: {
-      // Define if the setting is managed by the ConfigurationStore service
-      configurableManaged?: boolean;
-      // Define a text to print as the default in the configuration block
-      defaultBlock?: string;
-      /* Transform the value defined in the configuration file to be consumed by the Configuration
-        service */
-      transformFrom?: (value: any) => any;
-    };
-  };
+  source: EConfigurationProviders;
+  options?: TPlugingSettingOptions;
   // Default value.
   defaultValue: any;
-  /* Special: This is used for the settings of customization to get the hidden default value, because the default value is empty to not to be displayed on the App Settings. */
-  defaultValueIfNotSet?: any;
-  // Configurable from the App Settings app.
-  isConfigurableFromSettings: boolean;
-  // Modify the setting requires running the plugin health check (frontend).
-  requiresRunningHealthCheck?: boolean;
-  // Modify the setting requires reloading the browser tab (frontend).
-  requiresReloadingBrowserTab?: boolean;
-  // Modify the setting requires restarting the plugin platform to take effect.
-  requiresRestartingPluginPlatform?: boolean;
-  // Define options related to the `type`.
-  options?:
-    | TPluginSettingOptionsEditor
-    | TPluginSettingOptionsFile
-    | TPluginSettingOptionsNumber
-    | TPluginSettingOptionsSelect
-    | TPluginSettingOptionsSwitch
-    | TPluginSettingOptionsTextArea;
-  // Transform the input value. The result is saved in the form global state of Settings/Configuration
-  uiFormTransformChangedInputValue?: (value: any) => any;
-  // Transform the configuration value or default as initial value for the input in Settings/Configuration
-  uiFormTransformConfigurationValueToInputValue?: (value: any) => any;
-  // Transform the input value changed in the form of Settings/Configuration and returned in the `changed` property of the hook useForm
-  uiFormTransformInputValueToConfigurationValue?: (value: any) => any;
-  // Validate the value in the form of Settings/Configuration. It returns a string if there is some validation error.
-  validateUIForm?: (value: any) => string | undefined;
-  // Validate function creator to validate the setting in the backend.
-  validate?: (value: unknown) => string | undefined;
-};
+  validate?: (value: any) => string | undefined;
+}
 
+export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
+  'alerts.sample.prefix': {
+    title: 'Sample alerts prefix',
+    description:
+      'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+        '*',
+      ),
+    ),
+  },
+  'configuration.ui_api_editable': {
+    title: 'Configuration UI editable',
+    description:
+      'Enable or disable the ability to edit the configuration from UI or API endpoints. When disabled, this can only be edited from the configuration file, the related API endpoints are disabled, and the UI is inaccessible.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    validate: SettingsValidator.isBoolean,
+  },
+  'cron.prefix': {
+    title: 'Cron prefix',
+    description: 'Define the index prefix of predefined jobs.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_STATISTICS_DEFAULT_PREFIX,
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+        '*',
+      ),
+    ),
+  },
+  'customization.enabled': {
+    title: 'Status',
+    description: 'Enable or disable the customization.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    defaultValue: false,
+    category: SettingCategory.CUSTOMIZATION,
+    type: EpluginSettingType.switch,
+    validate: SettingsValidator.isBoolean,
+  },
+  'enrollment.dns': {
+    title: 'Enrollment DNS',
+    description:
+      'Specifies the Wazuh registration server, used for the agent enrollment.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: '',
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
+    ),
+  },
+  'enrollment.password': {
+    title: 'Enrollment password',
+    description:
+      'Specifies the password used to authenticate during the agent enrollment.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: '',
+    validate: SettingsValidator.compose(SettingsValidator.isString),
+  },
+  hideManagerAlerts: {
+    title: 'Hide manager alerts',
+    description: 'Hide the alerts of the manager in every dashboard.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    validate: SettingsValidator.isBoolean,
+  },
+  /* `# The following configuration is the default structure to define a host.
+#
+# hosts:
+#   # Host ID / name,
+#   - env-1:
+#       # Host URL
+#       url: https://env-1.example
+#       # Host / API port
+#       port: 55000
+#       # Host / API username
+#       username: wazuh-wui
+#       # Host / API password
+#       password: wazuh-wui
+#       # Use RBAC or not. If set to true, the username must be "wazuh-wui".
+#       run_as: true
+#   - env-2:
+#       url: https://env-2.example
+#       port: 55000
+#       username: wazuh-wui
+#       password: wazuh-wui
+#       run_as: true
+
+hosts:
+  - default:
+      url: https://localhost
+      port: 55000
+      username: wazuh-wui
+      password: wazuh-wui
+      run_as: false`,
+  */
+  hosts: {
+    title: 'Server hosts',
+    description: 'Configure the API connections.',
+    source: EConfigurationProviders.INITIALIZER_CONTEXT,
+    category: SettingCategory.API_CONNECTION,
+    type: EpluginSettingType.objectOf,
+    defaultValue: [],
+    options: {
+      objectOf: {
+        url: {
+          title: 'URL',
+          description: 'Server URL address',
+          type: EpluginSettingType.text,
+          defaultValue: 'https://localhost',
+          validate: SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+          ),
+        },
+        port: {
+          title: 'Port',
+          description: 'Port',
+          type: EpluginSettingType.number,
+          defaultValue: 55000,
+          options: {
+            number: {
+              min: 0,
+              max: 65535,
+              integer: true,
+            },
+          },
+          validate: function (value) {
+            return SettingsValidator.number(this.options?.number)(value);
+          },
+        },
+        username: {
+          title: 'Username',
+          description: 'Server API username',
+          type: EpluginSettingType.text,
+          defaultValue: 'wazuh-wui',
+          validate: SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+          ),
+        },
+        password: {
+          title: 'Password',
+          description: "User's Password",
+          type: EpluginSettingType.password,
+          defaultValue: 'wazuh-wui',
+          validate: SettingsValidator.compose(
+            SettingsValidator.isString,
+            SettingsValidator.isNotEmptyString,
+          ),
+        },
+        run_as: {
+          title: 'Run as',
+          description: 'Use the authentication context.',
+          type: EpluginSettingType.switch,
+          defaultValue: false,
+          options: {
+            switch: {
+              values: {
+                disabled: { label: 'false', value: false },
+                enabled: { label: 'true', value: true },
+              },
+            },
+          },
+          validate: SettingsValidator.isBoolean,
+        },
+      },
+    },
+    isConfigurableFromSettings: false,
+    // TODO: add validation
+    // validate: SettingsValidator.isBoolean,
+    // validate: function (schema) {
+    //   return schema.boolean();
+    // },
+  },
+  'ip.ignore': {
+    title: 'Index pattern ignore',
+    description:
+      'Disable certain index pattern names from being available in index pattern selector.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.editor,
+    defaultValue: [],
+    validate: SettingsValidator.compose(
+      SettingsValidator.array(
+        SettingsValidator.compose(
+          SettingsValidator.isString,
+          SettingsValidator.isNotEmptyString,
+          SettingsValidator.hasNoSpaces,
+          SettingsValidator.noLiteralString('.', '..'),
+          SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+          SettingsValidator.hasNotInvalidCharacters(
+            '\\',
+            '/',
+            '?',
+            '"',
+            '<',
+            '>',
+            '|',
+            ',',
+            '#',
+          ),
+        ),
+      ),
+    ),
+  },
+  'ip.selector': {
+    title: 'IP selector',
+    description:
+      'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: true,
+    validate: SettingsValidator.isBoolean,
+  },
+  'wazuh.updates.disabled': {
+    title: 'Check updates',
+    description: 'Define if the check updates service is active.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.switch,
+    defaultValue: false,
+    validate: SettingsValidator.isBoolean,
+  },
+  pattern: {
+    title: 'Index pattern',
+    description:
+      "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_ALERTS_PATTERN,
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  timeout: {
+    title: 'Request timeout',
+    description:
+      'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.number,
+    defaultValue: 20000,
+    options: {
+      number: {
+        min: 1500,
+        integer: true,
+      },
+    },
+    validate: function (value) {
+      return SettingsValidator.number(this.options?.number)(value);
+    },
+  },
+  'vulnerabilities.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for vulnerabilities.',
+    category: SettingCategory.VULNERABILITIES,
+    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_VULNERABILITIES_PATTERN,
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+};
+export type TPluginSettingKey = keyof typeof PLUGIN_SETTINGS;
 export type TPluginSettingWithKey = TPluginSetting & { key: TPluginSettingKey };
-export type TPluginSettingCategory = {
+export interface TPluginSettingCategory {
   title: string;
   description?: string;
   documentationLink?: string;
   renderOrder?: number;
-};
+}
 
-export const PLUGIN_SETTINGS_CATEGORIES: {
-  [category: number]: TPluginSettingCategory;
-} = {
+export const PLUGIN_SETTINGS_CATEGORIES: Record<
+  number,
+  TPluginSettingCategory
+> = {
   [SettingCategory.HEALTH_CHECK]: {
     title: 'Health check',
     description: "Checks will be executed by the app's Healthcheck.",
@@ -580,1529 +909,6 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
     renderOrder: SettingCategory.API_CONNECTION,
   },
 };
-
-export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
-  'alerts.sample.prefix': {
-    title: 'Sample alerts prefix',
-    description:
-      'Define the index name prefix of sample alerts. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-        '*',
-      ),
-    ),
-  },
-  'checks.api': {
-    title: 'API connection',
-    description: 'Enable or disable the API health check when opening the app.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'checks.fields': {
-    title: 'Known fields',
-    description:
-      'Enable or disable the known fields health check when opening the app.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'checks.maxBuckets': {
-    title: 'Set max buckets to 200000',
-    description:
-      'Change the default value of the plugin platform max buckets configuration.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'checks.metaFields': {
-    title: 'Remove meta fields',
-    description:
-      'Change the default value of the plugin platform metaField configuration.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'checks.pattern': {
-    title: 'Index pattern',
-    description:
-      'Enable or disable the index pattern health check when opening the app.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'checks.setup': {
-    title: 'API version',
-    description:
-      'Enable or disable the setup health check when opening the app.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'checks.template': {
-    title: 'Index template',
-    description:
-      'Enable or disable the template health check when opening the app.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'checks.timeFilter': {
-    title: 'Set time filter to 24h',
-    description:
-      'Change the default value of the plugin platform timeFilter configuration.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.HEALTH_CHECK,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'configuration.ui_api_editable': {
-    title: 'Configuration UI editable',
-    description:
-      'Enable or disable the ability to edit the configuration from UI or API endpoints. When disabled, this can only be edited from the configuration file, the related API endpoints are disabled, and the UI is inaccessible.',
-    store: {
-      file: {
-        configurableManaged: false,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: false,
-    requiresRestartingPluginPlatform: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'cron.prefix': {
-    title: 'Cron prefix',
-    description: 'Define the index prefix of predefined jobs.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_STATISTICS_DEFAULT_PREFIX,
-    isConfigurableFromSettings: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-        '*',
-      ),
-    ),
-  },
-  'cron.statistics.apis': {
-    title: 'Includes APIs',
-    description:
-      'Enter the ID of the hosts you want to save data from, leave this empty to run the task on every host.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.STATISTICS,
-    type: EpluginSettingType.editor,
-    defaultValue: [],
-    isConfigurableFromSettings: true,
-    options: {
-      editor: {
-        language: 'json',
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: any): any {
-      return JSON.stringify(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): any {
-      try {
-        return JSON.parse(value);
-      } catch (error) {
-        return value;
-      }
-    },
-    validateUIForm: function (value) {
-      return SettingsValidator.json(this.validate)(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.array(
-        SettingsValidator.compose(
-          SettingsValidator.isString,
-          SettingsValidator.isNotEmptyString,
-          SettingsValidator.hasNoSpaces,
-        ),
-      ),
-    ),
-  },
-  'cron.statistics.index.creation': {
-    title: 'Index creation',
-    description: 'Define the interval in which a new index will be created.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.STATISTICS,
-    type: EpluginSettingType.select,
-    options: {
-      select: [
-        {
-          text: 'Hourly',
-          value: 'h',
-        },
-        {
-          text: 'Daily',
-          value: 'd',
-        },
-        {
-          text: 'Weekly',
-          value: 'w',
-        },
-        {
-          text: 'Monthly',
-          value: 'm',
-        },
-      ],
-    },
-    defaultValue: WAZUH_STATISTICS_DEFAULT_CREATION,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: function (value) {
-      return SettingsValidator.literal(
-        this.options.select.map(({ value }) => value),
-      )(value);
-    },
-  },
-  'cron.statistics.index.name': {
-    title: 'Index name',
-    description:
-      'Define the name of the index in which the documents will be saved.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.STATISTICS,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_STATISTICS_DEFAULT_NAME,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-        '*',
-      ),
-    ),
-  },
-  'cron.statistics.index.replicas': {
-    title: 'Index replicas',
-    description:
-      'Define the number of replicas to use for the statistics indices.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.STATISTICS,
-    type: EpluginSettingType.number,
-    defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    options: {
-      number: {
-        min: 0,
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (
-      value: number,
-    ): string {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'cron.statistics.index.shards': {
-    title: 'Index shards',
-    description:
-      'Define the number of shards to use for the statistics indices.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.STATISTICS,
-    type: EpluginSettingType.number,
-    defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    options: {
-      number: {
-        min: 1,
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'cron.statistics.interval': {
-    title: 'Interval',
-    description:
-      'Define the frequency of task execution using cron schedule expressions.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.STATISTICS,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_STATISTICS_DEFAULT_CRON_FREQ,
-    isConfigurableFromSettings: true,
-    requiresRestartingPluginPlatform: true,
-    // Workaround: this need to be defined in the frontend side and backend side because an optimization error in the frontend side related to some module can not be loaded.
-    // validateUIForm: function (value) {
-    // },
-    // validate: function (value) {
-    // },
-  },
-  'cron.statistics.status': {
-    title: 'Status',
-    description: 'Enable or disable the statistics tasks.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.STATISTICS,
-    type: EpluginSettingType.switch,
-    defaultValue: WAZUH_STATISTICS_DEFAULT_STATUS,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'customization.enabled': {
-    title: 'Status',
-    description: 'Enable or disable the customization.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    requiresReloadingBrowserTab: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'customization.logo.app': {
-    title: 'App main logo',
-    description: `This logo is used as loading indicator while the user is logging into Wazuh API.`,
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.filepicker,
-    defaultValue: '',
-    isConfigurableFromSettings: true,
-    options: {
-      file: {
-        type: 'image',
-        extensions: ['.jpeg', '.jpg', '.png', '.svg'],
-        size: {
-          maxBytes:
-            CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
-        },
-        recommended: {
-          dimensions: {
-            width: 300,
-            height: 70,
-            unit: 'px',
-          },
-        },
-        store: {
-          relativePathFileSystem: 'public/assets/custom/images',
-          filename: 'customization.logo.app',
-          resolveStaticURL: (filename: string) =>
-            `custom/images/${filename}?v=${Date.now()}`,
-          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
-        },
-      },
-    },
-    validateUIForm: function (value) {
-      return SettingsValidator.compose(
-        SettingsValidator.filePickerFileSize({
-          ...this.options.file.size,
-          meaningfulUnit: true,
-        }),
-        SettingsValidator.filePickerSupportedExtensions(
-          this.options.file.extensions,
-        ),
-      )(value);
-    },
-  },
-  'customization.logo.healthcheck': {
-    title: 'Healthcheck logo',
-    description: `This logo is displayed during the Healthcheck routine of the app.`,
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.filepicker,
-    defaultValue: '',
-    isConfigurableFromSettings: true,
-    options: {
-      file: {
-        type: 'image',
-        extensions: ['.jpeg', '.jpg', '.png', '.svg'],
-        size: {
-          maxBytes:
-            CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
-        },
-        recommended: {
-          dimensions: {
-            width: 300,
-            height: 70,
-            unit: 'px',
-          },
-        },
-        store: {
-          relativePathFileSystem: 'public/assets/custom/images',
-          filename: 'customization.logo.healthcheck',
-          resolveStaticURL: (filename: string) =>
-            `custom/images/${filename}?v=${Date.now()}`,
-          // ?v=${Date.now()} is used to force the browser to reload the image when a new file is uploaded
-        },
-      },
-    },
-    validateUIForm: function (value) {
-      return SettingsValidator.compose(
-        SettingsValidator.filePickerFileSize({
-          ...this.options.file.size,
-          meaningfulUnit: true,
-        }),
-        SettingsValidator.filePickerSupportedExtensions(
-          this.options.file.extensions,
-        ),
-      )(value);
-    },
-  },
-  'customization.logo.reports': {
-    title: 'PDF reports logo',
-    description: `This logo is used in the PDF reports generated by the app. It's placed at the top left corner of every page of the PDF.`,
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.filepicker,
-    defaultValue: '',
-    defaultValueIfNotSet: REPORTS_LOGO_IMAGE_ASSETS_RELATIVE_PATH,
-    isConfigurableFromSettings: true,
-    options: {
-      file: {
-        type: 'image',
-        extensions: ['.jpeg', '.jpg', '.png'],
-        size: {
-          maxBytes:
-            CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
-        },
-        recommended: {
-          dimensions: {
-            width: 190,
-            height: 40,
-            unit: 'px',
-          },
-        },
-        store: {
-          relativePathFileSystem: 'public/assets/custom/images',
-          filename: 'customization.logo.reports',
-          resolveStaticURL: (filename: string) => `custom/images/${filename}`,
-        },
-      },
-    },
-    validateUIForm: function (value) {
-      return SettingsValidator.compose(
-        SettingsValidator.filePickerFileSize({
-          ...this.options.file.size,
-          meaningfulUnit: true,
-        }),
-        SettingsValidator.filePickerSupportedExtensions(
-          this.options.file.extensions,
-        ),
-      )(value);
-    },
-  },
-  'customization.reports.footer': {
-    title: 'Reports footer',
-    description: 'Set the footer of the reports.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.textarea,
-    defaultValue: '',
-    defaultValueIfNotSet: REPORTS_PAGE_FOOTER_TEXT,
-    isConfigurableFromSettings: true,
-    options: { maxRows: 2, maxLength: 50 },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: function (value) {
-      return SettingsValidator.compose(
-        SettingsValidator.isString,
-        SettingsValidator.multipleLinesString({
-          maxRows: this.options?.maxRows,
-          maxLength: this.options?.maxLength,
-        }),
-      )(value);
-    },
-  },
-  'customization.reports.header': {
-    title: 'Reports header',
-    description: 'Set the header of the reports.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.CUSTOMIZATION,
-    type: EpluginSettingType.textarea,
-    defaultValue: '',
-    defaultValueIfNotSet: REPORTS_PAGE_HEADER_TEXT,
-    isConfigurableFromSettings: true,
-    options: { maxRows: 3, maxLength: 40 },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: function (value) {
-      return SettingsValidator.compose(
-        SettingsValidator.isString,
-        SettingsValidator.multipleLinesString({
-          maxRows: this.options?.maxRows,
-          maxLength: this.options?.maxLength,
-        }),
-      )(value);
-    },
-  },
-  'enrollment.dns': {
-    title: 'Enrollment DNS',
-    description:
-      'Specifies the Wazuh registration server, used for the agent enrollment.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: '',
-    isConfigurableFromSettings: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
-    ),
-  },
-  'enrollment.password': {
-    title: 'Enrollment password',
-    description:
-      'Specifies the password used to authenticate during the agent enrollment.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: '',
-    isConfigurableFromSettings: false,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-    ),
-  },
-  hideManagerAlerts: {
-    title: 'Hide manager alerts',
-    description: 'Hide the alerts of the manager in every dashboard.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: false,
-    isConfigurableFromSettings: true,
-    requiresReloadingBrowserTab: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  hosts: {
-    title: 'Server hosts',
-    description: 'Configure the API connections.',
-    category: SettingCategory.API_CONNECTION,
-    type: EpluginSettingType.arrayOf,
-    defaultValue: [],
-    store: {
-      file: {
-        configurableManaged: false,
-        defaultBlock: `# The following configuration is the default structure to define a host.
-#
-# hosts:
-#   # Host ID / name,
-#   - env-1:
-#       # Host URL
-#       url: https://env-1.example
-#       # Host / API port
-#       port: 55000
-#       # Host / API username
-#       username: wazuh-wui
-#       # Host / API password
-#       password: wazuh-wui
-#       # Use RBAC or not. If set to true, the username must be "wazuh-wui".
-#       run_as: true
-#   - env-2:
-#       url: https://env-2.example
-#       port: 55000
-#       username: wazuh-wui
-#       password: wazuh-wui
-#       run_as: true
-
-hosts:
-  - default:
-      url: https://localhost
-      port: 55000
-      username: wazuh-wui
-      password: wazuh-wui
-      run_as: false`,
-        transformFrom: value => {
-          return value.map(hostData => {
-            const key = Object.keys(hostData)?.[0];
-            return { ...hostData[key], id: key };
-          });
-        },
-      },
-    },
-    options: {
-      arrayOf: {
-        id: {
-          title: 'Identifier',
-          description: 'Identifier of the API connection. This must be unique.',
-          type: EpluginSettingType.text,
-          defaultValue: 'default',
-          isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
-          validate: SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-          ),
-        },
-        url: {
-          title: 'URL',
-          description: 'Server URL address',
-          type: EpluginSettingType.text,
-          defaultValue: 'https://localhost',
-          isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
-          validate: SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-          ),
-        },
-        port: {
-          title: 'Port',
-          description: 'Port',
-          type: EpluginSettingType.number,
-          defaultValue: 55000,
-          isConfigurableFromSettings: true,
-          options: {
-            number: {
-              min: 0,
-              max: 65535,
-              integer: true,
-            },
-          },
-          uiFormTransformConfigurationValueToInputValue: function (
-            value: number,
-          ) {
-            return String(value);
-          },
-          uiFormTransformInputValueToConfigurationValue: function (
-            value: string,
-          ): number {
-            return Number(value);
-          },
-          validateUIForm: function (value) {
-            return this.validate(
-              this.uiFormTransformInputValueToConfigurationValue(value),
-            );
-          },
-          validate: function (value) {
-            return SettingsValidator.number(this.options.number)(value);
-          },
-        },
-        username: {
-          title: 'Username',
-          description: 'Server API username',
-          type: EpluginSettingType.text,
-          defaultValue: 'wazuh-wui',
-          isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
-          validate: SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-          ),
-        },
-        password: {
-          title: 'Password',
-          description: "User's Password",
-          type: EpluginSettingType.password,
-          defaultValue: 'wazuh-wui',
-          isConfigurableFromSettings: true,
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
-          validate: SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-          ),
-        },
-        run_as: {
-          title: 'Run as',
-          description: 'Use the authentication context.',
-          type: EpluginSettingType.switch,
-          defaultValue: false,
-          isConfigurableFromSettings: true,
-          options: {
-            switch: {
-              values: {
-                disabled: { label: 'false', value: false },
-                enabled: { label: 'true', value: true },
-              },
-            },
-          },
-          uiFormTransformChangedInputValue: function (
-            value: boolean | string,
-          ): boolean {
-            return Boolean(value);
-          },
-          validateUIForm: function (value) {
-            return this.validate(value);
-          },
-          validate: SettingsValidator.isBoolean,
-        },
-      },
-    },
-    isConfigurableFromSettings: false,
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    // TODO: add validation
-    // validate: SettingsValidator.isBoolean,
-    // validate: function (schema) {
-    //   return schema.boolean();
-    // },
-  },
-  'ip.ignore': {
-    title: 'Index pattern ignore',
-    description:
-      'Disable certain index pattern names from being available in index pattern selector.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.editor,
-    defaultValue: [],
-    isConfigurableFromSettings: true,
-    options: {
-      editor: {
-        language: 'json',
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: any): any {
-      return JSON.stringify(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): any {
-      try {
-        return JSON.parse(value);
-      } catch (error) {
-        return value;
-      }
-    },
-    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validateUIForm: function (value) {
-      return SettingsValidator.json(this.validate)(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.array(
-        SettingsValidator.compose(
-          SettingsValidator.isString,
-          SettingsValidator.isNotEmptyString,
-          SettingsValidator.hasNoSpaces,
-          SettingsValidator.noLiteralString('.', '..'),
-          SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-          SettingsValidator.hasNotInvalidCharacters(
-            '\\',
-            '/',
-            '?',
-            '"',
-            '<',
-            '>',
-            '|',
-            ',',
-            '#',
-          ),
-        ),
-      ),
-    ),
-  },
-  'ip.selector': {
-    title: 'IP selector',
-    description:
-      'Define if the user is allowed to change the selected index pattern directly from the top menu bar.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: true,
-    isConfigurableFromSettings: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'wazuh.updates.disabled': {
-    title: 'Check updates',
-    description: 'Define if the check updates service is active.',
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: false,
-    store: {
-      file: {
-        configurableManaged: false,
-      },
-    },
-    isConfigurableFromSettings: false,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  pattern: {
-    title: 'Index pattern',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    description:
-      "Default index pattern to use on the app. If there's no valid index pattern, the app will automatically create one with the name indicated in this option.",
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_ALERTS_PATTERN,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noLiteralString('.', '..'),
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-      ),
-    ),
-  },
-  timeout: {
-    title: 'Request timeout',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    description:
-      'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.number,
-    defaultValue: 20000,
-    isConfigurableFromSettings: true,
-    options: {
-      number: {
-        min: 1500,
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'wazuh.monitoring.creation': {
-    title: 'Index creation',
-    description:
-      'Define the interval in which a new wazuh-monitoring index will be created.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.select,
-    options: {
-      select: [
-        {
-          text: 'Hourly',
-          value: 'h',
-        },
-        {
-          text: 'Daily',
-          value: 'd',
-        },
-        {
-          text: 'Weekly',
-          value: 'w',
-        },
-        {
-          text: 'Monthly',
-          value: 'm',
-        },
-      ],
-    },
-    defaultValue: WAZUH_MONITORING_DEFAULT_CREATION,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: function (value) {
-      return SettingsValidator.literal(
-        this.options.select.map(({ value }) => value),
-      )(value);
-    },
-  },
-  'wazuh.monitoring.enabled': {
-    title: 'Status',
-    description:
-      'Enable or disable the wazuh-monitoring index creation and/or visualization.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.switch,
-    defaultValue: WAZUH_MONITORING_DEFAULT_ENABLED,
-    isConfigurableFromSettings: true,
-    requiresRestartingPluginPlatform: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'wazuh.monitoring.frequency': {
-    title: 'Frequency',
-    description:
-      'Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.number,
-    defaultValue: WAZUH_MONITORING_DEFAULT_FREQUENCY,
-    isConfigurableFromSettings: true,
-    requiresRestartingPluginPlatform: true,
-    options: {
-      number: {
-        min: 60,
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'wazuh.monitoring.pattern': {
-    title: 'Index pattern',
-    description: 'Default index pattern to use for Wazuh monitoring.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_MONITORING_PATTERN,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noLiteralString('.', '..'),
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-      ),
-    ),
-  },
-  'wazuh.monitoring.replicas': {
-    title: 'Index replicas',
-    description:
-      'Define the number of replicas to use for the wazuh-monitoring-* indices.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.number,
-    defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    options: {
-      number: {
-        min: 0,
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'wazuh.monitoring.shards': {
-    title: 'Index shards',
-    description:
-      'Define the number of shards to use for the wazuh-monitoring-* indices.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.number,
-    defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    options: {
-      number: {
-        min: 1,
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'vulnerabilities.pattern': {
-    title: 'Index pattern',
-    description: 'Default index pattern to use for vulnerabilities.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.VULNERABILITIES,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_VULNERABILITIES_PATTERN,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: false,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noLiteralString('.', '..'),
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-      ),
-    ),
-  },
-};
-
-export type TPluginSettingKey = keyof typeof PLUGIN_SETTINGS;
 
 export enum HTTP_STATUS_CODES {
   CONTINUE = 100,
@@ -2192,3 +998,35 @@ export const WAZUH_ROLE_ADMINISTRATOR_ID = 1;
 
 // ID used to refer the createOsdUrlStateStorage state
 export const OSD_URL_STATE_STORAGE_ID = 'state:storeInSessionStorage';
+
+// uiSettings
+
+export const HIDE_MANAGER_ALERTS_SETTING = 'hideManagerAlerts';
+export const ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
+// Checks
+export const CHECKS_API = 'checks.api';
+export const CHECKS_FIELDS = 'checks.fields';
+export const CHECKS_MAX_BUCKETS = 'checks.max_buckets';
+export const CHECKS_META_FIELDS = 'checks.meta_fields';
+export const CHECKS_PATTERN = 'checks.pattern';
+export const CHECKS_SETUP = 'checks.setup';
+export const CHECKS_TEMPLATE = 'checks.template';
+export const CHECKS_TIMEFILTER = 'checks.timefilter';
+
+export const CONFIG_UI_API_EDITABLE = 'configuration.ui_api_editable';
+
+export const CRON_PREFIX = 'cron.prefix';
+
+export const CUSTOMIZATION_ENABLED = 'customization.enabled';
+
+export const ENROLLMENT_DNS = 'enrollment.dns';
+export const ENROLLMENT_PASSWORD = 'enrollment.password';
+
+export const IP_IGNORE = 'ip.ignore';
+export const IP_SELECTOR = 'ip.selector';
+
+export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
+
+export const REQUEST_TIMEOUT = 'timeout';
+
+export const DEFAULT_COLUMNS_SETTING = 'defaultColumns2';

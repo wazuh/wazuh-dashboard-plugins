@@ -16,7 +16,12 @@ interface EnsureIndexPatternExistenceContextTaskWithConfigurationSetting
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const decoratorCheckIsEnabled =
-  callback =>
+  (
+    callback: (
+      ctx: InitializationTaskRunContext,
+      ctxTask: EnsureIndexPatternExistenceContextTask,
+    ) => Promise<void>,
+  ) =>
   async (
     ctx: InitializationTaskRunContext,
     {
@@ -221,34 +226,32 @@ export const initializationTaskCreatorIndexPattern = ({
   taskName: string;
   options: object;
   configurationSettingKey: string;
-}) => {
-  return {
-    name: taskName,
-    async run(ctx: InitializationTaskRunContext) {
-      let indexPatternID;
+}) => ({
+  name: taskName,
+  async run(ctx: InitializationTaskRunContext) {
+    let indexPatternID;
 
-      try {
-        ctx.logger.debug('Starting index pattern saved object');
-        indexPatternID = await getIndexPatternID(ctx, ctx.scope, rest);
+    try {
+      ctx.logger.debug('Starting index pattern saved object');
+      indexPatternID = await getIndexPatternID(ctx, ctx.scope, rest);
 
-        // Get clients depending on the scope
-        const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
-        const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
+      // Get clients depending on the scope
+      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
+      const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
 
-        return await ensureIndexPatternExistence(
-          { ...ctx, indexPatternsClient, savedObjectsClient },
-          {
-            indexPatternID,
-            options,
-            configurationSettingKey,
-          },
-        );
-      } catch (error) {
-        const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
+      return await ensureIndexPatternExistence(
+        { ...ctx, indexPatternsClient, savedObjectsClient },
+        {
+          indexPatternID,
+          options,
+          configurationSettingKey,
+        },
+      );
+    } catch (error) {
+      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
 
-        ctx.logger.error(message);
-        throw new Error(message);
-      }
-    },
-  };
-};
+      ctx.logger.error(message);
+      throw new Error(message);
+    }
+  },
+});

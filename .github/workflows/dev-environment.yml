@@ -50,11 +50,6 @@ jobs:
         plugins:
           [
             {
-              name: 'Main',
-              path: 'wazuh/plugins/main',
-              container_path: 'wazuh',
-            },
-            {
               name: 'Wazuh Check Updates',
               path: 'wazuh/plugins/wazuh-check-updates',
               container_path: 'wazuh-check-updates',
@@ -64,21 +59,11 @@ jobs:
               path: 'wazuh/plugins/wazuh-core',
               container_path: 'wazuh-core',
             },
-            {
-              name: 'Wazuh Engine',
-              path: 'wazuh/plugins/wazuh-engine',
-              container_path: 'wazuh-engine',
-            },
-            {
-              name: 'Wazuh Fleet',
-              path: 'wazuh/plugins/wazuh-fleet',
-              container_path: 'wazuh-fleet',
-            },
           ]
 
     steps:
       - name: Step 01 - Download the plugin's source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: wazuh/wazuh-dashboard-plugins
           ref: ${{ inputs.reference }}
@@ -118,7 +103,7 @@ jobs:
               cd /home/node/kbn/plugins/${{ matrix.plugins.container_path }} && yarn && ${{ inputs.command }};
             '
 
-      - name: Get the plugin version and and format reference name
+      - name: Get the plugin version and format reference name
         run: |
           echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
           echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
@@ -126,11 +111,12 @@ jobs:
 
       - name: Step 04 - Upload artifact to GitHub
         if: ${{ inputs.artifact_name && inputs.artifact_path }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ inputs.artifact_name }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          name: ${{ inputs.artifact_name }}_${{ matrix.plugins.container_path }}_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
           path: ${{ matrix.plugins.path }}/${{ inputs.artifact_path }}
           if-no-files-found: 'error'
+          overwrite: true
 
       - name: Step 05 - Upload coverage results to GitHub
         if: ${{ inputs.notify_jest_coverage_summary && github.event_name == 'pull_request' }}
