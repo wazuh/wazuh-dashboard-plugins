@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added creation of report definition when creating dashboard by reference and the button to reset the report [#7091](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7091)
 - Added a frontend http client to core plugin [#7000](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7000)
 - Added serverSecurity service to core plugin [#7026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7026)
-- Added an initilization service to core plugin to run the initilization tasks related to user scope [#7145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7145) [#7262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7262)
+- Added an initilization service to core plugin to run the initilization tasks related to user scope [#7145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7145) [#7262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7262) [#7263](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7263)
 
 ### Removed
 
