@@ -53,7 +53,6 @@ import indexPatternFieldsNetworks from './initialization/index-patterns-fields/f
 import indexPatternFieldsPackages from './initialization/index-patterns-fields/fields-packages.json';
 import indexPatternFieldsPorts from './initialization/index-patterns-fields/fields-ports.json';
 import indexPatternFieldsProcesses from './initialization/index-patterns-fields/fields-processes.json';
-import indexPatternFieldsSheduledCommands from './initialization/index-patterns-fields/fields-scheduled-commands.json';
 import indexPatternFieldsSystem from './initialization/index-patterns-fields/fields-system.json';
 import indexPatternFieldsVulnerabilities from './initialization/index-patterns-fields/fields-vulnerabilities.json';
 
@@ -269,12 +268,6 @@ export class WazuhCorePlugin
         indexPattern: 'wazuh-states-inventory-processes*',
         taskIndexPattern: 'states-inventory-processes',
         fieldsNoIndices: indexPatternFieldsProcesses,
-        configurationSettingKey: '',
-      },
-      {
-        indexPattern: '.scheduled-commands*',
-        taskIndexPattern: 'states-scheduled-commands',
-        fieldsNoIndices: indexPatternFieldsSheduledCommands,
         configurationSettingKey: '',
       },
     ] as {
