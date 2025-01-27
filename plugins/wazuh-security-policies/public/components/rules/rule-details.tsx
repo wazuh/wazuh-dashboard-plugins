@@ -6,25 +6,13 @@ import {
   EuiText,
   EuiButtonIcon,
   EuiSteps,
-  EuiPanel,
-  EuiAccordion,
-  EuiHorizontalRule,
-  EuiForm,
 } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
-import { renderInputs } from '../common/render-inputs';
+import { renderStepPanel } from '../common/render-steps';
 import { capitalizeFirstLetter } from '../utils/capitalize-first-letter';
+import { STEPS } from '../common/constants';
 import { decoder } from './mock-data-rules';
-
-const possibleSteps = {
-  metadata: 'metadata',
-  check: 'check',
-  parse: 'parse|',
-  normalize: 'normalize',
-  allow: 'allow',
-  output: 'output',
-  definitions: 'definitions',
-};
+import './rule-details.scss';
 
 export const RuleDetails = () => {
   const { id: name } = useParams();
@@ -46,7 +34,7 @@ export const RuleDetails = () => {
     </EuiButton>,
     <EuiButtonEmpty
       size='xs'
-      key='test-decoder'
+      key='test-item'
       color='primary'
       onClick={() => {}}
     >
@@ -71,56 +59,10 @@ export const RuleDetails = () => {
     </EuiButtonEmpty>,
   ];
 
-  const renderCardTitle = (stepName: string, item: any) => {
-    switch (true) {
-      case stepName === possibleSteps.metadata: {
-        return `${capitalizeFirstLetter(stepName)} of ${item.value.title}, from ${item.value.module}`;
-      }
-
-      case stepName === possibleSteps.check: {
-        if (typeof item.value === 'string') {
-          return `${capitalizeFirstLetter(stepName)}: ${item.value}`;
-        }
-
-        return `${capitalizeFirstLetter(stepName)} fields: ${item.value.map((obj: any) => Object.keys(obj)[0]).join(', ')}`;
-      }
-
-      case stepName.startsWith(possibleSteps.parse): {
-        return stepName.split('|')[1];
-      }
-
-      case stepName === possibleSteps.normalize: {
-        return `${capitalizeFirstLetter(stepName)} fields: `;
-        // ${item.value.map(
-        //   (obj: any) =>
-        //     Object.values(
-        //       obj.map.map((subObj: any) => Object.keys(subObj)[0]),
-        //     ).join(', '),
-        // )}`;
-      }
-
-      case stepName === possibleSteps.allow: {
-        return capitalizeFirstLetter(stepName);
-      }
-
-      case stepName === possibleSteps.output: {
-        return capitalizeFirstLetter(stepName);
-      }
-
-      case stepName === possibleSteps.definitions: {
-        return capitalizeFirstLetter(stepName);
-      }
-
-      default: {
-        return capitalizeFirstLetter(stepName);
-      }
-    }
-  };
-
   const renderTitleStep = (stepName: string) => {
     let title = stepName;
 
-    if (stepName.startsWith(possibleSteps.parse)) {
+    if (stepName.startsWith(STEPS.parse)) {
       title = stepName.split('|')[0];
     }
 
@@ -137,19 +79,7 @@ export const RuleDetails = () => {
       }));
     const steps = arraySteps.map(step => ({
       title: renderTitleStep(step.key),
-      children: (
-        <EuiPanel>
-          <EuiAccordion
-            id='accordion1'
-            paddingSize='s'
-            buttonContent={renderCardTitle(step.key, step)}
-          >
-            <EuiHorizontalRule margin='s' />
-
-            <EuiForm component='form'>{renderInputs(step)}</EuiForm>
-          </EuiAccordion>
-        </EuiPanel>
-      ),
+      children: renderStepPanel(step),
     }));
 
     return steps;
@@ -159,14 +89,14 @@ export const RuleDetails = () => {
     <>
       <EuiPageHeader
         pageTitle={title}
-        bottomBorder='true'
+        bottomBorder={true}
         alignItems='center'
         rightSideGroupProps={{
           alignItems: 'center',
         }}
         rightSideItems={buttons}
       />
-      <EuiSteps steps={step(item)} />
+      <EuiSteps className='steps-details' steps={step(item)} />
     </>
   );
 };
