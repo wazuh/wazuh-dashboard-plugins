@@ -181,12 +181,12 @@ function run(configuration) {
       );
     }
     cli.logger.debug(`Moving fields files to ${outputDir}/`);
-    // execSync(`mv index-pattern-fields/* ${outputDir}/`);
+    execSync(`mv index-pattern-fields/* ${outputDir}/`);
     cli.logger.info(`Moved fields files to ${outputDir}/`);
 
-    // cleanTmpDirectories();
+    cleanTmpDirectories();
   } catch (error) {
-    // cleanTmpDirectories();
+    cleanTmpDirectories();
     throw error;
   }
 }
