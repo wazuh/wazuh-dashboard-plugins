@@ -6,26 +6,25 @@ import {
   EuiBasicTable,
   EuiHealth,
   EuiPageHeader,
+  EuiLink,
 } from '@elastic/eui';
+import { useLocation } from 'react-router-dom';
 import { decoder } from '../rules/mock-data-rules';
 import { getHistory } from '../../plugin-services';
 import { LastUpdateContentManagerText } from './last-update-content-manager-text.tsx';
 import { SearchBar } from './searchbar';
 import { NoResultsData } from './no-results';
 
-interface OverviewTemplateProps {
-  view: 'rules' | 'decoders' | 'kvdb';
-}
-
-export const OverviewTemplate = (props: OverviewTemplateProps) => {
-  const { view } = props;
+export const OverviewTemplate = () => {
+  const { pathname } = useLocation();
+  const view = pathname.split('/')[1];
   const history = getHistory();
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(5);
   const [decoderList, setDecoderList] = useState(decoder);
   const [query, setQuery] = useState({ text: '' });
   // Header start
-  const titleHeader = <h1 style={{ textTransform: 'capitalize' }}>{view}</h1>;
+  const titleHeader = <span className='wz-capitalize'>{view}</span>;
   const descriptionHeader = LastUpdateContentManagerText({
     status: 'Updated',
     lastUpdateDate: '31/01/2025',
@@ -144,12 +143,23 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
     return <EuiHealth color={color}>{label}</EuiHealth>;
   };
 
+  const handleNavigation = (path: string) => {
+    history.push(path);
+  };
+
+  const getRowProps = (item: string) =>
+    handleNavigation(`/${view}/${encodeURIComponent(item)}`);
   const columns = [
     {
       field: 'name',
       name: 'Name',
       sortable: true,
       truncateText: true,
+      render: (item: string) => (
+        <EuiLink onClick={() => getRowProps(item)} className='wz-capitalize'>
+          {item}
+        </EuiLink>
+      ),
     },
     {
       field: 'metadata.module',
@@ -168,7 +178,7 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
       sortable: true,
       truncateText: true,
       render: (item: string) => (
-        <EuiText style={{ textTransform: 'capitalize' }}>{item}</EuiText>
+        <EuiText className='wz-capitalize'>{item}</EuiText>
       ),
     },
     {
@@ -238,15 +248,6 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
     pageSizeOptions: [3, 5, 8],
   };
 
-  const handleNavigation = (path: string) => {
-    history.push(path);
-  };
-
-  const getRowProps = item => ({
-    onClick: () =>
-      handleNavigation(`/${view}/${encodeURIComponent(item.name)}`),
-  });
-
   // Table end
 
   return (
@@ -263,7 +264,6 @@ export const OverviewTemplate = (props: OverviewTemplateProps) => {
         pagination={pagination}
         isSelectable={true}
         onChange={onTableChange}
-        rowProps={getRowProps}
       />
       {decoder.length <= 0 && <NoResultsData query={query} />}
     </EuiPanel>

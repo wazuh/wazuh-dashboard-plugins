@@ -1,7 +1,4 @@
 import React from 'react';
+import { DetailsTemplate } from '../common/details-template';
 
-export const DecoderDetails = () => (
-  <>
-    <h1>DecoderDetails</h1>
-  </>
-);
+export const DecoderDetails = () => <DetailsTemplate />;

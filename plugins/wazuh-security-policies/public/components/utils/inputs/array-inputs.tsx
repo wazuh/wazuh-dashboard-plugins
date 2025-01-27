@@ -33,6 +33,7 @@ export const inputArray = (input: { key: string; value: any }) => {
     return (
       <EuiBasicTable
         items={inputs}
+        className='wz-mtb-10'
         compressed
         columns={[
           {
@@ -70,6 +71,7 @@ export const inputArray = (input: { key: string; value: any }) => {
     );
   const tableInput = (
     <EuiBasicTable
+      className='wz-mtb-10'
       items={inputs}
       compressed
       columns={[

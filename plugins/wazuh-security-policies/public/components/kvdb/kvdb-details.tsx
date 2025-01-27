@@ -1,7 +1,4 @@
 import React from 'react';
+import { DetailsTemplate } from '../common/details-template';
 
-export const KVDBDetails = () => (
-  <>
-    <h1>KVDBDetails</h1>
-  </>
-);
+export const KVDBDetails = () => <DetailsTemplate />;

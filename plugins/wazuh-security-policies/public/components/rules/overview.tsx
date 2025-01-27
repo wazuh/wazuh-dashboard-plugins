@@ -1,8 +1,4 @@
 import React from 'react';
 import { OverviewTemplate } from '../common/overview-template';
 
-export const RulesOverview = () => {
-  const view = 'rules';
-
-  return <OverviewTemplate view={view} />;
-};
+export const RulesOverview = () => <OverviewTemplate />;

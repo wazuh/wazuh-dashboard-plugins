@@ -10,6 +10,7 @@ import {
 import { Router, Route, Switch, Redirect, useParams } from 'react-router-dom';
 import { getCore, getHistory } from '../plugin-services';
 import { views } from './common/views';
+import '../components/common/common.scss';
 
 export const WazuhSecurityPoliciesApp = () => {
   const history = getHistory();
