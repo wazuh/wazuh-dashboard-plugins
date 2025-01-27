@@ -1,0 +1,168 @@
+[
+  {
+    "name": "@timestamp",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "_id",
+    "type": "string",
+    "esTypes": ["_id"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_index",
+    "type": "string",
+    "esTypes": ["_index"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_score",
+    "type": "number",
+    "searchable": false,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_source",
+    "type": "_source",
+    "esTypes": ["_source"],
+    "searchable": false,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_type",
+    "type": "string",
+    "searchable": false,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "agent.groups",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.action.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.action.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.order_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.result.code",
+    "type": "number",
+    "esTypes": ["short"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.result.data",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.result.message",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.source",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.target.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.target.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.timeout",
+    "type": "number",
+    "esTypes": ["short"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "command.user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "delivery_timestamp",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  }
+]
