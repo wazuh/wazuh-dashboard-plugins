@@ -14,7 +14,6 @@ module.exports.getTemplatesURLs = function getTemplatesURLs({ branch }) {
     'packages',
     'ports',
     'processes',
-    'scheduled-commands',
     'system',
     'vulnerabilities',
   ].map(name => {
