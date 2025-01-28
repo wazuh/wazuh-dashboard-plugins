@@ -136,7 +136,7 @@ export const CreateTemplate = () => {
                 value={addStep}
                 compressed
                 fullWidth
-                onChange={event_ => setAddStep(event_.target.value)}
+                onChange={event => setAddStep(event.target.value)}
                 placeholder='Select next step'
               />
             </EuiFlexItem>
