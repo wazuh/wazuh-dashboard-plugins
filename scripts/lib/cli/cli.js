@@ -63,6 +63,7 @@ ${options
   return {
     parse,
     help,
+    logger,
   };
 }
 
