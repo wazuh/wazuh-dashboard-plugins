@@ -23,6 +23,7 @@ import { ServerHostStateContainer } from './services/state/containers/server-hos
 import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
 import { CoreServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';
+import { registerHomeApp } from './home/register-app';
 
 const noop = () => {};
 
@@ -47,7 +48,6 @@ export class WazuhCorePlugin
 
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     // No operation logger
-
     const logger = {
       info: noop,
       error: noop,
@@ -66,7 +66,6 @@ export class WazuhCorePlugin
       new InitializerConfigProvider(this.initializerContext),
     );
 
-    // register the uiSettins on the configuration store to avoid the use inside of configuration service
     this.internal.configurationStore.registerProvider(
       EConfigurationProviders.PLUGIN_UI_SETTINGS,
       new UISettingsConfigProvider(core.uiSettings),
@@ -126,6 +125,8 @@ export class WazuhCorePlugin
       useLoadingLogo: () =>
         this.runtime.start.serverSecurityDeps.chrome.logos.AnimatedMark,
     });
+
+    registerHomeApp({ core });
 
     return {
       ...this.services,

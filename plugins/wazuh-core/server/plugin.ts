@@ -45,6 +45,7 @@ import alertsIndexPatternDefaultFields from './initialization/index-patterns-fie
 import monitoringIndexPatternDefaultFields from './initialization/index-patterns-fields/monitoring-fields.json';
 import statisticsIndexPatternDefaultFields from './initialization/index-patterns-fields/statistics-fields.json';
 import vulnerabilitiesStatesFields from './initialization/index-patterns-fields/vulnerabibility-states-fields.json';
+import { registerHomeApp } from './home/index';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -238,6 +239,8 @@ export class WazuhCorePlugin
         },
       },
     }));
+
+    registerHomeApp(this.services, initializationTaskCreatorIndexPattern);
 
     return {
       ...this.services,
