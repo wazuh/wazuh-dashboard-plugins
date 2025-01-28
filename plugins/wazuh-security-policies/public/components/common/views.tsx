@@ -3,13 +3,10 @@ import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import { IntegrationOverview } from '../integretions/overview';
 import { IntegrationView } from '../integretions/integration-details';
-import { RulesOverview } from '../rules/overview';
-import { RuleDetails } from '../rules/rule-details';
-import { DecodersOverview } from '../decoders/overview';
-import { DecoderDetails } from '../decoders/decoder-details';
-import { KVDBOverview } from '../kvdb/overview';
-import { KVDBDetails } from '../kvdb/kvdb-details';
 import { getCore } from '../../plugin-services';
+import { OverviewTemplate } from './templates/overview-template';
+import { DetailsTemplate } from './templates/details-template';
+import { CreateTemplate } from './templates/create-template';
 
 interface ViewInterface {
   name: string;
@@ -82,7 +79,7 @@ export const views: ViewInterface[] = [
     path: '/rules',
     renderOnMenu: true,
     renderMenu: true,
-    render: () => <RulesOverview />,
+    render: () => <OverviewTemplate />,
     breadcrumb: () => [
       {
         className: 'osdBreadcrumbs',
@@ -96,6 +93,38 @@ export const views: ViewInterface[] = [
     ],
   },
   {
+    name: i18n.translate('wz-security-policies-rules-create', {
+      defaultMessage: 'Rules create',
+    }),
+    id: 'rulesCreate',
+    path: '/rules/create',
+    renderOnMenu: false,
+    renderMenu: false,
+    render: () => <CreateTemplate />,
+    breadcrumb: () => [
+      {
+        className: 'osdBreadcrumbs',
+        text: (
+          <FormattedMessage
+            id={`wz-security-policies-breadcrumbs-rules`}
+            defaultMessage='Rules'
+          />
+        ),
+        href: getCore().application.getUrlForApp('wazuhSecurityPolicies', {
+          path: `#/${views.find(view => view.id === 'rules')?.path}`,
+        }),
+      },
+      {
+        text: (
+          <FormattedMessage
+            id={`wz-security-policies-breadcrumbs-rulesCreate`}
+            defaultMessage='Create'
+          />
+        ),
+      },
+    ],
+  },
+  {
     name: i18n.translate('wz-security-policies-rule-details', {
       defaultMessage: 'Rule details',
     }),
@@ -103,7 +132,7 @@ export const views: ViewInterface[] = [
     path: '/rules/:id',
     renderOnMenu: false,
     renderMenu: false,
-    render: () => <RuleDetails />,
+    render: () => <DetailsTemplate />,
     breadcrumb: (name?: string) => [
       {
         text: (
@@ -130,7 +159,7 @@ export const views: ViewInterface[] = [
     path: '/decoders',
     renderOnMenu: true,
     renderMenu: true,
-    render: () => <DecodersOverview />,
+    render: () => <OverviewTemplate />,
     breadcrumb: () => [
       {
         className: 'osdBreadcrumbs',
@@ -151,7 +180,7 @@ export const views: ViewInterface[] = [
     path: '/decoders/:id',
     renderOnMenu: false,
     renderMenu: false,
-    render: () => <DecoderDetails />,
+    render: () => <DetailsTemplate />,
     breadcrumb: (name?: string) => [
       {
         text: (
@@ -178,7 +207,7 @@ export const views: ViewInterface[] = [
     path: '/kvdb',
     renderOnMenu: true,
     renderMenu: true,
-    render: () => <KVDBOverview />,
+    render: () => <OverviewTemplate />,
     breadcrumb: () => [
       {
         className: 'osdBreadcrumbs',
@@ -199,7 +228,7 @@ export const views: ViewInterface[] = [
     path: '/kvdb/:id',
     renderOnMenu: false,
     renderMenu: false,
-    render: () => <KVDBDetails />,
+    render: () => <DetailsTemplate />,
     breadcrumb: (name?: string) => [
       {
         text: (

@@ -8,7 +8,7 @@ import {
   EuiPageHeader,
 } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
-import { LastUpdateContentManagerText } from '../common/last-update-content-manager-text.tsx';
+import { LastUpdateContentManagerText } from '../common/components/last-update-content-manager-text.tsx';
 import { integrations } from './mock-data-integrations';
 import './integrations.scss';
 import { IntegrationDescription } from './components/integration-description';

@@ -8,16 +8,15 @@ import {
   EuiPageHeader,
   EuiLink,
 } from '@elastic/eui';
-import { useLocation } from 'react-router-dom';
-import { decoder } from '../rules/mock-data-rules';
-import { getHistory } from '../../plugin-services';
-import { LastUpdateContentManagerText } from './last-update-content-manager-text.tsx';
-import { SearchBar } from './searchbar';
+import { decoder } from '../../rules/mock-data-rules';
+import { getHistory } from '../../../plugin-services';
+import { getAppUrl } from '../../utils/get-app-url';
+import { LastUpdateContentManagerText } from '../components/last-update-content-manager-text.tsx';
+import { SearchBar } from '../components/searchbar';
 import { NoResultsData } from './no-results';
 
 export const OverviewTemplate = () => {
-  const { pathname } = useLocation();
-  const view = pathname.split('/')[1];
+  const view = getAppUrl();
   const history = getHistory();
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(5);
@@ -29,8 +28,13 @@ export const OverviewTemplate = () => {
     status: 'Updated',
     lastUpdateDate: '31/01/2025',
   });
+
+  const goCreateView = () => {
+    history.push(`/${view}/create`);
+  };
+
   const rightSideItems = [
-    <EuiButton key='create-rule' onClick={() => console.log('clicked')} fill>
+    <EuiButton key='create-rule' onClick={goCreateView} fill>
       Create
     </EuiButton>,
   ];

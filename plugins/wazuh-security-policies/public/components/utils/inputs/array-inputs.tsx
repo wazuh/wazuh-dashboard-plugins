@@ -1,8 +1,12 @@
 import React from 'react';
 import { EuiBasicTable, EuiFormRow, EuiComboBox } from '@elastic/eui';
+import { capitalizeFirstLetter } from '../capitalize-first-letter';
 import { inputString } from './string-inputs';
 
-export const inputArray = (input: { key: string; value: any }) => {
+export const inputArray = (
+  input: { key: string; value: any },
+  isEditable: boolean,
+) => {
   const renderArrayTable = ['check', 'parse|', 'normalize'];
   const isArrayOfObjects =
     Array.isArray(input.value) &&
@@ -50,12 +54,12 @@ export const inputArray = (input: { key: string; value: any }) => {
   }
 
   const comboBoxInput =
-    inputs.length === 1 && inputs[0].value === '' ? (
-      inputString({ key: input.key, value: inputs[0].value })
+    !isEditable && inputs.length === 1 && inputs[0].value === '' ? (
+      inputString({ key: input.key, value: inputs[0].value }, isEditable)
     ) : (
       <EuiFormRow
         key={`${input.key}`}
-        label={input.key}
+        label={capitalizeFirstLetter(input.key)}
         fullWidth
         display='columnCompressed'
       >
@@ -63,9 +67,12 @@ export const inputArray = (input: { key: string; value: any }) => {
           label={input.key}
           fullWidth
           noSuggestions
-          selectedOptions={inputs}
+          placeholder={`${capitalizeFirstLetter(input.key)} value`}
+          selectedOptions={
+            isEditable && inputs?.[0]?.value === '' ? [] : inputs
+          }
           compressed
-          isDisabled
+          isDisabled={!isEditable}
         />
       </EuiFormRow>
     );

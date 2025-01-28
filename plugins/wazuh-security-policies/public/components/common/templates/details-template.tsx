@@ -8,10 +8,10 @@ import {
   EuiSteps,
 } from '@elastic/eui';
 import { useParams } from 'react-router-dom';
-import { decoder } from '../rules/mock-data-rules';
-import { capitalizeFirstLetter } from '../utils/capitalize-first-letter';
-import { renderStepPanel } from './render-steps';
-import { STEPS } from './constants';
+import { decoder } from '../../rules/mock-data-rules';
+import { capitalizeFirstLetter } from '../../utils/capitalize-first-letter';
+import { renderStepPanel } from '../components/render-steps';
+import { STEPS } from '../constants';
 import './details-template.scss';
 
 export const DetailsTemplate = () => {

@@ -5,7 +5,7 @@ import {
   EuiButtonEmpty,
   EuiHorizontalRule,
 } from '@elastic/eui';
-import { PopoverIconButton } from '../../common/popover';
+import { PopoverIconButton } from '../../common/components/popover';
 import { getHistory } from '../../../plugin-services';
 
 interface CardIntegrationProps {

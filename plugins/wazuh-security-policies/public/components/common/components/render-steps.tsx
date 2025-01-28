@@ -5,9 +5,9 @@ import {
   EuiHorizontalRule,
   EuiForm,
 } from '@elastic/eui';
-import { capitalizeFirstLetter } from '../utils/capitalize-first-letter';
-import { renderInputs } from '../utils/inputs/render-inputs';
-import { STEPS } from './constants';
+import { capitalizeFirstLetter } from '../../utils/capitalize-first-letter';
+import { renderInputs } from '../../utils/inputs/render-inputs';
+import { STEPS } from '../constants';
 import './render-steps.scss';
 
 export const renderStepPanel = step => {

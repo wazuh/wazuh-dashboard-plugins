@@ -8,9 +8,9 @@ import {
   EuiPageHeader,
 } from '@elastic/eui';
 import './integrations.scss';
-import { SearchBar } from '../common/searchbar';
-import { LastUpdateContentManagerText } from '../common/last-update-content-manager-text.tsx';
-import { NoResultsData } from '../common/no-results';
+import { SearchBar } from '../common/components/searchbar';
+import { LastUpdateContentManagerText } from '../common/components/last-update-content-manager-text.tsx';
+import { NoResultsData } from '../common/templates/no-results';
 import { CardIntegration } from './components/card-integration';
 import { integrations } from './mock-data-integrations';
 
