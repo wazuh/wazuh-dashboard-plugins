@@ -1,6 +1,7 @@
 export interface MetadataSchema {
   enable: boolean;
   name: string;
+  status: string;
   metadata: {
     module: string;
     title: string;
@@ -29,20 +30,22 @@ export interface MetadataSchema {
 export const metadataInitialValues: MetadataSchema = {
   enable: false,
   name: '',
+  status: '',
   metadata: {
     module: '',
     title: '',
     description: '',
     compatibility: '',
-    versions: [''],
+    versions: [],
     author: {
       name: '',
-      date: new Date().toISOString().split('T')[0],
+      date: '',
       email: '',
     },
-    references: [''],
+    references: [],
   },
   check: '',
+  parse: '',
   normalize: [],
   definitions: '',
   allow: '',

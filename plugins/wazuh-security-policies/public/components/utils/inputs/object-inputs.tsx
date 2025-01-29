@@ -1,7 +1,7 @@
 import { inputString } from './string-inputs';
 
 export const inputObject = (
-  input: { key: string; value: any },
+  input: { key: string; value: any; handleSetItem: any; keyValue?: string },
   isEditable: boolean,
 ) => {
   const inputsList = Object.entries(input.value).map(([key, value]) => ({
@@ -9,5 +9,14 @@ export const inputObject = (
     value,
   }));
 
-  return inputsList.map(item => inputString(item, isEditable));
+  return inputsList.map(item =>
+    inputString(
+      {
+        ...item,
+        handleSetItem: input.handleSetItem,
+        keyValue: input.keyValue ?? '',
+      },
+      isEditable,
+    ),
+  );
 };

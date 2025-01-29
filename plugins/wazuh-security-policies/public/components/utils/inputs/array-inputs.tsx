@@ -1,10 +1,11 @@
 import React from 'react';
 import { EuiBasicTable, EuiFormRow, EuiComboBox } from '@elastic/eui';
 import { capitalizeFirstLetter } from '../capitalize-first-letter';
+import { transformInputKeyName } from '../transform-input-key-name';
 import { inputString } from './string-inputs';
 
 export const inputArray = (
-  input: { key: string; value: any },
+  input: { key: string; value: any; handleSetItem: any; keyValue?: string },
   isEditable: boolean,
 ) => {
   const renderArrayTable = ['check', 'parse|', 'normalize'];
@@ -53,9 +54,39 @@ export const inputArray = (
     );
   }
 
+  const onChange = event => {
+    const newValue = event.map(({ value }) => value);
+
+    input.handleSetItem({
+      key: transformInputKeyName(input.keyValue, input.key),
+      newValue: newValue,
+    });
+  };
+
+  const onCreateOption = (searchValue: string) => {
+    const normalizedSearchValue = searchValue.trim().toLowerCase();
+
+    if (!normalizedSearchValue) {
+      return;
+    }
+
+    input.handleSetItem({
+      key: transformInputKeyName(input.keyValue, input.key),
+      newValue: [...input.value, searchValue],
+    });
+  };
+
   const comboBoxInput =
     !isEditable && inputs.length === 1 && inputs[0].value === '' ? (
-      inputString({ key: input.key, value: inputs[0].value }, isEditable)
+      inputString(
+        {
+          key: input.key,
+          value: inputs[0].value,
+          handleSetItem: input.handleSetItem,
+          keyValue: input.keyValue,
+        },
+        isEditable,
+      )
     ) : (
       <EuiFormRow
         key={`${input.key}`}
@@ -67,12 +98,15 @@ export const inputArray = (
           label={input.key}
           fullWidth
           noSuggestions
+          onChange={onChange}
           placeholder={`${capitalizeFirstLetter(input.key)} value`}
           selectedOptions={
             isEditable && inputs?.[0]?.value === '' ? [] : inputs
           }
           compressed
           isDisabled={!isEditable}
+          isClearable={true}
+          onCreateOption={onCreateOption}
         />
       </EuiFormRow>
     );

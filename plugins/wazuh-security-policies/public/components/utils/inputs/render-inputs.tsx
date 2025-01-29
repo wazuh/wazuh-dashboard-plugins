@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router-dom';
+import { transformInputKeyName } from '../transform-input-key-name';
 import { inputString } from './string-inputs';
 import { inputArray } from './array-inputs';
 import { inputObject } from './object-inputs';
@@ -12,7 +13,12 @@ const possibleSteps = new Set([
   'definitions',
 ]);
 
-export const renderInputs = (input: { key: string; value: any }) => {
+export const renderInputs = (input: {
+  key: string;
+  value: any;
+  handleSetItem: any;
+  keyValue?: string;
+}) => {
   const isEditable =
     useLocation().pathname.includes('edit') ||
     useLocation().pathname.includes('create');
@@ -23,7 +29,13 @@ export const renderInputs = (input: { key: string; value: any }) => {
       value,
     }));
 
-    return inputsSteps.map(step => renderInputs(step));
+    return inputsSteps.map(step =>
+      renderInputs({
+        ...step,
+        handleSetItem: input.handleSetItem,
+        keyValue: transformInputKeyName(input.keyValue, input.key),
+      }),
+    );
   }
 
   if (typeof input.value === 'string') {

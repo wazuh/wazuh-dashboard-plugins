@@ -66,7 +66,12 @@ export const renderStepPanel = step => {
         >
           <EuiHorizontalRule margin='s' />
           <EuiForm component='form'>
-            {renderInputs({ key: step.key, value: item })}
+            {renderInputs({
+              key: step.key,
+              value: item,
+              handleSetItem: step.handleSetItem,
+              keyValue: step.keyValue ?? '',
+            })}
           </EuiForm>
         </EuiAccordion>
       </EuiPanel>

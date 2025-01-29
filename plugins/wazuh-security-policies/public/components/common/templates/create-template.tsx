@@ -11,6 +11,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
+import { set } from 'lodash';
 import { PopoverIconButton } from '../components/popover';
 import { getAppUrl } from '../../utils/get-app-url';
 import { capitalizeFirstLetter } from '../../utils/capitalize-first-letter';
@@ -59,32 +60,61 @@ export const CreateTemplate = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [onXml, setOnXml] = useState(false);
   const [stepsToRender, setstepsToRender] = useState(['metadata']);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [item, setItem] = useState(metadataInitialValues);
   const [addStep, setAddStep] = useState(
     getAvailableOptions(stepsToRender)?.[0]?.value,
   );
   const view = getAppUrl();
+
+  const handleSetItem = ({
+    newValue,
+    key,
+  }: {
+    newValue: string | boolean;
+    key: string;
+  }) => {
+    setItem(prevItem => {
+      const newItem = { ...prevItem };
+
+      set(newItem, key, newValue);
+
+      return newItem;
+    });
+  };
+
   const buttonsPopover = [
     {
       id: 'editOnFormOrXML',
       label: onXml ? 'Edit on form' : 'Edit on XML',
       color: 'text',
+      onClick: () => setOnXml(!onXml),
     },
     {
       id: 'enable/disable',
       label: item?.enable ? 'Disable' : 'Enable',
       color: item?.enable ? 'danger' : 'primary',
+      onClick: () => {
+        handleSetItem({
+          newValue: !item?.enable,
+          key: 'enable',
+        });
+      },
     },
     {
       id: 'testItem',
       label: `Test ${view}`,
       color: 'text',
+      onClick: () => {},
     },
     {
       id: 'setSaveAsDraft',
       label: useParams()?.id ? 'Save as Draft' : 'Set as draft',
       color: 'text',
+      onClick: () =>
+        handleSetItem({
+          newValue: 'draft',
+          key: 'status',
+        }),
     },
   ];
   const buttons = [
@@ -102,10 +132,29 @@ export const CreateTemplate = () => {
         ))}
       </div>
     </PopoverIconButton>,
-    <EuiButton size='s' key='save-item' color='primary' fill onClick={() => {}}>
+    <EuiButton
+      size='s'
+      key='save-item'
+      color='primary'
+      fill
+      onClick={() =>
+        console.log(
+          Object.fromEntries(
+            Object.entries(item).filter(([key]) =>
+              [...stepsToRender, 'name', 'status', 'enable'].includes(key),
+            ),
+          ),
+        )
+      }
+    >
       Save
     </EuiButton>,
-    <EuiButton size='s' key='cancel-item' color='danger'>
+    <EuiButton
+      size='s'
+      key='cancel-item'
+      color='danger'
+      onClick={() => history.back()}
+    >
       Cancel
     </EuiButton>,
   ];
@@ -119,7 +168,7 @@ export const CreateTemplate = () => {
       .filter(([key]) => stepsToRender.includes(key))
       .map(([stepName, value]) => ({
         title: capitalizeFirstLetter(stepName),
-        children: renderStepPanel({ key: stepName, value }),
+        children: renderStepPanel({ key: stepName, value, handleSetItem }),
       }));
     const optionsToSelect = getAvailableOptions(stepsToRender);
 
@@ -163,10 +212,15 @@ export const CreateTemplate = () => {
         pageTitle={
           <EuiFieldText
             placeholder={`${capitalizeFirstLetter(view)} name`}
-            value=''
+            value={item.name}
             style={{ display: 'flex' }}
             compressed
-            onChange={() => {}}
+            onChange={event =>
+              handleSetItem({
+                newValue: event.target.value,
+                key: 'name',
+              })
+            }
           />
         }
         bottomBorder={true}

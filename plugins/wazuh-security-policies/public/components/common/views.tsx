@@ -174,6 +174,37 @@ export const views: ViewInterface[] = [
   },
   {
     name: i18n.translate('wz-security-policies-decoders-details', {
+      defaultMessage: 'Create decoder',
+    }),
+    id: 'decodersCreate',
+    path: '/decoders/create',
+    renderOnMenu: false,
+    renderMenu: false,
+    render: () => <CreateTemplate />,
+    breadcrumb: () => [
+      {
+        text: (
+          <FormattedMessage
+            id={`wz-security-policies-breadcrumbs-decodersDetails`}
+            defaultMessage={views.find(view => view.id === 'decoders')?.name}
+          />
+        ),
+        href: getCore().application.getUrlForApp('wazuhSecurityPolicies', {
+          path: `#/${views.find(view => view.id === 'decoders')?.path}`,
+        }),
+      },
+      {
+        text: (
+          <FormattedMessage
+            id={`wz-security-policies-breadcrumbs-decoderCreate`}
+            defaultMessage='Create'
+          />
+        ),
+      },
+    ],
+  },
+  {
+    name: i18n.translate('wz-security-policies-decoders-details', {
       defaultMessage: 'Decoders details',
     }),
     id: 'decodersDetails',
@@ -215,6 +246,37 @@ export const views: ViewInterface[] = [
           <FormattedMessage
             id={`wz-security-policies-breadcrumbs-kvdb`}
             defaultMessage='KVDB'
+          />
+        ),
+      },
+    ],
+  },
+  {
+    name: i18n.translate('wz-security-policies-decoders-details', {
+      defaultMessage: 'Create KVDB',
+    }),
+    id: 'kvdbCreate',
+    path: '/kvdb/create',
+    renderOnMenu: false,
+    renderMenu: false,
+    render: () => <CreateTemplate />,
+    breadcrumb: () => [
+      {
+        text: (
+          <FormattedMessage
+            id={`wz-security-policies-breadcrumbs-decodersDetails`}
+            defaultMessage={views.find(view => view.id === 'kvdb')?.name}
+          />
+        ),
+        href: getCore().application.getUrlForApp('wazuhSecurityPolicies', {
+          path: `#/${views.find(view => view.id === 'decoders')?.path}`,
+        }),
+      },
+      {
+        text: (
+          <FormattedMessage
+            id={`wz-security-policies-breadcrumbs-kvdbCreate`}
+            defaultMessage='Create'
           />
         ),
       },
