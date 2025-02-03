@@ -1,4 +1,5 @@
 import {
+  App,
   AppMountParameters,
   AppNavLinkStatus,
   AppUpdater,
@@ -7,7 +8,7 @@ import { Subject } from 'rxjs';
 import { i18n } from '@osd/i18n';
 import { buildSubAppId } from '../../utils';
 import { PLUGIN_ID } from '../../../common/constants';
-import { ENDPOINT_SECURITY_ID } from './endpoint-security';
+import { ENDPOINT_SECURITY_ID } from '.';
 
 export const CONFIGURATION_ASSESSMENT_ID = buildSubAppId(
   ENDPOINT_SECURITY_ID,
@@ -34,7 +35,7 @@ export const FIM_TITLE = i18n.translate(`${PLUGIN_ID}.category.${FIM_ID}`, {
   defaultMessage: 'File Integrity Monitoring',
 });
 
-export function getEndpointSecurityApps(updater$: Subject<AppUpdater>) {
+export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
   return [
     {
       id: CONFIGURATION_ASSESSMENT_ID,

@@ -9,10 +9,6 @@ import {
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
 import { AnalysisSetup, AnalysisStart } from './types';
 import { CATEGORY } from './groups/category';
-import {
-  ENDPOINT_SECURITY_ID,
-  EndpointSecurityApp,
-} from './groups/endpoint-security/endpoint-security';
 import { searchPages } from './components/global_search/search-pages-command';
 import {
   THREAT_INTELLIGENCE_ID,
@@ -30,7 +26,6 @@ import {
   CloudSecurityApp,
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
-import { getEndpointSecurityApps } from './groups/endpoint-security/applications';
 import {
   getThreatIntelligenceApps,
   MITRE_ATTACK_ID,
@@ -63,8 +58,11 @@ import {
   OFFICE365_TITLE,
 } from './groups/cloud-security/applications';
 import { GroupsId } from './groups/types';
-import { setupEndpointSecurityNavGroup } from './groups/endpoint-security/nav-group';
 import { ApplicationService } from './services/application.service';
+import {
+  ENDPOINT_SECURITY_ID,
+  EndpointSecurityNavGroup,
+} from './groups/endpoint-security';
 
 interface AnalysisSetupDependencies {}
 
@@ -105,7 +103,7 @@ export class AnalysisPlugin
 
   private registerApps(core: CoreSetup) {
     const applications: App[] = [
-      EndpointSecurityApp(core),
+      EndpointSecurityNavGroup.getAppGroup(),
       ThreatIntelligenceApp(core),
       SecurityOperationsApp(core),
       CloudSecurityApp(core),
@@ -130,7 +128,7 @@ export class AnalysisPlugin
     }
 
     const subApps: Partial<Record<GroupsId, App[]>> = {
-      [ENDPOINT_SECURITY_ID]: getEndpointSecurityApps(
+      [ENDPOINT_SECURITY_ID]: EndpointSecurityNavGroup.getApps(
         this.applicationService.getAppUpdater(ENDPOINT_SECURITY_ID),
       ),
       [THREAT_INTELLIGENCE_ID]: getThreatIntelligenceApps(
@@ -153,7 +151,7 @@ export class AnalysisPlugin
   }
 
   private registerNavGroups(core: CoreSetup) {
-    setupEndpointSecurityNavGroup(core);
+    EndpointSecurityNavGroup.addNavLinks(core);
 
     core.chrome.navGroup.addNavLinksToGroup(
       NAV_GROUPS[THREAT_INTELLIGENCE_ID],
@@ -226,6 +224,7 @@ export class AnalysisPlugin
     ]);
 
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
+      EndpointSecurityNavGroup.getGroupNavLink(),
       {
         id: THREAT_INTELLIGENCE_ID,
         title: THREAT_INTELLIGENCE_TITLE,
