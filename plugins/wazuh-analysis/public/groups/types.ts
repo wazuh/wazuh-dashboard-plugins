@@ -7,7 +7,7 @@ import {
 } from 'opensearch-dashboards/public';
 import { Subject } from 'rxjs';
 import { SECURITY_OPERATIONS_ID } from './security-operations';
-import { THREAT_INTELLIGENCE_ID } from './threat-intelligence/threat-intelligence';
+import { THREAT_INTELLIGENCE_ID } from './threat-intelligence';
 import { ENDPOINT_SECURITY_ID } from './endpoint-security';
 import { CLOUD_SECURITY_ID } from './cloud-security';
 
@@ -17,8 +17,8 @@ export type GroupsId =
   | typeof SECURITY_OPERATIONS_ID
   | typeof CLOUD_SECURITY_ID;
 
-export interface Group {
-  getId: () => string;
+export interface Group<GroupId extends GroupsId> {
+  getId: () => GroupId;
   getTitle: () => string;
   getDescription: () => string;
 
