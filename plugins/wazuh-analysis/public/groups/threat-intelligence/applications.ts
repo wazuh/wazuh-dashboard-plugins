@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 import { i18n } from '@osd/i18n';
 import { buildSubAppId } from '../../utils';
 import { PLUGIN_ID } from '../../../common/constants';
-import { THREAT_INTELLIGENCE_ID } from './threat-intelligence';
+import { THREAT_INTELLIGENCE_ID } from '.';
 
 export const THREAT_HUNTING_ID = buildSubAppId(
   THREAT_INTELLIGENCE_ID,
@@ -40,7 +40,7 @@ export const MITRE_ATTACK_TITLE = i18n.translate(
   },
 );
 
-export function getThreatIntelligenceApps(updater$: Subject<AppUpdater>) {
+export function getThreatIntelligenceApps(updater$?: Subject<AppUpdater>) {
   return [
     {
       id: THREAT_HUNTING_ID,
