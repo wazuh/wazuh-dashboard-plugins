@@ -90,12 +90,17 @@ export class AnalysisPlugin
 {
   private readonly applicationService = new ApplicationService();
   private coreStart?: CoreStart;
+  private readonly navGroupsIds: GroupsId[] = [
+    ENDPOINT_SECURITY_ID,
+    THREAT_INTELLIGENCE_ID,
+    SECURITY_OPERATIONS_ID,
+    CLOUD_SECURITY_ID,
+  ];
 
   constructor() {
-    this.applicationService.registerAppUpdater(ENDPOINT_SECURITY_ID);
-    this.applicationService.registerAppUpdater(THREAT_INTELLIGENCE_ID);
-    this.applicationService.registerAppUpdater(SECURITY_OPERATIONS_ID);
-    this.applicationService.registerAppUpdater(CLOUD_SECURITY_ID);
+    for (const navGroupId of this.navGroupsIds) {
+      this.applicationService.registerAppUpdater(navGroupId);
+    }
   }
 
   private registerApps(core: CoreSetup) {
@@ -139,15 +144,11 @@ export class AnalysisPlugin
       ),
     };
 
-    for (const groupsId of Object.keys(subApps) as GroupsId[]) {
-      this.applicationService.initializeSubApplicationMounts(
-        subApps[groupsId] ?? [],
-        core,
-        {
-          prepareApp: setNavLinkVisible,
-          teardownApp: setNavLinkHidden,
-        },
-      );
+    for (const apps of Object.values(subApps)) {
+      this.applicationService.initializeSubApplicationMounts(apps, core, {
+        prepareApp: setNavLinkVisible,
+        teardownApp: setNavLinkHidden,
+      });
     }
   }
 
