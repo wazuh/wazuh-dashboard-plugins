@@ -1,9 +1,4 @@
-import {
-  AppMount,
-  AppMountParameters,
-  AppUpdater,
-} from 'opensearch-dashboards/public';
-import { first } from 'rxjs/operators';
+import { AppMount, AppMountParameters } from 'opensearch-dashboards/public';
 import { Subject } from 'rxjs';
 import {
   App,
@@ -18,7 +13,6 @@ import { AnalysisSetup, AnalysisStart } from './types';
 import { CATEGORY } from './groups/category';
 import {
   ENDPOINT_SECURITY_ID,
-  ENDPOINT_SECURITY_TITLE,
   EndpointSecurityApp,
 } from './groups/endpoint-security/endpoint-security';
 import { searchPages } from './components/global_search/search-pages-command';
@@ -38,7 +32,7 @@ import {
   CloudSecurityApp,
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
-import { navigateToFirstAppInNavGroup } from './utils';
+import { getCurrentNavGroup, navigateToFirstAppInNavGroup } from './utils';
 import { getEndpointSecurityApps } from './groups/endpoint-security/applications';
 import {
   getThreatIntelligenceApps,
@@ -72,7 +66,7 @@ import {
   OFFICE365_TITLE,
 } from './groups/cloud-security/applications';
 import { GroupsId } from './groups/types';
-import { registerEndpointSecurityNavLinksToGroup } from './groups/endpoint-security/nav-group';
+import { setupEndpointSecurityNavGroup } from './groups/endpoint-security/nav-group';
 
 interface AnalysisSetupDependencies {}
 
@@ -90,10 +84,6 @@ function setNavLinkHidden(): Partial<App> {
   return {
     navLinkStatus: AppNavLinkStatus.hidden,
   };
-}
-
-async function getCurrentNavGroup(core: CoreStart) {
-  return core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
 }
 
 export class AnalysisPlugin
