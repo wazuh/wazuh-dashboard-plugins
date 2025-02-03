@@ -17,9 +17,8 @@ import {
 } from './groups/threat-intelligence/threat-intelligence';
 import {
   SECURITY_OPERATIONS_ID,
-  SECURITY_OPERATIONS_TITLE,
-  SecurityOperationsApp,
-} from './groups/security-operations/security-operations';
+  SecurityOperationsNavGroup,
+} from './groups/security-operations';
 import { NAV_GROUPS } from './groups/nav-groups';
 import {
   getThreatIntelligenceApps,
@@ -30,15 +29,6 @@ import {
   VULNERABILITY_DETECTION_ID,
   VULNERABILITY_DETECTION_TITLE,
 } from './groups/threat-intelligence/applications';
-import {
-  getSecurityOperationsApps,
-  INCIDENT_RESPONSE_ID,
-  INCIDENT_RESPONSE_TITLE,
-  IT_HYGIENE_ID,
-  IT_HYGIENE_TITLE,
-  REGULATORY_COMPLIANCE_ID,
-  REGULATORY_COMPLIANCE_TITLE,
-} from './groups/security-operations/applications';
 import { GroupsId } from './groups/types';
 import { ApplicationService } from './services/application.service';
 import {
@@ -91,7 +81,7 @@ export class AnalysisPlugin
     const applications: App[] = [
       EndpointSecurityNavGroup.getAppGroup(),
       ThreatIntelligenceApp(core),
-      SecurityOperationsApp(core),
+      SecurityOperationsNavGroup.getAppGroup(),
       CloudSecurityNavGroup.getAppGroup(),
     ];
 
@@ -120,7 +110,7 @@ export class AnalysisPlugin
       [THREAT_INTELLIGENCE_ID]: getThreatIntelligenceApps(
         this.applicationService.getAppUpdater(THREAT_INTELLIGENCE_ID),
       ),
-      [SECURITY_OPERATIONS_ID]: getSecurityOperationsApps(
+      [SECURITY_OPERATIONS_ID]: SecurityOperationsNavGroup.getApps(
         this.applicationService.getAppUpdater(SECURITY_OPERATIONS_ID),
       ),
       [CLOUD_SECURITY_ID]: CloudSecurityNavGroup.getApps(
@@ -160,27 +150,7 @@ export class AnalysisPlugin
       ],
     );
 
-    core.chrome.navGroup.addNavLinksToGroup(
-      NAV_GROUPS[SECURITY_OPERATIONS_ID],
-      [
-        {
-          // Regulatory compliance
-          id: REGULATORY_COMPLIANCE_ID,
-          title: REGULATORY_COMPLIANCE_TITLE,
-        },
-        {
-          // IT hygiene
-          id: IT_HYGIENE_ID,
-          title: IT_HYGIENE_TITLE,
-        },
-        {
-          // Incident response
-          id: INCIDENT_RESPONSE_ID,
-          title: INCIDENT_RESPONSE_TITLE,
-        },
-      ],
-    );
-
+    SecurityOperationsNavGroup.addNavLinks(core);
     CloudSecurityNavGroup.addNavLinks(core);
 
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
@@ -191,12 +161,7 @@ export class AnalysisPlugin
         order: 1,
         category: CATEGORY,
       },
-      {
-        id: SECURITY_OPERATIONS_ID,
-        title: SECURITY_OPERATIONS_TITLE,
-        order: 2,
-        category: CATEGORY,
-      },
+      SecurityOperationsNavGroup.getGroupNavLink(),
       CloudSecurityNavGroup.getGroupNavLink(),
     ]);
   }

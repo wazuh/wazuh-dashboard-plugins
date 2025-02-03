@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 import { i18n } from '@osd/i18n';
 import { buildSubAppId } from '../../utils';
 import { PLUGIN_ID } from '../../../common/constants';
-import { SECURITY_OPERATIONS_ID } from './security-operations';
+import { SECURITY_OPERATIONS_ID } from '.';
 
 export const REGULATORY_COMPLIANCE_ID = buildSubAppId(
   SECURITY_OPERATIONS_ID,
@@ -40,7 +40,7 @@ export const INCIDENT_RESPONSE_TITLE = i18n.translate(
   },
 );
 
-export function getSecurityOperationsApps(updater$: Subject<AppUpdater>) {
+export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
   return [
     {
       id: REGULATORY_COMPLIANCE_ID,
