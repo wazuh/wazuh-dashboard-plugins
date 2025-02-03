@@ -41,8 +41,24 @@ import {
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
 import { buildSubAppId, navigateToFirstAppInNavGroup } from './utils';
-import { getEndpointSecurityApps } from './groups/endpoint-security/applications';
-import { getThreatIntelligenceApps } from './groups/threat-intelligence/applications';
+import {
+  CONFIGURATION_ASSESSMENT_ID,
+  CONFIGURATION_ASSESSMENT_TITLE,
+  FIM_ID,
+  FIM_TITLE,
+  getEndpointSecurityApps,
+  MALWARE_DETECTION_ID,
+  MALWARE_DETECTION_TITLE,
+} from './groups/endpoint-security/applications';
+import {
+  getThreatIntelligenceApps,
+  MITRE_ATTACK_ID,
+  MITRE_ATTACK_TITLE,
+  THREAT_HUNTING_ID,
+  THREAT_HUNTING_TITLE,
+  VULNERABILITY_DETECTION_ID,
+  VULNERABILITY_DETECTION_TITLE,
+} from './groups/threat-intelligence/applications';
 
 interface AnalysisSetupDependencies {}
 
@@ -321,17 +337,17 @@ export class AnalysisPlugin
       {
         // Configuration assessment
         id: CONFIGURATION_ASSESSMENT_ID,
-        title: TRANSLATION_MESSAGES.CONFIGURATION_ASSESSMENT_TITLE,
+        title: CONFIGURATION_ASSESSMENT_TITLE,
       },
       {
         // Malware detection
         id: MALWARE_DETECTION_ID,
-        title: TRANSLATION_MESSAGES.MALWARE_DETECTION_TITLE,
+        title: MALWARE_DETECTION_TITLE,
       },
       {
         // FIM
         id: FIM_ID,
-        title: TRANSLATION_MESSAGES.FIM_TITLE,
+        title: FIM_TITLE,
       },
     ]);
 
@@ -341,17 +357,17 @@ export class AnalysisPlugin
         {
           // Threat hunting
           id: THREAT_HUNTING_ID,
-          title: TRANSLATION_MESSAGES.THREAT_HUNTING_TITLE,
+          title: THREAT_HUNTING_TITLE,
         },
         {
           // Vulnerability detection
           id: VULNERABILITY_DETECTION_ID,
-          title: TRANSLATION_MESSAGES.VULNERABILITY_DETECTION_TITLE,
+          title: VULNERABILITY_DETECTION_TITLE,
         },
         {
           // MITRE ATT&CK
           id: MITRE_ATTACK_ID,
-          title: TRANSLATION_MESSAGES.MITRE_ATTACK_TITLE,
+          title: MITRE_ATTACK_TITLE,
         },
       ],
     );
