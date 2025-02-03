@@ -41,23 +41,12 @@ import {
   CloudSecurityApp,
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
+import { buildSubAppId } from './utils';
 
 interface AnalysisSetupDependencies {}
 
 interface AnalysisStartDependencies {
   navigation: NavigationPublicPluginStart;
-}
-
-/**
- * The function `generateSubAppId` takes a parent app ID and a sub app ID, and
- * returns a combined ID with the sub app ID URL-encoded.
- * @param {string} parentAppId - The `parentAppId` parameter is a string
- * representing the ID of the parent application.
- * @param {string} subAppId - The `subAppId` parameter is a string representing the
- * ID of a sub-application within a parent application.
- */
-function buildSubAppId(parentAppId: string, subAppId: string) {
-  return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
 }
 
 type ParentAppId =
