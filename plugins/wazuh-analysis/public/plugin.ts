@@ -39,15 +39,7 @@ import {
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
 import { navigateToFirstAppInNavGroup } from './utils';
-import {
-  CONFIGURATION_ASSESSMENT_ID,
-  CONFIGURATION_ASSESSMENT_TITLE,
-  FIM_ID,
-  FIM_TITLE,
-  getEndpointSecurityApps,
-  MALWARE_DETECTION_ID,
-  MALWARE_DETECTION_TITLE,
-} from './groups/endpoint-security/applications';
+import { getEndpointSecurityApps } from './groups/endpoint-security/applications';
 import {
   getThreatIntelligenceApps,
   MITRE_ATTACK_ID,
@@ -80,6 +72,7 @@ import {
   OFFICE365_TITLE,
 } from './groups/cloud-security/applications';
 import { GroupsId } from './groups/types';
+import { registerEndpointSecurityNavLinksToGroup } from './groups/endpoint-security/nav-group';
 
 interface AnalysisSetupDependencies {}
 
@@ -204,23 +197,7 @@ export class AnalysisPlugin
   }
 
   private registerNavGroups(core: CoreSetup) {
-    core.chrome.navGroup.addNavLinksToGroup(NAV_GROUPS[ENDPOINT_SECURITY_ID], [
-      {
-        // Configuration assessment
-        id: CONFIGURATION_ASSESSMENT_ID,
-        title: CONFIGURATION_ASSESSMENT_TITLE,
-      },
-      {
-        // Malware detection
-        id: MALWARE_DETECTION_ID,
-        title: MALWARE_DETECTION_TITLE,
-      },
-      {
-        // FIM
-        id: FIM_ID,
-        title: FIM_TITLE,
-      },
-    ]);
+    registerEndpointSecurityNavLinksToGroup(core);
 
     core.chrome.navGroup.addNavLinksToGroup(
       NAV_GROUPS[THREAT_INTELLIGENCE_ID],

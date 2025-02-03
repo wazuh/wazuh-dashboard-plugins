@@ -1,10 +1,5 @@
 import { ChromeNavGroup } from 'opensearch-dashboards/public';
 import {
-  ENDPOINT_SECURITY_ID,
-  ENDPOINT_SECURITY_TITLE,
-  ENDPOINT_SECURITY_DESCRIPTION,
-} from './endpoint-security/endpoint-security';
-import {
   SECURITY_OPERATIONS_ID,
   SECURITY_OPERATIONS_TITLE,
   SECURITY_OPERATIONS_DESCRIPTION,
@@ -22,11 +17,6 @@ import {
 import { GroupsId } from './types';
 
 export const NAV_GROUPS = Object.freeze({
-  [ENDPOINT_SECURITY_ID]: {
-    id: ENDPOINT_SECURITY_ID,
-    title: ENDPOINT_SECURITY_TITLE,
-    description: ENDPOINT_SECURITY_DESCRIPTION,
-  },
   [THREAT_INTELLIGENCE_ID]: {
     id: THREAT_INTELLIGENCE_ID,
     title: THREAT_INTELLIGENCE_TITLE,
