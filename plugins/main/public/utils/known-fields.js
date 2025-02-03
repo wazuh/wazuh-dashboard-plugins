@@ -2815,6 +2815,14 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
+    name: 'vulnerability.reference',
+    type: 'string',
+    esTypes: ['keyword'],
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
     name: 'data.vulnerability.severity',
     type: 'string',
     esTypes: ['keyword'],
