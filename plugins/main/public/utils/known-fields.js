@@ -2125,6 +2125,14 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
+    name: 'data.YARA.scanned_file',
+    type: 'string',
+    esTypes: ['keyword'],
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
     name: 'data.oscap.scan.id',
     type: 'string',
     esTypes: ['keyword'],
@@ -3109,6 +3117,14 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
+    name: 'vulnerability.score.base',
+    type: 'string',
+    esTypes: ['keyword'],
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
     name: 'data.vulnerability.cvss.cvss2.vector.access_complexity',
     type: 'string',
     esTypes: ['keyword'],
@@ -3341,6 +3357,14 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
+    name: 'vulnerability.published_at',
+    type: 'date',
+    esTypes: ['date'],
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
     name: 'data.vulnerability.rationale',
     type: 'string',
     esTypes: ['keyword'],
@@ -3358,6 +3382,14 @@ export const KnownFields = [
   },
   {
     name: 'data.vulnerability.severity',
+    type: 'string',
+    esTypes: ['keyword'],
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
+    name: 'vulnerability.severity',
     type: 'string',
     esTypes: ['keyword'],
     searchable: true,
@@ -3456,6 +3488,14 @@ export const KnownFields = [
   },
   {
     name: 'host',
+    type: 'string',
+    esTypes: ['keyword'],
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
+    name: 'host.os.type',
     type: 'string',
     esTypes: ['keyword'],
     searchable: true,

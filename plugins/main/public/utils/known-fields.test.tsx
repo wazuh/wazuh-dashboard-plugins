@@ -23,6 +23,7 @@ import {
 } from '../components/overview/mitre/framework/components/techniques/components/flyout-technique/flyout-technique-columns';
 import { FieldsStatistics } from './statistics-fields';
 import { FieldsMonitoring } from './monitoring-fields';
+import { compareColumnsValue } from './functions-to-test';
 
 const eventsColumns = [
   ...threatHuntingColumns,
@@ -42,23 +43,6 @@ const eventsColumns = [
   ...mitreAttackColumns,
   ...malwareDetectionColumns,
 ];
-
-function compareColumnsValue(knownColumns, columnsToCompare) {
-  const unmatchedColumns = columnsToCompare.filter(
-    column =>
-      !knownColumns.some(
-        knowColumn =>
-          knowColumn.name === column.id ||
-          knowColumn.name === column.name ||
-          knowColumn.name === column.field,
-      ),
-  );
-  return unmatchedColumns.length === 0
-    ? true
-    : `These columns don't match: ${unmatchedColumns
-        .map(column => column.id || column.name || column.field)
-        .join(', ')}`;
-}
 
 test('All events columns in KnowFields', () => {
   expect(compareColumnsValue(KnownFields, eventsColumns)).toBe(true);
