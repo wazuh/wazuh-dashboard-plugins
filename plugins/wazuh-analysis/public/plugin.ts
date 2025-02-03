@@ -59,6 +59,15 @@ import {
   VULNERABILITY_DETECTION_ID,
   VULNERABILITY_DETECTION_TITLE,
 } from './groups/threat-intelligence/applications';
+import {
+  getSecurityOperationsApps,
+  INCIDENT_RESPONSE_ID,
+  INCIDENT_RESPONSE_TITLE,
+  IT_HYGIENE_ID,
+  IT_HYGIENE_TITLE,
+  REGULATORY_COMPLIANCE_ID,
+  REGULATORY_COMPLIANCE_TITLE,
+} from './groups/security-operations/applications';
 
 interface AnalysisSetupDependencies {}
 
@@ -72,36 +81,12 @@ type ParentAppId =
   | typeof SECURITY_OPERATIONS_ID
   | typeof CLOUD_SECURITY_ID;
 
-const REGULATORY_COMPLIANCE_ID = buildSubAppId(
-  SECURITY_OPERATIONS_ID,
-  'regulatory_compliance',
-);
-const IT_HYGIENE_ID = buildSubAppId(SECURITY_OPERATIONS_ID, 'it_hygiene');
-const INCIDENT_RESPONSE_ID = buildSubAppId(
-  SECURITY_OPERATIONS_ID,
-  'incident_response',
-);
 const DOCKER_ID = buildSubAppId(CLOUD_SECURITY_ID, 'docker');
 const AWS_ID = buildSubAppId(CLOUD_SECURITY_ID, 'aws');
 const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
 const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
 const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
 const TRANSLATION_MESSAGES = Object.freeze({
-  REGULATORY_COMPLIANCE_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${REGULATORY_COMPLIANCE_ID}`,
-    {
-      defaultMessage: 'Regulatory Compliance',
-    },
-  ),
-  IT_HYGIENE_TITLE: i18n.translate(`${PLUGIN_ID}.category.${IT_HYGIENE_ID}`, {
-    defaultMessage: 'IT Hygiene',
-  }),
-  INCIDENT_RESPONSE_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${INCIDENT_RESPONSE_ID}`,
-    {
-      defaultMessage: 'Incident Response',
-    },
-  ),
   DOCKER_TITLE: i18n.translate(`${PLUGIN_ID}.category.${DOCKER_ID}`, {
     defaultMessage: 'Docker',
   }),
@@ -195,44 +180,9 @@ export class AnalysisPlugin
       [THREAT_INTELLIGENCE_ID]: getThreatIntelligenceApps(
         this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
       ),
-      [SECURITY_OPERATIONS_ID]: [
-        {
-          id: REGULATORY_COMPLIANCE_ID,
-          title: TRANSLATION_MESSAGES.REGULATORY_COMPLIANCE_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the regulatory compliance application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: IT_HYGIENE_ID,
-          title: TRANSLATION_MESSAGES.IT_HYGIENE_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the it hygiene application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: INCIDENT_RESPONSE_ID,
-          title: TRANSLATION_MESSAGES.INCIDENT_RESPONSE_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the incident response application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-      ],
+      [SECURITY_OPERATIONS_ID]: getSecurityOperationsApps(
+        this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
+      ),
       [CLOUD_SECURITY_ID]: [
         {
           id: DOCKER_ID,
@@ -378,17 +328,17 @@ export class AnalysisPlugin
         {
           // Regulatory compliance
           id: REGULATORY_COMPLIANCE_ID,
-          title: TRANSLATION_MESSAGES.REGULATORY_COMPLIANCE_TITLE,
+          title: REGULATORY_COMPLIANCE_TITLE,
         },
         {
           // IT hygiene
           id: IT_HYGIENE_ID,
-          title: TRANSLATION_MESSAGES.IT_HYGIENE_TITLE,
+          title: IT_HYGIENE_TITLE,
         },
         {
           // Incident response
           id: INCIDENT_RESPONSE_ID,
-          title: TRANSLATION_MESSAGES.INCIDENT_RESPONSE_TITLE,
+          title: INCIDENT_RESPONSE_TITLE,
         },
       ],
     );
