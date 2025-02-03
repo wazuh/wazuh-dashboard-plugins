@@ -1,4 +1,3 @@
-import { i18n } from '@osd/i18n';
 import {
   AppMount,
   AppMountParameters,
@@ -15,7 +14,6 @@ import {
   DEFAULT_NAV_GROUPS,
 } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
-import { PLUGIN_ID } from '../common/constants';
 import { AnalysisSetup, AnalysisStart } from './types';
 import { CATEGORY } from './groups/category';
 import {
@@ -40,7 +38,7 @@ import {
   CloudSecurityApp,
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
-import { buildSubAppId, navigateToFirstAppInNavGroup } from './utils';
+import { navigateToFirstAppInNavGroup } from './utils';
 import {
   CONFIGURATION_ASSESSMENT_ID,
   CONFIGURATION_ASSESSMENT_TITLE,
@@ -68,6 +66,19 @@ import {
   REGULATORY_COMPLIANCE_ID,
   REGULATORY_COMPLIANCE_TITLE,
 } from './groups/security-operations/applications';
+import {
+  AWS_ID,
+  AWS_TITLE,
+  DOCKER_ID,
+  DOCKER_TITLE,
+  getCloudSecurityApps,
+  GITHUB_ID,
+  GITHUB_TITLE,
+  GOOGLE_CLOUD_ID,
+  GOOGLE_CLOUD_TITLE,
+  OFFICE365_ID,
+  OFFICE365_TITLE,
+} from './groups/cloud-security/applications';
 
 interface AnalysisSetupDependencies {}
 
@@ -80,32 +91,6 @@ type ParentAppId =
   | typeof THREAT_INTELLIGENCE_ID
   | typeof SECURITY_OPERATIONS_ID
   | typeof CLOUD_SECURITY_ID;
-
-const DOCKER_ID = buildSubAppId(CLOUD_SECURITY_ID, 'docker');
-const AWS_ID = buildSubAppId(CLOUD_SECURITY_ID, 'aws');
-const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
-const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
-const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
-const TRANSLATION_MESSAGES = Object.freeze({
-  DOCKER_TITLE: i18n.translate(`${PLUGIN_ID}.category.${DOCKER_ID}`, {
-    defaultMessage: 'Docker',
-  }),
-  AWS_TITLE: i18n.translate(`${PLUGIN_ID}.category.${AWS_ID}`, {
-    defaultMessage: 'AWS',
-  }),
-  GOOGLE_CLOUD_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${GOOGLE_CLOUD_ID}`,
-    {
-      defaultMessage: 'Google Cloud',
-    },
-  ),
-  GITHUB_TITLE: i18n.translate(`${PLUGIN_ID}.category.${GITHUB_ID}`, {
-    defaultMessage: 'Github',
-  }),
-  OFFICE365_TITLE: i18n.translate(`${PLUGIN_ID}.category.${OFFICE365_ID}`, {
-    defaultMessage: 'Office 365',
-  }),
-});
 
 function setNavLinkVisible(): Partial<App> {
   return {
@@ -183,68 +168,9 @@ export class AnalysisPlugin
       [SECURITY_OPERATIONS_ID]: getSecurityOperationsApps(
         this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
       ),
-      [CLOUD_SECURITY_ID]: [
-        {
-          id: DOCKER_ID,
-          title: TRANSLATION_MESSAGES.DOCKER_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the docker application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: AWS_ID,
-          title: TRANSLATION_MESSAGES.AWS_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the aws application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: GOOGLE_CLOUD_ID,
-          title: TRANSLATION_MESSAGES.GOOGLE_CLOUD_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the google cloud application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: GITHUB_ID,
-          title: TRANSLATION_MESSAGES.GITHUB_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the github application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: OFFICE365_ID,
-          title: TRANSLATION_MESSAGES.OFFICE365_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[CLOUD_SECURITY_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the office365 application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-      ],
+      [CLOUD_SECURITY_ID]: getCloudSecurityApps(
+        this.appStatusUpdater$[CLOUD_SECURITY_ID],
+      ),
     } satisfies Partial<Record<ParentAppId, App[]>>;
 
     for (const parentAppId of Object.keys(subApps)) {
@@ -347,27 +273,27 @@ export class AnalysisPlugin
       {
         // Docker
         id: DOCKER_ID,
-        title: TRANSLATION_MESSAGES.DOCKER_TITLE,
+        title: DOCKER_TITLE,
       },
       {
         // AWS
         id: AWS_ID,
-        title: TRANSLATION_MESSAGES.AWS_TITLE,
+        title: AWS_TITLE,
       },
       {
         // Google Cloud
         id: GOOGLE_CLOUD_ID,
-        title: TRANSLATION_MESSAGES.GOOGLE_CLOUD_TITLE,
+        title: GOOGLE_CLOUD_TITLE,
       },
       {
         // Github
         id: GITHUB_ID,
-        title: TRANSLATION_MESSAGES.GITHUB_TITLE,
+        title: GITHUB_TITLE,
       },
       {
         // Office 365
         id: OFFICE365_ID,
-        title: TRANSLATION_MESSAGES.OFFICE365_TITLE,
+        title: OFFICE365_TITLE,
       },
     ]);
 
