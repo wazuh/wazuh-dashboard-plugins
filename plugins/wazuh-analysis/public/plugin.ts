@@ -76,16 +76,11 @@ export class AnalysisPlugin
       });
     }
 
-    const subApps: Partial<Record<GroupsId, App[]>> = Object.fromEntries(
-      this.navGroups.map(navGroup => [
-        navGroup.getId(),
-        navGroup.getApps(
-          this.applicationService.getAppUpdater(navGroup.getId()),
-        ),
-      ]),
+    const subApps: App[] = this.navGroups.map(navGroup =>
+      navGroup.getApps(this.applicationService.getAppUpdater(navGroup.getId())),
     );
 
-    for (const apps of Object.values(subApps)) {
+    for (const apps of subApps) {
       this.applicationService.initializeSubApplicationMounts(apps, core, {
         prepareApp: setNavLinkVisible,
         teardownApp: setNavLinkHidden,
