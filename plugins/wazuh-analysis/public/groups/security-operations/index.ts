@@ -27,55 +27,56 @@ export const SECURITY_OPERATIONS_DESCRIPTION = i18n.translate(
   },
 );
 
-export const SecurityOperationsNavGroup: Group = {
-  getId: () => SECURITY_OPERATIONS_ID,
-  getTitle: () => SECURITY_OPERATIONS_TITLE,
-  getDescription: () => SECURITY_OPERATIONS_DESCRIPTION,
+export const SecurityOperationsNavGroup: Group<typeof SECURITY_OPERATIONS_ID> =
+  {
+    getId: () => SECURITY_OPERATIONS_ID,
+    getTitle: () => SECURITY_OPERATIONS_TITLE,
+    getDescription: () => SECURITY_OPERATIONS_DESCRIPTION,
 
-  getNavGroup() {
-    return {
-      id: SECURITY_OPERATIONS_ID,
-      title: SECURITY_OPERATIONS_TITLE,
-      description: SECURITY_OPERATIONS_DESCRIPTION,
-    };
-  },
+    getNavGroup() {
+      return {
+        id: SECURITY_OPERATIONS_ID,
+        title: SECURITY_OPERATIONS_TITLE,
+        description: SECURITY_OPERATIONS_DESCRIPTION,
+      };
+    },
 
-  getAppGroup() {
-    return {
-      id: SECURITY_OPERATIONS_ID,
-      title: SECURITY_OPERATIONS_TITLE,
-      category: CATEGORY,
-      mount:
-        async (_params: AppMountParameters) =>
-        // TODO: Implement the security operations application
-        () => {},
-    };
-  },
+    getAppGroup() {
+      return {
+        id: SECURITY_OPERATIONS_ID,
+        title: SECURITY_OPERATIONS_TITLE,
+        category: CATEGORY,
+        mount:
+          async (_params: AppMountParameters) =>
+          // TODO: Implement the security operations application
+          () => {},
+      };
+    },
 
-  getGroupNavLink(): ChromeRegistrationNavLink {
-    return {
-      id: SECURITY_OPERATIONS_ID,
-      title: SECURITY_OPERATIONS_TITLE,
-      order: 0,
-      category: CATEGORY,
-    };
-  },
+    getGroupNavLink(): ChromeRegistrationNavLink {
+      return {
+        id: SECURITY_OPERATIONS_ID,
+        title: SECURITY_OPERATIONS_TITLE,
+        order: 0,
+        category: CATEGORY,
+      };
+    },
 
-  getAppsNavLinks(): ChromeRegistrationNavLink[] {
-    return getSecurityOperationsApps().map(app => ({
-      id: app.id,
-      title: app.title,
-    }));
-  },
+    getAppsNavLinks(): ChromeRegistrationNavLink[] {
+      return getSecurityOperationsApps().map(app => ({
+        id: app.id,
+        title: app.title,
+      }));
+    },
 
-  getApps(updater$: Subject<AppUpdater>): App[] {
-    return getSecurityOperationsApps(updater$);
-  },
+    getApps(updater$: Subject<AppUpdater>): App[] {
+      return getSecurityOperationsApps(updater$);
+    },
 
-  addNavLinks(core: CoreSetup): void {
-    core.chrome.navGroup.addNavLinksToGroup(
-      SecurityOperationsNavGroup.getNavGroup(),
-      SecurityOperationsNavGroup.getAppsNavLinks(),
-    );
-  },
-};
+    addNavLinks(core: CoreSetup): void {
+      core.chrome.navGroup.addNavLinksToGroup(
+        SecurityOperationsNavGroup.getNavGroup(),
+        SecurityOperationsNavGroup.getAppsNavLinks(),
+      );
+    },
+  };

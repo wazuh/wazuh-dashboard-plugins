@@ -28,7 +28,7 @@ export const ENDPOINT_SECURITY_DESCRIPTION = i18n.translate(
   },
 );
 
-export const EndpointSecurityNavGroup: Group = {
+export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
   getId: () => ENDPOINT_SECURITY_ID,
   getTitle: () => ENDPOINT_SECURITY_TITLE,
   getDescription: () => ENDPOINT_SECURITY_DESCRIPTION,

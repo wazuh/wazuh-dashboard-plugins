@@ -27,7 +27,7 @@ export const CLOUD_SECURITY_DESCRIPTION = i18n.translate(
   },
 );
 
-export const CloudSecurityNavGroup: Group = {
+export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
   getId: () => CLOUD_SECURITY_ID,
   getTitle: () => CLOUD_SECURITY_TITLE,
   getDescription: () => CLOUD_SECURITY_DESCRIPTION,
