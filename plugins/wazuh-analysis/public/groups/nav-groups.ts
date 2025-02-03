@@ -9,11 +9,6 @@ import {
   THREAT_INTELLIGENCE_TITLE,
   THREAT_INTELLIGENCE_DESCRIPTION,
 } from './threat-intelligence/threat-intelligence';
-import {
-  CLOUD_SECURITY_ID,
-  CLOUD_SECURITY_TITLE,
-  CLOUD_SECURITY_DESCRIPTION,
-} from './cloud-security/cloud-security';
 import { GroupsId } from './types';
 
 export const NAV_GROUPS = Object.freeze({
@@ -26,10 +21,5 @@ export const NAV_GROUPS = Object.freeze({
     id: SECURITY_OPERATIONS_ID,
     title: SECURITY_OPERATIONS_TITLE,
     description: SECURITY_OPERATIONS_DESCRIPTION,
-  },
-  [CLOUD_SECURITY_ID]: {
-    id: CLOUD_SECURITY_ID,
-    title: CLOUD_SECURITY_TITLE,
-    description: CLOUD_SECURITY_DESCRIPTION,
   },
 } satisfies Partial<Record<GroupsId, ChromeNavGroup>>);

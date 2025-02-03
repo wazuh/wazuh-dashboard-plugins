@@ -42,7 +42,7 @@ export const OFFICE365_TITLE = i18n.translate(
   },
 );
 
-export function getCloudSecurityApps(updater$: Subject<AppUpdater>) {
+export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
   return [
     {
       id: DOCKER_ID,

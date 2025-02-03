@@ -20,11 +20,6 @@ import {
   SECURITY_OPERATIONS_TITLE,
   SecurityOperationsApp,
 } from './groups/security-operations/security-operations';
-import {
-  CLOUD_SECURITY_ID,
-  CLOUD_SECURITY_TITLE,
-  CloudSecurityApp,
-} from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
 import {
   getThreatIntelligenceApps,
@@ -44,25 +39,16 @@ import {
   REGULATORY_COMPLIANCE_ID,
   REGULATORY_COMPLIANCE_TITLE,
 } from './groups/security-operations/applications';
-import {
-  AWS_ID,
-  AWS_TITLE,
-  DOCKER_ID,
-  DOCKER_TITLE,
-  getCloudSecurityApps,
-  GITHUB_ID,
-  GITHUB_TITLE,
-  GOOGLE_CLOUD_ID,
-  GOOGLE_CLOUD_TITLE,
-  OFFICE365_ID,
-  OFFICE365_TITLE,
-} from './groups/cloud-security/applications';
 import { GroupsId } from './groups/types';
 import { ApplicationService } from './services/application.service';
 import {
   ENDPOINT_SECURITY_ID,
   EndpointSecurityNavGroup,
 } from './groups/endpoint-security';
+import {
+  CLOUD_SECURITY_ID,
+  CloudSecurityNavGroup,
+} from './groups/cloud-security';
 
 interface AnalysisSetupDependencies {}
 
@@ -106,7 +92,7 @@ export class AnalysisPlugin
       EndpointSecurityNavGroup.getAppGroup(),
       ThreatIntelligenceApp(core),
       SecurityOperationsApp(core),
-      CloudSecurityApp(core),
+      CloudSecurityNavGroup.getAppGroup(),
     ];
 
     this.applicationService.initializeNavGroupMounts(applications, core, {
@@ -137,7 +123,7 @@ export class AnalysisPlugin
       [SECURITY_OPERATIONS_ID]: getSecurityOperationsApps(
         this.applicationService.getAppUpdater(SECURITY_OPERATIONS_ID),
       ),
-      [CLOUD_SECURITY_ID]: getCloudSecurityApps(
+      [CLOUD_SECURITY_ID]: CloudSecurityNavGroup.getApps(
         this.applicationService.getAppUpdater(CLOUD_SECURITY_ID),
       ),
     };
@@ -195,33 +181,7 @@ export class AnalysisPlugin
       ],
     );
 
-    core.chrome.navGroup.addNavLinksToGroup(NAV_GROUPS[CLOUD_SECURITY_ID], [
-      {
-        // Docker
-        id: DOCKER_ID,
-        title: DOCKER_TITLE,
-      },
-      {
-        // AWS
-        id: AWS_ID,
-        title: AWS_TITLE,
-      },
-      {
-        // Google Cloud
-        id: GOOGLE_CLOUD_ID,
-        title: GOOGLE_CLOUD_TITLE,
-      },
-      {
-        // Github
-        id: GITHUB_ID,
-        title: GITHUB_TITLE,
-      },
-      {
-        // Office 365
-        id: OFFICE365_ID,
-        title: OFFICE365_TITLE,
-      },
-    ]);
+    CloudSecurityNavGroup.addNavLinks(core);
 
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       EndpointSecurityNavGroup.getGroupNavLink(),
@@ -237,12 +197,7 @@ export class AnalysisPlugin
         order: 2,
         category: CATEGORY,
       },
-      {
-        id: CLOUD_SECURITY_ID,
-        title: CLOUD_SECURITY_TITLE,
-        order: 3,
-        category: CATEGORY,
-      },
+      CloudSecurityNavGroup.getGroupNavLink(),
     ]);
   }
 
