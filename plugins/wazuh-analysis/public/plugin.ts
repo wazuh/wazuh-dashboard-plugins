@@ -1,5 +1,3 @@
-import { AppMount, AppMountParameters } from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
 import {
   App,
   AppNavLinkStatus,
@@ -32,7 +30,6 @@ import {
   CloudSecurityApp,
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
-import { getCurrentNavGroup, navigateToFirstAppInNavGroup } from './utils';
 import { getEndpointSecurityApps } from './groups/endpoint-security/applications';
 import {
   getThreatIntelligenceApps,
@@ -67,6 +64,7 @@ import {
 } from './groups/cloud-security/applications';
 import { GroupsId } from './groups/types';
 import { setupEndpointSecurityNavGroup } from './groups/endpoint-security/nav-group';
+import { ApplicationService } from './services/application.service';
 
 interface AnalysisSetupDependencies {}
 
@@ -90,14 +88,15 @@ export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
+  private readonly applicationService = new ApplicationService();
   private coreStart?: CoreStart;
-  private readonly appStartup$ = new Subject<GroupsId>();
-  private readonly appStatusUpdater$ = {
-    [ENDPOINT_SECURITY_ID]: new Subject(),
-    [THREAT_INTELLIGENCE_ID]: new Subject(),
-    [SECURITY_OPERATIONS_ID]: new Subject(),
-    [CLOUD_SECURITY_ID]: new Subject(),
-  } satisfies Partial<Record<GroupsId, Subject<AppUpdater>>>;
+
+  constructor() {
+    this.applicationService.registerAppUpdater(ENDPOINT_SECURITY_ID);
+    this.applicationService.registerAppUpdater(THREAT_INTELLIGENCE_ID);
+    this.applicationService.registerAppUpdater(SECURITY_OPERATIONS_ID);
+    this.applicationService.registerAppUpdater(CLOUD_SECURITY_ID);
+  }
 
   private registerApps(core: CoreSetup) {
     const applications: App[] = [
@@ -107,20 +106,9 @@ export class AnalysisPlugin
       CloudSecurityApp(core),
     ];
 
-    for (const app of applications) {
-      const mount = app.mount.bind(app) as AppMount;
-
-      app.mount = async (params: AppMountParameters) => {
-        if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.appStatusUpdater$[app.id as GroupsId].next(setNavLinkVisible);
-          this.appStartup$.next(app.id as GroupsId);
-        }
-
-        return await mount(params);
-      };
-
-      core.application.register(app);
-    }
+    this.applicationService.initializeNavGroupMounts(applications, core, {
+      prepareApp: setNavLinkVisible,
+    });
 
     if (core.chrome.navGroup.getNavGroupEnabled()) {
       core.chrome.globalSearch.registerSearchCommand({
@@ -136,53 +124,30 @@ export class AnalysisPlugin
       });
     }
 
-    const subApps = {
+    const subApps: Partial<Record<GroupsId, App[]>> = {
       [ENDPOINT_SECURITY_ID]: getEndpointSecurityApps(
-        this.appStatusUpdater$[ENDPOINT_SECURITY_ID],
+        this.applicationService.getAppUpdater(ENDPOINT_SECURITY_ID),
       ),
       [THREAT_INTELLIGENCE_ID]: getThreatIntelligenceApps(
-        this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
+        this.applicationService.getAppUpdater(THREAT_INTELLIGENCE_ID),
       ),
       [SECURITY_OPERATIONS_ID]: getSecurityOperationsApps(
-        this.appStatusUpdater$[SECURITY_OPERATIONS_ID],
+        this.applicationService.getAppUpdater(SECURITY_OPERATIONS_ID),
       ),
       [CLOUD_SECURITY_ID]: getCloudSecurityApps(
-        this.appStatusUpdater$[CLOUD_SECURITY_ID],
+        this.applicationService.getAppUpdater(CLOUD_SECURITY_ID),
       ),
-    } satisfies Partial<Record<GroupsId, App[]>>;
+    };
 
-    for (const parentAppId of Object.keys(subApps)) {
-      this.setupAppMounts(subApps, parentAppId as GroupsId, core);
-    }
-  }
-
-  private setupAppMounts(
-    subApps: Partial<Record<GroupsId, App[]>>,
-    navGroupId: GroupsId,
-    core: CoreSetup,
-  ) {
-    for (const app of subApps[navGroupId] ?? []) {
-      const mount = app.mount.bind(app) as AppMount;
-
-      app.mount = async (params: AppMountParameters) => {
-        if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.appStatusUpdater$[navGroupId].next(setNavLinkVisible);
-        }
-
-        const unmount = await mount(params);
-
-        return () => {
-          if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.appStatusUpdater$[navGroupId].next(setNavLinkHidden);
-          }
-
-          unmount();
-
-          return true;
-        };
-      };
-
-      core.application.register(app);
+    for (const groupsId of Object.keys(subApps) as GroupsId[]) {
+      this.applicationService.initializeSubApplicationMounts(
+        subApps[groupsId] ?? [],
+        core,
+        {
+          prepareApp: setNavLinkVisible,
+          teardownApp: setNavLinkHidden,
+        },
+      );
     }
   }
 
@@ -293,26 +258,12 @@ export class AnalysisPlugin
     return {};
   }
 
-  private subscribeToAppStartup(core: CoreStart) {
-    this.appStartup$.subscribe({
-      next: async (navGroupId: string) => {
-        if (core.chrome.navGroup.getNavGroupEnabled()) {
-          core.chrome.navGroup.setCurrentNavGroup(navGroupId);
-
-          const currentNavGroup = await getCurrentNavGroup(core);
-
-          navigateToFirstAppInNavGroup(core, currentNavGroup);
-        }
-      },
-    });
-  }
-
   start(
     core: CoreStart,
     _plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
     this.coreStart = core;
-    this.subscribeToAppStartup(core);
+    this.applicationService.onAppStartupSubscribe(core);
 
     return {};
   }
