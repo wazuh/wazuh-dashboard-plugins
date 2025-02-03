@@ -1,7 +1,7 @@
 import { CoreStart, NavGroupItemInMap } from '../../../../src/core/public';
 
 /**
- * The function `generateSubAppId` takes a parent app ID and a sub app ID, and
+ * The function `buildSubAppId` takes a parent app ID and a sub app ID, and
  * returns a combined ID with the sub app ID URL-encoded.
  * @param {string} parentAppId - The `parentAppId` parameter is a string
  * representing the ID of the parent application.
