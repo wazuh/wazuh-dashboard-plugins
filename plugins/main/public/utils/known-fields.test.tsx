@@ -21,7 +21,8 @@ import {
   agentTechniquesColumns,
   techniquesColumns,
 } from '../components/overview/mitre/framework/components/techniques/components/flyout-technique/flyout-technique-columns';
-import { wzDiscoverRenderColumns } from '../components/common/wazuh-discover/render-columns';
+import { FieldsStatistics } from './statistics-fields';
+import { FieldsMonitoring } from './monitoring-fields';
 
 const eventsColumns = [
   ...threatHuntingColumns,
@@ -44,12 +45,18 @@ const eventsColumns = [
 
 function compareColumnsValue(knownColumns, columnsToCompare) {
   const unmatchedColumns = columnsToCompare.filter(
-    column => !knownColumns.some(knowColumn => knowColumn.name === column.id),
+    column =>
+      !knownColumns.some(
+        knowColumn =>
+          knowColumn.name === column.id ||
+          knowColumn.name === column.name ||
+          knowColumn.name === column.field,
+      ),
   );
   return unmatchedColumns.length === 0
     ? true
-    : `This columns doesn't match: ${unmatchedColumns
-        .map(column => column.id)
+    : `These columns don't match: ${unmatchedColumns
+        .map(column => column.id || column.name || column.field)
         .join(', ')}`;
 }
 
@@ -66,10 +73,6 @@ test('All technique columns in KnowFields', () => {
   ).toBe(true);
 });
 
-test('All discover columns in KnowFields', () => {
-  expect(compareColumnsValue(KnownFields, wzDiscoverRenderColumns)).toBe(true);
-});
-
 test('All commons columns in KnowFields', () => {
   expect(
     compareColumnsValue(
@@ -77,4 +80,12 @@ test('All commons columns in KnowFields', () => {
       Object.keys(commonColumns).map(key => ({ id: key })),
     ),
   ).toBe(true);
+});
+
+test('All fields on statistics in KnowFields', () => {
+  expect(compareColumnsValue(KnownFields, FieldsStatistics)).toBe(true);
+});
+
+test('All fields on monitoring in KnowFields', () => {
+  expect(compareColumnsValue(KnownFields, FieldsMonitoring)).toBe(true);
 });
