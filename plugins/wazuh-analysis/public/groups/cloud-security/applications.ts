@@ -7,7 +7,7 @@ import { Subject } from 'rxjs';
 import { i18n } from '@osd/i18n';
 import { buildSubAppId } from '../../utils';
 import { PLUGIN_ID } from '../../../common/constants';
-import { CLOUD_SECURITY_ID } from './cloud-security';
+import { CLOUD_SECURITY_ID } from '.';
 
 export const DOCKER_ID = buildSubAppId(CLOUD_SECURITY_ID, 'docker');
 export const AWS_ID = buildSubAppId(CLOUD_SECURITY_ID, 'aws');
