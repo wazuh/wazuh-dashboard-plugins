@@ -187,7 +187,7 @@ export class AnalysisPlugin
   }
 
   private registerNavGroups(core: CoreSetup) {
-    registerEndpointSecurityNavLinksToGroup(core);
+    setupEndpointSecurityNavGroup(core);
 
     core.chrome.navGroup.addNavLinksToGroup(
       NAV_GROUPS[THREAT_INTELLIGENCE_ID],
@@ -260,12 +260,6 @@ export class AnalysisPlugin
     ]);
 
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
-      {
-        id: ENDPOINT_SECURITY_ID,
-        title: ENDPOINT_SECURITY_TITLE,
-        order: 0,
-        category: CATEGORY,
-      },
       {
         id: THREAT_INTELLIGENCE_ID,
         title: THREAT_INTELLIGENCE_TITLE,

@@ -1,4 +1,5 @@
-import { CoreSetup } from 'opensearch-dashboards/public';
+import { CoreSetup, DEFAULT_NAV_GROUPS } from '../../../../../src/core/public';
+import { CATEGORY } from '../category';
 import {
   CONFIGURATION_ASSESSMENT_ID,
   CONFIGURATION_ASSESSMENT_TITLE,
@@ -19,7 +20,15 @@ export const ENDPOINT_SECURITY_NAV_GROUP = {
   description: ENDPOINT_SECURITY_DESCRIPTION,
 };
 
-export const registerEndpointSecurityNavLinksToGroup = (core: CoreSetup) => {
+export const setupEndpointSecurityNavGroup = (core: CoreSetup) => {
+  core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
+    {
+      id: ENDPOINT_SECURITY_ID,
+      title: ENDPOINT_SECURITY_TITLE,
+      order: 0,
+      category: CATEGORY,
+    },
+  ]);
   core.chrome.navGroup.addNavLinksToGroup(ENDPOINT_SECURITY_NAV_GROUP, [
     {
       // Configuration assessment
