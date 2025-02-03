@@ -3,42 +3,18 @@ import {
   AppNavLinkStatus,
   CoreSetup,
   CoreStart,
-  Plugin,
   DEFAULT_NAV_GROUPS,
+  Plugin,
 } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
-import { AnalysisSetup, AnalysisStart } from './types';
-import { CATEGORY } from './groups/category';
 import { searchPages } from './components/global_search/search-pages-command';
-import {
-  THREAT_INTELLIGENCE_ID,
-  THREAT_INTELLIGENCE_TITLE,
-  ThreatIntelligenceApp,
-} from './groups/threat-intelligence/threat-intelligence';
-import {
-  SECURITY_OPERATIONS_ID,
-  SecurityOperationsNavGroup,
-} from './groups/security-operations';
-import { NAV_GROUPS } from './groups/nav-groups';
-import {
-  getThreatIntelligenceApps,
-  MITRE_ATTACK_ID,
-  MITRE_ATTACK_TITLE,
-  THREAT_HUNTING_ID,
-  THREAT_HUNTING_TITLE,
-  VULNERABILITY_DETECTION_ID,
-  VULNERABILITY_DETECTION_TITLE,
-} from './groups/threat-intelligence/applications';
-import { GroupsId } from './groups/types';
+import { CloudSecurityNavGroup } from './groups/cloud-security';
+import { EndpointSecurityNavGroup } from './groups/endpoint-security';
+import { SecurityOperationsNavGroup } from './groups/security-operations';
+import { ThreatIntelligenceNavGroup } from './groups/threat-intelligence';
+import { Group, GroupsId } from './groups/types';
 import { ApplicationService } from './services/application.service';
-import {
-  ENDPOINT_SECURITY_ID,
-  EndpointSecurityNavGroup,
-} from './groups/endpoint-security';
-import {
-  CLOUD_SECURITY_ID,
-  CloudSecurityNavGroup,
-} from './groups/cloud-security';
+import { AnalysisSetup, AnalysisStart } from './types';
 
 interface AnalysisSetupDependencies {}
 
@@ -64,26 +40,23 @@ export class AnalysisPlugin
 {
   private readonly applicationService = new ApplicationService();
   private coreStart?: CoreStart;
-  private readonly navGroupsIds: GroupsId[] = [
-    ENDPOINT_SECURITY_ID,
-    THREAT_INTELLIGENCE_ID,
-    SECURITY_OPERATIONS_ID,
-    CLOUD_SECURITY_ID,
+  private readonly navGroups: Group<GroupsId>[] = [
+    EndpointSecurityNavGroup,
+    ThreatIntelligenceNavGroup,
+    SecurityOperationsNavGroup,
+    CloudSecurityNavGroup,
   ];
 
   constructor() {
-    for (const navGroupId of this.navGroupsIds) {
-      this.applicationService.registerAppUpdater(navGroupId);
+    for (const navGroup of this.navGroups) {
+      this.applicationService.registerAppUpdater(navGroup.getId());
     }
   }
 
   private registerApps(core: CoreSetup) {
-    const applications: App[] = [
-      EndpointSecurityNavGroup.getAppGroup(),
-      ThreatIntelligenceApp(core),
-      SecurityOperationsNavGroup.getAppGroup(),
-      CloudSecurityNavGroup.getAppGroup(),
-    ];
+    const applications: App[] = this.navGroups.map(navGroup =>
+      navGroup.getAppGroup(),
+    );
 
     this.applicationService.initializeNavGroupMounts(applications, core, {
       prepareApp: setNavLinkVisible,
@@ -103,20 +76,14 @@ export class AnalysisPlugin
       });
     }
 
-    const subApps: Partial<Record<GroupsId, App[]>> = {
-      [ENDPOINT_SECURITY_ID]: EndpointSecurityNavGroup.getApps(
-        this.applicationService.getAppUpdater(ENDPOINT_SECURITY_ID),
-      ),
-      [THREAT_INTELLIGENCE_ID]: getThreatIntelligenceApps(
-        this.applicationService.getAppUpdater(THREAT_INTELLIGENCE_ID),
-      ),
-      [SECURITY_OPERATIONS_ID]: SecurityOperationsNavGroup.getApps(
-        this.applicationService.getAppUpdater(SECURITY_OPERATIONS_ID),
-      ),
-      [CLOUD_SECURITY_ID]: CloudSecurityNavGroup.getApps(
-        this.applicationService.getAppUpdater(CLOUD_SECURITY_ID),
-      ),
-    };
+    const subApps: Partial<Record<GroupsId, App[]>> = Object.fromEntries(
+      this.navGroups.map(navGroup => [
+        navGroup.getId(),
+        navGroup.getApps(
+          this.applicationService.getAppUpdater(navGroup.getId()),
+        ),
+      ]),
+    );
 
     for (const apps of Object.values(subApps)) {
       this.applicationService.initializeSubApplicationMounts(apps, core, {
@@ -127,43 +94,12 @@ export class AnalysisPlugin
   }
 
   private registerNavGroups(core: CoreSetup) {
-    EndpointSecurityNavGroup.addNavLinks(core);
-
-    core.chrome.navGroup.addNavLinksToGroup(
-      NAV_GROUPS[THREAT_INTELLIGENCE_ID],
-      [
-        {
-          // Threat hunting
-          id: THREAT_HUNTING_ID,
-          title: THREAT_HUNTING_TITLE,
-        },
-        {
-          // Vulnerability detection
-          id: VULNERABILITY_DETECTION_ID,
-          title: VULNERABILITY_DETECTION_TITLE,
-        },
-        {
-          // MITRE ATT&CK
-          id: MITRE_ATTACK_ID,
-          title: MITRE_ATTACK_TITLE,
-        },
-      ],
-    );
-
-    SecurityOperationsNavGroup.addNavLinks(core);
-    CloudSecurityNavGroup.addNavLinks(core);
-
-    core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
-      EndpointSecurityNavGroup.getGroupNavLink(),
-      {
-        id: THREAT_INTELLIGENCE_ID,
-        title: THREAT_INTELLIGENCE_TITLE,
-        order: 1,
-        category: CATEGORY,
-      },
-      SecurityOperationsNavGroup.getGroupNavLink(),
-      CloudSecurityNavGroup.getGroupNavLink(),
-    ]);
+    for (const navGroup of this.navGroups) {
+      navGroup.addNavLinks(core);
+      core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
+        navGroup.getGroupNavLink(),
+      ]);
+    }
   }
 
   public setup(
