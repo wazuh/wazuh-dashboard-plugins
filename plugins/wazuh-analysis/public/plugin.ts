@@ -41,6 +41,8 @@ import {
 } from './groups/cloud-security/cloud-security';
 import { NAV_GROUPS } from './groups/nav-groups';
 import { buildSubAppId, navigateToFirstAppInNavGroup } from './utils';
+import { getEndpointSecurityApps } from './groups/endpoint-security/applications';
+import { getThreatIntelligenceApps } from './groups/threat-intelligence/applications';
 
 interface AnalysisSetupDependencies {}
 
@@ -54,24 +56,6 @@ type ParentAppId =
   | typeof SECURITY_OPERATIONS_ID
   | typeof CLOUD_SECURITY_ID;
 
-const CONFIGURATION_ASSESSMENT_ID = buildSubAppId(
-  ENDPOINT_SECURITY_ID,
-  'configuration_assessment',
-);
-const MALWARE_DETECTION_ID = buildSubAppId(
-  ENDPOINT_SECURITY_ID,
-  'malware_detection',
-);
-const FIM_ID = buildSubAppId(ENDPOINT_SECURITY_ID, 'fim');
-const THREAT_HUNTING_ID = buildSubAppId(
-  THREAT_INTELLIGENCE_ID,
-  'threat_hunting',
-);
-const VULNERABILITY_DETECTION_ID = buildSubAppId(
-  THREAT_INTELLIGENCE_ID,
-  'vulnerability_detection',
-);
-const MITRE_ATTACK_ID = buildSubAppId(THREAT_INTELLIGENCE_ID, 'mitre_attack');
 const REGULATORY_COMPLIANCE_ID = buildSubAppId(
   SECURITY_OPERATIONS_ID,
   'regulatory_compliance',
@@ -87,39 +71,6 @@ const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
 const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
 const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
 const TRANSLATION_MESSAGES = Object.freeze({
-  CONFIGURATION_ASSESSMENT_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${CONFIGURATION_ASSESSMENT_ID}`,
-    {
-      defaultMessage: 'Configuration Assessment',
-    },
-  ),
-  MALWARE_DETECTION_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${MALWARE_DETECTION_ID}`,
-    {
-      defaultMessage: 'Malware Detection',
-    },
-  ),
-  FIM_TITLE: i18n.translate(`${PLUGIN_ID}.category.${FIM_ID}`, {
-    defaultMessage: 'File Integrity Monitoring',
-  }),
-  THREAT_HUNTING_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${THREAT_HUNTING_ID}`,
-    {
-      defaultMessage: 'Threat Hunting',
-    },
-  ),
-  VULNERABILITY_DETECTION_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${VULNERABILITY_DETECTION_ID}`,
-    {
-      defaultMessage: 'Vulnerability Detection',
-    },
-  ),
-  MITRE_ATTACK_TITLE: i18n.translate(
-    `${PLUGIN_ID}.category.${MITRE_ATTACK_ID}`,
-    {
-      defaultMessage: 'MITRE ATT&CK',
-    },
-  ),
   REGULATORY_COMPLIANCE_TITLE: i18n.translate(
     `${PLUGIN_ID}.category.${REGULATORY_COMPLIANCE_ID}`,
     {
@@ -222,82 +173,12 @@ export class AnalysisPlugin
     }
 
     const subApps = {
-      [ENDPOINT_SECURITY_ID]: [
-        {
-          id: CONFIGURATION_ASSESSMENT_ID,
-          title: TRANSLATION_MESSAGES.CONFIGURATION_ASSESSMENT_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[ENDPOINT_SECURITY_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the configuration assessment application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: MALWARE_DETECTION_ID,
-          title: TRANSLATION_MESSAGES.MALWARE_DETECTION_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[ENDPOINT_SECURITY_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the malware detection application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: FIM_ID,
-          title: TRANSLATION_MESSAGES.FIM_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[ENDPOINT_SECURITY_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the fim application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-      ],
-      [THREAT_INTELLIGENCE_ID]: [
-        {
-          id: THREAT_HUNTING_ID,
-          title: TRANSLATION_MESSAGES.THREAT_HUNTING_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the threat hunting application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: VULNERABILITY_DETECTION_ID,
-          title: TRANSLATION_MESSAGES.VULNERABILITY_DETECTION_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the vulnerability detection application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-        {
-          id: MITRE_ATTACK_ID,
-          title: TRANSLATION_MESSAGES.MITRE_ATTACK_TITLE,
-          navLinkStatus: AppNavLinkStatus.hidden,
-          updater$: this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
-          mount: async (params: AppMountParameters) => {
-            // TODO: Implement the mitre attack application
-            const { renderApp } = await import('./application');
-
-            return await renderApp(params, {});
-          },
-        },
-      ],
+      [ENDPOINT_SECURITY_ID]: getEndpointSecurityApps(
+        this.appStatusUpdater$[ENDPOINT_SECURITY_ID],
+      ),
+      [THREAT_INTELLIGENCE_ID]: getThreatIntelligenceApps(
+        this.appStatusUpdater$[THREAT_INTELLIGENCE_ID],
+      ),
       [SECURITY_OPERATIONS_ID]: [
         {
           id: REGULATORY_COMPLIANCE_ID,
