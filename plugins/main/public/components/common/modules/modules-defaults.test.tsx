@@ -15,7 +15,13 @@ import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
+import { commonColumns } from '../../overview/common/data-grid-columns';
 import { KnownFields } from '../../../utils/known-fields';
+import {
+  agentTechniquesColumns,
+  techniquesColumns,
+} from '../../overview/mitre/framework/components/techniques/components/flyout-technique/flyout-technique-columns';
+import { wzDiscoverRenderColumns } from '../wazuh-discover/render-columns';
 
 const eventsColumns = [
   ...threatHuntingColumns,
@@ -48,9 +54,27 @@ function compareColumnsValue(knownColumns, columnsToCompare) {
 }
 
 test('All events columns in KnowFields', () => {
-  const result = compareColumnsValue(KnownFields, eventsColumns);
-  if (result !== true) {
-    console.log(result);
-  }
-  expect(result).toBe(true);
+  expect(compareColumnsValue(KnownFields, eventsColumns)).toBe(true);
+});
+
+test('All technique columns in KnowFields', () => {
+  expect(
+    compareColumnsValue(KnownFields, [
+      ...agentTechniquesColumns,
+      ...techniquesColumns,
+    ]),
+  ).toBe(true);
+});
+
+test('All discover columns in KnowFields', () => {
+  expect(compareColumnsValue(KnownFields, wzDiscoverRenderColumns)).toBe(true);
+});
+
+test('All commons columns in KnowFields', () => {
+  expect(
+    compareColumnsValue(
+      KnownFields,
+      Object.keys(commonColumns).map(key => ({ id: key })),
+    ),
+  ).toBe(true);
 });
