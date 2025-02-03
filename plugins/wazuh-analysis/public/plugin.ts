@@ -79,18 +79,13 @@ import {
   OFFICE365_ID,
   OFFICE365_TITLE,
 } from './groups/cloud-security/applications';
+import { GroupsId } from './groups/types';
 
 interface AnalysisSetupDependencies {}
 
 interface AnalysisStartDependencies {
   navigation: NavigationPublicPluginStart;
 }
-
-type ParentAppId =
-  | typeof ENDPOINT_SECURITY_ID
-  | typeof THREAT_INTELLIGENCE_ID
-  | typeof SECURITY_OPERATIONS_ID
-  | typeof CLOUD_SECURITY_ID;
 
 function setNavLinkVisible(): Partial<App> {
   return {
@@ -113,13 +108,13 @@ export class AnalysisPlugin
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
   private coreStart?: CoreStart;
-  private readonly appStartup$ = new Subject<ParentAppId>();
+  private readonly appStartup$ = new Subject<GroupsId>();
   private readonly appStatusUpdater$ = {
     [ENDPOINT_SECURITY_ID]: new Subject(),
     [THREAT_INTELLIGENCE_ID]: new Subject(),
     [SECURITY_OPERATIONS_ID]: new Subject(),
     [CLOUD_SECURITY_ID]: new Subject(),
-  } satisfies Partial<Record<ParentAppId, Subject<AppUpdater>>>;
+  } satisfies Partial<Record<GroupsId, Subject<AppUpdater>>>;
 
   private registerApps(core: CoreSetup) {
     const applications: App[] = [
@@ -134,8 +129,8 @@ export class AnalysisPlugin
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.appStatusUpdater$[app.id as ParentAppId].next(setNavLinkVisible);
-          this.appStartup$.next(app.id as ParentAppId);
+          this.appStatusUpdater$[app.id as GroupsId].next(setNavLinkVisible);
+          this.appStartup$.next(app.id as GroupsId);
         }
 
         return await mount(params);
@@ -171,16 +166,16 @@ export class AnalysisPlugin
       [CLOUD_SECURITY_ID]: getCloudSecurityApps(
         this.appStatusUpdater$[CLOUD_SECURITY_ID],
       ),
-    } satisfies Partial<Record<ParentAppId, App[]>>;
+    } satisfies Partial<Record<GroupsId, App[]>>;
 
     for (const parentAppId of Object.keys(subApps)) {
-      this.setupAppMounts(subApps, parentAppId as ParentAppId, core);
+      this.setupAppMounts(subApps, parentAppId as GroupsId, core);
     }
   }
 
   private setupAppMounts(
-    subApps: Partial<Record<ParentAppId, App[]>>,
-    navGroupId: ParentAppId,
+    subApps: Partial<Record<GroupsId, App[]>>,
+    navGroupId: GroupsId,
     core: CoreSetup,
   ) {
     for (const app of subApps[navGroupId] ?? []) {
