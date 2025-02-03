@@ -8,7 +8,7 @@ export const inputArray = (
   input: { key: string; value: any; handleSetItem: any; keyValue?: string },
   isEditable: boolean,
 ) => {
-  const renderArrayTable = ['check', 'parse|', 'normalize'];
+  const renderArrayTable = ['check', 'parse', 'normalize'];
   const isArrayOfObjects =
     Array.isArray(input.value) &&
     input.value.length > 0 &&
@@ -123,8 +123,9 @@ export const inputArray = (
       ]}
     />
   );
+  const tableOrComboBox = renderArrayTable.filter(item =>
+    input.key.startsWith(item),
+  );
 
-  return renderArrayTable.every(item => input.key.startsWith(item))
-    ? tableInput
-    : comboBoxInput;
+  return tableOrComboBox.length === 0 ? comboBoxInput : tableInput;
 };

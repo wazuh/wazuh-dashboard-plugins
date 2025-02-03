@@ -8,7 +8,7 @@ export const inputString = (
     key: string;
     value: any;
     handleSetItem: any;
-    keyValue: string | undefined;
+    keyValue?: string | undefined;
   },
   isEditable: boolean,
 ) => {

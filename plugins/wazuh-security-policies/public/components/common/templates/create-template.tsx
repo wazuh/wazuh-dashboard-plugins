@@ -70,7 +70,7 @@ export const CreateTemplate = () => {
     newValue,
     key,
   }: {
-    newValue: string | boolean;
+    newValue: string | boolean | object;
     key: string;
   }) => {
     setItem(prevItem => {
@@ -140,8 +140,14 @@ export const CreateTemplate = () => {
       onClick={() =>
         console.log(
           Object.fromEntries(
-            Object.entries(item).filter(([key]) =>
-              [...stepsToRender, 'name', 'status', 'enable'].includes(key),
+            Object.entries(item).filter(
+              ([key]) =>
+                [
+                  ...stepsToRender.filter(step => step !== 'parse'),
+                  'name',
+                  'status',
+                  'enable',
+                ].includes(key) || key.startsWith('parse|'),
             ),
           ),
         )
@@ -230,7 +236,11 @@ export const CreateTemplate = () => {
         }}
         rightSideItems={buttons}
       />
-      <EuiSteps steps={steps(item)} />
+      <EuiSteps
+        className='steps-details'
+        status='incomplete'
+        steps={steps(item)}
+      />
     </>
   );
 };

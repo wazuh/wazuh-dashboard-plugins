@@ -98,7 +98,11 @@ export const DetailsTemplate = () => {
         }}
         rightSideItems={buttons}
       />
-      <EuiSteps className='steps-details' steps={step(item)} />
+      <EuiSteps
+        className='steps-details'
+        status='complete'
+        steps={step(item)}
+      />
     </>
   );
 };

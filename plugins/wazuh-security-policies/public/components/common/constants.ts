@@ -1,7 +1,7 @@
 export const STEPS = {
   metadata: 'metadata',
   check: 'check',
-  parse: 'parse|',
+  parse: 'parse',
   normalize: 'normalize',
   allow: 'allow',
   output: 'output',

@@ -1,5 +1,5 @@
-import { useLocation } from 'react-router-dom';
 import { transformInputKeyName } from '../transform-input-key-name';
+import { isEditable } from '../is-editable';
 import { inputString } from './string-inputs';
 import { inputArray } from './array-inputs';
 import { inputObject } from './object-inputs';
@@ -19,9 +19,7 @@ export const renderInputs = (input: {
   handleSetItem: any;
   keyValue?: string;
 }) => {
-  const isEditable =
-    useLocation().pathname.includes('edit') ||
-    useLocation().pathname.includes('create');
+  const editable = isEditable();
 
   if (possibleSteps.has(input.key) && typeof input.value !== 'string') {
     const inputsSteps = Object.entries(input.value).map(([key, value]) => ({
@@ -39,10 +37,10 @@ export const renderInputs = (input: {
   }
 
   if (typeof input.value === 'string') {
-    return inputString(input, isEditable);
+    return inputString(input, editable);
   }
 
   return Array.isArray(input.value)
-    ? inputArray(input, isEditable)
-    : inputObject(input, isEditable);
+    ? inputArray(input, editable)
+    : inputObject(input, editable);
 };
