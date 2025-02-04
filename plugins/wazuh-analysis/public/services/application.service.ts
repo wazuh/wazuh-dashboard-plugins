@@ -132,7 +132,17 @@ export class ApplicationService {
           this.appStartup$.next(app.id);
         }
 
-        return await mount(params);
+        const unmount = await mount(params);
+
+        return () => {
+          if (core.chrome.navGroup.getNavGroupEnabled()) {
+            this.getAppUpdater(app.id).next(appOperations?.cleanup);
+          }
+
+          unmount();
+
+          return true;
+        };
       };
 
       core.application.register(app);
