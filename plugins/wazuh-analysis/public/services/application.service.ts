@@ -45,10 +45,28 @@ export class ApplicationService {
     return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
   }
 
+  /**
+   * This function creates a new Subject for a specific application updater
+   * identified by its `appId`.
+   * @param {string} appId - This parameter is a string that represents the
+   * unique identifier of the application for which you want to register an app
+   * updater.
+   */
   registerAppUpdater(appId: string) {
     this.appUpdater$[appId] = new Subject<AppUpdater>();
   }
 
+  /**
+   * This function retrieves the app updater for a specific app ID, throwing an
+   * error if the updater is not found.
+   * @param {string} appId - This function is used to retrieve an app updater
+   * based on the provided `appId`. If the app updater for the specified `appId`
+   * does not exist, it throws an `AppUpdaterNotFoundError` with the `appId`
+   * @returns This function is returning the app updater object associated with
+   * the provided `appId`. If the app updater object does not exist for the
+   * given `appId`, it will throw an `AppUpdaterNotFoundError` with the `appId`
+   * that was passed as an argument.
+   */
   getAppUpdater(appId: string) {
     if (!this.appUpdater$[appId]) {
       throw new AppUpdaterNotFoundError(appId);
@@ -57,18 +75,47 @@ export class ApplicationService {
     return this.appUpdater$[appId];
   }
 
+  /**
+   * This function returns an object with the `navLinkStatus` property set to
+   * `visible` for an App object.
+   * @returns A partial object of the App interface is being returned with the
+   * property `navLinkStatus` set to `AppNavLinkStatus.visible`.
+   */
   private setNavLinkVisible(): Partial<App> {
     return {
       navLinkStatus: AppNavLinkStatus.visible,
     };
   }
 
+  /**
+   * This function returns an object with the `navLinkStatus` property set to
+   * `hidden` for an App object.
+   * @returns A partial object of the App interface is being returned with the
+   * navLinkStatus property set to AppNavLinkStatus.hidden.
+   */
   private setNavLinkHidden(): Partial<App> {
     return {
       navLinkStatus: AppNavLinkStatus.hidden,
     };
   }
 
+  /**
+   * The function initializes navigation group mounts for a list of apps in a
+   * TypeScript codebase.
+   * @param {App[]} apps - This parameter is an array of objects representing
+   * different applications. Each object contains information about a specific
+   * app, such as its ID, name, and mount function.
+   * @param {CoreSetup} core - This parameter is used to access core
+   * functionalities and services provided by the application framework. This
+   * parameter is typically used to register applications, access the Chrome
+   * service for navigation group settings, and perform other core setup
+   * @param {AppOperations} [appOperations] - This parameter is an optional
+   * object that contains two properties: `beforeMount` and `cleanup`. These
+   * properties are functions that are executed before and after mounting each
+   * application, respectively. The `beforeMount` function is used to prepare
+   * the application for mounting, while the `cleanup` function is used to clean
+   * up the application after it has been unmounted.
+   */
   initializeNavGroupMounts(
     apps: App[],
     core: CoreSetup,
@@ -92,6 +139,24 @@ export class ApplicationService {
     }
   }
 
+  /**
+   * The function initializes mounts for multiple sub applications, allowing for
+   * preparation (beforeMount) and cleanup operations to be executed before and
+   * after * mounting each application.
+   * @param {App[]} apps - This parameter is an array of objects representing
+   * different applications. Each object contains information about a specific
+   * app, such as its ID, name, and mount function.
+   * @param {CoreSetup} core - This parameter in the is used to access core
+   * services and functionalities provided by the application framework. This
+   * parameter is typically used to register applications, access the Chrome
+   * service for UI components, and perform other core setup tasks
+   * @param {AppOperations} [appOperations] - This parameter is an optional
+   * object that contains two properties: `beforeMount` and `cleanup`. These
+   * properties are functions that are executed before and after mounting each
+   * application, respectively. The `beforeMount` function is used to prepare
+   * the application for mounting, while the `cleanup` function is used to clean
+   * up the application after it has been unmounted.
+   */
   initializeSubApplicationMounts(
     apps: App[],
     core: CoreSetup,
@@ -125,6 +190,15 @@ export class ApplicationService {
     }
   }
 
+  /**
+   * The function subscribes to an observable `appStartup$` and performs certain
+   * actions based on the received data.
+   * @param {CoreStart} core - This parameter is an object that provides access
+   * to various services and functionalities within the application. It is
+   * typically passed in as a parameter to allow the function to interact with
+   * the application's core services, such as navigation, UI components, data
+   * fetching, and more.
+   */
   onAppStartupSubscribe(core: CoreStart) {
     this.appStartup$.subscribe({
       next: async (navGroupId: string) => {
