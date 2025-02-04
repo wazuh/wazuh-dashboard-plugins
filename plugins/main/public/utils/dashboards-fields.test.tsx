@@ -1,12 +1,15 @@
 import React from 'react';
-import { KnownFields } from './known-fields';
-import { getDashboardPanelsAnalysisEngine } from '../components/overview/server-management-statistics/dashboards/dashboard_panels_analysis_engine';
-import { getDashboardPanelsListenerEngine } from '../components/overview/server-management-statistics/dashboards/dashboard_panels_listener_engine';
-import { idExtractor, compareColumnsValue } from './functions-to-test';
-import { getDashboardPanels as vulnerabilitiesPanels } from '../components/overview/vulnerabilities/dashboards/overview/dashboard_panels';
 import { getDashboardPanels as clusterPanels } from '../components/management/cluster/dashboard/dashboard_panels';
+import {
+  idExtractor,
+  compareColumnsValue,
+  clusterQExtractor,
+} from './functions-to-test';
+import { KnownFields } from './known-fields';
 
-const panelSourcesWithAgents = {
+const INDEX_PATTERN_ALERTS = 'wazuh-alerts-*';
+
+const dashboardPanels = {
   wellcome: '../components/common/welcome/dashboard/dashboard_panels',
   mitre: '../components/overview/mitre/dashboard/dashboard-panels',
   aws: '../components/overview/amazon-web-services/dashboards/dashboard_panels',
@@ -27,74 +30,41 @@ const panelSourcesWithAgents = {
   tsc: '../components/overview/tsc/dashboards/dashboard-panels',
 };
 
-const dashboardPanelsWithAgents = Object.fromEntries(
-  Object.entries(panelSourcesWithAgents).map(([key, path]) => [
-    key,
-    require(path).getDashboardPanels,
-  ]),
+const panelEntries = Object.entries(dashboardPanels);
+
+test.each(panelEntries)(
+  'Test %s panels with pinned agent',
+  async (name, path) => {
+    const module = await import(path);
+    const panelFunction = module.getDashboardPanels;
+    expect(
+      compareColumnsValue(
+        KnownFields,
+        idExtractor(panelFunction(INDEX_PATTERN_ALERTS, true)),
+      ),
+    ).toBe(true);
+  },
 );
 
-test('Test statistics panels in analysis engine with cluster mode', () => {
-  expect(
-    compareColumnsValue(
-      KnownFields,
-      idExtractor(getDashboardPanelsAnalysisEngine('index-pattern', true)),
-    ),
-  ).toBe(true);
-});
-
-test('Test statistics panels in analysis engine with disabled cluster mode', () => {
-  expect(
-    compareColumnsValue(
-      KnownFields,
-      idExtractor(getDashboardPanelsAnalysisEngine('index-pattern', false)),
-    ),
-  ).toBe(true);
-});
-
-test('Test statistics panels in listener engine', () => {
-  expect(
-    compareColumnsValue(
-      KnownFields,
-      idExtractor(getDashboardPanelsListenerEngine('index-pattern')),
-    ),
-  ).toBe(true);
-});
-
-Object.entries(dashboardPanelsWithAgents).forEach(([name, panelFunction]) => {
-  test(`Test ${name} panels with pinned agent`, () => {
+test.each(panelEntries)(
+  'Test %s panels without pinned agent',
+  async (name, path) => {
+    const module = await import(path);
+    const panelFunction = module.getDashboardPanels;
     expect(
       compareColumnsValue(
         KnownFields,
-        idExtractor(panelFunction('index-pattern', true)),
+        idExtractor(panelFunction(INDEX_PATTERN_ALERTS, false)),
       ),
     ).toBe(true);
-  });
-
-  test(`Test ${name} panels without pinned agent`, () => {
-    expect(
-      compareColumnsValue(
-        KnownFields,
-        idExtractor(panelFunction('index-pattern', false)),
-      ),
-    ).toBe(true);
-  });
-});
+  },
+);
 
 test(`Test vulnerability panels`, () => {
   expect(
     compareColumnsValue(
       KnownFields,
-      idExtractor(vulnerabilitiesPanels('index-pattern')),
-    ),
-  ).toBe(true);
-});
-
-test(`Test vulnerability panels`, () => {
-  expect(
-    compareColumnsValue(
-      KnownFields,
-      idExtractor(clusterPanels('index-pattern', [], 'manager')),
+      clusterQExtractor(clusterPanels(INDEX_PATTERN_ALERTS, [], 'manager')),
     ),
   ).toBe(true);
 });

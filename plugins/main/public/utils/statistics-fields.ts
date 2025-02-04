@@ -707,12 +707,4 @@ export const FieldsStatistics = [
     aggregatable: true,
     readFromDocValues: false,
   },
-  {
-    name: 'rule.mitre.technique',
-    type: 'string',
-    esTypes: ['keyword'],
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true,
-  },
 ];

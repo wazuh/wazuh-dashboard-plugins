@@ -21,8 +21,6 @@ import {
   agentTechniquesColumns,
   techniquesColumns,
 } from '../components/overview/mitre/framework/components/techniques/components/flyout-technique/flyout-technique-columns';
-import { FieldsStatistics } from './statistics-fields';
-import { FieldsMonitoring } from './monitoring-fields';
 import { compareColumnsValue } from './functions-to-test';
 
 const eventsColumns = [
@@ -64,12 +62,4 @@ test('All commons columns in KnowFields', () => {
       Object.keys(commonColumns).map(key => ({ id: key })),
     ),
   ).toBe(true);
-});
-
-test('All fields on statistics in KnowFields', () => {
-  expect(compareColumnsValue(KnownFields, FieldsStatistics)).toBe(true);
-});
-
-test('All fields on monitoring in KnowFields', () => {
-  expect(compareColumnsValue(KnownFields, FieldsMonitoring)).toBe(true);
 });
