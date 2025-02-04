@@ -9,10 +9,8 @@ import {
 } from 'opensearch-dashboards/public';
 import { Subject } from 'rxjs';
 import { i18n } from '@osd/i18n';
-import {
-  getCurrentNavGroup,
-  navigateToFirstAppInNavGroup,
-} from '../utils/nav-group';
+import { getCurrentNavGroup } from '../utils/nav-group';
+import { NavGroupItemInMap } from '../../../../src/core/public';
 
 class AppUpdaterNotFoundError extends Error {
   constructor(appId: string) {
@@ -135,9 +133,35 @@ export class ApplicationService {
 
           const currentNavGroup = await getCurrentNavGroup(core);
 
-          navigateToFirstAppInNavGroup(core, currentNavGroup);
+          this.navigateToFirstAppInNavGroup(core, currentNavGroup);
         }
       },
     });
+  }
+
+  /**
+   * This function navigates to the first app in a specified navigation group if
+   * it exists.
+   * @param {CoreStart} core - This parameter is an object that provides access
+   * to core services in Kibana, such as application navigation, HTTP requests,
+   * and more. It is typically provided by the Kibana platform to plugins and
+   * can be used to interact with various functionalities within the Kibana
+   * application.
+   * @param {NavGroupItemInMap | undefined} navGroup - This parameter is
+   * expected to be an object that represents a navigation group item in a map.
+   * It should have a property `navLinks` which is an array of navigation links.
+   * Each navigation link in the `navLinks` array should have an `id` property
+   * that represents the ID
+   */
+  async navigateToFirstAppInNavGroup(
+    core: CoreStart,
+    navGroup: NavGroupItemInMap | undefined,
+  ) {
+    // Get the first nav item, if it exists navigate to the app
+    const firstNavItem = navGroup?.navLinks[0];
+
+    if (firstNavItem?.id) {
+      core.application.navigateToApp(firstNavItem.id);
+    }
   }
 }
