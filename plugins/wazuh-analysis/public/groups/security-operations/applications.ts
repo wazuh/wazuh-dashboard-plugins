@@ -1,44 +1,17 @@
+import { Subject } from 'rxjs';
 import {
   AppMountParameters,
   AppNavLinkStatus,
   AppUpdater,
-} from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
-import { i18n } from '@osd/i18n';
-import { buildSubAppId } from '../../utils';
-import { PLUGIN_ID } from '../../../common/constants';
-import { SECURITY_OPERATIONS_ID } from '.';
-
-export const REGULATORY_COMPLIANCE_ID = buildSubAppId(
-  SECURITY_OPERATIONS_ID,
-  'regulatory_compliance',
-);
-export const IT_HYGIENE_ID = buildSubAppId(
-  SECURITY_OPERATIONS_ID,
-  'it_hygiene',
-);
-export const INCIDENT_RESPONSE_ID = buildSubAppId(
-  SECURITY_OPERATIONS_ID,
-  'incident_response',
-);
-export const REGULATORY_COMPLIANCE_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${REGULATORY_COMPLIANCE_ID}`,
-  {
-    defaultMessage: 'Regulatory Compliance',
-  },
-);
-export const IT_HYGIENE_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${IT_HYGIENE_ID}`,
-  {
-    defaultMessage: 'IT Hygiene',
-  },
-);
-export const INCIDENT_RESPONSE_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${INCIDENT_RESPONSE_ID}`,
-  {
-    defaultMessage: 'Incident Response',
-  },
-);
+} from '../../../../../src/core/public';
+import {
+  INCIDENT_RESPONSE_ID,
+  INCIDENT_RESPONSE_TITLE,
+  IT_HYGIENE_ID,
+  IT_HYGIENE_TITLE,
+  REGULATORY_COMPLIANCE_ID,
+  REGULATORY_COMPLIANCE_TITLE,
+} from './constants';
 
 export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
   return [

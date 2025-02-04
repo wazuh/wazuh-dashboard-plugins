@@ -1,46 +1,21 @@
+import { Subject } from 'rxjs';
 import {
   AppMountParameters,
   AppNavLinkStatus,
   AppUpdater,
-} from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
-import { i18n } from '@osd/i18n';
-import { buildSubAppId } from '../../utils';
-import { PLUGIN_ID } from '../../../common/constants';
-import { CLOUD_SECURITY_ID } from '.';
-
-export const DOCKER_ID = buildSubAppId(CLOUD_SECURITY_ID, 'docker');
-export const AWS_ID = buildSubAppId(CLOUD_SECURITY_ID, 'aws');
-export const GOOGLE_CLOUD_ID = buildSubAppId(CLOUD_SECURITY_ID, 'google_cloud');
-export const GITHUB_ID = buildSubAppId(CLOUD_SECURITY_ID, 'github');
-export const OFFICE365_ID = buildSubAppId(CLOUD_SECURITY_ID, 'office365');
-export const DOCKER_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${DOCKER_ID}`,
-  {
-    defaultMessage: 'Docker',
-  },
-);
-export const AWS_TITLE = i18n.translate(`${PLUGIN_ID}.category.${AWS_ID}`, {
-  defaultMessage: 'AWS',
-});
-export const GOOGLE_CLOUD_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${GOOGLE_CLOUD_ID}`,
-  {
-    defaultMessage: 'Google Cloud',
-  },
-);
-export const GITHUB_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${GITHUB_ID}`,
-  {
-    defaultMessage: 'Github',
-  },
-);
-export const OFFICE365_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${OFFICE365_ID}`,
-  {
-    defaultMessage: 'Office 365',
-  },
-);
+} from '../../../../../src/core/public';
+import {
+  AWS_ID,
+  AWS_TITLE,
+  DOCKER_ID,
+  DOCKER_TITLE,
+  GITHUB_ID,
+  GITHUB_TITLE,
+  GOOGLE_CLOUD_ID,
+  GOOGLE_CLOUD_TITLE,
+  OFFICE365_ID,
+  OFFICE365_TITLE,
+} from './constants';
 
 export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
   return [

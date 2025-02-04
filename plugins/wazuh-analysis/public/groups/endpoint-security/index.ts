@@ -1,4 +1,4 @@
-import { i18n } from '@osd/i18n';
+import { Subject } from 'rxjs';
 import {
   App,
   AppMountParameters,
@@ -6,27 +6,15 @@ import {
   ChromeNavGroup,
   ChromeRegistrationNavLink,
   CoreSetup,
-} from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
-import { PLUGIN_ID } from '../../../common/constants';
+} from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../types';
 import { getEndpointSecurityApps } from './applications';
-
-export const ENDPOINT_SECURITY_ID = 'endpoint_security';
-export const ENDPOINT_SECURITY_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${ENDPOINT_SECURITY_ID}`,
-  {
-    defaultMessage: 'Endpoint Security',
-  },
-);
-export const ENDPOINT_SECURITY_DESCRIPTION = i18n.translate(
-  `${PLUGIN_ID}.category.${ENDPOINT_SECURITY_ID}.description`,
-  {
-    defaultMessage:
-      'Advanced monitoring and protection for devices against security threats.',
-  },
-);
+import {
+  ENDPOINT_SECURITY_DESCRIPTION,
+  ENDPOINT_SECURITY_ID,
+  ENDPOINT_SECURITY_TITLE,
+} from './constants';
 
 export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
   getId: () => ENDPOINT_SECURITY_ID,

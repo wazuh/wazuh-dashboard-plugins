@@ -1,39 +1,18 @@
+import { Subject } from 'rxjs';
 import {
   App,
   AppMountParameters,
   AppNavLinkStatus,
   AppUpdater,
-} from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
-import { i18n } from '@osd/i18n';
-import { buildSubAppId } from '../../utils';
-import { PLUGIN_ID } from '../../../common/constants';
-import { ENDPOINT_SECURITY_ID } from '.';
-
-export const CONFIGURATION_ASSESSMENT_ID = buildSubAppId(
-  ENDPOINT_SECURITY_ID,
-  'configuration_assessment',
-);
-export const MALWARE_DETECTION_ID = buildSubAppId(
-  ENDPOINT_SECURITY_ID,
-  'malware_detection',
-);
-export const FIM_ID = buildSubAppId(ENDPOINT_SECURITY_ID, 'fim');
-export const CONFIGURATION_ASSESSMENT_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${CONFIGURATION_ASSESSMENT_ID}`,
-  {
-    defaultMessage: 'Configuration Assessment',
-  },
-);
-export const MALWARE_DETECTION_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${MALWARE_DETECTION_ID}`,
-  {
-    defaultMessage: 'Malware Detection',
-  },
-);
-export const FIM_TITLE = i18n.translate(`${PLUGIN_ID}.category.${FIM_ID}`, {
-  defaultMessage: 'File Integrity Monitoring',
-});
+} from '../../../../../src/core/public';
+import {
+  CONFIGURATION_ASSESSMENT_ID,
+  CONFIGURATION_ASSESSMENT_TITLE,
+  FIM_ID,
+  FIM_TITLE,
+  MALWARE_DETECTION_ID,
+  MALWARE_DETECTION_TITLE,
+} from './constants';
 
 export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
   return [

@@ -1,31 +1,19 @@
-import { i18n } from '@osd/i18n';
+import { Subject } from 'rxjs';
 import {
   App,
   AppMountParameters,
   AppUpdater,
   ChromeRegistrationNavLink,
   CoreSetup,
-} from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
-import { PLUGIN_ID } from '../../../common/constants';
+} from '../../../../../src/core/public';
 import { Group } from '../types';
 import { CATEGORY } from '../category';
 import { getCloudSecurityApps } from './applications';
-
-export const CLOUD_SECURITY_ID = 'cloud_security';
-export const CLOUD_SECURITY_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${CLOUD_SECURITY_ID}`,
-  {
-    defaultMessage: 'Cloud Security',
-  },
-);
-export const CLOUD_SECURITY_DESCRIPTION = i18n.translate(
-  `${PLUGIN_ID}.category.${CLOUD_SECURITY_ID}.description`,
-  {
-    defaultMessage:
-      'Monitoring and protection for cloud environments against security threats.',
-  },
-);
+import {
+  CLOUD_SECURITY_DESCRIPTION,
+  CLOUD_SECURITY_ID,
+  CLOUD_SECURITY_TITLE,
+} from './constants';
 
 export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
   getId: () => CLOUD_SECURITY_ID,

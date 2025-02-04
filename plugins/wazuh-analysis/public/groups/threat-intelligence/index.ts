@@ -1,31 +1,19 @@
-import { i18n } from '@osd/i18n';
+import { Subject } from 'rxjs';
 import {
   App,
   AppMountParameters,
   AppUpdater,
   ChromeRegistrationNavLink,
   CoreSetup,
-} from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
-import { PLUGIN_ID } from '../../../common/constants';
+} from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../types';
 import { getThreatIntelligenceApps } from './applications';
-
-export const THREAT_INTELLIGENCE_ID = 'threat_intelligence';
-export const THREAT_INTELLIGENCE_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${THREAT_INTELLIGENCE_ID}`,
-  {
-    defaultMessage: 'Threat Intelligence',
-  },
-);
-export const THREAT_INTELLIGENCE_DESCRIPTION = i18n.translate(
-  `${PLUGIN_ID}.category.${THREAT_INTELLIGENCE_ID}.description`,
-  {
-    defaultMessage:
-      'Collect and analyze information about potential threats to inform security decisions.',
-  },
-);
+import {
+  THREAT_INTELLIGENCE_DESCRIPTION,
+  THREAT_INTELLIGENCE_ID,
+  THREAT_INTELLIGENCE_TITLE,
+} from './constants';
 
 export const ThreatIntelligenceNavGroup: Group<typeof THREAT_INTELLIGENCE_ID> =
   {

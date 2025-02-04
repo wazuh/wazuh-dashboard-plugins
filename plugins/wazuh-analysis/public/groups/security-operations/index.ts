@@ -1,31 +1,19 @@
-import { i18n } from '@osd/i18n';
+import { Subject } from 'rxjs';
 import {
   App,
   AppMountParameters,
   AppUpdater,
   ChromeRegistrationNavLink,
   CoreSetup,
-} from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
-import { PLUGIN_ID } from '../../../common/constants';
+} from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../types';
 import { getSecurityOperationsApps } from './applications';
-
-export const SECURITY_OPERATIONS_ID = 'security_operations';
-export const SECURITY_OPERATIONS_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${SECURITY_OPERATIONS_ID}`,
-  {
-    defaultMessage: 'Security Operations',
-  },
-);
-export const SECURITY_OPERATIONS_DESCRIPTION = i18n.translate(
-  `${PLUGIN_ID}.category.${SECURITY_OPERATIONS_ID}.description`,
-  {
-    defaultMessage:
-      'Advanced monitoring and protection for devices against security threats.',
-  },
-);
+import {
+  SECURITY_OPERATIONS_DESCRIPTION,
+  SECURITY_OPERATIONS_ID,
+  SECURITY_OPERATIONS_TITLE,
+} from './constants';
 
 export const SecurityOperationsNavGroup: Group<typeof SECURITY_OPERATIONS_ID> =
   {
