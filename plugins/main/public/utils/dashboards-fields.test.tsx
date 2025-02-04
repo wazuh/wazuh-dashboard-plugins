@@ -10,7 +10,7 @@ import { KnownFields } from './known-fields';
 const INDEX_PATTERN_ALERTS = 'wazuh-alerts-*';
 
 const dashboardPanels = {
-  wellcome: '../components/common/welcome/dashboard/dashboard_panels',
+  welcome: '../components/common/welcome/dashboard/dashboard_panels',
   mitre: '../components/overview/mitre/dashboard/dashboard-panels',
   aws: '../components/overview/amazon-web-services/dashboards/dashboard_panels',
   docker: '../components/overview/docker/dashboards/dashboard-panels',

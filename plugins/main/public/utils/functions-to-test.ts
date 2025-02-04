@@ -1,5 +1,4 @@
 import React from 'react';
-
 export function idExtractor(table: { [x: string]: any }): string[] {
   return Object.values(table)
     .flatMap(panel => {
@@ -26,12 +25,15 @@ export function clusterQExtractor(table: { [x: string]: any }): string[] {
     })
     .flatMap(exp => {
       const matches = [...exp.matchAll(/q="(.*?)"/g)];
-      return matches.map(match => {
-        const valorQ = match[1];
-        if (!valorQ) return '';
-        const primeraCondicion = valorQ.split('AND')[0].trim();
-        const nombreCampo = primeraCondicion.split(':')[0].trim();
-        return nombreCampo;
+      return matches.flatMap(match => {
+        const fieldsMatches = match[1];
+        if (!fieldsMatches) {
+          return '';
+        }
+        return fieldsMatches
+          .split('AND')
+          .map(field => field.split(':')[0].trim())
+          .filter(Boolean);
       });
     })
     .filter(Boolean);
