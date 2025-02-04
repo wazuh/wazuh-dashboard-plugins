@@ -17,6 +17,7 @@ import { formatUIDate } from '../../../../react-services/time-service';
 import { Agent } from '../../../endpoints-summary/types';
 import { RibbonItemLabel, type IRibbonItem } from '../../ribbon/ribbon-item';
 import WzRibbon from '../../ribbon/ribbon';
+import { getOsName, getPlatformIcon } from '../../platform';
 
 interface AgentInfoProps {
   agent: Agent;
@@ -36,6 +37,10 @@ export class AgentInfo extends Component<AgentInfoProps> {
     });
   }
 
+  isIPv6(ip: string) {
+    return ip.includes(':');
+  }
+
   render() {
     const { agent } = this.props;
     let arrayStats: IRibbonItem[];
@@ -47,24 +52,27 @@ export class AgentInfo extends Component<AgentInfoProps> {
           value: agent.id,
           label: 'ID',
           style: { maxWidth: 100 },
+          condensed: true,
         },
         {
           key: RibbonItemLabel.AGENT_STATUS,
           value: agent,
           label: 'Status',
           style: { maxWidth: 150 },
+          condensed: true,
         },
         {
           key: 'version',
           value: agent.version,
           label: 'Version',
           style: { maxWidth: 150 },
+          condensed: true,
         },
         {
           key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
           label: 'Operating system',
-          style: { minWidth: 200, maxWidth: 200 },
+          style: { maxWidth: 200 },
         },
       ];
     } else {
@@ -73,37 +81,47 @@ export class AgentInfo extends Component<AgentInfoProps> {
           key: 'id',
           value: agent.id,
           label: 'ID',
-          style: { minWidth: 30 },
+          condensed: true,
         },
         {
           key: RibbonItemLabel.AGENT_STATUS,
           value: agent,
           label: 'Status',
-          style: { minWidth: 100 },
+          condensed: true,
         },
         {
           key: 'ip',
           value: agent.ip,
           label: 'IP address',
-          style: {},
+          style: {
+            // IPv4: maxWidth: 100
+            // IPv6: maxWidth: 150
+            maxWidth: this.isIPv6(agent.ip) ? 150 : 100,
+          },
+          condensed: true,
         },
         {
           key: 'version',
           value: agent.version,
           label: 'Version',
-          style: { minWidth: 100 },
+          condensed: true,
         },
         {
           key: RibbonItemLabel.GROUPS,
           value: agent.group,
           label: 'Group',
-          style: { minWidth: 150 },
+          condensed: true,
         },
         {
           key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
           label: 'Operating system',
-          style: { maxWidth: 150 },
+          render: (value: Agent) => (
+            <>
+              {getPlatformIcon(value)}
+              {getOsName(value)}
+            </>
+          ),
         },
         {
           key: 'cluster-node',
@@ -112,19 +130,19 @@ export class AgentInfo extends Component<AgentInfoProps> {
               ? agent.node_name
               : '-',
           label: 'Cluster node',
-          style: { minWidth: 120 },
+          style: { maxWidth: 100 },
         },
         {
           key: 'registration-date',
           value: formatUIDate(agent.dateAdd),
           label: 'Registration date',
-          style: { minWidth: 180 },
+          style: { minWidth: 165 },
         },
         {
           key: 'last-keep-alive',
           value: formatUIDate(agent.lastKeepAlive),
           label: 'Last keep alive',
-          style: { minWidth: 180 },
+          style: { minWidth: 165 },
         },
       ];
     }

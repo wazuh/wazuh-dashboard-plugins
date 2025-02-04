@@ -44,7 +44,7 @@ exports[`AgentStatus component Renders status indicator with the its color and t
     active
   </span>
   <span
-    class="euiToolTipAnchor wz-margin-left-10"
+    class="euiToolTipAnchor wz-agent-icon-tip"
   >
     <svg
       aria-hidden="true"
@@ -112,7 +112,7 @@ exports[`AgentStatus component Renders status indicator with the its color and t
     disconnected
   </span>
   <span
-    class="euiToolTipAnchor wz-margin-left-10"
+    class="euiToolTipAnchor wz-agent-icon-tip"
   >
     <svg
       aria-label="Description"
@@ -180,7 +180,7 @@ exports[`AgentStatus component Renders status indicator with the its color and t
     never connected
   </span>
   <span
-    class="euiToolTipAnchor wz-margin-left-10"
+    class="euiToolTipAnchor wz-agent-icon-tip"
   >
     <svg
       aria-label="Description"
@@ -248,7 +248,7 @@ exports[`AgentStatus component Renders status indicator with the its color and t
     pending
   </span>
   <span
-    class="euiToolTipAnchor wz-margin-left-10"
+    class="euiToolTipAnchor wz-agent-icon-tip"
   >
     <svg
       aria-label="Description"

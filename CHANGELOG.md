@@ -2,14 +2,18 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.10.2 - OpenSearch Dashboards 2.16.0 - Revision 00
+## Wazuh v4.11.0 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ### Added
 
-- Support for Wazuh 4.10.2
+- Support for Wazuh 4.11.0
+
+### Changed
+
+- Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
+- Changed the width of the command column, relocate argvs column and change the width of the rest of the columns in the table processes. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
 
 ### Fixed
-
 - Fixed documentation URL related to the usage of authentication password in the agent deployment [#7251](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7251)
 - Fixed a problem with duplicated requests to get the list of valid index patterns in the menu [#7255](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7255)
 
@@ -61,6 +65,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed the filter are displayed cropped on screens of 575px to 767px in vulnerability detection module [#7047](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7047)
 - Fixed read-only users could not access to Statistics application [#7001](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7001)
 - Fixed no-agent-alert spawn with selected agent in agent-welcome view [#7029](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7029)
 - Fixed loading state of the agents status chart in the home overview [#7120](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7120)

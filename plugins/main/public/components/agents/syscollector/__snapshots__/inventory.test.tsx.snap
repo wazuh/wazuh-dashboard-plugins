@@ -17,9 +17,12 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -49,9 +52,9 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -81,9 +84,9 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -113,9 +116,9 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -145,9 +148,9 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -177,9 +180,9 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -209,9 +212,9 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -241,9 +244,9 @@ exports[`Inventory data Network Network interfaces table A Apple agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1468,9 +1471,12 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1500,9 +1506,9 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1532,9 +1538,9 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1564,9 +1570,9 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1596,9 +1602,9 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1628,9 +1634,9 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1660,9 +1666,9 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -1692,9 +1698,9 @@ exports[`Inventory data Network Network interfaces table A Linux agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -2951,9 +2957,12 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -2983,9 +2992,9 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -3015,9 +3024,9 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -3047,9 +3056,9 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -3079,9 +3088,9 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -3111,9 +3120,9 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -3143,9 +3152,9 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -3175,9 +3184,9 @@ exports[`Inventory data Network Network interfaces table A Windows agent should 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4426,9 +4435,12 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4458,9 +4470,9 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4490,9 +4502,9 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4522,9 +4534,9 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4554,9 +4566,9 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4586,9 +4598,9 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4618,9 +4630,9 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -4650,9 +4662,9 @@ exports[`Inventory data Network Network ports table A Apple agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -5877,9 +5889,12 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -5909,9 +5924,9 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -5941,9 +5956,9 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -5973,9 +5988,9 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -6005,9 +6020,9 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -6037,9 +6052,9 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -6069,9 +6084,9 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -6101,9 +6116,9 @@ exports[`Inventory data Network Network ports table A Linux agent should render 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7360,9 +7375,12 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7392,9 +7410,9 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7424,9 +7442,9 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7456,9 +7474,9 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7488,9 +7506,9 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7520,9 +7538,9 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7552,9 +7570,9 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -7584,9 +7602,9 @@ exports[`Inventory data Network Network ports table A Windows agent should rende
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8835,9 +8853,12 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8867,9 +8888,9 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8899,9 +8920,9 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8931,9 +8952,9 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8963,9 +8984,9 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -8995,9 +9016,9 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -9027,9 +9048,9 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -9059,9 +9080,9 @@ exports[`Inventory data Network Network settings table A Apple agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10286,9 +10307,12 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10318,9 +10342,9 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10350,9 +10374,9 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10382,9 +10406,9 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10414,9 +10438,9 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10446,9 +10470,9 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10478,9 +10502,9 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -10510,9 +10534,9 @@ exports[`Inventory data Network Network settings table A Linux agent should rend
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11769,9 +11793,12 @@ exports[`Inventory data Network Network settings table A Windows agent should re
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11801,9 +11828,9 @@ exports[`Inventory data Network Network settings table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11833,9 +11860,9 @@ exports[`Inventory data Network Network settings table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11865,9 +11892,9 @@ exports[`Inventory data Network Network settings table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11897,9 +11924,9 @@ exports[`Inventory data Network Network settings table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11929,9 +11956,9 @@ exports[`Inventory data Network Network settings table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11961,9 +11988,9 @@ exports[`Inventory data Network Network settings table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -11993,9 +12020,9 @@ exports[`Inventory data Network Network settings table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13244,9 +13271,12 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13276,9 +13306,9 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13308,9 +13338,9 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13340,9 +13370,9 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13372,9 +13402,9 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13404,9 +13434,9 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13436,9 +13466,9 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13468,9 +13498,9 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13756,7 +13786,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                           data-test-subj="tableHeaderCell_name_0"
                           role="columnheader"
                           scope="col"
-                          style="width:10%"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton euiTableHeaderButton-isSorted"
@@ -13795,6 +13825,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                           data-test-subj="tableHeaderCell_euser_1"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -13819,6 +13850,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                           data-test-subj="tableHeaderCell_pid_2"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -13843,6 +13875,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                           data-test-subj="tableHeaderCell_ppid_3"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -13867,6 +13900,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                           data-test-subj="tableHeaderCell_vm_size_4"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -13891,6 +13925,7 @@ exports[`Inventory data Processes A Apple agent should render processes table wi
                           data-test-subj="tableHeaderCell_nice_5"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -13959,9 +13994,12 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -13991,9 +14029,9 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14023,9 +14061,9 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14055,9 +14093,9 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14087,9 +14125,9 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14119,9 +14157,9 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14151,9 +14189,9 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14183,9 +14221,9 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14471,7 +14509,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                           data-test-subj="tableHeaderCell_name_0"
                           role="columnheader"
                           scope="col"
-                          style="width:10%"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton euiTableHeaderButton-isSorted"
@@ -14510,6 +14548,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                           data-test-subj="tableHeaderCell_euser_1"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -14534,6 +14573,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                           data-test-subj="tableHeaderCell_egroup_2"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -14558,6 +14598,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                           data-test-subj="tableHeaderCell_pid_3"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -14582,6 +14623,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                           data-test-subj="tableHeaderCell_ppid_4"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -14603,7 +14645,132 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                           aria-live="polite"
                           aria-sort="none"
                           class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_cmd_5"
+                          data-test-subj="tableHeaderCell_vm_size_5"
+                          role="columnheader"
+                          scope="col"
+                          style="width:7%"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                              >
+                                VM size
+                              </span>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_size_6"
+                          role="columnheader"
+                          scope="col"
+                          style="width:7%"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                              >
+                                Size
+                              </span>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_session_7"
+                          role="columnheader"
+                          scope="col"
+                          style="width:7%"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                              >
+                                Session
+                              </span>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_nice_8"
+                          role="columnheader"
+                          scope="col"
+                          style="width:7%"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                              >
+                                Priority
+                              </span>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_state_9"
+                          role="columnheader"
+                          scope="col"
+                          style="width:7%"
+                        >
+                          <button
+                            class="euiTableHeaderButton"
+                            data-test-subj="tableHeaderSortButton"
+                            type="button"
+                          >
+                            <span
+                              class="euiTableCellContent"
+                            >
+                              <span
+                                class="euiTableCellContent__text"
+                              >
+                                State
+                              </span>
+                            </span>
+                          </button>
+                        </th>
+                        <th
+                          aria-live="polite"
+                          aria-sort="none"
+                          class="euiTableHeaderCell"
+                          data-test-subj="tableHeaderCell_cmd_10"
                           role="columnheader"
                           scope="col"
                           style="width:15%"
@@ -14628,7 +14795,7 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                           aria-live="polite"
                           aria-sort="none"
                           class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_argvs_6"
+                          data-test-subj="tableHeaderCell_argvs_11"
                           role="columnheader"
                           scope="col"
                           style="width:15%"
@@ -14645,127 +14812,6 @@ exports[`Inventory data Processes A Linux agent should render processes table wi
                                 class="euiTableCellContent__text"
                               >
                                 Argvs
-                              </span>
-                            </span>
-                          </button>
-                        </th>
-                        <th
-                          aria-live="polite"
-                          aria-sort="none"
-                          class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_vm_size_7"
-                          role="columnheader"
-                          scope="col"
-                        >
-                          <button
-                            class="euiTableHeaderButton"
-                            data-test-subj="tableHeaderSortButton"
-                            type="button"
-                          >
-                            <span
-                              class="euiTableCellContent"
-                            >
-                              <span
-                                class="euiTableCellContent__text"
-                              >
-                                VM size
-                              </span>
-                            </span>
-                          </button>
-                        </th>
-                        <th
-                          aria-live="polite"
-                          aria-sort="none"
-                          class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_size_8"
-                          role="columnheader"
-                          scope="col"
-                        >
-                          <button
-                            class="euiTableHeaderButton"
-                            data-test-subj="tableHeaderSortButton"
-                            type="button"
-                          >
-                            <span
-                              class="euiTableCellContent"
-                            >
-                              <span
-                                class="euiTableCellContent__text"
-                              >
-                                Size
-                              </span>
-                            </span>
-                          </button>
-                        </th>
-                        <th
-                          aria-live="polite"
-                          aria-sort="none"
-                          class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_session_9"
-                          role="columnheader"
-                          scope="col"
-                        >
-                          <button
-                            class="euiTableHeaderButton"
-                            data-test-subj="tableHeaderSortButton"
-                            type="button"
-                          >
-                            <span
-                              class="euiTableCellContent"
-                            >
-                              <span
-                                class="euiTableCellContent__text"
-                              >
-                                Session
-                              </span>
-                            </span>
-                          </button>
-                        </th>
-                        <th
-                          aria-live="polite"
-                          aria-sort="none"
-                          class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_nice_10"
-                          role="columnheader"
-                          scope="col"
-                        >
-                          <button
-                            class="euiTableHeaderButton"
-                            data-test-subj="tableHeaderSortButton"
-                            type="button"
-                          >
-                            <span
-                              class="euiTableCellContent"
-                            >
-                              <span
-                                class="euiTableCellContent__text"
-                              >
-                                Priority
-                              </span>
-                            </span>
-                          </button>
-                        </th>
-                        <th
-                          aria-live="polite"
-                          aria-sort="none"
-                          class="euiTableHeaderCell"
-                          data-test-subj="tableHeaderCell_state_11"
-                          role="columnheader"
-                          scope="col"
-                          style="width:15%"
-                        >
-                          <button
-                            class="euiTableHeaderButton"
-                            data-test-subj="tableHeaderSortButton"
-                            type="button"
-                          >
-                            <span
-                              class="euiTableCellContent"
-                            >
-                              <span
-                                class="euiTableCellContent__text"
-                              >
-                                State
                               </span>
                             </span>
                           </button>
@@ -14821,9 +14867,12 @@ exports[`Inventory data Processes A Windows agent should render processes table 
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14853,9 +14902,9 @@ exports[`Inventory data Processes A Windows agent should render processes table 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14885,9 +14934,9 @@ exports[`Inventory data Processes A Windows agent should render processes table 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14917,9 +14966,9 @@ exports[`Inventory data Processes A Windows agent should render processes table 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14949,9 +14998,9 @@ exports[`Inventory data Processes A Windows agent should render processes table 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -14981,9 +15030,9 @@ exports[`Inventory data Processes A Windows agent should render processes table 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15013,9 +15062,9 @@ exports[`Inventory data Processes A Windows agent should render processes table 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15045,9 +15094,9 @@ exports[`Inventory data Processes A Windows agent should render processes table 
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15333,7 +15382,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
                           data-test-subj="tableHeaderCell_name_0"
                           role="columnheader"
                           scope="col"
-                          style="width:10%"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton euiTableHeaderButton-isSorted"
@@ -15372,6 +15421,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
                           data-test-subj="tableHeaderCell_pid_1"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -15396,6 +15446,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
                           data-test-subj="tableHeaderCell_ppid_2"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -15420,6 +15471,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
                           data-test-subj="tableHeaderCell_vm_size_3"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -15444,6 +15496,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
                           data-test-subj="tableHeaderCell_priority_4"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -15468,6 +15521,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
                           data-test-subj="tableHeaderCell_nlwp_5"
                           role="columnheader"
                           scope="col"
+                          style="width:7%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -15492,7 +15546,7 @@ exports[`Inventory data Processes A Windows agent should render processes table 
                           data-test-subj="tableHeaderCell_cmd_6"
                           role="columnheader"
                           scope="col"
-                          style="width:30%"
+                          style="width:15%"
                         >
                           <button
                             class="euiTableHeaderButton"
@@ -15561,9 +15615,12 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15593,9 +15650,9 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15625,9 +15682,9 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15657,9 +15714,9 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15689,9 +15746,9 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15721,9 +15778,9 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15753,9 +15810,9 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -15785,9 +15842,9 @@ exports[`Inventory data Software Packages table A Apple agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16253,9 +16310,12 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16285,9 +16345,9 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16317,9 +16377,9 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16349,9 +16409,9 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16381,9 +16441,9 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16413,9 +16473,9 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16445,9 +16505,9 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16477,9 +16537,9 @@ exports[`Inventory data Software Packages table A Linux agent should render soft
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16946,9 +17006,12 @@ exports[`Inventory data Software Packages table A Windows agent should render so
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -16978,9 +17041,9 @@ exports[`Inventory data Software Packages table A Windows agent should render so
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17010,9 +17073,9 @@ exports[`Inventory data Software Packages table A Windows agent should render so
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17042,9 +17105,9 @@ exports[`Inventory data Software Packages table A Windows agent should render so
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17074,9 +17137,9 @@ exports[`Inventory data Software Packages table A Windows agent should render so
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17106,9 +17169,9 @@ exports[`Inventory data Software Packages table A Windows agent should render so
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17138,9 +17201,9 @@ exports[`Inventory data Software Packages table A Windows agent should render so
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17170,9 +17233,9 @@ exports[`Inventory data Software Packages table A Windows agent should render so
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17923,9 +17986,12 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
         style="responsive:"
       >
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-ribbon-condensed"
+        />
+        <div
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cores"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17955,9 +18021,9 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-memory"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -17987,9 +18053,9 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-arch"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -18019,9 +18085,9 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-operating-system"
-          style="max-width:200px"
+          style="max-width:200px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -18051,9 +18117,9 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-cpu"
-          style="max-width:250px"
+          style="max-width:250px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -18083,9 +18149,9 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-hostname"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -18115,9 +18181,9 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-board-serial"
-          style="max-width:100px"
+          style="max-width:100px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
@@ -18147,9 +18213,9 @@ exports[`Inventory data Software Windows updates table A Windows agent should re
           </div>
         </div>
         <div
-          class="euiFlexItem wz-ribbon-item"
+          class="euiFlexItem euiFlexItem--flexGrowZero wz-ribbon-item"
           data-test-subj="ribbon-item-last-scan"
-          style="max-width:180px"
+          style="max-width:180px;font-size:12px"
         >
           <div
             class="euiStat euiStat--leftAligned"
