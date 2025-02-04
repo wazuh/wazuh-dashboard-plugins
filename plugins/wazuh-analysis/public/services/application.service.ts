@@ -1,3 +1,6 @@
+import { Subject } from 'rxjs';
+import { i18n } from '@osd/i18n';
+import { Logger } from '@osd/logging';
 import {
   App,
   AppMount,
@@ -6,12 +9,9 @@ import {
   AppUpdater,
   CoreSetup,
   CoreStart,
-} from 'opensearch-dashboards/public';
-import { Subject } from 'rxjs';
-import { i18n } from '@osd/i18n';
-import { Logger } from '@osd/logging';
+  NavGroupItemInMap,
+} from '../../../../src/core/public';
 import { getCurrentNavGroup } from '../utils/nav-group';
-import { NavGroupItemInMap } from '../../../../src/core/public';
 
 class AppUpdaterNotFoundError extends Error {
   constructor(appId: string) {
