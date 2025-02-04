@@ -36,6 +36,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed documentation URL related to the usage of authentication password in the agent deployment [#7251](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7251)
 - Fixed a problem with duplicated requests to get the list of valid index patterns in the menu [#7255](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7255)
 
+### Removed
+
+- Remove unused `node_build` field in package manifest of `wazuh` plugin [#7245](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7245)
+
 ## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ### Added
@@ -47,10 +51,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Move the ability to manage the visibility of fields in `Events` and `Vulnerability Detection` > `Inventory` tables from `Columns` button to a new `Available fields` button enhancing the performance of the view [#7226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7226)
 - Change the color of `Export formatted` button of data grid tables to match the color of the rest of table buttons [#7226](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7226)
-
-### Removed
-
-- Remove unused `node_build` field in package manifest of `wazuh` plugin [#7245](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7245)
 
 ## Wazuh v4.10.0 - OpenSearch Dashboards 2.16.0 - Revision 08
 
