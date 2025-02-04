@@ -34,12 +34,6 @@ export class AnalysisPlugin
     CloudSecurityNavGroup,
   ];
 
-  constructor() {
-    for (const navGroup of this.navGroups) {
-      this.applicationService.registerAppUpdater(navGroup.getId());
-    }
-  }
-
   private registerApps(core: CoreSetup) {
     const applications: App[] = this.navGroups.map(navGroup =>
       navGroup.getAppGroup(),
@@ -84,6 +78,10 @@ export class AnalysisPlugin
     _plugins: AnalysisSetupDependencies,
   ): AnalysisSetup | Promise<AnalysisSetup> {
     console.debug('AnalysisPlugin started');
+
+    for (const navGroup of this.navGroups) {
+      this.applicationService.registerAppUpdater(navGroup.getId());
+    }
 
     this.registerApps(core);
     this.registerNavGroups(core);
