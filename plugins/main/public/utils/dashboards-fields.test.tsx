@@ -61,10 +61,13 @@ test.each(panelEntries)(
 );
 
 test(`Test vulnerability panels`, () => {
+  const nodeListMock = [{ name: 'node1' }, { name: 'node2' }];
   expect(
     compareColumnsValue(
       KnownFields,
-      clusterQExtractor(clusterPanels(INDEX_PATTERN_ALERTS, [], 'manager')),
+      clusterQExtractor(
+        clusterPanels(INDEX_PATTERN_ALERTS, nodeListMock, 'manager'),
+      ),
     ),
   ).toBe(true);
 });
