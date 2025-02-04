@@ -61,7 +61,7 @@ export class AnalysisPlugin
       });
     }
 
-    const subApps: App[] = this.navGroups.map(navGroup =>
+    const subApps: App[][] = this.navGroups.map(navGroup =>
       navGroup.getApps(this.applicationService.getAppUpdater(navGroup.getId())),
     );
 
