@@ -239,11 +239,13 @@ services:
       - ${OSD_PORT}:5601
     environment:
       - 'LOGS=/proc/1/fd/1'
+    tty: true
     volumes:
       - osd_cache:/home/node/.cache
       - '${SRC}/main:/home/node/kbn/plugins/main'
       - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
+      - '${SRC}/wazuh-security-policies:/home/node/kbn/plugins/wazuh-security-policies'
       - '${SRC}/wazuh-engine:/home/node/kbn/plugins/wazuh-engine'
       - '${SRC}/wazuh-fleet:/home/node/kbn/plugins/wazuh-fleet'
       - wd_certs:/home/node/kbn/certs/
