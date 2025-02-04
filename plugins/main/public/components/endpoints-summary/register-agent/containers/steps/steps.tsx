@@ -155,12 +155,12 @@ export const Steps = ({
                 color='warning'
                 title={
                   <span>
-                    The password is required but wasn't defined. Please
-                    check our{' '}
+                    The password is required but wasn't defined. Please check
+                    our{' '}
                     <EuiLink
                       target='_blank'
                       href={webDocumentationLink(
-                        'user-manual/agent-enrollment/security-options/using-password-authentication.html',
+                        'user-manual/agent/agent-enrollment/security-options/using-password-authentication.html',
                       )}
                       rel='noopener noreferrer'
                     >

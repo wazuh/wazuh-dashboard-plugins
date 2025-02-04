@@ -57,8 +57,6 @@ export const WzMenu = withWindowSize(
         currentPattern: '',
         patternList: [],
         currentSelectedPattern: '',
-        isManagementPopoverOpen: false,
-        isOverviewPopoverOpen: false,
       };
       this.store = store;
       this.genericReq = GenericRequest;
@@ -118,11 +116,70 @@ export const WzMenu = withWindowSize(
       return APIlist;
     };
 
-    loadIndexPatternsList = async () => {
+    async componentDidUpdate(prevProps) {
+      let newState = {};
+      const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
+      const { currentAPI } = this.state;
+
+      if (this.props.windowSize) {
+        this.showSelectorsInPopover = this.props.windowSize.width < 1100;
+      }
+
+      if (
+        !this.isLoading &&
+        (prevProps.state.showMenu !== this.props.state.showMenu ||
+          (this.props.state.showMenu === true && this.state.showMenu === false))
+      ) {
+        this.isLoading = true;
+        newState = {
+          ...newState,
+          ...(await this.loadIndexPatternsList()),
+          isSelectorsPopoverOpen: false,
+        };
+      }
+      if ((!currentAPI && apiId) || apiId !== currentAPI) {
+        newState = { ...newState, currentAPI: apiId };
+      } else {
+        if (
+          currentAPI &&
+          this.props.state.currentAPI &&
+          currentAPI !== this.props.state.currentAPI
+        ) {
+          newState = { ...newState, currentAPI: this.props.state.currentAPI };
+        }
+      }
+      if (
+        !this.isLoading &&
+        !_.isEqual(
+          prevProps?.appConfig?.data?.['ip.ignore'],
+          this.props?.appConfig?.data?.['ip.ignore'],
+        )
+      ) {
+        this.isLoading = true;
+        newState = { ...newState, ...(await this.loadIndexPatternsList()) };
+      }
+
+      if (
+        !_.isEqual(
+          this.props.globalBreadcrumbReducers.breadcrumb,
+          prevProps.globalBreadcrumbReducers.breadcrumb,
+        )
+      ) {
+        setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
+      }
+      newState = { ...prevProps.state, ...newState };
+      if (!_.isEqual(newState, prevProps.state)) {
+        // and the state is different from the previous one
+        this.setState(newState);
+      }
+    }
+
+    async loadIndexPatternsList() {
       try {
         let newState = {};
+
         let list = await PatternHandler.getPatternList('api');
-        if (!list) return;
+        if (!list || (list && !list.length)) return;
         this.props?.appConfig?.data?.['ip.ignore']?.length &&
           (list = list.filter(
             indexPattern =>
@@ -130,9 +187,6 @@ export const WzMenu = withWindowSize(
                 indexPattern.title,
               ),
           ));
-
-        // When not exists patterns, not show the selector
-        if (list.length === 1) return;
 
         let filtered = false;
         // If there is no current pattern, fetch it
@@ -163,114 +217,10 @@ export const WzMenu = withWindowSize(
             currentSelectedPattern: AppState.getCurrentPattern(),
           };
         }
+        this.isLoading = false;
         return newState;
       } catch (error) {
-        throw error;
-      }
-    };
-
-    async componentDidUpdate(prevProps) {
-      let newState = {};
-      const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
-      const { currentAPI } = this.state;
-
-      if (this.props.windowSize) {
-        this.showSelectorsInPopover = this.props.windowSize.width < 1100;
-      }
-
-      if (
-        prevProps.state.showMenu !== this.props.state.showMenu ||
-        (this.props.state.showMenu === true && this.state.showMenu === false)
-      ) {
-        newState = { ...newState, ...(await this.load()) };
-      }
-      if ((!currentAPI && apiId) || apiId !== currentAPI) {
-        newState = { ...newState, currentAPI: apiId };
-      } else {
-        if (
-          currentAPI &&
-          this.props.state.currentAPI &&
-          currentAPI !== this.props.state.currentAPI
-        ) {
-          newState = { ...newState, currentAPI: this.props.state.currentAPI };
-        }
-      }
-      if (
-        !_.isEqual(
-          prevProps?.appConfig?.data?.['ip.ignore'],
-          this.props?.appConfig?.data?.['ip.ignore'],
-        )
-      ) {
-        newState = { ...newState, ...(await this.loadIndexPatternsList()) };
-      }
-
-      if (
-        !_.isEqual(
-          this.props.globalBreadcrumbReducers.breadcrumb,
-          prevProps.globalBreadcrumbReducers.breadcrumb,
-        )
-      ) {
-        setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
-      }
-
-      newState = { ...prevProps.state, ...newState };
-      if (!_.isEqual(newState, prevProps.state)) {
-        // and the state is different from the previous one
-        this.setState(newState);
-      }
-    }
-
-    async load() {
-      try {
-        let newState = {};
-        newState = {
-          showMenu: true,
-          isOverviewPopoverOpen: false,
-          isManagementPopoverOpen: false,
-          isSelectorsPopoverOpen: false,
-        };
-
-        let list = await PatternHandler.getPatternList('api');
-        if (!list || (list && !list.length)) return;
-        this.props?.appConfig?.data?.['ip.ignore']?.length &&
-          (list = list.filter(
-            indexPattern =>
-              !this.props?.appConfig?.data?.['ip.ignore'].includes(
-                indexPattern.title,
-              ),
-          ));
-
-        let filtered = false;
-        // If there is no current pattern, fetch it
-        if (!AppState.getCurrentPattern()) {
-          AppState.setCurrentPattern(list[0].id);
-        } else {
-          // Check if the current pattern cookie is valid
-          filtered = list.filter(item =>
-            item.id.includes(AppState.getCurrentPattern()),
-          );
-          if (!filtered.length) AppState.setCurrentPattern(list[0].id);
-        }
-
-        const data = filtered
-          ? filtered
-          : await this.indexPatterns.get(AppState.getCurrentPattern());
-        newState = {
-          ...newState,
-          theresPattern: true,
-          currentPattern: data.title,
-        };
-
-        // Getting the list of index patterns
-        if (list) {
-          newState = {
-            ...newState,
-            patternList: list,
-            currentSelectedPattern: AppState.getCurrentPattern(),
-          };
-        }
-        return newState;
-      } catch (error) {
+        this.isLoading = false;
         const options = {
           context: `${WzMenu.name}.load`,
           level: UI_LOGGER_LEVELS.ERROR,
@@ -285,7 +235,6 @@ export const WzMenu = withWindowSize(
         };
         getErrorOrchestrator().handleError(options);
       }
-      this.isLoading = false;
     }
 
     updatePatternAndApi = async () => {
