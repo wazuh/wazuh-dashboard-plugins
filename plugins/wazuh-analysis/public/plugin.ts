@@ -1,6 +1,5 @@
 import {
   App,
-  AppNavLinkStatus,
   CoreSetup,
   CoreStart,
   DEFAULT_NAV_GROUPS,
@@ -20,18 +19,6 @@ interface AnalysisSetupDependencies {}
 
 interface AnalysisStartDependencies {
   navigation: NavigationPublicPluginStart;
-}
-
-function setNavLinkVisible(): Partial<App> {
-  return {
-    navLinkStatus: AppNavLinkStatus.visible,
-  };
-}
-
-function setNavLinkHidden(): Partial<App> {
-  return {
-    navLinkStatus: AppNavLinkStatus.hidden,
-  };
 }
 
 export class AnalysisPlugin
@@ -58,9 +45,7 @@ export class AnalysisPlugin
       navGroup.getAppGroup(),
     );
 
-    this.applicationService.initializeNavGroupMounts(applications, core, {
-      prepareApp: setNavLinkVisible,
-    });
+    this.applicationService.initializeNavGroupMounts(applications, core);
 
     if (core.chrome.navGroup.getNavGroupEnabled()) {
       core.chrome.globalSearch.registerSearchCommand({
@@ -81,10 +66,7 @@ export class AnalysisPlugin
     );
 
     for (const apps of subApps) {
-      this.applicationService.initializeSubApplicationMounts(apps, core, {
-        prepareApp: setNavLinkVisible,
-        teardownApp: setNavLinkHidden,
-      });
+      this.applicationService.initializeSubApplicationMounts(apps, core);
     }
   }
 

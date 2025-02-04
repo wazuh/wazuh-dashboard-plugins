@@ -2,6 +2,7 @@ import {
   App,
   AppMount,
   AppMountParameters,
+  AppNavLinkStatus,
   AppUpdater,
   CoreSetup,
   CoreStart,
@@ -58,17 +59,31 @@ export class ApplicationService {
     return this.appUpdater$[appId];
   }
 
+  private setNavLinkVisible(): Partial<App> {
+    return {
+      navLinkStatus: AppNavLinkStatus.visible,
+    };
+  }
+
+  private setNavLinkHidden(): Partial<App> {
+    return {
+      navLinkStatus: AppNavLinkStatus.hidden,
+    };
+  }
+
   initializeNavGroupMounts(
     apps: App[],
     core: CoreSetup,
-    appOperations: AppOperations,
+    appOperations?: AppOperations,
   ) {
+    const prepareApp = appOperations?.prepareApp ?? this.setNavLinkVisible;
+
     for (const app of apps) {
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.getAppUpdater(app.id).next(appOperations.prepareApp);
+          this.getAppUpdater(app.id).next(prepareApp);
           this.appStartup$.next(app.id);
         }
 
@@ -82,21 +97,24 @@ export class ApplicationService {
   initializeSubApplicationMounts(
     apps: App[],
     core: CoreSetup,
-    appOperations: AppOperations,
+    appOperations?: AppOperations,
   ) {
+    const prepareApp = appOperations?.prepareApp ?? this.setNavLinkVisible;
+    const teardownApp = appOperations?.teardownApp ?? this.setNavLinkHidden;
+
     for (const app of apps) {
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.getAppUpdater(app.id).next(appOperations.prepareApp);
+          this.getAppUpdater(app.id).next(prepareApp);
         }
 
         const unmount = await mount(params);
 
         return () => {
           if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.getAppUpdater(app.id).next(appOperations.teardownApp);
+            this.getAppUpdater(app.id).next(teardownApp);
           }
 
           unmount();
