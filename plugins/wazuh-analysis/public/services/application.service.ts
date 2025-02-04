@@ -110,6 +110,10 @@ export class ApplicationService {
     };
   }
 
+  private getNavGroupId(appId: string): string {
+    return appId.split('_%2F')[0];
+  }
+
   /**
    * The function initializes navigation group mounts for a list of apps in a
    * TypeScript codebase.
@@ -140,11 +144,12 @@ export class ApplicationService {
       this.logger?.debug(`initializeApp ${app.id}`);
 
       const mount = app.mount.bind(app) as AppMount;
+      const navGroupId = this.getNavGroupId(app.id);
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.getAppUpdater(app.id).next(beforeMount);
-          this.appStartup$.next(app.id);
+          this.getAppUpdater(navGroupId).next(beforeMount);
+          this.appStartup$.next(navGroupId);
         }
 
         const unmount = await mount(params);
@@ -153,7 +158,7 @@ export class ApplicationService {
           this.logger?.debug(`unmount ${app.id}`);
 
           if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.getAppUpdater(app.id).next(appOperations?.cleanup);
+            this.getAppUpdater(navGroupId).next(appOperations?.cleanup);
           }
 
           unmount();
@@ -198,10 +203,11 @@ export class ApplicationService {
       this.logger?.debug(`initializeApp ${app.id}`);
 
       const mount = app.mount.bind(app) as AppMount;
+      const navGroupId = this.getNavGroupId(app.id);
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.getAppUpdater(app.id).next(beforeMount);
+          this.getAppUpdater(navGroupId).next(beforeMount);
         }
 
         const unmount = await mount(params);
@@ -210,7 +216,7 @@ export class ApplicationService {
           this.logger?.debug(`unmount ${app.id}`);
 
           if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.getAppUpdater(app.id).next(cleanup);
+            this.getAppUpdater(navGroupId).next(cleanup);
           }
 
           unmount();
