@@ -5,6 +5,16 @@ import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 import { AGENT } from '../../../../test/__mocks__/agent';
 
+jest.mock('../../common/hooks/use-app-config', () => ({
+  useAppConfig: () => ({
+    isReady: true,
+    isLoading: false,
+    data: {
+      'reports.csv.maxRows': 10000,
+    },
+  }),
+}));
+
 const TABLE_ID = '__table_7d62db31-1cd0-11ee-8e0c-33242698a3b9';
 const SOFTWARE_PACKAGES = 'Packages';
 const SOFTWARE_WINDOWS_UPDATES = 'Windows updates';
