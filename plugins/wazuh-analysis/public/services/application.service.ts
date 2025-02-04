@@ -24,8 +24,8 @@ class AppUpdaterNotFoundError extends Error {
 }
 
 interface AppOperations {
-  prepareApp?: () => Partial<App>;
-  teardownApp?: () => Partial<App>;
+  beforeMount?: () => Partial<App>;
+  cleanup?: () => Partial<App>;
 }
 
 export class ApplicationService {
@@ -121,14 +121,14 @@ export class ApplicationService {
     core: CoreSetup,
     appOperations?: AppOperations,
   ) {
-    const prepareApp = appOperations?.prepareApp ?? this.setNavLinkVisible;
+    const beforeMount = appOperations?.beforeMount ?? this.setNavLinkVisible;
 
     for (const app of apps) {
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.getAppUpdater(app.id).next(prepareApp);
+          this.getAppUpdater(app.id).next(beforeMount);
           this.appStartup$.next(app.id);
         }
 
@@ -172,22 +172,22 @@ export class ApplicationService {
     core: CoreSetup,
     appOperations?: AppOperations,
   ) {
-    const prepareApp = appOperations?.prepareApp ?? this.setNavLinkVisible;
-    const teardownApp = appOperations?.teardownApp ?? this.setNavLinkHidden;
+    const beforeMount = appOperations?.beforeMount ?? this.setNavLinkVisible;
+    const cleanup = appOperations?.cleanup ?? this.setNavLinkHidden;
 
     for (const app of apps) {
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.getAppUpdater(app.id).next(prepareApp);
+          this.getAppUpdater(app.id).next(beforeMount);
         }
 
         const unmount = await mount(params);
 
         return () => {
           if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.getAppUpdater(app.id).next(teardownApp);
+            this.getAppUpdater(app.id).next(cleanup);
           }
 
           unmount();
