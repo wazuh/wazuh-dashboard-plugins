@@ -9,6 +9,7 @@ import {
 } from 'opensearch-dashboards/public';
 import { Subject } from 'rxjs';
 import { i18n } from '@osd/i18n';
+import { Logger } from '@osd/logging';
 import { getCurrentNavGroup } from '../utils/nav-group';
 import { NavGroupItemInMap } from '../../../../src/core/public';
 
@@ -33,6 +34,8 @@ export class ApplicationService {
     {};
   private readonly appStartup$ = new Subject<string>();
 
+  constructor(private readonly logger?: Logger) {}
+
   /**
    * This function takes a parent app ID and a sub app ID, and returns a
    * combined ID with the sub app ID URL-encoded.
@@ -53,6 +56,7 @@ export class ApplicationService {
    * updater.
    */
   registerAppUpdater(appId: string) {
+    this.logger?.debug('registerAppUpdater', {});
     this.appUpdater$[appId] = new Subject<AppUpdater>();
   }
 
@@ -68,7 +72,10 @@ export class ApplicationService {
    * that was passed as an argument.
    */
   getAppUpdater(appId: string) {
+    this.logger?.debug(`getAppUpdater ${appId}`);
+
     if (!this.appUpdater$[appId]) {
+      this.logger?.error(`getAppUpdater ${appId}`);
       throw new AppUpdaterNotFoundError(appId);
     }
 
@@ -82,6 +89,8 @@ export class ApplicationService {
    * property `navLinkStatus` set to `AppNavLinkStatus.visible`.
    */
   private setNavLinkVisible(): Partial<App> {
+    this.logger?.debug('setNavLinkVisible');
+
     return {
       navLinkStatus: AppNavLinkStatus.visible,
     };
@@ -94,6 +103,8 @@ export class ApplicationService {
    * navLinkStatus property set to AppNavLinkStatus.hidden.
    */
   private setNavLinkHidden(): Partial<App> {
+    this.logger?.debug('setNavLinkHidden');
+
     return {
       navLinkStatus: AppNavLinkStatus.hidden,
     };
@@ -121,9 +132,13 @@ export class ApplicationService {
     core: CoreSetup,
     appOperations?: AppOperations,
   ) {
+    this.logger?.debug('initializeNavGroupMounts');
+
     const beforeMount = appOperations?.beforeMount ?? this.setNavLinkVisible;
 
     for (const app of apps) {
+      this.logger?.debug(`initializeApp ${app.id}`);
+
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
@@ -135,6 +150,8 @@ export class ApplicationService {
         const unmount = await mount(params);
 
         return () => {
+          this.logger?.debug(`unmount ${app.id}`);
+
           if (core.chrome.navGroup.getNavGroupEnabled()) {
             this.getAppUpdater(app.id).next(appOperations?.cleanup);
           }
@@ -172,10 +189,14 @@ export class ApplicationService {
     core: CoreSetup,
     appOperations?: AppOperations,
   ) {
+    this.logger?.debug('initializeSubApplicationMounts');
+
     const beforeMount = appOperations?.beforeMount ?? this.setNavLinkVisible;
     const cleanup = appOperations?.cleanup ?? this.setNavLinkHidden;
 
     for (const app of apps) {
+      this.logger?.debug(`initializeApp ${app.id}`);
+
       const mount = app.mount.bind(app) as AppMount;
 
       app.mount = async (params: AppMountParameters) => {
@@ -186,6 +207,8 @@ export class ApplicationService {
         const unmount = await mount(params);
 
         return () => {
+          this.logger?.debug(`unmount ${app.id}`);
+
           if (core.chrome.navGroup.getNavGroupEnabled()) {
             this.getAppUpdater(app.id).next(cleanup);
           }
@@ -212,6 +235,8 @@ export class ApplicationService {
   onAppStartupSubscribe(core: CoreStart) {
     this.appStartup$.subscribe({
       next: async (navGroupId: string) => {
+        this.logger?.debug(`onAppStartupSubscribe ${navGroupId}`);
+
         if (core.chrome.navGroup.getNavGroupEnabled()) {
           core.chrome.navGroup.setCurrentNavGroup(navGroupId);
 
@@ -241,6 +266,8 @@ export class ApplicationService {
     core: CoreStart,
     navGroup: NavGroupItemInMap | undefined,
   ) {
+    this.logger?.debug('navigateToFirstAppInNavGroup');
+
     // Get the first nav item, if it exists navigate to the app
     const firstNavItem = navGroup?.navLinks[0];
 
