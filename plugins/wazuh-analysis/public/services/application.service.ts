@@ -157,10 +157,6 @@ export class ApplicationService {
         return () => {
           this.logger?.debug(`unmount ${app.id}`);
 
-          if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.getAppUpdater(navGroupId).next(appOperations?.cleanup);
-          }
-
           unmount();
 
           return true;
