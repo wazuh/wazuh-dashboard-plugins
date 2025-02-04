@@ -60,7 +60,7 @@ test.each(panelEntries)(
   },
 );
 
-test(`Test vulnerability panels`, () => {
+test(`Test cluster panels`, () => {
   const nodeListMock = [{ name: 'node1' }, { name: 'node2' }];
   expect(
     compareColumnsValue(
