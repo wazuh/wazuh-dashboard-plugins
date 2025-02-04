@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed the width of the command column, relocate argvs column and change the width of the rest of the columns in the table processes. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
 
 ### Fixed
+
 - Fixed documentation URL related to the usage of authentication password in the agent deployment [#7251](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7251)
 - Fixed a problem with duplicated requests to get the list of valid index patterns in the menu [#7255](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7255)
 
