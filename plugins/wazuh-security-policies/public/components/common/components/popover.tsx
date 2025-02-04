@@ -5,10 +5,11 @@ interface PopoverIconButtonProps {
   children?: React.ReactNode;
   styles?: React.CSSProperties;
   color?: string;
+  icon?: string;
 }
 
 export const PopoverIconButton = (props: PopoverIconButtonProps) => {
-  const { children, styles, color = 'text' } = props;
+  const { children, styles, color = 'text', icon = 'boxesVertical' } = props;
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const onButtonClick = () => setIsPopoverOpen(isPopoverOpen => !isPopoverOpen);
   const closePopover = () => setIsPopoverOpen(false);
@@ -21,7 +22,7 @@ export const PopoverIconButton = (props: PopoverIconButtonProps) => {
         <EuiButtonIcon
           color={color}
           onClick={onButtonClick}
-          iconType='boxesVertical'
+          iconType={icon}
           aria-label='Options'
         />
       }

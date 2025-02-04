@@ -11,12 +11,14 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
-import { set } from 'lodash';
+import { set, cloneDeep } from 'lodash';
+import convert from 'xml-js';
 import { PopoverIconButton } from '../components/popover';
 import { getAppUrl } from '../../utils/get-app-url';
 import { capitalizeFirstLetter } from '../../utils/capitalize-first-letter';
 import { metadataInitialValues } from '../../rules/schemas/metadata.schema';
-import { renderStepPanel } from '../components/render-steps';
+import { RenderStepPanel } from '../components/render-steps';
+import { XMLEditor } from '../components/xml-editor';
 
 const getAvailableOptions = selectedSteps => {
   const baseOptions = [
@@ -57,10 +59,10 @@ const getAvailableOptions = selectedSteps => {
 };
 
 export const CreateTemplate = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const cloneInitialValues = cloneDeep(metadataInitialValues);
   const [onXml, setOnXml] = useState(false);
   const [stepsToRender, setstepsToRender] = useState(['metadata']);
-  const [item, setItem] = useState(metadataInitialValues);
+  const [item, setItem] = useState(cloneInitialValues);
   const [addStep, setAddStep] = useState(
     getAvailableOptions(stepsToRender)?.[0]?.value,
   );
@@ -122,7 +124,11 @@ export const CreateTemplate = () => {
       <div>
         {buttonsPopover.map((button, index) => (
           <span key={button.id}>
-            <EuiButtonEmpty size='s' color={button.color}>
+            <EuiButtonEmpty
+              size='s'
+              color={button.color}
+              onClick={button.onClick}
+            >
               {button.label}
             </EuiButtonEmpty>
             {index < buttonsPopover.length - 1 && (
@@ -170,12 +176,14 @@ export const CreateTemplate = () => {
   };
 
   const steps = stepsItems => {
-    const stepsArray = Object.entries(stepsItems)
-      .filter(([key]) => stepsToRender.includes(key))
-      .map(([stepName, value]) => ({
-        title: capitalizeFirstLetter(stepName),
-        children: renderStepPanel({ key: stepName, value, handleSetItem }),
-      }));
+    const stepsArray = stepsToRender.map(stepName => ({
+      title: capitalizeFirstLetter(stepName),
+      children: (
+        <RenderStepPanel
+          step={{ key: stepName, value: stepsItems[stepName], handleSetItem }}
+        />
+      ),
+    }));
     const optionsToSelect = getAvailableOptions(stepsToRender);
 
     if (optionsToSelect.length > 1) {
@@ -236,11 +244,22 @@ export const CreateTemplate = () => {
         }}
         rightSideItems={buttons}
       />
-      <EuiSteps
-        className='steps-details'
-        status='incomplete'
-        steps={steps(item)}
-      />
+      {onXml ? (
+        <XMLEditor
+          data={item}
+          onChange={value => {
+            console.log('Check', value);
+          }}
+        />
+      ) : (
+        <EuiSteps
+          className='steps-details'
+          status='incomplete'
+          steps={steps(
+            typeof item === 'string' ? convert.xml2json(item) : item,
+          )}
+        />
+      )}
     </>
   );
 };

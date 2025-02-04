@@ -1,23 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   EuiPanel,
   EuiAccordion,
   EuiHorizontalRule,
   EuiForm,
   EuiButton,
+  EuiButtonEmpty,
 } from '@elastic/eui';
+import { cloneDeep } from 'lodash';
 import { capitalizeFirstLetter } from '../../utils/capitalize-first-letter';
 import { renderInputs } from '../../utils/inputs/render-inputs';
 import { STEPS } from '../constants';
 import './render-steps.scss';
 import { isEditable } from '../../utils/is-editable';
+import { metadataInitialValues } from '../../rules/schemas/metadata.schema';
 import { RenderCheckStep } from './steps/render-check-step';
 import { RenderNormalizeStep } from './steps/render-normalize-step';
 import { RenderParseStep } from './steps/render-parse-step';
-import { ParseNameInput } from './steps/parse-name-input';
+import { PopoverIconButton } from './popover';
 
-export const renderStepPanel = step => {
+interface StepsProps {
+  step: {
+    key: string;
+    value: any;
+    handleSetItem: (props: { key: string; newValue: any }) => void;
+    keyValue?: string;
+  };
+}
+
+export const RenderStepPanel = ({ step }: StepsProps) => {
   const editable = isEditable();
+  const [onXml, setOnXml] = useState(false);
   let panelToRender: React.ReactNode;
 
   const renderCardTitle = (stepName: string, item: any) => {
@@ -39,6 +52,10 @@ export const renderStepPanel = step => {
 
       case stepName.startsWith(STEPS.parse): {
         panelToRender = <RenderParseStep step={step} />;
+
+        if (!stepName.includes('|')) {
+          return 'Parse';
+        }
 
         return stepName.split('|')[1];
       }
@@ -115,25 +132,68 @@ export const renderStepPanel = step => {
     );
   }
 
+  const buttonsPopover = [
+    {
+      id: `editOnFormOrXMLStep-${step.key}`,
+      label: onXml ? 'Edit on form' : 'Edit on XML',
+      color: 'text',
+      onClick: () => setOnXml(!onXml),
+    },
+    {
+      id: `duplicateItem-${step.key}`,
+      label: `Duplicate ${step.key}`,
+      color: 'text',
+      onClick: () => {},
+    },
+    {
+      id: `clear-${step.key}`,
+      label: 'Clear',
+      color: 'text',
+      onClick: () => {
+        step.handleSetItem({
+          newValue: cloneDeep(metadataInitialValues[step.key]),
+          key: step.key,
+        });
+      },
+    },
+  ];
+  const popover = (
+    <PopoverIconButton>
+      <div>
+        {buttonsPopover.map((button, index) => (
+          <span key={button.id}>
+            <EuiButtonEmpty
+              size='s'
+              color={button.color}
+              onClick={button.onClick}
+            >
+              {button.label}
+            </EuiButtonEmpty>
+            {index < buttonsPopover.length - 1 && (
+              <EuiHorizontalRule margin='none' />
+            )}
+          </span>
+        ))}
+      </div>
+    </PopoverIconButton>
+  );
+
   return (
     <EuiPanel>
-      {step.key === STEPS.parse ? (
-        <ParseNameInput step={step} />
-      ) : (
-        <EuiAccordion
-          id='accordion1'
-          paddingSize='s'
-          buttonContent={renderCardTitle(step.key, step)}
-        >
-          <EuiHorizontalRule margin='s' />
+      <EuiAccordion
+        id='accordion1'
+        paddingSize='s'
+        buttonContent={renderCardTitle(step.key, step)}
+        extraAction={popover}
+      >
+        <EuiHorizontalRule margin='s' />
 
-          <EuiForm component='form'>
-            {editable && stepsDiferentRender.includes(step.key)
-              ? panelToRender
-              : renderInputs(step)}
-          </EuiForm>
-        </EuiAccordion>
-      )}
+        <EuiForm component='form'>
+          {editable && stepsDiferentRender.includes(step.key)
+            ? panelToRender
+            : renderInputs(step)}
+        </EuiForm>
+      </EuiAccordion>
     </EuiPanel>
   );
 };

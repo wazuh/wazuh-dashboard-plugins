@@ -7,6 +7,7 @@ import { inputArray } from '../../../utils/inputs/array-inputs';
 export const RenderParseStep = (props: any) => {
   const { step } = props;
   const [value, setValue] = useState('');
+  const [eventField, setEventField] = useState('');
   const [valueArray, setValueArray] = useState(step?.value || []);
 
   const handleSetValue = ({ newValue }: { newValue: string }) => {
@@ -22,13 +23,26 @@ export const RenderParseStep = (props: any) => {
 
   const handleSaveButton = () => {
     step.handleSetItem({
-      key: step.key,
+      key: `${step.key}|${eventField}`,
       newValue: valueArray,
     });
   };
 
+  const handleParseTitle = ({ newValue }: { newValue: string }) => {
+    setEventField(newValue);
+  };
+
   return (
     <>
+      {inputString(
+        {
+          ...step,
+          key: 'Field to parse',
+          value: eventField,
+          handleSetItem: handleParseTitle,
+        },
+        true,
+      )}
       {inputString({ ...step, value, handleSetItem: handleSetValue }, true)}
       <EuiButton
         size='s'

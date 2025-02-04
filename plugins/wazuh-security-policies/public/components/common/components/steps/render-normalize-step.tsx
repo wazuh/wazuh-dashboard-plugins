@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   EuiButton,
   EuiFlexGroup,
@@ -10,6 +10,26 @@ import { TableForm } from '../table-form';
 import { STEPS } from '../../constants';
 import { capitalizeFirstLetter } from '../../../utils/capitalize-first-letter';
 import { RenderCheckStep } from './render-check-step';
+import { RenderParseStep } from './render-parse-step';
+
+const optionsToSelect = [
+  {
+    text: 'Select item',
+    value: '',
+  },
+  {
+    text: 'Map',
+    value: 'map',
+  },
+  {
+    text: 'Check',
+    value: 'check',
+  },
+  {
+    text: 'Parse',
+    value: 'parse',
+  },
+];
 
 export const RenderNormalizeStep = (props: {
   step: {
@@ -18,54 +38,17 @@ export const RenderNormalizeStep = (props: {
     handleSetItem: (props: { key: string; newValue: any }) => void;
   };
 }) => {
-  const [itemSelected, setItemSelected] = useState('');
+  const [itemSelected, setItemSelected] = useState(optionsToSelect[0].text);
   const [items, setItems] = useState<string[]>([]);
-  const optionsToSelect = [
-    {
-      text: 'Select item',
-      value: '',
-    },
-    {
-      text: 'Map',
-      value: 'map',
-    },
-    {
-      text: 'Check',
-      value: 'check',
-    },
-    {
-      text: 'Parse',
-      value: 'parse',
-    },
-  ];
+  const [optionSelect, setOptionSelect] =
+    useState<{ text: string; value: string }[]>(optionsToSelect);
 
   const addItem = () => {
     setItems([...items, itemSelected]);
+    setOptionSelect(
+      optionSelect.filter(option => option.value !== itemSelected),
+    );
   };
-
-  let options = [
-    {
-      text: 'Select item',
-      value: 'Select item',
-    },
-    {
-      text: 'Map',
-      value: 'map',
-    },
-    {
-      text: 'Check',
-      value: 'check',
-    },
-    {
-      text: 'Parse',
-      value: 'parse',
-    },
-  ];
-
-  useEffect(() => {
-    setItemSelected(options?.[0].value);
-    options = optionsToSelect.filter(option => !items.includes(option.value));
-  }, [items]);
 
   return (
     <>
@@ -74,7 +57,7 @@ export const RenderNormalizeStep = (props: {
           <EuiSelect
             id='addItems'
             hasNoInitialSelection
-            options={options}
+            options={optionSelect}
             value={itemSelected}
             compressed
             fullWidth
@@ -87,34 +70,57 @@ export const RenderNormalizeStep = (props: {
           </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
-      {items?.map((item, index) => {
-        switch (item) {
-          case STEPS.check: {
-            return (
-              <div key={index}>
-                <EuiTitle size='xxs'>
-                  <h1>{capitalizeFirstLetter(STEPS.check)}</h1>
-                </EuiTitle>
-                <RenderCheckStep step={props.step} />
-              </div>
-            );
-          }
+      <EuiFlexGroup>
+        {items?.map((item, index) => {
+          switch (item) {
+            case STEPS.check: {
+              return (
+                <EuiFlexItem key={index}>
+                  <EuiTitle size='xxs'>
+                    <h1>{capitalizeFirstLetter(STEPS.check)}</h1>
+                  </EuiTitle>
+                  <RenderCheckStep
+                    step={{
+                      ...props.step,
+                      key: `${props.step.key}.[0].${STEPS.check}`,
+                    }}
+                  />
+                </EuiFlexItem>
+              );
+            }
 
-          default: {
-            return (
-              <div key={index}>
-                <EuiTitle size='xxs'>
-                  <h1>Map</h1>
-                </EuiTitle>
-                <TableForm
-                  parentKey={`${props.step.key}.map`}
-                  handleSetItem={props.step.handleSetItem}
-                />
-              </div>
-            );
+            case STEPS.parse: {
+              return (
+                <EuiFlexItem key={index}>
+                  <EuiTitle size='xxs'>
+                    <h1>{capitalizeFirstLetter(STEPS.parse)}</h1>
+                  </EuiTitle>
+                  <RenderParseStep
+                    step={{
+                      ...props.step,
+                      key: `${props.step.key}.${STEPS.parse}`,
+                    }}
+                  />
+                </EuiFlexItem>
+              );
+            }
+
+            default: {
+              return (
+                <EuiFlexItem key={index}>
+                  <EuiTitle size='xxs'>
+                    <h1>Map</h1>
+                  </EuiTitle>
+                  <TableForm
+                    parentKey={`${props.step.key}.map`}
+                    handleSetItem={props.step.handleSetItem}
+                  />
+                </EuiFlexItem>
+              );
+            }
           }
-        }
-      })}
+        })}
+      </EuiFlexGroup>
     </>
   );
 };
