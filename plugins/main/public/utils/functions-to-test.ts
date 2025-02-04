@@ -1,4 +1,7 @@
 import React from 'react';
+
+// TODO: Some fields are used in query params and idExtractor don't check it.
+
 export function idExtractor(table: { [x: string]: any }): string[] {
   return Object.values(table)
     .flatMap(panel => {
