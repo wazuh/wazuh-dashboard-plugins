@@ -79,8 +79,8 @@ export const EndpointsSummary = compose(
     filterAgentByOS(item: any) {
       const query =
         item.label === 'N/A'
-          ? 'id!=000;os.name=null'
-          : `id!=000;os.name~${item.label}`;
+          ? 'id!=000;os.platform=null'
+          : `id!=000;os.platform~${item.label}`;
       this._isMount &&
         this.setState({
           agentTableFilters: { q: query },
