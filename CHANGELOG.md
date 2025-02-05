@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Refined queue usage visualizations in Statistics [#7192](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7192)
+- Changed TOP-5-SO filter management in Endpoints > Summary [#7278](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7278)
 
 ### Fixed
 
