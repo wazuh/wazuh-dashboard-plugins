@@ -5,11 +5,6 @@ import {
   DEFAULT_NAV_GROUPS,
   Plugin,
 } from '../../../src/core/public';
-import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
-import {
-  WazuhCorePluginSetup,
-  WazuhCorePluginStart,
-} from '../../wazuh-core/public';
 import { ApplicationService } from '../../wazuh-core/public/services/application/application';
 import { searchPages } from './components/global_search/search-pages-command';
 import { CloudSecurityNavGroup } from './groups/cloud-security';
@@ -17,16 +12,12 @@ import { EndpointSecurityNavGroup } from './groups/endpoint-security';
 import { SecurityOperationsNavGroup } from './groups/security-operations';
 import { ThreatIntelligenceNavGroup } from './groups/threat-intelligence';
 import { Group, GroupsId } from './groups/types';
-import { AnalysisSetup, AnalysisStart } from './types';
-
-interface AnalysisSetupDependencies {
-  wazuhCore: WazuhCorePluginSetup;
-}
-
-interface AnalysisStartDependencies {
-  navigation: NavigationPublicPluginStart;
-  wazuhCore: WazuhCorePluginStart;
-}
+import {
+  AnalysisSetup,
+  AnalysisSetupDependencies,
+  AnalysisStart,
+  AnalysisStartDependencies,
+} from './types';
 
 export class AnalysisPlugin
   implements
