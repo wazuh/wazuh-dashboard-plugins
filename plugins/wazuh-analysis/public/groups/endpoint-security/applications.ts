@@ -23,9 +23,11 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
       updater$,
       mount: async (params: AppMountParameters) => {
         // TODO: Implement the configuration assessment application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import(
+          './apps/configuration-assesment/application'
+        );
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
     {
@@ -35,7 +37,9 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
       updater$,
       mount: async (params: AppMountParameters) => {
         // TODO: Implement the malware detection application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import(
+          './apps/malware-detection/application'
+        );
 
         return await renderApp(params, {});
       },
@@ -47,7 +51,7 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
       updater$,
       mount: async (params: AppMountParameters) => {
         // TODO: Implement the fim application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import('./apps/fim/application');
 
         return await renderApp(params, {});
       },
