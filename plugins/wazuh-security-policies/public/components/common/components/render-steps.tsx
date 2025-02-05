@@ -30,7 +30,7 @@ interface StepsProps {
 
 export const RenderStepPanel = ({ step }: StepsProps) => {
   const editable = isEditable();
-  const [onXml, setOnXml] = useState(false);
+  const [onYaml, setOnYaml] = useState(false);
   let panelToRender: React.ReactNode;
 
   const renderCardTitle = (stepName: string, item: any) => {
@@ -134,10 +134,10 @@ export const RenderStepPanel = ({ step }: StepsProps) => {
 
   const buttonsPopover = [
     {
-      id: `editOnFormOrXMLStep-${step.key}`,
-      label: onXml ? 'Edit on form' : 'Edit on XML',
+      id: `editOnFormOrYAMLStep-${step.key}`,
+      label: onYaml ? 'Edit on form' : 'Edit on YAML',
       color: 'text',
-      onClick: () => setOnXml(!onXml),
+      onClick: () => setOnYaml(!onYaml),
     },
     {
       id: `duplicateItem-${step.key}`,

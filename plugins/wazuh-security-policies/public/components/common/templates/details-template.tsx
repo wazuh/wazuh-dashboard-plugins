@@ -52,12 +52,12 @@ export const DetailsTemplate = () => {
       {item?.status}
     </EuiButtonEmpty>,
     <EuiButtonEmpty
-      key='view-in-xml'
+      key='view-in-yaml'
       size='xs'
       color='primary'
       onClick={() => {}}
     >
-      View in XML
+      View in YAML
     </EuiButtonEmpty>,
   ];
 

@@ -10,15 +10,16 @@ import {
   EuiSelect,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiTitle,
 } from '@elastic/eui';
 import { set, cloneDeep } from 'lodash';
-import convert from 'xml-js';
+import yaml from 'js-yaml';
 import { PopoverIconButton } from '../components/popover';
 import { getAppUrl } from '../../utils/get-app-url';
 import { capitalizeFirstLetter } from '../../utils/capitalize-first-letter';
 import { metadataInitialValues } from '../../rules/schemas/metadata.schema';
 import { RenderStepPanel } from '../components/render-steps';
-import { XMLEditor } from '../components/xml-editor';
+import { YAMLEditor } from '../components/yaml-editor';
 
 const getAvailableOptions = selectedSteps => {
   const baseOptions = [
@@ -60,7 +61,7 @@ const getAvailableOptions = selectedSteps => {
 
 export const CreateTemplate = () => {
   const cloneInitialValues = cloneDeep(metadataInitialValues);
-  const [onXml, setOnXml] = useState(false);
+  const [onYaml, setOnYaml] = useState(false);
   const [stepsToRender, setstepsToRender] = useState(['metadata']);
   const [item, setItem] = useState(cloneInitialValues);
   const [addStep, setAddStep] = useState(
@@ -86,10 +87,16 @@ export const CreateTemplate = () => {
 
   const buttonsPopover = [
     {
-      id: 'editOnFormOrXML',
-      label: onXml ? 'Edit on form' : 'Edit on XML',
+      id: 'editOnFormOrYAML',
+      label: onYaml ? 'Edit on form' : 'Edit on YAML',
       color: 'text',
-      onClick: () => setOnXml(!onXml),
+      onClick: () => {
+        if (onYaml) {
+          setItem(yaml.load(item));
+        }
+
+        setOnYaml(!onYaml);
+      },
     },
     {
       id: 'enable/disable',
@@ -145,17 +152,19 @@ export const CreateTemplate = () => {
       fill
       onClick={() =>
         console.log(
-          Object.fromEntries(
-            Object.entries(item).filter(
-              ([key]) =>
-                [
-                  ...stepsToRender.filter(step => step !== 'parse'),
-                  'name',
-                  'status',
-                  'enable',
-                ].includes(key) || key.startsWith('parse|'),
-            ),
-          ),
+          onYaml
+            ? item
+            : Object.fromEntries(
+                Object.entries(item).filter(
+                  ([key]) =>
+                    [
+                      ...stepsToRender.filter(step => step !== 'parse'),
+                      'name',
+                      'status',
+                      'enable',
+                    ].includes(key) || key.startsWith('parse|'),
+                ),
+              ),
         )
       }
     >
@@ -224,18 +233,24 @@ export const CreateTemplate = () => {
     <>
       <EuiPageHeader
         pageTitle={
-          <EuiFieldText
-            placeholder={`${capitalizeFirstLetter(view)} name`}
-            value={item.name}
-            style={{ display: 'flex' }}
-            compressed
-            onChange={event =>
-              handleSetItem({
-                newValue: event.target.value,
-                key: 'name',
-              })
-            }
-          />
+          onYaml ? (
+            <EuiTitle>
+              <h1>test</h1>
+            </EuiTitle>
+          ) : (
+            <EuiFieldText
+              placeholder={`${capitalizeFirstLetter(view)} name`}
+              value={item.name}
+              style={{ display: 'flex' }}
+              compressed
+              onChange={event =>
+                handleSetItem({
+                  newValue: event.target.value,
+                  key: 'name',
+                })
+              }
+            />
+          )
         }
         bottomBorder={true}
         alignItems='center'
@@ -244,20 +259,19 @@ export const CreateTemplate = () => {
         }}
         rightSideItems={buttons}
       />
-      {onXml ? (
-        <XMLEditor
+      {onYaml ? (
+        <YAMLEditor
           data={item}
           onChange={value => {
-            console.log('Check', value);
+            setItem(value);
+            console.log(yaml.load(value));
           }}
         />
       ) : (
         <EuiSteps
           className='steps-details'
           status='incomplete'
-          steps={steps(
-            typeof item === 'string' ? convert.xml2json(item) : item,
-          )}
+          steps={steps(item)}
         />
       )}
     </>
