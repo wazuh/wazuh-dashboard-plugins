@@ -12,7 +12,6 @@ import { EndpointSecurityNavGroup } from './groups/endpoint-security';
 import { SecurityOperationsNavGroup } from './groups/security-operations';
 import { ThreatIntelligenceNavGroup } from './groups/threat-intelligence';
 import { Group, GroupsId } from './groups/types';
-import { ApplicationService } from './services/application.service';
 import { AnalysisSetup, AnalysisStart } from './types';
 
 interface AnalysisSetupDependencies {}
@@ -25,7 +24,6 @@ export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
-  private readonly applicationService = new ApplicationService();
   private coreStart?: CoreStart;
   private readonly navGroups: Group<GroupsId>[] = [
     EndpointSecurityNavGroup,
@@ -39,7 +37,7 @@ export class AnalysisPlugin
       navGroup.getAppGroup(),
     );
 
-    this.applicationService.initializeNavGroupMounts(applications, core);
+    core.application.initializeNavGroupMounts(applications, core);
 
     if (core.chrome.navGroup.getNavGroupEnabled()) {
       core.chrome.globalSearch.registerSearchCommand({
@@ -56,11 +54,11 @@ export class AnalysisPlugin
     }
 
     const subApps: App[][] = this.navGroups.map(navGroup =>
-      navGroup.getApps(this.applicationService.getAppUpdater(navGroup.getId())),
+      navGroup.getApps(core.application.getAppUpdater(navGroup.getId())),
     );
 
     for (const apps of subApps) {
-      this.applicationService.initializeSubApplicationMounts(apps, core);
+      core.application.initializeSubApplicationMounts(apps, core);
     }
   }
 
@@ -80,7 +78,7 @@ export class AnalysisPlugin
     console.debug('AnalysisPlugin started');
 
     for (const navGroup of this.navGroups) {
-      this.applicationService.registerAppUpdater(navGroup.getId());
+      core.application.registerAppUpdater(navGroup.getId());
     }
 
     this.registerApps(core);
@@ -94,7 +92,7 @@ export class AnalysisPlugin
     _plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
     this.coreStart = core;
-    this.applicationService.onAppStartupSubscribe(core);
+    core.application.onAppStartupSubscribe(core);
 
     return {};
   }

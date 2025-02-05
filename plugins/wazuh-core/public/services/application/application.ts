@@ -1,5 +1,5 @@
+import { first } from 'rxjs/operators';
 import { Subject } from 'rxjs';
-import { i18n } from '@osd/i18n';
 import { Logger } from '@osd/logging';
 import {
   App,
@@ -10,24 +10,9 @@ import {
   CoreSetup,
   CoreStart,
   NavGroupItemInMap,
-} from '../../../../src/core/public';
-import { getCurrentNavGroup } from '../utils/nav-group';
-
-class AppUpdaterNotFoundError extends Error {
-  constructor(appId: string) {
-    super(
-      i18n.translate('errors.appUpdater.NotFound', {
-        defaultMessage: `AppUpdater for ${appId} not found`,
-      }),
-    );
-    this.name = 'AppUpdaterNotFoundError';
-  }
-}
-
-interface AppOperations {
-  beforeMount?: () => Partial<App>;
-  cleanup?: () => Partial<App>;
-}
+} from '../../../../../src/core/public';
+import { AppUpdaterNotFoundError } from './errors/app-updater-not-found-error';
+import { AppOperations } from './types';
 
 export class ApplicationService {
   private readonly appUpdater$: Partial<Record<string, Subject<AppUpdater>>> =
@@ -36,16 +21,8 @@ export class ApplicationService {
 
   constructor(private readonly logger?: Logger) {}
 
-  /**
-   * This function takes a parent app ID and a sub app ID, and returns a
-   * combined ID with the sub app ID URL-encoded.
-   * @param {string} parentAppId - Is a string representing the ID of the parent
-   * application.
-   * @param {string} subAppId - Is a string representing the ID of a
-   * sub-application within a parent application.
-   */
-  static buildSubAppId(parentAppId: string, subAppId: string) {
-    return `${parentAppId}_${encodeURIComponent(`/${subAppId}`)}`;
+  async getCurrentNavGroup(core: CoreStart) {
+    return core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
   }
 
   /**
@@ -56,7 +33,7 @@ export class ApplicationService {
    * updater.
    */
   registerAppUpdater(appId: string) {
-    this.logger?.debug('registerAppUpdater', {});
+    this.logger?.debug('registerAppUpdater');
     this.appUpdater$[appId] = new Subject<AppUpdater>();
   }
 
@@ -242,7 +219,7 @@ export class ApplicationService {
         if (core.chrome.navGroup.getNavGroupEnabled()) {
           core.chrome.navGroup.setCurrentNavGroup(navGroupId);
 
-          const currentNavGroup = await getCurrentNavGroup(core);
+          const currentNavGroup = await this.getCurrentNavGroup(core);
 
           this.navigateToFirstAppInNavGroup(core, currentNavGroup);
         }

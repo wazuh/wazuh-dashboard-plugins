@@ -28,6 +28,7 @@ import { ServerHostStateContainer } from './services/state/containers/server-hos
 import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
 import { CoreServerSecurity, ServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';
+import { ApplicationService } from './services/application/application';
 
 interface RuntimeSetup {
   dashboardSecurity: DashboardSecurityServiceSetupReturn;
@@ -47,6 +48,7 @@ export class WazuhCorePlugin
   runtime: Runtime;
   internal: Record<string, any>;
   services: {
+    application: ApplicationService;
     configuration: Configuration;
     dashboardSecurity: DashboardSecurity;
     http: CoreHTTPClient;
@@ -56,6 +58,7 @@ export class WazuhCorePlugin
 
   constructor(private readonly initializerContext: PluginInitializerContext) {
     this.runtime = {
+      // @ts-expect-error Type '{}' is missing some properties
       setup: {},
       start: {},
     };
@@ -81,6 +84,8 @@ export class WazuhCorePlugin
       EConfigurationProviders.PLUGIN_UI_SETTINGS,
       new UISettingsConfigProvider(core.uiSettings),
     );
+
+    this.services.application = new ApplicationService(logger);
 
     this.services.configuration = new Configuration(
       logger,
