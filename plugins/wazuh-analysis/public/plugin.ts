@@ -6,6 +6,11 @@ import {
   Plugin,
 } from '../../../src/core/public';
 import { NavigationPublicPluginStart } from '../../../src/plugins/navigation/public';
+import {
+  WazuhCorePluginSetup,
+  WazuhCorePluginStart,
+} from '../../wazuh-core/public';
+import { ApplicationService } from '../../wazuh-core/public/services/application/application';
 import { searchPages } from './components/global_search/search-pages-command';
 import { CloudSecurityNavGroup } from './groups/cloud-security';
 import { EndpointSecurityNavGroup } from './groups/endpoint-security';
@@ -14,10 +19,13 @@ import { ThreatIntelligenceNavGroup } from './groups/threat-intelligence';
 import { Group, GroupsId } from './groups/types';
 import { AnalysisSetup, AnalysisStart } from './types';
 
-interface AnalysisSetupDependencies {}
+interface AnalysisSetupDependencies {
+  wazuhCore: WazuhCorePluginSetup;
+}
 
 interface AnalysisStartDependencies {
   navigation: NavigationPublicPluginStart;
+  wazuhCore: WazuhCorePluginStart;
 }
 
 export class AnalysisPlugin
@@ -32,12 +40,15 @@ export class AnalysisPlugin
     CloudSecurityNavGroup,
   ];
 
-  private registerApps(core: CoreSetup) {
+  private registerApps(
+    core: CoreSetup,
+    applicationService: ApplicationService,
+  ) {
     const applications: App[] = this.navGroups.map(navGroup =>
       navGroup.getAppGroup(),
     );
 
-    core.application.initializeNavGroupMounts(applications, core);
+    applicationService.initializeNavGroupMounts(applications, core);
 
     if (core.chrome.navGroup.getNavGroupEnabled()) {
       core.chrome.globalSearch.registerSearchCommand({
@@ -54,11 +65,11 @@ export class AnalysisPlugin
     }
 
     const subApps: App[][] = this.navGroups.map(navGroup =>
-      navGroup.getApps(core.application.getAppUpdater(navGroup.getId())),
+      navGroup.getApps(applicationService.getAppUpdater(navGroup.getId())),
     );
 
     for (const apps of subApps) {
-      core.application.initializeSubApplicationMounts(apps, core);
+      applicationService.initializeSubApplicationMounts(apps, core);
     }
   }
 
@@ -73,15 +84,17 @@ export class AnalysisPlugin
 
   public setup(
     core: CoreSetup,
-    _plugins: AnalysisSetupDependencies,
+    plugins: AnalysisSetupDependencies,
   ): AnalysisSetup | Promise<AnalysisSetup> {
     console.debug('AnalysisPlugin started');
 
+    const wazuhCore = plugins.wazuhCore;
+
     for (const navGroup of this.navGroups) {
-      core.application.registerAppUpdater(navGroup.getId());
+      wazuhCore.applicationService.registerAppUpdater(navGroup.getId());
     }
 
-    this.registerApps(core);
+    this.registerApps(core, wazuhCore.applicationService);
     this.registerNavGroups(core);
 
     return {};
@@ -89,10 +102,12 @@ export class AnalysisPlugin
 
   start(
     core: CoreStart,
-    _plugins: AnalysisStartDependencies,
+    plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
+    const wazuhCore = plugins.wazuhCore;
+
     this.coreStart = core;
-    core.application.onAppStartupSubscribe(core);
+    wazuhCore.applicationService.onAppStartupSubscribe(core);
 
     return {};
   }

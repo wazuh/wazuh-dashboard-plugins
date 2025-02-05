@@ -48,7 +48,7 @@ export class WazuhCorePlugin
   runtime: Runtime;
   internal: Record<string, any>;
   services: {
-    application: ApplicationService;
+    applicationService: ApplicationService;
     configuration: Configuration;
     dashboardSecurity: DashboardSecurity;
     http: CoreHTTPClient;
@@ -85,7 +85,7 @@ export class WazuhCorePlugin
       new UISettingsConfigProvider(core.uiSettings),
     );
 
-    this.services.application = new ApplicationService(logger);
+    this.services.applicationService = new ApplicationService(logger);
 
     this.services.configuration = new Configuration(
       logger,
