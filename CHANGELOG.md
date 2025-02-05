@@ -21,7 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed width of long fields in the document detail flyout [#7206](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7206)
 - Fixed logging UI logs due to logger undefined property [#7267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7267)
 
-## Wazuh v4.11.0 - OpenSearch Dashboards 2.16.0 - Revision 00
+## Wazuh v4.11.0 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ### Added
 
@@ -31,6 +31,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
 - Changed the width of the command column, relocate argvs column and change the width of the rest of the columns in the table processes. [#7195](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7195)
+
+### Fixed
+
+- Fixed documentation URL related to the usage of authentication password in the agent deployment [#7251](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7251)
+- Fixed a problem with duplicated requests to get the list of valid index patterns in the menu [#7255](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7255)
+
+### Removed
+
+- Remove unused `node_build` field in package manifest of `wazuh` plugin [#7245](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7245)
 
 ## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 01
 
