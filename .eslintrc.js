@@ -219,6 +219,10 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                             @typescript-eslint                             */
         /* -------------------------------------------------------------------------- */
+        '@typescript-eslint/no-empty-object-type': [
+          'error',
+          { allowInterfaces: 'always' },
+        ],
         '@typescript-eslint/no-dynamic-delete': 'off',
         '@typescript-eslint/no-unused-vars': [
           'error',

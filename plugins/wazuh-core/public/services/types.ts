@@ -6,7 +6,7 @@ export interface LifecycleService<
   StopDeps = any,
   StopReturn = any,
 > {
-  setup: (deps: SetupDeps) => SetupReturn;
-  start: (deps: StartDeps) => StartReturn;
-  stop: (deps: StopDeps) => StopReturn;
+  setup: (deps?: SetupDeps) => SetupReturn;
+  start: (deps?: StartDeps) => StartReturn;
+  stop: (deps?: StopDeps) => StopReturn;
 }

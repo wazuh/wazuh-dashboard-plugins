@@ -1,6 +1,7 @@
 import { BehaviorSubject } from 'rxjs';
 import jwtDecode from 'jwt-decode';
-import { Logger } from '../../../common/services/configuration';
+import { Logger } from '@osd/logging';
+import { i18n } from '@osd/i18n';
 import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../../common/constants';
 import { createDashboardSecurityHooks } from './ui/hooks/creator';
 import { createDashboardSecurityHOCs } from './ui/hocs/creator';
@@ -12,20 +13,20 @@ import {
 } from './types';
 
 export class DashboardSecurity implements DashboardSecurityService {
-  private _securityPlatform = '';
+  private _securityPlatform: DashboardSecurityService['securityPlatform'] = '';
   public account$: BehaviorSubject<DashboardSecurityServiceAccount>;
 
   constructor(
     private readonly logger: Logger,
     private readonly http: { get: (path: string) => any },
   ) {
-    this.account$ = new BehaviorSubject({
+    this.account$ = new BehaviorSubject<DashboardSecurityServiceAccount>({
       administrator: false,
       administrator_requirements: null,
     });
   }
 
-  get securityPlatform() {
+  get securityPlatform(): DashboardSecurityService['securityPlatform'] {
     return this._securityPlatform;
   }
 
@@ -41,7 +42,7 @@ export class DashboardSecurity implements DashboardSecurityService {
       this.logger.debug(`Security platform: ${this._securityPlatform}`);
 
       return this.securityPlatform;
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(error.message);
       throw error;
     }
@@ -71,7 +72,7 @@ export class DashboardSecurity implements DashboardSecurityService {
       hocs = createDashboardSecurityHOCs(hooks);
       this.logger.debug('Created HOCs');
       this.logger.debug('Created the UI utilities');
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Error creating the UI utilities: ${error.message}`);
       throw error;
     }
@@ -79,14 +80,14 @@ export class DashboardSecurity implements DashboardSecurityService {
     try {
       this.logger.debug('Getting security platform');
       await this.fetchCurrentPlatform();
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(
         `Error fetching the current platform: ${error.message}`,
       );
     }
 
     // Update the dashboard security account information based on server API token
-    updateData$.subscribe(({ token }: { token: string }) => {
+    updateData$.subscribe(({ token }) => {
       const jwtPayload: {
         rbac_roles?: number[];
       } | null = token ? jwtDecode(token) : null;
@@ -104,18 +105,24 @@ export class DashboardSecurity implements DashboardSecurityService {
 
   async stop() {}
 
-  private getAccountFromJWTAPIDecodedToken(decodedToken: {
-    rbac_roles?: number[];
-  }) {
-    const isAdministrator = decodedToken?.rbac_roles?.some?.(
-      role => role === WAZUH_ROLE_ADMINISTRATOR_ID,
-    );
+  private getAccountFromJWTAPIDecodedToken(
+    decodedToken: {
+      rbac_roles?: number[];
+    } | null,
+  ) {
+    const isAdministrator =
+      decodedToken?.rbac_roles?.some?.(
+        role => role === WAZUH_ROLE_ADMINISTRATOR_ID,
+      ) ?? false;
 
     return {
       administrator: isAdministrator,
       administrator_requirements: isAdministrator
         ? null
-        : 'User has no administrator role in the selected API connection.',
+        : i18n.translate('wazuh.security.no_admin_role', {
+            defaultMessage:
+              'User has no administrator role in the selected API connection.',
+          }),
     };
   }
 }
