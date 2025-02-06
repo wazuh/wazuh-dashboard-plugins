@@ -45,7 +45,6 @@ export const SecurityOperationsNavGroup: Group<typeof SECURITY_OPERATIONS_ID> =
       return {
         id: SECURITY_OPERATIONS_ID,
         title: SECURITY_OPERATIONS_TITLE,
-        order: 0,
         category: CATEGORY,
       };
     },

@@ -45,7 +45,6 @@ export const ThreatIntelligenceNavGroup: Group<typeof THREAT_INTELLIGENCE_ID> =
       return {
         id: THREAT_INTELLIGENCE_ID,
         title: THREAT_INTELLIGENCE_TITLE,
-        order: 0,
         category: CATEGORY,
       };
     },

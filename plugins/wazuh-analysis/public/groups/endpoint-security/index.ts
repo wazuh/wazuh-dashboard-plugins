@@ -39,8 +39,8 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
         async (_params: AppMountParameters) =>
         // TODO: Implement the endpoint security landing page
         () => {
-          getCore().application.navigateToApp(getEndpointSecurityApps()[0].id);
-        },
+        getCore().application.navigateToApp(getEndpointSecurityApps()[0].id);
+      },
     };
   },
 
@@ -48,7 +48,6 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
     return {
       id: ENDPOINT_SECURITY_ID,
       title: ENDPOINT_SECURITY_TITLE,
-      order: 0,
       category: CATEGORY,
     };
   },

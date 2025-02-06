@@ -44,7 +44,6 @@ export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
     return {
       id: CLOUD_SECURITY_ID,
       title: CLOUD_SECURITY_TITLE,
-      order: 0,
       category: CATEGORY,
     };
   },
