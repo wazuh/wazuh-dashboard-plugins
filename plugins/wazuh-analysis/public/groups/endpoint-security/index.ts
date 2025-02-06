@@ -36,7 +36,9 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
       title: ENDPOINT_SECURITY_TITLE,
       category: CATEGORY,
       mount: async (_params: AppMountParameters) => {
-        getCore().application.navigateToApp(getEndpointSecurityApps()[0].id);
+        if (!getCore().chrome.navGroup.getNavGroupEnabled()) {
+          getCore().application.navigateToApp(getEndpointSecurityApps()[0].id);
+        }
 
         return () => {};
       },
