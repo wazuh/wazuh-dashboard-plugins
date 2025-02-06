@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { ThreatIntelligenceNavGroup } from '../..';
 import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
-import { MITRE_ATTACK_ID, THREAT_HUNTING_TITLE } from '../../constants';
+import { MITRE_ATTACK_ID, THREAT_INTELLIGENCE_TITLE } from '../../constants';
 import { MitreAttackApp } from './mitre-att&ck-app';
 
 export const renderApp = async (params: AppMountParameters) => {
@@ -14,7 +14,7 @@ export const renderApp = async (params: AppMountParameters) => {
   });
 
   ReactDOM.render(
-    <Layout aria-label={THREAT_HUNTING_TITLE} items={items}>
+    <Layout aria-label={THREAT_INTELLIGENCE_TITLE} items={items}>
       <MitreAttackApp params={params} />
     </Layout>,
     params.element,
