@@ -1,22 +1,11 @@
 import React from 'react';
-import { Layout } from '../../../layout';
-import {
-  CONFIGURATION_ASSESSMENT_ID,
-  CONFIGURATION_ASSESSMENT_TITLE,
-  ENDPOINT_SECURITY_TITLE,
-} from '../../constants';
-import { createEndpointSecurityNavItems } from '../../nav-items';
+import { AppMountParameters } from 'opensearch-dashboards/public';
+import { CONFIGURATION_ASSESSMENT_TITLE } from '../../constants';
 
-const ConfigurationAssessmentApp = () => {
-  const items = createEndpointSecurityNavItems({
-    selectedAppId: CONFIGURATION_ASSESSMENT_ID,
-  });
+interface ConfigurationAssessmentAppProps {
+  params: AppMountParameters;
+}
 
-  return (
-    <Layout aria-label={ENDPOINT_SECURITY_TITLE} items={items}>
-      {CONFIGURATION_ASSESSMENT_TITLE} App
-    </Layout>
-  );
-};
-
-export default ConfigurationAssessmentApp;
+export const ConfigurationAssessmentApp = (
+  _props: ConfigurationAssessmentAppProps,
+) => <>{CONFIGURATION_ASSESSMENT_TITLE} App</>;

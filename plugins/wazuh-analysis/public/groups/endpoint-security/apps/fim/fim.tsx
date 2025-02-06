@@ -1,16 +1,9 @@
 import React from 'react';
-import { Layout } from '../../../layout';
-import { ENDPOINT_SECURITY_TITLE, FIM_ID, FIM_TITLE } from '../../constants';
-import { createEndpointSecurityNavItems } from '../../nav-items';
+import { AppMountParameters } from 'opensearch-dashboards/public';
+import { FIM_TITLE } from '../../constants';
 
-const FimApp = () => {
-  const items = createEndpointSecurityNavItems({ selectedAppId: FIM_ID });
+interface FimAppProps {
+  params: AppMountParameters;
+}
 
-  return (
-    <Layout aria-label={ENDPOINT_SECURITY_TITLE} items={items}>
-      {FIM_TITLE} App
-    </Layout>
-  );
-};
-
-export default FimApp;
+export const FimApp = (_props: FimAppProps) => <>{FIM_TITLE} App</>;

@@ -11,7 +11,7 @@ import React from 'react';
 interface LayoutProps {
   'aria-label': string;
   items: EuiSideNavItemType<any>[];
-  children: React.ReactChild[];
+  children: React.ReactChild[] | React.ReactChild;
 }
 
 export const Layout = (props: LayoutProps) => (

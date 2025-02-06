@@ -6,10 +6,10 @@ import {
   CoreSetup,
 } from 'opensearch-dashboards/public';
 import { Subject } from 'rxjs';
-import { SECURITY_OPERATIONS_ID } from './security-operations';
-import { THREAT_INTELLIGENCE_ID } from './threat-intelligence';
-import { ENDPOINT_SECURITY_ID } from './endpoint-security';
-import { CLOUD_SECURITY_ID } from './cloud-security';
+import { SECURITY_OPERATIONS_ID } from './security-operations/constants';
+import { THREAT_INTELLIGENCE_ID } from './threat-intelligence/constants';
+import { ENDPOINT_SECURITY_ID } from './endpoint-security/constants';
+import { CLOUD_SECURITY_ID } from './cloud-security/constants';
 
 export type GroupsId =
   | typeof ENDPOINT_SECURITY_ID

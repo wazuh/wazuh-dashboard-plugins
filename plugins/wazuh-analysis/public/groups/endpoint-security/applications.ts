@@ -41,7 +41,7 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
           './apps/malware-detection/application'
         );
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
     {
@@ -53,7 +53,7 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
         // TODO: Implement the fim application
         const { renderApp } = await import('./apps/fim/application');
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
   ];
