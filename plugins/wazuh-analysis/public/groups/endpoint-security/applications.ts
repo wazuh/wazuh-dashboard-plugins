@@ -22,7 +22,6 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the configuration assessment application
         const { renderApp } = await import(
           './apps/configuration-assesment/application'
         );
@@ -36,7 +35,6 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the malware detection application
         const { renderApp } = await import(
           './apps/malware-detection/application'
         );
@@ -50,7 +48,6 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the fim application
         const { renderApp } = await import('./apps/fim/application');
 
         return await renderApp(params);
