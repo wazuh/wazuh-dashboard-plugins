@@ -8,6 +8,7 @@ import {
 } from '../../../../../src/core/public';
 import { Group } from '../types';
 import { CATEGORY } from '../category';
+import { getCore } from '../../plugin-services';
 import { getCloudSecurityApps } from './applications';
 import {
   CLOUD_SECURITY_DESCRIPTION,
@@ -33,10 +34,13 @@ export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
       id: CLOUD_SECURITY_ID,
       title: CLOUD_SECURITY_TITLE,
       category: CATEGORY,
-      mount:
-        async (_params: AppMountParameters) =>
-        // TODO: Implement the cloud security application
-        () => {},
+      mount: async (_params: AppMountParameters) => {
+        if (!getCore().chrome.navGroup.getNavGroupEnabled()) {
+          getCore().application.navigateToApp(getCloudSecurityApps()[0].id);
+        }
+
+        return () => {};
+      },
     };
   },
 
