@@ -1,5 +1,6 @@
 import { EuiSideNavItemType } from '@elastic/eui';
 import { App } from 'opensearch-dashboards/public';
+import { getCore } from '../plugin-services';
 
 export function createSideNavItems(
   id: string,
@@ -14,7 +15,7 @@ export function createSideNavItems(
       items: apps.map(app => ({
         id: app.id,
         name: app.title,
-        onClick: () => alert(`click on ${app.id}`),
+        onClick: () => getCore().application.navigateToApp(app.id),
         isSelected: app.id === selectedAppId,
       })),
     },
