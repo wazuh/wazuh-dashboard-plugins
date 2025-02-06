@@ -9,6 +9,7 @@ import {
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../types';
+import { getCore } from '../../plugin-services';
 import { getEndpointSecurityApps } from './applications';
 import {
   ENDPOINT_SECURITY_DESCRIPTION,
@@ -37,7 +38,9 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
       mount:
         async (_params: AppMountParameters) =>
         // TODO: Implement the endpoint security landing page
-        () => {},
+        () => {
+          getCore().application.navigateToApp(getEndpointSecurityApps()[0].id);
+        },
     };
   },
 
