@@ -6,11 +6,16 @@ import {
 } from './types';
 import { FleetManagement } from './components';
 import { setCore, setPlugins, setWazuhCore } from './plugin-services';
+import { appSetup } from './application';
 
 export class WazuhFleetPlugin
   implements Plugin<WazuhFleetPluginSetup, WazuhFleetPluginStart>
 {
-  public setup(core: CoreSetup): WazuhFleetPluginSetup {
+  public setup(core: CoreSetup, plugins): WazuhFleetPluginSetup {
+    appSetup({
+      registerApp: app => core.application.register(app),
+    });
+
     return {};
   }
 

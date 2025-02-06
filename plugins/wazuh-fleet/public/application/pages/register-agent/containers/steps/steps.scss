@@ -1,0 +1,51 @@
+.register-agent-wizard-container {
+  .euiStep__title {
+    font-style: normal;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.6px;
+    flex-direction: row;
+  }
+
+  .stepSubtitleServerAddress {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 24px;
+    margin-bottom: 9px;
+  }
+
+  .stepSubtitle {
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 24px;
+    margin-bottom: 20px;
+  }
+
+  .titleAndIcon {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .warningForAgentName {
+    margin-top: 10px;
+  }
+
+  .subtitleAgentName {
+    flex-direction: 'row';
+    font-style: 'normal';
+    font-weight: 700;
+    font-size: '12px';
+    line-height: '20px';
+    color: '#343741';
+  }
+
+  .euiStep__titleWrapper {
+    align-items: center;
+  }
+
+  .euiButtonEmpty .euiButtonEmpty__content {
+    padding: 0;
+  }
+}
