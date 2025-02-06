@@ -7,7 +7,7 @@ import {
   ENDPOINT_SECURITY_TITLE,
 } from '../../constants';
 import { Layout } from '../../../layout';
-import { ConfigurationAssessmentApp } from './configuration-assesment';
+import { ConfigurationAssessmentApp } from './configuration-assesment-app';
 
 export const renderApp = async (params: AppMountParameters) => {
   const items = createEndpointSecurityNavItems({

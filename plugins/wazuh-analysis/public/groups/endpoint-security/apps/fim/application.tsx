@@ -4,7 +4,7 @@ import { AppMountParameters } from 'opensearch-dashboards/public';
 import { Layout } from '../../../layout';
 import { ENDPOINT_SECURITY_TITLE, FIM_ID } from '../../constants';
 import { createEndpointSecurityNavItems } from '../../nav-items';
-import { FimApp } from './fim';
+import { FimApp } from './fim-app';
 
 export const renderApp = async (params: AppMountParameters) => {
   const items = createEndpointSecurityNavItems({
