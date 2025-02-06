@@ -68,7 +68,7 @@ export interface Group<GroupId extends GroupsId> {
    * such as its title, description, and configuration within the OpenSearch
    * Dashboards framework.
    */
-  getApps: (updater$: Subject<AppUpdater>) => App[];
+  getApps: (updater$?: Subject<AppUpdater>) => App[];
 
   /**
    * This method is used to add navigation links related to the specific group

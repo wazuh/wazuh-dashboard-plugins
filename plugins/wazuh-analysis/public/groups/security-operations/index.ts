@@ -56,7 +56,7 @@ export const SecurityOperationsNavGroup: Group<typeof SECURITY_OPERATIONS_ID> =
       }));
     },
 
-    getApps(updater$: Subject<AppUpdater>): App[] {
+    getApps(updater$?: Subject<AppUpdater>): App[] {
       return getSecurityOperationsApps(updater$);
     },
 

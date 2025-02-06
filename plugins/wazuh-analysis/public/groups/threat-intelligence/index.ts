@@ -56,7 +56,7 @@ export const ThreatIntelligenceNavGroup: Group<typeof THREAT_INTELLIGENCE_ID> =
       }));
     },
 
-    getApps(updater$: Subject<AppUpdater>): App[] {
+    getApps(updater$?: Subject<AppUpdater>): App[] {
       return getThreatIntelligenceApps(updater$);
     },
 

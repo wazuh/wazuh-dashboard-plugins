@@ -60,7 +60,7 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
     }));
   },
 
-  getApps(updater$: Subject<AppUpdater>): App[] {
+  getApps(updater$?: Subject<AppUpdater>): App[] {
     return getEndpointSecurityApps(updater$);
   },
 

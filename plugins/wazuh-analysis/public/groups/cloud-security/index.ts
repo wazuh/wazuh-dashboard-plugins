@@ -55,7 +55,7 @@ export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
     }));
   },
 
-  getApps(updater$: Subject<AppUpdater>): App[] {
+  getApps(updater$?: Subject<AppUpdater>): App[] {
     return getCloudSecurityApps(updater$);
   },
 
