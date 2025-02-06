@@ -12,6 +12,7 @@ import { EndpointSecurityNavGroup } from './groups/endpoint-security';
 import { SecurityOperationsNavGroup } from './groups/security-operations';
 import { ThreatIntelligenceNavGroup } from './groups/threat-intelligence';
 import { Group, GroupsId } from './groups/types';
+import { getCore, setCore } from './plugin-services';
 import {
   AnalysisSetup,
   AnalysisSetupDependencies,
@@ -23,7 +24,6 @@ export class AnalysisPlugin
   implements
     Plugin<AnalysisSetup, AnalysisStart, object, AnalysisStartDependencies>
 {
-  private coreStart?: CoreStart;
   private readonly navGroups: Group<GroupsId>[] = [
     EndpointSecurityNavGroup,
     ThreatIntelligenceNavGroup,
@@ -49,7 +49,7 @@ export class AnalysisPlugin
           searchPages(
             query,
             applications.map(app => app.id),
-            this.coreStart,
+            getCore(),
             done,
           ),
       });
@@ -95,9 +95,10 @@ export class AnalysisPlugin
     core: CoreStart,
     plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
+    setCore(core);
+
     const wazuhCore = plugins.wazuhCore;
 
-    this.coreStart = core;
     wazuhCore.applicationService.onAppStartupSubscribe(core);
 
     return {};
