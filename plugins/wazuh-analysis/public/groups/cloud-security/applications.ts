@@ -25,10 +25,9 @@ export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the docker application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import('./apps/docker/application');
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
     {
