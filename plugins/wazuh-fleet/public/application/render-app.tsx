@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { I18nProvider } from '@osd/i18n/react';
 import { createHashHistory } from 'history';
-import { Application } from './application';
+import { FleetManagement } from '../components';
 
 export async function renderApp(params) {
   const history = createHashHistory();
@@ -10,7 +10,7 @@ export async function renderApp(params) {
 
   ReactDOM.render(
     <I18nProvider>
-      <Application {...deps} />
+      <FleetManagement {...deps} />
     </I18nProvider>,
     params.element,
   );

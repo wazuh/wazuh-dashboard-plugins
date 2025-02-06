@@ -14,42 +14,49 @@ import {
   EuiTitle,
   EuiLink,
 } from '@elastic/eui';
-import { agentsTableColumns } from './columns';
-import { AgentsVisualizations } from './visualizations';
 import { Agent } from '../../../../common/types';
 import { AgentResume } from '../details/resume';
 import { getCore } from '../../../plugin-services';
+import NavigationService from '../../../react-services/navigation-service';
+import { enrollmentAgent } from '../../common/views';
+// import { agentsTableColumns } from './columns';
+import { AgentsVisualizations } from './visualizations';
 
-export interface AgentListProps {
-  FleetDataSource: any;
-  FleetDataSourceRepository: any;
-  TableIndexer: any;
-}
+// export interface AgentListProps {
+//   FleetDataSource: any;
+//   FleetDataSourceRepository: any;
+//   TableIndexer: any;
+// }
 
-export const AgentList = ({
-  FleetDataSource,
-  FleetDataSourceRepository,
-  TableIndexer,
-}: AgentListProps) => {
+export const AgentList = () => {
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [agent, setAgent] = useState<Agent>();
 
   const closeActions = () => {
     setIsActionsOpen(false);
   };
 
-  const handleOnOpenAgentDetails = (agentId: string) => {};
+  const navigateToDeployNewAgent = () => {
+    NavigationService.getInstance().navigate(enrollmentAgent.path);
+  };
 
   return (
     <>
       <EuiPageHeader
         pageTitle='Agents'
         rightSideItems={[
-          <EuiButton fill iconType='plusInCircle'>
+          <EuiButton
+            key='add-agent'
+            fill
+            iconType='plusInCircle'
+            onClick={() => navigateToDeployNewAgent()}
+          >
             Deploy new agent
           </EuiButton>,
           <EuiPopover
+            key='actions'
             id='actions'
             button={
               <EuiButton
@@ -82,7 +89,7 @@ export const AgentList = ({
                 >
                   Remove groups from agents
                 </EuiContextMenuItem>,
-                <EuiHorizontalRule margin='xs' />,
+                <EuiHorizontalRule margin='xs' key='horizontalRule' />,
                 <EuiContextMenuItem
                   key='upgrade-agents'
                   icon='package'
@@ -103,7 +110,8 @@ export const AgentList = ({
         ]}
       />
       <EuiSpacer />
-      <TableIndexer
+      <AgentsVisualizations />
+      {/* <TableIndexer
         DataSource={FleetDataSource}
         DataSourceRepository={FleetDataSourceRepository}
         columns={agentsTableColumns({
@@ -121,7 +129,7 @@ export const AgentList = ({
             onSelectionChange: () => {},
           },
         }}
-      />
+      /> */}
       {isFlyoutVisible ? (
         <EuiFlyout
           ownFocus

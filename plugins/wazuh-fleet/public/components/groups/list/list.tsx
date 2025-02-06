@@ -10,8 +10,8 @@ import {
   EuiFlyoutBody,
   EuiText,
 } from '@elastic/eui';
-import { columns } from './columns';
 import { getCore } from '../../../plugin-services';
+// import { columns } from './columns';
 
 export interface AgentListProps {
   FleetGroupsDataSource: any;
@@ -19,30 +19,29 @@ export interface AgentListProps {
   TableIndexer: any;
 }
 
-export const GroupList = ({
-  FleetGroupsDataSource,
-  FleetGroupsDataSourceRepository,
-  TableIndexer,
-}: AgentListProps) => {
-  const [isActionsOpen, setIsActionsOpen] = useState(false);
+// export const GroupList = ({
+//   FleetGroupsDataSource,
+//   FleetGroupsDataSourceRepository,
+//   TableIndexer,
+// }: AgentListProps) => {
+export const GroupList = () => {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  const [group, setGroup] = useState<Group>();
-
-  const handleOnOpenDetails = (agentId: string) => {};
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [group, setGroup] = useState();
 
   return (
     <>
       <EuiPageHeader
         pageTitle='Groups'
         rightSideItems={[
-          <EuiButton fill iconType='plusInCircle'>
+          <EuiButton key='addNewGroup' fill iconType='plusInCircle'>
             Add new group
           </EuiButton>,
         ]}
         // rightSideGroupProps={{ gutterSize: 's' }}
       />
       <EuiSpacer />
-      <TableIndexer
+      {/* <TableIndexer
         DataSource={FleetGroupsDataSource}
         DataSourceRepository={FleetGroupsDataSourceRepository}
         tableSortingInitialField='name'
@@ -54,7 +53,7 @@ export const GroupList = ({
         tableProps={{
           hasActions: true,
         }}
-      />
+      /> */}
       {isFlyoutVisible ? (
         <EuiFlyout
           ownFocus
