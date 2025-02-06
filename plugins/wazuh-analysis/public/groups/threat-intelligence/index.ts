@@ -8,6 +8,7 @@ import {
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../types';
+import { getCore } from '../../plugin-services';
 import { getThreatIntelligenceApps } from './applications';
 import {
   THREAT_INTELLIGENCE_DESCRIPTION,
@@ -34,10 +35,15 @@ export const ThreatIntelligenceNavGroup: Group<typeof THREAT_INTELLIGENCE_ID> =
         id: THREAT_INTELLIGENCE_ID,
         title: THREAT_INTELLIGENCE_TITLE,
         category: CATEGORY,
-        mount:
-          async (_params: AppMountParameters) =>
-          // TODO: Implement the threat intelligence application
-          () => {},
+        mount: async (_params: AppMountParameters) => {
+          if (!getCore().chrome.navGroup.getNavGroupEnabled()) {
+            getCore().application.navigateToApp(
+              getThreatIntelligenceApps()[0].id,
+            );
+          }
+
+          return () => {};
+        },
       };
     },
 
