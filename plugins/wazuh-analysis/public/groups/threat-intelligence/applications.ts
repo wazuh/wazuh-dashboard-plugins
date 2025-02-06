@@ -21,7 +21,7 @@ export function getThreatIntelligenceApps(updater$?: Subject<AppUpdater>) {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        const { renderApp } = await import('./apps/mitre-att&ck/application');
+        const { renderApp } = await import('./apps/threat-hunting/application');
 
         return await renderApp(params);
       },
