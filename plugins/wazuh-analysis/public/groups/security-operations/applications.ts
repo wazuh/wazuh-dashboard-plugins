@@ -21,7 +21,6 @@ export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the regulatory compliance application
         const { renderApp } = await import(
           './apps/regulatory-compliance/application'
         );
@@ -35,7 +34,6 @@ export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the it hygiene application
         const { renderApp } = await import('./apps/it-hygiene/application');
 
         return await renderApp(params);
@@ -47,10 +45,11 @@ export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the incident response application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import(
+          './apps/incident-response/application'
+        );
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
   ];
