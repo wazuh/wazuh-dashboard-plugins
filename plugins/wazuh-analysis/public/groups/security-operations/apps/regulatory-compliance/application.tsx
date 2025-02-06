@@ -6,7 +6,7 @@ import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
 import {
   REGULATORY_COMPLIANCE_ID,
-  SECURITY_OPERATIONS_ID,
+  SECURITY_OPERATIONS_TITLE,
 } from '../../constants';
 import { RegulatoryComplianceApp } from './regulatory-compliance-app';
 
@@ -17,7 +17,7 @@ export const renderApp = async (params: AppMountParameters) => {
   });
 
   ReactDOM.render(
-    <Layout aria-label={SECURITY_OPERATIONS_ID} items={items}>
+    <Layout aria-label={SECURITY_OPERATIONS_TITLE} items={items}>
       <RegulatoryComplianceApp params={params} />
     </Layout>,
     params.element,

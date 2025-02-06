@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { SecurityOperationsNavGroup } from '../..';
 import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
-import { IT_HYGIENE_ID, SECURITY_OPERATIONS_ID } from '../../constants';
+import { IT_HYGIENE_ID, SECURITY_OPERATIONS_TITLE } from '../../constants';
 import { ItHygieneApp } from './it-hygiene-app';
 
 export const renderApp = async (params: AppMountParameters) => {
@@ -14,7 +14,7 @@ export const renderApp = async (params: AppMountParameters) => {
   });
 
   ReactDOM.render(
-    <Layout aria-label={SECURITY_OPERATIONS_ID} items={items}>
+    <Layout aria-label={SECURITY_OPERATIONS_TITLE} items={items}>
       <ItHygieneApp params={params} />
     </Layout>,
     params.element,
