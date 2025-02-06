@@ -8,6 +8,7 @@ import {
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../types';
+import { getCore } from '../../plugin-services';
 import { getSecurityOperationsApps } from './applications';
 import {
   SECURITY_OPERATIONS_DESCRIPTION,
@@ -34,10 +35,15 @@ export const SecurityOperationsNavGroup: Group<typeof SECURITY_OPERATIONS_ID> =
         id: SECURITY_OPERATIONS_ID,
         title: SECURITY_OPERATIONS_TITLE,
         category: CATEGORY,
-        mount:
-          async (_params: AppMountParameters) =>
-          // TODO: Implement the security operations application
-          () => {},
+        mount: async (_params: AppMountParameters) => {
+          if (!getCore().chrome.navGroup.getNavGroupEnabled()) {
+            getCore().application.navigateToApp(
+              getSecurityOperationsApps()[0].id,
+            );
+          }
+
+          return () => {};
+        },
       };
     },
 

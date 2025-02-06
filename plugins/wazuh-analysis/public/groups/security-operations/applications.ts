@@ -22,9 +22,11 @@ export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
       updater$,
       mount: async (params: AppMountParameters) => {
         // TODO: Implement the regulatory compliance application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import(
+          './apps/regulatory-compliance/application'
+        );
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
     {
