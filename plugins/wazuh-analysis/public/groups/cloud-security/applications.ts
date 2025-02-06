@@ -69,10 +69,9 @@ export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the office365 application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import('./apps/office-365/application');
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
   ];
