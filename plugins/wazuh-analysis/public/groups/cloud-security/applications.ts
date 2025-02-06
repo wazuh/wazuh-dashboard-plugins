@@ -37,10 +37,9 @@ export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the aws application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import('./apps/aws/application');
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
     {
