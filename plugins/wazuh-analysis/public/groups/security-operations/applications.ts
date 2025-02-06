@@ -36,9 +36,9 @@ export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
       updater$,
       mount: async (params: AppMountParameters) => {
         // TODO: Implement the it hygiene application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import('./apps/it-hygiene/application');
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
     {
