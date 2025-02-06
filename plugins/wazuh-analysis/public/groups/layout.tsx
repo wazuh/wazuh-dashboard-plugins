@@ -7,6 +7,7 @@ import {
   EuiSideNavItemType,
 } from '@elastic/eui';
 import React from 'react';
+import { getCore } from '../plugin-services';
 
 interface LayoutProps {
   'aria-label': string;
@@ -16,12 +17,14 @@ interface LayoutProps {
 
 export const Layout = (props: LayoutProps) => (
   <EuiPage>
-    <EuiPageSideBar>
-      <EuiSideNav
-        aria-label={props['aria-label']}
-        items={props.items}
-      ></EuiSideNav>
-    </EuiPageSideBar>
+    {!getCore().chrome.navGroup.getNavGroupEnabled() && (
+      <EuiPageSideBar>
+        <EuiSideNav
+          aria-label={props['aria-label']}
+          items={props.items}
+        ></EuiSideNav>
+      </EuiPageSideBar>
+    )}
     <EuiPageBody>
       <EuiPageContentBody>{props.children}</EuiPageContentBody>
     </EuiPageBody>
