@@ -32,10 +32,11 @@ export function getThreatIntelligenceApps(updater$?: Subject<AppUpdater>) {
       navLinkStatus: AppNavLinkStatus.hidden,
       updater$,
       mount: async (params: AppMountParameters) => {
-        // TODO: Implement the vulnerability detection application
-        const { renderApp } = await import('../../application');
+        const { renderApp } = await import(
+          './apps/vulnerability-detection/application'
+        );
 
-        return await renderApp(params, {});
+        return await renderApp(params);
       },
     },
     {
