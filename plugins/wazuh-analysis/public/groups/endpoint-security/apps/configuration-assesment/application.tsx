@@ -1,16 +1,18 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { AppMountParameters } from 'opensearch-dashboards/public';
-import { createEndpointSecurityNavItems } from '../../nav-items';
+import ReactDOM from 'react-dom';
+import { EndpointSecurityNavGroup } from '../..';
+import { Layout } from '../../../layout';
+import { createSideNavItems } from '../../../side-nav';
 import {
   CONFIGURATION_ASSESSMENT_ID,
   ENDPOINT_SECURITY_TITLE,
 } from '../../constants';
-import { Layout } from '../../../layout';
 import { ConfigurationAssessmentApp } from './configuration-assesment-app';
 
 export const renderApp = async (params: AppMountParameters) => {
-  const items = createEndpointSecurityNavItems({
+  const items = createSideNavItems({
+    group: EndpointSecurityNavGroup,
     selectedAppId: CONFIGURATION_ASSESSMENT_ID,
   });
 

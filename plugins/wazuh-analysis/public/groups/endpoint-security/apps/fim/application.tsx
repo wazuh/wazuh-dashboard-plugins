@@ -1,13 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { AppMountParameters } from 'opensearch-dashboards/public';
+import ReactDOM from 'react-dom';
+import { EndpointSecurityNavGroup } from '../..';
 import { Layout } from '../../../layout';
+import { createSideNavItems } from '../../../side-nav';
 import { ENDPOINT_SECURITY_TITLE, FIM_ID } from '../../constants';
-import { createEndpointSecurityNavItems } from '../../nav-items';
 import { FimApp } from './fim-app';
 
 export const renderApp = async (params: AppMountParameters) => {
-  const items = createEndpointSecurityNavItems({
+  const items = createSideNavItems({
+    group: EndpointSecurityNavGroup,
     selectedAppId: FIM_ID,
   });
 

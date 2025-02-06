@@ -1,18 +1,19 @@
-import { EuiSideNavItemType } from '@elastic/eui';
+import { EuiSideNavItemType, htmlIdGenerator } from '@elastic/eui';
 import { App } from 'opensearch-dashboards/public';
 import { getCore } from '../plugin-services';
+import { Group } from './types';
 
-export function createSideNavItems(
-  id: string,
-  name: string,
-  apps: App[],
-  selectedAppId?: App['id'],
-) {
+interface Options {
+  group: Group<any>;
+  selectedAppId?: App['id'];
+}
+
+export function createSideNavItems({ group, selectedAppId }: Options) {
   const items: EuiSideNavItemType<any>[] = [
     {
-      name,
-      id,
-      items: apps.map(app => ({
+      id: htmlIdGenerator(group.getId())(),
+      name: group.getTitle(),
+      items: group.getApps().map(app => ({
         id: app.id,
         name: app.title,
         onClick: () => getCore().application.navigateToApp(app.id),
