@@ -5,7 +5,6 @@ import { AppMountParameters } from '../../../../src/core/public';
 export interface AnalysisAppDependencies {}
 
 interface AnalysisAppProps {
-  appBasePath: string;
   history: AppMountParameters['history'];
   dependencies: AnalysisAppDependencies;
 }

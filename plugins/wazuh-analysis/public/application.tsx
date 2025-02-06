@@ -7,15 +7,11 @@ import {
 } from './components/analysis-app';
 
 export const renderApp = async (
-  { history, appBasePath, element }: AppMountParameters,
+  { history, element }: AppMountParameters,
   dependencies: AnalysisAppDependencies,
 ) => {
   ReactDOM.render(
-    <AnalysisApp
-      dependencies={dependencies}
-      appBasePath={appBasePath}
-      history={history}
-    />,
+    <AnalysisApp dependencies={dependencies} history={history} />,
     element,
   );
 
