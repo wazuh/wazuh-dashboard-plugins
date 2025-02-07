@@ -46,7 +46,7 @@ export class ApplicationService {
    * updater.
    */
   registerAppUpdater(appId: string) {
-    this.logger?.debug('registerAppUpdater');
+    this.logger?.debug(`registerAppUpdater (AppId: ${appId})`);
     this.appUpdater$[appId] = new Subject<AppUpdater>();
   }
 
