@@ -272,7 +272,7 @@ export class ApplicationService {
     core.application.register(appGroup);
   }
 
-  private registerNavGroup(navGroup: Group<any>, core: CoreSetup) {
+  private assignNavLinksToChromeGroups(navGroup: Group<any>, core: CoreSetup) {
     core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       navGroup.getGroupNavLink(),
     ]);
@@ -280,7 +280,10 @@ export class ApplicationService {
       navGroup.getNavGroup(),
       navGroup.getAppsNavLinks(),
     );
+  }
 
+  private registerNavGroup(navGroup: Group<any>, core: CoreSetup) {
+    this.assignNavLinksToChromeGroups(navGroup, core);
     this.registerAppGroup(navGroup.getAppGroup(), core);
   }
 
