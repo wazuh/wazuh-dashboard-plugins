@@ -32,7 +32,6 @@ export class AnalysisPlugin
     plugins.wazuhCore.applicationService.setup({
       id: 'wz-analysis',
       navGroups: this.navGroups,
-      coreSetup: core,
     });
 
     return {};

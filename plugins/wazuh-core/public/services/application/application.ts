@@ -17,6 +17,11 @@ import { getCore } from '../../plugin-services';
 import { AppUpdaterNotFoundError } from './errors/app-updater-not-found-error';
 import { AppOperations, Group } from './types';
 
+interface SetupParams {
+  id: string;
+  navGroups: Group<any>[];
+}
+
 export class ApplicationService {
   /**
    * Usage: Used to emit updates (for example, changes in navigation link
@@ -307,15 +312,7 @@ export class ApplicationService {
     }
   }
 
-  private registerSearchCommand({
-    id,
-    navGroups,
-    coreSetup,
-  }: {
-    id: string;
-    navGroups: Group<any>[];
-    coreSetup: CoreSetup;
-  }) {
+  private registerSearchCommand({ id, navGroups }: SetupParams) {
     this.logger?.debug(`${this.registerSearchCommand.name} [Id: ${id}]`);
 
     const applications: App[] = navGroups.map(navGroup =>
@@ -323,8 +320,8 @@ export class ApplicationService {
     );
     const applicationIds = applications.map(app => app.id);
 
-    if (coreSetup.chrome.navGroup.getNavGroupEnabled()) {
-      coreSetup.chrome.globalSearch.registerSearchCommand({
+    if (this.coreSetup.chrome.navGroup.getNavGroupEnabled()) {
+      this.coreSetup.chrome.globalSearch.registerSearchCommand({
         id,
         type: 'PAGES',
         run: async (query: string, done?: () => void) =>
@@ -337,15 +334,7 @@ export class ApplicationService {
    * This method is used to add navigation links related to the specific group
    * within the OpenSearch Dashboards application.
    */
-  setup({
-    id,
-    navGroups,
-    coreSetup,
-  }: {
-    id: string;
-    navGroups: Group<any>[];
-    coreSetup: CoreSetup;
-  }) {
+  setup({ id, navGroups }: SetupParams) {
     this.logger?.debug(`${this.setup.name} [Id: ${id}]`);
 
     for (const navGroup of navGroups) {
@@ -356,7 +345,6 @@ export class ApplicationService {
     this.registerSearchCommand({
       id,
       navGroups,
-      coreSetup,
     });
   }
 }
