@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiPageHeader,
   EuiSpacer,
@@ -16,10 +16,11 @@ import {
 } from '@elastic/eui';
 import { Agent } from '../../../../common/types';
 import { AgentResume } from '../details/resume';
-import { getCore } from '../../../plugin-services';
+import { getCore, getPlugins } from '../../../plugin-services';
 import NavigationService from '../../../react-services/navigation-service';
 import { enrollmentAgent } from '../../common/views';
 // import { agentsTableColumns } from './columns';
+import { TableIndexer } from '../../common/table-indexer/table-indexer';
 import { AgentsVisualizations } from './visualizations';
 
 // export interface AgentListProps {
@@ -29,6 +30,7 @@ import { AgentsVisualizations } from './visualizations';
 // }
 
 export const AgentList = () => {
+  const [indexPattern, setIndexPattern] = useState<object | undefined>();
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -41,6 +43,12 @@ export const AgentList = () => {
   const navigateToDeployNewAgent = () => {
     NavigationService.getInstance().navigate(enrollmentAgent.path);
   };
+
+  useEffect(() => {
+    getPlugins()
+      .data.indexPatterns.get('wazuh-agents*')
+      .then((indexPattern: any) => setIndexPattern(indexPattern));
+  }, []);
 
   return (
     <>
@@ -111,25 +119,29 @@ export const AgentList = () => {
       />
       <EuiSpacer />
       <AgentsVisualizations />
-      {/* <TableIndexer
-        DataSource={FleetDataSource}
-        DataSourceRepository={FleetDataSourceRepository}
-        columns={agentsTableColumns({
-          onOpenAgentDetails: handleOnOpenAgentDetails,
-          setIsFlyoutAgentVisible: setIsFlyoutVisible,
-          setAgent,
-        })}
-        tableSortingInitialField='agent.last_login'
-        tableSortingInitialDirection='desc'
-        topTableComponent={<AgentsVisualizations />}
-        tableProps={{
-          hasActions: true,
-          isSelectable: true,
-          selection: {
-            onSelectionChange: () => {},
-          },
-        }}
-      /> */}
+      {indexPattern ? (
+        <TableIndexer
+          indexPatterns={[indexPattern]}
+
+          // DataSource={FleetDataSource}
+          // DataSourceRepository={FleetDataSourceRepository}
+          // columns={agentsTableColumns({
+          //   onOpenAgentDetails: handleOnOpenAgentDetails,
+          //   setIsFlyoutAgentVisible: setIsFlyoutVisible,
+          //   setAgent,
+          // })}
+          // tableSortingInitialField='agent.last_login'
+          // tableSortingInitialDirection='desc'
+          // topTableComponent={<AgentsVisualizations />}
+          // tableProps={{
+          //   hasActions: true,
+          //   isSelectable: true,
+          //   selection: {
+          //     onSelectionChange: () => {},
+          //   },
+          // }}
+        />
+      ) : null}
       {isFlyoutVisible ? (
         <EuiFlyout
           ownFocus

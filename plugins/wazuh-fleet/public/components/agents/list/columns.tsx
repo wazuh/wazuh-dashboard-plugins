@@ -1,5 +1,4 @@
 import React from 'react';
-import { agentsTableActions } from './actions/actions';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -11,13 +10,14 @@ import {
 import { getCore, getWazuhCore } from '../../../plugin-services';
 import { Agent } from '../../../../common/types';
 import { AgentGroups, HostOS } from '../../common';
+import { agentsTableActions } from './actions/actions';
 
 export const agentsTableColumns = ({
   setIsFlyoutAgentVisible,
   setAgent,
 }: {
-  setIsFlyoutAgentVisible: (isVisible: boolean) => void;
-  setAgent: (agent: Agent) => void;
+  setIsFlyoutAgentVisible?: (isVisible: boolean) => void;
+  setAgent?: (agent: Agent) => void;
   // allowEditGroups: boolean,
   // allowUpgrade: boolean,
   // setAgent: (agents: Agent) => void,
@@ -46,7 +46,7 @@ export const agentsTableColumns = ({
         <EuiFlexItem>
           <EuiToolTip content={agentData.agent.id}>
             <EuiText color='subdued' size='xs'>
-              {`${agentData.agent.id.substring(0, 14)}...`}
+              {`${agentData.agent.id.slice(0, 14)}...`}
             </EuiText>
           </EuiToolTip>
         </EuiFlexItem>
@@ -76,11 +76,12 @@ export const agentsTableColumns = ({
     show: true,
     searchable: true,
     width: '100px',
-    render: (version: string, agent: any) => {
+    render: (version: string) => {
       const isOutdated = false;
       // const isOutdated = !!outdatedAgents.find(
       //   outdatedAgent => outdatedAgent.id === agent.id,
       // );
+
       return (
         <EuiFlexGroup
           wrap={false}
@@ -130,9 +131,10 @@ export const agentsTableColumns = ({
   {
     field: 'agent.last_login',
     name: 'Last login',
-    render: (last_login: Date) => {
+    render: (lastLogin: Date) => {
       const { utils } = getWazuhCore();
-      return utils.formatUIDate(last_login);
+
+      return utils.formatUIDate(lastLogin);
     },
     sortable: true,
     show: false,

@@ -9,17 +9,12 @@ import {
 } from '@elastic/eui';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import NavigationService from '../react-services/navigation-service';
-import { views } from './common/views';
+import { summaryAgent, views } from './common/views';
 import { RouteComponent } from './common/route-component';
 
 export interface FleetManagementProps {
-  // FleetDataSource: any;
-  // FleetDataSourceRepository: any;
-  TableIndexer: any;
-  useTimeFilter: any;
-  LoadingSpinner: any;
-  AlertsDataSource: any;
-  AlertsDataSourceRepository: any;
+  indexPattern: any;
+  // useTimeFilter: any;
 }
 
 export const FleetManagement = ({ ...restProps }: FleetManagementProps) => {
@@ -86,7 +81,7 @@ export const FleetManagement = ({ ...restProps }: FleetManagementProps) => {
                     )}
                   />
                 ))}
-                <Redirect to={`//${views[0].id}`} />
+                <Redirect to={summaryAgent.path} />
               </Switch>
             </EuiPanel>
           </EuiPageBody>
