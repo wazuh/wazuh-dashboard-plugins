@@ -7,7 +7,7 @@ import { first } from 'rxjs/operators';
 import React, { ReactNode } from 'react';
 import { GlobalSearchPageItem } from './global-search-page-item';
 
-function match(title: string | undefined, query: string) {
+function hasMatch(title: string | undefined, query: string) {
   return title && title.toLowerCase().includes(query.toLowerCase());
 }
 
@@ -52,9 +52,9 @@ export const searchPages = async (
             )?.title ?? '';
         }
 
-        const navGroupTitleMatch = match(navGroup.title, query);
-        const titleMatch = match(title, query);
-        const parentTitleMatch = match(parentNavLinkTitle, query);
+        const navGroupTitleMatch = hasMatch(navGroup.title, query);
+        const titleMatch = hasMatch(title, query);
+        const parentTitleMatch = hasMatch(parentNavLinkTitle, query);
 
         return (
           !link.disabled &&
