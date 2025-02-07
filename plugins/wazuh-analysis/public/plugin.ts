@@ -45,9 +45,7 @@ export class AnalysisPlugin
   ): AnalysisStart | Promise<AnalysisStart> {
     setCore(core);
 
-    const wazuhCore = plugins.wazuhCore;
-
-    wazuhCore.applicationService.onAppStartupSubscribe(core);
+    plugins.wazuhCore.applicationService.onAppStartup(core);
 
     return {};
   }

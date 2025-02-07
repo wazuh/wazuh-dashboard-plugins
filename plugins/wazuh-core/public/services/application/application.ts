@@ -215,7 +215,7 @@ export class ApplicationService {
    * the application's core services, such as navigation, UI components, data
    * fetching, and more.
    */
-  onAppStartupSubscribe(core: CoreStart) {
+  onAppStartup(core: CoreStart) {
     this.appStartup$.subscribe({
       next: async (navGroupId: string) => {
         this.logger?.debug(`onAppStartupSubscribe ${navGroupId}`);
