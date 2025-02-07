@@ -172,44 +172,36 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  modifySubAppsMount(
-    apps: App[],
-    core: CoreSetup,
-    appOperations?: AppOperations,
-  ) {
+  modifySubAppMount(app: App, core: CoreSetup, appOperations?: AppOperations) {
     this.logger?.debug('initializeSubApplicationMounts');
 
     const beforeMount = appOperations?.beforeMount ?? this.setNavLinkVisible;
     const cleanup = appOperations?.cleanup ?? this.setNavLinkHidden;
 
-    for (const app of apps) {
-      this.logger?.debug(`initializeApp ${app.id}`);
+    this.logger?.debug(`initializeApp ${app.id}`);
 
-      const mount = app.mount.bind(app) as AppMount;
-      const navGroupId = this.getNavGroupId(app.id);
+    const mount = app.mount.bind(app) as AppMount;
+    const navGroupId = this.getNavGroupId(app.id);
 
-      app.mount = async (params: AppMountParameters) => {
+    app.mount = async (params: AppMountParameters) => {
+      if (core.chrome.navGroup.getNavGroupEnabled()) {
+        this.getAppUpdater(navGroupId).next(beforeMount);
+      }
+
+      const unmount = await mount(params);
+
+      return () => {
+        this.logger?.debug(`unmount ${app.id}`);
+
         if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.getAppUpdater(navGroupId).next(beforeMount);
+          this.getAppUpdater(navGroupId).next(cleanup);
         }
 
-        const unmount = await mount(params);
+        unmount();
 
-        return () => {
-          this.logger?.debug(`unmount ${app.id}`);
-
-          if (core.chrome.navGroup.getNavGroupEnabled()) {
-            this.getAppUpdater(navGroupId).next(cleanup);
-          }
-
-          unmount();
-
-          return true;
-        };
+        return true;
       };
-
-      core.application.register(app);
-    }
+    };
   }
 
   /**
@@ -292,7 +284,10 @@ export class ApplicationService {
       this.getAppUpdater(navGroup.getId()),
     );
 
-    this.modifySubAppsMount(subApps, core);
+    for (const app of subApps) {
+      this.modifySubAppMount(app, core);
+      core.application.register(app);
+    }
   }
 
   /**
