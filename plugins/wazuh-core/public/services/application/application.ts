@@ -41,7 +41,7 @@ export class ApplicationService {
   /**
    * Asynchronously gets the current navigation group.
    */
-  async getCurrentNavGroup(core: CoreStart) {
+  private async getCurrentNavGroup(core: CoreStart) {
     return core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
   }
 
@@ -53,7 +53,7 @@ export class ApplicationService {
    * unique identifier of the application for which you want to register an app
    * updater.
    */
-  registerAppUpdater(appId: string) {
+  private registerAppUpdater(appId: string) {
     this.logger?.debug(`${this.registerAppUpdater.name} [AppId: ${appId}]`);
     this.appUpdater$[appId] = new Subject<AppUpdater>();
   }
@@ -69,7 +69,7 @@ export class ApplicationService {
    * given `appId`, it will throw an `AppUpdaterNotFoundError` with the `appId`
    * that was passed as an argument.
    */
-  getAppUpdater(appId: string) {
+  private getAppUpdater(appId: string) {
     this.logger?.debug(`${this.getAppUpdater.name} [AppId: ${appId}]`);
 
     if (!this.appUpdater$[appId]) {
@@ -160,7 +160,7 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  modifyAppGroupMount(app: App) {
+  private modifyAppGroupMount(app: App) {
     this.logger?.debug(`${this.modifyAppGroupMount.name} [AppId: ${app.id}]`);
 
     const navGroupId = this.getNavGroupId(app.id);
@@ -190,7 +190,7 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  modifySubAppMount(app: App) {
+  private modifySubAppMount(app: App) {
     this.logger?.debug(`${this.modifySubAppMount.name} [AppId: ${app.id}]`);
 
     const navGroupId = this.getNavGroupId(app.id);
@@ -248,7 +248,7 @@ export class ApplicationService {
    * Each navigation link in the `navLinks` array should have an `id` property
    * that represents the ID
    */
-  async navigateToFirstAppInNavGroup(
+  private async navigateToFirstAppInNavGroup(
     core: CoreStart,
     navGroup: NavGroupItemInMap | undefined,
   ) {
