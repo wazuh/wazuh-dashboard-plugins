@@ -5,11 +5,10 @@ import {
   AppUpdater,
   ChromeNavGroup,
   ChromeRegistrationNavLink,
-  CoreSetup,
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
-import { Group } from '../types';
 import { getCore } from '../../plugin-services';
+import { Group } from '../../../../wazuh-core/public/services/application/types';
 import { getEndpointSecurityApps } from './applications';
 import {
   ENDPOINT_SECURITY_DESCRIPTION,
@@ -62,12 +61,5 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
 
   getApps(updater$?: Subject<AppUpdater>): App[] {
     return getEndpointSecurityApps(updater$);
-  },
-
-  addNavLinks(core: CoreSetup) {
-    core.chrome.navGroup.addNavLinksToGroup(
-      EndpointSecurityNavGroup.getNavGroup(),
-      EndpointSecurityNavGroup.getAppsNavLinks(),
-    );
   },
 };

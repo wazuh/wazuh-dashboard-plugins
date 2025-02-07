@@ -4,11 +4,10 @@ import {
   AppMountParameters,
   AppUpdater,
   ChromeRegistrationNavLink,
-  CoreSetup,
 } from '../../../../../src/core/public';
-import { Group } from '../types';
 import { CATEGORY } from '../category';
 import { getCore } from '../../plugin-services';
+import { Group } from '../../../../wazuh-core/public/services/application/types';
 import { getCloudSecurityApps } from './applications';
 import {
   CLOUD_SECURITY_DESCRIPTION,
@@ -61,12 +60,5 @@ export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
 
   getApps(updater$?: Subject<AppUpdater>): App[] {
     return getCloudSecurityApps(updater$);
-  },
-
-  addNavLinks(core: CoreSetup): void {
-    core.chrome.navGroup.addNavLinksToGroup(
-      CloudSecurityNavGroup.getNavGroup(),
-      CloudSecurityNavGroup.getAppsNavLinks(),
-    );
   },
 };

@@ -4,11 +4,10 @@ import {
   AppMountParameters,
   AppUpdater,
   ChromeRegistrationNavLink,
-  CoreSetup,
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
-import { Group } from '../types';
 import { getCore } from '../../plugin-services';
+import { Group } from '../../../../wazuh-core/public/services/application/types';
 import { getThreatIntelligenceApps } from './applications';
 import {
   THREAT_INTELLIGENCE_DESCRIPTION,
@@ -64,12 +63,5 @@ export const ThreatIntelligenceNavGroup: Group<typeof THREAT_INTELLIGENCE_ID> =
 
     getApps(updater$?: Subject<AppUpdater>): App[] {
       return getThreatIntelligenceApps(updater$);
-    },
-
-    addNavLinks(core: CoreSetup): void {
-      core.chrome.navGroup.addNavLinksToGroup(
-        ThreatIntelligenceNavGroup.getNavGroup(),
-        ThreatIntelligenceNavGroup.getAppsNavLinks(),
-      );
     },
   };
