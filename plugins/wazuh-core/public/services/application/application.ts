@@ -1,6 +1,6 @@
-import { first } from 'rxjs/operators';
-import { Subject } from 'rxjs';
 import { Logger } from '@osd/logging';
+import { Subject } from 'rxjs';
+import { first } from 'rxjs/operators';
 import {
   App,
   AppMount,
@@ -9,10 +9,11 @@ import {
   AppUpdater,
   CoreSetup,
   CoreStart,
+  DEFAULT_NAV_GROUPS,
   NavGroupItemInMap,
 } from '../../../../../src/core/public';
 import { AppUpdaterNotFoundError } from './errors/app-updater-not-found-error';
-import { AppOperations } from './types';
+import { AppOperations, Group } from './types';
 
 export class ApplicationService {
   /**
@@ -124,16 +125,13 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  initializeNavGroupMounts(
-    apps: App[],
+  modifyAppGroupMount(
+    app: App,
     core: CoreSetup,
     appOperations?: AppOperations,
   ) {
-    this.logger?.debug('initializeNavGroupMounts');
-
     const beforeMount = appOperations?.beforeMount ?? this.setNavLinkVisible;
 
-    for (const app of apps) {
       this.logger?.debug(`initializeApp ${app.id}`);
 
       const mount = app.mount.bind(app) as AppMount;
@@ -155,9 +153,6 @@ export class ApplicationService {
           return true;
         };
       };
-
-      core.application.register(app);
-    }
   }
 
   /**
@@ -268,6 +263,34 @@ export class ApplicationService {
 
     if (firstNavItem?.id) {
       core.application.navigateToApp(firstNavItem.id);
+    }
+  }
+
+  private registerAppGroup(appGroup: App, core: CoreSetup) {
+    this.registerAppUpdater(appGroup.id);
+    this.modifyAppGroupMount(appGroup, core);
+    core.application.register(appGroup);
+  }
+
+  private registerNavGroup(navGroup: Group<any>, core: CoreSetup) {
+    core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
+      navGroup.getGroupNavLink(),
+    ]);
+    core.chrome.navGroup.addNavLinksToGroup(
+      navGroup.getNavGroup(),
+      navGroup.getAppsNavLinks(),
+    );
+
+    this.registerAppGroup(navGroup.getAppGroup(), core);
+  }
+
+  /**
+   * This method is used to add navigation links related to the specific group
+   * within the OpenSearch Dashboards application.
+   */
+  setup(navGroups: Group<any>[], core: CoreSetup) {
+    for (const navGroup of navGroups) {
+      this.registerNavGroup(navGroup, core);
     }
   }
 }
