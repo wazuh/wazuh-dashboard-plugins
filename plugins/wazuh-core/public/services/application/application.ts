@@ -34,7 +34,9 @@ export class ApplicationService {
   constructor(
     private readonly logger: Logger,
     private readonly coreSetup: CoreSetup,
-  ) {}
+  ) {
+    this.logger = logger.get('ApplicationService');
+  }
 
   /**
    * Asynchronously gets the current navigation group.
@@ -52,7 +54,7 @@ export class ApplicationService {
    * updater.
    */
   registerAppUpdater(appId: string) {
-    this.logger?.debug(`registerAppUpdater (AppId: ${appId})`);
+    this.logger?.debug(`${this.registerAppUpdater.name} [AppId: ${appId}]`);
     this.appUpdater$[appId] = new Subject<AppUpdater>();
   }
 
@@ -68,7 +70,7 @@ export class ApplicationService {
    * that was passed as an argument.
    */
   getAppUpdater(appId: string) {
-    this.logger?.debug(`getAppUpdater ${appId}`);
+    this.logger?.debug(`${this.getAppUpdater.name} [AppId: ${appId}]`);
 
     if (!this.appUpdater$[appId]) {
       this.logger?.error(`getAppUpdater ${appId}`);
@@ -85,7 +87,7 @@ export class ApplicationService {
    * property `navLinkStatus` set to `AppNavLinkStatus.visible`.
    */
   private setNavLinkVisible(): Partial<App> {
-    this.logger?.debug('setNavLinkVisible');
+    this.logger?.debug(`${this.setNavLinkVisible.name}`);
 
     return {
       navLinkStatus: AppNavLinkStatus.visible,
@@ -99,7 +101,7 @@ export class ApplicationService {
    * navLinkStatus property set to AppNavLinkStatus.hidden.
    */
   private setNavLinkHidden(): Partial<App> {
-    this.logger?.debug('setNavLinkHidden');
+    this.logger?.debug(`${this.setNavLinkHidden.name}`);
 
     return {
       navLinkStatus: AppNavLinkStatus.hidden,
@@ -159,7 +161,7 @@ export class ApplicationService {
    * up the application after it has been unmounted.
    */
   modifyAppGroupMount(app: App) {
-    this.logger?.debug(this.modifyAppGroupMount.name);
+    this.logger?.debug(`${this.modifyAppGroupMount.name} [AppId: ${app.id}]`);
 
     const navGroupId = this.getNavGroupId(app.id);
 
@@ -189,7 +191,7 @@ export class ApplicationService {
    * up the application after it has been unmounted.
    */
   modifySubAppMount(app: App) {
-    this.logger?.debug(this.modifySubAppMount.name);
+    this.logger?.debug(`${this.modifySubAppMount.name} [AppId: ${app.id}]`);
 
     const navGroupId = this.getNavGroupId(app.id);
 
@@ -217,7 +219,9 @@ export class ApplicationService {
   onAppStartup(core: CoreStart) {
     this.appStartup$.subscribe({
       next: async (navGroupId: string) => {
-        this.logger?.debug(`onAppStartupSubscribe ${navGroupId}`);
+        this.logger?.debug(
+          `${this.onAppStartup.name} [NavGroupId: ${navGroupId}]`,
+        );
 
         if (core.chrome.navGroup.getNavGroupEnabled()) {
           core.chrome.navGroup.setCurrentNavGroup(navGroupId);
@@ -248,7 +252,9 @@ export class ApplicationService {
     core: CoreStart,
     navGroup: NavGroupItemInMap | undefined,
   ) {
-    this.logger?.debug('navigateToFirstAppInNavGroup');
+    this.logger?.debug(
+      `${this.navigateToFirstAppInNavGroup.name} [NavGroupId: ${navGroup?.id}]`,
+    );
 
     // Get the first nav item, if it exists navigate to the app
     const firstNavItem = navGroup?.navLinks[0];
@@ -259,12 +265,16 @@ export class ApplicationService {
   }
 
   private registerAppGroup(appGroup: App) {
+    this.logger?.debug(`${this.registerAppGroup.name} [AppId: ${appGroup.id}]`);
     this.registerAppUpdater(appGroup.id);
     this.modifyAppGroupMount(appGroup);
     this.coreSetup.application.register(appGroup);
   }
 
   private assignNavLinksToChromeGroups(navGroup: Group<any>) {
+    this.logger?.debug(
+      `${this.assignNavLinksToChromeGroups.name} [NavGroupId: ${navGroup.getId()}]`,
+    );
     this.coreSetup.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       navGroup.getGroupNavLink(),
     ]);
@@ -275,11 +285,18 @@ export class ApplicationService {
   }
 
   private registerNavGroup(navGroup: Group<any>) {
+    this.logger?.debug(
+      `${this.registerNavGroup.name} [NavGroupId: ${navGroup.getId()}]`,
+    );
     this.assignNavLinksToChromeGroups(navGroup);
     this.registerAppGroup(navGroup.getAppGroup());
   }
 
   private registerSubAppsGroups(navGroup: Group<any>) {
+    this.logger?.debug(
+      `${this.registerSubAppsGroups.name} [NavGroupId: ${navGroup.getId()}]`,
+    );
+
     const subApps: App[] = navGroup.getApps(
       this.getAppUpdater(navGroup.getId()),
     );
@@ -299,6 +316,8 @@ export class ApplicationService {
     navGroups: Group<any>[];
     coreSetup: CoreSetup;
   }) {
+    this.logger?.debug(`${this.registerSearchCommand.name} [Id: ${id}]`);
+
     const applications: App[] = navGroups.map(navGroup =>
       navGroup.getAppGroup(),
     );
@@ -327,6 +346,8 @@ export class ApplicationService {
     navGroups: Group<any>[];
     coreSetup: CoreSetup;
   }) {
+    this.logger?.debug(`${this.setup.name} [Id: ${id}]`);
+
     for (const navGroup of navGroups) {
       this.registerNavGroup(navGroup);
       this.registerSubAppsGroups(navGroup);
