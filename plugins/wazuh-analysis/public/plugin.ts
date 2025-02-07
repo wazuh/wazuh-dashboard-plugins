@@ -1,17 +1,12 @@
-import {
-  App,
-  CoreSetup,
-  CoreStart,
-  DEFAULT_NAV_GROUPS,
-  Plugin,
-} from '../../../src/core/public';
+import { App, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
 import { ApplicationService } from '../../wazuh-core/public/services/application/application';
+import { Group } from '../../wazuh-core/public/services/application/types';
 import { searchPages } from './components/global_search/search-pages-command';
 import { CloudSecurityNavGroup } from './groups/cloud-security';
 import { EndpointSecurityNavGroup } from './groups/endpoint-security';
 import { SecurityOperationsNavGroup } from './groups/security-operations';
 import { ThreatIntelligenceNavGroup } from './groups/threat-intelligence';
-import { Group, GroupsId } from './groups/types';
+import { GroupsId } from './groups/types';
 import { getCore, setCore } from './plugin-services';
 import {
   AnalysisSetup,
@@ -38,20 +33,14 @@ export class AnalysisPlugin
     const applications: App[] = this.navGroups.map(navGroup =>
       navGroup.getAppGroup(),
     );
-
-    applicationService.initializeNavGroupMounts(applications, core);
+    const applicationIds = applications.map(app => app.id);
 
     if (core.chrome.navGroup.getNavGroupEnabled()) {
       core.chrome.globalSearch.registerSearchCommand({
         id: 'wz-analysis',
         type: 'PAGES',
         run: async (query: string, done?: () => void) =>
-          searchPages(
-            query,
-            applications.map(app => app.id),
-            getCore(),
-            done,
-          ),
+          searchPages(query, applicationIds, getCore(), done),
       });
     }
 
@@ -60,16 +49,7 @@ export class AnalysisPlugin
     );
 
     for (const apps of subApps) {
-      applicationService.initializeSubApplicationMounts(apps, core);
-    }
-  }
-
-  private registerNavGroups(core: CoreSetup) {
-    for (const navGroup of this.navGroups) {
-      navGroup.addNavLinks(core);
-      core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
-        navGroup.getGroupNavLink(),
-      ]);
+      applicationService.modifySubAppsMount(apps, core);
     }
   }
 
@@ -81,12 +61,8 @@ export class AnalysisPlugin
 
     const wazuhCore = plugins.wazuhCore;
 
-    for (const navGroup of this.navGroups) {
-      wazuhCore.applicationService.registerAppUpdater(navGroup.getId());
-    }
-
+    wazuhCore.applicationService.setup(this.navGroups, core);
     this.registerApps(core, wazuhCore.applicationService);
-    this.registerNavGroups(core);
 
     return {};
   }

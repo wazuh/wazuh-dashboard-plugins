@@ -132,27 +132,27 @@ export class ApplicationService {
   ) {
     const beforeMount = appOperations?.beforeMount ?? this.setNavLinkVisible;
 
-      this.logger?.debug(`initializeApp ${app.id}`);
+    this.logger?.debug(`initializeApp ${app.id}`);
 
-      const mount = app.mount.bind(app) as AppMount;
-      const navGroupId = this.getNavGroupId(app.id);
+    const mount = app.mount.bind(app) as AppMount;
+    const navGroupId = this.getNavGroupId(app.id);
 
-      app.mount = async (params: AppMountParameters) => {
-        if (core.chrome.navGroup.getNavGroupEnabled()) {
-          this.getAppUpdater(navGroupId).next(beforeMount);
-          this.appStartup$.next(navGroupId);
-        }
+    app.mount = async (params: AppMountParameters) => {
+      if (core.chrome.navGroup.getNavGroupEnabled()) {
+        this.getAppUpdater(navGroupId).next(beforeMount);
+        this.appStartup$.next(navGroupId);
+      }
 
-        const unmount = await mount(params);
+      const unmount = await mount(params);
 
-        return () => {
-          this.logger?.debug(`unmount ${app.id}`);
+      return () => {
+        this.logger?.debug(`unmount ${app.id}`);
 
-          unmount();
+        unmount();
 
-          return true;
-        };
+        return true;
       };
+    };
   }
 
   /**
@@ -172,7 +172,7 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  initializeSubApplicationMounts(
+  modifySubAppsMount(
     apps: App[],
     core: CoreSetup,
     appOperations?: AppOperations,
