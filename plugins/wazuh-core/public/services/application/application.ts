@@ -15,19 +15,32 @@ import { AppUpdaterNotFoundError } from './errors/app-updater-not-found-error';
 import { AppOperations } from './types';
 
 export class ApplicationService {
+  /**
+   * Usage: Used to emit updates (for example, changes in navigation link
+   * visibility) to registered applications or application groups.
+   */
   private readonly appUpdater$: Partial<Record<string, Subject<AppUpdater>>> =
     {};
+  /**
+   * Usage: Used to notify the startup event of an application (or group) and,
+   * from it, update the application navigation (for example, setting the
+   * current group and navigating to the first app in the group).
+   */
   private readonly appStartup$ = new Subject<string>();
 
   constructor(private readonly logger?: Logger) {}
 
+  /**
+   * Asynchronously gets the current navigation group.
+   */
   async getCurrentNavGroup(core: CoreStart) {
     return core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
   }
 
   /**
-   * This function creates a new Subject for a specific application updater
-   * identified by its `appId`.
+   * Registers (or initializes) an updater for a specific appId (in practice,
+   * for a navigation group).
+   *
    * @param {string} appId - This parameter is a string that represents the
    * unique identifier of the application for which you want to register an app
    * updater.
@@ -38,12 +51,12 @@ export class ApplicationService {
   }
 
   /**
-   * This function retrieves the app updater for a specific app ID, throwing an
+   * This method retrieves the app updater for a specific app ID, throwing an
    * error if the updater is not found.
-   * @param {string} appId - This function is used to retrieve an app updater
+   * @param {string} appId - This method is used to retrieve an app updater
    * based on the provided `appId`. If the app updater for the specified `appId`
    * does not exist, it throws an `AppUpdaterNotFoundError` with the `appId`
-   * @returns This function is returning the app updater object associated with
+   * @returns This method is returning the app updater object associated with
    * the provided `appId`. If the app updater object does not exist for the
    * given `appId`, it will throw an `AppUpdaterNotFoundError` with the `appId`
    * that was passed as an argument.
@@ -60,8 +73,8 @@ export class ApplicationService {
   }
 
   /**
-   * This function returns an object with the `navLinkStatus` property set to
-   * `visible` for an App object.
+   * This method returns a partial object of type App where the navLinkStatus
+   * property is set to visible.
    * @returns A partial object of the App interface is being returned with the
    * property `navLinkStatus` set to `AppNavLinkStatus.visible`.
    */
@@ -74,8 +87,8 @@ export class ApplicationService {
   }
 
   /**
-   * This function returns an object with the `navLinkStatus` property set to
-   * `hidden` for an App object.
+   * This method returns a partial object with the navLinkStatus property set
+   * to hidden.
    * @returns A partial object of the App interface is being returned with the
    * navLinkStatus property set to AppNavLinkStatus.hidden.
    */
@@ -87,13 +100,16 @@ export class ApplicationService {
     };
   }
 
+  /**
+   * Extracts the navigation group identifier from the appId.
+   */
   private getNavGroupId(appId: string): string {
     return appId.split('_%2F')[0];
   }
 
   /**
-   * The function initializes navigation group mounts for a list of apps in a
-   * TypeScript codebase.
+   * The method initializes and registers the mounting of a set of
+   * applications that belong to navigation groups.
    * @param {App[]} apps - This parameter is an array of objects representing
    * different applications. Each object contains information about a specific
    * app, such as its ID, name, and mount function.
@@ -145,9 +161,8 @@ export class ApplicationService {
   }
 
   /**
-   * The function initializes mounts for multiple sub applications, allowing for
-   * preparation (beforeMount) and cleanup operations to be executed before and
-   * after * mounting each application.
+   * The method initializes and registers the mounting of sub-applications,
+   * adding logic for both mounting and cleanup (unmounting).
    * @param {App[]} apps - This parameter is an array of objects representing
    * different applications. Each object contains information about a specific
    * app, such as its ID, name, and mount function.
@@ -203,11 +218,12 @@ export class ApplicationService {
   }
 
   /**
-   * The function subscribes to an observable `appStartup$` and performs certain
-   * actions based on the received data.
+   * The method ensures that, after an application starts, the interface updates
+   * to reflect the active group and automatically redirects the user to the
+   * first available application in that group.
    * @param {CoreStart} core - This parameter is an object that provides access
    * to various services and functionalities within the application. It is
-   * typically passed in as a parameter to allow the function to interact with
+   * typically passed in as a parameter to allow the method to interact with
    * the application's core services, such as navigation, UI components, data
    * fetching, and more.
    */
@@ -228,8 +244,8 @@ export class ApplicationService {
   }
 
   /**
-   * This function navigates to the first app in a specified navigation group if
-   * it exists.
+   * This method navigates to the first application (or link) in the specified
+   * navigation group if it exists.
    * @param {CoreStart} core - This parameter is an object that provides access
    * to core services in Kibana, such as application navigation, HTTP requests,
    * and more. It is typically provided by the Kibana platform to plugins and
