@@ -85,7 +85,7 @@ export class WazuhCorePlugin
       new UISettingsConfigProvider(core.uiSettings),
     );
 
-    this.services.applicationService = new ApplicationService(logger);
+    this.services.applicationService = new ApplicationService(logger, core);
 
     this.services.configuration = new Configuration(
       logger,

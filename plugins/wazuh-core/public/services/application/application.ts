@@ -31,7 +31,10 @@ export class ApplicationService {
    */
   private readonly appStartup$ = new Subject<string>();
 
-  constructor(private readonly logger?: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly coreSetup: CoreSetup,
+  ) {}
 
   /**
    * Asynchronously gets the current navigation group.
@@ -110,21 +113,17 @@ export class ApplicationService {
     return appId.split('_%2F')[0];
   }
 
-  private isNavGroupEnabled(core: CoreSetup) {
-    return core.chrome.navGroup.getNavGroupEnabled();
+  private isNavGroupEnabled() {
+    return this.coreSetup.chrome.navGroup.getNavGroupEnabled();
   }
 
-  private modifyMount(
-    app: App,
-    core: CoreSetup,
-    appOperations?: AppOperations,
-  ) {
+  private modifyMount(app: App, appOperations?: AppOperations) {
     this.logger?.debug(`${this.modifyMount.name} [AppId: ${app.id}]`);
 
     const mount = app.mount.bind(app) as AppMount;
 
     app.mount = async (params: AppMountParameters) => {
-      if (this.isNavGroupEnabled(core)) {
+      if (this.isNavGroupEnabled()) {
         appOperations?.beforeMount?.();
       }
 
@@ -133,7 +132,7 @@ export class ApplicationService {
       return () => {
         this.logger?.debug(`Unmount [AppId: ${app.id}]`);
 
-        if (this.isNavGroupEnabled(core)) {
+        if (this.isNavGroupEnabled()) {
           appOperations?.cleanup?.();
         }
 
@@ -159,7 +158,7 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  modifyAppGroupMount(app: App, core: CoreSetup) {
+  modifyAppGroupMount(app: App) {
     this.logger?.debug(this.modifyAppGroupMount.name);
 
     const navGroupId = this.getNavGroupId(app.id);
@@ -169,7 +168,7 @@ export class ApplicationService {
       this.appStartup$.next(navGroupId);
     };
 
-    this.modifyMount(app, core, { beforeMount });
+    this.modifyMount(app, { beforeMount });
   }
 
   /**
@@ -189,7 +188,7 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  modifySubAppMount(app: App, core: CoreSetup) {
+  modifySubAppMount(app: App) {
     this.logger?.debug(this.modifySubAppMount.name);
 
     const navGroupId = this.getNavGroupId(app.id);
@@ -202,7 +201,7 @@ export class ApplicationService {
       this.getAppUpdater(navGroupId).next(this.setNavLinkHidden);
     };
 
-    this.modifyMount(app, core, { beforeMount, cleanup });
+    this.modifyMount(app, { beforeMount, cleanup });
   }
 
   /**
@@ -259,35 +258,35 @@ export class ApplicationService {
     }
   }
 
-  private registerAppGroup(appGroup: App, core: CoreSetup) {
+  private registerAppGroup(appGroup: App) {
     this.registerAppUpdater(appGroup.id);
-    this.modifyAppGroupMount(appGroup, core);
-    core.application.register(appGroup);
+    this.modifyAppGroupMount(appGroup);
+    this.coreSetup.application.register(appGroup);
   }
 
-  private assignNavLinksToChromeGroups(navGroup: Group<any>, core: CoreSetup) {
-    core.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
+  private assignNavLinksToChromeGroups(navGroup: Group<any>) {
+    this.coreSetup.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       navGroup.getGroupNavLink(),
     ]);
-    core.chrome.navGroup.addNavLinksToGroup(
+    this.coreSetup.chrome.navGroup.addNavLinksToGroup(
       navGroup.getNavGroup(),
       navGroup.getAppsNavLinks(),
     );
   }
 
-  private registerNavGroup(navGroup: Group<any>, core: CoreSetup) {
-    this.assignNavLinksToChromeGroups(navGroup, core);
-    this.registerAppGroup(navGroup.getAppGroup(), core);
+  private registerNavGroup(navGroup: Group<any>) {
+    this.assignNavLinksToChromeGroups(navGroup);
+    this.registerAppGroup(navGroup.getAppGroup());
   }
 
-  private registerSubAppsGroups(navGroup: Group<any>, core: CoreSetup) {
+  private registerSubAppsGroups(navGroup: Group<any>) {
     const subApps: App[] = navGroup.getApps(
       this.getAppUpdater(navGroup.getId()),
     );
 
     for (const app of subApps) {
-      this.modifySubAppMount(app, core);
-      core.application.register(app);
+      this.modifySubAppMount(app);
+      this.coreSetup.application.register(app);
     }
   }
 
@@ -329,8 +328,8 @@ export class ApplicationService {
     coreSetup: CoreSetup;
   }) {
     for (const navGroup of navGroups) {
-      this.registerNavGroup(navGroup, coreSetup);
-      this.registerSubAppsGroups(navGroup, coreSetup);
+      this.registerNavGroup(navGroup);
+      this.registerSubAppsGroups(navGroup);
     }
 
     this.registerSearchCommand({
