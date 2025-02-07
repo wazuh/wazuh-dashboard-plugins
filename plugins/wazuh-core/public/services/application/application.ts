@@ -13,6 +13,7 @@ import {
   NavGroupItemInMap,
 } from '../../../../../src/core/public';
 import { searchPages } from '../../components/global_search/search-pages-command';
+import { getCore } from '../../plugin-services';
 import { AppUpdaterNotFoundError } from './errors/app-updater-not-found-error';
 import { AppOperations, Group } from './types';
 
@@ -294,12 +295,10 @@ export class ApplicationService {
     id,
     navGroups,
     coreSetup,
-    getCoreStart,
   }: {
     id: string;
     navGroups: Group<any>[];
     coreSetup: CoreSetup;
-    getCoreStart: () => CoreStart;
   }) {
     const applications: App[] = navGroups.map(navGroup =>
       navGroup.getAppGroup(),
@@ -311,7 +310,7 @@ export class ApplicationService {
         id,
         type: 'PAGES',
         run: async (query: string, done?: () => void) =>
-          searchPages(query, applicationIds, getCoreStart(), done),
+          searchPages(query, applicationIds, getCore(), done),
       });
     }
   }
@@ -324,12 +323,10 @@ export class ApplicationService {
     id,
     navGroups,
     coreSetup,
-    getCoreStart,
   }: {
     id: string;
     navGroups: Group<any>[];
     coreSetup: CoreSetup;
-    getCoreStart: () => CoreStart;
   }) {
     for (const navGroup of navGroups) {
       this.registerNavGroup(navGroup, coreSetup);
@@ -340,7 +337,6 @@ export class ApplicationService {
       id,
       navGroups,
       coreSetup,
-      getCoreStart,
     });
   }
 }

@@ -5,7 +5,7 @@ import { EndpointSecurityNavGroup } from './groups/endpoint-security';
 import { SecurityOperationsNavGroup } from './groups/security-operations';
 import { ThreatIntelligenceNavGroup } from './groups/threat-intelligence';
 import { GroupsId } from './groups/types';
-import { getCore, setCore } from './plugin-services';
+import { setCore } from './plugin-services';
 import {
   AnalysisSetup,
   AnalysisSetupDependencies,
@@ -33,7 +33,6 @@ export class AnalysisPlugin
       id: 'wz-analysis',
       navGroups: this.navGroups,
       coreSetup: core,
-      getCoreStart: getCore,
     });
 
     return {};
