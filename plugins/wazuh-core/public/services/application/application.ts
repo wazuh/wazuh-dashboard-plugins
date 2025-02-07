@@ -287,6 +287,14 @@ export class ApplicationService {
     this.registerAppGroup(navGroup.getAppGroup(), core);
   }
 
+  private registerSubAppsGroups(navGroup: Group<any>, core: CoreSetup) {
+    const subApps: App[] = navGroup.getApps(
+      this.getAppUpdater(navGroup.getId()),
+    );
+
+    this.modifySubAppsMount(subApps, core);
+  }
+
   /**
    * This method is used to add navigation links related to the specific group
    * within the OpenSearch Dashboards application.
@@ -294,6 +302,7 @@ export class ApplicationService {
   setup(navGroups: Group<any>[], core: CoreSetup) {
     for (const navGroup of navGroups) {
       this.registerNavGroup(navGroup, core);
+      this.registerSubAppsGroups(navGroup, core);
     }
   }
 }
