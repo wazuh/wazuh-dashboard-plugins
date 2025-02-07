@@ -1,6 +1,5 @@
-import { App, CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
+import { CoreSetup, CoreStart, Plugin } from '../../../src/core/public';
 import { Group } from '../../wazuh-core/public/services/application/types';
-import { searchPages } from './components/global_search/search-pages-command';
 import { CloudSecurityNavGroup } from './groups/cloud-security';
 import { EndpointSecurityNavGroup } from './groups/endpoint-security';
 import { SecurityOperationsNavGroup } from './groups/security-operations';
@@ -25,29 +24,17 @@ export class AnalysisPlugin
     CloudSecurityNavGroup,
   ];
 
-  private registerApps(core: CoreSetup) {
-    const applications: App[] = this.navGroups.map(navGroup =>
-      navGroup.getAppGroup(),
-    );
-    const applicationIds = applications.map(app => app.id);
-
-    if (core.chrome.navGroup.getNavGroupEnabled()) {
-      core.chrome.globalSearch.registerSearchCommand({
-        id: 'wz-analysis',
-        type: 'PAGES',
-        run: async (query: string, done?: () => void) =>
-          searchPages(query, applicationIds, getCore(), done),
-      });
-    }
-  }
-
   public setup(
     core: CoreSetup,
     plugins: AnalysisSetupDependencies,
   ): AnalysisSetup | Promise<AnalysisSetup> {
     console.debug('AnalysisPlugin started');
-    plugins.wazuhCore.applicationService.setup(this.navGroups, core);
-    this.registerApps(core);
+    plugins.wazuhCore.applicationService.setup({
+      id: 'wz-analysis',
+      navGroups: this.navGroups,
+      coreSetup: core,
+      getCoreStart: getCore,
+    });
 
     return {};
   }

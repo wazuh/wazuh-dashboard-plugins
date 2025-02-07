@@ -12,6 +12,7 @@ import {
   DEFAULT_NAV_GROUPS,
   NavGroupItemInMap,
 } from '../../../../../src/core/public';
+import { searchPages } from '../../components/global_search/search-pages-command';
 import { AppUpdaterNotFoundError } from './errors/app-updater-not-found-error';
 import { AppOperations, Group } from './types';
 
@@ -290,14 +291,57 @@ export class ApplicationService {
     }
   }
 
+  private registerSearchCommand({
+    id,
+    navGroups,
+    coreSetup,
+    getCoreStart,
+  }: {
+    id: string;
+    navGroups: Group<any>[];
+    coreSetup: CoreSetup;
+    getCoreStart: () => CoreStart;
+  }) {
+    const applications: App[] = navGroups.map(navGroup =>
+      navGroup.getAppGroup(),
+    );
+    const applicationIds = applications.map(app => app.id);
+
+    if (coreSetup.chrome.navGroup.getNavGroupEnabled()) {
+      coreSetup.chrome.globalSearch.registerSearchCommand({
+        id,
+        type: 'PAGES',
+        run: async (query: string, done?: () => void) =>
+          searchPages(query, applicationIds, getCoreStart(), done),
+      });
+    }
+  }
+
   /**
    * This method is used to add navigation links related to the specific group
    * within the OpenSearch Dashboards application.
    */
-  setup(navGroups: Group<any>[], core: CoreSetup) {
+  setup({
+    id,
+    navGroups,
+    coreSetup,
+    getCoreStart,
+  }: {
+    id: string;
+    navGroups: Group<any>[];
+    coreSetup: CoreSetup;
+    getCoreStart: () => CoreStart;
+  }) {
     for (const navGroup of navGroups) {
-      this.registerNavGroup(navGroup, core);
-      this.registerSubAppsGroups(navGroup, core);
+      this.registerNavGroup(navGroup, coreSetup);
+      this.registerSubAppsGroups(navGroup, coreSetup);
     }
+
+    this.registerSearchCommand({
+      id,
+      navGroups,
+      coreSetup,
+      getCoreStart,
+    });
   }
 }
