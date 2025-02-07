@@ -28,7 +28,7 @@ export class AnalysisPlugin
     core: CoreSetup,
     plugins: AnalysisSetupDependencies,
   ): AnalysisSetup | Promise<AnalysisSetup> {
-    console.debug('AnalysisPlugin started');
+    console.debug(`${AnalysisPlugin.name} setup`);
     plugins.wazuhCore.applicationService.setup({
       id: 'wz-analysis',
       navGroups: this.navGroups,
@@ -42,6 +42,7 @@ export class AnalysisPlugin
     core: CoreStart,
     plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
+    console.debug(`${AnalysisPlugin.name} start`);
     setCore(core);
 
     plugins.wazuhCore.applicationService.onAppStartup(core);
@@ -49,5 +50,7 @@ export class AnalysisPlugin
     return {};
   }
 
-  stop?(): void {}
+  stop?(): void {
+    console.debug(`${AnalysisPlugin.name} stop`);
+  }
 }
