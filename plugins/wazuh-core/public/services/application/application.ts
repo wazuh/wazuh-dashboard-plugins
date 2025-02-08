@@ -24,15 +24,12 @@ interface SetupParams {
 
 export class ApplicationService {
   /**
-   * Usage: Used to emit updates (for example, changes in navigation link
-   * visibility) to registered applications or application groups.
+   * Stores app updaters for different applications, used to emit updates (e.g., navigation link visibility changes).
    */
   private readonly appUpdater$: Partial<Record<string, Subject<AppUpdater>>> =
     {};
   /**
-   * Usage: Used to notify the startup event of an application (or group) and,
-   * from it, update the application navigation (for example, setting the
-   * current group and navigating to the first app in the group).
+   * Emits startup events for applications, allowing navigation updates (e.g., setting the current group and navigating).
    */
   private readonly appStartup$ = new Subject<string>();
 
@@ -44,19 +41,15 @@ export class ApplicationService {
   }
 
   /**
-   * Asynchronously gets the current navigation group.
+   * Retrieves the current navigation group asynchronously.
    */
   private async getCurrentNavGroup(core: CoreStart) {
     return core.chrome.navGroup.getCurrentNavGroup$().pipe(first()).toPromise();
   }
 
   /**
-   * Registers (or initializes) an updater for a specific appId (in practice,
-   * for a navigation group).
-   *
-   * @param {string} appId - This parameter is a string that represents the
-   * unique identifier of the application for which you want to register an app
-   * updater.
+   * Registers an app updater for a given application ID, typically used for navigation group updates.
+   * @param appId - Unique identifier of the application to register an updater for.
    */
   private registerAppUpdater(appId: string) {
     this.logger?.debug(`${this.registerAppUpdater.name} [AppId: ${appId}]`);
@@ -64,15 +57,10 @@ export class ApplicationService {
   }
 
   /**
-   * This method retrieves the app updater for a specific app ID, throwing an
-   * error if the updater is not found.
-   * @param {string} appId - This method is used to retrieve an app updater
-   * based on the provided `appId`. If the app updater for the specified `appId`
-   * does not exist, it throws an `AppUpdaterNotFoundError` with the `appId`
-   * @returns This method is returning the app updater object associated with
-   * the provided `appId`. If the app updater object does not exist for the
-   * given `appId`, it will throw an `AppUpdaterNotFoundError` with the `appId`
-   * that was passed as an argument.
+   * Retrieves the app updater for a specific app ID. Throws an error if not found.
+   * @param appId - Unique identifier of the application.
+   * @returns The app updater associated with the given `appId`.
+   * @throws {AppUpdaterNotFoundError} If no updater exists for the provided `appId`.
    */
   private getAppUpdater(appId: string) {
     this.logger?.debug(`${this.getAppUpdater.name} [AppId: ${appId}]`);
@@ -86,47 +74,39 @@ export class ApplicationService {
   }
 
   /**
-   * This method returns a partial object of type App where the navLinkStatus
-   * property is set to visible.
-   * @returns A partial object of the App interface is being returned with the
-   * property `navLinkStatus` set to `AppNavLinkStatus.visible`.
+   * Returns an object setting `navLinkStatus` to visible.
    */
   private setNavLinkVisible(): Partial<App> {
-    this.logger?.debug(`${this.setNavLinkVisible.name}`);
-
-    return {
-      navLinkStatus: AppNavLinkStatus.visible,
-    };
+    return { navLinkStatus: AppNavLinkStatus.visible };
   }
 
   /**
-   * This method returns a partial object with the navLinkStatus property set
-   * to hidden.
-   * @returns A partial object of the App interface is being returned with the
-   * navLinkStatus property set to AppNavLinkStatus.hidden.
+   * Returns an object setting `navLinkStatus` to hidden.
    */
   private setNavLinkHidden(): Partial<App> {
-    this.logger?.debug(`${this.setNavLinkHidden.name}`);
-
-    return {
-      navLinkStatus: AppNavLinkStatus.hidden,
-    };
+    return { navLinkStatus: AppNavLinkStatus.hidden };
   }
 
   /**
-   * Extracts the navigation group identifier from the appId.
+   * Extracts the navigation group ID from an application ID.
    */
   private getNavGroupId(appId: string): string {
     return appId.split('_%2F')[0];
   }
 
+  /**
+   * Checks if navigation groups are enabled.
+   */
   private isNavGroupEnabled() {
     return this.coreSetup.chrome.navGroup.getNavGroupEnabled();
   }
 
+  /**
+   * Modifies an application's mount behavior to handle lifecycle operations.
+   * @param app - The application to modify.
+   * @param appOperations - Optional lifecycle operations.
+   */
   private modifyMount(app: App, appOperations?: AppOperations) {
-    this.logger?.debug(`${this.modifyMount.name} [AppId: ${app.id}]`);
-
     const mount = app.mount.bind(app) as AppMount;
 
     app.mount = async (params: AppMountParameters) => {
@@ -215,19 +195,13 @@ export class ApplicationService {
    * The method ensures that, after an application starts, the interface updates
    * to reflect the active group and automatically redirects the user to the
    * first available application in that group.
-   * @param {CoreStart} core - This parameter is an object that provides access
-   * to various services and functionalities within the application. It is
-   * typically passed in as a parameter to allow the method to interact with
-   * the application's core services, such as navigation, UI components, data
-   * fetching, and more.
+   * @param {CoreStart} core - An object that provides access to various
+   * services and functionalities within the application. It allows interaction
+   * with core services such as navigation, HTTP requests, and more.
    */
   onAppStartup(core: CoreStart) {
     this.appStartup$.subscribe({
       next: async (navGroupId: string) => {
-        this.logger?.debug(
-          `${this.onAppStartup.name} [NavGroupId: ${navGroupId}]`,
-        );
-
         if (core.chrome.navGroup.getNavGroupEnabled()) {
           core.chrome.navGroup.setCurrentNavGroup(navGroupId);
 
@@ -240,18 +214,12 @@ export class ApplicationService {
   }
 
   /**
-   * This method navigates to the first application (or link) in the specified
-   * navigation group if it exists.
-   * @param {CoreStart} core - This parameter is an object that provides access
-   * to core services in Kibana, such as application navigation, HTTP requests,
-   * and more. It is typically provided by the Kibana platform to plugins and
-   * can be used to interact with various functionalities within the Kibana
-   * application.
-   * @param {NavGroupItemInMap | undefined} navGroup - This parameter is
-   * expected to be an object that represents a navigation group item in a map.
-   * It should have a property `navLinks` which is an array of navigation links.
-   * Each navigation link in the `navLinks` array should have an `id` property
-   * that represents the ID
+   * Navigates to the first available application in in the specified navigation
+   * group
+   * @param {CoreStart} core - An object that provides access to various
+   * services and functionalities within the application. It allows interaction
+   * with core services such as navigation, HTTP requests, and more.
+   * @param navGroup - Navigation group containing app links.
    */
   private async navigateToFirstAppInNavGroup(
     core: CoreStart,
@@ -289,6 +257,9 @@ export class ApplicationService {
     );
   }
 
+  /**
+   * Registers a navigation group and its associated applications.
+   */
   private registerNavGroup(navGroup: Group<any>) {
     this.logger?.debug(
       `${this.registerNavGroup.name} [NavGroupId: ${navGroup.getId()}]`,
@@ -297,6 +268,9 @@ export class ApplicationService {
     this.registerAppGroup(navGroup.getAppGroup());
   }
 
+  /**
+   * Registers sub-applications within a navigation group.
+   */
   private registerSubAppsGroups(navGroup: Group<any>) {
     this.logger?.debug(
       `${this.registerSubAppsGroups.name} [NavGroupId: ${navGroup.getId()}]`,
@@ -312,6 +286,9 @@ export class ApplicationService {
     }
   }
 
+  /**
+   * Registers a global search command for searching pages within app groups.
+   */
   private registerSearchCommand({ id, navGroups }: SetupParams) {
     this.logger?.debug(`${this.registerSearchCommand.name} [Id: ${id}]`);
 
@@ -331,8 +308,7 @@ export class ApplicationService {
   }
 
   /**
-   * This method is used to add navigation links related to the specific group
-   * within the OpenSearch Dashboards application.
+   * Initializes the service by registering navigation groups and applications.
    */
   setup({ id, navGroups }: SetupParams) {
     this.logger?.debug(`${this.setup.name} [Id: ${id}]`);
@@ -342,9 +318,6 @@ export class ApplicationService {
       this.registerSubAppsGroups(navGroup);
     }
 
-    this.registerSearchCommand({
-      id,
-      navGroups,
-    });
+    this.registerSearchCommand({ id, navGroups });
   }
 }
