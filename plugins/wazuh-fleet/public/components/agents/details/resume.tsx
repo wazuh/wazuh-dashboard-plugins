@@ -14,6 +14,7 @@ import { getWazuhCore } from '../../../plugin-services';
 export interface AgentResumeProps {
   agent: Agent;
 }
+
 export const AgentResume = ({ agent }: AgentResumeProps) => {
   const { utils } = getWazuhCore();
 
@@ -30,7 +31,7 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
                 </EuiDescriptionListDescription>
                 <EuiDescriptionListTitle>Cluster node</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent.wazuh.cluster.name}
+                  {agent.agent.host.name}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -56,11 +57,11 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Name</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent.host.hostname}
+                  {agent.agent.host.hostname}
                 </EuiDescriptionListDescription>
                 <EuiDescriptionListTitle>IP</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent.host.ip}
+                  {agent.agent.host.ip}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -68,11 +69,11 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>OS</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  <HostOS os={agent.host.os} />
+                  <HostOS os={agent.agent.host.os} />
                 </EuiDescriptionListDescription>
                 <EuiDescriptionListTitle>Architecture</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent.host.architecture}
+                  {agent.agent.host.architecture}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>

@@ -3,7 +3,7 @@ import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import classNames from 'classnames';
 import { escapeRegExp } from 'lodash';
 import { i18n } from '@osd/i18n';
-import { FieldIcon } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { FieldIcon } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { DocViewTableRowBtnFilterAdd } from './table-row-btn-filter-add';
 import { DocViewTableRowBtnFilterRemove } from './table-row-btn-filter-remove';
 import { DocViewTableRowBtnToggleColumn } from './table-row-btn-toggle-column';

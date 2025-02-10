@@ -19,7 +19,7 @@ import { SearchResponse } from '../../../../../../src/core/server';
 //   HttpError,
 // } from '../../../react-services/error-management';
 // common components/hooks
-import { agentsTableColumns } from '../../agents/list/columns';
+// import { agentsTableColumns } from '../../agents/list/columns';
 import useSearchBar from './components/search-bar/use-search-bar';
 // import { IndexPattern } from '../../../../../src/plugins/data/public';
 // import { DocumentViewTableAndJson } from './components/document-view/document-view-table-and-json';
@@ -31,24 +31,34 @@ import { LoadingSpinner } from './components/loading-spinner/loading-spinner';
 //   PatternDataSource,
 // } from '../../common/data-source';
 import { search } from './components/search-bar/search-bar-service';
+// import { Agent } from '../../../../common/types';
 
-// type TDocumentDetailsTab = {
-//   id: string;
-//   name: string;
-//   content: any;
-// };
+interface TDocumentDetailsTab {
+  id: string;
+  name: string;
+  content: any;
+}
 
 export const TableIndexer = (props: {
   indexPatterns: any;
   columns: any;
-  // documentDetailsExtraTabs?:
-  //   | TDocumentDetailsTab[]
-  //   | (({ document: any, indexPattern: any }) => TDocumentDetailsTab[]);
+  documentDetailsExtraTabs?:
+    | TDocumentDetailsTab[]
+    | (({ document: any, indexPattern: any }) => TDocumentDetailsTab[]);
   tableSortingInitialField?: string;
   tableSortingInitialDirection?: string;
-  topTableComponent?: React.ReactNode;
+  topTableComponent?: (searchBarProps: any) => React.ReactNode;
   tableProps?: any;
 }) => {
+  const {
+    indexPatterns,
+    columns,
+    tableSortingInitialField,
+    tableSortingInitialDirection,
+    topTableComponent,
+    tableProps,
+    // documentDetailsExtraTabs,
+  } = props;
   // const {
   //   dataSource,
   //   filters,
@@ -60,25 +70,24 @@ export const TableIndexer = (props: {
   //   DataSource: DataSource,
   //   repository: new DataSourceRepository(),
   // });
-
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 15,
   });
   const [sorting, setSorting] = useState({
     sort: {
-      field: props.tableSortingInitialField || '_id',
-      direction: props.tableSortingInitialDirection || 'desc',
+      field: tableSortingInitialField || '_id',
+      direction: tableSortingInitialDirection || 'desc',
     },
   });
   const { searchBarProps } = useSearchBar({
-    indexPattern: props.indexPatterns,
+    indexPattern: indexPatterns,
     filters: [],
     setFilters: [],
   });
   const { query } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
-  // const [inspectedHit, setInspectedHit] = useState<any>(undefined);
+  // const [inspectedHit, setInspectedHit] = useState<any>();
   // const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
   //   indexPattern,
   // );
@@ -153,12 +162,12 @@ export const TableIndexer = (props: {
   // // };
 
   useEffect(() => {
-    if (!props.indexPatterns) {
+    if (!indexPatterns) {
       return;
     }
 
     search({
-      indexPattern: props.indexPatterns[0],
+      indexPattern: indexPatterns[0],
       query,
       pagination,
       sorting: {
@@ -209,7 +218,7 @@ export const TableIndexer = (props: {
   const isDataSourceLoading = false;
   const tablePagination = {
     ...pagination,
-    totalItemCount: 0,
+    totalItemCount: results?.total || 0,
     pageSizeOptions: [15, 25, 50, 100],
     hidePerPageOptions: false,
   };
@@ -238,23 +247,20 @@ export const TableIndexer = (props: {
           />
         )}
       </EuiFlexItem>
-      {props.topTableComponent}
+      {topTableComponent(searchBarProps)}
       <EuiFlexItem>
-        <EuiBasicTable
-          columns={agentsTableColumns({}).filter(
-            ({ show, ...rest }) =>
-              show ?? {
-                ...rest,
-              },
-          )}
-          items={results.hits?.hits ?? []}
-          loading={false}
-          pagination={tablePagination}
-          sorting={sorting}
-          onChange={tableOnChange}
-          rowProps={getRowProps}
-          {...props.tableProps}
-        />
+        {Array.isArray(results?.hits?.hits) && results.hits.hits.length > 0 && (
+          <EuiBasicTable
+            columns={columns}
+            items={results.hits.hits.map((item: any) => item._source) ?? []}
+            loading={false}
+            pagination={tablePagination}
+            sorting={sorting}
+            onChange={tableOnChange}
+            rowProps={getRowProps}
+            {...tableProps}
+          />
+        )}
       </EuiFlexItem>
       {/* {inspectedHit && (
         <EuiFlyout onClose={() => setInspectedHit(undefined)} size='m'>
@@ -267,7 +273,7 @@ export const TableIndexer = (props: {
             <EuiFlexGroup direction='column'>
               <DocumentViewTableAndJson
                 document={inspectedHit}
-                indexPattern={indexPattern}
+                indexPattern={indexPatterns}
                 extraTabs={documentDetailsExtraTabs}
               />
             </EuiFlexGroup>

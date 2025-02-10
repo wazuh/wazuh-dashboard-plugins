@@ -11,9 +11,10 @@ import {
   EuiTabbedContent,
   EuiLoadingContent,
   EuiContextMenu,
-  EuiIcon,
+  // EuiIcon,
 } from '@elastic/eui';
 import { Agent } from '../../../../common/types';
+import { search } from '../../common/table-indexer/components/search-bar/search-bar-service';
 import { AgentResume } from './resume';
 import { AgentDashboard } from './dashboard';
 import { AgentNetworks } from './networks';
@@ -21,55 +22,69 @@ import { AgentNetworks } from './networks';
 export interface AgentDetailsProps {
   useDataSource: any;
   FleetDataSource: any;
+  indexPatterns: any;
   FleetDataSourceRepository: any;
 }
 
 export const AgentDetails = ({
-  FleetDataSource,
-  FleetDataSourceRepository,
+  // FleetDataSource,
+  // FleetDataSourceRepository,
+  indexPatterns,
   ...restProps
 }: AgentDetailsProps) => {
   const { id } = useParams();
-
-  const {
-    dataSource,
-    isLoading: isDataSourceLoading,
-    fetchData,
-    filterManager,
-    fetchFilters,
-  } = restProps.useDataSource({
-    DataSource: FleetDataSource,
-    repository: new FleetDataSourceRepository(),
-  });
-
+  // const {
+  //   dataSource,
+  //   isLoading: isDataSourceLoading,
+  //   fetchData,
+  //   filterManager,
+  //   fetchFilters,
+  // } = restProps.useDataSource({
+  //   DataSource: FleetDataSource,
+  //   repository: new FleetDataSourceRepository(),
+  // });
   const [isAgentLoading, setIsAgentLoading] = useState(true);
   const [agentData, setAgentData] = useState<Agent>();
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isNavigateToOpen, setIsNavigateToOpen] = useState(false);
 
   useEffect(() => {
-    if (!filterManager || isDataSourceLoading) return;
+    if (!indexPatterns) {
+      return;
+    }
 
-    const filterByAgentId = filterManager.createFilter(
-      'is',
-      'agent.id',
-      id,
-      dataSource?.indexPattern.id,
-    );
+    // const filterByAgentId = filterManager.createFilter(
+    //   'is',
+    //   'agent.id',
+    //   id,
+    //   dataSource?.indexPattern.id,
+    // );
 
-    fetchData({
-      filters: [filterByAgentId, ...fetchFilters],
+    search({
+      indexPattern: indexPatterns,
+      filePrefix: '',
     })
       .then((results: any) => {
-        setAgentData(results.hits.hits?.[0]?._source);
+        console.log(results);
+        setAgentData(results?.hits?.hits?.[0]?._source);
         setIsAgentLoading(false);
       })
       .catch((error: any) => {
         console.log(error);
       });
-  }, [filterManager, isDataSourceLoading]);
+    // fetchData({
+    //   filters: [filterByAgentId, ...fetchFilters],
+    // })
+    //   .then((results: any) => {
+    //     setAgentData(results.hits.hits?.[0]?._source);
+    //     setIsAgentLoading(false);
+    //   })
+    //   .catch((error: any) => {
+    //     console.log(error);
+    //   });
+  }, [id]);
 
-  if (isDataSourceLoading || isAgentLoading) {
+  if (isAgentLoading) {
     return (
       <div>
         <EuiLoadingContent lines={3} />
@@ -158,19 +173,23 @@ export const AgentDetails = ({
       ],
     },
   ];
-
   const tabContent = (content: React.ReactNode) => (
     <>
       <EuiSpacer />
       {content}
     </>
   );
-
   const tabs = [
     {
       id: 'dashboard',
       name: 'Dashboard',
-      content: tabContent(<AgentDashboard agentId={id} {...restProps} />),
+      content: tabContent(
+        <AgentDashboard
+          indexPattern={indexPatterns}
+          agentId={id}
+          {...restProps}
+        />,
+      ),
     },
     {
       id: 'networks',
@@ -200,6 +219,7 @@ export const AgentDetails = ({
         pageTitle={agentData?.agent?.name}
         rightSideItems={[
           <EuiPopover
+            key={'actions'}
             id='actions'
             button={
               <EuiButton
@@ -232,7 +252,7 @@ export const AgentDetails = ({
                 >
                   Remove groups from agent
                 </EuiContextMenuItem>,
-                <EuiHorizontalRule margin='xs' />,
+                <EuiHorizontalRule key='space' margin='xs' />,
                 <EuiContextMenuItem
                   key='upgrade-agents'
                   icon='package'
@@ -251,6 +271,7 @@ export const AgentDetails = ({
             />
           </EuiPopover>,
           <EuiPopover
+            key={'navigate-to'}
             id='navigate-to'
             button={
               <EuiButton

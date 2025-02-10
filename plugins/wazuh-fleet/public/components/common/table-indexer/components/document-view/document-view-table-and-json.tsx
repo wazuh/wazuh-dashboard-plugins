@@ -1,8 +1,8 @@
 import React from 'react';
 import { EuiFlexItem, EuiCodeBlock, EuiTabbedContent } from '@elastic/eui';
-import { IndexPattern } from '../../../../../../../src/plugins/data/common';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/common';
 import DocViewer from './doc-viewer/doc-viewer';
-import { useDocViewer } from './doc-viewer';
+import { useDocViewer } from './doc-viewer/use-doc-viewer';
 
 interface Props {
   document: any;

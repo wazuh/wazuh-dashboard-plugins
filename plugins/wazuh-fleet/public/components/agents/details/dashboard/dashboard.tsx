@@ -1,15 +1,16 @@
 import React from 'react';
-import { getPlugins } from '../../../../plugin-services';
 import { EuiSpacer } from '@elastic/eui';
+import { getPlugins } from '../../../../plugin-services';
 import './dashboard.scss';
 import { EventsCount } from './events-count';
 
 export interface AgentDashboardProps {
   agentId: string;
+  indexPattern: any;
 }
 
 export const AgentDashboard = ({
-  agentId,
+  // agentId,
   ...restProps
 }: AgentDashboardProps) => {
   const SearchBar = getPlugins().data.ui.SearchBar;

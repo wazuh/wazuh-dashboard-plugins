@@ -7,7 +7,7 @@ import {
   EuiText,
   EuiLink,
 } from '@elastic/eui';
-import { getCore, getWazuhCore } from '../../../plugin-services';
+import { getCore } from '../../../plugin-services';
 import { Agent } from '../../../../common/types';
 import { AgentGroups, HostOS } from '../../common';
 import { agentsTableActions } from './actions/actions';
@@ -16,15 +16,8 @@ export const agentsTableColumns = ({
   setIsFlyoutAgentVisible,
   setAgent,
 }: {
-  setIsFlyoutAgentVisible?: (isVisible: boolean) => void;
-  setAgent?: (agent: Agent) => void;
-  // allowEditGroups: boolean,
-  // allowUpgrade: boolean,
-  // setAgent: (agents: Agent) => void,
-  // setIsEditGroupsVisible: (visible: boolean) => void,
-  // setIsUpgradeModalVisible: (visible: boolean) => void,
-  // setFilters: (filters) => void,
-  // outdatedAgents: Agent[],
+  setIsFlyoutAgentVisible: (isVisible: boolean) => void;
+  setAgent: (agent: Agent) => void;
 }) => [
   {
     field: 'agent.name',
@@ -36,15 +29,15 @@ export const agentsTableColumns = ({
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
           <EuiLink
-            href={getCore().application.getUrlForApp('fleet-management', {
-              path: `#/fleet-management/agents/${agentData.agent.id}`,
+            href={getCore().application.getUrlForApp('wazuh-fleet', {
+              path: `#/agents/${agentData.agent.id}`,
             })}
           >
-            {agentData.agent.name}
+            {field}
           </EuiLink>
         </EuiFlexItem>
         <EuiFlexItem>
-          <EuiToolTip content={agentData.agent.id}>
+          <EuiToolTip content={field}>
             <EuiText color='subdued' size='xs'>
               {`${agentData.agent.id.slice(0, 14)}...`}
             </EuiText>
@@ -60,14 +53,6 @@ export const agentsTableColumns = ({
     show: true,
     render: (groups: string[]) => <AgentGroups groups={groups} />,
     searchable: true,
-  },
-  {
-    field: 'wazuh.cluster.name',
-    name: 'Cluster node',
-    sortable: true,
-    show: true,
-    searchable: true,
-    width: '140px',
   },
   {
     field: 'agent.version',
@@ -102,54 +87,36 @@ export const agentsTableColumns = ({
     },
   },
   {
-    field: 'host.os.name,host.os.version',
+    field: 'agent.host.os.name,agent.host.os.version',
     composeField: ['host.os.name', 'host.os.version'],
     name: 'Host OS',
     sortable: true,
     show: true,
     render: (field: string, agentData: Agent) => (
-      <HostOS os={agentData.host.os} />
+      <HostOS os={agentData.agent.host.os} />
     ),
     searchable: true,
   },
   {
-    field: 'host.ip',
+    field: 'agent.host.ip',
     name: 'Host IP',
     sortable: true,
     show: true,
     searchable: true,
     width: '140px',
   },
-  // {
-  //   field: 'status',
-  //   name: 'Status',
-  //   truncateText: true,
-  //   sortable: true,
-  //   show: true,
-  //   render: (status, agent) => <AgentStatus status={status} agent={agent} />,
-  // },
   {
-    field: 'agent.last_login',
-    name: 'Last login',
-    render: (lastLogin: Date) => {
-      const { utils } = getWazuhCore();
-
-      return utils.formatUIDate(lastLogin);
-    },
+    field: 'agent.status',
+    name: 'Status',
+    truncateText: true,
     sortable: true,
-    show: false,
-    searchable: false,
+    show: true,
+    // render: (status, agent) => <AgentStatus status={status} agent={agent} />,
   },
   {
     field: 'actions',
     name: 'Actions',
     show: true,
     actions: agentsTableActions({ setIsFlyoutAgentVisible, setAgent }),
-    // allowEditGroups,
-    // allowUpgrade,
-    // setAgent,
-    // setIsEditGroupsVisible,
-    // setIsUpgradeModalVisible,
-    // outdatedAgents,
   },
 ];

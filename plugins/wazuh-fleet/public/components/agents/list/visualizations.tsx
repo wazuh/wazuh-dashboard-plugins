@@ -79,12 +79,7 @@ const getVisTopOS = (indexPatternId: string) =>
 const getVisTopGroups = (indexPatternId: string) =>
   getPieVis(indexPatternId, 'agent.groups', 'Top 5 Groups', 'top_5_groups');
 const getVisTopAgentByNode = (indexPatternId: string) =>
-  getPieVis(
-    indexPatternId,
-    'agent.node_name',
-    'Top 5 Agents by Node',
-    'top_5_agents_by_node',
-  );
+  getPieVis(indexPatternId, 'agent.status', 'Agents status', 'agents_status');
 const VIS_HEIGHT = 10;
 const VIS_WIDTH = 16;
 
@@ -138,7 +133,10 @@ export const getKPIsPanel = (
   },
 });
 
-export const AgentsVisualizations = () => {
+export const AgentsVisualizations = (props: {
+  searchBarProps: { dateRangeFrom: string; dateRangeTo: string; query: string };
+}) => {
+  const { searchBarProps } = props;
   const plugins = getPlugins();
   const DashboardByRenderer =
     plugins.dashboard.DashboardContainerByValueRenderer;
@@ -157,13 +155,13 @@ export const AgentsVisualizations = () => {
           filters: [],
           useMargins: true,
           id: 'agents-visualizations',
-          /* timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
-                    },*/
+          timeRange: {
+            from: searchBarProps.dateRangeFrom,
+            to: searchBarProps.dateRangeTo,
+          },
           title: 'KPIs Agents dashboard',
           description: 'KPIs Dashboard of Agents',
-          // query: searchBarProps.query,
+          query: searchBarProps.query,
           refreshConfig: {
             pause: false,
             value: 15,

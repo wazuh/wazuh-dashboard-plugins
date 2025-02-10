@@ -5,14 +5,12 @@ export interface AgentGroupsProps {
   groups: string[];
 }
 
-export const AgentGroups = ({ groups }: AgentGroupsProps) => {
-  return (
-    <EuiFlexGroup responsive={false} wrap gutterSize='xs'>
-      {groups?.map(group => (
-        <EuiFlexItem grow={false}>
-          <EuiBadge color='hollow'>{group}</EuiBadge>
-        </EuiFlexItem>
-      ))}
-    </EuiFlexGroup>
-  );
-};
+export const AgentGroups = ({ groups }: AgentGroupsProps) => (
+  <EuiFlexGroup responsive={false} wrap gutterSize='xs'>
+    {groups?.map((group, index) => (
+      <EuiFlexItem key={`${group}-${index}`} grow={false}>
+        <EuiBadge color='hollow'>{group}</EuiBadge>
+      </EuiFlexItem>
+    ))}
+  </EuiFlexGroup>
+);

@@ -1,14 +1,15 @@
 import React from 'react';
 import { getPlugins } from '../../../../plugin-services';
-import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import {
-  EuiPanel,
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiSpacer,
-  EuiText,
-} from '@elastic/eui';
+// import {
+//   EuiPanel,
+//   EuiFlexItem,
+//   EuiFlexGroup,
+//   EuiSpacer,
+//   EuiText,
+// } from '@elastic/eui';
+import { useTimeFilter } from '../../../common/table-indexer/components/search-bar/hooks/use-time-filter';
+import { getDashboardPanels } from './dashboard_panels';
 
 export interface EventsCountProps {
   AlertsDataSource: any;
@@ -16,36 +17,37 @@ export interface EventsCountProps {
   useDataSource: any;
   useTimeFilter: any;
   LoadingSpinner: any;
+  indexPattern: any;
 }
+
 export const EventsCount = ({
-  useDataSource,
-  AlertsDataSource,
-  AlertsDataSourceRepository,
-  useTimeFilter,
+  // useDataSource,
+  // AlertsDataSource,
+  // AlertsDataSourceRepository,
   LoadingSpinner,
+  indexPattern,
 }: EventsCountProps) => {
-  const {
-    dataSource,
-    fetchFilters,
-    isLoading: isDataSourceLoading,
-  } = useDataSource({
-    DataSource: AlertsDataSource,
-    repository: new AlertsDataSourceRepository(),
-  });
+  // const {
+  //   dataSource,
+  //   fetchFilters,
+  //   isLoading: isDataSourceLoading,
+  // } = useDataSource({
+  //   DataSource: AlertsDataSource,
+  //   repository: new AlertsDataSourceRepository(),
+  // });
 
   const plugins = getPlugins();
   const DashboardByRenderer =
     plugins.dashboard.DashboardContainerByValueRenderer;
-
   const { timeFilter } = useTimeFilter();
 
-  return !isDataSourceLoading && dataSource ? (
+  return indexPattern ? (
     <DashboardByRenderer
       input={{
         viewMode: ViewMode.VIEW,
-        panels: getDashboardPanels(dataSource?.id),
+        panels: getDashboardPanels(indexPattern.id),
         isFullScreenMode: false,
-        filters: fetchFilters ?? [],
+        filters: [],
         useMargins: true,
         id: 'agent-events-count-evolution',
         timeRange: {

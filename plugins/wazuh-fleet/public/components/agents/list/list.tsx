@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   EuiPageHeader,
   EuiSpacer,
@@ -16,21 +16,25 @@ import {
 } from '@elastic/eui';
 import { Agent } from '../../../../common/types';
 import { AgentResume } from '../details/resume';
-import { getCore, getPlugins } from '../../../plugin-services';
+import { getCore } from '../../../plugin-services';
 import NavigationService from '../../../react-services/navigation-service';
 import { enrollmentAgent } from '../../common/views';
-// import { agentsTableColumns } from './columns';
 import { TableIndexer } from '../../common/table-indexer/table-indexer';
+import { agentsTableColumns } from './columns';
 import { AgentsVisualizations } from './visualizations';
 
-// export interface AgentListProps {
-//   FleetDataSource: any;
-//   FleetDataSourceRepository: any;
-//   TableIndexer: any;
-// }
+export interface AgentListProps {
+  indexPatterns: any;
+}
 
-export const AgentList = () => {
-  const [indexPattern, setIndexPattern] = useState<object | undefined>();
+export const AgentList = (props: AgentListProps) => {
+  const { indexPatterns } = props;
+
+  console.log(props);
+  // const [indexPattern, setIndexPattern] = useState<object | undefined>(
+  //   indexPatern,
+  // );
+
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,12 +47,6 @@ export const AgentList = () => {
   const navigateToDeployNewAgent = () => {
     NavigationService.getInstance().navigate(enrollmentAgent.path);
   };
-
-  useEffect(() => {
-    getPlugins()
-      .data.indexPatterns.get('wazuh-agents*')
-      .then((indexPattern: any) => setIndexPattern(indexPattern));
-  }, []);
 
   return (
     <>
@@ -118,21 +116,20 @@ export const AgentList = () => {
         ]}
       />
       <EuiSpacer />
-      <AgentsVisualizations />
-      {indexPattern ? (
+      {indexPatterns ? (
         <TableIndexer
-          indexPatterns={[indexPattern]}
-
+          indexPatterns={[indexPatterns]}
+          topTableComponent={(searchBarProps: any) => (
+            <AgentsVisualizations searchBarProps={searchBarProps} />
+          )}
+          columns={agentsTableColumns({
+            setIsFlyoutAgentVisible: setIsFlyoutVisible,
+            setAgent,
+          })}
           // DataSource={FleetDataSource}
           // DataSourceRepository={FleetDataSourceRepository}
-          // columns={agentsTableColumns({
-          //   onOpenAgentDetails: handleOnOpenAgentDetails,
-          //   setIsFlyoutAgentVisible: setIsFlyoutVisible,
-          //   setAgent,
-          // })}
           // tableSortingInitialField='agent.last_login'
           // tableSortingInitialDirection='desc'
-          // topTableComponent={<AgentsVisualizations />}
           // tableProps={{
           //   hasActions: true,
           //   isSelectable: true,
@@ -152,12 +149,12 @@ export const AgentList = () => {
             <EuiTitle size='m'>
               <h2>
                 <EuiLink
-                  href={getCore().application.getUrlForApp('fleet-management', {
-                    path: `#/fleet-management/agents/${agent.agent.id}`,
+                  href={getCore().application.getUrlForApp('wazuh-fleet', {
+                    path: `#/agents/${agent?.agent.id}`,
                   })}
                   target='_blank'
                 >
-                  {agent.agent.name}
+                  {agent?.agent.name}
                 </EuiLink>
               </h2>
             </EuiTitle>
