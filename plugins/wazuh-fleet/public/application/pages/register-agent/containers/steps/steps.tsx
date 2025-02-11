@@ -1,6 +1,7 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { EuiCallOut, EuiLink, EuiSteps } from '@elastic/eui';
+import React, { useEffect, useState } from 'react';
+import { EuiCallOut, EuiSteps, EuiSpacer } from '@elastic/eui';
 import './steps.scss';
+import { FormattedMessage } from '@osd/i18n/react';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
   IParseRegisterFormValues,
@@ -11,68 +12,70 @@ import { useRegisterAgentCommands } from '../../hooks/use-register-agent-command
 import {
   osCommandsDefinitions,
   optionalParamsDefinitions,
-  tOperatingSystem,
-  tOptionalParameters,
+  TOperatingSystem,
+  TOptionalParameters,
 } from '../../core/config/os-commands-definitions';
 import { UseFormReturn } from '../../components/form/types';
 import CommandOutput from '../../components/command-output/command-output';
 import ServerAddress from '../../components/server-address/server-address';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
+import { SecurityInputs } from '../../components/security';
 import {
   getAgentCommandsStepStatus,
-  tFormStepsStatus,
+  TFormStepsStatus,
   getOSSelectorStepStatus,
   getServerAddressStepStatus,
   getOptionalParameterStepStatus,
   showCommandsSections,
-  getPasswordStepStatus,
   getIncompleteSteps,
   getInvalidFields,
-  tFormFieldsLabel,
-  tFormStepsLabel,
+  FORM_FIELDS_LABEL,
+  FORM_STEPS_LABELS,
+  getServerCredentialsStepStatus,
 } from '../../services/register-agent-steps-status-services';
-import { webDocumentationLink } from '../../services/web-documentation-link';
 import OsCommandWarning from '../../components/command-output/os-warning';
 
 interface IStepsProps {
-  needsPassword: boolean;
   form: UseFormReturn;
   osCard: React.ReactElement;
   connection: {
     isUDP: boolean;
   };
-  wazuhPassword: string;
 }
 
-export const Steps = ({
-  needsPassword,
-  form,
-  osCard,
-  connection,
-  wazuhPassword,
-}: IStepsProps) => {
+const FORM_MESSAGE_CONJUNTION = ' and ';
+
+export const Steps = ({ form, osCard }: IStepsProps) => {
   const initialParsedFormValues = {
     operatingSystem: {
       name: '',
       architecture: '',
     },
     optionalParams: {
-      agentGroups: '',
       agentName: '',
       serverAddress: '',
-      wazuhPassword,
-      protocol: connection.isUDP ? 'UDP' : '',
     },
   } as IParseRegisterFormValues;
-  const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>(
+  const [missingStepsName, setMissingStepsName] = useState<FORM_STEPS_LABELS[]>(
     [],
   );
   const [invalidFieldsName, setInvalidFieldsName] = useState<
-    tFormFieldsLabel[]
+    FORM_FIELDS_LABEL[]
   >([]);
   const [registerAgentFormValues, setRegisterAgentFormValues] =
     useState<IParseRegisterFormValues>(initialParsedFormValues);
-  const FORM_MESSAGE_CONJUNTION = ' and ';
+  const { installCommand, startCommand, selectOS, setOptionalParams } =
+    useRegisterAgentCommands<TOperatingSystem, TOptionalParameters>({
+      osDefinitions: osCommandsDefinitions,
+      optionalParamsDefinitions: optionalParamsDefinitions,
+    });
+  // install - start commands step state
+  const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
+  const [installCommandStepStatus, setInstallCommandStepStatus] =
+    useState<TFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
+  const [startCommandWasCopied, setStartCommandWasCopied] = useState(false);
+  const [startCommandStepStatus, setStartCommandStepStatus] =
+    useState<TFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
 
   useEffect(() => {
     // get form values and parse them divided in OS and optional params
@@ -93,30 +96,17 @@ export const Steps = ({
     setInvalidFieldsName(getInvalidFields(form.fields) || []);
   }, [form.fields]);
 
-  const { installCommand, startCommand, selectOS, setOptionalParams } =
-    useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
-      osDefinitions: osCommandsDefinitions,
-      optionalParamsDefinitions: optionalParamsDefinitions,
-    });
-  // install - start commands step state
-  const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
-  const [installCommandStepStatus, setInstallCommandStepStatus] =
-    useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
-  const [startCommandWasCopied, setStartCommandWasCopied] = useState(false);
-  const [startCommandStepStatus, setStartCommandStepStatus] =
-    useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
-
   useEffect(() => {
     if (
       registerAgentFormValues.operatingSystem.name !== '' &&
       registerAgentFormValues.operatingSystem.architecture !== ''
     ) {
-      selectOS(registerAgentFormValues.operatingSystem as tOperatingSystem);
+      selectOS(registerAgentFormValues.operatingSystem as TOperatingSystem);
     }
 
     setOptionalParams(
       { ...registerAgentFormValues.optionalParams },
-      registerAgentFormValues.operatingSystem as tOperatingSystem,
+      registerAgentFormValues.operatingSystem as TOperatingSystem,
     );
     setInstallCommandWasCopied(false);
     setStartCommandWasCopied(false);
@@ -145,36 +135,21 @@ export const Steps = ({
       children: <ServerAddress formField={form.fields.serverAddress} />,
       status: getServerAddressStepStatus(form.fields),
     },
-    ...(needsPassword && !wazuhPassword
-      ? [
-          {
-            title: 'Password',
-            children: (
-              <EuiCallOut
-                color='warning'
-                title={
-                  <span>
-                    The password is required but wasn't defined. Please check
-                    our{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'user-manual/agent-enrollment/security-options/using-password-authentication.html',
-                      )}
-                      rel='noopener noreferrer'
-                    >
-                      documentation
-                    </EuiLink>
-                  </span>
-                }
-                iconType='iInCircle'
-                className='warningForAgentName'
-              />
-            ),
-            status: getPasswordStepStatus(form.fields),
-          },
-        ]
-      : []),
+    {
+      title: (
+        <FormattedMessage
+          id='wzFleet.enrollmentAssistant.steps.credentials.title'
+          defaultMessage='Server credentials:'
+        />
+      ),
+      children: (
+        <SecurityInputs
+          username={form.fields.username}
+          password={form.fields.password}
+        />
+      ),
+      status: getServerCredentialsStepStatus(form.fields),
+    },
     {
       title: 'Optional settings:',
       children: <OptionalsInputs formFields={form.fields} />,
@@ -208,12 +183,19 @@ export const Steps = ({
           ) : null}
           {!missingStepsName?.length && !invalidFieldsName?.length ? (
             <>
+              {/* TODO: remove the warning and spacer when the packages are publically hosted */}
+              <EuiCallOut
+                color='warning'
+                title='The agent packages are not publically hosted and need to be manually downloaded from the internal resource. This warning should be removed and the command to copy should include how to download the file using some utility from the operating system.'
+                iconType='iInCircle'
+              />
+              <EuiSpacer size='s' />
               <CommandOutput
                 commandText={installCommand}
                 showCommand={showCommandsSections(form.fields)}
                 os={registerAgentFormValues.operatingSystem.name}
                 onCopy={() => setInstallCommandWasCopied(true)}
-                password={registerAgentFormValues.optionalParams.wazuhPassword}
+                password={registerAgentFormValues.optionalParams.password}
               />
               <OsCommandWarning
                 os={registerAgentFormValues.operatingSystem.name}

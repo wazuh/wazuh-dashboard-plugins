@@ -10,12 +10,6 @@ import {
 } from './hooks';
 import { FormConfiguration, IInputForm } from './types';
 
-function inspect(obj) {
-  return console.log(
-    require('util').inspect(obj, false, null, true /* enable colors */),
-  );
-}
-
 describe('[hook] useForm utils', () => {
   it('[utils] getFormFields', () => {
     const result = getFormFields({
@@ -24,6 +18,7 @@ describe('[hook] useForm utils', () => {
         initialValue: '',
       },
     });
+
     expect(result.text1.currentValue).toBe('');
     expect(result.text1.initialValue).toBe('');
   });
@@ -38,6 +33,7 @@ describe('[hook] useForm utils', () => {
         initialValue: 1,
       },
     });
+
     expect(result.text1.currentValue).toBe('text1');
     expect(result.text1.initialValue).toBe('text1');
     expect(result.number1.currentValue).toBe(1);
@@ -69,6 +65,7 @@ describe('[hook] useForm utils', () => {
         },
       },
     });
+
     expect(result.text1.currentValue).toBe('text1');
     expect(result.text1.initialValue).toBe('text1');
     expect(result.arrayOf1.fields[0]['arrayOf1.text1'].currentValue).toBe(
@@ -80,7 +77,7 @@ describe('[hook] useForm utils', () => {
     expect(result.arrayOf1.fields[0]['arrayOf1.number1'].currentValue).toBe(10);
     expect(result.arrayOf1.fields[0]['arrayOf1.number1'].initialValue).toBe(10);
   });
-  it.only('[utils] mapFormFields', () => {
+  it('[utils] mapFormFields', () => {
     const result = mapFormFields(
       {
         formDefinition: {
@@ -133,6 +130,7 @@ describe('[hook] useForm utils', () => {
       },
       state => ({ ...state, currentValue: state.initialValue }),
     );
+
     expect(result.text1.currentValue).toBe('text1');
     expect(result.arrayOf1.fields[0]['arrayOf1.text1'].currentValue).toBe(
       'arrayOf1.text1',
@@ -148,20 +146,19 @@ describe('[hook] useForm', () => {
     const references = {
       current: {},
     };
-
     const fields = {
       text1: {
         type: 'text',
         initialValue: '',
       },
     };
-
     const formFields = getFormFields(fields);
     const enhancedFields = enhanceFormFields(formFields, {
       fields,
       references,
       setState,
     });
+
     expect(enhancedFields.text1).toBeDefined();
     expect(enhancedFields.text1.type).toBe('text');
     expect(enhancedFields.text1.initialValue).toBe('');
@@ -179,7 +176,6 @@ describe('[hook] useForm', () => {
     const references = {
       current: {},
     };
-
     const arrayOfFields = {
       'arrayOf1.text1': {
         type: 'text',
@@ -206,13 +202,13 @@ describe('[hook] useForm', () => {
         fields: arrayOfFields,
       },
     };
-
     const formFields = getFormFields(fields);
     const enhancedFields = enhanceFormFields(formFields, {
       fields,
       references,
       setState,
     });
+
     expect(enhancedFields.text1).toBeDefined();
     expect(enhancedFields.text1.type).toBe('text');
     expect(enhancedFields.text1.initialValue).toBe('');
@@ -261,7 +257,6 @@ describe('[hook] useForm', () => {
         initialValue: '',
       },
     };
-
     const { result } = renderHook(() => useForm(initialFields));
 
     // assert initial state
@@ -284,7 +279,6 @@ describe('[hook] useForm', () => {
         initialValue: 1,
       },
     };
-
     const { result } = renderHook(() => useForm(initialFields));
 
     // assert initial state
@@ -306,14 +300,12 @@ describe('[hook] useForm', () => {
   it(`[hook] useForm lifecycle. Set the initial value. Change the field value. Undo changes. Change the field. Do changes.`, async () => {
     const initialFieldValue = '';
     const fieldType = 'text';
-
     const initialFields: FormConfiguration = {
       text1: {
         type: fieldType,
         initialValue: initialFieldValue,
       },
     };
-
     const { result } = renderHook(() => useForm(initialFields));
 
     // assert initial state
@@ -326,6 +318,7 @@ describe('[hook] useForm', () => {
 
     // change the input
     const changedValue = 't';
+
     act(() => {
       result.current.fields.text1.onChange({
         target: {
@@ -355,6 +348,7 @@ describe('[hook] useForm', () => {
 
     // change the input
     const changedValue2 = 'e';
+
     act(() => {
       result.current.fields.text1.onChange({
         target: {
@@ -386,16 +380,16 @@ describe('[hook] useForm', () => {
   it(`[hook] useForm lifecycle. Set the initial value. Change the field value to invalid value`, async () => {
     const initialFieldValue = 'test';
     const fieldType = 'text';
-
     const initialFields: FormConfiguration = {
       text1: {
         type: fieldType,
         initialValue: initialFieldValue,
         validate: (value: string): string | undefined =>
-          value.length ? undefined : `Validation error: string can be empty.`,
+          value.length > 0
+            ? undefined
+            : `Validation error: string can be empty.`,
       },
     };
-
     const { result } = renderHook(() => useForm(initialFields));
 
     // assert initial state
@@ -408,6 +402,7 @@ describe('[hook] useForm', () => {
 
     // change the input
     const changedValue = '';
+
     act(() => {
       result.current.fields.text1.onChange({
         target: {
@@ -455,7 +450,6 @@ describe('[hook] useForm', () => {
         },
       },
     };
-
     const { result } = renderHook(() => useForm(initialFields));
 
     // assert initial state
@@ -534,6 +528,7 @@ describe('[hook] useForm', () => {
 
     // change the input
     const changedValue = 'changed_text';
+
     act(() => {
       result.current.fields.text1.onChange({
         target: {
@@ -551,6 +546,7 @@ describe('[hook] useForm', () => {
 
     // change arrayOf input
     const changedArrayOfValue = 'changed_arrayOf_field';
+
     act(() => {
       result.current.fields.arrayOf1.fields[0]['arrayOf1.text1'].onChange({
         target: {
@@ -596,9 +592,9 @@ describe('[hook] useForm', () => {
       const { onChange, field, initialValue } = props;
       const [value, setValue] = useState(initialValue || '');
 
-      const handleOnChange = (e: any) => {
-        setValue(e.target.value);
-        onChange(e);
+      const handleOnChange = (event: any) => {
+        setValue(event.target.value);
+        onChange(event);
       };
 
       return (
@@ -616,14 +612,15 @@ describe('[hook] useForm', () => {
         component: props => CustomComponent(props),
       },
     };
-
     const { result } = renderHook(() => useForm(formFields));
     const { container, getByRole } = render(
       <CustomComponent {...result.current.fields.customField} />,
     );
 
     expect(container).toBeInTheDocument();
+
     const input = getByRole('textbox');
+
     expect(input).toHaveValue('default value');
     fireEvent.change(input, { target: { value: 'new value' } });
     expect(result.current.fields.customField.component).toBeInstanceOf(

@@ -1,9 +1,9 @@
 import React from 'react';
 import { EuiCallOut } from '@elastic/eui';
-import { tOperatingSystem } from '../../core/config/os-commands-definitions';
+import { TOperatingSystem } from '../../core/config/os-commands-definitions';
 
 interface OsWarningProps {
-  os?: tOperatingSystem['name'];
+  os?: TOperatingSystem['name'];
 }
 
 export default function OsCommandWarning(props: OsWarningProps) {

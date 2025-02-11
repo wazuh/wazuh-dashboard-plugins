@@ -14,6 +14,8 @@ import { OPTIONAL_PARAMETERS_TEXT } from '../../utils/register-agent-data';
 import { webDocumentationLink } from '../../services/web-documentation-link';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
+import { VerificationModeInput } from './verification-mode-input';
+import { EnrollmentKeyInput } from './enrollment-key-input';
 
 interface OptionalsInputsProps {
   formFields: UseFormReturn['fields'];
@@ -108,7 +110,8 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
         iconType='iInCircle'
         className='warningForAgentName'
       />
-      <InputForm {...formFields.agentGroups}></InputForm>
+      <VerificationModeInput formField={formFields.verificationMode} />
+      <EnrollmentKeyInput formField={formFields.enrollmentKey} />
     </Fragment>
   );
 };

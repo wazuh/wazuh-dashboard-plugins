@@ -64,14 +64,15 @@ interface IMacOSTypes {
   architecture: '32/64';
 }
 
-type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes; // add the necessary OS options
+type TOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes; // add the necessary OS options
 
-type tOptionalParameters =
+type TOptionalParameters =
   | 'server_address'
   | 'agent_name'
-  | 'agent_group'
-  | 'protocol'
-  | 'wazuh_password';
+  | 'username'
+  | 'password'
+  | 'verificationMode'
+  | 'enrollmentKey';
 
 export interface IOSDefinition<
   OS extends IOperationSystem,
@@ -100,7 +101,7 @@ This configuration will define the different OS that we want to support and the 
 
 ```ts
 
-const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [{
+const osDefinitions: IOSDefinition<TOperatingSystem, TOptionalParameters>[] = [{
   name: 'linux',
   options: [
     {
@@ -150,9 +151,10 @@ The optional parameters are a set of parameters that will be added to the regist
 export type tOptionalParamsName =
   | 'server_address'
   | 'agent_name'
-  | 'protocol'
-  | 'agent_group'
-  | 'wazuh_password';
+  | 'username'
+  | 'password'
+  | 'verificationMode'
+  | 'enrollmentKey';
 
 export type tOptionalParams = {
   [key in tOptionalParamsName]: {
@@ -168,9 +170,9 @@ This configuration will define the different optional parameters that we want to
 
 ```ts
 
-export const optionalParameters: tOptionalParams<tOptionalParameters> = {
+export const optionalParameters: tOptionalParams<TOptionalParameters> = {
   server_address: {
-      property: 'WAZUH_MANAGER',
+      property: '--url',
       getParamCommand:  props => 'returns the optional param command'
     }
   },

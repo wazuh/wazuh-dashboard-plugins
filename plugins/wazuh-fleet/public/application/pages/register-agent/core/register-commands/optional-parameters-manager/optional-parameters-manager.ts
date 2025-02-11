@@ -10,7 +10,7 @@ import {
 export class OptionalParametersManager<Params extends string>
   implements IOptionalParametersManager<Params>
 {
-  constructor(private optionalParamsConfig: tOptionalParams<Params>) {}
+  constructor(private readonly optionalParamsConfig: tOptionalParams<Params>) {}
 
   /**
    * Returns the command string for a given optional parameter.
@@ -23,9 +23,11 @@ export class OptionalParametersManager<Params extends string>
     selectedOS?: IOperationSystem,
   ) {
     const { value, name } = props;
+
     if (!this.optionalParamsConfig[name]) {
       throw new NoOptionalParamFoundException(name);
     }
+
     return this.optionalParamsConfig[name].getParamCommand(
       {
         value,
@@ -49,14 +51,16 @@ export class OptionalParametersManager<Params extends string>
     // get keys for only the optional params with values !== ''
     const optionalParams = Object.keys(paramsValues).filter(
       key => paramsValues[key as keyof typeof paramsValues] !== '',
-    ) as Array<keyof typeof paramsValues>;
+    ) as (keyof typeof paramsValues)[];
     const resolvedOptionalParams: any = {};
+
     for (const param of optionalParams) {
       if (!this.optionalParamsConfig[param]) {
         throw new NoOptionalParamFoundException(param as string);
       }
 
       const paramDef = this.optionalParamsConfig[param];
+
       resolvedOptionalParams[param as string] = paramDef.getParamCommand(
         {
           name: param as Params,
@@ -66,6 +70,7 @@ export class OptionalParametersManager<Params extends string>
         selectedOS,
       ) as string;
     }
+
     return resolvedOptionalParams;
   }
 }

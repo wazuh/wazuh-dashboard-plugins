@@ -1,68 +1,82 @@
-import { tOperatingSystem } from "../hooks/use-register-agent-commands.test";
+import { TOperatingSystem } from '../hooks/use-register-agent-commands.test';
 
 export const scapeSpecialCharsForLinux = (password: string) => {
-  let passwordScaped = password;
+  const passwordScaped = password;
   // the " characters is scaped by default in the password retrieved from the API
   const specialCharsList = ["'"];
   const regex = new RegExp(`([${specialCharsList.join('')}])`, 'g');
+
   // the single quote is escaped first, and then any unescaped backslashes are escaped
-  return passwordScaped.replace(regex, `\'\"$&\"\'`).replace(/(?<!\\)\\(?!["\\])/g, '\\\\');
+  return passwordScaped
+    .replaceAll(regex, `'"$&"'`)
+    .replaceAll(/(?<!\\)\\(?!["\\])/g, '\\\\');
 };
 
 export const scapeSpecialCharsForMacOS = (password: string) => {
-  let passwordScaped = password;
+  const passwordScaped = password;
+
   // The double quote is escaped first and then the backslash followed by a single quote
-  return passwordScaped.replace(/\\"/g, '\\\"').replace(/\\'/g, `\\'\"'\"'`);
-}
+  return (
+    passwordScaped
+      // eslint-disable-next-line no-useless-escape
+      .replaceAll(String.raw`\"`, '\\\"')
+      // eslint-disable-next-line no-useless-escape
+      .replaceAll(String.raw`\'`, `\\'\"'\"'`)
+  );
+};
 
 export const scapeSpecialCharsForWindows = (password: string) => {
-  let passwordScaped = password;
+  const passwordScaped = password;
   // the " characters is scaped by default in the password retrieved from the API
   const specialCharsList = ["'"];
   const regex = new RegExp(`([${specialCharsList.join('')}])`, 'g');
+
   // the single quote is escaped first, and then any unescaped backslashes are escaped
-  return passwordScaped.replace(regex, `\'\"$&\"\'`).replace(/(?<!\\)\\(?!["\\])/g, '\\');
+  return passwordScaped
+    .replaceAll(regex, `'"$&"'`)
+    .replaceAll(/(?<!\\)\\(?!["\\])/g, '\\');
 };
 
-export const osdfucatePasswordInCommand = (password: string, commandText: string, os: tOperatingSystem['name']): string => {
-  let command = commandText;
+export const obfuscatePasswordInCommand = (
+  password: string,
+  commandText: string,
+  os: TOperatingSystem['name'],
+): string => {
+  const command = commandText;
   const osName = os?.toLocaleLowerCase();
-  switch (osName){
-    case 'macos':
-    {
-      const regex = /WAZUH_REGISTRATION_PASSWORD=\'((?:\\'|[^']|[\"'])*)'/g;
-      const replacedString = command.replace(
-        regex,
-        (match, capturedGroup) => {
-          return match.replace(
-            capturedGroup,
-            '*'.repeat(capturedGroup.length),
-          );
-        }
+
+  switch (osName) {
+    case 'macos': {
+      const regex = /--password\s'((?:\\'|[^']|["'])*)'/g;
+      const replacedString = command.replaceAll(regex, (match, capturedGroup) =>
+        match.replace(capturedGroup, '*'.repeat(capturedGroup.length)),
       );
-    return replacedString;
-    }
-    case 'windows':
-      {
-        const replacedString = command.replace(
-          `WAZUH_REGISTRATION_PASSWORD=\'${scapeSpecialCharsForWindows(password)}'`,
-          () => {
-            return `WAZUH_REGISTRATION_PASSWORD=\'${'*'.repeat(scapeSpecialCharsForWindows(password).length)}\'`;
-          }
-        );
-        return replacedString;
-      }
-    case 'linux':
-    {
-      const replacedString = command.replace(
-        `WAZUH_REGISTRATION_PASSWORD=\$'${scapeSpecialCharsForLinux(password)}'`,
-        () => {
-          return `WAZUH_REGISTRATION_PASSWORD=\$\'${'*'.repeat(scapeSpecialCharsForLinux(password).length)}\'`;
-        }
-      );
+
       return replacedString;
     }
-    default:
+
+    case 'windows': {
+      const replacedString = command.replace(
+        `--password '${scapeSpecialCharsForWindows(password)}'`,
+        () =>
+          `--password '${'*'.repeat(scapeSpecialCharsForWindows(password).length)}'`,
+      );
+
+      return replacedString;
+    }
+
+    case 'linux': {
+      const replacedString = command.replace(
+        `--password $'${scapeSpecialCharsForLinux(password)}'`,
+        () =>
+          `--password $'${'*'.repeat(scapeSpecialCharsForLinux(password).length)}'`,
+      );
+
+      return replacedString;
+    }
+
+    default: {
       return commandText;
+    }
   }
-}
+};

@@ -64,20 +64,21 @@ export interface IMacOSApple {
 
 type IMacOSTypes = IMacOSApple | IMacOSIntel;
 
-export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
+export type TOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
-export type tOptionalParameters =
+export type TOptionalParameters =
   | 'serverAddress'
+  | 'username'
+  | 'password'
+  | 'verificationMode'
   | 'agentName'
-  | 'agentGroups'
-  | 'wazuhPassword'
-  | 'protocol';
+  | 'enrollmentKey';
 
-///////////////////////////////////////////////////////////////////
-/// Operating system commands definitions
-///////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////
+// / Operating system commands definitions
+// /////////////////////////////////////////////////////////////////
 
-const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
+const linuxDefinition: IOSDefinition<ILinuxOSTypes, TOptionalParameters> = {
   name: 'LINUX',
   options: [
     {
@@ -110,8 +111,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
     },
   ],
 };
-
-const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
+const windowsDefinition: IOSDefinition<IWindowsOSTypes, TOptionalParameters> = {
   name: 'WINDOWS',
   options: [
     {
@@ -123,8 +123,7 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
     },
   ],
 };
-
-const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
+const macDefinition: IOSDefinition<IMacOSTypes, TOptionalParameters> = {
   name: 'macOS',
   options: [
     {
@@ -150,65 +149,79 @@ export const osCommandsDefinitions = [
   macDefinition,
 ];
 
-///////////////////////////////////////////////////////////////////
-/// Optional parameters definitions
-///////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////
+// / Optional parameters definitions
+// /////////////////////////////////////////////////////////////////
 
-export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
+export const optionalParamsDefinitions: tOptionalParams<TOptionalParameters> = {
   serverAddress: {
-    property: 'WAZUH_MANAGER',
-    getParamCommand: (props, selectedOS) => {
+    property: '--url',
+    getParamCommand: props => {
       const { property, value } = props;
-      return value !== '' ? `${property}='${value}'` : '';
+
+      return value === '' ? '' : `${property} '${value}'`;
     },
   },
-  agentName: {
-    property: 'WAZUH_AGENT_NAME',
-    getParamCommand: (props, selectedOS) => {
+  username: {
+    property: '--user',
+    getParamCommand: props => {
       const { property, value } = props;
-      return value !== '' ? `${property}='${value}'` : '';
+
+      return value === '' ? '' : `${property} '${value}'`;
     },
   },
-  agentGroups: {
-    property: 'WAZUH_AGENT_GROUP',
+  password: {
+    property: '--password',
     getParamCommand: (props, selectedOS) => {
       const { property, value } = props;
-      let parsedValue = value;
-      if (Array.isArray(value)) {
-        parsedValue = value.length > 0 ? value.join(',') : '';
-      }
-      return parsedValue ? `${property}='${parsedValue}'` : '';
-    },
-  },
-  protocol: {
-    property: 'WAZUH_PROTOCOL',
-    getParamCommand: (props, selectedOS) => {
-      const { property, value } = props;
-      return value !== '' ? `${property}='${value}'` : '';
-    },
-  },
-  wazuhPassword: {
-    property: 'WAZUH_REGISTRATION_PASSWORD',
-    getParamCommand: (props, selectedOS) => {
-      const { property, value } = props;
-      if (!value) {
-        return '';
-      }
+
       if (selectedOS) {
-        let osName = selectedOS.name.toLocaleLowerCase();
+        const osName = selectedOS.name.toLocaleLowerCase();
+
         switch (osName) {
-          case 'linux':
-            return `${property}=$'${scapeSpecialCharsForLinux(value)}'`;
-          case 'macos':
-            return `${property}='${scapeSpecialCharsForMacOS(value)}'`;
-          case 'windows':
-            return `${property}='${scapeSpecialCharsForWindows(value)}'`;
-          default:
-            return `${property}=$'${value}'`;
+          case 'linux': {
+            return `${property} $'${scapeSpecialCharsForLinux(value)}'`;
+          }
+
+          case 'macos': {
+            return `${property} '${scapeSpecialCharsForMacOS(value)}'`;
+          }
+
+          case 'windows': {
+            return `${property} '${scapeSpecialCharsForWindows(value)}'`;
+          }
+
+          default: {
+            return `${property} '${value}'`;
+          }
         }
       }
 
-      return value !== '' ? `${property}=$'${value}'` : '';
+      return value === '' ? '' : `${property} '${value}'`;
+    },
+  },
+  verificationMode: {
+    property: '--verification-mode',
+    getParamCommand: props => {
+      const { property, value } = props;
+
+      return value === '' ? '' : `${property} '${value}'`;
+    },
+  },
+  agentName: {
+    property: '--name',
+    getParamCommand: props => {
+      const { property, value } = props;
+
+      return value === '' ? '' : `${property} '${value}'`;
+    },
+  },
+  enrollmentKey: {
+    property: '--key',
+    getParamCommand: props => {
+      const { property, value } = props;
+
+      return value === '' ? '' : `${property} '${value}'`;
     },
   },
 };
