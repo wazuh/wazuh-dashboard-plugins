@@ -5,6 +5,7 @@ import {
   AppUpdater,
   ChromeNavGroup,
   ChromeRegistrationNavLink,
+  NavGroupType,
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { getCore } from '../../plugin-services';
@@ -26,6 +27,7 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
       id: ENDPOINT_SECURITY_ID,
       title: ENDPOINT_SECURITY_TITLE,
       description: ENDPOINT_SECURITY_DESCRIPTION,
+      type: NavGroupType.SYSTEM
     };
   },
 

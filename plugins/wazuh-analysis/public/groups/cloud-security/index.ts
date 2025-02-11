@@ -4,6 +4,7 @@ import {
   AppMountParameters,
   AppUpdater,
   ChromeRegistrationNavLink,
+  NavGroupType,
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { getCore } from '../../plugin-services';
@@ -25,6 +26,7 @@ export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
       id: CLOUD_SECURITY_ID,
       title: CLOUD_SECURITY_TITLE,
       description: CLOUD_SECURITY_DESCRIPTION,
+      type: NavGroupType.SYSTEM
     };
   },
 
