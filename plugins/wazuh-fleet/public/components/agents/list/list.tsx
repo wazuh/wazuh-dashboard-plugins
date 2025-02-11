@@ -25,19 +25,13 @@ import { AgentsVisualizations } from './visualizations';
 
 export interface AgentListProps {
   indexPatterns: any;
+  filters: any[];
 }
 
 export const AgentList = (props: AgentListProps) => {
-  const { indexPatterns } = props;
-
-  console.log(props);
-  // const [indexPattern, setIndexPattern] = useState<object | undefined>(
-  //   indexPatern,
-  // );
-
+  const { indexPatterns, filters } = props;
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [agent, setAgent] = useState<Agent>();
 
   const closeActions = () => {
@@ -118,6 +112,7 @@ export const AgentList = (props: AgentListProps) => {
       <EuiSpacer />
       {indexPatterns ? (
         <TableIndexer
+          filters={filters}
           indexPatterns={[indexPatterns]}
           topTableComponent={(searchBarProps: any) => (
             <AgentsVisualizations searchBarProps={searchBarProps} />
@@ -126,17 +121,13 @@ export const AgentList = (props: AgentListProps) => {
             setIsFlyoutAgentVisible: setIsFlyoutVisible,
             setAgent,
           })}
-          // DataSource={FleetDataSource}
-          // DataSourceRepository={FleetDataSourceRepository}
-          // tableSortingInitialField='agent.last_login'
-          // tableSortingInitialDirection='desc'
-          // tableProps={{
-          //   hasActions: true,
-          //   isSelectable: true,
-          //   selection: {
-          //     onSelectionChange: () => {},
-          //   },
-          // }}
+          tableProps={{
+            hasActions: true,
+            isSelectable: true,
+            selection: {
+              onSelectionChange: () => {},
+            },
+          }}
         />
       ) : null}
       {isFlyoutVisible ? (

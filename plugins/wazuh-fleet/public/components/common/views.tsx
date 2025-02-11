@@ -35,7 +35,7 @@ export const agentDetails = {
   renderOnMenu: false,
   renderMenu: true,
   render: (props: any) => <AgentDetails {...props} />,
-  breadcrumb: () => [
+  breadcrumb: (id: string) => [
     {
       className: 'osdBreadcrumbs',
       text: (
@@ -44,9 +44,12 @@ export const agentDetails = {
           defaultMessage='Summary'
         />
       ),
+      href: getCore().application.getUrlForApp('wazuh-fleet', {
+        path: `#${summaryAgent.path}`,
+      }),
     },
     {
-      text: 'ID OR NAME',
+      text: id,
     },
   ],
 };

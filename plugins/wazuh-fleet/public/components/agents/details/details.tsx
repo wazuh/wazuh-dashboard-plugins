@@ -11,7 +11,6 @@ import {
   EuiTabbedContent,
   EuiLoadingContent,
   EuiContextMenu,
-  // EuiIcon,
 } from '@elastic/eui';
 import { Agent } from '../../../../common/types';
 import { search } from '../../common/table-indexer/components/search-bar/search-bar-service';
@@ -20,29 +19,16 @@ import { AgentDashboard } from './dashboard';
 import { AgentNetworks } from './networks';
 
 export interface AgentDetailsProps {
-  useDataSource: any;
-  FleetDataSource: any;
   indexPatterns: any;
-  FleetDataSourceRepository: any;
+  filters: any[];
 }
 
 export const AgentDetails = ({
-  // FleetDataSource,
-  // FleetDataSourceRepository,
   indexPatterns,
+  filters,
   ...restProps
 }: AgentDetailsProps) => {
   const { id } = useParams();
-  // const {
-  //   dataSource,
-  //   isLoading: isDataSourceLoading,
-  //   fetchData,
-  //   filterManager,
-  //   fetchFilters,
-  // } = restProps.useDataSource({
-  //   DataSource: FleetDataSource,
-  //   repository: new FleetDataSourceRepository(),
-  // });
   const [isAgentLoading, setIsAgentLoading] = useState(true);
   const [agentData, setAgentData] = useState<Agent>();
   const [isActionsOpen, setIsActionsOpen] = useState(false);
@@ -53,35 +39,26 @@ export const AgentDetails = ({
       return;
     }
 
-    // const filterByAgentId = filterManager.createFilter(
-    //   'is',
-    //   'agent.id',
-    //   id,
-    //   dataSource?.indexPattern.id,
-    // );
-
     search({
       indexPattern: indexPatterns,
+      filters: [
+        {
+          match_phrase: {
+            'agent.id': {
+              query: id,
+            },
+          },
+        },
+      ],
       filePrefix: '',
     })
       .then((results: any) => {
-        console.log(results);
         setAgentData(results?.hits?.hits?.[0]?._source);
         setIsAgentLoading(false);
       })
       .catch((error: any) => {
         console.log(error);
       });
-    // fetchData({
-    //   filters: [filterByAgentId, ...fetchFilters],
-    // })
-    //   .then((results: any) => {
-    //     setAgentData(results.hits.hits?.[0]?._source);
-    //     setIsAgentLoading(false);
-    //   })
-    //   .catch((error: any) => {
-    //     console.log(error);
-    //   });
   }, [id]);
 
   if (isAgentLoading) {
@@ -187,6 +164,7 @@ export const AgentDetails = ({
         <AgentDashboard
           indexPattern={indexPatterns}
           agentId={id}
+          filters={filters}
           {...restProps}
         />,
       ),

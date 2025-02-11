@@ -1,41 +1,16 @@
 import React from 'react';
 import { getPlugins } from '../../../../plugin-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-// import {
-//   EuiPanel,
-//   EuiFlexItem,
-//   EuiFlexGroup,
-//   EuiSpacer,
-//   EuiText,
-// } from '@elastic/eui';
 import { useTimeFilter } from '../../../common/table-indexer/components/search-bar/hooks/use-time-filter';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import { getDashboardPanels } from './dashboard_panels';
 
 export interface EventsCountProps {
-  AlertsDataSource: any;
-  AlertsDataSourceRepository: any;
-  useDataSource: any;
-  useTimeFilter: any;
-  LoadingSpinner: any;
   indexPattern: any;
+  filters: any[];
 }
 
-export const EventsCount = ({
-  // useDataSource,
-  // AlertsDataSource,
-  // AlertsDataSourceRepository,
-  LoadingSpinner,
-  indexPattern,
-}: EventsCountProps) => {
-  // const {
-  //   dataSource,
-  //   fetchFilters,
-  //   isLoading: isDataSourceLoading,
-  // } = useDataSource({
-  //   DataSource: AlertsDataSource,
-  //   repository: new AlertsDataSourceRepository(),
-  // });
-
+export const EventsCount = ({ filters, indexPattern }: EventsCountProps) => {
   const plugins = getPlugins();
   const DashboardByRenderer =
     plugins.dashboard.DashboardContainerByValueRenderer;
@@ -47,7 +22,7 @@ export const EventsCount = ({
         viewMode: ViewMode.VIEW,
         panels: getDashboardPanels(indexPattern.id),
         isFullScreenMode: false,
-        filters: [],
+        filters: filters || [],
         useMargins: true,
         id: 'agent-events-count-evolution',
         timeRange: {
