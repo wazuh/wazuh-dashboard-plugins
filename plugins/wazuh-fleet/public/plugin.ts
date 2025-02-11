@@ -11,7 +11,7 @@ import { appSetup } from './application';
 export class WazuhFleetPlugin
   implements Plugin<WazuhFleetPluginSetup, WazuhFleetPluginStart>
 {
-  public setup(core: CoreSetup, plugins): WazuhFleetPluginSetup {
+  public setup(core: CoreSetup): WazuhFleetPluginSetup {
     appSetup({
       registerApp: app => core.application.register(app),
     });
