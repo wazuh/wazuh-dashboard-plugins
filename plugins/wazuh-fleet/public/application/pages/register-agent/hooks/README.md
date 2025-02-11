@@ -30,7 +30,7 @@ import { OSdefintions, paramsDefinitions} from 'path/config/os-definitions';
 /*
   the props recived by the hook must implement types:
     - OS: IOSDefinition<TOperatingSystem, TOptionalParamsNames>[]
-    - optional parameters: tOptionalParams<TOptionalParamsNames>
+    - optional parameters: TOptionalParams<TOptionalParamsNames>
 */
 
 const {
@@ -80,7 +80,7 @@ interface IUseRegisterCommandsProps<
   Params extends string,
 > {
   osDefinitions: IOSDefinition<OS, Params>[];
-  optionalParamsDefinitions: tOptionalParams<Params>;
+  optionalParamsDefinitions: TOptionalParams<Params>;
 }
 ```
 
@@ -116,10 +116,10 @@ And the hook will validate and show warning in compilation and development time.
 
 export interface IOptionsParamConfig<T extends string> {
   property: string;
-  getParamCommand: (props: tOptionalParamsCommandProps<T>) => string;
+  getParamCommand: (props: TOptionalParamsCommandProps<T>) => string;
 }
 
-export type tOptionalParams<T extends string> = {
+export type TOptionalParams<T extends string> = {
   [key in T]: IOptionsParamConfig<T>;
 };
 

@@ -33,7 +33,7 @@ export const PasswordInput = (props: {
               gutterSize='s'
             >
               <EuiFlexItem grow={false}>
-                <span className='registerAgentLabels'>
+                <span className='enrollment-agent-form-input-label'>
                   <FormattedMessage
                     id='wzFleet.enrollmentAssistant.steps.credentials.username.description'
                     defaultMessage='Define the server API password'

@@ -1,4 +1,4 @@
-import { IOSDefinition, IOptionalParameters, tOptionalParams } from '../types';
+import { IOSDefinition, IOptionalParameters, TOptionalParams } from '../types';
 import {
   DuplicatedOSException,
   DuplicatedOSOptionException,
@@ -56,7 +56,7 @@ const osDefinitions: IOSDefinition<TOperatingSystem, TOptionalParameters>[] = [
     ],
   },
 ];
-const optionalParams: tOptionalParams<TOptionalParameters> = {
+const optionalParams: TOptionalParams<TOptionalParameters> = {
   server_address: {
     property: '--url',
     getParamCommand: props => `${props.property} '${props.value}'`,

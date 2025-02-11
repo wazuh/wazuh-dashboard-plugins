@@ -5,9 +5,9 @@ import {
   IOperationSystem,
   IOptionalParameters,
   IOptionalParametersManager,
-  tOptionalParams,
+  TOptionalParams,
+  ICommandGenerator,
 } from '../types';
-import { ICommandGenerator } from '../types';
 import {
   searchOSDefinitions,
   validateOSDefinitionHasDuplicatedOptions,
@@ -30,17 +30,20 @@ export class CommandGenerator<
   osDefinitionSelected: IOSCommandsDefinition<OS, Params> | null = null;
   optionalsManager: IOptionalParametersManager<Params>;
   protected optionals: IOptionalParameters<Params> | object = {};
+
   constructor(
     public osDefinitions: IOSDefinition<OS, Params>[],
-    protected optionalParams: tOptionalParams<Params>,
+    protected optionalParams: TOptionalParams<Params>,
     public wazuhVersion: string = version,
   ) {
     // validate os definitions received
     validateOSDefinitionsDuplicated(this.osDefinitions);
     validateOSDefinitionHasDuplicatedOptions(this.osDefinitions);
-    if (wazuhVersion == '') {
+
+    if (wazuhVersion === '') {
       throw new WazuhVersionUndefinedException();
     }
+
     this.optionalsManager = new OptionalParametersManager(optionalParams);
   }
 
@@ -83,9 +86,11 @@ export class CommandGenerator<
    */
   private checkIfOSisValid(params: OS): IOSCommandsDefinition<OS, Params> {
     const { name, architecture } = params;
+
     if (!name) {
       throw new NoOSSelectedException();
     }
+
     if (!architecture) {
       throw new NoArchitectureSelectedException();
     }
@@ -94,6 +99,7 @@ export class CommandGenerator<
       name,
       architecture,
     });
+
     return option;
   }
 
@@ -106,6 +112,7 @@ export class CommandGenerator<
     if (!this.osDefinitionSelected) {
       throw new NoOSSelectedException();
     }
+
     return this.osDefinitionSelected.urlPackage({
       wazuhVersion: this.wazuhVersion,
       architecture: this.osDefinitionSelected

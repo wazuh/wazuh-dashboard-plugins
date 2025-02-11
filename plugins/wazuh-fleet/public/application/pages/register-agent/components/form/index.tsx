@@ -1,14 +1,26 @@
 import React from 'react';
-import { InputFormEditor } from './input_editor';
-import { InputFormNumber } from './input_number';
-import { InputFormText } from './input_text';
-import { InputFormSelect } from './input_select';
-import { InputFormSwitch } from './input_switch';
-import { InputFormFilePicker } from './input_filepicker';
-import { InputFormTextArea } from './input_text_area';
 import { EuiFlexGroup, EuiFlexItem, EuiFormRow } from '@elastic/eui';
+import { InputFormEditor } from './input-editor';
+import { InputFormNumber } from './input-number';
+import { InputFormText } from './input-text';
+import { InputFormSelect } from './input-select';
+import { InputFormSwitch } from './input-switch';
+import { InputFormFilePicker } from './input-filepicker';
+import { InputFormTextArea } from './input-textarea';
 import { SettingTypes } from './types';
 import { InputFormPassword } from './input-password';
+
+const Input = {
+  switch: InputFormSwitch,
+  editor: InputFormEditor,
+  filepicker: InputFormFilePicker,
+  number: InputFormNumber,
+  select: InputFormSelect,
+  text: InputFormText,
+  textarea: InputFormTextArea,
+  password: InputFormPassword,
+  custom: ({ component, ...rest }) => component(rest),
+};
 
 export interface InputFormProps {
   type: SettingTypes;
@@ -55,7 +67,6 @@ export const InputForm = ({
   }
 
   const isInvalid = Boolean(error);
-
   const input = (
     <ComponentInput
       {...rest}
@@ -84,16 +95,4 @@ export const InputForm = ({
   ) : (
     input
   );
-};
-
-const Input = {
-  switch: InputFormSwitch,
-  editor: InputFormEditor,
-  filepicker: InputFormFilePicker,
-  number: InputFormNumber,
-  select: InputFormSelect,
-  text: InputFormText,
-  textarea: InputFormTextArea,
-  password: InputFormPassword,
-  custom: ({ component, ...rest }) => component(rest),
 };

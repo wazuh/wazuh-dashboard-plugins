@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CommandGenerator } from '../core/register-commands/command-generator/command-generator';
 import {
   IOSDefinition,
   IOperationSystem,
   IOptionalParameters,
-  tOptionalParams,
+  TOptionalParams,
 } from '../core/register-commands/types';
 import { version } from '../../../../../package.json';
 
@@ -13,7 +13,7 @@ interface IUseRegisterCommandsProps<
   Params extends string,
 > {
   osDefinitions: IOSDefinition<OS, Params>[];
-  optionalParamsDefinitions: tOptionalParams<Params>;
+  optionalParamsDefinitions: TOptionalParams<Params>;
 }
 
 interface IUseRegisterCommandsOutput<
@@ -27,7 +27,7 @@ interface IUseRegisterCommandsOutput<
   ) => void;
   installCommand: string;
   startCommand: string;
-  optionalParamsParsed: IOptionalParameters<Params> | {};
+  optionalParamsParsed: IOptionalParameters<Params> | object;
 }
 
 /**
@@ -48,20 +48,19 @@ export function useRegisterAgentCommands<
   const wazuhVersion = version;
   const osCommands: IOSDefinition<OS, Params>[] =
     osDefinitions as IOSDefinition<OS, Params>[];
-  const optionalParams: tOptionalParams<Params> =
-    optionalParamsDefinitions as tOptionalParams<Params>;
+  const optionalParams: TOptionalParams<Params> =
+    optionalParamsDefinitions as TOptionalParams<Params>;
   const commandGenerator = new CommandGenerator(
     osCommands,
     optionalParams,
     wazuhVersion,
   );
-
   const [osSelected, setOsSelected] = useState<OS | null>(null);
   const [optionalParamsValues, setOptionalParamsValues] = useState<
-    IOptionalParameters<Params> | {}
+    IOptionalParameters<Params> | object
   >({});
   const [optionalParamsParsed, setOptionalParamsParsed] = useState<
-    IOptionalParameters<Params> | {}
+    IOptionalParameters<Params> | object
   >({});
   const [installCommand, setInstallCommand] = useState('');
   const [startCommand, setStartCommand] = useState('');
@@ -72,18 +71,24 @@ export function useRegisterAgentCommands<
    * The generated commands are then set as state variables for later use.
    */
   const generateCommands = () => {
-    if (!osSelected) return;
+    if (!osSelected) {
+      return;
+    }
+
     if (osSelected) {
       commandGenerator.selectOS(osSelected);
     }
+
     if (optionalParamsValues) {
       commandGenerator.addOptionalParams(
         optionalParamsValues as IOptionalParameters<Params>,
         osSelected,
       );
     }
+
     const installCommand = commandGenerator.getInstallCommand();
     const startCommand = commandGenerator.getStartCommand();
+
     setInstallCommand(installCommand);
     setStartCommand(startCommand);
   };

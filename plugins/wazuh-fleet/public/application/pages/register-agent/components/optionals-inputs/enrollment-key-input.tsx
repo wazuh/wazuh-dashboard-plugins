@@ -33,7 +33,7 @@ export const EnrollmentKeyInput = (props: {
               gutterSize='s'
             >
               <EuiFlexItem grow={false}>
-                <span className='registerAgentLabels'>
+                <span className='enrollment-agent-form-input-label'>
                   <FormattedMessage
                     id='wzFleet.enrollmentAssistant.steps.optionals.enrollmentKey.description'
                     defaultMessage='Assign an enrollment key'

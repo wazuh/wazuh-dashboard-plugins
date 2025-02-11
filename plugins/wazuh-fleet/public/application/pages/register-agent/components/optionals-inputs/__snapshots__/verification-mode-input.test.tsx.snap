@@ -21,7 +21,7 @@ exports[`Verification mode input match the snapshopt 1`] = `
             class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <span
-              class="registerAgentLabels"
+              class="enrollment-agent-form-input-label"
             >
               SSL verification mode
             </span>

@@ -12,7 +12,7 @@ import { EnhancedFieldConfiguration } from '../form/types';
 import { InputForm } from '../form';
 import { webDocumentationLink } from '../../services/web-documentation-link';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
-import '../group-input/group-input.scss';
+import '../inputs/styles.scss';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -67,7 +67,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                   gutterSize='s'
                 >
                   <EuiFlexItem grow={false}>
-                    <span className='registerAgentLabels'>
+                    <span className='enrollment-agent-form-input-label'>
                       Assign a server address
                     </span>
                   </EuiFlexItem>

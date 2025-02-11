@@ -23,7 +23,7 @@ export class RegisterAgentFormStatusManager implements FormFieldsStatusManager {
     private readonly formSteps?: FormStepsDependencies,
   ) {}
 
-  getFieldStatus = (fieldname: FormFieldName): FieldStatus => {
+  getFieldStatus(fieldname: FormFieldName): FieldStatus {
     const field = this.formFields[fieldname];
 
     if (!field) {
@@ -39,18 +39,21 @@ export class RegisterAgentFormStatusManager implements FormFieldsStatusManager {
     }
 
     return 'complete';
-  };
-  getFormStatus = (): FormStatus => {
+  }
+
+  getFormStatus(): FormStatus {
     const fieldNames = Object.keys(this.formFields);
     const formStatus: FormStatus | object = {};
 
+    // eslint-disable-next-line unicorn/no-array-for-each
     fieldNames.forEach((fieldName: string) => {
       formStatus[fieldName] = this.getFieldStatus(fieldName);
     });
 
     return formStatus as FormStatus;
-  };
-  getStepStatus = (stepName: string): FieldStatus => {
+  }
+
+  getStepStatus(stepName: string): FieldStatus {
     if (!this.formSteps) {
       throw new Error('Form steps not defined');
     }
@@ -63,6 +66,7 @@ export class RegisterAgentFormStatusManager implements FormFieldsStatusManager {
 
     const formStepStatus: FormStepsStatus | object = {};
 
+    // eslint-disable-next-line unicorn/no-array-for-each
     stepFields.forEach((fieldName: FormFieldName) => {
       formStepStatus[fieldName] = this.getFieldStatus(fieldName);
     });
@@ -79,34 +83,38 @@ export class RegisterAgentFormStatusManager implements FormFieldsStatusManager {
       // if all are complete
       return 'complete';
     }
-  };
-  getFormStepsStatus = (): FormStepsStatus => {
+  }
+
+  getFormStepsStatus(): FormStepsStatus {
     if (!this.formSteps) {
       throw new Error('Form steps not defined');
     }
 
     const formStepsStatus: FormStepsStatus | object = {};
 
+    // eslint-disable-next-line unicorn/no-array-for-each
     Object.keys(this.formSteps).forEach((stepName: string) => {
       formStepsStatus[stepName] = this.getStepStatus(stepName);
     });
 
     return formStepsStatus as FormStepsStatus;
-  };
-  getIncompleteSteps = (): string[] => {
+  }
+
+  getIncompleteSteps(): string[] {
     const formStepsStatus = this.getFormStepsStatus();
     const notCompleteSteps = Object.entries(formStepsStatus).filter(
       ([_, status]) => status === 'empty',
     );
 
     return notCompleteSteps.map(([stepName, _]) => stepName);
-  };
-  getInvalidFields = (): string[] => {
+  }
+
+  getInvalidFields(): string[] {
     const formStatus = this.getFormStatus();
     const invalidFields = Object.entries(formStatus).filter(
       ([_, status]) => status === 'invalid',
     );
 
     return invalidFields.map(([fieldName, _]) => fieldName);
-  };
+  }
 }

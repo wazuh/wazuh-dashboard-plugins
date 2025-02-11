@@ -22,7 +22,6 @@ const defaultFormFieldData: EnhancedFieldConfiguration = {
   },
   inputRef: null,
 };
-
 const formFieldsDefault: UseFormReturn['fields'] = {
   field1: {
     ...defaultFormFieldData,
@@ -46,6 +45,7 @@ describe('RegisterAgentFormStatusManager', () => {
     const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
       formFieldsDefault,
     );
+
     expect(registerAgentFormStatusManager).toBeDefined();
   });
 
@@ -54,6 +54,7 @@ describe('RegisterAgentFormStatusManager', () => {
       formFieldsDefault,
     );
     const formStatus = registerAgentFormStatusManager.getFormStatus();
+
     expect(formStatus).toEqual({
       field1: 'empty',
       field2: 'invalid',
@@ -66,6 +67,7 @@ describe('RegisterAgentFormStatusManager', () => {
       formFieldsDefault,
     );
     const fieldStatus = registerAgentFormStatusManager.getFieldStatus('field1');
+
     expect(fieldStatus).toEqual('empty');
   });
 
@@ -73,6 +75,7 @@ describe('RegisterAgentFormStatusManager', () => {
     const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
       formFieldsDefault,
     );
+
     expect(() =>
       registerAgentFormStatusManager.getFieldStatus('field4'),
     ).toThrowError('Fieldname not found');
@@ -87,6 +90,7 @@ describe('RegisterAgentFormStatusManager', () => {
       formFieldsDefault,
       formSteps,
     );
+
     expect(registerAgentFormStatusManager).toBeDefined();
     expect(registerAgentFormStatusManager.getStepStatus('step1')).toEqual(
       'invalid',
@@ -102,6 +106,7 @@ describe('RegisterAgentFormStatusManager', () => {
       formFieldsDefault,
       formSteps,
     );
+
     expect(registerAgentFormStatusManager).toBeDefined();
     expect(registerAgentFormStatusManager.getStepStatus('step2')).toEqual(
       'complete',
@@ -111,13 +116,13 @@ describe('RegisterAgentFormStatusManager', () => {
   it('should return EMPTY when the step all fields empty', () => {
     const formSteps: FormStepsDependencies = {
       step1: ['field1'],
-      step2: [ 'field2',
-        'field3' ],
+      step2: ['field2', 'field3'],
     };
     const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
       formFieldsDefault,
       formSteps,
     );
+
     expect(registerAgentFormStatusManager).toBeDefined();
     expect(registerAgentFormStatusManager.getStepStatus('step1')).toEqual(
       'empty',
@@ -127,19 +132,19 @@ describe('RegisterAgentFormStatusManager', () => {
   it('should return all the steps status', () => {
     const formSteps: FormStepsDependencies = {
       step1: ['field1'],
-      step2: [ 'field2',
-        'field3' ],
-      step3: ['field3']
+      step2: ['field2', 'field3'],
+      step3: ['field3'],
     };
     const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
       formFieldsDefault,
       formSteps,
     );
+
     expect(registerAgentFormStatusManager).toBeDefined();
     expect(registerAgentFormStatusManager.getFormStepsStatus()).toEqual({
       step1: 'empty',
       step2: 'invalid',
-      step3: 'complete'
+      step3: 'complete',
     });
   });
 });

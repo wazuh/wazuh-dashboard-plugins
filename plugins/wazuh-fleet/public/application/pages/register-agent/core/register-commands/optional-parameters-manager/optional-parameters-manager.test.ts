@@ -1,8 +1,8 @@
 import { NoOptionalParamFoundException } from '../exceptions';
 import {
   IOptionalParameters,
-  tOptionalParams,
-  tOptionalParamsCommandProps,
+  TOptionalParams,
+  TOptionalParamsCommandProps,
 } from '../types';
 import { OptionalParametersManager } from './optional-parameters-manager';
 
@@ -13,14 +13,14 @@ type TOptionalParamsFieldname =
   | 'another_valid_fieldname';
 
 const returnOptionalParam = (
-  props: tOptionalParamsCommandProps<TOptionalParamsFieldname>,
+  props: TOptionalParamsCommandProps<TOptionalParamsFieldname>,
 ) => {
   const { property, value } = props;
 
   return `${property} '${value}'`;
 };
 
-const optionalParametersDefinition: tOptionalParams<TOptionalParamsFieldname> =
+const optionalParametersDefinition: TOptionalParams<TOptionalParamsFieldname> =
   {
     username: {
       property: '--user',

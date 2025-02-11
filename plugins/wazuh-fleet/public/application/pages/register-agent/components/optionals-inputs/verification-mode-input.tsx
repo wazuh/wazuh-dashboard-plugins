@@ -33,7 +33,7 @@ export const VerificationModeInput = (props: {
               gutterSize='s'
             >
               <EuiFlexItem grow={false}>
-                <span className='registerAgentLabels'>
+                <span className='enrollment-agent-form-input-label'>
                   <FormattedMessage
                     id='wzFleet.enrollmentAssistant.steps.optionals.verificationMode.description'
                     defaultMessage='SSL verification mode'

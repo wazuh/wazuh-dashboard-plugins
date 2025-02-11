@@ -14,7 +14,7 @@ import {
   scapeSpecialCharsForMacOS,
   scapeSpecialCharsForWindows,
 } from '../../services/wazuh-password-service';
-import { IOSDefinition, tOptionalParams } from '../register-commands/types';
+import { IOSDefinition, TOptionalParams } from '../register-commands/types';
 
 // Defined OS combinations
 
@@ -153,7 +153,7 @@ export const osCommandsDefinitions = [
 // / Optional parameters definitions
 // /////////////////////////////////////////////////////////////////
 
-export const optionalParamsDefinitions: tOptionalParams<TOptionalParameters> = {
+export const optionalParamsDefinitions: TOptionalParams<TOptionalParameters> = {
   serverAddress: {
     property: '--url',
     getParamCommand: props => {

@@ -23,6 +23,19 @@ enum EpluginSettingType { // eslint-disable-next-line @typescript-eslint/naming-
   custom = 'custom', // eslint-disable-next-line @typescript-eslint/naming-convention
 }
 
+const getValueFromEventType: IgetValueFromEventType = {
+  [EpluginSettingType.switch]: (event: any) => event.target.checked,
+  [EpluginSettingType.editor]: (value: any) => value,
+  [EpluginSettingType.filepicker]: (value: any) => value,
+  [EpluginSettingType.select]: (event: any) => event.target.value,
+  [EpluginSettingType.text]: (event: any) => event.target.value,
+  [EpluginSettingType.textarea]: (event: any) => event.target.value,
+  [EpluginSettingType.number]: (event: any) => event.target.value,
+  [EpluginSettingType.password]: (event: any) => event.target.value,
+  custom: (event: any) => event.target.value,
+  default: (event: any) => event.target.value,
+};
+
 /**
  * Returns the value of the event according to the type of field
  * When the type is not found, it returns the value defined in the default key
@@ -37,19 +50,6 @@ function getValueFromEvent(
 ): any {
   return (getValueFromEventType[type] || getValueFromEventType.default)(event);
 }
-
-const getValueFromEventType: IgetValueFromEventType = {
-  [EpluginSettingType.switch]: (event: any) => event.target.checked,
-  [EpluginSettingType.editor]: (value: any) => value,
-  [EpluginSettingType.filepicker]: (value: any) => value,
-  [EpluginSettingType.select]: (event: any) => event.target.value,
-  [EpluginSettingType.text]: (event: any) => event.target.value,
-  [EpluginSettingType.textarea]: (event: any) => event.target.value,
-  [EpluginSettingType.number]: (event: any) => event.target.value,
-  [EpluginSettingType.password]: (event: any) => event.target.value,
-  custom: (event: any) => event.target.value,
-  default: (event: any) => event.target.value,
-};
 
 export function getFormFields(fields) {
   return Object.fromEntries(
@@ -93,6 +93,7 @@ export function enhanceFormFields(
     pathFormFieldParent = [],
   },
 ) {
+  // eslint-disable-next-line unicorn/no-array-reduce
   return Object.entries(formFields).reduce(
     (accum, [fieldKey, { currentValue: value, ...restFieldState }]) => {
       // Define the path to fields object
@@ -186,6 +187,7 @@ export function mapFormFields(
   },
   callbackFormField,
 ) {
+  // eslint-disable-next-line unicorn/no-array-reduce
   return Object.entries(formState).reduce((accum, [key, value]) => {
     const pathField = [...pathFieldFormDefinition, key];
     const fieldDefinition = get(formDefinition, pathField);
@@ -243,9 +245,15 @@ export const useForm = (fields: FormConfiguration): UseFormReturn => {
         pathFieldFormDefinition: [],
         pathFormState: [],
       },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       ({ changed, error, value }, _, { pathFormState, fieldDefinition }) => {
-        changed && (result.changed[pathFormState] = value);
-        error && (result.errors[pathFormState] = error);
+        if (changed) {
+          result.changed[pathFormState] = value;
+        }
+
+        if (error) {
+          result.errors[pathFormState] = error;
+        }
       },
     );
 

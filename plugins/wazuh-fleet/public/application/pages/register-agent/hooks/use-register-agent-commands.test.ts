@@ -2,7 +2,7 @@ import React from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
 import {
   IOSDefinition,
-  tOptionalParams,
+  TOptionalParams,
 } from '../core/register-commands/types';
 import { useRegisterAgentCommands } from './use-register-agent-commands';
 
@@ -51,7 +51,7 @@ export const osCommandsDefinitions = [linuxDefinition];
 // / Optional parameters definitions
 // /////////////////////////////////////////////////////////////////
 
-export const optionalParamsDefinitions: tOptionalParams<TOptionalParamsNames> =
+export const optionalParamsDefinitions: TOptionalParams<TOptionalParamsNames> =
   {
     optional1: {
       property: '--url',

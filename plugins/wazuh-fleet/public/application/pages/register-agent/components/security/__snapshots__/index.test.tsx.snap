@@ -42,7 +42,7 @@ exports[`credentials input match the snapshopt 1`] = `
                 class="euiFlexItem euiFlexItem--flexGrowZero"
               >
                 <span
-                  class="registerAgentLabels"
+                  class="enrollment-agent-form-input-label"
                 >
                   <span>
                     Define the server API username
@@ -141,7 +141,7 @@ exports[`credentials input match the snapshopt 1`] = `
                 class="euiFlexItem euiFlexItem--flexGrowZero"
               >
                 <span
-                  class="registerAgentLabels"
+                  class="enrollment-agent-form-input-label"
                 >
                   <span>
                     Define the server API password

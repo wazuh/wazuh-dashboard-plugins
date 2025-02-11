@@ -1,21 +1,19 @@
 import React from 'react';
-import { EuiFieldPassword } from '@elastic/eui';
+import { EuiFieldText } from '@elastic/eui';
 import { IInputFormType } from './types';
 
-export const InputFormPassword = ({
+export const InputFormText = ({
   value,
   isInvalid,
   onChange,
   placeholder,
   fullWidth,
-  options,
 }: IInputFormType) => (
-  <EuiFieldPassword
+  <EuiFieldText
     fullWidth={fullWidth === undefined ? true : fullWidth}
     value={value}
     isInvalid={isInvalid}
     onChange={onChange}
     placeholder={placeholder}
-    type={options?.password?.type || 'dual'}
   />
 );

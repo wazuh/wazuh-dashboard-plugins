@@ -1,8 +1,8 @@
 import { TOptionalParameters } from '../core/config/os-commands-definitions';
 import {
   IOptionalParameters,
-  tOSEntryInstallCommand,
-  tOSEntryProps,
+  TOSEntryInstallCommand,
+  TOSEntryProps,
 } from '../core/register-commands/types';
 import { TOperatingSystem } from '../hooks/use-register-agent-commands.test';
 
@@ -59,7 +59,7 @@ export const getAllOptionalsMacos = (
 /** ***** DEB *******/
 
 export const getDEBAMD64InstallCommand = (
-  props: tOSEntryInstallCommand<TOptionalParameters>,
+  props: TOSEntryInstallCommand<TOptionalParameters>,
 ) => {
   const { optionals, wazuhVersion } = props;
   const packageName = `wazuh-agent_${wazuhVersion}-1_amd64.deb`;
@@ -72,7 +72,7 @@ export const getDEBAMD64InstallCommand = (
 };
 
 export const getDEBARM64InstallCommand = (
-  props: tOSEntryInstallCommand<TOptionalParameters>,
+  props: TOSEntryInstallCommand<TOptionalParameters>,
 ) => {
   const { optionals, wazuhVersion } = props;
   const packageName = `wazuh-agent_${wazuhVersion}-1_arm64.deb`;
@@ -87,7 +87,7 @@ export const getDEBARM64InstallCommand = (
 /** ***** RPM *******/
 
 export const getRPMAMD64InstallCommand = (
-  props: tOSEntryInstallCommand<TOptionalParameters>,
+  props: TOSEntryInstallCommand<TOptionalParameters>,
 ) => {
   const { optionals, wazuhVersion } = props;
   const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`;
@@ -100,7 +100,7 @@ export const getRPMAMD64InstallCommand = (
 };
 
 export const getRPMARM64InstallCommand = (
-  props: tOSEntryInstallCommand<TOptionalParameters>,
+  props: TOSEntryInstallCommand<TOptionalParameters>,
 ) => {
   const { optionals, wazuhVersion } = props;
   const packageName = `wazuh-agent-${wazuhVersion}-1.aarch64.rpm`;
@@ -116,14 +116,14 @@ export const getRPMARM64InstallCommand = (
 
 // Start command
 export const getLinuxStartCommand = (
-  _props: tOSEntryProps<TOptionalParameters>,
+  _props: TOSEntryProps<TOptionalParameters>,
 ) =>
   `sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent`;
 
 /** ****** Windows ********/
 
 export const getWindowsInstallCommand = (
-  props: tOSEntryInstallCommand<TOptionalParameters>,
+  props: TOSEntryInstallCommand<TOptionalParameters>,
 ) => {
   const { optionals, name } = props;
 
@@ -136,7 +136,7 @@ export const getWindowsInstallCommand = (
 };
 
 export const getWindowsStartCommand = (
-  _props: tOSEntryProps<TOptionalParameters>,
+  _props: TOSEntryProps<TOptionalParameters>,
 ) => `NET START WazuhSvc`;
 
 /** ****** MacOS ********/
@@ -148,7 +148,7 @@ export const transformOptionalsParamatersMacOSCommand = (command: string) =>
     .trim();
 
 export const getMacOsInstallCommand = (
-  props: tOSEntryInstallCommand<TOptionalParameters>,
+  props: TOSEntryInstallCommand<TOptionalParameters>,
 ) => {
   const { optionals } = props;
   const optionalsForCommand = { ...optionals };
@@ -186,5 +186,5 @@ export const getMacOsInstallCommand = (
 };
 
 export const getMacosStartCommand = (
-  _props: tOSEntryProps<TOptionalParameters>,
+  _props: TOSEntryProps<TOptionalParameters>,
 ) => `sudo /Library/Ossec/bin/wazuh-control start`;

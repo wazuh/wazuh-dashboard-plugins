@@ -34,7 +34,7 @@ exports[`Enrollment key input match the snapshopt 1`] = `
             class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <p
-              class="registerAgentLabels"
+              class="enrollment-agent-form-input-label"
             >
               Assign an agent name:
             </p>
@@ -183,7 +183,7 @@ exports[`Enrollment key input match the snapshopt 1`] = `
             class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <span
-              class="registerAgentLabels"
+              class="enrollment-agent-form-input-label"
             >
               SSL verification mode
             </span>
@@ -296,7 +296,7 @@ exports[`Enrollment key input match the snapshopt 1`] = `
             class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <span
-              class="registerAgentLabels"
+              class="enrollment-agent-form-input-label"
             >
               Assign an enrollment key
             </span>

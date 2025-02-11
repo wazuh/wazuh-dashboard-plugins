@@ -4,13 +4,13 @@ import {
   IOptionalParamInput,
   IOptionalParameters,
   IOptionalParametersManager,
-  tOptionalParams,
+  TOptionalParams,
 } from '../types';
 
 export class OptionalParametersManager<Params extends string>
   implements IOptionalParametersManager<Params>
 {
-  constructor(private readonly optionalParamsConfig: tOptionalParams<Params>) {}
+  constructor(private readonly optionalParamsConfig: TOptionalParams<Params>) {}
 
   /**
    * Returns the command string for a given optional parameter.
