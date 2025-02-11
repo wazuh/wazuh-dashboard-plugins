@@ -75,3 +75,9 @@ export interface Agent {
     };
   };
 }
+
+export interface Group {
+  id: string;
+  name: string;
+  agents: any;
+}

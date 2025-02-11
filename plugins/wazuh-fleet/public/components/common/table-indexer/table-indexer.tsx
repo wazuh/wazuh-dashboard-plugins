@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { EuiFlexGroup, EuiBasicTable, EuiFlexItem } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
-import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import useSearchBar from './components/search-bar/use-search-bar';
 import { WzSearchBar } from './components/search-bar/search-bar';
 import { search } from './components/search-bar/search-bar-service';
@@ -34,6 +33,7 @@ export const TableIndexer = (props: {
     filters: filtersDefault,
     // documentDetailsExtraTabs,
   } = props;
+  const [loadingSearch, setLoadingSearch] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 15,
@@ -46,7 +46,7 @@ export const TableIndexer = (props: {
   });
   const [filters, setFilters] = useState([]);
   const { searchBarProps } = useSearchBar({
-    indexPattern: indexPatterns[0],
+    indexPattern: indexPatterns,
     filters: [...filtersDefault, ...filters],
     setFilters,
   });
@@ -58,8 +58,9 @@ export const TableIndexer = (props: {
       return;
     }
 
+    setLoadingSearch(true);
     search({
-      indexPattern: indexPatterns[0],
+      indexPattern: indexPatterns,
       filters: searchBarProps.filters,
       query,
       pagination,
@@ -79,8 +80,9 @@ export const TableIndexer = (props: {
       .catch(error => {
         console.log(error);
       });
+    setLoadingSearch(false);
   }, [
-    props.indexPatterns,
+    indexPatterns,
     filters,
     JSON.stringify(query),
     JSON.stringify(pagination),
@@ -109,7 +111,6 @@ export const TableIndexer = (props: {
     });
   }
 
-  const isDataSourceLoading = false;
   const tablePagination = {
     ...pagination,
     totalItemCount: results?.hits?.total || 0,
@@ -120,32 +121,26 @@ export const TableIndexer = (props: {
   return (
     <EuiFlexGroup direction='column' gutterSize='m'>
       <EuiFlexItem>
-        {isDataSourceLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <WzSearchBar
-            appName='search'
-            {...searchBarProps}
-            showDatePicker={false}
-            showQueryInput={true}
-            showQueryBar={true}
-            showSaveQuery={true}
-          />
-        )}
+        <WzSearchBar
+          appName='search'
+          {...searchBarProps}
+          showDatePicker={false}
+          showQueryInput={true}
+          showQueryBar={true}
+          showSaveQuery={true}
+        />
       </EuiFlexItem>
       {topTableComponent && topTableComponent(searchBarProps)}
       <EuiFlexItem>
-        {Array.isArray(results?.hits?.hits) && results.hits.hits.length > 0 && (
-          <EuiBasicTable
-            columns={columns}
-            items={results.hits.hits.map((item: any) => item._source) ?? []}
-            loading={false}
-            pagination={tablePagination}
-            sorting={sorting}
-            onChange={tableOnChange}
-            {...tableProps}
-          />
-        )}
+        <EuiBasicTable
+          columns={columns}
+          items={results?.hits?.hits?.map((item: any) => item._source) ?? []}
+          loading={loadingSearch}
+          pagination={tablePagination}
+          sorting={sorting}
+          onChange={tableOnChange}
+          {...tableProps}
+        />
       </EuiFlexItem>
     </EuiFlexGroup>
   );

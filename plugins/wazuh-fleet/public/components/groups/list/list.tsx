@@ -11,22 +11,17 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { getCore } from '../../../plugin-services';
-// import { columns } from './columns';
+import { TableIndexer } from '../../common/table-indexer/table-indexer';
+import { groupsTableColumns } from './columns';
 
-export interface AgentListProps {
-  FleetGroupsDataSource: any;
-  FleetGroupsDataSourceRepository: any;
-  TableIndexer: any;
+export interface IGroupListProps {
+  indexPatterns: any;
+  filters: any[];
 }
 
-// export const GroupList = ({
-//   FleetGroupsDataSource,
-//   FleetGroupsDataSourceRepository,
-//   TableIndexer,
-// }: AgentListProps) => {
-export const GroupList = () => {
+export const GroupList = (props: IGroupListProps) => {
+  const { indexPatterns, filters } = props;
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [group, setGroup] = useState();
 
   return (
@@ -38,22 +33,21 @@ export const GroupList = () => {
             Add new group
           </EuiButton>,
         ]}
-        // rightSideGroupProps={{ gutterSize: 's' }}
       />
       <EuiSpacer />
-      {/* <TableIndexer
-        DataSource={FleetGroupsDataSource}
-        DataSourceRepository={FleetGroupsDataSourceRepository}
+      <TableIndexer
+        indexPatterns={indexPatterns}
         tableSortingInitialField='name'
         tableSortingInitialDirection='asc'
-        columns={columns({
+        columns={groupsTableColumns({
           setIsFlyoutVisible: setIsFlyoutVisible,
           setGroup,
         })}
+        filters={filters}
         tableProps={{
           hasActions: true,
         }}
-      /> */}
+      />
       {isFlyoutVisible ? (
         <EuiFlyout
           ownFocus

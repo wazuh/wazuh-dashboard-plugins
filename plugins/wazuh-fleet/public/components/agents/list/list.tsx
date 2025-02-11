@@ -113,7 +113,7 @@ export const AgentList = (props: AgentListProps) => {
       {indexPatterns ? (
         <TableIndexer
           filters={filters}
-          indexPatterns={[indexPatterns]}
+          indexPatterns={indexPatterns}
           topTableComponent={(searchBarProps: any) => (
             <AgentsVisualizations searchBarProps={searchBarProps} />
           )}
