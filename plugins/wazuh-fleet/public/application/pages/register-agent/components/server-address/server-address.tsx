@@ -5,16 +5,14 @@ import {
   EuiPopover,
   EuiButtonEmpty,
   EuiLink,
-  EuiSwitch,
 } from '@elastic/eui';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
 import { EnhancedFieldConfiguration } from '../form/types';
 import { InputForm } from '../form';
 import { webDocumentationLink } from '../../services/web-documentation-link';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
-import '../group-input/group-input.scss';
-import { getWazuhCore } from '../../../../../plugin-services';
+import '../inputs/styles.scss';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -44,58 +42,9 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
       isPopoverServerAddress => !isPopoverServerAddress,
     );
   const closeServerAddress = () => setIsPopoverServerAddress(false);
-  const [rememberServerAddress, setRememberServerAddress] = useState(false);
-  const [defaultServerAddress, setDefaultServerAddress] = useState(
-    formField?.initialValue ? formField?.initialValue : '',
-  );
-  const appConfig = getWazuhCore().configuration.get(); // TODO: this should use a live state (that reacts to changes in the configuration)
-
-  const handleToggleRememberAddress = async event => {
-    setRememberServerAddress(event.target.checked);
-
-    if (event.target.checked) {
-      await saveServerAddress();
-      setDefaultServerAddress(formField.value);
-    }
-  };
-
-  const saveServerAddress = async () => {
-    try {
-      const res = await getWazuhCore().http.server.request(
-        'PUT',
-        '/utils/configuration',
-        {
-          'enrollment.dns': formField.value,
-        },
-      );
-    } catch {
-      // TODO: use error handler
-      // ErrorHandler.handleError(error, {
-      //   message: error.message,
-      //   title: 'Error saving server address configuration',
-      // });
-      setRememberServerAddress(false);
-    }
-  };
-
-  const rememberToggleIsDisabled = () => !formField.value || !!formField.error;
-
-  const handleInputChange = value => {
-    if (value === defaultServerAddress) {
-      setRememberServerAddress(true);
-    } else {
-      setRememberServerAddress(false);
-    }
-  };
-
-  useEffect(() => {
-    handleInputChange(formField.value);
-  }, [formField.value]);
-
-  const { ServerButtonPermissions } = getWazuhCore().ui;
 
   return (
-    <Fragment>
+    <>
       <EuiFlexGroup gutterSize='s' wrap>
         {SERVER_ADDRESS_TEXTS.map((data, index) => (
           <EuiFlexItem key={index}>
@@ -118,7 +67,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                   gutterSize='s'
                 >
                   <EuiFlexItem grow={false}>
-                    <span className='registerAgentLabels'>
+                    <span className='enrollment-agent-form-input-label'>
                       Assign a server address
                     </span>
                   </EuiFlexItem>
@@ -147,25 +96,11 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
               </>
             }
             fullWidth={false}
-            placeholder='Server address'
+            placeholder='https://server-address:55000'
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      {appConfig?.['configuration.ui_api_editable'] && (
-        <EuiFlexGroup wrap>
-          <EuiFlexItem grow={false}>
-            <ServerButtonPermissions
-              buttonType='switch'
-              administrator
-              disabled={rememberToggleIsDisabled()}
-              label='Remember server address'
-              checked={rememberServerAddress}
-              onChange={e => handleToggleRememberAddress(e)}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      )}
-    </Fragment>
+    </>
   );
 };
 

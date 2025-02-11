@@ -1,6 +1,4 @@
-import {
-  NoOSOptionFoundException,
-} from '../exceptions';
+import { NoOSOptionFoundException } from '../exceptions';
 import { IOSDefinition } from '../types';
 import {
   searchOSDefinitions,
@@ -12,7 +10,7 @@ const mockedInstallCommand = (props: any) => 'install command mocked';
 const mockedStartCommand = (props: any) => 'start command mocked';
 const mockedUrlPackage = (props: any) => 'https://package-url.com';
 
-type tOptionalParamsNames = 'optional1' | 'optional2';
+type TOptionalParamsNames = 'optional1' | 'optional2';
 
 export interface ILinuxOSTypes {
   name: 'linux';
@@ -28,9 +26,12 @@ export interface IMacOSTypes {
   architecture: '32/64';
 }
 
-export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
+export type TOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
-const validOSDefinitions: IOSDefinition<tOperatingSystem,tOptionalParamsNames>[] = [
+const validOSDefinitions: IOSDefinition<
+  TOperatingSystem,
+  TOptionalParamsNames
+>[] = [
   {
     name: 'linux',
     options: [
@@ -62,24 +63,26 @@ describe('search OS definitions services', () => {
         name: 'linux',
         architecture: 'x64',
       });
+
       expect(result).toMatchObject(validOSDefinitions[0].options[0]);
     });
 
     it('should throw an error if the OS name is not found', () => {
       expect(() =>
         searchOSDefinitions(validOSDefinitions, {
-          // @ts-ignore
           name: 'invalid-os',
           architecture: 'x64',
         }),
       ).toThrow(NoOSOptionFoundException);
     });
-    
   });
 
   describe('validateOSDefinitionsDuplicated', () => {
     it('should not throw an error if there are no duplicated OS definitions', () => {
-      const osDefinitions: IOSDefinition<tOperatingSystem,tOptionalParamsNames>[] = [
+      const osDefinitions: IOSDefinition<
+        TOperatingSystem,
+        TOptionalParamsNames
+      >[] = [
         {
           name: 'linux',
           options: [
@@ -110,12 +113,14 @@ describe('search OS definitions services', () => {
     });
 
     it('should throw an error if there are duplicated OS definitions', () => {
-      const osDefinition: IOSDefinition<tOperatingSystem,tOptionalParamsNames> = {
+      const osDefinition: IOSDefinition<
+        TOperatingSystem,
+        TOptionalParamsNames
+      > = {
         name: 'linux',
         options: [
           {
             architecture: 'x64',
-            // @ts-ignore
             packageManager: 'aix',
             installCommand: mockedInstallCommand,
             startCommand: mockedStartCommand,
@@ -123,7 +128,10 @@ describe('search OS definitions services', () => {
           },
         ],
       };
-      const osDefinitions: IOSDefinition<tOperatingSystem,tOptionalParamsNames>[] = [osDefinition, osDefinition];
+      const osDefinitions: IOSDefinition<
+        TOperatingSystem,
+        TOptionalParamsNames
+      >[] = [osDefinition, osDefinition];
 
       expect(() => validateOSDefinitionsDuplicated(osDefinitions)).toThrow();
     });
@@ -137,7 +145,10 @@ describe('search OS definitions services', () => {
     });
 
     it('should throw an error if there are duplicated OS definitions with different options', () => {
-      const osDefinitions: IOSDefinition<tOperatingSystem,tOptionalParamsNames>[] = [
+      const osDefinitions: IOSDefinition<
+        TOperatingSystem,
+        TOptionalParamsNames
+      >[] = [
         {
           name: 'linux',
           options: [

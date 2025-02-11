@@ -20,7 +20,7 @@ export interface IInputForm {
   postInput?: (options: { value: any; error: string | null }) => JSX.Element;
 }
 
-/// use form hook types
+// / use form hook types
 
 export type SettingTypes =
   | 'text'
@@ -49,17 +49,15 @@ interface CustomFieldConfiguration extends FieldConfiguration {
 
 interface ArrayOfFieldConfiguration extends FieldConfiguration {
   type: 'arrayOf';
-  fields: {
-    [key: string]: any; // TODO: enhance this type
-  };
+  fields: Record<string, any>;
 }
 
-export interface FormConfiguration {
-  [key: string]:
-    | DefaultFieldConfiguration
-    | CustomFieldConfiguration
-    | ArrayOfFieldConfiguration;
-}
+export type FormConfiguration = Record<
+  string,
+  | DefaultFieldConfiguration
+  | CustomFieldConfiguration
+  | ArrayOfFieldConfiguration
+>;
 
 interface EnhancedField {
   currentValue: any;
@@ -84,14 +82,12 @@ interface EnhancedCustomField extends EnhancedField {
 export type EnhancedFieldConfiguration =
   | EnhancedDefaultField
   | EnhancedCustomField;
-export interface EnhancedFields {
-  [key: string]: EnhancedFieldConfiguration;
-}
+export type EnhancedFields = Record<string, EnhancedFieldConfiguration>;
 
 export interface UseFormReturn {
   fields: EnhancedFields;
-  changed: { [key: string]: any };
-  errors: { [key: string]: string };
+  changed: Record<string, any>;
+  errors: Record<string, string>;
   undoChanges: () => void;
   doChanges: () => void;
   forEach: (
@@ -104,5 +100,5 @@ export interface UseFormReturn {
       pathFormState: string[];
       fieldDefinition: FormConfiguration;
     },
-  ) => { [key: string]: any };
+  ) => Record<string, any>;
 }

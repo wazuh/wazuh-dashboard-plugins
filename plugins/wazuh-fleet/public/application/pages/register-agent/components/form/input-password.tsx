@@ -9,15 +9,13 @@ export const InputFormPassword = ({
   placeholder,
   fullWidth,
   options,
-}: IInputFormType) => {
-  return (
-    <EuiFieldPassword
-      fullWidth={typeof fullWidth === 'undefined' ? true : fullWidth}
-      value={value}
-      isInvalid={isInvalid}
-      onChange={onChange}
-      placeholder={placeholder}
-      type={options?.password?.type || 'dual'}
-    />
-  );
-};
+}: IInputFormType) => (
+  <EuiFieldPassword
+    fullWidth={fullWidth === undefined ? true : fullWidth}
+    value={value}
+    isInvalid={isInvalid}
+    onChange={onChange}
+    placeholder={placeholder}
+    type={options?.password?.type || 'dual'}
+  />
+);

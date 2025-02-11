@@ -8,14 +8,15 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
-import { tOperatingSystem } from '../../core/config/os-commands-definitions';
-import { osdfucatePasswordInCommand } from '../../services/wazuh-password-service';
+import { TOperatingSystem } from '../../core/config/os-commands-definitions';
+import { obfuscatePasswordInCommand } from '../../services/wazuh-password-service';
+import './command-output.scss';
 
 interface ICommandSectionProps {
   commandText: string;
   showCommand: boolean;
   onCopy: () => void;
-  os?: tOperatingSystem['name'];
+  os?: TOperatingSystem['name'];
   password?: string;
 }
 
@@ -25,36 +26,45 @@ export default function CommandOutput(props: ICommandSectionProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   const onHandleCopy = (command: any) => {
-    onCopy && onCopy();
+    if (onCopy) {
+      onCopy();
+    }
+
     return command; // the return is needed to avoid a bug in EuiCopy
   };
 
   const [commandToShow, setCommandToShow] = useState(commandText);
 
+  const obfuscatePassword = (password: string) => {
+    if (!password) {
+      return;
+    }
+
+    if (!commandText) {
+      return;
+    }
+
+    if (showPassword) {
+      setCommandToShow(commandText);
+    } else {
+      setCommandToShow(obfuscatePasswordInCommand(password, commandText, os));
+    }
+  };
+
   useEffect(() => {
     if (password) {
       setHavePassword(true);
-      osdfucatePassword(password);
+      obfuscatePassword(password);
     } else {
       setHavePassword(false);
       setCommandToShow(commandText);
     }
   }, [password, commandText, showPassword]);
 
-  const osdfucatePassword = (password: string) => {
-    if (!password) return;
-    if (!commandText) return;
-
-    if (showPassword) {
-      setCommandToShow(commandText);
-    } else {
-      setCommandToShow(osdfucatePasswordInCommand(password, commandText, os));
-    }
-  };
-
   const onChangeShowPassword = (event: EuiSwitchEvent) => {
     setShowPassword(event.target.checked);
   };
+
   return (
     <Fragment>
       <EuiSpacer />

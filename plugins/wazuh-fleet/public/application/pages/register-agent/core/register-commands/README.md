@@ -36,10 +36,10 @@ The OS definitions are a set of parameters that will be used to generate the reg
 
 export interface IOptionsParamConfig<T extends string> {
   property: string;
-  getParamCommand: (props: tOptionalParamsCommandProps<T>) => string;
+  getParamCommand: (props: TOptionalParamsCommandProps<T>) => string;
 }
 
-export type tOptionalParams<T extends string> = {
+export type TOptionalParams<T extends string> = {
   [key in T]: IOptionsParamConfig<T>;
 };
 
@@ -64,14 +64,15 @@ interface IMacOSTypes {
   architecture: '32/64';
 }
 
-type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes; // add the necessary OS options
+type TOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes; // add the necessary OS options
 
-type tOptionalParameters =
+type TOptionalParameters =
   | 'server_address'
   | 'agent_name'
-  | 'agent_group'
-  | 'protocol'
-  | 'wazuh_password';
+  | 'username'
+  | 'password'
+  | 'verificationMode'
+  | 'enrollmentKey';
 
 export interface IOSDefinition<
   OS extends IOperationSystem,
@@ -86,11 +87,11 @@ export interface IOSCommandsDefinition<
   Param extends string,
 > {
   architecture: OS['architecture'];
-  urlPackage: (props: tOSEntryProps<Param>) => string;
+  urlPackage: (props: TOSEntryProps<Param>) => string;
   installCommand: (
-    props: tOSEntryProps<Param> & { urlPackage: string },
+    props: TOSEntryProps<Param> & { urlPackage: string },
   ) => string;
-  startCommand: (props: tOSEntryProps<Param>) => string;
+  startCommand: (props: TOSEntryProps<Param>) => string;
 }
 ```
 
@@ -100,7 +101,7 @@ This configuration will define the different OS that we want to support and the 
 
 ```ts
 
-const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [{
+const osDefinitions: IOSDefinition<TOperatingSystem, TOptionalParameters>[] = [{
   name: 'linux',
   options: [
     {
@@ -147,15 +148,16 @@ Another validations will be provided in development time and will be provided by
 The optional parameters are a set of parameters that will be added to the registration commands. The parameters are the following:
 
 ```ts
-export type tOptionalParamsName =
+export type TOptionalParamsName =
   | 'server_address'
   | 'agent_name'
-  | 'protocol'
-  | 'agent_group'
-  | 'wazuh_password';
+  | 'username'
+  | 'password'
+  | 'verificationMode'
+  | 'enrollmentKey';
 
-export type tOptionalParams = {
-  [key in tOptionalParamsName]: {
+export type TOptionalParams = {
+  [key in TOptionalParamsName]: {
     property: string;
     getParamCommand: (props) => string;
   };
@@ -168,9 +170,9 @@ This configuration will define the different optional parameters that we want to
 
 ```ts
 
-export const optionalParameters: tOptionalParams<tOptionalParameters> = {
+export const optionalParameters: TOptionalParams<TOptionalParameters> = {
   server_address: {
-      property: 'WAZUH_MANAGER',
+      property: '--url',
       getParamCommand:  props => 'returns the optional param command'
     }
   },
@@ -187,7 +189,7 @@ export const optionalParameters: tOptionalParams<tOptionalParameters> = {
 The `Command Generator` will validate the Optional Parameters received and will throw an error if the configuration is not valid. The validations are the following:
 
 - The Optional Parameters must not have duplicated names defined.
-- The Optional Parameters name would be defined in the `tOptionalParamsName` type.
+- The Optional Parameters name would be defined in the `TOptionalParamsName` type.
 
 Another validations will be provided in development time and will be provided by the types added to the project. You can find the types definitions in the `types` file.
 

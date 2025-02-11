@@ -1,13 +1,14 @@
-import { CommandGenerator } from './command-generator';
+import { IOSDefinition, IOptionalParameters, TOptionalParams } from '../types';
 import {
-  IOSDefinition,
-  IOptionalParameters,
-  tOptionalParams,
-} from '../types';
-import { DuplicatedOSException, DuplicatedOSOptionException, NoOSSelectedException, WazuhVersionUndefinedException } from '../exceptions';
+  DuplicatedOSException,
+  DuplicatedOSOptionException,
+  NoOSSelectedException,
+  WazuhVersionUndefinedException,
+} from '../exceptions';
+import { CommandGenerator } from './command-generator';
 
-const mockedCommandValue = 'mocked command';
-const mockedCommandsResponse = jest.fn().mockReturnValue(mockedCommandValue);
+const MOCKED_COMMAND_VALUE = 'mocked command';
+const mockedCommandsResponse = jest.fn().mockReturnValue(MOCKED_COMMAND_VALUE);
 
 // Defined OS combinations
 export interface ILinuxOSTypes {
@@ -24,14 +25,19 @@ export interface IMacOSTypes {
   architecture: '32/64';
 }
 
-export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
+export type TOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
 // Defined Optional Parameters
 
+export type TOptionalParameters =
+  | 'server_address'
+  | 'agent_name'
+  | 'username'
+  | 'password'
+  | 'verificationMode'
+  | 'enrollmentKey';
 
-export type tOptionalParameters = 'server_address' | 'agent_name' | 'agent_group' | 'protocol' | 'wazuh_password';
-
-const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
+const osDefinitions: IOSDefinition<TOperatingSystem, TOptionalParameters>[] = [
   {
     name: 'linux',
     options: [
@@ -50,36 +56,39 @@ const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
     ],
   },
 ];
-
-const optionalParams: tOptionalParams<tOptionalParameters> = {
+const optionalParams: TOptionalParams<TOptionalParameters> = {
   server_address: {
-    property: 'WAZUH_MANAGER',
-    getParamCommand: props => `${props.property}=${props.value}`,
+    property: '--url',
+    getParamCommand: props => `${props.property} '${props.value}'`,
   },
   agent_name: {
-    property: 'WAZUH_AGENT_NAME',
-    getParamCommand: props => `${props.property}=${props.value}`,
+    property: '--name',
+    getParamCommand: props => `${props.property} '${props.value}'`,
   },
-  protocol: {
-    property: 'WAZUH_MANAGER_PROTOCOL',
-    getParamCommand: props => `${props.property}=${props.value}`,
+  username: {
+    property: '--user',
+    getParamCommand: props => `${props.property} '${props.value}'`,
   },
-  agent_group: {
-    property: 'WAZUH_AGENT_GROUP',
-    getParamCommand: props => `${props.property}=${props.value}`,
+  password: {
+    property: '--password',
+    getParamCommand: props => `${props.property} '${props.value}'`,
   },
-  wazuh_password: {
-    property: 'WAZUH_PASSWORD',
-    getParamCommand: props => `${props.property}=${props.value}`,
+  verificationMode: {
+    property: '--verification-mode',
+    getParamCommand: props => `${props.property} '${props.value}'`,
+  },
+  enrollmentKey: {
+    property: '--key',
+    getParamCommand: props => `${props.property} '${props.value}'`,
   },
 };
-
-const optionalValues: IOptionalParameters<tOptionalParameters> = {
+const optionalValues: IOptionalParameters<TOptionalParameters> = {
   server_address: '',
   agent_name: '',
-  protocol: '',
-  agent_group: '',
-  wazuh_password: '',
+  username: '',
+  password: '',
+  verificationMode: '',
+  enrollmentKey: '',
 };
 
 describe('Command Generator', () => {
@@ -87,8 +96,9 @@ describe('Command Generator', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
+
     expect(commandGenerator).toBeDefined();
   });
 
@@ -96,51 +106,60 @@ describe('Command Generator', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
+
     commandGenerator.selectOS({
       name: 'linux',
       architecture: 'x64',
     });
     commandGenerator.addOptionalParams(optionalValues);
+
     const command = commandGenerator.getInstallCommand();
-    expect(command).toBe(mockedCommandValue);
+
+    expect(command).toBe(MOCKED_COMMAND_VALUE);
   });
 
   it('should return the start command for the os selected', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
+
     commandGenerator.selectOS({
       name: 'linux',
       architecture: 'x64',
     });
     commandGenerator.addOptionalParams(optionalValues);
+
     const command = commandGenerator.getStartCommand();
-    expect(command).toBe(mockedCommandValue);
+
+    expect(command).toBe(MOCKED_COMMAND_VALUE);
   });
 
   it('should return all the commands for the os selected', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
+
     commandGenerator.selectOS({
       name: 'linux',
       architecture: 'x64',
     });
     commandGenerator.addOptionalParams(optionalValues);
+
     const commands = commandGenerator.getAllCommands();
+
     expect(commands).toEqual({
       os: 'linux',
       architecture: 'x64',
-      wazuhVersion: '4.4',
-      install_command: mockedCommandValue,
-      start_command: mockedCommandValue,
-      url_package: mockedCommandValue,
+      wazuhVersion: '5.0',
+      install_command: MOCKED_COMMAND_VALUE,
+      start_command: MOCKED_COMMAND_VALUE,
+      url_package: MOCKED_COMMAND_VALUE,
       optionals: {},
     });
   });
@@ -149,32 +168,35 @@ describe('Command Generator', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
-
-    const selectedOs: tOperatingSystem = {
+    const selectedOs: TOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
     };
+
     commandGenerator.selectOS(selectedOs);
 
     const optionalValues = {
       server_address: '10.10.10.121',
       agent_name: 'agent1',
-      protocol: 'tcp',
-      agent_group: '',
-      wazuh_password: '123456',
+      username: 'user',
+      password: '1234',
+      verificationMode: 'none',
+      enrollmentKey: '00000000000000000000000000000000',
     };
+
     commandGenerator.addOptionalParams(optionalValues);
 
     const commands = commandGenerator.getAllCommands();
+
     expect(commands).toEqual({
       os: selectedOs.name,
       architecture: selectedOs.architecture,
-      wazuhVersion: '4.4',
-      install_command: mockedCommandValue,
-      start_command: mockedCommandValue,
-      url_package: mockedCommandValue,
+      wazuhVersion: '5.0',
+      install_command: MOCKED_COMMAND_VALUE,
+      start_command: MOCKED_COMMAND_VALUE,
+      url_package: MOCKED_COMMAND_VALUE,
       optionals: {
         server_address: optionalParams.server_address.getParamCommand({
           property: optionalParams.server_address.property,
@@ -186,22 +208,35 @@ describe('Command Generator', () => {
           value: optionalValues.agent_name,
           name: 'agent_name',
         }),
-        protocol: optionalParams.protocol.getParamCommand({
-          property: optionalParams.protocol.property,
-          value: optionalValues.protocol,
-          name: 'protocol',
+        username: optionalParams.username.getParamCommand({
+          property: optionalParams.username.property,
+          value: optionalValues.username,
+          name: 'username',
         }),
-        wazuh_password: optionalParams.wazuh_password.getParamCommand({
-          property: optionalParams.wazuh_password.property,
-          value: optionalValues.wazuh_password,
-          name: 'wazuh_password',
+        password: optionalParams.password.getParamCommand({
+          property: optionalParams.password.property,
+          value: optionalValues.password,
+          name: 'password',
+        }),
+        verificationMode: optionalParams.verificationMode.getParamCommand({
+          property: optionalParams.verificationMode.property,
+          value: optionalValues.verificationMode,
+          name: 'verificationMode',
+        }),
+        enrollmentKey: optionalParams.enrollmentKey.getParamCommand({
+          property: optionalParams.enrollmentKey.property,
+          value: optionalValues.enrollmentKey,
+          name: 'enrollmentKey',
         }),
       },
     });
   });
 
   it('should return an ERROR when the os definitions received has a os with options duplicated', () => {
-    const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
+    const osDefinitions: IOSDefinition<
+      TOperatingSystem,
+      TOptionalParameters
+    >[] = [
       {
         name: 'linux',
         options: [
@@ -222,15 +257,19 @@ describe('Command Generator', () => {
     ];
 
     try {
-      new CommandGenerator(osDefinitions, optionalParams, '4.4');
+      new CommandGenerator(osDefinitions, optionalParams, '5.0');
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
         expect(error).toBeInstanceOf(DuplicatedOSOptionException);
+      }
     }
   });
 
   it('should return an ERROR when the os definitions received has a os with options duplicated', () => {
-    const osDefinitions: IOSDefinition<tOperatingSystem, tOptionalParameters>[] = [
+    const osDefinitions: IOSDefinition<
+      TOperatingSystem,
+      TOptionalParameters
+    >[] = [
       {
         name: 'linux',
         options: [
@@ -256,10 +295,11 @@ describe('Command Generator', () => {
     ];
 
     try {
-      new CommandGenerator(osDefinitions, optionalParams, '4.4');
+      new CommandGenerator(osDefinitions, optionalParams, '5.0');
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
         expect(error).toBeInstanceOf(DuplicatedOSException);
+      }
     }
   });
 
@@ -267,13 +307,15 @@ describe('Command Generator', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
+
     try {
       commandGenerator.getAllCommands();
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
         expect(error).toBeInstanceOf(NoOSSelectedException);
+      }
     }
   });
 
@@ -281,13 +323,15 @@ describe('Command Generator', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
+
     try {
       commandGenerator.getInstallCommand();
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
         expect(error).toBeInstanceOf(NoOSSelectedException);
+      }
     }
   });
 
@@ -295,13 +339,15 @@ describe('Command Generator', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
+
     try {
       commandGenerator.getStartCommand();
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
         expect(error).toBeInstanceOf(NoOSSelectedException);
+      }
     }
   });
 
@@ -309,8 +355,9 @@ describe('Command Generator', () => {
     try {
       new CommandGenerator(osDefinitions, optionalParams, '');
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
         expect(error).toBeInstanceOf(WazuhVersionUndefinedException);
+      }
     }
   });
 
@@ -318,20 +365,22 @@ describe('Command Generator', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
-
-    const selectedOs: tOperatingSystem = {
+    const selectedOs: TOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
     };
+
     commandGenerator.selectOS(selectedOs);
 
     const optionalValues = {
       server_address: 'wazuh-ip',
     };
 
-    commandGenerator.addOptionalParams(optionalValues as IOptionalParameters<tOptionalParameters>);
+    commandGenerator.addOptionalParams(
+      optionalValues as IOptionalParameters<TOptionalParameters>,
+    );
     commandGenerator.getInstallCommand();
     expect(mockedCommandsResponse).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -346,24 +395,26 @@ describe('Command Generator', () => {
     );
   });
 
-  it('should receives the solved optional params when the start command is called', () => {
+  it('should receive the solved optional params when the start command is called', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
       optionalParams,
-      '4.4',
+      '5.0',
     );
-
-    const selectedOs: tOperatingSystem = {
+    const selectedOs: TOperatingSystem = {
       name: 'linux',
       architecture: 'x64',
     };
+
     commandGenerator.selectOS(selectedOs);
 
     const optionalValues = {
       server_address: 'wazuh-ip',
     };
 
-    commandGenerator.addOptionalParams(optionalValues as IOptionalParameters<tOptionalParameters>);
+    commandGenerator.addOptionalParams(
+      optionalValues as IOptionalParameters<TOptionalParameters>,
+    );
     commandGenerator.getStartCommand();
     expect(mockedCommandsResponse).toHaveBeenCalledWith(
       expect.objectContaining({

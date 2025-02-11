@@ -20,6 +20,7 @@ describe('CheckboxGroupComponent', () => {
     );
 
     const checkboxItems = screen.getAllByRole('radio');
+
     expect(checkboxItems).toHaveLength(data.length);
 
     expect(checkboxItems[0]).toHaveAttribute('id', 'Option 1');

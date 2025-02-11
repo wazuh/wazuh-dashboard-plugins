@@ -15,20 +15,19 @@ import { IOSDefinition, IOperationSystem } from '../types';
  * @returns The matching OS definition option.
  * @throws NoOSOptionFoundException - If no matching OS definition is found.
  */
-export function searchOSDefinitions<OS extends IOperationSystem, Params extends string>(
-  osDefinitions: IOSDefinition<OS,Params>[],
-  params: IOperationSystem,
-){
+export function searchOSDefinitions<
+  OS extends IOperationSystem,
+  Params extends string,
+>(osDefinitions: IOSDefinition<OS, Params>[], params: IOperationSystem) {
   const { name, architecture } = params;
-
   const osDefinition = osDefinitions.find(os => os.name === name);
+
   if (!osDefinition) {
     throw new NoOSOptionFoundException(name);
   }
 
   const osDefinitionOption = osDefinition.options.find(
-    option =>
-      option.architecture === architecture,
+    option => option.architecture === architecture,
   );
 
   if (!osDefinitionOption) {
@@ -36,7 +35,7 @@ export function searchOSDefinitions<OS extends IOperationSystem, Params extends 
   }
 
   return osDefinitionOption;
-};
+}
 
 /**
  * Validates that there are no duplicated OS definitions in the given list.
@@ -45,18 +44,20 @@ export function searchOSDefinitions<OS extends IOperationSystem, Params extends 
  * @param osDefinitions - The list of OS definitions to validate.
  * @throws DuplicatedOSException - If a duplicated OS definition is found.
  */
-export function validateOSDefinitionsDuplicated<OS extends IOperationSystem, Params extends string>(
-  osDefinitions: IOSDefinition<OS,Params>[],
-){
+export function validateOSDefinitionsDuplicated<
+  OS extends IOperationSystem,
+  Params extends string,
+>(osDefinitions: IOSDefinition<OS, Params>[]) {
   const osNames = new Set<string>();
 
   for (const osDefinition of osDefinitions) {
     if (osNames.has(osDefinition.name)) {
       throw new DuplicatedOSException(osDefinition.name);
     }
+
     osNames.add(osDefinition.name);
   }
-};
+}
 
 /**
  * Validates that there are no duplicated OS definition options in the given list.
@@ -65,20 +66,24 @@ export function validateOSDefinitionsDuplicated<OS extends IOperationSystem, Par
  * @param osDefinitions - The list of OS definitions to validate.
  * @throws DuplicatedOSOptionException - If a duplicated OS definition option is found.
  */
-export function validateOSDefinitionHasDuplicatedOptions<OS extends IOperationSystem, Params extends string>(
-  osDefinitions: IOSDefinition<OS,Params>[],
-){
+export function validateOSDefinitionHasDuplicatedOptions<
+  OS extends IOperationSystem,
+  Params extends string,
+>(osDefinitions: IOSDefinition<OS, Params>[]) {
   for (const osDefinition of osDefinitions) {
     const options = new Set<string>();
+
     for (const option of osDefinition.options) {
-      let ext_arch_manager = `${option.architecture}`;
-      if (options.has(ext_arch_manager)) {
+      const managerArchitecture = `${option.architecture}`;
+
+      if (options.has(managerArchitecture)) {
         throw new DuplicatedOSOptionException(
           osDefinition.name,
           option.architecture,
         );
       }
-      options.add(ext_arch_manager);
+
+      options.add(managerArchitecture);
     }
   }
-};
+}

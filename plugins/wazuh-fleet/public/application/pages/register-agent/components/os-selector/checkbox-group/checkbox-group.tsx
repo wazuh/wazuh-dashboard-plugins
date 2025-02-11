@@ -19,6 +19,7 @@ const CheckboxGroupComponent: React.FC<Props> = ({
   const isSingleArchitecture = data.length === 1;
   const isDoubleArchitecture = data.length === 2;
   const isFirstCardWithFourItems = cardIndex === 0 && data.length === 4;
+
   return (
     <div
       className={`checkbox-group-container${

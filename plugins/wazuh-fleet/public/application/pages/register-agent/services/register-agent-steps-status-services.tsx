@@ -36,11 +36,11 @@ const fieldsAreEmpty = (
     throw new Error('fields to check are not defined in formFields');
   }
 
-  const notEmpty = fieldsToCheck.some(
-    key => formFields[key]?.value?.length > 0,
+  const someFieldisEmptyValue = fieldsToCheck.some(
+    key => formFields[key]?.value?.length === 0,
   );
 
-  return !notEmpty;
+  return someFieldisEmptyValue;
 };
 
 const anyFieldIsComplete = (
@@ -71,36 +71,44 @@ export const showCommandsSections = (
   formFields: UseFormReturn['fields'],
 ): boolean => {
   if (
-    !formFields.operatingSystemSelection.value ||
-    formFields.serverAddress.value === '' ||
-    formFields.serverAddress.error
+    fieldsAreEmpty(
+      // required fields
+      ['operatingSystemSelection', 'serverAddress', 'username', 'password'],
+      formFields,
+    ) ||
+    fieldsHaveErrors(
+      // check for errors
+      [
+        'operatingSystemSelection',
+        'serverAddress',
+        'username',
+        'password',
+        'agentName',
+        'verificationMode',
+        'enrollmentKey',
+      ],
+      formFields,
+    )
   ) {
     return false;
-  } else if (
-    formFields.serverAddress.value === '' &&
-    formFields.agentName.value === ''
-  ) {
-    return true;
-  } else if (fieldsHaveErrors(['agentGroups', 'agentName'], formFields)) {
-    return false;
-  } else {
-    return true;
   }
+
+  return true;
 };
 
 /** ****** Form Steps status getters ********/
 
-export type tFormStepsStatus = EuiStepStatus | 'current' | 'disabled' | '';
+export type TFormStepsStatus = EuiStepStatus | 'current' | 'disabled' | '';
 
 export const getOSSelectorStepStatus = (
   formFields: UseFormReturn['fields'],
-): tFormStepsStatus =>
+): TFormStepsStatus =>
   formFields.operatingSystemSelection.value ? 'complete' : 'current';
 
 export const getAgentCommandsStepStatus = (
   formFields: UseFormReturn['fields'],
   wasCopied: boolean,
-): tFormStepsStatus | 'disabled' => {
+): TFormStepsStatus | 'disabled' => {
   if (!showCommandsSections(formFields)) {
     return 'disabled';
   } else if (showCommandsSections(formFields) && wasCopied) {
@@ -112,15 +120,65 @@ export const getAgentCommandsStepStatus = (
 
 export const getServerAddressStepStatus = (
   formFields: UseFormReturn['fields'],
-): tFormStepsStatus => {
+): TFormStepsStatus => {
   if (
-    !formFields.operatingSystemSelection.value ||
-    formFields.operatingSystemSelection.error
+    fieldsAreEmpty(
+      // required fields
+      ['operatingSystemSelection'],
+      formFields,
+    ) ||
+    fieldsHaveErrors(
+      // check for errors
+      ['operatingSystemSelection'],
+      formFields,
+    )
   ) {
     return 'disabled';
   } else if (
-    !formFields.serverAddress.value ||
-    formFields.serverAddress.error
+    fieldsAreEmpty(
+      // required fields
+      ['serverAddress'],
+      formFields,
+    ) ||
+    fieldsHaveErrors(
+      // check for errors
+      ['serverAddress'],
+      formFields,
+    )
+  ) {
+    return 'current';
+  } else {
+    return 'complete';
+  }
+};
+
+export const getServerCredentialsStepStatus = (
+  formFields: UseFormReturn['fields'],
+): TFormStepsStatus => {
+  if (
+    fieldsAreEmpty(
+      // required fields
+      ['operatingSystemSelection', 'serverAddress'],
+      formFields,
+    ) ||
+    fieldsHaveErrors(
+      // check for errors
+      ['operatingSystemSelection', 'serverAddress'],
+      formFields,
+    )
+  ) {
+    return 'disabled';
+  } else if (
+    fieldsAreEmpty(
+      // required fields
+      ['username', 'password'],
+      formFields,
+    ) ||
+    fieldsHaveErrors(
+      // check for errors
+      ['username', 'password'],
+      formFields,
+    )
   ) {
     return 'current';
   } else {
@@ -131,18 +189,27 @@ export const getServerAddressStepStatus = (
 export const getOptionalParameterStepStatus = (
   formFields: UseFormReturn['fields'],
   installCommandWasCopied: boolean,
-): tFormStepsStatus => {
+): TFormStepsStatus => {
   // when previous step are not complete
   if (
-    !formFields.operatingSystemSelection.value ||
-    formFields.operatingSystemSelection.error ||
-    !formFields.serverAddress.value ||
-    formFields.serverAddress.error
+    fieldsAreEmpty(
+      // required fields
+      ['operatingSystemSelection', 'serverAddress', 'username', 'password'],
+      formFields,
+    ) ||
+    fieldsHaveErrors(
+      // check for errors
+      ['operatingSystemSelection', 'serverAddress', 'username', 'password'],
+      formFields,
+    )
   ) {
     return 'disabled';
   } else if (
     installCommandWasCopied ||
-    anyFieldIsComplete(['agentName', 'agentGroups'], formFields)
+    anyFieldIsComplete(
+      ['agentName', 'verificationMode', 'enrollmentKey'],
+      formFields,
+    )
   ) {
     return 'complete';
   } else {
@@ -150,53 +217,49 @@ export const getOptionalParameterStepStatus = (
   }
 };
 
-export const getPasswordStepStatus = (
-  formFields: UseFormReturn['fields'],
-): tFormStepsStatus => {
-  if (
-    !formFields.operatingSystemSelection.value ||
-    formFields.operatingSystemSelection.error ||
-    !formFields.serverAddress.value ||
-    formFields.serverAddress.error
-  ) {
-    return 'disabled';
-  } else {
-    return 'complete';
-  }
-};
-
-export enum tFormStepsLabel {
+export enum FORM_STEPS_LABELS {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   operatingSystemSelection = 'operating system',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   serverAddress = 'server address',
 }
 
 export const getIncompleteSteps = (
   formFields: UseFormReturn['fields'],
-): tFormStepsLabel[] => {
+): FORM_STEPS_LABELS[] => {
   const steps: FormStepsDependencies = {
     operatingSystemSelection: ['operatingSystemSelection'],
     serverAddress: ['serverAddress'],
+    username: ['username'],
+    password: ['password'],
   };
   const statusManager = new RegisterAgentFormStatusManager(formFields, steps);
 
   // replace fields array using label names
   return statusManager
     .getIncompleteSteps()
-    .map(field => tFormStepsLabel[field] || field);
+    .map(field => FORM_STEPS_LABELS[field] || field);
 };
 
-export enum tFormFieldsLabel {
+export enum FORM_FIELDS_LABEL {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   agentName = 'agent name',
-  agentGroups = 'agent groups',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  username = 'username',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  password = 'password',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  enrollmentKey = 'enrollment key',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
   serverAddress = 'server address',
 }
 
 export const getInvalidFields = (
   formFields: UseFormReturn['fields'],
-): tFormFieldsLabel[] => {
+): FORM_FIELDS_LABEL[] => {
   const statusManager = new RegisterAgentFormStatusManager(formFields);
 
   return statusManager
     .getInvalidFields()
-    .map(field => tFormFieldsLabel[field] || field);
+    .map(field => FORM_FIELDS_LABEL[field] || field);
 };

@@ -1,12 +1,12 @@
 import React from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
-import { useRegisterAgentCommands } from './use-register-agent-commands';
 import {
   IOSDefinition,
-  tOptionalParams,
+  TOptionalParams,
 } from '../core/register-commands/types';
+import { useRegisterAgentCommands } from './use-register-agent-commands';
 
-type tOptionalParamsNames = 'optional1' | 'optional2';
+type TOptionalParamsNames = 'optional1' | 'optional2';
 
 export interface ILinuxOSTypes {
   name: 'linux';
@@ -22,9 +22,9 @@ export interface IMacOSTypes {
   architecture: '32/64';
 }
 
-export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
+export type TOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
-const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParamsNames> = {
+const linuxDefinition: IOSDefinition<TOperatingSystem, TOptionalParamsNames> = {
   name: 'linux',
   options: [
     {
@@ -47,24 +47,26 @@ const linuxDefinition: IOSDefinition<tOperatingSystem, tOptionalParamsNames> = {
 
 export const osCommandsDefinitions = [linuxDefinition];
 
-///////////////////////////////////////////////////////////////////
-/// Optional parameters definitions
-///////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////
+// / Optional parameters definitions
+// /////////////////////////////////////////////////////////////////
 
-export const optionalParamsDefinitions: tOptionalParams<tOptionalParamsNames> =
+export const optionalParamsDefinitions: TOptionalParams<TOptionalParamsNames> =
   {
     optional1: {
-      property: 'WAZUH_MANAGER',
+      property: '--url',
       getParamCommand: props => {
         const { property, value } = props;
-        return `${property}=${value}`;
+
+        return `${property} '${value}'`;
       },
     },
     optional2: {
-      property: 'WAZUH_AGENT_NAME',
+      property: '--name',
       getParamCommand: props => {
         const { property, value } = props;
-        return `${property}=${value}`;
+
+        return `${property} '${value}'`;
       },
     },
   };
@@ -77,6 +79,7 @@ describe('useRegisterAgentCommands hook', () => {
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
     );
+
     expect(hook.result.current.installCommand).toBe('');
     expect(hook.result.current.startCommand).toBe('');
   });
@@ -92,6 +95,7 @@ describe('useRegisterAgentCommands hook', () => {
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
     );
+
     try {
       act(() => {
         selectOS({
@@ -100,28 +104,26 @@ describe('useRegisterAgentCommands hook', () => {
         });
       });
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
         expect(error.message).toContain('No OS option found for');
+      }
     }
   });
 
   it('should change the commands when the OS is selected successfully', async () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<tOperatingSystem, tOptionalParamsNames>({
+      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
     );
     const { selectOS } = hook.result.current;
     const { result } = hook;
-
     const optionSelected = osCommandsDefinitions
       .find(os => os.name === 'linux')
-      ?.options.find(
-        item => item.architecture === 'x64',
-      );
-    const spyInstall = jest.spyOn(optionSelected!, 'installCommand');
-    const spyStart = jest.spyOn(optionSelected!, 'startCommand');
+      ?.options.find(item => item.architecture === 'x64');
+    const spyInstall = jest.spyOn(optionSelected, 'installCommand');
+    const spyStart = jest.spyOn(optionSelected, 'startCommand');
 
     act(() => {
       selectOS({
@@ -137,7 +139,7 @@ describe('useRegisterAgentCommands hook', () => {
 
   it('should return commands empty when set optional params and OS is NOT selected', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<tOperatingSystem, tOptionalParamsNames>({
+      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -157,18 +159,19 @@ describe('useRegisterAgentCommands hook', () => {
 
   it('should return optional params empty when optional params are not added', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<tOperatingSystem, tOptionalParamsNames>({
+      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
     );
     const { optionalParamsParsed } = hook.result.current;
+
     expect(optionalParamsParsed).toEqual({});
   });
 
   it('should return optional params when optional params are added', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<tOperatingSystem, tOptionalParamsNames>({
+      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -182,6 +185,7 @@ describe('useRegisterAgentCommands hook', () => {
       optionalParamsDefinitions.optional2,
       'getParamCommand',
     );
+
     act(() => {
       setOptionalParams({
         optional1: 'value 1',
@@ -195,7 +199,7 @@ describe('useRegisterAgentCommands hook', () => {
 
   it('should update the commands when the OS is selected and optional params are added', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<tOperatingSystem, tOptionalParamsNames>({
+      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -203,11 +207,9 @@ describe('useRegisterAgentCommands hook', () => {
     const { selectOS, setOptionalParams } = hook.result.current;
     const optionSelected = osCommandsDefinitions
       .find(os => os.name === 'linux')
-      ?.options.find(
-        item => item.architecture === 'x64',
-      );
-    const spyInstall = jest.spyOn(optionSelected!, 'installCommand');
-    const spyStart = jest.spyOn(optionSelected!, 'startCommand');
+      ?.options.find(item => item.architecture === 'x64');
+    const spyInstall = jest.spyOn(optionSelected, 'installCommand');
+    const spyStart = jest.spyOn(optionSelected, 'startCommand');
 
     act(() => {
       selectOS({
