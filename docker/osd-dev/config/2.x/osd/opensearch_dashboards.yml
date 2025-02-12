@@ -9,9 +9,6 @@ opensearch.ssl.verificationMode: certificate
 opensearch.requestHeadersAllowlist: ['securitytenant', 'Authorization']
 #
 opensearch_security.multitenancy.enabled: false
-uiSettings:
-  overrides:
-    'home:useNewHomePage': true
 opensearch_security.readonly_mode.roles: ['kibana_read_only']
 server.ssl.enabled: true
 server.ssl.key: '/home/node/kbn/certs/osd.key'
