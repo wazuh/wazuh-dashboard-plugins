@@ -197,7 +197,7 @@ async function main(input) {
 
     configuration = {
       // Default values
-      branch: 'master',
+      branch: 'main',
       'wazuh-dashboard': 'https://localhost:5601',
       'wazuh-indexer': 'https://localhost:9200',
       username: 'admin',
