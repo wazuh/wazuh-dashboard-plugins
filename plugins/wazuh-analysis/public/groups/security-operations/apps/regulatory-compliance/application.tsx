@@ -4,11 +4,9 @@ import ReactDOM from 'react-dom';
 import { SecurityOperationsNavGroup } from '../..';
 import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
-import {
-  REGULATORY_COMPLIANCE_ID,
-  SECURITY_OPERATIONS_TITLE,
-} from '../../constants';
+import { SECURITY_OPERATIONS_TITLE } from '../../constants';
 import { RegulatoryComplianceApp } from './regulatory-compliance-app';
+import { REGULATORY_COMPLIANCE_ID } from './constants';
 
 export const renderApp = async (params: AppMountParameters) => {
   const items = createSideNavItems({
