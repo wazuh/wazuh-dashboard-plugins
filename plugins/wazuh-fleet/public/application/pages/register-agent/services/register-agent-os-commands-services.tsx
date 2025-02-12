@@ -129,15 +129,16 @@ export const getWindowsInstallCommand = (
 
   return [
     // `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\wazuh-agent;`, // TODO: enable when the packages are publically hosted
-    `msiexec.exe /i $env:tmp\\wazuh-agent --register-agent ${
+    // https://stackoverflow.com/questions/1673967/how-to-run-an-exe-file-in-powershell-with-parameters-with-spaces-and-quotes
+    `msiexec.exe /i $env:tmp\\wazuh-agent /q;& 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${
       optionals && getAllOptionals(optionals, name)
-    } /q`,
+    }`,
   ].join(' ');
 };
 
 export const getWindowsStartCommand = (
   _props: TOSEntryProps<TOptionalParameters>,
-) => `NET START WazuhSvc`;
+) => `NET START 'Wazuh Agent'`;
 
 /** ****** MacOS ********/
 
