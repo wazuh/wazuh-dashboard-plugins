@@ -16,10 +16,11 @@ import {
 } from '@elastic/eui';
 import { Agent } from '../../../../common/types';
 import { AgentResume } from '../details/resume';
-import { getCore } from '../../../plugin-services';
+import { getAgentManagement, getCore } from '../../../plugin-services';
 import NavigationService from '../../../react-services/navigation-service';
 import { enrollmentAgent } from '../../common/views';
 import { TableIndexer } from '../../common/table-indexer/table-indexer';
+import { ConfirmModal } from '../../common/confirm-modal/confirm-modal';
 import { agentsTableColumns } from './columns';
 import { AgentsVisualizations } from './visualizations';
 
@@ -32,6 +33,7 @@ export const AgentList = (props: AgentListProps) => {
   const { indexPatterns, filters } = props;
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [agent, setAgent] = useState<Agent>();
 
   const closeActions = () => {
@@ -40,6 +42,18 @@ export const AgentList = (props: AgentListProps) => {
 
   const navigateToDeployNewAgent = () => {
     NavigationService.getInstance().navigate(enrollmentAgent.path);
+  };
+
+  const closeModal = () => {
+    setIsDeleteModalVisible(false);
+    setAgent(undefined);
+  };
+
+  const confirmDelete = () => {
+    if (agent) {
+      getAgentManagement().delete(agent.agent.id);
+      closeModal();
+    }
   };
 
   return (
@@ -120,6 +134,7 @@ export const AgentList = (props: AgentListProps) => {
           columns={agentsTableColumns({
             setIsFlyoutAgentVisible: setIsFlyoutVisible,
             setAgent,
+            setIsDeleteModalVisible,
           })}
           tableProps={{
             hasActions: true,
@@ -130,6 +145,17 @@ export const AgentList = (props: AgentListProps) => {
           }}
         />
       ) : null}
+      {isDeleteModalVisible && (
+        <ConfirmModal
+          isVisible={isDeleteModalVisible}
+          title='Delete agent'
+          message='Are you sure you want to delete this agent?'
+          onConfirm={confirmDelete}
+          onCancel={closeModal}
+          confirmButtonText='Delete'
+          buttonColor='danger'
+        />
+      )}
       {isFlyoutVisible ? (
         <EuiFlyout
           ownFocus

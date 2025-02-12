@@ -11,9 +11,11 @@ import { Agent } from '../../../../../common/types';
 export const agentsTableActions = ({
   setIsFlyoutAgentVisible,
   setAgent,
+  setIsDeleteModalVisible,
 }: {
   setIsFlyoutAgentVisible: (isVisible: boolean) => void;
   setAgent: (agent: Agent) => void;
+  setIsDeleteModalVisible: (isVisible: boolean) => void;
 }) =>
   // allowEditGroups: boolean,
   // allowUpgrade: boolean,
@@ -38,6 +40,18 @@ export const agentsTableActions = ({
       // NavigationService.getInstance().navigateToApp(endpointSummary.id, {
       //   path: `#/agents?tab=welcome&agent=${agent.id}`,
       // }),
+    },
+    {
+      name: 'Delete agent',
+      description: 'Delete agent',
+      icon: 'trash',
+      type: 'icon',
+      isPrimary: true,
+      color: 'danger',
+      onClick: (agent: Agent) => {
+        setAgent(agent);
+        setIsDeleteModalVisible(true);
+      },
     },
     {
       name: 'Agent configuration',

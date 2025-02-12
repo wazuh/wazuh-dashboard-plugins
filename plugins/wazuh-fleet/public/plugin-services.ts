@@ -8,3 +8,5 @@ export const [getPlugins, setPlugins] =
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
 export const [getWazuhCore, setWazuhCore] =
   createGetterSetter<WazuhCorePluginStart>('WazuhCore');
+export const [getAgentManagement, setAgentManagement] =
+  createGetterSetter('AgentManagement');

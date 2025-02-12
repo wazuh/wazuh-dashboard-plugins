@@ -1,6 +1,7 @@
+import { setAgentManagement } from '../plugin-services';
 import { AppSetup } from './types';
 
-export function appSetup({ registerApp }: AppSetup) {
+export function appSetup({ registerApp, agentManagement }: AppSetup) {
   registerApp({
     id: 'wazuh-fleet',
     title: 'Fleet management',
@@ -25,4 +26,6 @@ export function appSetup({ registerApp }: AppSetup) {
     //   ({ id: categoryID }) => categoryID === category,
     // ),
   });
+
+  setAgentManagement(agentManagement);
 }

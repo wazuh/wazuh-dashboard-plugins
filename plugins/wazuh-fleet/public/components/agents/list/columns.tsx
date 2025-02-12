@@ -15,9 +15,11 @@ import { agentsTableActions } from './actions/actions';
 export const agentsTableColumns = ({
   setIsFlyoutAgentVisible,
   setAgent,
+  setIsDeleteModalVisible,
 }: {
   setIsFlyoutAgentVisible: (isVisible: boolean) => void;
   setAgent: (agent: Agent) => void;
+  setIsDeleteModalVisible: (isVisible: boolean) => void;
 }) => [
   {
     field: 'agent.name',
@@ -117,6 +119,10 @@ export const agentsTableColumns = ({
     field: 'actions',
     name: 'Actions',
     show: true,
-    actions: agentsTableActions({ setIsFlyoutAgentVisible, setAgent }),
+    actions: agentsTableActions({
+      setIsFlyoutAgentVisible,
+      setAgent,
+      setIsDeleteModalVisible,
+    }),
   },
 ];
