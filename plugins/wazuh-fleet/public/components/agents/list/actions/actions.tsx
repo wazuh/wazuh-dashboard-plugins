@@ -8,19 +8,27 @@
 
 import { Agent } from '../../../../../common/types';
 
+export interface AgentsTableGlobalActionsProps {
+  setIsFlyoutAgentVisible: (visible: boolean) => void;
+  setIsDeleteModalVisible: (visible: boolean) => void;
+  setIsEditGroupsVisible: (visible: boolean) => void;
+  setAgent: (agent: Agent) => void;
+  selectedAgents: Agent[];
+  allAgentsSelected: boolean;
+  allAgentsCount: number;
+  filters: any;
+  allowEditGroups: boolean;
+  allowUpgrade: boolean;
+}
+
 export const agentsTableActions = ({
   setIsFlyoutAgentVisible,
   setAgent,
   setIsDeleteModalVisible,
-}: {
-  setIsFlyoutAgentVisible: (isVisible: boolean) => void;
-  setAgent: (agent: Agent) => void;
-  setIsDeleteModalVisible: (isVisible: boolean) => void;
-}) =>
+  setIsEditGroupsVisible,
+}: AgentsTableGlobalActionsProps) =>
   // allowEditGroups: boolean,
   // allowUpgrade: boolean,
-  // setAgent: (agent: Agent) => void,
-  // setIsEditGroupsVisible: (visible: boolean) => void,
   // setIsUpgradeModalVisible: (visible: boolean) => void,
   // outdatedAgents: Agent[],
   [
@@ -71,12 +79,11 @@ export const agentsTableActions = ({
       description: 'Edit groups',
       icon: 'pencil',
       type: 'icon',
-      onClick: () => {},
-      // onClick: (agent: Agent) => {
-      //   setAgent(agent);
-      //   setIsEditGroupsVisible(true);
-      // },
-      // 'data-test-subj': 'action-groups',
+      onClick: (agent: Agent) => {
+        setAgent(agent);
+        setIsEditGroupsVisible(true);
+      },
+      'data-test-subj': 'action-groups',
       // enabled: () => allowEditGroups,
     },
     {

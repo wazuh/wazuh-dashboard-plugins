@@ -23,6 +23,7 @@ import { TableIndexer } from '../../common/table-indexer/table-indexer';
 import { ConfirmModal } from '../../common/confirm-modal/confirm-modal';
 import { agentsTableColumns } from './columns';
 import { AgentsVisualizations } from './visualizations';
+import { EditAgentGroupsModal } from './actions/edit-groups-modal';
 
 export interface AgentListProps {
   indexPatterns: any;
@@ -35,6 +36,9 @@ export const AgentList = (props: AgentListProps) => {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [agent, setAgent] = useState<Agent>();
+  const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [agentSelected, setAgentSelected] = useState<Agent[]>([]);
 
   const closeActions = () => {
     setIsActionsOpen(false);
@@ -42,6 +46,13 @@ export const AgentList = (props: AgentListProps) => {
 
   const navigateToDeployNewAgent = () => {
     NavigationService.getInstance().navigate(enrollmentAgent.path);
+  };
+
+  const onSelectionChange = (selectedItems: Agent[]) => {
+    setAgentSelected(selectedItems);
+    // if (selectedItems.length < agentList.totalItems) {
+    //   setAllAgentsSelected(false);
+    // }
   };
 
   const closeModal = () => {
@@ -135,16 +146,31 @@ export const AgentList = (props: AgentListProps) => {
             setIsFlyoutAgentVisible: setIsFlyoutVisible,
             setAgent,
             setIsDeleteModalVisible,
+            setIsEditGroupsVisible,
           })}
           tableProps={{
             hasActions: true,
             isSelectable: true,
+            itemId: 'agent',
             selection: {
-              onSelectionChange: () => {},
+              selectable: (agent: Agent) => agent.agent.status === 'active',
+              selectableMessage: selectable =>
+                selectable ? undefined : 'Agent is currently offline',
+              onSelectionChange: onSelectionChange,
             },
           }}
         />
       ) : null}
+      {isEditGroupsVisible && agent && (
+        <EditAgentGroupsModal
+          onClose={() => {
+            setIsEditGroupsVisible(false);
+            setAgent(undefined);
+          }}
+          reloadAgents={() => {}}
+          agent={agent}
+        />
+      )}
       {isDeleteModalVisible && (
         <ConfirmModal
           isVisible={isDeleteModalVisible}

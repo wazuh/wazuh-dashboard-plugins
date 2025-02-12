@@ -10,17 +10,17 @@ import {
 import { getCore } from '../../../plugin-services';
 import { Agent } from '../../../../common/types';
 import { AgentGroups, HostOS } from '../../common';
-import { agentsTableActions } from './actions/actions';
+import {
+  agentsTableActions,
+  AgentsTableGlobalActionsProps,
+} from './actions/actions';
 
 export const agentsTableColumns = ({
   setIsFlyoutAgentVisible,
   setAgent,
   setIsDeleteModalVisible,
-}: {
-  setIsFlyoutAgentVisible: (isVisible: boolean) => void;
-  setAgent: (agent: Agent) => void;
-  setIsDeleteModalVisible: (isVisible: boolean) => void;
-}) => [
+  setIsEditGroupsVisible,
+}: AgentsTableGlobalActionsProps) => [
   {
     field: 'agent.name',
     name: 'Name / ID',
@@ -123,6 +123,7 @@ export const agentsTableColumns = ({
       setIsFlyoutAgentVisible,
       setAgent,
       setIsDeleteModalVisible,
+      setIsEditGroupsVisible,
     }),
   },
 ];
