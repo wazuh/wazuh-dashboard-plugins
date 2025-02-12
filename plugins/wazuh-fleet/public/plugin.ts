@@ -5,7 +5,12 @@ import {
   WazuhFleetPluginSetup,
   WazuhFleetPluginStart,
 } from './types';
-import { setCore, setPlugins, setWazuhCore } from './plugin-services';
+import {
+  setCore,
+  setPlugins,
+  setToasts,
+  setWazuhCore,
+} from './plugin-services';
 import { appSetup } from './application';
 import NavigationService from './react-services/navigation-service';
 import { AgentManagement } from './services/agent-management';
@@ -30,6 +35,7 @@ export class WazuhFleetPlugin
     setCore(core);
     setPlugins(plugins);
     setWazuhCore(plugins.wazuhCore);
+    setToasts(core.notifications.toasts);
 
     return {};
   }
