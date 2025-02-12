@@ -16,19 +16,9 @@ export const THREAT_INTELLIGENCE_DESCRIPTION = i18n.translate(
       'Collect and analyze information about potential threats to inform security decisions.',
   },
 );
-export const THREAT_HUNTING_ID = buildSubAppId(
-  THREAT_INTELLIGENCE_ID,
-  'threat_hunting',
-);
 export const VULNERABILITY_DETECTION_ID = buildSubAppId(
   THREAT_INTELLIGENCE_ID,
   'vulnerability_detection',
-);
-export const THREAT_HUNTING_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${THREAT_HUNTING_ID}`,
-  {
-    defaultMessage: 'Threat Hunting',
-  },
 );
 export const VULNERABILITY_DETECTION_TITLE = i18n.translate(
   `${PLUGIN_ID}.category.${VULNERABILITY_DETECTION_ID}`,
