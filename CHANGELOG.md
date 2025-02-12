@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed rendering of rows in CDB list table when it starts with quotes [#7171](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7171)
 - Fixed width of long fields in the document detail flyout [#7206](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7206)
 - Fixed logging UI logs due to logger undefined property [#7267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7267)
+- Fixed TOP-5-SO filter management in Endpoints > Summary [#7278](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7278)
 
 ## Wazuh v4.11.0 - OpenSearch Dashboards 2.16.0 - Revision 01
 
