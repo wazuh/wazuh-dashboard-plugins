@@ -27,7 +27,7 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
       id: ENDPOINT_SECURITY_ID,
       title: ENDPOINT_SECURITY_TITLE,
       description: ENDPOINT_SECURITY_DESCRIPTION,
-      type: NavGroupType.SYSTEM
+      type: NavGroupType.SYSTEM,
     };
   },
 
