@@ -20,13 +20,9 @@ export const MALWARE_DETECTION_ID = buildSubAppId(
   ENDPOINT_SECURITY_ID,
   'malware_detection',
 );
-export const FIM_ID = buildSubAppId(ENDPOINT_SECURITY_ID, 'fim');
 export const MALWARE_DETECTION_TITLE = i18n.translate(
   `${PLUGIN_ID}.category.${MALWARE_DETECTION_ID}`,
   {
     defaultMessage: 'Malware Detection',
   },
 );
-export const FIM_TITLE = i18n.translate(`${PLUGIN_ID}.category.${FIM_ID}`, {
-  defaultMessage: 'File Integrity Monitoring',
-});

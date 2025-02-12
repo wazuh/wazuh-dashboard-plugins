@@ -5,16 +5,12 @@ import {
   AppNavLinkStatus,
   AppUpdater,
 } from '../../../../../src/core/public';
-import {
-  FIM_ID,
-  FIM_TITLE,
-  MALWARE_DETECTION_ID,
-  MALWARE_DETECTION_TITLE,
-} from './constants';
+import { MALWARE_DETECTION_ID, MALWARE_DETECTION_TITLE } from './constants';
 import {
   CONFIGURATION_ASSESSMENT_ID,
   CONFIGURATION_ASSESSMENT_TITLE,
 } from './apps/configuration-assesment/constants';
+import { FIM_ID, FIM_TITLE } from './apps/fim/constants';
 
 export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
   return [

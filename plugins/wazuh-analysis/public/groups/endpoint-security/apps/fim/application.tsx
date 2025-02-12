@@ -4,8 +4,9 @@ import ReactDOM from 'react-dom';
 import { EndpointSecurityNavGroup } from '../..';
 import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
-import { ENDPOINT_SECURITY_TITLE, FIM_ID } from '../../constants';
+import { ENDPOINT_SECURITY_TITLE } from '../../constants';
 import { FimApp } from './fim-app';
+import { FIM_ID } from './constants';
 
 export const renderApp = async (params: AppMountParameters) => {
   const items = createSideNavItems({

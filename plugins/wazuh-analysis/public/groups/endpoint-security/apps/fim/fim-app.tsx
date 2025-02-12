@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppMountParameters } from 'opensearch-dashboards/public';
-import { FIM_TITLE } from '../../constants';
+import { FIM_TITLE } from './constants';
 
 interface FimAppProps {
   params: AppMountParameters;
