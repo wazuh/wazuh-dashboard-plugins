@@ -4,11 +4,9 @@ import ReactDOM from 'react-dom';
 import { SecurityOperationsNavGroup } from '../..';
 import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
-import {
-  INCIDENT_RESPONSE_ID,
-  SECURITY_OPERATIONS_TITLE,
-} from '../../constants';
+import { SECURITY_OPERATIONS_TITLE } from '../../constants';
 import { IncidentResponseApp } from './incident-response-app';
+import { INCIDENT_RESPONSE_ID } from './constants';
 
 export const renderApp = async (params: AppMountParameters) => {
   const items = createSideNavItems({

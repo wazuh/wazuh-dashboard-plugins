@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppMountParameters } from 'opensearch-dashboards/public';
-import { INCIDENT_RESPONSE_TITLE } from '../../constants';
+import { INCIDENT_RESPONSE_TITLE } from './constants';
 
 interface IncidentResponseAppProps {
   params: AppMountParameters;

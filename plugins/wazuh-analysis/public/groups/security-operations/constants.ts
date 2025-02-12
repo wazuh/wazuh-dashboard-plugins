@@ -24,10 +24,6 @@ export const IT_HYGIENE_ID = buildSubAppId(
   SECURITY_OPERATIONS_ID,
   'it_hygiene',
 );
-export const INCIDENT_RESPONSE_ID = buildSubAppId(
-  SECURITY_OPERATIONS_ID,
-  'incident_response',
-);
 export const REGULATORY_COMPLIANCE_TITLE = i18n.translate(
   `${PLUGIN_ID}.category.${REGULATORY_COMPLIANCE_ID}`,
   {
@@ -38,11 +34,5 @@ export const IT_HYGIENE_TITLE = i18n.translate(
   `${PLUGIN_ID}.category.${IT_HYGIENE_ID}`,
   {
     defaultMessage: 'IT Hygiene',
-  },
-);
-export const INCIDENT_RESPONSE_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${INCIDENT_RESPONSE_ID}`,
-  {
-    defaultMessage: 'Incident Response',
   },
 );
