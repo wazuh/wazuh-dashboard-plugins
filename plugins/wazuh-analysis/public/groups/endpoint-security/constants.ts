@@ -16,21 +16,11 @@ export const ENDPOINT_SECURITY_DESCRIPTION = i18n.translate(
       'Advanced monitoring and protection for devices against security threats.',
   },
 );
-export const CONFIGURATION_ASSESSMENT_ID = buildSubAppId(
-  ENDPOINT_SECURITY_ID,
-  'configuration_assessment',
-);
 export const MALWARE_DETECTION_ID = buildSubAppId(
   ENDPOINT_SECURITY_ID,
   'malware_detection',
 );
 export const FIM_ID = buildSubAppId(ENDPOINT_SECURITY_ID, 'fim');
-export const CONFIGURATION_ASSESSMENT_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${CONFIGURATION_ASSESSMENT_ID}`,
-  {
-    defaultMessage: 'Configuration Assessment',
-  },
-);
 export const MALWARE_DETECTION_TITLE = i18n.translate(
   `${PLUGIN_ID}.category.${MALWARE_DETECTION_ID}`,
   {
