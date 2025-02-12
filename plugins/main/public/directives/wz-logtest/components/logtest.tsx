@@ -66,7 +66,7 @@ export const Logtest = compose(
   // Format the result of the Wazuh API response to an output similar one to the `wazuh-logtest` utility
   const formatResult = (result, alert, messages) => {
     // How to the `wazuh-logtest` utility logs the output:
-    // https://github.com/wazuh/wazuh/blob/master/framework/scripts/wazuh-logtest.py#L359-L397
+    // https://github.com/wazuh/wazuh/blob/v4.3.0/framework/scripts/wazuh-logtest.py#L359-L397
 
     const logging = [];
 

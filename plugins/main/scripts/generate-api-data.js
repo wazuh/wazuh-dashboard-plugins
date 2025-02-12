@@ -146,14 +146,14 @@ ${Object.keys(outputs)
   function displayExamples() {
     // TODO: examples
     console.log(`
-- Get API data from URL spec file and save to files (API branch master). Run from project root path.
-node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/master/api/api/spec/spec.yaml --output file --output-directory common/api-info
+- Get API data from URL spec file and save to files (API branch main). Run from project root path.
+node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/main/api/api/spec/spec.yaml --output file --output-directory common/api-info
 
 - Get API data from URL spec file using the plugin version and save to files. Run from project root path.
 node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/$(node -e \"console.log(require('./package.json').version.split('.').splice(0,2).join('.'))\")/api/api/spec/spec.yaml --output file --output-directory common/api-info
 
-- Unused: Get API data from spec file and print to stdout (API branch master). Run from project root path.
-node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/master/api/api/spec/spec.yaml --output stdout
+- Unused: Get API data from spec file and print to stdout (API branch main). Run from project root path.
+node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/main/api/api/spec/spec.yaml --output stdout
 
 `);
   }
