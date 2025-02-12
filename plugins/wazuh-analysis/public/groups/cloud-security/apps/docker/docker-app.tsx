@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppMountParameters } from 'opensearch-dashboards/public';
-import { DOCKER_TITLE } from '../../constants';
+import { DOCKER_TITLE } from './constants';
 
 interface DockerAppProps {
   params: AppMountParameters;

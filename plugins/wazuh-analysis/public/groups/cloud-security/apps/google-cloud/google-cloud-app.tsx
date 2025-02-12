@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppMountParameters } from 'opensearch-dashboards/public';
-import { GOOGLE_CLOUD_TITLE } from '../../constants';
+import { GOOGLE_CLOUD_TITLE } from './constants';
 
 interface GoogleCloudAppProps {
   params: AppMountParameters;

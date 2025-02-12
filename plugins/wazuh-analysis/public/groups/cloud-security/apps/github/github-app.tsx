@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppMountParameters } from 'opensearch-dashboards/public';
-import { GITHUB_TITLE } from '../../constants';
+import { GITHUB_TITLE } from './constants';
 
 interface GithubAppProps {
   params: AppMountParameters;

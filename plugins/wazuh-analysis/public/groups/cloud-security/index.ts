@@ -26,7 +26,7 @@ export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
       id: CLOUD_SECURITY_ID,
       title: CLOUD_SECURITY_TITLE,
       description: CLOUD_SECURITY_DESCRIPTION,
-      type: NavGroupType.SYSTEM
+      type: NavGroupType.SYSTEM,
     };
   },
 

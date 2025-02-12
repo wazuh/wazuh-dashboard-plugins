@@ -4,18 +4,14 @@ import {
   AppNavLinkStatus,
   AppUpdater,
 } from '../../../../../src/core/public';
+import { DOCKER_ID, DOCKER_TITLE } from './apps/docker/constants';
+import { AWS_ID, AWS_TITLE } from './apps/aws/constants';
 import {
-  AWS_ID,
-  AWS_TITLE,
-  DOCKER_ID,
-  DOCKER_TITLE,
-  GITHUB_ID,
-  GITHUB_TITLE,
   GOOGLE_CLOUD_ID,
   GOOGLE_CLOUD_TITLE,
-  OFFICE365_ID,
-  OFFICE365_TITLE,
-} from './constants';
+} from './apps/google-cloud/constants';
+import { GITHUB_ID, GITHUB_TITLE } from './apps/github/constants';
+import { OFFICE365_ID, OFFICE365_TITLE } from './apps/office-365/constants';
 
 export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
   return [

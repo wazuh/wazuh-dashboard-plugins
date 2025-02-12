@@ -3,9 +3,10 @@ import { AppMountParameters } from 'opensearch-dashboards/public';
 import ReactDOM from 'react-dom';
 import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
-import { AWS_ID, CLOUD_SECURITY_TITLE } from '../../constants';
+import { CLOUD_SECURITY_TITLE } from '../../constants';
 import { CloudSecurityNavGroup } from '../..';
 import { AwsApp } from './aws-app';
+import { AWS_ID } from './constants';
 
 export const renderApp = async (params: AppMountParameters) => {
   const items = createSideNavItems({

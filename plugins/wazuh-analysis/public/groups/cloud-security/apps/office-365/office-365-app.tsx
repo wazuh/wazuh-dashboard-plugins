@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppMountParameters } from 'opensearch-dashboards/public';
-import { OFFICE365_TITLE } from '../../constants';
+import { OFFICE365_TITLE } from './constants';
 
 interface Office365AppProps {
   params: AppMountParameters;
