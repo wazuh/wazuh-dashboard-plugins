@@ -1,7 +1,7 @@
 import { EuiSideNavItemType, htmlIdGenerator } from '@elastic/eui';
 import { App } from 'opensearch-dashboards/public';
 import { getCore } from '../plugin-services';
-import { Group } from './types';
+import { type Group } from '../../../wazuh-core/public/services/application/types';
 
 interface Options {
   group: Group<any>;
