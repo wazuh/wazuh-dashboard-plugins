@@ -5,7 +5,6 @@ import {
   WazuhFleetPluginSetup,
   WazuhFleetPluginStart,
 } from './types';
-import { FleetManagement } from './components';
 import { setCore, setPlugins, setWazuhCore } from './plugin-services';
 import { appSetup } from './application';
 import NavigationService from './react-services/navigation-service';
@@ -30,9 +29,7 @@ export class WazuhFleetPlugin
     setPlugins(plugins);
     setWazuhCore(plugins.wazuhCore);
 
-    return {
-      FleetManagement,
-    };
+    return {};
   }
 
   public stop() {}

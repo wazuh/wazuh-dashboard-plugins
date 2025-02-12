@@ -61,7 +61,7 @@ export const TableIndexer = (props: {
     setLoadingSearch(true);
     search({
       indexPattern: indexPatterns,
-      filters: searchBarProps.filters,
+      filters: searchBarProps.filters || [],
       query,
       pagination,
       sorting: {

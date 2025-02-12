@@ -13,8 +13,7 @@ import { summaryAgent, views } from './common/views';
 import { RouteComponent } from './common/route-component';
 
 export interface FleetManagementProps {
-  indexPattern: any;
-  // useTimeFilter: any;
+  indexPatterns: any;
 }
 
 export const FleetManagement = ({ ...restProps }: FleetManagementProps) => {
