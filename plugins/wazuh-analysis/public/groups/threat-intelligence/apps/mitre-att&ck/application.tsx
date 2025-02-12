@@ -4,8 +4,9 @@ import ReactDOM from 'react-dom';
 import { ThreatIntelligenceNavGroup } from '../..';
 import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
-import { MITRE_ATTACK_ID, THREAT_INTELLIGENCE_TITLE } from '../../constants';
+import { THREAT_INTELLIGENCE_TITLE } from '../../constants';
 import { MitreAttackApp } from './mitre-att&ck-app';
+import { MITRE_ATTACK_ID } from './constants';
 
 export const renderApp = async (params: AppMountParameters) => {
   const items = createSideNavItems({

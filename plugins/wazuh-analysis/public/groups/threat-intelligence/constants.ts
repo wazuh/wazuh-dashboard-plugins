@@ -24,10 +24,6 @@ export const VULNERABILITY_DETECTION_ID = buildSubAppId(
   THREAT_INTELLIGENCE_ID,
   'vulnerability_detection',
 );
-export const MITRE_ATTACK_ID = buildSubAppId(
-  THREAT_INTELLIGENCE_ID,
-  'mitre_attack',
-);
 export const THREAT_HUNTING_TITLE = i18n.translate(
   `${PLUGIN_ID}.category.${THREAT_HUNTING_ID}`,
   {
@@ -38,11 +34,5 @@ export const VULNERABILITY_DETECTION_TITLE = i18n.translate(
   `${PLUGIN_ID}.category.${VULNERABILITY_DETECTION_ID}`,
   {
     defaultMessage: 'Vulnerability Detection',
-  },
-);
-export const MITRE_ATTACK_TITLE = i18n.translate(
-  `${PLUGIN_ID}.category.${MITRE_ATTACK_ID}`,
-  {
-    defaultMessage: 'MITRE ATT&CK',
   },
 );

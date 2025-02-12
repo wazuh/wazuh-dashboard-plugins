@@ -5,13 +5,15 @@ import {
   AppUpdater,
 } from '../../../../../src/core/public';
 import {
-  MITRE_ATTACK_ID,
-  MITRE_ATTACK_TITLE,
   THREAT_HUNTING_ID,
   THREAT_HUNTING_TITLE,
   VULNERABILITY_DETECTION_ID,
   VULNERABILITY_DETECTION_TITLE,
 } from './constants';
+import {
+  MITRE_ATTACK_ID,
+  MITRE_ATTACK_TITLE,
+} from './apps/mitre-att&ck/constants';
 
 export function getThreatIntelligenceApps(updater$?: Subject<AppUpdater>) {
   return [
