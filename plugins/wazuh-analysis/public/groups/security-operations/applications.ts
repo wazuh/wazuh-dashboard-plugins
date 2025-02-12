@@ -5,8 +5,6 @@ import {
   AppUpdater,
 } from '../../../../../src/core/public';
 import {
-  IT_HYGIENE_ID,
-  IT_HYGIENE_TITLE,
   REGULATORY_COMPLIANCE_ID,
   REGULATORY_COMPLIANCE_TITLE,
 } from './constants';
@@ -14,6 +12,7 @@ import {
   INCIDENT_RESPONSE_ID,
   INCIDENT_RESPONSE_TITLE,
 } from './apps/incident-response/constants';
+import { IT_HYGIENE_ID, IT_HYGIENE_TITLE } from './apps/it-hygiene/constants';
 
 export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
   return [
