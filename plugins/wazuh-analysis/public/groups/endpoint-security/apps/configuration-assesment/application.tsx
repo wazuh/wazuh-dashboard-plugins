@@ -4,11 +4,9 @@ import ReactDOM from 'react-dom';
 import { EndpointSecurityNavGroup } from '../..';
 import { Layout } from '../../../layout';
 import { createSideNavItems } from '../../../side-nav';
-import {
-  CONFIGURATION_ASSESSMENT_ID,
-  ENDPOINT_SECURITY_TITLE,
-} from '../../constants';
+import { ENDPOINT_SECURITY_TITLE } from '../../constants';
 import { ConfigurationAssessmentApp } from './configuration-assesment-app';
+import { CONFIGURATION_ASSESSMENT_ID } from './constants';
 
 export const renderApp = async (params: AppMountParameters) => {
   const items = createSideNavItems({
