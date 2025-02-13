@@ -7,7 +7,6 @@ import {
   ChromeRegistrationNavLink,
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
-import { getCore } from '../../plugin-services';
 import { Group } from '../../../../wazuh-core/public/services/application/types';
 import { getEndpointSecurityApps } from './applications';
 import {
@@ -34,13 +33,7 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
       id: ENDPOINT_SECURITY_ID,
       title: ENDPOINT_SECURITY_TITLE,
       category: CATEGORY,
-      mount: async (_params: AppMountParameters) => {
-        if (!getCore().chrome.navGroup.getNavGroupEnabled()) {
-          getCore().application.navigateToApp(getEndpointSecurityApps()[0].id);
-        }
-
-        return () => {};
-      },
+      mount: async (_params: AppMountParameters) => () => {},
     };
   },
 

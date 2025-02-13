@@ -146,7 +146,7 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  private modifyAppGroupMount(app: App) {
+  private modifyAppGroupMount(app: App, subApps: App[]) {
     this.logger?.debug(`${this.modifyAppGroupMount.name} [AppId: ${app.id}]`);
 
     const navGroupId = this.getNavGroupId(app.id);
@@ -154,6 +154,10 @@ export class ApplicationService {
     const beforeMount = () => {
       this.getAppUpdater(navGroupId).next(this.setNavLinkVisible);
       this.appStartup$.next(navGroupId);
+
+      if (!getCore().chrome.navGroup.getNavGroupEnabled()) {
+        getCore().application.navigateToApp(subApps[0].id);
+      }
     };
 
     this.modifyMount(app, { beforeMount });
@@ -238,10 +242,10 @@ export class ApplicationService {
     }
   }
 
-  private registerAppGroup(appGroup: App) {
+  private registerAppGroup(appGroup: App, subApps: App[]) {
     this.logger?.debug(`${this.registerAppGroup.name} [AppId: ${appGroup.id}]`);
     this.registerAppUpdater(appGroup.id);
-    this.modifyAppGroupMount(appGroup);
+    this.modifyAppGroupMount(appGroup, subApps);
     this.coreSetup.application.register(appGroup);
   }
 
@@ -270,7 +274,7 @@ export class ApplicationService {
       `${this.registerNavGroup.name} [NavGroupId: ${navGroup.getId()}]`,
     );
     this.assignNavLinksToChromeGroups(navGroup);
-    this.registerAppGroup(navGroup.getAppGroup());
+    this.registerAppGroup(navGroup.getAppGroup(), navGroup.getApps());
   }
 
   /**

@@ -6,7 +6,6 @@ import {
   ChromeRegistrationNavLink,
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
-import { getCore } from '../../plugin-services';
 import { Group } from '../../../../wazuh-core/public/services/application/types';
 import { getSecurityOperationsApps } from './applications';
 import {
@@ -34,15 +33,7 @@ export const SecurityOperationsNavGroup: Group<typeof SECURITY_OPERATIONS_ID> =
         id: SECURITY_OPERATIONS_ID,
         title: SECURITY_OPERATIONS_TITLE,
         category: CATEGORY,
-        mount: async (_params: AppMountParameters) => {
-          if (!getCore().chrome.navGroup.getNavGroupEnabled()) {
-            getCore().application.navigateToApp(
-              getSecurityOperationsApps()[0].id,
-            );
-          }
-
-          return () => {};
-        },
+        mount: async (_params: AppMountParameters) => () => {},
       };
     },
 
