@@ -9,6 +9,10 @@ import { ConfigurationStore } from '../common/services/configuration/configurati
 import { EConfigurationProviders } from '../common/constants';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
+import {
+  IndexerQueryManagerFactory,
+  QueryManagerRegistry,
+} from '../common/services/query-manager';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
 import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
@@ -126,6 +130,16 @@ export class WazuhCorePlugin
       useLoadingLogo: () =>
         this.runtime.start.serverSecurityDeps.chrome.logos.AnimatedMark,
     });
+
+    // query manager registrations
+    const queryManagerRegistryService = QueryManagerRegistry.getInstance();
+    const indexerQueryManagerFactory = new IndexerQueryManagerFactory();
+
+    queryManagerRegistryService.register(
+      'core-query-manager',
+      indexerQueryManagerFactory,
+    );
+    this.services.queryManagerRegistry = queryManagerRegistryService;
 
     return {
       ...this.services,
