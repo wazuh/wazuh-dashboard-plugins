@@ -600,16 +600,6 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     //   SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
     // ),
   },
-  'enrollment.password': {
-    title: 'Enrollment password',
-    description:
-      'Specifies the password used to authenticate during the agent enrollment.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: '',
-    validate: SettingsValidator.compose(SettingsValidator.isString),
-  },
   hideManagerAlerts: {
     title: 'Hide manager alerts',
     description: 'Hide the alerts of the manager in every dashboard.',
@@ -1021,7 +1011,6 @@ export const CRON_PREFIX = 'cron.prefix';
 export const CUSTOMIZATION_ENABLED = 'customization.enabled';
 
 export const ENROLLMENT_DNS = 'enrollment.dns';
-export const ENROLLMENT_PASSWORD = 'enrollment.password';
 
 export const IP_IGNORE = 'ip.ignore';
 export const IP_SELECTOR = 'ip.selector';
