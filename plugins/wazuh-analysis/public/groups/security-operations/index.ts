@@ -4,7 +4,6 @@ import {
   AppMountParameters,
   AppUpdater,
   ChromeRegistrationNavLink,
-  NavGroupType,
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { getCore } from '../../plugin-services';
@@ -27,7 +26,6 @@ export const SecurityOperationsNavGroup: Group<typeof SECURITY_OPERATIONS_ID> =
         id: SECURITY_OPERATIONS_ID,
         title: SECURITY_OPERATIONS_TITLE,
         description: SECURITY_OPERATIONS_DESCRIPTION,
-        type: NavGroupType.SYSTEM,
       };
     },
 

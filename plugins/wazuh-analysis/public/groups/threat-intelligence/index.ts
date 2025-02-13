@@ -4,7 +4,6 @@ import {
   AppMountParameters,
   AppUpdater,
   ChromeRegistrationNavLink,
-  NavGroupType,
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { getCore } from '../../plugin-services';
@@ -27,7 +26,6 @@ export const ThreatIntelligenceNavGroup: Group<typeof THREAT_INTELLIGENCE_ID> =
         id: THREAT_INTELLIGENCE_ID,
         title: THREAT_INTELLIGENCE_TITLE,
         description: THREAT_INTELLIGENCE_DESCRIPTION,
-        type: NavGroupType.SYSTEM,
       };
     },
 

@@ -11,6 +11,7 @@ import {
   CoreStart,
   DEFAULT_NAV_GROUPS,
   NavGroupItemInMap,
+  NavGroupType,
 } from '../../../../../src/core/public';
 import { searchPages } from '../../components/global_search/search-pages-command';
 import { getCore } from '../../plugin-services';
@@ -251,8 +252,12 @@ export class ApplicationService {
     this.coreSetup.chrome.navGroup.addNavLinksToGroup(DEFAULT_NAV_GROUPS.all, [
       navGroup.getGroupNavLink(),
     ]);
+
+    const navGroupChromeGroup = navGroup.getNavGroup();
+
+    navGroupChromeGroup.type = NavGroupType.SYSTEM;
     this.coreSetup.chrome.navGroup.addNavLinksToGroup(
-      navGroup.getNavGroup(),
+      navGroupChromeGroup,
       navGroup.getAppsNavLinks(),
     );
   }
