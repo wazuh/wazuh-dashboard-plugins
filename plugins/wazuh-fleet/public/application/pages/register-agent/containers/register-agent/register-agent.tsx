@@ -33,7 +33,7 @@ export const RegisterAgent = compose(
   //     text: endpointSummary.breadcrumbLabel,
   //     href: `#${endpointSummary.redirectTo()}`,
   //   },
-  //   { text: 'Deploy new agent' },
+  //   { text: 'Enroll new agent' },
   // ]),
   // withUserAuthorizationPrompt([
   //   [{ action: 'agent:create', resource: '*:*:*' }],
@@ -137,7 +137,7 @@ export const RegisterAgent = compose(
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle size='s'>
-                      <h1>Deploy new agent</h1>
+                      <h1>Enroll new agent</h1>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>
