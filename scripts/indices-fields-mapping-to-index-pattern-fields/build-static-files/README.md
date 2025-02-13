@@ -11,7 +11,7 @@ fields for the Wazuh indices using different approaches:
 ## Usage
 
 ```console
-node build-static-files-get-from-wildcard.js --branch master
+node build-static-files-get-from-wildcard.js --branch main
 ```
 
 By default, this should move the static files to `plugins/wazuh-core/server/initialization/index-pattern-fields` directory that are used to define the initialization tasks related to index patterns.
@@ -26,7 +26,7 @@ This tool uses under the hood the [CLI](../README.md).
 ## Usage
 
 ```console
-node build-static-files-get-from-wildcard.js --branch master
+node build-static-files-get-from-wildcard.js --branch main
 ```
 
 By default, this should move the static files to `plugins/wazuh-core/server/initialization/index-pattern-fields` directory that are used to define the initialization tasks related to index patterns.
