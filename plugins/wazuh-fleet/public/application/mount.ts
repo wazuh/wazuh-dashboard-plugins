@@ -1,6 +1,7 @@
+import { setEnrollAgentManagement } from '../plugin-services';
 import { AppSetup } from './types';
 
-export function appSetup({ registerApp }: AppSetup) {
+export function appSetup({ registerApp, enrollmentAgentManagement }: AppSetup) {
   registerApp({
     id: 'wazuh-fleet',
     title: 'Fleet management',
@@ -25,4 +26,7 @@ export function appSetup({ registerApp }: AppSetup) {
     //   ({ id: categoryID }) => categoryID === category,
     // ),
   });
+
+  // TODO: This setter should be local to fleet management instead of using the related to the plugin itself. This approach was done because the integration of FleetManagement is using another setter from plugin-services.
+  setEnrollAgentManagement(enrollmentAgentManagement);
 }

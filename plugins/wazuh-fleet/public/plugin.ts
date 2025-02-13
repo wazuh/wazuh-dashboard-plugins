@@ -5,7 +5,7 @@ import {
   WazuhFleetPluginStart,
 } from './types';
 import { FleetManagement } from './components';
-import { setCore, setPlugins, setWazuhCore } from './plugin-services';
+import { getCore, setCore, setPlugins, setWazuhCore } from './plugin-services';
 import { appSetup } from './application';
 
 export class WazuhFleetPlugin
@@ -14,6 +14,16 @@ export class WazuhFleetPlugin
   public setup(core: CoreSetup): WazuhFleetPluginSetup {
     appSetup({
       registerApp: app => core.application.register(app),
+      enrollmentAgentManagement: {
+        async getServerAddress() {
+          // TODO: this should be replaced by getWazuhCore().configuration.get that in the current state does not return the setting because this is filtering by settings with the category 'wazuhCore'.
+          return getCore().uiSettings.get('enrollment.dns');
+        },
+        async setServerAddress(url) {
+          // TODO: this should be replaced by getWazuhCore().configuration.set that is not implemented
+          return await getCore().uiSettings.set('enrollment.dns', url);
+        },
+      },
     });
 
     return {};

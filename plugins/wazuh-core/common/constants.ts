@@ -594,10 +594,11 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
-    ),
+    // TODO: this should be enabled when the configuration service of core plugin provides a mechanism to retrieve this definition to be used in the enrollment agent wizard. See https://github.com/wazuh/wazuh-dashboard/issues/514#issuecomment-2656602679
+    // validate: SettingsValidator.compose(
+    //   SettingsValidator.isString,
+    //   SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
+    // ),
   },
   'enrollment.password': {
     title: 'Enrollment password',

@@ -8,3 +8,7 @@ export const [getPlugins, setPlugins] =
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
 export const [getWazuhCore, setWazuhCore] =
   createGetterSetter<WazuhCorePluginStart>('WazuhCore');
+export const [getEnrollAgentManagement, setEnrollAgentManagement] =
+  createGetterSetter<WazuhCorePluginStart>(
+    'fleetManagementEnrollmentAgentManagement',
+  );
