@@ -1,32 +1,240 @@
-### **General Plugin Structure and Functionality**
+# **General Plugin Structure and Functionality**
 
 A **plugin** in this context follows a **modular and organized structure**, dividing its functionalities into **thematic groups**. Each group contains specific applications, each with its own logic and components.
 
-📂 **groups/** _(Folder containing different security areas)_
-├── 📂 **<group-name>/** _(Example: cloud-security, endpoint-security, etc.)_
-│ . ├── 📂 **apps/** _(Contains the applications within this group)_
-│ . │ . └── 📂 **<app-name>/** _(Example: aws, docker, fim, etc.)_
-│ . │ . . . ├── 📄 `application.tsx` _(Mounts the app and configures the UI)_
-│ . │ . . . └── 📄 `<app-name>-app.tsx` _(Main React component for the app)_
-│ . ├── 📄 `applications.ts` _(Lists available apps within the group)_
-│ . ├── 📄 `constants.ts` _(Defines IDs, titles, and other constant values)_
-│ . └── 📄 `index.ts` _(Exports the group)_
-├── 📄 `category.ts` _(Defines app categories for the UI)_
-├── 📄 `layout.tsx` _(Handles the general visual structure of the plugin)_
-├── 📄 `side-nav.tsx` _(Configures the sidebar navigation items based on the groups and their apps)_
-└── 📄 `types.ts` _(Defines TypeScript types for consistency and structure)_
+Here’s a step-by-step guide on how to **create a new plugin** with **groups and applications**, using snippets based on the provided structure.
 
 ---
 
-### **Example of a Group and its Application**
+## **1️⃣ Creating the Plugin Structure**
 
-Let’s take the **endpoint-security** group and an application called **malware-detection** as an example:
+```
+📂 **`plugins/my-security-plugin/`** _(Root directory of the plugin)_
+│── 📂 `public/` _(Frontend-related code)_
+│ │── 📂 `groups/` _(Contains the different security-related groups)_
+│ │ │── 📂 `network-security/` _(New group: Network Security)_
+│ │ │ │── 📂 `apps/` _(Contains the individual applications in this group)_
+│ │ │ │ │── 📂 `firewall-monitoring/` _(First app: Firewall Monitoring)_
+│ │ │ │ │ │── 📄 `application.tsx` _(App entry point and rendering logic)_
+│ │ │ │ │ │── 📄 `firewall-monitoring-app.tsx` _(Main React component for the app)_
+│ │ │ │ │ │── 📄 `constants.ts` _(App-specific constants, titles, and IDs)_
+│ │ │ │ │── 📂 `network-anomaly-detection/` _(Second app: Network Anomaly Detection)_
+│ │ │ │ │ │── 📄 `application.tsx`
+│ │ │ │ │ │── 📄 `network-anomaly-detection-app.tsx`
+│ │ │ │ │ │── 📄 `constants.ts`
+│ │ │ │── 📄 `applications.ts` _(Registers all apps in this group)_
+│ │ │ │── 📄 `constants.ts` _(Defines the group ID, title, and description)_
+│ │ │ │── 📄 `index.ts` _(Registers the group and navigation details)_
+│ │── 📄 `category.ts` _(Defines categories for grouping apps in UI)_
+│ │── 📄 `layout.tsx` _(Handles UI layout and sidebar navigation)_
+```
 
-📂 **endpoint-security/**
-├── 📂 **apps/**
-│ . ├── 📂 **malware-detection/**
-│ . ├── 📄 `application.tsx` _(Mounts the app and defines internal navigation)_
-│ . └── 📄 `malware-detection-app.tsx` _(Contains the main UI and logic for the app)_
-├── 📄 `applications.ts` _(Lists all apps within endpoint-security)_
-├── 📄 `constants.ts` _(Stores app IDs and text labels for this group)_
-└── 📄 `index.ts` _(Exports the group for use)_
+---
+
+## **2️⃣ Creating a Group: `network-security`**
+
+A **group** represents a **category** of related applications.
+
+📌 **File:** `public/groups/network-security/constants.ts`
+
+```ts
+import { i18n } from '@osd/i18n';
+import { PLUGIN_ID } from '../../../common/constants';
+
+export const NETWORK_SECURITY_ID = 'network_security';
+export const NETWORK_SECURITY_TITLE = i18n.translate(
+  `${PLUGIN_ID}.category.${NETWORK_SECURITY_ID}`,
+  { defaultMessage: 'Network Security' },
+);
+export const NETWORK_SECURITY_DESCRIPTION = i18n.translate(
+  `${PLUGIN_ID}.category.${NETWORK_SECURITY_ID}.description`,
+  { defaultMessage: 'Monitor and secure your network infrastructure.' },
+);
+```
+
+📌 **File:** `public/groups/network-security/index.ts`
+
+```ts
+import { Subject } from 'rxjs';
+import {
+  App,
+  AppMountParameters,
+  AppUpdater,
+  ChromeNavGroup,
+  ChromeRegistrationNavLink,
+} from '../../../../../src/core/public';
+import { CATEGORY } from '../category';
+import { Group } from '../../../../wazuh-core/public/services/application/types';
+import { getNetworkSecurityApps } from './applications';
+import {
+  NETWORK_SECURITY_DESCRIPTION,
+  NETWORK_SECURITY_ID,
+  NETWORK_SECURITY_TITLE,
+} from './constants';
+
+export const NetworkSecurityNavGroup: Group<typeof NETWORK_SECURITY_ID> = {
+  getId: () => NETWORK_SECURITY_ID,
+  getTitle: () => NETWORK_SECURITY_TITLE,
+  getDescription: () => NETWORK_SECURITY_DESCRIPTION,
+
+  getNavGroup(): ChromeNavGroup {
+    return {
+      id: NETWORK_SECURITY_ID,
+      title: NETWORK_SECURITY_TITLE,
+      description: NETWORK_SECURITY_DESCRIPTION,
+    };
+  },
+
+  getAppGroup(): App {
+    return {
+      id: NETWORK_SECURITY_ID,
+      title: NETWORK_SECURITY_TITLE,
+      category: CATEGORY,
+      mount: async (_params: AppMountParameters) => () => {},
+    };
+  },
+
+  getGroupNavLink(): ChromeRegistrationNavLink {
+    return {
+      id: NETWORK_SECURITY_ID,
+      title: NETWORK_SECURITY_TITLE,
+      category: CATEGORY,
+    };
+  },
+
+  getAppsNavLinks(): ChromeRegistrationNavLink[] {
+    return getNetworkSecurityApps().map(app => ({
+      id: app.id,
+      title: app.title,
+    }));
+  },
+
+  getApps(updater$?: Subject<AppUpdater>): App[] {
+    return getNetworkSecurityApps(updater$);
+  },
+};
+```
+
+---
+
+## **3️⃣ Creating an Application: `firewall-monitoring`**
+
+📌 **File:** `public/groups/network-security/apps/firewall-monitoring/constants.ts`
+
+```ts
+import { i18n } from '@osd/i18n';
+import { PLUGIN_ID } from '../../../../../common/constants';
+import { buildSubAppId } from '../../../../utils';
+import { NETWORK_SECURITY_ID } from '../../constants';
+
+export const FIREWALL_MONITORING_ID = buildSubAppId(
+  NETWORK_SECURITY_ID,
+  'firewall-monitoring',
+);
+export const FIREWALL_MONITORING_TITLE = i18n.translate(
+  `${PLUGIN_ID}.category.${FIREWALL_MONITORING_ID}`,
+  {
+    defaultMessage: 'Firewall Monitoring',
+  },
+);
+```
+
+📌 **File:** `public/groups/network-security/apps/firewall-monitoring/firewall-monitoring-app.tsx`
+
+```tsx
+import React from 'react';
+import { AppMountParameters } from 'opensearch-dashboards/public';
+import { FIREWALL_MONITORING_TITLE } from './constants';
+
+interface FirewallMonitoringProps {
+  params: AppMountParameters;
+}
+
+export const FirewallMonitoringApp = (_props: FirewallMonitoringProps) => (
+  <>{FIREWALL_MONITORING_TITLE} App</>
+);
+```
+
+📌 **File:** `public/groups/network-security/apps/firewall-monitoring/application.tsx`
+
+```tsx
+import React from 'react';
+import { AppMountParameters } from 'opensearch-dashboards/public';
+import ReactDOM from 'react-dom';
+import { NetworkSecurityNavGroup } from '../..';
+import { Layout } from '../../../layout';
+import { createSideNavItems } from '../../../side-nav';
+import { NETWORK_SECURITY_TITLE } from '../../constants';
+import { FirewallMonitoringApp } from './firewall-monitoring-app';
+import { FIREWALL_MONITORING_ID } from './constants';
+
+export const renderApp = async (params: AppMountParameters) => {
+  const items = createSideNavItems({
+    group: NetworkSecurityNavGroup,
+    selectedAppId: FIREWALL_MONITORING_ID,
+  });
+
+  ReactDOM.render(
+    <Layout aria-label={NETWORK_SECURITY_TITLE} items={items}>
+      <FirewallMonitoringApp params={params} />
+    </Layout>,
+    params.element,
+  );
+
+  return () => ReactDOM.unmountComponentAtNode(params.element);
+};
+```
+
+---
+
+## **4️⃣ Registering Applications in the Group**
+
+📌 **File:** `public/groups/network-security/applications.ts`
+
+```ts
+import { Subject } from 'rxjs';
+import {
+  App,
+  AppMountParameters,
+  AppNavLinkStatus,
+  AppUpdater,
+} from '../../../../../src/core/public';
+import {
+  FIREWALL_MONITORING_ID,
+  FIREWALL_MONITORING_TITLE,
+} from './apps/firewall-monitoring/constants';
+
+export function getNetworkSecurityApps(updater$?: Subject<AppUpdater>): App[] {
+  return [
+    {
+      id: FIREWALL_MONITORING_ID,
+      title: FIREWALL_MONITORING_TITLE,
+      navLinkStatus: AppNavLinkStatus.hidden,
+      updater$,
+      mount: async (params: AppMountParameters) => {
+        const { renderApp } = await import(
+          './apps/firewall-monitoring/application'
+        );
+        return await renderApp(params);
+      },
+    },
+  ];
+}
+```
+
+---
+
+## **5️⃣ Updating `category.ts` to Include the New Group**
+
+📌 **File:** `public/groups/category.ts`
+
+```ts
+import { AppCategory } from 'opensearch-dashboards/public';
+import { PLUGIN_TITLE, PLUGIN_ID } from '../../common/constants';
+
+export const CATEGORY: AppCategory = Object.freeze({
+  id: PLUGIN_ID,
+  label: PLUGIN_TITLE,
+  order: 5000,
+});
+```
