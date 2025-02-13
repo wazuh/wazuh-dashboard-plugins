@@ -12,13 +12,8 @@ export interface AgentsTableGlobalActionsProps {
   setIsFlyoutAgentVisible: (visible: boolean) => void;
   setIsDeleteModalVisible: (visible: boolean) => void;
   setIsEditGroupsVisible: (visible: boolean) => void;
+  setIsUpgradeModalVisible: (visible: boolean) => void;
   setAgent: (agent: Agent) => void;
-  selectedAgents: Agent[];
-  allAgentsSelected: boolean;
-  allAgentsCount: number;
-  filters: any;
-  allowEditGroups: boolean;
-  allowUpgrade: boolean;
 }
 
 export const agentsTableActions = ({
@@ -26,6 +21,7 @@ export const agentsTableActions = ({
   setAgent,
   setIsDeleteModalVisible,
   setIsEditGroupsVisible,
+  setIsUpgradeModalVisible,
 }: AgentsTableGlobalActionsProps) =>
   // allowEditGroups: boolean,
   // allowUpgrade: boolean,
@@ -91,12 +87,11 @@ export const agentsTableActions = ({
       description: 'Upgrade',
       icon: 'package',
       type: 'icon',
-      onClick: () => {},
-      // onClick: agent => {
-      //   setAgent(agent);
-      //   setIsUpgradeModalVisible(true);
-      // },
-      // 'data-test-subj': 'action-upgrade',
+      onClick: (agent: Agent) => {
+        setAgent(agent);
+        setIsUpgradeModalVisible(true);
+      },
+      'data-test-subj': 'action-upgrade',
       // enabled: agent => {
       //   const isOutdated = !!outdatedAgents.find(
       //     outdatedAgent => outdatedAgent.id === agent.id,

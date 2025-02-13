@@ -20,6 +20,7 @@ export const agentsTableColumns = ({
   setAgent,
   setIsDeleteModalVisible,
   setIsEditGroupsVisible,
+  setIsUpgradeModalVisible,
 }: AgentsTableGlobalActionsProps) => [
   {
     field: 'agent.name',
@@ -124,6 +125,7 @@ export const agentsTableColumns = ({
       setAgent,
       setIsDeleteModalVisible,
       setIsEditGroupsVisible,
+      setIsUpgradeModalVisible,
     }),
   },
 ];

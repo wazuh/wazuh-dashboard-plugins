@@ -2,8 +2,26 @@ import { IAgentManagement } from '../application/types';
 import { getToasts } from '../plugin-services';
 
 export const AgentManagement = (): IAgentManagement => {
+  const getAll = () => {
+    console.log('Get all');
+
+    return [];
+  };
+
+  const getByAgentId = (id: string) => {
+    console.log(`Get by agent id ${id}`);
+
+    return;
+  };
+
   const deleteAgent = (id: string) => {
     console.log(`Delete ${id}`);
+    getToasts().add({
+      color: 'primary',
+      title: 'Agent deleted',
+      text: 'Agent deleted successfully',
+      toastLifeTimeMs: 3000,
+    });
   };
 
   const upgradeAgent = (id: string) => {
@@ -25,6 +43,8 @@ export const AgentManagement = (): IAgentManagement => {
   };
 
   return {
+    getAll: async () => await getAll(),
+    getByAgentId: async (id: string) => await getByAgentId(id),
     delete: async (id: string) => await deleteAgent(id),
     upgrade: async (id: string) => await upgradeAgent(id),
     editName: async (id: string) => await editAgentName(id),

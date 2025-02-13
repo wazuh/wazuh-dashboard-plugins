@@ -24,6 +24,7 @@ import { ConfirmModal } from '../../common/confirm-modal/confirm-modal';
 import { agentsTableColumns } from './columns';
 import { AgentsVisualizations } from './visualizations';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
+import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
 
 export interface AgentListProps {
   indexPatterns: any;
@@ -37,6 +38,7 @@ export const AgentList = (props: AgentListProps) => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [agent, setAgent] = useState<Agent>();
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
+  const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [agentSelected, setAgentSelected] = useState<Agent[]>([]);
 
@@ -50,9 +52,10 @@ export const AgentList = (props: AgentListProps) => {
 
   const onSelectionChange = (selectedItems: Agent[]) => {
     setAgentSelected(selectedItems);
-    // if (selectedItems.length < agentList.totalItems) {
-    //   setAllAgentsSelected(false);
-    // }
+  };
+
+  const reloadAgents = () => {
+    getAgentManagement().getAll();
   };
 
   const closeModal = () => {
@@ -147,6 +150,7 @@ export const AgentList = (props: AgentListProps) => {
             setAgent,
             setIsDeleteModalVisible,
             setIsEditGroupsVisible,
+            setIsUpgradeModalVisible,
           })}
           tableProps={{
             hasActions: true,
@@ -180,6 +184,16 @@ export const AgentList = (props: AgentListProps) => {
           onCancel={closeModal}
           confirmButtonText='Delete'
           buttonColor='danger'
+        />
+      )}
+      {isUpgradeModalVisible && agent && (
+        <UpgradeAgentModal
+          agent={agent}
+          reloadAgents={() => reloadAgents()}
+          onClose={() => {
+            setIsUpgradeModalVisible(false);
+            setAgent(undefined);
+          }}
         />
       )}
       {isFlyoutVisible ? (
