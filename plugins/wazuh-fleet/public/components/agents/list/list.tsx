@@ -3,10 +3,6 @@ import {
   EuiPageHeader,
   EuiSpacer,
   EuiButton,
-  EuiPopover,
-  EuiContextMenuPanel,
-  EuiContextMenuItem,
-  EuiHorizontalRule,
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
@@ -25,6 +21,7 @@ import { agentsTableColumns } from './columns';
 import { AgentsVisualizations } from './visualizations';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
 import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
+import { AgentsTableGlobalActions } from './global-actions/global-actions';
 
 export interface AgentListProps {
   indexPatterns: any;
@@ -33,7 +30,6 @@ export interface AgentListProps {
 
 export const AgentList = (props: AgentListProps) => {
   const { indexPatterns, filters } = props;
-  const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [agent, setAgent] = useState<Agent>();
@@ -41,10 +37,6 @@ export const AgentList = (props: AgentListProps) => {
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [agentSelected, setAgentSelected] = useState<Agent[]>([]);
-
-  const closeActions = () => {
-    setIsActionsOpen(false);
-  };
 
   const navigateToDeployNewAgent = () => {
     NavigationService.getInstance().navigate(enrollmentAgent.path);
@@ -81,60 +73,18 @@ export const AgentList = (props: AgentListProps) => {
             iconType='plusInCircle'
             onClick={() => navigateToDeployNewAgent()}
           >
-            Deploy new agent
+            Enroll new agent
           </EuiButton>,
-          <EuiPopover
+          <AgentsTableGlobalActions
             key='actions'
-            id='actions'
-            button={
-              <EuiButton
-                iconType='arrowDown'
-                iconSide='right'
-                onClick={() => setIsActionsOpen(!isActionsOpen)}
-              >
-                Actions
-              </EuiButton>
-            }
-            isOpen={isActionsOpen}
-            closePopover={closeActions}
-            panelPaddingSize='none'
-            anchorPosition='downLeft'
-            panelStyle={{ overflowY: 'unset' }}
-          >
-            <EuiContextMenuPanel
-              items={[
-                <EuiContextMenuItem
-                  key='add-groups'
-                  icon='plusInCircle'
-                  onClick={closeActions}
-                >
-                  Add groups to agents
-                </EuiContextMenuItem>,
-                <EuiContextMenuItem
-                  key='remove-groups'
-                  icon='trash'
-                  onClick={closeActions}
-                >
-                  Remove groups from agents
-                </EuiContextMenuItem>,
-                <EuiHorizontalRule margin='xs' key='horizontalRule' />,
-                <EuiContextMenuItem
-                  key='upgrade-agents'
-                  icon='package'
-                  onClick={closeActions}
-                >
-                  Upgrade agents
-                </EuiContextMenuItem>,
-                <EuiContextMenuItem
-                  key='upgrade-tasks'
-                  icon='eye'
-                  onClick={closeActions}
-                >
-                  Upgrade tasks details
-                </EuiContextMenuItem>,
-              ]}
-            />
-          </EuiPopover>,
+            selectedAgents={agentSelected}
+            allowDeleteAgent
+            allowEditGroups
+            allowGetTasks
+            allowUpgrade
+            reloadAgents={() => reloadAgents()}
+            // allAgentsSelected
+          />,
         ]}
       />
       <EuiSpacer />

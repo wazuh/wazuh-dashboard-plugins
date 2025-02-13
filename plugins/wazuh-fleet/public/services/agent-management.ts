@@ -14,8 +14,13 @@ export const AgentManagement = (): IAgentManagement => {
     return;
   };
 
-  const deleteAgent = (id: string) => {
-    console.log(`Delete ${id}`);
+  const deleteAgent = (id: string | string[]) => {
+    if (Array.isArray(id)) {
+      console.log(`Delete ${id.join(', ')}`);
+    } else {
+      console.log(`Delete ${id}`);
+    }
+
     getToasts().add({
       color: 'primary',
       title: 'Agent deleted',
@@ -45,7 +50,7 @@ export const AgentManagement = (): IAgentManagement => {
   return {
     getAll: async () => await getAll(),
     getByAgentId: async (id: string) => await getByAgentId(id),
-    delete: async (id: string) => await deleteAgent(id),
+    delete: async (id: string | string[]) => await deleteAgent(id),
     upgrade: async (id: string) => await upgradeAgent(id),
     editName: async (id: string) => await editAgentName(id),
     editGroup: async (id: string, groups: string[]) =>
