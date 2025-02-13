@@ -38,16 +38,99 @@ This method is invoked by the plugin’s setup routine (as seen in the sample `A
 
 ## How It’s Used in a Plugin
 
-The sample `AnalysisPlugin` demonstrates how `ApplicationService` integrates into the plugin lifecycle:
+The sample `MyCustomPlugin` demonstrates how `ApplicationService` integrates into the plugin lifecycle:
 
 - **In the `setup` method:**
 
-  - The plugin defines an array of navigation groups (e.g., `EndpointSecurityNavGroup`, `ThreatIntelligenceNavGroup`, etc.).
+  - The plugin defines an array of navigation groups (e.g., `CustomGroupNavGroup`, etc.).
   - Each navigation group must be implemented as an object that implements the `Group` interface. [See the `Group` interface for more details.](types.ts)
   - It calls `plugins.wazuhCore.applicationService.setup({ ... })` to register all navigation groups and their sub-applications with the core system.
 
 - **In the `onAppStartup` method:**
   - The plugin calls `plugins.wazuhCore.applicationService.onAppStartup(core)` to subscribe to startup events. This ensures that when an app group is started, the UI will update the active navigation group and automatically navigate to the first available app in that group.
+
+### Defining Navigation Groups and Submenus
+
+To define a navigation group, each group should implement the `Group` interface and define its submenus:
+
+#### Example of a Navigation Group Definition
+
+```ts
+export const CustomGroupNavGroup: Group<typeof CUSTOM_GROUP_ID> = {
+  getId: (): string => CUSTOM_GROUP_ID,
+  getTitle: (): string => CUSTOM_GROUP_TITLE,
+  getDescription: (): string => CUSTOM_GROUP_DESCRIPTION,
+
+  getNavGroup(): ChromeNavGroup {
+    return {
+      id: CUSTOM_GROUP_ID,
+      title: CUSTOM_GROUP_TITLE,
+      description: CUSTOM_GROUP_DESCRIPTION,
+    };
+  },
+
+  getAppGroup(): App {
+    return {
+      id: CUSTOM_GROUP_ID,
+      title: CUSTOM_GROUP_TITLE,
+      category: CUSTOM_CATEGORY,
+      mount: async (_params: AppMountParameters) => () => {},
+    };
+  },
+
+  getGroupNavLink(): ChromeRegistrationNavLink {
+    return {
+      id: CUSTOM_GROUP_ID,
+      title: CUSTOM_GROUP_TITLE,
+      category: CUSTOM_CATEGORY,
+    };
+  },
+
+  getAppsNavLinks(): ChromeRegistrationNavLink[] {
+    return getCustomGroupApps().map(app => ({
+      id: app.id,
+      title: app.title,
+    }));
+  },
+
+  getApps(updater$?: Subject<AppUpdater>): App[] {
+    return getCustomGroupApps(updater$);
+  },
+};
+```
+
+#### Registering Navigation Groups in the Plugin
+
+```diff
+export class MyCustomPlugin
+  implements Plugin<CustomSetup, CustomStart, object, CustomStartDependencies>
+{
++  private readonly navGroups: Group<GroupsId>[] = [
++    UserManagementNavGroup,
++  ];
+
+  public setup(
+    core: CoreSetup,
+    plugins: CustomSetupDependencies,
+  ): CustomSetup | Promise<CustomSetup> {
++    plugins.wazuhCore.applicationService.setup({
++      id: 'custom-app',
++      navGroups: this.navGroups,
++    });
+
+    return {};
+  }
+
+  public start(
+    core: CoreStart,
+    plugins: CustomStartDependencies,
+  ): CustomStart | Promise<CustomStart> {
++    plugins.wazuhCore.applicationService.onAppStartup(core);
+
+    return {};
+  }
+}
+```
 
 ---
 
