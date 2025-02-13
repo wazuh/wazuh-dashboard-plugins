@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { EuiFlexGroup, EuiBasicTable, EuiFlexItem } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
+import { AgentManagement } from '../../../services/agent-management';
 import useSearchBar from './components/search-bar/use-search-bar';
 import { WzSearchBar } from './components/search-bar/search-bar';
-import { search } from './components/search-bar/search-bar-service';
 
 interface TDocumentDetailsTab {
   id: string;
@@ -38,13 +38,18 @@ export const TableIndexer = (props: {
     pageIndex: 0,
     pageSize: 15,
   });
-  const [sorting, setSorting] = useState({
+  const [sorting, setSorting] = useState<{
+    sort: {
+      field: string;
+      direction: string;
+    };
+  }>({
     sort: {
       field: tableSortingInitialField || '_id',
       direction: tableSortingInitialDirection || 'desc',
     },
   });
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState<any[]>([]);
   const { searchBarProps } = useSearchBar({
     indexPattern: indexPatterns,
     filters: [...filtersDefault, ...filters],
@@ -54,26 +59,14 @@ export const TableIndexer = (props: {
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
 
   useEffect(() => {
-    if (!indexPatterns) {
-      return;
-    }
-
     setLoadingSearch(true);
-    search({
-      indexPattern: indexPatterns,
-      filters: searchBarProps.filters || [],
-      query,
-      pagination,
-      sorting: {
-        columns: [
-          {
-            id: sorting.sort.field,
-            direction: sorting.sort.direction,
-          },
-        ],
-      },
-      filePrefix: '',
-    })
+    AgentManagement()
+      .getAll({
+        filter: filters,
+        query,
+        pagination,
+        sort: { field: sorting.sort.field, direction: sorting.sort.direction },
+      })
       .then(results => {
         setResults(results);
       })
@@ -82,7 +75,6 @@ export const TableIndexer = (props: {
       });
     setLoadingSearch(false);
   }, [
-    indexPatterns,
     filters,
     JSON.stringify(query),
     JSON.stringify(pagination),
@@ -113,7 +105,7 @@ export const TableIndexer = (props: {
 
   const tablePagination = {
     ...pagination,
-    totalItemCount: results?.hits?.total || 0,
+    totalItemCount: results?.total || 0,
     pageSizeOptions: [15, 25, 50, 100],
     hidePerPageOptions: false,
   };
@@ -134,7 +126,7 @@ export const TableIndexer = (props: {
       <EuiFlexItem>
         <EuiBasicTable
           columns={columns}
-          items={results?.hits?.hits?.map((item: any) => item._source) ?? []}
+          items={results?.hits?.map((item: any) => item._source) ?? []}
           loading={loadingSearch}
           pagination={tablePagination}
           sorting={sorting}

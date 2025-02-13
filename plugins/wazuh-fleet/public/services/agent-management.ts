@@ -1,17 +1,37 @@
-import { IAgentManagement } from '../application/types';
+import { IAgentManagement, IGetAllParams } from '../application/types';
 import { getToasts } from '../plugin-services';
+import { queryManagerService } from './mocks/agent-management';
 
 export const AgentManagement = (): IAgentManagement => {
-  const getAll = () => {
-    console.log('Get all');
+  const getAll = async (params: IGetAllParams) => {
+    const { filter, query, pagination, sort } = params;
 
-    return [];
+    console.log(params);
+
+    const manager = queryManagerService();
+
+    try {
+      const results = manager
+        .addFilter(filter || [])
+        .addQuery(query)
+        .addSort(sort)
+        .addPagination(pagination)
+        .executeQuery();
+
+      console.log(results);
+
+      return results.hits;
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const getByAgentId = (id: string) => {
+  const getByAgentId = async (id: string) => {
     console.log(`Get by agent id ${id}`);
 
-    return;
+    const results = await queryManagerService().executeQuery();
+
+    return results.hits;
   };
 
   const deleteAgent = (id: string | string[]) => {
@@ -48,7 +68,8 @@ export const AgentManagement = (): IAgentManagement => {
   };
 
   return {
-    getAll: async () => await getAll(),
+    getAll: async ({ filter, query, pagination, sort }: IGetAllParams) =>
+      await getAll({ filter, query, pagination, sort }),
     getByAgentId: async (id: string) => await getByAgentId(id),
     delete: async (id: string | string[]) => await deleteAgent(id),
     upgrade: async (id: string) => await upgradeAgent(id),

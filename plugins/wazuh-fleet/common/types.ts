@@ -8,7 +8,7 @@ export interface Agent {
     type: string;
     version: string;
     groups: string[];
-    host: {
+    host?: {
       architecture: string;
       boot: { id: string };
       cpu: { usage: number };
@@ -21,13 +21,13 @@ export interface Agent {
         };
       };
       domain: string;
-      geo: {
+      geo?: {
         city_name: string;
         continent_name: string;
         continent_code: string;
         country_iso_code: string;
         country_name: string;
-        location: {
+        location?: {
           lat: number;
           lon: number;
         };
@@ -80,4 +80,11 @@ export interface Group {
   id: string;
   name: string;
   agents: any;
+}
+
+export interface IAgentResponse {
+  _index: string;
+  _id: string;
+  _score: number | null;
+  _source: Agent;
 }
