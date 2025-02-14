@@ -18,7 +18,7 @@ It adjusts the lifecycle of sub-applications so that their navigation links are 
 
 ---
 
-### `onAppStartup(core: CoreStart)`
+### `start(core: CoreStart)`
 
 This method is typically called during the plugin’s `start` phase to ensure that, when an application or group starts, the UI reflects the correct navigation state and the user is redirected accordingly.
 
@@ -46,8 +46,8 @@ The sample `MyCustomPlugin` demonstrates how `ApplicationService` integrates int
   - Each navigation group must be implemented as an object that implements the `Group` interface. [See the `Group` interface for more details.](types.ts)
   - It calls `plugins.wazuhCore.applicationService.setup({ ... })` to register all navigation groups and their sub-applications with the core system.
 
-- **In the `onAppStartup` method:**
-  - The plugin calls `plugins.wazuhCore.applicationService.onAppStartup(core)` to subscribe to startup events. This ensures that when an app group is started, the UI will update the active navigation group and automatically navigate to the first available app in that group.
+- **In the `start` method:**
+  - The wazuh-core plugin calls `this.services.applicationService.start(core)` to subscribe to startup events. This ensures that when an app group is started, the UI will update the active navigation group and automatically navigate to the first available app in that group.
 
 ### Defining Navigation Groups and Submenus
 
@@ -117,15 +117,6 @@ export class MyCustomPlugin
 +      id: 'custom-app',
 +      navGroups: this.navGroups,
 +    });
-
-    return {};
-  }
-
-  public start(
-    core: CoreStart,
-    plugins: CustomStartDependencies,
-  ): CustomStart | Promise<CustomStart> {
-+    plugins.wazuhCore.applicationService.onAppStartup(core);
 
     return {};
   }

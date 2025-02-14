@@ -204,7 +204,7 @@ export class ApplicationService {
    * services and functionalities within the application. It allows interaction
    * with core services such as navigation, HTTP requests, and more.
    */
-  onAppStartup(core: CoreStart) {
+  start(core: CoreStart) {
     this.appStartup$.subscribe({
       next: async (navGroupId: string) => {
         if (core.chrome.navGroup.getNavGroupEnabled()) {

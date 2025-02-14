@@ -39,12 +39,10 @@ export class AnalysisPlugin
 
   start(
     core: CoreStart,
-    plugins: AnalysisStartDependencies,
+    _plugins: AnalysisStartDependencies,
   ): AnalysisStart | Promise<AnalysisStart> {
     console.debug(`${AnalysisPlugin.name} start`);
     setCore(core);
-
-    plugins.wazuhCore.applicationService.onAppStartup(core);
 
     return {};
   }

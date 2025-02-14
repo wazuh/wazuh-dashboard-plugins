@@ -174,6 +174,7 @@ export class WazuhCorePlugin
     this.services.state.start();
     await this.services.dashboardSecurity.start();
     await this.services.http.start();
+    this.services.applicationService.start(core);
 
     this.runtime.start.serverSecurityDeps = {
       chrome: core.chrome,
