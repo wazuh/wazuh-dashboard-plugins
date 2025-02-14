@@ -11,7 +11,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import { i18n } from '@osd/i18n';
-import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
+import { SERVER_ADDRESS_TEXTS } from '../../utils/enroll-agent-data';
 import { EnhancedFieldConfiguration } from '../form/types';
 import { InputForm } from '../form';
 import { webDocumentationLink } from '../../services/web-documentation-link';

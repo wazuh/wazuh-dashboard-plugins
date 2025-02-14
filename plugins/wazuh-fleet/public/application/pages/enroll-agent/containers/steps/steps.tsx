@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { EuiCallOut, EuiSteps, EuiSpacer } from '@elastic/eui';
 import './steps.scss';
 import { FormattedMessage } from '@osd/i18n/react';
-import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
+import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/enroll-agent-data';
 import {
-  IParseRegisterFormValues,
-  getRegisterAgentFormValues,
-  parseRegisterAgentFormValues,
-} from '../../services/register-agent-services';
-import { useRegisterAgentCommands } from '../../hooks/use-register-agent-commands';
+  IParseEnrollFormValues,
+  getEnrollAgentFormValues,
+  parseEnrollAgentFormValues,
+} from '../../services/enroll-agent-services';
+import { useEnrollAgentCommands } from '../../hooks/use-enroll-agent-commands';
 import {
   osCommandsDefinitions,
   optionalParamsDefinitions,
@@ -32,7 +32,7 @@ import {
   FORM_FIELDS_LABEL,
   FORM_STEPS_LABELS,
   getServerCredentialsStepStatus,
-} from '../../services/register-agent-steps-status-services';
+} from '../../services/enroll-agent-steps-status-services';
 import OsCommandWarning from '../../components/command-output/os-warning';
 
 interface IStepsProps {
@@ -55,17 +55,17 @@ export const Steps = ({ form, osCard }: IStepsProps) => {
       agentName: '',
       serverAddress: '',
     },
-  } as IParseRegisterFormValues;
+  } as IParseEnrollFormValues;
   const [missingStepsName, setMissingStepsName] = useState<FORM_STEPS_LABELS[]>(
     [],
   );
   const [invalidFieldsName, setInvalidFieldsName] = useState<
     FORM_FIELDS_LABEL[]
   >([]);
-  const [registerAgentFormValues, setRegisterAgentFormValues] =
-    useState<IParseRegisterFormValues>(initialParsedFormValues);
+  const [enrollAgentFormValues, setEnrollAgentFormValues] =
+    useState<IParseEnrollFormValues>(initialParsedFormValues);
   const { installCommand, startCommand, selectOS, setOptionalParams } =
-    useRegisterAgentCommands<TOperatingSystem, TOptionalParameters>({
+    useEnrollAgentCommands<TOperatingSystem, TOptionalParameters>({
       osDefinitions: osCommandsDefinitions,
       optionalParamsDefinitions: optionalParamsDefinitions,
     });
@@ -79,13 +79,13 @@ export const Steps = ({ form, osCard }: IStepsProps) => {
 
   useEffect(() => {
     // get form values and parse them divided in OS and optional params
-    const registerAgentFormValuesParsed = parseRegisterAgentFormValues(
-      getRegisterAgentFormValues(form),
+    const enrollAgentFormValuesParsed = parseEnrollAgentFormValues(
+      getEnrollAgentFormValues(form),
       OPERATING_SYSTEMS_OPTIONS,
       initialParsedFormValues,
     );
 
-    setRegisterAgentFormValues(registerAgentFormValuesParsed);
+    setEnrollAgentFormValues(enrollAgentFormValuesParsed);
     setInstallCommandStepStatus(
       getAgentCommandsStepStatus(form.fields, installCommandWasCopied),
     );
@@ -98,19 +98,19 @@ export const Steps = ({ form, osCard }: IStepsProps) => {
 
   useEffect(() => {
     if (
-      registerAgentFormValues.operatingSystem.name !== '' &&
-      registerAgentFormValues.operatingSystem.architecture !== ''
+      enrollAgentFormValues.operatingSystem.name !== '' &&
+      enrollAgentFormValues.operatingSystem.architecture !== ''
     ) {
-      selectOS(registerAgentFormValues.operatingSystem as TOperatingSystem);
+      selectOS(enrollAgentFormValues.operatingSystem as TOperatingSystem);
     }
 
     setOptionalParams(
-      { ...registerAgentFormValues.optionalParams },
-      registerAgentFormValues.operatingSystem as TOperatingSystem,
+      { ...enrollAgentFormValues.optionalParams },
+      enrollAgentFormValues.operatingSystem as TOperatingSystem,
     );
     setInstallCommandWasCopied(false);
     setStartCommandWasCopied(false);
-  }, [registerAgentFormValues]);
+  }, [enrollAgentFormValues]);
 
   useEffect(() => {
     setInstallCommandStepStatus(
@@ -124,7 +124,7 @@ export const Steps = ({ form, osCard }: IStepsProps) => {
     );
   }, [startCommandWasCopied]);
 
-  const registerAgentFormSteps = [
+  const enrollAgentFormSteps = [
     {
       title: 'Select the package to download and install on your system:',
       children: osCard,
@@ -193,12 +193,12 @@ export const Steps = ({ form, osCard }: IStepsProps) => {
               <CommandOutput
                 commandText={installCommand}
                 showCommand={showCommandsSections(form.fields)}
-                os={registerAgentFormValues.operatingSystem.name}
+                os={enrollAgentFormValues.operatingSystem.name}
                 onCopy={() => setInstallCommandWasCopied(true)}
-                password={registerAgentFormValues.optionalParams.password}
+                password={enrollAgentFormValues.optionalParams.password}
               />
               <OsCommandWarning
-                os={registerAgentFormValues.operatingSystem.name}
+                os={enrollAgentFormValues.operatingSystem.name}
               />
             </>
           ) : null}
@@ -233,7 +233,7 @@ export const Steps = ({ form, osCard }: IStepsProps) => {
             <CommandOutput
               commandText={startCommand}
               showCommand={showCommandsSections(form.fields)}
-              os={registerAgentFormValues.operatingSystem.name}
+              os={enrollAgentFormValues.operatingSystem.name}
               onCopy={() => setStartCommandWasCopied(true)}
             />
           ) : null}
@@ -243,5 +243,5 @@ export const Steps = ({ form, osCard }: IStepsProps) => {
     },
   ];
 
-  return <EuiSteps steps={registerAgentFormSteps} />;
+  return <EuiSteps steps={enrollAgentFormSteps} />;
 };

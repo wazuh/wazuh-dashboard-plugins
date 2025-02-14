@@ -8,13 +8,13 @@ import {
   getRPMAMD64InstallCommand,
   getRPMARM64InstallCommand,
   getDEBARM64InstallCommand,
-} from '../../services/register-agent-os-commands-services';
+} from '../../services/enroll-agent-os-commands-services';
 import {
   scapeSpecialCharsForLinux,
   scapeSpecialCharsForMacOS,
   scapeSpecialCharsForWindows,
 } from '../../services/wazuh-password-service';
-import { IOSDefinition, TOptionalParams } from '../register-commands/types';
+import { IOSDefinition, TOptionalParams } from '../enroll-commands/types';
 
 // Defined OS combinations
 

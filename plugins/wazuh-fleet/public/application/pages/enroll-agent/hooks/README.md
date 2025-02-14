@@ -1,6 +1,6 @@
 # Documentation
 
-- [useRegisterAgentCommand hook](#useregisteragentcommand-hook)
+- [useEnrollAgentCommand hook](#useenrollagentcommand-hook)
 - [Advantages](#advantages)
 - [Usage](#usage)
 - [Types](#types)
@@ -9,21 +9,21 @@
 - [Hook with Generic types](#hook-with-generic-types)
   - [Operating systems types example](#operating-systems-types-example)
 
-## useRegisterAgentCommand hook
+## useEnrollAgentCommand hook
 
-This hook makes use of the `Command Generator class` to generate the commands to register agents in the manager and allows to use it in React components.
+This hook makes use of the `Command Generator class` to generate the commands to enroll agents in the manager and allows to use it in React components.
 
 ## Advantages
 
 - Ease of use of the Command Generator class.
-- The hook returns the methods envolved to create the register commands by the operating system and optionas specified.
+- The hook returns the methods envolved to create the enroll commands by the operating system and optionas specified.
 - The commands generate are stored in the state of the hook and can be used in the component.
 
 ## Usage
 
 ```ts
 
-import { useRegisterAgentCommands } from 'path/to/use-register-agent-commands';
+import { useEnrollAgentCommands } from 'path/to/use-enroll-agent-commands';
 
 import { OSdefintions, paramsDefinitions} from 'path/config/os-definitions';
 
@@ -39,7 +39,7 @@ const {
   installCommand,
   startCommand,
   optionalParamsParsed
- } = useRegisterAgentCommands<TOperatingSystem, TOptionalParameters>();
+ } = useEnrollAgentCommands<TOperatingSystem, TOptionalParameters>();
 
 // select OS depending on the specified OS defined in the hook configuration
 selectOS({
@@ -75,7 +75,7 @@ export interface IOperationSystem {
   architecture: string;
 }
 
-interface IUseRegisterCommandsProps<
+interface IUseEnrollCommandsProps<
   OS extends IOperationSystem,
   Params extends string,
 > {
@@ -92,7 +92,7 @@ export interface IOperationSystem {
   architecture: string;
 }
 
-interface IUseRegisterCommandsOutput<
+interface IUseEnrollCommandsOutput<
   OS extends IOperationSystem,
   Params extends string,
 > {
@@ -163,7 +163,7 @@ const {
   installCommand,
   startCommand,
   optionalParamsParsed,
-} = useRegisterAgentCommands<TOperatingSystem, TOptionalParameters>(
+} = useEnrollAgentCommands<TOperatingSystem, TOptionalParameters>(
   OSdefintions,
   paramsDefinitions,
 );

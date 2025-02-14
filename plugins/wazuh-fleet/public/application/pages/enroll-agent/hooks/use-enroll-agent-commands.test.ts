@@ -1,10 +1,7 @@
 import React from 'react';
 import { act, renderHook } from '@testing-library/react-hooks';
-import {
-  IOSDefinition,
-  TOptionalParams,
-} from '../core/register-commands/types';
-import { useRegisterAgentCommands } from './use-register-agent-commands';
+import { IOSDefinition, TOptionalParams } from '../core/enroll-commands/types';
+import { useEnrollAgentCommands } from './use-enroll-agent-commands';
 
 type TOptionalParamsNames = 'optional1' | 'optional2';
 
@@ -71,10 +68,10 @@ export const optionalParamsDefinitions: TOptionalParams<TOptionalParamsNames> =
     },
   };
 
-describe('useRegisterAgentCommands hook', () => {
+describe('useEnrollAgentCommands hook', () => {
   it('should return installCommand and startCommand null when the hook is initialized', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands({
+      useEnrollAgentCommands({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -90,7 +87,7 @@ describe('useRegisterAgentCommands hook', () => {
         current: { selectOS },
       },
     } = renderHook(() =>
-      useRegisterAgentCommands({
+      useEnrollAgentCommands({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -112,7 +109,7 @@ describe('useRegisterAgentCommands hook', () => {
 
   it('should change the commands when the OS is selected successfully', async () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
+      useEnrollAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -139,7 +136,7 @@ describe('useRegisterAgentCommands hook', () => {
 
   it('should return commands empty when set optional params and OS is NOT selected', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
+      useEnrollAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -159,7 +156,7 @@ describe('useRegisterAgentCommands hook', () => {
 
   it('should return optional params empty when optional params are not added', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
+      useEnrollAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -171,7 +168,7 @@ describe('useRegisterAgentCommands hook', () => {
 
   it('should return optional params when optional params are added', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
+      useEnrollAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),
@@ -199,7 +196,7 @@ describe('useRegisterAgentCommands hook', () => {
 
   it('should update the commands when the OS is selected and optional params are added', () => {
     const hook = renderHook(() =>
-      useRegisterAgentCommands<TOperatingSystem, TOptionalParamsNames>({
+      useEnrollAgentCommands<TOperatingSystem, TOptionalParamsNames>({
         osDefinitions: osCommandsDefinitions,
         optionalParamsDefinitions: optionalParamsDefinitions,
       }),

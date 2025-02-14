@@ -10,7 +10,7 @@ import {
   EuiProgress,
 } from '@elastic/eui';
 import { compose } from 'redux';
-import './register-agent.scss';
+import './enroll-agent.scss';
 import { Steps } from '../steps/steps';
 import { InputForm } from '../../components/form';
 import { useForm } from '../../components/form/hooks';
@@ -27,7 +27,7 @@ import {
 } from '../../../../../plugin-services';
 import { version } from '../../../../../../package.json';
 
-export const RegisterAgent = compose(
+export const EnrollAgent = compose(
   // TODO: add HOCs
   // withErrorBoundary,
   // withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
@@ -137,7 +137,7 @@ export const RegisterAgent = compose(
         <EuiPageBody>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiPanel className='register-agent-wizard-container'>
+              <EuiPanel className='enroll-agent-wizard-container'>
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle size='s'>

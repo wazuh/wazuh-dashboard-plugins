@@ -4,7 +4,7 @@ import {
 } from '../../../components/common/form/types';
 import {
   FormStepsDependencies,
-  RegisterAgentFormStatusManager,
+  EnrollAgentFormStatusManager,
 } from './form-status-manager';
 
 const defaultFormFieldData: EnhancedFieldConfiguration = {
@@ -40,20 +40,20 @@ const formFieldsDefault: UseFormReturn['fields'] = {
   },
 };
 
-describe('RegisterAgentFormStatusManager', () => {
+describe('EnrollAgentFormStatusManager', () => {
   it('should create a instance', () => {
-    const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
+    const enrollAgentFormStatusManager = new EnrollAgentFormStatusManager(
       formFieldsDefault,
     );
 
-    expect(registerAgentFormStatusManager).toBeDefined();
+    expect(enrollAgentFormStatusManager).toBeDefined();
   });
 
   it('should return the form status', () => {
-    const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
+    const enrollAgentFormStatusManager = new EnrollAgentFormStatusManager(
       formFieldsDefault,
     );
-    const formStatus = registerAgentFormStatusManager.getFormStatus();
+    const formStatus = enrollAgentFormStatusManager.getFormStatus();
 
     expect(formStatus).toEqual({
       field1: 'empty',
@@ -63,21 +63,21 @@ describe('RegisterAgentFormStatusManager', () => {
   });
 
   it('should return the field status', () => {
-    const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
+    const enrollAgentFormStatusManager = new EnrollAgentFormStatusManager(
       formFieldsDefault,
     );
-    const fieldStatus = registerAgentFormStatusManager.getFieldStatus('field1');
+    const fieldStatus = enrollAgentFormStatusManager.getFieldStatus('field1');
 
     expect(fieldStatus).toEqual('empty');
   });
 
   it('should return error if fieldname not found', () => {
-    const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
+    const enrollAgentFormStatusManager = new EnrollAgentFormStatusManager(
       formFieldsDefault,
     );
 
     expect(() =>
-      registerAgentFormStatusManager.getFieldStatus('field4'),
+      enrollAgentFormStatusManager.getFieldStatus('field4'),
     ).toThrowError('Fieldname not found');
   });
 
@@ -86,13 +86,13 @@ describe('RegisterAgentFormStatusManager', () => {
       step1: ['field1', 'field2'],
       step2: ['field3'],
     };
-    const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
+    const enrollAgentFormStatusManager = new EnrollAgentFormStatusManager(
       formFieldsDefault,
       formSteps,
     );
 
-    expect(registerAgentFormStatusManager).toBeDefined();
-    expect(registerAgentFormStatusManager.getStepStatus('step1')).toEqual(
+    expect(enrollAgentFormStatusManager).toBeDefined();
+    expect(enrollAgentFormStatusManager.getStepStatus('step1')).toEqual(
       'invalid',
     );
   });
@@ -102,13 +102,13 @@ describe('RegisterAgentFormStatusManager', () => {
       step1: ['field1', 'field2'],
       step2: ['field3'],
     };
-    const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
+    const enrollAgentFormStatusManager = new EnrollAgentFormStatusManager(
       formFieldsDefault,
       formSteps,
     );
 
-    expect(registerAgentFormStatusManager).toBeDefined();
-    expect(registerAgentFormStatusManager.getStepStatus('step2')).toEqual(
+    expect(enrollAgentFormStatusManager).toBeDefined();
+    expect(enrollAgentFormStatusManager.getStepStatus('step2')).toEqual(
       'complete',
     );
   });
@@ -118,13 +118,13 @@ describe('RegisterAgentFormStatusManager', () => {
       step1: ['field1'],
       step2: ['field2', 'field3'],
     };
-    const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
+    const enrollAgentFormStatusManager = new EnrollAgentFormStatusManager(
       formFieldsDefault,
       formSteps,
     );
 
-    expect(registerAgentFormStatusManager).toBeDefined();
-    expect(registerAgentFormStatusManager.getStepStatus('step1')).toEqual(
+    expect(enrollAgentFormStatusManager).toBeDefined();
+    expect(enrollAgentFormStatusManager.getStepStatus('step1')).toEqual(
       'empty',
     );
   });
@@ -135,13 +135,13 @@ describe('RegisterAgentFormStatusManager', () => {
       step2: ['field2', 'field3'],
       step3: ['field3'],
     };
-    const registerAgentFormStatusManager = new RegisterAgentFormStatusManager(
+    const enrollAgentFormStatusManager = new EnrollAgentFormStatusManager(
       formFieldsDefault,
       formSteps,
     );
 
-    expect(registerAgentFormStatusManager).toBeDefined();
-    expect(registerAgentFormStatusManager.getFormStepsStatus()).toEqual({
+    expect(enrollAgentFormStatusManager).toBeDefined();
+    expect(enrollAgentFormStatusManager.getFormStepsStatus()).toEqual({
       step1: 'empty',
       step2: 'invalid',
       step3: 'complete',

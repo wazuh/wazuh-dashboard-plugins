@@ -1,6 +1,6 @@
 # Documentation
 
-- [Register Agent](#register-agent)
+- [Enroll Agent](#enroll-agent)
   - [Solution details](#solution-details)
   - [Configuration details](#configuration-details)
     - [OS Definitions](#os-definitions)
@@ -15,9 +15,9 @@
       - [Get url package](#get-url-package)
       - [Get all commands](#get-all-commands)
 
-# Register Agent
+# Enroll Agent
 
-The register agent is a process that will allow the user to register an agent in the Manager. The plugin will provide a form where the user will be able to select the OS and the package that he wants to install. The plugin will generate the registration commands and will show them to the user.
+The agent enrollment is a process that will allow the user to enroll an agent in the Manager. The plugin will provide a form where the user will be able to select the OS and the package that he wants to install. The plugin will generate the registration commands and will show them to the user.
 
 # Solution details
 
