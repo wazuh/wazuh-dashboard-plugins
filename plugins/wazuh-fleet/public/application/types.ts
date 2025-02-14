@@ -31,4 +31,8 @@ export interface IAgentManagement {
 export interface AppSetup {
   registerApp: (app: any) => void;
   agentManagement: IAgentManagement;
+  enrollmentAgentManagement: {
+    getServerAddress: () => Promise<string>;
+    setServerAddress: (url: string) => Promise<string>;
+  };
 }

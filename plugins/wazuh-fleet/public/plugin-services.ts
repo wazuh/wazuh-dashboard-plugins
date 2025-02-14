@@ -11,3 +11,7 @@ export const [getWazuhCore, setWazuhCore] =
 export const [getAgentManagement, setAgentManagement] =
   createGetterSetter('AgentManagement');
 export const [getToasts, setToasts] = createGetterSetter<ToastsStart>('Toasts');
+export const [getEnrollAgentManagement, setEnrollAgentManagement] =
+  createGetterSetter<WazuhCorePluginStart>(
+    'fleetManagementEnrollmentAgentManagement',
+  );

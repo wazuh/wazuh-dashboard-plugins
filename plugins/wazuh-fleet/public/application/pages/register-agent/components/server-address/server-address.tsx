@@ -1,18 +1,23 @@
 import {
+  EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiText,
   EuiPopover,
   EuiButtonEmpty,
   EuiLink,
+  EuiToolTip,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { FormattedMessage } from '@osd/i18n/react';
+import { i18n } from '@osd/i18n';
 import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
 import { EnhancedFieldConfiguration } from '../form/types';
 import { InputForm } from '../form';
 import { webDocumentationLink } from '../../services/web-documentation-link';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../inputs/styles.scss';
+import { getEnrollAgentManagement } from '../../../../../plugin-services';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -42,6 +47,42 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
       isPopoverServerAddress => !isPopoverServerAddress,
     );
   const closeServerAddress = () => setIsPopoverServerAddress(false);
+  const [defaultServerAddress, setDefaultServerAddress] = useState(
+    formField?.initialValue ?? '',
+  );
+
+  const saveServerAddress = async () => {
+    try {
+      await getEnrollAgentManagement().setServerAddress(formField.value);
+      setDefaultServerAddress(formField.value);
+    } catch {
+      /* empty */
+    }
+  };
+
+  const rememberServerAddressIsDisabled =
+    !formField.value ||
+    !!formField.error ||
+    formField.value === defaultServerAddress;
+
+  // TODO: this retrieves the value and redefines the form field value, but this should be obtained before defining the form and set this as the initial value
+  useEffect(() => {
+    async function fetchServerAddresFromConfiguration() {
+      const userValue = await getEnrollAgentManagement().getServerAddress();
+
+      if (userValue) {
+        setDefaultServerAddress(userValue);
+        formField.onChange({
+          // simulate the input text interface expected by the onChange method
+          target: {
+            value: userValue,
+          },
+        });
+      }
+    }
+
+    fetchServerAddresFromConfiguration();
+  }, []);
 
   return (
     <>
@@ -68,7 +109,10 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                 >
                   <EuiFlexItem grow={false}>
                     <span className='enrollment-agent-form-input-label'>
-                      Assign a server address
+                      <FormattedMessage
+                        id='wzFleet.enrollmentAssistant.steps.serverAddress.serverAddress.description'
+                        defaultMessage='Assign a server address'
+                      />
                     </span>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
@@ -95,8 +139,49 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                 </EuiFlexGroup>
               </>
             }
-            fullWidth={false}
+            fullWidth={true}
             placeholder='https://server-address:55000'
+            postInput={
+              <>
+                <EuiFlexItem
+                  grow={false}
+                  style={{ marginLeft: 0, marginRight: 0 }}
+                >
+                  <EuiToolTip
+                    content={
+                      !formField.value || !!formField.error ? (
+                        <FormattedMessage
+                          id='wzFleet.enrollmentAssistant.steps.serverAddress.serverAddress.rememberValue.noValueOrError'
+                          defaultMessage='No defined value or there is some error'
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id='wzFleet.enrollmentAssistant.steps.serverAddress.serverAddress.rememberValue.setValue'
+                          defaultMessage='Save the {setting} setting'
+                          values={{
+                            setting: 'enrollment.dns',
+                          }}
+                        />
+                      )
+                    }
+                  >
+                    <EuiButtonIcon
+                      iconType='save'
+                      size='m'
+                      aria-label={i18n.translate(
+                        'wzFleet.enrollmentAssistant.steps.serverAddress.serverAddress.rememberValue',
+                        {
+                          defaultMessage: 'Remember server address',
+                        },
+                      )}
+                      isDisabled={rememberServerAddressIsDisabled}
+                      onClick={saveServerAddress}
+                    ></EuiButtonIcon>
+                  </EuiToolTip>
+                </EuiFlexItem>
+                <EuiFlexItem grow={true}></EuiFlexItem>
+              </>
+            }
           />
         </EuiFlexItem>
       </EuiFlexGroup>

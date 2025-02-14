@@ -77,4 +77,4 @@ node cli.js --template path/to/template.json
 
 # References
 
-- Wazuh index templates: https://github.com/wazuh/wazuh-indexer-plugins/tree/master/plugins/setup/src/main/resources
+- Wazuh index templates: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources

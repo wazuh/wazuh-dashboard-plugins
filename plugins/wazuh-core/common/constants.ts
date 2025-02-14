@@ -594,20 +594,11 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
-    ),
-  },
-  'enrollment.password': {
-    title: 'Enrollment password',
-    description:
-      'Specifies the password used to authenticate during the agent enrollment.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: '',
-    validate: SettingsValidator.compose(SettingsValidator.isString),
+    // TODO: this should be enabled when the configuration service of core plugin provides a mechanism to retrieve this definition to be used in the enrollment agent wizard. See https://github.com/wazuh/wazuh-dashboard/issues/514#issuecomment-2656602679
+    // validate: SettingsValidator.compose(
+    //   SettingsValidator.isString,
+    //   SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
+    // ),
   },
   hideManagerAlerts: {
     title: 'Hide manager alerts',
@@ -1020,7 +1011,6 @@ export const CRON_PREFIX = 'cron.prefix';
 export const CUSTOMIZATION_ENABLED = 'customization.enabled';
 
 export const ENROLLMENT_DNS = 'enrollment.dns';
-export const ENROLLMENT_PASSWORD = 'enrollment.password';
 
 export const IP_IGNORE = 'ip.ignore';
 export const IP_SELECTOR = 'ip.selector';

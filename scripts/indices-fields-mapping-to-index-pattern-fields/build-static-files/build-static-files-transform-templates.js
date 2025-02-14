@@ -66,7 +66,7 @@ function main(input) {
 
     configuration = {
       // Default values
-      branch: 'master',
+      branch: 'main',
       'output-dir': path.join(
         __dirname,
         '../../../plugins/wazuh-core/server/initialization/index-patterns-fields',
