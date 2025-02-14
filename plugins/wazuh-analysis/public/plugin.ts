@@ -29,7 +29,7 @@ export class AnalysisPlugin
     plugins: AnalysisSetupDependencies,
   ): AnalysisSetup | Promise<AnalysisSetup> {
     console.debug(`${AnalysisPlugin.name} setup`);
-    plugins.wazuhCore.applicationService.setup({
+    plugins.wazuhCore.applicationService.register({
       id: 'wz-analysis',
       navGroups: this.navGroups,
     });

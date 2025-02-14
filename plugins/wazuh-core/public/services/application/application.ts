@@ -18,7 +18,7 @@ import { getCore } from '../../plugin-services';
 import { AppUpdaterNotFoundError } from './errors/app-updater-not-found-error';
 import { AppOperations, Group } from './types';
 
-interface SetupParams {
+interface RegisterParams {
   id: string;
   navGroups: Group<any>[];
 }
@@ -298,7 +298,7 @@ export class ApplicationService {
   /**
    * Registers a global search command for searching pages within app groups.
    */
-  private registerSearchCommand({ id, navGroups }: SetupParams) {
+  private registerSearchCommand({ id, navGroups }: RegisterParams) {
     this.logger?.debug(`${this.registerSearchCommand.name} [Id: ${id}]`);
 
     const applications: App[] = navGroups.map(navGroup =>
@@ -319,8 +319,8 @@ export class ApplicationService {
   /**
    * Initializes the service by registering navigation groups and applications.
    */
-  setup({ id, navGroups }: SetupParams) {
-    this.logger?.debug(`${this.setup.name} [Id: ${id}]`);
+  register({ id, navGroups }: RegisterParams) {
+    this.logger?.debug(`${this.register.name} [Id: ${id}]`);
 
     for (const navGroup of navGroups) {
       this.registerNavGroup(navGroup);

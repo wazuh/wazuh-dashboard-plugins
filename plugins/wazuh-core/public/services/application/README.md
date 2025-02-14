@@ -24,13 +24,13 @@ This method is typically called during the plugin’s `start` phase to ensure th
 
 ---
 
-### `registerSearchCommand({ id, navGroups }: SetupParams)`
+### `registerSearchCommand({ id, navGroups }: RegisterParams)`
 
 This command integrates global search functionality so that users can search within the pages provided by the registered app groups.
 
 ---
 
-### `setup({ id, navGroups }: SetupParams)`
+### `register({ id, navGroups }: RegisterParams)`
 
 This method is invoked by the plugin’s setup routine (as seen in the sample `AnalysisPlugin`), initializing the navigation groups, their associated applications, and the search command.
 
@@ -44,7 +44,7 @@ The sample `MyCustomPlugin` demonstrates how `ApplicationService` integrates int
 
   - The plugin defines an array of navigation groups (e.g., `CustomGroupNavGroup`, etc.).
   - Each navigation group must be implemented as an object that implements the `Group` interface. [See the `Group` interface for more details.](types.ts)
-  - It calls `plugins.wazuhCore.applicationService.setup({ ... })` to register all navigation groups and their sub-applications with the core system.
+  - It calls `plugins.wazuhCore.applicationService.register({ ... })` to register all navigation groups and their sub-applications with the core system.
 
 - **In the `start` method:**
   - The wazuh-core plugin calls `this.services.applicationService.start(core)` to subscribe to startup events. This ensures that when an app group is started, the UI will update the active navigation group and automatically navigate to the first available app in that group.
@@ -113,7 +113,7 @@ export class MyCustomPlugin
     core: CoreSetup,
     plugins: CustomSetupDependencies,
   ): CustomSetup | Promise<CustomSetup> {
-+    plugins.wazuhCore.applicationService.setup({
++    plugins.wazuhCore.applicationService.register({
 +      id: 'custom-app',
 +      navGroups: this.navGroups,
 +    });
