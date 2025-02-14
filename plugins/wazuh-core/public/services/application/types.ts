@@ -60,12 +60,14 @@ export interface Group<GroupId extends string> {
 
   /**
    * This method is used to retrieve the list of applications associated with
-   * the specific group. The `updater$` parameter is a subject that can be used
-   * to update or notify subscribers about changes to the list of applications.
-   * By calling this method, you can get the array of `App` objects that belong
-   * to the group, allowing you to access information about each application,
-   * such as its title, description, and configuration within the OpenSearch
-   * Dashboards framework.
+   * the specific group.
+   * @param {Subject<AppUpdater>} updater$ This parameter is a subject that can
+   * be used to update or notify subscribers about changes to the list of
+   * applications.
+   * @returns {App[]} By calling this method, you can get the array of `App`
+   * objects that belong to the group, allowing you to access information about
+   * each application, such as its title, description, and configuration within
+   * the OpenSearch Dashboards framework.
    */
   getApps: (
     applicationService: ApplicationService,
