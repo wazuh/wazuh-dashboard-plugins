@@ -1,6 +1,7 @@
 import { Logger } from '@osd/logging';
 import { Subject } from 'rxjs';
 import { first } from 'rxjs/operators';
+import { EuiSideNavItemType, htmlIdGenerator } from '@elastic/eui';
 import {
   App,
   AppMount,
@@ -12,11 +13,13 @@ import {
   DEFAULT_NAV_GROUPS,
   NavGroupItemInMap,
   NavGroupType,
+  ChromeRegistrationNavLink,
 } from '../../../../../src/core/public';
 import { searchPages } from '../../components/global_search/search-pages-command';
 import { getCore } from '../../plugin-services';
 import { AppUpdaterNotFoundError } from './errors/app-updater-not-found-error';
 import { AppOperations, Group } from './types';
+import { createLayout } from './create-layout';
 
 interface RegisterParams {
   id: string;
@@ -142,7 +145,7 @@ export class ApplicationService {
    * the application for mounting, while the `cleanup` function is used to clean
    * up the application after it has been unmounted.
    */
-  private modifyAppGroupMount(app: App, subApps: App[]) {
+  private modifyAppGroupMount(app: App, subApps: ChromeRegistrationNavLink[]) {
     this.logger?.debug(`${this.modifyAppGroupMount.name} [AppId: ${app.id}]`);
 
     const navGroupId = this.getNavGroupId(app.id);
@@ -244,7 +247,10 @@ export class ApplicationService {
     }
   }
 
-  private registerAppGroup(appGroup: App, subApps: App[]) {
+  private registerAppGroup(
+    appGroup: App,
+    subApps: ChromeRegistrationNavLink[],
+  ) {
     this.logger?.debug(`${this.registerAppGroup.name} [AppId: ${appGroup.id}]`);
     this.registerAppUpdater(appGroup.id);
     this.modifyAppGroupMount(appGroup, subApps);
@@ -276,7 +282,7 @@ export class ApplicationService {
       `${this.registerNavGroup.name} [NavGroupId: ${navGroup.getId()}]`,
     );
     this.assignNavLinksToChromeGroups(navGroup);
-    this.registerAppGroup(navGroup.getAppGroup(), navGroup.getApps());
+    this.registerAppGroup(navGroup.getAppGroup(), navGroup.getAppsNavLinks());
   }
 
   /**
@@ -288,6 +294,7 @@ export class ApplicationService {
     );
 
     const subApps: App[] = navGroup.getApps(
+      this,
       this.getAppUpdater(navGroup.getId()),
     );
 
@@ -330,5 +337,37 @@ export class ApplicationService {
     }
 
     this.registerSearchCommand({ id, navGroups });
+  }
+
+  private createSideNavItems(group: Group<any>) {
+    return (selectedAppId?: App['id']) => {
+      this.logger.debug(`createSideNavItems [GroupId: ${group.getId()}]`);
+
+      const items: EuiSideNavItemType<any>[] = [
+        {
+          id: htmlIdGenerator(group.getId())(),
+          name: group.getTitle(),
+          items: group.getAppsNavLinks().map(app => ({
+            id: app.id,
+            name: app.title,
+            onClick: () => getCore().application.navigateToApp(app.id),
+            isSelected: app.id === selectedAppId,
+          })),
+        },
+      ];
+
+      return items;
+    };
+  }
+
+  createLayout(group: Group<any>) {
+    return (selectedAppId: string) => {
+      this.logger.debug(`createLayout [GroupId: ${group.getId()}]`);
+
+      return createLayout({
+        label: group.getTitle(),
+        items: this.createSideNavItems(group)(selectedAppId),
+      });
+    };
   }
 }

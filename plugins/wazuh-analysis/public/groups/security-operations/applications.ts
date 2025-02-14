@@ -3,7 +3,9 @@ import {
   AppMountParameters,
   AppNavLinkStatus,
   AppUpdater,
+  App,
 } from '../../../../../src/core/public';
+import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
 import {
   INCIDENT_RESPONSE_ID,
   INCIDENT_RESPONSE_TITLE,
@@ -13,8 +15,16 @@ import {
   REGULATORY_COMPLIANCE_ID,
   REGULATORY_COMPLIANCE_TITLE,
 } from './apps/regulatory-compliance/constants';
+import { SecurityOperationsNavGroup } from '.';
 
-export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
+export function getSecurityOperationsApps(
+  applicationService?: ApplicationService,
+  updater$?: Subject<AppUpdater>,
+): App[] {
+  const securityOperationsLayout = applicationService?.createLayout(
+    SecurityOperationsNavGroup,
+  );
+
   return [
     {
       id: REGULATORY_COMPLIANCE_ID,
@@ -26,7 +36,9 @@ export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
           './apps/regulatory-compliance/application'
         );
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: securityOperationsLayout!(REGULATORY_COMPLIANCE_ID),
+        });
       },
     },
     {
@@ -37,7 +49,9 @@ export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
       mount: async (params: AppMountParameters) => {
         const { renderApp } = await import('./apps/it-hygiene/application');
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: securityOperationsLayout!(IT_HYGIENE_ID),
+        });
       },
     },
     {
@@ -50,7 +64,9 @@ export function getSecurityOperationsApps(updater$?: Subject<AppUpdater>) {
           './apps/incident-response/application'
         );
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: securityOperationsLayout!(INCIDENT_RESPONSE_ID),
+        });
       },
     },
   ];

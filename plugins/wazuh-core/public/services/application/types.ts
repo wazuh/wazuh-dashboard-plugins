@@ -5,10 +5,15 @@ import {
   ChromeRegistrationNavLink,
 } from 'opensearch-dashboards/public';
 import { Subject } from 'rxjs';
+import { ApplicationService } from './application';
 
 export interface AppOperations {
   beforeMount?: () => Partial<App>;
   cleanup?: () => Partial<App>;
+}
+
+export interface AppProps {
+  Layout: React.ElementType;
 }
 
 export interface Group<GroupId extends string> {
@@ -62,5 +67,8 @@ export interface Group<GroupId extends string> {
    * such as its title, description, and configuration within the OpenSearch
    * Dashboards framework.
    */
-  getApps: (updater$?: Subject<AppUpdater>) => App[];
+  getApps: (
+    applicationService: ApplicationService,
+    updater$: Subject<AppUpdater>,
+  ) => App[];
 }

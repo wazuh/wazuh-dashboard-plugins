@@ -1,21 +1,15 @@
 import React from 'react';
 import { AppMountParameters } from 'opensearch-dashboards/public';
 import ReactDOM from 'react-dom';
-import { EndpointSecurityNavGroup } from '../..';
-import { Layout } from '../../../layout';
-import { createSideNavItems } from '../../../side-nav';
-import { ENDPOINT_SECURITY_TITLE } from '../../constants';
+import { AppProps } from '../../../../../../wazuh-core/public/services/application/types';
 import { FimApp } from './fim-app';
-import { FIM_ID } from './constants';
 
-export const renderApp = async (params: AppMountParameters) => {
-  const items = createSideNavItems({
-    group: EndpointSecurityNavGroup,
-    selectedAppId: FIM_ID,
-  });
-
+export const renderApp = async (
+  params: AppMountParameters,
+  { Layout }: AppProps,
+) => {
   ReactDOM.render(
-    <Layout aria-label={ENDPOINT_SECURITY_TITLE} items={items}>
+    <Layout>
       <FimApp params={params} />
     </Layout>,
     params.element,

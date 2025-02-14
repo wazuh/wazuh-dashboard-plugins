@@ -7,6 +7,7 @@ import {
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../../../../wazuh-core/public/services/application/types';
+import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
 import { getCloudSecurityApps } from './applications';
 import {
   CLOUD_SECURITY_DESCRIPTION,
@@ -51,7 +52,10 @@ export const CloudSecurityNavGroup: Group<typeof CLOUD_SECURITY_ID> = {
     }));
   },
 
-  getApps(updater$?: Subject<AppUpdater>): App[] {
-    return getCloudSecurityApps(updater$);
+  getApps(
+    applicationService: ApplicationService,
+    updater$: Subject<AppUpdater>,
+  ): App[] {
+    return getCloudSecurityApps(applicationService, updater$);
   },
 };

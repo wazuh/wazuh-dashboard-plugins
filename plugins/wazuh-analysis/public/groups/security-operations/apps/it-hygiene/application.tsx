@@ -1,21 +1,15 @@
 import React from 'react';
 import { AppMountParameters } from 'opensearch-dashboards/public';
 import ReactDOM from 'react-dom';
-import { SecurityOperationsNavGroup } from '../..';
-import { Layout } from '../../../layout';
-import { createSideNavItems } from '../../../side-nav';
-import { SECURITY_OPERATIONS_TITLE } from '../../constants';
+import { AppProps } from '../../../../../../wazuh-core/public/services/application/types';
 import { ItHygieneApp } from './it-hygiene-app';
-import { IT_HYGIENE_ID } from './constants';
 
-export const renderApp = async (params: AppMountParameters) => {
-  const items = createSideNavItems({
-    group: SecurityOperationsNavGroup,
-    selectedAppId: IT_HYGIENE_ID,
-  });
-
+export const renderApp = async (
+  params: AppMountParameters,
+  { Layout }: AppProps,
+) => {
   ReactDOM.render(
-    <Layout aria-label={SECURITY_OPERATIONS_TITLE} items={items}>
+    <Layout>
       <ItHygieneApp params={params} />
     </Layout>,
     params.element,

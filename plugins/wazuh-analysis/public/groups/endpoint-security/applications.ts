@@ -5,6 +5,7 @@ import {
   AppNavLinkStatus,
   AppUpdater,
 } from '../../../../../src/core/public';
+import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
 import {
   CONFIGURATION_ASSESSMENT_ID,
   CONFIGURATION_ASSESSMENT_TITLE,
@@ -14,8 +15,16 @@ import {
   MALWARE_DETECTION_ID,
   MALWARE_DETECTION_TITLE,
 } from './apps/malware-detection/constants';
+import { EndpointSecurityNavGroup } from '.';
 
-export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
+export function getEndpointSecurityApps(
+  applicationService?: ApplicationService,
+  updater$?: Subject<AppUpdater>,
+): App[] {
+  const endpointSecurityLayout = applicationService?.createLayout(
+    EndpointSecurityNavGroup,
+  );
+
   return [
     {
       id: CONFIGURATION_ASSESSMENT_ID,
@@ -27,7 +36,9 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
           './apps/configuration-assesment/application'
         );
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: endpointSecurityLayout!(CONFIGURATION_ASSESSMENT_ID),
+        });
       },
     },
     {
@@ -40,7 +51,9 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
           './apps/malware-detection/application'
         );
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: endpointSecurityLayout!(MALWARE_DETECTION_ID),
+        });
       },
     },
     {
@@ -51,7 +64,9 @@ export function getEndpointSecurityApps(updater$?: Subject<AppUpdater>): App[] {
       mount: async (params: AppMountParameters) => {
         const { renderApp } = await import('./apps/fim/application');
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: endpointSecurityLayout!(FIM_ID),
+        });
       },
     },
   ];

@@ -4,6 +4,7 @@ import {
   AppNavLinkStatus,
   AppUpdater,
 } from '../../../../../src/core/public';
+import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
 import { DOCKER_ID, DOCKER_TITLE } from './apps/docker/constants';
 import { AWS_ID, AWS_TITLE } from './apps/aws/constants';
 import {
@@ -12,8 +13,16 @@ import {
 } from './apps/google-cloud/constants';
 import { GITHUB_ID, GITHUB_TITLE } from './apps/github/constants';
 import { OFFICE365_ID, OFFICE365_TITLE } from './apps/office-365/constants';
+import { CloudSecurityNavGroup } from '.';
 
-export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
+export function getCloudSecurityApps(
+  applicationService?: ApplicationService,
+  updater$?: Subject<AppUpdater>,
+) {
+  const cloudSecurityLayout = applicationService?.createLayout(
+    CloudSecurityNavGroup,
+  );
+
   return [
     {
       id: DOCKER_ID,
@@ -23,7 +32,9 @@ export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
       mount: async (params: AppMountParameters) => {
         const { renderApp } = await import('./apps/docker/application');
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: cloudSecurityLayout!(DOCKER_ID),
+        });
       },
     },
     {
@@ -34,7 +45,9 @@ export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
       mount: async (params: AppMountParameters) => {
         const { renderApp } = await import('./apps/aws/application');
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: cloudSecurityLayout!(AWS_ID),
+        });
       },
     },
     {
@@ -45,7 +58,9 @@ export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
       mount: async (params: AppMountParameters) => {
         const { renderApp } = await import('./apps/google-cloud/application');
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: cloudSecurityLayout!(GOOGLE_CLOUD_ID),
+        });
       },
     },
     {
@@ -56,7 +71,9 @@ export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
       mount: async (params: AppMountParameters) => {
         const { renderApp } = await import('./apps/github/application');
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: cloudSecurityLayout!(GITHUB_ID),
+        });
       },
     },
     {
@@ -67,7 +84,9 @@ export function getCloudSecurityApps(updater$?: Subject<AppUpdater>) {
       mount: async (params: AppMountParameters) => {
         const { renderApp } = await import('./apps/office-365/application');
 
-        return await renderApp(params);
+        return await renderApp(params, {
+          Layout: cloudSecurityLayout!(OFFICE365_ID),
+        });
       },
     },
   ];

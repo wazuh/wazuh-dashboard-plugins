@@ -7,22 +7,19 @@ import {
   EuiSideNavItemType,
 } from '@elastic/eui';
 import React from 'react';
-import { getCore } from '../plugin-services';
+import { getCore } from '../../plugin-services';
 
 interface LayoutProps {
-  'aria-label': string;
+  label: string;
   items: EuiSideNavItemType<any>[];
-  children: React.ReactChild[] | React.ReactChild;
+  children: React.ReactNode[];
 }
 
 export const Layout = (props: LayoutProps) => (
   <EuiPage>
     {!getCore().chrome.navGroup.getNavGroupEnabled() && (
       <EuiPageSideBar>
-        <EuiSideNav
-          aria-label={props['aria-label']}
-          items={props.items}
-        ></EuiSideNav>
+        <EuiSideNav aria-label={props.label} items={props.items}></EuiSideNav>
       </EuiPageSideBar>
     )}
     <EuiPageBody>

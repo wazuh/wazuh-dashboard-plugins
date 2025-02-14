@@ -7,6 +7,7 @@ import {
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../../../../wazuh-core/public/services/application/types';
+import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
 import { getSecurityOperationsApps } from './applications';
 import {
   SECURITY_OPERATIONS_DESCRIPTION,
@@ -52,7 +53,10 @@ export const SecurityOperationsNavGroup: Group<typeof SECURITY_OPERATIONS_ID> =
       }));
     },
 
-    getApps(updater$?: Subject<AppUpdater>): App[] {
-      return getSecurityOperationsApps(updater$);
+    getApps(
+      applicationService: ApplicationService,
+      updater$: Subject<AppUpdater>,
+    ): App[] {
+      return getSecurityOperationsApps(applicationService, updater$);
     },
   };

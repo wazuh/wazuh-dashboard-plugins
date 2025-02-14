@@ -8,6 +8,7 @@ import {
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../../../../wazuh-core/public/services/application/types';
+import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
 import { getEndpointSecurityApps } from './applications';
 import {
   ENDPOINT_SECURITY_DESCRIPTION,
@@ -52,7 +53,10 @@ export const EndpointSecurityNavGroup: Group<typeof ENDPOINT_SECURITY_ID> = {
     }));
   },
 
-  getApps(updater$?: Subject<AppUpdater>): App[] {
-    return getEndpointSecurityApps(updater$);
+  getApps(
+    applicationService: ApplicationService,
+    updater$: Subject<AppUpdater>,
+  ): App[] {
+    return getEndpointSecurityApps(applicationService, updater$);
   },
 };

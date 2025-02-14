@@ -7,6 +7,7 @@ import {
 } from '../../../../../src/core/public';
 import { CATEGORY } from '../category';
 import { Group } from '../../../../wazuh-core/public/services/application/types';
+import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
 import { getThreatIntelligenceApps } from './applications';
 import {
   THREAT_INTELLIGENCE_DESCRIPTION,
@@ -52,7 +53,10 @@ export const ThreatIntelligenceNavGroup: Group<typeof THREAT_INTELLIGENCE_ID> =
       }));
     },
 
-    getApps(updater$?: Subject<AppUpdater>): App[] {
-      return getThreatIntelligenceApps(updater$);
+    getApps(
+      applicationService: ApplicationService,
+      updater$: Subject<AppUpdater>,
+    ): App[] {
+      return getThreatIntelligenceApps(applicationService, updater$);
     },
   };
