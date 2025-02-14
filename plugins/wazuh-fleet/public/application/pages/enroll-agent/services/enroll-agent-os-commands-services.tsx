@@ -3,8 +3,8 @@ import {
   IOptionalParameters,
   TOSEntryInstallCommand,
   TOSEntryProps,
-} from '../core/register-commands/types';
-import { TOperatingSystem } from '../hooks/use-register-agent-commands.test';
+} from '../core/enroll-commands/types';
+import { TOperatingSystem } from '../hooks/use-enroll-agent-commands.test';
 
 export const getAllOptionals = (
   optionals: IOptionalParameters<TOptionalParameters>,

@@ -10,7 +10,7 @@ import {
 } from '@elastic/eui';
 import { UseFormReturn } from '../form/types';
 import { InputForm } from '../form';
-import { OPTIONAL_PARAMETERS_TEXT } from '../../utils/register-agent-data';
+import { OPTIONAL_PARAMETERS_TEXT } from '../../utils/enroll-agent-data';
 import { webDocumentationLink } from '../../services/web-documentation-link';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../inputs/styles.scss';

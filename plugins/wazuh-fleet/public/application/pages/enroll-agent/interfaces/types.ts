@@ -1,6 +1,6 @@
 import { TOperatingSystem } from '../config/os-commands-definitions';
 
-interface RegisterAgentData {
+interface EnrollAgentData {
   icon: string;
   title: TOperatingSystem['name'];
   hr: boolean;
@@ -15,4 +15,4 @@ interface CheckboxGroupComponentProps {
   onChange: (id: string) => void;
 }
 
-export type { RegisterAgentData, CheckboxGroupComponentProps };
+export type { EnrollAgentData, CheckboxGroupComponentProps };

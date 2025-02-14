@@ -7,7 +7,7 @@ import {
   EuiLink,
   EuiCheckbox,
 } from '@elastic/eui';
-import { OPERATING_SYSTEMS_OPTIONS } from '../../../utils/register-agent-data';
+import { OPERATING_SYSTEMS_OPTIONS } from '../../../utils/enroll-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
 import { webDocumentationLink } from '../../../services/web-documentation-link';

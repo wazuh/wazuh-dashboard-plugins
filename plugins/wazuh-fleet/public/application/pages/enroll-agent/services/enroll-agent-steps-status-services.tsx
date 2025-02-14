@@ -2,7 +2,7 @@ import { EuiStepStatus } from '@elastic/eui';
 import { UseFormReturn } from '../components/form/types';
 import {
   FormStepsDependencies,
-  RegisterAgentFormStatusManager,
+  EnrollAgentFormStatusManager,
 } from './form-status-manager';
 
 const fieldsHaveErrors = (
@@ -233,7 +233,7 @@ export const getIncompleteSteps = (
     username: ['username'],
     password: ['password'],
   };
-  const statusManager = new RegisterAgentFormStatusManager(formFields, steps);
+  const statusManager = new EnrollAgentFormStatusManager(formFields, steps);
 
   // replace fields array using label names
   return statusManager
@@ -257,7 +257,7 @@ export enum FORM_FIELDS_LABEL {
 export const getInvalidFields = (
   formFields: UseFormReturn['fields'],
 ): FORM_FIELDS_LABEL[] => {
-  const statusManager = new RegisterAgentFormStatusManager(formFields);
+  const statusManager = new EnrollAgentFormStatusManager(formFields);
 
   return statusManager
     .getInvalidFields()

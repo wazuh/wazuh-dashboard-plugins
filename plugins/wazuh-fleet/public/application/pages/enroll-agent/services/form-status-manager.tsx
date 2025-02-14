@@ -17,7 +17,7 @@ interface FormFieldsStatusManager {
   getFormStepsStatus: () => FormStepsStatus;
 }
 
-export class RegisterAgentFormStatusManager implements FormFieldsStatusManager {
+export class EnrollAgentFormStatusManager implements FormFieldsStatusManager {
   constructor(
     private readonly formFields: FormFields,
     private readonly formSteps?: FormStepsDependencies,

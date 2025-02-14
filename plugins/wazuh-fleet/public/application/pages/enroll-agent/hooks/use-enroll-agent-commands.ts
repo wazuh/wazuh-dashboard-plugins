@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { CommandGenerator } from '../core/register-commands/command-generator/command-generator';
+import { CommandGenerator } from '../core/enroll-commands/command-generator/command-generator';
 import {
   IOSDefinition,
   IOperationSystem,
   IOptionalParameters,
   TOptionalParams,
-} from '../core/register-commands/types';
+} from '../core/enroll-commands/types';
 import { version } from '../../../../../package.json';
 
-interface IUseRegisterCommandsProps<
+interface IUseEnrollCommandsProps<
   OS extends IOperationSystem,
   Params extends string,
 > {
@@ -16,7 +16,7 @@ interface IUseRegisterCommandsProps<
   optionalParamsDefinitions: TOptionalParams<Params>;
 }
 
-interface IUseRegisterCommandsOutput<
+interface IUseEnrollCommandsOutput<
   OS extends IOperationSystem,
   Params extends string,
 > {
@@ -34,15 +34,15 @@ interface IUseRegisterCommandsOutput<
  * Custom hook that generates install and start commands based on the selected OS and optional parameters.
  *
  * @template T - The type of the selected OS.
- * @param {IUseRegisterCommandsProps} props - The properties to configure the command generator.
- * @returns {IUseRegisterCommandsOutput<OS,Params>} - An object containing the generated commands and methods to update the selected OS and optional parameters.
+ * @param {IUseEnrollCommandsProps} props - The properties to configure the command generator.
+ * @returns {IUseEnrollCommandsOutput<OS,Params>} - An object containing the generated commands and methods to update the selected OS and optional parameters.
  */
-export function useRegisterAgentCommands<
+export function useEnrollAgentCommands<
   OS extends IOperationSystem,
   Params extends string,
 >(
-  props: IUseRegisterCommandsProps<OS, Params>,
-): IUseRegisterCommandsOutput<OS, Params> {
+  props: IUseEnrollCommandsProps<OS, Params>,
+): IUseEnrollCommandsOutput<OS, Params> {
   const { osDefinitions, optionalParamsDefinitions } = props;
   // command generator settings
   const wazuhVersion = version;

@@ -11,7 +11,7 @@ import {
   getWindowsInstallCommand,
   getWindowsStartCommand,
   transformOptionalsParamatersMacOSCommand,
-} from './register-agent-os-commands-services';
+} from './enroll-agent-os-commands-services';
 
 let test: any;
 

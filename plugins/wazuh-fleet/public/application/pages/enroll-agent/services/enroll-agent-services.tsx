@@ -3,7 +3,7 @@ import {
   TOperatingSystem,
   TOptionalParameters,
 } from '../core/config/os-commands-definitions';
-import { RegisterAgentData } from '../interfaces/types';
+import { EnrollAgentData } from '../interfaces/types';
 
 export interface ServerAddressOptions {
   label: string;
@@ -38,14 +38,14 @@ export const parseNodesInOptions = (
     nodetype: item.type,
   }));
 
-export const getRegisterAgentFormValues = (form: UseFormReturn) =>
+export const getEnrollAgentFormValues = (form: UseFormReturn) =>
   // return the values form the formFields and the value property
   Object.keys(form.fields).map(key => ({
     name: key,
     value: form.fields[key].value,
   }));
 
-export interface IParseRegisterFormValues {
+export interface IParseEnrollFormValues {
   operatingSystem: {
     name: TOperatingSystem['name'] | '';
     architecture: TOperatingSystem['architecture'] | '';
@@ -54,10 +54,10 @@ export interface IParseRegisterFormValues {
   optionalParams: Record<TOptionalParameters, any>;
 }
 
-export const parseRegisterAgentFormValues = (
+export const parseEnrollAgentFormValues = (
   formValues: { name: keyof UseFormReturn['fields']; value: any }[],
-  OSOptionsDefined: RegisterAgentData[],
-  initialValues?: IParseRegisterFormValues,
+  OSOptionsDefined: EnrollAgentData[],
+  initialValues?: IParseEnrollFormValues,
 ) => {
   // return the values form the formFields and the value property
   const parsedForm =
@@ -68,7 +68,7 @@ export const parseRegisterAgentFormValues = (
         name: '',
       },
       optionalParams: {},
-    } as IParseRegisterFormValues);
+    } as IParseEnrollFormValues);
 
   for (const field of formValues) {
     if (field.name === 'operatingSystemSelection') {

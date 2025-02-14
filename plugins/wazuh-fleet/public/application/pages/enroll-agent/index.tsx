@@ -1,1 +1,1 @@
-export { RegisterAgent } from './containers/register-agent/register-agent';
+export { EnrollAgent } from './containers/enroll-agent/enroll-agent';

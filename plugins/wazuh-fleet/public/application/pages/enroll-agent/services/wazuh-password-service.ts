@@ -1,4 +1,4 @@
-import { TOperatingSystem } from '../hooks/use-register-agent-commands.test';
+import { TOperatingSystem } from '../hooks/use-enroll-agent-commands.test';
 
 export const scapeSpecialCharsForLinux = (password: string) => {
   const passwordScaped = password;

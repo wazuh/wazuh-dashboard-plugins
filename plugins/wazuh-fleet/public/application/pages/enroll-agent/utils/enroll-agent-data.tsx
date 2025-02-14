@@ -1,4 +1,4 @@
-import { RegisterAgentData } from '../interfaces/types';
+import { EnrollAgentData } from '../interfaces/types';
 import LinuxDarkIcon from '../assets/images/themes/dark/linux-icon.svg';
 import LinuxLightIcon from '../assets/images/themes/light/linux-icon.svg';
 import WindowsDarkIcon from '../assets/images/themes/dark/windows-icon.svg';
@@ -9,7 +9,7 @@ import { getCore } from '../../../../plugin-services';
 
 const darkMode = getCore()?.uiSettings?.get('theme:darkMode');
 
-export const OPERATING_SYSTEMS_OPTIONS: RegisterAgentData[] = [
+export const OPERATING_SYSTEMS_OPTIONS: EnrollAgentData[] = [
   {
     icon: darkMode ? LinuxDarkIcon : LinuxLightIcon,
     title: 'LINUX',
