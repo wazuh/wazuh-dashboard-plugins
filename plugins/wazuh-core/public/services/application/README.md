@@ -6,7 +6,7 @@ Below is a simple explanation of each relevant method in the `ApplicationService
 
 ## Methods
 
-### `modifyAppGroupMount(app: App)`
+### `modifyAppGroupMount(app: App, subApps: ChromeRegistrationNavLink[])`
 
 It prepares and registers the mounting process for an application group, ensuring that navigation links become visible and a startup event is triggered when the group mounts.
 
