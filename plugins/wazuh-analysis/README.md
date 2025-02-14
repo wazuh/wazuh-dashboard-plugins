@@ -26,7 +26,6 @@ Here’s a step-by-step guide on how to **create a new plugin** with **groups an
 │ │ │ │── 📄 `constants.ts` _(Defines the group ID, title, and description)_
 │ │ │ │── 📄 `index.ts` _(Registers the group and navigation details)_
 │ │── 📄 `category.ts` _(Defines categories for grouping apps in UI)_
-│ │── 📄 `layout.tsx` _(Handles UI layout and sidebar navigation)_
 ```
 
 ---
@@ -109,8 +108,11 @@ export const NetworkSecurityNavGroup: Group<typeof NETWORK_SECURITY_ID> = {
     }));
   },
 
-  getApps(updater$?: Subject<AppUpdater>): App[] {
-    return getNetworkSecurityApps(updater$);
+  getApps(
+    applicationService: ApplicationService,
+    updater$: Subject<AppUpdater>,
+  ): App[] {
+    return getNetworkSecurityApps(applicationService, updater$);
   },
 };
 ```
@@ -168,14 +170,12 @@ import { NETWORK_SECURITY_TITLE } from '../../constants';
 import { FirewallMonitoringApp } from './firewall-monitoring-app';
 import { FIREWALL_MONITORING_ID } from './constants';
 
-export const renderApp = async (params: AppMountParameters) => {
-  const items = createSideNavItems({
-    group: NetworkSecurityNavGroup,
-    selectedAppId: FIREWALL_MONITORING_ID,
-  });
-
+export const renderApp = async (
+  params: AppMountParameters,
+  { Layout }: AppProps,
+) => {
   ReactDOM.render(
-    <Layout aria-label={NETWORK_SECURITY_TITLE} items={items}>
+    <Layout>
       <FirewallMonitoringApp params={params} />
     </Layout>,
     params.element,
@@ -199,12 +199,21 @@ import {
   AppNavLinkStatus,
   AppUpdater,
 } from '../../../../../src/core/public';
+import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
 import {
   FIREWALL_MONITORING_ID,
   FIREWALL_MONITORING_TITLE,
 } from './apps/firewall-monitoring/constants';
+import { NetworkSecurityNavGroup } from '.';
 
-export function getNetworkSecurityApps(updater$?: Subject<AppUpdater>): App[] {
+export function getNetworkSecurityApps(
+  applicationService?: ApplicationService,
+  updater$?: Subject<AppUpdater>,
+): App[] {
+  const networkSecurityLayout = applicationService?.createLayout(
+    NetworkSecurityNavGroup,
+  );
+
   return [
     {
       id: FIREWALL_MONITORING_ID,
@@ -215,7 +224,10 @@ export function getNetworkSecurityApps(updater$?: Subject<AppUpdater>): App[] {
         const { renderApp } = await import(
           './apps/firewall-monitoring/application'
         );
-        return await renderApp(params);
+
+        return await renderApp(params, {
+          Layout: networkSecurityLayout!(FIREWALL_MONITORING_ID),
+        });
       },
     },
   ];
