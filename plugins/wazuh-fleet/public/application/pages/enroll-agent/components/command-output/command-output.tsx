@@ -11,6 +11,15 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { TOperatingSystem } from '../../core/config/os-commands-definitions';
 import { obfuscatePasswordInCommand } from '../../services/wazuh-password-service';
 import './command-output.scss';
+import { getCore } from '../../../../../plugin-services';
+
+const IS_DARK_THEME = getCore().uiSettings.get('theme:darkMode');
+
+/* tslint-disable no-undef */
+if (IS_DARK_THEME) {
+  // eslint-disable-next-line unicorn/prefer-top-level-await
+  import('./command-output.dark.scss').then();
+}
 
 interface ICommandSectionProps {
   commandText: string;
