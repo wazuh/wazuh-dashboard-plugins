@@ -15,6 +15,7 @@ export class WazuhFleetPlugin
     appSetup({
       registerApp: app => core.application.register(app),
       enrollmentAgentManagement: {
+        serverAddresSettingName: 'enrollment.dns',
         async getServerAddress() {
           // TODO: this should be replaced by getWazuhCore().configuration.get that in the current state does not return the setting because this is filtering by settings with the category 'wazuhCore'.
           return getCore().uiSettings.get('enrollment.dns');

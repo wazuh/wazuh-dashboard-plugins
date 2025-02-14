@@ -246,7 +246,7 @@ describe('getLinuxStartCommand', () => {
 
 describe('getWindowsInstallCommand', () => {
   it('should return the correct install command', () => {
-    let expected = `msiexec.exe /i $env:tmp\\wazuh-agent /q;& 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${[
+    let expected = `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -264,7 +264,7 @@ describe('getWindowsInstallCommand', () => {
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
 
-    expected = `msiexec.exe /i $env:tmp\\wazuh-agent /q;& 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${[
+    expected = `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${[
       'serverAddress',
       'username',
       'password',

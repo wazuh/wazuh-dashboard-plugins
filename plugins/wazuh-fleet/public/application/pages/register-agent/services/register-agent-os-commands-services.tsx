@@ -130,7 +130,7 @@ export const getWindowsInstallCommand = (
   return [
     // `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\wazuh-agent;`, // TODO: enable when the packages are publically hosted
     // https://stackoverflow.com/questions/1673967/how-to-run-an-exe-file-in-powershell-with-parameters-with-spaces-and-quotes
-    `msiexec.exe /i $env:tmp\\wazuh-agent /q;& 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${
+    `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${
       optionals && getAllOptionals(optionals, name)
     }`,
   ].join(' ');

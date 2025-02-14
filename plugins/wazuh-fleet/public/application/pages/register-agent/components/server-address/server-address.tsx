@@ -159,7 +159,9 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                           id='wzFleet.enrollmentAssistant.steps.serverAddress.serverAddress.rememberValue.setValue'
                           defaultMessage='Save the {setting} setting'
                           values={{
-                            setting: 'enrollment.dns',
+                            setting:
+                              getEnrollAgentManagement()
+                                .serverAddresSettingName,
                           }}
                         />
                       )

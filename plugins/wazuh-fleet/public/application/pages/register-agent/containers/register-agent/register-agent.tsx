@@ -21,7 +21,10 @@ import {
   validateEnrollmentKey,
   validateServerAddress,
 } from '../../utils/validations';
-import { getWazuhCore } from '../../../../../plugin-services';
+import {
+  getEnrollAgentManagement,
+  getWazuhCore,
+} from '../../../../../plugin-services';
 import { version } from '../../../../../../package.json';
 
 export const RegisterAgent = compose(
@@ -52,7 +55,8 @@ export const RegisterAgent = compose(
     },
     serverAddress: {
       type: 'text',
-      initialValue: configuration['enrollment.dns'] || '', // TODO: use the setting value as default value
+      initialValue:
+        configuration[getEnrollAgentManagement().serverAddresSettingName] || '', // TODO: use the setting value as default value
       validate: validateServerAddress,
     },
     username: {
