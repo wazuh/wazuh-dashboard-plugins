@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { EuiFlexGroup, EuiBasicTable, EuiFlexItem } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
-import { AgentManagement } from '../../../services/agent-management';
+import { getAgentManagement } from '../../../plugin-services';
 import useSearchBar from './components/search-bar/use-search-bar';
 import { WzSearchBar } from './components/search-bar/search-bar';
 
@@ -60,7 +60,7 @@ export const TableIndexer = (props: {
 
   useEffect(() => {
     setLoadingSearch(true);
-    AgentManagement()
+    getAgentManagement()
       .getAll({
         filter: filters,
         query,

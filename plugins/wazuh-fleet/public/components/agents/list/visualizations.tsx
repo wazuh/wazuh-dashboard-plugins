@@ -134,7 +134,12 @@ export const getKPIsPanel = (
 });
 
 export const AgentsVisualizations = (props: {
-  searchBarProps: { dateRangeFrom: string; dateRangeTo: string; query: string };
+  searchBarProps: {
+    dateRangeFrom: string;
+    dateRangeTo: string;
+    query: string;
+    filters: any[];
+  };
 }) => {
   const { searchBarProps } = props;
   const plugins = getPlugins();
@@ -152,7 +157,7 @@ export const AgentsVisualizations = (props: {
           // and embeddables need index pattern.
           panels: getKPIsPanel('wazuh-agents*'),
           isFullScreenMode: false,
-          filters: [],
+          filters: searchBarProps.filters,
           useMargins: true,
           id: 'agents-visualizations',
           timeRange: {

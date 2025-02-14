@@ -36,14 +36,27 @@ export const EditAgentGroupsModal = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const handleOnSave = async () => {
-    setIsSaving(true);
-    await getAgentManagement().editGroup(
-      agent.agent.id,
-      selectedGroups.map(group => group.label),
-    );
-    setIsSaving(false);
-    reloadAgents();
-    onClose();
+    try {
+      setIsSaving(true);
+      await getAgentManagement().editGroup(
+        agent.agent.id,
+        selectedGroups.map(group => group.label),
+      );
+      setIsSaving(false);
+      reloadAgents();
+      onClose();
+    } catch {
+      setIsSaving(false);
+    }
+  };
+
+  const onCreateOption = (searchValue: string) => {
+    const newOption = {
+      label: searchValue,
+    };
+
+    // Select the option.
+    setSelectedGroups([...selectedGroups, newOption]);
   };
 
   const form = (
@@ -78,11 +91,14 @@ export const EditAgentGroupsModal = ({
             <EuiComboBox
               placeholder='Select groups'
               options={[]}
-              // options={groups?.map(group => ({ label: group })) || []}
               selectedOptions={selectedGroups}
               onChange={selectedGroups => setSelectedGroups(selectedGroups)}
               isLoading={false}
               clearOnBlur
+              // TODO: Change when the endpoint or index pattern is available to request the groups
+              // options={groups?.map(group => ({ label: group })) || []}
+              noSuggestions
+              onCreateOption={onCreateOption}
             />
           </EuiFormRow>
         </EuiFlexItem>

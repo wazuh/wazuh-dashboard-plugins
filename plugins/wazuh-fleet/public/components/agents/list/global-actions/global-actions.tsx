@@ -7,7 +7,7 @@ import {
   EuiHorizontalRule,
   EuiToolTip,
 } from '@elastic/eui';
-import { AgentManagement } from '../../../../services/agent-management';
+import { getAgentManagement } from '../../../../plugin-services';
 import { Agent } from '../../../../../common/types';
 import { ConfirmModal } from '../../../common/confirm-modal/confirm-modal';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
@@ -45,6 +45,7 @@ export const AgentsTableGlobalActions = ({
     'add' | 'remove'
   >();
   const [isUpgradeAgentsVisible, setIsUpgradeAgentsVisible] = useState(false);
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
 
   const onButtonClick = () => {
     setPopover(!isPopoverOpen);
@@ -54,9 +55,15 @@ export const AgentsTableGlobalActions = ({
     setPopover(false);
   };
 
-  const confirmDelete = () => {
-    AgentManagement().delete(selectedAgents.map(agent => agent.agent.id));
-    setIsDeleteAgentsVisible(false);
+  const confirmDelete = async () => {
+    try {
+      setIsLoadingModal(true);
+      await getAgentManagement().delete(selectedAgents.map(agent => agent._id));
+      setIsLoadingModal(false);
+      setIsDeleteAgentsVisible(false);
+    } catch {
+      setIsLoadingModal(false);
+    }
   };
 
   const button = (
@@ -206,6 +213,7 @@ export const AgentsTableGlobalActions = ({
         onCancel={() => setIsDeleteAgentsVisible(false)}
         confirmButtonText='Delete'
         buttonColor='danger'
+        isLoading={isLoadingModal}
       />
     </>
   );

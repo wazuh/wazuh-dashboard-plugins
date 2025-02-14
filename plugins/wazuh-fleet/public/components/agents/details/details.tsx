@@ -13,7 +13,7 @@ import {
   EuiContextMenu,
 } from '@elastic/eui';
 import { Agent } from '../../../../common/types';
-import { search } from '../../common/table-indexer/components/search-bar/search-bar-service';
+import { getAgentManagement } from '../../../plugin-services';
 import { AgentResume } from './resume';
 import { AgentDashboard } from './dashboard';
 import { AgentNetworks } from './networks';
@@ -39,21 +39,10 @@ export const AgentDetails = ({
       return;
     }
 
-    search({
-      indexPattern: indexPatterns,
-      filters: [
-        {
-          match_phrase: {
-            'agent.id': {
-              query: id,
-            },
-          },
-        },
-      ],
-      filePrefix: '',
-    })
+    getAgentManagement()
+      .getByAgentId(id)
       .then((results: any) => {
-        setAgentData(results?.hits?.hits?.[0]?._source);
+        setAgentData(results?.hits?.[0]?._source);
         setIsAgentLoading(false);
       })
       .catch((error: any) => {

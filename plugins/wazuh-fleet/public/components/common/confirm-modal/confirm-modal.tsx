@@ -10,6 +10,7 @@ interface ConfirmModalProps {
   confirmButtonText?: string;
   cancelButtonText?: string;
   buttonColor?: string;
+  isLoading?: boolean;
 }
 
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -21,6 +22,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   confirmButtonText = 'Confirm',
   cancelButtonText = 'Cancel',
   buttonColor = 'danger',
+  isLoading = false,
 }) => {
   if (!isVisible) {
     return null;
@@ -34,6 +36,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       cancelButtonText={cancelButtonText}
       confirmButtonText={confirmButtonText}
       buttonColor={buttonColor}
+      isLoading={isLoading}
       defaultFocusedButton='confirm'
     >
       <p>{message}</p>

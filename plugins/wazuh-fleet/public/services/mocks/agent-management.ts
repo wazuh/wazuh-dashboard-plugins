@@ -1,138 +1,297 @@
-import { cloneDeep } from 'lodash';
-import { agentsMock } from './agents-data';
+import dateMath from '@elastic/datemath';
+import { parse } from 'query-string';
+import { SearchResponse } from '../../../../../src/core/server';
+import { getPlugins, getToasts } from '../../plugin-services';
+import { OpenSearchQuerySortValue } from '../../../../../src/plugins/data/public';
+
+const MAX_ENTRIES_PER_QUERY = 10000;
+const DEFAULT_PAGE_SIZE = 100;
+
+export const deleteAgent = (documentId: string | string[]): Promise<any> =>
+  new Promise((resolve, reject) => {
+    // Simulate API delay
+    setTimeout(() => {
+      // Simulate random success/error (50% success rate)
+      if (Math.random() > 0.5) {
+        resolve({
+          status: 200,
+          body: {
+            message: `Agent${Array.isArray(documentId) ? 's' : ''} deleted successfully`,
+            data: {
+              affected_items: Array.isArray(documentId)
+                ? documentId
+                : [documentId],
+              failed_items: [],
+              total_affected_items: Array.isArray(documentId)
+                ? documentId.length
+                : 1,
+              total_failed_items: 0,
+            },
+          },
+        });
+      } else {
+        reject({
+          status: 500,
+          body: {
+            message: 'Error deleting agent(s)',
+            error: 1,
+            data: {
+              affected_items: [],
+              failed_items: Array.isArray(documentId)
+                ? documentId
+                : [documentId],
+              total_affected_items: 0,
+              total_failed_items: Array.isArray(documentId)
+                ? documentId.length
+                : 1,
+            },
+          },
+        });
+      }
+    }, 1000); // 500ms delay
+  });
+
+export const editAgentGroups = (
+  documentId: string | string[],
+  groupIds: string | string[],
+): Promise<any> =>
+  new Promise((resolve, reject) => {
+    // Simulate API delay
+    setTimeout(() => {
+      // Simulate random success/error (50% success rate)
+      if (Math.random() > 0.5) {
+        resolve({
+          status: 200,
+          body: {
+            message: `${Array.isArray(groupIds) ? groupIds.join(', ') : groupIds} added successfully to agent${Array.isArray(documentId) ? 's' : ''}`,
+            data: {
+              affected_items: Array.isArray(documentId)
+                ? documentId
+                : [documentId],
+              failed_items: [],
+              total_affected_items: Array.isArray(documentId)
+                ? documentId.length
+                : 1,
+              total_failed_items: 0,
+            },
+          },
+        });
+      } else {
+        reject({
+          status: 500,
+          body: {
+            message: 'Error editing agent(s)',
+            error: 1,
+            data: {
+              affected_items: [],
+              failed_items: Array.isArray(documentId)
+                ? documentId
+                : [documentId],
+              total_affected_items: 0,
+              total_failed_items: Array.isArray(documentId)
+                ? documentId.length
+                : 1,
+            },
+          },
+        });
+      }
+    }, 1000); // 500ms delay
+  });
+
+export const addOrRemoveGroups = async (
+  documentId: string | string[],
+  groupIds: string | string[],
+  action: 'add' | 'remove',
+) => {
+  try {
+    if (action === 'add') {
+      await editAgentGroups(documentId, groupIds);
+    } else {
+      await editAgentGroups(documentId, groupIds);
+    }
+
+    getToasts().add({
+      color: 'success',
+      title: `${action === 'add' ? 'Added' : 'Removed'} successfully`,
+      text: `${Array.isArray(groupIds) ? groupIds.join(', ') : groupIds} ${action === 'add' ? 'added' : 'removed'} successfully to agent${Array.isArray(documentId) ? 's' : ''}`,
+      toastLifeTimeMs: 3000,
+    });
+  } catch (error) {
+    getToasts().add({
+      color: 'danger',
+      title: 'Error editing agent groups',
+      text: error.message || 'Error editing agent groups',
+      toastLifeTimeMs: 3000,
+    });
+    throw error;
+  }
+};
 
 export const queryManagerService = () => {
-  const state = {
-    currentFilters: [],
-    currentPagination: {
-      pageSize: 10,
-      pageIndex: 0,
-    },
-    currentSort: {
-      field: '_id',
-      direction: 'asc',
-    },
-    currentQuery: '',
+  let currentContext = null;
+
+  const createContext = async ({
+    indexPatternId,
+    fixedFilters = [],
+  }: {
+    indexPatternId: string;
+    fixedFilters: object[] | [];
+  }) => {
+    currentContext = {
+      indexPattern: await getPlugins().data.indexPatterns.get(indexPatternId),
+      filters: fixedFilters,
+      pagination: {
+        pageIndex: 0,
+        pageSize: 10,
+      },
+      sorting: {
+        columns: [],
+      },
+      query: undefined,
+    };
+
+    return currentContext;
   };
 
-  const addFilter = (filters = []) => {
-    state.currentFilters = Array.isArray(filters) ? filters : [filters];
+  /**
+   * Parse the query string and return an object with the query parameters
+   */
+  const parseQueryString = () => {
+    // window.location.search is an empty string
+    // get search from href
+    const hrefSplit = globalThis.location.href.split('?');
 
-    // eslint-disable-next-line no-use-before-define
-    return manager;
+    if (hrefSplit.length <= 1) {
+      return {};
+    }
+
+    return parse(hrefSplit[1], { sort: false });
   };
 
-  const addPagination = pagination => {
-    state.currentPagination = pagination;
+  /**
+   * Get the forceNow query parameter
+   */
+  const getForceNow = () => {
+    const forceNow = parseQueryString().forceNow as string;
 
-    // eslint-disable-next-line no-use-before-define
-    return manager;
-  };
+    if (!forceNow) {
+      return;
+    }
 
-  const addSort = sort => {
-    state.currentSort = sort;
+    const ticks = Date.parse(forceNow);
 
-    // eslint-disable-next-line no-use-before-define
-    return manager;
-  };
-
-  const addQuery = query => {
-    state.currentQuery = query;
-
-    // eslint-disable-next-line no-use-before-define
-    return manager;
-  };
-
-  const executeQuery = () => {
-    const filteredAgents = cloneDeep(agentsMock);
-
-    // Apply filters
-    if (state.currentFilters.length > 0) {
-      filteredAgents.hits.hits = filteredAgents.hits.hits.filter(agent =>
-        state.currentFilters.every(filter => {
-          const [field, value] = filter.split(':');
-          const fieldPath = field.split('.');
-          let fieldValue = agent._source;
-
-          for (const path of fieldPath) {
-            fieldValue = fieldValue[path];
-
-            if (!fieldValue) {
-              return false;
-            }
-          }
-
-          return fieldValue
-            .toString()
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        }),
+    if (Number.isNaN(ticks)) {
+      throw new TypeError(
+        `forceNow query parameter, ${forceNow}, can't be parsed by Date.parse`,
       );
     }
 
-    // Apply query (search in all fields)
-    if (state.currentQuery && state.currentQuery.length > 0) {
-      filteredAgents.hits.hits = filteredAgents.hits.hits.filter(agent => {
-        const searchIn = JSON.stringify(agent._source).toLowerCase();
+    return new Date(ticks);
+  };
 
-        // Fix query reference
-
-        return searchIn.includes(state.currentQuery.toLowerCase());
-      });
+  const search = async (params: any = {}): Promise<SearchResponse> => {
+    if (!currentContext) {
+      throw new Error('Context must be created before searching');
     }
 
-    // Apply sort
-    if (state.currentSort && state.currentSort.field) {
-      filteredAgents.hits.hits.sort((a, b) => {
-        let valueA, valueB;
+    const searchParams = {
+      ...currentContext,
+      ...params,
+      indexPattern: currentContext.indexPattern,
+      filters: [...(currentContext.filters || []), ...(params.filter || [])],
+      pagination: { ...currentContext.pagination, ...params.pagination },
+      sorting: params.sort || currentContext.sorting,
+    };
+    const {
+      indexPattern,
+      filters: defaultFilters,
+      query,
+      pagination,
+      sorting,
+      fields,
+      aggs,
+    } = searchParams;
 
-        if (state.currentSort.field === '_id') {
-          valueA = a?._id;
-          valueB = b?._id;
-        } else {
-          const fieldPath = state.currentSort.field?.split('.');
-
-          valueA = a?._source;
-          valueB = b?._source;
-
-          for (const path of fieldPath) {
-            if (!valueA || !valueB) {
-              break;
-            }
-
-            valueA = valueA?.[path];
-            valueB = valueB?.[path];
-          }
-        }
-
-        if (!valueA || !valueB) {
-          return 0;
-        }
-
-        return state.currentSort.direction === 'asc'
-          ? String(valueA).localeCompare(String(valueB))
-          : String(valueB).localeCompare(String(valueA));
-      });
+    if (!indexPattern) {
+      return;
     }
 
-    // Apply pagination
-    if (state.currentPagination) {
-      const { pageIndex, pageSize } = state.currentPagination;
-      const start = pageIndex * pageSize;
-      const end = start + pageSize;
+    const data = getPlugins().data;
+    const searchSource = await data.search.searchSource.create();
+    const paginationPageSize = pagination?.pageSize || DEFAULT_PAGE_SIZE;
+    const fromField = (pagination?.pageIndex || 0) * paginationPageSize;
+    // If the paginationPageSize + the offset exceeds the 10000 result limit of OpenSearch, truncates the page size
+    // to avoid an exception
+    const pageSize =
+      paginationPageSize + fromField < MAX_ENTRIES_PER_QUERY
+        ? paginationPageSize
+        : MAX_ENTRIES_PER_QUERY - fromField;
+    const sortOrder: OpenSearchQuerySortValue[] = {
+      [sorting.field]: {
+        order: sorting.direction,
+      },
+    };
+    let filters = defaultFilters;
 
-      filteredAgents.hits.hits = filteredAgents.hits.hits.slice(start, end);
+    // check if dateRange is defined
+    if (params.dateRange && params.dateRange?.from && params.dateRange?.to) {
+      const { from, to } = params.dateRange;
+
+      filters = [
+        ...filters,
+        {
+          range: {
+            [indexPattern.timeFieldName || 'timestamp']: {
+              gte: dateMath.parse(from).toISOString(),
+              /* roundUp: true is used to transform the osd dateform to a generic date format
+              For instance: the "This week" date range in the date picker.
+              To: now/w
+              From: now/w
+              Without the roundUp the to and from date will be the same and the search will return no results or error
+
+              - src/plugins/data/common/query/timefilter/get_time.ts
+            */
+              lte: dateMath
+                .parse(to, { roundUp: true, forceNow: getForceNow() })
+                .toISOString(),
+              format: 'strict_date_optional_time',
+            },
+          },
+        },
+      ];
     }
 
-    return filteredAgents;
+    const searchParamsRequest = searchSource
+      .setParent(undefined)
+      .setField('filter', filters)
+      .setField('query', query)
+      .setField('sort', sortOrder)
+      .setField('size', pageSize)
+      .setField('from', fromField)
+      .setField('index', indexPattern);
+
+    if (fields && Array.isArray(fields) && fields.length > 0) {
+      searchParamsRequest.setField('fields', fields);
+    }
+
+    if (aggs) {
+      searchParamsRequest.setField('aggs', aggs);
+    }
+
+    try {
+      return await searchParamsRequest.fetch();
+    } catch (error) {
+      if (error.body) {
+        throw error.body;
+      }
+
+      throw error;
+    }
   };
 
   const manager = {
-    addFilter,
-    addPagination,
-    addSort,
-    addQuery,
-    executeQuery,
+    createContext,
+    search,
   };
 
   return manager;

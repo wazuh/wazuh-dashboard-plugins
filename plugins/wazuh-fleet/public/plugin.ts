@@ -15,6 +15,12 @@ import {
 import { appSetup } from './application';
 import NavigationService from './react-services/navigation-service';
 import { AgentManagement } from './services/agent-management';
+import {
+  addOrRemoveGroups,
+  deleteAgent,
+  editAgentGroups,
+  queryManagerService,
+} from './services/mocks/agent-management';
 
 export class WazuhFleetPlugin
   implements Plugin<WazuhFleetPluginSetup, WazuhFleetPluginStart>
@@ -22,7 +28,22 @@ export class WazuhFleetPlugin
   public setup(core: CoreSetup): WazuhFleetPluginSetup {
     appSetup({
       registerApp: app => core.application.register(app),
-      agentManagement: AgentManagement(),
+      agentManagement: AgentManagement({
+        queryManagerService,
+        getIndexPatternId: () => 'wazuh-agents*',
+        deleteAgent: (agentId: string | string[]) => deleteAgent(agentId),
+        editAgentGroups: (
+          groupsIds: string | string[],
+          documentId: string | string[],
+        ) => editAgentGroups(groupsIds, documentId),
+        addOrRemoveGroups: (
+          agentId: string[],
+          groups: string | string[],
+          addOrRemove: 'add' | 'remove',
+        ) => addOrRemoveGroups(agentId, groups, addOrRemove),
+        editAgentName: (agentId: string | string[], name: string) =>
+          editAgentGroups(agentId, name),
+      }),
       enrollmentAgentManagement: {
         async getServerAddress() {
           // TODO: this should be replaced by getWazuhCore().configuration.get that in the current state does not return the setting because this is filtering by settings with the category 'wazuhCore'.

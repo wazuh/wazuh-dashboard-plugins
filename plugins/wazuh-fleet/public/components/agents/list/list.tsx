@@ -35,6 +35,7 @@ export const AgentList = (props: AgentListProps) => {
   const [agent, setAgent] = useState<Agent>();
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [agentSelected, setAgentSelected] = useState<Agent[]>([]);
 
@@ -55,10 +56,16 @@ export const AgentList = (props: AgentListProps) => {
     setAgent(undefined);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (agent) {
-      getAgentManagement().delete(agent.agent.id);
-      closeModal();
+      try {
+        setIsLoadingModal(true);
+        await getAgentManagement().delete(agent.agent.id);
+        setIsLoadingModal(false);
+        closeModal();
+      } catch {
+        setIsLoadingModal(false);
+      }
     }
   };
 
@@ -125,17 +132,16 @@ export const AgentList = (props: AgentListProps) => {
           agent={agent}
         />
       )}
-      {isDeleteModalVisible && (
-        <ConfirmModal
-          isVisible={isDeleteModalVisible}
-          title='Delete agent'
-          message='Are you sure you want to delete this agent?'
-          onConfirm={confirmDelete}
-          onCancel={closeModal}
-          confirmButtonText='Delete'
-          buttonColor='danger'
-        />
-      )}
+      <ConfirmModal
+        isVisible={isDeleteModalVisible}
+        title='Delete agent'
+        message='Are you sure you want to delete this agent?'
+        onConfirm={confirmDelete}
+        onCancel={closeModal}
+        confirmButtonText='Delete'
+        buttonColor='danger'
+        isLoading={isLoadingModal}
+      />
       {isUpgradeModalVisible && agent && (
         <UpgradeAgentModal
           agent={agent}
