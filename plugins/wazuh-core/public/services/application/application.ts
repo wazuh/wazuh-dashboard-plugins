@@ -111,18 +111,14 @@ export class ApplicationService {
     const mount = app.mount.bind(app) as AppMount;
 
     app.mount = async (params: AppMountParameters) => {
-      if (this.isNavGroupEnabled()) {
-        appOperations?.beforeMount?.();
-      }
+      appOperations?.beforeMount?.();
 
       const unmount = await mount(params);
 
       return () => {
         this.logger?.debug(`Unmount [AppId: ${app.id}]`);
 
-        if (this.isNavGroupEnabled()) {
-          appOperations?.cleanup?.();
-        }
+        appOperations?.cleanup?.();
 
         return unmount();
       };
@@ -152,8 +148,10 @@ export class ApplicationService {
     const navGroupId = this.getNavGroupId(app.id);
 
     const beforeMount = () => {
-      this.getAppUpdater(navGroupId).next(this.setNavLinkVisible);
-      this.appStartup$.next(navGroupId);
+      if (getCore().chrome.navGroup.getNavGroupEnabled()) {
+        this.getAppUpdater(navGroupId).next(this.setNavLinkVisible);
+        this.appStartup$.next(navGroupId);
+      }
 
       if (!getCore().chrome.navGroup.getNavGroupEnabled()) {
         getCore().application.navigateToApp(subApps[0].id);
@@ -186,11 +184,15 @@ export class ApplicationService {
     const navGroupId = this.getNavGroupId(app.id);
 
     const beforeMount = () => {
-      this.getAppUpdater(navGroupId).next(this.setNavLinkVisible);
+      if (getCore().chrome.navGroup.getNavGroupEnabled()) {
+        this.getAppUpdater(navGroupId).next(this.setNavLinkVisible);
+      }
     };
 
     const cleanup = () => {
-      this.getAppUpdater(navGroupId).next(this.setNavLinkHidden);
+      if (getCore().chrome.navGroup.getNavGroupEnabled()) {
+        this.getAppUpdater(navGroupId).next(this.setNavLinkHidden);
+      }
     };
 
     this.modifyMount(app, { beforeMount, cleanup });
