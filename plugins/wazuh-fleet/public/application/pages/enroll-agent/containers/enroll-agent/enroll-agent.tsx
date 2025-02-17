@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -7,7 +7,6 @@ import {
   EuiPage,
   EuiPageBody,
   EuiSpacer,
-  EuiProgress,
 } from '@elastic/eui';
 import './enroll-agent.scss';
 import { Steps } from '../steps/steps';
@@ -19,16 +18,10 @@ import {
   validateEnrollmentKey,
   validateServerAddress,
 } from '../../utils/validations';
-import {
-  getEnrollAgentManagement,
-  getWazuhCore,
-} from '../../../../../plugin-services';
-import { version } from '../../../../../../package.json';
+import { getEnrollAgentManagement } from '../../../../../plugin-services';
 
 export const EnrollAgent = () => {
   const configuration = {}; // TODO:  Use a live state (reacts to changes through some hook that provides the configuration);
-  const [_wazuhVersion, setWazuhVersion] = useState('');
-  const [loading, setLoading] = useState(false);
   const initialFields: FormConfiguration = {
     operatingSystemSelection: {
       type: 'custom',
@@ -78,36 +71,6 @@ export const EnrollAgent = () => {
   };
   const form = useForm(initialFields);
 
-  const getWazuhVersion = async () => {
-    try {
-      const result = await getWazuhCore().http.server.request('GET', '/', {});
-
-      return result?.data?.data?.api_version;
-    } catch {
-      // TODO: manage error
-
-      return version;
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const wazuhVersion = await getWazuhVersion();
-
-        setWazuhVersion(wazuhVersion);
-        setLoading(false);
-      } catch {
-        setWazuhVersion(version);
-        setLoading(false);
-
-        // TODO: manage error
-      }
-    };
-
-    fetchData();
-  }, []);
-
   return (
     <div>
       <EuiPage style={{ background: 'transparent' }}>
@@ -123,18 +86,9 @@ export const EnrollAgent = () => {
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer />
-                {loading ? (
-                  <>
-                    <EuiFlexItem>
-                      <EuiProgress size='xs' color='primary' />
-                    </EuiFlexItem>
-                    <EuiSpacer></EuiSpacer>
-                  </>
-                ) : (
-                  <EuiFlexItem>
-                    <Steps form={form} />
-                  </EuiFlexItem>
-                )}
+                <EuiFlexItem>
+                  <Steps form={form} />
+                </EuiFlexItem>
               </EuiPanel>
             </EuiFlexItem>
           </EuiFlexGroup>
