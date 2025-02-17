@@ -14,6 +14,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.11.0
 
+### Fixed
+
+- Fixed documentation links related to agent management [#7299](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7299)
+
 ### Changed
 
 - Refined the layout of the agent details view [#7193](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7193)
