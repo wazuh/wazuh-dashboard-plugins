@@ -1,7 +1,7 @@
 import dateMath from '@elastic/datemath';
 import { parse } from 'query-string';
 import { SearchResponse } from '../../../../../src/core/server';
-import { getPlugins, getToasts } from '../../plugin-services';
+import { getPlugins } from '../../plugin-services';
 import { OpenSearchQuerySortValue } from '../../../../../src/plugins/data/public';
 
 const MAX_ENTRIES_PER_QUERY = 10000;
@@ -51,8 +51,44 @@ export const deleteAgent = (documentId: string | string[]): Promise<any> =>
     }, 1000); // 500ms delay
   });
 
-export const editAgentGroups = (
-  documentId: string | string[],
+export const editName = (agentId: string, newName: string): Promise<any> =>
+  new Promise((resolve, reject) => {
+    // Simulate API delay
+    setTimeout(() => {
+      // Simulate random success/error (50% success rate)
+      if (Math.random() > 0.5) {
+        resolve({
+          status: 200,
+          body: {
+            message: `Renamed agent ${agentId} successfully to ${newName}`,
+            data: {
+              affected_items: [agentId],
+              failed_items: [],
+              total_affected_items: 1,
+              total_failed_items: 0,
+            },
+          },
+        });
+      } else {
+        reject({
+          status: 500,
+          body: {
+            message: `Error renaming agent ${agentId} to ${newName}`,
+            error: 1,
+            data: {
+              affected_items: [],
+              failed_items: [agentId],
+              total_affected_items: 0,
+              total_failed_items: 1,
+            },
+          },
+        });
+      }
+    }, 1000); // 500ms delay
+  });
+
+export const removeGroups = (
+  agentId: string | string[],
   groupIds: string | string[],
 ): Promise<any> =>
   new Promise((resolve, reject) => {
@@ -63,15 +99,11 @@ export const editAgentGroups = (
         resolve({
           status: 200,
           body: {
-            message: `${Array.isArray(groupIds) ? groupIds.join(', ') : groupIds} added successfully to agent${Array.isArray(documentId) ? 's' : ''}`,
+            message: `${Array.isArray(groupIds) ? groupIds.join(', ') : groupIds} removed successfully to agent${Array.isArray(agentId) ? 's' : ''}`,
             data: {
-              affected_items: Array.isArray(documentId)
-                ? documentId
-                : [documentId],
+              affected_items: Array.isArray(agentId) ? agentId : [agentId],
               failed_items: [],
-              total_affected_items: Array.isArray(documentId)
-                ? documentId.length
-                : 1,
+              total_affected_items: Array.isArray(agentId) ? agentId.length : 1,
               total_failed_items: 0,
             },
           },
@@ -80,17 +112,13 @@ export const editAgentGroups = (
         reject({
           status: 500,
           body: {
-            message: 'Error editing agent(s)',
+            message: 'Error removing agent(s)',
             error: 1,
             data: {
               affected_items: [],
-              failed_items: Array.isArray(documentId)
-                ? documentId
-                : [documentId],
+              failed_items: Array.isArray(agentId) ? agentId : [agentId],
               total_affected_items: 0,
-              total_failed_items: Array.isArray(documentId)
-                ? documentId.length
-                : 1,
+              total_failed_items: Array.isArray(agentId) ? agentId.length : 1,
             },
           },
         });
@@ -98,31 +126,14 @@ export const editAgentGroups = (
     }, 1000); // 500ms delay
   });
 
-export const addOrRemoveGroups = async (
+export const addGroups = async (
   documentId: string | string[],
   groupIds: string | string[],
-  action: 'add' | 'remove',
 ) => {
   try {
-    if (action === 'add') {
-      await editAgentGroups(documentId, groupIds);
-    } else {
-      await editAgentGroups(documentId, groupIds);
-    }
-
-    getToasts().add({
-      color: 'success',
-      title: `${action === 'add' ? 'Added' : 'Removed'} successfully`,
-      text: `${Array.isArray(groupIds) ? groupIds.join(', ') : groupIds} ${action === 'add' ? 'added' : 'removed'} successfully to agent${Array.isArray(documentId) ? 's' : ''}`,
-      toastLifeTimeMs: 3000,
-    });
+    await removeGroups(documentId, groupIds);
   } catch (error) {
-    getToasts().add({
-      color: 'danger',
-      title: 'Error editing agent groups',
-      text: error.message || 'Error editing agent groups',
-      toastLifeTimeMs: 3000,
-    });
+    console.log(error);
     throw error;
   }
 };

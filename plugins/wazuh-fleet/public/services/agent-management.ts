@@ -9,9 +9,9 @@ export const AgentManagement = ({
   queryManagerService,
   getIndexPatternId,
   deleteAgent,
-  editAgentGroups,
+  removeGroups,
   editAgentName,
-  addOrRemoveGroups,
+  addGroups,
 }: IAgentManagementProps): IAgentManagement => {
   const getAll = async (params: IGetAllParams) => {
     const { filter, query, pagination, sort } = params;
@@ -95,87 +95,69 @@ export const AgentManagement = ({
   };
 
   const handleEditAgentName = async (id: string, newName: string) => {
-    if (newName === '') {
-      getToasts().add({
-        color: 'danger',
-        title: 'Error editing agent name',
-        text: 'Agent name cannot be empty',
-        toastLifeTimeMs: 3000,
-      });
-      throw new Error('Agent name cannot be empty');
-    }
-
     try {
       await editAgentName(id, newName);
       getToasts().add({
         color: 'primary',
-        title: 'Agent groups edited',
-        text: 'Agent groups edited successfully',
+        title: 'Agent name edited',
+        text: `Agent name edited successfully to ${newName}`,
         toastLifeTimeMs: 3000,
       });
     } catch (error) {
       getToasts().add({
         color: 'danger',
-        title: 'Error editing agent groups',
-        text: error.message || 'Error editing agent groups',
+        title: 'Error editing agent name',
+        text: error.message || 'Error editing agent name',
         toastLifeTimeMs: 3000,
       });
       throw error;
     }
   };
 
-  const editAgentGroup = async (
-    id: string | string[],
+  const handleRemoveGroupToAgents = async (
+    agentId: string,
     groupsIds: string | string[],
   ) => {
-    if (groupsIds.length === 0) {
-      getToasts().add({
-        color: 'danger',
-        title: 'Error editing agent groups',
-        text: 'Agent groups cannot be empty',
-        toastLifeTimeMs: 3000,
-      });
-
-      throw new Error('Agent groups cannot be empty');
-    }
-
     try {
-      await editAgentGroups(id, groupsIds);
+      await removeGroups(agentId, groupsIds);
       getToasts().add({
         color: 'primary',
-        title: 'Agent groups edited',
-        text: 'Agent groups edited successfully',
+        title: 'Agent groups removed',
+        text: `${
+          Array.isArray(groupsIds) ? groupsIds.join(', ') : groupsIds
+        } removed from agent ${agentId} successfully`,
         toastLifeTimeMs: 3000,
       });
     } catch (error) {
       getToasts().add({
         color: 'danger',
-        title: 'Error editing agent groups',
-        text: error.message || 'Error editing agent groups',
+        title: 'Error removing agent groups',
+        text: error.message || 'Error removing agent groups',
         toastLifeTimeMs: 3000,
       });
       throw error;
     }
   };
 
-  const handleAddOrRemoveGroupsToAgents = async (
-    listIds: string[],
+  const handleAddGroupToAgents = async (
+    agentId: string,
     groupsIds: string | string[],
-    addOrRemove: 'add' | 'remove',
   ) => {
     try {
-      await addOrRemoveGroups(listIds, groupsIds, addOrRemove);
+      await addGroups(agentId, groupsIds);
       getToasts().add({
         color: 'primary',
         title: 'Agent groups edited',
-        text: 'Agent groups edited successfully',
+        text: `${
+          Array.isArray(groupsIds) ? groupsIds.join(', ') : groupsIds
+        } added to agent ${agentId} successfully`,
         toastLifeTimeMs: 3000,
       });
     } catch (error) {
       getToasts().add({
         color: 'danger',
         title: 'Error editing agent groups',
-        text: error.message || 'Error editing agent groups',
+        text: error.message || 'Error adding agent groups',
         toastLifeTimeMs: 3000,
       });
       throw error;
@@ -191,12 +173,9 @@ export const AgentManagement = ({
     upgrade: async (id: string) => await upgradeAgent(id),
     editName: async (id: string, newName: string) =>
       await handleEditAgentName(id, newName),
-    editGroup: async (id: string, groupsIds: string | string[]) =>
-      await editAgentGroup(id, groupsIds),
-    addOrRemoveGroupsToAgents: async (
-      listIds: string[],
-      groupsIds: string | string[],
-      addOrRemove: 'add' | 'remove',
-    ) => await handleAddOrRemoveGroupsToAgents(listIds, groupsIds, addOrRemove),
+    removeGroups: async (id: string, groupsIds: string | string[]) =>
+      await handleRemoveGroupToAgents(id, groupsIds),
+    addGroups: async (listIds: string, groupsIds: string | string[]) =>
+      await handleAddGroupToAgents(listIds, groupsIds),
   };
 };

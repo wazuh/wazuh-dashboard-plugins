@@ -24,29 +24,18 @@ export interface IAgentManagement {
   getByAgentId: (id: string) => Promise<ISearch>;
   delete: (id: string | string[]) => Promise<void>;
   upgrade: (id: string) => Promise<void>;
-  editGroup: (id: string, groups: string | string[]) => Promise<void>;
+  removeGroups: (id: string, groups: string | string[]) => Promise<void>;
   editName: (id: string, newName: string) => Promise<void>;
-  addOrRemoveGroupsToAgents: (
-    id: string[],
-    group: string | string[],
-    addOrRemove: 'add' | 'remove',
-  ) => Promise<void>;
+  addGroups: (id: string, group: string | string[]) => Promise<void>;
 }
 
 export interface IAgentManagementProps {
   queryManagerService: any;
   getIndexPatternId: () => string;
   deleteAgent: (documentId: string | string[]) => Promise<any>;
-  editAgentGroups: (
-    agentId: string | string[],
-    groups: string | string[],
-  ) => Promise<any>;
+  removeGroups: (agentId: string, groups: string | string[]) => Promise<any>;
   editAgentName: (agentId: string, newName: string) => Promise<any>;
-  addOrRemoveGroups: (
-    agentId: string[],
-    groups: string | string[],
-    addOrRemove: 'add' | 'remove',
-  ) => Promise<any>;
+  addGroups: (agentId: string, groups: string | string[]) => Promise<any>;
 }
 
 export interface AppSetup {

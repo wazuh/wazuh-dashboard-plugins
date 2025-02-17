@@ -36,12 +36,37 @@ export const EditAgentGroupsModal = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const handleOnSave = async () => {
+    const flatSelectedGroups = selectedGroups.map(group => group.label);
+    const addedGroups =
+      flatSelectedGroups.filter(
+        group => !agent.agent.groups?.includes(group),
+      ) || [];
+    const removedGroups =
+      agent.agent.groups?.filter(
+        group => !flatSelectedGroups.includes(group),
+      ) || [];
+
+    if (removedGroups.length === 0 && addedGroups.length === 0) {
+      setIsSaving(false);
+      onClose();
+
+      return;
+    }
+
     try {
       setIsSaving(true);
-      await getAgentManagement().editGroup(
-        agent.agent.id,
-        selectedGroups.map(group => group.label),
-      );
+
+      if (addedGroups.length > 0) {
+        await getAgentManagement().addGroups(agent.agent.id, addedGroups);
+      }
+
+      if (removedGroups.length > 0) {
+        await getAgentManagement().removeGroups({
+          agentId: agent.agent.id,
+          groupIds: removedGroups,
+        });
+      }
+
       setIsSaving(false);
       reloadAgents();
       onClose();
@@ -94,7 +119,6 @@ export const EditAgentGroupsModal = ({
               selectedOptions={selectedGroups}
               onChange={selectedGroups => setSelectedGroups(selectedGroups)}
               isLoading={false}
-              clearOnBlur
               // TODO: Change when the endpoint or index pattern is available to request the groups
               // options={groups?.map(group => ({ label: group })) || []}
               noSuggestions

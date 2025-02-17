@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { EuiFlexGroup, EuiBasicTable, EuiFlexItem } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
+import { IAgentResponse } from '../../../../common/types';
 import { getAgentManagement } from '../../../plugin-services';
 import useSearchBar from './components/search-bar/use-search-bar';
 import { WzSearchBar } from './components/search-bar/search-bar';
@@ -126,7 +127,9 @@ export const TableIndexer = (props: {
       <EuiFlexItem>
         <EuiBasicTable
           columns={columns}
-          items={results?.hits?.map((item: any) => item._source) ?? []}
+          items={
+            results?.hits?.map((item: IAgentResponse) => item._source) ?? []
+          }
           loading={loadingSearch}
           pagination={tablePagination}
           sorting={sorting}

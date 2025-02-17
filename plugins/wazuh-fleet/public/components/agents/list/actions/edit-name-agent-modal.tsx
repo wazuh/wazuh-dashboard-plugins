@@ -64,7 +64,7 @@ export const EditAgentNameModal = ({
   const handleOnSave = async () => {
     try {
       setIsSaving(true);
-      await getAgentManagement().editName({ agent: { ...agent }, newName });
+      await getAgentManagement().editName(agent.agent.id, newName);
       setIsSaving(false);
       reloadAgents();
       onClose();

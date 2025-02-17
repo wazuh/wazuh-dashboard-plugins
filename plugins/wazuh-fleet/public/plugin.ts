@@ -16,10 +16,11 @@ import { appSetup } from './application';
 import NavigationService from './react-services/navigation-service';
 import { AgentManagement } from './services/agent-management';
 import {
-  addOrRemoveGroups,
+  addGroups,
   deleteAgent,
-  editAgentGroups,
+  removeGroups,
   queryManagerService,
+  editName,
 } from './services/mocks/agent-management';
 
 export class WazuhFleetPlugin
@@ -32,17 +33,12 @@ export class WazuhFleetPlugin
         queryManagerService,
         getIndexPatternId: () => 'wazuh-agents*',
         deleteAgent: (agentId: string | string[]) => deleteAgent(agentId),
-        editAgentGroups: (
-          groupsIds: string | string[],
-          documentId: string | string[],
-        ) => editAgentGroups(groupsIds, documentId),
-        addOrRemoveGroups: (
-          agentId: string[],
-          groups: string | string[],
-          addOrRemove: 'add' | 'remove',
-        ) => addOrRemoveGroups(agentId, groups, addOrRemove),
-        editAgentName: (agentId: string | string[], name: string) =>
-          editAgentGroups(agentId, name),
+        removeGroups: (agentId: string, groupsIds: string | string[]) =>
+          removeGroups(agentId, groupsIds),
+        addGroups: (agentId: string, groups: string | string[]) =>
+          addGroups(agentId, groups),
+        editAgentName: (agentId: string, name: string) =>
+          editName(agentId, name),
       }),
       enrollmentAgentManagement: {
         serverAddresSettingName: 'enrollment.dns',
