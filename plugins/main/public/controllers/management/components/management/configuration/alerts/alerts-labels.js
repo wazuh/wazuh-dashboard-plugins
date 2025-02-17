@@ -34,7 +34,9 @@ const columns = [
 const helpLinks = [
   {
     text: 'Agent labels',
-    href: webDocumentationLink('user-manual/agent/agent-management/labels.html'),
+    href: webDocumentationLink(
+      'user-manual/agent/agent-management/labels.html',
+    ),
   },
   {
     text: 'Labels reference',
