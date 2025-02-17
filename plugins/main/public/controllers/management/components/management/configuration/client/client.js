@@ -28,7 +28,7 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Checking connection with manager',
-    href: webDocumentationLink('user-manual/agents/agent-connection.html'),
+    href: webDocumentationLink('user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager'),
   },
   {
     text: 'Client reference',
