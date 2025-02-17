@@ -7,7 +7,9 @@ export function Application({ history }: { history: History }) {
   return (
     <Router history={history}>
       <Switch>
-        <Route path={'/enrollment/agent'} exact render={EnrollAgent}></Route>
+        <Route path={'/enrollment/agent'} exact>
+          <EnrollAgent />
+        </Route>
         <Redirect to='/enrollment/agent' />
       </Switch>
     </Router>

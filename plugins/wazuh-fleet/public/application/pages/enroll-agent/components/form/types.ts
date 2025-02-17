@@ -23,13 +23,14 @@ export interface IInputForm {
 // / use form hook types
 
 export type SettingTypes =
-  | 'text'
-  | 'textarea'
+  | 'editor'
+  | 'filepicker'
   | 'number'
+  | 'password'
   | 'select'
   | 'switch'
-  | 'editor'
-  | 'filepicker';
+  | 'text'
+  | 'textarea';
 
 interface FieldConfiguration {
   initialValue: any;

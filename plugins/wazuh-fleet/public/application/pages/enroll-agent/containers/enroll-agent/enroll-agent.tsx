@@ -9,10 +9,8 @@ import {
   EuiSpacer,
   EuiProgress,
 } from '@elastic/eui';
-import { compose } from 'redux';
 import './enroll-agent.scss';
 import { Steps } from '../steps/steps';
-import { InputForm } from '../../components/form';
 import { useForm } from '../../components/form/hooks';
 import { FormConfiguration } from '../../components/form/types';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
@@ -27,25 +25,9 @@ import {
 } from '../../../../../plugin-services';
 import { version } from '../../../../../../package.json';
 
-export const EnrollAgent = compose(
-  // TODO: add HOCs
-  // withErrorBoundary,
-  // withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
-  // withGlobalBreadcrumb([
-  //   {
-  //     text: endpointSummary.breadcrumbLabel,
-  //     href: `#${endpointSummary.redirectTo()}`,
-  //   },
-  //   { text: 'Enroll new agent' },
-  // ]),
-  // withUserAuthorizationPrompt([
-  //   [{ action: 'agent:create', resource: '*:*:*' }],
-  // ]),
-  // eslint-disable-next-line react/display-name
-  WrappedComponent => props => <WrappedComponent {...props} />,
-)(() => {
+export const EnrollAgent = () => {
   const configuration = {}; // TODO:  Use a live state (reacts to changes through some hook that provides the configuration);
-  const [wazuhVersion, setWazuhVersion] = useState('');
+  const [_wazuhVersion, setWazuhVersion] = useState('');
   const [loading, setLoading] = useState(false);
   const initialFields: FormConfiguration = {
     operatingSystemSelection: {
@@ -113,11 +95,10 @@ export const EnrollAgent = compose(
       try {
         const wazuhVersion = await getWazuhVersion();
 
-        // get wazuh password configuration
         setWazuhVersion(wazuhVersion);
         setLoading(false);
       } catch {
-        setWazuhVersion(wazuhVersion);
+        setWazuhVersion(version);
         setLoading(false);
 
         // TODO: manage error
@@ -126,10 +107,6 @@ export const EnrollAgent = compose(
 
     fetchData();
   }, []);
-
-  const osCard = (
-    <InputForm {...form.fields.operatingSystemSelection}></InputForm>
-  );
 
   return (
     <div>
@@ -155,7 +132,7 @@ export const EnrollAgent = compose(
                   </>
                 ) : (
                   <EuiFlexItem>
-                    <Steps form={form} osCard={osCard} />
+                    <Steps form={form} />
                   </EuiFlexItem>
                 )}
               </EuiPanel>
@@ -165,4 +142,4 @@ export const EnrollAgent = compose(
       </EuiPage>
     </div>
   );
-});
+};

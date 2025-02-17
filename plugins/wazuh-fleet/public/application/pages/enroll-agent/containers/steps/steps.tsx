@@ -34,18 +34,15 @@ import {
   getServerCredentialsStepStatus,
 } from '../../services/enroll-agent-steps-status-services';
 import OsCommandWarning from '../../components/command-output/os-warning';
+import { InputForm } from '../../components/form';
 
 interface IStepsProps {
   form: UseFormReturn;
-  osCard: React.ReactElement;
-  connection: {
-    isUDP: boolean;
-  };
 }
 
 const FORM_MESSAGE_CONJUNTION = ' and ';
 
-export const Steps = ({ form, osCard }: IStepsProps) => {
+export const Steps = ({ form }: IStepsProps) => {
   const initialParsedFormValues = {
     operatingSystem: {
       name: '',
@@ -127,7 +124,9 @@ export const Steps = ({ form, osCard }: IStepsProps) => {
   const enrollAgentFormSteps = [
     {
       title: 'Select the package to download and install on your system:',
-      children: osCard,
+      children: (
+        <InputForm {...form.fields.operatingSystemSelection}></InputForm>
+      ),
       status: getOSSelectorStepStatus(form.fields),
     },
     {
