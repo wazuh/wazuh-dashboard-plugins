@@ -71,14 +71,14 @@ describe('getDEBAMD64InstallCommand', () => {
     const result = getDEBAMD64InstallCommand(props);
 
     expect(result).toBe(
-      "sudo dpkg -i ./wazuh-agent_5.0.0-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent --url 'localhost' --username 'user' --password 'pass' --verification-mode 'none' --name 'agent1' --key '00000000000000000000000000000000'",
+      "sudo dpkg -i ./wazuh-agent_5.0.0-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent --url 'localhost' --username 'user' --password 'pass' --verification-mode 'none' --name 'agent1' --key '00000000000000000000000000000000'",
     );
   });
 });
 
 describe('getDEBAMD64InstallCommand', () => {
   it('should return the correct command', () => {
-    let expected = `sudo dpkg -i ./wazuh-agent_${test.wazuhVersion}-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${[
+    let expected = `sudo dpkg -i ./wazuh-agent_${test.wazuhVersion}-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -96,7 +96,7 @@ describe('getDEBAMD64InstallCommand', () => {
     delete test.optionals.enrollmentKey;
     delete test.optionals.agentName;
 
-    expected = `sudo dpkg -i ./wazuh-agent_${test.wazuhVersion}-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${[
+    expected = `sudo dpkg -i ./wazuh-agent_${test.wazuhVersion}-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -117,7 +117,7 @@ describe('getDEBAMD64InstallCommand', () => {
 
 describe('getDEBARM64InstallCommand', () => {
   it('should return the correct command', () => {
-    let expected = `sudo dpkg -i ./wazuh-agent_${test.wazuhVersion}-1_arm64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${[
+    let expected = `sudo dpkg -i ./wazuh-agent_${test.wazuhVersion}-1_arm64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -135,7 +135,7 @@ describe('getDEBARM64InstallCommand', () => {
     delete test.optionals.enrollmentKey;
     delete test.optionals.agentName;
 
-    expected = `sudo dpkg -i ./wazuh-agent_${test.wazuhVersion}-1_arm64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${[
+    expected = `sudo dpkg -i ./wazuh-agent_${test.wazuhVersion}-1_arm64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -156,7 +156,7 @@ describe('getDEBARM64InstallCommand', () => {
 
 describe('getRPMAMD64InstallCommand', () => {
   it('should return the correct command', () => {
-    let expected = `sudo rpm -ihv wazuh-agent-${test.wazuhVersion}-1.x86_64.rpm && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${[
+    let expected = `sudo rpm -ihv wazuh-agent-${test.wazuhVersion}-1.x86_64.rpm && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -174,7 +174,7 @@ describe('getRPMAMD64InstallCommand', () => {
     delete test.optionals.enrollmentKey;
     delete test.optionals.agentName;
 
-    expected = `sudo rpm -ihv wazuh-agent-${test.wazuhVersion}-1.x86_64.rpm && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${[
+    expected = `sudo rpm -ihv wazuh-agent-${test.wazuhVersion}-1.x86_64.rpm && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -195,7 +195,7 @@ describe('getRPMAMD64InstallCommand', () => {
 
 describe('getRPMARM64InstallCommand', () => {
   it('should return the correct command', () => {
-    let expected = `sudo rpm -ihv wazuh-agent-${test.wazuhVersion}-1.aarch64.rpm && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${[
+    let expected = `sudo rpm -ihv wazuh-agent-${test.wazuhVersion}-1.aarch64.rpm && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -213,7 +213,7 @@ describe('getRPMARM64InstallCommand', () => {
     delete test.optionals.enrollmentKey;
     delete test.optionals.agentName;
 
-    expected = `sudo rpm -ihv wazuh-agent-${test.wazuhVersion}-1.aarch64.rpm && sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${[
+    expected = `sudo rpm -ihv wazuh-agent-${test.wazuhVersion}-1.aarch64.rpm && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -246,7 +246,7 @@ describe('getLinuxStartCommand', () => {
 
 describe('getWindowsInstallCommand', () => {
   it('should return the correct install command', () => {
-    let expected = `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${[
+    let expected = `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -264,7 +264,7 @@ describe('getWindowsInstallCommand', () => {
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
 
-    expected = `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${[
+    expected = `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -334,7 +334,7 @@ describe('transformOptionalsParamatersMacOSCommand', () => {
 
 describe('getMacOsInstallCommand', () => {
   it('should return the correct macOS installation script', () => {
-    let expected = `sudo installer -pkg ./wazuh-agent.pkg -target / && /Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --register-agent ${[
+    let expected = `sudo installer -pkg ./wazuh-agent.pkg -target / && /Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
@@ -351,7 +351,7 @@ describe('getMacOsInstallCommand', () => {
 
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
-    expected = `sudo installer -pkg ./wazuh-agent.pkg -target / && /Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --register-agent ${[
+    expected = `sudo installer -pkg ./wazuh-agent.pkg -target / && /Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --enroll-agent ${[
       'serverAddress',
       'username',
       'password',
