@@ -6,7 +6,7 @@ import { AgentDetails } from '../agents/details';
 // import { CommandsList } from '../commands';
 import { ViewInterface } from '../interfaces/interfaces';
 import { getCore } from '../../plugin-services';
-import { RegisterAgent } from '../../application/pages/register-agent';
+import { EnrollAgent } from '../../application/pages/enroll-agent';
 
 export const summaryAgent = {
   name: 'Agents',
@@ -60,7 +60,7 @@ export const enrollmentAgent = {
   path: '/enrollment/agent',
   renderOnMenu: false,
   renderMenu: false,
-  render: () => <RegisterAgent />,
+  render: () => <EnrollAgent />,
   breadcrumb: () => [
     {
       className: 'osdBreadcrumbs',
