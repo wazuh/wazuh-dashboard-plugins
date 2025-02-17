@@ -22,6 +22,7 @@ import { AgentsVisualizations } from './visualizations';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
 import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
+import { EditAgentNameModal } from './actions/edit-name-agent-modal';
 
 export interface AgentListProps {
   indexPatterns: any;
@@ -36,6 +37,7 @@ export const AgentList = (props: AgentListProps) => {
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
   const [isLoadingModal, setIsLoadingModal] = useState(false);
+  const [isEditNameVisible, setIsEditNameVisible] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [agentSelected, setAgentSelected] = useState<Agent[]>([]);
 
@@ -108,6 +110,7 @@ export const AgentList = (props: AgentListProps) => {
             setIsDeleteModalVisible,
             setIsEditGroupsVisible,
             setIsUpgradeModalVisible,
+            setIsEditNameVisible,
           })}
           tableProps={{
             hasActions: true,
@@ -150,6 +153,16 @@ export const AgentList = (props: AgentListProps) => {
             setIsUpgradeModalVisible(false);
             setAgent(undefined);
           }}
+        />
+      )}
+      {isEditNameVisible && agent && (
+        <EditAgentNameModal
+          onClose={() => {
+            setIsEditNameVisible(false);
+            setAgent(undefined);
+          }}
+          reloadAgents={() => {}}
+          agent={agent}
         />
       )}
       {isFlyoutVisible ? (

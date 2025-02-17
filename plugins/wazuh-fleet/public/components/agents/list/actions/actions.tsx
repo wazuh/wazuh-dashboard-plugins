@@ -13,6 +13,7 @@ export interface AgentsTableGlobalActionsProps {
   setIsDeleteModalVisible: (visible: boolean) => void;
   setIsEditGroupsVisible: (visible: boolean) => void;
   setIsUpgradeModalVisible: (visible: boolean) => void;
+  setIsEditNameVisible: (visible: boolean) => void;
   setAgent: (agent: Agent) => void;
 }
 
@@ -22,6 +23,7 @@ export const agentsTableActions = ({
   setIsDeleteModalVisible,
   setIsEditGroupsVisible,
   setIsUpgradeModalVisible,
+  setIsEditNameVisible,
 }: AgentsTableGlobalActionsProps) =>
   // allowEditGroups: boolean,
   // allowUpgrade: boolean,
@@ -58,15 +60,14 @@ export const agentsTableActions = ({
       },
     },
     {
-      name: 'Agent configuration',
-      description: 'Agent configuration',
-      icon: 'wrench',
+      name: 'Edit name',
+      description: 'Edit name',
+      icon: 'pencil',
       type: 'icon',
-      onClick: () => {},
-      // onClick: agent =>
-      //   NavigationService.getInstance().navigateToApp(endpointSummary.id, {
-      //     path: `#/agents?tab=configuration&agent=${agent.id}`,
-      //   }),
+      onClick: (agent: Agent) => {
+        setAgent(agent);
+        setIsEditNameVisible(true);
+      },
       // enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
       // 'data-test-subj': 'action-configuration',
     },
