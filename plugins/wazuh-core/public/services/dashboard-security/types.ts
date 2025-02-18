@@ -5,6 +5,7 @@ import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../c
 export interface DashboardSecurityServiceAccount {
   administrator: boolean;
   administrator_requirements: string | null;
+  token?: string;
 }
 
 export interface DashboardSecurityServiceSetupReturn {
@@ -16,13 +17,12 @@ export interface DashboardSecurityServiceSetupReturn {
     useDashboardSecurityIsAdmin: () => boolean;
   };
   hocs: {
-    // FIXME: enhance typing
     withDashboardSecurityAccount: (
       WrappedComponent: React.ElementType,
-    ) => (props: any) => React.ElementRef;
+    ) => (props: any) => React.ElementRef<typeof WrappedComponent>;
     withDashboardSecurityAccountAdmin: (
       WrappedComponent: React.ElementType,
-    ) => (props: any) => React.ElementRef;
+    ) => (props: any) => React.ElementRef<typeof WrappedComponent>;
   };
 }
 
