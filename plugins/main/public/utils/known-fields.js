@@ -2855,6 +2855,14 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
+    name: 'data.vulnerability.scanner.reference',
+    type: 'string',
+    esTypes: ['keyword'],
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
     name: 'decoder.accumulate',
     type: 'number',
     esTypes: ['long'],

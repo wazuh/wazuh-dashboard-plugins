@@ -167,4 +167,32 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
     id: 'rule.tsc',
     render: renderRequirementsSecurityOperations,
   },
+  {
+    id: 'vulnerability.id',
+    render: (value, row) => {
+      if (!row.vulnerability?.scanner?.reference) {
+        return value;
+      }
+      return (
+        <EuiToolTip
+          position='top'
+          content={i18n.translate(
+            'discover.fieldLinkTooltip.vulnerabilityScannerReference',
+            {
+              defaultMessage: 'Navigate to the vulnerability CTI reference',
+            },
+          )}
+        >
+          <EuiLink
+            href={row.vulnerability.scanner.reference}
+            target='_blank'
+            rel='noopener noreferrer'
+            external
+          >
+            {value}
+          </EuiLink>
+        </EuiToolTip>
+      );
+    },
+  },
 ];
