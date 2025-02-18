@@ -1,7 +1,14 @@
-import { setAgentManagement, setEnrollAgentManagement } from '../plugin-services';
+import {
+  setAgentManagement,
+  setEnrollAgentManagement,
+} from '../plugin-services';
 import { AppSetup } from './types';
 
-export function appSetup({ registerApp, agentManagement, enrollmentAgentManagement }: AppSetup) {
+export function appSetup({
+  registerApp,
+  agentManagement,
+  enrollmentAgentManagement,
+}: AppSetup) {
   registerApp({
     id: 'wazuh-fleet',
     title: 'Fleet management',
