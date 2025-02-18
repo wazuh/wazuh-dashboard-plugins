@@ -67,7 +67,7 @@ export const getDEBAMD64InstallCommand = (
   return [
     // `wget ${urlPackage}`, // TODO: enable when the packages are publically hosted
     `sudo dpkg -i ./${packageName}`,
-    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${optionals && getAllOptionals(optionals)}`,
+    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${optionals && getAllOptionals(optionals)}`,
   ].join(' && ');
 };
 
@@ -80,7 +80,7 @@ export const getDEBARM64InstallCommand = (
   return [
     // `wget ${urlPackage}`, // TODO: enable when the packages are publically hosted
     `sudo dpkg -i ./${packageName}`,
-    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${optionals && getAllOptionals(optionals)}`,
+    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${optionals && getAllOptionals(optionals)}`,
   ].join(' && ');
 };
 
@@ -95,7 +95,7 @@ export const getRPMAMD64InstallCommand = (
   return [
     // `curl -o ${packageName} ${urlPackage}`, // TODO: enable when the packages are publically hosted
     `sudo rpm -ihv ${packageName}`,
-    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${optionals && getAllOptionals(optionals)}`,
+    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${optionals && getAllOptionals(optionals)}`,
   ].join(' && ');
 };
 
@@ -108,7 +108,7 @@ export const getRPMARM64InstallCommand = (
   return [
     // `curl -o ${packageName} ${urlPackage}`, // TODO: enable when the packages are publically hosted
     `sudo rpm -ihv ${packageName}`,
-    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --register-agent ${optionals && getAllOptionals(optionals)}`,
+    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${optionals && getAllOptionals(optionals)}`,
   ].join(' && ');
 };
 
@@ -130,7 +130,7 @@ export const getWindowsInstallCommand = (
   return [
     // `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\wazuh-agent;`, // TODO: enable when the packages are publically hosted
     // https://stackoverflow.com/questions/1673967/how-to-run-an-exe-file-in-powershell-with-parameters-with-spaces-and-quotes
-    `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --register-agent ${
+    `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --enroll-agent ${
       optionals && getAllOptionals(optionals, name)
     }`,
   ].join(' ');
@@ -180,7 +180,7 @@ export const getMacOsInstallCommand = (
   const macOSInstallationScript = [
     // `curl -so wazuh-agent.pkg ${urlPackage}`,
     'sudo installer -pkg ./wazuh-agent.pkg -target /',
-    `/Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --register-agent ${macOSInstallationOptions}`,
+    `/Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --enroll-agent ${macOSInstallationOptions}`,
   ].join(' && ');
 
   return macOSInstallationScript;
