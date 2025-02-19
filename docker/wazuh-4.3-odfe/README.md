@@ -2,10 +2,10 @@
 
 On this folder we can find two types of environments:
 
- * release environment, managed by the `rel.sh` script.
- <!-- * prerelease environment managed by the `pre.sh` script. -->
+- release environment, managed by the `rel.sh` script.
+<!-- * prerelease environment managed by the `pre.sh` script. -->
 
-##  UI Credentials
+## UI Credentials
 
 The default user and password to access the UI at https://0.0.0.0:5601/ are:
 
@@ -16,9 +16,10 @@ admin:SecretPassword
 ## Release environment
 
 This environment brings up a complete ODFE environment with:
- - ODFE cluster with a single node
- - ODFE Kibana with a single node
- - Wazuh manager
+
+- ODFE cluster with a single node
+- ODFE Kibana with a single node
+- Wazuh manager
 
 The environment expect the network `mon` to exists, either bring up the
 `mon` stack or execute the following command:
@@ -46,7 +47,6 @@ supported versions.
 
 ### SAML identity provider
 
-
 This environments includes SAML as an IdP (identity provider) which use is optional.
 To bring up the environment with SAML, add the `idp` hostname to your `/etc/hosts/`.
 
@@ -63,7 +63,8 @@ Then simply run the script with the `saml` flag, as follows:
 ```bash
 ./rel.sh 1.13.2 4.3.8 saml up
 ```
-####  IdP credentials
+
+#### IdP credentials
 
 The default user and password to access the UI via Keycloak are:
 
@@ -73,7 +74,7 @@ wazuh:wazuh
 
 ### Install a compatible Wazuh app
 
-When the `rel.sh` script ends, it will print the commands how to install the 
+When the `rel.sh` script ends, it will print the commands how to install the
 Wazuh app in Kibana:
 
 For example, the command
@@ -100,7 +101,7 @@ docker cp ./config/kibana/wazuh.yml odfe-rel-l-1132-kibana-1:/usr/share/kibana/d
 https://localhost:5601
 ```
 
-This is a manual procedure which might be automated in the future. Any 
+This is a manual procedure which might be automated in the future. Any
 automatism will need:
 
 1. Wait for Kibana to be ready.
@@ -124,20 +125,21 @@ docker restart odfe-rel-l-1132-kibana-1
 docker cp ./config/kibana/wazuh.yml odfe-rel-l-1132-kibana-1:/usr/share/kibana/data/wazuh/config/
 ```
 
-If this command returns a `no such file or directory` message, means Kibana is 
-still initializing the plugin, try again a couple of seconds later, depending 
+If this command returns a `no such file or directory` message, means Kibana is
+still initializing the plugin, try again a couple of seconds later, depending
 on your computer.
 
-### Registering agents using Docker
+### Enroll agents using Docker
 
-To register an agent, we need to get the registering command from the UI and 
-run commands like the ones below. Please pay atention to the Wazuh version in 
+To enroll an agent, we need to get the enrollment command from the UI and
+run commands like the ones below. Please pay atention to the Wazuh version in
 the network name.
 
-These images will run in the background and a `docker logs` command will show 
+These images will run in the background and a `docker logs` command will show
 the agent `ossec.log` file.
 
 - For `CentOS/8` images:
+
   ```bash
   docker run --name odfe-rel-1132-agent --network odfe-rel-1132 --label com.docker.compose.project=odfe-rel-1132 -d centos:8 bash -c '
       sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
@@ -152,6 +154,7 @@ the agent `ossec.log` file.
   ```
 
 - For `Ubuntu` images
+
   ```bash
   docker run --name odfe-rel-1132-agent --network odfe-rel-1132 --label com.docker.compose.project=odfe-rel-1132 -d ubuntu:20.04 bash -c '
     apt update -y
@@ -166,5 +169,5 @@ the agent `ossec.log` file.
   ```
 
 - For `non-Linux` agents:
-  
+
   We need to provision virtual machines.
