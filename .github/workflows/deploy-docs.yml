@@ -1,0 +1,41 @@
+name: deploy-gh-pages
+
+# From https://github.com/rust-lang/mdBook/wiki/Automated-Deployment%3A-GitHub-Actions#GitHub-Pages-Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # To push a branch
+      pages: write # To push to a GitHub Pages site
+      id-token: write # To update the deployment status
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup mdBook
+        uses: jontze/action-mdbook@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          use-linkcheck: true
+          use-mermaid: true
+          use-toc: true
+      - run: mdbook build
+        working-directory: docs
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs/book'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
