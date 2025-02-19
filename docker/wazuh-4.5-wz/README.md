@@ -44,9 +44,9 @@ to adjust them.
 This is related to the way the official Wazuh docker images are
 prepared.
 
-### Registering agents using Docker
+### Enroll agents using Docker
 
-To register an agent, we need to get the enrollment command from the
+To enroll an agent, we need to get the enrollment command from the
 UI and then execute:
 
 - For `CentOS/8` images:
@@ -137,6 +137,6 @@ Follow the instructions provided by the `pre.sh` script.
 
 ### Agent enrollment
 
-Because we're not using a real Wazuh Manager, we cannot register new agents.
+Because we're not using a real Wazuh Manager, we cannot enroll new agents.
 Instead, Imposter (the mock server) will provide mocked responds to valid API
 requests, as if it were the real Wazuh server.

@@ -67,6 +67,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added pinned agent data validation when rendering the Inventory data, Stats and Configuration tabs in Agent preview of Endpoints Summary [#6800](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6800)
 - Added wz-link component to make redirections [#6848](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6848)
 - Added embedded and customized `dom-to-image-more` dependency [#6902](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6902)
+- Added `wazuh-fleet` plugin [#7289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7289)
+- Added enrollment agent assistant to `wazuh-fleet` plugin [#7289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7289)
 
 ### Changed
 
