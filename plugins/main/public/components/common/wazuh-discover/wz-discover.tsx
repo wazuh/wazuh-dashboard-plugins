@@ -193,6 +193,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         pageIndex: 0,
         pageSize: results.hits.total,
       },
+      dateRange: absoluteDateRange,
       sorting,
     };
     try {
