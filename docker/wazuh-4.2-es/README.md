@@ -2,10 +2,10 @@
 
 On this folder we can find two types of environments:
 
- * release environment, managed by the `rel.sh` script
- * prerelease environment managed by the `pre.sh` script
+- release environment, managed by the `rel.sh` script
+- prerelease environment managed by the `pre.sh` script
 
-###  UI Credentials
+### UI Credentials
 
 The default user and password to access the UI at https://0.0.0.0:5601/ are:
 
@@ -15,16 +15,17 @@ elastic:SecretPassword
 
 ## Multi-node cluster
 
-The `rel.yml` and `pre.yml` files contain a docker-compose with all the set 
+The `rel.yml` and `pre.yml` files contain a docker-compose with all the set
 up for a 3 node cluster, read it carefully if you need to bring such a cluster.
 
 ## Release environment
 
 This environment brings up a complete Elastic environment with:
- - Elasticsearch cluster with a single node
- - Elasticsearch Kibana with a single node
- - Elasticsearch exporter
- - Wazuh manager
+
+- Elasticsearch cluster with a single node
+- Elasticsearch Kibana with a single node
+- Elasticsearch exporter
+- Wazuh manager
 
 The environment expect the network `mon` to exists, either bring up the
 `mon` stack or execute the following command:
@@ -38,7 +39,7 @@ This needs to be done just once.
 ### Usage:
 
 ```bash
-./rel.sh elastic_version wazuh_manager_version action 
+./rel.sh elastic_version wazuh_manager_version action
 
 where
   elastic_version is one of  7.14.2 7.14.1 7.14.0 7.13.4 7.13.3 7.13.2 7.13.1 7.13.0 7.12.1 7.11.2 7.10.2
@@ -78,7 +79,7 @@ docker cp ./config/kibana/wazuh.yml es-rel-7142-kibana-1:/usr/share/kibana/data/
 http://localhost:5601
 ```
 
-This is a manual procedure which might be automated in the future. Any 
+This is a manual procedure which might be automated in the future. Any
 automatism will need:
 
 1. Wait for Kibana to be ready.
@@ -102,20 +103,21 @@ docker restart es-rel-7142-kibana-1
 docker cp ./config/kibana/wazuh.yml es-rel-7142-kibana-1:/usr/share/kibana/data/wazuh/config/
 ```
 
-If this command returns a `no such file or directory` message, means Kibana is 
-still initializing the plugin, try again a couple of seconds later, depending on 
+If this command returns a `no such file or directory` message, means Kibana is
+still initializing the plugin, try again a couple of seconds later, depending on
 your computer.
 
-## Registering agents using Docker
+## Enroll agents using Docker
 
-To register an agent, we need to get the registering command from the UI and 
-run commands like the ones below. Please pay atention to the Wazuh version in 
+To enroll an agent, we need to get the enrollment command from the UI and
+run commands like the ones below. Please pay atention to the Wazuh version in
 the network name.
 
-These images will run in the background and a `docker logs` command will show 
+These images will run in the background and a `docker logs` command will show
 the agent `ossec.log` file.
 
 - For `CentOS/8` images:
+
   ```bash
   docker run --rm --name es-rel-7142-wazuh.agent --network es-rel-7142 --label com.docker.compose.project=es-rel-7142 -d centos:8 bash -c '
     sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
@@ -130,6 +132,7 @@ the agent `ossec.log` file.
   ```
 
 - For `Ubuntu` images:
+
   ```bash
   docker run --name es-rel-7142-wazuh.agent --network es-rel-7142 --label com.docker.compose.project=es-rel-7142 -d ubuntu:20.04 bash -c '
     apt update -y
@@ -142,9 +145,9 @@ the agent `ossec.log` file.
     tail -f /var/ossec/logs/ossec.log
   '
   ```
- 
+
 - For `non-Linux` agents:
-  
+
   We need to provision virtual machines.
 
 ## Prerelease environment
@@ -154,16 +157,16 @@ Wazuh packages haven't been generated yet.
 
 This environment will bring up:
 
- - Elasticsearch cluster with a single node
- - Elasticsearch Kibana with a single node
- - Elasticsearch exporter
- - Filebeat
- - Imposter
+- Elasticsearch cluster with a single node
+- Elasticsearch Kibana with a single node
+- Elasticsearch exporter
+- Filebeat
+- Imposter
 
 ### Usage
 
 ```bash
-./pre.sh elastic_version wazuh_api_version action 
+./pre.sh elastic_version wazuh_api_version action
 
 where
   elastic_version is one of  7.14.2 7.14.1 7.14.0 7.13.4 7.13.3 7.13.2 7.13.1 7.13.0 7.12.1 7.11.2 7.10.2
@@ -171,23 +174,23 @@ where
   action is one of up | down | stop
 
 In a minor release, the API should not change the version here bumps the API
- string returned for testing. This script generates the file 
+ string returned for testing. This script generates the file
 
     config/imposter/api_info.json
 
 used by the mock server
 ```
 
-Please take into account that the API version for this environment will always 
-be a 4.3.X version. Also consider that our application version must be the same 
+Please take into account that the API version for this environment will always
+be a 4.3.X version. Also consider that our application version must be the same
 as the one selected here.
 
 ### Install a compatible Wazuh app
 
-Follow the instructions provided by the `pre.sh` script. 
+Follow the instructions provided by the `pre.sh` script.
 
 ### Agent enrollment
 
-Because we're not using a real Wazuh Manager, we cannot register new agents. 
-Instead, Imposter (the mock server) will provide mocked responds to valid API 
+Because we're not using a real Wazuh Manager, we cannot enroll new agents.
+Instead, Imposter (the mock server) will provide mocked responds to valid API
 requests, as if it were the real Wazuh server.
