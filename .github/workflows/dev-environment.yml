@@ -59,6 +59,11 @@ jobs:
               path: 'wazuh/plugins/wazuh-core',
               container_path: 'wazuh-core',
             },
+            {
+              name: 'Wazuh Fleet Management',
+              path: 'wazuh/plugins/wazuh-fleet',
+              container_path: 'wazuh-fleet',
+            },
           ]
 
     steps:
