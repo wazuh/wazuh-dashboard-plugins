@@ -23,6 +23,9 @@ export const TableIndexer = (props: {
   tableSortingInitialDirection?: string;
   topTableComponent?: (searchBarProps: any) => React.ReactNode;
   tableProps?: any;
+  setAllAgentsSelected: (allAgentsSelected: boolean) => void;
+  agentSelected: IAgentResponse[];
+  setParams: (params: object) => void;
 }) => {
   const {
     indexPatterns,
@@ -32,6 +35,9 @@ export const TableIndexer = (props: {
     topTableComponent,
     tableProps,
     filters: filtersDefault,
+    agentSelected,
+    setAllAgentsSelected,
+    setParams,
     // documentDetailsExtraTabs,
   } = props;
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -58,6 +64,18 @@ export const TableIndexer = (props: {
   });
   const { query } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+
+  useEffect(() => {
+    if (agentSelected.length === results?.hits?.length) {
+      setAllAgentsSelected(true);
+      setParams({
+        filter: filters,
+        query,
+      });
+    } else {
+      setAllAgentsSelected(false);
+    }
+  }, [agentSelected]);
 
   useEffect(() => {
     setLoadingSearch(true);
@@ -127,9 +145,7 @@ export const TableIndexer = (props: {
       <EuiFlexItem>
         <EuiBasicTable
           columns={columns}
-          items={
-            results?.hits?.map((item: IAgentResponse) => item._source) ?? []
-          }
+          items={results?.hits ?? []}
           loading={loadingSearch}
           pagination={tablePagination}
           sorting={sorting}

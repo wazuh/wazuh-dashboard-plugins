@@ -11,17 +11,16 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
-import { Agent } from '../../../../../../common/types';
+import { IAgentResponse } from '../../../../../../common/types';
 import { GroupResult, RESULT_TYPE } from './edit-groups-modal';
-// import { ErrorAgent } from '../../../services/paginated-agents-group';
 
 interface EditAgentsGroupsModalResultProps {
   addOrRemove: 'add' | 'remove';
-  finalAgents: Agent[];
+  finalAgents: IAgentResponse[];
   getAgentsStatus: string;
   getAgentsError?: Error;
   saveChangesStatus: string;
-  groupResults: GroupResult[];
+  documentResults: GroupResult[];
   groups: string[];
 }
 
@@ -31,22 +30,22 @@ export const EditAgentsGroupsModalResult = ({
   getAgentsStatus,
   getAgentsError,
   saveChangesStatus,
-  groupResults,
+  documentResults,
   groups,
 }: EditAgentsGroupsModalResultProps) => {
-  const agentsTable = (agents: Agent[]) => (
+  const agentsTable = (agents: IAgentResponse[]) => (
     <EuiInMemoryTable
       items={agents}
       tableLayout='auto'
       columns={[
         {
-          field: 'id',
-          name: 'Id',
+          field: '_id',
+          name: 'Document id',
           align: 'left',
           sortable: true,
         },
         {
-          field: 'name',
+          field: '_source.agent.name',
           name: 'Name',
           align: 'left',
           sortable: true,
@@ -59,40 +58,6 @@ export const EditAgentsGroupsModalResult = ({
           direction: 'asc',
         },
       }}
-    />
-  );
-  const errorsTable = (errors: [] = []) => (
-    <EuiInMemoryTable
-      items={errors}
-      tableLayout='auto'
-      columns={[
-        {
-          field: 'error.code',
-          name: 'Code',
-          align: 'left',
-          sortable: true,
-          width: '100px',
-        },
-        {
-          field: 'error.message',
-          name: 'Error',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'error.remediation',
-          name: 'Remediation',
-          align: 'left',
-          sortable: true,
-        },
-        {
-          field: 'id',
-          name: 'Agent IDs',
-          align: 'left',
-          render: ids => ids.join(', '),
-        },
-      ]}
-      pagination={true}
     />
   );
 
@@ -164,96 +129,52 @@ export const EditAgentsGroupsModalResult = ({
           children:
             getAgentsStatus === 'complete' ? (
               <EuiFlexGroup direction='column'>
-                {groups.map(group => {
-                  const groupResult = groupResults.find(
-                    groupResult => groupResult.group === group,
+                {finalAgents.map(agent => {
+                  const documentResult = documentResults.find(
+                    documentResult => documentResult.documentId === agent._id,
                   );
-                  const isLoading = !groupResult;
+                  const isLoading = !documentResult;
 
                   if (isLoading) {
                     return (
-                      <EuiFlexItem key={group}>
+                      <EuiFlexItem key={agent._id}>
                         {groupStatus({
                           isLoading,
                           status: RESULT_TYPE.SUCCESS,
-                          text: group,
+                          text: agent._source.agent.name,
                         })}
                       </EuiFlexItem>
                     );
                   }
 
-                  const {
-                    result,
-                    successAgents,
-                    errorAgents,
-                    totalErrorAgents,
-                  } = groupResult;
+                  const { result, successAgents } = documentResult;
 
                   if (result === RESULT_TYPE.SUCCESS) {
                     return (
-                      <EuiFlexItem key={group}>
-                        <EuiAccordion
-                          id={`${group}Accordion`}
-                          arrowDisplay='none'
-                          paddingSize='m'
-                          buttonContent={groupStatus({
-                            status: RESULT_TYPE.SUCCESS,
-                            text: `${group} (${finalAgents.length})`,
-                          })}
-                        >
-                          {agentsTable(finalAgents)}
-                        </EuiAccordion>
+                      <EuiFlexItem key={agent._id}>
+                        {groupStatus({
+                          status: RESULT_TYPE.SUCCESS,
+                          text: `${agent._source.agent.name} (${groups.join(', ')} ${addOrRemove === 'add' ? 'added' : 'removed'})`,
+                        })}
                       </EuiFlexItem>
                     );
                   }
 
                   return (
-                    <EuiFlexItem key={group}>
-                      <EuiAccordion
-                        id={`${group}Accordion`}
-                        arrowDisplay='none'
-                        paddingSize='m'
-                        initialIsOpen={true}
-                        buttonContent={groupStatus({
-                          status: RESULT_TYPE.ERROR,
-                          text: group,
-                        })}
-                      >
-                        <EuiAccordion
-                          id={`${group}Accordion`}
-                          arrowDisplay='none'
-                          paddingSize='m'
-                          buttonContent={groupStatus({
-                            status: RESULT_TYPE.ERROR,
-                            text: `Failed agents (${totalErrorAgents})`,
+                    <EuiFlexItem key={agent._id}>
+                      {groupStatus({
+                        status: RESULT_TYPE.ERROR,
+                        text: `${agent._source.agent.name} (no ${groups.join(', ')} have been ${addOrRemove === 'add' ? 'added' : 'removed'})`,
+                      })}
+                      {successAgents?.length ? (
+                        <>
+                          <EuiSpacer size='s' />
+                          {groupStatus({
+                            status: RESULT_TYPE.SUCCESS,
+                            text: `Success agents (${successAgents?.length})`,
                           })}
-                        >
-                          {errorsTable(errorAgents)}
-                        </EuiAccordion>
-                        {successAgents?.length ? (
-                          <>
-                            <EuiSpacer size='s' />
-                            <EuiAccordion
-                              id={`${group}Accordion`}
-                              arrowDisplay='none'
-                              paddingSize='m'
-                              buttonContent={groupStatus({
-                                status: RESULT_TYPE.SUCCESS,
-                                text: `Success agents (${successAgents?.length})`,
-                              })}
-                            >
-                              {agentsTable(
-                                successAgents.map(
-                                  agentId =>
-                                    finalAgents.find(
-                                      finalAgent => finalAgent.id === agentId,
-                                    ) as Agent,
-                                ),
-                              )}
-                            </EuiAccordion>
-                          </>
-                        ) : null}
-                      </EuiAccordion>
+                        </>
+                      ) : null}
                     </EuiFlexItem>
                   );
                 })}

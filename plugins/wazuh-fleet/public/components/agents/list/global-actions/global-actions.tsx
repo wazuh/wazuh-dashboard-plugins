@@ -15,8 +15,8 @@ import { UpgradeAgentsModal } from './upgrade/upgrade-modal';
 
 export interface AgentsTableGlobalActionsProps {
   selectedAgents: Agent[];
-  // allAgentsSelected: boolean;
-  // filters: any;
+  allAgentsSelected: boolean;
+  params: object;
   allowEditGroups: boolean;
   allowUpgrade: boolean;
   allowGetTasks: boolean;
@@ -28,8 +28,8 @@ export interface AgentsTableGlobalActionsProps {
 
 export const AgentsTableGlobalActions = ({
   selectedAgents,
-  // allAgentsSelected,
-  // filters,
+  allAgentsSelected,
+  params,
   allowEditGroups,
   allowUpgrade,
   allowGetTasks,
@@ -184,8 +184,8 @@ export const AgentsTableGlobalActions = ({
       {isEditGroupsVisible && (
         <EditAgentsGroupsModal
           selectedAgents={selectedAgents}
-          // allAgentsSelected={allAgentsSelected}
-          // filters={filters}
+          allAgentsSelected={allAgentsSelected}
+          params={params}
           reloadAgents={() => reloadAgents()}
           onClose={() => {
             setIsEditGroupsVisible(false);
@@ -196,8 +196,8 @@ export const AgentsTableGlobalActions = ({
       {isUpgradeAgentsVisible && (
         <UpgradeAgentsModal
           selectedAgents={selectedAgents}
-          // allAgentsSelected={allAgentsSelected}
-          // filters={filters}
+          allAgentsSelected={allAgentsSelected}
+          params={params}
           reloadAgents={() => reloadAgents()}
           onClose={() => {
             setIsUpgradeAgentsVisible(false);

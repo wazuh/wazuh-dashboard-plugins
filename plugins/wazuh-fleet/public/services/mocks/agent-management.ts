@@ -98,25 +98,55 @@ export const removeGroups = (
       if (Math.random() > 0.5) {
         resolve({
           status: 200,
-          body: {
-            message: `${Array.isArray(groupIds) ? groupIds.join(', ') : groupIds} removed successfully to agent${Array.isArray(agentId) ? 's' : ''}`,
+          data: {
+            message: `Removed successfully to agent`,
+            error: null,
             data: {
-              affected_items: Array.isArray(agentId) ? agentId : [agentId],
+              affected_items: [
+                {
+                  _id: agentId,
+                  _source: { agent: { groups: groupIds, name: 'agent' } },
+                },
+              ],
               failed_items: [],
               total_affected_items: Array.isArray(agentId) ? agentId.length : 1,
               total_failed_items: 0,
             },
           },
         });
-      } else {
-        reject({
-          status: 500,
-          body: {
-            message: 'Error removing agent(s)',
+      } else if (Math.random() > 0.8) {
+        resolve({
+          status: 400,
+          data: {
+            message: 'Error removing groups agent(s)',
             error: 1,
             data: {
               affected_items: [],
-              failed_items: Array.isArray(agentId) ? agentId : [agentId],
+              failed_items: [
+                {
+                  groups: groupIds,
+                  error: { code: Math.floor(Math.random() * 9000) + 1000 },
+                },
+              ],
+              total_affected_items: 0,
+              total_failed_items: Array.isArray(agentId) ? agentId.length : 1,
+            },
+          },
+        });
+      } else {
+        reject({
+          status: 500,
+          data: {
+            message: 'Error removing groups agent(s)',
+            error: 1,
+            data: {
+              affected_items: [],
+              failed_items: [
+                {
+                  groups: groupIds,
+                  error: { code: Math.floor(Math.random() * 9000) + 1000 },
+                },
+              ],
               total_affected_items: 0,
               total_failed_items: Array.isArray(agentId) ? agentId.length : 1,
             },
@@ -131,7 +161,7 @@ export const addGroups = async (
   groupIds: string | string[],
 ) => {
   try {
-    await removeGroups(documentId, groupIds);
+    return await removeGroups(documentId, groupIds);
   } catch (error) {
     console.log(error);
     throw error;
@@ -153,7 +183,6 @@ export const queryManagerService = () => {
       filters: fixedFilters,
       pagination: {
         pageIndex: 0,
-        pageSize: 10,
       },
       sorting: {
         columns: [],

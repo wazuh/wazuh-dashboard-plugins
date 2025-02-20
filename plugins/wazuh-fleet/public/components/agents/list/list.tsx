@@ -10,7 +10,7 @@ import {
   EuiTitle,
   EuiLink,
 } from '@elastic/eui';
-import { Agent } from '../../../../common/types';
+import { Agent, IAgentResponse } from '../../../../common/types';
 import { AgentResume } from '../details/resume';
 import { getAgentManagement, getCore } from '../../../plugin-services';
 import NavigationService from '../../../react-services/navigation-service';
@@ -33,13 +33,25 @@ export const AgentList = (props: AgentListProps) => {
   const { indexPatterns, filters } = props;
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [agent, setAgent] = useState<Agent>();
+  const [agent, setAgent] = useState<IAgentResponse>();
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
   const [isLoadingModal, setIsLoadingModal] = useState(false);
   const [isEditNameVisible, setIsEditNameVisible] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [agentSelected, setAgentSelected] = useState<Agent[]>([]);
+  const [allAgentsSelected, setAllAgentsSelected] = useState<boolean>(false);
+  const [params, setParams] = useState({
+    filters: [],
+    query: '',
+    pagination: {
+      pageIndex: 0,
+      pageSize: 15,
+    },
+    sort: {
+      field: '',
+      direction: '',
+    },
+  });
 
   const navigateToDeployNewAgent = () => {
     NavigationService.getInstance().navigate(enrollmentAgent.path);
@@ -62,7 +74,7 @@ export const AgentList = (props: AgentListProps) => {
     if (agent) {
       try {
         setIsLoadingModal(true);
-        await getAgentManagement().delete(agent.agent.id);
+        await getAgentManagement().delete(agent._source.agent.id);
         setIsLoadingModal(false);
         closeModal();
       } catch {
@@ -92,18 +104,22 @@ export const AgentList = (props: AgentListProps) => {
             allowGetTasks
             allowUpgrade
             reloadAgents={() => reloadAgents()}
-            // allAgentsSelected
+            allAgentsSelected={allAgentsSelected}
+            params={params}
           />,
         ]}
       />
       <EuiSpacer />
       {indexPatterns ? (
         <TableIndexer
+          setParams={setParams}
+          setAllAgentsSelected={setAllAgentsSelected}
           filters={filters}
           indexPatterns={indexPatterns}
           topTableComponent={(searchBarProps: any) => (
             <AgentsVisualizations searchBarProps={searchBarProps} />
           )}
+          agentSelected={agentSelected}
           columns={agentsTableColumns({
             setIsFlyoutAgentVisible: setIsFlyoutVisible,
             setAgent,
@@ -115,11 +131,8 @@ export const AgentList = (props: AgentListProps) => {
           tableProps={{
             hasActions: true,
             isSelectable: true,
-            itemId: 'agent',
+            itemId: '_id',
             selection: {
-              selectable: (agent: Agent) => agent.agent.status === 'active',
-              selectableMessage: selectable =>
-                selectable ? undefined : 'Agent is currently offline',
               onSelectionChange: onSelectionChange,
             },
           }}
@@ -180,7 +193,7 @@ export const AgentList = (props: AgentListProps) => {
                   })}
                   target='_blank'
                 >
-                  {agent?.agent.name}
+                  {agent?._source.agent.name}
                 </EuiLink>
               </h2>
             </EuiTitle>
