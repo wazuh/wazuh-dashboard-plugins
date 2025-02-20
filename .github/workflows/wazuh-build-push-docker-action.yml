@@ -53,7 +53,7 @@ jobs:
   job-build-manager-image:
     if: ${{ github.event.inputs.build-manager-image == 'true' }}
     name: Run build and push manager image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Step 01 - Download wazuh-kibana-app
         uses: actions/checkout@v4
@@ -77,7 +77,7 @@ jobs:
   job-build-agent-image:
     if: ${{ github.event.inputs.build-agent-image == 'true' }}
     name: Run build and push agent image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Step 01 - Download wazuh-kibana-app
         uses: actions/checkout@v4
@@ -98,7 +98,7 @@ jobs:
   job-build-cypress-image:
     if: ${{ github.event.inputs.build-cypress-image == 'true' }}
     name: Run build and push cypress image
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Step 01 - Download wazuh-kibana-app
         uses: actions/checkout@v4
