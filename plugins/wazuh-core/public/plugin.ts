@@ -9,10 +9,6 @@ import { ConfigurationStore } from '../common/services/configuration/configurati
 import { EConfigurationProviders } from '../common/constants';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
-import {
-  IndexerQueryManagerFactory,
-  QueryManagerRegistry,
-} from '../common/services/query-manager';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
 import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
@@ -27,6 +23,7 @@ import { ServerHostStateContainer } from './services/state/containers/server-hos
 import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
 import { CoreServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';
+import { QueryManagerFactory } from './services/query-manager/query-manager-factory';
 
 const noop = () => {};
 
@@ -51,7 +48,6 @@ export class WazuhCorePlugin
 
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
     // No operation logger
-
     const logger = {
       info: noop,
       error: noop,
@@ -131,16 +127,6 @@ export class WazuhCorePlugin
         this.runtime.start.serverSecurityDeps.chrome.logos.AnimatedMark,
     });
 
-    // query manager registrations
-    const queryManagerRegistryService = QueryManagerRegistry.getInstance();
-    const indexerQueryManagerFactory = new IndexerQueryManagerFactory();
-
-    queryManagerRegistryService.register(
-      'core-query-manager',
-      indexerQueryManagerFactory,
-    );
-    this.services.queryManagerRegistry = queryManagerRegistryService;
-
     return {
       ...this.services,
       utils,
@@ -163,7 +149,10 @@ export class WazuhCorePlugin
     };
   }
 
-  public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
+  public async start(
+    core: CoreStart,
+    plugins: AppPluginStartDependencies,
+  ): Promise<WazuhCorePluginStart> {
     setChrome(core.chrome);
     setCore(core);
     setUiSettings(core.uiSettings);
@@ -177,6 +166,8 @@ export class WazuhCorePlugin
     this.runtime.start.serverSecurityDeps = {
       chrome: core.chrome,
     };
+
+    this.services.queryManagerFactory = new QueryManagerFactory(plugins.data);
 
     return {
       ...this.services,
