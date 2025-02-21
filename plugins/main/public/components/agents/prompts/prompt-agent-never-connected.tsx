@@ -17,7 +17,7 @@ import { webDocumentationLink } from '../../../../common/services/web_documentat
 import { showExploreAgentModalGlobal } from '../../../redux/actions/appStateActions';
 
 const documentationLink = webDocumentationLink(
-  'user-manual/agents/agent-connection.html',
+  'user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager',
 );
 
 export const PromptAgentNeverConnected = () => {
