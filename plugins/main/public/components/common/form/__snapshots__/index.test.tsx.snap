@@ -376,7 +376,7 @@ exports[`[component] InputForm Renders correctly to match the snapshot: Input: s
 exports[`[component] InputForm Renders correctly to match the snapshot: Input: switch 1`] = `
 <div>
   <div
-    class="euiSwitch"
+    class="euiSwitch euiSwitch--primary"
   >
     <button
       aria-checked="true"

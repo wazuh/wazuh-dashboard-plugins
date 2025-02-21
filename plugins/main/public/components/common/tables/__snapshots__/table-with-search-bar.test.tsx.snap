@@ -506,6 +506,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                                         >
                                           <EuiButtonContent
                                             className="euiButtonEmpty__content"
+                                            iconGap="m"
                                             iconSide="left"
                                             iconSize="m"
                                             textProps={
@@ -719,6 +720,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                                 >
                                   <EuiButtonContent
                                     className="euiButtonEmpty__content"
+                                    iconGap="m"
                                     iconSide="right"
                                     iconSize="s"
                                     iconType="arrowDown"
