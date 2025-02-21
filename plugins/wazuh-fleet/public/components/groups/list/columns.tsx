@@ -1,22 +1,21 @@
 import React from 'react';
-import { tableActions } from './actions/actions';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiHealth,
   EuiToolTip,
   EuiText,
-  EuiBadge,
   EuiLink,
 } from '@elastic/eui';
-import { getCore, getWazuhCore } from '../../../plugin-services';
+import { Group } from '../../../../common/types';
+import { getCore } from '../../../plugin-services';
+import { tableActions } from './actions/actions';
 
-export const columns = ({
+export const groupsTableColumns = ({
   setIsFlyoutVisible,
   setGroup,
 }: {
   setIsFlyoutVisible: (isVisible: boolean) => void;
-  setGroup: (agent: Group) => void;
+  setGroup: (group: Group) => void;
 }) => [
   {
     field: 'id',
@@ -24,11 +23,11 @@ export const columns = ({
     sortable: true,
     show: true,
     searchable: true,
-    render: (field: string, data: Group) => (
+    render: (field: string) => (
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
-          <EuiToolTip content={data.id}>
-            <EuiText size='s'>{`${data.id.substring(0, 22)}...`}</EuiText>
+          <EuiToolTip content={field}>
+            <EuiText size='s'>{`${field?.slice(0, 22)}...`}</EuiText>
           </EuiToolTip>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -40,7 +39,7 @@ export const columns = ({
     sortable: true,
     show: true,
     searchable: true,
-    render: (field: string, data: Agent) => (
+    render: (field: string, data: Group) => (
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
           <EuiLink
@@ -48,7 +47,7 @@ export const columns = ({
               path: `#/fleet-management/groups/${data.id}`,
             })}
           >
-            {data.name}
+            {field}
           </EuiLink>
         </EuiFlexItem>
       </EuiFlexGroup>

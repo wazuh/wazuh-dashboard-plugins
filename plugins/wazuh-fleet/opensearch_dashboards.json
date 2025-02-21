@@ -10,6 +10,7 @@
     "dashboard",
     "embeddable",
     "opensearchDashboardsUtils",
+    "opensearchDashboardsReact",
     "wazuhCore"
   ],
   "optionalPlugins": ["securityDashboards"]

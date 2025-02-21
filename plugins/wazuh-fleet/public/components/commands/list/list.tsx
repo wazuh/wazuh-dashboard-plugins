@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import {
   EuiFlyout,
   EuiFlyoutBody,
@@ -6,8 +7,7 @@ import {
   EuiSpacer,
   EuiTitle,
 } from '@elastic/eui';
-import React, { useState } from 'react';
-import { tableColumns } from './columns';
+// import { tableColumns } from './columns';
 
 export interface CommandListProps {
   FleetCommandsDataSource: any;
@@ -15,21 +15,21 @@ export interface CommandListProps {
   TableIndexer: any;
 }
 
-import { getCore } from '../../../plugin-services';
-
-export const CommandsList = ({
-  FleetCommandsDataSource,
-  FleetCommandsDataSourceRepository,
-  TableIndexer,
-}: CommandListProps) => {
+// export const CommandsList = ({
+//   FleetCommandsDataSource,
+//   FleetCommandsDataSourceRepository,
+//   TableIndexer,
+// }: CommandListProps) => {
+export const CommandsList = () => {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [command, setCommand] = useState();
 
   return (
     <>
       <EuiPageHeader pageTitle='Agents commands' />
       <EuiSpacer />
-      <TableIndexer
+      {/* <TableIndexer
         DataSource={FleetCommandsDataSource}
         DataSourceRepository={FleetCommandsDataSourceRepository}
         columns={tableColumns({
@@ -39,7 +39,7 @@ export const CommandsList = ({
         tableProps={{
           hasActions: true,
         }}
-      />
+      /> */}
       {isFlyoutVisible ? (
         <EuiFlyout
           ownFocus
