@@ -8,7 +8,7 @@ import {
   EuiLink,
 } from '@elastic/eui';
 import { getCore } from '../../../plugin-services';
-import { Agent } from '../../../../common/types';
+import { IAgentResponse } from '../../../../common/types';
 import { AgentGroups, HostOS } from '../../common';
 import {
   agentsTableActions,
@@ -24,17 +24,17 @@ export const agentsTableColumns = ({
   setIsEditNameVisible,
 }: AgentsTableGlobalActionsProps) => [
   {
-    field: 'agent.name',
+    field: '_source.agent.name',
     name: 'Name / ID',
     sortable: true,
     show: true,
     searchable: true,
-    render: (field: string, agentData: Agent) => (
+    render: (field: string, agentData: IAgentResponse) => (
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
           <EuiLink
             href={getCore().application.getUrlForApp('wazuh-fleet', {
-              path: `#/agents/${agentData.agent.id}`,
+              path: `#/agents/${agentData._source.agent.id}`,
             })}
           >
             {field}
@@ -43,7 +43,7 @@ export const agentsTableColumns = ({
         <EuiFlexItem>
           <EuiToolTip content={field}>
             <EuiText color='subdued' size='xs'>
-              {`${agentData.agent.id.slice(0, 14)}...`}
+              {`${agentData._source.agent.id.slice(0, 14)}...`}
             </EuiText>
           </EuiToolTip>
         </EuiFlexItem>
@@ -51,7 +51,7 @@ export const agentsTableColumns = ({
     ),
   },
   {
-    field: 'agent.groups',
+    field: '_source.agent.groups',
     name: 'Groups',
     sortable: true,
     show: true,
@@ -59,7 +59,7 @@ export const agentsTableColumns = ({
     searchable: true,
   },
   {
-    field: 'agent.version',
+    field: '_source.agent.version',
     name: 'Version',
     sortable: true,
     show: true,
@@ -91,18 +91,18 @@ export const agentsTableColumns = ({
     },
   },
   {
-    field: 'agent.host.os.name,agent.host.os.version',
+    field: '_source.agent.host.os.name,_source.agent.host.os.version',
     composeField: ['host.os.name', 'host.os.version'],
     name: 'Host OS',
     sortable: true,
     show: true,
-    render: (field: string, agentData: Agent) => (
-      <HostOS os={agentData.agent.host.os} />
+    render: (field: string, agentData: IAgentResponse) => (
+      <HostOS os={agentData._source.agent.host?.os} />
     ),
     searchable: true,
   },
   {
-    field: 'agent.host.ip',
+    field: '_source.agent.host.ip',
     name: 'Host IP',
     sortable: true,
     show: true,
@@ -110,7 +110,7 @@ export const agentsTableColumns = ({
     width: '140px',
   },
   {
-    field: 'agent.status',
+    field: '_source.agent.status',
     name: 'Status',
     truncateText: true,
     sortable: true,

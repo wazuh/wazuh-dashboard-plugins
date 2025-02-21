@@ -16,11 +16,11 @@ import {
   EuiDescriptionListTitle,
   EuiDescriptionListDescription,
 } from '@elastic/eui';
-import { getAgentManagement } from '../../../../plugin-services';
-import { Agent } from '../../../../../common/types';
+import { getAgentManagement, getToasts } from '../../../../plugin-services';
+import { IAgentResponse } from '../../../../../common/types';
 
 interface EditAgentGroupsModalProps {
-  agent: Agent;
+  agent: IAgentResponse;
   onClose: () => void;
   reloadAgents: () => void;
 }
@@ -31,7 +31,7 @@ export const EditAgentGroupsModal = ({
   reloadAgents,
 }: EditAgentGroupsModalProps) => {
   const [selectedGroups, setSelectedGroups] = useState(
-    agent.agent.groups?.map(group => ({ label: group })) || [],
+    agent._source.agent.groups?.map(group => ({ label: group })) || [],
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -39,10 +39,10 @@ export const EditAgentGroupsModal = ({
     const flatSelectedGroups = selectedGroups.map(group => group.label);
     const addedGroups =
       flatSelectedGroups.filter(
-        group => !agent.agent.groups?.includes(group),
+        group => !agent._source.agent.groups?.includes(group),
       ) || [];
     const removedGroups =
-      agent.agent.groups?.filter(
+      agent._source.agent.groups?.filter(
         group => !flatSelectedGroups.includes(group),
       ) || [];
 
@@ -57,20 +57,35 @@ export const EditAgentGroupsModal = ({
       setIsSaving(true);
 
       if (addedGroups.length > 0) {
-        await getAgentManagement().addGroups(agent.agent.id, addedGroups);
+        await getAgentManagement().addGroups(
+          agent._source.agent.id,
+          addedGroups,
+        );
       }
 
       if (removedGroups.length > 0) {
         await getAgentManagement().removeGroups({
-          agentId: agent.agent.id,
+          agentId: agent._source.agent.id,
           groupIds: removedGroups,
         });
       }
 
+      getToasts().add({
+        color: 'primary',
+        title: 'Agent groups edited',
+        text: `Agent ${agent._source.agent.name} groups have been updated`,
+        toastLifeTimeMs: 3000,
+      });
       setIsSaving(false);
       reloadAgents();
       onClose();
     } catch {
+      getToasts().add({
+        color: 'danger',
+        title: 'Error editing agent groups',
+        text: `No agent ${agent._source.agent.name} groups have been updated`,
+        toastLifeTimeMs: 3000,
+      });
       setIsSaving(false);
     }
   };
@@ -93,7 +108,7 @@ export const EditAgentGroupsModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent.agent.id}
+                  {agent._source.agent.id}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -101,7 +116,7 @@ export const EditAgentGroupsModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent.agent.name}
+                  {agent._source.agent.name}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>

@@ -23,7 +23,7 @@ export interface Result {
 
 interface UpgradeAgentsModalProps {
   selectedAgents: Agent[];
-  // allAgentsSelected: boolean;
+  allAgentsSelected: boolean;
   // filters: any;
   onClose: () => void;
   reloadAgents: () => void;

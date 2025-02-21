@@ -119,22 +119,9 @@ export const AgentManagement = ({
     groupsIds: string | string[],
   ) => {
     try {
-      await removeGroups(agentId, groupsIds);
-      getToasts().add({
-        color: 'primary',
-        title: 'Agent groups removed',
-        text: `${
-          Array.isArray(groupsIds) ? groupsIds.join(', ') : groupsIds
-        } removed from agent ${agentId} successfully`,
-        toastLifeTimeMs: 3000,
-      });
+      return await removeGroups(agentId, groupsIds);
     } catch (error) {
-      getToasts().add({
-        color: 'danger',
-        title: 'Error removing agent groups',
-        text: error.message || 'Error removing agent groups',
-        toastLifeTimeMs: 3000,
-      });
+      console.log(error);
       throw error;
     }
   };
@@ -144,22 +131,9 @@ export const AgentManagement = ({
     groupsIds: string | string[],
   ) => {
     try {
-      await addGroups(agentId, groupsIds);
-      getToasts().add({
-        color: 'primary',
-        title: 'Agent groups edited',
-        text: `${
-          Array.isArray(groupsIds) ? groupsIds.join(', ') : groupsIds
-        } added to agent ${agentId} successfully`,
-        toastLifeTimeMs: 3000,
-      });
+      return await addGroups(agentId, groupsIds);
     } catch (error) {
-      getToasts().add({
-        color: 'danger',
-        title: 'Error editing agent groups',
-        text: error.message || 'Error adding agent groups',
-        toastLifeTimeMs: 3000,
-      });
+      console.log(error);
       throw error;
     }
   };
@@ -173,9 +147,9 @@ export const AgentManagement = ({
     upgrade: async (id: string) => await upgradeAgent(id),
     editName: async (id: string, newName: string) =>
       await handleEditAgentName(id, newName),
-    removeGroups: async (id: string, groupsIds: string | string[]) =>
-      await handleRemoveGroupToAgents(id, groupsIds),
-    addGroups: async (listIds: string, groupsIds: string | string[]) =>
-      await handleAddGroupToAgents(listIds, groupsIds),
+    removeGroups: async (documentId: string, groupsIds: string | string[]) =>
+      await handleRemoveGroupToAgents(documentId, groupsIds),
+    addGroups: async (documentId: string, groupsIds: string | string[]) =>
+      await handleAddGroupToAgents(documentId, groupsIds),
   };
 };

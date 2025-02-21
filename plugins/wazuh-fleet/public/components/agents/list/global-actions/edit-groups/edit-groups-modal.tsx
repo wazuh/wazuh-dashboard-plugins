@@ -11,8 +11,10 @@ import {
   EuiFormRow,
   EuiComboBox,
   EuiText,
+  EuiCallOut,
 } from '@elastic/eui';
-import { Agent } from '../../../../../../common/types';
+import { Agent, IAgentResponse } from '../../../../../../common/types';
+import { getAgentManagement } from '../../../../../plugin-services';
 import { EditAgentsGroupsModalResult } from './result';
 
 export enum RESULT_TYPE {
@@ -21,18 +23,23 @@ export enum RESULT_TYPE {
 }
 
 export interface GroupResult {
-  group: string;
+  documentId: string;
   result: RESULT_TYPE;
   successAgents?: string[];
   errorMessage?: string;
   totalErrorAgents?: number;
-  errorAgents?: [];
+  errorAgents?: [
+    {
+      error: { message: string };
+      id: string;
+    },
+  ];
 }
 
 interface EditAgentsGroupsModalProps {
   selectedAgents: Agent[];
-  // allAgentsSelected: boolean;
-  // filters: any;
+  allAgentsSelected: boolean;
+  params: object;
   onClose: () => void;
   reloadAgents: () => void;
   addOrRemove: 'add' | 'remove';
@@ -44,24 +51,26 @@ interface Option {
 
 export const EditAgentsGroupsModal = ({
   selectedAgents,
-  // allAgentsSelected,
-  // filters,
+  allAgentsSelected,
+  params,
   onClose,
   reloadAgents,
   addOrRemove,
 }: EditAgentsGroupsModalProps) => {
   const [selectedGroups, setSelectedGroups] = useState<Option[]>([]);
-  const [finalAgents, setFinalAgents] = useState<Agent[]>([]);
+  const [finalAgents, setFinalAgents] = useState<IAgentResponse[]>([]);
   const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
   const [getAgentsError, setGetAgentsError] = useState();
   const [saveChangesStatus, setSaveChangesStatus] = useState('disabled');
   const [isResultVisible, setIsResultVisible] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [groupResults, setGroupResults] = useState<GroupResult[]>([]);
+  const [documentResults, setDocumentResults] = useState<GroupResult[]>([]);
 
   const getAgents = async () => {
     try {
-      setGetAgentsStatus('complete');
+      const { hits: results }: { hits: IAgentResponse } =
+        await getAgentManagement().getAll(params);
+
+      return results;
     } catch (error) {
       setGetAgentsStatus('danger');
       setGetAgentsError(error);
@@ -72,19 +81,77 @@ export const EditAgentsGroupsModal = ({
     array.map(element => element[propertyName]);
 
   const handleOnSave = async () => {
-    setGetAgentsStatus('loading');
     setIsResultVisible(true);
+    setGetAgentsStatus('loading');
 
-    const agents = await getAgents();
+    let agents = selectedAgents;
+
+    if (allAgentsSelected) {
+      agents = await getAgents();
+    }
 
     if (!agents?.length) {
       return;
     }
 
+    setGetAgentsStatus('complete');
+
     setFinalAgents(agents);
     setSaveChangesStatus('loading');
 
+    const groups = getArrayByProperty(selectedGroups, 'label');
+    const agentDocumentIds = getArrayByProperty(agents, '_id');
+    const promises = agentDocumentIds.map(documentId => {
+      const promise =
+        addOrRemove === 'add'
+          ? getAgentManagement().addGroups(documentId, groups)
+          : getAgentManagement().removeGroups(documentId, groups);
+
+      return promise
+        .then(result => {
+          if (!result) {
+            return;
+          }
+
+          const { data, error, message } = result;
+          const {
+            affected_items: affectedItems,
+            failed_items: failedItems,
+            total_failed_items: totalFailedItems,
+          } = data;
+
+          setDocumentResults(results => {
+            const newGroupResult = {
+              documentId,
+              result: error ? RESULT_TYPE.ERROR : RESULT_TYPE.SUCCESS,
+              successAgents: affectedItems,
+              errorAgents: failedItems,
+              errorMessage: message,
+              totalErrorAgents: totalFailedItems,
+            };
+
+            return [...results, newGroupResult];
+          });
+        })
+        .catch(error => {
+          setDocumentResults(results => {
+            const newResult: GroupResult = {
+              documentId,
+              result: RESULT_TYPE.ERROR,
+              errorMessage: error.message,
+              errorAgents: {
+                error: { message: error.message },
+                groups: groups,
+              },
+            };
+
+            return [...results, newResult];
+          });
+        });
+    });
+
     try {
+      await Promise.allSettled(promises);
       setSaveChangesStatus('complete');
     } catch {
       setSaveChangesStatus('danger');
@@ -100,9 +167,18 @@ export const EditAgentsGroupsModal = ({
     setSelectedGroups(selectedGroups);
   };
 
+  const onCreateOption = (searchValue: string) => {
+    const newOption = {
+      label: searchValue,
+    };
+
+    // Select the option.
+    setSelectedGroups([...selectedGroups, newOption]);
+  };
+
   const selectGroupsForm = (
     <EuiForm component='form'>
-      {/* {true ? (
+      {allAgentsSelected ? (
         <EuiFormRow>
           <EuiCallOut
             color='warning'
@@ -110,20 +186,22 @@ export const EditAgentsGroupsModal = ({
             title='The changes will be applied to all agents that match the filters set in the list'
           />
         </EuiFormRow>
-      ) : ( */}
-      <EuiFormRow label='Selected agents'>
-        <EuiText>{selectedAgents.length}</EuiText>
-      </EuiFormRow>
-      {/* )} */}
+      ) : (
+        <EuiFormRow label='Selected agents'>
+          <EuiText>{selectedAgents.length}</EuiText>
+        </EuiFormRow>
+      )}
 
       <EuiFormRow label={groupsText}>
         <EuiComboBox
           placeholder={groupsText}
-          options={[]}
           selectedOptions={selectedGroups}
           onChange={handleOnChangeGroupsSelect}
           isLoading={false}
-          clearOnBlur
+          // TODO: Change when the endpoint or index pattern is available to request the groups
+          // options={groups?.map(group => ({ label: group })) || []}
+          noSuggestions
+          onCreateOption={onCreateOption}
         />
       </EuiFormRow>
     </EuiForm>
@@ -146,7 +224,7 @@ export const EditAgentsGroupsModal = ({
             getAgentsStatus={getAgentsStatus}
             getAgentsError={getAgentsError}
             saveChangesStatus={saveChangesStatus}
-            groupResults={groupResults}
+            documentResults={documentResults}
             groups={getArrayByProperty(selectedGroups, 'label')}
           />
         ) : (

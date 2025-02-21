@@ -1,12 +1,4 @@
-// import React from 'react';
-// import { EuiToolTip } from '@elastic/eui';
-// import { endpointSummary } from '../../../../utils/applications';
-// import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
-// import { WzElementPermissions } from '../../../common/permissions/element';
-// import { Agent } from '../../types';
-// import NavigationService from '../../../../react-services/navigation-service';
-
-import { Agent } from '../../../../../common/types';
+import { IAgentResponse } from '../../../../../common/types';
 
 export interface AgentsTableGlobalActionsProps {
   setIsFlyoutAgentVisible: (visible: boolean) => void;
@@ -14,7 +6,7 @@ export interface AgentsTableGlobalActionsProps {
   setIsEditGroupsVisible: (visible: boolean) => void;
   setIsUpgradeModalVisible: (visible: boolean) => void;
   setIsEditNameVisible: (visible: boolean) => void;
-  setAgent: (agent: Agent) => void;
+  setAgent: (agent: IAgentResponse) => void;
 }
 
 export const agentsTableActions = ({
@@ -37,7 +29,7 @@ export const agentsTableActions = ({
       type: 'icon',
       isPrimary: true,
       color: 'primary',
-      onClick: (agent: Agent) => {
+      onClick: (agent: IAgentResponse) => {
         setAgent(agent);
         setIsFlyoutAgentVisible(true);
       },
@@ -54,7 +46,7 @@ export const agentsTableActions = ({
       type: 'icon',
       isPrimary: true,
       color: 'danger',
-      onClick: (agent: Agent) => {
+      onClick: (agent: IAgentResponse) => {
         setAgent(agent);
         setIsDeleteModalVisible(true);
       },
@@ -64,7 +56,7 @@ export const agentsTableActions = ({
       description: 'Edit name',
       icon: 'pencil',
       type: 'icon',
-      onClick: (agent: Agent) => {
+      onClick: (agent: IAgentResponse) => {
         setAgent(agent);
         setIsEditNameVisible(true);
       },
@@ -76,7 +68,7 @@ export const agentsTableActions = ({
       description: 'Edit groups',
       icon: 'pencil',
       type: 'icon',
-      onClick: (agent: Agent) => {
+      onClick: (agent: IAgentResponse) => {
         setAgent(agent);
         setIsEditGroupsVisible(true);
       },
@@ -88,7 +80,7 @@ export const agentsTableActions = ({
       description: 'Upgrade',
       icon: 'package',
       type: 'icon',
-      onClick: (agent: Agent) => {
+      onClick: (agent: IAgentResponse) => {
         setAgent(agent);
         setIsUpgradeModalVisible(true);
       },
