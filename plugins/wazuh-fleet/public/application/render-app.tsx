@@ -4,7 +4,7 @@ import { I18nProvider } from '@osd/i18n/react';
 import { FleetManagement } from '../components';
 import { getPlugins } from '../plugin-services';
 
-export async function renderApp(params) {
+export async function renderApp(params, { Layout }) {
   const deps = {
     /* coreStart, navigation, */ params /* config */,
     history,
@@ -14,7 +14,9 @@ export async function renderApp(params) {
 
   ReactDOM.render(
     <I18nProvider>
-      <FleetManagement indexPatterns={indexPattern} filters={[]} {...deps} />
+      <Layout>
+        <FleetManagement indexPatterns={indexPattern} filters={[]} {...deps} />
+      </Layout>
     </I18nProvider>,
     params.element,
   );
