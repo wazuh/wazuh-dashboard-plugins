@@ -1,0 +1,7 @@
+{
+  "prefix": "wazuhSecurityPolicies",
+  "paths": {
+    "wazuhSecurityPolicies": "."
+  },
+  "translations": ["translations/ja-JP.json"]
+}
