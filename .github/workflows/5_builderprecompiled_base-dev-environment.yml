@@ -1,8 +1,18 @@
-# This workflow downloads the source code at the given git reference
-# (branch, tag or commit), an sets up an environment (Kibana or OpenSearch)
-# to run this code and a command (build, test, ...).
-#
 # This workflow is used as a base for other workflows.
+#
+# This workflow is designed to prepare and run an environment (in Kibana or
+# OpenSearch) where a given command (for example, build or test) can be run
+# on source code downloaded from a Git reference. This file serves as a base
+# for other workflows, allowing reuse of its steps.
+#
+# This workflow:
+# - 💻 Prepares the Docker execution environment, setting up OpenSearch
+#   Dashboards.
+# - ⚙️ Executes custom commands (like `yarn build`, `yarn test`, etc.)
+#   on the downloaded source code.
+# - 📦 Uploads artifacts and coverage results to GitHub if the corresponding
+#   parameters are configured.
+#
 
 name: Base workflow - Environment
 
