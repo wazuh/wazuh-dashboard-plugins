@@ -1,8 +1,18 @@
-# This workflow allows you to deploy a development environment and run any
-# npm / yarn available command for testing purposes.
-# Any branch, tag or commit SHA existing in the origin can be used.
+# 🎯 **Playground Workflow**
 #
-# This workflow is based on the `5_builderprecompiled_base-dev-environment` workflow.
+# ⚡ **Overview:**
+# This workflow deploys a development environment and executes any specified `npm` or `yarn` command for testing purposes.
+#
+# 🛠️ **Key Features:**
+# - 🔄 Supports any valid Git reference (branch, tag, or commit SHA).
+# - 💡 Allows execution of custom commands (e.g., `yarn test:jest`, `npm run lint`).
+# - 🐳 Supports additional Docker run parameters for flexible environment configurations.
+# - 📦 Enables artifact creation with customizable names and paths.
+# - ♻️ Reuses the `5_builderprecompiled_base-dev-environment` workflow for consistency.
+#
+# ⚠️ **Notes:**
+# - Ensure that commands specified are compatible with the project’s dependencies.
+# - Artifacts, if defined, will be archived automatically with a `.zip` suffix.
 
 name: Playground
 
