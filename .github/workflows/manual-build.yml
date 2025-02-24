@@ -1,7 +1,7 @@
 # This workflow builds a production-ready package from the given Git reference.
 # Any branch, tag or commit SHA existing in the origin can be used.
 #
-# This workflow is based on the `dev-environment` workflow.
+# This workflow is based on the `5_builderprecompiled_base-dev-environment` workflow.
 
 name: Manual build
 
@@ -25,7 +25,7 @@ jobs:
   # Build an app package from the given source code reference.
   build:
     name: Build app package
-    uses: ./.github/workflows/dev-environment.yml
+    uses: ./.github/workflows/5_builderprecompiled_base-dev-environment.yml
     with:
       reference: ${{ inputs.reference }}
       command: 'yarn build'

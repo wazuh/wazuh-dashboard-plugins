@@ -1,6 +1,6 @@
 # This workflow builds a production-ready package when a tag is created.
 #
-# This workflow is based on the `dev-environment` workflow.
+# This workflow is based on the `5_builderprecompiled_base-dev-environment` workflow.
 
 name: Build
 
@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Build app package (auto)
-    uses: ./.github/workflows/dev-environment.yml
+    uses: ./.github/workflows/5_builderprecompiled_base-dev-environment.yml
     with:
       reference: ${{ github.ref_name }}
       command: 'yarn build'

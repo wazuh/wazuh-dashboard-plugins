@@ -2,7 +2,7 @@
 # npm / yarn available command for testing purposes.
 # Any branch, tag or commit SHA existing in the origin can be used.
 #
-# This workflow is based on the `dev-environment` workflow.
+# This workflow is based on the `5_builderprecompiled_base-dev-environment` workflow.
 
 name: Playground
 
@@ -38,7 +38,7 @@ on:
 jobs:
   deploy_and_run_command:
     name: Deploy and run command
-    uses: ./.github/workflows/dev-environment.yml
+    uses: ./.github/workflows/5_builderprecompiled_base-dev-environment.yml
     with:
       reference: ${{ github.event.inputs.reference }}
       command: ${{ github.event.inputs.command }}
