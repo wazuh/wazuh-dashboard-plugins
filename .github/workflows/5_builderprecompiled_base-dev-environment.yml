@@ -1,18 +1,16 @@
-# This workflow is used as a base for other workflows.
+# 📚 Base Workflow - Environment Setup and Command Execution
 #
-# This workflow is designed to prepare and run an environment (in Kibana or
-# OpenSearch) where a given command (for example, build or test) can be run
-# on source code downloaded from a Git reference. This file serves as a base
-# for other workflows, allowing reuse of its steps.
+# ⚡ Overview:
+# This workflow serves as a reusable base for other workflows, providing a
+# standardized environment to execute custom commands (e.g., `yarn build`, `yarn test`)
+# on source code fetched from a specified Git reference.
 #
-# This workflow:
-# - 💻 Prepares the Docker execution environment, setting up OpenSearch
-#   Dashboards.
-# - ⚙️ Executes custom commands (like `yarn build`, `yarn test`, etc.)
-#   on the downloaded source code.
-# - 📦 Uploads artifacts and coverage results to GitHub if the corresponding
-#   parameters are configured.
+# 🚀 Key Features:
+# - 💻 Docker-Based Environment Setup: Prepares a Docker environment with OpenSearch Dashboards or Kibana.
+# - ⚙️ Custom Command Execution: Runs any specified command on the downloaded source code.
+# - 📦 Artifact and Coverage Upload: Uploads build artifacts and test coverage results to GitHub when configured.
 #
+# 🔗 Designed for: Easy integration and reuse by other workflows.
 
 name: Base workflow - Environment
 
