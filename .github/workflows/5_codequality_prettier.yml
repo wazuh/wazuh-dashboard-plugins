@@ -1,3 +1,22 @@
+# ✨ **Prettier Code Formatting Workflow**
+#
+# ⚡ **Overview:**
+# This GitHub Action ensures that the code formatting of all changed files in a pull request
+# adheres to the Prettier configuration. It runs automatically for every PR and fails if files
+# do not meet the formatting standards.
+#
+# 🛠️ **Key Features:**
+# - 🎯 Runs Prettier checks only on changed or renamed files (ignores deleted files).
+# - 🚀 Ensures consistent code style before merging PRs.
+# - 📦 Supports all file types that Prettier can format.
+#
+# ⚠️ **Notes:**
+# - The workflow uses `--ignore-unknown` to skip unsupported file types.
+# - If any file fails the formatting check, the workflow will fail, prompting the contributor to fix formatting issues.
+#
+# 📖 **References:**
+# - Prettier: https://prettier.io/docs/en/cli.html
+
 name: Prettier
 
 on:
