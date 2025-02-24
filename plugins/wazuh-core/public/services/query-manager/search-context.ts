@@ -8,7 +8,13 @@ import {
   QueryResult,
 } from './types';
 import { FilterManagerService } from './filter-manager-service';
+import { SearchParams } from './search-service';
 import { QueryService } from './query-service';
+
+export type QuerySearchParams = Omit<
+  SearchParams,
+  'indexPatternID' | 'filters'
+>;
 
 export class SearchContext implements ISearchContext {
   private readonly filterManagerService: IFilterManagerService =
@@ -61,11 +67,14 @@ export class SearchContext implements ISearchContext {
     return this.filterManagerService.getAllFilters();
   }
 
-  async executeQuery(): Promise<QueryResult> {
-    return await this.queryService.executeQuery(
-      this.indexPattern,
-      this.getAllFilters(),
-    );
+  async executeQuery(params?: QuerySearchParams = {}): Promise<QueryResult> {
+    const searchParams: SearchParams = {
+      ...params,
+      indexPatternID: this.indexPattern.id,
+      filters: this.getAllFilters(),
+    };
+
+    return await this.queryService.executeQuery(searchParams);
   }
 
   async refreshQuery(): Promise<QueryResult> {

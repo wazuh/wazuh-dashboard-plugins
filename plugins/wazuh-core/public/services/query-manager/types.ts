@@ -21,6 +21,7 @@ export interface ISearchContextConfig {
   indexPattern: IndexPattern;
   fixedFilters: TFilter[];
   contextId?: string;
+  searchService: DataService['search'];
 }
 
 export interface ISearchContext {

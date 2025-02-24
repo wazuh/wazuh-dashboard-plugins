@@ -33,26 +33,24 @@ export class QueryManagerService implements IQueryManagerService {
     this.indexPatternRepository = new IndexPatternRepository(
       dataService.indexPatterns,
     );
-    this.loadIndexPatterns(
-      config.indexPatterns.map(indexPattern => indexPattern.id),
-    );
+    this.init();
   }
 
   async init(): Promise<void> {
-    const indexPatternsIds = this.defaultIndexPatternsIds.map(
-      indexPattern => indexPattern.id,
-    );
+    try {
+      if (this.defaultIndexPatternsIds.length === 0) {
+        throw new Error('Index patterns are required');
+      }
 
-    if (indexPatternsIds.length === 0) {
-      throw new Error('Index patterns are required');
+      const indexPatternsPromises = this.defaultIndexPatternsIds
+        .filter(Boolean)
+        .map(indexPatternId => this.indexPatternRepository.get(indexPatternId));
+      const indexPatterns = await Promise.all(indexPatternsPromises);
+
+      this.indexPatterns = indexPatterns;
+    } catch (error) {
+      console.error('Error initializing QueryManagerService', error);
     }
-
-    const indexPatternsPromises = indexPatternsIds
-      .filter(Boolean)
-      .map(indexPatternId => this.indexPatternRepository.get(indexPatternId));
-    const indexPatterns = await Promise.all(indexPatternsPromises);
-
-    this.indexPatterns = indexPatterns;
   }
 
   async createSearchContext(
@@ -73,16 +71,16 @@ export class QueryManagerService implements IQueryManagerService {
   }
 
   private async getIndexPatternById(id: string): IndexPattern {
-    const indexPattern = this.indexPatterns.find(
-      indexPattern => indexPattern.id === id,
-    );
-
     try {
-      if (!indexPattern) {
+      const indexPattern = this.indexPatterns.find(
+        pattern => pattern.id === id,
+      );
+
+      if (indexPattern) {
+        return indexPattern;
+      } else {
         return await this.indexPatternRepository.get(id);
       }
-
-      return indexPattern;
     } catch (error) {
       throw new Error(
         `Index pattern not found with id: ${id}: ${error instanceof Error ? error.message : error}`,

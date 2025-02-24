@@ -9,10 +9,31 @@ import dateMath from '@elastic/datemath';
 import { parse } from 'query-string';
 import { TFilter } from './types';
 
+export interface ISearchParams {
+  filters?: TFilter[];
+  query?: any;
+  pagination?: {
+    pageIndex?: number;
+    pageSize?: number;
+  };
+  fields?: string[];
+  sorting?: {
+    columns: {
+      id: string;
+      direction: 'asc' | 'desc';
+    }[];
+  };
+  dateRange?: {
+    from: string;
+    to: string;
+  };
+  aggs?: any;
+}
+
 export type SearchParams = {
   indexPattern: IndexPattern;
   filePrefix: string;
-} & tSearchParams;
+} & ISearchParams;
 
 const DEFAULT_PAGE_SIZE = 100;
 const MAX_ENTRIES_PER_QUERY = 10000;
