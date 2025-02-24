@@ -1,9 +1,17 @@
-# This workflow run the unit tests of the app using Jest.
-# Any branch, tag or commit SHA existing in the origin can be used.
+# 🧪 **Jest Unit Testing Workflow**
 #
-# This workflow is based on the `5_builderprecompiled_base-dev-environment` workflow.
+# ⚡ **Overview:**
+# This GitHub Action runs Jest unit tests on the application’s source code.
+# It ensures that code changes pass the defined test suites, maintaining code reliability and functionality.
 #
-# Jest is a third-party software https://jestjs.io/
+# 🛠️ **Key Features:**
+# - 🧬 Runs Jest tests on specified Git references (branches, tags, or commit SHAs).
+# - 🔄 Supports manual execution with selectable test commands.
+# - 📦 Reuses the `5_builderprecompiled_base-dev-environment` workflow for consistent test environments.
+# - 📊 Generates and notifies about Jest coverage summaries after execution.
+#
+# 🔗 Reference:
+# - Jest: https://jestjs.io/
 
 name: Run unit test
 
