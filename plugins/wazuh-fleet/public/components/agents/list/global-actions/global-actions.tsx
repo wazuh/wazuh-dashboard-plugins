@@ -8,13 +8,13 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { getAgentManagement } from '../../../../plugin-services';
-import { Agent } from '../../../../../common/types';
+import { IAgentResponse } from '../../../../../common/types';
 import { ConfirmModal } from '../../../common/confirm-modal/confirm-modal';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
 import { UpgradeAgentsModal } from './upgrade/upgrade-modal';
 
 export interface AgentsTableGlobalActionsProps {
-  selectedAgents: Agent[];
+  selectedAgents: IAgentResponse[];
   allAgentsSelected: boolean;
   params: object;
   allowEditGroups: boolean;
@@ -22,8 +22,6 @@ export interface AgentsTableGlobalActionsProps {
   allowGetTasks: boolean;
   allowDeleteAgent: boolean;
   reloadAgents: () => void;
-  // setIsUpgradeTasksModalVisible: (isModalVisible: boolean) => void;
-  // setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const AgentsTableGlobalActions = ({
@@ -32,18 +30,15 @@ export const AgentsTableGlobalActions = ({
   params,
   allowEditGroups,
   allowUpgrade,
-  allowGetTasks,
   allowDeleteAgent,
   reloadAgents,
-  // setIsUpgradeTasksModalVisible,
-  // setIsUpgradePanelClosed,
 }: AgentsTableGlobalActionsProps) => {
   const [isPopoverOpen, setPopover] = useState(false);
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isDeleteAgentsVisible, setIsDeleteAgentsVisible] = useState(false);
-  const [addOrRemoveGroups, setAddOrRemoveGroups] = useState<
-    'add' | 'remove'
-  >();
+  const [addOrRemoveGroups, setAddOrRemoveGroups] = useState<'add' | 'remove'>(
+    'add',
+  );
   const [isUpgradeAgentsVisible, setIsUpgradeAgentsVisible] = useState(false);
   const [isLoadingModal, setIsLoadingModal] = useState(false);
 
@@ -168,16 +163,6 @@ export const AgentsTableGlobalActions = ({
                 {totalAgents ? ` (${totalAgents})` : ''}
               </span>
             )}
-          </EuiContextMenuItem>
-          <EuiContextMenuItem
-            icon='eye'
-            disabled={!allowGetTasks}
-            onClick={() => {
-              closePopover();
-              // setIsUpgradeTasksModalVisible(true);
-            }}
-          >
-            <span>{actions.upgradeDetails}</span>
           </EuiContextMenuItem>
         </EuiContextMenuPanel>
       </EuiPopover>

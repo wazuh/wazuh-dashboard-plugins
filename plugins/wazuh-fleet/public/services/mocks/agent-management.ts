@@ -168,6 +168,57 @@ export const addGroups = async (
   }
 };
 
+export const upgradeAgent = (agentId: string[]): Promise<any> =>
+  new Promise(resolve => {
+    // Simulate API delay
+    setTimeout(() => {
+      // Simulate random success/error (50% success rate)
+      if (Math.random() > 0.5) {
+        resolve({
+          status: 200,
+          data: {
+            message: `Upgrade successfully`,
+            error: null,
+            data: {
+              affected_items: [
+                {
+                  _id: agentId,
+                  _source: { agent: { name: 'agent' }, task_id: '1234' },
+                },
+              ],
+              failed_items: [],
+              total_affected_items: Array.isArray(agentId) ? agentId.length : 1,
+              total_failed_items: 0,
+            },
+          },
+        });
+      } else {
+        resolve({
+          status: 400,
+          data: {
+            message: 'Error upgrade agent(s)',
+            error: 1,
+            data: {
+              affected_items: [],
+              failed_items: [
+                {
+                  _id: agentId,
+                  error: {
+                    code: Math.floor(Math.random() * 9000) + 1000,
+                    message: 'Upgrade error',
+                    remedation: 'Retry',
+                  },
+                },
+              ],
+              total_affected_items: 0,
+              total_failed_items: 4,
+            },
+          },
+        });
+      }
+    }, 1000); // 500ms delay
+  });
+
 export const queryManagerService = () => {
   let currentContext = null;
 

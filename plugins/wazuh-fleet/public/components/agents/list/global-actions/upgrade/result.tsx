@@ -11,7 +11,8 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
-import { Agent, ResponseUpgradeAgents } from '../../../types';
+import { Agent } from '../../../../../../common/types';
+import { ResponseUpgradeAgents } from '../../../../../application/types';
 import { Result } from './upgrade-modal';
 
 export enum RESULT_TYPE {
@@ -68,26 +69,20 @@ export const UpgradeAgentsModalResult = ({
       tableLayout='auto'
       columns={[
         {
-          field: 'agent',
+          field: '_id',
           name: 'Agent ID',
           align: 'left',
           sortable: true,
+          render: agents => agents.agentIds.join(', '),
         },
         {
-          field: 'name',
+          field: '_source.agent.name',
           name: 'Name',
           align: 'left',
           sortable: true,
-          render: (field, task) => {
-            const agent = finalAgents.find(
-              finalAgent => finalAgent.id === task.agent,
-            ) as Agent;
-
-            return agent.name;
-          },
         },
         {
-          field: 'task_id',
+          field: '_source.task_id',
           name: 'Task ID',
           align: 'left',
           sortable: true,
@@ -127,10 +122,11 @@ export const UpgradeAgentsModalResult = ({
           sortable: true,
         },
         {
-          field: 'id',
+          field: '_id',
           name: 'Agent IDs',
           align: 'left',
-          render: ids => ids.join(', '),
+          width: '200px',
+          render: agents => agents.agentIds.join(', '),
         },
       ]}
       pagination={true}

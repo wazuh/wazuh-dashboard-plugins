@@ -23,10 +23,11 @@ export interface IAgentManagement {
   getAll: (params: IGetAllParams) => Promise<ISearch>;
   getByAgentId: (id: string) => Promise<ISearch>;
   delete: (id: string | string[]) => Promise<void>;
-  upgrade: (id: string) => Promise<void>;
+  upgrade: (id: string[]) => Promise<void>;
   removeGroups: (id: string, groups: string | string[]) => Promise<void>;
   editName: (id: string, newName: string) => Promise<void>;
   addGroups: (id: string, group: string | string[]) => Promise<void>;
+  upgradeAgent: (agentIds: string[]) => Promise<void>;
 }
 
 export interface IAgentManagementProps {
@@ -36,6 +37,7 @@ export interface IAgentManagementProps {
   removeGroups: (agentId: string, groups: string | string[]) => Promise<any>;
   editAgentName: (agentId: string, newName: string) => Promise<any>;
   addGroups: (agentId: string, groups: string | string[]) => Promise<any>;
+  upgradeAgent: (agentIds: string[]) => Promise<any>;
 }
 
 export interface AppSetup {
@@ -46,4 +48,9 @@ export interface AppSetup {
     getServerAddress: () => Promise<string>;
     setServerAddress: (url: string) => Promise<string>;
   };
+}
+
+export interface ResponseUpgradeAgents {
+  agent: string;
+  task_id: number;
 }

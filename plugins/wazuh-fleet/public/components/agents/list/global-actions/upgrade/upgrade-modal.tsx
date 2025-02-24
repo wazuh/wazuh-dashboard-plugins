@@ -10,9 +10,12 @@ import {
   EuiForm,
   EuiFormRow,
   EuiText,
-  // EuiCallOut,
+  EuiCallOut,
 } from '@elastic/eui';
-import { Agent } from '../../../../../../common/types';
+import { IAgentResponse } from '../../../../../../common/types';
+import { getAgents } from '../common/get-agents';
+import { getAgentManagement } from '../../../../../plugin-services';
+import { UpgradeAgentsModalResult } from './result';
 
 export interface Result {
   successAgents?: [];
@@ -22,58 +25,87 @@ export interface Result {
 }
 
 interface UpgradeAgentsModalProps {
-  selectedAgents: Agent[];
+  selectedAgents: IAgentResponse[];
   allAgentsSelected: boolean;
-  // filters: any;
+  params: any;
   onClose: () => void;
   reloadAgents: () => void;
-  // setIsUpgradePanelClosed: (isUpgradePanelClosed: boolean) => void;
 }
 
 export const UpgradeAgentsModal = ({
   selectedAgents,
-  // allAgentsSelected,
-  // filters,
+  allAgentsSelected,
+  params,
   onClose,
   reloadAgents,
-  // setIsUpgradePanelClosed,
 }: UpgradeAgentsModalProps) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [finalAgents, setFinalAgents] = useState<Agent[]>([]);
+  const [finalAgents, setFinalAgents] = useState<IAgentResponse[]>([]);
   const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [getAgentsError, setGetAgentsError] = useState();
   const [saveChangesStatus, setSaveChangesStatus] = useState('disabled');
   const [isResultVisible, setIsResultVisible] = useState(false);
-  // const [result, setResult] = useState<Result>();
-
-  const getAgents = async () => {
-    try {
-      setGetAgentsStatus('complete');
-      // return affected_items;
-    } catch (error) {
-      setGetAgentsStatus('danger');
-      setGetAgentsError(error);
-    }
-  };
+  const [result, setResult] = useState<Result>();
+  const getArrayByProperty = (
+    array: IAgentResponse[],
+    propertyName: string,
+  ): string[] => array.map(element => element[propertyName]);
 
   const handleOnSave = async () => {
     setGetAgentsStatus('loading');
     setIsResultVisible(true);
 
-    const agents = await getAgents();
+    let agents = selectedAgents;
+
+    if (allAgentsSelected) {
+      agents = await getAgents({
+        params,
+        setGetAgentsError,
+        setGetAgentsStatus,
+      });
+    }
 
     if (!agents?.length) {
       return;
     }
 
+    setGetAgentsStatus('complete');
+
     setFinalAgents(agents);
 
     setSaveChangesStatus('loading');
 
+    const agentIds = getArrayByProperty(agents, '_id');
+
     try {
+      const response = await getAgentManagement().upgrade({
+        agentIds,
+      });
+      const { data, message } = response.data;
+      const {
+        affected_items: affectedItems,
+        failed_items: failedItems,
+        total_failed_items: totalFailedItems,
+      } = data;
+
+      setResult({
+        successAgents: affectedItems,
+        errorAgents: failedItems,
+        errorMessage: message,
+        totalErrorAgents: totalFailedItems,
+      });
+
       setSaveChangesStatus('complete');
-    } catch {
+    } catch (error) {
+      console.log(error);
+      setResult({
+        errorMessage: error.message,
+        errorAgents: [
+          {
+            error: { message: error.message },
+            id: agentIds,
+          },
+        ],
+      });
       setSaveChangesStatus('danger');
     } finally {
       reloadAgents();
@@ -82,7 +114,7 @@ export const UpgradeAgentsModal = ({
 
   const form = (
     <EuiForm component='form'>
-      {/* {allAgentsSelected ? (
+      {allAgentsSelected ? (
         <EuiFormRow>
           <EuiCallOut
             color='warning'
@@ -90,11 +122,11 @@ export const UpgradeAgentsModal = ({
             title='The changes will be applied to all agents that match the filters set in the list'
           />
         </EuiFormRow>
-      ) : ( */}
-      <EuiFormRow label='Selected agents'>
-        <EuiText>{selectedAgents.length}</EuiText>
-      </EuiFormRow>
-      {/* )} */}
+      ) : (
+        <EuiFormRow label='Selected agents'>
+          <EuiText>{selectedAgents.length}</EuiText>
+        </EuiFormRow>
+      )}
     </EuiForm>
   );
 
@@ -104,7 +136,7 @@ export const UpgradeAgentsModal = ({
         <EuiModalHeaderTitle>Upgrade agents</EuiModalHeaderTitle>
       </EuiModalHeader>
       <EuiModalBody>
-        {/* {isResultVisible ? (
+        {isResultVisible ? (
           <UpgradeAgentsModalResult
             finalAgents={finalAgents}
             getAgentsStatus={getAgentsStatus}
@@ -112,9 +144,9 @@ export const UpgradeAgentsModal = ({
             saveChangesStatus={saveChangesStatus}
             result={result}
           />
-        ) : ( */}
-        {form}
-        {/* )} */}
+        ) : (
+          form
+        )}
       </EuiModalBody>
       <EuiModalFooter>
         {isResultVisible ? (

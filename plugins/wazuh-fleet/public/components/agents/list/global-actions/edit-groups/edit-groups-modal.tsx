@@ -13,8 +13,9 @@ import {
   EuiText,
   EuiCallOut,
 } from '@elastic/eui';
-import { Agent, IAgentResponse } from '../../../../../../common/types';
+import { IAgentResponse } from '../../../../../../common/types';
 import { getAgentManagement } from '../../../../../plugin-services';
+import { getAgents } from '../common/get-agents';
 import { EditAgentsGroupsModalResult } from './result';
 
 export enum RESULT_TYPE {
@@ -37,7 +38,7 @@ export interface GroupResult {
 }
 
 interface EditAgentsGroupsModalProps {
-  selectedAgents: Agent[];
+  selectedAgents: IAgentResponse[];
   allAgentsSelected: boolean;
   params: object;
   onClose: () => void;
@@ -64,19 +65,6 @@ export const EditAgentsGroupsModal = ({
   const [saveChangesStatus, setSaveChangesStatus] = useState('disabled');
   const [isResultVisible, setIsResultVisible] = useState(false);
   const [documentResults, setDocumentResults] = useState<GroupResult[]>([]);
-
-  const getAgents = async () => {
-    try {
-      const { hits: results }: { hits: IAgentResponse } =
-        await getAgentManagement().getAll(params);
-
-      return results;
-    } catch (error) {
-      setGetAgentsStatus('danger');
-      setGetAgentsError(error);
-    }
-  };
-
   const getArrayByProperty = (array: any[], propertyName: string) =>
     array.map(element => element[propertyName]);
 
@@ -87,7 +75,11 @@ export const EditAgentsGroupsModal = ({
     let agents = selectedAgents;
 
     if (allAgentsSelected) {
-      agents = await getAgents();
+      agents = await getAgents({
+        params,
+        setGetAgentsError,
+        setGetAgentsStatus,
+      });
     }
 
     if (!agents?.length) {

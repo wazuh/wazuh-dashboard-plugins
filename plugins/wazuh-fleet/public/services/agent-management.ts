@@ -12,6 +12,7 @@ export const AgentManagement = ({
   removeGroups,
   editAgentName,
   addGroups,
+  upgradeAgent,
 }: IAgentManagementProps): IAgentManagement => {
   const getAll = async (params: IGetAllParams) => {
     const { filter, query, pagination, sort } = params;
@@ -37,8 +38,6 @@ export const AgentManagement = ({
   };
 
   const getByAgentId = async (agentId: string) => {
-    console.log(`Get by agent id ${agentId}`);
-
     const manager = queryManagerService();
 
     await manager.createContext({
@@ -90,8 +89,27 @@ export const AgentManagement = ({
     }
   };
 
-  const upgradeAgent = (id: string) => {
-    console.log(`Upgrade ${id}`);
+  const handleUpgradeAgent = async (id: string[]) => {
+    try {
+      const result = await upgradeAgent(id);
+
+      getToasts().add({
+        color: 'primary',
+        title: 'Agent upgraded',
+        text: 'Agent upgraded successfully',
+        toastLifeTimeMs: 3000,
+      });
+
+      return result;
+    } catch (error) {
+      getToasts().add({
+        color: 'danger',
+        title: 'Error upgrading agent',
+        text: error.message || 'Agent could not be upgraded',
+        toastLifeTimeMs: 3000,
+      });
+      throw error;
+    }
   };
 
   const handleEditAgentName = async (id: string, newName: string) => {
@@ -144,7 +162,7 @@ export const AgentManagement = ({
     getByAgentId: async (id: string) => await getByAgentId(id),
     delete: async (documentId: string | string[]) =>
       await handleDeleteAgent(documentId),
-    upgrade: async (id: string) => await upgradeAgent(id),
+    upgrade: async (id: string[]) => await handleUpgradeAgent(id),
     editName: async (id: string, newName: string) =>
       await handleEditAgentName(id, newName),
     removeGroups: async (documentId: string, groupsIds: string | string[]) =>

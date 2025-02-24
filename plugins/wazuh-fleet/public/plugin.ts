@@ -21,6 +21,7 @@ import {
   removeGroups,
   queryManagerService,
   editName,
+  upgradeAgent,
 } from './services/mocks/agent-management';
 import { AgentsNavGroup } from './groups/agents';
 
@@ -43,6 +44,7 @@ export class WazuhFleetPlugin
           addGroups(agentId, groups),
         editAgentName: (agentId: string, name: string) =>
           editName(agentId, name),
+        upgradeAgent: agentIds => upgradeAgent(agentIds),
       }),
     );
     setEnrollAgentManagement({

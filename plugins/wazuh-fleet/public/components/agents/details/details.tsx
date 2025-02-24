@@ -16,6 +16,7 @@ import { IAgentResponse } from '../../../../common/types';
 import { getAgentManagement } from '../../../plugin-services';
 import { AgentResume } from './resume';
 import { AgentDashboard } from './dashboard';
+import { AgentNetworks } from './networks';
 
 export interface AgentDetailsProps {
   indexPatterns: any;
@@ -157,26 +158,26 @@ export const AgentDetails = ({
         />,
       ),
     },
-    // {
-    //   id: 'networks',
-    //   name: 'Networks',
-    //   content: tabContent(<AgentNetworks agentId={id} />),
-    // },
-    // {
-    //   id: 'processes',
-    //   name: 'Processes',
-    //   content: tabContent(<div>Processes</div>),
-    // },
-    // {
-    //   id: 'packages',
-    //   name: 'Packages',
-    //   content: tabContent(<div>Packages</div>),
-    // },
-    // {
-    //   id: 'configuration',
-    //   name: 'Configuration',
-    //   content: tabContent(<div>Configuration</div>),
-    // },
+    {
+      id: 'networks',
+      name: 'Networks',
+      content: tabContent(<AgentNetworks agentId={id} />),
+    },
+    {
+      id: 'processes',
+      name: 'Processes',
+      content: tabContent(<div>Processes</div>),
+    },
+    {
+      id: 'packages',
+      name: 'Packages',
+      content: tabContent(<div>Packages</div>),
+    },
+    {
+      id: 'configuration',
+      name: 'Configuration',
+      content: tabContent(<div>Configuration</div>),
+    },
   ];
 
   return (
