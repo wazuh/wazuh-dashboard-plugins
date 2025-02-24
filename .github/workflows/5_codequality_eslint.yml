@@ -1,11 +1,17 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# ESLint is a tool for identifying and reporting on patterns
-# found in ECMAScript/JavaScript code.
-# More details at https://github.com/eslint/eslint
-# and https://eslint.org
+# ✨ **ESLint Workflow for Code Quality Assurance**
+#
+# ⚡ **Overview:**
+# This GitHub Action runs ESLint on all JavaScript and TypeScript files (`.js`, `.jsx`, `.ts`, `.tsx`)
+# that have changed in a pull request. It ensures that code adheres to defined linting standards,
+# helping maintain code quality and consistency across the project.
+#
+# 🛠️ **Key Features:**
+# - 🚨 Runs ESLint checks only on changed or renamed JS/TS files (ignores deleted files).
+# - 🚀 Ensures code consistency before PRs are merged.
+#
+# 📖 **References:**
+# - ESLint: https://eslint.org
+# - ESLint GitHub Repo: https://github.com/eslint/eslint
 
 name: ESLint
 
