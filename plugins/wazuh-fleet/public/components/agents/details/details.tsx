@@ -12,11 +12,10 @@ import {
   EuiLoadingContent,
   EuiContextMenu,
 } from '@elastic/eui';
-import { Agent } from '../../../../common/types';
+import { IAgentResponse } from '../../../../common/types';
 import { getAgentManagement } from '../../../plugin-services';
 import { AgentResume } from './resume';
 import { AgentDashboard } from './dashboard';
-import { AgentNetworks } from './networks';
 
 export interface AgentDetailsProps {
   indexPatterns: any;
@@ -30,7 +29,7 @@ export const AgentDetails = ({
 }: AgentDetailsProps) => {
   const { id } = useParams();
   const [isAgentLoading, setIsAgentLoading] = useState(true);
-  const [agentData, setAgentData] = useState<Agent>();
+  const [agentData, setAgentData] = useState<IAgentResponse>();
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isNavigateToOpen, setIsNavigateToOpen] = useState(false);
 
@@ -42,7 +41,7 @@ export const AgentDetails = ({
     getAgentManagement()
       .getByAgentId(id)
       .then((results: any) => {
-        setAgentData(results?.hits?.[0]?._source);
+        setAgentData(results?.hits?.[0]);
         setIsAgentLoading(false);
       })
       .catch((error: any) => {
@@ -158,32 +157,32 @@ export const AgentDetails = ({
         />,
       ),
     },
-    {
-      id: 'networks',
-      name: 'Networks',
-      content: tabContent(<AgentNetworks agentId={id} />),
-    },
-    {
-      id: 'processes',
-      name: 'Processes',
-      content: tabContent(<div>Processes</div>),
-    },
-    {
-      id: 'packages',
-      name: 'Packages',
-      content: tabContent(<div>Packages</div>),
-    },
-    {
-      id: 'configuration',
-      name: 'Configuration',
-      content: tabContent(<div>Configuration</div>),
-    },
+    // {
+    //   id: 'networks',
+    //   name: 'Networks',
+    //   content: tabContent(<AgentNetworks agentId={id} />),
+    // },
+    // {
+    //   id: 'processes',
+    //   name: 'Processes',
+    //   content: tabContent(<div>Processes</div>),
+    // },
+    // {
+    //   id: 'packages',
+    //   name: 'Packages',
+    //   content: tabContent(<div>Packages</div>),
+    // },
+    // {
+    //   id: 'configuration',
+    //   name: 'Configuration',
+    //   content: tabContent(<div>Configuration</div>),
+    // },
   ];
 
   return (
     <>
       <EuiPageHeader
-        pageTitle={agentData?.agent?.name}
+        pageTitle={agentData?._source.agent?.name}
         rightSideItems={[
           <EuiPopover
             key={'actions'}
@@ -260,7 +259,7 @@ export const AgentDetails = ({
         ]}
       />
       <EuiSpacer />
-      <AgentResume agent={agentData} />
+      {agentData !== null && <AgentResume agent={agentData} />}
       <EuiSpacer />
       <EuiTabbedContent
         tabs={tabs}

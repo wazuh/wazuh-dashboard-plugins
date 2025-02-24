@@ -33,9 +33,12 @@ export const agentsTableColumns = ({
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
           <EuiLink
-            href={getCore().application.getUrlForApp('wazuh-fleet', {
-              path: `#/agents/${agentData._source.agent.id}`,
-            })}
+            href={getCore().application.getUrlForApp(
+              'wz_agents_%2Fwz-agents-summary',
+              {
+                path: `#/agents/${agentData._source.agent.id}`,
+              },
+            )}
           >
             {field}
           </EuiLink>

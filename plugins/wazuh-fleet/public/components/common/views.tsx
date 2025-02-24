@@ -44,9 +44,12 @@ export const agentDetails = {
           defaultMessage='Summary'
         />
       ),
-      href: getCore().application.getUrlForApp('wazuh-fleet', {
-        path: `#${summaryAgent.path}`,
-      }),
+      href: getCore().application.getUrlForApp(
+        'wz_agents_%2Fwz-agents-summary',
+        {
+          path: `#${summaryAgent.path}`,
+        },
+      ),
     },
     {
       text: id,
@@ -70,9 +73,12 @@ export const enrollmentAgent = {
           defaultMessage='Summary'
         />
       ),
-      href: getCore().application.getUrlForApp('wazuh-fleet', {
-        path: `#${summaryAgent.path}`,
-      }),
+      href: getCore().application.getUrlForApp(
+        'wz_agents_%2Fwz-agents-summary',
+        {
+          path: `#${summaryAgent.path}`,
+        },
+      ),
     },
     {
       text: 'Agent enrollment',

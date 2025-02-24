@@ -178,7 +178,7 @@ export const AgentList = (props: AgentListProps) => {
           agent={agent}
         />
       )}
-      {isFlyoutVisible ? (
+      {isFlyoutVisible && agent ? (
         <EuiFlyout
           ownFocus
           onClose={() => setIsFlyoutVisible(false)}
@@ -188,9 +188,12 @@ export const AgentList = (props: AgentListProps) => {
             <EuiTitle size='m'>
               <h2>
                 <EuiLink
-                  href={getCore().application.getUrlForApp('wazuh-fleet', {
-                    path: `#/agents/${agent?.agent.id}`,
-                  })}
+                  href={getCore().application.getUrlForApp(
+                    'wz_agents_%2Fwz-agents-summary',
+                    {
+                      path: `#/agents/${agent?._source.agent.id}`,
+                    },
+                  )}
                   target='_blank'
                 >
                   {agent?._source.agent.name}
