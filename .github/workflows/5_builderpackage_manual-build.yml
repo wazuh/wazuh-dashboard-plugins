@@ -47,6 +47,9 @@ jobs:
     needs: build
     name: Test packages
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        plugin: [wazuh-core, wazuh-check-updates]
 
     steps:
       - name: Step 01 - Download the plugin's source code
@@ -58,28 +61,21 @@ jobs:
 
       - name: Step 02 - Set variables
         run: |
-          echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
-          echo "currentDir=$(pwd -P)" >> $GITHUB_ENV
-          echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
-          echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
-          echo "versionPlatform=$(jq -r '.pluginPlatform.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+          echo "GITHUB_REFERENCE=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
+          echo "CURRENT_DIR=$(pwd -P)" >> $GITHUB_ENV
+          echo "VERSION=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+          echo "REVISION=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+          echo "VERSION_PLATFORM=$(jq -r '.pluginPlatform.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
 
-      - name: Step 04 - Download the core plugin's artifact
+      - name: Step 03 - Download plugin artifact
         uses: actions/download-artifact@v4
         with:
-          name: wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          name: wazuh-dashboard-plugins_${{ matrix.plugin }}_${{ env.VERSION }}-${{ env.REVISION }}_${{ env.GITHUB_REFERENCE }}.zip
+          path: ${{ env.CURRENT_DIR }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_${{ matrix.plugin }}_${{ env.VERSION }}-${{ env.REVISION }}_${{ env.GITHUB_REFERENCE }}.zip
           overwrite: true
 
-      - name: Step 05 - Download the check-updates plugin's artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
-          overwrite: true
-
-      - name: Step 06 - Build the Docker image
+      - name: Step 04 - Build the Docker image
         run: |
-          echo "current=${{ env.currentDir }}"
+          echo "current=${{ env.CURRENT_DIR }}"
           cd ./wazuh/scripts/test-packages
-          docker build --build-arg OSD_VERSION=${{ env.versionPlatform }} --build-arg PACKAGE_NAME=wazuh-dashboard-plugins_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip -f osd-test-packages.Dockerfile ./
+          docker build --build-arg OSD_VERSION=${{ env.VERSION_PLATFORM }} --build-arg PACKAGE_NAME=wazuh-dashboard-plugins_${{ env.VERSION }}-${{ env.REVISION }}_${{ env.GITHUB_REFERENCE }}.zip -f osd-test-packages.Dockerfile ./
