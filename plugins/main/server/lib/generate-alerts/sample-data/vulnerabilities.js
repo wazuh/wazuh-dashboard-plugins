@@ -10,6 +10,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2017-18018',
+        },
         package: {
           name: 'coreutils',
           version: '8.28-1ubuntu1',

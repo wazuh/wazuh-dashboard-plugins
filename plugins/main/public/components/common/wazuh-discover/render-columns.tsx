@@ -195,4 +195,40 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
       );
     },
   },
+  {
+    id: 'data.vulnerability.cve',
+    render: (value, row) => {
+      if (!row.data?.vulnerability?.scanner?.reference) {
+        return value;
+      }
+      return (
+        <EuiToolTip
+          position='top'
+          content={i18n.translate(
+            'discover.fieldLinkTooltip.vulnerabilityScannerReference',
+            {
+              defaultMessage: 'Navigate to the vulnerability CTI reference',
+            },
+          )}
+        >
+          <EuiLink
+            href={row.data.vulnerability.scanner.reference}
+            target='_blank'
+            rel='noopener noreferrer'
+            external
+          >
+            {value}
+          </EuiLink>
+        </EuiToolTip>
+      );
+    },
+  },
+  {
+    id: 'data.vulnerability.scanner.reference',
+    render: renderLinksReference,
+  },
+  {
+    id: 'vulnerability.scanner.reference',
+    render: renderLinksReference,
+  },
 ];
