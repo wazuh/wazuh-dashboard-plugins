@@ -79,6 +79,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-17540',
+        },
         package: {
           name: 'imagemagick',
           version: '8:6.9.7.4+dfsg-16ubuntu6.8',
@@ -129,6 +133,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-17540',
+        },
         package: {
           name: 'libmagickcore-6.q16-3',
           source: 'imagemagick',
@@ -180,6 +188,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-1000035',
+        },
         package: {
           name: 'unzip',
           version: '6.0-21ubuntu1',
@@ -248,6 +260,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-1000035',
+        },
         package: {
           name: 'unzip',
           version: '6.0-21ubuntu1',
@@ -316,6 +332,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-1747',
+        },
         package: {
           name: 'python3-yaml',
           source: 'pyyaml',
@@ -369,6 +388,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-1552',
+        },
         package: {
           name: 'openssl',
           version: '1.1.1-1ubuntu2.1~18.04.6',
@@ -444,6 +466,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-1747',
+        },
         package: {
           name: 'python3-yaml',
           source: 'pyyaml',
@@ -497,6 +522,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-18684',
+        },
         package: {
           name: 'sudo',
           version: '1.8.21p2-3ubuntu1.2',
@@ -543,6 +572,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-20482',
+        },
         package: {
           name: 'tar',
           version: '1.29b-2ubuntu0.1',
@@ -617,6 +650,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2015-2987',
+        },
         package: {
           name: 'ed',
           version: '1.10-2.1',
@@ -666,6 +702,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-8769',
+        },
         package: {
           name: 'elfutils',
           version: '0.170-0.4ubuntu0.1',
@@ -725,6 +764,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-1552',
+        },
         package: {
           name: 'openssl',
           version: '1.1.1-1ubuntu2.1~18.04.6',
@@ -800,6 +842,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-1752',
+        },
         package: {
           name: 'libc-bin',
           source: 'glibc',
@@ -854,6 +899,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-1752',
+        },
         package: {
           name: 'multiarch-support',
           source: 'glibc',
@@ -908,6 +956,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-19645',
+        },
         package: {
           name: 'libsqlite3-0',
           source: 'sqlite3',
@@ -960,6 +1012,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-19645',
+        },
         package: {
           name: 'sqlite3',
           version: '3.22.0-1ubuntu0.3',
@@ -1011,6 +1067,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2013-4235',
+        },
         package: {
           name: 'login',
           source: 'shadow',
@@ -1067,6 +1126,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2013-4235',
+        },
         package: {
           name: 'passwd',
           source: 'shadow',
@@ -1123,6 +1185,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2013-4235',
+        },
         package: {
           name: 'login',
           source: 'shadow',
@@ -1179,6 +1244,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-1003010',
+        },
         package: {
           name: 'git',
           version: '1:2.17.1-1ubuntu0.7',
@@ -1240,6 +1309,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-9366',
+        },
         package: {
           name: 'screen',
           version: '4.6.2-1ubuntu1',
@@ -1289,6 +1361,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-15847',
+        },
         package: {
           name: 'gcc',
           source: 'gcc-defaults',
@@ -1358,6 +1434,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2017-14988',
+        },
         package: {
           name: 'libopenexr22',
           source: 'openexr',
@@ -1419,6 +1499,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-1927',
+        },
         package: {
           name: 'apache2',
           version: '2.4.29-1ubuntu4.13',
@@ -1477,6 +1560,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-1927',
+        },
         package: {
           name: 'apache2-bin',
           source: 'apache2',
@@ -1536,6 +1622,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-1927',
+        },
         package: {
           name: 'apache2-data',
           source: 'apache2',
@@ -1595,6 +1684,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-1927',
+        },
         package: {
           name: 'apache2-utils',
           source: 'apache2',
@@ -1654,6 +1746,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-15919',
+        },
         package: {
           name: 'openssh-client',
           source: 'openssh',
@@ -1725,6 +1821,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-15919',
+        },
         package: {
           name: 'openssh-server',
           source: 'openssh',
@@ -1796,6 +1896,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-17595',
+        },
         package: {
           name: 'ncurses-base',
           source: 'ncurses',
@@ -1852,6 +1956,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-17543',
+        },
         package: {
           name: 'liblz4-1',
           source: 'lz4',
@@ -1918,6 +2026,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-20217',
+        },
         package: {
           name: 'libkrb5-3',
           source: 'krb5',
@@ -1989,6 +2101,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-14036',
+        },
         package: {
           name: 'accountsservice',
           version: '0.6.40-2ubuntu11.3',
@@ -2059,6 +2175,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2017-7244',
+        },
         package: {
           name: 'libpcre3',
           source: 'pcre3',
@@ -2130,6 +2249,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2020-8631',
+        },
         package: {
           name: 'grub-legacy-ec2',
           source: 'cloud-init',
@@ -2183,6 +2305,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-20079',
+        },
         package: {
           name: 'vim',
           version: '2:7.4.1689-3ubuntu1.4',
@@ -2232,6 +2358,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2016-4484',
+        },
         package: {
           name: 'cryptsetup',
           version: '2:1.6.6-5ubuntu2.1',
@@ -2301,6 +2430,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-13050',
+        },
         package: {
           name: 'gnupg',
           version: '1.4.20-1ubuntu3.3',
@@ -2377,6 +2510,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-7738',
+        },
         package: {
           name: 'mount',
           source: 'util-linux',
@@ -2448,6 +2584,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-7738',
+        },
         package: {
           name: 'util-linux',
           version: '2.27.1-6ubuntu3.10',
@@ -2518,6 +2657,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-7738',
+        },
         package: {
           name: 'uuid-runtime',
           source: 'util-linux',
@@ -2589,6 +2731,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-1547',
+        },
         package: {
           name: 'libssl1.0.0',
           source: 'openssl',
@@ -2667,6 +2812,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-3843',
+        },
         package: {
           name: 'systemd',
           version: '229-4ubuntu21.27',
@@ -2730,6 +2878,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-11727',
+        },
         package: {
           name: 'thunderbird',
           version: '1:68.8.0+build2-0ubuntu0.16.04.2',
@@ -2806,6 +2958,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-18276',
+        },
         package: {
           name: 'bash',
           version: '4.3-14ubuntu1.4',
@@ -2861,6 +3017,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2017-9502',
+        },
         package: {
           name: 'curl',
           version: '7.47.0-1ubuntu2.14',
@@ -2923,6 +3082,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-20483',
+        },
         package: {
           name: 'wget',
           version: '1.17.1-1ubuntu1.5',
@@ -2988,6 +3151,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-1010204',
+        },
         package: {
           name: 'binutils',
           version: '2.26.1-1ubuntu1~16.04.8',
@@ -3056,6 +3223,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-14855',
+        },
         package: {
           name: 'dirmngr',
           source: 'gnupg2',
@@ -3111,6 +3282,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2016-5011',
+        },
         package: {
           name: 'uuid-runtime',
           source: 'util-linux',
@@ -3184,6 +3358,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2015-5191',
+        },
         package: {
           name: 'open-vm-tools',
           version: '2:10.2.0-3~ubuntu0.16.04.1',
@@ -3251,6 +3428,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-8975',
+        },
         package: {
           name: 'netpbm',
           source: 'netpbm-free',
@@ -3312,6 +3492,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-19232',
+        },
         package: {
           name: 'sudo',
           version: '1.8.16-0ubuntu1.9',
@@ -3381,6 +3565,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2017-12588',
+        },
         package: {
           name: 'rsyslog',
           version: '8.16.0-1ubuntu3.1',
@@ -3442,6 +3630,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2017-18342',
+        },
         package: {
           name: 'python3-yaml',
           source: 'pyyaml',
@@ -3516,6 +3708,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2017-15994',
+        },
         package: {
           name: 'rsync',
           version: '3.1.1-3ubuntu1.3',
@@ -3577,6 +3773,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2019-9169',
+        },
         package: {
           name: 'libc6',
           source: 'glibc',
@@ -3652,6 +3851,10 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference:
+            'https://cti.wazuh.com/vulnerabilities/cves/CVE-2017-15088',
+        },
         package: {
           name: 'krb5-locales',
           source: 'krb5',
@@ -3722,6 +3925,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2018-6485',
+        },
         package: {
           name: 'libc-bin',
           source: 'glibc',
@@ -3797,6 +4003,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2016-7944',
+        },
         package: {
           name: 'libxfixes3',
           source: 'libxfixes',
@@ -3871,6 +4080,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2016-7947',
+        },
         package: {
           name: 'libxrandr2',
           source: 'libxrandr',
@@ -3942,6 +4154,9 @@ module.exports.data = [
     },
     data: {
       vulnerability: {
+        scanner: {
+          reference: 'https://cti.wazuh.com/vulnerabilities/cves/CVE-2016-7948',
+        },
         package: {
           name: 'libxrandr2',
           source: 'libxrandr',
