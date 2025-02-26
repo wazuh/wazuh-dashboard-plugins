@@ -4,22 +4,21 @@ import {
   DataService,
   IQueryManagerService,
   ISearchContext,
-  ICreateSearchContextConfig,
-  QueryManagerConfig,
+  TQueyManagerCreateSearchContextConfig,
   IIndexPatternRepository,
+  IQueryManagerConfig,
 } from './types';
-import { IndexPatternRepository } from './patterns-repository';
 
 export class QueryManagerService implements IQueryManagerService {
   private indexPatterns: IndexPattern[] = [];
-  private readonly indexPatternRepository: IIndexPatternRepository;
   private readonly defaultIndexPatternsIds: string[] = [];
+  private readonly dataService: DataService;
+  private readonly indexPatternRepository: IIndexPatternRepository;
 
-  constructor(
-    config: QueryManagerConfig,
-    private readonly dataService: DataService,
-  ) {
-    if (!config.indexPatterns || config.indexPatterns.length === 0) {
+  constructor(config: IQueryManagerConfig) {
+    const { indexPatterns, dataService, patternsRepository } = config;
+
+    if (!indexPatterns || config.indexPatterns.length === 0) {
       throw new Error('Index patterns are required');
     }
 
@@ -27,12 +26,15 @@ export class QueryManagerService implements IQueryManagerService {
       throw new Error('Search service is required');
     }
 
-    this.defaultIndexPatternsIds = config.indexPatterns.map(
+    if (!patternsRepository) {
+      throw new Error('Index pattern repository is required');
+    }
+
+    this.defaultIndexPatternsIds = indexPatterns.map(
       indexPattern => indexPattern.id,
     );
-    this.indexPatternRepository = new IndexPatternRepository(
-      dataService.indexPatterns,
-    );
+    this.dataService = dataService;
+    this.indexPatternRepository = patternsRepository;
     this.init();
   }
 
@@ -54,8 +56,8 @@ export class QueryManagerService implements IQueryManagerService {
   }
 
   async createSearchContext(
-    config: ICreateSearchContextConfig,
-  ): ISearchContext {
+    config: TQueyManagerCreateSearchContextConfig,
+  ): Promise<ISearchContext> {
     if (!config.indexPatternId) {
       throw new Error('Index pattern is required');
     }
@@ -65,12 +67,12 @@ export class QueryManagerService implements IQueryManagerService {
     return new SearchContext({
       indexPattern,
       fixedFilters: config.fixedFilters,
-      contextId: config.context,
+      contextId: config.contextId,
       searchService: this.dataService.search,
     });
   }
 
-  private async getIndexPatternById(id: string): IndexPattern {
+  private async getIndexPatternById(id: string): Promise<IndexPattern> {
     try {
       const indexPattern = this.indexPatterns.find(
         pattern => pattern.id === id,

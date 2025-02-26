@@ -67,10 +67,10 @@ export class SearchContext implements ISearchContext {
     return this.filterManagerService.getAllFilters();
   }
 
-  async executeQuery(params?: QuerySearchParams = {}): Promise<QueryResult> {
+  async executeQuery(params?: QuerySearchParams): Promise<QueryResult> {
     const searchParams: SearchParams = {
       ...params,
-      indexPatternID: this.indexPattern.id,
+      indexPattern: this.indexPattern,
       filters: this.getAllFilters(),
     };
 

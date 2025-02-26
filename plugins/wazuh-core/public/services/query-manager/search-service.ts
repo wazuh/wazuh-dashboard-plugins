@@ -2,12 +2,11 @@ import {
   IndexPattern,
   OpenSearchQuerySortValue,
   TimeRange,
-  IndexPatternsContract,
 } from 'src/plugins/data/public';
 import { SearchResponse } from 'src/core/server';
 import dateMath from '@elastic/datemath';
 import { parse } from 'query-string';
-import { TFilter } from './types';
+import { DataService, TFilter } from './types';
 
 export interface ISearchParams {
   filters?: TFilter[];
@@ -91,7 +90,7 @@ export function transformDateRange(dateRange: TimeRange) {
 
 export const search = async (
   params: SearchParams,
-  searchService: IndexPatternsContract,
+  searchService: DataService['search'],
 ): Promise<SearchResponse> => {
   const {
     indexPattern,
@@ -104,10 +103,10 @@ export const search = async (
   } = params;
 
   if (!indexPattern) {
-    return;
+    throw new Error('Index pattern is required');
   }
 
-  const searchSource = await searchService.searchSource.create();
+  const searchSource = await searchService?.searchSource?.create();
   const paginationPageSize = pagination?.pageSize || DEFAULT_PAGE_SIZE;
   const fromField = (pagination?.pageIndex || 0) * paginationPageSize;
   // If the paginationPageSize + the offset exceeds the 10000 result limit of OpenSearch, truncates the page size
@@ -172,73 +171,10 @@ export const search = async (
   try {
     return await searchParams.fetch();
   } catch (error) {
-    if (error.body) {
+    if (error instanceof Error && 'body' in error) {
       throw error.body;
     }
 
     throw error;
-  }
-};
-
-const getValueDisplayedOnFilter = (filter: TFilter) =>
-  filter.query?.bool?.minimum_should_match === 1
-    ? `is one of ${filter.meta?.value}`
-    : filter.meta?.params?.query || filter.meta?.value;
-
-export const hideCloseButtonOnFixedFilters = (
-  filters: TFilter[],
-  elements: NodeListOf<Element>,
-) => {
-  const fixedFilters = filters
-    .map((filter, index) => {
-      if (
-        filter.meta.controlledBy &&
-        !filter.meta.controlledBy.startsWith('hidden')
-      ) {
-        return {
-          index,
-          filter,
-          field: filter.meta?.key,
-          value: getValueDisplayedOnFilter(filter),
-        };
-      }
-    })
-    .filter(Boolean);
-
-  for (const [index, element] of elements.entries()) {
-    // the filter badge will be changed only when the field and value are the same and the position in the array is the same
-    const filterField = element
-      .querySelector('.euiBadge__content .euiBadge__childButton > span')
-      ?.textContent?.split(':')[0];
-    const filterValue = element.querySelector(
-      '.euiBadge__content .globalFilterLabel__value',
-    )?.textContent;
-    // when the field,value and index is the same, hide the remove button
-    const filter = fixedFilters.find(
-      filter =>
-        filter?.field === filterField &&
-        filter?.value === filterValue &&
-        filter?.index === index,
-    );
-    const removeButton = element.querySelector('.euiBadge__iconButton');
-    const badgeButton = element.querySelector(
-      '.euiBadge__content .euiBadge__childButton',
-    ) as HTMLElement;
-
-    if (filter) {
-      $(removeButton).addClass('hide-close-button');
-      $(removeButton).on('click', event => {
-        event.stopPropagation();
-      });
-      $(badgeButton).on('click', event => {
-        event.stopPropagation();
-      });
-      $(badgeButton).css('cursor', 'not-allowed');
-    } else {
-      $(removeButton).removeClass('hide-close-button');
-      $(removeButton).off('click');
-      $(badgeButton).off('click');
-      $(badgeButton).css('cursor', 'pointer');
-    }
   }
 };

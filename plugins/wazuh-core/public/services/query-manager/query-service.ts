@@ -10,7 +10,7 @@ export class QueryService implements IQueryService {
     const searchParams: SearchParams = {
       ...params,
       filePrefix: 'events', // ToDo: check if is necessary
-    };
+    } as SearchParams;
 
     return await search(searchParams, this.searchService);
   }

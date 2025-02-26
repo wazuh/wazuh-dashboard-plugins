@@ -1,12 +1,17 @@
 import { SearchResponse } from 'src/core/server';
 import { Filter } from 'src/plugins/data/common';
 import { IndexPattern, DataPublicPluginStart } from 'src/plugins/data/public';
+import { SearchParams } from './search-service';
 
 export type TFilter = Filter;
 export type QueryResult = SearchResponse;
 
 export type DataService = DataPublicPluginStart;
 
+export interface IIndexPatternRepository {
+  get: (id: string) => Promise<IndexPattern>;
+  getAll: () => Promise<IndexPattern[]>;
+}
 export interface IFilterManagerService {
   setUserFilters: (filters: TFilter[]) => void;
   clearUserFilters: () => void;
@@ -27,18 +32,22 @@ export interface ISearchContextConfig {
 export interface ISearchContext {
   executeQuery: () => Promise<SearchResponse>;
   refreshQuery: () => Promise<SearchResponse>;
-}
-
-export interface QueryManagerConfig {
-  indexPatterns: { id: string }[];
+  setUserFilters: (filters: TFilter[]) => void;
+  clearUserFilters: () => void;
+  getUserFilters: () => TFilter[];
+  setFixedFilters: (filters: TFilter[]) => void;
+  clearFixedFilters: () => void;
+  getFixedFilters: () => TFilter[];
+  getAllFilters: () => TFilter[];
 }
 
 export interface IQueryService {
-  executeQuery: (
-    indexPatternId: IndexPattern,
-    filters: TFilter,
-  ) => Promise<SearchResponse>;
+  executeQuery: (params?: SearchParams) => Promise<SearchResponse>;
   refreshQuery: () => Promise<SearchResponse>;
+}
+
+export interface QueryManagerFactoryConfig {
+  indexPatterns: { id: string }[];
 }
 
 export interface ICreateSearchContextConfig {
@@ -48,11 +57,23 @@ export interface ICreateSearchContextConfig {
   searchService: DataService['search'];
 }
 
-export interface IQueryManagerService {
-  createSearchContext: (config: ICreateSearchContextConfig) => ISearchContext;
+export interface IQueryManagerConfig {
+  indexPatterns: { id: string }[];
+  dataService: DataService;
+  patternsRepository: IIndexPatternRepository;
 }
 
-export interface IIndexPatternRepository {
-  get: (id: string) => Promise<IndexPattern>;
-  getAll: () => Promise<IndexPattern[]>;
+export type TQueyManagerCreateSearchContextConfig = Omit<
+  ICreateSearchContextConfig,
+  'searchService'
+>;
+
+export interface IQueryManagerService {
+  createSearchContext: (
+    config: TQueyManagerCreateSearchContextConfig,
+  ) => Promise<ISearchContext>;
+}
+
+export interface IQueryManagerFactory {
+  create: (config: QueryManagerFactoryConfig) => Promise<IQueryManagerService>;
 }

@@ -5,7 +5,7 @@ export class FilterManagerService implements IFilterManagerService {
   private fixedFilters: TFilter[] = [];
 
   getAllFilters(): TFilter[] {
-    return [...this.userFilters, ...this.fixedFilters];
+    return [...this.fixedFilters, ...this.userFilters];
   }
 
   setUserFilters(filters: TFilter[]): void {
