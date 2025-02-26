@@ -18,7 +18,7 @@ let test: any;
 beforeEach(() => {
   test = {
     optionals: {
-      serverAddress: "--url '1.1.1.1'",
+      serverAddress: "--enroll-url '1.1.1.1'",
       username: "--username 'user'",
       password: "--password 'pass'",
       agentName: "--name 'test'",
@@ -39,7 +39,7 @@ describe('getAllOptionals', () => {
 
   it('should return the correct paramsText', () => {
     const optionals = {
-      serverAddress: "--url '1.1.1.1'",
+      serverAddress: "--enroll-url '1.1.1.1'",
       username: "--username 'user'",
       password: "--password 'pass'",
       agentName: "--name 'test'",
@@ -49,7 +49,7 @@ describe('getAllOptionals', () => {
     const result = getAllOptionals(optionals, 'linux');
 
     expect(result).toBe(
-      "--url '1.1.1.1' --username 'user' --password 'pass' --verification-mode 'none' --name 'test' --key '00000000000000000000000000000000'",
+      "--enroll-url '1.1.1.1' --username 'user' --password 'pass' --verification-mode 'none' --name 'test' --key '00000000000000000000000000000000'",
     );
   });
 });
@@ -58,7 +58,7 @@ describe('getDEBAMD64InstallCommand', () => {
   it('should return the correct install command', () => {
     const props = {
       optionals: {
-        serverAddress: "--url 'localhost'",
+        serverAddress: "--enroll-url 'localhost'",
         username: "--username 'user'",
         password: "--password 'pass'",
         agentName: "--name 'agent1'",
@@ -71,7 +71,7 @@ describe('getDEBAMD64InstallCommand', () => {
     const result = getDEBAMD64InstallCommand(props);
 
     expect(result).toBe(
-      "sudo dpkg -i ./wazuh-agent_5.0.0-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent --url 'localhost' --username 'user' --password 'pass' --verification-mode 'none' --name 'agent1' --key '00000000000000000000000000000000'",
+      "sudo dpkg -i ./wazuh-agent_5.0.0-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent --enroll-url 'localhost' --username 'user' --password 'pass' --verification-mode 'none' --name 'agent1' --key '00000000000000000000000000000000'",
     );
   });
 });

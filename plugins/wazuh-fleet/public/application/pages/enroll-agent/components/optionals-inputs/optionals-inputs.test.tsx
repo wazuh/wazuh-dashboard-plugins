@@ -40,6 +40,10 @@ describe('Enrollment key input', () => {
                   label: 'none',
                 },
                 {
+                  value: 'certificate',
+                  label: 'certificate',
+                },
+                {
                   value: 'full',
                   label: 'full',
                 },

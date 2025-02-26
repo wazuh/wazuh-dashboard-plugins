@@ -58,7 +58,7 @@ const osDefinitions: IOSDefinition<TOperatingSystem, TOptionalParameters>[] = [
 ];
 const optionalParams: TOptionalParams<TOptionalParameters> = {
   server_address: {
-    property: '--url',
+    property: '--enroll-url',
     getParamCommand: props => `${props.property} '${props.value}'`,
   },
   agent_name: {

@@ -15,7 +15,7 @@ The user can specify the required and optional parameters to enroll the agent th
 | Username              | Required | Define the username of Wazuh server                                   | -             | Any string                                                              |
 | Password              | Required | Define the passowrd of the Wazuh server user                          | -             | Any string                                                              |
 | Agent name            | Optional | Define the agent name. If not defined, it will be used the hostname   | -             | Any string with 2 or more charecters. Allowed characters: A-Za-z0-9.-\_ |
-| SSL verification mode | Optional | Define the verification mode of certificates against the Wazuh server | none          | none, full                                                              |
+| SSL verification mode | Optional | Define the verification mode of certificates against the Wazuh server | none          | none, certificate, full                                                 |
 | Enrollment key        | Optional | Define the enrollment key                                             | -             | Any alphanumeric string of 32 characters                                |
 
 > **_NOTE:_** The user to enroll the agent must have permissions to execute this operation.

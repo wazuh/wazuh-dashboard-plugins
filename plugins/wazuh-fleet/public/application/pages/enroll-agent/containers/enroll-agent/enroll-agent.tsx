@@ -52,6 +52,10 @@ export const EnrollAgent = () => {
             value: 'none',
           },
           {
+            value: 'certificate',
+            label: 'certificate',
+          },
+          {
             text: 'full',
             value: 'full',
           },

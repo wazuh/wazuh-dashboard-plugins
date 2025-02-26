@@ -112,7 +112,7 @@ describe('getInstallCommandByOS', () => {
     const optionalParams: IOptionalParameters<TOptionalParameters> = {
       username: "--user 'user'",
       agent_name: "--name 'agent_name'",
-      server_address: "--url 'server_address'",
+      server_address: "--enroll-url 'server_address'",
       password: "--password '1231323'",
       verificationMode: "--verification-mode '1231323'",
       enrollmentKey: "--key '1231323'",

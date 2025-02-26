@@ -155,7 +155,7 @@ export const osCommandsDefinitions = [
 
 export const optionalParamsDefinitions: TOptionalParams<TOptionalParameters> = {
   serverAddress: {
-    property: '--url',
+    property: '--enroll-url',
     getParamCommand: props => {
       const { property, value } = props;
 

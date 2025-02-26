@@ -51,7 +51,7 @@ export const osCommandsDefinitions = [linuxDefinition];
 export const optionalParamsDefinitions: TOptionalParams<TOptionalParamsNames> =
   {
     optional1: {
-      property: '--url',
+      property: '--enroll-url',
       getParamCommand: props => {
         const { property, value } = props;
 
