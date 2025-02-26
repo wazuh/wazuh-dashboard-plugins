@@ -35,6 +35,7 @@ export type TOptionalParameters =
   | 'username'
   | 'password'
   | 'verificationMode'
+  | 'communicationsAPIUrl'
   | 'enrollmentKey';
 
 const osDefinitions: IOSDefinition<TOperatingSystem, TOptionalParameters>[] = [
@@ -79,6 +80,10 @@ const optionalParams: TOptionalParams<TOptionalParameters> = {
   },
   enrollmentKey: {
     property: '--key',
+    getParamCommand: props => `${props.property} '${props.value}'`,
+  },
+  communicationsAPIUrl: {
+    property: '--connect-url',
     getParamCommand: props => `${props.property} '${props.value}'`,
   },
 };
@@ -178,12 +183,13 @@ describe('Command Generator', () => {
     commandGenerator.selectOS(selectedOs);
 
     const optionalValues = {
-      server_address: '10.10.10.121',
+      server_address: 'https://10.10.10.121:55000',
       agent_name: 'agent1',
       username: 'user',
       password: '1234',
       verificationMode: 'none',
       enrollmentKey: '00000000000000000000000000000000',
+      communicationsAPIUrl: 'https://comms:27000',
     };
 
     commandGenerator.addOptionalParams(optionalValues);
@@ -226,6 +232,11 @@ describe('Command Generator', () => {
         enrollmentKey: optionalParams.enrollmentKey.getParamCommand({
           property: optionalParams.enrollmentKey.property,
           value: optionalValues.enrollmentKey,
+          name: 'enrollmentKey',
+        }),
+        communicationsAPIUrl: optionalParams.enrollmentKey.getParamCommand({
+          property: optionalParams.communicationsAPIUrl.property,
+          value: optionalValues.communicationsAPIUrl,
           name: 'enrollmentKey',
         }),
       },

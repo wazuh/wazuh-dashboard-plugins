@@ -72,7 +72,8 @@ export type TOptionalParameters =
   | 'password'
   | 'verificationMode'
   | 'agentName'
-  | 'enrollmentKey';
+  | 'enrollmentKey'
+  | 'communicationsAPIUrl';
 
 // /////////////////////////////////////////////////////////////////
 // / Operating system commands definitions
@@ -218,6 +219,14 @@ export const optionalParamsDefinitions: TOptionalParams<TOptionalParameters> = {
   },
   enrollmentKey: {
     property: '--key',
+    getParamCommand: props => {
+      const { property, value } = props;
+
+      return value === '' ? '' : `${property} '${value}'`;
+    },
+  },
+  communicationsAPIUrl: {
+    property: '--connect-url',
     getParamCommand: props => {
       const { property, value } = props;
 

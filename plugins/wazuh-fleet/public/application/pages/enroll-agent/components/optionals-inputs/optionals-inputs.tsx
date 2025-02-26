@@ -16,6 +16,7 @@ import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../inputs/styles.scss';
 import { VerificationModeInput } from './verification-mode-input';
 import { EnrollmentKeyInput } from './enrollment-key-input';
+import { CommunicationsAPIUrlInput } from './comms-url-input';
 
 interface OptionalsInputsProps {
   formFields: UseFormReturn['fields'];
@@ -113,6 +114,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
         className='warningForAgentName'
       />
       <VerificationModeInput formField={formFields.verificationMode} />
+      <CommunicationsAPIUrlInput formField={formFields.communicationsAPIUrl} />
       <EnrollmentKeyInput formField={formFields.enrollmentKey} />
     </Fragment>
   );

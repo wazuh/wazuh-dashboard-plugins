@@ -15,14 +15,23 @@ export class WazuhFleetPlugin
     appSetup({
       registerApp: app => core.application.register(app),
       enrollmentAgentManagement: {
-        serverAddresSettingName: 'enrollment.dns',
-        async getServerAddress() {
+        serverURLSettingName: 'enrollment.url',
+        async getServerURL() {
           // TODO: this should be replaced by getWazuhCore().configuration.get that in the current state does not return the setting because this is filtering by settings with the category 'wazuhCore'.
-          return getCore().uiSettings.get('enrollment.dns');
+          return getCore().uiSettings.get('enrollment.url');
         },
-        async setServerAddress(url) {
+        async setServerURL(url) {
           // TODO: this should be replaced by getWazuhCore().configuration.set that is not implemented
-          return await getCore().uiSettings.set('enrollment.dns', url);
+          return await getCore().uiSettings.set('enrollment.url', url);
+        },
+        commsURLSettingName: 'enrollment.commsUrl',
+        async getCommunicationsURL() {
+          // TODO: this should be replaced by getWazuhCore().configuration.get that in the current state does not return the setting because this is filtering by settings with the category 'wazuhCore'.
+          return getCore().uiSettings.get('enrollment.commsUrl');
+        },
+        async setCommunicationsURL(url) {
+          // TODO: this should be replaced by getWazuhCore().configuration.set that is not implemented
+          return await getCore().uiSettings.set('enrollment.commsUrl', url);
         },
       },
     });
