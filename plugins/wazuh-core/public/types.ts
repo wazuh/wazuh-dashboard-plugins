@@ -16,6 +16,7 @@ import {
   DashboardSecurityService,
   DashboardSecurityServiceSetupReturn,
 } from './services/dashboard-security';
+import { ApplicationService } from './services/application/application';
 
 export interface AppPluginSetupDependencies {
   data: DataPublicPluginSetup;
@@ -28,6 +29,7 @@ export interface AppPluginStartDependencies {
 export interface WazuhCorePluginSetup {
   _internal: any;
   utils: { formatUIDate: (date: Date) => string };
+  applicationService: ApplicationService;
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurityService;
@@ -55,6 +57,7 @@ export interface WazuhCorePluginSetup {
 
 export interface WazuhCorePluginStart {
   utils: { formatUIDate: (date: Date) => string };
+  applicationService: ApplicationService;
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   configuration: Configuration;
   dashboardSecurity: DashboardSecurityService;

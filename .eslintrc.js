@@ -219,6 +219,8 @@ module.exports = {
         /* -------------------------------------------------------------------------- */
         /*                             @typescript-eslint                             */
         /* -------------------------------------------------------------------------- */
+        '@typescript-eslint/no-non-null-assertion': 'off',
+        '@typescript-eslint/no-empty-object-type': 'off',
         '@typescript-eslint/no-dynamic-delete': 'off',
         '@typescript-eslint/no-unused-vars': [
           'error',
@@ -359,6 +361,7 @@ module.exports = {
             },
           },
         ],
+        'react/prop-types': 'off',
       },
     },
     {

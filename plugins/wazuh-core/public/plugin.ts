@@ -5,43 +5,65 @@ import {
   PluginInitializerContext,
 } from 'opensearch-dashboards/public';
 import { Cookies } from 'react-cookie';
+import { Logger } from '@osd/logging';
 import { ConfigurationStore } from '../common/services/configuration/configuration-store';
 import { EConfigurationProviders } from '../common/constants';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
+import { NoopLogger } from '../common/logger/noop-logger';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
 import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
 import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
 import * as utils from './utils';
 import * as uiComponents from './components';
-import { DashboardSecurity } from './services/dashboard-security';
+import {
+  DashboardSecurity,
+  DashboardSecurityServiceSetupReturn,
+} from './services/dashboard-security';
 import * as hooks from './hooks';
-import { CoreState, State } from './services/state';
+import { CoreState, State, StateSetupReturn } from './services/state';
 import { ServerHostClusterInfoStateContainer } from './services/state/containers/server-host-cluster-info';
 import { ServerHostStateContainer } from './services/state/containers/server-host';
 import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
-import { CoreServerSecurity } from './services';
+import { CoreServerSecurity, ServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';
 import { QueryManagerFactory } from './services/query-manager/query-manager-factory';
+import { ApplicationService } from './services/application/application';
 
-const noop = () => {};
+interface RuntimeSetup {
+  dashboardSecurity: DashboardSecurityServiceSetupReturn;
+  http: Awaited<ReturnType<CoreHTTPClient['setup']>>;
+  serverSecurity: Awaited<ReturnType<ServerSecurity['setup']>>;
+  state: StateSetupReturn;
+}
+
+interface Runtime {
+  setup: RuntimeSetup;
+  start: Record<string, any>;
+}
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
 {
-  runtime: Record<string, any> = {
-    setup: {},
-    start: {},
-  };
-  internal: Record<string, any> = {};
+  runtime: Runtime;
+  internal: Record<string, any>;
   services: {
-    [key: string]: any;
-    dashboardSecurity?: DashboardSecurity;
-    state?: State;
-  } = {};
+    applicationService: ApplicationService;
+    configuration: Configuration;
+    dashboardSecurity: DashboardSecurity;
+    http: CoreHTTPClient;
+    serverSecurity: ServerSecurity;
+    state: State;
+  };
 
   constructor(private readonly initializerContext: PluginInitializerContext) {
+    this.runtime = {
+      // @ts-expect-error Type '{}' is missing some properties
+      setup: {},
+      start: {},
+    };
+    // @ts-expect-error Type '{}' is missing some properties
     this.services = {};
     this.internal = {};
   }
@@ -58,6 +80,7 @@ export class WazuhCorePlugin
       log: noop,
       get: () => logger,
     };
+    const logger: Logger = new NoopLogger();
 
     this.internal.configurationStore = new ConfigurationStore(logger);
 
@@ -72,6 +95,8 @@ export class WazuhCorePlugin
       new UISettingsConfigProvider(core.uiSettings),
     );
 
+    this.services.applicationService = new ApplicationService(logger, core);
+
     this.services.configuration = new Configuration(
       logger,
       this.internal.configurationStore,
@@ -81,7 +106,7 @@ export class WazuhCorePlugin
     this.services.dashboardSecurity = new DashboardSecurity(logger, core.http);
 
     // Create state
-    this.services.state = new CoreState(logger);
+    this.services.state = new CoreState(logger) as unknown as State;
 
     const cookiesStore = new Cookies();
 
@@ -162,6 +187,7 @@ export class WazuhCorePlugin
     this.services.state.start();
     await this.services.dashboardSecurity.start();
     await this.services.http.start();
+    this.services.applicationService.start(core);
 
     this.runtime.start.serverSecurityDeps = {
       chrome: core.chrome,
