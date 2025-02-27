@@ -4,7 +4,7 @@ import { IQueryService } from './types';
 import { search, SearchParams } from './search-service';
 
 export class QueryService implements IQueryService {
-  constructor(private readonly searchService: IndexPatternsContract) { }
+  constructor(private readonly searchService: IndexPatternsContract) {}
 
   async executeQuery(params?: SearchParams): Promise<SearchResponse> {
     const searchParams: SearchParams = {
