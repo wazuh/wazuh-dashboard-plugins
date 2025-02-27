@@ -43,7 +43,7 @@ export interface ISearchContext {
 
 export interface IQueryService {
   executeQuery: (params?: SearchParams) => Promise<SearchResponse>;
-  refreshQuery: () => Promise<SearchResponse>;
+  refreshQuery: (params?: SearchParams) => Promise<SearchResponse>;
 }
 
 export interface QueryManagerFactoryConfig {

@@ -4,7 +4,7 @@ import { IQueryService } from './types';
 import { search, SearchParams } from './search-service';
 
 export class QueryService implements IQueryService {
-  constructor(private readonly searchService: IndexPatternsContract) {}
+  constructor(private readonly searchService: IndexPatternsContract) { }
 
   async executeQuery(params?: SearchParams): Promise<SearchResponse> {
     const searchParams: SearchParams = {
@@ -15,7 +15,7 @@ export class QueryService implements IQueryService {
     return await search(searchParams, this.searchService);
   }
 
-  async refreshQuery(): Promise<SearchResponse> {
-    throw new Error('Method not implemented.');
+  async refreshQuery(params?: SearchParams): Promise<SearchResponse> {
+    this.executeQuery(params);
   }
 }
