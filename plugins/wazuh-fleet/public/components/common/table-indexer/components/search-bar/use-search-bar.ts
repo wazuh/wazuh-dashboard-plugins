@@ -138,7 +138,7 @@ const useSearchBarConfiguration = (
       setQuery(query);
     },
     // its necessary to use saved queries. if not, the load saved query not work
-    useDefaultBehaviors: false,
+    useDefaultBehaviors: true,
   };
 
   return {
