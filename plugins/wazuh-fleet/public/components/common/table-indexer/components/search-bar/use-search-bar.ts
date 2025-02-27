@@ -15,7 +15,6 @@ import { transformDateRange } from './search-bar-service';
 // Input - types
 interface TUseSearchBarCustomInputs {
   indexPattern: IndexPattern;
-  setFilters: (filters: Filter[]) => void;
   setTimeFilter?: (timeRange: TimeRange) => void;
   setQuery?: (query: Query) => void;
   onFiltersUpdated?: (filters: Filter[]) => void;
@@ -40,7 +39,7 @@ interface TUserSearchBarResponse {
 const useSearchBarConfiguration = (
   props: TUseSearchBarProps,
 ): TUserSearchBarResponse => {
-  const { indexPattern, filters: defaultFilters, setFilters } = props;
+  const { indexPattern, filters: defaultFilters } = props;
   // dependencies
   const {
     timeFilter: globalTimeFilter,
@@ -118,14 +117,6 @@ const useSearchBarConfiguration = (
     absoluteDateRange,
     dateRangeFrom: timeFilter.from,
     dateRangeTo: timeFilter.to,
-    onFiltersUpdated: (userFilters: Filter[]) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      setFilters
-        ? setFilters(userFilters)
-        : console.warn('setFilters function is not defined');
-      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-      props?.onFiltersUpdated && props?.onFiltersUpdated(userFilters);
-    },
     onQuerySubmit: (
       payload: { dateRange: TimeRange; query?: Query },
       _isUpdate?: boolean,
@@ -147,7 +138,7 @@ const useSearchBarConfiguration = (
       setQuery(query);
     },
     // its necessary to use saved queries. if not, the load saved query not work
-    useDefaultBehaviors: true,
+    useDefaultBehaviors: false,
   };
 
   return {

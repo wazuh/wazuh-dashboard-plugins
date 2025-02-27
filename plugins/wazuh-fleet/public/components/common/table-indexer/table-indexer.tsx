@@ -5,6 +5,7 @@ import { IAgentResponse } from '../../../../common/types';
 import { getAgentManagement } from '../../../plugin-services';
 import useSearchBar from './components/search-bar/use-search-bar';
 import { WzSearchBar } from './components/search-bar/search-bar';
+import { useFilterManager } from './components/search-bar/hooks/use-filter-manager';
 
 interface TDocumentDetailsTab {
   id: string;
@@ -56,11 +57,10 @@ export const TableIndexer = (props: {
       direction: tableSortingInitialDirection || 'desc',
     },
   });
-  const [filters, setFilters] = useState<any[]>([]);
+  const { filters } = useFilterManager();
   const { searchBarProps } = useSearchBar({
     indexPattern: indexPatterns,
     filters: [...filtersDefault, ...filters],
-    setFilters,
   });
   const { query } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
