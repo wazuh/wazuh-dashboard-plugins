@@ -1,6 +1,6 @@
 {
   "id": "wazuhCheckUpdates",
-  "version": "4.11.1-00",
+  "version": "4.11.1-01",
   "opensearchDashboardsVersion": "opensearchDashboards",
   "server": true,
   "ui": true,
