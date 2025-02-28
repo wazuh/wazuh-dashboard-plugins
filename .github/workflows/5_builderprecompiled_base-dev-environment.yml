@@ -21,21 +21,21 @@ on:
         required: true
         type: string
         default: main
-        description: Source code reference (branch, tag or commit SHA).
+        description: Git reference (branch, tag, or commit SHA) to build from.
       command:
         required: true
         type: string
         default: 'yarn build'
-        description: Command to run in the environment
+        description: Command to run in the environment.
       docker_run_extra_args:
         type: string
         default: ''
-        description: Additional paramaters for the docker run command.
+        description: Additional parameters for the docker run command.
         required: false
       artifact_name:
         type: string
         default: ''
-        description: Artifact name (will be automatically suffixed with .zip)
+        description: Artifact name (will be automatically suffixed with .zip).
         required: false
       artifact_path:
         type: string
