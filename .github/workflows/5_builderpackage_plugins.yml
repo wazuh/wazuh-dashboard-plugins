@@ -14,7 +14,7 @@
 # - 🧪 Automated Testing: Automatically downloads and tests generated artifacts using a dynamically configured Docker environment.
 #
 
-name: Manual build
+name: Build package (on demand)
 
 on:
   workflow_call:
@@ -23,14 +23,14 @@ on:
         required: true
         type: string
         default: main
-        description: Source code reference (branch, tag or commit SHA)
+        description: 'Git reference (branch, tag, or commit SHA) to build from.'
   workflow_dispatch:
     inputs:
       reference:
         required: true
         type: string
         default: main
-        description: Source code reference (branch, tag or commit SHA)
+        description: 'Git reference (branch, tag, or commit SHA) to build from.'
 
 jobs:
   # Build an app package from the given source code reference.
