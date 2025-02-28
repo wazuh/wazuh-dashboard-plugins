@@ -11,7 +11,7 @@
 # ⚠️ **Notes:**
 # - Ensure tag names follow the `v*` convention (e.g., `v1.2.3`).
 
-name: Build
+name: Build app package (on tag)
 
 on:
   push:

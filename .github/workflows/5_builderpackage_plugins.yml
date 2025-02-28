@@ -14,7 +14,7 @@
 # - 🧪 Automated Testing: Automatically downloads and tests generated artifacts using a dynamically configured Docker environment.
 #
 
-name: Build package (on demand)
+name: Build app package (on demand)
 
 on:
   workflow_call:
