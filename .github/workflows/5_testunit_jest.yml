@@ -22,12 +22,12 @@ on:
         required: true
         type: string
         default: main
-        description: Source code reference (branch, tag or commit SHA)
+        description: Git reference (branch, tag, or commit SHA) to build from.
       command:
         required: true
         type: choice
         default: 'yarn test:jest'
-        description: Select the type of test to run.
+        description: Select the test command to run.
         options:
           - 'yarn test:jest'
   pull_request:
