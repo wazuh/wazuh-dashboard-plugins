@@ -120,7 +120,7 @@ def generateRandomVulnerability():
     vulnerability['id'] = 'CVE-{}'.format(random.randint(0, 9999))
     vulnerability['reference'] = generateRandomReference(vulnerability['id'])
     vulnerability['report_id'] = 'report-{}'.format(random.randint(0, 9999))
-    vulnerability['scanner'] = {'vendor':'vendor-{}'.format(random.randint(0, 9))}
+    vulnerability['scanner'] = {'vendor':'vendor-{}'.format(random.randint(0, 9)), 'reference':'https://cti.wazuh.com/vulnerabilities/cves/'+vulnerability['id']}
     vulnerability['score'] = {'base':round(random.uniform(0, 10),1), 'environmental':round(random.uniform(0, 10),1), 'temporal':round(random.uniform(0, 10),1),'version':'{}'.format(round(random.uniform(0, 10),1))}
     vulnerability['severity'] = random.choice(['Low','Medium','High','Critical'])
     vulnerability['published_at'] = generateRandomDate(2000)
