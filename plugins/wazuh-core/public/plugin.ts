@@ -69,17 +69,6 @@ export class WazuhCorePlugin
   }
 
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
-    // No operation logger
-    const logger = {
-      info: noop,
-      error: noop,
-      debug: noop,
-      warn: noop,
-      trace: noop,
-      fatal: noop,
-      log: noop,
-      get: () => logger,
-    };
     const logger: Logger = new NoopLogger();
 
     this.internal.configurationStore = new ConfigurationStore(logger);
