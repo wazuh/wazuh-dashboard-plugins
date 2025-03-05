@@ -30,12 +30,12 @@ export class QueryManagerService implements IQueryManagerService {
       throw new Error('Index pattern repository is required');
     }
 
-    this.defaultIndexPatternsIds = indexPatterns.map(
-      indexPattern => indexPattern.id,
-    );
+    this.defaultIndexPatternsIds = indexPatterns
+      .filter(indexPattern => indexPattern.id)
+      .map(indexPattern => indexPattern.id);
 
     if (this.defaultIndexPatternsIds.length === 0) {
-      throw new Error('Index patterns are required');
+      throw new Error('Index patterns ids are required');
     }
 
     this.dataService = dataService;
