@@ -39,17 +39,17 @@ export class FiltersService {
     field: string,
     value: string | string[],
   ): TFilter[] {
-    const filterIndex = filters.findIndex(f =>
+    const filterToRemoveIndex = filters.findIndex(f =>
       f.meta?.key === field && f.meta?.value === Array.isArray(value)
         ? value?.join(', ')
         : value,
     );
 
-    if (filterIndex === -1) {
-      return;
+    if (filterToRemoveIndex === -1) {
+      return filters;
     }
 
-    filters.splice(filterIndex, 1);
+    filters.splice(filterToRemoveIndex, 1);
 
     return filters;
   }
