@@ -8,15 +8,15 @@ import {
   EuiContextMenuPanel,
   EuiContextMenuItem,
   EuiHorizontalRule,
-  EuiTabbedContent,
+  // EuiTabbedContent,
   EuiLoadingContent,
   EuiContextMenu,
 } from '@elastic/eui';
 import { IAgentResponse } from '../../../../common/types';
 import { getAgentManagement } from '../../../plugin-services';
 import { AgentResume } from './resume';
-import { AgentDashboard } from './dashboard';
-import { AgentNetworks } from './networks';
+// import { AgentDashboard } from './dashboard';
+// import { AgentNetworks } from './networks';
 
 export interface AgentDetailsProps {
   indexPatterns: any;
@@ -25,8 +25,8 @@ export interface AgentDetailsProps {
 
 export const AgentDetails = ({
   indexPatterns,
-  filters,
-  ...restProps
+  // filters,
+  // ...restProps
 }: AgentDetailsProps) => {
   const { id } = useParams();
   const [isAgentLoading, setIsAgentLoading] = useState(true);
@@ -139,46 +139,47 @@ export const AgentDetails = ({
       ],
     },
   ];
-  const tabContent = (content: React.ReactNode) => (
-    <>
-      <EuiSpacer />
-      {content}
-    </>
-  );
-  const tabs = [
-    {
-      id: 'dashboard',
-      name: 'Dashboard',
-      content: tabContent(
-        <AgentDashboard
-          indexPattern={indexPatterns}
-          agentId={id}
-          filters={filters}
-          {...restProps}
-        />,
-      ),
-    },
-    {
-      id: 'networks',
-      name: 'Networks',
-      content: tabContent(<AgentNetworks agentId={id} />),
-    },
-    {
-      id: 'processes',
-      name: 'Processes',
-      content: tabContent(<div>Processes</div>),
-    },
-    {
-      id: 'packages',
-      name: 'Packages',
-      content: tabContent(<div>Packages</div>),
-    },
-    {
-      id: 'configuration',
-      name: 'Configuration',
-      content: tabContent(<div>Configuration</div>),
-    },
-  ];
+  // TODO: Add tabs for each section of the agent details page when we have them implemented
+  // const tabContent = (content: React.ReactNode) => (
+  //   <>
+  //     <EuiSpacer />
+  //     {content}
+  //   </>
+  // );
+  // const tabs = [
+  //   {
+  //     id: 'dashboard',
+  //     name: 'Dashboard',
+  //     content: tabContent(
+  //       <AgentDashboard
+  //         indexPattern={indexPatterns}
+  //         agentId={id}
+  //         filters={filters}
+  //         {...restProps}
+  //       />,
+  //     ),
+  //   },
+  //   {
+  //     id: 'networks',
+  //     name: 'Networks',
+  //     content: tabContent(<AgentNetworks agentId={id} />),
+  //   },
+  //   {
+  //     id: 'processes',
+  //     name: 'Processes',
+  //     content: tabContent(<div>Processes</div>),
+  //   },
+  //   {
+  //     id: 'packages',
+  //     name: 'Packages',
+  //     content: tabContent(<div>Packages</div>),
+  //   },
+  //   {
+  //     id: 'configuration',
+  //     name: 'Configuration',
+  //     content: tabContent(<div>Configuration</div>),
+  //   },
+  // ];
 
   return (
     <>
@@ -262,11 +263,14 @@ export const AgentDetails = ({
       <EuiSpacer />
       {agentData !== null && <AgentResume agent={agentData} />}
       <EuiSpacer />
+
+      {/*
+      TODO: Add tabs for each section of the agent details page when we have them implemented
       <EuiTabbedContent
         tabs={tabs}
         initialSelectedTab={tabs[0]}
         autoFocus='selected'
-      />
+      /> */}
     </>
   );
 };
