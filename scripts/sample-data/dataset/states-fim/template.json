@@ -1,0 +1,122 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "number_of_replicas": "0",
+      "refresh_interval": "5s",
+      "query.default_field": [
+        "agent.host.architecture",
+        "agent.host.ip",
+        "agent.id",
+        "agent.name",
+        "agent.version",
+        "data_stream.type",
+        "event.action",
+        "event.category",
+        "event.type",
+        "file.gid",
+        "file.group",
+        "file.hash.md5",
+        "file.hash.sha1",
+        "file.hash.sha256",
+        "file.inode",
+        "file.mtime",
+        "file.owner",
+        "file.path",
+        "file.size",
+        "file.uid",
+        "registry.data.type",
+        "registry.value"
+      ]
+    }
+  },
+  "mappings": {
+    "date_detection": false,
+    "dynamic": "strict",
+    "properties": {
+      "agent": {
+        "properties": {
+          "host": {
+            "properties": {
+              "architecture": {
+                "type": "keyword"
+              },
+              "ip": {
+                "type": "keyword"
+              }
+            }
+          },
+          "id": {
+            "type": "keyword"
+          },
+          "ip": {
+            "type": "keyword"
+          },
+          "name": {
+            "type": "keyword"
+          }
+        }
+      },
+      "file": {
+        "properties": {
+          "attributes": {
+            "type": "keyword"
+          },
+          "gid": {
+            "type": "keyword"
+          },
+          "group": {
+            "type": "keyword"
+          },
+          "hash": {
+            "properties": {
+              "md5": {
+                "type": "keyword"
+              },
+              "sha1": {
+                "type": "keyword"
+              },
+              "sha256": {
+                "type": "keyword"
+              }
+            }
+          },
+          "inode": {
+            "type": "keyword"
+          },
+          "mode": {
+            "type": "keyword"
+          },
+          "mtime": {
+            "type": "date"
+          },
+          "owner": {
+            "type": "keyword"
+          },
+          "path": {
+            "type": "keyword"
+          },
+          "size": {
+            "type": "long"
+          },
+          "uid": {
+            "type": "keyword"
+          },
+          "user_name": {
+            "type": "keyword"
+          }
+        }
+      },
+      "registry": {
+        "properties": {
+          "key": {
+            "type": "keyword"
+          },
+          "value": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+  }
+}

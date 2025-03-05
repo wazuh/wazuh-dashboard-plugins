@@ -1,0 +1,84 @@
+{
+  "settings": {
+    "index": {
+      "number_of_shards": "1",
+      "number_of_replicas": "0",
+      "refresh_interval": "5s",
+      "query.default_field": [
+        "agent.host.architecture",
+        "agent.host.ip",
+        "agent.id",
+        "agent.name",
+        "agent.version",
+        "data_stream.type",
+        "event.action",
+        "event.category",
+        "event.type",
+        "package.name",
+        "package.version",
+        "package.vendor",
+        "package.location",
+        "package.architecture",
+        "package.groups",
+        "package.description"
+      ]
+    }
+  },
+  "mappings": {
+    "date_detection": false,
+    "dynamic": "strict",
+    "properties": {
+      "agent": {
+        "properties": {
+          "host": {
+            "properties": {
+              "architecture": {
+                "type": "keyword"
+              },
+              "ip": {
+                "type": "keyword"
+              }
+            }
+          },
+          "id": {
+            "type": "keyword"
+          },
+          "ip": {
+            "type": "keyword"
+          },
+          "name": {
+            "type": "keyword"
+          }
+        }
+      },
+      "package": {
+        "properties": {
+          "name": {
+            "type": "keyword"
+          },
+          "version": {
+            "type": "keyword"
+          },
+          "vendor": {
+            "type": "keyword"
+          },
+          "install_time": {
+            "type": "date"
+          },
+          "location": {
+            "type": "keyword"
+          },
+          "architecture": {
+            "type": "keyword"
+          },
+          "groups": {
+            "type": "keyword"
+          },
+          "description": {
+            "type": "keyword"
+          }
+        }
+      }
+    }
+  }
+}
