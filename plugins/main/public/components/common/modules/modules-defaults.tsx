@@ -77,6 +77,7 @@ import {
   ThreatHuntingDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
+import { InventoryFIM } from '../../overview/fim/inventory';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -116,6 +117,12 @@ export const ModulesDefaults = {
       {
         id: 'inventory',
         name: 'Inventory',
+        buttons: [ButtonExploreAgent],
+        component: InventoryFIM,
+      },
+      {
+        id: 'inventory-og',
+        name: 'InventoryOG',
         buttons: [ButtonExploreAgent],
         component: MainFim,
       },
