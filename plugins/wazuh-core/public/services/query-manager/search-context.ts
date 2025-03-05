@@ -6,9 +6,9 @@ import {
   ISearchContext,
   ISearchContextConfig,
   QueryResult,
+  SearchParams,
 } from './types';
 import { FilterManagerService } from './filter-manager-service';
-import { SearchParams } from './search-service';
 import { QueryService } from './query-service';
 
 export type QuerySearchParams = Omit<

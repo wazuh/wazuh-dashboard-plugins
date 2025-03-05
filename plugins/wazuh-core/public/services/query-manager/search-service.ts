@@ -1,38 +1,19 @@
-import {
-  IndexPattern,
-  OpenSearchQuerySortValue,
-  TimeRange,
-} from 'src/plugins/data/public';
+import { OpenSearchQuerySortValue, TimeRange } from 'src/plugins/data/public';
 import { SearchResponse } from 'src/core/server';
 import dateMath from '@elastic/datemath';
 import { parse } from 'query-string';
-import { DataService, TFilter } from './types';
+import { DataService, SearchParams } from './types';
 
-export interface ISearchParams {
-  filters?: TFilter[];
-  query?: any;
-  pagination?: {
-    pageIndex?: number;
-    pageSize?: number;
-  };
-  fields?: string[];
-  sorting?: {
-    columns: {
-      id: string;
-      direction: 'asc' | 'desc';
-    }[];
-  };
-  dateRange?: {
-    from: string;
-    to: string;
-  };
-  aggs?: any;
+enum SEARCHFIELD {
+  FILTER = 'filter',
+  QUERY = 'query',
+  SORT = 'sort',
+  SIZE = 'size',
+  FROM = 'from',
+  INDEX = 'index',
+  FIELDS = 'fields',
+  AGGS = 'aggs',
 }
-
-export type SearchParams = {
-  indexPattern: IndexPattern;
-  filePrefix: string;
-} & ISearchParams;
 
 const DEFAULT_PAGE_SIZE = 100;
 const MAX_ENTRIES_PER_QUERY = 10000;
@@ -119,7 +100,7 @@ export const search = async (
     sorting?.columns?.map(column => {
       const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
 
-      return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
+      return { [column?.id]: sortDirection } as OpenSearchQuerySortValue;
     }) || [];
   let filters = defaulTFilters;
 
@@ -131,7 +112,7 @@ export const search = async (
       ...filters,
       {
         range: {
-          [indexPattern.timeFieldName || 'timestamp']: {
+          [indexPattern.timeFieldName]: {
             gte: dateMath.parse(from).toISOString(),
             /* roundUp: true is used to transform the osd dateform to a generic date format
               For instance: the "This week" date range in the date picker.
@@ -153,19 +134,19 @@ export const search = async (
 
   const searchParams = searchSource
     .setParent(undefined)
-    .setField('filter', filters)
-    .setField('query', query)
-    .setField('sort', sortOrder)
-    .setField('size', pageSize)
-    .setField('from', fromField)
-    .setField('index', indexPattern);
+    .setField(SEARCHFIELD.FILTER, filters)
+    .setField(SEARCHFIELD.QUERY, query)
+    .setField(SEARCHFIELD.SORT, sortOrder)
+    .setField(SEARCHFIELD.SIZE, pageSize)
+    .setField(SEARCHFIELD.FROM, fromField)
+    .setField(SEARCHFIELD.INDEX, indexPattern);
 
   if (fields && Array.isArray(fields) && fields.length > 0) {
-    searchParams.setField('fields', fields);
+    searchParams.setField(SEARCHFIELD.FIELDS, fields);
   }
 
   if (aggs) {
-    searchSource.setField('aggs', aggs);
+    searchSource.setField(SEARCHFIELD.AGGS, aggs);
   }
 
   try {

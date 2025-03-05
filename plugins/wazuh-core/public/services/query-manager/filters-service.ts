@@ -23,9 +23,12 @@ export class FiltersService {
     );
   }
 
-  static removeFilterByControlledBy(filters: TFilter[]): TFilter {
+  static removeFilterByControlledBy(
+    controlledByValue: string,
+    filters: TFilter[],
+  ): TFilter {
     const controlledBy = filters.filter(
-      filter => filter.meta?.controlledBy === value,
+      filter => filter.meta?.controlledBy === controlledByValue,
     );
 
     return controlledBy;
@@ -264,7 +267,7 @@ export class FiltersService {
    */
 
   static filtersToURLFormat(filters: TFilter[]) {
-    const filterCopy = filters || [];
+    const filterCopy = filters ? filters.map(filter => ({ ...filter })) : [];
 
     return rison.encode({
       filters: filterCopy,

@@ -33,6 +33,11 @@ export class QueryManagerService implements IQueryManagerService {
     this.defaultIndexPatternsIds = indexPatterns.map(
       indexPattern => indexPattern.id,
     );
+
+    if (this.defaultIndexPatternsIds.length === 0) {
+      throw new Error('Index patterns are required');
+    }
+
     this.dataService = dataService;
     this.indexPatternRepository = patternsRepository;
     this.init();
@@ -40,10 +45,6 @@ export class QueryManagerService implements IQueryManagerService {
 
   async init(): Promise<void> {
     try {
-      if (this.defaultIndexPatternsIds.length === 0) {
-        throw new Error('Index patterns are required');
-      }
-
       const indexPatternsPromises = this.defaultIndexPatternsIds
         .filter(Boolean)
         .map(indexPatternId => this.indexPatternRepository.get(indexPatternId));

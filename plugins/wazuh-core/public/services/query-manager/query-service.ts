@@ -1,7 +1,7 @@
 import { SearchResponse } from 'src/core/server';
 import { IndexPatternsContract } from '../../../../../src/plugins/data/public';
-import { IQueryService } from './types';
-import { search, SearchParams } from './search-service';
+import { IQueryService, SearchParams } from './types';
+import { search } from './search-service';
 
 export class QueryService implements IQueryService {
   constructor(private readonly searchService: IndexPatternsContract) {}

@@ -1,9 +1,35 @@
 import { SearchResponse } from 'src/core/server';
 import { Filter } from 'src/plugins/data/common';
 import { IndexPattern, DataPublicPluginStart } from 'src/plugins/data/public';
-import { SearchParams } from './search-service';
 
 export type TFilter = Filter;
+
+export interface ISearchParams {
+  filters?: TFilter[];
+  query?: any;
+  pagination?: {
+    pageIndex?: number;
+    pageSize?: number;
+  };
+  fields?: string[];
+  sorting?: {
+    columns: {
+      id: string;
+      direction: 'asc' | 'desc';
+    }[];
+  };
+  dateRange?: {
+    from: string;
+    to: string;
+  };
+  aggs?: any;
+}
+
+export type SearchParams = {
+  indexPattern: IndexPattern;
+  filePrefix: string;
+} & ISearchParams;
+
 export type QueryResult = SearchResponse;
 
 export type DataService = DataPublicPluginStart;
