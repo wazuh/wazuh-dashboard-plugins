@@ -17,8 +17,9 @@ export const getAllOptionals = (
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ];
 
@@ -41,8 +42,9 @@ export const getAllOptionalsMacos = (
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ];
 

@@ -9,6 +9,11 @@ jest.mock('../../../../../plugin-services', () => ({
       get: () => true,
     },
   }),
+  getEnrollAgentManagement: jest.fn().mockReturnValue({
+    commsURLSettingName: () => 'commsURL',
+    getCommunicationsURL: async () => '',
+    setCommunicationsURL: async () => {},
+  }),
 }));
 
 jest.mock('@elastic/eui/lib/services/accessibility/html_id_generator', () => ({
@@ -31,6 +36,11 @@ describe('Enrollment key input', () => {
               value: '',
               onChange: () => {},
             },
+            communicationsAPIUrl: {
+              type: 'text',
+              value: '',
+              onChange: () => {},
+            },
             verificationMode: {
               type: 'select',
               value: 'none',
@@ -38,6 +48,10 @@ describe('Enrollment key input', () => {
                 {
                   value: 'none',
                   label: 'none',
+                },
+                {
+                  value: 'certificate',
+                  label: 'certificate',
                 },
                 {
                   value: 'full',

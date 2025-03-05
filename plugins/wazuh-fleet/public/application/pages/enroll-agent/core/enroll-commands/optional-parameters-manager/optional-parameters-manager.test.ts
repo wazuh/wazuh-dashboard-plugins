@@ -31,7 +31,7 @@ const optionalParametersDefinition: TOptionalParams<TOptionalParamsFieldname> =
       getParamCommand: returnOptionalParam,
     },
     server_address: {
-      property: '--url',
+      property: '--enroll-url',
       getParamCommand: returnOptionalParam,
     },
     another_valid_fieldname: {

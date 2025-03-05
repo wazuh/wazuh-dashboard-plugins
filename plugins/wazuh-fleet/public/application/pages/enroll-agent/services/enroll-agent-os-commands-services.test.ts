@@ -18,12 +18,13 @@ let test: any;
 beforeEach(() => {
   test = {
     optionals: {
-      serverAddress: "--url '1.1.1.1'",
+      serverAddress: "--enroll-url 'https://server:55000'",
       username: "--username 'user'",
       password: "--password 'pass'",
       agentName: "--name 'test'",
       verificationMode: "--verification-mode 'none'",
       enrollmentKey: "--key '00000000000000000000000000000000'",
+      communicationsAPIUrl: "--connect-url 'https://comms:27000'",
     },
     urlPackage: 'https://test.com/agent.deb',
     wazuhVersion: '5.0.0',
@@ -39,17 +40,18 @@ describe('getAllOptionals', () => {
 
   it('should return the correct paramsText', () => {
     const optionals = {
-      serverAddress: "--url '1.1.1.1'",
+      serverAddress: "--enroll-url 'https://server:55000'",
       username: "--username 'user'",
       password: "--password 'pass'",
       agentName: "--name 'test'",
       verificationMode: "--verification-mode 'none'",
       enrollmentKey: "--key '00000000000000000000000000000000'",
+      communicationsAPIUrl: "--connect-url 'https://comms:27000'",
     };
     const result = getAllOptionals(optionals, 'linux');
 
     expect(result).toBe(
-      "--url '1.1.1.1' --username 'user' --password 'pass' --verification-mode 'none' --name 'test' --key '00000000000000000000000000000000'",
+      "--enroll-url 'https://server:55000' --username 'user' --password 'pass' --name 'test' --verification-mode 'none' --connect-url 'https://comms:27000' --key '00000000000000000000000000000000'",
     );
   });
 });
@@ -58,12 +60,13 @@ describe('getDEBAMD64InstallCommand', () => {
   it('should return the correct install command', () => {
     const props = {
       optionals: {
-        serverAddress: "--url 'localhost'",
+        serverAddress: "--enroll-url 'localhost'",
         username: "--username 'user'",
         password: "--password 'pass'",
         agentName: "--name 'agent1'",
         verificationMode: "--verification-mode 'none'",
         enrollmentKey: "--key '00000000000000000000000000000000'",
+        communicationsAPIUrl: "--connect-url 'https://comms:27000'",
       },
       urlPackage: 'https://example.com/package.deb',
       wazuhVersion: '5.0.0',
@@ -71,7 +74,7 @@ describe('getDEBAMD64InstallCommand', () => {
     const result = getDEBAMD64InstallCommand(props);
 
     expect(result).toBe(
-      "sudo dpkg -i ./wazuh-agent_5.0.0-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent --url 'localhost' --username 'user' --password 'pass' --verification-mode 'none' --name 'agent1' --key '00000000000000000000000000000000'",
+      "sudo dpkg -i ./wazuh-agent_5.0.0-1_amd64.deb && sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent --enroll-url 'localhost' --username 'user' --password 'pass' --name 'agent1' --verification-mode 'none' --connect-url 'https://comms:27000' --key '00000000000000000000000000000000'",
     );
   });
 });
@@ -82,8 +85,9 @@ describe('getDEBAMD64InstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -100,8 +104,9 @@ describe('getDEBAMD64InstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -121,8 +126,9 @@ describe('getDEBARM64InstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -139,8 +145,9 @@ describe('getDEBARM64InstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -160,8 +167,9 @@ describe('getRPMAMD64InstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -178,8 +186,9 @@ describe('getRPMAMD64InstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -199,8 +208,9 @@ describe('getRPMARM64InstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -217,8 +227,9 @@ describe('getRPMARM64InstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -250,8 +261,9 @@ describe('getWindowsInstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -268,8 +280,9 @@ describe('getWindowsInstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -309,8 +322,9 @@ describe('getAllOptionalsMacos', () => {
         'serverAddress',
         'username',
         'password',
-        'verificationMode',
         'agentName',
+        'verificationMode',
+        'communicationsAPIUrl',
         'enrollmentKey',
       ]
         .map(key => test.optionals[key])
@@ -338,8 +352,9 @@ describe('getMacOsInstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])
@@ -355,8 +370,9 @@ describe('getMacOsInstallCommand', () => {
       'serverAddress',
       'username',
       'password',
-      'verificationMode',
       'agentName',
+      'verificationMode',
+      'communicationsAPIUrl',
       'enrollmentKey',
     ]
       .map(key => test.optionals[key])

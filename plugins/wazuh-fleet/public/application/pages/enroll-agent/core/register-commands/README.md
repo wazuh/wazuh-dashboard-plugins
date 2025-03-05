@@ -172,7 +172,7 @@ This configuration will define the different optional parameters that we want to
 
 export const optionalParameters: TOptionalParams<TOptionalParameters> = {
   server_address: {
-      property: '--url',
+      property: '--enroll-url',
       getParamCommand:  props => 'returns the optional param command'
     }
   },

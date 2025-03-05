@@ -21,6 +21,10 @@ describe('Verification mode input', () => {
                 label: 'none',
               },
               {
+                value: 'certificate',
+                label: 'certificate',
+              },
+              {
                 value: 'full',
                 label: 'full',
               },

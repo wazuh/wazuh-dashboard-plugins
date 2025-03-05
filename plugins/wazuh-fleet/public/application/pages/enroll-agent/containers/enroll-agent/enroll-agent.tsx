@@ -31,7 +31,7 @@ export const EnrollAgent = () => {
     serverAddress: {
       type: 'text',
       initialValue:
-        configuration[getEnrollAgentManagement().serverAddresSettingName] || '', // TODO: use the setting value as default value
+        configuration[getEnrollAgentManagement().serverURLSettingName] || '', // TODO: use the setting value as default value
       validate: validateServerAddress,
     },
     username: {
@@ -52,6 +52,10 @@ export const EnrollAgent = () => {
             value: 'none',
           },
           {
+            value: 'certificate',
+            label: 'certificate',
+          },
+          {
             text: 'full',
             value: 'full',
           },
@@ -67,6 +71,12 @@ export const EnrollAgent = () => {
       type: 'text',
       initialValue: '',
       validate: validateEnrollmentKey,
+    },
+    communicationsAPIUrl: {
+      type: 'text',
+      initialValue:
+        configuration[getEnrollAgentManagement().serverURLSettingName] || '', // TODO: use the setting value as default value
+      validate: validateServerAddress,
     },
   };
   const form = useForm(initialFields);

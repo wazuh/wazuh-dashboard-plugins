@@ -28,35 +28,44 @@ import { AgentsNavGroup } from './groups/agents';
 export class WazuhFleetPlugin
   implements Plugin<WazuhFleetPluginSetup, WazuhFleetPluginStart>
 {
-  public setup(
-    _core: CoreSetup,
-    plugins: AppPluginSetupDependencies,
-  ): WazuhFleetPluginSetup {
-    // TODO: This setter should be local to fleet management instead of using the related to the plugin itself. This approach was done because the integration of FleetManagement is using another setter from plugin-services.
-    setAgentManagement(
-      AgentManagement({
-        queryManagerService,
-        getIndexPatternId: () => 'wazuh-agents*',
-        deleteAgent: (agentId: string | string[]) => deleteAgent(agentId),
-        removeGroups: (agentId: string, groupsIds: string | string[]) =>
-          removeGroups(agentId, groupsIds),
-        addGroups: (agentId: string, groups: string | string[]) =>
-          addGroups(agentId, groups),
-        editAgentName: (agentId: string, name: string) =>
-          editName(agentId, name),
-        upgradeAgent: agentIds => upgradeAgent(agentIds),
-      }),
-    );
-    setEnrollAgentManagement({
-      serverAddresSettingName: 'enrollment.dns',
-      async getServerAddress() {
-        // TODO: this should be replaced by getWazuhCore().configuration.get that in the current state does not return the setting because this is filtering by settings with the category 'wazuhCore'.
-        return getCore().uiSettings.get('enrollment.dns');
+  public setup(core: CoreSetup): WazuhFleetPluginSetup {
+    appSetup({
+      registerApp: app => core.application.register(app),
+      enrollmentAgentManagement: {
+        serverURLSettingName: 'enrollment.url',
+        async getServerURL() {
+          // TODO: this should be replaced by getWazuhCore().configuration.get that in the current state does not return the setting because this is filtering by settings with the category 'wazuhCore'.
+          return getCore().uiSettings.get('enrollment.url');
+        },
+        async setServerURL(url) {
+          // TODO: this should be replaced by getWazuhCore().configuration.set that is not implemented
+          return await getCore().uiSettings.set('enrollment.url', url);
+        },
+        commsURLSettingName: 'enrollment.commsUrl',
+        async getCommunicationsURL() {
+          // TODO: this should be replaced by getWazuhCore().configuration.get that in the current state does not return the setting because this is filtering by settings with the category 'wazuhCore'.
+          return getCore().uiSettings.get('enrollment.commsUrl');
+        },
+        async setCommunicationsURL(url) {
+          // TODO: this should be replaced by getWazuhCore().configuration.set that is not implemented
+          return await getCore().uiSettings.set('enrollment.commsUrl', url);
+        },
       },
-      async setServerAddress(url) {
-        // TODO: this should be replaced by getWazuhCore().configuration.set that is not implemented
-        return await getCore().uiSettings.set('enrollment.dns', url);
-      },
+      // TODO: This setter should be local to fleet management instead of using the related to the plugin itself. This approach was done because the integration of FleetManagement is using another setter from plugin-services.
+      setAgentManagement(
+        AgentManagement({
+          queryManagerService,
+          getIndexPatternId: () => 'wazuh-agents*',
+          deleteAgent: (agentId: string | string[]) => deleteAgent(agentId),
+          removeGroups: (agentId: string, groupsIds: string | string[]) =>
+            removeGroups(agentId, groupsIds),
+          addGroups: (agentId: string, groups: string | string[]) =>
+            addGroups(agentId, groups),
+          editAgentName: (agentId: string, name: string) =>
+            editName(agentId, name),
+          upgradeAgent: agentIds => upgradeAgent(agentIds),
+        }),
+      );
     });
 
     plugins.wazuhCore.applicationService.register({

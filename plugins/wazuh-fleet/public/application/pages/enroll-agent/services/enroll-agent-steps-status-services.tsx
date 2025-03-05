@@ -85,6 +85,7 @@ export const showCommandsSections = (
         'password',
         'agentName',
         'verificationMode',
+        'communicationsAPIUrl',
         'enrollmentKey',
       ],
       formFields,
@@ -207,7 +208,12 @@ export const getOptionalParameterStepStatus = (
   } else if (
     installCommandWasCopied ||
     anyFieldIsComplete(
-      ['agentName', 'verificationMode', 'enrollmentKey'],
+      [
+        'agentName',
+        'verificationMode',
+        'communicationsAPIUrl',
+        'enrollmentKey',
+      ],
       formFields,
     )
   ) {
@@ -252,6 +258,8 @@ export enum FORM_FIELDS_LABEL {
   enrollmentKey = 'enrollment key',
   // eslint-disable-next-line @typescript-eslint/naming-convention
   serverAddress = 'server address',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  communicationsAPIUrl = 'communications API',
 }
 
 export const getInvalidFields = (
