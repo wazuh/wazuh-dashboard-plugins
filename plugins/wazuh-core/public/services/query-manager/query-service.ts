@@ -16,6 +16,7 @@ export class QueryService implements IQueryService {
   }
 
   async refreshQuery(params?: SearchParams): Promise<SearchResponse> {
+    // ToDo: When will implemented whi solution on the UI. Modify this method so that when the query is refreshed, we ensure that a new query is generated with a different time range.
     this.executeQuery(params);
   }
 }
