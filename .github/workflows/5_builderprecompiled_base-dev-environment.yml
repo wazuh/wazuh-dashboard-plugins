@@ -1,8 +1,16 @@
-# This workflow downloads the source code at the given git reference
-# (branch, tag or commit), an sets up an environment (Kibana or OpenSearch)
-# to run this code and a command (build, test, ...).
+# 📚 Base Workflow - Environment Setup and Command Execution
 #
-# This workflow is used as a base for other workflows.
+# ⚡ Overview:
+# This workflow serves as a reusable base for other workflows, providing a
+# standardized environment to execute custom commands (e.g., `yarn build`, `yarn test`)
+# on source code fetched from a specified Git reference.
+#
+# 🚀 Key Features:
+# - 💻 Docker-Based Environment Setup: Prepares a Docker environment with OpenSearch Dashboards or Kibana.
+# - ⚙️ Custom Command Execution: Runs any specified command on the downloaded source code.
+# - 📦 Artifact and Coverage Upload: Uploads build artifacts and test coverage results to GitHub when configured.
+#
+# 🔗 Designed for: Easy integration and reuse by other workflows.
 
 name: Base workflow - Environment
 
@@ -13,21 +21,21 @@ on:
         required: true
         type: string
         default: main
-        description: Source code reference (branch, tag or commit SHA).
+        description: Git reference (branch, tag, or commit SHA) to build from.
       command:
         required: true
         type: string
         default: 'yarn build'
-        description: Command to run in the environment
+        description: Command to run in the environment.
       docker_run_extra_args:
         type: string
         default: ''
-        description: Additional paramaters for the docker run command.
+        description: Additional parameters for the docker run command.
         required: false
       artifact_name:
         type: string
         default: ''
-        description: Artifact name (will be automatically suffixed with .zip)
+        description: Artifact name (will be automatically suffixed with .zip).
         required: false
       artifact_path:
         type: string
