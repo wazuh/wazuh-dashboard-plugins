@@ -1,11 +1,10 @@
 import { Location, History } from 'history';
 
-class NavigationService {
+export class NavigationService {
   // eslint-disable-next-line no-use-before-define
   private static instance: NavigationService;
-  private readonly history: History;
 
-  private constructor(history: History) {
+  private constructor(private readonly history: History) {
     this.history = history;
   }
 
@@ -38,6 +37,3 @@ class NavigationService {
     return this.history.location;
   }
 }
-
-export default NavigationService;
-export { NavigationService };

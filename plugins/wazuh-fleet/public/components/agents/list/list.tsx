@@ -13,7 +13,7 @@ import {
 import { Agent, IAgentResponse } from '../../../../common/types';
 import { AgentResume } from '../details/resume';
 import { getAgentManagement, getCore } from '../../../plugin-services';
-import NavigationService from '../../../react-services/navigation-service';
+import { NavigationService } from '../../../react-services/navigation-service';
 import { enrollmentAgent } from '../../common/views';
 import { TableIndexer } from '../../common/table-indexer/table-indexer';
 import { ConfirmModal } from '../../common/confirm-modal/confirm-modal';

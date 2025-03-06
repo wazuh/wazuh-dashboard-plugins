@@ -8,7 +8,7 @@ import {
   AppUpdater,
 } from '../../../../../src/core/public';
 import { ApplicationService } from '../../../../wazuh-core/public/services/application/application';
-import NavigationService from '../../react-services/navigation-service';
+import { NavigationService } from '../../react-services/navigation-service';
 import { PLUGIN_ID } from '../../../common/constants';
 import { AGENTS_ID } from './constants';
 import { AgentsNavGroup } from '.';

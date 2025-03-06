@@ -12,34 +12,36 @@ default_count='10000'
 default_index_name='wazuh-agents-sample-data'
 asset_identifier='agents'
 
-def generateDocuments(number):
-    for i in range(0, int(number)):
-        yield{
-            'agent': generateRandomAgent(i),
-        }
-
 def generateRandomDate(days_interval=10):
     start_date = datetime.now()
     end_date = start_date - timedelta(days=days_interval)
     random_date = start_date + (end_date - start_date) * random.random()
     return(random_date.strftime("%Y-%m-%dT%H:%M:%S.{}Z".format(random.randint(0, 999))))
 
-def generateRandomGroups():
-    groups = ['default', 'group1', 'group2', 'group3']
-    num_groups = random.randint(1, len(groups))
-    return random.sample(groups, num_groups)
+def generateRandomGroups(max_groups = 5):
+    # Generate a number of groups equal to a random number between 1 and 5
+    num_groups = random.randint(1, max_groups)
+    # Create a list of group names using numbers
+    groups = ['default'] + [f'group{i}' for i in range(1, num_groups + 1)]
+    # Return a random sample of groups (at least 1, at most all groups)
+    return random.sample(groups, random.randint(1, len(groups)))
 
 def generateGeo():
+
+    city_names = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose']
+
+    iso_codes = ['US', 'CA', 'MX', 'GB', 'AU', 'NZ']
+
     geo={}
-    geo['city_name'] = random.choice(['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'])
+    geo['city_name'] = random.choice(city_names)
     geo['continent_name'] = random.choice(['North America', 'Europe', 'Asia', 'Africa', 'Australia', 'Antarctica']),
     geo['continent_code'] = random.choice(['NA', 'EU', 'AS', 'AF', 'OC', 'AN'])
-    geo['country_iso_code'] = random.choice(['US', 'CA', 'MX', 'GB', 'AU', 'NZ'])
+    geo['country_iso_code'] = random.choice(iso_codes)
     geo['country_name'] = random.choice(['United States', 'Canada', 'Mexico', 'United Kingdom', 'Australia', 'New Zealand'])
     geo['location'] = {'lat': random.uniform(-90, 90), 'lon': random.uniform(-180, 180)}
-    geo['name'] = random.choice(['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'])
-    geo['region_name'] = random.choice(['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'San Jose'])
-    geo['region_iso_code'] = random.choice(['US', 'CA', 'MX', 'GB', 'AU', 'NZ'])
+    geo['name'] = random.choice(city_names)
+    geo['region_name'] = random.choice(city_names)
+    geo['region_iso_code'] = random.choice(iso_codes)
     geo['timezone'] = random.choice(['America/New_York', 'Europe/London', 'Asia/Tokyo', 'Australia/Sydney', 'Pacific/Auckland'])
     geo['postal_code'] = random.choice(['10001', '20001', '30001', '40001', '50001'])
     return(geo)
@@ -118,7 +120,7 @@ def generateRandomHost():
       'calculated_score_norm': round(random.uniform(0, 100), 2),
       'static_level': random.choice(['none', 'low','medium', 'high', 'critical']),
       'static_score': round(random.uniform(0, 100), 2),
-     'static_score_norm': round(random.uniform(0, 100), 2)
+      'static_score_norm': round(random.uniform(0, 100), 2)
     }
     host['type'] = random.choice(['host', 'container'])
     host['uptime'] = random.randint(0, 100)

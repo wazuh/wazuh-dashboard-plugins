@@ -27,7 +27,6 @@ export interface IAgentManagement {
   removeGroups: (id: string, groups: string | string[]) => Promise<void>;
   editName: (id: string, newName: string) => Promise<void>;
   addGroups: (id: string, group: string | string[]) => Promise<void>;
-  upgradeAgent: (agentIds: string[]) => Promise<void>;
 }
 
 export interface IAgentManagementProps {

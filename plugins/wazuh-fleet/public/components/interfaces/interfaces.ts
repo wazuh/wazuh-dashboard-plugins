@@ -6,6 +6,6 @@ export interface ViewInterface {
   renderMenu: boolean;
   render: (props: any) => React.ReactNode;
   breadcrumb: (
-    name?: string,
+    id?: string,
   ) => { text: string | React.ReactNode; className?: string }[];
 }

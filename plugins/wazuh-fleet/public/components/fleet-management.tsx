@@ -2,7 +2,7 @@ import React from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { EuiPage, EuiPageBody, EuiPanel } from '@elastic/eui';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
-import NavigationService from '../react-services/navigation-service';
+import { NavigationService } from '../react-services/navigation-service';
 import { summaryAgent, views } from './common/views';
 import { RouteComponent } from './common/route-component';
 
