@@ -1,0 +1,55 @@
+.card {
+  height: 183px;
+
+  label {
+    cursor: pointer;
+  }
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  margin-top: 28px;
+  justify-content: center;
+  user-select: none;
+}
+
+.cardIcon {
+  margin-right: 10px;
+}
+
+.cardText {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  letter-spacing: 0.6px;
+}
+
+.hr {
+  border: 1px solid #d3dae6;
+}
+
+.cardContent {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.checkboxGroupContainer {
+  flex-basis: 50%;
+}
+
+.architectureItem {
+  margin-bottom: 8px;
+}
+
+.last-card {
+  margin-right: 63px;
+}
+
+.cardsCallOut {
+  margin-top: 16px;
+}
