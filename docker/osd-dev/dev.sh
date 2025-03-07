@@ -57,16 +57,29 @@ required_argument() {
   fi
 }
 
+validate_argument() {
+  local arg="$1"
+  local pattern="$2"
+  local name="$3"
+
+  if [[ ! "$arg" =~ $pattern ]]; then
+    printError "Invalid $name: $(printGreen -b -- \'$arg\'). It must match pattern: $pattern"
+    usage
+  fi
+}
+
 while [[ $# -gt 0 ]]; do
   key="$1"
   case $key in
   -os)
     required_argument "$2" "$key"
+    validate_argument "$2" "^[0-9]+\.[0-9]+\.[0-9]+$" "OS version"
     os_version="$2"
     shift 2
     ;;
   -osd)
     required_argument "$2" "$key"
+    validate_argument "$2" "^[0-9]+\.[0-9]+\.[0-9]+$" "OSD version"
     osd_version="$2"
     shift 2
     ;;
