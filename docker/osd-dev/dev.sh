@@ -48,6 +48,7 @@ SAML=false
 SERVER=false
 ACTION=""
 WAZUH_STACK=""
+profile="standard"
 
 required_argument() {
   if [[ -z "$1" || "$1" == -* ]]; then
@@ -76,11 +77,13 @@ while [[ $# -gt 0 ]]; do
     ;;
   --saml)
     SAML=true
+    profile="saml"
     shift
     ;;
   --server)
     required_argument "$2" "$key"
     SERVER=true
+    profile="server"
     WAZUH_STACK="$2"
     shift 2
     ;;
@@ -111,6 +114,10 @@ if [ -z "$ACTION" ]; then
   printError "Action is required."
   echo
   usage
+fi
+
+if [ "$SAML" = true ]; then
+  cat /etc/hosts | grep -q "idp" || exit_with_message "Add idp to /etc/hosts"
 fi
 
 # Function to get version from package.json
@@ -160,20 +167,11 @@ else
   export OSD_MAJOR="1.x"
 fi
 
-profile="standard"
 export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards.yml
 export SEC_CONFIG_FILE=./config/${OSD_MAJOR}/os/config.yml
-if [[ "$3" =~ "saml" ]]; then
-  cat /etc/hosts | grep -q "idp" || exit_with_message "Add idp to /etc/hosts"
-
-  profile="saml"
+if [ "$SAML" = true ]; then
   export WAZUH_DASHBOARD_CONF=./config/${OSD_MAJOR}/osd/opensearch_dashboards_saml.yml
   export SEC_CONFIG_FILE=./config/${OSD_MAJOR}/os/config-saml.yml
-fi
-
-if [[ "$3" =~ "server" ]]; then
-  profile="server"
-  export WAZUH_STACK="${4}"
 fi
 
 export SEC_CONFIG_PATH=/usr/share/opensearch/plugins/opensearch-security/securityconfig
