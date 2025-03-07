@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import store from '../../redux/store';
 import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from '../../../common/constants';
@@ -22,7 +23,7 @@ export class PinnedAgentManager {
 
   private equalToPinnedAgent(agentData: any): boolean {
     const pinnedAgent = this.getPinnedAgent();
-    return pinnedAgent?.id === agentData?.id;
+    return _.isEqual(pinnedAgent, agentData);
   }
 
   private checkValidAgentId(agentId: string | null): boolean {
