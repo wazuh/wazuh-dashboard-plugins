@@ -6,7 +6,7 @@ source $ROOT_DIR/docker/scripts/style_text.sh
 
 usage() {
   echo
-  echo "$(styleText -b -u Usage): $0 [$(printGreen -- "-os <os_version>")] [$(printGreen -- "-osd <osd_version>")] [$(printGreen -- "--wz-home <wazuh_app_source>")] [$(printGreen -- "--saml") | $(printGreen -- "--server <server_version>")] ($(printGreen -- "-a"), $(printGreen -- "--action <action>"))"
+  echo "$(styleText -b -u Usage): $0 [$(printGreen -- "-os <os_version>")] [$(printGreen -- "-osd <osd_version>")] [$(printGreen -- "--wz-home <wazuh_app_source>")] [$(printGreen -- "--saml") | $(printGreen -- "--server <server_version>")] [$(printGreen -- "--no-start")] $(printGreen -- "-a"), $(printGreen -- "--action <action>")"
   echo
   echo "$(styleText -b -u Options):"
   {
