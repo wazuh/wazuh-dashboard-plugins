@@ -1,17 +1,26 @@
 #!/bin/bash
 
 # Color name to code mapping
-declare -A COLORS=(
-  [black]=30
-  [red]=31
-  [green]=32
-  [yellow]=33
-  [blue]=34
-  [magenta]=35
-  [cyan]=36
-  [white]=37
-  [gray]=90
-)
+# Using function-based approach for macOS compatibility
+function color_code() {
+  case "$1" in
+  "black") echo "30" ;;
+  "red") echo "31" ;;
+  "green") echo "32" ;;
+  "yellow") echo "33" ;;
+  "blue") echo "34" ;;
+  "magenta") echo "35" ;;
+  "cyan") echo "36" ;;
+  "white") echo "37" ;;
+  "gray") echo "90" ;;
+  *) echo "" ;;
+  esac
+}
+
+# Get available colors
+function available_colors() {
+  echo "black red green yellow blue magenta cyan white gray"
+}
 
 # Modifiers
 BOLD=1
@@ -48,12 +57,13 @@ styleText() {
       shift
       ;;
     -c | --color)
-      if [[ -n "$2" && -n "${COLORS[$2]}" ]]; then
-        MODIFIERS="${MODIFIERS};${COLORS[$2]}"
+      local COLOR_CODE=$(color_code "$2")
+      if [[ -n "$2" && -n "$COLOR_CODE" ]]; then
+        MODIFIERS="${MODIFIERS};$COLOR_CODE"
         shift 2
       else
         echo "Invalid color name: $2"
-        echo "Available colors: ${!COLORS[@]}"
+        echo "Available colors: $(available_colors)"
         return 1
       fi
       ;;
@@ -75,7 +85,7 @@ styleText() {
         echo "  -u, --underline|Underline text"
         echo "  -s, --strikethrough|Strikethrough text"
         echo "  -r, --reverse|Reverse colors"
-        echo "  -c, --color|Text color name (${!COLORS[@]})"
+        echo "  -c, --color|Text color name ($(available_colors))"
       } | column -t -s '|'
       exit 1
       ;;
