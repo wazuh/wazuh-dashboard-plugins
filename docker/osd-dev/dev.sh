@@ -183,44 +183,51 @@ fi
 #                                  RUN ACTION                                  #
 # ---------------------------------------------------------------------------- #
 
-# case "$2" in
-# up)
-#   /bin/bash ../scripts/create_docker_networks.sh
-#   docker compose --profile $profile -f dev.yml up -Vd
+echo
+case "$ACTION" in
+up)
+  printInfo "Creating networks and starting containers..."
 
-#   # Display a command to deploy an agent when using the real server
-#   if [[ "$3" =~ "server" ]]; then
-#     echo
-#     echo "**************WARNING**************"
-#     echo "The agent version must be a published one. This uses only released versions."
-#     echo "If you need to change de version, edit the command as you see fit."
-#     echo "***********************************"
-#     echo "1. (Optional) Enroll an agent (Ubuntu 20.04):"
-#     echo "docker run --name ${COMPOSE_PROJECT_NAME}-agent-\$(date +%s) --network os-dev-${OS_VERSION} --label com.docker.compose.project=${COMPOSE_PROJECT_NAME} --env WAZUH_AGENT_VERSION=${WAZUH_STACK} -d ubuntu:20.04 bash -c '"
-#     echo "  apt update -y"
-#     echo "  apt install -y curl lsb-release"
-#     echo "  curl -so \wazuh-agent-\${WAZUH_AGENT_VERSION}.deb \\"
-#     echo "    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_\${WAZUH_AGENT_VERSION}-1_amd64.deb \\"
-#     echo "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-\${WAZUH_AGENT_VERSION}.deb"
-#     echo
-#     echo "  /etc/init.d/wazuh-agent start"
-#     echo "  tail -f /var/ossec/logs/ossec.log"
-#     echo "'"
-#     echo
-#   fi
-#   ;;
-# down)
-#   docker compose --profile $profile -f dev.yml down -v --remove-orphans
-#   ;;
-# start)
-#   docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} start
-#   ;;
-# stop)
-#   docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
-#   ;;
-# *)
-#   echo "[ERROR] Action must be up | down | stop | start: "
-#   echo
-#   usage
-#   ;;
-# esac
+  /bin/bash ../scripts/create_docker_networks.sh
+  docker compose --profile $profile -f dev.yml up -Vd
+
+  # Display a command to deploy an agent when using the real server
+  if [ "$SERVER" = true ]; then
+    echo
+    printWarn "$(printYellow -b "**************WARNING**************")"
+    printWarn "$(printYellow "The agent version must be a published one. This uses only released versions.")"
+    printWarn "$(printYellow "If you need to change de version, edit the command as you see fit.")"
+    printWarn "$(printYellow -b "***********************************")"
+    echo
+    echo "($(printGray -b Optional)) Enroll an agent ($(printCyan -b "Ubuntu 20.04")):"
+    echo
+    printCommand "docker run --name ${COMPOSE_PROJECT_NAME}-agent-\$(date +%s) --network os-dev-${OS_VERSION} --label com.docker.compose.project=${COMPOSE_PROJECT_NAME} --env WAZUH_AGENT_VERSION=${WAZUH_STACK} -d ubuntu:20.04 bash -c '"
+    echo "  apt update -y"
+    echo "  apt install -y curl lsb-release"
+    echo "  curl -so \wazuh-agent-\${WAZUH_AGENT_VERSION}.deb \\"
+    echo "    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_\${WAZUH_AGENT_VERSION}-1_amd64.deb \\"
+    echo "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-\${WAZUH_AGENT_VERSION}.deb"
+    echo
+    echo "  /etc/init.d/wazuh-agent start"
+    echo "  tail -f /var/ossec/logs/ossec.log"
+    echo "'"
+    echo
+  fi
+  ;;
+down)
+  printInfo "Removing containers and volumes..."
+  docker compose --profile $profile -f dev.yml down -v --remove-orphans
+  ;;
+start)
+  printInfo "Starting containers..."
+  docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} start
+  ;;
+stop)
+  printInfo "Stopping containers..."
+  docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
+  ;;
+*)
+  echo
+  usage
+  ;;
+esac
