@@ -12,15 +12,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
-import { withGuardAsync } from './withGuard';
 
 export const withAgentSync = WrappedComponent => props => {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const pinnedAgentManager = new PinnedAgentManager();
-    pinnedAgentManager.syncPinnedAgentSources().finally(() => {
-      setLoading(false);
-    });
+    pinnedAgentManager
+      .syncPinnedAgentSources({ forceUpdate: true })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
   return loading ? null : <WrappedComponent {...props}></WrappedComponent>;
 };
