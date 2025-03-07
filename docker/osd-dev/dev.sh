@@ -88,7 +88,7 @@ while [[ $# -gt 0 ]]; do
     usage
     ;;
   *)
-    printError "Unknown option: $1"
+    printError "Unknown option: $(printGreen -b -- \'$1\')"
     usage
     ;;
   esac
