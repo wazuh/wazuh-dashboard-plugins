@@ -136,16 +136,17 @@ printCommand() {
 
 usage() {
   echo
-  echo "$0 [-os os_version] [-osd osd_version] [--wz-home] [--saml|--server server_version] (-a | --action)"
+  echo "$(styleText -b -u Usage): $0 [$(printGreen -- "-os <os_version>")] [$(printGreen -- "-osd <osd_version>")] [$(printGreen -- "--wz-home <wazuh_app_source>")] ($(printGreen -- "--saml")|$(printGreen -- "--server <server_version>")) ($(printGreen -- "-a"), $(printGreen -- "--action <action>"))"
   echo
-  echo "Where:"
+  echo "$(styleText -b -u Options):"
   {
-    echo "  $(printGreen -- "-o <os_version>") @ ($(printGray optional)) Specify the OS version"
-    echo "  $(printGreen -- "-d <osd_version>") @ ($(printGray optional)) Specify the OSD version"
-    echo "  $(printGreen -- "--wz-home <wazuh_app_source>") @ ($(printGray optional), default: '$(printCyan -- "../../plugins")') The path where the wazuh application source code is located"
-    echo "  $(printGreen -- "--saml") @ ($(printGray optional)) To deploy a saml enabled environment"
-    echo "  $(printGreen -- "--server <server_version>") @ ($(printGray optional)) To deploy a real server enabled environment"
-    echo "  $(printGreen -- "-a"), $(printGreen -- "--action") @ Is one of ( up | down | stop | start )"
+    echo "  $(printGreen -- "-os <os_version>") @ ($(printGray optional)) Specify the OS version"
+    echo "  $(printGreen -- "-osd <osd_version>") @ ($(printGray optional)) Specify the OSD version"
+    echo "  $(printGreen -- "--wz-home <wazuh_app_source>") @ ($(printGray optional)) The path where the wazuh application source code is located. ( Default: '$(printCyan -- "$ROOT_DIR/plugins")' )"
+    echo "  $(printGreen -- "--saml") @ ($(printGray optional)) To deploy a $(styleText -u "saml") enabled environment"
+    echo "  $(printGreen -- "--server <server_version>") @ ($(printGray optional)) To deploy a $(styleText -u "real server") enabled environment"
+    echo "  $(printGreen -- "-a"), $(printGreen -- "--action <action>") @ Action to perform, one of: $(printCyan -- "up | down | stop | start")"
+    echo "  $(printGreen -- "--help") @ Display this help message"
   } | column -t -s '@'
   exit -1
 }
@@ -201,31 +202,31 @@ if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
 
   if [ -z "$os_version" ]; then
     os_version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
-    echo "[INFO] OS Version not received via flag, getting the version from $PACKAGE_PATH. Using: $os_version"
+    printInfo "OS Version not received via flag, getting the version from $(printCyan -u $PACKAGE_PATH). Using: $(printYellow -b $os_version)"
     if [ -z "$os_version" ]; then
-      echo "[ERROR] Could not retrieve the OS version from package.json."
+      printError "Could not retrieve the OS version from package.json."
       exit 1
     fi
   fi
 
   if [ -z "$osd_version" ]; then
     osd_version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
-    echo "[INFO] OSD Version not received via flag, getting the version from $PACKAGE_PATH. Using: $osd_version"
+    printInfo "OSD Version not received via flag, getting the version from $(printCyan -u $PACKAGE_PATH). Using: $(printYellow -b $osd_version)"
     if [ -z "$osd_version" ]; then
-      echo "[ERROR] Could not retrieve the OSD version from package.json."
+      printError "Could not retrieve the OSD version from package.json."
       exit 1
     fi
   fi
 fi
 
 if [ $# -lt 2 ]; then
-  echo "[ERROR] Incorrect number of arguments " $# ", got " $@
+  printError "Incorrect number of arguments " $# ", got " $@
   echo
   usage
 fi
 
 if [[ $1 != /* ]]; then
-  echo "[ERROR] Source path must be absolute, and start with /"
+  printError "Source path must be absolute, and start with /"
   echo
   usage
   exit
