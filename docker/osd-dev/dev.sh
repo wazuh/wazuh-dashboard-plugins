@@ -15,6 +15,7 @@ usage() {
     echo "  $(printGreen -- "--wz-home <wazuh_app_source>") @ ($(printGray optional)) The path where the wazuh application source code is located. ( Default: '$(printCyan -- "$ROOT_DIR/plugins")' )"
     echo "  $(printGreen -- "--saml") @ ($(printGray optional)) To deploy a $(styleText -u "saml") enabled environment"
     echo "  $(printGreen -- "--server <server_version>") @ ($(printGray optional)) To deploy a $(styleText -u "real server") enabled environment"
+    echo "  $(printGreen -- "--no-start") @ ($(printGray optional)) Prevent osd container from starting service automatically (keeps them ready but idle)"
     echo "  $(printGreen -- "-a"), $(printGreen -- "--action <action>") @ Action to perform, one of: $(printCyan -- "up | down | stop | start | restart")"
     echo "  $(printGreen -- "--help") @ Display this help message"
   } | column -t -s '@'
@@ -49,6 +50,7 @@ SERVER=false
 ACTION=""
 WAZUH_STACK=""
 profile="standard"
+ENTRYPOINT="yarn start --no-base-path"
 
 required_argument() {
   if [[ -z "$1" || "$1" == -* ]]; then
@@ -118,6 +120,10 @@ while [[ $# -gt 0 ]]; do
     ACTION="$2"
     shift 2
     ;;
+  --no-start)
+    ENTRYPOINT="tail -f /dev/null"
+    shift
+    ;;
   --help)
     usage
     ;;
@@ -141,6 +147,15 @@ if [ -z "$ACTION" ]; then
   echo
   usage
 fi
+
+# Install dependencies for each plugin in $WAZUH_HOME
+for plugin in $(ls $WAZUH_HOME); do
+  if [ -f "$WAZUH_HOME/$plugin/package.json" ] && [ ! -d "$WAZUH_HOME/$plugin/node_modules" ]; then
+    pushd $WAZUH_HOME/$plugin
+    yarn install
+    popd
+  fi
+done
 
 if [ "$SAML" = true ]; then
   cat /etc/hosts | grep -q "idp" || exit_with_message "Add idp to /etc/hosts"
@@ -186,6 +201,7 @@ export SRC=$WAZUH_HOME
 export OSD_MAJOR_NUMBER=$(echo $OSD_VERSION | cut -d. -f1)
 export COMPOSE_PROJECT_NAME=os-dev-${OSD_VERSION//./}
 export WAZUH_STACK=$WAZUH_STACK
+export ENTRYPOINT=$ENTRYPOINT
 
 if [[ "$OSD_MAJOR_NUMBER" -ge 2 ]]; then
   export OSD_MAJOR="2.x"
