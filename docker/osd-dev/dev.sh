@@ -44,25 +44,55 @@ PACKAGE_PATH="$ROOT_DIR/plugins/wazuh-core/package.json"
 os_version=""
 osd_version=""
 
-while getopts ":o:d:" opt; do
-  case ${opt} in
-  o)
-    os_version=$OPTARG
+required_argument() {
+  if [[ -z "$1" || "$1" == -* ]]; then
+    printError "Option $(printGreen -b -- \'$2\') requires an argument"
+    usage
+  fi
+}
+
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+  -os)
+    required_argument "$2" "$key"
+    os_version="$2"
+    shift 2
     ;;
-  d)
-    osd_version=$OPTARG
+  -osd)
+    required_argument "$2" "$key"
+    osd_version="$2"
+    shift 2
     ;;
-  \?)
-    echo "Invalid option: -$OPTARG" >&2
-    exit 1
+  --wz-home)
+    required_argument "$2" "$key"
+    WAZUH_HOME="$2"
+    shift 2
     ;;
-  :)
-    echo "The -$OPTARG option requires an argument." >&2
-    exit 1
+  --saml)
+    SAML=true
+    shift
+    ;;
+  --server)
+    required_argument "$2" "$key"
+    SERVER=true
+    WAZUH_STACK="$2"
+    shift 2
+    ;;
+  -a | --action)
+    required_argument "$2" "$key"
+    ACTION="$2"
+    shift 2
+    ;;
+  --help)
+    usage
+    ;;
+  *)
+    printError "Unknown option: $1"
+    usage
     ;;
   esac
 done
-shift $((OPTIND - 1))
 
 if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
   if [ ! -f $PACKAGE_PATH ]; then
