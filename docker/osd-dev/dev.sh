@@ -72,6 +72,9 @@ while [[ $# -gt 0 ]]; do
     ;;
   --wz-home)
     required_argument "$2" "$key"
+    if [[ ! "$2" = /* ]]; then
+      WAZUH_HOME=$(realpath "$2")
+    fi
     WAZUH_HOME="$2"
     shift 2
     ;;
