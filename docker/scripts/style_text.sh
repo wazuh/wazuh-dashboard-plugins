@@ -119,17 +119,17 @@ printGray() {
 }
 
 printInfo() {
-  printf "[ $(printBlue "INFO") ] $@\n"
+  printf -- "[ $(printBlue "INFO") ] $@\n"
 }
 
 printWarn() {
-  printf "[ $(printYellow "WARN") ] $@\n"
+  printf -- "[ $(printYellow "WARN") ] $@\n"
 }
 
 printError() {
-  printf "[ $(printRed "ERROR") ] $@\n"
+  printf -- "[ $(printRed "ERROR") ] $@\n"
 }
 
 printCommand() {
-  printf "$(printGreen -b "$") $@\n"
+  printf -- "$(printGreen -b "$") $@\n"
 }
