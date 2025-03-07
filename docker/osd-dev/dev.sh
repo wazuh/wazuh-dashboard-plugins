@@ -15,7 +15,7 @@ usage() {
     echo "  $(printGreen -- "--wz-home <wazuh_app_source>") @ ($(printGray optional)) The path where the wazuh application source code is located. ( Default: '$(printCyan -- "$ROOT_DIR/plugins")' )"
     echo "  $(printGreen -- "--saml") @ ($(printGray optional)) To deploy a $(styleText -u "saml") enabled environment"
     echo "  $(printGreen -- "--server <server_version>") @ ($(printGray optional)) To deploy a $(styleText -u "real server") enabled environment"
-    echo "  $(printGreen -- "-a"), $(printGreen -- "--action <action>") @ Action to perform, one of: $(printCyan -- "up | down | stop | start")"
+    echo "  $(printGreen -- "-a"), $(printGreen -- "--action <action>") @ Action to perform, one of: $(printCyan -- "up | down | stop | start | restart")"
     echo "  $(printGreen -- "--help") @ Display this help message"
   } | column -t -s '@'
   exit -1
@@ -114,7 +114,7 @@ while [[ $# -gt 0 ]]; do
     ;;
   -a | --action)
     required_argument "$2" "$key"
-    validate_argument "$2" "^(up|down|stop|start)$" "Action"
+    validate_argument "$2" "^(up|down|stop|start|restart)$" "Action"
     ACTION="$2"
     shift 2
     ;;
@@ -248,6 +248,12 @@ stop)
   printInfo "Stopping containers..."
   echo
   docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
+  ;;
+restart)
+  printo "Restarting osd service..."
+  echo
+  SERVICE="osd"
+  docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} restart $SERVICE
   ;;
 *)
   echo
