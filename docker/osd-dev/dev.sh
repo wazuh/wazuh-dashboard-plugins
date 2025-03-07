@@ -59,7 +59,7 @@ required_argument() {
   fi
 }
 
-VERSION_PATTERN="^[0-9]+\.[0-9]+\.[0-9]+$"
+VERSION_PATTERN="^[0-9]+\.[0-9]+\.[0-9]+(\.[a-z]+)$"
 validate_argument() {
   local arg="$1"
   local pattern="$2"
