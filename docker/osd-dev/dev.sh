@@ -96,7 +96,7 @@ done
 
 if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
   if [ ! -f $PACKAGE_PATH ]; then
-    echo "[ERROR] The file package.json was not found."
+    printError "The file package.json was not found."
     exit 1
   fi
 
