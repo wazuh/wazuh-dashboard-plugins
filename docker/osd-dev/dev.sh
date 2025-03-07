@@ -119,19 +119,6 @@ if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
   fi
 fi
 
-if [ $# -lt 2 ]; then
-  printError "Incorrect number of arguments " $# ", got " $@
-  echo
-  usage
-fi
-
-if [[ $1 != /* ]]; then
-  printError "Source path must be absolute, and start with /"
-  echo
-  usage
-  exit
-fi
-
 export PASSWORD=${PASSWORD:-admin}
 export OS_VERSION=$os_version
 export OSD_VERSION=$osd_version
