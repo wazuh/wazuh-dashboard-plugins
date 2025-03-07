@@ -85,10 +85,17 @@ while [[ $# -gt 0 ]]; do
     ;;
   --wz-home)
     required_argument "$2" "$key"
+    # Convert to absolute path if relative
     if [[ ! "$2" = /* ]]; then
       WAZUH_HOME=$(realpath "$2")
-    fi
+    else
     WAZUH_HOME="$2"
+    fi
+    # Validate that path exists
+    if [[ ! -d "$WAZUH_HOME" ]]; then
+      printError "The directory '$(printCyan -b -- $WAZUH_HOME)' does not exist"
+      usage
+    fi
     shift 2
     ;;
   --saml)
