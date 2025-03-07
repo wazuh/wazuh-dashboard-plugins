@@ -64,7 +64,7 @@ validate_argument() {
   local name="$3"
 
   if [[ ! "$arg" =~ $pattern ]]; then
-    printError "Invalid $name: '$(printGreen -b -- $arg)'. It must match pattern: $pattern"
+    printError "Invalid $(styleText -u -- "$name"): '$(printGreen -b -- $arg)'. It must match pattern: '$(printCyan -b -- $pattern)'"
     usage
   fi
 }
