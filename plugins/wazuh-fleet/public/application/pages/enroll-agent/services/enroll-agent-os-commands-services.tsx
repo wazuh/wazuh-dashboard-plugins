@@ -1,193 +1,258 @@
-import { TOptionalParameters } from '../core/config/os-commands-definitions';
 import {
-  IOptionalParameters,
-  TOSEntryInstallCommand,
-  TOSEntryProps,
-} from '../core/enroll-commands/types';
-import { TOperatingSystem } from '../hooks/use-enroll-agent-commands.test';
+  scapeSpecialCharsForLinux,
+  scapeSpecialCharsForMacOS,
+  scapeSpecialCharsForWindows,
+} from './wazuh-password-service';
 
-export const getAllOptionals = (
-  optionals: IOptionalParameters<TOptionalParameters>,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  osName?: TOperatingSystem['name'],
-) => {
-  // create paramNameOrderList, which is an array of the keys of optionals add interface
-  const paramNameOrderList: (keyof IOptionalParameters<TOptionalParameters>)[] =
-    [
-      'serverAddress',
-      'username',
-      'password',
-      'agentName',
-      'verificationMode',
-      'communicationsAPIUrl',
-      'enrollmentKey',
-    ];
+const orderEnrollOptions = [
+  'serverAddress',
+  'username',
+  'password',
+  'agentName',
+  'verificationMode',
+  'communicationsAPIUrl',
+  'enrollmentKey',
+];
 
-  if (!optionals) {
-    return '';
-  }
+export interface GenerateInstallCommandFromFormOptions {
+  version: string;
+  [key: string]: any;
+}
 
-  return Object.values(paramNameOrderList)
-    .map(key => optionals[key])
-    .filter(Boolean)
+export type GenerateInstallCommandFromFormForm = Record<
+  string,
+  { value: string }
+>;
+
+const createEnrollOptionCreator =
+  (option: string) =>
+  (
+    value: any,
+    _form: GenerateInstallCommandFromFormOptions,
+    _options: GenerateInstallCommandFromFormForm,
+  ) =>
+    `${option} '${value}'`;
+const formFieldToEnrollOptions = {
+  serverAddress: createEnrollOptionCreator('--enroll-url'),
+  username: createEnrollOptionCreator('--user'),
+  password: (
+    value: any,
+    form: GenerateInstallCommandFromFormForm,
+    options: GenerateInstallCommandFromFormOptions,
+  ) => {
+    const property = '--password';
+
+    if (form.operatingSystemSelection.value.startsWith('linux')) {
+      return `${property} $'${options?.obfuscatePassword ? '*'.repeat(value.length) : scapeSpecialCharsForLinux(value)}'`;
+    } else if (form.operatingSystemSelection.value.startsWith('macos')) {
+      return `${property} '${options?.obfuscatePassword ? '*'.repeat(value.length) : scapeSpecialCharsForMacOS(value)}'`;
+    } else if (form.operatingSystemSelection.value.startsWith('windows')) {
+      return `${property} '${options?.obfuscatePassword ? '*'.repeat(value.length) : scapeSpecialCharsForWindows(value)}'`;
+    }
+  },
+  verificationMode: createEnrollOptionCreator('--verification-mode'),
+  agentName: createEnrollOptionCreator('--name'),
+  communicationsAPIUrl: createEnrollOptionCreator('--connect-url'),
+  enrollmentKey: createEnrollOptionCreator('--key'),
+};
+
+export function getEnrollOptions(
+  form: GenerateInstallCommandFromFormForm,
+  options: GenerateInstallCommandFromFormOptions,
+) {
+  return orderEnrollOptions
+    .filter(
+      option =>
+        option in formFieldToEnrollOptions && Boolean(form[option].value),
+    )
+    .map(option =>
+      formFieldToEnrollOptions[option](form[option].value, form, options),
+    )
     .join(' ');
+}
+
+const packagesByOSArch = {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  linux_deb_amd64: {
+    install: (
+      form: GenerateInstallCommandFromFormForm,
+      options: GenerateInstallCommandFromFormOptions,
+    ) => {
+      const packageName = `wazuh-agent_${options.version}-1_amd64.deb`;
+
+      return [
+        // Download
+        // `wget `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/${packageName}`, // TODO: enable when the packages are publically hosted
+        // Install
+        `sudo dpkg -i ./${packageName}`,
+        // Enroll
+        `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${getEnrollOptions(form, options)}`,
+      ].join(' && ');
+    },
+    start: (
+      _form: GenerateInstallCommandFromFormForm,
+      _options: GenerateInstallCommandFromFormOptions,
+    ) =>
+      `sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent`,
+  },
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  linux_deb_arm64: {
+    install: (
+      form: GenerateInstallCommandFromFormForm,
+      options: GenerateInstallCommandFromFormOptions,
+    ) => {
+      const packageName = `wazuh-agent_${options.version}-1_arm64.deb`;
+
+      return [
+        // Download
+        // `wget `https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/${packageName}`, // TODO: enable when the packages are publically hosted
+        // Install
+        `sudo dpkg -i ./${packageName}`,
+        // Enroll
+        `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${getEnrollOptions(form, options)}`,
+      ].join(' && ');
+    },
+    start: (
+      _form: GenerateInstallCommandFromFormForm,
+      _options: GenerateInstallCommandFromFormOptions,
+    ) =>
+      `sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent`,
+  },
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  linux_rpm_amd64: {
+    install: (
+      form: GenerateInstallCommandFromFormForm,
+      options: GenerateInstallCommandFromFormOptions,
+    ) => {
+      // const urlPackage = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${options.version}-1.x86_64.rpm`;
+      const packageName = `wazuh-agent-${options.version}-1.x86_64.rpm`;
+
+      return [
+        // Download
+        // `curl -o ${packageName} ${urlPackage}`, // TODO: enable when the packages are publically hosted
+        // Install
+        `sudo rpm -ihv ${packageName}`,
+        // Enroll
+        `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${getEnrollOptions(form, options)}`,
+      ].join(' && ');
+    },
+    start: (
+      _form: GenerateInstallCommandFromFormForm,
+      _options: GenerateInstallCommandFromFormOptions,
+    ) =>
+      `sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent`,
+  },
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  linux_rpm_arm64: {
+    install: (
+      form: GenerateInstallCommandFromFormForm,
+      options: GenerateInstallCommandFromFormOptions,
+    ) => {
+      // const urlPackage = `https://packages.wazuh.com/4.x/yum/wazuh-agent-${options.version}-1.aarch64.rpm`;
+      const packageName = `wazuh-agent-${options.version}-1.aarch64.rpm`;
+
+      return [
+        // Download
+        // `curl -o ${packageName} ${urlPackage}`, // TODO: enable when the packages are publically hosted
+        // Install
+        `sudo rpm -ihv ${packageName}`,
+        // Enroll
+        `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${getEnrollOptions(form, options)}`,
+      ].join(' && ');
+    },
+    start: (
+      _form: GenerateInstallCommandFromFormForm,
+      _options: GenerateInstallCommandFromFormOptions,
+    ) =>
+      `sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent`,
+  },
+  windows: {
+    install: (
+      form: GenerateInstallCommandFromFormForm,
+      options: GenerateInstallCommandFromFormOptions,
+    ) => {
+      // const urlPackage = `https://packages.wazuh.com/4.x/windows/wazuh-agent-${options.version}-1.msi`;
+      const localPackagePath = `$env:tmp\\wazuh-agent.msi;`;
+
+      return [
+        // Download
+        // `Invoke-WebRequest -Uri ${urlPackage} -OutFile ${localPackagePath}`, // TODO: enable when the packages are publically hosted
+        // Install and enroll
+        // https://stackoverflow.com/questions/1673967/how-to-run-an-exe-file-in-powershell-with-parameters-with-spaces-and-quotes
+        `Start-Process msiexec.exe "/i ${localPackagePath} /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --enroll-agent ${getEnrollOptions(
+          form,
+          options,
+        )}`,
+      ].join(' ');
+    },
+    start: (
+      _form: GenerateInstallCommandFromFormForm,
+      _options: GenerateInstallCommandFromFormOptions,
+    ) => `NET START 'Wazuh Agent'`,
+  },
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  macos_intel64: {
+    install: (
+      form: GenerateInstallCommandFromFormForm,
+      options: GenerateInstallCommandFromFormOptions,
+    ) => {
+      // const urlPackage = `https://packages.wazuh.com/4.x/macos/wazuh-agent-${options.version}-1.intel64.pkg`;
+      const localPackageName = 'wazuh-agent.pkg';
+
+      return [
+        // Download
+        // `curl -so wazuh-agent.pkg ${urlPackage}`, // TODO: enable when the packages are publically hosted
+        // Install
+        `sudo installer -pkg ./${localPackageName} -target /`,
+        // Enroll
+        `/Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --enroll-agent ${getEnrollOptions(form, options)}`,
+      ].join(' && ');
+    },
+    start: () => `sudo /Library/Ossec/bin/wazuh-control start`,
+  },
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  macos_arm64: {
+    install: (
+      form: GenerateInstallCommandFromFormForm,
+      options: GenerateInstallCommandFromFormOptions,
+    ) => {
+      // const urlPackage = `https://packages.wazuh.com/4.x/macos/wazuh-agent-${options.version}-1.arm64.pkg`;
+      const localPackageName = 'wazuh-agent.pkg';
+
+      return [
+        // Download
+        // `curl -so wazuh-agent.pkg ${urlPackage}`,
+        // Install
+        `sudo installer -pkg ./${localPackageName} -target /`,
+        // Enroll
+        `/Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --enroll-agent ${getEnrollOptions(form, options)}`,
+      ].join(' && ');
+    },
+    start: (
+      _form: GenerateInstallCommandFromFormForm,
+      _options: GenerateInstallCommandFromFormOptions,
+    ) => `sudo /Library/Ossec/bin/wazuh-control start`,
+  },
 };
 
-export const getAllOptionalsMacos = (
-  optionals: IOptionalParameters<TOptionalParameters>,
-) => {
-  // create paramNameOrderList, which is an array of the keys of optionals add interface
-  const paramNameOrderList: (keyof IOptionalParameters<TOptionalParameters>)[] =
-    [
-      'serverAddress',
-      'username',
-      'password',
-      'agentName',
-      'verificationMode',
-      'communicationsAPIUrl',
-      'enrollmentKey',
-    ];
+export function generateInstallCommandFromForm(
+  form: GenerateInstallCommandFromFormForm,
+  options: GenerateInstallCommandFromFormOptions,
+) {
+  return packagesByOSArch[
+    form.operatingSystemSelection.value as keyof typeof packagesByOSArch
+  ].install(form, options);
+}
 
-  if (!optionals) {
-    return '';
-  }
-
-  return Object.values(paramNameOrderList)
-    .map(key => optionals[key])
-    .filter(Boolean)
-    .join(' ');
-};
-
-/** ***** DEB *******/
-
-export const getDEBAMD64InstallCommand = (
-  props: TOSEntryInstallCommand<TOptionalParameters>,
-) => {
-  const { optionals, wazuhVersion } = props;
-  const packageName = `wazuh-agent_${wazuhVersion}-1_amd64.deb`;
-
-  return [
-    // `wget ${urlPackage}`, // TODO: enable when the packages are publically hosted
-    `sudo dpkg -i ./${packageName}`,
-    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${optionals && getAllOptionals(optionals)}`,
-  ].join(' && ');
-};
-
-export const getDEBARM64InstallCommand = (
-  props: TOSEntryInstallCommand<TOptionalParameters>,
-) => {
-  const { optionals, wazuhVersion } = props;
-  const packageName = `wazuh-agent_${wazuhVersion}-1_arm64.deb`;
-
-  return [
-    // `wget ${urlPackage}`, // TODO: enable when the packages are publically hosted
-    `sudo dpkg -i ./${packageName}`,
-    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${optionals && getAllOptionals(optionals)}`,
-  ].join(' && ');
-};
-
-/** ***** RPM *******/
-
-export const getRPMAMD64InstallCommand = (
-  props: TOSEntryInstallCommand<TOptionalParameters>,
-) => {
-  const { optionals, wazuhVersion } = props;
-  const packageName = `wazuh-agent-${wazuhVersion}-1.x86_64.rpm`;
-
-  return [
-    // `curl -o ${packageName} ${urlPackage}`, // TODO: enable when the packages are publically hosted
-    `sudo rpm -ihv ${packageName}`,
-    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${optionals && getAllOptionals(optionals)}`,
-  ].join(' && ');
-};
-
-export const getRPMARM64InstallCommand = (
-  props: TOSEntryInstallCommand<TOptionalParameters>,
-) => {
-  const { optionals, wazuhVersion } = props;
-  const packageName = `wazuh-agent-${wazuhVersion}-1.aarch64.rpm`;
-
-  return [
-    // `curl -o ${packageName} ${urlPackage}`, // TODO: enable when the packages are publically hosted
-    `sudo rpm -ihv ${packageName}`,
-    `sudo /usr/share/wazuh-agent/bin/wazuh-agent --enroll-agent ${optionals && getAllOptionals(optionals)}`,
-  ].join(' && ');
-};
-
-/** ***** Linux *******/
-
-// Start command
-export const getLinuxStartCommand = (
-  _props: TOSEntryProps<TOptionalParameters>,
-) =>
-  `sudo systemctl daemon-reload\nsudo systemctl enable wazuh-agent\nsudo systemctl start wazuh-agent`;
-
-/** ****** Windows ********/
-
-export const getWindowsInstallCommand = (
-  props: TOSEntryInstallCommand<TOptionalParameters>,
-) => {
-  const { optionals, name } = props;
-
-  return [
-    // `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\wazuh-agent;`, // TODO: enable when the packages are publically hosted
-    // https://stackoverflow.com/questions/1673967/how-to-run-an-exe-file-in-powershell-with-parameters-with-spaces-and-quotes
-    `Start-Process msiexec.exe "/i $env:tmp\\wazuh-agent /q" -Wait; & 'C:\\Program Files\\wazuh-agent\\wazuh-agent.exe' --enroll-agent ${
-      optionals && getAllOptionals(optionals, name)
-    }`,
-  ].join(' ');
-};
-
-export const getWindowsStartCommand = (
-  _props: TOSEntryProps<TOptionalParameters>,
-) => `NET START 'Wazuh Agent'`;
-
-/** ****** MacOS ********/
-
-export const transformOptionalsParamatersMacOSCommand = (command: string) =>
-  command
-    .replaceAll(/' ([A-Za-z])/g, "' && $1") // Separate environment variables with &&
-    .replaceAll('"', String.raw`\"`) // Escape double quotes
-    .trim();
-
-export const getMacOsInstallCommand = (
-  props: TOSEntryInstallCommand<TOptionalParameters>,
-) => {
-  const { optionals } = props;
-  const optionalsForCommand = { ...optionals };
-
-  if (optionalsForCommand?.password) {
-    /**
-     * We use the JSON.stringify to prevent that the scaped specials characters will be removed
-     * and maintain the format of the password
-      The JSON.stringify maintain the password format but adds " to wrap the characters
-    */
-    const scapedPasswordLength = JSON.stringify(
-      optionalsForCommand?.password,
-    ).length;
-
-    // We need to remove the " added by JSON.stringify
-    optionalsForCommand.password = `${JSON.stringify(
-      optionalsForCommand?.password,
-    ).slice(1, scapedPasswordLength - 1)}`;
-  }
-
-  // Set macOS installation script with environment variables
-  const optionalsText =
-    optionalsForCommand && getAllOptionals(optionalsForCommand);
-  const macOSInstallationOptions = transformOptionalsParamatersMacOSCommand(
-    optionalsText || '',
-  );
-  // Merge environment variables with installation script
-  const macOSInstallationScript = [
-    // `curl -so wazuh-agent.pkg ${urlPackage}`,
-    'sudo installer -pkg ./wazuh-agent.pkg -target /',
-    `/Library/Application\\ Support/Wazuh\\ agent.app/bin/wazuh-agent --enroll-agent ${macOSInstallationOptions}`,
-  ].join(' && ');
-
-  return macOSInstallationScript;
-};
-
-export const getMacosStartCommand = (
-  _props: TOSEntryProps<TOptionalParameters>,
-) => `sudo /Library/Ossec/bin/wazuh-control start`;
+export function generateStartCommandFromForm(
+  form: GenerateInstallCommandFromFormForm,
+  options: GenerateInstallCommandFromFormOptions,
+) {
+  return packagesByOSArch[
+    form.operatingSystemSelection.value as keyof typeof packagesByOSArch
+  ].start(form, options);
+}

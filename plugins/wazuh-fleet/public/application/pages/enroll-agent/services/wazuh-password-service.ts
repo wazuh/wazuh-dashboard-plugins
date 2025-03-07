@@ -1,5 +1,3 @@
-import { TOperatingSystem } from '../hooks/use-enroll-agent-commands.test';
-
 export const scapeSpecialCharsForLinux = (password: string) => {
   const passwordScaped = password;
   // the " characters is scaped by default in the password retrieved from the API
@@ -35,48 +33,4 @@ export const scapeSpecialCharsForWindows = (password: string) => {
   return passwordScaped
     .replaceAll(regex, `'"$&"'`)
     .replaceAll(/(?<!\\)\\(?!["\\])/g, '\\');
-};
-
-export const obfuscatePasswordInCommand = (
-  password: string,
-  commandText: string,
-  os: TOperatingSystem['name'],
-): string => {
-  const command = commandText;
-  const osName = os?.toLocaleLowerCase();
-
-  switch (osName) {
-    case 'macos': {
-      const regex = /--password\s'((?:\\'|[^']|["'])*)'/g;
-      const replacedString = command.replaceAll(regex, (match, capturedGroup) =>
-        match.replace(capturedGroup, '*'.repeat(capturedGroup.length)),
-      );
-
-      return replacedString;
-    }
-
-    case 'windows': {
-      const replacedString = command.replace(
-        `--password '${scapeSpecialCharsForWindows(password)}'`,
-        () =>
-          `--password '${'*'.repeat(scapeSpecialCharsForWindows(password).length)}'`,
-      );
-
-      return replacedString;
-    }
-
-    case 'linux': {
-      const replacedString = command.replace(
-        `--password $'${scapeSpecialCharsForLinux(password)}'`,
-        () =>
-          `--password $'${'*'.repeat(scapeSpecialCharsForLinux(password).length)}'`,
-      );
-
-      return replacedString;
-    }
-
-    default: {
-      return commandText;
-    }
-  }
 };

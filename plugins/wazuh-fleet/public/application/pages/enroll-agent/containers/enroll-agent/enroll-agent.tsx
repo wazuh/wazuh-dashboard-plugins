@@ -42,6 +42,18 @@ export const EnrollAgent = () => {
       type: 'password',
       initialValue: '',
     },
+    showPassword: {
+      type: 'switch',
+      initialValue: false,
+      options: {
+        switch: {
+          values: {
+            enabled: { label: 'Show password', value: true },
+            disabled: { label: 'Obfuscate password', value: false },
+          },
+        },
+      },
+    },
     verificationMode: {
       type: 'select',
       initialValue: 'none',
