@@ -18,6 +18,15 @@ import { ModuleMitreAttackIntelligence } from './intelligence';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 
+jest.mock('../../../common/hooks/use-app-config', () => ({
+  useAppConfig: () => ({
+    isReady: true,
+    isLoading: false,
+    data: {
+      'reports.csv.maxRows': 10000,
+    },
+  }),
+}));
 jest.mock(
   '../../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
