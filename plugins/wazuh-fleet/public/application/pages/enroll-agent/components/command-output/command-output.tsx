@@ -1,15 +1,5 @@
-import {
-  EuiCodeBlock,
-  EuiCopy,
-  EuiIcon,
-  EuiSpacer,
-  EuiSwitch,
-  EuiSwitchEvent,
-  EuiText,
-} from '@elastic/eui';
-import React, { Fragment, useEffect, useState } from 'react';
-import { TOperatingSystem } from '../../core/config/os-commands-definitions';
-import { obfuscatePasswordInCommand } from '../../services/wazuh-password-service';
+import React from 'react';
+import { EuiCodeBlock, EuiCopy, EuiIcon, EuiText } from '@elastic/eui';
 import './command-output.scss';
 import { getCore } from '../../../../../plugin-services';
 
@@ -23,16 +13,12 @@ if (IS_DARK_THEME) {
 
 interface ICommandSectionProps {
   commandText: string;
-  showCommand: boolean;
-  onCopy: () => void;
-  os?: TOperatingSystem['name'];
-  password?: string;
+  commandCopy?: string;
+  onCopy?: () => void;
 }
 
 export default function CommandOutput(props: ICommandSectionProps) {
-  const { commandText, showCommand, onCopy, os, password } = props;
-  const [havePassword, setHavePassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const { commandText, commandCopy, onCopy } = props;
 
   const onHandleCopy = (command: any) => {
     if (onCopy) {
@@ -42,80 +28,28 @@ export default function CommandOutput(props: ICommandSectionProps) {
     return command; // the return is needed to avoid a bug in EuiCopy
   };
 
-  const [commandToShow, setCommandToShow] = useState(commandText);
-
-  const obfuscatePassword = (password: string) => {
-    if (!password) {
-      return;
-    }
-
-    if (!commandText) {
-      return;
-    }
-
-    if (showPassword) {
-      setCommandToShow(commandText);
-    } else {
-      setCommandToShow(obfuscatePasswordInCommand(password, commandText, os));
-    }
-  };
-
-  useEffect(() => {
-    if (password) {
-      setHavePassword(true);
-      obfuscatePassword(password);
-    } else {
-      setHavePassword(false);
-      setCommandToShow(commandText);
-    }
-  }, [password, commandText, showPassword]);
-
-  const onChangeShowPassword = (event: EuiSwitchEvent) => {
-    setShowPassword(event.target.checked);
-  };
-
   return (
-    <Fragment>
-      <EuiSpacer />
-      <EuiText>
-        <div className='copy-codeblock-wrapper'>
-          <EuiCodeBlock
-            style={{
-              zIndex: '100',
-              wordWrap: 'break-word',
-            }}
-            language='tsx'
-          >
-            {showCommand ? commandToShow : ''}
-          </EuiCodeBlock>
-          {showCommand && (
-            <EuiCopy textToCopy={commandText}>
-              {copy => (
-                <div
-                  className='copy-overlay'
-                  onClick={() => onHandleCopy(copy())}
-                >
-                  <p>
-                    <EuiIcon type='copy' /> Copy command
-                  </p>
-                </div>
-              )}
-            </EuiCopy>
+    <EuiText>
+      <div className='copy-codeblock-wrapper'>
+        <EuiCodeBlock
+          style={{
+            zIndex: '100',
+            wordWrap: 'break-word',
+          }}
+          language='tsx'
+        >
+          {commandText}
+        </EuiCodeBlock>
+        <EuiCopy textToCopy={commandCopy || commandText}>
+          {copy => (
+            <div className='copy-overlay' onClick={() => onHandleCopy(copy())}>
+              <p>
+                <EuiIcon type='copy' /> Copy command
+              </p>
+            </div>
           )}
-        </div>
-        {showCommand && havePassword ? (
-          <>
-            <EuiSwitch
-              checked={showPassword}
-              label='Show password'
-              onChange={onChangeShowPassword}
-            />
-            <EuiSpacer size='l' />
-          </>
-        ) : (
-          <EuiSpacer size='s' />
-        )}
-      </EuiText>
-    </Fragment>
+        </EuiCopy>
+      </div>
+    </EuiText>
   );
 }

@@ -4,9 +4,13 @@ import '@testing-library/jest-dom/extend-expect';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 
 describe('CheckboxGroupComponent', () => {
-  const data = ['Option 1', 'Option 2', 'Option 3'];
+  const data = [
+    { label: 'Option 1', value: 'option_1' },
+    { label: 'Option 2', value: 'option_2' },
+    { label: 'Option 3', value: 'option_3' },
+  ];
   const cardIndex = 0;
-  const selectedOption = 'Option 1';
+  const selectedOption = 'option_1';
   const onOptionChange = jest.fn();
 
   test('renders checkbox items with correct labels', () => {
@@ -23,9 +27,9 @@ describe('CheckboxGroupComponent', () => {
 
     expect(checkboxItems).toHaveLength(data.length);
 
-    expect(checkboxItems[0]).toHaveAttribute('id', 'Option 1');
-    expect(checkboxItems[1]).toHaveAttribute('id', 'Option 2');
-    expect(checkboxItems[2]).toHaveAttribute('id', 'Option 3');
+    expect(checkboxItems[0]).toHaveAttribute('id', 'option_1');
+    expect(checkboxItems[1]).toHaveAttribute('id', 'option_2');
+    expect(checkboxItems[2]).toHaveAttribute('id', 'option_3');
 
     expect(checkboxItems[0]).toBeChecked();
     expect(checkboxItems[1]).not.toBeChecked();
@@ -53,7 +57,7 @@ describe('CheckboxGroupComponent', () => {
     expect(onOptionChange).toHaveBeenCalledTimes(1);
     expect(onOptionChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        target: { value: `Option 2` },
+        target: { value: `option_2` },
       }),
     );
   });

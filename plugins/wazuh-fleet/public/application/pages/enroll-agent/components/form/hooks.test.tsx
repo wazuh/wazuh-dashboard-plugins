@@ -419,7 +419,7 @@ describe('[hook] useForm', () => {
     expect(result.current.fields.text1.initialValue).toBe(initialFieldValue);
   });
 
-  it.only(`[hook] useForm. ArrayOf.`, async () => {
+  it(`[hook] useForm. ArrayOf.`, async () => {
     const initialFields: FormConfiguration = {
       text1: {
         type: 'text',

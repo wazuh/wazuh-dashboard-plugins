@@ -3,7 +3,7 @@ import { EuiRadioGroup } from '@elastic/eui';
 import './checkbox-group.scss';
 
 interface Props {
-  data: string[];
+  data: [{ label: string; value: string }];
   cardIndex: number;
   selectedOption: string | undefined;
   onOptionChange: (optionId: string) => void;
@@ -28,18 +28,18 @@ const CheckboxGroupComponent: React.FC<Props> = ({
         isDoubleArchitecture ? ' double-architecture' : ''
       }`}
     >
-      {data.map((arch, idx) => (
+      {data.map(({ label, value }, idx) => (
         <div
           key={idx}
           className={`checkbox-item${
             idx === 0 || idx === 2 ? ' first-of-row' : ''
           }`}
         >
-          <label className='architecture-label' htmlFor={arch}>
-            {arch}
+          <label className='architecture-label' htmlFor={value}>
+            {label}
           </label>
           <EuiRadioGroup
-            options={[{ id: `${arch}` }]}
+            options={[{ id: value }]}
             idSelected={selectedOption}
             onChange={(id: string) => {
               onOptionChange({ target: { value: id } });

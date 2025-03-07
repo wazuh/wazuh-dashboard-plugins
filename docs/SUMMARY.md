@@ -11,6 +11,9 @@
 - [Build from Sources](dev/build-sources.md)
 - [Run from Sources](dev/run-sources.md)
 - [Run Tests](dev/run-tests.md)
+- [Wazuh Core](dev/wazuh-core/SUMMARY.md)
+  - [Services](dev/wazuh-core/services/SUMMARY.md)
+    - [Query Manager](dev/wazuh-core/services/query-manager/README.md)
 
 # Reference Manual
 

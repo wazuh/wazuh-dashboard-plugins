@@ -14,19 +14,45 @@ export const OPERATING_SYSTEMS_OPTIONS: EnrollAgentData[] = [
     icon: darkMode ? LinuxDarkIcon : LinuxLightIcon,
     title: 'LINUX',
     hr: true,
-    architecture: ['RPM amd64', 'RPM aarch64', 'DEB amd64', 'DEB aarch64'],
+    architecture: [
+      {
+        label: 'RPM amd64',
+        value: 'linux_rpm_amd64',
+      },
+      {
+        label: 'RPM aarch64',
+        value: 'linux_rpm_arm64',
+      },
+      {
+        label: 'DEB amd64',
+        value: 'linux_deb_amd64',
+      },
+      {
+        label: 'DEB aarch64',
+        value: 'linux_deb_arm64',
+      },
+    ],
   },
   {
     icon: darkMode ? WindowsDarkIcon : WindowsLightIcon,
     title: 'WINDOWS',
     hr: true,
-    architecture: ['MSI 32/64 bits'],
+    architecture: [{ label: 'MSI 32/64 bits', value: 'windows' }],
   },
   {
     icon: darkMode ? MacDarkIcon : MacLightIcon,
     title: 'macOS',
     hr: true,
-    architecture: ['Intel', 'Apple silicon'],
+    architecture: [
+      {
+        label: 'Intel',
+        value: 'macos_intel64',
+      },
+      {
+        label: 'Apple silicon',
+        value: 'macos_arm64',
+      },
+    ],
   },
 ];
 
