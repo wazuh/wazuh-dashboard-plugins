@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ROOT_DIR=$(git rev-parse --show-toplevel)
+
 # Color name to code mapping
 declare -A COLORS=(
   [black]=30
@@ -170,7 +172,7 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
-PACKAGE_PATH="../../plugins/wazuh-core/package.json"
+PACKAGE_PATH="$ROOT_DIR/plugins/wazuh-core/package.json"
 os_version=""
 osd_version=""
 
