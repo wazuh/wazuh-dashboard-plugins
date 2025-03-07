@@ -28,6 +28,7 @@ import { ServerHostStateContainer } from './services/state/containers/server-hos
 import { DataSourceAlertsStateContainer } from './services/state/containers/data-source-alerts';
 import { CoreServerSecurity, ServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';
+import { QueryManagerFactory } from './services/query-manager/query-manager-factory';
 import { ApplicationService } from './services/application/application';
 
 interface RuntimeSetup {
@@ -68,8 +69,6 @@ export class WazuhCorePlugin
   }
 
   public async setup(core: CoreSetup): Promise<WazuhCorePluginSetup> {
-    // No operation logger
-
     const logger: Logger = new NoopLogger();
 
     this.internal.configurationStore = new ConfigurationStore(logger);
@@ -164,7 +163,10 @@ export class WazuhCorePlugin
     };
   }
 
-  public async start(core: CoreStart): Promise<WazuhCorePluginStart> {
+  public async start(
+    core: CoreStart,
+    plugins: AppPluginStartDependencies,
+  ): Promise<WazuhCorePluginStart> {
     setChrome(core.chrome);
     setCore(core);
     setUiSettings(core.uiSettings);
@@ -179,6 +181,8 @@ export class WazuhCorePlugin
     this.runtime.start.serverSecurityDeps = {
       chrome: core.chrome,
     };
+
+    this.services.queryManagerFactory = new QueryManagerFactory(plugins.data);
 
     return {
       ...this.services,
