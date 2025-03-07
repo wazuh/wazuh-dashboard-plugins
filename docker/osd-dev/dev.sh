@@ -113,30 +113,32 @@ if [ -z "$ACTION" ]; then
   usage
 fi
 
-if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
-  if [ ! -f $PACKAGE_PATH ]; then
-    printError "The file package.json was not found."
-    exit 1
-  fi
+# Function to get version from package.json
+get_version_from_package() {
+  local version_type=$1
+  local version_var=$2
 
-  if [ -z "$os_version" ]; then
-    os_version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
-    printInfo "OS Version not received via flag, getting the version from $(printCyan -u $PACKAGE_PATH). Using: $(printYellow -b $os_version)"
-    if [ -z "$os_version" ]; then
-      printError "Could not retrieve the OS version from package.json."
+  if [ -z "${!version_var}" ]; then
+    if [ ! -f $PACKAGE_PATH ]; then
+      printError "The file package.json was not found."
       exit 1
     fi
-  fi
 
-  if [ -z "$osd_version" ]; then
-    osd_version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
-    printInfo "OSD Version not received via flag, getting the version from $(printCyan -u $PACKAGE_PATH). Using: $(printYellow -b $osd_version)"
-    if [ -z "$osd_version" ]; then
-      printError "Could not retrieve the OSD version from package.json."
+    local version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
+    printInfo "${version_type} Version not received via flag, getting the version from $(printCyan -u $PACKAGE_PATH). Using: $(printYellow -b $version)"
+
+    if [ -z "$version" ]; then
+      printError "Could not retrieve the ${version_type} version from package.json."
       exit 1
     fi
+
+    eval "$version_var=$version"
   fi
-fi
+}
+
+# Get versions from package.json if not provided
+get_version_from_package "OS" "os_version"
+get_version_from_package "OSD" "osd_version"
 
 export PASSWORD=${PASSWORD:-admin}
 export OS_VERSION=$os_version
