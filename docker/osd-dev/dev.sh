@@ -187,6 +187,7 @@ echo
 case "$ACTION" in
 up)
   printInfo "Creating networks and starting containers..."
+  echo
 
   /bin/bash ../scripts/create_docker_networks.sh
   docker compose --profile $profile -f dev.yml up -Vd
@@ -216,14 +217,17 @@ up)
   ;;
 down)
   printInfo "Removing containers and volumes..."
+  echo
   docker compose --profile $profile -f dev.yml down -v --remove-orphans
   ;;
 start)
   printInfo "Starting containers..."
+  echo
   docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} start
   ;;
 stop)
   printInfo "Stopping containers..."
+  echo
   docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
   ;;
 *)
