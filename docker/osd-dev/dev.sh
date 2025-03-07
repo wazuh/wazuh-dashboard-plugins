@@ -57,6 +57,7 @@ required_argument() {
   fi
 }
 
+VERSION_PATTERN="^[0-9]+\.[0-9]+\.[0-9]+$"
 validate_argument() {
   local arg="$1"
   local pattern="$2"
@@ -73,13 +74,13 @@ while [[ $# -gt 0 ]]; do
   case $key in
   -os)
     required_argument "$2" "$key"
-    validate_argument "$2" "^[0-9]+\.[0-9]+\.[0-9]+$" "OS version"
+    validate_argument "$2" "$VERSION_PATTERN" "OS version"
     os_version="$2"
     shift 2
     ;;
   -osd)
     required_argument "$2" "$key"
-    validate_argument "$2" "^[0-9]+\.[0-9]+\.[0-9]+$" "OSD version"
+    validate_argument "$2" "$VERSION_PATTERN" "OSD version"
     osd_version="$2"
     shift 2
     ;;
@@ -105,6 +106,7 @@ while [[ $# -gt 0 ]]; do
     ;;
   --server)
     required_argument "$2" "$key"
+    validate_argument "$2" "$VERSION_PATTERN" "Server version"
     SERVER=true
     profile="server"
     WAZUH_STACK="$2"
@@ -112,6 +114,7 @@ while [[ $# -gt 0 ]]; do
     ;;
   -a | --action)
     required_argument "$2" "$key"
+    validate_argument "$2" "^(up|down|stop|start)$" "Action"
     ACTION="$2"
     shift 2
     ;;
