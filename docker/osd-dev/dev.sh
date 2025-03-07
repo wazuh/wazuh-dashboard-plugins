@@ -52,7 +52,7 @@ profile="standard"
 
 required_argument() {
   if [[ -z "$1" || "$1" == -* ]]; then
-    printError "Option $(printGreen -b -- \'$2\') requires an argument"
+    printError "Option '$(printGreen -b -- $2)' requires an argument"
     usage
   fi
 }
@@ -63,7 +63,7 @@ validate_argument() {
   local name="$3"
 
   if [[ ! "$arg" =~ $pattern ]]; then
-    printError "Invalid $name: $(printGreen -b -- \'$arg\'). It must match pattern: $pattern"
+    printError "Invalid $name: '$(printGreen -b -- $arg)'. It must match pattern: $pattern"
     usage
   fi
 }
@@ -89,7 +89,7 @@ while [[ $# -gt 0 ]]; do
     if [[ ! "$2" = /* ]]; then
       WAZUH_HOME=$(realpath "$2")
     else
-    WAZUH_HOME="$2"
+      WAZUH_HOME="$2"
     fi
     # Validate that path exists
     if [[ ! -d "$WAZUH_HOME" ]]; then
@@ -119,7 +119,7 @@ while [[ $# -gt 0 ]]; do
     usage
     ;;
   *)
-    printError "Unknown option: $(printGreen -b -- \'$1\')"
+    printError "Unknown option: '$(printGreen -b -- $1)'"
     usage
     ;;
   esac
