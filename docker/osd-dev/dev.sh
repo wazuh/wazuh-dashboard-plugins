@@ -43,6 +43,11 @@ fi
 PACKAGE_PATH="$ROOT_DIR/plugins/wazuh-core/package.json"
 os_version=""
 osd_version=""
+WAZUH_HOME="$ROOT_DIR/plugins"
+SAML=false
+SERVER=false
+ACTION=""
+WAZUH_STACK=""
 
 required_argument() {
   if [[ -z "$1" || "$1" == -* ]]; then
