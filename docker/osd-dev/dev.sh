@@ -94,6 +94,20 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+# Check if both SAML and SERVER are enabled at the same time
+if [ "$SAML" = true ] && [ "$SERVER" = true ]; then
+  printError "Cannot enable both $(printGreen -b -- --saml) and $(printGreen -b -- --server) at the same time."
+  echo
+  usage
+fi
+
+# Check if action is provided
+if [ -z "$ACTION" ]; then
+  printError "Action is required."
+  echo
+  usage
+fi
+
 if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
   if [ ! -f $PACKAGE_PATH ]; then
     printError "The file package.json was not found."
