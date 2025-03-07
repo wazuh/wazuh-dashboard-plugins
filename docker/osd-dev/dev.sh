@@ -135,13 +135,6 @@ if [ "$SAML" = true ] && [ "$SERVER" = true ]; then
   usage
 fi
 
-# Check if action is provided
-if [ -z "$ACTION" ]; then
-  printError "Action is required."
-  echo
-  usage
-fi
-
 if [ "$SAML" = true ]; then
   cat /etc/hosts | grep -q "idp" || exit_with_message "Add idp to /etc/hosts"
 fi
