@@ -140,6 +140,10 @@ get_version_from_package() {
 get_version_from_package "OS" "os_version"
 get_version_from_package "OSD" "osd_version"
 
+# ---------------------------------------------------------------------------- #
+#                                    EXPORTS                                   #
+# ---------------------------------------------------------------------------- #
+
 export PASSWORD=${PASSWORD:-admin}
 export OS_VERSION=$os_version
 export OSD_VERSION=$osd_version
@@ -176,6 +180,10 @@ export SEC_CONFIG_PATH=/usr/share/opensearch/plugins/opensearch-security/securit
 if [[ "$OSD_MAJOR" == "2.x" ]]; then
   export SEC_CONFIG_PATH=/usr/share/opensearch/config/opensearch-security
 fi
+
+# ---------------------------------------------------------------------------- #
+#                                  RUN ACTION                                  #
+# ---------------------------------------------------------------------------- #
 
 # case "$2" in
 # up)
