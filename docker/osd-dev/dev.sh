@@ -64,7 +64,9 @@ required_argument() {
   fi
 }
 
-VERSION_PATTERN="^[0-9]+\.[0-9]+\.[0-9]+(\.[a-z]+)?$"
+MAJOR_MINOR_PATCH_PATTERN="[0-9]+(\.[0-9]+){2}"
+VERSIONING_SUFFIX_PATTERN="(-${MAJOR_MINOR_PATCH_PATTERN})?(\.[a-z]+)?"
+VERSION_PATTERN="^${MAJOR_MINOR_PATCH_PATTERN}${VERSIONING_SUFFIX_PATTERN}$"
 validate_argument() {
   local arg="$1"
   local pattern="$2"
