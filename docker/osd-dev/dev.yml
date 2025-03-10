@@ -289,7 +289,6 @@ services:
     profiles:
       - 'saml'
     hostname: idp
-
     # <<: *logging
     networks:
       - os-dev
