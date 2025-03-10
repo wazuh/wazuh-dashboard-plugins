@@ -1,24 +1,24 @@
-// import React from 'react';
-// import { EuiToolTip } from '@elastic/eui';
-// import { endpointSummary } from '../../../../utils/applications';
-// import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
-// import { WzElementPermissions } from '../../../common/permissions/element';
-// import { Agent } from '../../types';
-// import NavigationService from '../../../../react-services/navigation-service';
+import { IAgentResponse } from '../../../../../common/types';
 
-import { Agent } from '../../../../../common/types';
+export interface AgentsTableGlobalActionsProps {
+  setIsFlyoutAgentVisible: (visible: boolean) => void;
+  setIsDeleteModalVisible: (visible: boolean) => void;
+  setIsEditGroupsVisible: (visible: boolean) => void;
+  setIsUpgradeModalVisible: (visible: boolean) => void;
+  setIsEditNameVisible: (visible: boolean) => void;
+  setAgent: (agent: IAgentResponse) => void;
+}
 
 export const agentsTableActions = ({
   setIsFlyoutAgentVisible,
   setAgent,
-}: {
-  setIsFlyoutAgentVisible: (isVisible: boolean) => void;
-  setAgent: (agent: Agent) => void;
-}) =>
+  setIsDeleteModalVisible,
+  setIsEditGroupsVisible,
+  setIsUpgradeModalVisible,
+  setIsEditNameVisible,
+}: AgentsTableGlobalActionsProps) =>
   // allowEditGroups: boolean,
   // allowUpgrade: boolean,
-  // setAgent: (agent: Agent) => void,
-  // setIsEditGroupsVisible: (visible: boolean) => void,
   // setIsUpgradeModalVisible: (visible: boolean) => void,
   // outdatedAgents: Agent[],
   [
@@ -29,7 +29,7 @@ export const agentsTableActions = ({
       type: 'icon',
       isPrimary: true,
       color: 'primary',
-      onClick: (agent: Agent) => {
+      onClick: (agent: IAgentResponse) => {
         setAgent(agent);
         setIsFlyoutAgentVisible(true);
       },
@@ -40,15 +40,26 @@ export const agentsTableActions = ({
       // }),
     },
     {
-      name: 'Agent configuration',
-      description: 'Agent configuration',
-      icon: 'wrench',
+      name: 'Delete agent',
+      description: 'Delete agent',
+      icon: 'trash',
       type: 'icon',
-      onClick: () => {},
-      // onClick: agent =>
-      //   NavigationService.getInstance().navigateToApp(endpointSummary.id, {
-      //     path: `#/agents?tab=configuration&agent=${agent.id}`,
-      //   }),
+      isPrimary: true,
+      color: 'danger',
+      onClick: (agent: IAgentResponse) => {
+        setAgent(agent);
+        setIsDeleteModalVisible(true);
+      },
+    },
+    {
+      name: 'Edit name',
+      description: 'Edit name',
+      icon: 'pencil',
+      type: 'icon',
+      onClick: (agent: IAgentResponse) => {
+        setAgent(agent);
+        setIsEditNameVisible(true);
+      },
       // enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
       // 'data-test-subj': 'action-configuration',
     },
@@ -57,12 +68,11 @@ export const agentsTableActions = ({
       description: 'Edit groups',
       icon: 'pencil',
       type: 'icon',
-      onClick: () => {},
-      // onClick: (agent: Agent) => {
-      //   setAgent(agent);
-      //   setIsEditGroupsVisible(true);
-      // },
-      // 'data-test-subj': 'action-groups',
+      onClick: (agent: IAgentResponse) => {
+        setAgent(agent);
+        setIsEditGroupsVisible(true);
+      },
+      'data-test-subj': 'action-groups',
       // enabled: () => allowEditGroups,
     },
     {
@@ -70,12 +80,11 @@ export const agentsTableActions = ({
       description: 'Upgrade',
       icon: 'package',
       type: 'icon',
-      onClick: () => {},
-      // onClick: agent => {
-      //   setAgent(agent);
-      //   setIsUpgradeModalVisible(true);
-      // },
-      // 'data-test-subj': 'action-upgrade',
+      onClick: (agent: IAgentResponse) => {
+        setAgent(agent);
+        setIsUpgradeModalVisible(true);
+      },
+      'data-test-subj': 'action-upgrade',
       // enabled: agent => {
       //   const isOutdated = !!outdatedAgents.find(
       //     outdatedAgent => outdatedAgent.id === agent.id,

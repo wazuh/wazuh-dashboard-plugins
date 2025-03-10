@@ -20,6 +20,10 @@
 name: 'Dependency Review'
 on: [pull_request]
 
+concurrency:
+  group: pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 

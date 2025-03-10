@@ -1,5 +1,4 @@
 import React from 'react';
-import { agentsTableActions } from './actions/actions';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -8,45 +7,46 @@ import {
   EuiText,
   EuiLink,
 } from '@elastic/eui';
-import { getCore, getWazuhCore } from '../../../plugin-services';
-import { Agent } from '../../../../common/types';
+import { getCore } from '../../../plugin-services';
+import { IAgentResponse } from '../../../../common/types';
 import { AgentGroups, HostOS } from '../../common';
+import {
+  agentsTableActions,
+  AgentsTableGlobalActionsProps,
+} from './actions/actions';
 
 export const agentsTableColumns = ({
   setIsFlyoutAgentVisible,
   setAgent,
-}: {
-  setIsFlyoutAgentVisible: (isVisible: boolean) => void;
-  setAgent: (agent: Agent) => void;
-  // allowEditGroups: boolean,
-  // allowUpgrade: boolean,
-  // setAgent: (agents: Agent) => void,
-  // setIsEditGroupsVisible: (visible: boolean) => void,
-  // setIsUpgradeModalVisible: (visible: boolean) => void,
-  // setFilters: (filters) => void,
-  // outdatedAgents: Agent[],
-}) => [
+  setIsDeleteModalVisible,
+  setIsEditGroupsVisible,
+  setIsUpgradeModalVisible,
+  setIsEditNameVisible,
+}: AgentsTableGlobalActionsProps) => [
   {
-    field: 'agent.name',
+    field: '_source.agent.name',
     name: 'Name / ID',
     sortable: true,
     show: true,
     searchable: true,
-    render: (field: string, agentData: Agent) => (
+    render: (field: string, agentData: IAgentResponse) => (
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
           <EuiLink
-            href={getCore().application.getUrlForApp('fleet-management', {
-              path: `#/fleet-management/agents/${agentData.agent.id}`,
-            })}
+            href={getCore().application.getUrlForApp(
+              'wz_agents_%2Fwz-agents-summary',
+              {
+                path: `#/agents/${agentData._source.agent.id}`,
+              },
+            )}
           >
-            {agentData.agent.name}
+            {field}
           </EuiLink>
         </EuiFlexItem>
         <EuiFlexItem>
-          <EuiToolTip content={agentData.agent.id}>
+          <EuiToolTip content={field}>
             <EuiText color='subdued' size='xs'>
-              {`${agentData.agent.id.substring(0, 14)}...`}
+              {`${agentData._source.agent.id.slice(0, 14)}...`}
             </EuiText>
           </EuiToolTip>
         </EuiFlexItem>
@@ -54,7 +54,7 @@ export const agentsTableColumns = ({
     ),
   },
   {
-    field: 'agent.groups',
+    field: '_source.agent.groups',
     name: 'Groups',
     sortable: true,
     show: true,
@@ -62,25 +62,18 @@ export const agentsTableColumns = ({
     searchable: true,
   },
   {
-    field: 'wazuh.cluster.name',
-    name: 'Cluster node',
-    sortable: true,
-    show: true,
-    searchable: true,
-    width: '140px',
-  },
-  {
-    field: 'agent.version',
+    field: '_source.agent.version',
     name: 'Version',
     sortable: true,
     show: true,
     searchable: true,
     width: '100px',
-    render: (version: string, agent: any) => {
+    render: (version: string) => {
       const isOutdated = false;
       // const isOutdated = !!outdatedAgents.find(
       //   outdatedAgent => outdatedAgent.id === agent.id,
       // );
+
       return (
         <EuiFlexGroup
           wrap={false}
@@ -101,53 +94,43 @@ export const agentsTableColumns = ({
     },
   },
   {
-    field: 'host.os.name,host.os.version',
+    field: '_source.agent.host.os.name,_source.agent.host.os.version',
     composeField: ['host.os.name', 'host.os.version'],
     name: 'Host OS',
     sortable: true,
     show: true,
-    render: (field: string, agentData: Agent) => (
-      <HostOS os={agentData.host.os} />
+    render: (field: string, agentData: IAgentResponse) => (
+      <HostOS os={agentData._source.agent.host?.os} />
     ),
     searchable: true,
   },
   {
-    field: 'host.ip',
+    field: '_source.agent.host.ip',
     name: 'Host IP',
     sortable: true,
     show: true,
     searchable: true,
     width: '140px',
   },
-  // {
-  //   field: 'status',
-  //   name: 'Status',
-  //   truncateText: true,
-  //   sortable: true,
-  //   show: true,
-  //   render: (status, agent) => <AgentStatus status={status} agent={agent} />,
-  // },
   {
-    field: 'agent.last_login',
-    name: 'Last login',
-    render: (last_login: Date) => {
-      const { utils } = getWazuhCore();
-      return utils.formatUIDate(last_login);
-    },
+    field: '_source.agent.status',
+    name: 'Status',
+    truncateText: true,
     sortable: true,
-    show: false,
-    searchable: false,
+    show: true,
+    // render: (status, agent) => <AgentStatus status={status} agent={agent} />,
   },
   {
     field: 'actions',
     name: 'Actions',
     show: true,
-    actions: agentsTableActions({ setIsFlyoutAgentVisible, setAgent }),
-    // allowEditGroups,
-    // allowUpgrade,
-    // setAgent,
-    // setIsEditGroupsVisible,
-    // setIsUpgradeModalVisible,
-    // outdatedAgents,
+    actions: agentsTableActions({
+      setIsFlyoutAgentVisible,
+      setAgent,
+      setIsDeleteModalVisible,
+      setIsEditGroupsVisible,
+      setIsUpgradeModalVisible,
+      setIsEditNameVisible,
+    }),
   },
 ];
