@@ -4,7 +4,7 @@ export interface ViewInterface {
   path: string;
   renderOnMenu: boolean;
   renderMenu: boolean;
-  render: (props: any) => React.ReactNode;
+  render: (props: Record<string, any>) => React.ReactNode;
   breadcrumb: (
     id?: string,
   ) => { text: string | React.ReactNode; className?: string }[];
