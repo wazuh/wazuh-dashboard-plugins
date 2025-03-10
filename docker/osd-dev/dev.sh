@@ -48,10 +48,10 @@ if ! command -v jq &>/dev/null; then
   printError "'$(printCyan -b -i jq)' is not installed. Please install '$(printCyan -b -i jq)' to continue."
   echo
   {
-    printCommand "sudo apt-get install jq @ $(printGray "# in Debian/Ubuntu OS")"
-    printCommand "sudo yum install jq @ $(printGray "# in RedHat/CentOS OS")"
-    printCommand "sudo pacman -Sy --noconfirm jq @ $(printGray "# in Arch OS")"
-    printCommand "brew install jq @ $(printGray "# in MAC OS")"
+    printCommand "$(printGreen "sudo apt-get") install -y jq @ $(printGray "# in Debian/Ubuntu OS")"
+    printCommand "$(printGreen "sudo yum") install jq @ $(printGray "# in RedHat/CentOS OS")"
+    printCommand "$(printGreen "sudo pacman") -Sy --noconfirm jq @ $(printGray "# in Arch OS")"
+    printCommand "$(printGreen "brew") install jq @ $(printGray "# in MAC OS")"
   } | column -t -s '@'
   echo
   exit 1
