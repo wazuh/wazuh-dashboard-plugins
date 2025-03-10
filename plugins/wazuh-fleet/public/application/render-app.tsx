@@ -6,7 +6,7 @@ import { getPlugins } from '../plugin-services';
 
 export async function renderApp(params, { Layout }) {
   const deps = {
-    /* coreStart, navigation, */ params /* config */,
+    params,
     history,
   };
   const indexPattern =
