@@ -114,11 +114,12 @@ def generateRandomHost():
         'version': os.split(' ')[-1],
     }
     host['pid_ns_ino'] = str(random.randint(4000000000, 4294967295))
+    level = ['none', 'low', 'medium', 'high', 'critical']
     host['risk'] = {
-      'calculated_level': random.choice(['none', 'low', 'medium', 'high', 'critical']),
+      'calculated_level': random.choice(level),
       'calculated_score': round(random.uniform(0, 100), 2),
       'calculated_score_norm': round(random.uniform(0, 100), 2),
-      'static_level': random.choice(['none', 'low','medium', 'high', 'critical']),
+      'static_level': random.choice(level),
       'static_score': round(random.uniform(0, 100), 2),
       'static_score_norm': round(random.uniform(0, 100), 2)
     }
