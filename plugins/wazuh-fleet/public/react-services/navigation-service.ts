@@ -4,9 +4,7 @@ export class NavigationService {
   // eslint-disable-next-line no-use-before-define
   private static instance: NavigationService;
 
-  private constructor(private readonly history: History) {
-    this.history = history;
-  }
+  private constructor(private readonly history: History) {}
 
   public static getInstance(history?: History): NavigationService {
     if (history) {
