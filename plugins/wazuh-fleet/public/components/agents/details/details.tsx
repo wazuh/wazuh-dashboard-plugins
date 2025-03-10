@@ -14,13 +14,17 @@ import {
 } from '@elastic/eui';
 import { IAgentResponse } from '../../../../common/types';
 import { getAgentManagement } from '../../../plugin-services';
+import {
+  Filter,
+  IndexPattern,
+} from '../../../../../../src/plugins/data/common';
 import { AgentResume } from './resume';
 // import { AgentDashboard } from './dashboard';
 // import { AgentNetworks } from './networks';
 
 export interface AgentDetailsProps {
-  indexPatterns: any;
-  filters: any[];
+  indexPatterns: IndexPattern;
+  filters: Filter[];
 }
 
 export const AgentDetails = ({
