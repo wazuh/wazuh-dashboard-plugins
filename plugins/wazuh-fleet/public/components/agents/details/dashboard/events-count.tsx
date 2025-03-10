@@ -3,11 +3,15 @@ import { getPlugins } from '../../../../plugin-services';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { useTimeFilter } from '../../../common/table-indexer/components/search-bar/hooks/use-time-filter';
 import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
+import {
+  Filter,
+  IndexPattern,
+} from '../../../../../../../src/plugins/data/common';
 import { getDashboardPanels } from './dashboard_panels';
 
 export interface EventsCountProps {
-  indexPattern: any;
-  filters: any[];
+  indexPattern: IndexPattern;
+  filters: Filter[];
 }
 
 export const EventsCount = ({ filters, indexPattern }: EventsCountProps) => {
