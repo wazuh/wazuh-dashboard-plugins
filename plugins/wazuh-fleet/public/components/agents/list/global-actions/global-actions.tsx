@@ -12,6 +12,7 @@ import { IAgentResponse } from '../../../../../common/types';
 import { ConfirmModal } from '../../../common/confirm-modal/confirm-modal';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
 import { UpgradeAgentsModal } from './upgrade/upgrade-modal';
+import { EditActionGroups } from './edit-groups/types';
 
 export interface AgentsTableGlobalActionsProps {
   selectedAgents: IAgentResponse[];
@@ -36,8 +37,8 @@ export const AgentsTableGlobalActions = ({
   const [isPopoverOpen, setPopover] = useState(false);
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isDeleteAgentsVisible, setIsDeleteAgentsVisible] = useState(false);
-  const [addOrRemoveGroups, setAddOrRemoveGroups] = useState<'add' | 'remove'>(
-    'add',
+  const [editActionGroups, setEditActionGroups] = useState<EditActionGroups>(
+    EditActionGroups.ADD,
   );
   const [isUpgradeAgentsVisible, setIsUpgradeAgentsVisible] = useState(false);
   const [isLoadingModal, setIsLoadingModal] = useState(false);
@@ -114,7 +115,7 @@ export const AgentsTableGlobalActions = ({
             icon='plusInCircle'
             disabled={!totalAgents || !allowEditGroups}
             onClick={() => {
-              setAddOrRemoveGroups('add');
+              setEditActionGroups(EditActionGroups.ADD);
               closePopover();
               setIsEditGroupsVisible(true);
             }}
@@ -132,7 +133,7 @@ export const AgentsTableGlobalActions = ({
             icon='trash'
             disabled={!totalAgents || !allowEditGroups}
             onClick={() => {
-              setAddOrRemoveGroups('remove');
+              setEditActionGroups(EditActionGroups.REMOVE);
               closePopover();
               setIsEditGroupsVisible(true);
             }}
@@ -175,7 +176,7 @@ export const AgentsTableGlobalActions = ({
           onClose={() => {
             setIsEditGroupsVisible(false);
           }}
-          addOrRemove={addOrRemoveGroups}
+          editAction={editActionGroups}
         />
       )}
       {isUpgradeAgentsVisible && (

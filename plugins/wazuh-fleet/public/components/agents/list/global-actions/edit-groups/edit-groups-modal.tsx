@@ -17,6 +17,7 @@ import { IAgentResponse } from '../../../../../../common/types';
 import { getAgentManagement } from '../../../../../plugin-services';
 import { getAgents } from '../common/get-agents';
 import { EditAgentsGroupsModalResult } from './result';
+import { EditActionGroups } from './types';
 
 export enum RESULT_TYPE {
   SUCCESS = 'success',
@@ -43,7 +44,7 @@ interface EditAgentsGroupsModalProps {
   params: object;
   onClose: () => void;
   reloadAgents: () => void;
-  addOrRemove: 'add' | 'remove';
+  editAction: EditActionGroups;
 }
 
 interface Option {
@@ -56,7 +57,7 @@ export const EditAgentsGroupsModal = ({
   params,
   onClose,
   reloadAgents,
-  addOrRemove,
+  editAction,
 }: EditAgentsGroupsModalProps) => {
   const [selectedGroups, setSelectedGroups] = useState<Option[]>([]);
   const [finalAgents, setFinalAgents] = useState<IAgentResponse[]>([]);
@@ -95,7 +96,7 @@ export const EditAgentsGroupsModal = ({
     const agentDocumentIds = getArrayByProperty(agents, '_id');
     const promises = agentDocumentIds.map(documentId => {
       const promise =
-        addOrRemove === 'add'
+        editAction === EditActionGroups.ADD
           ? getAgentManagement().addGroups(documentId, groups)
           : getAgentManagement().removeGroups(documentId, groups);
 
@@ -153,7 +154,9 @@ export const EditAgentsGroupsModal = ({
   };
 
   const groupsText =
-    addOrRemove === 'add' ? 'Select groups to add' : 'Select groups to remove';
+    editAction === EditActionGroups.ADD
+      ? 'Select groups to add'
+      : 'Select groups to remove';
 
   const handleOnChangeGroupsSelect = (selectedGroups: Option[]) => {
     setSelectedGroups(selectedGroups);
@@ -203,7 +206,7 @@ export const EditAgentsGroupsModal = ({
     <EuiModal onClose={onClose}>
       <EuiModalHeader>
         <EuiModalHeaderTitle>
-          {addOrRemove === 'add'
+          {editAction === EditActionGroups.ADD
             ? 'Add groups to agents'
             : 'Remove groups from agents'}
         </EuiModalHeaderTitle>
@@ -212,7 +215,7 @@ export const EditAgentsGroupsModal = ({
         {isResultVisible ? (
           <EditAgentsGroupsModalResult
             finalAgents={finalAgents}
-            addOrRemove={addOrRemove}
+            editAction={editAction}
             getAgentsStatus={getAgentsStatus}
             getAgentsError={getAgentsError}
             saveChangesStatus={saveChangesStatus}

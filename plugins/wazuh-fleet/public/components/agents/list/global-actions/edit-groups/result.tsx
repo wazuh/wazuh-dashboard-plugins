@@ -13,9 +13,10 @@ import {
 } from '@elastic/eui';
 import { IAgentResponse } from '../../../../../../common/types';
 import { GroupResult, RESULT_TYPE } from './edit-groups-modal';
+import { EditActionGroups } from './types';
 
 interface EditAgentsGroupsModalResultProps {
-  addOrRemove: 'add' | 'remove';
+  editAction: EditActionGroups;
   finalAgents: IAgentResponse[];
   getAgentsStatus: string;
   getAgentsError?: Error;
@@ -25,7 +26,7 @@ interface EditAgentsGroupsModalResultProps {
 }
 
 export const EditAgentsGroupsModalResult = ({
-  addOrRemove,
+  editAction,
   finalAgents,
   getAgentsStatus,
   getAgentsError,
@@ -124,7 +125,10 @@ export const EditAgentsGroupsModalResult = ({
         },
         {
           step: 2,
-          title: addOrRemove === 'add' ? 'Add groups' : 'Remove groups',
+          title:
+            editAction === EditActionGroups.ADD
+              ? 'Add groups'
+              : 'Remove groups',
           status: saveChangesStatus,
           children:
             getAgentsStatus === 'complete' ? (
@@ -154,7 +158,7 @@ export const EditAgentsGroupsModalResult = ({
                       <EuiFlexItem key={agent._id}>
                         {groupStatus({
                           status: RESULT_TYPE.SUCCESS,
-                          text: `${agent._source.agent.name} (${groups.join(', ')} ${addOrRemove === 'add' ? 'added' : 'removed'})`,
+                          text: `${agent._source.agent.name} (${groups.join(', ')} ${editAction === EditActionGroups.ADD ? 'added' : 'removed'})`,
                         })}
                       </EuiFlexItem>
                     );
@@ -164,7 +168,7 @@ export const EditAgentsGroupsModalResult = ({
                     <EuiFlexItem key={agent._id}>
                       {groupStatus({
                         status: RESULT_TYPE.ERROR,
-                        text: `${agent._source.agent.name} (no ${groups.join(', ')} have been ${addOrRemove === 'add' ? 'added' : 'removed'})`,
+                        text: `${agent._source.agent.name} (no ${groups.join(', ')} have been ${editAction === EditActionGroups.ADD ? 'added' : 'removed'})`,
                       })}
                       {successAgents?.length ? (
                         <>
