@@ -17,6 +17,10 @@ import { NavigationService } from '../../../react-services/navigation-service';
 import { enrollmentAgent } from '../../common/views';
 import { TableIndexer } from '../../common/table-indexer/table-indexer';
 import { ConfirmModal } from '../../common/confirm-modal/confirm-modal';
+import {
+  Filter,
+  IndexPattern,
+} from '../../../../../../src/plugins/data/common';
 import { agentsTableColumns } from './columns';
 import { AgentsVisualizations } from './visualizations';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
@@ -25,8 +29,8 @@ import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { EditAgentNameModal } from './actions/edit-name-agent-modal';
 
 export interface AgentListProps {
-  indexPatterns: any;
-  filters: any[];
+  indexPatterns: IndexPattern;
+  filters: Filter[];
 }
 
 export const AgentList = (props: AgentListProps) => {
