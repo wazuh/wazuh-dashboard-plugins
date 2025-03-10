@@ -1,6 +1,6 @@
 # Agent summary
 
-The agent summary module provides a complete interface for managing and monitoring Wazuh agents. Allows essential operations such as deploying, updating, deleting and configuring agents.
+The agent summary module provides a complete interface for managing and monitoring Wazuh agents. It allows essential operations such as deploying, upgrading, deleting and configuring agents.
 
 ![Agent summary](agent-summary.png)
 
