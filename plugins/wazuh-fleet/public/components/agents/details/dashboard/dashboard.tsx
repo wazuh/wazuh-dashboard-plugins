@@ -15,7 +15,6 @@ export interface AgentDashboardProps {
 }
 
 export const AgentDashboard = ({
-  // agentId,
   indexPattern,
   ...restProps
 }: AgentDashboardProps) => {
