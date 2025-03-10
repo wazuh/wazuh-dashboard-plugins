@@ -173,7 +173,7 @@ get_version_from_package() {
     fi
 
     local version=$(jq -r '.pluginPlatform.version' $PACKAGE_PATH)
-    printInfo "$(styleText -u -- $version_type) Version not received via flag, getting the version from $(printCyan -u $PACKAGE_PATH). Using: $(printYellow -b $version)"
+    printInfo "$(styleText -u -- "$version_type Version") not received via flag, getting the version from $(printCyan -u $PACKAGE_PATH). Using: $(printYellow -b $version)"
 
     if [ -z "$version" ]; then
       printError "Could not retrieve the $(styleText -u -- $version_type) version from package.json."
