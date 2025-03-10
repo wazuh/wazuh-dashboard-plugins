@@ -109,5 +109,5 @@ export interface IAgentResponse {
   _index: string;
   _id: string;
   _score: number | null;
-  _source: Agent;
+  _source: AgentWrapper;
 }
