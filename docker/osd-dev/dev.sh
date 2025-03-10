@@ -41,7 +41,7 @@ if ! command -v jq &>/dev/null; then
   exit 1
 fi
 
-PACKAGE_PATH="$ROOT_DIR/plugins/wazuh-core/package.json"
+PACKAGE_PATH="../../plugins/wazuh-core/package.json"
 os_version=""
 osd_version=""
 WAZUH_HOME="$ROOT_DIR/plugins"
