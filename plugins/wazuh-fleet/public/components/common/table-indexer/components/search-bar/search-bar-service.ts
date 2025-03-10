@@ -12,6 +12,17 @@ import { TFilter, ISearchParams } from './interfaces/interface';
 const MAX_ENTRIES_PER_QUERY = 10000;
 const DEFAULT_PAGE_SIZE = 100;
 
+enum SEARCH_FIELD {
+  FILTER = 'filter',
+  QUERY = 'query',
+  SORT = 'sort',
+  SIZE = 'size',
+  FROM = 'from',
+  INDEX = 'index',
+  FIELDS = 'fields',
+  AGGS = 'aggs',
+}
+
 export type SearchParams = {
   indexPattern: IndexPattern;
   filePrefix: string;
@@ -131,19 +142,19 @@ export const search = async (params: SearchParams): Promise<SearchResponse> => {
 
   const searchParams = searchSource
     .setParent(undefined)
-    .setField('filter', filters)
-    .setField('query', query)
-    .setField('sort', sortOrder)
-    .setField('size', pageSize)
-    .setField('from', fromField)
-    .setField('index', indexPattern);
+    .setField(SEARCH_FIELD.FILTER, filters)
+    .setField(SEARCH_FIELD.QUERY, query)
+    .setField(SEARCH_FIELD.SORT, sortOrder)
+    .setField(SEARCH_FIELD.SIZE, pageSize)
+    .setField(SEARCH_FIELD.FROM, fromField)
+    .setField(SEARCH_FIELD.INDEX, indexPattern);
 
   if (fields && Array.isArray(fields) && fields.length > 0) {
-    searchParams.setField('fields', fields);
+    searchParams.setField(SEARCH_FIELD.FIELDS, fields);
   }
 
   if (aggs) {
-    searchSource.setField('aggs', aggs);
+    searchSource.setField(SEARCH_FIELD.AGGS, aggs);
   }
 
   try {
