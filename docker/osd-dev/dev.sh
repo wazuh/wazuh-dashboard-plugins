@@ -22,14 +22,14 @@ ENTRYPOINT="yarn start --no-base-path"
 
 usage() {
   echo
-  echo "$(styleText -b -u Usage): $0 [$(printGreen -- "-os <os_version>")] [$(printGreen -- "-osd <osd_version>")] [$(printGreen -- "--wz-home <wazuh_app_source>")] [$(printGreen -- "--saml") | $(printGreen -- "--server <server_version>")] [$(printGreen -- "--no-start")] $(printGreen -- "-a"), $(printGreen -- "--action <action>")"
+  echo "$(styleText -b -u Usage): $0 [$(printGreen -- "-os <os_version>")] [$(printGreen -- "-osd <osd_version>")] [$(printGreen -- "--wz-home <wazuh_app_source>")] [$(printGreen -- "-saml") | $(printGreen -- "--server <server_version>")] [$(printGreen -- "--no-start")] $(printGreen -- "-a"), $(printGreen -- "--action <action>")"
   echo
   echo "$(styleText -b -u Options):"
   {
     echo "  $(printGreen -- "-os <os_version>") @ ($(printGray optional)) Specify the OS version"
     echo "  $(printGreen -- "-osd <osd_version>") @ ($(printGray optional)) Specify the OSD version"
     echo "  $(printGreen -- "--wz-home <wazuh_app_source>") @ ($(printGray optional)) The path where the wazuh application source code is located. ( Default: '$(printCyan -- "$(relative_this $ROOT_DIR)/plugins")' )"
-    echo "  $(printGreen -- "--saml") @ ($(printGray optional)) To deploy a $(styleText -u "saml") enabled environment"
+    echo "  $(printGreen -- "-saml") @ ($(printGray optional)) To deploy a $(styleText -u "saml") enabled environment"
     echo "  $(printGreen -- "--server <server_version>") @ ($(printGray optional)) To deploy a $(styleText -u "real server") enabled environment"
     echo "  $(printGreen -- "--no-start") @ ($(printGray optional)) Keep the osd container idle without starting the service (useful for debugging or manual initialization)"
     echo "  $(printGreen -- "-a"), $(printGreen -- "--action <action>") @ Action to perform, one of: $(printCyan -- "up | down | stop | start | restart")"
@@ -106,7 +106,7 @@ while [[ $# -gt 0 ]]; do
     fi
     shift 2
     ;;
-  --saml)
+  -saml)
     SAML=true
     profile="saml"
     shift
