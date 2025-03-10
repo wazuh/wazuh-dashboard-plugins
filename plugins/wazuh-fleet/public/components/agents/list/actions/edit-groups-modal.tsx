@@ -83,7 +83,7 @@ export const EditAgentGroupsModal = ({
       getToasts().add({
         color: 'danger',
         title: 'Error editing agent groups',
-        text: `No agent ${agent._source.agent.name} groups have been updated`,
+        text: `Failed to update groups for agent ${agent._source.agent.name}`,
         toastLifeTimeMs: 3000,
       });
       setIsSaving(false);
