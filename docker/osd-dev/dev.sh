@@ -12,7 +12,9 @@ SAML=false
 SERVER=false
 ACTION=""
 WAZUH_STACK=""
-profile="standard"
+# https://docs.docker.com/compose/how-tos/environment-variables/envvars/#compose_profiles
+# https://docs.docker.com/compose/how-tos/profiles/#start-multiple-profiles
+COMPOSE_PROFILE=""
 ENTRYPOINT="yarn start --no-base-path"
 
 usage() {
@@ -105,14 +107,14 @@ while [[ $# -gt 0 ]]; do
     ;;
   -saml)
     SAML=true
-    profile="saml"
+    COMPOSE_PROFILE=${COMPOSE_PROFILE:+$COMPOSE_PROFILE,}saml
     shift
     ;;
   --server)
     required_argument "$2" "$key"
     validate_argument "$2" "$VERSION_PATTERN" "Server version"
     SERVER=true
-    profile="server"
+    COMPOSE_PROFILE=${COMPOSE_PROFILE:+$COMPOSE_PROFILE,}server
     WAZUH_STACK="$2"
     shift 2
     ;;
@@ -135,6 +137,13 @@ while [[ $# -gt 0 ]]; do
     ;;
   esac
 done
+
+if [ -z $COMPOSE_PROFILE ]; then
+  COMPOSE_PROFILE="standard"
+fi
+
+printInfo "Running with profiles: $(printCyan -b $COMPOSE_PROFILE)"
+echo
 
 # Check if action is provided
 if [ -z "$ACTION" ]; then
@@ -220,6 +229,10 @@ fi
 #                                  RUN ACTION                                  #
 # ---------------------------------------------------------------------------- #
 
+run-docker-compose() {
+  docker compose ${COMPOSE_PROFILE:+--profile ${COMPOSE_PROFILE//,/ --profile}} -f dev.yml "$@"
+}
+
 echo
 case "$ACTION" in
 up)
@@ -227,7 +240,7 @@ up)
   echo
 
   /bin/bash ../scripts/create_docker_networks.sh
-  docker compose --profile $profile -f dev.yml up -Vd
+  run-docker-compose up -Vd
 
   # Display a command to deploy an agent when using the real server
   if [ "$SERVER" = true ]; then
@@ -255,17 +268,17 @@ up)
 down)
   printInfo "Removing containers and volumes..."
   echo
-  docker compose --profile $profile -f dev.yml down -v --remove-orphans
+  run-docker-compose down -v --remove-orphans
   ;;
 start)
   printInfo "Starting containers..."
   echo
-  docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} start
+  run-docker-compose -p ${COMPOSE_PROJECT_NAME} start
   ;;
 stop)
   printInfo "Stopping containers..."
   echo
-  docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
+  run-docker-compose -p ${COMPOSE_PROJECT_NAME} stop
   ;;
 restart)
   printInfo "Restarting osd service..."
