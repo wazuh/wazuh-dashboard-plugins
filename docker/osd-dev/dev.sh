@@ -136,13 +136,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Check if both SAML and SERVER are enabled at the same time
-if [ "$SAML" = true ] && [ "$SERVER" = true ]; then
-  printError "Cannot enable both $(printGreen -b -- -saml) and $(printGreen -b -- --server) at the same time."
-  echo
-  usage
-fi
-
 # Check if action is provided
 if [ -z "$ACTION" ]; then
   printError "No action specified. Please provide an action with $(printGreen -b -- "-a") or $(printGreen -b -- "--action")."
