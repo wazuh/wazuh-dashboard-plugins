@@ -10,7 +10,6 @@ from datetime import timedelta, datetime
 index_template_file='template.json'
 default_count='10000'
 default_index_name='wazuh-agents-sample-data'
-asset_identifier='agents'
 
 def generateRandomDate(days_interval=10):
     start_date = datetime.now()
