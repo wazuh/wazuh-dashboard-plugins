@@ -245,7 +245,7 @@ up)
   echo
 
   /bin/bash ../scripts/create_docker_networks.sh
-  run_docker_compose up -Vd
+  run_docker_compose up --renew-anon-volumes --detach
 
   # Display a command to deploy an agent when using the real server
   if [ "$SERVER" = true ]; then
@@ -273,7 +273,7 @@ up)
 down)
   printInfo "Removing containers and volumes..."
   echo
-  run_docker_compose down -v --remove-orphans
+  run_docker_compose down --volumes --remove-orphans
   ;;
 start)
   printInfo "Starting containers..."
