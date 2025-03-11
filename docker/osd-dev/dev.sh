@@ -4,6 +4,7 @@ ROOT_DIR=$(git rev-parse --show-toplevel)
 
 source $ROOT_DIR/docker/scripts/style_text.sh
 
+COMPOSE_FILE=dev.yml
 PACKAGE_PATH="$ROOT_DIR/plugins/wazuh-core/package.json"
 os_version=""
 osd_version=""
@@ -230,7 +231,7 @@ fi
 # ---------------------------------------------------------------------------- #
 
 run_docker_compose() {
-  docker compose ${COMPOSE_PROFILE:+--profile ${COMPOSE_PROFILE//,/ --profile}} -f dev.yml "$@"
+  docker compose ${COMPOSE_PROFILE:+--profile ${COMPOSE_PROFILE//,/ --profile}} -f $COMPOSE_FILE "$@"
 }
 
 echo
@@ -273,18 +274,18 @@ down)
 start)
   printInfo "Starting containers..."
   echo
-  run_docker_compose -p ${COMPOSE_PROJECT_NAME} start
+  run_docker_compose -p $COMPOSE_PROJECT_NAME start
   ;;
 stop)
   printInfo "Stopping containers..."
   echo
-  run_docker_compose -p ${COMPOSE_PROJECT_NAME} stop
+  run_docker_compose -p $COMPOSE_PROJECT_NAME stop
   ;;
 restart)
   printInfo "Restarting osd service..."
   echo
   SERVICE="osd"
-  docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} restart $SERVICE
+  docker compose -f $COMPOSE_FILE -p $COMPOSE_PROJECT_NAME restart $SERVICE
   ;;
 *)
   echo
