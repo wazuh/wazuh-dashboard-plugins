@@ -19,3 +19,10 @@ export interface AvailableUpdates {
 }
 
 export type OmitStrict<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+export interface IndexedDocument<T> {
+  _index: string;
+  _id: string;
+  _score: number | null;
+  _source: T;
+}

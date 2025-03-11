@@ -1,3 +1,5 @@
+import { IndexedDocument } from '../../wazuh-core/common/types';
+
 export interface AgentNetworkTraffic {
   bytes: number;
   packets: number;
@@ -105,9 +107,4 @@ export interface Group {
   agents: any;
 }
 
-export interface IAgentResponse {
-  _index: string;
-  _id: string;
-  _score: number | null;
-  _source: AgentWrapper;
-}
+export type IAgentResponse = IndexedDocument<AgentWrapper>;
