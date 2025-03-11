@@ -3,11 +3,12 @@ import { I18nProvider } from '@osd/i18n/react';
 import { EuiPage, EuiPageBody, EuiPanel } from '@elastic/eui';
 import { Router, Route, Switch, Redirect } from 'react-router-dom';
 import { NavigationService } from '../react-services/navigation-service';
+import { IndexPattern } from '../../../../src/plugins/data/common';
 import { summaryAgent, views } from './common/views';
 import { RouteComponent } from './common/route-component';
 
 export interface FleetManagementProps {
-  indexPatterns: any;
+  indexPatterns: IndexPattern;
 }
 
 export const FleetManagement = ({ ...restProps }: FleetManagementProps) => {
