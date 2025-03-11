@@ -11,6 +11,9 @@
 - [Build from Sources](dev/build-sources.md)
 - [Run from Sources](dev/run-sources.md)
 - [Run Tests](dev/run-tests.md)
+- [Wazuh Core](dev/wazuh-core/SUMMARY.md)
+  - [Services](dev/wazuh-core/services/SUMMARY.md)
+    - [Query Manager](dev/wazuh-core/services/query-manager/README.md)
 
 # Reference Manual
 
@@ -24,6 +27,11 @@
   - [Installation](ref/getting-started/installation.md)
 - [Configuration](ref/configuration.md)
 - [Modules](ref/modules/README.md)
+  - [Fleet management](ref/modules/fleet-management/description.md)
+    - [Description](ref/modules/fleet-management/description.md)
+    - [Architecture](ref/modules/fleet-management/architecture.md)
+    - [API reference](ref/modules/fleet-management/api-reference.md)
+    - [Enrollment agent assistant](ref/modules/fleet-management/enrollment-agent-assistant.md)
 - [Upgrade](ref/upgrade.md)
 - [Uninstall](ref/uninstall.md)
 - [Back Up and Restore](ref/backup-restore.md)
