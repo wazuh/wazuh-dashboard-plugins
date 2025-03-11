@@ -68,20 +68,6 @@ export function getApps(
           console.debug(error);
         }
       },
-      // {
-      //   id: FIREWALL_MONITORING_ID,
-      //   title: FIREWALL_MONITORING_TITLE,
-      //   navLinkStatus: AppNavLinkStatus.hidden,
-      //   updater$,
-      //   mount: async (params: AppMountParameters) => {
-      //     const { renderApp } = await import(
-      //       './apps/firewall-monitoring/application'
-      //     );
-
-      //     return await renderApp(params, {
-      //       Layout: networkSecurityLayout!(FIREWALL_MONITORING_ID),
-      //     });
-      //   },
     },
   ];
 }
