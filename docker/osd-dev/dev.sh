@@ -145,7 +145,7 @@ fi
 
 # Check if action is provided
 if [ -z "$ACTION" ]; then
-  printError "Action is required."
+  printError "No action specified. Please provide an action with $(printGreen -b -- "-a") or $(printGreen -b -- "--action")."
   echo
   usage
 fi
