@@ -26,9 +26,17 @@ files=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE "
 eslint_files=$(echo "$files" | grep "plugins/" | grep -E ".*\.[jt]sx?$" || true)
 
 printInfo "⏳ Checking for linting errors..."
+if [ -z "$eslint_files" ]; then
+  printSuccess "No files to check!"
+  exit 0
+fi
 ./node_modules/.bin/eslint $eslint_files
 printSuccess "ESLint check passed!"
 
 printInfo "⏳ Checking for formatting errors..."
+if [ -z "$files" ]; then
+  printSuccess "No files to check!"
+  exit 0
+fi
 ./node_modules/.bin/prettier --check --ignore-unknown $files
 printSuccess "Prettier check passed!"
