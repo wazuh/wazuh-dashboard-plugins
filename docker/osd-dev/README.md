@@ -26,7 +26,7 @@ Use always the provided script to bring up or down the development
 environment. For example:
 
 ```
-./dev.sh [-os <os_version>] [-osd <osd_version>] [--wz-home <wazuh_app_source>] [--saml | --server <server_version>] (-a, --action <action>)
+./dev.sh [-os <os_version>] [-osd <osd_version>] [--wz-home <wazuh_app_source>] [-saml] [--server <server_version>] -a, --action <action>
 ```
 
 use `--help` for more info.
