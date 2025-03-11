@@ -231,7 +231,11 @@ fi
 # ---------------------------------------------------------------------------- #
 
 run_docker_compose() {
-  docker compose ${COMPOSE_PROFILE:+--profile ${COMPOSE_PROFILE//,/ --profile}} -f $COMPOSE_FILE "$@"
+  docker compose \
+    ${COMPOSE_PROFILE:+--profile ${COMPOSE_PROFILE//,/ --profile}} \
+    -p $COMPOSE_PROJECT_NAME \
+    -f $COMPOSE_FILE \
+    "$@"
 }
 
 echo
@@ -274,18 +278,18 @@ down)
 start)
   printInfo "Starting containers..."
   echo
-  run_docker_compose -p $COMPOSE_PROJECT_NAME start
+  run_docker_compose start
   ;;
 stop)
   printInfo "Stopping containers..."
   echo
-  run_docker_compose -p $COMPOSE_PROJECT_NAME stop
+  run_docker_compose stop
   ;;
 restart)
   printInfo "Restarting osd service..."
   echo
   SERVICE="osd"
-  docker compose -f $COMPOSE_FILE -p $COMPOSE_PROJECT_NAME restart $SERVICE
+  run_docker_compose restart $SERVICE
   ;;
 *)
   echo
