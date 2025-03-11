@@ -138,7 +138,7 @@ done
 
 # Check if both SAML and SERVER are enabled at the same time
 if [ "$SAML" = true ] && [ "$SERVER" = true ]; then
-  printError "Cannot enable both $(printGreen -b -- --saml) and $(printGreen -b -- --server) at the same time."
+  printError "Cannot enable both $(printGreen -b -- -saml) and $(printGreen -b -- --server) at the same time."
   echo
   usage
 fi
