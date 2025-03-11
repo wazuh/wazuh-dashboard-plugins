@@ -26,3 +26,5 @@ export interface IndexedDocument<T> {
   _score: number | null;
   _source: T;
 }
+
+export type Direction = 'asc' | 'desc';

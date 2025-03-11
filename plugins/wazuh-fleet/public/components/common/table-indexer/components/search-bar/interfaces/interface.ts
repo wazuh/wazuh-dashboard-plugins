@@ -1,4 +1,5 @@
 import { Filter } from '../../../../../../../../../src/plugins/data/common';
+import { Direction } from '../../../../../../../../wazuh-core/common/types';
 
 export interface ISearchParams {
   filters?: Filter[];
@@ -11,7 +12,7 @@ export interface ISearchParams {
   sorting?: {
     columns: {
       id: string;
-      direction: 'asc' | 'desc';
+      direction: Direction;
     }[];
   };
   dateRange?: {
