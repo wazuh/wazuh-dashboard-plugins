@@ -10,6 +10,7 @@ import {
 import { getCore } from '../../../plugin-services';
 import { IAgentResponse } from '../../../../common/types';
 import { AgentGroups, HostOS } from '../../common';
+import { AGENTS_SUMMARY_ID } from '../../../groups/agents/applications';
 import {
   agentsTableActions,
   AgentsTableGlobalActionsProps,
@@ -33,12 +34,9 @@ export const agentsTableColumns = ({
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
           <EuiLink
-            href={getCore().application.getUrlForApp(
-              'wz_agents_%2Fwz-agents-summary',
-              {
-                path: `#/agents/${agentData._source.agent.id}`,
-              },
-            )}
+            href={getCore().application.getUrlForApp(AGENTS_SUMMARY_ID, {
+              path: `#/agents/${agentData._source.agent.id}`,
+            })}
           >
             {field}
           </EuiLink>

@@ -26,7 +26,8 @@ function buildSubAppId(parentAppId: string, subAppId: string) {
 }
 
 // TODO: This should be moved to the apps directory
-const AGENTS_SUMMARY_ID = buildSubAppId(AGENTS_ID, 'wz-agents-summary');
+export const AGENTS_SUMMARY_ID = buildSubAppId(AGENTS_ID, 'wz-agents-summary');
+
 const AGENTS_SUMMARY_TITLE = i18n.translate(
   `${PLUGIN_ID}.category.${AGENTS_SUMMARY_ID}`,
   {

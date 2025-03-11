@@ -21,6 +21,7 @@ import {
   Filter,
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
+import { AGENTS_SUMMARY_ID } from '../../../groups/agents/applications';
 import { agentsTableColumns } from './columns';
 import { AgentsVisualizations } from './visualizations';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
@@ -192,12 +193,9 @@ export const AgentList = (props: AgentListProps) => {
             <EuiTitle size='m'>
               <h2>
                 <EuiLink
-                  href={getCore().application.getUrlForApp(
-                    'wz_agents_%2Fwz-agents-summary',
-                    {
-                      path: `#/agents/${agent?._source.agent.id}`,
-                    },
-                  )}
+                  href={getCore().application.getUrlForApp(AGENTS_SUMMARY_ID, {
+                    path: `#/agents/${agent?._source.agent.id}`,
+                  })}
                   target='_blank'
                 >
                   {agent?._source.agent.name}

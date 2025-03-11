@@ -5,6 +5,7 @@ import { AgentDetails } from '../agents/details';
 import { ViewInterface } from '../interfaces/interfaces';
 import { getCore } from '../../plugin-services';
 import { EnrollAgent } from '../../application/pages/enroll-agent';
+import { AGENTS_SUMMARY_ID } from '../../groups/agents/applications';
 
 export const summaryAgent: ViewInterface = {
   name: 'Agents',
@@ -42,12 +43,9 @@ export const agentDetails: ViewInterface = {
           defaultMessage='Summary'
         />
       ),
-      href: getCore().application.getUrlForApp(
-        'wz_agents_%2Fwz-agents-summary',
-        {
-          path: `#${summaryAgent.path}`,
-        },
-      ),
+      href: getCore().application.getUrlForApp(AGENTS_SUMMARY_ID, {
+        path: `#${summaryAgent.path}`,
+      }),
     },
     {
       text: id,
@@ -71,12 +69,9 @@ export const enrollmentAgent: ViewInterface = {
           defaultMessage='Summary'
         />
       ),
-      href: getCore().application.getUrlForApp(
-        'wz_agents_%2Fwz-agents-summary',
-        {
-          path: `#${summaryAgent.path}`,
-        },
-      ),
+      href: getCore().application.getUrlForApp(AGENTS_SUMMARY_ID, {
+        path: `#${summaryAgent.path}`,
+      }),
     },
     {
       text: 'Agent enrollment',
