@@ -229,7 +229,7 @@ fi
 #                                  RUN ACTION                                  #
 # ---------------------------------------------------------------------------- #
 
-run-docker-compose() {
+run_docker_compose() {
   docker compose ${COMPOSE_PROFILE:+--profile ${COMPOSE_PROFILE//,/ --profile}} -f dev.yml "$@"
 }
 
@@ -240,7 +240,7 @@ up)
   echo
 
   /bin/bash ../scripts/create_docker_networks.sh
-  run-docker-compose up -Vd
+  run_docker_compose up -Vd
 
   # Display a command to deploy an agent when using the real server
   if [ "$SERVER" = true ]; then
@@ -268,17 +268,17 @@ up)
 down)
   printInfo "Removing containers and volumes..."
   echo
-  run-docker-compose down -v --remove-orphans
+  run_docker_compose down -v --remove-orphans
   ;;
 start)
   printInfo "Starting containers..."
   echo
-  run-docker-compose -p ${COMPOSE_PROJECT_NAME} start
+  run_docker_compose -p ${COMPOSE_PROJECT_NAME} start
   ;;
 stop)
   printInfo "Stopping containers..."
   echo
-  run-docker-compose -p ${COMPOSE_PROJECT_NAME} stop
+  run_docker_compose -p ${COMPOSE_PROJECT_NAME} stop
   ;;
 restart)
   printInfo "Restarting osd service..."
