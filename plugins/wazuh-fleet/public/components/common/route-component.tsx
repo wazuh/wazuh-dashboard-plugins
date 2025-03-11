@@ -13,11 +13,7 @@ export const RouteComponent = (props: RouterComponentProps) => {
   const { id } = useParams();
 
   useEffect(() => {
-    if (id) {
-      getCore().chrome.setBreadcrumbs(view.breadcrumb(id));
-    } else {
-      getCore().chrome.setBreadcrumbs(view.breadcrumb());
-    }
+    getCore().chrome.setBreadcrumbs(view.breadcrumb(id || undefined));
   }, [id, view]);
 
   return view.render({ ...restProps });
