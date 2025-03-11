@@ -14,72 +14,7 @@ DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 def generate_random_host():
     host = {
         'architecture': random.choice(['x86_64', 'arm64']),
-        # 'boot': {
-        #     'id': f'bootid{random.randint(0, 9999)}'
-        # },
-        # 'cpu': {
-        #     'usage': random.uniform(0, 100)
-        # },
-        # 'disk': {
-        #     'read': {
-        #         'bytes': random.randint(1000, 1000000)
-        #     },
-        #     'write': {
-        #         'bytes': random.randint(1000, 1000000)
-        #     }
-        # },
-        # 'domain': f'domain{random.randint(0, 1000)}',
-        # 'geo': {
-        #     'city_name': 'CityName',
-        #     'continent_code': 'NA',
-        #     'continent_name': 'North America',
-        #     'country_iso_code': 'US',
-        #     'country_name': 'United States',
-        #     'location': {
-        #         'lat': round(random.uniform(-90, 90), 6),
-        #         'lon': round(random.uniform(-180, 180), 6)
-        #     },
-        #     'name': f'hostname{random.randint(0, 999)}',
-        #     'postal_code': f'{random.randint(10000, 99999)}',
-        #     'region_iso_code': 'US-CA',
-        #     'region_name': 'California',
-        #     'timezone': 'America/Los_Angeles'
-        # },
-        # 'hostname': f'host{random.randint(0, 1000)}',
-        # 'id': f'id{random.randint(0, 1000)}',
         'ip': f'{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}',
-        # 'mac': f'{random.randint(0, 255):02x}:{random.randint(0, 255):02x}:{random.randint(0, 255):02x}:{random.randint(0, 255):02x}:{random.randint(0, 255):02x}:{random.randint(0, 255):02x}',
-        # 'name': f'host{random.randint(0, 1000)}',
-        # 'network': {
-        #     'egress': {
-        #         'bytes': random.randint(1000, 1000000),
-        #         'packets': random.randint(100, 10000)
-        #     },
-        #     'ingress': {
-        #         'bytes': random.randint(1000, 1000000),
-        #         'packets': random.randint(100, 10000)
-        #     }
-        # },
-        # 'os': {
-        #     'family': random.choice(['debian', 'ubuntu', 'macos', 'ios', 'android', 'RHEL']),
-        #     'full': f'{random.choice(["debian", "ubuntu", "macos", "ios", "android", "RHEL"])} {random.randint(0, 99)}.{random.randint(0, 99)}',
-        #     'kernel': f'{random.randint(0, 9)}.{random.randint(0, 9)}.{random.randint(0, 9)}',
-        #     'name': random.choice(['Linux', 'Windows', 'macOS']),
-        #     'platform': random.choice(['platform1', 'platform2']),
-        #     'type': random.choice(['os_type1', 'os_type2']),
-        #     'version': f'{random.randint(0, 9)}.{random.randint(0, 9)}.{random.randint(0, 9)}'
-        # },
-        # 'pid_ns_ino': f'pid_ns{random.randint(0, 9999)}',
-        # 'risk': {
-        #     'calculated_level': random.choice(['low', 'medium', 'high']),
-        #     'calculated_score': random.uniform(0, 10),
-        #     'calculated_score_norm': random.uniform(0, 1),
-        #     'static_level': random.choice(['low', 'medium', 'high']),
-        #     'static_score': random.uniform(0, 10),
-        #     'static_score_norm': random.uniform(0, 1)
-        # },
-        # 'type': random.choice(['type1', 'type2']),
-        # 'uptime': random.randint(1000, 1000000)
     }
     return host
 
@@ -89,10 +24,7 @@ def generate_random_agent():
     agent = {
         'id': agent_id,
         'name': f'Agent{agent_id}',
-        'ip': f'{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}',
-        # 'type': random.choice(['filebeat', 'windows', 'linux', 'macos']),
-        # 'version': f'v{random.randint(0, 9)}-stable',
-        # 'groups': [f'group{random.randint(0, 99)}', f'group{random.randint(0, 99)}'],
+        'version': f'v{random.randint(0, 9)}-stable',
         'host': generate_random_host()
     }
     return agent
@@ -103,9 +35,39 @@ def generate_random_date():
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date.strftime(DATE_FORMAT)
 
+def generate_random_data_stream():
+    data_stream = {"type": random.choice(["Scheduled", "Realtime"])}
+    return data_stream
+
+
+def generate_random_event():
+    return {
+        "action": random.choice(["added", "modified", "deleted"]),
+        "category": random.choice(["registy_value", "registry_key", "file"]),
+        "type": "event",
+    }
+
+def generate_random_operation():
+    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
+
+
+def generate_random_registry():
+    return {
+        "data": {"type": random.choice(["REG_SZ", "REG_DWORD"])},
+        "value": f"registry_value{random.randint(0, 1000)}",
+    }
+
+def generate_random_wazuh():
+    return {
+        "cluster": {
+            "name": f"wazuh-cluster-{random.randint(0, 10)}",
+            "node": f"wazuh-cluster-node-{random.randint(0, 10)}",
+        },
+        "schema": {"version": "1.7.0"},
+    }
+
 def generate_random_file():
     file = {
-        'attributes': random.choice(['attribute1', 'attribute2']),
         'gid': f'gid{random.randint(0, 1000)}',
         'group': f'group{random.randint(0, 1000)}',
         'hash': {
@@ -114,25 +76,14 @@ def generate_random_file():
             'sha256': f'{random.randint(0, 9999)}'
         },
         'inode': f'inode{random.randint(0, 1000)}',
-        'mode': f'mode{random.randint(0, 1000)}',
         'mtime': generate_random_date(),
         'owner': f'owner{random.randint(0, 1000)}',
         'path': f'/path/to/file',
         'size': random.randint(1000, 1000000),
-        # 'target_path': f'/path/to/target{random.randint(0, 1000)}',
-        # 'type': random.choice(['file_type1', 'file_type2']),
-        'uid': f'uid{random.randint(0, 1000)}',
-        'user_name': f'user{random.randint(0, 1000)}',
+        'uid': f'uid{random.randint(0, 1000)}'
     }
     return file
 
-
-def generate_random_registry():
-    registry = {
-        'key': f'registry_key{random.randint(0, 1000)}',
-        'value': f'registry_value{random.randint(0, 1000)}'
-    }
-    return registry
 
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/717
@@ -140,7 +91,12 @@ def generate_document(params):
   fim_mode = random.choice(['file', 'registry'])
 
   data = {
+    "@timestamp": generate_random_date(),
     "agent": generate_random_agent(),
+    "data_stream": generate_random_data_stream(),
+    "event": generate_random_event(),
+    "operation": generate_random_operation(),
+    "wazuh": generate_random_wazuh(),
   }
 
   if fim_mode == 'file':

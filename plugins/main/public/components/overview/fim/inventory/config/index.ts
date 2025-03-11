@@ -13,13 +13,16 @@ export const inventoryTableDefaultColumns: EuiDataGridColumn[] = [
     id: 'file.mtime',
   },
   {
-    id: 'file.user_name',
+    id: 'file.owner',
   },
   {
     id: 'file.uid',
   },
   {
     id: 'file.group',
+  },
+  {
+    id: 'file.gid',
   },
   {
     id: 'file.size',

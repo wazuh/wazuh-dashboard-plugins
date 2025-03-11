@@ -11,7 +11,7 @@ export class FIMStatesDataSourceRepository extends PatternDataSourceRepository {
     if (this.validate(dataSource)) {
       return dataSource;
     } else {
-      throw new Error('FIM states index pattern not found');
+      throw new Error('Index pattern not found');
     }
   }
 
