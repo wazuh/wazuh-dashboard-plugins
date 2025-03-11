@@ -109,6 +109,15 @@ export const EditAgentNameModal = ({
                 validateInput(value.target.value);
               }}
               value={newName}
+              onKeyDown={event => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+
+                  if (!validateName.isInvalid) {
+                    handleOnSave();
+                  }
+                }
+              }}
             />
           </EuiFormRow>
         </EuiFlexItem>
