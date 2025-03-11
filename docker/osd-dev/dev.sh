@@ -280,7 +280,7 @@ stop)
   docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
   ;;
 restart)
-  printo "Restarting osd service..."
+  printInfo "Restarting osd service..."
   echo
   SERVICE="osd"
   docker compose -f dev.yml -p ${COMPOSE_PROJECT_NAME} restart $SERVICE
