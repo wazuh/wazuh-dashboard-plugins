@@ -14,7 +14,6 @@ import { NoopLogger } from '../common/logger/noop-logger';
 import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
 import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
-import { InitializerConfigProvider } from './services/configuration/initializer-context-provider';
 import * as utils from './utils';
 import * as uiComponents from './components';
 import {
@@ -73,10 +72,11 @@ export class WazuhCorePlugin
 
     this.internal.configurationStore = new ConfigurationStore(logger);
 
-    this.internal.configurationStore.registerProvider(
-      EConfigurationProviders.INITIALIZER_CONTEXT,
-      new InitializerConfigProvider(this.initializerContext),
-    );
+    // Uncomment if there is at least one setting of "wazuh_core" plugin
+    // this.internal.configurationStore.registerProvider(
+    //   EConfigurationProviders.INITIALIZER_CONTEXT,
+    //   new InitializerConfigProvider(this.initializerContext),
+    // );
 
     // register the uiSettins on the configuration store to avoid the use inside of configuration service
     this.internal.configurationStore.registerProvider(
