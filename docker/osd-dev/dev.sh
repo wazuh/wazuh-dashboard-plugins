@@ -4,15 +4,10 @@ ROOT_DIR=$(git rev-parse --show-toplevel)
 
 source $ROOT_DIR/docker/scripts/style_text.sh
 
-relative_this() {
-  local to=$1
-  realpath --relative-to="$(dirname $0)" "$to"
-}
-
-PACKAGE_PATH="$(relative_this $ROOT_DIR)/plugins/wazuh-core/package.json"
+PACKAGE_PATH="$ROOT_DIR/plugins/wazuh-core/package.json"
 os_version=""
 osd_version=""
-WAZUH_HOME="$(relative_this $ROOT_DIR)/plugins"
+WAZUH_HOME="$ROOT_DIR/plugins"
 SAML=false
 SERVER=false
 ACTION=""
@@ -28,7 +23,7 @@ usage() {
   {
     echo "  $(printGreen -- "-os <os_version>") @ ($(printGray optional)) Specify the OS version"
     echo "  $(printGreen -- "-osd <osd_version>") @ ($(printGray optional)) Specify the OSD version"
-    echo "  $(printGreen -- "--wz-home <wazuh_app_source>") @ ($(printGray optional)) The path where the wazuh application source code is located. ( Default: '$(printCyan -- "$(relative_this $ROOT_DIR)/plugins")' )"
+    echo "  $(printGreen -- "--wz-home <wazuh_app_source>") @ ($(printGray optional)) The path where the wazuh application source code is located. ( Default: '$(printCyan -- "$ROOT_DIR/plugins")' )"
     echo "  $(printGreen -- "-saml") @ ($(printGray optional)) To deploy a $(styleText -u "saml") enabled environment"
     echo "  $(printGreen -- "--server <server_version>") @ ($(printGray optional)) To deploy a $(styleText -u "real server") enabled environment"
     echo "  $(printGreen -- "--no-start") @ ($(printGray optional)) Keep the osd container idle without starting the service (useful for debugging or manual initialization)"
