@@ -229,7 +229,11 @@ const DocViewer = (props: tDocViewerProps) => {
                            */
                           // eslint-disable-next-line react/no-danger
                           dangerouslySetInnerHTML={{ __html: value as string }}
-                          style={{ overflowY: 'auto', wordBreak: 'break-all' }}
+                          style={{
+                            overflowY: 'auto',
+                            wordBreak: 'break-all',
+                            width: '100%',
+                          }}
                         />
                       )}
                     </td>

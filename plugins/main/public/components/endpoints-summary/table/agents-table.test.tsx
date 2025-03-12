@@ -5,6 +5,16 @@ import { WzRequest } from '../../../react-services/wz-request';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 
+jest.mock('../../common/hooks/use-app-config', () => ({
+  useAppConfig: () => ({
+    isReady: true,
+    isLoading: false,
+    data: {
+      'reports.csv.maxRows': 10000,
+    },
+  }),
+}));
+
 const data = [
   {
     id: '001',

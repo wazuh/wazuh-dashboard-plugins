@@ -24,6 +24,7 @@ export interface SearchBarProps {
   onSearch: (params: any) => void;
   buttonsRender?: () => React.ReactNode;
   input?: string;
+  inputTimeMark?: number;
 }
 
 export const SearchBar = ({
@@ -102,7 +103,7 @@ export const SearchBar = ({
           },
         ),
       );
-  }, [rest.input]);
+  }, [rest.inputTimeMark]);
 
   useEffect(() => {
     (async () => {

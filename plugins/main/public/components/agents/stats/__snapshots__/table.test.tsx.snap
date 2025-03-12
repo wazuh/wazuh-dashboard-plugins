@@ -445,6 +445,7 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
                 >
                   <EuiButtonContent
                     className="euiButtonEmpty__content"
+                    iconGap="m"
                     iconSide="left"
                     iconSize="m"
                     iconType="importAction"
