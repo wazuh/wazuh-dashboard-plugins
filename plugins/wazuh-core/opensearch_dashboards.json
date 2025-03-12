@@ -1,6 +1,6 @@
 {
   "id": "wazuhCore",
-  "version": "4.11.1-02",
+  "version": "4.12.0-00",
   "opensearchDashboardsVersion": "opensearchDashboards",
   "server": true,
   "ui": true,

@@ -89,6 +89,12 @@ const tableProps = {
   },
 };
 
+beforeAll(() => {
+  global.Date.now = jest.fn(() =>
+    new Date('2024-12-02T14:35:10.123').getTime(),
+  );
+});
+
 describe('Table With Search Bar component', () => {
   it('renders correctly to match the snapshot', () => {
     const wrapper = mount(<TableWithSearchBar {...tableProps} />);

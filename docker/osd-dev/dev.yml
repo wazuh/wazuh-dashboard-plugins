@@ -237,12 +237,13 @@ services:
     # <<: *logging
     ports:
       - ${OSD_PORT}:5601
+    tty: true
     environment:
       - 'LOGS=/proc/1/fd/1'
     entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
-      - '${SRC}/main:/home/node/kbn/plugins/wazuh'
+      - '${SRC}/main:/home/node/kbn/plugins/main'
       - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
       - wd_certs:/home/node/kbn/certs/
@@ -288,7 +289,6 @@ services:
     profiles:
       - 'saml'
     hostname: idp
-
     # <<: *logging
     networks:
       - os-dev

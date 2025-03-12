@@ -99,6 +99,7 @@ export const exportSearchToCSV = async (
     sorting,
     fields,
     pagination,
+    dateRange,
   } = params;
   // when the pageSize is greater than the default max size per call (10000)
   // then we need to paginate the search
@@ -124,6 +125,7 @@ export const exportSearchToCSV = async (
           pageSize,
         },
         sorting,
+        dateRange,
         fields,
       };
       searchResults = await search(searchParams);
