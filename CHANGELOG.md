@@ -24,7 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed CSV export not filtering by timerange [#7304](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7304)
 - Fixed agent view not showing the latest agent state [#7336](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7336)
 
-## Wazuh v4.11.1 - OpenSearch Dashboards 2.16.0 - Revision 01
+## Wazuh v4.11.1 - OpenSearch Dashboards 2.16.0 - Revision 02
 
 ### Added
 
