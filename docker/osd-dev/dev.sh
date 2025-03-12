@@ -173,7 +173,7 @@ get_version_from_package() {
 
   if [ -z "${!version_var}" ]; then
     if [ ! -f $PACKAGE_PATH ]; then
-      printError "The file package.json was not found."
+      printError "The file $PACKAGE_PATH was not found."
       exit 1
     fi
 
@@ -181,7 +181,7 @@ get_version_from_package() {
     printInfo "$(styleText -u -- "$version_type Version") not received via flag, getting the version from $(printCyan -u $PACKAGE_PATH). Using: $(printYellow -b $version)"
 
     if [ -z "$version" ]; then
-      printError "Could not retrieve the $(styleText -u -- $version_type) version from package.json."
+      printError "Could not retrieve the $(styleText -u -- $version_type) version from $PACKAGE_PATH."
       exit 1
     fi
 
