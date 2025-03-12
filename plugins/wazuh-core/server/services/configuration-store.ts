@@ -26,10 +26,7 @@ export class ConfigurationStore implements IConfigurationStore {
   private _cacheKey: string;
   private _fileEncoding: string = 'utf-8';
   file: string = '';
-  constructor(
-    private logger: Logger,
-    options: IConfigurationStoreOptions,
-  ) {
+  constructor(private logger: Logger, options: IConfigurationStoreOptions) {
     this.file = options.file;
 
     if (!this.file) {
