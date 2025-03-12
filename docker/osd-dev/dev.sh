@@ -250,7 +250,7 @@ up)
   # Display a command to deploy an agent when using the real server
   if [ "$SERVER" = true ]; then
     echo
-    printWarn "$(printYellow -b "**************WARNING**************")"
+    printWarn "$(printYellow -b "************* WARNING *************")"
     printWarn "$(printYellow "The agent version must be a published one. This uses only released versions.")"
     printWarn "$(printYellow "If you need to change de version, edit the command as you see fit.")"
     printWarn "$(printYellow -b "***********************************")"
