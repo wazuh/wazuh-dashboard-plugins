@@ -80,7 +80,10 @@ export const AgentConfiguration = {
       sections: [
         {
           subtitle: 'Policy monitoring',
-          docuLink: webDocumentationLink('pci-dss/policy-monitoring.html'),
+          docuLink: webDocumentationLink(
+            'pci-dss/policy-monitoring.html',
+            '4.2',
+          ),
           desc: 'Configuration to ensure compliance with security policies, standards and hardening guides',
           config: [{ component: 'syscheck', configuration: 'rootcheck' }],
           wodle: [{ name: 'sca' }],
@@ -114,6 +117,7 @@ export const AgentConfiguration = {
           subtitle: 'OpenSCAP',
           docuLink: webDocumentationLink(
             'user-manual/reference/ossec-conf/wodle-openscap.html',
+            '4.8',
           ),
           desc: 'Configuration assessment and automation of compliance monitoring using SCAP checks',
           wodle: [{ name: 'open-scap' }],
@@ -131,6 +135,7 @@ export const AgentConfiguration = {
           subtitle: 'CIS-CAT',
           docuLink: webDocumentationLink(
             'user-manual/reference/ossec-conf/wodle-ciscat.html',
+            '4.8',
           ),
           desc: 'Configuration assessment using CIS scanner and SCAP checks',
           wodle: [{ name: 'cis-cat' }],
