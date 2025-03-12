@@ -232,7 +232,7 @@ fi
 
 run_docker_compose() {
   docker compose \
-    ${COMPOSE_PROFILE:+--profile ${COMPOSE_PROFILE//,/ --profile}} \
+    ${COMPOSE_PROFILE:+--profile=${COMPOSE_PROFILE//,/ --profile=}} \
     -p $COMPOSE_PROJECT_NAME \
     -f $COMPOSE_FILE \
     "$@"
