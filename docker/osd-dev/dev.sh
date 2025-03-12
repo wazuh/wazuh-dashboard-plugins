@@ -37,7 +37,7 @@ usage() {
 }
 
 exit_with_message() {
-  echo $1
+  printError "$1"
   exit -1
 }
 
@@ -163,7 +163,7 @@ for plugin in $(ls $WAZUH_HOME); do
 done
 
 if [ "$SAML" = true ]; then
-  cat /etc/hosts | grep -q "idp" || exit_with_message "Add idp to /etc/hosts"
+  cat /etc/hosts | grep -q "idp" || exit_with_message "Add $(printGreen -i -b -- "127.0.0.1 idp") to $(printCyan -u -- "/etc/hosts")"
 fi
 
 # Function to get version from package.json
