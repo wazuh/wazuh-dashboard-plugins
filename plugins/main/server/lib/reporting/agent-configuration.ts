@@ -1,4 +1,4 @@
-import { webDocumentationLink } from "../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../common/services/web_documentation';
 
 /*
  * Wazuh app - Agent configuration request objet for exporting it
@@ -24,13 +24,15 @@ export const AgentConfiguration = {
             {
               plain: 'Write internal logs in plain text',
               json: 'Write internal logs in JSON format',
-              server: 'List of managers to connect'
-            }
-          ]
+              server: 'List of managers to connect',
+            },
+          ],
         },
         {
           subtitle: 'Communication',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/client.html'),
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/client.html',
+          ),
           desc: 'Settings related to the connection with the manager',
           config: [{ component: 'agent', configuration: 'client' }],
           labels: [
@@ -44,30 +46,34 @@ export const AgentConfiguration = {
                 'Time (in seconds) before attempting to reconnect',
               server: 'List of managers to connect',
               'config-profile': 'Configuration profiles',
-              remote_conf: 'Remote configuration is enabled'
-            }
-          ]
+              remote_conf: 'Remote configuration is enabled',
+            },
+          ],
         },
         {
           subtitle: 'Anti-flooding settings',
-          docuLink: webDocumentationLink('user-manual/capabilities/antiflooding.html'),
+          docuLink: webDocumentationLink(
+            'user-manual/agent/agent-management/antiflooding.html',
+          ),
           desc: 'Agent bucket parameters to avoid event flooding',
           config: [{ component: 'agent', configuration: 'buffer' }],
           labels: [
             {
               disabled: 'Buffer disabled',
               queue_size: 'Queue size',
-              events_per_second: 'Events per second'
-            }
-          ]
+              events_per_second: 'Events per second',
+            },
+          ],
         },
         {
           subtitle: 'Agent labels',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/labels.html'),
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/labels.html',
+          ),
           desc: 'User-defined information about the agent included in alerts',
-          config: [{ component: 'agent', configuration: 'labels' }]
-        }
-      ]
+          config: [{ component: 'agent', configuration: 'labels' }],
+        },
+      ],
     },
     {
       title: 'Auditing and policy monitoring',
@@ -75,8 +81,7 @@ export const AgentConfiguration = {
         {
           subtitle: 'Policy monitoring',
           docuLink: webDocumentationLink('pci-dss/policy-monitoring.html'),
-          desc:
-            'Configuration to ensure compliance with security policies, standards and hardening guides',
+          desc: 'Configuration to ensure compliance with security policies, standards and hardening guides',
           config: [{ component: 'syscheck', configuration: 'rootcheck' }],
           wodle: [{ name: 'sca' }],
           labels: [
@@ -100,16 +105,17 @@ export const AgentConfiguration = {
               enabled: 'Security configuration assessment enabled',
               scan_on_start: 'Scan on start',
               interval: 'Interval',
-              policies: 'Policies'
-            }
+              policies: 'Policies',
+            },
           ],
-          tabs: ['General', 'Security configuration assessment']
+          tabs: ['General', 'Security configuration assessment'],
         },
         {
           subtitle: 'OpenSCAP',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/wodle-openscap.html'),
-          desc:
-            'Configuration assessment and automation of compliance monitoring using SCAP checks',
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/wodle-openscap.html',
+          ),
+          desc: 'Configuration assessment and automation of compliance monitoring using SCAP checks',
           wodle: [{ name: 'open-scap' }],
           labels: [
             {
@@ -117,13 +123,15 @@ export const AgentConfiguration = {
               disabled: 'OpenSCAP integration disabled',
               'scan-on-start': 'Scan on start',
               interval: 'Interval between scan executions',
-              timeout: 'Timeout (in seconds) for scan executions'
-            }
-          ]
+              timeout: 'Timeout (in seconds) for scan executions',
+            },
+          ],
         },
         {
           subtitle: 'CIS-CAT',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/wodle-ciscat.html'),
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/wodle-ciscat.html',
+          ),
           desc: 'Configuration assessment using CIS scanner and SCAP checks',
           wodle: [{ name: 'cis-cat' }],
           labels: [
@@ -134,20 +142,21 @@ export const AgentConfiguration = {
               java_path: 'Path to Java executable directory',
               ciscat_path: 'Path to CIS-CAT executable directory',
               timeout: 'Timeout (in seconds) for scan executions',
-              content: 'Benchmarks'
-            }
-          ]
-        }
-      ]
+              content: 'Benchmarks',
+            },
+          ],
+        },
+      ],
     },
     {
       title: 'System threats and incident response',
       sections: [
         {
           subtitle: 'Osquery',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/wodle-osquery.html'),
-          desc:
-            'Expose an operating system as a high-performance relational database',
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/wodle-osquery.html',
+          ),
+          desc: 'Expose an operating system as a high-performance relational database',
           wodle: [{ name: 'osquery' }],
           labels: [
             {
@@ -155,15 +164,16 @@ export const AgentConfiguration = {
               run_daemon: 'Auto-run the Osquery daemon',
               add_labels: 'Use defined labels as decorators',
               log_path: 'Path to the Osquery results log file',
-              config_path: 'Path to the Osquery configuration file'
-            }
-          ]
+              config_path: 'Path to the Osquery configuration file',
+            },
+          ],
         },
         {
           subtitle: 'Inventory data',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/wodle-syscollector.html'),
-          desc:
-            'Gather relevant information about the operating system, hardware, networking and packages',
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/wodle-syscollector.html',
+          ),
+          desc: 'Gather relevant information about the operating system, hardware, networking and packages',
           wodle: [{ name: 'syscollector' }],
           labels: [
             {
@@ -176,26 +186,30 @@ export const AgentConfiguration = {
               packages: 'Scan installed packages',
               ports: 'Scan listening network ports',
               ports_all: 'Scan all network ports',
-              processes: 'Scan current processes'
-            }
-          ]
+              processes: 'Scan current processes',
+            },
+          ],
         },
         {
           subtitle: 'Active response',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/active-response.html'),
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/active-response.html',
+          ),
           desc: 'Active threat addressing by immediate response',
           config: [{ component: 'com', configuration: 'active-response' }],
           labels: [
             {
               disabled: 'Active response disabled',
               ca_store: 'Use the following list of root CA certificates',
-              ca_verification: 'Validate WPKs using root CA certificate'
-            }
-          ]
+              ca_verification: 'Validate WPKs using root CA certificate',
+            },
+          ],
         },
         {
           subtitle: 'Commands',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/wodle-command.html'),
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/wodle-command.html',
+          ),
           desc: 'Configuration options of the Command wodle',
           wodle: [{ name: 'command' }],
           labels: [
@@ -209,15 +223,16 @@ export const AgentConfiguration = {
               command: 'Command to execute',
               verify_md5: 'Verify MD5 sum',
               verify_sha1: 'Verify SHA1 sum',
-              verify_sha256: 'Verify SHA256 sum'
-            }
-          ]
+              verify_sha256: 'Verify SHA256 sum',
+            },
+          ],
         },
         {
           subtitle: 'Docker listener',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/wodle-docker.html'),
-          desc:
-            'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/wodle-docker.html',
+          ),
+          desc: 'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
           wodle: [{ name: 'docker-listener' }],
           labels: [
             {
@@ -225,27 +240,28 @@ export const AgentConfiguration = {
               run_on_start:
                 'Run the listener immediately when service is started',
               interval: 'Waiting time to rerun the listener in case it fails',
-              attempts: 'Number of attempts to execute the listener'
-            }
-          ]
-        }
-      ]
+              attempts: 'Number of attempts to execute the listener',
+            },
+          ],
+        },
+      ],
     },
     {
       title: 'Log data analysis',
       sections: [
         {
           subtitle: 'Log collection',
-          docuLink: webDocumentationLink('user-manual/capabilities/log-data-collection/index.html'),
-          desc:
-            'Log analysis from text files, Windows events or syslog outputs',
+          docuLink: webDocumentationLink(
+            'user-manual/capabilities/log-data-collection/index.html',
+          ),
+          desc: 'Log analysis from text files, Windows events or syslog outputs',
           config: [
             {
               component: 'logcollector',
               configuration: 'localfile',
-              filterBy: 'logformat'
+              filterBy: 'logformat',
             },
-            { component: 'logcollector', configuration: 'socket' }
+            { component: 'logcollector', configuration: 'socket' },
           ],
           labels: [
             {
@@ -261,20 +277,21 @@ export const AgentConfiguration = {
               syslog: 'Syslog',
               command: 'Command',
               full_command: 'Full command',
-              audit: 'Audit'
-            }
+              audit: 'Audit',
+            },
           ],
-          options: { hideHeader: true }
+          options: { hideHeader: true },
         },
         {
           subtitle: 'Integrity monitoring',
-          docuLink: webDocumentationLink('user-manual/reference/ossec-conf/syscheck.html'),
-          desc:
-            'Identify changes in content, permissions, ownership, and attributes of files',
+          docuLink: webDocumentationLink(
+            'user-manual/reference/ossec-conf/syscheck.html',
+          ),
+          desc: 'Identify changes in content, permissions, ownership, and attributes of files',
           config: [
-            { component: 'syscheck', configuration: 'syscheck', matrix: true }
+            { component: 'syscheck', configuration: 'syscheck', matrix: true },
           ],
-          tabs: ['General','Who data'],
+          tabs: ['General', 'Who data'],
           labels: [
             {
               disabled: 'Integrity monitoring disabled',
@@ -285,8 +302,8 @@ export const AgentConfiguration = {
               nodiff: 'No diff directories',
               ignore: 'Ignored files and directories',
               restart_audit: 'Restart audit',
-              startup_healthcheck: 'Startup healthcheck'
-            }
+              startup_healthcheck: 'Startup healthcheck',
+            },
           ],
           opts: {
             realtime: 'RT',
@@ -301,10 +318,10 @@ export const AgentConfiguration = {
             check_mtime: 'MT',
             check_inode: 'Inode',
             check_sha256sum: 'SHA256',
-            follow_symbolic_link: 'SL'
-          }
-        }
-      ]
-    }
-  ]
+            follow_symbolic_link: 'SL',
+          },
+        },
+      ],
+    },
+  ],
 };

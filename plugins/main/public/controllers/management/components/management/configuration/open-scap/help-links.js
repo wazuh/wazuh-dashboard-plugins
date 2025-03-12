@@ -10,15 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 export default [
   {
     text: 'OpenSCAP module documentation',
-    href: webDocumentationLink('user-manual/capabilities/policy-monitoring/openscap/index.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/policy-monitoring/openscap/index.html',
+    ),
   },
   {
     text: 'OpenSCAP module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-openscap.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-openscap.html',
+    ),
+  },
 ];

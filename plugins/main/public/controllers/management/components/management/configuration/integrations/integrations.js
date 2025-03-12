@@ -20,7 +20,9 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Integration with external APIs',
-    href: webDocumentationLink('user-manual/manager/manual-integration.html'),
+    href: webDocumentationLink(
+      'user-manual/manager/integration-with-external-apis.html',
+    ),
   },
   {
     text: 'VirusTotal integration',
@@ -94,28 +96,26 @@ class WzConfigurationIntegrations extends Component {
             />
           )}
         {currentConfig['integrator-integration'] &&
-          !isString(currentConfig['integrator-integration']) ? (
-            integrations &&
-              integrations.map((integrationInfo, key) => {
-                const integration = Object.assign(
-                  this.buildIntegration(integrationInfo.name),
-                  integrationInfo
-                );
-                return (
-                  <Fragment key={`integration-${integration.title}`}>
-                    <WzConfigurationSettingsGroup
-                      title={integration.title}
-                      description={integration.description}
-                      items={integrationsSettings}
-                      config={integration}
-                      help={key === 0 ? helpLinks : undefined}
-                    />
-                  </Fragment>
-                );
-              })
-          )
-          : null
-        }
+        !isString(currentConfig['integrator-integration'])
+          ? integrations &&
+            integrations.map((integrationInfo, key) => {
+              const integration = Object.assign(
+                this.buildIntegration(integrationInfo.name),
+                integrationInfo,
+              );
+              return (
+                <Fragment key={`integration-${integration.title}`}>
+                  <WzConfigurationSettingsGroup
+                    title={integration.title}
+                    description={integration.description}
+                    items={integrationsSettings}
+                    config={integration}
+                    help={key === 0 ? helpLinks : undefined}
+                  />
+                </Fragment>
+              );
+            })
+          : null}
       </Fragment>
     );
   }

@@ -25,10 +25,6 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 
 const helpLinks = [
   {
-    text: 'Generating automatic reports',
-    href: webDocumentationLink('user-manual/manager/automatic-reports.html'),
-  },
-  {
     text: 'Reports reference',
     href: webDocumentationLink('user-manual/reference/ossec-conf/reports.html'),
   },
