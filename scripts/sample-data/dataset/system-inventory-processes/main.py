@@ -8,7 +8,7 @@ import datetime
 
 index_template_file='template.json'
 default_count='10000'
-default_index_name_prefix='wazuh-states-inventory-packages'
+default_index_name_prefix='wazuh-states-inventory-processes'
 default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -25,37 +25,51 @@ def generate_random_date():
     return random_date.strftime(DATE_FORMAT)
 
 
-def generate_random_host():
-    host = {
-        'architecture': random.choice(['x86_64', 'arm64']),
-        'ip': generate_random_ip(),
-    }
-    return host
-
-
 def generate_random_agent():
     agent_id = f'{random.randint(0, 99):03d}'
-    agent = {
-        'id': agent_id,
-        'name': f'Agent{agent_id}',
-        'version': f'v{random.randint(0, 9)}-stable',
-        'host': generate_random_host()
+    return {
+        "id": agent_id,
+        "name": f"Agent{random.randint(0, 99)}",
+        "version": f"v{random.randint(0, 9)}-stable",
+        "host": generate_random_host(),
     }
-    return agent
 
 
-def generate_random_package():
-  package_name = f'package_{random.randint(1, 255)}'
-  return {
-      "architecture": random.choice(["x86_64", "arm64"]),
-      "description": f"description{random.randint(0, 9999)}",
-      "groups": f"group{random.randint(1, 100)}",
-      "installed": generate_random_date(),
-      "name": f"package{random.randint(0, 9999)}",
-      "path": f"/path/to/package{random.randint(0, 9999)}",
-      "vendor": random.choice(["Microsoft", "Canonical", "Apple", "RedHat"]),
-      "version": f"{random.randint(0, 9)}.{random.randint(0, 9)}.{random.randint(0, 9)}",
-  }
+def generate_random_host():
+    return {
+        "architecture": random.choice(["x86_64", "arm64"]),
+        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
+    }
+
+
+def generate_random_process():
+    return {
+        "args": f"arg{random.randint(0, 9999)}",
+        "command_line": f"command{random.randint(0, 9999)}",
+        "name": f"process{random.randint(0, 9999)}",
+        "parent": {"pid": random.randint(1, 9999)},
+        "pid": random.randint(1, 9999),
+        "state": random.choice(
+            [
+                "Running",
+                "Uninterruptible Sleep",
+                "Interruptable Sleep",
+                "Stopped",
+                "Zombie",
+            ]
+        ),
+        "stime": generate_random_unix_timestamp(),
+        "utime": generate_random_unix_timestamp(),
+    }
+
+
+def generate_random_unix_timestamp():
+    start_time = datetime.datetime(2000, 1, 1)
+    end_time = datetime.datetime.now()
+    random_time = start_time + datetime.timedelta(
+        seconds=random.randint(0, int((end_time - start_time).total_seconds()))
+    )
+    return int(random_time.timestamp())
 
 
 def generate_random_operation():
@@ -78,7 +92,7 @@ def generate_document(params):
   return {
       "@timestamp": generate_random_date(),
       "agent": generate_random_agent(),
-      "package": generate_random_package(),
+      "process": generate_random_process(),
       "operation": generate_random_operation(),
       "wazuh": generate_random_wazuh(),
   }

@@ -41,38 +41,48 @@
           }
         }
       },
-      "package": {
+      "process": {
         "properties": {
-          "architecture": {
+          "args": {
             "ignore_above": 1024,
             "type": "keyword"
           },
-          "description": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "groups": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "installed": {
-            "type": "date"
+          "command_line": {
+            "fields": {
+              "text": {
+                "type": "text"
+              }
+            },
+            "type": "wildcard"
           },
           "name": {
+            "fields": {
+              "text": {
+                "type": "text"
+              }
+            },
             "ignore_above": 1024,
             "type": "keyword"
           },
-          "path": {
+          "parent": {
+            "properties": {
+              "pid": {
+                "type": "long"
+              }
+            }
+          },
+          "pid": {
+            "type": "long"
+          },
+          "state": {
             "ignore_above": 1024,
             "type": "keyword"
           },
-          "vendor": {
-            "ignore_above": 1024,
-            "type": "keyword"
+          "stime": {
+            "type": "long"
           },
-          "version": {
-            "ignore_above": 1024,
-            "type": "keyword"
+          "utime": {
+            "type": "long"
           }
         }
       },
@@ -108,9 +118,9 @@
       "number_of_shards": "1",
       "query.default_field": [
         "agent.id",
-        "package.architecture",
-        "package.name",
-        "package.version"
+        "process.name",
+        "process.pid",
+        "process.command_line"
       ],
       "refresh_interval": "5s"
     }

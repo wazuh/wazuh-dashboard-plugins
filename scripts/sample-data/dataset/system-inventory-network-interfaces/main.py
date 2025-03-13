@@ -8,7 +8,7 @@ import datetime
 
 index_template_file='template.json'
 default_count='10000'
-default_index_name_prefix='wazuh-states-inventory-packages'
+default_index_name_prefix='wazuh-states-inventory-interfaces'
 default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -24,43 +24,59 @@ def generate_random_date():
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date.strftime(DATE_FORMAT)
 
-
-def generate_random_host():
-    host = {
-        'architecture': random.choice(['x86_64', 'arm64']),
-        'ip': generate_random_ip(),
-    }
-    return host
-
-
 def generate_random_agent():
     agent_id = f'{random.randint(0, 99):03d}'
-    agent = {
-        'id': agent_id,
-        'name': f'Agent{agent_id}',
-        'version': f'v{random.randint(0, 9)}-stable',
-        'host': generate_random_host()
+    return {
+        "id": agent_id,
+        "name": f"Agent{random.randint(0, 99)}",
+        "version": f"v{random.randint(0, 9)}-stable",
+        "host": generate_random_host(False),
     }
-    return agent
+
+def generate_random_host(is_root_level_level=False):
+    if is_root_level_level:
+        return {
+            "network": {
+                "egress": {
+                    "bytes": random.randint(1000, 1000000),
+                    "drops": random.randint(0, 100),
+                    "errors": random.randint(0, 100),
+                    "packets": random.randint(100, 10000),
+                },
+                "ingress": {
+                    "bytes": random.randint(1000, 1000000),
+                    "drops": random.randint(0, 100),
+                    "errors": random.randint(0, 100),
+                    "packets": random.randint(100, 10000),
+                },
+            },
+        }
+    else:
+        return {
+            "architecture": random.choice(["x86_64", "arm64"]),
+            "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
+        }
+
+def generate_random_network():
+    return {"type": random.choice(["wired", "wireless"])}
 
 
-def generate_random_package():
-  package_name = f'package_{random.randint(1, 255)}'
-  return {
-      "architecture": random.choice(["x86_64", "arm64"]),
-      "description": f"description{random.randint(0, 9999)}",
-      "groups": f"group{random.randint(1, 100)}",
-      "installed": generate_random_date(),
-      "name": f"package{random.randint(0, 9999)}",
-      "path": f"/path/to/package{random.randint(0, 9999)}",
-      "vendor": random.choice(["Microsoft", "Canonical", "Apple", "RedHat"]),
-      "version": f"{random.randint(0, 9)}.{random.randint(0, 9)}.{random.randint(0, 9)}",
-  }
+def generate_random_interface(is_root_level=False):
+    return {
+        "alias": f"alias{random.randint(0, 9999)}",
+        "id": f"eth{random.randint(0, 99)}",
+        "mtu": f"{random.randint(1000000, 99999999)}",
+        "name": f"name{random.randint(0, 9999)}",
+        "state": random.choice(["Active", "Inactive", "Unknown"]),
+        "type": random.choice(["wireless", "ethernet"]),
+    }
+
+def generate_random_observer():
+    return {"ingress": {"interface": generate_random_interface(False)}}
 
 
 def generate_random_operation():
     return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
-
 
 def generate_random_wazuh():
     return {
@@ -71,14 +87,15 @@ def generate_random_wazuh():
         "schema": {"version": "1.7.0"},
     }
 
-
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
   return {
       "@timestamp": generate_random_date(),
       "agent": generate_random_agent(),
-      "package": generate_random_package(),
+      "host": generate_random_host(True),
+      "network": generate_random_network(),
+      "observer": generate_random_observer(),
       "operation": generate_random_operation(),
       "wazuh": generate_random_wazuh(),
   }

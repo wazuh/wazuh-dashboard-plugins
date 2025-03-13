@@ -86,7 +86,7 @@ def generate_random_file():
 
 
 def generate_document(params):
-  # https://github.com/wazuh/wazuh-indexer/pull/717
+  # https://github.com/wazuh/wazuh-indexer/pull/744
 
   fim_mode = random.choice(['file', 'registry'])
 

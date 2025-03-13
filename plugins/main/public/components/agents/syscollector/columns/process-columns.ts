@@ -26,40 +26,38 @@ const mapColumns = (
 });
 
 const windowsColumns = [
-  { field: 'name', searchable: true, sortable: true, width: '10%' },
-  { field: 'pid', searchable: true, sortable: true },
-  { field: 'ppid', searchable: true, sortable: true },
-  { field: 'vm_size', searchable: true, sortable: true },
-  { field: 'priority', searchable: true, sortable: true },
-  { field: 'nlwp', searchable: true, sortable: true },
-  { field: 'cmd', searchable: true, sortable: true, width: '30%' },
-  // TODO: review if this is working as expected
-].map(mapColumns);
+  { id: 'process.name' },
+  { id: 'process.pid' },
+  { id: 'process.parent.pid' },
+  // { id: 'vm_size' },
+  // { id: 'priority' },
+  // { id: 'nlwp' },
+  { id: 'process.command_line' },
+];
 
 const linuxColumns = [
-  { field: 'name', searchable: true, sortable: true },
-  { field: 'euser', searchable: true, sortable: true },
-  { field: 'egroup', searchable: true, sortable: true },
-  { field: 'pid', searchable: true, sortable: true },
-  { field: 'ppid', searchable: true, sortable: true },
-  { field: 'vm_size', searchable: true, sortable: true },
-  { field: 'size', searchable: true, sortable: true },
-  { field: 'session', searchable: true, sortable: true },
-  { field: 'nice', searchable: true, sortable: true },
-  { field: 'state', searchable: true, sortable: true },
-  { field: 'cmd', searchable: true, sortable: true },
-  { field: 'argvs', searchable: true, sortable: true },
-].map(column => mapColumns(column, true));
+  { id: 'process.name' },
+  // { id: 'euser' },
+  // { id: 'egroup' },
+  { id: 'process.pid' },
+  { id: 'process.parent.pid' },
+  // { id: 'vm_size' },
+  // { id: 'size' },
+  // { id: 'session' },
+  // { id: 'nice' },
+  // { id: 'state' },
+  { id: 'process.command_line' },
+  { id: 'process.args' },
+];
 
 const macColumns = [
-  { field: 'name', searchable: true, sortable: true, width: '10%' },
-  { field: 'euser', searchable: true, sortable: true },
-  { field: 'pid', searchable: true, sortable: true },
-  { field: 'ppid', searchable: true, sortable: true },
-  { field: 'vm_size', searchable: true, sortable: true },
-  { field: 'nice', searchable: true, sortable: true },
-  // TODO: review if this is working as expected
-].map(mapColumns);
+  { id: 'process.name' },
+  // { id: 'euser' },
+  { id: 'process.pid' },
+  { id: 'process.parent.pid' },
+  // { id: 'vm_size' },
+  // { id: 'nice' },
+];
 
 export const processColumns = {
   windows: windowsColumns,

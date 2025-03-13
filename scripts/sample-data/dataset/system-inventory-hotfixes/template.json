@@ -43,36 +43,14 @@
       },
       "package": {
         "properties": {
-          "architecture": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "description": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "groups": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "installed": {
-            "type": "date"
-          },
-          "name": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "path": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "vendor": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "version": {
-            "ignore_above": 1024,
-            "type": "keyword"
+          "hotfix": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            },
+            "type": "object"
           }
         }
       },
@@ -106,12 +84,7 @@
     "index": {
       "number_of_replicas": "0",
       "number_of_shards": "1",
-      "query.default_field": [
-        "agent.id",
-        "package.architecture",
-        "package.name",
-        "package.version"
-      ],
+      "query.default_field": ["package.hotfix.name"],
       "refresh_interval": "5s"
     }
   }

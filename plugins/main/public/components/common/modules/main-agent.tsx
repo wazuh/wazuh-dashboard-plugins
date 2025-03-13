@@ -168,6 +168,7 @@ export class AgentInventoryDataSource extends AlertsDataSource {
 }
 
 const GenerateReportButton = ({ agent }: { agent: Agent }) => {
+  return null; // TODO: research if the user can generete a report from system agent inventory or not
   const {
     dataSource,
     fetchFilters,

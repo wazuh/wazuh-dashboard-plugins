@@ -8,7 +8,7 @@ import datetime
 
 index_template_file='template.json'
 default_count='10000'
-default_index_name_prefix='wazuh-states-inventory-packages'
+default_index_name_prefix='wazuh-states-inventory-ports'
 default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -44,18 +44,48 @@ def generate_random_agent():
     return agent
 
 
-def generate_random_package():
-  package_name = f'package_{random.randint(1, 255)}'
-  return {
-      "architecture": random.choice(["x86_64", "arm64"]),
-      "description": f"description{random.randint(0, 9999)}",
-      "groups": f"group{random.randint(1, 100)}",
-      "installed": generate_random_date(),
-      "name": f"package{random.randint(0, 9999)}",
-      "path": f"/path/to/package{random.randint(0, 9999)}",
-      "vendor": random.choice(["Microsoft", "Canonical", "Apple", "RedHat"]),
-      "version": f"{random.randint(0, 9)}.{random.randint(0, 9)}.{random.randint(0, 9)}",
-  }
+def generate_random_host(is_root_level=False):
+    if is_root_level:
+        return {
+            "network": {
+                "egress": {"queue": random.randint(0, 1000)},
+                "ingress": {"queue": random.randint(0, 1000)},
+            }
+        }
+    else:
+        return {
+            "architecture": random.choice(["x86_64", "arm64"]),
+            "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
+        }
+
+
+def generate_random_destination():
+    return {
+        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
+        "port": random.randint(0, 65535),
+    }
+
+
+def generate_random_device():
+    return {"id": f"device{random.randint(0, 9999)}"}
+
+
+def generate_random_file():
+    return {"inode": f"inode{random.randint(0, 9999)}"}
+
+
+def generate_random_process():
+    return {
+        "name": f"process{random.randint(0, 9999)}",
+        "pid": random.randint(0, 99999),
+    }
+
+
+def generate_random_source():
+    return {
+        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
+        "port": random.randint(0, 65535),
+    }
 
 
 def generate_random_operation():
@@ -78,10 +108,18 @@ def generate_document(params):
   return {
       "@timestamp": generate_random_date(),
       "agent": generate_random_agent(),
-      "package": generate_random_package(),
+      "destination": generate_random_destination(),
+      "device": generate_random_device(),
+      "file": generate_random_file(),
+      "host": generate_random_host(True),
+      "interface": {"state": random.choice(["LISTEN", "ESTABLISHED"])},
+      "network": {"transport": random.choice(["TCP", "UDP", "ICMP"])},
+      "process": generate_random_process(),
+      "source": generate_random_source(),
       "operation": generate_random_operation(),
       "wazuh": generate_random_wazuh(),
   }
+
 
 def generate_documents(params):
   for i in range(0, int(params["count"])):

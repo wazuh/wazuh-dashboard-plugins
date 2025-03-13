@@ -33,44 +33,62 @@
           }
         }
       },
-      "operation": {
+      "event": {
         "properties": {
-          "name": {
+          "id": {
             "ignore_above": 1024,
             "type": "keyword"
           }
         }
       },
-      "package": {
+      "host": {
         "properties": {
-          "architecture": {
+          "ip": {
+            "type": "ip"
+          }
+        }
+      },
+      "network": {
+        "properties": {
+          "broadcast": {
+            "type": "ip"
+          },
+          "dhcp": {
             "ignore_above": 1024,
             "type": "keyword"
           },
-          "description": {
+          "metric": {
+            "type": "long"
+          },
+          "netmask": {
+            "type": "ip"
+          },
+          "protocol": {
             "ignore_above": 1024,
             "type": "keyword"
-          },
-          "groups": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "installed": {
-            "type": "date"
-          },
+          }
+        }
+      },
+      "observer": {
+        "properties": {
+          "ingress": {
+            "properties": {
+              "interface": {
+                "properties": {
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
+              }
+            },
+            "type": "object"
+          }
+        }
+      },
+      "operation": {
+        "properties": {
           "name": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "path": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "vendor": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "version": {
             "ignore_above": 1024,
             "type": "keyword"
           }
@@ -107,10 +125,9 @@
       "number_of_replicas": "0",
       "number_of_shards": "1",
       "query.default_field": [
-        "agent.id",
-        "package.architecture",
-        "package.name",
-        "package.version"
+        "event.id",
+        "host.ip",
+        "observer.ingress.interface.name"
       ],
       "refresh_interval": "5s"
     }

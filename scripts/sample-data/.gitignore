@@ -1,0 +1,4 @@
+__pycache__
+
+# Wazuh indexer connection configuration
+connection.json
