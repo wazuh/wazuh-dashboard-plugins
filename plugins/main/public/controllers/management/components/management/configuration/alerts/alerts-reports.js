@@ -26,7 +26,10 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Generating automatic reports',
-    href: webDocumentationLink('user-manual/manager/automatic-reports.html'),
+    href: webDocumentationLink(
+      'user-manual/manager/automatic-reports.html',
+      '4.6',
+    ),
   },
   {
     text: 'Reports reference',
