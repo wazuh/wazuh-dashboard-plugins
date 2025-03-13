@@ -56,6 +56,7 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
     };
     const troubleshootingUrl = webDocumentationLink(
       'user-manual/elasticsearch/troubleshooting.html',
+      '4.4',
     );
     const message: ReactNode = (
       <>

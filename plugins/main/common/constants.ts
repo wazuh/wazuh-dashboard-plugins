@@ -313,7 +313,7 @@ export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_UPGRADE_PLATFORM =
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING =
   'user-manual/wazuh-dashboard/troubleshooting.html';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION =
-  'user-manual/wazuh-dashboard/config-file.html';
+  'user-manual/wazuh-dashboard/settings.html';
 export const PLUGIN_PLATFORM_URL_GUIDE =
   'https://opensearch.org/docs/2.10/about';
 export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'OpenSearch guide';

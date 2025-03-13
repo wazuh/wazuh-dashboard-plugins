@@ -33,7 +33,7 @@ export const ClusterDisabled = withErrorBoundary(
                   Visit the documentation on{' '}
                   <EuiLink
                     href={webDocumentationLink(
-                      'user-manual/configuring-cluster/index.html',
+                      'user-manual/wazuh-server-cluster/cluster-nodes-configuration.html',
                     )}
                     external
                     target='_blank'

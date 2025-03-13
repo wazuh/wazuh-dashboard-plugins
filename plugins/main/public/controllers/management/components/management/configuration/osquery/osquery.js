@@ -26,29 +26,33 @@ const mainSettings = [
   {
     field: 'disabled',
     label: 'Osquery integration status',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   { field: 'run_daemon', label: 'Auto-run the Osquery daemon' },
   { field: 'bin_path', label: 'Path to the Osquery executable' },
   { field: 'log_path', label: 'Path to the Osquery results log file' },
   { field: 'config_path', label: 'Path to the Osquery configuration file' },
-  { field: 'add_labels', label: 'Use defined labels as decorators' }
+  { field: 'add_labels', label: 'Use defined labels as decorators' },
 ];
 
 const helpLinks = [
   {
     text: 'Osquery module documentation',
-    href: webDocumentationLink('user-manual/capabilities/osquery.html')
+    href: webDocumentationLink(
+      'user-manual/capabilities/system-inventory/osquery.html',
+    ),
   },
   {
     text: 'Osquery module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-osquery.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-osquery.html',
+    ),
+  },
 ];
 
 const columns = [
   { field: 'name', name: 'Name' },
-  { field: 'path', name: 'Path' }
+  { field: 'path', name: 'Path' },
 ];
 
 class WzConfigurationOsquery extends Component {
@@ -80,12 +84,12 @@ class WzConfigurationOsquery extends Component {
         {currentConfig &&
           !this.wodleConfig.osquery &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.osquery && (
           <WzConfigurationSettingsHeader
-            title="Main settings"
-            description="General Osquery integration settings"
+            title='Main settings'
+            description='General Osquery integration settings'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
@@ -98,8 +102,8 @@ class WzConfigurationOsquery extends Component {
               this.wodleConfig.osquery.packs.length && (
                 <Fragment>
                   <WzConfigurationSettingsHeader
-                    title="Osquery packs"
-                    description="A pack contains multiple queries to quickly retrieve system information"
+                    title='Osquery packs'
+                    description='A pack contains multiple queries to quickly retrieve system information'
                   />
                   <EuiBasicTable
                     items={this.wodleConfig.osquery.packs}

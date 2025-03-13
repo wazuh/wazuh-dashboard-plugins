@@ -19,37 +19,41 @@ import withWzConfig from '../util-hocs/wz-config';
 import {
   isString,
   renderValueNoThenEnabled,
-  renderValueOrDefault
+  renderValueOrDefault,
 } from '../utils/utils';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const helpLinks = [
   {
     text: 'Anti-flooding mechanism',
-    href: webDocumentationLink('user-manual/capabilities/antiflooding.html')
+    href: webDocumentationLink(
+      'user-manual/agent/agent-management/antiflooding.html',
+    ),
   },
   {
     text: 'Client buffer reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/client-buffer.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/client-buffer.html',
+    ),
+  },
 ];
 
 const mainSettings = [
   {
     field: 'disabled',
     label: 'Buffer status',
-    render: renderValueNoThenEnabled
+    render: renderValueNoThenEnabled,
   },
   {
     field: 'queue_size',
     label: 'Queue size',
-    render: renderValueOrDefault('5000')
+    render: renderValueOrDefault('5000'),
   },
   {
     field: 'events_per_second',
     label: 'Events per second',
-    render: renderValueOrDefault('500')
-  }
+    render: renderValueOrDefault('500'),
+  },
 ];
 
 class WzConfigurationClientBuffer extends Component {
@@ -70,14 +74,14 @@ class WzConfigurationClientBuffer extends Component {
         {currentConfig['agent-buffer'] &&
           !isString(currentConfig['agent-buffer']) &&
           !currentConfig['agent-buffer'].buffer && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig['agent-buffer'] &&
           !isString(currentConfig['agent-buffer']) &&
           currentConfig['agent-buffer'].buffer && (
             <WzConfigurationSettingsHeader
-              title="Main settings"
-              description="These settings determine the event processing rate for the agent"
+              title='Main settings'
+              description='These settings determine the event processing rate for the agent'
               help={helpLinks}
             >
               <WzConfigurationSettingsGroup
