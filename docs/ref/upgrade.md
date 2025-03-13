@@ -1,5 +1,7 @@
 # Upgrade
 
+> Note: You need root user privileges to run all the commands described below.
+
 ## Backup files
 
 Backup the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file to save your settings. For example, create a copy of the file using the following command:
@@ -13,13 +15,13 @@ sudo cp /etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/open
 - RPM-based operating system:
 
 ```console
-sudo yum upgrade wazuh-dashboard|WAZUH_DASHBOARD_RPM_PKG_INSTALL|
+sudo yum upgrade wazuh-dashboard
 ```
 
 - Debian-based operating system:
 
 ```console
-sudo apt-get install wazuh-dashboard|WAZUH_DASHBOARD_DEB_PKG_INSTALL|
+sudo apt-get install wazuh-dashboard
 ```
 
 > Note: When prompted, choose to replace the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file with the updated version.
@@ -56,7 +58,7 @@ sudo update-rc.d wazuh-dashboard defaults 95 10
 sudo service wazuh-dashboard start
 ```
 
-You can now access the Wazuh dashboard via: `https://<DASHBOARD_IP_ADDRESS>/app/wz-home`.
+You can now access the Wazuh dashboard via: `https://<DASHBOARD_IP_ADDRESS>`.
 
 > Note that the upgrade process doesn't update plugins installed manually. Outdated plugins might cause the upgrade to fail.
 
@@ -77,7 +79,7 @@ sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plu
 
 ## Verify the installed version
 
-The Wazuh server, indexer, and dashboard are now successfully upgraded. You can verify the versions by running the following commands on the node(s) where the central components are installed:
+The Wazuh dashboard is now successfully upgraded. You can verify the version by running the following command on the host:
 
 - RPM-based operating system:
 

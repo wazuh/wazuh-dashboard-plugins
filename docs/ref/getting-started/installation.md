@@ -10,13 +10,13 @@ Install and configure the Wazuh dashboard following step-by-step instructions. T
 
 Install the following packages if missing.
 
-- `yum`
+- RPM-based operating system:
 
 ```console
 sudo yum install libcap
 ```
 
-- `apt`
+- Debian-based operating system:
 
 ```console
 sudo apt-get install debhelper tar curl libcap2-bin #debhelper version 9 or later
@@ -24,9 +24,9 @@ sudo apt-get install debhelper tar curl libcap2-bin #debhelper version 9 or late
 
 ### Installing Wazuh dashboard
 
-#### Installing using a package manager
+#### Installing with package manager
 
-> Note: The packages are not hosted in the Wazuh repository at the moment, so you must download the package from the internal resource and [install the local package](#install-local-package).
+<div class='warning'>The packages are not hosted in the Wazuh repository at the moment, so you must download the package from the internal resource and <a href='#install-local-package'>install the local package</a>.</div>
 
 ##### Adding the Wazuh repository
 
@@ -110,18 +110,38 @@ Edit the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file and replace the f
 
 - `opensearch.hosts`: The URLs of the Wazuh indexer instances to use for all your queries. The Wazuh dashboard can be configured to connect to multiple Wazuh indexer nodes in the same cluster. The addresses of the nodes can be separated by commas. For example, `["https://10.0.0.2:9200", "https://10.0.0.3:9200","https://10.0.0.4:9200"]`
 
-For example:
+Example:
 
 ```yaml
 server.host: 0.0.0.0
-server.port: 443
 opensearch.hosts: https://localhost:9200
-opensearch.ssl.verificationMode: certificate
 ```
 
 ### Deploying certificates
 
-The configuration of certificates in Wazuh dashboard allows to serve the application in **https** protocol and validates the authentication against the Wazuh indexer.
+The configuration of certificates in Wazuh dashboard allows to enable TLS for HTTPS.
+
+The default configuration defines that certificates should be located at `/etc/wazuh-dashboard/certs` directory:
+
+- `root-ca.pem`: Root certificate that identifies to the root certificate authority (CA).
+- `dashboard.pem`: Wazuh dashboard certificate.
+- `dashboard-key.pem`: Wazuh dashboard certificate key.
+
+```yml
+server.ssl.enabled: true
+server.ssl.key: '/etc/wazuh-dashboard/certs/dashboard-key.pem'
+server.ssl.certificate: '/etc/wazuh-dashboard/certs/dashboard.pem'
+opensearch.ssl.verificationMode: certificate
+opensearch.ssl.certificateAuthorities:
+  ['/etc/wazuh-dashboard/certs/root-ca.pem']
+```
+
+You can configure self-signed or from a trusted CA certificates.
+
+Ensure the certificates files have the following permissions:
+
+- only read by the owner user: `400`
+- owned by `wazuh-dashboard` user and `wazuh-dashboard` group
 
 #### Using the wazuh-certificates.tar file
 
@@ -145,29 +165,13 @@ sudo chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
 
 #### Using other certificates
 
-The default configuration of Wazuh dashboard defines the certificates that should be located at `/etc/wazuh-dashboard/certs` directory:
-
-- `root-ca.pem`: Root certificate that identifies to the root certificate authority (CA).
-- `dashboard.pem`: Wazuh dashboard certificate.
-- `dashboard-key.pem`: Wazuh dashboard certificate key.
-
-```yml
-opensearch.ssl.verificationMode: certificate
-server.ssl.key: '/etc/wazuh-dashboard/certs/dashboard-key.pem'
-server.ssl.certificate: '/etc/wazuh-dashboard/certs/dashboard.pem'
-opensearch.ssl.certificateAuthorities:
-  ['/etc/wazuh-dashboard/certs/root-ca.pem']
-```
-
-> Note: rename the certificate files to match the expected names and place them in the expected location or change the path to the certificates in the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file to match where the files are located. Ensure they has the expected permissions (`400` and owned by `wazuh-dashboard:wazuh-dashboard`).
-
-Create the directory to store the certificates, copy the files in the expected location and set the permissions:
+Create the directory to store the certificates, copy the files and set the permissions:
 
 Replace:
 
-- `<WAZUH_DASHBOARD_ROOT_CA_PATH>` with the path to the root CA file
-- `<WAZUH_DASHBOARD_CERTIFICATE_PATH>` with the path to the Wazuh dashbaord certificate file
-- `<WAZUH_DASHBOARD_CERTIFICATE_KEY_PATH>` with the path to Wazuh dashbaord certificate key file
+- `<WAZUH_DASHBOARD_ROOT_CA_PATH>` with the path to the root CA file.
+- `<WAZUH_DASHBOARD_CERTIFICATE_PATH>` with the path to the Wazuh dashboard certificate file.
+- `<WAZUH_DASHBOARD_CERTIFICATE_KEY_PATH>` with the path to Wazuh dashboard certificate key file.
 
 ```console
 WAZUH_DASHBOARD_ROOT_CA_PATH=<WAZUH_DASHBOARD_ROOT_CA_PATH>
@@ -217,15 +221,13 @@ sudo service wazuh-dashboard start
 - **Username**: `admin`
 - **Password**: `admin`
 
-When you access the Wazuh dashboard for the first time, the browser shows a warning message stating that the certificate was not issued by a trusted authority. An exception can be added in the advanced options of the web browser. For increased security, the `root-ca.pem` file previously generated can be imported to the certificate manager of the browser. Alternatively, a certificate from a trusted authority can be configured.
+When you access the Wazuh dashboard for the first time, if you configured self-signed certificates, the browser shows a warning message stating that the certificate was not issued by a trusted authority. An exception can be added in the advanced options of the web browser. For increased security, the `root-ca.pem` file can be imported to the certificate manager of the browser. Alternatively, a certificate from a trusted authority can be configured.
 
-### Post installation
+### Post-installation
 
 #### Prevent accidental upgrades
 
-**Recommended Action**: Disable Wazuh updates.
-
-If you added the package repository, then we recommend disabling the Wazuh package repositories after installation to prevent accidental upgrades that could break the environment.
+If you added the Wazuh package repository, then **we recommend disabling the Wazuh package repository after installation** to prevent accidental upgrades that could break the environment.
 
 Execute the following command to disable the Wazuh repository:
 

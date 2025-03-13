@@ -2,6 +2,8 @@
 
 Remove the Wazuh dashboard installation.
 
+> Note: You need root user privileges to run all the commands described below.
+
 - RPM-based operating system:
 
 ```console
