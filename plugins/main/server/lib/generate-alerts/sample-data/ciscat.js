@@ -11,7 +11,7 @@
  */
 
 // CIS-CAT
-// More info https://documentation.wazuh.com/3.12/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html
+// More info https://documentation.wazuh.com/4.8/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html
 module.exports.ruleTitle = [
   'CIS-CAT 1',
   'CIS-CAT 2',

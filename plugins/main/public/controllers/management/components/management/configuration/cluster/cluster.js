@@ -72,7 +72,9 @@ const haproxySettings = [
 const helpLinks = [
   {
     text: 'Configuring a cluster',
-    href: webDocumentationLink('user-manual/configuring-cluster/index.html'),
+    href: webDocumentationLink(
+      'user-manual/wazuh-server-cluster/cluster-nodes-configuration.html',
+    ),
   },
   {
     text: 'Cluster reference',
