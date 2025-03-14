@@ -39,7 +39,6 @@ export const TableIndexer = (props: {
     agentSelected,
     setAllAgentsSelected,
     setParams,
-    // documentDetailsExtraTabs,
   } = props;
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [pagination, setPagination] = useState({
@@ -81,10 +80,18 @@ export const TableIndexer = (props: {
     setLoadingSearch(true);
     getAgentManagement()
       .getAll({
-        filter: filters,
+        filters,
         query,
         pagination,
-        sort: { field: sorting.sort.field, direction: sorting.sort.direction },
+        sort: {
+          columns: [
+            {
+              // With the _source it does not do the sorting correctly
+              id: sorting.sort.field.replace('_source.', ''),
+              direction: sorting.sort.direction,
+            },
+          ],
+        },
       })
       .then(results => {
         setResults(results);

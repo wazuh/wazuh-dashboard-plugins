@@ -46,7 +46,7 @@ export const AgentDetails = ({
     getAgentManagement()
       .getByAgentId(id)
       .then((results: any) => {
-        setAgentData(results?.hits?.[0]);
+        setAgentData(results);
         setIsAgentLoading(false);
       })
       .catch((error: any) => {
@@ -184,8 +184,7 @@ export const AgentDetails = ({
   //     content: tabContent(<div>Configuration</div>),
   //   },
   // ];
-
-  return (
+  const renderViewAgent = (
     <>
       <EuiPageHeader
         pageTitle={agentData?._source.agent?.name}
@@ -277,4 +276,7 @@ export const AgentDetails = ({
       /> */}
     </>
   );
+  const renderNoAgent = <EuiPageHeader pageTitle={'Agent not found'} />;
+
+  return agentData === null ? renderNoAgent : renderViewAgent;
 };

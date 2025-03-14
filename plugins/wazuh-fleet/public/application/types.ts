@@ -7,7 +7,7 @@ export interface ISearch {
 }
 
 export interface IGetAllParams {
-  filter?: any[];
+  filters?: any[];
   query?: string;
   pagination?: {
     pageSize: number;
