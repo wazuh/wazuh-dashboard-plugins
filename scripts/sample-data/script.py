@@ -5,71 +5,110 @@ import warnings
 from importlib import import_module
 import logging
 import sys
+from lib.configuration import Configuration
+from lib.dashboard import OpenSearchDashboards
 
 warnings.filterwarnings("ignore")
 
-def get_opensearch_connection():
-  verified = False
-  connection_config_file='connection.json'
-  if os.path.exists(connection_config_file):
-    with open(connection_config_file) as configFile:
-      config = json.load(configFile)
-      if 'ip' not in config or 'port' not in config or 'username' not in config or 'password' not in config:
-        print('\nConnection configuration file is not properly configured. Continuing without it.')
-      else:
-        verified = True
-  else:
-    print('\nConnection configuration file not found. Continuing without it.')
+configuration_file='config.json'
 
-  if not verified:
-    ip = input("\nEnter the IP of your Indexer [default=0.0.0.0]: \n")
-    if ip == '':
-      ip = '0.0.0.0'
+def get_config_indexer(config = None):
+  default_ip='0.0.0.0'
+  default_port='9200'
+  default_username='admin'
+  default_password='admin'
+  ip = input(f"Enter the IP of your Indexer [default={default_ip}]: ")
+  if ip == '':
+    ip = default_ip
 
-    port = input("\nEnter the port of your Indexer [default=9200]: \n")
-    if port == '':
-      port = '9200'
+  port = input(f"\nEnter the port of your Indexer [default={default_port}]: ")
+  if port == '':
+    port = default_port
 
-    username = input("\nUsername [default=admin]: \n")
-    if username == '':
-      username = 'admin'
+  username = input(f"\nUsername [default={default_username}]: ")
+  if username == '':
+    username = default_username
 
-    password = input("\nPassword [default=admin]: \n")
-    if password == '':
-      password = 'admin'
+  password = input(f"\nPassword [default={default_password}]: ")
+  if password == '':
+    password = default_password
 
-    config = {'ip':ip,'port':port,'username':username,'password':password}
+  return {'ip':ip,'port':port,'username':username,'password':password}
 
-    store = input("\nDo you want to store these settings for future use? (y/n) [default=n] \n")
-    if store == '':
-        store = 'n'
+def get_config_dashboard(config = None):
+  default_url='https://localhost:5601'
+  default_username='admin'
+  default_password='admin'
+  url = input(f"Enter the URL of your Dashboard [default={default_url}]: ")
+  if url == '':
+    url = default_url
 
-    while store != 'y' and store != 'n':
-        store = input("\nInvalid option.\n Do you want to store these settings for future use? (y/n) \n")
-    if store == 'y':
-      with open(connection_config_file, 'w') as configFile:
-        json.dump(config, configFile)
-  return config
+  username = input(f"\nUsername [default={default_username}]: ")
+  if username == '':
+    username = default_username
+
+  password = input(f"\nPassword [default={default_password}]: ")
+  if password == '':
+    password = default_password
+
+  return {'url':url,'username':username,'password':password}
 
 
 def main():
-    config = get_opensearch_connection()
-    client = OpenSearch([{'host':config['ip'],'port':config['port']}], http_auth=(config['username'], config['password']), use_ssl=True, verify_certs=False)
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(level=logging.INFO)
+    dataset = sys.argv[1]
 
-    if not client.ping():
+    log_level = logging.DEBUG if '--debug' in sys.argv else logging.INFO
+
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=log_level)
+
+    if not dataset:
+      logger.error('No dataset selected')
+      sys.exit(1)
+
+
+    # Get configuration
+    configuration = Configuration(configuration_file, {'log_level': log_level})
+    config = configuration.load()
+
+    # Register configuration
+    # Indexer
+    configuration.register('indexer', get_config_indexer, lambda config: 'ip' in config or 'port' in config or 'username' in config or 'password' in config )
+    # Dashboard
+    configuration.register('dashboard', get_config_dashboard, lambda config: 'url' in config or 'username' in config or 'password' in config )
+
+    # Create clients
+    # Indexer client
+    indexer_client_config = configuration.get('indexer')
+    indexer_client = OpenSearch([{
+      'host':indexer_client_config['ip'],
+      'port':indexer_client_config['port']
+      }],
+      http_auth=(indexer_client_config['username'], indexer_client_config['password']),
+      use_ssl=True,
+      verify_certs=False
+    )
+
+    if not indexer_client.ping():
       logger.error('Could not connect to the indexer')
       return
 
-    module_name = sys.argv[1]
+    # Dashboard client
+    dashboard_client_config = configuration.get('dashboard')
+    dashboard_client = OpenSearchDashboards(dashboard_client_config['url'], (dashboard_client_config['username'], dashboard_client_config['password']), {'log_level': log_level})
 
-    if not module_name:
-      logger.error('No dataset selected')
-
-    module = import_module(f'dataset.{module_name}.main')
-    logger.info(f'Running dataset [{module_name}]')
-    module.main({"client":client, "logger": logging.getLogger(module_name)})
+    # Load dataset
+    module = import_module(f'dataset.{dataset}.main')
+    logger.info(f'Running dataset [{dataset}]')
+    dataset_logger = logging.getLogger(dataset)
+    dataset_logger.setLevel(log_level)
+    module.main({
+      "dataset": dataset,
+      "logger": logging.getLogger(dataset),
+      "configuration": configuration,
+      "indexer_client":indexer_client,
+      "dashboard_client": dashboard_client,
+    })
 
 if __name__=="__main__":
   main()

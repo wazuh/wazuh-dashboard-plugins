@@ -1,11 +1,11 @@
 # Sample data injector
 
-This script generates sample data for different datasets and injects the data into an index on a Wazuh indexer instance.
+This script generates sample data for different datasets and injects the data into an index on a Wazuh indexer instance and optionally creates the index pattern.
 
 ## Files
 
 - `script.py`: main script file
-- `connection.json`: persistence of Wazuh indexer connection details
+- `config.json`: persistence of configuration
 - `datasets`: directory that contains the available datasets
 
 # Getting started
@@ -51,23 +51,26 @@ This script must define a `main` function that is run when the dataset creator i
 This receives the following parameters:
 
 - context:
-  - client: OpenSearch client to interact with the Wazuh indexer instance
-  - logger: a logger
+  - dataset: dataset name
+  - logger: dataset logger
+  - configuration: configuration client
+  - indexer_client: OpenSearch client to interact with the Wazuh indexer instance
+  - dashboard_client: HTTP client to interact with the Wazuh dashboard API
 
 See some built-in dataset to know more.
 
 # Exploring the data on Wazuh dashboard
 
 The indexed data needs an index pattern that match with the index of the data to be explorable on
-on Wazuh dashboard. So, if this is not created by another source, tt could be necessary to create
+on Wazuh dashboard. So, if this is not created by another source, it could be necessary to create
 the index pattern manually if it was not previously created.
 
 In the case it does not exist, create it with from Dashboard management > Dashboard Management > Index patterns:
 
-- title: `wazuh-DATASET_NAME*`.
+- title: `wazuh-DATASET_NAME`.
 
 where:
 
 - `DATASET_NAME` is the name of the dataset.
 
-example: `wazuh-states-fim*`.
+example: `wazuh-states-fim`.

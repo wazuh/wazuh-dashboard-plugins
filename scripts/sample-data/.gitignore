@@ -1,4 +1,4 @@
 __pycache__
 
-# Wazuh indexer connection configuration
-connection.json
+# Sample data generator configuration
+config.json

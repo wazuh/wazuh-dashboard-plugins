@@ -1,10 +1,8 @@
 import random
-import sys
 import os.path
-import json
-from opensearchpy import helpers
 from pathlib import Path
 import datetime
+from lib.indexer_dashboard import setup_dataset_index_index_pattern
 
 index_template_file='template.json'
 default_count='10000'
@@ -132,39 +130,10 @@ def input_question(message, options = {}):
 
 
 def main(ctx):
-  client = ctx["client"]
-  logger = ctx["logger"]
-  logger.info('Getting configuration')
-
-  config = get_params(ctx)
-  logger.info(f'Config {config}')
-
-  resolved_index_template_file = os.path.join(Path(__file__).parent, index_template_file)
-
-  logger.info(f'Checking existence of index [{config["index_name"]}]')
-  if client.indices.exists(config["index_name"]):
-    logger.info(f'Index found [{config["index_name"]}]')
-    should_delete_index = input_question(f'Remove the [{config["index_name"]}] index? [Y/n]', {"default_value": 'Y'})
-    if should_delete_index == 'Y':
-      client.indices.delete(config["index_name"])
-      logger.info(f'Index [{config["index_name"]}] deleted')
-    else:
-      logger.error(f'Index found [{config["index_name"]}] should be removed before create and insert documents')
-      sys.exit(1)
-
-  if not os.path.exists(resolved_index_template_file):
-    logger.error(f'Index template found [{resolved_index_template_file}]')
-    sys.exit(1)
-
-  with open(resolved_index_template_file) as templateFile:
-    index_template = json.load(templateFile)
-    try:
-      client.indices.create(index=config["index_name"], body=index_template)
-      logger.info(f'Index [{config["index_name"]}] created')
-    except Exception as e:
-      logger.error(f'Error: {e}')
-      sys.exit(1)
-
-  helpers.bulk(client, generate_documents(config), index=config['index_name'])
-  logger.info(f'Data was indexed into [{config["index_name"]}]')
+  setup_dataset_index_index_pattern(ctx,
+    template_file=os.path.join(Path(__file__).parent, index_template_file),
+    generate_document=generate_document,
+    default_index_name=default_index_name,
+    default_count=default_count
+  )
 
