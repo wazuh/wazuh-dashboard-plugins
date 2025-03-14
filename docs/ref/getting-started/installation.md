@@ -114,7 +114,7 @@ Example:
 
 ```yaml
 server.host: 0.0.0.0
-opensearch.hosts: https://localhost:9200
+opensearch.hosts: https://127.0.0.1:9200
 ```
 
 ### Deploying certificates
