@@ -934,6 +934,14 @@
     "readFromDocValues": true
   },
   {
+    "name": "vulnerability.scanner.reference",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "vulnerability.scanner.source",
     "type": "string",
     "esTypes": ["keyword"],
