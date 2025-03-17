@@ -35,11 +35,7 @@ usage() {
 
 check_dependencies() {
   # Check if all required dependencies are installed
-  local deps=()
-
-  if [[ $# -gt 0 && "$1" == "--deps" ]]; then
-    deps=("${@:2}") # Use all arguments after --deps
-  fi
+  local deps=("$@")
 
   for cmd in "${deps[@]}"; do
     if ! command -v "$cmd" &>/dev/null; then
@@ -62,7 +58,7 @@ has_mappings() {
 }
 
 main() {
-  check_dependencies --deps rg jq
+  check_dependencies rg jq
 
   local field="$1" # e.g., metadata.author.name
 
