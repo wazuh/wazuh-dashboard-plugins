@@ -74,7 +74,7 @@ main() {
 
   local last_field="${field##*.}"
 
-  echo -e "${YELLOW}Searching for field:${NC} $field"
+  echo -e "${BLUE}Searching for field:${NC} ${UNDERLINE}$field${NC}\n"
 
   # This script will check if a field exists in a file
   local files="$(rg --iglob "\!plugins/main" --iglob "*.json" "\"$last_field\":" -l)"
@@ -93,15 +93,20 @@ main() {
       echo -e "${BLUE}Checking:${NC} ${MAGENTA}$file${NC}"
       if [[ -n $field_object && $field_object != "null" ]]; then
         found=true
-        field_object="{ \"$field\": $field_object }"
-        echo "$field_object" | jq 2>/dev/null
+        echo
+        echo "{ \"$field\": $field_object }" | jq 2>/dev/null
+      else
+        echo
+        logWarn "Field '${UNDERLINE}$field${NC}' not found in this file."
       fi
       echo
+      echo -e "${GRAY}$(printf '=%.0s' {1..80})${NC}"
     fi
   done <<<"$files"
 
   if [[ "$found" == "false" ]]; then
-    echo -e "${YELLOW}Field '$field' was not found in any mapping properties.${NC}"
+    echo
+    logWarn "Field '${UNDERLINE}$field${NC}' was not found in any mapping properties."
   fi
 }
 
