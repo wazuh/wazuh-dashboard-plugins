@@ -1,4 +1,5 @@
 {
+  "index_patterns": ["wazuh-states-fim-files*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",
@@ -33,19 +34,24 @@
           }
         }
       },
-      "destination": {
+      "data_stream": {
         "properties": {
-          "ip": {
-            "type": "ip"
-          },
-          "port": {
-            "type": "long"
+          "type": {
+            "type": "keyword"
           }
         }
       },
-      "device": {
+      "event": {
         "properties": {
-          "id": {
+          "action": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "category": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "type": {
             "ignore_above": 1024,
             "type": "keyword"
           }
@@ -53,45 +59,54 @@
       },
       "file": {
         "properties": {
+          "gid": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "group": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "hash": {
+            "properties": {
+              "md5": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "sha1": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "sha256": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              }
+            }
+          },
           "inode": {
             "ignore_above": 1024,
             "type": "keyword"
-          }
-        }
-      },
-      "host": {
-        "properties": {
-          "network": {
-            "properties": {
-              "egress": {
-                "properties": {
-                  "queue": {
-                    "type": "long"
-                  }
-                }
-              },
-              "ingress": {
-                "properties": {
-                  "queue": {
-                    "type": "long"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "interface": {
-        "properties": {
-          "state": {
+          },
+          "mtime": {
+            "type": "date"
+          },
+          "owner": {
             "ignore_above": 1024,
             "type": "keyword"
-          }
-        }
-      },
-      "network": {
-        "properties": {
-          "transport": {
+          },
+          "path": {
+            "fields": {
+              "text": {
+                "type": "text"
+              }
+            },
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "size": {
+            "type": "long"
+          },
+          "uid": {
             "ignore_above": 1024,
             "type": "keyword"
           }
@@ -102,32 +117,6 @@
           "name": {
             "ignore_above": 1024,
             "type": "keyword"
-          }
-        }
-      },
-      "process": {
-        "properties": {
-          "name": {
-            "fields": {
-              "text": {
-                "type": "text"
-              }
-            },
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "pid": {
-            "type": "long"
-          }
-        }
-      },
-      "source": {
-        "properties": {
-          "ip": {
-            "type": "ip"
-          },
-          "port": {
-            "type": "long"
           }
         }
       },
@@ -157,15 +146,32 @@
       }
     }
   },
+  "order": 1,
   "settings": {
     "index": {
       "number_of_replicas": "0",
       "number_of_shards": "1",
       "query.default_field": [
+        "agent.host.architecture",
+        "agent.host.ip",
         "agent.id",
-        "process.name",
-        "source.ip",
-        "destination.ip"
+        "agent.name",
+        "agent.version",
+        "data_stream.type",
+        "event.action",
+        "event.category",
+        "event.type",
+        "file.gid",
+        "file.group",
+        "file.hash.md5",
+        "file.hash.sha1",
+        "file.hash.sha256",
+        "file.inode",
+        "file.mtime",
+        "file.owner",
+        "file.path",
+        "file.size",
+        "file.uid"
       ],
       "refresh_interval": "5s"
     }

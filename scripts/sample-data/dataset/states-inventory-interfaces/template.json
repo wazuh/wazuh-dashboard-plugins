@@ -1,4 +1,5 @@
 {
+  "index_patterns": ["wazuh-states-inventory-interfaces*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",
@@ -33,37 +34,53 @@
           }
         }
       },
-      "event": {
-        "properties": {
-          "id": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          }
-        }
-      },
       "host": {
         "properties": {
-          "ip": {
-            "type": "ip"
+          "mac": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "network": {
+            "properties": {
+              "egress": {
+                "properties": {
+                  "bytes": {
+                    "type": "long"
+                  },
+                  "drops": {
+                    "type": "long"
+                  },
+                  "errors": {
+                    "type": "long"
+                  },
+                  "packets": {
+                    "type": "long"
+                  }
+                }
+              },
+              "ingress": {
+                "properties": {
+                  "bytes": {
+                    "type": "long"
+                  },
+                  "drops": {
+                    "type": "long"
+                  },
+                  "errors": {
+                    "type": "long"
+                  },
+                  "packets": {
+                    "type": "long"
+                  }
+                }
+              }
+            }
           }
         }
       },
       "network": {
         "properties": {
-          "broadcast": {
-            "type": "ip"
-          },
-          "dhcp": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "metric": {
-            "type": "long"
-          },
-          "netmask": {
-            "type": "ip"
-          },
-          "protocol": {
+          "type": {
             "ignore_above": 1024,
             "type": "keyword"
           }
@@ -75,7 +92,26 @@
             "properties": {
               "interface": {
                 "properties": {
+                  "alias": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "mtu": {
+                    "type": "long"
+                  },
                   "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "state": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
                     "ignore_above": 1024,
                     "type": "keyword"
                   }
@@ -120,14 +156,16 @@
       }
     }
   },
+  "order": 1,
   "settings": {
     "index": {
       "number_of_replicas": "0",
       "number_of_shards": "1",
       "query.default_field": [
-        "event.id",
-        "host.ip",
-        "observer.ingress.interface.name"
+        "agent.id",
+        "agent.ip",
+        "observer.ingress.interface.name",
+        "observer.ingress.interface.alias"
       ],
       "refresh_interval": "5s"
     }

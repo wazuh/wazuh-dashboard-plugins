@@ -1,14 +1,12 @@
 import random
-import sys
 import os.path
-import json
-from opensearchpy import helpers
 from pathlib import Path
 import datetime
+from lib.indexer_dashboard import setup_dataset_index_index_pattern
 
 index_template_file='template.json'
 default_count='10000'
-default_index_name_prefix='wazuh-states-inventory-interfaces'
+default_index_name_prefix='wazuh-states-inventory-ports'
 default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
@@ -24,32 +22,25 @@ def generate_random_date():
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date.strftime(DATE_FORMAT)
 
+
 def generate_random_agent():
     agent_id = f'{random.randint(0, 99):03d}'
-    return {
-        "id": agent_id,
-        "name": f"Agent{random.randint(0, 99)}",
-        "version": f"v{random.randint(0, 9)}-stable",
-        "host": generate_random_host(False),
+    agent = {
+        'id': agent_id,
+        'name': f'Agent{agent_id}',
+        'version': f'v{random.randint(0, 9)}-stable',
+        'host': generate_random_host()
     }
+    return agent
 
-def generate_random_host(is_root_level_level=False):
-    if is_root_level_level:
+
+def generate_random_host(is_root_level=False):
+    if is_root_level:
         return {
             "network": {
-                "egress": {
-                    "bytes": random.randint(1000, 1000000),
-                    "drops": random.randint(0, 100),
-                    "errors": random.randint(0, 100),
-                    "packets": random.randint(100, 10000),
-                },
-                "ingress": {
-                    "bytes": random.randint(1000, 1000000),
-                    "drops": random.randint(0, 100),
-                    "errors": random.randint(0, 100),
-                    "packets": random.randint(100, 10000),
-                },
-            },
+                "egress": {"queue": random.randint(0, 1000)},
+                "ingress": {"queue": random.randint(0, 1000)},
+            }
         }
     else:
         return {
@@ -57,26 +48,39 @@ def generate_random_host(is_root_level_level=False):
             "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
         }
 
-def generate_random_network():
-    return {"type": random.choice(["wired", "wireless"])}
 
-
-def generate_random_interface(is_root_level=False):
+def generate_random_destination():
     return {
-        "alias": f"alias{random.randint(0, 9999)}",
-        "id": f"eth{random.randint(0, 99)}",
-        "mtu": f"{random.randint(1000000, 99999999)}",
-        "name": f"name{random.randint(0, 9999)}",
-        "state": random.choice(["Active", "Inactive", "Unknown"]),
-        "type": random.choice(["wireless", "ethernet"]),
+        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
+        "port": random.randint(0, 65535),
     }
 
-def generate_random_observer():
-    return {"ingress": {"interface": generate_random_interface(False)}}
+
+def generate_random_device():
+    return {"id": f"device{random.randint(0, 9999)}"}
+
+
+def generate_random_file():
+    return {"inode": f"inode{random.randint(0, 9999)}"}
+
+
+def generate_random_process():
+    return {
+        "name": f"process{random.randint(0, 9999)}",
+        "pid": random.randint(0, 99999),
+    }
+
+
+def generate_random_source():
+    return {
+        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
+        "port": random.randint(0, 65535),
+    }
 
 
 def generate_random_operation():
     return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
+
 
 def generate_random_wazuh():
     return {
@@ -87,23 +91,29 @@ def generate_random_wazuh():
         "schema": {"version": "1.7.0"},
     }
 
+
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
   return {
       "@timestamp": generate_random_date(),
       "agent": generate_random_agent(),
+      "destination": generate_random_destination(),
+      "device": generate_random_device(),
+      "file": generate_random_file(),
       "host": generate_random_host(True),
-      "network": generate_random_network(),
-      "observer": generate_random_observer(),
+      "interface": {"state": random.choice(["LISTEN", "ESTABLISHED"])},
+      "network": {"transport": random.choice(["TCP", "UDP", "ICMP"])},
+      "process": generate_random_process(),
+      "source": generate_random_source(),
       "operation": generate_random_operation(),
       "wazuh": generate_random_wazuh(),
   }
 
+
 def generate_documents(params):
   for i in range(0, int(params["count"])):
     yield generate_document({"id": i})
-
 
 def main(ctx):
   setup_dataset_index_index_pattern(ctx,

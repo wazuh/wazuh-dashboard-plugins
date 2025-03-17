@@ -39,6 +39,9 @@ def helper_create_index(client, index_name, template_file, logger):
 
   with open(template_file) as templateFile:
     index_template = json.load(templateFile)
+    # Remove index_patterns and order that is not used in the index settings
+    del index_template['index_patterns']
+    del index_template['order']
     try:
       client.indices.create(index= index_name, body=index_template)
       logger.info(f'Index [{index_name}] created')

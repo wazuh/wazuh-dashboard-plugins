@@ -1,4 +1,5 @@
 {
+  "index_patterns": ["wazuh-states-inventory-packages*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",
@@ -33,84 +34,6 @@
           }
         }
       },
-      "data_stream": {
-        "properties": {
-          "type": {
-            "type": "keyword"
-          }
-        }
-      },
-      "event": {
-        "properties": {
-          "action": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "category": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "type": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          }
-        }
-      },
-      "file": {
-        "properties": {
-          "gid": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "group": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "hash": {
-            "properties": {
-              "md5": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              },
-              "sha1": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              },
-              "sha256": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              }
-            }
-          },
-          "inode": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "mtime": {
-            "type": "date"
-          },
-          "owner": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "path": {
-            "fields": {
-              "text": {
-                "type": "text"
-              }
-            },
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "size": {
-            "type": "long"
-          },
-          "uid": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          }
-        }
-      },
       "operation": {
         "properties": {
           "name": {
@@ -119,17 +42,36 @@
           }
         }
       },
-      "registry": {
+      "package": {
         "properties": {
-          "data": {
-            "properties": {
-              "type": {
-                "ignore_above": 1024,
-                "type": "keyword"
-              }
-            }
+          "architecture": {
+            "ignore_above": 1024,
+            "type": "keyword"
           },
-          "value": {
+          "description": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "groups": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "installed": {
+            "type": "date"
+          },
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "path": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "vendor": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "version": {
             "ignore_above": 1024,
             "type": "keyword"
           }
@@ -161,33 +103,16 @@
       }
     }
   },
+  "order": 1,
   "settings": {
     "index": {
       "number_of_replicas": "0",
       "number_of_shards": "1",
       "query.default_field": [
-        "agent.host.architecture",
-        "agent.host.ip",
         "agent.id",
-        "agent.name",
-        "agent.version",
-        "data_stream.type",
-        "event.action",
-        "event.category",
-        "event.type",
-        "file.gid",
-        "file.group",
-        "file.hash.md5",
-        "file.hash.sha1",
-        "file.hash.sha256",
-        "file.inode",
-        "file.mtime",
-        "file.owner",
-        "file.path",
-        "file.size",
-        "file.uid",
-        "registry.data.type",
-        "registry.value"
+        "package.architecture",
+        "package.name",
+        "package.version"
       ],
       "refresh_interval": "5s"
     }

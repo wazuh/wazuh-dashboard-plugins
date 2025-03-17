@@ -6,7 +6,7 @@ from lib.indexer_dashboard import setup_dataset_index_index_pattern
 
 index_template_file='template.json'
 default_count='10000'
-default_index_name='wazuh-states-fim-sample'
+default_index_name='wazuh-states-fim-registries-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 def generate_random_host():
@@ -16,6 +16,13 @@ def generate_random_host():
     }
     return host
 
+def generate_random_unix_timestamp():
+  start_time = datetime.datetime(2000, 1, 1)
+  end_time = datetime.datetime.now()
+  random_time = start_time + datetime.timedelta(
+    seconds=random.randint(0, int((end_time - start_time).total_seconds()))
+  )
+  return int(random_time.timestamp())
 
 def generate_random_agent():
     agent_id = f'{random.randint(0, 99):03d}'
@@ -33,6 +40,7 @@ def generate_random_date():
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date.strftime(DATE_FORMAT)
 
+
 def generate_random_data_stream():
     data_stream = {"type": random.choice(["Scheduled", "Realtime"])}
     return data_stream
@@ -45,15 +53,32 @@ def generate_random_event():
         "type": "event",
     }
 
-def generate_random_operation():
-    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
-
 
 def generate_random_registry():
     return {
-        "data": {"type": random.choice(["REG_SZ", "REG_DWORD"])},
+        "data": {
+            "hash": {
+                "md5": f"{random.randint(0, 9999)}",
+                "sha1": f"{random.randint(0, 9999)}",
+                "sha256": f"{random.randint(0, 9999)}"
+            },
+            "type": random.choice(["REG_SZ", "REG_DWORD"]),
+        },
+        "gid": f"gid{random.randint(0, 1000)}",
+        "group": f"group{random.randint(0, 1000)}",
+        "hive": "HKLM",
+        "key": "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe",
+        "mtime": generate_random_unix_timestamp(),
+        "owner": f"owner{random.randint(0, 1000)}",
+        "path": "/path/to/file",
+        "size": random.randint(1000, 1000000),
+        "uid": f"uid{random.randint(0, 1000)}",
         "value": f"registry_value{random.randint(0, 1000)}",
     }
+
+
+def generate_random_operation():
+    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
 
 def generate_random_wazuh():
     return {
@@ -64,50 +89,19 @@ def generate_random_wazuh():
         "schema": {"version": "1.7.0"},
     }
 
-def generate_random_file():
-    file = {
-        'gid': f'gid{random.randint(0, 1000)}',
-        'group': f'group{random.randint(0, 1000)}',
-        'hash': {
-            'md5': f'{random.randint(0, 9999)}',
-            'sha1': f'{random.randint(0, 9999)}',
-            'sha256': f'{random.randint(0, 9999)}'
-        },
-        'inode': f'inode{random.randint(0, 1000)}',
-        'mtime': generate_random_date(),
-        'owner': f'owner{random.randint(0, 1000)}',
-        'path': f'/path/to/file',
-        'size': random.randint(1000, 1000000),
-        'uid': f'uid{random.randint(0, 1000)}'
-    }
-    return file
-
 
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
-  fim_mode = random.choice(['file', 'registry'])
-
-  data = {
-    "@timestamp": generate_random_date(),
-    "agent": generate_random_agent(),
-    "data_stream": generate_random_data_stream(),
-    "event": generate_random_event(),
-    "operation": generate_random_operation(),
-    "wazuh": generate_random_wazuh(),
+  return {
+      "@timestamp": generate_random_date(),
+      "agent": generate_random_agent(),
+      "data_stream": generate_random_data_stream(),
+      "event": generate_random_event(),
+      "operation": generate_random_operation(),
+      "registry": generate_random_registry(),
+      "wazuh": generate_random_wazuh(),
   }
-
-  if fim_mode == 'file':
-    data["file"] = generate_random_file()
-  elif fim_mode == 'registry':
-    data["registry"] = generate_random_registry()
-
-  return data
-
-def generate_documents(params):
-  for i in range(0, int(params["count"])):
-    yield generate_document({"id": i})
-
 
 def main(ctx):
   setup_dataset_index_index_pattern(ctx,

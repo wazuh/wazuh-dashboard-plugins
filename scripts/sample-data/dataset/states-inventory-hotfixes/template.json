@@ -1,4 +1,5 @@
 {
+  "index_patterns": ["wazuh-states-inventory-hotfixes*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",
@@ -41,48 +42,16 @@
           }
         }
       },
-      "process": {
+      "package": {
         "properties": {
-          "args": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "command_line": {
-            "fields": {
-              "text": {
-                "type": "text"
-              }
-            },
-            "type": "wildcard"
-          },
-          "name": {
-            "fields": {
-              "text": {
-                "type": "text"
-              }
-            },
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "parent": {
+          "hotfix": {
             "properties": {
-              "pid": {
-                "type": "long"
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
               }
-            }
-          },
-          "pid": {
-            "type": "long"
-          },
-          "state": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
-          "stime": {
-            "type": "long"
-          },
-          "utime": {
-            "type": "long"
+            },
+            "type": "object"
           }
         }
       },
@@ -112,16 +81,12 @@
       }
     }
   },
+  "order": 1,
   "settings": {
     "index": {
       "number_of_replicas": "0",
       "number_of_shards": "1",
-      "query.default_field": [
-        "agent.id",
-        "process.name",
-        "process.pid",
-        "process.command_line"
-      ],
+      "query.default_field": ["package.hotfix.name"],
       "refresh_interval": "5s"
     }
   }

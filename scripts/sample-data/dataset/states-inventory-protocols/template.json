@@ -1,4 +1,5 @@
 {
+  "index_patterns": ["wazuh-states-inventory-protocols*"],
   "mappings": {
     "date_detection": false,
     "dynamic": "strict",
@@ -33,24 +34,50 @@
           }
         }
       },
-      "operation": {
+      "network": {
         "properties": {
-          "name": {
+          "dhcp": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "gateway": {
+            "type": "ip"
+          },
+          "metric": {
+            "type": "long"
+          },
+          "type": {
             "ignore_above": 1024,
             "type": "keyword"
           }
         }
       },
-      "package": {
+      "observer": {
         "properties": {
-          "hotfix": {
+          "ingress": {
             "properties": {
-              "name": {
-                "ignore_above": 1024,
-                "type": "keyword"
+              "interface": {
+                "properties": {
+                  "id": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  }
+                }
               }
             },
             "type": "object"
+          }
+        }
+      },
+      "operation": {
+        "properties": {
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
           }
         }
       },
@@ -80,11 +107,17 @@
       }
     }
   },
+  "order": 1,
   "settings": {
     "index": {
       "number_of_replicas": "0",
       "number_of_shards": "1",
-      "query.default_field": ["package.hotfix.name"],
+      "query.default_field": [
+        "agent.id",
+        "agent.host.ip",
+        "observer.ingress.interface.name",
+        "observer.ingress.interface.id"
+      ],
       "refresh_interval": "5s"
     }
   }

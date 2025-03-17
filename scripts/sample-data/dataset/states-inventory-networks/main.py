@@ -6,7 +6,8 @@ from lib.indexer_dashboard import setup_dataset_index_index_pattern
 
 index_template_file='template.json'
 default_count='10000'
-default_index_name='wazuh-states-inventory-networks-sample'
+default_index_name_prefix='wazuh-states-inventory-networks'
+default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 def generate_random_ip():
