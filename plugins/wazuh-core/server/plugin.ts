@@ -12,7 +12,6 @@ import {
   WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
   WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
   WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
-  EConfigurationProviders,
   PLUGIN_SETTINGS,
 } from '../common/constants';
 import {
@@ -26,16 +25,9 @@ import {
   WazuhCorePluginStart,
 } from './types';
 import { setCore } from './plugin-services';
-import {
-  ManageHosts,
-  createDashboardSecurity,
-  ServerAPIClient,
-  InitializationService,
-} from './services';
+import { createDashboardSecurity, InitializationService } from './services';
 // configuration common
 // configuration server
-import { InitializerConfigProvider } from './services/configuration';
-import { initializationTaskCreatorServerAPIConnectionCompatibility } from './initialization/server-api';
 import {
   initializationTaskCreatorExistTemplate,
   initializationTaskCreatorIndexPattern,
@@ -86,10 +78,11 @@ export class WazuhCorePlugin
     );
 
     // add the initializer context config to the configuration store
-    this.internal.configurationStore.registerProvider(
-      EConfigurationProviders.PLUGIN_UI_SETTINGS,
-      new InitializerConfigProvider(this.initializerContext),
-    );
+    // Uncomment if there is at least one setting of "wazuh_core" plugin
+    // this.internal.configurationStore.registerProvider(
+    //   EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    //   new InitializerConfigProvider(this.initializerContext),
+    // );
 
     // create the configuration service to use like a facede pattern
     this.services.configuration = new Configuration(
@@ -99,19 +92,6 @@ export class WazuhCorePlugin
 
     this.services.configuration.setup();
 
-    this.services.manageHosts = new ManageHosts(
-      this.logger.get('manage-hosts'),
-      this.services.configuration,
-    );
-
-    this.services.serverAPIClient = new ServerAPIClient(
-      this.logger.get('server-api-client'),
-      this.services.manageHosts,
-      this.services.dashboardSecurity,
-    );
-
-    this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
-
     this.services.initialization = new InitializationService(
       this.logger.get('initialization'),
       this.services,
@@ -120,11 +100,12 @@ export class WazuhCorePlugin
     this.services.initialization.setup({ core });
 
     // Register initialization tasks
-    this.services.initialization.register(
-      initializationTaskCreatorServerAPIConnectionCompatibility({
-        taskName: 'check-server-api-connection-compatibility',
-      }),
-    );
+    // TODO: remove because the server API management is not used
+    // this.services.initialization.register(
+    //   initializationTaskCreatorServerAPIConnectionCompatibility({
+    //     taskName: 'check-server-api-connection-compatibility',
+    //   }),
+    // );
 
     // Index pattern: alerts
     // TODO: this task should be registered by the related plugin
@@ -337,25 +318,10 @@ export class WazuhCorePlugin
       logger: this.logger.get(
         `${request.route.method.toUpperCase()} ${request.route.path}`,
       ),
-      api: {
-        client: {
-          asInternalUser: this.services.serverAPIClient.asInternalUser,
-          asCurrentUser: this.services.serverAPIClient.asScoped(
-            context,
-            request,
-          ),
-        },
-      },
     }));
 
     return {
       ...this.services,
-      api: {
-        client: {
-          asInternalUser: this.services.serverAPIClient.asInternalUser,
-          asScoped: this.services.serverAPIClient.asScoped,
-        },
-      },
     } as WazuhCorePluginSetup;
   }
 
@@ -365,17 +331,10 @@ export class WazuhCorePlugin
     setCore(core);
 
     await this.services.configuration.start();
-    await this.services.manageHosts.start();
     await this.services.initialization.start({ core });
 
     return {
       ...this.services,
-      api: {
-        client: {
-          asInternalUser: this.services.serverAPIClient.asInternalUser,
-          asScoped: this.services.serverAPIClient.asScoped,
-        },
-      },
     } as WazuhCorePluginSetup;
   }
 
