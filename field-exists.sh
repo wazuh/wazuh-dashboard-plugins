@@ -27,8 +27,10 @@ usage() {
   echo "and displays its definition if found."
   echo
   echo -e "${BLUE}Requirements:${NC}"
-  echo "  - ripgrep (rg) - for searching files"
-  echo "  - jq - for parsing JSON"
+  {
+    echo "  - ripgrep (rg) | for searching files"
+    echo "  - jq | for parsing JSON"
+  } | column -t -s '|'
 }
 
 check_dependencies() {
