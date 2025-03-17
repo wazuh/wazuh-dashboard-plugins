@@ -108,26 +108,6 @@ def generate_documents(params):
   for i in range(0, int(params["count"])):
     yield generate_document({"id": i})
 
-def get_params(ctx):
-  count = ''
-  while not count.isdigit():
-    count = input_question(f'How many documents do you want to generate? [default={default_count}]', {"default_value": default_count})
-
-  index_name = input_question(f'Enter the index name [default={default_index_name}]', {"default_value": default_index_name})
-
-  return {
-    "count": count,
-    "index_name": index_name
-  }
-
-def input_question(message, options = {}):
-  response = input(message)
-
-  if(options["default_value"] and response == ''):
-    response = options["default_value"]
-
-  return response
-
 
 def main(ctx):
   setup_dataset_index_index_pattern(ctx,
