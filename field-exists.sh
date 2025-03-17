@@ -12,7 +12,7 @@ UNDERLINE='\033[4m'
 NC='\033[0m' # No Color
 
 logError() {
-  echo -e "[ ${RED}Error${NC} ] $@" >&2
+  echo -e "[ ${RED}ERROR${NC} ] $@" >&2
 }
 
 logWarn() {
@@ -43,8 +43,8 @@ check_dependencies() {
 
   for cmd in "${deps[@]}"; do
     if ! command -v "$cmd" &>/dev/null; then
-      echo -e "${RED}Error:${NC} Required tool '$cmd' is not installed or not in PATH." >&2
-      echo -e "Please install '$cmd' to use this script." >&2
+      logError "Required tool '$cmd' is not installed or not in PATH." >&2
+      logError "Please install '$cmd' to use this script." >&2
       exit 2
     fi
   done
@@ -67,7 +67,7 @@ main() {
   local field="$1" # e.g., metadata.author.name
 
   if [[ -z "$field" ]]; then
-    echo -e "${RED}Error:${NC} Field parameter is required" >&2
+    logError "Field parameter is required" >&2
     usage
     exit 1
   fi
