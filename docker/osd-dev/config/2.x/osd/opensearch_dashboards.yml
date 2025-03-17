@@ -19,10 +19,3 @@ opensearch.username: 'kibanaserver'
 opensearch.password: 'kibanaserver'
 opensearchDashboards.branding:
   useExpandedHeader: false
-wazuh_core.hosts:
-  manager:
-    url: 'https://wazuh.manager'
-    port: 55000
-    username: wazuh-wui
-    password: MyS3cr37P450r.*-
-    run_as: false
