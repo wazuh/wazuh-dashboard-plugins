@@ -1,0 +1,100 @@
+#!/bin/bash
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+NC='\033[0m' # No Color
+
+usage() {
+  echo -e "${BLUE}Usage:${NC} $(basename $0) <field>"
+  echo -e "${BLUE}Example:${NC} $(basename $0) metadata.author.name"
+  echo
+  echo "This script checks if a specified field exists in JSON mapping files"
+  echo "and displays its definition if found."
+  echo
+  echo -e "${BLUE}Requirements:${NC}"
+  echo "  - ripgrep (rg) - for searching files"
+  echo "  - jq - for parsing JSON"
+}
+
+check_dependencies() {
+  # Check if all required dependencies are installed
+  local deps=()
+
+  if [[ $# -gt 0 && "$1" == "--deps" ]]; then
+    deps=("${@:2}") # Use all arguments after --deps
+  fi
+
+  for cmd in "${deps[@]}"; do
+    if ! command -v "$cmd" &>/dev/null; then
+      echo -e "${RED}Error:${NC} Required tool '$cmd' is not installed or not in PATH." >&2
+      echo -e "Please install '$cmd' to use this script." >&2
+      exit 2
+    fi
+  done
+}
+
+has_mappings() {
+  local file="$1"
+  if [[ -f "$file" ]]; then
+    # Check if file has mappings.properties structure
+    if jq -e '.mappings.properties' "$file" >/dev/null 2>&1; then
+      return 0 # True, file has mappings
+    fi
+  fi
+  return 1 # False, file doesn't have mappings
+}
+
+main() {
+  check_dependencies --deps rg jq
+
+  local field="$1" # e.g., metadata.author.name
+
+  if [[ -z "$field" ]]; then
+    echo -e "${RED}Error:${NC} Field parameter is required" >&2
+    usage
+    exit 1
+  fi
+
+  local last_field="${field##*.}"
+
+  echo -e "${YELLOW}Searching for field:${NC} $field"
+
+  # This script will check if a field exists in a file
+  local files="$(rg --iglob "\!plugins/main" --iglob "*.json" "\"$last_field\":" -l)"
+
+  if [[ -z "$files" ]]; then
+    echo -e "${YELLOW}No files found containing the field '${last_field}'.${NC}"
+    exit 0
+  fi
+
+  local mapped_field="${field//\./.properties.}"
+  local found=false
+
+  while IFS= read -r file; do
+    field_object="$(cat "$file" | jq ".mappings.properties.$mapped_field" 2>/dev/null)"
+    if has_mappings "$file"; then
+      echo -e "${BLUE}Checking:${NC} ${MAGENTA}$file${NC}"
+      if [[ -n $field_object && $field_object != "null" ]]; then
+        found=true
+        field_object="{ \"$field\": $field_object }"
+        echo "$field_object" | jq 2>/dev/null
+      fi
+      echo
+    fi
+  done <<<"$files"
+
+  if [[ "$found" == "false" ]]; then
+    echo -e "${YELLOW}Field '$field' was not found in any mapping properties.${NC}"
+  fi
+}
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+  usage
+  exit 0
+fi
+
+main "$@"
