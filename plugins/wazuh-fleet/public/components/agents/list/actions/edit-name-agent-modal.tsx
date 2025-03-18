@@ -43,7 +43,7 @@ export const EditAgentNameModal = ({
   const validateInput = (name: string) => {
     const errors: string[] = [];
 
-    if (name === agent._source.agent.name) {
+    if (name === agent.agent.name) {
       errors.push('New agent name cannot be the same as the current one');
     }
 
@@ -64,7 +64,7 @@ export const EditAgentNameModal = ({
   const handleOnSave = async () => {
     try {
       setIsSaving(true);
-      await getAgentManagement().editName(agent._source.agent.id, newName);
+      await getAgentManagement().editName(agent.agent.id, newName);
       setIsSaving(false);
       reloadAgents();
       onClose();
@@ -82,7 +82,7 @@ export const EditAgentNameModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.id}
+                  {agent.agent.id}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -90,7 +90,7 @@ export const EditAgentNameModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.name}
+                  {agent.agent.name}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>

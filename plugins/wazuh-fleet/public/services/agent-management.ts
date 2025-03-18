@@ -1,4 +1,5 @@
 import { PLUGIN_ID } from '../../common/constants';
+import { AgentWrapper } from '../../common/types';
 import {
   IAgentManagement,
   IAgentManagementProps,
@@ -27,7 +28,7 @@ export const AgentManagement = ({
     const searchContext = await createSearchContext();
 
     try {
-      searchContext.setUserFilters(filters);
+      searchContext.setUserFilters(filters || []);
 
       const results = await searchContext.executeQuery({
         query,
@@ -35,7 +36,15 @@ export const AgentManagement = ({
         sorting,
       });
 
-      return results.hits;
+      return {
+        ...results.hits,
+        hits: results.hits.hits.map(
+          ({ _source: { agent }, ...item }: { _source: AgentWrapper }) => ({
+            ...item,
+            agent,
+          }),
+        ),
+      };
     } catch (error) {
       getToasts().add({
         color: 'danger',
@@ -60,7 +69,12 @@ export const AgentManagement = ({
     try {
       const results = await searchContext.executeQuery();
 
-      return results?.hits?.hits?.[0] || null;
+      return results?.hits?.hits?.[0]
+        ? {
+            ...results?.hits?.hits?.[0],
+            agent: results?.hits?.hits?.[0]?._source?.agent,
+          }
+        : null;
     } catch (error) {
       getToasts().add({
         color: 'danger',

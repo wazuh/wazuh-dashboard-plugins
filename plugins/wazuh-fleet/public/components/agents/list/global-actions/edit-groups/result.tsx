@@ -46,7 +46,7 @@ export const EditAgentsGroupsModalResult = ({
           sortable: true,
         },
         {
-          field: '_source.agent.name',
+          field: 'agent.name',
           name: 'Name',
           align: 'left',
           sortable: true,
@@ -145,7 +145,7 @@ export const EditAgentsGroupsModalResult = ({
                         {groupStatus({
                           isLoading,
                           status: RESULT_TYPE.SUCCESS,
-                          text: agent._source.agent.name,
+                          text: agent.agent.name,
                         })}
                       </EuiFlexItem>
                     );
@@ -158,7 +158,7 @@ export const EditAgentsGroupsModalResult = ({
                       <EuiFlexItem key={agent._id}>
                         {groupStatus({
                           status: RESULT_TYPE.SUCCESS,
-                          text: `${agent._source.agent.name} (${groups.join(', ')} ${editAction === EditActionGroups.ADD ? 'added' : 'removed'})`,
+                          text: `${agent.agent.name} (${groups.join(', ')} ${editAction === EditActionGroups.ADD ? 'added' : 'removed'})`,
                         })}
                       </EuiFlexItem>
                     );
@@ -168,7 +168,7 @@ export const EditAgentsGroupsModalResult = ({
                     <EuiFlexItem key={agent._id}>
                       {groupStatus({
                         status: RESULT_TYPE.ERROR,
-                        text: `${agent._source.agent.name} (no ${groups.join(', ')} have been ${editAction === EditActionGroups.ADD ? 'added' : 'removed'})`,
+                        text: `${agent.agent.name} (no ${groups.join(', ')} have been ${editAction === EditActionGroups.ADD ? 'added' : 'removed'})`,
                       })}
                       {successAgents?.length ? (
                         <>

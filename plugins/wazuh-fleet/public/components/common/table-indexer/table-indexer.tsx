@@ -86,8 +86,7 @@ export const TableIndexer = (props: {
         sort: {
           columns: [
             {
-              // With the _source it does not do the sorting correctly
-              id: sorting.sort.field.replace('_source.', ''),
+              id: sorting.sort.field,
               direction: sorting.sort.direction,
             },
           ],

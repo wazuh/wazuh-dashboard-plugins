@@ -76,13 +76,13 @@ export const UpgradeAgentsModalResult = ({
           render: agents => agents.agentIds.join(', '),
         },
         {
-          field: '_source.agent.name',
+          field: 'agent.name',
           name: 'Name',
           align: 'left',
           sortable: true,
         },
         {
-          field: '_source.task_id',
+          field: 'task_id',
           name: 'Task ID',
           align: 'left',
           sortable: true,

@@ -62,7 +62,7 @@ export const UpgradeAgentModal = ({
     setIsLoading(true);
 
     try {
-      await getAgentManagement().upgrade(agent._source.agent.id);
+      await getAgentManagement().upgrade(agent.agent.id);
       showToast('success', 'Upgrade agent', 'Upgrade task in progress');
       reloadAgents();
     } catch (error) {
@@ -73,9 +73,9 @@ export const UpgradeAgentModal = ({
   };
 
   const regex = /linux/i;
-  const isLinux = regex.test(agent._source.agent.host.os.platform);
+  const isLinux = regex.test(agent.agent.host.os.platform);
   const showPackageSelector =
-    isLinux && !supportedPlatforms.has(agent._source.agent.host.os.name);
+    isLinux && !supportedPlatforms.has(agent.agent.host.os.name);
   const form = (
     <EuiForm component='form'>
       <EuiFlexGroup direction='column' gutterSize='m'>
@@ -85,7 +85,7 @@ export const UpgradeAgentModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.id}
+                  {agent.agent.id}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -93,7 +93,7 @@ export const UpgradeAgentModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.name}
+                  {agent.agent.name}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -105,7 +105,7 @@ export const UpgradeAgentModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent version</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.version}
+                  {agent.agent.version}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -113,7 +113,7 @@ export const UpgradeAgentModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>OS</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.host.os.name}
+                  {agent.agent.host.os.name}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
