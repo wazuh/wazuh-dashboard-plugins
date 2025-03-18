@@ -1,3 +1,4 @@
+import { PLUGIN_ID } from '../../common/constants';
 import {
   IAgentManagement,
   IAgentManagementProps,
@@ -18,7 +19,7 @@ export const AgentManagement = ({
     await queryManagerService.createSearchContext({
       indexPatternId: await getIndexPatternId(),
       fixedFilters: [],
-      contextId: 'fleet-management',
+      contextId: PLUGIN_ID,
     });
 
   const getAll = async (params: IGetAllParams) => {
