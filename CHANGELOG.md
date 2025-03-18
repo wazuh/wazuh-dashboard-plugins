@@ -13,7 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added an initilization service to core plugin to run the initilization tasks related to user scope [#7145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7145) [#7262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7262) [#7263](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7263)
 - Added `wazuh-fleet` plugin [#7289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7289) [#7283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7283)
 - Added enrollment agent assistant to `wazuh-fleet` plugin [#7289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7289)
-- Added agent summary and detail views to `wazuh-fleet` plugin [#7283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7283)
+- Added agent summary and detail views to `wazuh-fleet` plugin [#7283](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7283) [#7360](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7360)
 
 ### Removed
 
