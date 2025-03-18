@@ -11,9 +11,7 @@ export class SystemInventoryNetworkPortsStatesDataSource extends PatternDataSour
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-      /* TODO: define the cluster/manager filter, ...this.getClusterManagerFilters(),*/ ...super.getFixedFilters(),
-    ];
+    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
   }
 
   getClusterManagerFilters() {

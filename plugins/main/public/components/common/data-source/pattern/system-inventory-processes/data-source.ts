@@ -11,9 +11,7 @@ export class SystemInventoryProcessesStatesDataSource extends PatternDataSource 
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-      /* TODO: define the cluster/manager filter, ...this.getClusterManagerFilters(),*/ ...super.getFixedFilters(),
-    ];
+    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
   }
 
   getClusterManagerFilters() {
