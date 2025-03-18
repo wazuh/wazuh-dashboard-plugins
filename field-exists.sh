@@ -73,7 +73,7 @@ main() {
   echo -e "${BLUE}Searching for field:${NC} ${UNDERLINE}$field${NC}\n"
 
   # This script will check if a field exists in a file
-  local files="$(fd -e json --type f -E 'plugins/main' -E 'docker/imposter' -E 'docker/wazuh-4*' -E 'tsconfig*' -E 'VERSION*')"
+  local files="$(fd -e json --type f -E 'plugins/main' -E 'docker/imposter' -E 'docker/wazuh-4*' -E 'tsconfig*' -E 'VERSION*' -E 'cypress' -E 'forks' -E 'elasticsearch')"
 
   if [[ -z "$files" ]]; then
     echo -e "${YELLOW}No files found containing the field '${last_field}'.${NC}"
