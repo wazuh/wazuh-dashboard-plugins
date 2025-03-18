@@ -7,6 +7,8 @@ import logging
 import sys
 from lib.configuration import Configuration
 from lib.dashboard import OpenSearchDashboards
+from lib.indexer_dashboard import setup_dataset_index_index_pattern
+from pathlib import Path
 
 warnings.filterwarnings("ignore")
 
@@ -62,9 +64,20 @@ def main():
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=log_level)
 
+    # Check dataset is defined
     if not dataset:
       logger.error('No dataset selected')
       sys.exit(1)
+
+    datasets_dir = os.path.join(Path(__file__).parent, 'dataset')
+
+    # Get available datasets
+    datasets = [f for f in os.listdir(datasets_dir) if os.path.isdir(os.path.join(datasets_dir,f))]
+
+    # Check the selected dataset exists
+    if dataset not in datasets:
+        logger.error(f'Dataset [{dataset}] not found. Availabe datasets: {", ".join(datasets)}')
+        sys.exit(1)
 
 
     # Get configuration
@@ -102,13 +115,33 @@ def main():
     logger.info(f'Running dataset [{dataset}]')
     dataset_logger = logging.getLogger(dataset)
     dataset_logger.setLevel(log_level)
-    module.main({
-      "dataset": dataset,
-      "logger": logging.getLogger(dataset),
-      "configuration": configuration,
-      "indexer_client":indexer_client,
-      "dashboard_client": dashboard_client,
-    })
+
+    if hasattr(module, 'main'):
+        logger.debug(f'Running main method from dataset [{dataset}]')
+        module.main({
+          "dataset": dataset,
+          "logger": logging.getLogger(dataset),
+          "configuration": configuration,
+          "indexer_client":indexer_client,
+          "dashboard_client": dashboard_client,
+        })
+    else:
+        logger.debug('main method is not defined, trying the pre-defined flows')
+        if hasattr(module, 'generate_document') and hasattr(module, 'default_index_name') and hasattr(module, 'default_count'):
+
+            logger.debug(f'Running main method from dataset [{dataset}]')
+            setup_dataset_index_index_pattern({
+              "dataset": dataset,
+              "logger": logging.getLogger(dataset),
+              "configuration": configuration,
+              "indexer_client":indexer_client,
+              "dashboard_client": dashboard_client,
+            },
+              template_file=os.path.join(datasets_dir, dataset, 'template.json'),
+              generate_document=module.generate_document,
+              default_index_name=module.default_index_name,
+              default_count=module.default_count
+            )
 
 if __name__=="__main__":
   main()

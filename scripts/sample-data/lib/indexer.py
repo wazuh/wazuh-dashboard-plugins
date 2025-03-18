@@ -34,7 +34,7 @@ def helper_create_index(client, index_name, template_file, logger):
       sys.exit(1)
 
   if not os.path.exists(template_file):
-    logger.error(f'Index template found [{template_file}]')
+    logger.error(f'Index template not found [{template_file}]')
     sys.exit(1)
 
   with open(template_file) as templateFile:
@@ -43,7 +43,7 @@ def helper_create_index(client, index_name, template_file, logger):
     del index_template['index_patterns']
     del index_template['order']
     try:
-      client.indices.create(index= index_name, body=index_template)
+      client.indices.create(index=index_name, body=index_template)
       logger.info(f'Index [{index_name}] created')
     except Exception as e:
       logger.error(f'Error: {e}')

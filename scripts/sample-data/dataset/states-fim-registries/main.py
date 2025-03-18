@@ -1,10 +1,6 @@
 import random
-import os.path
-from pathlib import Path
 import datetime
-from lib.indexer_dashboard import setup_dataset_index_index_pattern
 
-index_template_file='template.json'
 default_count='10000'
 default_index_name='wazuh-states-fim-registries-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -102,12 +98,4 @@ def generate_document(params):
       "registry": generate_random_registry(),
       "wazuh": generate_random_wazuh(),
   }
-
-def main(ctx):
-  setup_dataset_index_index_pattern(ctx,
-    template_file=os.path.join(Path(__file__).parent, index_template_file),
-    generate_document=generate_document,
-    default_index_name=default_index_name,
-    default_count=default_count
-  )
 
