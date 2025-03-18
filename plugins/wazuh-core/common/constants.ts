@@ -55,6 +55,24 @@ export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim-*';
 
+// System inventory
+export const WAZUH_SYSTEM_INVENTORY_HARDWARE_PATTERN =
+  'wazuh-states-inventory-hardware-*';
+export const WAZUH_SYSTEM_INVENTORY_HOTFIXES_PATTERN =
+  'wazuh-states-inventory-hotfixes-*';
+export const WAZUH_SYSTEM_INVENTORY_INTERFACES_PATTERN =
+  'wazuh-states-inventory-interfaces-*';
+export const WAZUH_SYSTEM_INVENTORY_NETWORKS_PATTERN =
+  'wazuh-states-inventory-networks-*';
+export const WAZUH_SYSTEM_INVENTORY_PACKAGES_PATTERN =
+  'wazuh-states-inventory-packages-*';
+export const WAZUH_SYSTEM_INVENTORY_PORTS_PATTERN =
+  'wazuh-states-inventory-ports-*';
+export const WAZUH_SYSTEM_INVENTORY_PROCESSES_PATTERN =
+  'wazuh-states-inventory-processes-*';
+export const WAZUH_SYSTEM_INVENTORY_SYSTEM_PATTERN =
+  'wazuh-states-inventory-system-*';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
@@ -1917,6 +1935,321 @@ hosts:
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
     },
+  },
+  'system_inventory_hardware.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for hardware inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_HARDWARE_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'system_inventory_hotfixes.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for hotfixes inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_HOTFIXES_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'system_inventory_interfaces.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for interfaces inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_INTERFACES_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'system_inventory_networks.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for networks inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_NETWORKS_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'system_inventory_packages.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for packages inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_PACKAGES_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'system_inventory_ports.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for ports inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_PORTS_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'system_inventory_processes.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for processes inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_PROCESSES_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'system_inventory_protocols.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for protocols inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_HOTFIXES_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'system_inventory_system.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for system inventory.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SYSTEM_INVENTORY_SYSTEM_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
   },
   'wazuh.monitoring.creation': {
     title: 'Index creation',

@@ -6,19 +6,22 @@ import {
   SystemInventoryHotfixesStatesDataSource,
   SystemInventoryHotfixesStatesDataSourceRepository,
 } from '../../../common/data-source';
+import { withSystemInventoryHotfixesDataSource } from '../../../overview/system-inventory/common/hocs/validate-system-inventory-index-pattern';
 
-export const WindowsUpdatesTable = ({ agent }) => {
-  return (
-    <EuiPanel data-test-subj='software-windows-updates-table' paddingSize='m'>
-      <WzTableDiscover
-        title='Windows updates'
-        DataSource={SystemInventoryHotfixesStatesDataSource}
-        DataSourceRepositoryCreator={
-          SystemInventoryHotfixesStatesDataSourceRepository
-        }
-        tableDefaultColumns={windowsUpdatesColumns}
-        createNewSearchContext={true}
-      />
-    </EuiPanel>
-  );
-};
+export const WindowsUpdatesTable = withSystemInventoryHotfixesDataSource(
+  ({ agent }) => {
+    return (
+      <EuiPanel data-test-subj='software-windows-updates-table' paddingSize='m'>
+        <WzTableDiscover
+          title='Windows updates'
+          DataSource={SystemInventoryHotfixesStatesDataSource}
+          DataSourceRepositoryCreator={
+            SystemInventoryHotfixesStatesDataSourceRepository
+          }
+          tableDefaultColumns={windowsUpdatesColumns}
+          createNewSearchContext={true}
+        />
+      </EuiPanel>
+    );
+  },
+);

@@ -6,19 +6,22 @@ import {
   SystemInventoryNetworkSettingsStatesDataSource,
   SystemInventoryNetworkSettingsStatesDataSourceRepository,
 } from '../../../common/data-source';
+import { withSystemInventoryNetworksDataSource } from '../../../overview/system-inventory/common/hocs/validate-system-inventory-index-pattern';
 
-export const NetworkSettingsTable = ({ agent }) => {
-  return (
-    <EuiPanel data-test-subj='network-settings-table' paddingSize='m'>
-      <WzTableDiscover
-        title='Network settings'
-        DataSource={SystemInventoryNetworkSettingsStatesDataSource}
-        DataSourceRepositoryCreator={
-          SystemInventoryNetworkSettingsStatesDataSourceRepository
-        }
-        tableDefaultColumns={netaddrColumns}
-        createNewSearchContext={true}
-      />
-    </EuiPanel>
-  );
-};
+export const NetworkSettingsTable = withSystemInventoryNetworksDataSource(
+  ({ agent }) => {
+    return (
+      <EuiPanel data-test-subj='network-settings-table' paddingSize='m'>
+        <WzTableDiscover
+          title='Network settings'
+          DataSource={SystemInventoryNetworkSettingsStatesDataSource}
+          DataSourceRepositoryCreator={
+            SystemInventoryNetworkSettingsStatesDataSourceRepository
+          }
+          tableDefaultColumns={netaddrColumns}
+          createNewSearchContext={true}
+        />
+      </EuiPanel>
+    );
+  },
+);

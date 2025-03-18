@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { EuiPanel, EuiIcon } from '@elastic/eui';
 import _ from 'lodash';
-import { useGenericRequest } from '../../../common/hooks/useGenericRequest';
 import { formatUIDate } from '../../../../react-services/time-service';
 import WzRibbon from '../../../common/ribbon/ribbon';
 import {
   IRibbonItem,
   RibbonItemLabel,
 } from '../../../common/ribbon/ribbon-item';
-import { getOsName, getPlatformIcon } from '../../../common/platform';
+import { getOsName } from '../../../common/platform';
 import { Agent } from '../../../endpoints-summary/types';
+import {
+  PatternDataSource,
+  SystemInventoryHardwareStatesDataSource,
+  SystemInventoryHardwareStatesDataSourceRepository,
+  SystemInventorySystemStatesDataSource,
+  SystemInventorySystemStatesDataSourceRepository,
+  tParsedIndexPattern,
+  useDataSource,
+} from '../../../common/data-source';
+import { withSystemInventoryHardwareSystemDataSource } from '../../../overview/system-inventory/common/hocs/validate-system-inventory-index-pattern';
+import { WAZUH_AGENTS_OS_TYPE } from '../../../../../common/constants';
 
 interface SyscollectorMetricsProps {
   agent: Agent;
@@ -23,55 +33,140 @@ const offsetTimestamp = (text: string, time: string) => {
   }
 };
 
-export function InventoryMetrics({ agent }: SyscollectorMetricsProps) {
-  const syscollector = useGenericRequest({
-    method: 'GET',
-    path: `/api/syscollector/${agent.id}`,
-    resolveData: data => data?.data || {},
-  });
+// This is a customized method (see getAgentOSType from react-services/wz-agents.ts)
+// for the system inventory data
+function getAgentOSTypeIndexerData(agent?: Agent) {
+  if (agent?.os?.name?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX)) {
+    return WAZUH_AGENTS_OS_TYPE.LINUX;
+  } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.WINDOWS) {
+    return WAZUH_AGENTS_OS_TYPE.WINDOWS;
+  } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.SUNOS) {
+    return WAZUH_AGENTS_OS_TYPE.SUNOS;
+  } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.DARWIN) {
+    return WAZUH_AGENTS_OS_TYPE.DARWIN;
+  } else {
+    return WAZUH_AGENTS_OS_TYPE.OTHERS;
+  }
+}
 
-  if (
-    !syscollector.isLoading &&
-    (_.isEmpty(syscollector.data.hardware) || _.isEmpty(syscollector.data.os))
+const getPlatformIcon = (agent?: Agent): React.JSX.Element => {
+  let icon = '';
+  const osType = getAgentOSTypeIndexerData(agent);
+  if (osType === WAZUH_AGENTS_OS_TYPE.DARWIN) {
+    icon = 'apple';
+  } else if (
+    [WAZUH_AGENTS_OS_TYPE.WINDOWS, WAZUH_AGENTS_OS_TYPE.LINUX].includes(osType)
   ) {
-    return (
-      <EuiPanel paddingSize='s' style={{ margin: 16, textAlign: 'center' }}>
-        <EuiIcon type='iInCircle' /> Not enough hardware or operating system
-        information
-      </EuiPanel>
-    );
+    icon = osType;
   }
 
-  const render = () => {
+  if (icon) {
+    return (
+      <i
+        className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${osType}`}
+        aria-hidden='true'
+      ></i>
+    );
+  }
+  return <></>;
+};
+
+export const InventoryMetrics = withSystemInventoryHardwareSystemDataSource(
+  ({ agent }: SyscollectorMetricsProps) => {
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [data, setData] = useState<{ hardware: any; software: any } | null>(
+      null,
+    );
+
+    const hardwareDataSource = useDataSource<
+      tParsedIndexPattern,
+      PatternDataSource
+    >({
+      DataSource: SystemInventoryHardwareStatesDataSource,
+      repository: new SystemInventoryHardwareStatesDataSourceRepository(),
+    });
+
+    const softwareDataSource = useDataSource<
+      tParsedIndexPattern,
+      PatternDataSource
+    >({
+      DataSource: SystemInventorySystemStatesDataSource,
+      repository: new SystemInventorySystemStatesDataSourceRepository(),
+    });
+
+    useEffect(() => {
+      if (!hardwareDataSource.isLoading && !softwareDataSource.isLoading) {
+        const fetchInventoryHardwareSystemData = async () => {
+          try {
+            setIsLoading(true);
+            const [hardware, software] = (
+              await Promise.all([
+                hardwareDataSource.fetchData({
+                  pagination: {
+                    // Get the first item
+                    pageIndex: 0,
+                    pageSize: 1,
+                  },
+                }),
+                softwareDataSource.fetchData({
+                  pagination: {
+                    // Get the first item
+                    pageIndex: 0,
+                    pageSize: 1,
+                  },
+                }),
+              ])
+            ).map(response => response?.hits?.hits[0]?._source);
+            setData({ hardware, software });
+          } finally {
+            setIsLoading(false);
+          }
+        };
+        fetchInventoryHardwareSystemData();
+      }
+    }, [hardwareDataSource.isLoading, softwareDataSource.isLoading, agent.id]);
+
+    if (
+      !isLoading &&
+      (_.isEmpty(data?.hardware) || _.isEmpty(data?.software))
+    ) {
+      return (
+        <EuiPanel paddingSize='s' style={{ margin: 16, textAlign: 'center' }}>
+          <EuiIcon type='iInCircle' /> Not enough hardware or operating system
+          information
+        </EuiPanel>
+      );
+    }
+
     const items: IRibbonItem[] = [
       {
         key: 'cores',
         label: 'Cores',
-        value: syscollector?.data?.hardware?.cpu?.cores,
-        isLoading: syscollector.isLoading,
+        value: data?.hardware?.host?.cpu?.cores,
+        isLoading: isLoading,
         style: { maxWidth: 100 },
       },
       {
         key: 'memory',
         label: 'Memory',
-        value: syscollector?.data?.hardware?.ram?.total
-          ? `${(syscollector?.data?.hardware?.ram?.total / 1024).toFixed(2)} MB`
+        value: data?.hardware?.host?.memory?.total
+          ? `${(data?.hardware?.host?.memory?.total / 1024).toFixed(2)} MB`
           : '-',
-        isLoading: syscollector.isLoading,
+        isLoading: isLoading,
         style: { maxWidth: 100 },
       },
       {
         key: 'arch',
         label: 'Arch',
-        value: syscollector?.data?.os?.architecture,
-        isLoading: syscollector.isLoading,
+        value: data?.hardware?.agent?.host?.architecture,
+        isLoading: isLoading,
         style: { maxWidth: 100 },
       },
       {
         key: RibbonItemLabel.OPERATING_SYSTEM,
-        value: syscollector?.data?.os,
+        value: data?.software?.host,
         label: 'Operating system',
-        isLoading: syscollector.isLoading,
+        isLoading: isLoading,
         style: { maxWidth: 200 },
         render: (value: Agent) => (
           <>
@@ -83,37 +178,35 @@ export function InventoryMetrics({ agent }: SyscollectorMetricsProps) {
       {
         key: 'cpu',
         label: 'CPU',
-        value: syscollector?.data?.hardware?.cpu?.name,
-        isLoading: syscollector.isLoading,
+        value: data?.hardware?.host?.cpu?.name,
+        isLoading: isLoading,
         style: { maxWidth: 250 },
       },
       {
         key: 'hostname',
         label: 'Host name',
-        value: syscollector?.data?.os?.hostname,
-        isLoading: syscollector.isLoading,
+        value: data?.software?.host?.hostname,
+        isLoading: isLoading,
         style: { maxWidth: 100 },
       },
       {
         key: 'board-serial',
         label: 'Board serial',
-        value: syscollector?.data?.hardware?.board_serial,
-        isLoading: syscollector.isLoading,
+        value: data?.hardware?.observer?.serial_number,
+        isLoading: isLoading,
         style: { maxWidth: 100 },
       },
       {
         key: 'last-scan',
         label: 'Last scan',
-        value: syscollector?.data?.os?.scan?.time
-          ? offsetTimestamp('', syscollector?.data?.os?.scan?.time)
+        value: data?.software?.['@timestamp']
+          ? offsetTimestamp('', data?.software?.['@timestamp']) // there are 2 dates (hardware/software) Should we indicate each value?
           : '-',
-        isLoading: syscollector.isLoading,
+        isLoading: isLoading,
         style: { maxWidth: 180 },
       },
     ];
 
     return <WzRibbon data-test-subj='syscollector-metrics' items={items} />;
-  };
-
-  return render();
-}
+  },
+);

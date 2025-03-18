@@ -7,8 +7,13 @@ import {
   SystemInventoryProcessesStatesDataSource,
   SystemInventoryProcessesStatesDataSourceRepository,
 } from '../../../common/data-source';
+import { compose } from 'redux';
+import { withSystemInventoryProcessesDataSource } from '../../../overview/system-inventory/common/hocs/validate-system-inventory-index-pattern';
 
-export const ProcessesTable = withSOPlatformGuard(({ agent, soPlatform }) => {
+export const ProcessesTable = compose(
+  withSOPlatformGuard,
+  withSystemInventoryProcessesDataSource,
+)(({ agent, soPlatform }) => {
   return (
     <EuiPanel data-test-subj='processes-table' paddingSize='m'>
       <WzTableDiscover
