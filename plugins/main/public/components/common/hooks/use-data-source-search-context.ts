@@ -104,7 +104,7 @@ export function useDataSourceSearchContext({
   };
 }
 
-export function useDataSeourceWithSearchBar({
+export function useDataSourceWithSearchBar({
   createNewSearchContext,
   DataSource,
   DataSourceRepositoryCreator,

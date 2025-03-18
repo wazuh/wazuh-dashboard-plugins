@@ -44,7 +44,7 @@ import { WzSearchBar } from '../search-bar';
 import { DataGridVisibleColumnsSelector } from './components/visible-columns-selector';
 import {
   CreateNewSearchContext,
-  useDataSeourceWithSearchBar,
+  useDataSourceWithSearchBar,
 } from '../hooks/use-data-source-search-context';
 import {
   IDataSourceFactoryConstructor,
@@ -52,6 +52,7 @@ import {
   tDataSourceRepository,
   tParsedIndexPattern,
 } from '../data-source';
+import { DiscoverNoResults } from '../no-results/no-results';
 
 export interface WzTableDiscoverProps {
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
@@ -59,7 +60,9 @@ export interface WzTableDiscoverProps {
   tableDefaultColumns: tDataGridColumn[];
   createNewSearchContext?: CreateNewSearchContext;
   useAbsoluteDateRange?: boolean;
+  displayOnlyNoResultsCalloutOnNoResults?: boolean;
   title?: React.ReactNode;
+  inspectDetailsTitle?: string;
 }
 
 /**
@@ -72,9 +75,11 @@ export const WzTableDiscover = ({
   DataSource,
   DataSourceRepositoryCreator,
   tableDefaultColumns,
-  createNewSearchContext,
+  createNewSearchContext = false,
   useAbsoluteDateRange = false,
+  displayOnlyNoResultsCalloutOnNoResults = false,
   title,
+  inspectDetailsTitle = 'Details',
 }: WzTableDiscoverProps) => {
   const {
     dataSource,
@@ -86,7 +91,7 @@ export const WzTableDiscover = ({
     setFilters,
     searchBarProps,
     fingerprint,
-  } = useDataSeourceWithSearchBar({
+  } = useDataSourceWithSearchBar({
     DataSource,
     DataSourceRepositoryCreator,
     createNewSearchContext,
@@ -188,6 +193,13 @@ export const WzTableDiscover = ({
 
   const closeFlyoutHandler = () => setInspectedHit(undefined);
 
+  const shouldDisplayNoResults =
+    displayOnlyNoResultsCalloutOnNoResults &&
+    !isDataSourceLoading &&
+    results?.hits?.total === 0;
+
+  const shouldDisplayTable = !shouldDisplayNoResults;
+
   return (
     <IntlProvider locale='en'>
       <>
@@ -221,7 +233,8 @@ export const WzTableDiscover = ({
                 />
               </>
             )}
-            {!isDataSourceLoading ? (
+            {shouldDisplayNoResults && <DiscoverNoResults />}
+            {!isDataSourceLoading && shouldDisplayTable ? (
               <EuiPanel
                 paddingSize='s'
                 hasShadow={false}
@@ -285,7 +298,7 @@ export const WzTableDiscover = ({
               <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                 <EuiFlyoutHeader>
                   <EuiTitle>
-                    <h2>Details</h2>
+                    <h2>{inspectDetailsTitle}</h2>
                   </EuiTitle>
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
