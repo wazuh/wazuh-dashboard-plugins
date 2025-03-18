@@ -73,21 +73,7 @@ main() {
   echo -e "${BLUE}Searching for field:${NC} ${UNDERLINE}$field${NC}\n"
 
   # This script will check if a field exists in a file
-  local exclusions=(
-    "plugins/main"
-    "docker/imposter"
-    "docker/wazuh-4*"
-    "tsconfig*"
-    "VERSION*"
-  )
-
-  local file_search_exclusions=""
-  for exclusion in "${exclusions[@]}"; do
-    file_search_exclusions+=" -E '$exclusion'"
-  done
-
-  # Execute the command to find files
-  local files="$(fd -e json --type f . $file_search_exclusions)"
+  local files="$(fd -e json --type f -E 'plugins/main' -E 'docker/imposter' -E 'docker/wazuh-4*' -E 'tsconfig*' -E 'VERSION*')"
 
   if [[ -z "$files" ]]; then
     echo -e "${YELLOW}No files found containing the field '${last_field}'.${NC}"
