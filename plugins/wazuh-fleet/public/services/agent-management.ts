@@ -1,3 +1,5 @@
+import { PLUGIN_ID } from '../../common/constants';
+import { AgentWrapper } from '../../common/types';
 import {
   IAgentManagement,
   IAgentManagementProps,
@@ -14,19 +16,35 @@ export const AgentManagement = ({
   addGroups,
   upgradeAgent,
 }: IAgentManagementProps): IAgentManagement => {
-  const getAll = async (params: IGetAllParams) => {
-    const { filter, query, pagination, sort } = params;
-    const manager = queryManagerService();
-
-    await manager.createContext({
+  const createSearchContext = async () =>
+    await queryManagerService.createSearchContext({
       indexPatternId: await getIndexPatternId(),
       fixedFilters: [],
+      contextId: PLUGIN_ID,
     });
 
-    try {
-      const results = await manager.search({ filter, query, pagination, sort });
+  const getAll = async (params: IGetAllParams) => {
+    const { filters, query, pagination, sort: sorting } = params;
+    const searchContext = await createSearchContext();
 
-      return results.hits;
+    try {
+      searchContext.setUserFilters(filters || []);
+
+      const results = await searchContext.executeQuery({
+        query,
+        pagination,
+        sorting,
+      });
+
+      return {
+        ...results.hits,
+        hits: results.hits.hits.map(
+          ({ _source: { agent }, ...item }: { _source: AgentWrapper }) => ({
+            ...item,
+            agent,
+          }),
+        ),
+      };
     } catch (error) {
       getToasts().add({
         color: 'danger',
@@ -38,27 +56,25 @@ export const AgentManagement = ({
   };
 
   const getByAgentId = async (agentId: string) => {
-    const manager = queryManagerService();
+    const searchContext = await createSearchContext();
 
-    await manager.createContext({
-      indexPatternId: await getIndexPatternId(),
-      fixedFilters: [],
-    });
+    searchContext.setFixedFilters([
+      {
+        match: {
+          'agent.id': agentId,
+        },
+      },
+    ]);
 
     try {
-      const results = await manager.search({
-        filter: [
-          {
-            match_phrase: {
-              'agent.id': {
-                query: agentId,
-              },
-            },
-          },
-        ],
-      });
+      const results = await searchContext.executeQuery();
 
-      return results.hits;
+      return results?.hits?.hits?.[0]
+        ? {
+            ...results?.hits?.hits?.[0],
+            agent: results?.hits?.hits?.[0]?._source?.agent,
+          }
+        : null;
     } catch (error) {
       getToasts().add({
         color: 'danger',
@@ -157,8 +173,8 @@ export const AgentManagement = ({
   };
 
   return {
-    getAll: async ({ filter, query, pagination, sort }: IGetAllParams) =>
-      await getAll({ filter, query, pagination, sort }),
+    getAll: async ({ filters, query, pagination, sort }: IGetAllParams) =>
+      await getAll({ filters, query, pagination, sort }),
     getByAgentId: async (id: string) => await getByAgentId(id),
     delete: async (documentId: string | string[]) =>
       await handleDeleteAgent(documentId),

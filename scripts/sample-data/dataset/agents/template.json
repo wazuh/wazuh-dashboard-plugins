@@ -252,8 +252,8 @@
         "agent.type",
         "agent.version",
         "agent.name",
-        "host.os.full",
-        "host.ip"
+        "agent.host.os.full",
+        "agent.host.ip"
       ],
       "refresh_interval": "5s"
     }

@@ -107,4 +107,4 @@ export interface Group {
   agents: any;
 }
 
-export type IAgentResponse = IndexedDocument<AgentWrapper>;
+export type IAgentResponse = IndexedDocument<AgentWrapper> & AgentWrapper;

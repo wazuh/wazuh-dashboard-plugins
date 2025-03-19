@@ -25,7 +25,7 @@ export const agentsTableColumns = ({
   setIsEditNameVisible,
 }: AgentsTableGlobalActionsProps) => [
   {
-    field: '_source.agent.name',
+    field: 'agent.name',
     name: 'Name / ID',
     sortable: true,
     show: true,
@@ -35,7 +35,7 @@ export const agentsTableColumns = ({
         <EuiFlexItem>
           <EuiLink
             href={getCore().application.getUrlForApp(AGENTS_SUMMARY_ID, {
-              path: `#/agents/${agentData._source.agent.id}`,
+              path: `#/agents/${agentData.agent.id}`,
             })}
           >
             {field}
@@ -44,7 +44,7 @@ export const agentsTableColumns = ({
         <EuiFlexItem>
           <EuiToolTip content={field}>
             <EuiText color='subdued' size='xs'>
-              {`${agentData._source.agent.id.slice(0, 14)}...`}
+              {`${agentData.agent.id.slice(0, 14)}...`}
             </EuiText>
           </EuiToolTip>
         </EuiFlexItem>
@@ -52,7 +52,7 @@ export const agentsTableColumns = ({
     ),
   },
   {
-    field: '_source.agent.groups',
+    field: 'agent.groups',
     name: 'Groups',
     sortable: true,
     show: true,
@@ -60,7 +60,7 @@ export const agentsTableColumns = ({
     searchable: true,
   },
   {
-    field: '_source.agent.version',
+    field: 'agent.version',
     name: 'Version',
     sortable: true,
     show: true,
@@ -92,18 +92,17 @@ export const agentsTableColumns = ({
     },
   },
   {
-    field: '_source.agent.host.os.name,_source.agent.host.os.version',
-    composeField: ['host.os.name', 'host.os.version'],
+    field: 'agent.host.os.full',
     name: 'Host OS',
     sortable: true,
     show: true,
     render: (field: string, agentData: IAgentResponse) => (
-      <HostOS os={agentData._source.agent.host?.os} />
+      <HostOS os={agentData.agent.host?.os} />
     ),
     searchable: true,
   },
   {
-    field: '_source.agent.host.ip',
+    field: 'agent.host.ip',
     name: 'Host IP',
     sortable: true,
     show: true,
@@ -111,7 +110,7 @@ export const agentsTableColumns = ({
     width: '140px',
   },
   {
-    field: '_source.agent.status',
+    field: 'agent.status',
     name: 'Status',
     truncateText: true,
     sortable: true,

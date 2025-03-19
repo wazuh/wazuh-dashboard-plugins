@@ -79,7 +79,7 @@ export const AgentList = (props: AgentListProps) => {
     if (agent) {
       try {
         setIsLoadingModal(true);
-        await getAgentManagement().delete(agent._source.agent.id);
+        await getAgentManagement().delete(agent.agent.id);
         setIsLoadingModal(false);
         closeModal();
       } catch {
@@ -194,11 +194,11 @@ export const AgentList = (props: AgentListProps) => {
               <h2>
                 <EuiLink
                   href={getCore().application.getUrlForApp(AGENTS_SUMMARY_ID, {
-                    path: `#/agents/${agent?._source.agent.id}`,
+                    path: `#/agents/${agent?.agent.id}`,
                   })}
                   target='_blank'
                 >
-                  {agent?._source.agent.name}
+                  {agent?.agent.name}
                 </EuiLink>
               </h2>
             </EuiTitle>

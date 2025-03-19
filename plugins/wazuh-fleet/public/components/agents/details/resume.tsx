@@ -27,11 +27,11 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Groups</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  <AgentGroups groups={agent._source.agent.groups} />
+                  <AgentGroups groups={agent.agent.groups} />
                 </EuiDescriptionListDescription>
                 <EuiDescriptionListTitle>Cluster node</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.host.name}
+                  {agent.agent.host.name}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -39,11 +39,11 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Version</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.version}
+                  {agent.agent.version}
                 </EuiDescriptionListDescription>
                 <EuiDescriptionListTitle>Last login</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {utils.formatUIDate(agent._source.agent.last_login)}
+                  {utils.formatUIDate(agent.agent.last_login)}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -57,11 +57,11 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Name</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.host.hostname}
+                  {agent.agent.host.hostname}
                 </EuiDescriptionListDescription>
                 <EuiDescriptionListTitle>IP</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.host.ip}
+                  {agent.agent.host.ip}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -69,11 +69,11 @@ export const AgentResume = ({ agent }: AgentResumeProps) => {
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>OS</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  <HostOS os={agent._source.agent.host.os} />
+                  <HostOS os={agent.agent.host.os} />
                 </EuiDescriptionListDescription>
                 <EuiDescriptionListTitle>Architecture</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.host.architecture}
+                  {agent.agent.host.architecture}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>

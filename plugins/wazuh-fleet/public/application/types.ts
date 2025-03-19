@@ -1,3 +1,4 @@
+import { Filter } from '../../../../src/plugins/data/public';
 import { IAgentResponse } from '../../common/types';
 
 export interface ISearch {
@@ -7,7 +8,7 @@ export interface ISearch {
 }
 
 export interface IGetAllParams {
-  filter?: any[];
+  filters?: Filter[];
   query?: string;
   pagination?: {
     pageSize: number;

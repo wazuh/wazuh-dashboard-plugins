@@ -31,7 +31,7 @@ export const EditAgentGroupsModal = ({
   reloadAgents,
 }: EditAgentGroupsModalProps) => {
   const [selectedGroups, setSelectedGroups] = useState(
-    agent._source.agent.groups?.map(group => ({ label: group })) || [],
+    agent.agent.groups?.map(group => ({ label: group })) || [],
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -39,10 +39,10 @@ export const EditAgentGroupsModal = ({
     const flatSelectedGroups = selectedGroups.map(group => group.label);
     const addedGroups =
       flatSelectedGroups.filter(
-        group => !agent._source.agent.groups?.includes(group),
+        group => !agent.agent.groups?.includes(group),
       ) || [];
     const removedGroups =
-      agent._source.agent.groups?.filter(
+      agent.agent.groups?.filter(
         group => !flatSelectedGroups.includes(group),
       ) || [];
 
@@ -57,15 +57,12 @@ export const EditAgentGroupsModal = ({
       setIsSaving(true);
 
       if (addedGroups.length > 0) {
-        await getAgentManagement().addGroups(
-          agent._source.agent.id,
-          addedGroups,
-        );
+        await getAgentManagement().addGroups(agent.agent.id, addedGroups);
       }
 
       if (removedGroups.length > 0) {
         await getAgentManagement().removeGroups({
-          agentId: agent._source.agent.id,
+          agentId: agent.agent.id,
           groupIds: removedGroups,
         });
       }
@@ -73,7 +70,7 @@ export const EditAgentGroupsModal = ({
       getToasts().add({
         color: 'primary',
         title: 'Agent groups edited',
-        text: `Agent ${agent._source.agent.name} groups have been updated`,
+        text: `Agent ${agent.agent.name} groups have been updated`,
         toastLifeTimeMs: 3000,
       });
       setIsSaving(false);
@@ -83,7 +80,7 @@ export const EditAgentGroupsModal = ({
       getToasts().add({
         color: 'danger',
         title: 'Error editing agent groups',
-        text: `Failed to update groups for agent ${agent._source.agent.name}`,
+        text: `Failed to update groups for agent ${agent.agent.name}`,
         toastLifeTimeMs: 3000,
       });
       setIsSaving(false);
@@ -108,7 +105,7 @@ export const EditAgentGroupsModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.id}
+                  {agent.agent.id}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -116,7 +113,7 @@ export const EditAgentGroupsModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent._source.agent.name}
+                  {agent.agent.name}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
