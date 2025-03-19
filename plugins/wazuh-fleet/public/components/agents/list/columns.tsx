@@ -92,8 +92,7 @@ export const agentsTableColumns = ({
     },
   },
   {
-    field: 'agent.host.os.name,agent.host.os.version',
-    composeField: ['host.os.name', 'host.os.version'],
+    field: 'agent.host.os.full',
     name: 'Host OS',
     sortable: true,
     show: true,
