@@ -95,6 +95,91 @@ export const EditAgentsGroupsModalResult = ({
     );
   };
 
+  const renderAgentsAccordion = () => (
+    <EuiAccordion
+      id='agentsAccordion'
+      arrowDisplay='none'
+      paddingSize='m'
+      buttonContent={`Agents details (${finalAgents.length})`}
+    >
+      {agentsTable(finalAgents)}
+    </EuiAccordion>
+  );
+  const renderErrorCallout = () => (
+    <EuiCallOut
+      color='danger'
+      iconType='alert'
+      title='Could not get agents data'
+    >
+      <EuiText>{getAgentsError?.message}</EuiText>
+    </EuiCallOut>
+  );
+
+  const renderAgentsDataStep = () => {
+    if (getAgentsStatus === 'loading') {
+      return null;
+    }
+
+    return getAgentsStatus === 'complete'
+      ? renderAgentsAccordion()
+      : renderErrorCallout();
+  };
+
+  const AgentGroupActionResult = ({ agent }: { agent: IAgentResponse }) => {
+    const documentResult = documentResults.find(
+      result => result.documentId === agent._id,
+    );
+
+    // Loading state
+    if (!documentResult) {
+      return (
+        <EuiFlexItem key={agent._id}>
+          {groupStatus({
+            isLoading: true,
+            status: RESULT_TYPE.SUCCESS,
+            text: agent.agent.name,
+          })}
+        </EuiFlexItem>
+      );
+    }
+
+    const { result, successAgents } = documentResult;
+    const actionText =
+      editAction === EditActionGroups.ADD ? 'added' : 'removed';
+    const groupsList = groups.join(', ');
+
+    // Success state
+    if (result === RESULT_TYPE.SUCCESS) {
+      return (
+        <EuiFlexItem key={agent._id}>
+          {groupStatus({
+            status: RESULT_TYPE.SUCCESS,
+            text: `${agent.agent.name} (${groupsList} ${actionText})`,
+          })}
+        </EuiFlexItem>
+      );
+    }
+
+    // Error state
+    return (
+      <EuiFlexItem key={agent._id}>
+        {groupStatus({
+          status: RESULT_TYPE.ERROR,
+          text: `${agent.agent.name} (no ${groupsList} have been ${actionText})`,
+        })}
+        {successAgents?.length > 0 && (
+          <>
+            <EuiSpacer size='s' />
+            {groupStatus({
+              status: RESULT_TYPE.SUCCESS,
+              text: `Success agents (${successAgents.length})`,
+            })}
+          </>
+        )}
+      </EuiFlexItem>
+    );
+  };
+
   return (
     <EuiSteps
       steps={[
@@ -102,26 +187,7 @@ export const EditAgentsGroupsModalResult = ({
           step: 1,
           title: 'Retrieve agents data',
           status: getAgentsStatus,
-          children:
-            getAgentsStatus === 'loading' ? null : getAgentsStatus ===
-              'complete' ? (
-              <EuiAccordion
-                id='agentsAccordion'
-                arrowDisplay='none'
-                paddingSize='m'
-                buttonContent={`Agents details (${finalAgents.length})`}
-              >
-                {agentsTable(finalAgents)}
-              </EuiAccordion>
-            ) : (
-              <EuiCallOut
-                color='danger'
-                iconType='alert'
-                title='Could not get agents data'
-              >
-                <EuiText>{getAgentsError?.message}</EuiText>
-              </EuiCallOut>
-            ),
+          children: renderAgentsDataStep(),
         },
         {
           step: 2,
@@ -133,55 +199,9 @@ export const EditAgentsGroupsModalResult = ({
           children:
             getAgentsStatus === 'complete' ? (
               <EuiFlexGroup direction='column'>
-                {finalAgents.map(agent => {
-                  const documentResult = documentResults.find(
-                    documentResult => documentResult.documentId === agent._id,
-                  );
-                  const isLoading = !documentResult;
-
-                  if (isLoading) {
-                    return (
-                      <EuiFlexItem key={agent._id}>
-                        {groupStatus({
-                          isLoading,
-                          status: RESULT_TYPE.SUCCESS,
-                          text: agent.agent.name,
-                        })}
-                      </EuiFlexItem>
-                    );
-                  }
-
-                  const { result, successAgents } = documentResult;
-
-                  if (result === RESULT_TYPE.SUCCESS) {
-                    return (
-                      <EuiFlexItem key={agent._id}>
-                        {groupStatus({
-                          status: RESULT_TYPE.SUCCESS,
-                          text: `${agent.agent.name} (${groups.join(', ')} ${editAction === EditActionGroups.ADD ? 'added' : 'removed'})`,
-                        })}
-                      </EuiFlexItem>
-                    );
-                  }
-
-                  return (
-                    <EuiFlexItem key={agent._id}>
-                      {groupStatus({
-                        status: RESULT_TYPE.ERROR,
-                        text: `${agent.agent.name} (no ${groups.join(', ')} have been ${editAction === EditActionGroups.ADD ? 'added' : 'removed'})`,
-                      })}
-                      {successAgents?.length ? (
-                        <>
-                          <EuiSpacer size='s' />
-                          {groupStatus({
-                            status: RESULT_TYPE.SUCCESS,
-                            text: `Success agents (${successAgents?.length})`,
-                          })}
-                        </>
-                      ) : null}
-                    </EuiFlexItem>
-                  );
-                })}
+                {finalAgents.map(agent => (
+                  <AgentGroupActionResult key={agent._id} agent={agent} />
+                ))}
               </EuiFlexGroup>
             ) : null,
         },
