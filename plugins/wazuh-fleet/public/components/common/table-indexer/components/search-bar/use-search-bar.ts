@@ -7,10 +7,9 @@ import {
   IndexPattern,
   IndexPatternsContract,
 } from '../../../../../../../../src/plugins/data/public';
-import { getPlugins } from '../../../../../plugin-services';
+import { getPlugins, getWazuhCore } from '../../../../../plugin-services';
 import { useQueryManager } from './hooks/use-query';
 import { useTimeFilter } from './hooks/use-time-filter';
-import { transformDateRange } from './search-bar-service';
 
 // Input - types
 interface TUseSearchBarCustomInputs {
@@ -40,6 +39,7 @@ const useSearchBarConfiguration = (
   props: TUseSearchBarProps,
 ): TUserSearchBarResponse => {
   const { indexPattern, filters: defaultFilters } = props;
+  const { transformDateRange } = getWazuhCore().utils;
   // dependencies
   const {
     timeFilter: globalTimeFilter,
@@ -53,9 +53,10 @@ const useSearchBarConfiguration = (
     : useQueryManager();
   // This absoluteDateRange is used to ensure that the date range is the same when we make the
   // pagination request with relative dates like "Last 24 hours"
-  const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>(
-    transformDateRange(globalTimeFilter),
-  );
+  const [absoluteDateRange, setAbsoluteDateRange] = useState<TimeRange>();
+
+  transformDateRange(globalTimeFilter);
+
   // states
   const [isLoading, setIsLoading] = useState(true);
   const [indexPatternSelected, setIndexPatternSelected] =
