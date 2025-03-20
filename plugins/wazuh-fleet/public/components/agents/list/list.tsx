@@ -148,7 +148,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             setIsEditGroupsVisible(false);
             setAgent(undefined);
           }}
-          reloadAgents={() => {}}
+          reloadAgents={() => reloadAgents()}
           agent={agent}
         />
       )}
@@ -178,7 +178,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             setIsEditNameVisible(false);
             setAgent(undefined);
           }}
-          reloadAgents={() => {}}
+          reloadAgents={() => reloadAgents()}
           agent={agent}
         />
       )}

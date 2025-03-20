@@ -39,20 +39,25 @@ export const EditAgentNameModal = ({
     isInvalid: false,
     errors: [],
   });
+  const errorMessagesTypes = {
+    minLength: 'Agent name must be at least 3 characters long',
+    maxLength: 'Agent name cannot exceed 50 characters',
+    newName: 'New agent name cannot be the same as the current one',
+  };
 
   const validateInput = (name: string) => {
     const errors: string[] = [];
 
     if (name === agent.agent.name) {
-      errors.push('New agent name cannot be the same as the current one');
+      errors.push(errorMessagesTypes.newName);
     }
 
     if (name.length < 3) {
-      errors.push('Agent name must be at least 3 characters long');
+      errors.push(errorMessagesTypes.minLength);
     }
 
     if (name.length > 50) {
-      errors.push('Agent name cannot exceed 50 characters');
+      errors.push(errorMessagesTypes.maxLength);
     }
 
     setValidateName({
@@ -61,7 +66,7 @@ export const EditAgentNameModal = ({
     });
   };
 
-  const handleOnSave = async () => {
+  const handleSave = async () => {
     try {
       setIsSaving(true);
       await getAgentManagement().editName(agent.agent.id, newName);
@@ -114,7 +119,7 @@ export const EditAgentNameModal = ({
                   event.preventDefault();
 
                   if (!validateName.isInvalid) {
-                    handleOnSave();
+                    handleSave();
                   }
                 }
               }}
@@ -142,7 +147,7 @@ export const EditAgentNameModal = ({
         <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
         <EuiButton
           disabled={validateName.isInvalid}
-          onClick={handleOnSave}
+          onClick={handleSave}
           fill
           isLoading={isSaving}
         >
