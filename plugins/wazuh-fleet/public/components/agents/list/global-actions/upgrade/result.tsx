@@ -19,7 +19,6 @@ export enum RESULT_TYPE {
   SUCCESS = 'success',
   ERROR = 'error',
 }
-
 interface UpgradeAgentsModalResultProps {
   finalAgents: Agent[];
   getAgentsStatus: string;
@@ -73,7 +72,7 @@ export const UpgradeAgentsModalResult = ({
           name: 'Agent ID',
           align: 'left',
           sortable: true,
-          render: agents => agents.agentIds.join(', '),
+          render: ({ agentIds }: { agentIds: string[] }) => agentIds.join(', '),
         },
         {
           field: 'agent.name',
@@ -126,7 +125,7 @@ export const UpgradeAgentsModalResult = ({
           name: 'Agent IDs',
           align: 'left',
           width: '200px',
-          render: agents => agents.agentIds.join(', '),
+          render: ({ agentIds }: { agentIds: string[] }) => agentIds.join(', '),
         },
       ]}
       pagination={true}
@@ -158,6 +157,106 @@ export const UpgradeAgentsModalResult = ({
     );
   };
 
+  const AgentsDataStep = () => {
+    if (getAgentsStatus === 'loading') {
+      return null;
+    }
+
+    if (getAgentsStatus === 'complete') {
+      return (
+        <EuiAccordion
+          id='agentsAccordion'
+          arrowDisplay='none'
+          paddingSize='m'
+          buttonContent={`Agents details (${finalAgents.length})`}
+        >
+          {agentsTable(finalAgents)}
+        </EuiAccordion>
+      );
+    }
+
+    return (
+      <EuiCallOut
+        color='danger'
+        iconType='alert'
+        title='Could not get agents data'
+      >
+        <EuiText>{getAgentsError?.message}</EuiText>
+      </EuiCallOut>
+    );
+  };
+
+  const UpgradeTasksLoading = () => (
+    <EuiFlexItem key='upgrade-tasks-loading'>
+      <EuiFlexGroup
+        alignItems='center'
+        responsive={false}
+        wrap={false}
+        gutterSize='s'
+      >
+        <EuiFlexItem grow={false}>
+          <EuiLoadingSpinner size='m' />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiText>Creating upgrade agent tasks</EuiText>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </EuiFlexItem>
+  );
+  const UpgradeTasksComplete = () => (
+    <>
+      {successAgents?.length ? (
+        <EuiFlexItem key='upgrade-tasks-success'>
+          <EuiAccordion
+            id='successAccordion'
+            arrowDisplay='none'
+            paddingSize='m'
+            buttonContent={resultStatus({
+              status: RESULT_TYPE.SUCCESS,
+              text: `Upgrade agent tasks created (${successAgents.length})`,
+            })}
+          >
+            {tasksTable(successAgents)}
+          </EuiAccordion>
+        </EuiFlexItem>
+      ) : null}
+      {successAgents?.length && errorAgents?.length ? (
+        <EuiSpacer size='s' />
+      ) : null}
+      {totalErrorAgents ? (
+        <EuiFlexItem key='upgrade-tasks-error'>
+          <EuiAccordion
+            id='errorAccordion'
+            arrowDisplay='none'
+            paddingSize='m'
+            buttonContent={resultStatus({
+              status: RESULT_TYPE.ERROR,
+              text: `Upgrade agent tasks not created (${totalErrorAgents})`,
+            })}
+          >
+            {errorsTable(errorAgents)}
+          </EuiAccordion>
+        </EuiFlexItem>
+      ) : null}
+    </>
+  );
+
+  const UpgradeTasksStep = () => {
+    if (getAgentsStatus !== 'complete') {
+      return null;
+    }
+
+    return (
+      <EuiFlexGroup direction='column'>
+        {saveChangesStatus === 'loading' ? (
+          <UpgradeTasksLoading />
+        ) : (
+          <UpgradeTasksComplete />
+        )}
+      </EuiFlexGroup>
+    );
+  };
+
   return (
     <EuiSteps
       steps={[
@@ -165,89 +264,13 @@ export const UpgradeAgentsModalResult = ({
           step: 1,
           title: 'Retrieve agents data',
           status: getAgentsStatus,
-          children:
-            getAgentsStatus === 'loading' ? null : getAgentsStatus ===
-              'complete' ? (
-              <EuiAccordion
-                id='agentsAccordion'
-                arrowDisplay='none'
-                paddingSize='m'
-                buttonContent={`Agents details (${finalAgents.length})`}
-              >
-                {agentsTable(finalAgents)}
-              </EuiAccordion>
-            ) : (
-              <EuiCallOut
-                color='danger'
-                iconType='alert'
-                title='Could not get agents data'
-              >
-                <EuiText>{getAgentsError?.message}</EuiText>
-              </EuiCallOut>
-            ),
+          children: <AgentsDataStep />,
         },
         {
           step: 2,
           title: 'Upgrade agent tasks',
           status: saveChangesStatus,
-          children:
-            getAgentsStatus === 'complete' ? (
-              <EuiFlexGroup direction='column'>
-                {saveChangesStatus === 'loading' ? (
-                  <EuiFlexItem key='upgrade-tasks-loading'>
-                    <EuiFlexGroup
-                      alignItems='center'
-                      responsive={false}
-                      wrap={false}
-                      gutterSize='s'
-                    >
-                      <EuiFlexItem grow={false}>
-                        <EuiLoadingSpinner size='m' />
-                      </EuiFlexItem>
-                      <EuiFlexItem grow={false}>
-                        <EuiText>Creating upgrade agent tasks</EuiText>
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  </EuiFlexItem>
-                ) : (
-                  <>
-                    {successAgents?.length ? (
-                      <EuiFlexItem key='upgrade-tasks-success'>
-                        <EuiAccordion
-                          id={`$successAccordion`}
-                          arrowDisplay='none'
-                          paddingSize='m'
-                          buttonContent={resultStatus({
-                            status: RESULT_TYPE.SUCCESS,
-                            text: `Upgrade agent tasks created (${successAgents.length})`,
-                          })}
-                        >
-                          {tasksTable(successAgents)}
-                        </EuiAccordion>
-                      </EuiFlexItem>
-                    ) : null}
-                    {successAgents?.length && errorAgents?.length ? (
-                      <EuiSpacer size='s' />
-                    ) : null}
-                    {totalErrorAgents ? (
-                      <EuiFlexItem key='upgrade-tasks-error'>
-                        <EuiAccordion
-                          id={`$errorAccordion`}
-                          arrowDisplay='none'
-                          paddingSize='m'
-                          buttonContent={resultStatus({
-                            status: RESULT_TYPE.ERROR,
-                            text: `Upgrade agent tasks not created (${totalErrorAgents})`,
-                          })}
-                        >
-                          {errorsTable(errorAgents)}
-                        </EuiAccordion>
-                      </EuiFlexItem>
-                    ) : null}
-                  </>
-                )}
-              </EuiFlexGroup>
-            ) : null,
+          children: <UpgradeTasksStep />,
         },
       ]}
     />
