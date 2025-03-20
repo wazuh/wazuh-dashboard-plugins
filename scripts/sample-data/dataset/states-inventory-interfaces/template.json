@@ -78,14 +78,6 @@
           }
         }
       },
-      "network": {
-        "properties": {
-          "type": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          }
-        }
-      },
       "observer": {
         "properties": {
           "ingress": {
@@ -93,10 +85,6 @@
               "interface": {
                 "properties": {
                   "alias": {
-                    "ignore_above": 1024,
-                    "type": "keyword"
-                  },
-                  "id": {
                     "ignore_above": 1024,
                     "type": "keyword"
                   },
@@ -119,14 +107,6 @@
               }
             },
             "type": "object"
-          }
-        }
-      },
-      "operation": {
-        "properties": {
-          "name": {
-            "ignore_above": 1024,
-            "type": "keyword"
           }
         }
       },

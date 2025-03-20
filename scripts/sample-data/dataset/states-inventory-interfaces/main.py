@@ -6,26 +6,21 @@ default_index_name_prefix='wazuh-states-inventory-interfaces'
 default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-def generate_random_ip():
-    return f'{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}'
-
-def generate_random_port():
-    return random.randint(0,65535)
-
 def generate_random_date():
     start_date = datetime.datetime.now()
     end_date = start_date - datetime.timedelta(days=10)
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date.strftime(DATE_FORMAT)
 
+
 def generate_random_agent():
-    agent_id = f'{random.randint(0, 99):03d}'
     return {
-        "id": agent_id,
+        "id": f"{random.randint(0, 99):03d}",
         "name": f"Agent{random.randint(0, 99)}",
         "version": f"v{random.randint(0, 9)}-stable",
         "host": generate_random_host(False),
     }
+
 
 def generate_random_host(is_root_level_level=False):
     if is_root_level_level:
@@ -51,26 +46,19 @@ def generate_random_host(is_root_level_level=False):
             "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
         }
 
-def generate_random_network():
-    return {"type": random.choice(["wired", "wireless"])}
-
 
 def generate_random_interface(is_root_level=False):
     return {
         "alias": f"alias{random.randint(0, 9999)}",
-        "id": f"eth{random.randint(0, 99)}",
         "mtu": f"{random.randint(1000000, 99999999)}",
         "name": f"name{random.randint(0, 9999)}",
         "state": random.choice(["Active", "Inactive", "Unknown"]),
         "type": random.choice(["wireless", "ethernet"]),
     }
 
+
 def generate_random_observer():
     return {"ingress": {"interface": generate_random_interface(False)}}
-
-
-def generate_random_operation():
-    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
 
 def generate_random_wazuh():
     return {
@@ -88,9 +76,7 @@ def generate_document(params):
       "@timestamp": generate_random_date(),
       "agent": generate_random_agent(),
       "host": generate_random_host(True),
-      "network": generate_random_network(),
       "observer": generate_random_observer(),
-      "operation": generate_random_operation(),
       "wazuh": generate_random_wazuh(),
   }
 

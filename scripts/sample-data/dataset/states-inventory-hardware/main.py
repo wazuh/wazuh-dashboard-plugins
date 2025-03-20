@@ -6,21 +6,21 @@ default_index_name_prefix='wazuh-states-inventory-hardware'
 default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-def generate_random_agent():
-    agent_id = f'{random.randint(0, 99):03d}'
-    agent = {
-        'id': agent_id,
-        'name': f'Agent{agent_id}',
-        'version': f'v{random.randint(0, 9)}-stable',
-        'host': generate_random_host(False)
-    }
-    return agent
-
 def generate_random_date():
     start_date = datetime.datetime.now()
     end_date = start_date - datetime.timedelta(days=10)
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date.strftime(DATE_FORMAT)
+
+
+def generate_random_agent():
+    return {
+        "id": f"{random.randint(0, 99):03d}",
+        "name": f"Agent{random.randint(0, 99)}",
+        "version": f"v{random.randint(0, 9)}-stable",
+        "host": generate_random_host(False),
+    }
+
 
 def generate_random_host(is_root_level=False):
     if is_root_level:
@@ -47,10 +47,6 @@ def generate_random_observer():
     return {"serial_number": f"serial{random.randint(0, 9999)}"}
 
 
-def generate_random_operation():
-    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
-
-
 def generate_random_wazuh():
     return {
         "cluster": {
@@ -69,7 +65,6 @@ def generate_document(params):
       "agent": generate_random_agent(),
       "host": generate_random_host(True),
       "observer": generate_random_observer(),
-      "operation": generate_random_operation(),
       "wazuh": generate_random_wazuh(),
   }
 

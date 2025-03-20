@@ -76,7 +76,7 @@ def main():
 
     # Check the selected dataset exists
     if dataset not in datasets:
-        logger.error(f'Dataset [{dataset}] not found. Availabe datasets: {", ".join(datasets)}')
+        logger.error(f'Dataset [{dataset}] not found. Available datasets: {", ".join(datasets)}')
         sys.exit(1)
 
 

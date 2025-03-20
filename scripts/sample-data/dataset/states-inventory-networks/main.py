@@ -6,17 +6,21 @@ default_index_name_prefix='wazuh-states-inventory-networks'
 default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-def generate_random_ip():
-    return f'{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}'
-
-def generate_random_port():
-    return random.randint(0,65535)
-
 def generate_random_date():
     start_date = datetime.datetime.now()
     end_date = start_date - datetime.timedelta(days=10)
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date.strftime(DATE_FORMAT)
+
+
+def generate_random_agent():
+    return {
+        "id": f"{random.randint(0, 99):03d}",
+        "name": f"Agent{random.randint(0, 99)}",
+        "version": f"v{random.randint(0, 9)}-stable",
+        "host": generate_random_host(False),
+    }
+
 
 def generate_random_host(is_root_level_level=False):
     if is_root_level_level:
@@ -30,39 +34,20 @@ def generate_random_host(is_root_level_level=False):
         }
 
 
-def generate_random_agent():
-    agent_id = f'{random.randint(0, 99):03d}'
-    agent = {
-        'id': agent_id,
-        'name': f'Agent{agent_id}',
-        'version': f'v{random.randint(0, 9)}-stable',
-        'host': generate_random_host(False)
-    }
-    return agent
-
-def generate_random_event():
-    return {"id": f"{random.randint(1000, 10000000000)}"}
-
-
 def generate_random_network():
     return {
         "broadcast": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
-        "dhcp": f"dhcp{random.randint(0, 9999)}",
+        "dhcp": random.choice([True,False]),
+        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
         "metric": random.randint(1, 100),
+        "name":  generate_random_interface(),
         "netmask": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
         "protocol": random.choice(["TCP", "UDP", "ICMP"]),
     }
 
+
 def generate_random_interface():
-    return {"name": f"name{random.randint(0, 9999)}"}
-
-
-def generate_random_observer():
-    return {"ingress": {"interface": generate_random_interface()}}
-
-
-def generate_random_operation():
-    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
+    return f"name{random.randint(0, 9999)}"
 
 
 def generate_random_wazuh():
@@ -78,13 +63,9 @@ def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
   return {
-    "@timestamp": generate_random_date(),
-    "agent": generate_random_agent(),
-    "host": generate_random_host(True),
-    "event": generate_random_event(),
-    "network": generate_random_network(),
-    "observer": generate_random_observer(),
-    "operation": generate_random_operation(),
-    "wazuh": generate_random_wazuh(),
+      "@timestamp": generate_random_date(),
+      "agent": generate_random_agent(),
+      "network": generate_random_network(),
+      "wazuh": generate_random_wazuh()
   }
 

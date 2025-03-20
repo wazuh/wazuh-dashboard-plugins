@@ -6,12 +6,6 @@ default_index_name_prefix='wazuh-states-inventory-hotfixes'
 default_index_name=f'{default_index_name_prefix}-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-def generate_random_ip():
-    return f'{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}'
-
-def generate_random_port():
-    return random.randint(0,65535)
-
 def generate_random_date():
     start_date = datetime.datetime.now()
     end_date = start_date - datetime.timedelta(days=10)
@@ -20,9 +14,8 @@ def generate_random_date():
 
 
 def generate_random_agent():
-    agent_id = f'{random.randint(0, 99):03d}'
     agent = {
-        "id": agent_id,
+        "id": f"{random.randint(0, 99):03d}",
         "name": f"Agent{random.randint(0, 99)}",
         "version": f"v{random.randint(0, 9)}-stable",
         "host": generate_random_host(),
@@ -39,10 +32,6 @@ def generate_random_host():
 
 def generate_random_package():
     return {"hotfix": {"name": f"hotfix{random.randint(0, 9999)}"}}
-
-
-def generate_random_operation():
-    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
 
 
 def generate_random_wazuh():
@@ -62,7 +51,6 @@ def generate_document(params):
       "@timestamp": generate_random_date(),
       "agent": generate_random_agent(),
       "package": generate_random_package(),
-      "operation": generate_random_operation(),
       "wazuh": generate_random_wazuh(),
   }
 

@@ -5,22 +5,20 @@ default_count='10000'
 default_index_name='wazuh-states-fim-files-sample'
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-
-def generate_random_agent():
-    agent_id = f'{random.randint(0, 99):03d}'
-    agent = {
-        'id': agent_id,
-        'name': f'Agent{agent_id}',
-        'version': f'v{random.randint(0, 9)}-stable',
-        'host': generate_random_host()
-    }
-    return agent
-
 def generate_random_date():
     start_date = datetime.datetime.now()
     end_date = start_date - datetime.timedelta(days=10)
     random_date = start_date + (end_date - start_date) * random.random()
     return random_date.strftime(DATE_FORMAT)
+
+def generate_random_agent():
+    return {
+        "id": f"{random.randint(0, 99):03d}",
+        "name": f"Agent{random.randint(0, 99)}",
+        "version": f"v{random.randint(0, 9)}-stable",
+        "host": generate_random_host(),
+    }
+
 
 def generate_random_host():
     return {
@@ -36,9 +34,8 @@ def generate_random_data_stream():
 
 def generate_random_event():
     return {
-        "action": random.choice(["added", "modified", "deleted"]),
         "category": random.choice(["registy_value", "registry_key", "file"]),
-        "type": "event",
+        "type": random.choice(["added", "modified", "deleted"])
     }
 
 
@@ -58,10 +55,6 @@ def generate_random_file():
         "size": random.randint(1000, 1000000),
         "uid": f"uid{random.randint(0, 1000)}",
     }
-
-
-def generate_random_operation():
-    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
 
 def generate_random_wazuh():
     return {
@@ -86,7 +79,6 @@ def generate_document(params):
       "data_stream": generate_random_data_stream(),
       "event": generate_random_event(),
       "file": generate_random_file(),
-      "operation": generate_random_operation(),
       "wazuh": generate_random_wazuh(),
   }
 

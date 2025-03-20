@@ -43,10 +43,6 @@
       },
       "event": {
         "properties": {
-          "action": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          },
           "category": {
             "ignore_above": 1024,
             "type": "keyword"
@@ -112,14 +108,6 @@
           }
         }
       },
-      "operation": {
-        "properties": {
-          "name": {
-            "ignore_above": 1024,
-            "type": "keyword"
-          }
-        }
-      },
       "wazuh": {
         "properties": {
           "cluster": {
@@ -159,7 +147,6 @@
         "agent.version",
         "data_stream.type",
         "event.action",
-        "event.category",
         "event.type",
         "file.gid",
         "file.group",
