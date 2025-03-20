@@ -1,4 +1,5 @@
 import { CoreSetup, CoreStart, Plugin } from 'opensearch-dashboards/public';
+import { PLUGIN_ID } from '../common/constants';
 import {
   AppPluginSetupDependencies,
   AppPluginStartDependencies,
@@ -7,9 +8,11 @@ import {
 } from './types';
 import {
   getCore,
+  getIndexPattern,
   setAgentManagement,
   setCore,
   setEnrollAgentManagement,
+  setIndexPattern,
   setPlugins,
   setToasts,
   setWazuhCore,
@@ -52,8 +55,10 @@ export class WazuhFleetPlugin
       },
     });
 
+    setIndexPattern({ getIndexPatternId: () => 'wazuh-agents*' });
+
     plugins.wazuhCore.applicationService.register({
-      id: 'wz-management',
+      id: PLUGIN_ID,
       navGroups: [AgentsNavGroup],
     });
 
@@ -66,14 +71,13 @@ export class WazuhFleetPlugin
   ): Promise<WazuhFleetPluginStart> {
     const queryManagerFactory = plugins.wazuhCore.queryManagerFactory;
     const fleetQueryManager = await queryManagerFactory.create({
-      indexPatterns: [{ id: 'wazuh-agents*' }],
+      indexPatterns: [{ id: getIndexPattern().getIndexPatternId() }],
     });
 
     // TODO: This setter should be local to fleet management instead of using the related to the plugin itself. This approach was done because the integration of FleetManagement is using another setter from plugin-services.
     setAgentManagement(
       AgentManagement({
         queryManagerService: fleetQueryManager,
-        getIndexPatternId: () => 'wazuh-agents*',
         deleteAgent: (agentId: string | string[]) => deleteAgent(agentId),
         removeGroups: (agentId: string, groupsIds: string | string[]) =>
           removeGroups(agentId, groupsIds),

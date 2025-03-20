@@ -32,7 +32,6 @@ export interface IAgentManagement {
 
 export interface IAgentManagementProps {
   queryManagerService: any;
-  getIndexPatternId: () => string;
   deleteAgent: (documentId: string | string[]) => Promise<any>;
   removeGroups: (agentId: string, groups: string | string[]) => Promise<any>;
   editAgentName: (agentId: string, newName: string) => Promise<any>;
@@ -50,6 +49,9 @@ export interface AppSetup {
     commsURLSettingName: string;
     getCommunicationsURL: () => Promise<string>;
     setCommunicationsURL: (url: string) => Promise<string>;
+  };
+  indexPattern: {
+    getIndexPatternId: () => string;
   };
 }
 

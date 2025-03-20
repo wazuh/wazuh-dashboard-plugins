@@ -5,11 +5,10 @@ import {
   IAgentManagementProps,
   IGetAllParams,
 } from '../application/types';
-import { getToasts } from '../plugin-services';
+import { getIndexPattern, getToasts } from '../plugin-services';
 
 export const AgentManagement = ({
   queryManagerService,
-  getIndexPatternId,
   deleteAgent,
   removeGroups,
   editAgentName,
@@ -18,7 +17,7 @@ export const AgentManagement = ({
 }: IAgentManagementProps): IAgentManagement => {
   const createSearchContext = async () =>
     await queryManagerService.createSearchContext({
-      indexPatternId: await getIndexPatternId(),
+      indexPatternId: await getIndexPattern().getIndexPatternId(),
       fixedFilters: [],
       contextId: PLUGIN_ID,
     });

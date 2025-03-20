@@ -107,4 +107,5 @@ export interface Group {
   agents: any;
 }
 
-export type IAgentResponse = IndexedDocument<AgentWrapper> & AgentWrapper;
+export type IAgentResponse = Omit<IndexedDocument<AgentWrapper>, '_source'> &
+  AgentWrapper;
