@@ -45,7 +45,7 @@ export const AgentDetails = ({
 
     getAgentManagement()
       .getByAgentId(id)
-      .then((results: any) => {
+      .then((results: IAgentResponse) => {
         setAgentData(results);
         setIsAgentLoading(false);
       })
