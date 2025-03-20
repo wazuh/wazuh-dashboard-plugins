@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   EuiPageHeader,
   EuiSpacer,
@@ -34,8 +34,7 @@ export interface AgentListProps {
   filters: Filter[];
 }
 
-export const AgentList = (props: AgentListProps) => {
-  const { indexPatterns, filters } = props;
+export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [agent, setAgent] = useState<IAgentResponse>();
@@ -66,9 +65,9 @@ export const AgentList = (props: AgentListProps) => {
     setAgentSelected(selectedItems);
   };
 
-  const reloadAgents = () => {
+  const reloadAgents = useCallback(() => {
     getAgentManagement().getAll();
-  };
+  }, []);
 
   const closeModal = () => {
     setIsDeleteModalVisible(false);

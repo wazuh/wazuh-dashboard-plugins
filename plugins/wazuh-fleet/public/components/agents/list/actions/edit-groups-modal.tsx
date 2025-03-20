@@ -35,7 +35,7 @@ export const EditAgentGroupsModal = ({
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleOnSave = async () => {
+  const handleSave = async () => {
     const flatSelectedGroups = selectedGroups.map(group => group.label);
     const addedGroups =
       flatSelectedGroups.filter(
@@ -46,6 +46,7 @@ export const EditAgentGroupsModal = ({
         group => !flatSelectedGroups.includes(group),
       ) || [];
 
+    // Exit early if no changes
     if (removedGroups.length === 0 && addedGroups.length === 0) {
       setIsSaving(false);
       onClose();
@@ -56,32 +57,37 @@ export const EditAgentGroupsModal = ({
     try {
       setIsSaving(true);
 
+      // Perform group operations in parallel if needed
+      const operations = [];
+
       if (addedGroups.length > 0) {
-        await getAgentManagement().addGroups(agent.agent.id, addedGroups);
+        operations.push(
+          getAgentManagement().addGroups(agent.agent.id, addedGroups),
+        );
       }
 
       if (removedGroups.length > 0) {
-        await getAgentManagement().removeGroups({
-          agentId: agent.agent.id,
-          groupIds: removedGroups,
-        });
+        operations.push(
+          getAgentManagement().removeGroups({
+            agentId: agent.agent.id,
+            groupIds: removedGroups,
+          }),
+        );
       }
 
-      getToasts().add({
-        color: 'primary',
+      await Promise.all(operations);
+
+      getToasts().addInfo({
         title: 'Agent groups edited',
         text: `Agent ${agent.agent.name} groups have been updated`,
-        toastLifeTimeMs: 3000,
       });
       setIsSaving(false);
       reloadAgents();
       onClose();
     } catch {
-      getToasts().add({
-        color: 'danger',
+      getToasts().addDanger({
         title: 'Error editing agent groups',
         text: `Failed to update groups for agent ${agent.agent.name}`,
-        toastLifeTimeMs: 3000,
       });
       setIsSaving(false);
     }
@@ -157,7 +163,7 @@ export const EditAgentGroupsModal = ({
 
       <EuiModalFooter>
         <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
-        <EuiButton onClick={handleOnSave} fill isLoading={isSaving}>
+        <EuiButton onClick={handleSave} fill isLoading={isSaving}>
           Save
         </EuiButton>
       </EuiModalFooter>
