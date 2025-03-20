@@ -12,8 +12,11 @@ import {
 } from '@elastic/eui';
 import { Agent, IAgentResponse } from '../../../../common/types';
 import { AgentResume } from '../details/resume';
-import { getAgentManagement, getCore } from '../../../plugin-services';
-import { NavigationService } from '../../../react-services/navigation-service';
+import {
+  getAgentManagement,
+  getCore,
+  getWazuhCore,
+} from '../../../plugin-services';
 import { enrollmentAgent } from '../../common/views';
 import { TableIndexer } from '../../common/table-indexer/table-indexer';
 import { ConfirmModal } from '../../common/confirm-modal/confirm-modal';
@@ -58,7 +61,9 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
   });
 
   const navigateToDeployNewAgent = () => {
-    NavigationService.getInstance().navigate(enrollmentAgent.path);
+    getWazuhCore()
+      .navigationService.getInstance()
+      .navigate(enrollmentAgent.path);
   };
 
   const onSelectionChange = (selectedItems: Agent[]) => {

@@ -11,12 +11,15 @@
  */
 import { useState, useEffect } from 'react';
 import { createOsdUrlStateStorage } from '../../../../../../../../../src/plugins/opensearch_dashboards_utils/public';
-import { getCore, getPlugins } from '../../../../../../plugin-services';
+import {
+  getCore,
+  getPlugins,
+  getWazuhCore,
+} from '../../../../../../plugin-services';
 import { OSD_URL_STATE_STORAGE_ID } from '../../../../../../../common/constants';
-import { NavigationService } from '../../../../../../react-services/navigation-service';
 
 export function useTimeFilter() {
-  const navigationService = NavigationService.getInstance();
+  const navigationService = getWazuhCore().navigationService.getInstance();
   const config = getCore().uiSettings;
   const history = navigationService.getHistory();
   const osdUrlStateStorage = createOsdUrlStateStorage({
