@@ -1,32 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { EuiFlexGroup, EuiBasicTable, EuiFlexItem } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiBasicTable,
+  EuiFlexItem,
+  EuiBasicTableProps,
+} from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
+import {
+  IndexPattern,
+  Filter,
+} from '../../../../../../src/plugins/data/common';
 import { IAgentResponse } from '../../../../common/types';
 import { getAgentManagement } from '../../../plugin-services';
-import useSearchBar from './components/search-bar/use-search-bar';
+import { SearchBarProps } from '../../../../../wazuh-core/public/components';
+import useSearchBar, {
+  TUseSearchBarProps,
+} from './components/search-bar/use-search-bar';
 import { WzSearchBar } from './components/search-bar/search-bar';
 import { useFilterManager } from './components/search-bar/hooks/use-filter-manager';
 
-interface TDocumentDetailsTab {
-  id: string;
-  name: string;
-  content: any;
-}
-
 export const TableIndexer = (props: {
-  indexPatterns: any;
+  indexPatterns: IndexPattern;
   columns: any;
-  filters: any[];
-  documentDetailsExtraTabs?:
-    | TDocumentDetailsTab[]
-    | (({ document: any, indexPattern: any }) => TDocumentDetailsTab[]);
+  filters: Filter[];
   tableSortingInitialField?: string;
   tableSortingInitialDirection?: string;
-  topTableComponent?: (searchBarProps: any) => React.ReactNode;
-  tableProps?: any;
+  topTableComponent?: (searchBarProps: TUseSearchBarProps) => React.ReactNode;
+  tableProps?: EuiBasicTableProps;
   setAllAgentsSelected: (allAgentsSelected: boolean) => void;
   agentSelected: IAgentResponse[];
-  setParams: (params: object) => void;
+  setParams: (params: { filter: Filter[]; query: SearchBarProps }) => void;
 }) => {
   const {
     indexPatterns,
@@ -62,10 +65,11 @@ export const TableIndexer = (props: {
     filters: [...filtersDefault, ...filters],
   });
   const { query } = searchBarProps;
-  const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+  const [items, setItems] = useState<SearchResponse['hits'][]>([]); // Use the corresponding type.
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    if (agentSelected.length === results?.hits?.length) {
+    if (agentSelected.length === items.length) {
       setAllAgentsSelected(true);
       setParams({
         filter: filters,
@@ -92,10 +96,11 @@ export const TableIndexer = (props: {
           ],
         },
       })
-      .then(results => {
-        setResults(results);
+      .then((results: SearchResponse) => {
+        setItems(results.hits);
+        setTotal(results.total);
       })
-      .catch(error => {
+      .catch((error: unknown) => {
         console.log(error);
       });
     setLoadingSearch(false);
@@ -130,7 +135,7 @@ export const TableIndexer = (props: {
 
   const tablePagination = {
     ...pagination,
-    totalItemCount: results?.total || 0,
+    totalItemCount: total,
     pageSizeOptions: [15, 25, 50, 100],
     hidePerPageOptions: false,
   };
@@ -151,7 +156,7 @@ export const TableIndexer = (props: {
       <EuiFlexItem>
         <EuiBasicTable
           columns={columns}
-          items={results?.hits ?? []}
+          items={items}
           loading={loadingSearch}
           pagination={tablePagination}
           sorting={sorting}
