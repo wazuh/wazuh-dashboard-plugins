@@ -39,7 +39,10 @@ import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-
 // common components/hooks
 import { IndexPattern } from '../../../../../../../src/plugins/data/public';
 import { wzDiscoverRenderColumns } from './render-columns';
-import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
+import {
+  DocumentViewTableAndJson,
+  DocumentViewTableAndJsonPropsAdditionalTabs,
+} from './components/document-view-table-and-json';
 import { WzSearchBar } from '../search-bar';
 import { DataGridVisibleColumnsSelector } from './components/visible-columns-selector';
 import {
@@ -63,6 +66,7 @@ export interface WzTableDiscoverProps {
   displayOnlyNoResultsCalloutOnNoResults?: boolean;
   title?: React.ReactNode;
   inspectDetailsTitle?: string;
+  additionalDocumentDetailsTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
 }
 
 /**
@@ -80,6 +84,7 @@ export const WzTableDiscover = ({
   displayOnlyNoResultsCalloutOnNoResults = false,
   title,
   inspectDetailsTitle = 'Details',
+  additionalDocumentDetailsTabs = [],
 }: WzTableDiscoverProps) => {
   const {
     dataSource,
@@ -313,6 +318,7 @@ export const WzTableDiscover = ({
                       filters={filters}
                       setFilters={setFilters}
                       onFilter={closeFlyoutHandler}
+                      additionalTabs={additionalDocumentDetailsTabs}
                     />
                   </EuiFlexGroup>
                 </EuiFlyoutBody>

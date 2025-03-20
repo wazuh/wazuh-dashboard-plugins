@@ -19,6 +19,7 @@ import useSearchBar, {
 } from '../../common/search-bar/use-search-bar';
 import { useTimeFilter } from './use-time-filter';
 import { transformDateRange } from '../search-bar';
+import { useNewFilterManager } from './use-filter-manager';
 
 export type CreateNewSearchContext =
   | boolean
@@ -38,7 +39,7 @@ interface UseSearchBarParams extends UseDataSourceSearchParams {
 }
 
 function useDataSourceNewSearchContext(context: CreateNewSearchContext) {
-  const filterManager = useMemo(() => new FilterManager(getUiSettings()), []);
+  const filterManager = useNewFilterManager();
 
   return {
     filterManager,
