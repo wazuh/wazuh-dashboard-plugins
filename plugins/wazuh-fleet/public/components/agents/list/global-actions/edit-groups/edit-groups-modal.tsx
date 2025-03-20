@@ -69,10 +69,11 @@ export const EditAgentsGroupsModal = ({
   const getArrayByProperty = (array: any[], propertyName: string) =>
     array.map(element => element[propertyName]);
 
-  const handleOnSave = async () => {
+  const handleSave = async () => {
     setIsResultVisible(true);
     setGetAgentsStatus('loading');
 
+    // Get agents to modify
     let agents = selectedAgents;
 
     if (allAgentsSelected) {
@@ -88,63 +89,67 @@ export const EditAgentsGroupsModal = ({
     }
 
     setGetAgentsStatus('complete');
-
     setFinalAgents(agents);
     setSaveChangesStatus('loading');
 
     const groups = getArrayByProperty(selectedGroups, 'label');
     const agentDocumentIds = getArrayByProperty(agents, '_id');
-    const promises = agentDocumentIds.map(documentId => {
-      const promise =
-        editAction === EditActionGroups.ADD
-          ? getAgentManagement().addGroups(documentId, groups)
-          : getAgentManagement().removeGroups(documentId, groups);
 
-      return promise
-        .then(result => {
-          if (!result) {
-            return;
-          }
+    // Process each agent
+    const processAgent = async (documentId: string) => {
+      try {
+        // Determine which action to perform
+        const actionMethod =
+          editAction === EditActionGroups.ADD
+            ? getAgentManagement().addGroups
+            : getAgentManagement().removeGroups;
+        const result = await actionMethod(documentId, groups);
 
-          const { data, error, message } = result;
-          const {
-            affected_items: affectedItems,
-            failed_items: failedItems,
-            total_failed_items: totalFailedItems,
-          } = data;
+        if (!result) {
+          return;
+        }
 
-          setDocumentResults(results => {
-            const newGroupResult = {
-              documentId,
-              result: error ? RESULT_TYPE.ERROR : RESULT_TYPE.SUCCESS,
-              successAgents: affectedItems,
-              errorAgents: failedItems,
-              errorMessage: message,
-              totalErrorAgents: totalFailedItems,
-            };
+        const { data, error, message } = result;
+        const {
+          affected_items: affectedItems,
+          failed_items: failedItems,
+          total_failed_items: totalFailedItems,
+        } = data;
 
-            return [...results, newGroupResult];
-          });
-        })
-        .catch(error => {
-          setDocumentResults(results => {
-            const newResult: GroupResult = {
-              documentId,
-              result: RESULT_TYPE.ERROR,
-              errorMessage: error.message,
-              errorAgents: {
+        // Update results
+        setDocumentResults(results => [
+          ...results,
+          {
+            documentId,
+            result: error ? RESULT_TYPE.ERROR : RESULT_TYPE.SUCCESS,
+            successAgents: affectedItems,
+            errorAgents: failedItems,
+            errorMessage: message,
+            totalErrorAgents: totalFailedItems,
+          },
+        ]);
+      } catch (error: any) {
+        setDocumentResults(results => [
+          ...results,
+          {
+            documentId,
+            result: RESULT_TYPE.ERROR,
+            errorMessage: error.message,
+            errorAgents: [
+              {
                 error: { message: error.message },
-                groups: groups,
+                id: documentId,
               },
-            };
-
-            return [...results, newResult];
-          });
-        });
-    });
+            ],
+          },
+        ]);
+      }
+    };
 
     try {
-      await Promise.allSettled(promises);
+      await Promise.allSettled(
+        agentDocumentIds.map(element => processAgent(element)),
+      );
       setSaveChangesStatus('complete');
     } catch {
       setSaveChangesStatus('danger');
@@ -241,7 +246,7 @@ export const EditAgentsGroupsModal = ({
           <>
             <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
             <EuiButton
-              onClick={handleOnSave}
+              onClick={handleSave}
               fill
               disabled={!selectedGroups?.length}
             >
