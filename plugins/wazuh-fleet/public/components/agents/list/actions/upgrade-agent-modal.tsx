@@ -41,33 +41,40 @@ interface UpgradeAgentModalProps {
   reloadAgents: () => void;
 }
 
+type PackageType = 'deb' | 'rpm';
+
+interface IOption {
+  value: string;
+  text: string;
+}
+
 export const UpgradeAgentModal = ({
   agent,
   onClose,
   reloadAgents,
 }: UpgradeAgentModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [packageType, setPackageType] = useState<'deb' | 'rpm'>();
+  const [packageType, setPackageType] = useState<PackageType>();
+  const optionSelector: IOption[] = [
+    { value: 'deb', text: 'DEB' },
+    { value: 'rpm', text: 'RPM' },
+  ];
 
-  const showToast = (color: string, title = '', text = '', time = 3000) => {
-    getToasts().add({
-      color: color,
-      title: title,
-      text: text,
-      toastLifeTimeMs: time,
-    });
-  };
-
-  const handleOnSave = async () => {
+  const handleSave = async () => {
     setIsLoading(true);
 
     try {
       await getAgentManagement().upgrade(agent.agent.id);
-      showToast('success', 'Upgrade agent', 'Upgrade task in progress');
+      getToasts().addInfo({
+        title: 'Upgrade agent',
+        text: 'Upgrade task in progress',
+      });
       reloadAgents();
     } catch (error) {
-      showToast('danger', 'Upgrade agent', error.message);
+      getToasts().addDanger({ title: 'Upgrade agent', text: error.message });
+      setIsLoading(false);
     } finally {
+      setIsLoading(false);
       onClose();
     }
   };
@@ -133,10 +140,7 @@ export const UpgradeAgentModal = ({
               <EuiSelect
                 placeholder='Packege type'
                 value={packageType}
-                options={[
-                  { value: 'deb', text: 'DEB' },
-                  { value: 'rpm', text: 'RPM' },
-                ]}
+                options={optionSelector}
                 onChange={event => setPackageType(event.target.value)}
                 hasNoInitialSelection
               />
@@ -163,7 +167,7 @@ export const UpgradeAgentModal = ({
       <EuiModalFooter>
         <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
         <EuiButton
-          onClick={handleOnSave}
+          onClick={handleSave}
           fill
           isLoading={isLoading}
           disabled={showPackageSelector && !packageType}

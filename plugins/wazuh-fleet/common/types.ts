@@ -94,7 +94,7 @@ export interface Agent {
   type: string;
   version: string;
   groups: string[];
-  host?: AgentHost;
+  host: AgentHost;
 }
 
 export interface AgentWrapper {
