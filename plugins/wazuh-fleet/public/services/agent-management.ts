@@ -45,11 +45,9 @@ export const AgentManagement = ({
         ),
       };
     } catch (error) {
-      getToasts().add({
-        color: 'danger',
+      getToasts().addDanger({
         title: 'Error fetching agents',
-        text: error.message || 'Error fetching agents',
-        toastLifeTimeMs: 3000,
+        text: error instanceof Error ? error.message : 'Error fetching agents',
       });
     }
   };
@@ -68,18 +66,20 @@ export const AgentManagement = ({
     try {
       const results = await searchContext.executeQuery();
 
-      return results?.hits?.hits?.[0]
-        ? {
-            ...results?.hits?.hits?.[0],
-            agent: results?.hits?.hits?.[0]?._source?.agent,
-          }
-        : null;
+      if (results?.hits?.hits?.length === 0) {
+        return null;
+      }
+
+      const hit = results.hits.hits[0];
+
+      return {
+        ...hit,
+        agent: hit._source?.agent,
+      };
     } catch (error) {
-      getToasts().add({
-        color: 'danger',
+      getToasts().addDanger({
         title: 'Error fetching agent',
-        text: error.message || 'Error fetching agent',
-        toastLifeTimeMs: 3000,
+        text: error instanceof Error ? error.message : 'Error fetching agent',
       });
     }
   };
@@ -87,18 +87,15 @@ export const AgentManagement = ({
   const handleDeleteAgent = async (documentId: string | string[]) => {
     try {
       await deleteAgent(documentId);
-      getToasts().add({
-        color: 'primary',
+      getToasts().addInfo({
         title: 'Agent deleted',
         text: 'Agent deleted successfully',
-        toastLifeTimeMs: 3000,
       });
     } catch (error) {
-      getToasts().add({
-        color: 'danger',
+      getToasts().addDanger({
         title: 'Error deleting agent',
-        text: error.message || 'Agent could not be deleted',
-        toastLifeTimeMs: 3000,
+        text:
+          error instanceof Error ? error.message : 'Agent could not be deleted',
       });
       throw error;
     }
@@ -108,20 +105,19 @@ export const AgentManagement = ({
     try {
       const result = await upgradeAgent(id);
 
-      getToasts().add({
-        color: 'primary',
+      getToasts().addInfo({
         title: 'Agent upgraded',
         text: 'Agent upgraded successfully',
-        toastLifeTimeMs: 3000,
       });
 
       return result;
     } catch (error) {
-      getToasts().add({
-        color: 'danger',
+      getToasts().addDanger({
         title: 'Error upgrading agent',
-        text: error.message || 'Agent could not be upgraded',
-        toastLifeTimeMs: 3000,
+        text:
+          error instanceof Error
+            ? error.message
+            : 'Agent could not be upgraded',
       });
       throw error;
     }
@@ -130,18 +126,15 @@ export const AgentManagement = ({
   const handleEditAgentName = async (id: string, newName: string) => {
     try {
       await editAgentName(id, newName);
-      getToasts().add({
-        color: 'primary',
+      getToasts().addInfo({
         title: 'Agent name edited',
         text: `Agent name edited successfully to ${newName}`,
-        toastLifeTimeMs: 3000,
       });
     } catch (error) {
-      getToasts().add({
-        color: 'danger',
+      getToasts().addDanger({
         title: 'Error editing agent name',
-        text: error.message || 'Error editing agent name',
-        toastLifeTimeMs: 3000,
+        text:
+          error instanceof Error ? error.message : 'Error editing agent name',
       });
       throw error;
     }
