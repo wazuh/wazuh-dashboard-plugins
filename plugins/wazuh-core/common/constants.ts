@@ -2255,7 +2255,7 @@ hosts:
       ),
     ),
   },
-  'system_inventory_system.pattern': {
+  'system_inventory_systems.pattern': {
     title: 'Index pattern',
     description: 'Default index pattern to use for system inventory.',
     store: {

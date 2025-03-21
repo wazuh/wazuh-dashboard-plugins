@@ -45,13 +45,13 @@ export const withSystemInventoryProtocolsDataSource =
 
 export const withSystemInventorySystemDataSource =
   withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_system.pattern',
+    indexPatternSetting: 'system_inventory_systems.pattern',
   });
 
 export const withSystemInventoryHardwareSystemDataSource =
   withIndexPatternsFromSettingDataSource({
     indexPatternSettings: [
       'system_inventory_hardware.pattern',
-      'system_inventory_system.pattern',
+      'system_inventory_systems.pattern',
     ],
   });
