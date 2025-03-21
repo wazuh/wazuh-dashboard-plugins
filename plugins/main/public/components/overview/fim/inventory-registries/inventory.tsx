@@ -1,16 +1,13 @@
 import React from 'react';
-
-import './inventory.scss';
 import { inventoryTableDefaultColumns } from './config';
 import { withErrorBoundary } from '../../../common/hocs';
 import { compose } from 'redux';
-import { withFIMStateDataSource } from '../common/hocs/validate-fim-states-index-pattern';
+import { withFIMRegistriesDataSource } from '../common/hocs/validate-fim-states-index-pattern';
 import { ModuleEnabledCheck } from '../common/components/check-module-enabled';
 import {
   FILTER_OPERATOR,
-  FIMStatesDataSource,
-  FIMStatesDataSourceRepository,
-  PatternDataSource,
+  FIMRegistriesStatesDataSource,
+  FIMRegistriesStatesDataSourceRepository,
   PatternDataSourceFilterManager,
 } from '../../../common/data-source';
 import { WzTableDiscover } from '../../../common/wazuh-discover/table';
@@ -166,14 +163,14 @@ function renderDiscoverExpandedRow(props: {
   );
 }
 
-export const InventoryFIM = compose(
+export const InventoryFIMRegistries = compose(
   withErrorBoundary,
-  withFIMStateDataSource,
+  withFIMRegistriesDataSource,
 )(({ agent }) => {
   return (
     <WzTableDiscover
-      DataSource={FIMStatesDataSource}
-      DataSourceRepositoryCreator={FIMStatesDataSourceRepository}
+      DataSource={FIMRegistriesStatesDataSource}
+      DataSourceRepositoryCreator={FIMRegistriesStatesDataSourceRepository}
       tableDefaultColumns={inventoryTableDefaultColumns}
       displayOnlyNoResultsCalloutOnNoResults={true}
       additionalDocumentDetailsTabs={({ document }) => {
@@ -186,7 +183,7 @@ export const InventoryFIM = compose(
                 DataSource={PatternDataSource}
                 tableColumns={getDiscoverColumns({ agent: agent })}
                 initialFetchFilters={getImplicitFilters({
-                  file: document._source.file.path,
+                  file: document._source.registry.path,
                 })}
                 expandedRowComponent={(...args) =>
                   renderDiscoverExpandedRow(...args)

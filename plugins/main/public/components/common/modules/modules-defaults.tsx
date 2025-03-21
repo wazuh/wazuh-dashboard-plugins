@@ -77,7 +77,17 @@ import {
   ThreatHuntingDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
-import { InventoryFIM } from '../../overview/fim/inventory';
+import { SystemInventoryProcessesTable } from '../../overview/system-inventory-processes/inventory/inventory';
+import { SystemInventoryPackagesTable } from '../../overview/system-inventory-packages/inventory/inventory';
+import { SystemInventoryNetworksTable } from '../../overview/system-inventory-networks/inventory/inventory';
+import { SystemInventoryHotfixesTable } from '../../overview/system-inventory-hotfixes/inventory/inventory';
+import { SystemInventoryPortsTable } from '../../overview/system-inventory-ports/inventory/inventory';
+import { SystemInventoryInterfacesTable } from '../../overview/system-inventory-interfaces/inventory/inventory';
+import { SystemInventoryProtocolsTable } from '../../overview/system-inventory-protocols/inventory/inventory';
+import { SystemInventorySystemTable } from '../../overview/system-inventory-system/inventory/inventory';
+import { SystemInventoryHardwareTable } from '../../overview/system-inventory-hardware/inventory/inventory';
+import { InventoryFIMFiles } from '../../overview/fim/inventory-files';
+import { InventoryFIMRegistries } from '../../overview/fim/inventory-registries';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -115,10 +125,16 @@ export const ModulesDefaults = {
         component: DashboardFIM,
       },
       {
-        id: 'inventory',
-        name: 'Inventory',
+        id: 'inventory-files',
+        name: 'Inventory - Files',
         buttons: [ButtonExploreAgent],
-        component: InventoryFIM,
+        component: InventoryFIMFiles,
+      },
+      {
+        id: 'inventory-registries',
+        name: 'Inventory - Registries',
+        buttons: [ButtonExploreAgent],
+        component: InventoryFIMRegistries,
       },
       {
         id: 'inventory-og',
@@ -448,6 +464,84 @@ export const ModulesDefaults = {
         tableColumns: tscColumns,
         DataSource: TSCDataSource,
       }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  'system-inventory-hosts': {
+    init: 'hardware',
+    tabs: [
+      {
+        id: 'hardware',
+        name: 'Hardware',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventoryHardwareTable,
+      },
+      {
+        id: 'software',
+        name: 'Software',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventorySystemTable,
+      },
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  'system-inventory-network': {
+    init: 'interfaces',
+    tabs: [
+      {
+        id: 'interfaces',
+        name: 'Interfaces',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventoryInterfacesTable,
+      },
+      {
+        id: 'ports',
+        name: 'Ports',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventoryPortsTable,
+      },
+      {
+        id: 'protocols',
+        name: 'Protocols',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventoryProtocolsTable,
+      },
+      {
+        id: 'settings',
+        name: 'Settings',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventoryNetworksTable,
+      },
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  'system-inventory-software': {
+    init: 'packages',
+    tabs: [
+      {
+        id: 'packages',
+        name: 'Packages',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventoryPackagesTable,
+      },
+      {
+        id: 'hotfixes',
+        name: 'Hotfixes',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventoryHotfixesTable,
+      },
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  'system-inventory-processes': {
+    init: 'proccesses',
+    tabs: [
+      {
+        id: 'proccesses',
+        name: 'Proccesses',
+        buttons: [ButtonExploreAgent],
+        component: SystemInventoryProcessesTable,
+      },
     ],
     availableFor: ['manager', 'agent'],
   },

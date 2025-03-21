@@ -5,7 +5,7 @@ import {
 import { tFilter, PatternDataSourceFilterManager } from '../../index';
 import { PatternDataSource } from '../pattern-data-source';
 
-export class FIMStatesDataSource extends PatternDataSource {
+export class FIMFilesStatesDataSource extends PatternDataSource {
   constructor(id: string, title: string) {
     super(id, title);
   }

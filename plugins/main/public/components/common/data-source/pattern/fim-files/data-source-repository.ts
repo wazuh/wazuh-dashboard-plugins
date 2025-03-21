@@ -1,7 +1,7 @@
 import { PatternDataSourceRepository } from '../pattern-data-source-repository';
 import { tParsedIndexPattern } from '../../index';
 
-export class FIMStatesDataSourceRepository extends PatternDataSourceRepository {
+export class FIMFilesStatesDataSourceRepository extends PatternDataSourceRepository {
   constructor() {
     super();
   }
@@ -27,7 +27,7 @@ export class FIMStatesDataSourceRepository extends PatternDataSourceRepository {
     for (const field of fieldsToCheck) {
       if (
         dataSource[field] &&
-        dataSource[field].toLowerCase().includes('fim')
+        dataSource[field].toLowerCase().includes('fim-files')
       ) {
         return true;
       }

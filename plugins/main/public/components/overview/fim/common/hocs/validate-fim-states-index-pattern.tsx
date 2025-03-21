@@ -1,7 +1,4 @@
 import React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { withGuardAsync } from '../../../../common/hocs';
 import {
   existsIndices,
   existsIndexPattern,
@@ -9,8 +6,8 @@ import {
 } from '../../../../../react-services';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
 import { HTTP_STATUS_CODES } from '../../../../../../common/constants';
+import { withIndexPatternFromSettingDataSource } from '../../../system-inventory/common/hocs/validate-index-pattern';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
@@ -135,15 +132,15 @@ export const PromptCheckIndex = props => {
   );
 };
 
-const mapStateToProps = state => ({
-  indexPatternID: state.appConfig.data['fim.pattern'],
+export const withFIMFilesDataSource = withIndexPatternFromSettingDataSource({
+  indexPatternSetting: 'fim_files.pattern',
+  PromptError: PromptCheckIndex,
+  validate: validateFIMStateDataSources,
 });
 
-export const withFIMStateDataSource = compose(
-  connect(mapStateToProps),
-  withGuardAsync(
-    validateFIMStateDataSources,
-    ({ error, check }) => <PromptCheckIndex error={error} refresh={check} />,
-    () => <LoadingSpinnerDataSource />,
-  ),
-);
+export const withFIMRegistriesDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'fim_registries.pattern',
+    PromptError: PromptCheckIndex,
+    validate: validateFIMStateDataSources,
+  });
