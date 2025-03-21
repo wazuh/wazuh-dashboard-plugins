@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { EuiPanel, EuiIcon } from '@elastic/eui';
+import {
+  EuiPanel,
+  EuiIcon,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+  EuiToolTip,
+  EuiButtonIcon,
+} from '@elastic/eui';
 import _ from 'lodash';
 import { formatUIDate } from '../../../../react-services/time-service';
 import WzRibbon from '../../../common/ribbon/ribbon';
@@ -20,6 +28,10 @@ import {
 } from '../../../common/data-source';
 import { withSystemInventoryHardwareSystemDataSource } from '../../../overview/system-inventory/common/hocs/validate-system-inventory-index-pattern';
 import { WAZUH_AGENTS_OS_TYPE } from '../../../../../common/constants';
+import { getCore } from '../../../../kibana-services';
+import NavigationService from '../../../../react-services/navigation-service';
+import { systemInventoryHosts } from '../../../../utils/applications';
+import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 interface SyscollectorMetricsProps {
   agent: Agent;
@@ -162,19 +174,19 @@ export const InventoryMetrics = withSystemInventoryHardwareSystemDataSource(
         isLoading: isLoading,
         style: { maxWidth: 100 },
       },
-      {
-        key: RibbonItemLabel.OPERATING_SYSTEM,
-        value: data?.software?.host,
-        label: 'Operating system',
-        isLoading: isLoading,
-        style: { maxWidth: 200 },
-        render: (value: Agent) => (
-          <>
-            {getPlatformIcon(value)}
-            {getOsName(value)}
-          </>
-        ),
-      },
+      // {
+      //   key: RibbonItemLabel.OPERATING_SYSTEM,
+      //   value: data?.software?.host,
+      //   label: 'Operating system',
+      //   isLoading: isLoading,
+      //   style: { maxWidth: 200 },
+      //   render: (value: Agent) => (
+      //     <>
+      //       {getPlatformIcon(value)}
+      //       {getOsName(value)}
+      //     </>
+      //   ),
+      // },
       {
         key: 'cpu',
         label: 'CPU',
@@ -207,6 +219,39 @@ export const InventoryMetrics = withSystemInventoryHardwareSystemDataSource(
       },
     ];
 
-    return <WzRibbon data-test-subj='syscollector-metrics' items={items} />;
+    return (
+      <WzRibbon
+        data-test-subj='syscollector-metrics'
+        items={items}
+        title={
+          <EuiFlexGroup justifyContent='spaceBetween'>
+            <EuiFlexItem grow={false}>
+              <EuiTitle>
+                <h2>System inventory</h2>
+              </EuiTitle>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiToolTip
+                  position='top'
+                  content='Open System inventory > Hosts'
+                >
+                  <EuiButtonIcon
+                    iconType='popout'
+                    color='primary'
+                    className='EuiButtonIcon'
+                    href={NavigationService.getInstance().getUrlForApp(
+                      systemInventoryHosts.id,
+                    )}
+                    aria-label='Open System inventory > Hosts'
+                  />
+                </EuiToolTip>
+              </RedirectAppLinks>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        }
+        titleAction
+      />
+    );
   },
 );

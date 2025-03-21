@@ -809,7 +809,7 @@ const about = {
   redirectTo: () => '/settings?tab=about',
 };
 
-const systemInventoryHosts = {
+export const systemInventoryHosts = {
   category: 'wz-category-system-inventory',
   id: 'system-inventory-hosts',
   title: i18n.translate('wz-app-system-inventory-hosts-title', {
