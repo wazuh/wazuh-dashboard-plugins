@@ -827,7 +827,7 @@ const systemInventoryHosts = {
   euiIconType: 'packetbeatApp',
   order: 651,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=system-inventory-hosts&tabView=hardware${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -854,7 +854,7 @@ const systemInventoryNetwork = {
   euiIconType: 'packetbeatApp',
   order: 652,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=system-inventory-network&tabView=hardware${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -881,7 +881,7 @@ const systemInventorySoftware = {
   euiIconType: 'packetbeatApp',
   order: 653,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=system-inventory-software&tabView=hardware${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -908,7 +908,7 @@ const systemInventoryProcesses = {
   euiIconType: 'packetbeatApp',
   order: 654,
   showInOverviewApp: true,
-  showInAgentMenu: false,
+  showInAgentMenu: true,
   redirectTo: () =>
     `/overview/?tab=system-inventory-processes&tabView=hardware${
       store.getState()?.appStateReducers?.currentAgentData?.id
