@@ -41,25 +41,25 @@ export const EditAgentNameModal = ({
     isInvalid: false,
     errors: [],
   });
-  const errorMessagesTypes = {
+  const agentNameErrorMessages = {
     minLength: 'Agent name must be at least 3 characters long',
     maxLength: 'Agent name cannot exceed 50 characters',
-    newName: 'New agent name cannot be the same as the current one',
+    newAgentIdentifier: 'New agent name cannot be the same as the current one',
   };
 
   const validateInput = (name: string) => {
     const errors: string[] = [];
 
     if (name === agent.agent.name) {
-      errors.push(errorMessagesTypes.newName);
+      errors.push(agentNameErrorMessages.newAgentIdentifier);
     }
 
     if (name.length < 3) {
-      errors.push(errorMessagesTypes.minLength);
+      errors.push(agentNameErrorMessages.minLength);
     }
 
     if (name.length > 50) {
-      errors.push(errorMessagesTypes.maxLength);
+      errors.push(agentNameErrorMessages.maxLength);
     }
 
     setValidateName({
