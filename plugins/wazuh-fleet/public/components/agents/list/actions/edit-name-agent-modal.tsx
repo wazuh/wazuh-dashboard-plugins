@@ -33,9 +33,11 @@ export const EditAgentNameModal = ({
   const [newName, setNewName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [validateName, setValidateName] = useState<{
+    isValid: boolean;
     isInvalid: boolean;
     errors: string[];
   }>({
+    isValid: true,
     isInvalid: false,
     errors: [],
   });
@@ -61,6 +63,7 @@ export const EditAgentNameModal = ({
     }
 
     setValidateName({
+      isValid: errors.length === 0,
       isInvalid: errors.length > 0,
       errors: errors,
     });
@@ -118,7 +121,7 @@ export const EditAgentNameModal = ({
                 if (event.key === 'Enter') {
                   event.preventDefault();
 
-                  if (!validateName.isInvalid) {
+                  if (validateName.isValid) {
                     handleSave();
                   }
                 }
