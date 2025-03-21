@@ -112,6 +112,34 @@ export const WAZUH_MODULES = {
     description:
       'Applications, network configuration, open ports and processes running on your monitored systems.',
   },
+  'system-inventory-hosts': {
+    title: 'Hosts',
+    // This appId is not used, for consistency was added.
+    appId: 'system-inventory-hosts',
+    description:
+      'Applications, network configuration, open ports and processes running on your monitored systems.',
+  },
+  'system-inventory-network': {
+    title: 'Processes',
+    // This appId is not used, for consistency was added.
+    appId: 'system-inventory-network',
+    description:
+      'Applications, network configuration, open ports and processes running on your monitored systems.',
+  },
+  'system-inventory-software': {
+    title: 'Processes',
+    // This appId is not used, for consistency was added.
+    appId: 'system-inventory-software',
+    description:
+      'Applications, network configuration, open ports and processes running on your monitored systems.',
+  },
+  'system-inventory-processes': {
+    title: 'Processes',
+    // This appId is not used, for consistency was added.
+    appId: 'system-inventory-processes',
+    description:
+      'Applications, network configuration, open ports and processes running on your monitored systems.',
+  },
   stats: {
     title: 'Stats',
     // This appId is not used, for consistency was added.

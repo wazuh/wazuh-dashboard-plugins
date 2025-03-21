@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress, EuiLink } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { MainSyscollector } from '../../agents/syscollector/main';
@@ -91,7 +91,8 @@ export const AgentView = compose(
 
   const pinnedAgentManager = new PinnedAgentManager();
 
-  const [isLoadingAgent, setIsLoadingAgent] = useState(true);
+  const [isLoadingAgent, setIsLoadingAgent] = useState(false);
+  const isMounted = useRef(false);
 
   const syncAgent = async () => {
     setIsLoadingAgent(true);
@@ -100,8 +101,18 @@ export const AgentView = compose(
   };
 
   useEffect(() => {
-    syncAgent();
+    /* The component has the withAgentSync hook that synchronizes the agent data and this
+    effect would trigger on mount causing the views are mounted 2 times, that causes problems with
+    the views that are wrapped with index pattern creation due to conflict document errors (same index pattern could be tried to create despite it exist). Avoiding the effect is triggered on mount mitigates the problem or canceling the async operations (index patten validation/creation)
+    */
+    if (isMounted.current) {
+      syncAgent();
+    }
   }, [tab]);
+
+  useEffect(() => {
+    isMounted.current = true;
+  }, []);
 
   const switchTab = (tab: string) => {
     navigationService.navigate(`/agents?tab=${tab}&agent=${agentData?.id}`);

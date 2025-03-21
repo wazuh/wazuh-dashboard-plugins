@@ -15,13 +15,18 @@ export async function existsIndexPattern(indexPatternID: string) {
   return await getSavedObjects().client.get('index-pattern', indexPatternID);
 }
 
-export async function createIndexPattern(indexPattern, fields: any) {
+export async function createIndexPattern(
+  indexPattern: string,
+  fields: any,
+  extraAttributes: any = {},
+) {
   try {
     await SavedObject.createSavedObject(
       'index-pattern',
       indexPattern,
       {
         attributes: {
+          ...(extraAttributes ?? {}),
           title: indexPattern,
           timeFieldName: NOT_TIME_FIELD_NAME_INDEX_PATTERN,
         },

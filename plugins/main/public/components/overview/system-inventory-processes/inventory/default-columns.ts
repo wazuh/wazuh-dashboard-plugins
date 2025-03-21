@@ -1,0 +1,15 @@
+export default [
+  { id: 'agent.name' },
+  { id: 'process.name' },
+  // { id: 'euser' },
+  // { id: 'egroup' },
+  { id: 'process.pid' },
+  { id: 'process.parent.pid' },
+  // { id: 'vm_size' },
+  // { id: 'size' },
+  // { id: 'session' },
+  // { id: 'nice' },
+  // { id: 'state' },
+  { id: 'process.command_line' },
+  { id: 'process.args' },
+];

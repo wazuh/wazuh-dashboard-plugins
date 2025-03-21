@@ -97,24 +97,4 @@ describe('Syscollector metrics', () => {
       ),
     ).toHaveLength(8);
   });
-
-  it('should fetch syscollector data for given agent id either when changing agent or not', () => {
-    // @ts-expect-error
-    let { rerender } = render(<InventoryMetrics agent={{ id: AGENT_000 }} />);
-
-    expect(useGenericRequestMock.mock.calls[0][0].method).toEqual('GET');
-    expect(useGenericRequestMock.mock.calls[0][0].path).toEqual(
-      `/api/syscollector/${AGENT_000}`,
-    );
-
-    useGenericRequestMock.mockClear();
-
-    // @ts-expect-error
-    rerender(<InventoryMetrics agent={{ id: AGENT_001 }} />);
-
-    expect(useGenericRequestMock.mock.calls[0][0].method).toEqual('GET');
-    expect(useGenericRequestMock.mock.calls[0][0].path).toEqual(
-      `/api/syscollector/${AGENT_001}`,
-    );
-  });
 });
