@@ -19,6 +19,9 @@ import {
 import { getAgentManagement } from '../../../../plugin-services';
 import { IAgentResponse } from '../../../../../common/types';
 
+const AGENT_NAME_MIN_LENGTH = 3;
+const AGENT_NAME_MAX_LENGTH = 50;
+
 interface EditAgentNameModalProps {
   agent: IAgentResponse;
   onClose: () => void;
@@ -42,8 +45,8 @@ export const EditAgentNameModal = ({
     errors: [],
   });
   const agentNameErrorMessages = {
-    minLength: 'Agent name must be at least 3 characters long',
-    maxLength: 'Agent name cannot exceed 50 characters',
+    minLength: `Agent name must be at least ${AGENT_NAME_MIN_LENGTH} characters long`,
+    maxLength: `Agent name cannot exceed ${AGENT_NAME_MAX_LENGTH} characters`,
     newAgentIdentifier: 'New agent name cannot be the same as the current one',
   };
 
@@ -54,11 +57,11 @@ export const EditAgentNameModal = ({
       errors.push(agentNameErrorMessages.newAgentIdentifier);
     }
 
-    if (name.length < 3) {
+    if (name.length < AGENT_NAME_MIN_LENGTH) {
       errors.push(agentNameErrorMessages.minLength);
     }
 
-    if (name.length > 50) {
+    if (name.length > AGENT_NAME_MAX_LENGTH) {
       errors.push(agentNameErrorMessages.maxLength);
     }
 
