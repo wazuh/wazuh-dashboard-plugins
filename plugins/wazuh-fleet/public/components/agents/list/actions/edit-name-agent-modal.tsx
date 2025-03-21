@@ -37,11 +37,9 @@ export const EditAgentNameModal = ({
   const [isSaving, setIsSaving] = useState(false);
   const [validateName, setValidateName] = useState<{
     isValid: boolean;
-    isInvalid: boolean;
     errors: string[];
   }>({
     isValid: true,
-    isInvalid: false,
     errors: [],
   });
   const agentNameErrorMessages = {
@@ -67,7 +65,6 @@ export const EditAgentNameModal = ({
 
     setValidateName({
       isValid: errors.length === 0,
-      isInvalid: errors.length > 0,
       errors: errors,
     });
   };
@@ -110,7 +107,7 @@ export const EditAgentNameModal = ({
         <EuiFlexItem>
           <EuiFormRow
             label='New name'
-            isInvalid={validateName.isInvalid}
+            isInvalid={!validateName.isValid}
             error={validateName.errors}
           >
             <EuiFieldText
@@ -152,7 +149,7 @@ export const EditAgentNameModal = ({
       <EuiModalFooter>
         <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
         <EuiButton
-          disabled={validateName.isInvalid}
+          disabled={!validateName.isValid}
           onClick={handleSave}
           fill
           isLoading={isSaving}
