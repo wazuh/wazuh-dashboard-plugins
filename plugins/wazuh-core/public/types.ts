@@ -17,6 +17,7 @@ import {
   DashboardSecurityServiceSetupReturn,
 } from './services/dashboard-security';
 import { ApplicationService } from './services/application/application';
+import { IQueryManagerFactory } from './services/query-manager/types';
 
 export interface AppPluginSetupDependencies {
   data: DataPublicPluginSetup;
@@ -56,6 +57,7 @@ export interface WazuhCorePluginSetup {
 }
 
 export interface WazuhCorePluginStart {
+  queryManagerFactory: IQueryManagerFactory;
   utils: { formatUIDate: (date: Date) => string };
   applicationService: ApplicationService;
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;

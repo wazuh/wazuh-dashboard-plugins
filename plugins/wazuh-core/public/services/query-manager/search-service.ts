@@ -1,4 +1,4 @@
-import { OpenSearchQuerySortValue, TimeRange } from 'src/plugins/data/public';
+import { OpenSearchQuerySortValue } from 'src/plugins/data/public';
 import { SearchResponse } from 'src/core/server';
 import dateMath from '@elastic/datemath';
 import { parse } from 'query-string';
@@ -56,15 +56,6 @@ export function getForceNow() {
   }
 
   return new Date(ticks);
-}
-
-export function transformDateRange(dateRange: TimeRange) {
-  return {
-    from: dateMath.parse(dateRange.from).toISOString(),
-    to: dateMath
-      .parse(dateRange.to, { roundUp: true, forceNow: getForceNow() })
-      .toISOString(),
-  };
 }
 
 // //////////////////////////////////////////////////////////////////////////////////
