@@ -57,6 +57,7 @@ export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
 export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
 
 // System inventory
+export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory-*';
 export const WAZUH_SYSTEM_INVENTORY_HARDWARE_PATTERN =
   'wazuh-states-inventory-hardware-*';
 export const WAZUH_SYSTEM_INVENTORY_HOTFIXES_PATTERN =
@@ -1974,6 +1975,41 @@ hosts:
     validate: function (value) {
       return SettingsValidator.number(this.options.number)(value);
     },
+  },
+  'system_inventory.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for IT Hygiene.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_IT_HYGIENE_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
   },
   'system_inventory_hardware.pattern': {
     title: 'Index pattern',

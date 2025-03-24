@@ -6,6 +6,7 @@ export * from './pattern-data-source-filter-manager';
 export * from './alerts';
 export * from './fim-files';
 export * from './fim-registries';
+export * from './system-inventory';
 export * from './system-inventory-hardware';
 export * from './system-inventory-hotfixes';
 export * from './system-inventory-network-interfaces';

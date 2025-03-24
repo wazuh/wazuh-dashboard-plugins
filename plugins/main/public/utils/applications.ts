@@ -809,108 +809,24 @@ const about = {
   redirectTo: () => '/settings?tab=about',
 };
 
-export const systemInventoryHosts = {
-  category: 'wz-category-system-inventory',
-  id: 'system-inventory-hosts',
-  title: i18n.translate('wz-app-system-inventory-hosts-title', {
-    defaultMessage: 'Hosts',
+export const ITHygiene = {
+  category: 'wz-category-security-operations',
+  id: 'it-hygiene',
+  title: i18n.translate('wz-app-it-hygiene-title', {
+    defaultMessage: 'IT Hygiene',
   }),
-  breadcrumbLabel: i18n.translate(
-    'wz-app-system-inventory-hosts-breadcrumbLabel',
-    {
-      defaultMessage: 'Hosts',
-    },
-  ),
-  description: i18n.translate('wz-app-system-inventory-hosts-description', {
-    defaultMessage: 'Show information about hosts inventory.',
-  }),
-  euiIconType: 'packetbeatApp',
-  order: 651,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=system-inventory-hosts&tabView=hardware${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
-const systemInventoryNetwork = {
-  category: 'wz-category-system-inventory',
-  id: 'system-inventory-network',
-  title: i18n.translate('wz-app-system-inventory-network-title', {
-    defaultMessage: 'Network',
-  }),
-  breadcrumbLabel: i18n.translate(
-    'wz-app-system-inventory-network-breadcrumbLabel',
-    {
-      defaultMessage: 'Network',
-    },
-  ),
-  description: i18n.translate('wz-app-system-inventory-network-description', {
-    defaultMessage: 'Show information about network inventory.',
-  }),
-  euiIconType: 'packetbeatApp',
-  order: 652,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=system-inventory-network&tabView=hardware${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
-const systemInventorySoftware = {
-  category: 'wz-category-system-inventory',
-  id: 'system-inventory-software',
-  title: i18n.translate('wz-app-system-inventory-software-title', {
-    defaultMessage: 'Software',
-  }),
-  breadcrumbLabel: i18n.translate(
-    'wz-app-system-inventory-software-breadcrumbLabel',
-    {
-      defaultMessage: 'Software',
-    },
-  ),
-  description: i18n.translate('wz-app-system-inventory-software-description', {
-    defaultMessage: 'Show information about software inventory.',
-  }),
-  euiIconType: 'packetbeatApp',
-  order: 653,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=system-inventory-software&tabView=hardware${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
-};
-
-const systemInventoryProcesses = {
-  category: 'wz-category-system-inventory',
-  id: 'system-inventory-processes',
-  title: i18n.translate('wz-app-system-inventory-processes-title', {
+  breadcrumbLabel: i18n.translate('wz-app-it-hygiene-breadcrumbLabel', {
     defaultMessage: 'Processes',
   }),
-  breadcrumbLabel: i18n.translate(
-    'wz-app-system-inventory-processes-breadcrumbLabel',
-    {
-      defaultMessage: 'Processes',
-    },
-  ),
-  description: i18n.translate('wz-app-system-inventory-processes-description', {
-    defaultMessage: 'Show information about processes inventory.',
+  description: i18n.translate('wz-app-it-hygiene-description', {
+    defaultMessage: 'Show information about IT Hygiene.',
   }),
   euiIconType: 'packetbeatApp',
-  order: 654,
+  order: 405,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=system-inventory-processes&tabView=hardware${
+    `/overview/?tab=it-hygiene&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -953,10 +869,7 @@ export const Applications = [
   sampleData,
   appSettings,
   about,
-  systemInventoryHosts,
-  systemInventoryNetwork,
-  systemInventorySoftware,
-  systemInventoryProcesses,
+  ITHygiene,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {

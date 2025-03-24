@@ -30,7 +30,7 @@ import { withSystemInventoryHardwareSystemDataSource } from '../../../overview/s
 import { WAZUH_AGENTS_OS_TYPE } from '../../../../../common/constants';
 import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
-import { systemInventoryHosts } from '../../../../utils/applications';
+import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 interface SyscollectorMetricsProps {
@@ -232,18 +232,15 @@ export const InventoryMetrics = withSystemInventoryHardwareSystemDataSource(
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>
-                <EuiToolTip
-                  position='top'
-                  content='Open System inventory > Hosts'
-                >
+                <EuiToolTip position='top' content={`Open ${ITHygiene.title}`}>
                   <EuiButtonIcon
                     iconType='popout'
                     color='primary'
                     className='EuiButtonIcon'
                     href={NavigationService.getInstance().getUrlForApp(
-                      systemInventoryHosts.id,
+                      ITHygiene.id,
                     )}
-                    aria-label='Open System inventory > Hosts'
+                    aria-label={`Open ${ITHygiene.title}`}
                   />
                 </EuiToolTip>
               </RedirectAppLinks>
