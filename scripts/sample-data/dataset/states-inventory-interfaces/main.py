@@ -21,6 +21,9 @@ def generate_random_agent():
         "host": generate_random_host(False),
     }
 
+def generate_mac_address():
+    mac = [random.randint(0x00, 0xFF) for _ in range(6)]
+    return ':'.join(f'{octet:02x}' for octet in mac)
 
 def generate_random_host(is_root_level_level=False):
     if is_root_level_level:
@@ -39,6 +42,7 @@ def generate_random_host(is_root_level_level=False):
                     "packets": random.randint(100, 10000),
                 },
             },
+            "mac": generate_mac_address()
         }
     else:
         return {
