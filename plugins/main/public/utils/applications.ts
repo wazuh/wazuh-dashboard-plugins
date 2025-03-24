@@ -816,7 +816,7 @@ export const ITHygiene = {
     defaultMessage: 'IT Hygiene',
   }),
   breadcrumbLabel: i18n.translate('wz-app-it-hygiene-breadcrumbLabel', {
-    defaultMessage: 'Processes',
+    defaultMessage: 'IT Hygiene',
   }),
   description: i18n.translate('wz-app-it-hygiene-description', {
     defaultMessage: 'Show information about IT Hygiene.',
