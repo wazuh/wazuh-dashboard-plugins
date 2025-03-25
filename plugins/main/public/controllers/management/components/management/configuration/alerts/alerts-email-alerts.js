@@ -53,13 +53,13 @@ const helpLinks = [
   {
     text: 'Configuring email alerts',
     href: webDocumentationLink(
-      'user-manual/manager/manual-email-report/index.html',
+      'user-manual/manager/alert-management.html#configuring-email-alerts',
     ),
   },
   {
     text: 'SMTP server with authentication',
     href: webDocumentationLink(
-      'user-manual/manager/manual-email-report/smtp-authentication.html',
+      'user-manual/manager/alert-management.html#smtp-server-with-authentication',
     ),
   },
   {
