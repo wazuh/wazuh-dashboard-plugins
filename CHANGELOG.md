@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Fixed several broken Wazuh documentation links [#7370](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7370)
+- Fixed several broken Wazuh documentation links [#7370](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7370) [#7371](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7371)
 
 ## Wazuh v4.11.1 - OpenSearch Dashboards 2.16.0 - Revision 02
 
