@@ -26,7 +26,13 @@ import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
 import { AppState } from '../../react-services/app-state';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+  WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+} from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import {
   amazonWebServices,
@@ -59,6 +65,8 @@ const sampleThreatDetectionApplication = [
 
 const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 
+const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
+
 export default class WzSampleData extends Component {
   categories: {
     title: string;
@@ -82,19 +90,27 @@ export default class WzSampleData extends Component {
         title: 'Sample security information',
         description: `Sample data, visualizations and dashboards for security information (${sampleSecurityInformationApplication}).`,
         image: '',
-        categorySampleAlertsIndex: 'security',
+        categorySampleAlertsIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       },
       {
         title: `Sample ${malwareDetection.title}`,
         description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
         image: '',
-        categorySampleAlertsIndex: 'auditing-policy-monitoring',
+        categorySampleAlertsIndex:
+          WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       },
       {
         title: 'Sample threat detection and response',
         description: `Sample data, visualizations and dashboards for threat events of detection and response (${sampleThreatDetectionApplication}).`,
         image: '',
-        categorySampleAlertsIndex: 'threat-detection',
+        categorySampleAlertsIndex:
+          WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+      },
+      {
+        title: 'Sample file integrity monitoring',
+        description: `Sample data, visualizations and dashboards for (${sampleFileIntegrityMonitoring}).`,
+        image: '',
+        categorySampleAlertsIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       },
     ];
     this.state = {};

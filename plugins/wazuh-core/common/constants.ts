@@ -82,6 +82,9 @@ export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
 // Sample data
 export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-4.x-';
+export const WAZUH_SAMPLE_FIM_FILES_PREFIX = 'wazuh-states-fim-files-';
+export const WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX =
+  'wazuh-states-fim-registries-';
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
@@ -620,6 +623,80 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+        '*',
+      ),
+    ),
+  },
+  'fim_files.prefix': {
+    title: 'Sample alerts prefix',
+    description:
+      'Define the index name prefix of sample data to files of file integrity monitoring. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SAMPLE_FIM_FILES_PREFIX,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+        '*',
+      ),
+    ),
+  },
+  'fim_registries.prefix': {
+    title: 'Sample fim registries prefix',
+    description:
+      'Define the index name prefix of sample data to registries of file integrity monitoring. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validateUIForm: function (value) {

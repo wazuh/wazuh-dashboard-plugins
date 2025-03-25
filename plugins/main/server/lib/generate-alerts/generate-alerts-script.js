@@ -56,6 +56,10 @@ const {
 const { Random } = require('./helpers/random');
 const { DateFormatter } = require('./helpers/date-formatter');
 const { interpolateAlertProps } = require('./helpers/interpolate-alert-props');
+const {
+  WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
+} = require('../../../common/constants');
+const { generateSampleData } = require('../sample-data');
 
 /**
  * Generate a alert
@@ -1177,11 +1181,21 @@ function generateAlert(params) {
  * @param {number} numAlerts - Define number of alerts
  * @return {*} - Random generated alerts defined with params
  */
-function generateAlerts(params, numAlerts = 1) {
+function generateAlerts(
+  { settingIndexPattern, dataSet, ...params },
+  numAlerts = 1,
+) {
   /** @type {import('./types').Alert[]} */
   const alerts = [];
-  for (let i = 0; i < numAlerts; i++) {
-    alerts.push(generateAlert(params));
+  console.log(params);
+  if (settingIndexPattern === WAZUH_SETTING_ALERTS_SAMPLE_PREFIX) {
+    for (let i = 0; i < numAlerts; i++) {
+      alerts.push(generateAlert(params));
+    }
+  } else {
+    for (let i = 0; i < numAlerts; i++) {
+      alerts.push(generateSampleData(dataSet, params));
+    }
   }
   return alerts;
 }

@@ -38,10 +38,26 @@ export class WazuhElasticCtrl {
   async buildSampleIndexByCategory(
     context: RequestHandlerContext,
     category: string,
-  ): Promise<string> {
-    return `${await context.wazuh_core.configuration.get(
-      'alerts.sample.prefix',
-    )}sample-${category}`;
+  ): Promise<string[]> {
+    const settingsIndexPatterns: string[] = [];
+
+    WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[category].forEach(item => {
+      if (settingsIndexPatterns.includes(item.settingIndexPattern)) {
+        return;
+      }
+      settingsIndexPatterns.push(item.settingIndexPattern);
+    });
+
+    const indexNames = [];
+    for (const settingsIndexPattern of settingsIndexPatterns) {
+      indexNames.push(
+        `${await context.wazuh_core.configuration.get(
+          settingsIndexPattern,
+        )}sample-${category}`,
+      );
+    }
+
+    return indexNames;
   }
 
   /**
@@ -443,16 +459,36 @@ export class WazuhElasticCtrl {
   ) {
     try {
       // Check if wazuh sample alerts index exists
-      const results = await Promise.all(
-        Object.keys(WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS).map(
-          async category =>
-            context.core.opensearch.client.asCurrentUser.indices.exists({
-              index: await this.buildSampleIndexByCategory(context, category),
+      const categoryPromises = Object.keys(
+        WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS,
+      ).map(async category => {
+        const indexNames = await this.buildSampleIndexByCategory(
+          context,
+          category,
+        );
+
+        try {
+          const indexResults = await Promise.all(
+            indexNames.map(async indexName => {
+              return await context.core.opensearch.client.asCurrentUser.indices.get(
+                {
+                  index: indexName,
+                },
+              );
             }),
-        ),
-      );
+          );
+          return indexResults.some(result => result.body);
+        } catch (error) {
+          // If indices.get fails, the index doesn't exist
+          return false;
+        }
+      });
+
+      // Wait for all category checks to complete
+      const results = await Promise.all(categoryPromises);
+
       return response.ok({
-        body: { sampleAlertsInstalled: results.some(result => result.body) },
+        body: { sampleAlertsInstalled: results.some(result => result) },
       });
     } catch (error) {
       return ErrorResponse(
@@ -530,82 +566,99 @@ export class WazuhElasticCtrl {
       request: OpenSearchDashboardsRequest<{ category: string }>,
       response: OpenSearchDashboardsResponseFactory,
     ) => {
-      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+      const sampleIndexNames = await this.buildSampleIndexByCategory(
         context,
         request.params.category,
       );
 
-      try {
-        const bulkPrefix = JSON.stringify({
-          index: {
-            _index: sampleAlertsIndex,
-          },
-        });
-        const alertGenerateParams = (request.body && request.body.params) || {};
+      const sampleDocumentsResponse = [];
 
-        const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
-          request.params.category
-        ]
-          .map(typeAlert =>
-            generateAlerts(
-              { ...typeAlert, ...alertGenerateParams },
-              request.body.alerts ||
-                typeAlert.alerts ||
-                WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
-            ),
-          )
-          .flat();
-        const bulk = sampleAlerts
-          .map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`)
-          .join('');
-
-        // Index alerts
-
-        // Check if wazuh sample alerts index exists
-        const existsSampleIndex =
-          await context.core.opensearch.client.asCurrentUser.indices.exists({
-            index: sampleAlertsIndex,
-          });
-        if (!existsSampleIndex.body) {
-          // Create wazuh sample alerts index
-
-          const configuration = {
-            settings: {
-              index: {
-                number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
-                number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
-              },
+      sampleIndexNames.forEach(async indexName => {
+        try {
+          const bulkPrefix = JSON.stringify({
+            index: {
+              _index: indexName,
             },
-          };
-
-          await context.core.opensearch.client.asCurrentUser.indices.create({
-            index: sampleAlertsIndex,
-            body: configuration,
           });
-          context.wazuh.logger.info(`Index ${sampleAlertsIndex} created`);
+          const alertGenerateParams =
+            (request.body && request.body.params) || {};
+
+          const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
+            request.params.category
+          ]
+            .map(typeAlert =>
+              generateAlerts(
+                { ...typeAlert, ...alertGenerateParams },
+                request.body.alerts ||
+                  typeAlert.alerts ||
+                  WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
+              ),
+            )
+            .flat();
+          const bulk = sampleAlerts
+            .map(
+              sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`,
+            )
+            .join('');
+
+          // Index alerts
+
+          // Check if wazuh sample alerts index exists
+          const existsSampleIndex =
+            await context.core.opensearch.client.asCurrentUser.indices.exists({
+              index: indexName,
+            });
+          if (!existsSampleIndex.body) {
+            // Create wazuh sample alerts index
+
+            const configuration = {
+              settings: {
+                index: {
+                  number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
+                  number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+                },
+              },
+            };
+
+            await context.core.opensearch.client.asCurrentUser.indices.create({
+              index: indexName,
+              body: configuration,
+            });
+            context.wazuh.logger.info(`Index ${indexName} created`);
+          }
+
+          await context.core.opensearch.client.asCurrentUser.bulk({
+            index: indexName,
+            body: bulk,
+          });
+          context.wazuh.logger.info(
+            `Added sample alerts to ${indexName} index`,
+          );
+
+          return sampleDocumentsResponse.push({
+            index: indexName,
+            alertCount: sampleAlerts.length,
+          });
+        } catch (error) {
+          context.wazuh.logger.error(
+            `Error adding sample alerts to ${indexName} index: ${
+              error.message || error
+            }`,
+          );
+
+          const [statusCode, errorMessage] = this.getErrorDetails(error);
+
+          return ErrorResponse(
+            errorMessage || error,
+            1000,
+            statusCode,
+            response,
+          );
         }
-
-        await context.core.opensearch.client.asCurrentUser.bulk({
-          index: sampleAlertsIndex,
-          body: bulk,
-        });
-        context.wazuh.logger.info(
-          `Added sample alerts to ${sampleAlertsIndex} index`,
-        );
-        return response.ok({
-          body: { index: sampleAlertsIndex, alertCount: sampleAlerts.length },
-        });
-      } catch (error) {
-        context.wazuh.logger.error(
-          `Error adding sample alerts to ${sampleAlertsIndex} index: ${
-            error.message || error
-          }`,
-        );
-
-        const [statusCode, errorMessage] = this.getErrorDetails(error);
-
-        return ErrorResponse(errorMessage || error, 1000, statusCode, response);
-      }
+      });
+      return response.ok({
+        body: { sampleDocumentsResponse },
+      });
     },
   );
   /**
