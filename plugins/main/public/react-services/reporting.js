@@ -176,13 +176,15 @@ export class ReportingService {
       const time =
         tab === 'syscollector'
           ? { to: dataSourceContext.time.to, from: dataSourceContext.time.from }
-          : {
+          : dataSourceContext.time
+          ? {
               to: dateMath.parse(dataSourceContext.time.to, {
                 roundUp: true,
                 forceNow: getForceNow(),
               }),
               from: dateMath.parse(dataSourceContext.time.from),
-            };
+            }
+          : undefined;
 
       const data = {
         array: visualizations,

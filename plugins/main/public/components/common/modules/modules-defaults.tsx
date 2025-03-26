@@ -77,6 +77,10 @@ import {
   ThreatHuntingDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
+import { InventoryFIMFiles } from '../../overview/fim/inventory-files';
+import { InventoryFIMRegistries } from '../../overview/fim/inventory-registries';
+import { InventoryITHygiene } from '../../overview/it-hygiene';
+import { DashboardITHygiene } from '../../overview/it-hygiene/dashboards';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -114,8 +118,20 @@ export const ModulesDefaults = {
         component: DashboardFIM,
       },
       {
-        id: 'inventory',
-        name: 'Inventory',
+        id: 'inventory-files',
+        name: 'Inventory - Files',
+        buttons: [ButtonExploreAgent],
+        component: InventoryFIMFiles,
+      },
+      {
+        id: 'inventory-registries',
+        name: 'Inventory - Registries',
+        buttons: [ButtonExploreAgent],
+        component: InventoryFIMRegistries,
+      },
+      {
+        id: 'inventory-og',
+        name: 'InventoryOG',
         buttons: [ButtonExploreAgent],
         component: MainFim,
       },
@@ -441,6 +457,24 @@ export const ModulesDefaults = {
         tableColumns: tscColumns,
         DataSource: TSCDataSource,
       }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  'it-hygiene': {
+    init: 'dashboard',
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardITHygiene,
+      },
+      {
+        id: 'inventory',
+        name: 'Inventory',
+        buttons: [ButtonExploreAgent],
+        component: InventoryITHygiene,
+      },
     ],
     availableFor: ['manager', 'agent'],
   },

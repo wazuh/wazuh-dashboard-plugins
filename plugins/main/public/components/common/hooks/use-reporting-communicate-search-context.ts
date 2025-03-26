@@ -12,7 +12,7 @@ export function useReportingCommunicateSearchContext(context: {
   totalResults: number;
   indexPattern: IIndexPattern;
   filters: any;
-  time: any;
+  time?: any;
   query: any;
 }) {
   const dispatch = useDispatch();

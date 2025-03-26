@@ -35,7 +35,7 @@ const Application =  () => {
 
 ### Routing based on search parameters
 
-Some views are managed depending on the search parameters ( `tab=syscollector` ), and the current version of `react-router-dom` that is `v5` is unable to re-render components when the search parameters change. To cover this requirement, we use a custom routing components/hooks/HOCs that have a similar interface to the provided by the `react-router-dom`.
+Some views are managed depending on the search parameters ( `tab=users` ), and the current version of `react-router-dom` that is `v5` is unable to re-render components when the search parameters change. To cover this requirement, we use a custom routing components/hooks/HOCs that have a similar interface to the provided by the `react-router-dom`.
 
 - Components with similar interface that provided by `react-router-dom`
   - Switch: find the first Route that matches the search paramerts or render the Redirect if this is included

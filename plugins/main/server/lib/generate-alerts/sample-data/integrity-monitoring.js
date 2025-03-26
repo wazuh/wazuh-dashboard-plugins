@@ -38,6 +38,7 @@ module.exports.pathsLinux = [
   '/var/wazuh/queue/fim/db/fim.db',
   '/var/osquery/osquery.db/CURRENT',
   '/run/utmp',
+  '/path/to/file',
 ];
 module.exports.pathsWindows = [
   '[x32] HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\MpKslDrv',
