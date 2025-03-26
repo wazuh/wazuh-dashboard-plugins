@@ -1,4 +1,5 @@
 import { IAgentResponse } from '../../../../../common/types';
+import { getWazuhCore } from '../../../../plugin-services';
 
 export interface AgentsTableGlobalActionsProps {
   setIsFlyoutAgentVisible: (visible: boolean) => void;
@@ -22,6 +23,18 @@ export const agentsTableActions = ({
   // setIsUpgradeModalVisible: (visible: boolean) => void,
   // outdatedAgents: Agent[],
   [
+    {
+      name: 'View agent tasks',
+      description: 'View agent tasks',
+      icon: 'storage',
+      type: 'icon',
+      onClick: (agent: IAgentResponse) => {
+        // TODO: Change this url to the url of the command view with a pinned agent
+        getWazuhCore()
+          .navigationService.getInstance()
+          .navigate(`/agents/${agent.agent.id}`);
+      },
+    },
     {
       name: 'View agent details',
       description: 'View agent details',
