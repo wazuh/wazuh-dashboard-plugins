@@ -62,33 +62,70 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING =
   'auditing-policy-monitoring';
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
+export const WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING =
+  'file-integrity-monitoring';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 3000;
+export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
+export const WAZUH_SETTING_FIM_FILES_PREFIX = 'fim_files.prefix';
+export const WAZUH_SETTING_FIM_REGISTRIES_PREFIX = 'fim_registries.prefix';
 export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
-    { syscheck: true },
-    { aws: true },
-    { office: true },
-    { gcp: true },
-    { authentication: true },
-    { ssh: true },
-    { apache: true, alerts: 2000 },
-    { web: true },
-    { windows: { service_control_manager: true }, alerts: 1000 },
-    { github: true },
+    { syscheck: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    { aws: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    { office: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    { gcp: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    {
+      authentication: true,
+      settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
+    },
+    { ssh: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    {
+      apache: true,
+      alerts: 2000,
+      settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
+    },
+    { web: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    {
+      windows: { service_control_manager: true },
+      alerts: 1000,
+      settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
+    },
+    { github: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
-    { rootcheck: true },
-    { audit: true },
-    { openscap: true },
-    { ciscat: true },
-    { virustotal: true },
-    { yara: true },
+    {
+      rootcheck: true,
+      settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
+    },
+    { audit: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    { openscap: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    { ciscat: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    {
+      virustotal: true,
+      settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
+    },
+    { yara: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
-    { vulnerabilities: true },
-    { osquery: true },
-    { docker: true },
-    { mitre: true },
+    {
+      vulnerabilities: true,
+      settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
+    },
+    { osquery: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    { docker: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+    { mitre: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
+  ],
+  [WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]: [
+    {
+      files: true,
+      settingIndexPattern: WAZUH_SETTING_FIM_FILES_PREFIX,
+      dataSet: 'states-fim-files',
+    },
+    {
+      registries: true,
+      settingIndexPattern: WAZUH_SETTING_FIM_REGISTRIES_PREFIX,
+      dataSet: 'states-fim-registries',
+    },
   ],
 };
 
