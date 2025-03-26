@@ -47,6 +47,7 @@ import { Applications, Categories } from './utils/applications';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
+import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
 
 export class WazuhPlugin
   implements
@@ -115,6 +116,19 @@ export class WazuhPlugin
 
       _.merge(this._mapping, _.zipObject(keysToMap, colorPalette));
     };
+
+    /* ---------------------------------------------------------------------- */
+    /*           Register the supported languages for the query bar           */
+    /* ---------------------------------------------------------------------- */
+    const appIds: string[] = Applications.map(app => app.id);
+    const languageService = plugins.data.query.queryString.languageService;
+    SUPPORTED_LANGUAGES_ARRAY.forEach(language => {
+      const languageInstance = languageService.getLanguage(language);
+      languageService.registerLanguage({
+        ...languageInstance,
+        supportedAppNames: [...languageInstance.supportedAppNames, ...appIds],
+      });
+    });
 
     // Register the applications
     Applications.forEach(app => {

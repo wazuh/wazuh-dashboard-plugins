@@ -535,3 +535,10 @@ export enum FilterStateStore {
   APP_STATE = 'appState',
   GLOBAL_STATE = 'globalState',
 }
+
+export const SUPPORTED_LANGUAGES = {
+  KUERY: 'kuery',
+  LUCENE: 'lucene',
+} as const;
+
+export const SUPPORTED_LANGUAGES_ARRAY = Object.values(SUPPORTED_LANGUAGES);
