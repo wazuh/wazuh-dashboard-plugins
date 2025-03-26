@@ -117,9 +117,9 @@ export class WazuhPlugin
       _.merge(this._mapping, _.zipObject(keysToMap, colorPalette));
     };
 
-    /* ---------------------------------------------------------------------- */
-    /*           Register the supported languages for the query bar           */
-    /* ---------------------------------------------------------------------- */
+    // Register the supported languages for the query bar, including Wazuh
+    // applications IDs to enable the use of Saved queries in our search bar
+    // implementations
     const appIds: string[] = Applications.map(app => app.id);
     const languageService = plugins.data.query.queryString.languageService;
     SUPPORTED_LANGUAGES_ARRAY.forEach(language => {
