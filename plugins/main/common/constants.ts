@@ -537,7 +537,7 @@ export enum FilterStateStore {
 }
 
 export const SUPPORTED_LANGUAGES = {
-  KUERY: 'kuery',
+  DQL: 'kuery',
   LUCENE: 'lucene',
 } as const;
 
