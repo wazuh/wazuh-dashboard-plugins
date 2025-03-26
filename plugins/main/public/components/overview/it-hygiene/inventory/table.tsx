@@ -167,7 +167,6 @@ export const WzTableUseParentDataSource = ({
     if (isDataSourceLoading) {
       return;
     }
-    console.log('FETCH DATA', { fetchFilters });
     fetchData({ pagination, sorting, filters: [...fetchFilters] })
       .then(results => {
         setResults(results);

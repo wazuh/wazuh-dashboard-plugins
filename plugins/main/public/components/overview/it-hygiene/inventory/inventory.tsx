@@ -42,8 +42,6 @@ export const InventoryITHygiene = () => {
   const shouldDisplayNoResults = false;
   const shouldDisplayTable = false;
 
-  console.log({ dataSource });
-
   return (
     <IntlProvider locale='en'>
       <>
