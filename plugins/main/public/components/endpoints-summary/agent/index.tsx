@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress, EuiLink } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
-import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
 import {
@@ -135,33 +134,6 @@ export const AgentView = compose(
 
   return (
     <Switch>
-      <Route path={`?tab=${AgentTabs.SOFTWARE}`}>
-        <MainModuleAgent
-          agent={agentData}
-          section={tab}
-          switchTab={switchTab}
-          unPinAgent={unPinAgent}
-        />
-        <MainSyscollector agent={agentData} section={tab} />
-      </Route>
-      <Route path={`?tab=${AgentTabs.NETWORK}`}>
-        <MainModuleAgent
-          agent={agentData}
-          section={tab}
-          switchTab={switchTab}
-          unPinAgent={unPinAgent}
-        />
-        <MainSyscollector agent={agentData} section={tab} />
-      </Route>
-      <Route path={`?tab=${AgentTabs.PROCESSES}`}>
-        <MainModuleAgent
-          agent={agentData}
-          section={tab}
-          switchTab={switchTab}
-          unPinAgent={unPinAgent}
-        />
-        <MainSyscollector agent={agentData} section={tab} />
-      </Route>
       <Route path={`?tab=${AgentTabs.STATS}`}>
         <MainModuleAgent
           agent={agentData}

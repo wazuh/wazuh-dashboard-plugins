@@ -7,7 +7,7 @@ import {
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { HTTP_STATUS_CODES } from '../../../../../../common/constants';
-import { withIndexPatternFromSettingDataSource } from '../../../system-inventory/common/hocs/validate-index-pattern';
+import { withIndexPatternFromSettingDataSource } from '../../../it-hygiene/common/hocs/validate-index-pattern';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 

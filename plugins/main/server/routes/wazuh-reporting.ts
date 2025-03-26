@@ -58,6 +58,7 @@ export function WazuhReportingRoutes(router: IRouter) {
     schema.literal('nist'),
     schema.literal('gdpr'),
     schema.literal('tsc'),
+    schema.literal('it-hygiene'),
   ]);
 
   router.post(
@@ -77,13 +78,15 @@ export function WazuhReportingRoutes(router: IRouter) {
           section: schema.maybe(schema.string()),
           tab: schema.string(),
           tables: schema.maybe(schema.any()),
-          time: schema.oneOf([
-            schema.object({
-              from: schema.string(),
-              to: schema.string(),
-            }),
-            schema.string(),
-          ]),
+          time: schema.maybe(
+            schema.oneOf([
+              schema.object({
+                from: schema.string(),
+                to: schema.string(),
+              }),
+              schema.string(),
+            ]),
+          ),
           indexPatternTitle: schema.string(),
           apiId: schema.string(),
         }),

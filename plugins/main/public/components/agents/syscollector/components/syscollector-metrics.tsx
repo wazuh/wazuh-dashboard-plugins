@@ -18,15 +18,15 @@ import {
 import { getOsName } from '../../../common/platform';
 import { Agent } from '../../../endpoints-summary/types';
 import {
+  FILTER_OPERATOR,
   PatternDataSource,
-  SystemInventoryHardwareStatesDataSource,
-  SystemInventoryHardwareStatesDataSourceRepository,
-  SystemInventorySystemStatesDataSource,
-  SystemInventorySystemStatesDataSourceRepository,
+  PatternDataSourceFilterManager,
+  SystemInventoryStatesDataSource,
+  SystemInventoryStatesDataSourceRepository,
   tParsedIndexPattern,
   useDataSource,
 } from '../../../common/data-source';
-import { withSystemInventoryHardwareSystemDataSource } from '../../../overview/system-inventory/common/hocs/validate-system-inventory-index-pattern';
+import { withSystemInventoryDataSource } from '../../../overview/it-hygiene/common/hocs/validate-system-inventory-index-pattern';
 import { WAZUH_AGENTS_OS_TYPE } from '../../../../../common/constants';
 import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
@@ -83,49 +83,57 @@ const getPlatformIcon = (agent?: Agent): React.JSX.Element => {
   return <></>;
 };
 
-export const InventoryMetrics = withSystemInventoryHardwareSystemDataSource(
+export const InventoryMetrics = withSystemInventoryDataSource(
   ({ agent }: SyscollectorMetricsProps) => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [data, setData] = useState<{ hardware: any; software: any } | null>(
       null,
     );
 
-    const hardwareDataSource = useDataSource<
+    const itHygieneDataSource = useDataSource<
       tParsedIndexPattern,
       PatternDataSource
     >({
-      DataSource: SystemInventoryHardwareStatesDataSource,
-      repository: new SystemInventoryHardwareStatesDataSourceRepository(),
-    });
-
-    const softwareDataSource = useDataSource<
-      tParsedIndexPattern,
-      PatternDataSource
-    >({
-      DataSource: SystemInventorySystemStatesDataSource,
-      repository: new SystemInventorySystemStatesDataSourceRepository(),
+      DataSource: SystemInventoryStatesDataSource,
+      repository: new SystemInventoryStatesDataSourceRepository(),
     });
 
     useEffect(() => {
-      if (!hardwareDataSource.isLoading && !softwareDataSource.isLoading) {
+      if (!itHygieneDataSource.isLoading) {
         const fetchInventoryHardwareSystemData = async () => {
           try {
             setIsLoading(true);
             const [hardware, software] = (
               await Promise.all([
-                hardwareDataSource.fetchData({
+                itHygieneDataSource.fetchData({
                   pagination: {
                     // Get the first item
                     pageIndex: 0,
                     pageSize: 1,
                   },
+                  filters: [
+                    PatternDataSourceFilterManager.createFilter(
+                      FILTER_OPERATOR.EXISTS,
+                      'host.cpu.name',
+                      null,
+                      itHygieneDataSource.title,
+                    ),
+                  ],
                 }),
-                softwareDataSource.fetchData({
+                itHygieneDataSource.fetchData({
                   pagination: {
                     // Get the first item
                     pageIndex: 0,
                     pageSize: 1,
                   },
+                  filters: [
+                    PatternDataSourceFilterManager.createFilter(
+                      FILTER_OPERATOR.EXISTS,
+                      'host.os.name',
+                      null,
+                      itHygieneDataSource.title,
+                    ),
+                  ],
                 }),
               ])
             ).map(response => response?.hits?.hits[0]?._source);
@@ -136,7 +144,7 @@ export const InventoryMetrics = withSystemInventoryHardwareSystemDataSource(
         };
         fetchInventoryHardwareSystemData();
       }
-    }, [hardwareDataSource.isLoading, softwareDataSource.isLoading, agent.id]);
+    }, [itHygieneDataSource.isLoading, agent.id]);
 
     if (
       !isLoading &&
