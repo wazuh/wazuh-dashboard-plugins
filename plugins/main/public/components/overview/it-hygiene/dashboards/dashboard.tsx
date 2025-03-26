@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { SearchResponse } from '../../../../../../../../src/core/server';
-import { getPlugins } from '../../../../../kibana-services';
-import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import { getDashboardPanels } from './dashboard_panels';
+import { SearchResponse } from '../../../../../../../src/core/server';
+import { getPlugins } from '../../../../kibana-services';
+import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
+import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
-import useSearchBar from '../../../../common/search-bar/use-search-bar';
+import useSearchBar from '../../../common/search-bar/use-search-bar';
 import './styles.scss';
-import { withErrorBoundary } from '../../../../common/hocs';
-import { DiscoverNoResults } from '../../common/components/no_results';
-import { LoadingSearchbarProgress } from '../../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
+import { withErrorBoundary } from '../../../common/hocs';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
+import { LoadingSearchbarProgress } from '../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 import {
   ErrorFactory,
   ErrorHandler,
   HttpError,
-} from '../../../../../react-services/error-management';
+} from '../../../../react-services/error-management';
 import { compose } from 'redux';
 
 import {
-  VulnerabilitiesDataSourceRepository,
-  VulnerabilitiesDataSource,
   PatternDataSource,
   tParsedIndexPattern,
-} from '../../../../common/data-source';
-import { useDataSource } from '../../../../common/data-source/hooks';
-import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
-import { WzSearchBar } from '../../../../common/search-bar';
+  SystemInventoryStatesDataSource,
+  SystemInventoryStatesDataSourceRepository,
+} from '../../../common/data-source';
+import { useDataSource } from '../../../common/data-source/hooks';
+import { IndexPattern } from '../../../../../../../src/plugins/data/public';
+import { WzSearchBar } from '../../../common/search-bar';
 import { withSystemInventoryDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
+import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -50,8 +51,8 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
     fetchData,
     setFilters,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: VulnerabilitiesDataSource,
-    repository: new VulnerabilitiesDataSourceRepository(),
+    DataSource: SystemInventoryStatesDataSource,
+    repository: new SystemInventoryStatesDataSourceRepository(),
   });
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
@@ -62,6 +63,14 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
     setFilters,
   });
   const { query } = searchBarProps;
+
+  useReportingCommunicateSearchContext({
+    isSearching: isDataSourceLoading,
+    totalResults: results?.hits?.total ?? 0,
+    indexPattern: dataSource?.indexPattern,
+    filters: fetchFilters,
+    query: query,
+  });
 
   useEffect(() => {
     if (isDataSourceLoading) {

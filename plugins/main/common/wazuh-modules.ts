@@ -149,6 +149,11 @@ export const WAZUH_MODULES = {
     description:
       'Monitoring events from audit logs of your GitHub organizations.',
   },
+  'it-hygiene': {
+    title: 'IT Hygiene',
+    appId: 'it-hygiene',
+    description: 'Collect data about the system inventory.',
+  },
   devTools: {
     title: 'API console',
     appId: 'api-console',

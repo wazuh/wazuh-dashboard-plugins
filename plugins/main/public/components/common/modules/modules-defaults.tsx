@@ -80,6 +80,7 @@ import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent
 import { InventoryFIMFiles } from '../../overview/fim/inventory-files';
 import { InventoryFIMRegistries } from '../../overview/fim/inventory-registries';
 import { InventoryITHygiene } from '../../overview/it-hygiene';
+import { DashboardITHygiene } from '../../overview/it-hygiene/dashboards';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -466,7 +467,7 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardTSC,
+        component: DashboardITHygiene,
       },
       {
         id: 'inventory',
