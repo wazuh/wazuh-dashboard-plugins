@@ -78,8 +78,13 @@ const getVisTopOS = (indexPatternId: string) =>
   getPieVis(indexPatternId, 'agent.host.os.name', 'Top 5 OS', 'top_5_os');
 const getVisTopGroups = (indexPatternId: string) =>
   getPieVis(indexPatternId, 'agent.groups', 'Top 5 Groups', 'top_5_groups');
-const getVisTopAgentByNode = (indexPatternId: string) =>
-  getPieVis(indexPatternId, 'agent.status', 'Agents status', 'agents_status');
+const getVisStatus = (indexPatternId: string) =>
+  getPieVis(
+    indexPatternId,
+    'agent.status',
+    'Agents by Status',
+    'agents_status',
+  );
 const VIS_HEIGHT = 10;
 const VIS_WIDTH = 16;
 
@@ -100,7 +105,7 @@ export const getKPIsPanel = (
     type: 'visualization',
     explicitInput: {
       id: '1',
-      savedVis: getVisTopOS(indexPatternId),
+      savedVis: getVisStatus(indexPatternId),
     },
   },
   '2': {
@@ -114,7 +119,7 @@ export const getKPIsPanel = (
     type: 'visualization',
     explicitInput: {
       id: '2',
-      savedVis: getVisTopGroups(indexPatternId),
+      savedVis: getVisTopOS(indexPatternId),
     },
   },
   '3': {
@@ -128,7 +133,7 @@ export const getKPIsPanel = (
     type: 'visualization',
     explicitInput: {
       id: '3',
-      savedVis: getVisTopAgentByNode(indexPatternId),
+      savedVis: getVisTopGroups(indexPatternId),
     },
   },
 });
