@@ -119,17 +119,18 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory-files',
-        name: 'Inventory - Files',
+        name: 'Files',
         buttons: [ButtonExploreAgent],
         component: InventoryFIMFiles,
       },
       {
         id: 'inventory-registries',
-        name: 'Inventory - Registries',
+        name: 'Registries',
         buttons: [ButtonExploreAgent],
         component: InventoryFIMRegistries,
       },
       {
+        // TODO: remove this tab
         id: 'inventory-og',
         name: 'InventoryOG',
         buttons: [ButtonExploreAgent],
