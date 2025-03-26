@@ -83,17 +83,6 @@ export class MainModuleAgent extends Component {
         >
           <ButtonExploreAgent onUnpinAgent={this.props.unPinAgent} />
         </EuiFlexItem>
-        {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
-          section,
-        ) && (
-          <EuiFlexItem
-            grow={false}
-            style={{ marginTop: 13.25, marginInline: 0, paddingInline: 12 }}
-            className='euiTabs'
-          >
-            <GenerateReportButton agent={agent} />
-          </EuiFlexItem>
-        )}
       </EuiFlexGroup>
     );
   }
@@ -153,56 +142,3 @@ export class MainModuleAgent extends Component {
     );
   }
 }
-
-export class AgentInventoryDataSource extends AlertsDataSource {
-  constructor(id: string, title: string) {
-    super(id, title);
-  }
-
-  getFixedFilters(): tFilter[] {
-    return [
-      ...super.getFixedFiltersClusterManager(),
-      ...super.getFixedFilters(),
-    ];
-  }
-}
-
-const GenerateReportButton = ({ agent }: { agent: Agent }) => {
-  return null; // TODO: research if the user can generete a report from system agent inventory or not
-  const {
-    dataSource,
-    fetchFilters,
-    isLoading: isDataSourceLoading,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
-    DataSource: AgentInventoryDataSource,
-  });
-
-  const action = useAsyncAction(async () => {
-    const reportingService = new ReportingService();
-    const agentID =
-      (agent || store.getState().appStateReducers.currentAgentData || {}).id ||
-      false;
-    await reportingService.startVis2Png('syscollector', agentID, {
-      indexPattern: dataSource?.indexPattern,
-      query: { query: '', language: 'kuery' },
-      filters: fetchFilters,
-      time: {
-        from: 'now-1d/d',
-        to: 'now',
-      },
-    });
-  }, [dataSource]);
-
-  return (
-    <EuiButtonEmpty
-      data-test-subj='generate-report-button'
-      iconType='document'
-      isLoading={action.running}
-      isDisabled={isDataSourceLoading}
-      onClick={action.run}
-    >
-      Generate report
-    </EuiButtonEmpty>
-  );
-};
