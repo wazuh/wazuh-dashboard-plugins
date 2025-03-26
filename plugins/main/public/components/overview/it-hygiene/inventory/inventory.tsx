@@ -16,12 +16,12 @@ import {
 } from '../../../common/data-source';
 import { WzSearchBar } from '../../../common/search-bar';
 import { WzTableUseParentDataSource } from './table';
-import packagesColumns from '../../system-inventory-packages/inventory/default-columns';
-import hotfixesColumns from '../../system-inventory-hotfixes/inventory/default-columns';
-import systemColumns from '../../system-inventory-system/inventory/default-columns';
-import processesColumns from '../../system-inventory-processes/inventory/default-columns';
-import portsColumns from '../../system-inventory-ports/inventory/default-columns';
-import interfacesColumns from '../../system-inventory-interfaces/inventory/default-columns';
+import packagesColumns from './table-columns/packages';
+import hotfixesColumns from './table-columns/hotfixes';
+import systemColumns from './table-columns/system';
+import processesColumns from './table-columns/processes';
+import portsColumns from './table-columns/ports';
+import interfacesColumns from './table-columns/interfaces';
 
 export const InventoryITHygiene = () => {
   const {

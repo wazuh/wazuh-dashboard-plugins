@@ -25,7 +25,7 @@ import {
 import { useDataSource } from '../../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { WzSearchBar } from '../../../../common/search-bar';
-import { withSystemInventoryDataSource } from '../../system-inventory/common/hocs/validate-system-inventory-index-pattern';
+import { withSystemInventoryDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
