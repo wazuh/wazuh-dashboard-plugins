@@ -22,13 +22,33 @@ printSuccess() {
   printFormat "$(printGreen "SUCCESS")" "✅ $@"
 }
 
-files=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD | grep -vE "yarn.lock")
+files=$(git diff-index --cached --name-only --diff-filter=ACMR HEAD)
+
+if [ -z "$files" ]; then
+  printInfo "No files to check."
+  exit 0
+fi
+
+files=$(echo "$files" | grep -vE "yarn.lock")
 eslint_files=$(echo "$files" | grep "plugins/" | grep -E ".*\.[jt]sx?$" || true)
 
-printInfo "⏳ Checking for linting errors..."
-./node_modules/.bin/eslint $eslint_files
-printSuccess "ESLint check passed!"
+printInfo ":hourglass_flowing_sand: Checking for linting errors..."
+if [ -z "$eslint_files" ]; then
+  printSuccess "No files to check!"
+else
+  ./node_modules/.bin/eslint $eslint_files
+  printSuccess "ESLint check passed!"
+fi
 
-printInfo "⏳ Checking for formatting errors..."
-./node_modules/.bin/prettier --check --ignore-unknown $files
-printSuccess "Prettier check passed!"
+printInfo ":hourglass_flowing_sand: Checking for formatting errors..."
+if [ -z "$files" ]; then
+  printSuccess "No files to check!"
+else
+  ./node_modules/.bin/prettier --check --ignore-unknown $files
+  printSuccess "Prettier check passed!"
+fi
+
+if [ -z "$eslint_files" ] && [ -z "$files" ]; then
+  printInfo "No linting or formatting errors found."
+  exit 0
+fi

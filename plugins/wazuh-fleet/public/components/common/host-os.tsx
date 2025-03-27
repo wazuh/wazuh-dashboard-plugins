@@ -11,12 +11,26 @@ export interface HostOSProps {
 
 export const HostOS = ({ os }: HostOSProps) => {
   let icon = '';
-  if (os?.platform === 'linux') {
-    icon = 'linux';
-  } else if (os?.platform === 'windows') {
-    icon = 'windows';
-  } else if (os?.platform === 'darwin') {
-    icon = 'apple';
+
+  switch (os?.platform) {
+    case 'linux': {
+      icon = 'linux';
+
+      break;
+    }
+
+    case 'windows': {
+      icon = 'windows';
+
+      break;
+    }
+
+    case 'darwin': {
+      icon = 'apple';
+
+      break;
+    }
+    // No default
   }
 
   return (

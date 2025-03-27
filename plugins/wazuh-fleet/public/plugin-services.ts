@@ -1,4 +1,4 @@
-import { CoreStart } from 'opensearch-dashboards/public';
+import { CoreStart, ToastsStart } from 'opensearch-dashboards/public';
 import { createGetterSetter } from '../../../src/plugins/opensearch_dashboards_utils/common';
 import { WazuhCorePluginStart } from '../../wazuh-core/public';
 import { AppPluginStartDependencies } from './types';
@@ -9,7 +9,16 @@ export const [getPlugins, setPlugins] =
 export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
 export const [getWazuhCore, setWazuhCore] =
   createGetterSetter<WazuhCorePluginStart>('WazuhCore');
+export const [getAgentManagement, setAgentManagement] =
+  createGetterSetter('AgentManagement');
+export const [getToasts, setToasts] = createGetterSetter<ToastsStart>('Toasts');
 export const [getEnrollAgentManagement, setEnrollAgentManagement] =
   createGetterSetter<AppSetup['enrollmentAgentManagement']>(
     'fleetManagementEnrollmentAgentManagement',
   );
+export const [getIndexPattern, setIndexPattern] = createGetterSetter<
+  AppSetup['indexPattern']
+>('fleetManagementIndexPattern');
+export const [getVersionList, setVersionList] = createGetterSetter<
+  AppSetup['versionList']
+>('fleetManagementVersionList');
