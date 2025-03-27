@@ -255,7 +255,7 @@ export const WzTableDiscover = ({
                       additionalControls: (
                         <>
                           <HitsCounter
-                            hits={results?.hits?.total}
+                            hits={results?.hits?.total ?? 0}
                             showResetButton={false}
                             tooltip={
                               results?.hits?.total &&
