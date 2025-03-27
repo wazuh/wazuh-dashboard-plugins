@@ -159,7 +159,10 @@ export const addGroups = async (
   }
 };
 
-export const upgradeAgent = (agentId: string[]): Promise<any> =>
+export const upgradeAgent = (
+  agentId: string[],
+  version: string,
+): Promise<any> =>
   new Promise(resolve => {
     // Simulate API delay
     setTimeout(() => {
@@ -174,7 +177,11 @@ export const upgradeAgent = (agentId: string[]): Promise<any> =>
               affected_items: [
                 {
                   _id: agentId,
-                  _source: { agent: { name: 'agent' }, task_id: '1234' },
+                  _source: {
+                    agent: { name: 'agent' },
+                    task_id: '1234',
+                    version: version,
+                  },
                 },
               ],
               failed_items: [],

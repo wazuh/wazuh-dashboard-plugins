@@ -101,9 +101,9 @@ export const AgentManagement = ({
     }
   };
 
-  const handleUpgradeAgent = async (id: string[]) => {
+  const handleUpgradeAgent = async (id: string[], version: string) => {
     try {
-      const result = await upgradeAgent(id);
+      const result = await upgradeAgent(id, version);
 
       getToasts().addInfo({
         title: 'Agent upgraded',
@@ -170,7 +170,8 @@ export const AgentManagement = ({
     getByAgentId: async (id: string) => await getByAgentId(id),
     delete: async (documentId: string | string[]) =>
       await handleDeleteAgent(documentId),
-    upgrade: async (id: string[]) => await handleUpgradeAgent(id),
+    upgrade: async (id: string[], verion: string) =>
+      await handleUpgradeAgent(id, verion),
     editName: async (id: string, newName: string) =>
       await handleEditAgentName(id, newName),
     removeGroups: async (documentId: string, groupsIds: string | string[]) =>

@@ -29,7 +29,9 @@ export const TableIndexer = (props: {
   tableProps?: EuiBasicTableProps;
   setAllAgentsSelected: (allAgentsSelected: boolean) => void;
   agentSelected: IAgentResponse[];
-  setParams: (params: { filter: Filter[]; query: SearchBarProps }) => void;
+  setParams: (params: { filters: Filter[]; query: SearchBarProps }) => void;
+  needReload: boolean;
+  setNeedReload: (needReload: boolean) => void;
 }) => {
   const {
     indexPatterns,
@@ -42,6 +44,8 @@ export const TableIndexer = (props: {
     agentSelected,
     setAllAgentsSelected,
     setParams,
+    needReload,
+    setNeedReload,
   } = props;
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [pagination, setPagination] = useState({
@@ -72,7 +76,7 @@ export const TableIndexer = (props: {
     if (agentSelected.length === items.length) {
       setAllAgentsSelected(true);
       setParams({
-        filter: filters,
+        filters,
         query,
       });
     } else {
@@ -80,7 +84,7 @@ export const TableIndexer = (props: {
     }
   }, [agentSelected]);
 
-  useEffect(() => {
+  const search = () => {
     setLoadingSearch(true);
     getAgentManagement()
       .getAll({
@@ -104,12 +108,23 @@ export const TableIndexer = (props: {
         console.log(error);
       });
     setLoadingSearch(false);
+  };
+
+  useEffect(() => {
+    search();
   }, [
     filters,
     JSON.stringify(query),
     JSON.stringify(pagination),
     JSON.stringify(sorting),
   ]);
+
+  useEffect(() => {
+    if (needReload) {
+      search();
+      setNeedReload(false);
+    }
+  }, [needReload]);
 
   function tableOnChange({
     page,

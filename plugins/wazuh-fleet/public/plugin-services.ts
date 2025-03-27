@@ -19,3 +19,6 @@ export const [getEnrollAgentManagement, setEnrollAgentManagement] =
 export const [getIndexPattern, setIndexPattern] = createGetterSetter<
   AppSetup['indexPattern']
 >('fleetManagementIndexPattern');
+export const [getVersionList, setVersionList] = createGetterSetter<
+  AppSetup['versionList']
+>('fleetManagementVersionList');

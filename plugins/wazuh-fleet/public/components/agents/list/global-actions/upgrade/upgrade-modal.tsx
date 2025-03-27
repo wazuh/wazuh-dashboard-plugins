@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiModal,
   EuiModalHeader,
@@ -11,10 +11,13 @@ import {
   EuiFormRow,
   EuiText,
   EuiCallOut,
+  EuiSelect,
+  EuiIconTip,
 } from '@elastic/eui';
 import { IAgentResponse } from '../../../../../../common/types';
 import { getAgents } from '../common/get-agents';
 import { getAgentManagement } from '../../../../../plugin-services';
+import { getOptionsToUpgrade } from '../../utils/selector-version-upgrade';
 import { UpgradeAgentsModalResult } from './result';
 
 export interface Result {
@@ -45,6 +48,9 @@ export const UpgradeAgentsModal = ({
   const [saveChangesStatus, setSaveChangesStatus] = useState('disabled');
   const [isResultVisible, setIsResultVisible] = useState(false);
   const [result, setResult] = useState<Result>();
+  const [versionToUpgrade, setVersionToUpgrade] = useState<string>();
+  const [versionToUpgradeOptions, setVersionToUpgradeOptions] =
+    useState<{ value: string; text: string }[]>();
   const getArrayByProperty = (
     array: IAgentResponse[],
     propertyName: string,
@@ -79,6 +85,7 @@ export const UpgradeAgentsModal = ({
     try {
       const response = await getAgentManagement().upgrade({
         agentIds,
+        version: versionToUpgrade,
       });
       const { data, message } = response.data;
       const {
@@ -112,6 +119,12 @@ export const UpgradeAgentsModal = ({
     }
   };
 
+  useEffect(() => {
+    getOptionsToUpgrade().then(response =>
+      setVersionToUpgradeOptions(response),
+    );
+  }, []);
+
   const form = (
     <EuiForm component='form'>
       {allAgentsSelected ? (
@@ -127,6 +140,23 @@ export const UpgradeAgentsModal = ({
           <EuiText>{selectedAgents.length}</EuiText>
         </EuiFormRow>
       )}
+      <EuiFormRow
+        label={
+          <span>
+            Version to upgrade{' '}
+            <EuiIconTip content='Specify the version to upgrade' />
+          </span>
+        }
+        isInvalid={!versionToUpgrade}
+      >
+        <EuiSelect
+          options={versionToUpgradeOptions}
+          value={versionToUpgrade}
+          onChange={event => setVersionToUpgrade(event.target.value)}
+          hasNoInitialSelection
+          compressed
+        />
+      </EuiFormRow>
     </EuiForm>
   );
 
@@ -162,7 +192,7 @@ export const UpgradeAgentsModal = ({
         ) : (
           <>
             <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
-            <EuiButton onClick={handleOnSave} fill>
+            <EuiButton onClick={handleOnSave} fill disabled={!versionToUpgrade}>
               Upgrade
             </EuiButton>
           </>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiForm,
   EuiFormRow,
@@ -19,6 +19,7 @@ import {
 } from '@elastic/eui';
 import { getAgentManagement, getToasts } from '../../../../plugin-services';
 import { IAgentResponse } from '../../../../../common/types';
+import { getOptionsToUpgrade } from '../utils/selector-version-upgrade';
 
 const supportedPlatforms = new Set([
   'debian',
@@ -55,16 +56,25 @@ export const UpgradeAgentModal = ({
 }: UpgradeAgentModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [packageType, setPackageType] = useState<PackageType>();
+  const [versionToUpgrade, setVersionToUpgrade] = useState<string>();
+  const [versionToUpgradeOptions, setVersionToUpgradeOptions] =
+    useState<{ value: string; text: string }[]>();
   const optionSelector: IOption[] = [
     { value: 'deb', text: 'DEB' },
     { value: 'rpm', text: 'RPM' },
   ];
 
+  useEffect(() => {
+    getOptionsToUpgrade().then(response =>
+      setVersionToUpgradeOptions(response),
+    );
+  }, []);
+
   const handleSave = async () => {
     setIsLoading(true);
 
     try {
-      await getAgentManagement().upgrade(agent.agent.id);
+      await getAgentManagement().upgrade(agent.agent.id, versionToUpgrade);
       getToasts().addInfo({
         title: 'Upgrade agent',
         text: 'Upgrade task in progress',
@@ -126,6 +136,25 @@ export const UpgradeAgentModal = ({
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiFormRow
+            label={
+              <span>
+                Version to upgrade{' '}
+                <EuiIconTip content='Specify the version to upgrade' />
+              </span>
+            }
+            isInvalid={!versionToUpgrade}
+          >
+            <EuiSelect
+              options={versionToUpgradeOptions}
+              value={versionToUpgrade}
+              onChange={event => setVersionToUpgrade(event.target.value)}
+              hasNoInitialSelection
+              compressed
+            />
+          </EuiFormRow>
+        </EuiFlexItem>
         {showPackageSelector && (
           <EuiFlexItem>
             <EuiFormRow
@@ -143,6 +172,7 @@ export const UpgradeAgentModal = ({
                 options={optionSelector}
                 onChange={event => setPackageType(event.target.value)}
                 hasNoInitialSelection
+                compressed
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -170,7 +200,7 @@ export const UpgradeAgentModal = ({
           onClick={handleSave}
           fill
           isLoading={isLoading}
-          disabled={showPackageSelector && !packageType}
+          disabled={showPackageSelector && !packageType && !versionToUpgrade}
         >
           Upgrade
         </EuiButton>

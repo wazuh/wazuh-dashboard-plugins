@@ -47,6 +47,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
   const [isEditNameVisible, setIsEditNameVisible] = useState(false);
   const [agentSelected, setAgentSelected] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState<boolean>(false);
+  const [needReload, setNeedReload] = useState<boolean>(false);
   const [params, setParams] = useState({
     filters: [],
     query: '',
@@ -71,7 +72,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
   };
 
   const reloadAgents = useCallback(() => {
-    getAgentManagement().getAll();
+    setNeedReload(true);
   }, []);
 
   const closeModal = () => {
@@ -86,6 +87,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
         await getAgentManagement().delete(agent.agent.id);
         setIsLoadingModal(false);
         closeModal();
+        reloadAgents();
       } catch {
         setIsLoadingModal(false);
       }
@@ -121,6 +123,8 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
       <EuiSpacer />
       {indexPatterns ? (
         <TableIndexer
+          needReload={needReload}
+          setNeedReload={setNeedReload}
           setParams={setParams}
           setAllAgentsSelected={setAllAgentsSelected}
           filters={filters}

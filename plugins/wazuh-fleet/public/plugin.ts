@@ -15,6 +15,7 @@ import {
   setIndexPattern,
   setPlugins,
   setToasts,
+  setVersionList,
   setWazuhCore,
 } from './plugin-services';
 import { AgentManagement } from './services/agent-management';
@@ -26,6 +27,7 @@ import {
   upgradeAgent,
 } from './services/mocks/agent-management';
 import { AgentsNavGroup } from './groups/agents';
+import { versionsToUpgradeMock } from './services/mocks/agent-version';
 
 export class WazuhFleetPlugin
   implements Plugin<WazuhFleetPluginSetup, WazuhFleetPluginStart>
@@ -57,6 +59,10 @@ export class WazuhFleetPlugin
 
     setIndexPattern({ getIndexPatternId: () => 'wazuh-agents*' });
 
+    setVersionList({
+      getVersions: async () => versionsToUpgradeMock,
+    });
+
     plugins.wazuhCore.applicationService.register({
       id: PLUGIN_ID,
       navGroups: [AgentsNavGroup],
@@ -85,7 +91,7 @@ export class WazuhFleetPlugin
           addGroups(agentId, groups),
         editAgentName: (agentId: string, name: string) =>
           editName(agentId, name),
-        upgradeAgent: agentIds => upgradeAgent(agentIds),
+        upgradeAgent: (agentIds, version) => upgradeAgent(agentIds, version),
       }),
     );
 

@@ -1,4 +1,5 @@
 import { Filter } from '../../../../src/plugins/data/public';
+import { AvailableUpdates } from '../../../wazuh-core/common/types';
 import { IAgentResponse } from '../../common/types';
 
 export interface ISearch {
@@ -24,7 +25,7 @@ export interface IAgentManagement {
   getAll: (params: IGetAllParams) => Promise<ISearch>;
   getByAgentId: (id: string) => Promise<ISearch>;
   delete: (id: string | string[]) => Promise<void>;
-  upgrade: (id: string[]) => Promise<void>;
+  upgrade: (id: string[], version: string) => Promise<void>;
   removeGroups: (id: string, groups: string | string[]) => Promise<void>;
   editName: (id: string, newName: string) => Promise<void>;
   addGroups: (id: string, group: string | string[]) => Promise<void>;
@@ -36,7 +37,7 @@ export interface IAgentManagementProps {
   removeGroups: (agentId: string, groups: string | string[]) => Promise<any>;
   editAgentName: (agentId: string, newName: string) => Promise<any>;
   addGroups: (agentId: string, groups: string | string[]) => Promise<any>;
-  upgradeAgent: (agentIds: string[]) => Promise<any>;
+  upgradeAgent: (agentIds: string[], version: string) => Promise<any>;
 }
 
 export interface AppSetup {
@@ -52,6 +53,9 @@ export interface AppSetup {
   };
   indexPattern: {
     getIndexPatternId: () => string;
+  };
+  versionList: {
+    getVersions: () => Promise<AvailableUpdates>;
   };
 }
 
