@@ -22,8 +22,188 @@ import systemColumns from './table-columns/system';
 import processesColumns from './table-columns/processes';
 import portsColumns from './table-columns/ports';
 import interfacesColumns from './table-columns/interfaces';
+import { withSystemInventoryDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
+import { withDataSourceInitiated } from '../../../common/hocs';
 
-export const InventoryITHygiene = () => {
+const InventoryITHygieneDashboard = withDataSourceInitiated(
+  ({
+    dataSource,
+    fetchFilters,
+    fixedFilters,
+    filters,
+    setFilters,
+    searchBarProps,
+    fetchData,
+    fingerprint,
+    isDataSourceLoading,
+  }) => (
+    <>
+      <WzSearchBar
+        appName='wzTable'
+        {...searchBarProps}
+        filters={filters}
+        fixedFilters={fixedFilters}
+        showDatePicker={false}
+        showQueryInput={true}
+        showQueryBar={true}
+        showSaveQuery={true}
+      />
+      <EuiPanel
+        paddingSize='m'
+        hasShadow={false}
+        hasBorder={false}
+        color='transparent'
+      >
+        <EuiFlexGroup gutterSize='s'>
+          <EuiFlexItem>
+            <WzTableUseParentDataSource
+              dataSource={dataSource}
+              fetchFilters={[
+                ...fetchFilters,
+                PatternDataSourceFilterManager.createFilter(
+                  FILTER_OPERATOR.EXISTS,
+                  'package.name',
+                  null,
+                  dataSource.title,
+                ),
+              ]}
+              fixedFilters={fixedFilters}
+              filters={filters}
+              setFilters={setFilters}
+              searchBarProps={searchBarProps}
+              fetchData={fetchData}
+              fingerprint={fingerprint}
+              isDataSourceLoading={isDataSourceLoading}
+              tableDefaultColumns={packagesColumns}
+              title='Packages'
+            />
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <WzTableUseParentDataSource
+              dataSource={dataSource}
+              fetchFilters={[
+                ...fetchFilters,
+                PatternDataSourceFilterManager.createFilter(
+                  FILTER_OPERATOR.EXISTS,
+                  'package.hotfix.name',
+                  null,
+                  dataSource.title,
+                ),
+              ]}
+              fixedFilters={fixedFilters}
+              filters={filters}
+              setFilters={setFilters}
+              searchBarProps={searchBarProps}
+              fetchData={fetchData}
+              fingerprint={fingerprint}
+              isDataSourceLoading={isDataSourceLoading}
+              tableDefaultColumns={hotfixesColumns}
+              title='Windows updates'
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup gutterSize='s'>
+          <EuiFlexItem>
+            <WzTableUseParentDataSource
+              dataSource={dataSource}
+              fetchFilters={[
+                ...fetchFilters,
+                PatternDataSourceFilterManager.createFilter(
+                  FILTER_OPERATOR.EXISTS,
+                  'host.os.name',
+                  null,
+                  dataSource.title,
+                ),
+              ]}
+              fixedFilters={fixedFilters}
+              filters={filters}
+              setFilters={setFilters}
+              searchBarProps={searchBarProps}
+              fetchData={fetchData}
+              fingerprint={fingerprint}
+              isDataSourceLoading={isDataSourceLoading}
+              tableDefaultColumns={systemColumns}
+              title='System'
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup gutterSize='s'>
+          <EuiFlexItem>
+            <WzTableUseParentDataSource
+              dataSource={dataSource}
+              fetchFilters={[
+                ...fetchFilters,
+                PatternDataSourceFilterManager.createFilter(
+                  FILTER_OPERATOR.EXISTS,
+                  'process.pid', // package.name field is present in the ports data
+                  null,
+                  dataSource.title,
+                ),
+              ]}
+              fixedFilters={fixedFilters}
+              filters={filters}
+              setFilters={setFilters}
+              searchBarProps={searchBarProps}
+              fetchData={fetchData}
+              fingerprint={fingerprint}
+              isDataSourceLoading={isDataSourceLoading}
+              tableDefaultColumns={processesColumns}
+              title='Processes'
+            />
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <WzTableUseParentDataSource
+              dataSource={dataSource}
+              fetchFilters={[
+                ...fetchFilters,
+                PatternDataSourceFilterManager.createFilter(
+                  FILTER_OPERATOR.EXISTS,
+                  'destination.port',
+                  null,
+                  dataSource.title,
+                ),
+              ]}
+              fixedFilters={fixedFilters}
+              filters={filters}
+              setFilters={setFilters}
+              searchBarProps={searchBarProps}
+              fetchData={fetchData}
+              fingerprint={fingerprint}
+              isDataSourceLoading={isDataSourceLoading}
+              tableDefaultColumns={portsColumns}
+              title='Ports'
+            />
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <WzTableUseParentDataSource
+              dataSource={dataSource}
+              fetchFilters={[
+                ...fetchFilters,
+                PatternDataSourceFilterManager.createFilter(
+                  FILTER_OPERATOR.EXISTS,
+                  'observer.ingress.interface.name',
+                  null,
+                  dataSource.title,
+                ),
+              ]}
+              fixedFilters={fixedFilters}
+              filters={filters}
+              setFilters={setFilters}
+              searchBarProps={searchBarProps}
+              fetchData={fetchData}
+              fingerprint={fingerprint}
+              isDataSourceLoading={isDataSourceLoading}
+              tableDefaultColumns={interfacesColumns}
+              title='Interfaces'
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPanel>
+    </>
+  ),
+);
+
+export const InventoryITHygiene = withSystemInventoryDataSource(() => {
   const {
     dataSource,
     filters,
@@ -34,13 +214,11 @@ export const InventoryITHygiene = () => {
     setFilters,
     searchBarProps,
     fingerprint,
+    error,
   } = useDataSourceWithSearchBar({
     DataSource: SystemInventoryStatesDataSource,
     DataSourceRepositoryCreator: SystemInventoryStatesDataSourceRepository,
   });
-
-  const shouldDisplayNoResults = false;
-  const shouldDisplayTable = false;
 
   return (
     <IntlProvider locale='en'>
@@ -57,175 +235,22 @@ export const InventoryITHygiene = () => {
             {isDataSourceLoading ? (
               <LoadingSearchbarProgress />
             ) : (
-              <WzSearchBar
-                appName='wzTable'
-                {...searchBarProps}
-                filters={filters}
+              <InventoryITHygieneDashboard
+                error={error}
+                dataSource={dataSource}
+                fetchFilters={fetchFilters}
                 fixedFilters={fixedFilters}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
+                filters={filters}
+                setFilters={setFilters}
+                searchBarProps={searchBarProps}
+                fetchData={fetchData}
+                fingerprint={fingerprint}
+                isDataSourceLoading={isDataSourceLoading}
               />
-            )}
-            {!isDataSourceLoading && (
-              <>
-                <EuiPanel
-                  paddingSize='m'
-                  hasShadow={false}
-                  hasBorder={false}
-                  color='transparent'
-                >
-                  <EuiFlexGroup gutterSize='s'>
-                    <EuiFlexItem>
-                      <WzTableUseParentDataSource
-                        dataSource={dataSource}
-                        fetchFilters={[
-                          ...fetchFilters,
-                          PatternDataSourceFilterManager.createFilter(
-                            FILTER_OPERATOR.EXISTS,
-                            'package.name',
-                            null,
-                            dataSource.title,
-                          ),
-                        ]}
-                        fixedFilters={fixedFilters}
-                        filters={filters}
-                        setFilters={setFilters}
-                        searchBarProps={searchBarProps}
-                        fetchData={fetchData}
-                        fingerprint={fingerprint}
-                        isDataSourceLoading={isDataSourceLoading}
-                        tableDefaultColumns={packagesColumns}
-                        title='Packages'
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <WzTableUseParentDataSource
-                        dataSource={dataSource}
-                        fetchFilters={[
-                          ...fetchFilters,
-                          PatternDataSourceFilterManager.createFilter(
-                            FILTER_OPERATOR.EXISTS,
-                            'package.hotfix.name',
-                            null,
-                            dataSource.title,
-                          ),
-                        ]}
-                        fixedFilters={fixedFilters}
-                        filters={filters}
-                        setFilters={setFilters}
-                        searchBarProps={searchBarProps}
-                        fetchData={fetchData}
-                        fingerprint={fingerprint}
-                        isDataSourceLoading={isDataSourceLoading}
-                        tableDefaultColumns={hotfixesColumns}
-                        title='Windows updates'
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiFlexGroup gutterSize='s'>
-                    <EuiFlexItem>
-                      <WzTableUseParentDataSource
-                        dataSource={dataSource}
-                        fetchFilters={[
-                          ...fetchFilters,
-                          PatternDataSourceFilterManager.createFilter(
-                            FILTER_OPERATOR.EXISTS,
-                            'host.os.name',
-                            null,
-                            dataSource.title,
-                          ),
-                        ]}
-                        fixedFilters={fixedFilters}
-                        filters={filters}
-                        setFilters={setFilters}
-                        searchBarProps={searchBarProps}
-                        fetchData={fetchData}
-                        fingerprint={fingerprint}
-                        isDataSourceLoading={isDataSourceLoading}
-                        tableDefaultColumns={systemColumns}
-                        title='System'
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiFlexGroup gutterSize='s'>
-                    <EuiFlexItem>
-                      <WzTableUseParentDataSource
-                        dataSource={dataSource}
-                        fetchFilters={[
-                          ...fetchFilters,
-                          PatternDataSourceFilterManager.createFilter(
-                            FILTER_OPERATOR.EXISTS,
-                            'process.pid', // package.name field is present in the ports data
-                            null,
-                            dataSource.title,
-                          ),
-                        ]}
-                        fixedFilters={fixedFilters}
-                        filters={filters}
-                        setFilters={setFilters}
-                        searchBarProps={searchBarProps}
-                        fetchData={fetchData}
-                        fingerprint={fingerprint}
-                        isDataSourceLoading={isDataSourceLoading}
-                        tableDefaultColumns={processesColumns}
-                        title='Processes'
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <WzTableUseParentDataSource
-                        dataSource={dataSource}
-                        fetchFilters={[
-                          ...fetchFilters,
-                          PatternDataSourceFilterManager.createFilter(
-                            FILTER_OPERATOR.EXISTS,
-                            'destination.port',
-                            null,
-                            dataSource.title,
-                          ),
-                        ]}
-                        fixedFilters={fixedFilters}
-                        filters={filters}
-                        setFilters={setFilters}
-                        searchBarProps={searchBarProps}
-                        fetchData={fetchData}
-                        fingerprint={fingerprint}
-                        isDataSourceLoading={isDataSourceLoading}
-                        tableDefaultColumns={portsColumns}
-                        title='Ports'
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem>
-                      <WzTableUseParentDataSource
-                        dataSource={dataSource}
-                        fetchFilters={[
-                          ...fetchFilters,
-                          PatternDataSourceFilterManager.createFilter(
-                            FILTER_OPERATOR.EXISTS,
-                            'observer.ingress.interface.name',
-                            null,
-                            dataSource.title,
-                          ),
-                        ]}
-                        fixedFilters={fixedFilters}
-                        filters={filters}
-                        setFilters={setFilters}
-                        searchBarProps={searchBarProps}
-                        fetchData={fetchData}
-                        fingerprint={fingerprint}
-                        isDataSourceLoading={isDataSourceLoading}
-                        tableDefaultColumns={interfacesColumns}
-                        title='Interfaces'
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPanel>
-              </>
             )}
           </>
         </EuiPageTemplate>
       </>
     </IntlProvider>
   );
-};
+});
