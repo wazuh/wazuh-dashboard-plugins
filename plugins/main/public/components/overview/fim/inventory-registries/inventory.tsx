@@ -8,6 +8,7 @@ import {
   FILTER_OPERATOR,
   FIMRegistriesStatesDataSource,
   FIMRegistriesStatesDataSourceRepository,
+  PatternDataSource,
   PatternDataSourceFilterManager,
 } from '../../../common/data-source';
 import { WzTableDiscover } from '../../../common/wazuh-discover/table';
@@ -169,6 +170,12 @@ export const InventoryFIMRegistries = compose(
 )(({ agent }) => {
   return (
     <WzTableDiscover
+      showSearchBar={true}
+      searchBarProps={{
+        showQueryInput: true,
+        showQueryBar: true,
+        showSaveQuery: true,
+      }}
       DataSource={FIMRegistriesStatesDataSource}
       DataSourceRepositoryCreator={FIMRegistriesStatesDataSourceRepository}
       tableDefaultColumns={inventoryTableDefaultColumns}

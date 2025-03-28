@@ -37,7 +37,7 @@ type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   fixedFilters?: tFilter[];
 };
 
-type tUseDataSourceLoadedReturns<K> = {
+export type tUseDataSourceLoadedReturns<K> = {
   isLoading: boolean;
   dataSource: K;
   /*

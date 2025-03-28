@@ -170,6 +170,12 @@ export const InventoryFIMFiles = compose(
 )(({ agent }) => {
   return (
     <WzTableDiscover
+      showSearchBar={true}
+      searchBarProps={{
+        showQueryInput: true,
+        showQueryBar: true,
+        showSaveQuery: true,
+      }}
       DataSource={FIMFilesStatesDataSource}
       DataSourceRepositoryCreator={FIMFilesStatesDataSourceRepository}
       tableDefaultColumns={inventoryTableDefaultColumns}

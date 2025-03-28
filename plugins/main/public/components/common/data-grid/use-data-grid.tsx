@@ -60,6 +60,10 @@ export type tDataGridProps = {
   setFilters?: (filters: Filter[]) => void;
 };
 
+export type TDataGridReturn = EuiDataGridProps & {
+  columnsAvailable: string[];
+};
+
 export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   const {
     indexPattern,
@@ -265,5 +269,5 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       onChangePage: onChangePage,
     },
     setPagination,
-  } as EuiDataGridProps;
+  } as TDataGridReturn;
 };
