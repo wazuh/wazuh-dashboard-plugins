@@ -35,6 +35,22 @@ export const EditAgentGroupsModal = ({
   );
   const [isSaving, setIsSaving] = useState(false);
 
+  // Check if selected groups are the same as agent's current groups
+  const areGroupsUnchanged = () => {
+    const currentGroups = agent.agent.groups || [];
+    const selectedGroupLabels = selectedGroups.map(group => group.label);
+
+    if (currentGroups.length !== selectedGroupLabels.length) {
+      return false;
+    }
+
+    // Check if all current groups are in selected groups and vice versa
+    return (
+      currentGroups.every(group => selectedGroupLabels.includes(group)) &&
+      selectedGroupLabels.every(group => currentGroups.includes(group))
+    );
+  };
+
   const handleSave = async () => {
     const flatSelectedGroups = selectedGroups.map(group => group.label);
     const addedGroups =
@@ -163,7 +179,12 @@ export const EditAgentGroupsModal = ({
 
       <EuiModalFooter>
         <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
-        <EuiButton onClick={handleSave} fill isLoading={isSaving}>
+        <EuiButton
+          onClick={handleSave}
+          fill
+          isLoading={isSaving}
+          disabled={selectedGroups.length === 0 || areGroupsUnchanged()}
+        >
           Save
         </EuiButton>
       </EuiModalFooter>
