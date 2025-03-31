@@ -6,12 +6,15 @@ export interface DataGridState {
 }
 
 export interface DataGridStateManagement {
-  getColumnsState: (moduleId: string) => DataGridState['columns'] | null;
-  setColumnsState: (
+  retrieveColumnsState: (moduleId: string) => DataGridState['columns'] | null;
+  persistColumnsState: (
     moduleId: string,
     columns: DataGridState['columns'],
   ) => void;
-  getPageSize: (moduleId: string) => number;
-  setPageSize: (moduleId: string, pageSize: DataGridState['pageSize']) => void;
-  resetState: (moduleId: string) => void;
+  retrievePageSize: (moduleId: string) => number;
+  persistPageSize: (
+    moduleId: string,
+    pageSize: DataGridState['pageSize'],
+  ) => void;
+  cleanState: (moduleId: string) => void;
 }

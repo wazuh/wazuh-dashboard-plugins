@@ -1,44 +1,44 @@
 import React from 'react';
 import { localStorageDataGridStateManagement } from './local-storage-data-grid-state-management';
-import { DataGridState } from './types';
+import { DataGridState, DataGridStateManagement } from './types';
 
-const useDataGridStateManagement = () => {
-  const columnsPersistence = localStorageDataGridStateManagement;
-
-  const getColumnsState = (
+const useDataGridStateManagement = (
+  stateManagement: DataGridStateManagement,
+) => {
+  const retrieveColumnsState = (
     moduleId: string,
   ): DataGridState['columns'] | null => {
-    return columnsPersistence.getColumnsState(moduleId);
+    return stateManagement.retrieveColumnsState(moduleId);
   };
 
-  const setColumnsState = (
+  const persistColumnsState = (
     moduleId: string,
     columns: DataGridState['columns'],
   ): void => {
-    columnsPersistence.setColumnsState(moduleId, columns);
+    stateManagement.persistColumnsState(moduleId, columns);
   };
 
-  const getPageSize = (moduleId: string): number => {
-    return columnsPersistence.getPageSize(moduleId);
+  const retrievePageSize = (moduleId: string): number => {
+    return stateManagement.retrievePageSize(moduleId);
   };
 
-  const setPageSize = (
+  const persistPageSize = (
     moduleId: string,
     pageSize: DataGridState['pageSize'],
   ) => {
-    columnsPersistence.setPageSize(moduleId, pageSize);
+    stateManagement.persistPageSize(moduleId, pageSize);
   };
 
-  const resetState = (moduleId: string) => {
-    columnsPersistence.resetState(moduleId);
+  const cleanState = (moduleId: string) => {
+    stateManagement.cleanState(moduleId);
   };
 
   return {
-    getColumnsState,
-    setColumnsState,
-    getPageSize,
-    setPageSize,
-    resetState,
+    retrieveColumnsState,
+    persistColumnsState,
+    retrievePageSize,
+    persistPageSize,
+    cleanState,
   };
 };
 

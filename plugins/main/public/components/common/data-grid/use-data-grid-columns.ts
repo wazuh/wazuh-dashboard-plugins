@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { tDataGridColumn } from './types';
 import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
+import { localStorageDataGridStateManagement } from './data-grid-state-persistence/local-storage-data-grid-state-management';
 
 interface useDataGridColumnsProps {
   moduleId: string;
@@ -16,7 +17,8 @@ function useDataGridColumns({
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
     defaultColumns.map(({ id }) => id),
   );
-  const { getColumnsState, setColumnsState } = useDataGridStateManagement();
+  const { retrieveColumnsState, persistColumnsState } =
+    useDataGridStateManagement(localStorageDataGridStateManagement);
 
   const sortFirstMatchedColumns = (
     firstMatchedColumns: tDataGridColumn[],
@@ -62,7 +64,7 @@ function useDataGridColumns({
         return column ? column : null;
       })
       .filter(column => column !== null);
-    setColumnsState(moduleId, columnsToPersist);
+    persistColumnsState(moduleId, columnsToPersist);
   };
 
   return {
@@ -77,8 +79,8 @@ function useDataGridColumns({
       visibleColumns,
       setVisibleColumns: setVisibleColumnsHandler,
     },
-    getColumnsState: () => {
-      const persistedColumns = getColumnsState(moduleId);
+    retrieveColumnsState: () => {
+      const persistedColumns = retrieveColumnsState(moduleId);
       if (!persistedColumns) return null;
       const persistedColumnIds = persistedColumns.map(({ id }) => id);
       setVisibleColumns(persistedColumnIds);
