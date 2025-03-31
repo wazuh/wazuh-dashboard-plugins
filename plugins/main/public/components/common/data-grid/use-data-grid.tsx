@@ -1,8 +1,6 @@
 import {
   EuiDataGridCellValueElementProps,
-  EuiDataGridColumn,
   EuiDataGridProps,
-  EuiDataGridSorting,
 } from '@elastic/eui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
@@ -16,24 +14,7 @@ import {
   Filter,
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
-import { EuiDataGridPaginationProps } from '@opensearch-project/oui';
 import dompurify from 'dompurify';
-
-export interface PaginationOptions
-  extends Pick<
-    EuiDataGridPaginationProps,
-    'pageIndex' | 'pageSize' | 'pageSizeOptions'
-  > {}
-
-type SortingColumns = EuiDataGridSorting['columns'];
-
-export interface RenderColumn {
-  render: (value: any, rowItem: object) => string | React.ReactNode;
-}
-
-export type tDataGridColumn = Partial<RenderColumn> & EuiDataGridColumn;
-
-export type tDataGridRenderColumn = RenderColumn & EuiDataGridColumn;
 
 export type tDataGridProps = {
   indexPattern: IndexPattern;
