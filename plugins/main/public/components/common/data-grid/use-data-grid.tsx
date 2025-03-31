@@ -15,8 +15,16 @@ import {
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
 import dompurify from 'dompurify';
+import {
+  SortingColumns,
+  tDataGridColumn,
+  tDataGridRenderColumn,
+} from './types';
+import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
+import useDataGridColumns from './use-data-grid-columns';
 
 export type tDataGridProps = {
+  moduleId: string;
   indexPattern: IndexPattern;
   results: SearchResponse;
   defaultColumns: tDataGridColumn[];
@@ -33,6 +41,7 @@ export type tDataGridProps = {
 
 export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   const {
+    moduleId,
     indexPattern,
     DocViewInspectButton,
     results,
@@ -43,9 +52,6 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     filters = [],
     setFilters = () => {},
   } = props;
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
-    defaultColumns.map(({ id }) => id),
-  );
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
   const rowCount = results ? (results?.hits?.total as number) : 0;
@@ -81,42 +87,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         },
   );
 
-  const sortFirstMatchedColumns = (
-    firstMatchedColumns: tDataGridColumn[],
-    visibleColumnsOrdered: string[],
-  ) => {
-    firstMatchedColumns.sort(
-      (a, b) =>
-        visibleColumnsOrdered.indexOf(a.id) -
-        visibleColumnsOrdered.indexOf(b.id),
-    );
-    return firstMatchedColumns;
-  };
-
-  const orderFirstMatchedColumns = (
-    columns: tDataGridColumn[],
-    visibleColumnsOrdered: string[],
-  ) => {
-    const firstMatchedColumns: tDataGridColumn[] = [];
-    const nonMatchedColumns: tDataGridColumn[] = [];
-    const visibleColumnsSet = new Set(visibleColumnsOrdered);
-
-    for (let i = 0; i < columns.length; i++) {
-      const column = columns[i];
-      if (visibleColumnsSet.has(column.id)) {
-        firstMatchedColumns.push(column);
-      } else {
-        nonMatchedColumns.push(column);
-      }
-    }
-
-    return [
-      ...sortFirstMatchedColumns(firstMatchedColumns, visibleColumnsOrdered),
-      ...nonMatchedColumns,
-    ];
-  };
-
-  const getColumns = useMemo(() => {
+  const columnDefinitions = useMemo(() => {
     return parseColumns(
       indexPattern?.fields || [],
       defaultColumns,
@@ -127,6 +98,12 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       setFilters,
     );
   }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
+
+  const { columnsAvailable, columns, columnVisibility } = useDataGridColumns({
+    moduleId,
+    defaultColumns,
+    columnDefinitions: columnDefinitions,
+  });
 
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) =>
@@ -218,14 +195,9 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
 
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columnsAvailable: orderFirstMatchedColumns(getColumns, visibleColumns), // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
-    columns: visibleColumns.map(columnId =>
-      getColumns.find(({ id }) => id === columnId),
-    ),
-    columnVisibility: {
-      visibleColumns,
-      setVisibleColumns,
-    },
+    columnsAvailable, // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
+    columns,
+    columnVisibility,
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,
     rowCount: Math.min(rowCount, MAX_ENTRIES_PER_QUERY),
