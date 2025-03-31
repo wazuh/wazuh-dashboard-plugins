@@ -22,6 +22,8 @@ import {
 } from './types';
 import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
 import useDataGridColumns from './use-data-grid-columns';
+import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
+import { localStorageDataGridStateManagement } from './data-grid-state-persistence/local-storage-data-grid-state-management';
 
 export type tDataGridProps = {
   moduleId: string;
@@ -99,6 +101,17 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     );
   }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
 
+  const { retrievePageSize, persistPageSize } = useDataGridStateManagement(
+    localStorageDataGridStateManagement,
+  );
+
+  useEffect(() => {
+    setPagination(pagination => ({
+      ...pagination,
+      pageSize: retrievePageSize(moduleId),
+    }));
+  }, [moduleId]);
+
   const { columnsAvailable, columns, columnVisibility } = useDataGridColumns({
     moduleId,
     defaultColumns,
@@ -106,12 +119,14 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   });
 
   const onChangeItemsPerPage = useMemo(
-    () => (pageSize: number) =>
+    () => (pageSize: number) => {
       setPagination(pagination => ({
         ...pagination,
         pageSize,
         pageIndex: 0,
-      })),
+      }));
+      persistPageSize(moduleId, pageSize);
+    },
     [rows, rowCount],
   );
   const onChangePage = (pageIndex: number) =>
