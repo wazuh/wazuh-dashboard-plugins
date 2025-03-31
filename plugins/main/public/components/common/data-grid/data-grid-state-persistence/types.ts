@@ -16,5 +16,5 @@ export interface DataGridStateManagement {
     moduleId: string,
     pageSize: DataGridState['pageSize'],
   ) => void;
-  cleanState: (moduleId: string) => void;
+  clearState: (moduleId: string) => void;
 }

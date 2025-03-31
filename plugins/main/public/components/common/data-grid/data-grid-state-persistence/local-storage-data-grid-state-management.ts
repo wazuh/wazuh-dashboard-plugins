@@ -31,7 +31,7 @@ export const localStorageDataGridStateManagement: DataGridStateManagement = {
     localStorage.setItem(buildKey(moduleId, 'page-size'), String(pageSize));
   },
 
-  cleanState(moduleId: string) {
+  clearState(moduleId: string) {
     localStorage.removeItem(buildKey(moduleId, 'column'));
     localStorage.removeItem(buildKey(moduleId, 'page-size'));
   },

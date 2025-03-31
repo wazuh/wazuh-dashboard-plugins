@@ -29,8 +29,8 @@ const useDataGridStateManagement = (
     stateManagement.persistPageSize(moduleId, pageSize);
   };
 
-  const cleanState = (moduleId: string) => {
-    stateManagement.cleanState(moduleId);
+  const clearState = (moduleId: string) => {
+    stateManagement.clearState(moduleId);
   };
 
   return {
@@ -38,7 +38,7 @@ const useDataGridStateManagement = (
     persistColumnsState,
     retrievePageSize,
     persistPageSize,
-    cleanState,
+    clearState,
   };
 };
 
