@@ -16,8 +16,7 @@ function useDataGridColumns({
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
     defaultColumns.map(({ id }) => id),
   );
-  const { getColumnsState, setColumnsState: setPersistedColumns } =
-    useDataGridStateManagement();
+  const { getColumnsState, setColumnsState } = useDataGridStateManagement();
 
   const sortFirstMatchedColumns = (
     firstMatchedColumns: tDataGridColumn[],
@@ -63,7 +62,7 @@ function useDataGridColumns({
         return column ? column : null;
       })
       .filter(column => column !== null);
-    setPersistedColumns(moduleId, columnsToPersist);
+    setColumnsState(moduleId, columnsToPersist);
   };
 
   return {
