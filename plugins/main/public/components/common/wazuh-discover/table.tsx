@@ -433,7 +433,7 @@ export const TableDiscover = ({
   inspectDetailsTitle,
   additionalDocumentDetailsTabs,
   showSearchBar,
-  searchBarProps,
+  searchBarProps = {},
 }: WzTableDiscoverProps) => {
   const {
     dataSource,

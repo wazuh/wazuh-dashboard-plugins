@@ -66,11 +66,3 @@ on Wazuh dashboard. So, if this is not created by another source, it could be ne
 the index pattern manually if it was not previously created.
 
 In the case it does not exist, create it with from Dashboard management > Dashboard Management > Index patterns:
-
-- title: `wazuh-DATASET_NAME`.
-
-where:
-
-- `DATASET_NAME` is the name of the dataset.
-
-example: `wazuh-states-fim`.
