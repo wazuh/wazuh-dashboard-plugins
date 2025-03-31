@@ -1,32 +1,28 @@
-import React from 'react';
-import { localStorageDataGridStateManagement } from './local-storage-data-grid-state-management';
 import { DataGridState, DataGridStateManagement } from './types';
 
-const useDataGridStateManagement = (
-  stateManagement: DataGridStateManagement,
-) => {
-  const retrieveColumnsState = (
-    moduleId: string,
-  ): DataGridState['columns'] | null => {
-    return stateManagement.retrieveColumnsState(moduleId);
+interface UseDataGridStateManagementProps<
+  State extends DataGridState[keyof DataGridState],
+> {
+  stateManagement: DataGridStateManagement<State>;
+  validateState?: (state: State) => boolean;
+}
+
+const useDataGridStateManagement = <
+  State extends DataGridState[keyof DataGridState],
+>({
+  stateManagement,
+  validateState,
+}: UseDataGridStateManagementProps<State>) => {
+  const retrieveState = (moduleId: string): State | null => {
+    const state = stateManagement.retrieveState(moduleId);
+    if (state && validateState?.(state)) {
+      return state;
+    }
+    return null;
   };
 
-  const persistColumnsState = (
-    moduleId: string,
-    columns: DataGridState['columns'],
-  ): void => {
-    stateManagement.persistColumnsState(moduleId, columns);
-  };
-
-  const retrievePageSize = (moduleId: string): number => {
-    return stateManagement.retrievePageSize(moduleId);
-  };
-
-  const persistPageSize = (
-    moduleId: string,
-    pageSize: DataGridState['pageSize'],
-  ) => {
-    stateManagement.persistPageSize(moduleId, pageSize);
+  const persistState = (moduleId: string, payload: State): void => {
+    stateManagement.persistState(moduleId, payload);
   };
 
   const clearState = (moduleId: string) => {
@@ -34,10 +30,8 @@ const useDataGridStateManagement = (
   };
 
   return {
-    retrieveColumnsState,
-    persistColumnsState,
-    retrievePageSize,
-    persistPageSize,
+    retrieveState,
+    persistState,
     clearState,
   };
 };
