@@ -23,7 +23,8 @@ import {
 import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
 import useDataGridColumns from './use-data-grid-columns';
 import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
-import { localStorageDataGridStateManagement } from './data-grid-state-persistence/local-storage-data-grid-state-management';
+import { DataGridState } from './data-grid-state-persistence/types';
+import { localStoragePageSizeStateManagement } from './data-grid-state-persistence/local-storage-page-size-state-management';
 
 export type tDataGridProps = {
   moduleId: string;
@@ -101,9 +102,13 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     );
   }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
 
-  const { retrievePageSize, persistPageSize } = useDataGridStateManagement(
-    localStorageDataGridStateManagement,
-  );
+  const { retrieveState: retrievePageSize, persistState: persistPageSize } =
+    useDataGridStateManagement<DataGridState['pageSize']>({
+      stateManagement: localStoragePageSizeStateManagement,
+      validateState(state) {
+        return typeof state === 'number' && Number.isInteger(state);
+      },
+    });
 
   useEffect(() => {
     setPagination(pagination => ({
