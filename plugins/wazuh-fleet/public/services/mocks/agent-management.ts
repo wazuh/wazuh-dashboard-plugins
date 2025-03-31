@@ -96,7 +96,7 @@ export const removeGroups = (
               affected_items: [
                 {
                   _id: agentId,
-                  _source: { agent: { groups: groupIds, name: 'agent' } },
+                  agent: { groups: groupIds, name: 'agent' },
                 },
               ],
               failed_items: [],
@@ -177,11 +177,9 @@ export const upgradeAgent = (
               affected_items: [
                 {
                   _id: agentId,
-                  _source: {
-                    agent: { name: 'agent' },
-                    task_id: '1234',
-                    version: version,
-                  },
+                  agent: { name: 'agent' },
+                  task_id: '1234',
+                  version: version,
                 },
               ],
               failed_items: [],
@@ -204,7 +202,7 @@ export const upgradeAgent = (
                   error: {
                     code: Math.floor(Math.random() * 9000) + 1000,
                     message: 'Upgrade error',
-                    remedation: 'Retry',
+                    remediation: 'Retry',
                   },
                 },
               ],

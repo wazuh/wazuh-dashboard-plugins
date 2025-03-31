@@ -13,11 +13,16 @@ import {
   EuiContextMenu,
 } from '@elastic/eui';
 import { IAgentResponse } from '../../../../common/types';
-import { getAgentManagement } from '../../../plugin-services';
+import { getAgentManagement, getWazuhCore } from '../../../plugin-services';
 import {
   Filter,
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
+import { EditAgentGroupsModal } from '../list/actions/edit-groups-modal';
+import { ConfirmModal } from '../../common/confirm-modal/confirm-modal';
+import { UpgradeAgentModal } from '../list/actions/upgrade-agent-modal';
+import { EditAgentNameModal } from '../list/actions/edit-name-agent-modal';
+import { summaryAgent } from '../../common/views';
 import { AgentResume } from './resume';
 // import { AgentDashboard } from './dashboard';
 // import { AgentNetworks } from './networks';
@@ -37,12 +42,14 @@ export const AgentDetails = ({
   const [agentData, setAgentData] = useState<IAgentResponse>();
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isNavigateToOpen, setIsNavigateToOpen] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
+  const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
+  const [isEditNameVisible, setIsEditNameVisible] = useState(false);
+  const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
+  const [needReload, setNeedReload] = useState(false);
 
-  useEffect(() => {
-    if (!indexPatterns) {
-      return;
-    }
-
+  const getAgent = async (id: string) => {
     getAgentManagement()
       .getByAgentId(id)
       .then((results: IAgentResponse) => {
@@ -52,7 +59,22 @@ export const AgentDetails = ({
       .catch((error: any) => {
         console.log(error);
       });
+  };
+
+  useEffect(() => {
+    if (!indexPatterns) {
+      return;
+    }
+
+    getAgent(id);
   }, [id]);
+
+  useEffect(() => {
+    if (needReload) {
+      getAgent(id);
+      setNeedReload(false);
+    }
+  }, [needReload]);
 
   if (isAgentLoading) {
     return (
@@ -68,6 +90,29 @@ export const AgentDetails = ({
 
   const closeActions = () => {
     setIsActionsOpen(false);
+  };
+
+  const closeModal = () => {
+    setIsDeleteModalVisible(false);
+  };
+
+  const confirmDelete = async () => {
+    if (agentData) {
+      try {
+        setIsLoadingModal(true);
+        await getAgentManagement().delete(agentData.agent.id);
+        setIsLoadingModal(false);
+        getWazuhCore()
+          .navigationService.getInstance()
+          .navigate(summaryAgent.path);
+      } catch {
+        setIsLoadingModal(false);
+      }
+    }
+  };
+
+  const reloadAgents = () => {
+    setNeedReload(true);
   };
 
   const navigateToPanels = [
@@ -187,7 +232,7 @@ export const AgentDetails = ({
   const renderViewAgent = (
     <>
       <EuiPageHeader
-        pageTitle={agentData?._source.agent?.name}
+        pageTitle={agentData?.agent?.name}
         rightSideItems={[
           <EuiPopover
             key={'actions'}
@@ -212,31 +257,43 @@ export const AgentDetails = ({
                 <EuiContextMenuItem
                   key='add-groups'
                   icon='plusInCircle'
-                  onClick={closeActions}
+                  onClick={() => {
+                    setIsEditGroupsVisible(true);
+                    closeActions();
+                  }}
                 >
-                  Add groups to agent
-                </EuiContextMenuItem>,
-                <EuiContextMenuItem
-                  key='remove-groups'
-                  icon='trash'
-                  onClick={closeActions}
-                >
-                  Remove groups from agent
+                  Edit groups to agent
                 </EuiContextMenuItem>,
                 <EuiHorizontalRule key='space' margin='xs' />,
                 <EuiContextMenuItem
                   key='upgrade-agents'
                   icon='package'
-                  onClick={closeActions}
+                  onClick={() => {
+                    setIsUpgradeModalVisible(true);
+                    closeActions();
+                  }}
                 >
                   Upgrade agent
                 </EuiContextMenuItem>,
                 <EuiContextMenuItem
-                  key='upgrade-tasks'
+                  key='edit-name'
                   icon='eye'
-                  onClick={closeActions}
+                  onClick={() => {
+                    setIsEditNameVisible(true);
+                    closeActions();
+                  }}
                 >
-                  Upgrade tasks details
+                  Edit Name
+                </EuiContextMenuItem>,
+                <EuiContextMenuItem
+                  key='edit-name'
+                  icon='eye'
+                  onClick={() => {
+                    setIsDeleteModalVisible(true);
+                    closeActions();
+                  }}
+                >
+                  Remove agent
                 </EuiContextMenuItem>,
               ]}
             />
@@ -274,6 +331,43 @@ export const AgentDetails = ({
         initialSelectedTab={tabs[0]}
         autoFocus='selected'
       /> */}
+      {isEditGroupsVisible && agentData && (
+        <EditAgentGroupsModal
+          onClose={() => {
+            setIsEditGroupsVisible(false);
+          }}
+          reloadAgents={() => {}}
+          agent={agentData}
+        />
+      )}
+      <ConfirmModal
+        isVisible={isDeleteModalVisible}
+        title='Delete agent'
+        message='Are you sure you want to delete this agent?'
+        onConfirm={confirmDelete}
+        onCancel={closeModal}
+        confirmButtonText='Delete'
+        buttonColor='danger'
+        isLoading={isLoadingModal}
+      />
+      {isUpgradeModalVisible && agentData && (
+        <UpgradeAgentModal
+          agent={agentData}
+          reloadAgents={reloadAgents}
+          onClose={() => {
+            setIsUpgradeModalVisible(false);
+          }}
+        />
+      )}
+      {isEditNameVisible && agentData && (
+        <EditAgentNameModal
+          onClose={() => {
+            setIsEditNameVisible(false);
+          }}
+          reloadAgents={reloadAgents}
+          agent={agentData}
+        />
+      )}
     </>
   );
   const renderNoAgent = <EuiPageHeader pageTitle={'Agent not found'} />;

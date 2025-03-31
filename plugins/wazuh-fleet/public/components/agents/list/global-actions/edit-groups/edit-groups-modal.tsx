@@ -248,7 +248,7 @@ export const EditAgentsGroupsModal = ({
             <EuiButton
               onClick={handleSave}
               fill
-              disabled={!selectedGroups?.length}
+              disabled={selectedGroups?.length === 0}
             >
               Save
             </EuiButton>

@@ -117,7 +117,8 @@ export const EditAgentsGroupsModalResult = ({
 
   const renderAgentsDataStep = () => {
     if (getAgentsStatus === 'loading') {
-      return null;
+      // Provide an empty div instead of null to satisfy the required prop of EuiSteps
+      return <div></div>;
     }
 
     return getAgentsStatus === 'complete'
@@ -203,7 +204,10 @@ export const EditAgentsGroupsModalResult = ({
                   <AgentGroupActionResult key={agent._id} agent={agent} />
                 ))}
               </EuiFlexGroup>
-            ) : null,
+            ) : (
+              // Provide an empty div instead of null to satisfy the required prop of EuiSteps
+              <div> </div>
+            ),
         },
       ]}
     />

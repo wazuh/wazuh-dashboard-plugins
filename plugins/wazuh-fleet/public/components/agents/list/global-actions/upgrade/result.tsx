@@ -41,13 +41,13 @@ export const UpgradeAgentsModalResult = ({
       tableLayout='auto'
       columns={[
         {
-          field: 'id',
+          field: '_id',
           name: 'ID',
           align: 'left',
           sortable: true,
         },
         {
-          field: 'name',
+          field: 'agent.name',
           name: 'Name',
           align: 'left',
           sortable: true,

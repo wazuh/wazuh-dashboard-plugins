@@ -103,7 +103,6 @@ export const UpgradeAgentsModal = ({
 
       setSaveChangesStatus('complete');
     } catch (error) {
-      console.log(error);
       setResult({
         errorMessage: error.message,
         errorAgents: [

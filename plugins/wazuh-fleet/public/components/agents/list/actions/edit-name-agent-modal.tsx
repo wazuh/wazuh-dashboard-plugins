@@ -149,7 +149,7 @@ export const EditAgentNameModal = ({
       <EuiModalFooter>
         <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
         <EuiButton
-          disabled={!validateName.isValid}
+          disabled={!validateName.isValid || !newName}
           onClick={handleSave}
           fill
           isLoading={isSaving}
