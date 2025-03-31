@@ -20,7 +20,6 @@ import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import {
   useDataGrid,
-  tDataGridColumn,
   exportSearchToCSV,
   getAllCustomRenders,
 } from '../data-grid';
@@ -51,16 +50,18 @@ import { wzDiscoverRenderColumns } from './render-columns';
 import { WzSearchBar } from '../search-bar';
 import { transformDateRange } from '../search-bar/search-bar-service';
 import DocDetailsHeader from './components/doc-details-header';
+import { tDataGridColumn } from '../data-grid/types';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 export type WazuhDiscoverProps = {
+  moduleId: string;
   tableColumns: tDataGridColumn[];
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
-  const { DataSource, tableColumns: defaultTableColumns } = props;
+  const { moduleId, DataSource, tableColumns: defaultTableColumns } = props;
 
   if (!DataSource) {
     throw new Error('DataSource is required');
@@ -122,6 +123,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
   );
   const dataGridProps = useDataGrid({
+    moduleId,
     ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
     renderColumns: wzDiscoverRenderColumns,
