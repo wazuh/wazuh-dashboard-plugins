@@ -6,7 +6,11 @@ export const localStorageDataGridStateManagement: DataGridStateManagement = {
   retrieveColumnsState(moduleId: string) {
     const state = localStorage.getItem(buildKey(moduleId, 'column'));
     if (state) {
-      return JSON.parse(state) as DataGridState['columns'];
+      try {
+        return JSON.parse(state) as DataGridState['columns'];
+      } catch {
+        return [];
+      }
     }
     return [];
   },
@@ -20,7 +24,7 @@ export const localStorageDataGridStateManagement: DataGridStateManagement = {
     if (state) {
       try {
         return JSON.parse(state) as DataGridState['pageSize'];
-      } catch (err) {
+      } catch {
         return DEFAULT_PAGE_SIZE;
       }
     }
