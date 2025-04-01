@@ -31,7 +31,7 @@ import { EditAgentGroupsModal } from './actions/edit-groups-modal';
 import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { EditAgentNameModal } from './actions/edit-name-agent-modal';
-import { agentsTableActions } from './actions/actions';
+import { actionsButtons } from './actions/actions';
 
 export interface AgentListProps {
   indexPatterns: IndexPattern;
@@ -134,7 +134,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             <AgentsVisualizations searchBarProps={searchBarProps} />
           )}
           agentSelected={agentSelected}
-          actionsColumn={agentsTableActions({
+          actionsColumn={actionsButtons({
             setIsFlyoutAgentVisible: setIsFlyoutVisible,
             setAgent,
             setIsDeleteModalVisible,

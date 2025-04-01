@@ -1,12 +1,130 @@
 import { SearchResponse } from 'src/core/server';
-import { IFieldType } from 'src/plugins/data/common';
+import { IFieldType, IndexPattern, Filter } from 'src/plugins/data/common';
 import * as FileSaver from '../../../utils/file-saver';
 import { beautifyDate } from '../../../utils/beautify-date';
 
-// import { SearchParams, search } from '../search-bar/search-bar-service';
 export const MAX_ENTRIES_PER_QUERY = 10000;
-// import { EuiDataGridColumn } from '@elastic/eui';
-import { tDataGridColumn } from './use-data-grid';
+import { getPlugins } from '../../../plugin-services';
+import { DataGridColumn } from './use-data-grid';
+
+export interface TSearchParams {
+  filters?: Filter[];
+  query?: any;
+  pagination?: {
+    pageIndex?: number;
+    pageSize?: number;
+  };
+  fields?: string[];
+  sorting?: {
+    columns: {
+      id: string;
+      direction: 'asc' | 'desc';
+    }[];
+  };
+  dateRange?: {
+    from: string;
+    to: string;
+  };
+  aggs?: any;
+}
+
+export type SearchParams = {
+  indexPattern: IndexPattern;
+  filePrefix: string;
+} & TSearchParams;
+
+const DEFAULT_PAGE_SIZE = 100;
+
+// Para el primer error, modificamos el tipo de retorno de la función search
+export const search = async (params: SearchParams): Promise<SearchResponse> => {
+  const {
+    indexPattern,
+    filters: defaultFilters = [],
+    query,
+    pagination,
+    sorting,
+    fields,
+    aggs,
+  } = params;
+
+  if (!indexPattern) {
+    throw new Error('Index pattern is required');
+  }
+
+  const data = getPlugins().data;
+  const searchSource = await data.search.searchSource.create();
+  const paginationPageSize = pagination?.pageSize || DEFAULT_PAGE_SIZE;
+  const fromField = (pagination?.pageIndex || 0) * paginationPageSize;
+  // If the paginationPageSize + the offset exceeds the 10000 result limit of OpenSearch, truncates the page size
+  // to avoid an exception
+  const pageSize =
+    paginationPageSize + fromField < MAX_ENTRIES_PER_QUERY
+      ? paginationPageSize
+      : MAX_ENTRIES_PER_QUERY - fromField;
+  const sortOrder: OpenSearchQuerySortValue[] =
+    sorting?.columns?.map(column => {
+      const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
+
+      return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
+    }) || [];
+  let filters = defaultFilters;
+
+  // check if dateRange is defined
+  if (params.dateRange && params.dateRange?.from && params.dateRange?.to) {
+    const { from, to } = params.dateRange;
+
+    filters = [
+      ...filters,
+      {
+        // @ts-expect-error filters typo not match
+        range: {
+          [indexPattern.timeFieldName || 'timestamp']: {
+            gte: dateMath.parse(from).toISOString(),
+            /* roundUp: true is used to transform the osd dateform to a generic date format
+              For instance: the "This week" date range in the date picker.
+              To: now/w
+              From: now/w
+              Without the roundUp the to and from date will be the same and the search will return no results or error
+
+              - src/plugins/data/common/query/timefilter/get_time.ts
+            */
+            lte: dateMath
+              .parse(to, { roundUp: true, forceNow: getForceNow() })
+              .toISOString(),
+            format: 'strict_date_optional_time',
+          },
+        },
+      },
+    ];
+  }
+
+  const searchParams = searchSource
+    .setParent(undefined)
+    .setField('filter', filters)
+    .setField('query', query)
+    .setField('sort', sortOrder)
+    .setField('size', pageSize)
+    .setField('from', fromField)
+    .setField('index', indexPattern);
+
+  if (fields && Array.isArray(fields) && fields.length > 0) {
+    searchParams.setField('fields', fields);
+  }
+
+  if (aggs) {
+    searchSource.setField('aggs', aggs);
+  }
+
+  try {
+    return await searchParams.fetch();
+  } catch (error) {
+    if (error.body) {
+      throw error.body;
+    }
+
+    throw error;
+  }
+};
 
 export const parseData = (
   resultsHits: SearchResponse['hits']['hits'],
@@ -88,29 +206,30 @@ export const exportSearchToCSV = async (params: any): Promise<void> => {
   const defaultMaxSizePerCall = 1000;
   const {
     indexPattern,
-    filtersIgnored = [],
-    queryIgnored,
-    sortingIgnored,
+    filters = [],
+    query,
+    sorting,
     fields,
     pagination,
     filePrefix = 'events',
   } = params;
   const mustPaginateSearch =
     pagination?.pageSize && pagination?.pageSize > defaultMaxSizePerCall;
-  const pageSizeIgnored = mustPaginateSearch
+  const pageSize = mustPaginateSearch
     ? defaultMaxSizePerCall
     : pagination?.pageSize;
   const totalHits = pagination?.pageSize || defaultMaxSizePerCall;
-  let pageIndexIgnored = params.pagination?.pageIndex || 0;
+  let pageIndex = params.pagination?.pageIndex || 0;
   let hitsCount = 0;
   let allHits = [];
   let searchResults;
+  const searchPromises = [];
 
   if (mustPaginateSearch) {
     // paginate the search
     while (hitsCount < totalHits && hitsCount < MAX_ENTRIES_PER_QUERY) {
       // ToDo: Uncomment when the search function is ready
-      /* const searchParams = {
+      const searchParams = {
         indexPattern,
         filters,
         query,
@@ -121,14 +240,15 @@ export const exportSearchToCSV = async (params: any): Promise<void> => {
         sorting,
         fields,
       };
-      */
 
-      // searchResults = await search(searchParams);
-      // allHits = allHits.concat(searchResults.hits.hits);
-      allHits = [];
-      hitsCount = allHits.length;
-      pageIndexIgnored++;
+      searchPromises.push(search(searchParams));
+      hitsCount += pageSize;
+      pageIndex++;
     }
+
+    const searchResults = await Promise.all(searchPromises);
+
+    allHits = searchResults.flatMap(result => result.hits.hits);
   } else {
     searchResults = await search(params);
     allHits = searchResults.hits.hits;
@@ -194,8 +314,8 @@ export const exportSearchToCSV = async (params: any): Promise<void> => {
 
 export const parseColumns = (
   fields: IFieldType[],
-  defaultColumns: tDataGridColumn[] = [],
-): tDataGridColumn[] => {
+  defaultColumns: DataGridColumn[] = [],
+): DataGridColumn[] => {
   // remove _source field becuase is a object field and is not supported
   // merge the properties of the field with the default columns
   if (!fields?.length) {
@@ -219,7 +339,7 @@ export const parseColumns = (
         },
         ...defaultColumn,
       };
-    }) as tDataGridColumn[];
+    }) as DataGridColumn[];
 
   return columns;
 };
@@ -232,9 +352,9 @@ export const parseColumns = (
  * @param defaultColumns
  */
 export const getAllCustomRenders = (
-  customColumns: tDataGridColumn[],
-  discoverColumns: tDataGridColumn[],
-): tDataGridColumn[] => {
+  customColumns: DataGridColumn[],
+  discoverColumns: DataGridColumn[],
+): DataGridColumn[] => {
   const customColumnsWithRender = customColumns.filter(column => column.render);
   const allColumns = discoverColumns.map(column => {
     const customColumn = customColumnsWithRender.find(

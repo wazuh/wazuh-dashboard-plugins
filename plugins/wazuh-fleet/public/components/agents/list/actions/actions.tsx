@@ -1,13 +1,5 @@
-import React, { createContext, useState, useContext } from 'react';
-import {
-  EuiCheckbox,
-  EuiPopover,
-  EuiButtonIcon,
-  EuiPopoverTitle,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiDataGridControlColumn,
-} from '@elastic/eui';
+import React, { createContext, useContext } from 'react';
+import { EuiCheckbox, EuiDataGridControlColumn } from '@elastic/eui';
 import { IAgentResponse } from '../../../../../common/types';
 import { getWazuhCore } from '../../../../plugin-services';
 
@@ -90,7 +82,7 @@ const SelectionRowCell = ({ rowIndex }) => {
   );
 };
 
-const actionsButtons = ({
+export const actionsButtons = ({
   setIsFlyoutAgentVisible,
   setAgent,
   setIsDeleteModalVisible,
@@ -103,7 +95,7 @@ const actionsButtons = ({
     description: 'View agent tasks',
     icon: 'storage',
     type: 'icon',
-    onClick: (agent: IAgentResponse) => {
+    onClick: (_row, agent: IAgentResponse) => {
       // TODO: Change this url to the url of the command view with a pinned agent
       getWazuhCore()
         .navigationService.getInstance()
@@ -117,7 +109,7 @@ const actionsButtons = ({
     type: 'icon',
     isPrimary: true,
     color: 'primary',
-    onClick: (agent: IAgentResponse) => {
+    onClick: (_row, agent: IAgentResponse) => {
       setAgent(agent);
       setIsFlyoutAgentVisible(true);
     },
@@ -134,7 +126,7 @@ const actionsButtons = ({
     type: 'icon',
     isPrimary: true,
     color: 'danger',
-    onClick: (agent: IAgentResponse) => {
+    onClick: (_row, agent: IAgentResponse) => {
       setAgent(agent);
       setIsDeleteModalVisible(true);
     },
@@ -144,7 +136,7 @@ const actionsButtons = ({
     description: 'Edit name',
     icon: 'pencil',
     type: 'icon',
-    onClick: (agent: IAgentResponse) => {
+    onClick: (_row, agent: IAgentResponse) => {
       setAgent(agent);
       setIsEditNameVisible(true);
     },
@@ -156,7 +148,7 @@ const actionsButtons = ({
     description: 'Edit groups',
     icon: 'pencil',
     type: 'icon',
-    onClick: (agent: IAgentResponse) => {
+    onClick: (_row, agent: IAgentResponse) => {
       setAgent(agent);
       setIsEditGroupsVisible(true);
     },
@@ -168,7 +160,7 @@ const actionsButtons = ({
     description: 'Upgrade',
     icon: 'package',
     type: 'icon',
-    onClick: (agent: IAgentResponse) => {
+    onClick: (row, agent: IAgentResponse) => {
       setAgent(agent);
       setIsUpgradeModalVisible(true);
     },
@@ -192,69 +184,6 @@ export const agentsTableSelection: EuiDataGridControlColumn[] = [
     width: 32,
     headerCellRender: SelectionHeaderCell,
     rowCellRender: SelectionRowCell,
-  },
-];
-
-export const agentsTableActions = ({
-  setIsFlyoutAgentVisible,
-  setAgent,
-  setIsDeleteModalVisible,
-  setIsEditGroupsVisible,
-  setIsUpgradeModalVisible,
-  setIsEditNameVisible,
-}: AgentsTableGlobalActionsProps): EuiDataGridControlColumn[] => [
-  {
-    id: 'actions',
-    width: 40,
-    headerCellRender: () => null,
-    rowCellRender: function RowCellRender() {
-      const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-
-      return (
-        <div>
-          <EuiPopover
-            isOpen={isPopoverOpen}
-            anchorPosition='upCenter'
-            panelPaddingSize='s'
-            button={
-              <EuiButtonIcon
-                aria-label='show actions'
-                iconType='boxesHorizontal'
-                color='text'
-                onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-              />
-            }
-            closePopover={() => setIsPopoverOpen(false)}
-          >
-            <EuiPopoverTitle>Actions</EuiPopoverTitle>
-            <div style={{ width: 150 }}>
-              {actionsButtons({
-                setIsFlyoutAgentVisible,
-                setAgent,
-                setIsDeleteModalVisible,
-                setIsEditGroupsVisible,
-                setIsUpgradeModalVisible,
-                setIsEditNameVisible,
-              }).map((action, index) => (
-                <EuiFlexGroup key={index} gutterSize='s'>
-                  <EuiFlexItem grow={false}>
-                    <EuiButtonIcon
-                      iconType={action.icon}
-                      aria-label={action.description}
-                      onClick={() => {
-                        action?.onClick(action?.agent);
-                        setIsPopoverOpen(false);
-                      }}
-                    />
-                  </EuiFlexItem>
-                  <EuiFlexItem>{action.description}</EuiFlexItem>
-                </EuiFlexGroup>
-              ))}
-            </div>
-          </EuiPopover>
-        </div>
-      );
-    },
   },
 ];
 // allowEditGroups: boolean,

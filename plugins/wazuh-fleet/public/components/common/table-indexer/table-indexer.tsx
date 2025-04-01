@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiBasicTableProps } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiBasicTableProps,
+  EuiPopover,
+  EuiPopoverTitle,
+  EuiButtonIcon,
+} from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
 import {
   IndexPattern,
@@ -15,6 +22,99 @@ import useSearchBar, {
 } from './components/search-bar/use-search-bar';
 import { WzSearchBar } from './components/search-bar/search-bar';
 import { useFilterManager } from './components/search-bar/hooks/use-filter-manager';
+
+export interface TableAction {
+  name: string;
+  description: string;
+  icon: string;
+  type: 'icon';
+  isPrimary?: boolean;
+  color?: string;
+  'data-test-subj'?: string;
+  onClick: (row, rowData) => void;
+  enabled?: (row, rowData) => boolean;
+}
+export interface TableIndexerProps {
+  indexPatterns: IndexPattern;
+  columns: any;
+  filters: Filter[];
+  tableSortingInitialField?: string;
+  tableSortingInitialDirection?: string;
+  topTableComponent?: (searchBarProps: TUseSearchBarProps) => React.ReactNode;
+  tablePropsIgnored?: EuiBasicTableProps;
+  setAllAgentsSelected: (allAgentsSelected: boolean) => void;
+  agentSelected: IAgentResponse[];
+  setParams: (params: { filters: Filter[]; query: SearchBarProps }) => void;
+  needReload: boolean;
+  setNeedReload: (needReload: boolean) => void;
+  actionsColumn?: TableAction[];
+}
+
+export const actionsDropdown = (
+  actions: TableAction[],
+  items: IAgentResponse[],
+) => [
+  {
+    id: 'actions',
+    width: 40,
+    headerCellRender: () => null,
+    rowCellRender: function RowCellRender(row) {
+      const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+      return (
+        <div>
+          <EuiPopover
+            isOpen={isPopoverOpen}
+            anchorPosition='upCenter'
+            panelPaddingSize='s'
+            button={
+              <EuiButtonIcon
+                aria-label='show actions'
+                iconType='boxesHorizontal'
+                color='text'
+                onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+              />
+            }
+            closePopover={() => setIsPopoverOpen(false)}
+          >
+            <EuiPopoverTitle>Actions</EuiPopoverTitle>
+            <div>
+              {actions.map((action, index) => (
+                <div style={{ width: 200 }} key={index}>
+                  <button
+                    onClick={() => {
+                      // ToDo: Fix the items typo
+                      action?.onClick(
+                        row,
+                        items?.hits?.hits[row.rowIndex]._source,
+                      );
+                      setIsPopoverOpen(false);
+                    }}
+                  >
+                    <EuiFlexGroup
+                      alignItems='center'
+                      component='span'
+                      gutterSize='s'
+                    >
+                      <EuiFlexItem grow={false}>
+                        <EuiButtonIcon
+                          iconType={action.icon}
+                          aria-label={action.description}
+                          color='text'
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem>{action.description}</EuiFlexItem>
+                    </EuiFlexGroup>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </EuiPopover>
+        </div>
+      );
+    },
+  },
+];
 
 export const TableIndexer = (props: {
   indexPatterns: IndexPattern;
@@ -172,8 +272,12 @@ export const TableIndexer = (props: {
           isLoading={loadingSearch}
           defaultColumns={columns}
           results={items}
+          exportFilters={filters}
           leadingControlColumns={agentsTableSelection}
-          trailingControlColumns={props.actionsColumn}
+          trailingControlColumns={actionsDropdown(
+            props.actionsColumn || [],
+            items,
+          )}
           indexPattern={indexPatterns}
           defaultPagination={tablePagination}
           onChangePagination={pagination => {

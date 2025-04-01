@@ -13,19 +13,7 @@ import {
   EuiDataGridControlColumn,
 } from '@elastic/eui';
 import { IndexPattern, SearchResponse } from 'src/plugins/data/public';
-import {
-  useDataGrid,
-  // exportSearchToCSV,
-  tDataGridColumn,
-} from '../data-grid';
-// import { getWazuhCorePlugin } from '../../../kibana-services';
-// import { useDocViewer } from '../doc-viewer';
-/* import {
-  ErrorHandler,
-  ErrorFactory,
-  HttpError,
-} from '../../../react-services/error-management';
-*/
+import { useDataGrid, exportSearchToCSV, TDataGridColumn } from '../data-grid';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
@@ -39,7 +27,7 @@ export const MAX_ENTRIES_PER_QUERY = 10000;
 export interface TWazuhDataGridProps {
   indexPattern: IndexPattern;
   results: SearchResponse;
-  defaultColumns: tDataGridColumn[];
+  defaultColumns: TDataGridColumn[];
   leadingControlColumns?: EuiDataGridControlColumn[];
   trailingControlColumns?: EuiDataGridControlColumn[];
   isLoading: boolean;
@@ -66,13 +54,13 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     isLoading,
     defaultPagination,
     onChangePagination,
-    exportFiltersIgnored = [],
+    exportFilters = [],
     onChangeSorting,
-    queryIgnored,
+    query,
     dateRange,
   } = props;
   const [inspectedHit, setInspectedHit] = useState<any>();
-  const [isExporting, _setIsExporting] = useState<boolean>(false);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
   // const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
   const sideNavDocked = false; // Placeholder for sideNavDocked
   const onClickInspectDoc = useMemo(
@@ -115,7 +103,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
       pageSizeOptions: [15, 25, 50, 100],
     },
   });
-  const { pagination, sorting, columnVisibilityIgnored } = dataGridProps;
+  const { pagination, sorting, columnVisibility } = dataGridProps;
 
   useEffect(() => {
     if (onChangePagination) {
@@ -130,6 +118,29 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
   }, [JSON.stringify(sorting)]);
 
   const timeField = indexPattern?.timeFieldName || undefined;
+
+  const onClickExportResults = async () => {
+    const params = {
+      indexPattern: indexPattern as IndexPattern,
+      filters: exportFilters,
+      query,
+      fields: columnVisibility.visibleColumns,
+      pagination: {
+        pageIndex: 0,
+        pageSize: results.hits.total,
+      },
+      sorting,
+    };
+
+    try {
+      setIsExporting(true);
+      await exportSearchToCSV(params);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <>
@@ -148,7 +159,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
                   <DiscoverDataGridAdditionalControls
                     totalHits={results?.hits?.total}
                     isExporting={isExporting}
-                    onClickExportResults={() => {}}
+                    onClickExportResults={onClickExportResults}
                     maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
                     dateRange={dateRange}
                   />
