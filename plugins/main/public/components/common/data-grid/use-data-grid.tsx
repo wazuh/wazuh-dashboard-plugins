@@ -124,7 +124,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
 
   const { columnsAvailable, columns, columnVisibility } = useDataGridColumns({
     moduleId,
-    defaultColumns,
+    defaultColumns: defaultColumns.map(({ id }) => id),
     columnDefinitions,
     allColumns: new Set(indexPattern?.fields.map(({ name }) => name) || []),
   });

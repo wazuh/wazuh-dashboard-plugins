@@ -6,7 +6,7 @@ import { localStorageColumnsStateManagement } from './data-grid-state-persistenc
 
 interface useDataGridColumnsProps {
   moduleId: string;
-  defaultColumns: tDataGridColumn[];
+  defaultColumns: string[];
   columnDefinitions: tDataGridColumn[];
   allColumns: Set<string>;
 }
@@ -17,8 +17,8 @@ function useDataGridColumns({
   columnDefinitions,
   allColumns,
 }: useDataGridColumnsProps) {
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
-    defaultColumns.map(({ id }) => id),
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    () => defaultColumns,
   );
 
   // Fix potential circular dependency with columnStateManagement
@@ -119,7 +119,7 @@ function useDataGridColumns({
         // If validation fails, reset to default columns
         try {
           columnStateManagement.persistState(moduleId, defaultColumns);
-          setVisibleColumns(defaultColumns.map(({ id }) => id));
+          setVisibleColumns(defaultColumns);
         } catch (resetError) {
           console.error('Failed to reset columns to defaults:', resetError);
         }
@@ -169,7 +169,7 @@ function useDataGridColumns({
       setVisibleColumnsHandler(persistedColumns);
     } catch (error) {
       console.error('Error loading persisted columns:', error);
-      setVisibleColumnsHandler(defaultColumns.map(({ id }) => id));
+      setVisibleColumnsHandler(defaultColumns);
     }
   }, [moduleId, JSON.stringify(Array.from(allColumns))]);
 
