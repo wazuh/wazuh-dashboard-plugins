@@ -13,9 +13,7 @@ import {
   getFieldFormatted,
   parseColumns,
 } from './data-grid-service';
-
-const MAX_ENTRIES_PER_QUERY = 10000;
-const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
+import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
 
 export type DataGridColumn = {
   render?: (value: any, rowItem: object) => string | React.ReactNode;
@@ -83,11 +81,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
 
   /** Pagination **/
   const [pagination, setPagination] = useState<EuiDataGridProps['pagination']>(
-    defaultPagination || {
-      pageIndex: 0,
-      pageSize: 20,
-      pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
-    },
+    defaultPagination || DEFAULT_PAGINATION_OPTIONS,
   );
   const onChangeItemsPerPage = useMemo(
     () => pageSize =>

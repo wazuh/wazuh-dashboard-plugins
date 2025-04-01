@@ -2,10 +2,9 @@ import { SearchResponse } from 'src/core/server';
 import { IFieldType, IndexPattern, Filter } from 'src/plugins/data/common';
 import * as FileSaver from '../../../utils/file-saver';
 import { beautifyDate } from '../../../utils/beautify-date';
-
-export const MAX_ENTRIES_PER_QUERY = 10000;
 import { getPlugins } from '../../../plugin-services';
 import { DataGridColumn } from './use-data-grid';
+import { MAX_ENTRIES_PER_QUERY } from './constants';
 
 export interface TSearchParams {
   filters?: Filter[];
