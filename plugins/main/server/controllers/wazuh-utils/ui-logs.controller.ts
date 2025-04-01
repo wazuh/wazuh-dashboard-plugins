@@ -40,8 +40,8 @@ export class UiLogsCtrl {
     try {
       const { location, message, level } = request.body;
       const loggerUI = context.wazuh.logger.get('ui');
-      const loggerByLevel = loggerUI?.[level] || loggerUI.error;
-      loggerByLevel(`${location}: ${message}`);
+      const loggerLevel = loggerUI?.[level] ? level : 'error';
+      loggerUI[loggerLevel](`${location}: ${message}`);
       return response.ok({
         body: {
           statusCode: 200,

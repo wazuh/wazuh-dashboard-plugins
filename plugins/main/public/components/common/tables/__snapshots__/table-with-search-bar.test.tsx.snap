@@ -58,6 +58,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
   <SearchBar
     defaultMode="wql"
     input=""
+    inputTimeMark={1733150110123}
     modes={
       Array [
         Object {
@@ -109,7 +110,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
               <EuiSpacer />
               <div>
                 <EuiLink
-                  href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                  href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                   rel="noopener noreferrer"
                   target="__blank"
                 >
@@ -178,7 +179,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                   <EuiSpacer />
                   <div>
                     <EuiLink
-                      href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                      href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                       rel="noopener noreferrer"
                       target="__blank"
                     >
@@ -258,7 +259,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                             <EuiSpacer />
                             <div>
                               <EuiLink
-                                href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                                href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                                 rel="noopener noreferrer"
                                 target="__blank"
                               >
@@ -368,7 +369,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                                       <EuiSpacer />
                                       <div>
                                         <EuiLink
-                                          href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                                          href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                                           rel="noopener noreferrer"
                                           target="__blank"
                                         >
@@ -434,7 +435,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                                         <EuiSpacer />
                                         <div>
                                           <EuiLink
-                                            href="https://documentation.wazuh.com/4.11/user-manual/wazuh-dashboard/queries.html"
+                                            href="https://documentation.wazuh.com/4.12/user-manual/wazuh-dashboard/queries.html"
                                             rel="noopener noreferrer"
                                             target="__blank"
                                           >
@@ -505,6 +506,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                                         >
                                           <EuiButtonContent
                                             className="euiButtonEmpty__content"
+                                            iconGap="m"
                                             iconSide="left"
                                             iconSize="m"
                                             textProps={
@@ -718,6 +720,7 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
                                 >
                                   <EuiButtonContent
                                     className="euiButtonEmpty__content"
+                                    iconGap="m"
                                     iconSide="right"
                                     iconSize="s"
                                     iconType="arrowDown"

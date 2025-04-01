@@ -2,6 +2,29 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.12.0
+- Add setting to limit the number of rows in csv reports [#7182](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7182)
+- Add new `vulnerability.scanner.reference` field which contains the CTI reference of the vulnerability [#7306](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7306)
+
+### Changed
+
+- Refined queue usage visualizations in Statistics [#7192](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7192)
+
+### Fixed
+
+- Fixed adding the same filter twice doesn't show it in the search bar [#7185](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7185)
+- Fixed rendering of rows in CDB list table when it starts with quotes [#7171](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7171)
+- Fixed width of long fields in the document detail flyout [#7206](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7206)
+- Fixed logging UI logs due to logger undefined property [#7267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7267)
+- Fixed TOP-5-SO filter management in Endpoints > Summary [#7278](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7278)
+- Fixed CSV export not filtering by timerange [#7304](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7304)
+- Fixed agent view not showing the latest agent state [#7336](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7336)
+- Fixed saved queries not displaying in the search bar [#7377](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7377)
+
 ## Wazuh v4.11.2 - OpenSearch Dashboards 2.16.0 - Revision 02
 
 ### Added
