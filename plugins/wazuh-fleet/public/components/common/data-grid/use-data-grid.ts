@@ -80,9 +80,10 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
   };
 
   /** Pagination **/
-  const [pagination, setPagination] = useState<EuiDataGridProps['pagination']>(
-    defaultPagination || DEFAULT_PAGINATION_OPTIONS,
-  );
+  const [pagination, setPagination] = useState<EuiDataGridProps['pagination']>({
+    ...DEFAULT_PAGINATION_OPTIONS,
+    ...defaultPagination,
+  });
   const onChangeItemsPerPage = useMemo(
     () => pageSize =>
       setPagination(pagination => ({
