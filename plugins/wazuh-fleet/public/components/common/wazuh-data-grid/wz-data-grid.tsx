@@ -16,6 +16,14 @@ import { IndexPattern, SearchResponse } from 'src/plugins/data/public';
 import { useDataGrid, exportSearchToCSV, TDataGridColumn } from '../data-grid';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
+import useDataGridStateManagement from '../data-grid/data-grid-state-persistence/use-data-grid-state-management';
+import { DataGridState } from '../data-grid/data-grid-state-persistence/types';
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGINATION_OPTIONS,
+  MAX_ENTRIES_PER_QUERY,
+} from '../data-grid/constants';
+import { localStoragePageSizeStateManagement } from '../data-grid/data-grid-state-persistence/local-storage-page-size-state-management';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import './wazuh-data-grid.scss';
 import { wzDiscoverRenderColumns } from './render-columns';
@@ -23,6 +31,7 @@ import { DocumentViewTableAndJson } from './components/document-view-table-and-j
 import DocDetailsHeader from './components/doc-details-header';
 
 export interface TWazuhDataGridProps {
+  appId: string;
   indexPattern: IndexPattern;
   results: SearchResponse;
   defaultColumns: TDataGridColumn[];
@@ -46,6 +55,7 @@ export interface TWazuhDataGridProps {
 
 const WazuhDataGrid = (props: TWazuhDataGridProps) => {
   const {
+    appId,
     results,
     defaultColumns,
     indexPattern,
@@ -86,6 +96,14 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     );
   };
 
+  const { retrieveState: retrievePageSize, persistState: persistPageSize } =
+    useDataGridStateManagement<DataGridState['pageSize']>({
+      stateManagement: localStoragePageSizeStateManagement,
+      defaultState: DEFAULT_PAGE_SIZE,
+      validateState(state) {
+        return typeof state === 'number' && Number.isInteger(state);
+      },
+    });
   const dataGridProps = useDataGrid({
     ariaLabelledBy: 'Actions data grid',
     defaultColumns,
@@ -95,17 +113,25 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     DocViewInspectButton,
     leadingControlColumns: props.leadingControlColumns,
     trailingControlColumns: props.trailingControlColumns,
-    pagination: defaultPagination || {
-      pageIndex: 0,
-      pageSize: 15,
-      pageSizeOptions: [15, 25, 50, 100],
+    pagination: {
+      ...DEFAULT_PAGINATION_OPTIONS,
+      ...defaultPagination,
+      pageSize: retrievePageSize(appId),
     },
   });
   const { pagination, sorting, columnVisibility } = dataGridProps;
 
   useEffect(() => {
+    onChangePagination({
+      ...pagination,
+      pageSize: retrievePageSize(appId),
+    });
+  }, [appId]);
+
+  useEffect(() => {
     if (onChangePagination) {
       onChangePagination(pagination);
+      persistPageSize(appId, pagination.pageSize);
     }
   }, [JSON.stringify(pagination)]);
 
