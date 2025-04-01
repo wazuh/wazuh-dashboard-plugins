@@ -1,44 +1,41 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getCore, getDataPlugin } from '../../../../kibana-services';
 import { AppState } from '../../../../react-services';
 import { PatternDataSourceFilterManager } from '../../data-source';
 import { withWrapComponent } from '../../hocs';
 import { WazuhFlyoutDiscoverNewFilterManager } from '../../wazuh-discover/wz-flyout-discover';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
-import { ButtonExploreEvents } from './button-recent-events';
+import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
 
-const viewInEvents =
-  ({
-    document,
-    indexPattern,
-    agent,
-    applicationId,
-    applicationTab,
-    getSpecificFilters,
-  }) =>
-  async ev => {
-    const specificFilters = getSpecificFilters
-      ? getSpecificFilters({ document, indexPattern, agent })
-      : [];
+const generatePathNavigate = ({
+  document,
+  indexPattern,
+  agent,
+  applicationId,
+  applicationTab,
+  getSpecificFilters,
+}) => {
+  const specificFilters = getSpecificFilters
+    ? getSpecificFilters({ document, indexPattern, agent })
+    : [];
 
-    const agentId = agent?.id;
+  const agentId = agent?.id;
 
-    const predefinedFilters =
-      PatternDataSourceFilterManager.filtersToURLFormat(specificFilters);
+  const predefinedFilters =
+    PatternDataSourceFilterManager.filtersToURLFormat(specificFilters);
 
-    const destURL = getCore().application.getUrlForApp(applicationId, {
-      path: `#/overview/?${[
-        `tab=${applicationTab}`,
-        'tabView=events',
-        agentId && `agentId=${agentId}`,
-        `_a=${predefinedFilters}`,
-      ]
-        .filter(Boolean)
-        .join('&')}`,
-    });
+  const destURL = getCore().application.getUrlForApp(applicationId, {
+    path: `#/overview/?${[
+      `tab=${applicationTab}`,
+      'tabView=events',
+      agentId && `agentId=${agentId}`,
+      `_a=${predefinedFilters}`,
+    ]
+      .filter(Boolean)
+      .join('&')}`,
+  });
 
-    window.open(destURL, '_blank', 'noreferrer');
-  };
+  return destURL;
+};
 
 export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
   withWrapComponent(
@@ -50,33 +47,38 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
       applicationTab,
       recentEventsSpecificFilters,
     }) => {
-      const [indexPattern, setIndexPattern] = useState(undefined);
+      const [href, setHref] = useState(undefined);
       useEffect(() => {
         (async () => {
           const indexPattern = await getDataPlugin().indexPatterns.get(
             AppState.getCurrentPattern(),
           );
-          setIndexPattern(indexPattern);
+          setHref(
+            generatePathNavigate({
+              document,
+              agent,
+              indexPattern,
+              applicationId,
+              applicationTab,
+              getSpecificFilters: recentEventsSpecificFilters,
+            }),
+          );
         })();
-      }, []);
+      }, [document, agent]); // Maybe it should be done when the index pattern is changed
 
-      const onClick = useCallback(
-        viewInEvents({
-          document,
-          agent,
-          indexPattern,
-          applicationId,
-          applicationTab,
-          getSpecificFilters: recentEventsSpecificFilters,
-        }),
-        [document, agent, indexPattern],
-      );
       return (
         <>
           {children}
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <ButtonExploreEvents onClick={onClick} />
+              <EuiLink
+                href={href}
+                external
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                Explore events
+              </EuiLink>
             </EuiFlexItem>
           </EuiFlexGroup>
         </>
