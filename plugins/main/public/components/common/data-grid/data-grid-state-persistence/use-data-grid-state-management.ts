@@ -4,6 +4,7 @@ interface UseDataGridStateManagementProps<
   State extends DataGridState[keyof DataGridState],
 > {
   stateManagement: DataGridStateManagement<State>;
+  defaultState: State;
   validateState?: (state: State) => boolean;
 }
 
@@ -11,14 +12,15 @@ const useDataGridStateManagement = <
   State extends DataGridState[keyof DataGridState],
 >({
   stateManagement,
+  defaultState,
   validateState,
 }: UseDataGridStateManagementProps<State>) => {
-  const retrieveState = (moduleId: string): State | null => {
+  const retrieveState = (moduleId: string): State => {
     const state = stateManagement.retrieveState(moduleId);
     if (state && validateState?.(state)) {
       return state;
     }
-    return null;
+    return defaultState;
   };
 
   const persistState = (moduleId: string, payload: State): void => {
