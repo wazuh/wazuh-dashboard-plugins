@@ -1,29 +1,19 @@
 import React from 'react';
-import { inventoryTableDefaultColumns } from './config';
-import { withErrorBoundary } from '../../../common/hocs';
-import { compose } from 'redux';
-import { withFIMRegistriesDataSource } from '../common/hocs/validate-fim-states-index-pattern';
-import { ModuleEnabledCheck } from '../common/components/check-module-enabled';
 import {
   FILTER_OPERATOR,
-  FIMRegistriesStatesDataSource,
-  FIMRegistriesStatesDataSourceRepository,
-  PatternDataSource,
   PatternDataSourceFilterManager,
 } from '../../../common/data-source';
-import { WzTableDiscover } from '../../../common/wazuh-discover/table';
 import { AppState, formatUIDate } from '../../../../react-services';
 import { getCore } from '../../../../kibana-services';
 import { EuiLink } from '@elastic/eui';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../common/constants';
-import { fileIntegrityMonitoring, rules } from '../../../../utils/applications';
+import { rules } from '../../../../utils/applications';
 import TechniqueRowDetails from '../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import { setFilters } from '../../../common/search-bar/set-filters';
 import { buildPhraseFilter } from '../../../../../../../src/plugins/data/common';
-import { WazuhFlyoutDiscoverNewFilterManagerRecentEvents } from '../../../common/wazuh-data-grid/recent-events/recent-events';
 
-function getDiscoverColumns({ agent }) {
+export function getDiscoverColumns({ agent }) {
   const agentId = agent?.id;
   return agentId
     ? [
@@ -107,7 +97,7 @@ function getDiscoverColumns({ agent }) {
       ];
 }
 
-function getImplicitFilters({ file }: { file: string }) {
+export function getImplicitFilters({ file }: { file: string }) {
   return [
     ...PatternDataSourceFilterManager.getClusterManagerFilters(
       AppState.getCurrentPattern(),
@@ -128,7 +118,7 @@ function getImplicitFilters({ file }: { file: string }) {
   ];
 }
 
-function renderDiscoverExpandedRow(props: {
+export function renderDiscoverExpandedRow(props: {
   doc: any;
   item: any;
   indexPattern: any;
@@ -164,7 +154,7 @@ function renderDiscoverExpandedRow(props: {
   );
 }
 
-const getRecentEventsSpecificFilters = ({ document, indexPattern }) => {
+export const getRecentEventsSpecificFilters = ({ document, indexPattern }) => {
   const file = document._source.file.path;
 
   return [
@@ -176,48 +166,3 @@ const getRecentEventsSpecificFilters = ({ document, indexPattern }) => {
     ),
   ];
 };
-
-export const InventoryFIMRegistries = compose(
-  withErrorBoundary,
-  withFIMRegistriesDataSource,
-)(({ agent }) => {
-  return (
-    <WzTableDiscover
-      showSearchBar={true}
-      searchBarProps={{
-        showQueryInput: true,
-        showQueryBar: true,
-        showSaveQuery: true,
-      }}
-      DataSource={FIMRegistriesStatesDataSource}
-      DataSourceRepositoryCreator={FIMRegistriesStatesDataSourceRepository}
-      tableDefaultColumns={inventoryTableDefaultColumns}
-      displayOnlyNoResultsCalloutOnNoResults={true} // TODO: review with false value not render
-      additionalDocumentDetailsTabs={({ document }) => {
-        return [
-          {
-            id: 'events',
-            name: 'Events',
-            content: (
-              <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
-                document={document}
-                agent={agent}
-                applicationId={fileIntegrityMonitoring.id}
-                applicationTab='fim'
-                recentEventsSpecificFilters={getRecentEventsSpecificFilters}
-                DataSource={PatternDataSource}
-                tableColumns={getDiscoverColumns({ agent })}
-                initialFetchFilters={getImplicitFilters({
-                  file: document._source.registry.path,
-                })}
-                expandedRowComponent={(...args) =>
-                  renderDiscoverExpandedRow(...args)
-                }
-              />
-            ),
-          },
-        ];
-      }}
-    />
-  );
-});

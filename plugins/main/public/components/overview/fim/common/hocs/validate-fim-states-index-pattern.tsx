@@ -44,21 +44,19 @@ const errorPromptTypes = {
   },
 };
 
-export const withFIMFilesDataSource = withIndexPatternFromSettingDataSource({
-  indexPatternSetting: 'fim_files.pattern',
+export const withFIMDataSource = withIndexPatternFromSettingDataSource({
+  indexPatternSetting: 'fim.pattern',
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   validate: ensureIndexPatternIsCreated({
     mapSavedObjectAttributesCreation: ({ fields }) => {
-      return fields?.some(({ name }) => name === 'file.size')
-        ? { fieldFormatMap: `{"file.size":{"id":"bytes"}}` } // Add format map for file.size field
-        : {};
+      const mappedFields = fields
+        ?.filter(({ name }) => ['file.size', 'regsitry.size'].includes(name))
+        .map(({ name }) => `"${name}":{"id":"bytes"}`);
+
+      if (mappedFields.length) {
+        return { fieldFormatMap: `{${mappedFields.join(',')}}` }; // Add format map for file.size and registry.path field
+      }
+      return {};
     },
   }),
 });
-
-export const withFIMRegistriesDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'fim_registries.pattern',
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-    validate: ensureIndexPatternIsCreated(),
-  });
