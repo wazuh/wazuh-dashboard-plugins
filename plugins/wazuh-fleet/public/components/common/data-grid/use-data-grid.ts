@@ -14,6 +14,7 @@ import {
   parseColumns,
 } from './data-grid-service';
 import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
+import useDataGridColumns from './use-data-grid-columns';
 
 export type DataGridColumn = {
   render?: (value: any, rowItem: object) => string | React.ReactNode;
@@ -23,6 +24,7 @@ export type DataGridRenderColumn = Required<Pick<DataGridColumn, 'render'>> &
   Omit<DataGridColumn, 'render'>;
 
 export interface DataGridProps {
+  appId: string;
   indexPattern: IndexPattern;
   results: SearchResponse;
   defaultColumns: DataGridColumn[];
@@ -38,6 +40,7 @@ export interface DataGridProps {
 
 export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
   const {
+    appId,
     indexPattern,
     DocViewInspectButton,
     results,
@@ -46,11 +49,6 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     trailingControlColumns,
     pagination: defaultPagination,
   } = props;
-  /** Columns **/
-  const [columns, _setColumns] = useState<DataGridColumn[]>(defaultColumns);
-  const [columnVisibility, setVisibility] = useState(() =>
-    columns.map(({ id }) => id),
-  );
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
   const rowCount = results ? (results?.hits?.total as number) : 0;
@@ -58,7 +56,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
   /** Sorting **/
   // get default sorting from default columns
   const getDefaultSorting = () => {
-    const defaultSort = columns.find(
+    const defaultSort = defaultColumns.find(
       column => column.isSortable || column.defaultSortDirection,
     );
 
@@ -104,7 +102,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     setPagination(pagination => ({ ...pagination, pageIndex: 0 }));
   }, [rowCount]);
 
-  const renderCellValue = ({ rowIndex, columnId, _setCellProps }) => {
+  const renderCellValue = ({ rowIndex, columnId }) => {
     const rowsParsed = parseData(rows);
     // On the context data always is stored the current page data (pagination)
     // then the rowIndex is relative to the current page
@@ -118,7 +116,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
         rowsParsed,
       );
       // check if column have render method initialized
-      const column = columns.find(column => column.id === columnId);
+      const column = defaultColumns.find(column => column.id === columnId);
 
       if (column && column.render) {
         return column.render(fieldFormatted, rowsParsed[relativeRowIndex]);
@@ -158,14 +156,20 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     ],
     [results],
   );
+  const columnDefinitions = parseColumns(
+    indexPattern?.fields || [],
+    defaultColumns,
+  );
+  const { columnVisibility } = useDataGridColumns({
+    appId,
+    defaultColumns: defaultColumns.map(column => column.id),
+    allColumns: new Set(columnDefinitions.map(column => column.id) || []),
+  });
 
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns: parseColumns(indexPattern?.fields || [], defaultColumns),
-    columnVisibility: {
-      visibleColumns: columnVisibility,
-      setVisibleColumns: setVisibility,
-    },
+    columns: columnDefinitions,
+    columnVisibility,
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,
     trailingControlColumns: trailingControlColumns,

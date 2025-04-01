@@ -105,6 +105,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
       },
     });
   const dataGridProps = useDataGrid({
+    appId,
     ariaLabelledBy: 'Actions data grid',
     defaultColumns,
     renderColumns: wzDiscoverRenderColumns,
