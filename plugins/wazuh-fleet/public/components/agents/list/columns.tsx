@@ -4,68 +4,47 @@ import {
   EuiFlexItem,
   EuiHealth,
   EuiToolTip,
-  EuiText,
   EuiLink,
 } from '@elastic/eui';
 import { getCore } from '../../../plugin-services';
 import { IAgentResponse } from '../../../../common/types';
 import { AgentGroups, HostOS } from '../../common';
 import { AGENTS_SUMMARY_ID } from '../../../groups/agents/applications';
-import {
-  agentsTableActions,
-  AgentsTableGlobalActionsProps,
-} from './actions/actions';
+import { tDataGridColumn } from '../../common/data-grid';
 
-export const agentsTableColumns = ({
-  setIsFlyoutAgentVisible,
-  setAgent,
-  setIsDeleteModalVisible,
-  setIsEditGroupsVisible,
-  setIsUpgradeModalVisible,
-  setIsEditNameVisible,
-}: AgentsTableGlobalActionsProps) => [
+export const agentsTableColumns: tDataGridColumn[] = [
   {
-    field: 'agent.name',
-    name: 'Name / ID',
-    sortable: true,
-    show: true,
+    id: 'agent.name',
+    displayAsText: 'Name / ID',
+    isSortable: true,
     searchable: true,
-    render: (field: string, agentData: IAgentResponse) => (
+    render: (id: string, agentData: IAgentResponse) => (
       <EuiFlexGroup direction='column' gutterSize='none'>
         <EuiFlexItem>
-          <EuiLink
-            href={getCore().application.getUrlForApp(AGENTS_SUMMARY_ID, {
-              path: `#/agents/${agentData.agent.id}`,
-            })}
-          >
-            {field}
-          </EuiLink>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiToolTip content={field}>
-            <EuiText color='subdued' size='xs'>
-              {`${agentData.agent.id.slice(0, 14)}...`}
-            </EuiText>
+          <EuiToolTip content={agentData.agent.id}>
+            <EuiLink
+              href={getCore().application.getUrlForApp(AGENTS_SUMMARY_ID, {
+                path: `#/agents/${agentData.agent.id}`,
+              })}
+            >
+              {id}
+            </EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
       </EuiFlexGroup>
     ),
   },
   {
-    field: 'agent.groups',
-    name: 'Groups',
-    sortable: true,
-    show: true,
+    id: 'agent.groups',
+    displayAsText: 'Groups',
+    isSortable: true,
     render: (groups: string[]) => <AgentGroups groups={groups} />,
-    searchable: true,
   },
   {
-    field: 'agent.version',
-    name: 'Version',
-    sortable: true,
-    show: true,
-    searchable: true,
-    width: '100px',
+    id: 'agent.version',
+    displayAsText: 'Version',
+    isSortable: true,
+    initialWidth: 100,
     render: (version: string) => {
       const isOutdated = false;
       // const isOutdated = !!outdatedAgents.find(
@@ -92,42 +71,23 @@ export const agentsTableColumns = ({
     },
   },
   {
-    field: 'agent.host.os.full',
-    name: 'Host OS',
-    sortable: true,
-    show: true,
+    id: 'agent.host.os.full',
+    displayAsText: 'Host OS',
+    isSortable: true,
     render: (field: string, agentData: IAgentResponse) => (
       <HostOS os={agentData.agent.host?.os} />
     ),
-    searchable: true,
   },
   {
-    field: 'agent.host.ip',
-    name: 'Host IP',
-    sortable: true,
-    show: true,
-    searchable: true,
-    width: '140px',
+    id: 'agent.host.ip',
+    displayAsText: 'Host IP',
+    isSortable: true,
+    initialWidth: 140,
   },
   {
-    field: 'agent.status',
-    name: 'Status',
-    truncateText: true,
-    sortable: true,
-    show: true,
+    id: 'agent.status',
+    displayAsText: 'Status',
+    isSortable: true,
     // render: (status, agent) => <AgentStatus status={status} agent={agent} />,
-  },
-  {
-    field: 'actions',
-    name: 'Actions',
-    show: true,
-    actions: agentsTableActions({
-      setIsFlyoutAgentVisible,
-      setAgent,
-      setIsDeleteModalVisible,
-      setIsEditGroupsVisible,
-      setIsUpgradeModalVisible,
-      setIsEditNameVisible,
-    }),
   },
 ];

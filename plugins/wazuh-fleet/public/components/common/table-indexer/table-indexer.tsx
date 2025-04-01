@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  EuiFlexGroup,
-  EuiBasicTable,
-  EuiFlexItem,
-  EuiBasicTableProps,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiBasicTableProps } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
 import {
   IndexPattern,
@@ -13,6 +8,8 @@ import {
 import { IAgentResponse } from '../../../../common/types';
 import { getAgentManagement } from '../../../plugin-services';
 import { SearchBarProps } from '../../../../../wazuh-core/public/components';
+import WazuhDataGrid from '../wazuh-data-grid/wz-data-grid';
+import { agentsTableSelection } from '../../agents/list/actions/actions';
 import useSearchBar, {
   TUseSearchBarProps,
 } from './components/search-bar/use-search-bar';
@@ -26,12 +23,13 @@ export const TableIndexer = (props: {
   tableSortingInitialField?: string;
   tableSortingInitialDirection?: string;
   topTableComponent?: (searchBarProps: TUseSearchBarProps) => React.ReactNode;
-  tableProps?: EuiBasicTableProps;
+  tablePropsIgnored?: EuiBasicTableProps;
   setAllAgentsSelected: (allAgentsSelected: boolean) => void;
   agentSelected: IAgentResponse[];
   setParams: (params: { filters: Filter[]; query: SearchBarProps }) => void;
   needReload: boolean;
   setNeedReload: (needReload: boolean) => void;
+  actionsColumn?: any;
 }) => {
   const {
     indexPatterns,
@@ -39,7 +37,7 @@ export const TableIndexer = (props: {
     tableSortingInitialField,
     tableSortingInitialDirection,
     topTableComponent,
-    tableProps,
+    tablePropsIgnored,
     filters: filtersDefault,
     agentSelected,
     setAllAgentsSelected,
@@ -101,7 +99,7 @@ export const TableIndexer = (props: {
         },
       })
       .then((results: SearchResponse) => {
-        setItems(results.hits);
+        setItems(results);
         setTotal(results.total);
       })
       .catch((error: unknown) => {
@@ -126,7 +124,8 @@ export const TableIndexer = (props: {
     }
   }, [needReload]);
 
-  function tableOnChange({
+  // Remove unused function
+  /* function tableOnChange({
     page,
     sort,
   }: {
@@ -146,7 +145,7 @@ export const TableIndexer = (props: {
         direction,
       },
     });
-  }
+  } */
 
   const tablePagination = {
     ...pagination,
@@ -169,14 +168,30 @@ export const TableIndexer = (props: {
       </EuiFlexItem>
       {topTableComponent && topTableComponent(searchBarProps)}
       <EuiFlexItem>
-        <EuiBasicTable
-          columns={columns}
-          items={items}
-          loading={loadingSearch}
-          pagination={tablePagination}
-          sorting={sorting}
-          onChange={tableOnChange}
-          {...tableProps}
+        <WazuhDataGrid
+          isLoading={loadingSearch}
+          defaultColumns={columns}
+          results={items}
+          leadingControlColumns={agentsTableSelection}
+          trailingControlColumns={props.actionsColumn}
+          indexPattern={indexPatterns}
+          defaultPagination={tablePagination}
+          onChangePagination={pagination => {
+            console.log('pagination', pagination);
+            setPagination(prev => ({
+              ...prev,
+              pageIndex: pagination.pageIndex,
+              pageSize: pagination.pageSize,
+            }));
+          }}
+          onChangeSorting={sorting => {
+            console.log('sorting', sorting);
+
+            setSorting(prev => ({
+              ...prev,
+              sort: sorting,
+            }));
+          }}
         />
       </EuiFlexItem>
     </EuiFlexGroup>

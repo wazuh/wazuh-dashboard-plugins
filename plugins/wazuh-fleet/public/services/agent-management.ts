@@ -1,5 +1,4 @@
 import { PLUGIN_ID } from '../../common/constants';
-import { AgentWrapper } from '../../common/types';
 import {
   IAgentManagement,
   IAgentManagementProps,
@@ -36,13 +35,7 @@ export const AgentManagement = ({
       });
 
       return {
-        ...results.hits,
-        hits: results.hits.hits.map(
-          ({ _source: { agent }, ...item }: { _source: AgentWrapper }) => ({
-            ...item,
-            agent,
-          }),
-        ),
+        ...results,
       };
     } catch (error) {
       getToasts().addDanger({

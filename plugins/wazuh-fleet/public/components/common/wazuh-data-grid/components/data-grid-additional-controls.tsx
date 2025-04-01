@@ -1,0 +1,88 @@
+import React from 'react';
+import {
+  EuiButtonEmpty,
+  EuiFlexItem,
+  EuiFlexGroup,
+  EuiText,
+} from '@elastic/eui';
+import { MAX_ENTRIES_PER_QUERY } from '../../data-grid/data-grid-service';
+// Remove unused import
+// import { formatUIDate } from '../../../../utils/time-service';
+import { HitsCounter } from './hits-counter';
+import { formatNumWithCommas } from './helpers';
+
+interface DiscoverDataGridAdditionalControlsProps {
+  totalHits: number;
+  isExporting: boolean;
+  onClickExportResults: () => void;
+  maxEntriesPerQuery?: number;
+  dateRange: TimeRange;
+}
+
+const DiscoverDataGridAdditionalControls = (
+  props: DiscoverDataGridAdditionalControlsProps,
+) => {
+  const {
+    totalHits,
+    isExporting,
+    maxEntriesPerQuery = MAX_ENTRIES_PER_QUERY,
+    onClickExportResults,
+    dateRange,
+  } = props;
+
+  const onHandleExportResults = () => {
+    if (onClickExportResults) {
+      onClickExportResults();
+    }
+  };
+
+  return (
+    <>
+      <HitsCounter
+        hits={totalHits}
+        showResetButton={false}
+        tooltip={
+          totalHits && totalHits > maxEntriesPerQuery
+            ? {
+                ariaLabel: 'Warning',
+                content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                  maxEntriesPerQuery,
+                )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                  maxEntriesPerQuery,
+                )} hits.`,
+                iconType: 'alert',
+                position: 'top',
+              }
+            : undefined
+        }
+      />
+      {dateRange ? (
+        <EuiFlexGroup
+          gutterSize='s'
+          responsive={false}
+          justifyContent='center'
+          alignItems='center'
+        >
+          <EuiFlexItem grow={false}>
+            <EuiText size='s'>
+              {/* formatUIDate(dateRange?.from)} - {formatUIDate(dateRange?.to)*/}
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ) : null}
+      <EuiButtonEmpty
+        disabled={totalHits === 0 || isExporting}
+        size='xs'
+        iconType='exportAction'
+        color='primary'
+        isLoading={isExporting}
+        className='euiDataGrid__controlBtn'
+        onClick={onHandleExportResults}
+      >
+        Export Formated
+      </EuiButtonEmpty>
+    </>
+  );
+};
+
+export default DiscoverDataGridAdditionalControls;

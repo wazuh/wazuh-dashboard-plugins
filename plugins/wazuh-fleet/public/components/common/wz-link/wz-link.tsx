@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { RedirectAppLinks } from 'src/plugins/opensearch_dashboards_react/public';
 import { EuiLink, EuiToolTip, EuiToolTipProps } from '@elastic/eui';
-import { CoreStart } from 'src/core/public';
-import { createGetterSetter } from 'src/opensearch_dashboards_utils/public';
 import useObservable from 'react-use/lib/useObservable';
+import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { getCore } from '../../kibana-services';
 import NavigationService from '../../react-services/navigation-service';
-
-export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
 
 interface TWzLinkProps {
   appId: string;
