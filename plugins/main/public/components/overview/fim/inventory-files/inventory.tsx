@@ -12,16 +12,16 @@ import {
   PatternDataSourceFilterManager,
 } from '../../../common/data-source';
 import { WzTableDiscover } from '../../../common/wazuh-discover/table';
-import { WazuhFlyoutDiscoverNewFilterManager } from '../../../common/wazuh-discover/wz-flyout-discover';
 import { AppState, formatUIDate } from '../../../../react-services';
 import { getCore } from '../../../../kibana-services';
 import { EuiLink } from '@elastic/eui';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../common/constants';
-import { rules } from '../../../../utils/applications';
+import { fileIntegrityMonitoring, rules } from '../../../../utils/applications';
 import TechniqueRowDetails from '../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import { setFilters } from '../../../common/search-bar/set-filters';
 import { buildPhraseFilter } from '../../../../../../../src/plugins/data/common';
+import { WazuhFlyoutDiscoverNewFilterManagerRecentEvents } from '../../../common/wazuh-data-grid/recent-events/recent-events';
 
 function getDiscoverColumns({ agent }) {
   const agentId = agent?.id;
@@ -164,6 +164,19 @@ function renderDiscoverExpandedRow(props: {
   );
 }
 
+const getRecentEventsSpecificFilters = ({ document, indexPattern }) => {
+  const file = document._source.file.path;
+
+  return [
+    PatternDataSourceFilterManager.createFilter(
+      FILTER_OPERATOR.IS,
+      'syscheck.path',
+      file,
+      indexPattern.id,
+    ),
+  ];
+};
+
 export const InventoryFIMFiles = compose(
   withErrorBoundary,
   withFIMFilesDataSource,
@@ -180,15 +193,21 @@ export const InventoryFIMFiles = compose(
       DataSourceRepositoryCreator={FIMFilesStatesDataSourceRepository}
       tableDefaultColumns={inventoryTableDefaultColumns}
       displayOnlyNoResultsCalloutOnNoResults={true}
-      additionalDocumentDetailsTabs={({ document }) => {
+      additionalDocumentDetailsTabs={({ document, indexPattern }) => {
+        console.log({ document, indexPattern });
         return [
           {
             id: 'events',
             name: 'Events',
             content: (
-              <WazuhFlyoutDiscoverNewFilterManager
+              <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
+                document={document}
+                agent={agent}
+                applicationId={fileIntegrityMonitoring.id}
+                applicationTab='fim'
+                recentEventsSpecificFilters={getRecentEventsSpecificFilters}
                 DataSource={PatternDataSource}
-                tableColumns={getDiscoverColumns({ agent: agent })}
+                tableColumns={getDiscoverColumns({ agent })}
                 initialFetchFilters={getImplicitFilters({
                   file: document._source.file.path,
                 })}
