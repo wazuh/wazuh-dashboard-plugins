@@ -72,20 +72,24 @@ function useDataGridColumns({
   const setVisibleColumnsHandler = useCallback(
     (columns: string[]) => {
       if (!allColumns || allColumns.size === 0) return;
-      if (
-        columns.length !== visibleColumns.length ||
-        !columns.every((col, index) => col === visibleColumns[index])
-      ) {
-        setVisibleColumns(columns);
-        const columnsToPersist = columns
-          .map(columnId => {
-            return allColumns.has(columnId) ? columnId : null;
-          })
-          .filter(Boolean)
-          .filter(column => column !== null)
-          .filter(column => column !== undefined);
-        columnStateManagement.persistState(moduleId, columnsToPersist);
-      }
+      // Check if columns are the same as current visible columns
+      const isSameColumns =
+        columns.length === visibleColumns.length &&
+        columns.every((col, index) => col === visibleColumns[index]);
+
+      if (isSameColumns) return;
+
+      // Update visible columns
+      setVisibleColumns(columns);
+
+      // Filter and persist valid columns
+      const columnsToPersist = columns
+        .map(columnId => (allColumns.has(columnId) ? columnId : null))
+        .filter(Boolean) // Remove falsy values
+        .filter(column => column !== null)
+        .filter(column => column !== undefined);
+
+      columnStateManagement.persistState(moduleId, columnsToPersist);
     },
     [
       visibleColumns,
