@@ -22,8 +22,6 @@ import { wzDiscoverRenderColumns } from './render-columns';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import DocDetailsHeader from './components/doc-details-header';
 
-export const MAX_ENTRIES_PER_QUERY = 10000;
-
 export interface TWazuhDataGridProps {
   indexPattern: IndexPattern;
   results: SearchResponse;
