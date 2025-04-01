@@ -8,7 +8,7 @@ import { getCore } from '../../../../kibana-services';
 import { EuiLink } from '@elastic/eui';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER } from '../../../../../common/constants';
-import { rules } from '../../../../utils/applications';
+import { endpointSummary, rules } from '../../../../utils/applications';
 import TechniqueRowDetails from '../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import { setFilters } from '../../../common/search-bar/set-filters';
 import { buildPhraseFilter } from '../../../../../../../src/plugins/data/common';
