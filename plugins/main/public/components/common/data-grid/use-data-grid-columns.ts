@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { tDataGridColumn } from './types';
 import { IndexPattern } from '../../../../../../src/plugins/data/public';
 import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
@@ -20,30 +20,108 @@ function useDataGridColumns({
   const [visibleColumns, setVisibleColumns] = useState<string[]>(() =>
     defaultColumns.map(({ id }) => id),
   );
-  const columnStateManagement = useDataGridStateManagement<
-    DataGridState['columns']
-  >({
-    stateManagement: localStorageColumnsStateManagement,
-    defaultState: defaultColumns,
-    validateState(columns: DataGridState['columns']) {
-      // columns.forEach(columnState => {
-      //   const column = columnDefinitions.find(
-      //     field => field.id === columnState.id,
-      //   );
-      //   if (!column) {
-      //     throw new Error(
-      //       `Column ${columnState.id} is not existing in index pattern`,
-      //     );
-      //   }
-      // });
+
+  // Fix potential circular dependency with columnStateManagement
+  const validateColumns = useCallback(
+    (columns: DataGridState['columns']) => {
+      // Avoid validation if we have no columns to validate
+      if (!columns || !Array.isArray(columns) || columns.length === 0) {
+        return true;
+      }
+
+      // Only perform column existence validation if columnDefinitions is initialized and has items
+      if (columnDefinitions && columnDefinitions.length > 0) {
+        const columnDefinitionsIds = new Set(
+          columnDefinitions.map(column => column.id),
+        );
+        for (const columnState of columns) {
+          // Skip columns without ID (shouldn't happen, but for safety)
+          if (!columnState || !columnState.id) continue;
+
+          if (!columnDefinitionsIds.has(columnState.id)) {
+            throw new Error(
+              `Column ${columnState.id} does not exist in column definitions`,
+            );
+            // Check if columns are unique
+          }
+        }
+      }
+
       // Check if columns are unique
-      const uniqueColumnIds = new Set(columns.map(column => column.id));
+      const uniqueColumnIds = new Set(
+        columns.map(column => column?.id).filter(Boolean),
+      );
       if (uniqueColumnIds.size !== columns.length) {
         throw new Error('Column IDs must be unique');
       }
       return true;
     },
+    // Create state management with memoized validation function
+    [columnDefinitions],
+  );
+
+  // Create state management with memoized validation function
+  const columnStateManagement = useDataGridStateManagement<
+    DataGridState['columns']
+  >({
+    stateManagement: localStorageColumnsStateManagement,
+    defaultState: defaultColumns,
+    validateState: validateColumns,
   });
+
+  // Prevent infinite loop by checking if visibleColumns actually need updating
+  const setVisibleColumnsHandler = useCallback(
+    (columns: string[]) => {
+      if (
+        columns.length !== visibleColumns.length ||
+        !columns.every((col, index) => col === visibleColumns[index])
+      ) {
+        setVisibleColumns(columns);
+        const columnsToPersist = columns
+          .map(columnId => {
+            const column = columnDefinitions.find(({ id }) => id === columnId);
+            return column ? column : null;
+          })
+          .filter(column => column !== null);
+        columnStateManagement.persistState(moduleId, columnsToPersist);
+      }
+    },
+    [visibleColumns, columnDefinitions, columnStateManagement, moduleId],
+  );
+
+  useEffect(() => {
+    if (columnDefinitions && columnDefinitions.length > 0) {
+      try {
+        // Get current persisted state for validation
+        const persistedColumns = columnStateManagement.retrieveState(moduleId);
+        if (
+          persistedColumns &&
+          Array.isArray(persistedColumns) &&
+          persistedColumns.length > 0
+        ) {
+          validateColumns(persistedColumns);
+        }
+      } catch (error) {
+        console.error(
+          'Column validation failed after columnDefinitions changed:',
+          error,
+        );
+        // If validation fails, reset to default columns
+        try {
+          columnStateManagement.persistState(moduleId, defaultColumns);
+          setVisibleColumns(defaultColumns.map(({ id }) => id));
+        } catch (resetError) {
+          console.error('Failed to reset columns to defaults:', resetError);
+        }
+      }
+    }
+  }, [
+    columnDefinitions,
+    moduleId,
+    validateColumns,
+    columnStateManagement,
+    defaultColumns,
+  ]);
 
   const sortFirstMatchedColumns = (
     firstMatchedColumns: tDataGridColumn[],
@@ -80,30 +158,30 @@ function useDataGridColumns({
     ];
   };
 
-  const setVisibleColumnsHandler = (columns: string[]) => {
-    setVisibleColumns(columns);
-    // persist in the local storage the columns selected
-    const columnsToPersist = columns
-      .map(columnId => {
-        const column = columnDefinitions.find(({ id }) => id === columnId);
-        return column ? column : null;
-      })
-      .filter(column => column !== null);
-    columnStateManagement.persistState(moduleId, columnsToPersist);
-  };
-
   useEffect(() => {
-    console.log(visibleColumns);
-    const persistedColumns = columnStateManagement.retrieveState(moduleId);
-    if (!persistedColumns) return;
-    const persistedColumnsIds = persistedColumns
-      .map(({ id }) => id)
-      // TypeError: Cannot read properties of undefined (reading 'hasOwnProperty')
-      .filter(Boolean);
-    if (persistedColumnsIds && Array.isArray(persistedColumnsIds)) {
-      setVisibleColumns(persistedColumnsIds);
+    try {
+      const persistedColumns = columnStateManagement.retrieveState(moduleId);
+      if (!persistedColumns) return;
+      const persistedColumnsIds = persistedColumns
+        .map(column => column?.id)
+        .filter(Boolean);
+      if (
+        persistedColumnsIds &&
+        Array.isArray(persistedColumnsIds) &&
+        persistedColumnsIds.length > 0
+      ) {
+        setVisibleColumnsHandler(persistedColumnsIds);
+      }
+    } catch (error) {
+      console.error('Error loading persisted columns:', error);
+      setVisibleColumnsHandler(defaultColumns.map(({ id }) => id));
     }
-  }, [moduleId]);
+  }, [
+    moduleId,
+    columnStateManagement,
+    defaultColumns,
+    setVisibleColumnsHandler,
+  ]);
 
   return {
     // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
