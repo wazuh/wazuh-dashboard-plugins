@@ -1,8 +1,5 @@
-import { tDataGridColumn } from '../types';
-import { KeyState } from './constants';
-
 export interface DataGridState {
-  columns: tDataGridColumn[];
+  columns: string[];
   pageSize: number;
 }
 

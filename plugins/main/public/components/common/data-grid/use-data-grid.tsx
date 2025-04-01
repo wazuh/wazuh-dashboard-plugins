@@ -20,7 +20,11 @@ import {
   tDataGridColumn,
   tDataGridRenderColumn,
 } from './types';
-import { DEFAULT_PAGE_SIZE, DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGINATION_OPTIONS,
+  MAX_ENTRIES_PER_QUERY,
+} from './constants';
 import useDataGridColumns from './use-data-grid-columns';
 import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
 import { DataGridState } from './data-grid-state-persistence/types';
@@ -121,8 +125,8 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   const { columnsAvailable, columns, columnVisibility } = useDataGridColumns({
     moduleId,
     defaultColumns,
-    columnDefinitions: columnDefinitions,
-    indexPattern,
+    columnDefinitions,
+    allColumns: new Set(indexPattern?.fields.map(({ name }) => name) || []),
   });
 
   const onChangeItemsPerPage = useMemo(
