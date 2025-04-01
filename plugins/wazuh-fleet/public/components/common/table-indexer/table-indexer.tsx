@@ -117,6 +117,7 @@ export const actionsDropdown = (
 ];
 
 export const TableIndexer = (props: {
+  appId: string;
   indexPatterns: IndexPattern;
   columns: any;
   filters: Filter[];
@@ -132,6 +133,7 @@ export const TableIndexer = (props: {
   actionsColumn?: any;
 }) => {
   const {
+    appId,
     indexPatterns,
     columns,
     tableSortingInitialField,
@@ -269,6 +271,7 @@ export const TableIndexer = (props: {
       {topTableComponent && topTableComponent(searchBarProps)}
       <EuiFlexItem>
         <WazuhDataGrid
+          appId={appId}
           isLoading={loadingSearch}
           defaultColumns={columns}
           results={items}

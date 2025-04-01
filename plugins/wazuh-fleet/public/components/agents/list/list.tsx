@@ -25,6 +25,7 @@ import {
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
 import { AGENTS_SUMMARY_ID } from '../../../groups/agents/applications';
+import { AGENTS_ID } from '../../../groups/agents/constants';
 import { agentsTableColumns } from './columns';
 import { AgentsVisualizations } from './visualizations';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
@@ -124,6 +125,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
       <EuiSpacer />
       {indexPatterns ? (
         <TableIndexer
+          appId={AGENTS_ID}
           needReload={needReload}
           setNeedReload={setNeedReload}
           setParams={setParams}
