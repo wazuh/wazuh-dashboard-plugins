@@ -1,3 +1,4 @@
+import React from 'react';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { EuiLink } from '@elastic/eui';
 import {
