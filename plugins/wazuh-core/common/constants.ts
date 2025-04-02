@@ -1974,41 +1974,6 @@ hosts:
       ),
     ),
   },
-  'system_inventory_hardware.pattern': {
-    title: 'Index pattern',
-    description: 'Default index pattern to use for hardware inventory.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_SYSTEM_INVENTORY_HARDWARE_PATTERN,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: false,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noLiteralString('.', '..'),
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-      ),
-    ),
-  },
   'system_inventory_hotfixes.pattern': {
     title: 'Index pattern',
     description: 'Default index pattern to use for hotfixes inventory.',
