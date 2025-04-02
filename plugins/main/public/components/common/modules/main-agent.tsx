@@ -11,25 +11,8 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiButtonEmpty,
-  EuiTabs,
-  EuiTab,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiTabs, EuiTab } from '@elastic/eui';
 import '../../common/modules/module.scss';
-import store from '../../../redux/store';
-import { ReportingService } from '../../../react-services/reporting';
-import {
-  AlertsDataSource,
-  AlertsDataSourceRepository,
-  PatternDataSource,
-  tFilter,
-  tParsedIndexPattern,
-  useDataSource,
-} from '../data-source';
-import { useAsyncAction } from '../hooks';
 import { toTitleCase } from '../util/change-case';
 import clsx from 'clsx';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
@@ -48,32 +31,15 @@ export class MainModuleAgent extends Component {
     unPinAgent?: () => void;
   };
 
-  inventoryTabs = [AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES];
-
   renderTitle() {
-    const { agent, section, switchTab } = this.props;
+    const { section } = this.props;
     return (
       <EuiFlexGroup style={{ marginInline: 8 }}>
         <EuiFlexItem style={{ marginInline: 0 }}>
           <EuiTabs data-test-subj='agent-tabs'>
-            {this.inventoryTabs.includes(section) ? (
-              <>
-                {this.inventoryTabs.map(tab => (
-                  <EuiTab
-                    key={`agent-tab-${tab}`}
-                    data-test-subj={`agent-tab-${tab}`}
-                    isSelected={section === tab}
-                    onClick={() => switchTab?.(tab)}
-                  >
-                    {toTitleCase(tab)}
-                  </EuiTab>
-                ))}
-              </>
-            ) : (
-              <EuiTab data-test-subj={`agent-tab-${section}`} isSelected={true}>
-                {toTitleCase(section)}
-              </EuiTab>
-            )}
+            <EuiTab data-test-subj={`agent-tab-${section}`} isSelected={true}>
+              {toTitleCase(section)}
+            </EuiTab>
           </EuiTabs>
         </EuiFlexItem>
         <EuiFlexItem
