@@ -30,6 +30,7 @@ export type DocumentViewTableAndJsonPropsAdditionalTabs =
 
 type DocumentViewTableAndJsonProps = DocumentViewTableAndJsonPropsDoc & {
   additionalTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
+  showFilterButtons: boolean;
 };
 
 export const DocumentViewTableAndJson = ({
@@ -40,6 +41,7 @@ export const DocumentViewTableAndJson = ({
   setFilters,
   onFilter,
   additionalTabs = [],
+  showFilterButtons,
 }: DocumentViewTableAndJsonProps) => {
   const docViewerProps = useDocViewer({
     doc: document,
@@ -60,6 +62,7 @@ export const DocumentViewTableAndJson = ({
                 filters={filters}
                 setFilters={setFilters}
                 onFilter={onFilter}
+                showFilterButtons={showFilterButtons}
               />
             ),
           },

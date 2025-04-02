@@ -25,7 +25,10 @@ import interfacesColumns from './table-columns/interfaces';
 import { withSystemInventoryDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
 import { withDataSourceInitiated } from '../../../common/hocs';
 
-const InventoryITHygieneDashboard = withDataSourceInitiated(
+const InventoryITHygieneDashboard = withDataSourceInitiated({
+  dataSourceNameProp: 'dataSource',
+  isLoadingNameProp: 'isDataSourceLoading',
+})(
   ({
     dataSource,
     fetchFilters,

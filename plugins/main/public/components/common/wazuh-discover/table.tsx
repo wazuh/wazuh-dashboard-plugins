@@ -197,7 +197,10 @@ export type EnhancedTableProps<K> = TableDiscoverBasicTableProps<K> & {
 };
 
 const EnhancedTable: React.FunctionComponent<EnhancedTableProps<K>> =
-  withDataSourceInitiated(
+  withDataSourceInitiated({
+    dataSourceNameProp: 'dataSource',
+    isLoadingNameProp: 'isDataSourceLoading',
+  })(
     ({
       searchBarProps,
       filters,
@@ -260,7 +263,10 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
     ({ isDataSourceLoading }) => isDataSourceLoading,
     LoadingSearchbarProgress,
   ),
-  withDataSourceInitiated,
+  withDataSourceInitiated({
+    dataSourceNameProp: 'dataSource',
+    isLoadingNameProp: 'isDataSourceLoading',
+  }),
 )(
   ({
     dataSource,
@@ -378,35 +384,74 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
             isDataSourceLoading={isDataSourceLoading}
           />
         )}
+
         {inspectedHit && (
-          <EuiFlyout onClose={closeFlyoutHandler} size='m'>
-            <EuiFlyoutHeader>
-              <EuiTitle>
-                <h2>{inspectDetailsTitle}</h2>
-              </EuiTitle>
-            </EuiFlyoutHeader>
-            <EuiFlyoutBody>
-              <EuiFlexGroup direction='column'>
-                <DocumentViewTableAndJson
-                  document={inspectedHit}
-                  indexPattern={dataSource?.indexPattern}
-                  renderFields={getAllCustomRenders(
-                    tableDefaultColumns,
-                    wzDiscoverRenderColumns,
-                  )}
-                  filters={filters}
-                  setFilters={setFilters}
-                  onFilter={closeFlyoutHandler}
-                  additionalTabs={additionalDocumentDetailsTabs}
-                />
-              </EuiFlexGroup>
-            </EuiFlyoutBody>
-          </EuiFlyout>
+          <DocumentDetailsOnFlyout
+            title={inspectDetailsTitle}
+            document={inspectedHit}
+            indexPattern={dataSource?.indexPattern}
+            tableDefaultColumns={tableDefaultColumns}
+            filters={filters}
+            setFilters={setFilters}
+            onClose={closeFlyoutHandler}
+            onFilter={closeFlyoutHandler}
+            additionalTabs={additionalDocumentDetailsTabs}
+          />
         )}
       </>
     );
   },
 );
+
+export const DocumentDetails = withWrapComponent(({ children }) => (
+  <EuiFlexGroup direction='column'>{children}</EuiFlexGroup>
+))(
+  ({
+    document,
+    indexPattern,
+    tableDefaultColumns,
+    filters,
+    setFilters,
+    onFilter,
+    additionalTabs,
+    showFilterButtons,
+  }) => (
+    <DocumentViewTableAndJson
+      document={document}
+      indexPattern={indexPattern}
+      renderFields={getAllCustomRenders(
+        tableDefaultColumns,
+        wzDiscoverRenderColumns,
+      )}
+      filters={filters}
+      setFilters={setFilters}
+      onFilter={onFilter}
+      additionalTabs={additionalTabs}
+      showFilterButtons={showFilterButtons}
+    />
+  ),
+);
+
+export const FlyoutDocumentDetails = ({
+  title = 'Details',
+  children,
+  onClose,
+}) => (
+  <EuiFlyout onClose={onClose} size='m'>
+    <EuiFlyoutHeader>
+      <EuiTitle>
+        <h2>{title}</h2>
+      </EuiTitle>
+    </EuiFlyoutHeader>
+    <EuiFlyoutBody>{children}</EuiFlyoutBody>
+  </EuiFlyout>
+);
+
+export const withFlyoutDocumentDetails = withWrapComponent(
+  FlyoutDocumentDetails,
+);
+export const DocumentDetailsOnFlyout =
+  withFlyoutDocumentDetails(DocumentDetails);
 
 export interface WzTableDiscoverProps {
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;

@@ -26,7 +26,70 @@ import { fileIntegrityMonitoring } from '../../../../utils/applications';
 import * as filesUtils from './inventory-files';
 import * as registriesUtils from './inventory-files';
 
-const InventoryFIMDashboard = withDataSourceInitiated(
+export const InventoryFIMFilesDocumentDetailsEvents = ({ document, agent }) => (
+  <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
+    document={document}
+    agent={agent}
+    applicationId={fileIntegrityMonitoring.id}
+    applicationTab='fim'
+    recentEventsSpecificFilters={filesUtils.getRecentEventsSpecificFilters}
+    DataSource={PatternDataSource}
+    tableColumns={filesUtils.getDiscoverColumns({ agent })}
+    initialFetchFilters={filesUtils.getImplicitFilters({
+      file: document._source.file.path,
+    })}
+    expandedRowComponent={(...args) =>
+      filesUtils.renderDiscoverExpandedRow(...args)
+    }
+  />
+);
+
+export const filesEventsDocumentDetailsTab = ({ document, agent }) => ({
+  id: 'events',
+  name: 'Events',
+  content: (
+    <InventoryFIMFilesDocumentDetailsEvents document={document} agent={agent} />
+  ),
+});
+
+export const InventoryFIMRegistriesDocumentDetailsEvents = ({
+  document,
+  agent,
+}) => (
+  <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
+    document={document}
+    agent={agent}
+    applicationId={fileIntegrityMonitoring.id}
+    applicationTab='fim'
+    recentEventsSpecificFilters={registriesUtils.getRecentEventsSpecificFilters}
+    DataSource={PatternDataSource}
+    tableColumns={registriesUtils.getDiscoverColumns({
+      agent,
+    })}
+    initialFetchFilters={registriesUtils.getImplicitFilters({
+      file: document._source.registry.path,
+    })}
+    expandedRowComponent={(...args) =>
+      registriesUtils.renderDiscoverExpandedRow(...args)
+    }
+  />
+);
+
+export const registriesEventsDocumentDetailsTab = ({ document, agent }) => ({
+  id: 'events',
+  name: 'Events',
+  content: (
+    <InventoryFIMRegistriesDocumentDetailsEvents
+      document={document}
+      agent={agent}
+    />
+  ),
+});
+
+const InventoryFIMDashboard = withDataSourceInitiated({
+  dataSourceNameProp: 'dataSource',
+  isLoadingNameProp: 'isDataSourceLoading',
+})(
   ({
     dataSource,
     fetchFilters,
@@ -78,33 +141,8 @@ const InventoryFIMDashboard = withDataSourceInitiated(
               isDataSourceLoading={isDataSourceLoading}
               tableDefaultColumns={filesColumns}
               title='Files'
-              additionalDocumentDetailsTabs={({ document, indexPattern }) => {
-                console.log({ document, indexPattern });
-                return [
-                  {
-                    id: 'events',
-                    name: 'Events',
-                    content: (
-                      <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
-                        document={document}
-                        agent={agent}
-                        applicationId={fileIntegrityMonitoring.id}
-                        applicationTab='fim'
-                        recentEventsSpecificFilters={
-                          filesUtils.getRecentEventsSpecificFilters
-                        }
-                        DataSource={PatternDataSource}
-                        tableColumns={filesUtils.getDiscoverColumns({ agent })}
-                        initialFetchFilters={filesUtils.getImplicitFilters({
-                          file: document._source.file.path,
-                        })}
-                        expandedRowComponent={(...args) =>
-                          filesUtils.renderDiscoverExpandedRow(...args)
-                        }
-                      />
-                    ),
-                  },
-                ];
+              additionalDocumentDetailsTabs={({ document }) => {
+                return [filesEventsDocumentDetailsTab({ document, agent })];
               }}
             />
           </EuiFlexItem>
@@ -133,33 +171,7 @@ const InventoryFIMDashboard = withDataSourceInitiated(
               title='Registries'
               additionalDocumentDetailsTabs={({ document }) => {
                 return [
-                  {
-                    id: 'events',
-                    name: 'Events',
-                    content: (
-                      <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
-                        document={document}
-                        agent={agent}
-                        applicationId={fileIntegrityMonitoring.id}
-                        applicationTab='fim'
-                        recentEventsSpecificFilters={
-                          registriesUtils.getRecentEventsSpecificFilters
-                        }
-                        DataSource={PatternDataSource}
-                        tableColumns={registriesUtils.getDiscoverColumns({
-                          agent,
-                        })}
-                        initialFetchFilters={registriesUtils.getImplicitFilters(
-                          {
-                            file: document._source.registry.path,
-                          },
-                        )}
-                        expandedRowComponent={(...args) =>
-                          registriesUtils.renderDiscoverExpandedRow(...args)
-                        }
-                      />
-                    ),
-                  },
+                  registriesEventsDocumentDetailsTab({ document, agent }),
                 ];
               }}
             />
