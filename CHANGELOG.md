@@ -17,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Add new `vulnerability.scanner.reference` field which contains the CTI reference of the vulnerability [#7306](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7306)
 - Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added hardware and system information to agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Added `fim.pattern` and `system_inventory.pattern` settings [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 
 ### Changed
 
