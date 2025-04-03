@@ -79,7 +79,6 @@ const SelectionRowCell = ({ row, items, onClickSelectRow }) => {
 };
 
 export const actionsButtons = ({
-  setIsFlyoutAgentVisible,
   setAgent,
   setIsDeleteModalVisible,
   setIsEditGroupsVisible,
