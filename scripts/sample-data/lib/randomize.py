@@ -17,17 +17,17 @@ class Randomize():
         )
         return int(random_time.timestamp())
 
-    def data_stream():
+    def data_stream(self):
         data_stream = {"type": random.choice(["Scheduled", "Realtime"])}
         return data_stream
 
-    def event():
+    def event(self):
         return {
             "category": random.choice(["registy_value", "registry_key", "file"]),
             "type": random.choice(["added", "modified", "deleted"])
         }
 
-    def wazuh():
+    def wazuh(self):
         return {
             "cluster": {
                 "name": f"wazuh-cluster-{random.randint(0, 10)}",
@@ -36,7 +36,7 @@ class Randomize():
             "schema": {"version": "1.7.0"},
         }
 
-    def agent(host: dict):
+    def agent(self, host: dict):
         return {
             "id": f"{random.randint(0, 99):03d}",
             "name": f"Agent{random.randint(0, 99)}",
