@@ -121,7 +121,6 @@ export const TableIndexer = (props: {
   tableSortingInitialField?: string;
   tableSortingInitialDirection?: string;
   topTableComponent?: (searchBarProps: TUseSearchBarProps) => React.ReactNode;
-  tablePropsIgnored?: EuiBasicTableProps;
   setAllAgentsSelected: (allAgentsSelected: boolean) => void;
   agentSelected: IAgentResponse[];
   setParams: (params: { filters: Filter[]; query: SearchBarProps }) => void;
@@ -136,7 +135,6 @@ export const TableIndexer = (props: {
     tableSortingInitialField,
     tableSortingInitialDirection,
     topTableComponent,
-    tablePropsIgnored,
     filters: filtersDefault,
     agentSelected,
     setParams,
@@ -149,15 +147,17 @@ export const TableIndexer = (props: {
     pageSize: 15,
   });
   const [sorting, setSorting] = useState<{
-    sort: {
-      field: string;
+    columns: {
+      id: string;
       direction: string;
-    };
+    }[];
   }>({
-    sort: {
-      field: tableSortingInitialField || '_id',
-      direction: tableSortingInitialDirection || 'desc',
-    },
+    columns: [
+      {
+        id: tableSortingInitialField || '_id',
+        direction: tableSortingInitialDirection || 'desc',
+      },
+    ],
   });
   const { filters } = useFilterManager();
   const { searchBarProps } = useSearchBar({
@@ -184,14 +184,7 @@ export const TableIndexer = (props: {
         filters,
         query,
         pagination,
-        sort: {
-          columns: [
-            {
-              id: sorting.sort.field,
-              direction: sorting.sort.direction,
-            },
-          ],
-        },
+        sort: sorting,
       })
       .then((results: SearchResponse) => {
         setItems(results);
@@ -218,29 +211,6 @@ export const TableIndexer = (props: {
       setNeedReload(false);
     }
   }, [needReload]);
-
-  // Remove unused function
-  /* function tableOnChange({
-    page,
-    sort,
-  }: {
-    page: { index: number; size: number };
-    sort: { field: string; direction: string };
-  }) {
-    const { index: pageIndex, size: pageSize } = page;
-    const { field, direction } = sort;
-
-    setPagination({
-      pageIndex,
-      pageSize,
-    });
-    setSorting({
-      sort: {
-        field,
-        direction,
-      },
-    });
-  } */
 
   const tablePagination = {
     ...pagination,
@@ -288,13 +258,8 @@ export const TableIndexer = (props: {
               pageSize: pagination.pageSize,
             }));
           }}
-          onChangeSorting={sorting => {
-            console.log('sorting', sorting);
-
-            setSorting(prev => ({
-              ...prev,
-              sort: sorting,
-            }));
+          onChangeSorting={({ columns }) => {
+            setSorting({ columns });
           }}
         />
       </EuiFlexItem>
