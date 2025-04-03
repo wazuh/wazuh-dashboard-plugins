@@ -7,12 +7,7 @@ default_count=DEFAULT_COUNT
 default_index_name=generate.index_name('inventory-interfaces')
 
 def generate_random_agent():
-    return {
-        "id": f"{random.randint(0, 99):03d}",
-        "name": f"Agent{random.randint(0, 99)}",
-        "version": f"v{random.randint(0, 9)}-stable",
-        "host": generate_random_host(False),
-    }
+    return randomize.agent(host=generate_random_host(False))
 
 def generate_mac_address():
     mac = [random.randint(0x00, 0xFF) for _ in range(6)]

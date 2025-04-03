@@ -36,4 +36,12 @@ class Randomize():
             "schema": {"version": "1.7.0"},
         }
 
+    def agent(host: dict):
+        return {
+            "id": f"{random.randint(0, 99):03d}",
+            "name": f"Agent{random.randint(0, 99)}",
+            "version": f"v{random.randint(0, 9)}-stable",
+            "host": host,
+        }
+
 randomize = Randomize()

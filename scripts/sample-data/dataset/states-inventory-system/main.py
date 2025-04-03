@@ -7,13 +7,7 @@ default_count=DEFAULT_COUNT
 default_index_name=generate.index_name('inventory-system')
 
 def generate_random_agent():
-    return {
-        "id": f"{random.randint(0, 99):03d}",
-        "name": f"Agent{random.randint(0, 99)}",
-        "version": f"v{random.randint(0, 9)}-stable",
-        "host": generate_random_host(False),
-    }
-
+    return randomize.agent(host=generate_random_host(False))
 
 def generate_random_host(is_root_level=False):
     if is_root_level:
