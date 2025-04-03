@@ -21,7 +21,7 @@ class Randomize():
         data_stream = {"type": random.choice(["Scheduled", "Realtime"])}
         return data_stream
 
-    def random_event():
+    def event():
         return {
             "category": random.choice(["registy_value", "registry_key", "file"]),
             "type": random.choice(["added", "modified", "deleted"])

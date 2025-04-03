@@ -38,6 +38,6 @@ def generate_document(params):
 
     return generate.document(agent=generate_random_agent(), params={
         "data_stream": randomize.data_stream(),
-        "event": randomize.random_event(),
+        "event": randomize.event(),
         "file": generate_random_file(),
     })
