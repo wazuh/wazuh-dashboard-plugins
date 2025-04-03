@@ -1,4 +1,5 @@
 import random
+from lib.randomize import randomize
 from lib.constants import DEFAULT_COUNT
 from lib.generate import generate
 
@@ -7,7 +8,7 @@ default_index_name=generate.index_name('inventory-system')
 
 def generate_random_root_host():
     return {
-        "architecture": random.choice(["x86_64", "arm64"]),
+        "architecture": randomize.architecture(),
         "hostname": f"host{random.randint(0, 1000)}",
         "os": {
             "build": f"{random.randint(0, 1000)}",

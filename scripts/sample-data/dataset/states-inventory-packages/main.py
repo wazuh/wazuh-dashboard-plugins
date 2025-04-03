@@ -8,7 +8,7 @@ default_index_name=generate.index_name('inventory-packages')
 
 def generate_random_package():
     return {
-        "architecture": random.choice(["x86_64", "arm64"]),
+        "architecture": randomize.architecture(),
         "description": f"description{random.randint(0, 9999)}",
         "category": random.choice(["x11","libs","ssh"]),
         "installed": randomize.date(),

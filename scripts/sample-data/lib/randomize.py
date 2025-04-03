@@ -44,9 +44,12 @@ class Randomize():
             "host": self.common_host(),
         }
 
+    def architecture(self):
+        return random.choice(["x86_64", "arm64"])
+
     def common_host(self):
         return {
-            "architecture": random.choice(["x86_64", "arm64"]),
+            "architecture": self.architecture(),
             "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
         }
 
