@@ -20,14 +20,8 @@ def generate_random_package():
     return {"hotfix": {"name": f"hotfix{random.randint(0, 9999)}"}}
 
 def generate_document(params):
-  # https://github.com/wazuh/wazuh-indexer/pull/744
+    # https://github.com/wazuh/wazuh-indexer/pull/744
 
-  return {
-      "@timestamp": randomize.date(),
-      "agent": generate_random_agent(),
-      "package": generate_random_package(),
-      "wazuh": randomize.wazuh(),
-  }
-
-
-
+    return generate.document(agent=generate_random_agent(), params={
+        "package": generate_random_package(),
+    })

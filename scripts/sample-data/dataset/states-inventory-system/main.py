@@ -41,12 +41,8 @@ def generate_random_host(is_root_level=False):
         }
 
 def generate_document(params):
-  # https://github.com/wazuh/wazuh-indexer/pull/744
+    # https://github.com/wazuh/wazuh-indexer/pull/744
 
-  return {
-      "@timestamp": randomize.date(),
-      "agent": generate_random_agent(),
-      "host": generate_random_host(True),
-      "wazuh": randomize.wazuh(),
-  }
-
+    return generate.document(agent=generate_random_agent(), params={
+        "host": generate_random_host(True),
+    })

@@ -49,18 +49,14 @@ def generate_random_source():
     }
 
 def generate_document(params):
-  # https://github.com/wazuh/wazuh-indexer/pull/744
+    # https://github.com/wazuh/wazuh-indexer/pull/744
 
-  return {
-      "@timestamp": randomize.date(),
-      "agent": generate_random_agent(),
-      "destination": generate_random_destination(),
-      "file": generate_random_file(),
-      "host": generate_random_host(True),
-      "interface": {"state": random.choice(["LISTEN", "ESTABLISHED"])},
-      "network": {"transport": random.choice(["TCP", "UDP", "ICMP"])},
-      "process": generate_random_process(),
-      "source": generate_random_source(),
-      "wazuh": randomize.wazuh(),
-  }
-
+    return generate.document(agent=generate_random_agent(), params={
+        "destination": generate_random_destination(),
+        "file": generate_random_file(),
+        "host": generate_random_host(True),
+        "interface": {"state": random.choice(["LISTEN", "ESTABLISHED"])},
+        "network": {"transport": random.choice(["TCP", "UDP", "ICMP"])},
+        "process": generate_random_process(),
+        "source": generate_random_source(),
+    })

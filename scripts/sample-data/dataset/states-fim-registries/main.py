@@ -40,14 +40,10 @@ def generate_random_registry():
     }
 
 def generate_document(params):
-  # https://github.com/wazuh/wazuh-indexer/pull/744
+    # https://github.com/wazuh/wazuh-indexer/pull/744
 
-  return {
-      "@timestamp": randomize.date(),
-      "agent": generate_random_agent(),
-      "data_stream": randomize.data_stream(),
-      "event": randomize.random_event(),
-      "registry": generate_random_registry(),
-      "wazuh": randomize.wazuh(),
-  }
-
+    return generate.document(agent=generate_random_agent(), params={
+        "data_stream": randomize.data_stream(),
+        "event": randomize.random_event(),
+        "registry": generate_random_registry(),
+    })
