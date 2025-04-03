@@ -160,15 +160,17 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     indexPattern?.fields || [],
     defaultColumns,
   );
-  const { columnVisibility } = useDataGridColumns({
+  const { columnsAvailable, columns, columnVisibility } = useDataGridColumns({
     appId,
-    defaultColumns: defaultColumns.map(column => column.id),
-    allColumns: new Set(columnDefinitions.map(column => column.id) || []),
+    defaultColumns: defaultColumns.map(({ id }) => id),
+    columnDefinitions,
+    allColumns: new Set(indexPattern?.fields?.map(({ name }) => name) || []),
   });
 
   return {
     'aria-labelledby': props.ariaLabelledBy,
-    columns: columnDefinitions,
+    columnsAvailable, // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
+    columns,
     columnVisibility,
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,

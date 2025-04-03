@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { tDataGridColumn } from './types';
 import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
 import { DataGridState } from './data-grid-state-persistence/types';
 import { localStorageColumnsStateManagement } from './data-grid-state-persistence/local-storage-columns-state-management';
@@ -6,16 +7,19 @@ import { localStorageColumnsStateManagement } from './data-grid-state-persistenc
 interface UseDataGridColumnsProps {
   appId: string;
   defaultColumns: string[];
+  columnDefinitions: tDataGridColumn[];
   allColumns: Set<string>;
 }
 
 function useDataGridColumns({
   appId,
   defaultColumns,
+  columnDefinitions,
   allColumns,
 }: UseDataGridColumnsProps) {
-  const [visibleColumns, setVisibleColumns] =
-    useState<string[]>(defaultColumns);
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(
+    () => defaultColumns,
+  );
   // Fix potential circular dependency with columnStateManagement
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
@@ -131,6 +135,41 @@ function useDataGridColumns({
     }
   }, [appId, JSON.stringify([...allColumns])]);
 
+  const sortFirstMatchedColumns = (
+    firstMatchedColumns: tDataGridColumn[],
+    visibleColumnsOrdered: string[],
+  ) => {
+    firstMatchedColumns.sort(
+      (a, b) =>
+        visibleColumnsOrdered.indexOf(a.id) -
+        visibleColumnsOrdered.indexOf(b.id),
+    );
+
+    return firstMatchedColumns;
+  };
+
+  const orderFirstMatchedColumns = (
+    columns: tDataGridColumn[],
+    visibleColumnsOrdered: string[],
+  ) => {
+    const firstMatchedColumns: tDataGridColumn[] = [];
+    const nonMatchedColumns: tDataGridColumn[] = [];
+    const visibleColumnsSet = new Set(visibleColumnsOrdered);
+
+    for (const column of columns) {
+      if (visibleColumnsSet.has(column.id)) {
+        firstMatchedColumns.push(column);
+      } else {
+        nonMatchedColumns.push(column);
+      }
+    }
+
+    return [
+      ...sortFirstMatchedColumns(firstMatchedColumns, visibleColumnsOrdered),
+      ...nonMatchedColumns,
+    ];
+  };
+
   useEffect(() => {
     try {
       const persistedColumns = columnStateManagement.retrieveState(appId);
@@ -147,6 +186,14 @@ function useDataGridColumns({
   }, [appId, JSON.stringify([...allColumns])]);
 
   return {
+    // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
+    columnsAvailable: orderFirstMatchedColumns(
+      columnDefinitions,
+      visibleColumns,
+    ),
+    columns: visibleColumns.map(columnId =>
+      columnDefinitions.find(({ id }) => id === columnId),
+    ),
     columnVisibility: {
       visibleColumns,
       setVisibleColumns: setVisibleColumnsHandler,

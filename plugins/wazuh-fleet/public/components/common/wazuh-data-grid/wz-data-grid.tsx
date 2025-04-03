@@ -214,9 +214,14 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
         <div className='wazuhDataGridContainer'>
           <WazuhDataGridContextProvider value={rowSelection}>
             <EuiDataGrid
+              /* TODO: this component is not used in the current plugins so this could be removed.
+              If this is used in future versions, we should add the functionality to manage the
+              visibility of columns thorugh the Available fields button.
+              */
               {...dataGridProps}
               className={sideNavDocked ? 'dataGridDockedNav' : ''}
               toolbarVisibility={{
+                showColumnSelector: { allowHide: false },
                 additionalControls: (
                   <>
                     <DiscoverDataGridAdditionalControls
@@ -225,6 +230,8 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
                       onClickExportResults={onClickExportResults}
                       maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
                       dateRange={dateRange}
+                      columnsAvailable={dataGridProps.columnsAvailable}
+                      columnVisibility={dataGridProps.columnVisibility}
                     />
                   </>
                 ),
