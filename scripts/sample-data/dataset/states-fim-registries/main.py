@@ -7,15 +7,6 @@ from lib.generate import generate
 default_count=DEFAULT_COUNT
 default_index_name=generate.index_name('fim-registries')
 
-def generate_random_unix_timestamp():
-  start_time = datetime.datetime(2000, 1, 1)
-  end_time = datetime.datetime.now()
-  random_time = start_time + datetime.timedelta(
-    seconds=random.randint(0, int((end_time - start_time).total_seconds()))
-  )
-  return int(random_time.timestamp())
-
-
 def generate_random_agent():
     return {
         "id": f"{random.randint(0, 99):03d}",
@@ -58,7 +49,7 @@ def generate_random_registry():
         "group": f"group{random.randint(0, 1000)}",
         "hive": "HKLM",
         "key": r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe",
-        "mtime": generate_random_unix_timestamp(),
+        "mtime": randomize.unix_timestamp(),
         "owner": f"owner{random.randint(0, 1000)}",
         "path": "/path/to/file",
         "size": random.randint(1000, 1000000),

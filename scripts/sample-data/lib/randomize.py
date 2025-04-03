@@ -9,4 +9,12 @@ class Randomize():
         random_date = start_date + (end_date - start_date) * random.random()
         return random_date.strftime(DATE_FORMAT)
 
+    def unix_timestamp(self):
+        start_time = datetime.datetime(2000, 1, 1)
+        end_time = datetime.datetime.now()
+        random_time = start_time + datetime.timedelta(
+            seconds=random.randint(0, int((end_time - start_time).total_seconds()))
+        )
+        return int(random_time.timestamp())
+
 randomize = Randomize()
