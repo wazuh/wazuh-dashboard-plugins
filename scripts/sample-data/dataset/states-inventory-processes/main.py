@@ -1,8 +1,9 @@
 import random
 import datetime
 from lib.randomize import randomize
+from lib.constants import DEFAULT_COUNT
 
-default_count='10000'
+default_count=DEFAULT_COUNT
 default_index_name_prefix='wazuh-states-inventory-processes'
 default_index_name=f'{default_index_name_prefix}-sample'
 

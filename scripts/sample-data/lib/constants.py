@@ -1,1 +1,2 @@
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+DEFAULT_COUNT='10000'

@@ -1,7 +1,8 @@
 import random
 from lib.randomize import randomize
+from lib.constants import DEFAULT_COUNT
 
-default_count='10000'
+default_count=DEFAULT_COUNT
 default_index_name='wazuh-states-fim-files-sample'
 
 def generate_random_agent():
