@@ -95,7 +95,7 @@ export const actionsButtons = ({
       // TODO: Change this url to the url of the command view with a pinned agent
       getWazuhCore()
         .navigationService.getInstance()
-        .navigate(`/agents/${agent.agent.id}`);
+        .navigate(`/agents/${agent._source.agent.id}`);
     },
   },
   {
@@ -106,8 +106,9 @@ export const actionsButtons = ({
     isPrimary: true,
     color: 'primary',
     onClick: (_row, agent: IAgentResponse) => {
-      setAgent(agent);
-      setIsFlyoutAgentVisible(true);
+      getWazuhCore()
+        .navigationService.getInstance()
+        .navigate(`/agents/${agent._source.agent.id}`);
     },
     // enabled: agent => agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
     // onClick: agent =>

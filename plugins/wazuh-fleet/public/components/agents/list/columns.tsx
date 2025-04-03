@@ -15,7 +15,7 @@ import { tDataGridColumn } from '../../common/data-grid';
 export const agentsTableColumns: tDataGridColumn[] = [
   {
     id: 'agent.name',
-    displayAsText: 'Name / ID',
+    displayAsText: 'Name',
     isSortable: true,
     searchable: true,
     render: (id: string, agentData: IAgentResponse) => (

@@ -31,13 +31,13 @@ export const EditAgentGroupsModal = ({
   reloadAgents,
 }: EditAgentGroupsModalProps) => {
   const [selectedGroups, setSelectedGroups] = useState(
-    agent.agent.groups?.map(group => ({ label: group })) || [],
+    agent._source.agent.groups?.map(group => ({ label: group })) || [],
   );
   const [isSaving, setIsSaving] = useState(false);
 
   // Check if selected groups are the same as agent's current groups
   const areGroupsUnchanged = () => {
-    const currentGroups = agent.agent.groups || [];
+    const currentGroups = agent._source.agent.groups || [];
     const selectedGroupLabels = selectedGroups.map(group => group.label);
 
     if (currentGroups.length !== selectedGroupLabels.length) {
@@ -55,10 +55,10 @@ export const EditAgentGroupsModal = ({
     const flatSelectedGroups = selectedGroups.map(group => group.label);
     const addedGroups =
       flatSelectedGroups.filter(
-        group => !agent.agent.groups?.includes(group),
+        group => !agent._source.agent.groups?.includes(group),
       ) || [];
     const removedGroups =
-      agent.agent.groups?.filter(
+      agent._source.agent.groups?.filter(
         group => !flatSelectedGroups.includes(group),
       ) || [];
 
@@ -78,14 +78,14 @@ export const EditAgentGroupsModal = ({
 
       if (addedGroups.length > 0) {
         operations.push(
-          getAgentManagement().addGroups(agent.agent.id, addedGroups),
+          getAgentManagement().addGroups(agent._source.agent.id, addedGroups),
         );
       }
 
       if (removedGroups.length > 0) {
         operations.push(
           getAgentManagement().removeGroups({
-            agentId: agent.agent.id,
+            agentId: agent._source.agent.id,
             groupIds: removedGroups,
           }),
         );
@@ -95,7 +95,7 @@ export const EditAgentGroupsModal = ({
 
       getToasts().addInfo({
         title: 'Agent groups edited',
-        text: `Agent ${agent.agent.name} groups have been updated`,
+        text: `Agent ${agent._source.agent.name} groups have been updated`,
       });
       setIsSaving(false);
       reloadAgents();
@@ -103,7 +103,7 @@ export const EditAgentGroupsModal = ({
     } catch {
       getToasts().addDanger({
         title: 'Error editing agent groups',
-        text: `Failed to update groups for agent ${agent.agent.name}`,
+        text: `Failed to update groups for agent ${agent._source.agent.name}`,
       });
       setIsSaving(false);
     }
@@ -127,7 +127,7 @@ export const EditAgentGroupsModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent.agent.id}
+                  {agent._source.agent.id}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
@@ -135,7 +135,7 @@ export const EditAgentGroupsModal = ({
               <EuiDescriptionList compressed>
                 <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
                 <EuiDescriptionListDescription>
-                  {agent.agent.name}
+                  {agent._source.agent.name}
                 </EuiDescriptionListDescription>
               </EuiDescriptionList>
             </EuiFlexItem>
