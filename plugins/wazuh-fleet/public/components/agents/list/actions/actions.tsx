@@ -1,7 +1,8 @@
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import { EuiCheckbox, EuiDataGridControlColumn } from '@elastic/eui';
 import { IAgentResponse } from '../../../../../common/types';
 import { getWazuhCore } from '../../../../plugin-services';
+import { useWzDataGridContext } from '../../../common/wazuh-data-grid/wz-data-grid-context';
 
 export interface AgentsTableGlobalActionsProps {
   setIsFlyoutAgentVisible: (visible: boolean) => void;
@@ -12,15 +13,10 @@ export interface AgentsTableGlobalActionsProps {
   setAgent: (agent: IAgentResponse) => void;
 }
 
-const SelectionContext = createContext([
-  new Set<number>(),
-  (_action: { action: string; rowIndex?: number }) => {},
-] as [Set<number>, (action: { action: string; rowIndex?: number }) => void]);
-
-const SelectionHeaderCell = () => {
-  const [selectedRows, updateSelectedRows] = useContext(SelectionContext);
-  // const isIndeterminate = selectedRows.size > 0 && selectedRows.size < data.length;
-  const isIndeterminate = false;
+const SelectionHeaderCell = ({ row, items, onClickSelectAll }) => {
+  const { rowIndex } = row;
+  const [selectedRows, updateSelectedRows] = useWzDataGridContext();
+  const isIndeterminate = selectedRows.size > 0 && rowIndex < items.hits.total;
 
   return (
     <EuiCheckbox
@@ -41,28 +37,18 @@ const SelectionHeaderCell = () => {
             updateSelectedRows({ action: 'clear' });
           }
         }
+
+        onClickSelectAll(event.target.checked);
       }}
     />
   );
 };
 
-const SelectionRowCell = ({ rowIndex }) => {
-  const [selectedRows, setSelectedRows] = useContext(SelectionContext);
-  const isChecked = selectedRows.has(rowIndex);
-
-  const updateSelectedRows = (action: 'add' | 'delete', rowIndex: number) => {
-    setSelectedRows(prevSelectedRows => {
-      const updatedRows = new Set(prevSelectedRows);
-
-      if (action === 'add') {
-        updatedRows.add(rowIndex);
-      } else if (action === 'delete') {
-        updatedRows.delete(rowIndex);
-      }
-
-      return updatedRows;
-    });
-  };
+const SelectionRowCell = ({ row, items, _onClickSelectRow }) => {
+  const { rowIndex } = row;
+  const [selectedRows, updateSelectedRows] = useWzDataGridContext();
+  const agentData = items?.hits?.hits[rowIndex]?._source;
+  const isChecked = selectedRows.has(agentData);
 
   return (
     <div>
@@ -72,9 +58,17 @@ const SelectionRowCell = ({ rowIndex }) => {
         checked={isChecked}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           if (event.target.checked) {
-            updateSelectedRows('add', rowIndex);
+            updateSelectedRows({
+              action: 'add',
+              rowIndex,
+              rowData: items?.hits?.hits[rowIndex]._source,
+            });
           } else {
-            updateSelectedRows('delete', rowIndex);
+            updateSelectedRows({
+              action: 'delete',
+              rowIndex,
+              rowData: items?.hits?.hits[rowIndex]._source,
+            });
           }
         }}
       />
@@ -178,12 +172,17 @@ export const actionsButtons = ({
   },
 ];
 
-export const agentsTableSelection: EuiDataGridControlColumn[] = [
+export const agentsTableSelection = ({
+  items,
+  onClickSelectAll,
+  onClickSelectRow,
+}): EuiDataGridControlColumn[] => [
   {
     id: 'selection',
     width: 32,
-    headerCellRender: SelectionHeaderCell,
-    rowCellRender: SelectionRowCell,
+    headerCellRender: row =>
+      SelectionHeaderCell({ row, items, onClickSelectAll }),
+    rowCellRender: row => SelectionRowCell({ row, items, onClickSelectRow }),
   },
 ];
 // allowEditGroups: boolean,

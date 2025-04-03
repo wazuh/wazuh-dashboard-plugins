@@ -276,7 +276,11 @@ export const TableIndexer = (props: {
           defaultColumns={columns}
           results={items}
           exportFilters={filters}
-          leadingControlColumns={agentsTableSelection}
+          leadingControlColumns={agentsTableSelection({
+            items,
+            onClickSelectAll: props.onSelectAll,
+            onClickSelectRow: props.onSelectRow,
+          })}
           trailingControlColumns={actionsDropdown(
             props.actionsColumn || [],
             items,

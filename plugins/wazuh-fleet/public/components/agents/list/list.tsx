@@ -144,6 +144,13 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             setIsUpgradeModalVisible,
             setIsEditNameVisible,
           })}
+          onSelectAll={isAllChecked => {
+            setAllAgentsSelected(isAllChecked);
+            console.log('select all', agentSelected);
+          }}
+          onSelectRow={agentSelected => {
+            console.log('agentSelected', agentSelected);
+          }}
           columns={agentsTableColumns}
           tableProps={{
             hasActions: true,

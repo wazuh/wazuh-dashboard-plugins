@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useReducer } from 'react';
 import {
   EuiFlexItem,
   EuiToolTip,
@@ -29,6 +29,7 @@ import './wazuh-data-grid.scss';
 import { wzDiscoverRenderColumns } from './render-columns';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import DocDetailsHeader from './components/doc-details-header';
+import { WazuhDataGridContextProvider } from './wz-data-grid-context';
 
 export interface TWazuhDataGridProps {
   appId: string;
@@ -167,6 +168,42 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     }
   };
 
+  const rowSelection = useReducer(
+    (rowSelection, { action, _rowIndex, rowData }) => {
+      switch (action) {
+        case 'add': {
+          const nextRowSelection = new Set(rowSelection);
+
+          nextRowSelection.add(rowData);
+
+          return nextRowSelection;
+        }
+
+        case 'delete': {
+          const nextRowSelection = new Set(rowSelection);
+
+          nextRowSelection.delete(rowData);
+
+          return nextRowSelection;
+        }
+
+        case 'clear': {
+          return new Set();
+        }
+
+        case 'selectAll': {
+          return new Set(
+            results?.hits?.hits?.map((item, _index) => item._source),
+          );
+        }
+        // No default
+      }
+
+      return rowSelection;
+    },
+    new Set(),
+  );
+
   return (
     <>
       {isLoading ? <LoadingSpinner /> : null}
@@ -175,23 +212,25 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
       ) : null}
       {!isLoading && results?.hits?.total > 0 ? (
         <div className='wazuhDataGridContainer'>
-          <EuiDataGrid
-            {...dataGridProps}
-            className={sideNavDocked ? 'dataGridDockedNav' : ''}
-            toolbarVisibility={{
-              additionalControls: (
-                <>
-                  <DiscoverDataGridAdditionalControls
-                    totalHits={results?.hits?.total}
-                    isExporting={isExporting}
-                    onClickExportResults={onClickExportResults}
-                    maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
-                    dateRange={dateRange}
-                  />
-                </>
-              ),
-            }}
-          />
+          <WazuhDataGridContextProvider value={rowSelection}>
+            <EuiDataGrid
+              {...dataGridProps}
+              className={sideNavDocked ? 'dataGridDockedNav' : ''}
+              toolbarVisibility={{
+                additionalControls: (
+                  <>
+                    <DiscoverDataGridAdditionalControls
+                      totalHits={results?.hits?.total}
+                      isExporting={isExporting}
+                      onClickExportResults={onClickExportResults}
+                      maxEntriesPerQuery={MAX_ENTRIES_PER_QUERY}
+                      dateRange={dateRange}
+                    />
+                  </>
+                ),
+              }}
+            />
+          </WazuhDataGridContextProvider>
         </div>
       ) : null}
       {inspectedHit && (
