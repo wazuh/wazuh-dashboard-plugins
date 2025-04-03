@@ -29,7 +29,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed TOP-5-SO filter management in Endpoints > Summary [#7278](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7278)
 - Fixed CSV export not filtering by timerange [#7304](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7304)
 - Fixed agent view not showing the latest agent state [#7336](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7336)
-- Fixed several broken Wazuh documentation links [#7354](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7354)
+- Fixed saved queries not displaying in the search bar [#7377](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7377)
+
+## Wazuh v4.11.2 - OpenSearch Dashboards 2.16.0 - Revision 02
+
+### Added
+
+- Support for Wazuh 4.11.2
+
+### Fixed
+
+- Fixed several broken Wazuh documentation links [#7370](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7370) [#7371](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7371)
 
 ## Wazuh v4.11.1 - OpenSearch Dashboards 2.16.0 - Revision 02
 
