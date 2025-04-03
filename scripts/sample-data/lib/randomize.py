@@ -27,4 +27,13 @@ class Randomize():
             "type": random.choice(["added", "modified", "deleted"])
         }
 
+    def wazuh():
+        return {
+            "cluster": {
+                "name": f"wazuh-cluster-{random.randint(0, 10)}",
+                "node": f"wazuh-cluster-node-{random.randint(0, 10)}",
+            },
+            "schema": {"version": "1.7.0"},
+        }
+
 randomize = Randomize()

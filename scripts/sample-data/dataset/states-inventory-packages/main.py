@@ -34,17 +34,6 @@ def generate_random_package():
         "version": f"{random.randint(0, 9)}.{random.randint(0, 9)}.{random.randint(0, 9)}",
     }
 
-
-def generate_random_wazuh():
-    return {
-        "cluster": {
-            "name": f"wazuh-cluster-{random.randint(0, 10)}",
-            "node": f"wazuh-cluster-node-{random.randint(0, 10)}",
-        },
-        "schema": {"version": "1.7.0"},
-    }
-
-
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
@@ -52,6 +41,6 @@ def generate_document(params):
       "@timestamp": randomize.date(),
       "agent": generate_random_agent(),
       "package": generate_random_package(),
-      "wazuh": generate_random_wazuh(),
+      "wazuh": randomize.wazuh(),
   }
 

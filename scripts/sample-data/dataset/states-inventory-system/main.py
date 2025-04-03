@@ -46,17 +46,6 @@ def generate_random_host(is_root_level=False):
             "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
         }
 
-
-def generate_random_wazuh():
-    return {
-        "cluster": {
-            "name": f"wazuh-cluster-{random.randint(0, 10)}",
-            "node": f"wazuh-cluster-node-{random.randint(0, 10)}",
-        },
-        "schema": {"version": "1.7.0"},
-    }
-
-
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
@@ -64,6 +53,6 @@ def generate_document(params):
       "@timestamp": randomize.date(),
       "agent": generate_random_agent(),
       "host": generate_random_host(True),
-      "wazuh": generate_random_wazuh(),
+      "wazuh": randomize.wazuh(),
   }
 

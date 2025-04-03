@@ -39,17 +39,6 @@ def generate_random_host(is_root_level=False):
 def generate_random_observer():
     return {"serial_number": f"serial{random.randint(0, 9999)}"}
 
-
-def generate_random_wazuh():
-    return {
-        "cluster": {
-            "name": f"wazuh-cluster-{random.randint(0, 10)}",
-            "node": f"wazuh-cluster-node-{random.randint(0, 10)}",
-        },
-        "schema": {"version": "1.7.0"},
-    }
-
-
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
@@ -58,7 +47,7 @@ def generate_document(params):
       "agent": generate_random_agent(),
       "host": generate_random_host(True),
       "observer": generate_random_observer(),
-      "wazuh": generate_random_wazuh(),
+      "wazuh": randomize.wazuh(),
   }
 
 

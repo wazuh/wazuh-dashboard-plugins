@@ -44,16 +44,6 @@ def generate_random_registry():
         "value": f"registry_value{random.randint(0, 1000)}",
     }
 
-def generate_random_wazuh():
-    return {
-        "cluster": {
-            "name": f"wazuh-cluster-{random.randint(0, 10)}",
-            "node": f"wazuh-cluster-node-{random.randint(0, 10)}",
-        },
-        "schema": {"version": "1.7.0"},
-    }
-
-
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
@@ -63,6 +53,6 @@ def generate_document(params):
       "data_stream": randomize.data_stream(),
       "event": randomize.random_event(),
       "registry": generate_random_registry(),
-      "wazuh": generate_random_wazuh(),
+      "wazuh": randomize.wazuh(),
   }
 

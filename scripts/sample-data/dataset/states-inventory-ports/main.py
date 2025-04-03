@@ -54,17 +54,6 @@ def generate_random_source():
         "port": random.randint(0, 65535),
     }
 
-
-def generate_random_wazuh():
-    return {
-        "cluster": {
-            "name": f"wazuh-cluster-{random.randint(0, 10)}",
-            "node": f"wazuh-cluster-node-{random.randint(0, 10)}",
-        },
-        "schema": {"version": "1.7.0"},
-    }
-
-
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
@@ -78,6 +67,6 @@ def generate_document(params):
       "network": {"transport": random.choice(["TCP", "UDP", "ICMP"])},
       "process": generate_random_process(),
       "source": generate_random_source(),
-      "wazuh": generate_random_wazuh(),
+      "wazuh": randomize.wazuh(),
   }
 
