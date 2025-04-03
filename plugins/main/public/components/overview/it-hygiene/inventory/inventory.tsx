@@ -58,7 +58,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
         color='transparent'
       >
         <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem>
+          {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
+          <EuiFlexItem style={{ width: 'calc(50% - 4px)' }}>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -81,7 +82,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               title='Packages'
             />
           </EuiFlexItem>
-          <EuiFlexItem>
+          {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
+          <EuiFlexItem style={{ width: 'calc(50% - 4px)' }}>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -130,15 +132,16 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
             />
           </EuiFlexItem>
         </EuiFlexGroup>
+        {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
         <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem>
+          <EuiFlexItem style={{ width: 'calc(33.33% - 8px)' }}>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
                 ...fetchFilters,
                 PatternDataSourceFilterManager.createFilter(
                   FILTER_OPERATOR.EXISTS,
-                  'process.pid', // package.name field is present in the ports data
+                  'process.command_line', // package.name and process.id field is present in the ports data
                   null,
                   dataSource.title,
                 ),
@@ -154,7 +157,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               title='Processes'
             />
           </EuiFlexItem>
-          <EuiFlexItem>
+          {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
+          <EuiFlexItem style={{ width: 'calc(33.33% - 8px)' }}>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -177,7 +181,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               title='Ports'
             />
           </EuiFlexItem>
-          <EuiFlexItem>
+          {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
+          <EuiFlexItem style={{ width: 'calc(33.33% - 8px)' }}>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
