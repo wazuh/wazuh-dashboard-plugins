@@ -6,16 +6,6 @@ from lib.generate import generate
 default_count=DEFAULT_COUNT
 default_index_name=generate.index_name('inventory-packages')
 
-def generate_random_agent():
-    return randomize.agent(host=generate_random_host())
-
-def generate_random_host():
-    return {
-        "architecture": random.choice(["x86_64", "arm64"]),
-        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
-    }
-
-
 def generate_random_package():
     return {
         "architecture": random.choice(["x86_64", "arm64"]),
@@ -31,6 +21,6 @@ def generate_random_package():
 def generate_document(params):
     # https://github.com/wazuh/wazuh-indexer/pull/744
 
-    return generate.document(agent=generate_random_agent(), params={
+    return generate.document({
         "package": generate_random_package(),
     })

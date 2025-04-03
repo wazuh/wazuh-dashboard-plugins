@@ -12,13 +12,13 @@ class Generate():
         """
         return f'{DEFAULT_PREFIX_INDEX_NAME}{name}{DEFAULT_SUFFIX_INDEX_NAME}'
 
-    def document(self, agent: dict, params: dict) -> dict:
+    def document(self, params: dict) -> dict:
         """
         This method generates a common document for the sample data.
         """
         return {
             "@timestamp": randomize.date(),
-            "agent": agent,
+            "agent": randomize.agent(host=randomize.common_host()),
             "wazuh": randomize.wazuh(),
             **params
         }

@@ -6,16 +6,6 @@ from lib.generate import generate
 default_count=DEFAULT_COUNT
 default_index_name=generate.index_name('inventory-protocols')
 
-def generate_random_agent():
-    return randomize.agent(host=generate_random_host(False))
-
-def generate_random_host(is_root_level_level=False):
-    return {
-        "architecture": random.choice(["x86_64", "arm64"]),
-        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
-    }
-
-
 def generate_random_network():
     return {
         "dhcp": random.choice([True,False]),
@@ -24,10 +14,8 @@ def generate_random_network():
         "type": random.choice(["wired", "wireless"]),
     }
 
-
 def generate_random_observer():
     return {"ingress": {"interface": generate_random_interface()}}
-
 
 def generate_random_interface():
     return {
@@ -37,7 +25,7 @@ def generate_random_interface():
 def generate_document(params):
     # https://github.com/wazuh/wazuh-indexer/pull/744
 
-    return generate.document(agent=generate_random_agent(), params={
+    return generate.document({
         "network": generate_random_network(),
         "observer": generate_random_observer(),
     })
