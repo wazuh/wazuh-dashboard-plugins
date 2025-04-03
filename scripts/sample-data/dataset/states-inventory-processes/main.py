@@ -1,5 +1,4 @@
 import random
-import datetime
 from lib.randomize import randomize
 from lib.constants import DEFAULT_COUNT
 from lib.generate import generate
