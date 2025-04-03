@@ -38,10 +38,6 @@ def generate_random_file():
         "uid": f"uid{random.randint(0, 1000)}",
     }
 
-def generate_random_operation():
-    return {"name": random.choice(["INSERTED", "MODIFIED", "DELETED"])}
-
-
 def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
