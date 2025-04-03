@@ -1,15 +1,8 @@
 import random
-import datetime
+from lib.randomize import randomize
 
 default_count='10000'
 default_index_name='wazuh-states-fim-files-sample'
-DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-
-def generate_random_date():
-    start_date = datetime.datetime.now()
-    end_date = start_date - datetime.timedelta(days=10)
-    random_date = start_date + (end_date - start_date) * random.random()
-    return random_date.strftime(DATE_FORMAT)
 
 def generate_random_agent():
     return {
@@ -49,7 +42,7 @@ def generate_random_file():
             "sha256": f"{random.randint(0, 9999)}",
         },
         "inode": f"inode{random.randint(0, 1000)}",
-        "mtime": generate_random_date(),
+        "mtime": randomize.date(),
         "owner": f"owner{random.randint(0, 1000)}",
         "path": "/path/to/file",
         "size": random.randint(1000, 1000000),
@@ -74,7 +67,7 @@ def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
   return {
-      "@timestamp": generate_random_date(),
+      "@timestamp": randomize.date(),
       "agent": generate_random_agent(),
       "data_stream": generate_random_data_stream(),
       "event": generate_random_event(),

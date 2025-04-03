@@ -1,17 +1,9 @@
 import random
-import datetime
+from lib.randomize import randomize
 
 default_count='10000'
 default_index_name_prefix='wazuh-states-inventory-interfaces'
 default_index_name=f'{default_index_name_prefix}-sample'
-DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-
-def generate_random_date():
-    start_date = datetime.datetime.now()
-    end_date = start_date - datetime.timedelta(days=10)
-    random_date = start_date + (end_date - start_date) * random.random()
-    return random_date.strftime(DATE_FORMAT)
-
 
 def generate_random_agent():
     return {
@@ -77,7 +69,7 @@ def generate_document(params):
   # https://github.com/wazuh/wazuh-indexer/pull/744
 
   return {
-      "@timestamp": generate_random_date(),
+      "@timestamp": randomize.date(),
       "agent": generate_random_agent(),
       "host": generate_random_host(True),
       "observer": generate_random_observer(),
