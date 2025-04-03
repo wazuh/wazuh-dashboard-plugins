@@ -22,12 +22,6 @@ def generate_random_host():
         "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
     }
 
-
-def generate_random_data_stream():
-    data_stream = {"type": random.choice(["Scheduled", "Realtime"])}
-    return data_stream
-
-
 def generate_random_event():
     return {
         "category": random.choice(["registy_value", "registry_key", "file"]),
@@ -73,7 +67,7 @@ def generate_document(params):
   return {
       "@timestamp": randomize.date(),
       "agent": generate_random_agent(),
-      "data_stream": generate_random_data_stream(),
+      "data_stream": randomize.data_stream(),
       "event": generate_random_event(),
       "registry": generate_random_registry(),
       "wazuh": generate_random_wazuh(),

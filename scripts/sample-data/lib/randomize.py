@@ -17,4 +17,8 @@ class Randomize():
         )
         return int(random_time.timestamp())
 
+    def data_stream():
+        data_stream = {"type": random.choice(["Scheduled", "Realtime"])}
+        return data_stream
+
 randomize = Randomize()
