@@ -22,13 +22,6 @@ def generate_random_host():
         "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
     }
 
-def generate_random_event():
-    return {
-        "category": random.choice(["registy_value", "registry_key", "file"]),
-        "type": random.choice(["added","modified","deleted"])
-    }
-
-
 def generate_random_registry():
     return {
         "data": {
@@ -68,7 +61,7 @@ def generate_document(params):
       "@timestamp": randomize.date(),
       "agent": generate_random_agent(),
       "data_stream": randomize.data_stream(),
-      "event": generate_random_event(),
+      "event": randomize.random_event(),
       "registry": generate_random_registry(),
       "wazuh": generate_random_wazuh(),
   }
