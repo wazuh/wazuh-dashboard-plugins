@@ -36,12 +36,12 @@ class Randomize():
             "schema": {"version": "1.7.0"},
         }
 
-    def agent(self, host: dict):
+    def agent(self):
         return {
             "id": f"{random.randint(0, 99):03d}",
             "name": f"Agent{random.randint(0, 99)}",
             "version": f"v{random.randint(0, 9)}-stable",
-            "host": host,
+            "host": self.common_host(),
         }
 
     def common_host(self):

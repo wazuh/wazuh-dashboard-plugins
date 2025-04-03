@@ -18,7 +18,7 @@ class Generate():
         """
         return {
             "@timestamp": randomize.date(),
-            "agent": randomize.agent(host=randomize.common_host()),
+            "agent": randomize.agent(),
             "wazuh": randomize.wazuh(),
             **params
         }
