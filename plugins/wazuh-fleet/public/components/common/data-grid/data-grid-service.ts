@@ -287,11 +287,15 @@ export const exportSearchToCSV = async (params: any): Promise<void> => {
           return '';
         }
 
-        if (typeof value === 'object') {
+        /* if (typeof value === 'object') {
           return JSON.stringify(value);
-        }
-
-        return `"${value}"`;
+        }*/
+        // Escape double quotes and handle line breaks to prevent column misalignment
+        return `"${value
+          .toString()
+          .replaceAll('"', '""')
+          .replaceAll('\r\n', String.raw`\r\n`)
+          .replaceAll('\n', String.raw`\n`)}"`;
       });
 
       return parsedRow?.join(',');

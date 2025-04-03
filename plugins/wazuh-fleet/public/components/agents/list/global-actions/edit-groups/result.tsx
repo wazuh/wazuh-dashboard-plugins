@@ -46,7 +46,7 @@ export const EditAgentsGroupsModalResult = ({
           sortable: true,
         },
         {
-          field: 'agent.name',
+          field: '_source.agent.name',
           name: 'Name',
           align: 'left',
           sortable: true,
@@ -138,7 +138,7 @@ export const EditAgentsGroupsModalResult = ({
           {groupStatus({
             isLoading: true,
             status: RESULT_TYPE.SUCCESS,
-            text: agent.agent.name,
+            text: agent._source.agent.name,
           })}
         </EuiFlexItem>
       );
@@ -155,7 +155,7 @@ export const EditAgentsGroupsModalResult = ({
         <EuiFlexItem key={agent._id}>
           {groupStatus({
             status: RESULT_TYPE.SUCCESS,
-            text: `${agent.agent.name} (${groupsList} ${actionText})`,
+            text: `${agent._source.agent.name} (${groupsList} ${actionText})`,
           })}
         </EuiFlexItem>
       );
@@ -166,7 +166,7 @@ export const EditAgentsGroupsModalResult = ({
       <EuiFlexItem key={agent._id}>
         {groupStatus({
           status: RESULT_TYPE.ERROR,
-          text: `${agent.agent.name} (no ${groupsList} have been ${actionText})`,
+          text: `${agent._source.agent.name} (no ${groupsList} have been ${actionText})`,
         })}
         {successAgents?.length > 0 && (
           <>

@@ -84,10 +84,7 @@ export const actionsDropdown = (
                   <button
                     onClick={() => {
                       // ToDo: Fix the items typo
-                      action?.onClick(
-                        row,
-                        items?.hits?.hits[row.rowIndex]._source,
-                      );
+                      action?.onClick(row, items?.hits?.hits[row.rowIndex]);
                       setIsPopoverOpen(false);
                     }}
                   >
@@ -142,7 +139,6 @@ export const TableIndexer = (props: {
     tablePropsIgnored,
     filters: filtersDefault,
     agentSelected,
-    setAllAgentsSelected,
     setParams,
     needReload,
     setNeedReload,
@@ -174,13 +170,10 @@ export const TableIndexer = (props: {
 
   useEffect(() => {
     if (agentSelected.length === items.length) {
-      setAllAgentsSelected(true);
       setParams({
         filters,
         query,
       });
-    } else {
-      setAllAgentsSelected(false);
     }
   }, [agentSelected]);
 

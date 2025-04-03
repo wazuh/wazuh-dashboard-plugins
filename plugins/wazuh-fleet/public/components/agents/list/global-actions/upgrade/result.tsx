@@ -47,7 +47,7 @@ export const UpgradeAgentsModalResult = ({
           sortable: true,
         },
         {
-          field: 'agent.name',
+          field: '_source.agent.name',
           name: 'Name',
           align: 'left',
           sortable: true,

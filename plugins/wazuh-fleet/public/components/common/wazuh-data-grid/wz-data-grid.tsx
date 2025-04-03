@@ -169,12 +169,14 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
   };
 
   const rowSelection = useReducer(
-    (rowSelection, { action, _rowIndex, rowData }) => {
+    (rowSelection, { action, _rowIndex, rowData, onClickSelectRow }) => {
       switch (action) {
         case 'add': {
           const nextRowSelection = new Set(rowSelection);
 
           nextRowSelection.add(rowData);
+
+          onClickSelectRow(nextRowSelection);
 
           return nextRowSelection;
         }
@@ -192,9 +194,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
         }
 
         case 'selectAll': {
-          return new Set(
-            results?.hits?.hits?.map((item, _index) => item._source),
-          );
+          return new Set(results?.hits?.hits?.map((item, _index) => item));
         }
         // No default
       }

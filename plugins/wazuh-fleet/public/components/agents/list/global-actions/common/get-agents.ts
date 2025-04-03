@@ -3,8 +3,8 @@ import { getAgentManagement } from '../../../../../plugin-services';
 
 export const getAgents = async ({
   params,
-  setGetAgentsStatus,
-  setGetAgentsError,
+  // setGetAgentsStatus,
+  // setGetAgentsError,
 }: {
   params: object;
   setGetAgentsStatus: (state: string) => void;
@@ -16,7 +16,8 @@ export const getAgents = async ({
 
     return results;
   } catch (error: any) {
-    setGetAgentsStatus('danger');
-    setGetAgentsError(error);
+    console.error(error);
+    // setGetAgentsStatus('danger');
+    // setGetAgentsError(error);
   }
 };

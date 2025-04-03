@@ -15,7 +15,6 @@ import {
 } from '@elastic/eui';
 import { IAgentResponse } from '../../../../../../common/types';
 import { getAgentManagement } from '../../../../../plugin-services';
-import { getAgents } from '../common/get-agents';
 import { EditAgentsGroupsModalResult } from './result';
 import { EditActionGroups } from './types';
 
@@ -54,7 +53,6 @@ interface Option {
 export const EditAgentsGroupsModal = ({
   selectedAgents,
   allAgentsSelected,
-  params,
   onClose,
   reloadAgents,
   editAction,
@@ -62,7 +60,7 @@ export const EditAgentsGroupsModal = ({
   const [selectedGroups, setSelectedGroups] = useState<Option[]>([]);
   const [finalAgents, setFinalAgents] = useState<IAgentResponse[]>([]);
   const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
-  const [getAgentsError, setGetAgentsError] = useState();
+  const [getAgentsError, _setGetAgentsError] = useState();
   const [saveChangesStatus, setSaveChangesStatus] = useState('disabled');
   const [isResultVisible, setIsResultVisible] = useState(false);
   const [documentResults, setDocumentResults] = useState<GroupResult[]>([]);
@@ -72,28 +70,12 @@ export const EditAgentsGroupsModal = ({
   const handleSave = async () => {
     setIsResultVisible(true);
     setGetAgentsStatus('loading');
-
-    // Get agents to modify
-    let agents = selectedAgents;
-
-    if (allAgentsSelected) {
-      agents = await getAgents({
-        params,
-        setGetAgentsError,
-        setGetAgentsStatus,
-      });
-    }
-
-    if (!agents?.length) {
-      return;
-    }
-
     setGetAgentsStatus('complete');
-    setFinalAgents(agents);
+    setFinalAgents(selectedAgents);
     setSaveChangesStatus('loading');
 
     const groups = getArrayByProperty(selectedGroups, 'label');
-    const agentDocumentIds = getArrayByProperty(agents, '_id');
+    const agentDocumentIds = getArrayByProperty(selectedAgents, '_id');
 
     // Process each agent
     const processAgent = async (documentId: string) => {

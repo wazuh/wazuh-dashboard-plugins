@@ -44,10 +44,10 @@ const SelectionHeaderCell = ({ row, items, onClickSelectAll }) => {
   );
 };
 
-const SelectionRowCell = ({ row, items, _onClickSelectRow }) => {
+const SelectionRowCell = ({ row, items, onClickSelectRow }) => {
   const { rowIndex } = row;
   const [selectedRows, updateSelectedRows] = useWzDataGridContext();
-  const agentData = items?.hits?.hits[rowIndex]?._source;
+  const agentData = items?.hits?.hits[rowIndex];
   const isChecked = selectedRows.has(agentData);
 
   return (
@@ -61,13 +61,15 @@ const SelectionRowCell = ({ row, items, _onClickSelectRow }) => {
             updateSelectedRows({
               action: 'add',
               rowIndex,
-              rowData: items?.hits?.hits[rowIndex]._source,
+              rowData: items?.hits?.hits[rowIndex],
+              onClickSelectRow,
             });
           } else {
             updateSelectedRows({
               action: 'delete',
               rowIndex,
-              rowData: items?.hits?.hits[rowIndex]._source,
+              rowData: items?.hits?.hits[rowIndex],
+              onClickSelectRow,
             });
           }
         }}

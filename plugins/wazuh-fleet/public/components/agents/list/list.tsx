@@ -33,6 +33,7 @@ import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { EditAgentNameModal } from './actions/edit-name-agent-modal';
 import { actionsButtons } from './actions/actions';
+import { getAgents } from './global-actions/common/get-agents';
 
 export interface AgentListProps {
   indexPatterns: IndexPattern;
@@ -144,12 +145,15 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             setIsUpgradeModalVisible,
             setIsEditNameVisible,
           })}
-          onSelectAll={isAllChecked => {
+          onSelectAll={async isAllChecked => {
             setAllAgentsSelected(isAllChecked);
-            console.log('select all', agentSelected);
+
+            const agents = await getAgents({ params });
+
+            setAgentSelected(agents?.hits);
           }}
           onSelectRow={agentSelected => {
-            console.log('agentSelected', agentSelected);
+            setAgentSelected(agentSelected);
           }}
           columns={agentsTableColumns}
           tableProps={{

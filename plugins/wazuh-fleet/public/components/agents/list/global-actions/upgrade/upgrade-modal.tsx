@@ -15,7 +15,6 @@ import {
   EuiIconTip,
 } from '@elastic/eui';
 import { IAgentResponse } from '../../../../../../common/types';
-import { getAgents } from '../common/get-agents';
 import { getAgentManagement } from '../../../../../plugin-services';
 import { getOptionsToUpgrade } from '../../utils/selector-version-upgrade';
 import { UpgradeAgentsModalResult } from './result';
@@ -38,13 +37,12 @@ interface UpgradeAgentsModalProps {
 export const UpgradeAgentsModal = ({
   selectedAgents,
   allAgentsSelected,
-  params,
   onClose,
   reloadAgents,
 }: UpgradeAgentsModalProps) => {
   const [finalAgents, setFinalAgents] = useState<IAgentResponse[]>([]);
   const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
-  const [getAgentsError, setGetAgentsError] = useState();
+  const [getAgentsError, _setGetAgentsError] = useState();
   const [saveChangesStatus, setSaveChangesStatus] = useState('disabled');
   const [isResultVisible, setIsResultVisible] = useState(false);
   const [result, setResult] = useState<Result>();
@@ -60,27 +58,13 @@ export const UpgradeAgentsModal = ({
     setGetAgentsStatus('loading');
     setIsResultVisible(true);
 
-    let agents = selectedAgents;
-
-    if (allAgentsSelected) {
-      agents = await getAgents({
-        params,
-        setGetAgentsError,
-        setGetAgentsStatus,
-      });
-    }
-
-    if (!agents?.length) {
-      return;
-    }
-
     setGetAgentsStatus('complete');
 
-    setFinalAgents(agents);
+    setFinalAgents(selectedAgents);
 
     setSaveChangesStatus('loading');
 
-    const agentIds = getArrayByProperty(agents, '_id');
+    const agentIds = getArrayByProperty(selectedAgents, '_id');
 
     try {
       const response = await getAgentManagement().upgrade({

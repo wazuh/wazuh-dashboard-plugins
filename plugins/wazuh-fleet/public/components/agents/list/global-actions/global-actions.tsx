@@ -23,17 +23,20 @@ export interface AgentsTableGlobalActionsProps {
   allowGetTasks: boolean;
   allowDeleteAgent: boolean;
   reloadAgents: () => void;
+  setSelectedAgents: () => void;
 }
 
 export const AgentsTableGlobalActions = ({
-  selectedAgents,
+  selectedAgents: test,
   allAgentsSelected,
   params,
   allowEditGroups,
   allowUpgrade,
   allowDeleteAgent,
   reloadAgents,
+  setSelectedAgents,
 }: AgentsTableGlobalActionsProps) => {
+  const selectedAgents = [...test];
   const [isPopoverOpen, setPopover] = useState(false);
   const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
   const [isDeleteAgentsVisible, setIsDeleteAgentsVisible] = useState(false);
@@ -182,6 +185,7 @@ export const AgentsTableGlobalActions = ({
       {isUpgradeAgentsVisible && (
         <UpgradeAgentsModal
           selectedAgents={selectedAgents}
+          setSelectedAgents={setSelectedAgents}
           allAgentsSelected={allAgentsSelected}
           params={params}
           reloadAgents={() => reloadAgents()}
