@@ -186,10 +186,14 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
 
           nextRowSelection.delete(rowData);
 
+          onClickSelectRow(nextRowSelection);
+
           return nextRowSelection;
         }
 
         case 'clear': {
+          onClickSelectRow(new Set());
+
           return new Set();
         }
 

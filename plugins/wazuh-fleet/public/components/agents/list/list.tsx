@@ -75,6 +75,8 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
   };
 
   const reloadAgents = useCallback(() => {
+    setAgentSelected([]);
+    setAllAgentsSelected(false);
     setNeedReload(true);
   }, []);
 
@@ -94,6 +96,16 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
       } catch {
         setIsLoadingModal(false);
       }
+    }
+  };
+
+  const onSelectAll = async (isAllChecked: boolean) => {
+    setAllAgentsSelected(isAllChecked);
+
+    if (isAllChecked) {
+      const agents = await getAgents({ params });
+
+      setAgentSelected(agents?.hits);
     }
   };
 
@@ -145,13 +157,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             setIsUpgradeModalVisible,
             setIsEditNameVisible,
           })}
-          onSelectAll={async isAllChecked => {
-            setAllAgentsSelected(isAllChecked);
-
-            const agents = await getAgents({ params });
-
-            setAgentSelected(agents?.hits);
-          }}
+          onSelectAll={isAllChecked => onSelectAll(isAllChecked)}
           onSelectRow={agentSelected => {
             setAgentSelected(agentSelected);
           }}

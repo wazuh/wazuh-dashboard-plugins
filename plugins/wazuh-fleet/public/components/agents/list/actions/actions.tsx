@@ -13,7 +13,12 @@ export interface AgentsTableGlobalActionsProps {
   setAgent: (agent: IAgentResponse) => void;
 }
 
-const SelectionHeaderCell = ({ row, items, onClickSelectAll }) => {
+const SelectionHeaderCell = ({
+  row,
+  items,
+  onClickSelectAll,
+  onClickSelectRow,
+}) => {
   const { rowIndex } = row;
   const [selectedRows, updateSelectedRows] = useWzDataGridContext();
   const isIndeterminate = selectedRows.size > 0 && rowIndex < items.hits.total;
@@ -25,17 +30,12 @@ const SelectionHeaderCell = ({ row, items, onClickSelectAll }) => {
       indeterminate={isIndeterminate}
       checked={selectedRows.size > 0}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-        if (isIndeterminate) {
-          // clear selection
-          updateSelectedRows({ action: 'clear' });
+        if (event.target.checked) {
+          // select everything
+          updateSelectedRows({ action: 'selectAll', onClickSelectRow });
         } else {
-          if (event.target.checked) {
-            // select everything
-            updateSelectedRows({ action: 'selectAll' });
-          } else {
-            // clear selection
-            updateSelectedRows({ action: 'clear' });
-          }
+          // clear selection
+          updateSelectedRows({ action: 'clear', onClickSelectRow });
         }
 
         onClickSelectAll(event.target.checked);
@@ -183,7 +183,7 @@ export const agentsTableSelection = ({
     id: 'selection',
     width: 32,
     headerCellRender: row =>
-      SelectionHeaderCell({ row, items, onClickSelectAll }),
+      SelectionHeaderCell({ row, items, onClickSelectAll, onClickSelectRow }),
     rowCellRender: row => SelectionRowCell({ row, items, onClickSelectRow }),
   },
 ];
