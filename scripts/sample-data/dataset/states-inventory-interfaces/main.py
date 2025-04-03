@@ -6,10 +6,6 @@ from lib.generate import generate
 default_count=DEFAULT_COUNT
 default_index_name=generate.index_name('inventory-interfaces')
 
-def generate_mac_address():
-    mac = [random.randint(0x00, 0xFF) for _ in range(6)]
-    return ':'.join(f'{octet:02x}' for octet in mac)
-
 def generate_random_root_host():
     return {
         "network": {
@@ -26,10 +22,10 @@ def generate_random_root_host():
                 "packets": random.randint(100, 10000),
             },
         },
-        "mac": generate_mac_address()
+        "mac": randomize.mac_address()
     }
 
-def generate_random_interface(is_root_level=False):
+def generate_random_interface():
     return {
         "alias": f"alias{random.randint(0, 9999)}",
         "mtu": f"{random.randint(1000000, 99999999)}",
