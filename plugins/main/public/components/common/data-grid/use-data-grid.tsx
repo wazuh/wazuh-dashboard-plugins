@@ -126,7 +126,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     moduleId,
     defaultColumns: defaultColumns.map(({ id }) => id),
     columnDefinitions,
-    allColumns: new Set(indexPattern?.fields.map(({ name }) => name) || []),
+    allColumns: new Set(indexPattern?.fields?.map(({ name }) => name) || []),
   });
 
   const onChangeItemsPerPage = useMemo(
