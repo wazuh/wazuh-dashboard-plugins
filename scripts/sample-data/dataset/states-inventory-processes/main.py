@@ -2,10 +2,10 @@ import random
 import datetime
 from lib.randomize import randomize
 from lib.constants import DEFAULT_COUNT
+from lib.generate import generate
 
 default_count=DEFAULT_COUNT
-default_index_name_prefix='wazuh-states-inventory-processes'
-default_index_name=f'{default_index_name_prefix}-sample'
+default_index_name=generate.index_name('inventory-processes')
 
 def generate_random_agent():
     return {

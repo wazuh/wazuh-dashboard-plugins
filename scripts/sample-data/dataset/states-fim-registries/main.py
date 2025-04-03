@@ -2,9 +2,10 @@ import random
 import datetime
 from lib.randomize import randomize
 from lib.constants import DEFAULT_COUNT
+from lib.generate import generate
 
 default_count=DEFAULT_COUNT
-default_index_name='wazuh-states-fim-registries-sample'
+default_index_name=generate.index_name('fim-registries')
 
 def generate_random_unix_timestamp():
   start_time = datetime.datetime(2000, 1, 1)
