@@ -377,19 +377,6 @@ const getVisStateInstalledDateByPackageName = (indexPatternId: string) => {
         color: '#E7664C',
       },
     },
-    uiState: {
-      vis: {
-        /* These colors should match the specified on the metric visualizations
-        public/components/overview/vulnerabilities/dashboards/overview/vulnerability_detector_filters.scss
-        */
-        colors: {
-          Critical: '#CC5642',
-          High: '#F5A700',
-          Medium: '#6092C0',
-          Low: '#209280',
-        },
-      },
-    },
     data: {
       searchSource: {
         query: {
