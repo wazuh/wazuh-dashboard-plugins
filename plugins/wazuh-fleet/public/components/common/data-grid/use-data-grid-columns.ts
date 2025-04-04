@@ -258,19 +258,46 @@ function useDataGridColumns({
     // I need AllColumns to trigger updates when it changes, because when I retrieve the persisted column state, I need to verify that those persisted columns actually exist within the columns defined in the Index Pattern. That’s why I need both.
   }, [appId, JSON.stringify([...allColumns])]);
 
+  const onColumnResize: EuiDataGridProps['onColumnResize'] = ({
+    columnId,
+    width,
+  }) => {
+    const column = columnDefinitions.find(({ id }) => id === columnId);
+
+    if (column) {
+      column.initialWidth = width;
+      columnWidthStateManagement.persistState(appId, {
+        ...columnWidthStateManagement.retrieveState(appId),
+        [columnId]: width,
+      });
+    }
+  };
+
+  const retrieveVisibleDataGridColumns = (): EuiDataGridColumn[] =>
+    visibleColumns.map(columnId => {
+      const column = columnDefinitions.find(({ id }) => id === columnId);
+      const initialWidth =
+        columnWidthStateManagement.retrieveState(appId)[columnId];
+
+      if (initialWidth) {
+        column.initialWidth = initialWidth;
+      }
+
+      return column;
+    });
+
   return {
     // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
     columnsAvailable: orderFirstMatchedColumns(
       columnDefinitions,
       visibleColumns,
     ),
-    columns: visibleColumns.map(columnId =>
-      columnDefinitions.find(({ id }) => id === columnId),
-    ),
+    columns: retrieveVisibleDataGridColumns(),
     columnVisibility: {
       visibleColumns,
       setVisibleColumns: setVisibleColumnsHandler,
     },
+    onColumnResize,
   } satisfies DataGridColumnsReturn;
 }
 
