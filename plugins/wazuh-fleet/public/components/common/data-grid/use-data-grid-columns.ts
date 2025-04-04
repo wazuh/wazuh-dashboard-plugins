@@ -6,7 +6,7 @@ import { localStorageColumnsStateManagement } from './data-grid-state-persistenc
 
 interface UseDataGridColumnsProps {
   appId: string;
-  defaultColumns: string[];
+  defaultColumns: EuiDataGridColumn[];
   columnDefinitions: tDataGridColumn[];
   allColumns: Set<string>;
 }
@@ -24,9 +24,9 @@ function useDataGridColumns({
   columnDefinitions,
   allColumns,
 }: UseDataGridColumnsProps) {
-  const [visibleColumns, setVisibleColumns] = useState<string[]>(
-    () => defaultColumns,
-  );
+  const defaultColumnsIds = defaultColumns.map(column => column.id) || [];
+  const [visibleColumns, setVisibleColumns] =
+    useState<string[]>(defaultColumnsIds);
   // Fix potential circular dependency with columnStateManagement
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
@@ -133,8 +133,8 @@ function useDataGridColumns({
 
         // If validation fails, reset to default columns
         try {
-          columnStateManagement.persistState(appId, defaultColumns);
-          setVisibleColumns(defaultColumns);
+          columnStateManagement.persistState(appId, defaultColumnsIds);
+          setVisibleColumns(defaultColumnsIds);
         } catch (resetError) {
           console.error('Failed to reset columns to defaults:', resetError);
         }
@@ -188,7 +188,7 @@ function useDataGridColumns({
       setVisibleColumnsHandler(persistedColumns);
     } catch (error) {
       console.error('Error loading persisted columns:', error);
-      setVisibleColumnsHandler(defaultColumns);
+      setVisibleColumnsHandler(defaultColumnsIds);
     }
   }, [appId, JSON.stringify([...allColumns])]);
 
