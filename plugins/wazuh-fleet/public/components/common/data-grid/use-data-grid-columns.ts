@@ -255,6 +255,7 @@ function useDataGridColumns({
       console.error('Error loading persisted columns:', error);
       setVisibleColumnsHandler(defaultColumnsIds);
     }
+    // I need AllColumns to trigger updates when it changes, because when I retrieve the persisted column state, I need to verify that those persisted columns actually exist within the columns defined in the Index Pattern. That’s why I need both.
   }, [appId, JSON.stringify([...allColumns])]);
 
   return {
