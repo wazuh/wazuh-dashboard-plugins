@@ -31,7 +31,8 @@ const SelectionHeaderCell = ({ items, onClickSelectAll, onClickSelectRow }) => {
           updateSelectedRows({ action: 'clear', onClickSelectRow });
         }
 
-        onClickSelectAll(event.target.checked);
+        // onClickSelectAll(event.target.checked);
+        onClickSelectAll(false);
       }}
     />
   );
