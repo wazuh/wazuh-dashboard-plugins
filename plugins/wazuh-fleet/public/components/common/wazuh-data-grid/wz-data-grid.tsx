@@ -169,7 +169,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
   };
 
   const rowSelection = useReducer(
-    (rowSelection, { action, _rowIndex, rowData, onClickSelectRow }) => {
+    (rowSelection, { action, rowData, onClickSelectRow }) => {
       switch (action) {
         case 'add': {
           const nextRowSelection = new Set(rowSelection);
@@ -182,9 +182,11 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
         }
 
         case 'delete': {
-          const nextRowSelection = new Set(rowSelection);
-
-          nextRowSelection.delete(rowData);
+          const selectionArray = [...rowSelection];
+          const selectionDeleted = selectionArray.filter(
+            item => item._id !== rowData._id,
+          );
+          const nextRowSelection = new Set(selectionDeleted);
 
           onClickSelectRow(nextRowSelection);
 
@@ -198,7 +200,13 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
         }
 
         case 'selectAll': {
-          return new Set(results?.hits?.hits?.map((item, _index) => item));
+          const nextRowSelection = new Set(
+            results?.hits?.hits?.map((item, _index) => item),
+          );
+
+          onClickSelectRow(nextRowSelection);
+
+          return nextRowSelection;
         }
         // No default
       }
@@ -207,6 +215,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     },
     new Set(),
   );
+  const [selectedRows, _dispatchRowSelection] = rowSelection;
 
   return (
     <>
@@ -236,6 +245,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
                       dateRange={dateRange}
                       columnsAvailable={dataGridProps.columnsAvailable}
                       columnVisibility={dataGridProps.columnVisibility}
+                      selectedRows={selectedRows}
                     />
                   </>
                 ),

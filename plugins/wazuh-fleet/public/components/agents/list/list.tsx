@@ -33,7 +33,7 @@ import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { EditAgentNameModal } from './actions/edit-name-agent-modal';
 import { actionsButtons } from './actions/actions';
-import { getAgents } from './global-actions/common/get-agents';
+// import { getAgents } from './global-actions/common/get-agents';
 
 export interface AgentListProps {
   indexPatterns: IndexPattern;
@@ -70,10 +70,6 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
       .navigate(enrollmentAgent.path);
   };
 
-  const onSelectionChange = (selectedItems: Agent[]) => {
-    setAgentSelected(selectedItems);
-  };
-
   const reloadAgents = useCallback(() => {
     setAgentSelected([]);
     setAllAgentsSelected(false);
@@ -101,12 +97,6 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
 
   const onSelectAll = async (isAllChecked: boolean) => {
     setAllAgentsSelected(isAllChecked);
-
-    if (isAllChecked) {
-      const agents = await getAgents({ params });
-
-      setAgentSelected(agents?.hits);
-    }
   };
 
   return (
@@ -162,14 +152,6 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             setAgentSelected(agentSelected);
           }}
           columns={agentsTableColumns}
-          tableProps={{
-            hasActions: true,
-            isSelectable: true,
-            itemId: '_id',
-            selection: {
-              onSelectionChange: onSelectionChange,
-            },
-          }}
         />
       ) : null}
       {isEditGroupsVisible && agent && (

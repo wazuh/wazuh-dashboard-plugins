@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { EuiCheckbox, EuiDataGridControlColumn } from '@elastic/eui';
 import { IAgentResponse } from '../../../../../common/types';
 import { getWazuhCore } from '../../../../plugin-services';
@@ -13,15 +13,10 @@ export interface AgentsTableGlobalActionsProps {
   setAgent: (agent: IAgentResponse) => void;
 }
 
-const SelectionHeaderCell = ({
-  row,
-  items,
-  onClickSelectAll,
-  onClickSelectRow,
-}) => {
-  const { rowIndex } = row;
+const SelectionHeaderCell = ({ items, onClickSelectAll, onClickSelectRow }) => {
   const [selectedRows, updateSelectedRows] = useWzDataGridContext();
-  const isIndeterminate = selectedRows.size > 0 && rowIndex < items.hits.total;
+  const isIndeterminate =
+    selectedRows.size > 0 && selectedRows.size < items.hits.total;
 
   return (
     <EuiCheckbox
@@ -31,10 +26,8 @@ const SelectionHeaderCell = ({
       checked={selectedRows.size > 0}
       onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.checked) {
-          // select everything
           updateSelectedRows({ action: 'selectAll', onClickSelectRow });
         } else {
-          // clear selection
           updateSelectedRows({ action: 'clear', onClickSelectRow });
         }
 
@@ -45,33 +38,43 @@ const SelectionHeaderCell = ({
 };
 
 const SelectionRowCell = ({ row, items, onClickSelectRow }) => {
-  const { rowIndex } = row;
+  const { visibleRowIndex } = row;
   const [selectedRows, updateSelectedRows] = useWzDataGridContext();
-  const agentData = items?.hits?.hits[rowIndex];
-  const isChecked = selectedRows.has(agentData);
+  const agentData = items?.hits?.hits[visibleRowIndex];
+  const [isChecked, setIsChecked] = useState(false);
+
+  useEffect(() => {
+    setIsChecked(
+      [...selectedRows].some(
+        (agent: IAgentResponse) => agent?._id === agentData?._id,
+      ),
+    );
+  }, [selectedRows]);
 
   return (
     <div>
       <EuiCheckbox
-        id={`${rowIndex}`}
-        aria-label={`Select row ${rowIndex}`}
+        id={`${visibleRowIndex}`}
+        aria-label={`Select row ${visibleRowIndex}`}
         checked={isChecked}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
           if (event.target.checked) {
             updateSelectedRows({
               action: 'add',
-              rowIndex,
-              rowData: items?.hits?.hits[rowIndex],
+              visibleRowIndex,
+              rowData: items?.hits?.hits[visibleRowIndex],
               onClickSelectRow,
             });
           } else {
             updateSelectedRows({
               action: 'delete',
-              rowIndex,
-              rowData: items?.hits?.hits[rowIndex],
+              visibleRowIndex,
+              rowData: items?.hits?.hits[visibleRowIndex],
               onClickSelectRow,
             });
           }
+
+          setIsChecked(event.target.checked);
         }}
       />
     </div>

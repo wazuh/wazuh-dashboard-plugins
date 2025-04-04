@@ -251,7 +251,6 @@ export const TableIndexer = (props: {
           indexPattern={indexPatterns}
           defaultPagination={tablePagination}
           onChangePagination={pagination => {
-            console.log('pagination', pagination);
             setPagination(prev => ({
               ...prev,
               pageIndex: pagination.pageIndex,

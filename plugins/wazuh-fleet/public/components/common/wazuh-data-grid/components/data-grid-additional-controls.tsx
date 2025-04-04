@@ -13,15 +13,17 @@ import { MAX_ENTRIES_PER_QUERY } from '../../data-grid/data-grid-service';
 import { HitsCounter } from './hits-counter';
 import { formatNumWithCommas } from './helpers';
 import { DataGridVisibleColumnsSelector } from './visible-columns-selector';
+import SelectedItemsControls from './selected-items-controls';
 
 interface DiscoverDataGridAdditionalControlsProps {
   totalHits: number;
-  isExporting: boolean;
   onClickExportResults: () => void;
   maxEntriesPerQuery?: number;
   dateRange: TimeRange;
   columnsAvailable: EuiDataGridColumn[];
   columnVisibility: EuiDataGridColumnVisibility;
+  selectedRows: Set<any>;
+  isExporting: boolean;
 }
 
 const DiscoverDataGridAdditionalControls = (
@@ -29,6 +31,7 @@ const DiscoverDataGridAdditionalControls = (
 ) => {
   const {
     totalHits,
+    selectedRows,
     isExporting,
     maxEntriesPerQuery = MAX_ENTRIES_PER_QUERY,
     onClickExportResults,
@@ -77,6 +80,7 @@ const DiscoverDataGridAdditionalControls = (
           </EuiFlexItem>
         </EuiFlexGroup>
       ) : null}
+      <SelectedItemsControls selectedItems={selectedRows} />
       <EuiButtonEmpty
         disabled={totalHits === 0 || isExporting}
         size='xs'
