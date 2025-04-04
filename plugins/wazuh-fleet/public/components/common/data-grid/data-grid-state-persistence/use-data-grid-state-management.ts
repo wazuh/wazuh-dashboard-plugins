@@ -17,8 +17,19 @@ const useDataGridStateManagement = <
 }: UseDataGridStateManagementProps<State>) => {
   const retrieveState = (moduleId: string): State => {
     const state = stateManagement.retrieveState(moduleId);
+    let isValid = false;
 
-    if (state && validateState?.(state)) {
+    if (!state) {
+      return defaultState;
+    }
+
+    try {
+      isValid = validateState?.(state) || false;
+    } catch (error) {
+      console.error('Error validating state:', error);
+    }
+
+    if (isValid) {
       return state;
     }
 
