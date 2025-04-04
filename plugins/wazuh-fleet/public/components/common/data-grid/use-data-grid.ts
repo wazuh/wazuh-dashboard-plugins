@@ -165,7 +165,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
       appId,
       defaultColumns,
       columnDefinitions,
-      allColumns: new Set(indexPattern?.fields?.map(({ name }) => name) || []),
+      allColumns: new Set(columnDefinitions?.map(({ id }) => id) || []),
     });
 
   return {
