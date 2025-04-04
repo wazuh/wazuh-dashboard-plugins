@@ -12,10 +12,12 @@ jest.mock('../../../../plugin-services', () => ({
 
 describe('EditAgentGroupsModal component', () => {
   const mockAgent = {
-    agent: {
-      id: '001',
-      name: 'agent1',
-      groups: ['default', 'test1'],
+    _source: {
+      agent: {
+        id: '001',
+        name: 'agent1',
+        groups: ['default', 'test1'],
+      },
     },
   };
   const mockOnClose = jest.fn();

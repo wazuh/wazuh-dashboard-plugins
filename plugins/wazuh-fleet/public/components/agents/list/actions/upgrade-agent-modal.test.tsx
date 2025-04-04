@@ -17,27 +17,31 @@ jest.mock('../utils/selector-version-upgrade', () => ({
 
 describe('UpgradeAgentModal component', () => {
   const mockAgent = {
-    agent: {
-      id: '001',
-      name: 'agent1',
-      version: '4.3.0',
-      host: {
-        os: {
-          name: 'ubuntu',
-          platform: 'linux',
+    _source: {
+      agent: {
+        id: '001',
+        name: 'agent1',
+        version: '4.3.0',
+        host: {
+          os: {
+            name: 'ubuntu',
+            platform: 'linux',
+          },
         },
       },
     },
   };
   const mockAgentUnsupportedPlatform = {
-    agent: {
-      id: '002',
-      name: 'agent2',
-      version: '4.3.0',
-      host: {
-        os: {
-          name: 'unknown-linux',
-          platform: 'linux',
+    _source: {
+      agent: {
+        id: '002',
+        name: 'agent2',
+        version: '4.3.0',
+        host: {
+          os: {
+            name: 'unknown-linux',
+            platform: 'linux',
+          },
         },
       },
     },

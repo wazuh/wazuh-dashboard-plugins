@@ -11,9 +11,11 @@ jest.mock('../../../../plugin-services', () => ({
 
 describe('EditAgentNameModal component', () => {
   const mockAgent = {
-    agent: {
-      id: '001',
-      name: 'agent1',
+    _source: {
+      agent: {
+        id: '001',
+        name: 'agent1',
+      },
     },
   };
   const mockOnClose = jest.fn();

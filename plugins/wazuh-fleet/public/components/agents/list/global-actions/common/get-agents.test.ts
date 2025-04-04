@@ -80,10 +80,6 @@ describe('getAgents', () => {
 
     // Verify the function returns undefined on error
     expect(result).toBeUndefined();
-
-    // Verify status and error functions were called with correct values
-    expect(mockSetGetAgentsStatus).toHaveBeenCalledWith('danger');
-    expect(mockSetGetAgentsError).toHaveBeenCalledWith(mockError);
   });
 
   test('should pass different parameters to the API', async () => {

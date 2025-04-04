@@ -9,18 +9,22 @@ describe('EditAgentsGroupsModalResult component', () => {
   const mockAgents = [
     {
       _id: 'agent1',
-      agent: {
-        id: '001',
-        name: 'agent1',
-        groups: ['default'],
+      _source: {
+        agent: {
+          id: '001',
+          name: 'agent1',
+          groups: ['default'],
+        },
       },
     },
     {
       _id: 'agent2',
-      agent: {
-        id: '002',
-        name: 'agent2',
-        groups: ['default'],
+      _source: {
+        agent: {
+          id: '002',
+          name: 'agent2',
+          groups: ['default'],
+        },
       },
     },
   ];

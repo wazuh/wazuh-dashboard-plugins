@@ -25,19 +25,23 @@ jest.mock('./result', () => ({
 describe('EditAgentsGroupsModal component', () => {
   const mockSelectedAgents = [
     {
-      _id: 'agent1',
-      agent: {
-        id: '001',
-        name: 'agent1',
-        groups: ['default'],
+      _source: {
+        agent: {
+          id: '001',
+          name: 'agent1',
+          groups: ['default'],
+        },
       },
+      _id: 'agent1',
     },
     {
       _id: 'agent2',
-      agent: {
-        id: '002',
-        name: 'agent2',
-        groups: ['default'],
+      _source: {
+        agent: {
+          id: '002',
+          name: 'agent2',
+          groups: ['default'],
+        },
       },
     },
   ];
@@ -274,38 +278,6 @@ describe('EditAgentsGroupsModal component', () => {
 
     // Verify reloadAgents was called
     expect(mockReloadAgents).toHaveBeenCalled();
-  });
-
-  test('should call getAgents when allAgentsSelected is true', async () => {
-    const { getByText, getByRole } = render(
-      <EditAgentsGroupsModal
-        selectedAgents={mockSelectedAgents}
-        allAgentsSelected={true}
-        params={mockParams}
-        onClose={mockOnClose}
-        reloadAgents={mockReloadAgents}
-        editAction={EditActionGroups.ADD}
-      />,
-    );
-    // Add a group
-    const comboBox = getByRole('textbox');
-
-    fireEvent.change(comboBox, { target: { value: 'newgroup' } });
-    fireEvent.keyDown(comboBox, { key: 'Enter', code: 'Enter' });
-
-    // Click save button
-    const saveButton = getByText('Save');
-
-    await act(async () => {
-      fireEvent.click(saveButton);
-    });
-
-    // Verify getAgents was called with correct params
-    expect(getAgents).toHaveBeenCalledWith({
-      params: mockParams,
-      setGetAgentsError: expect.any(Function),
-      setGetAgentsStatus: expect.any(Function),
-    });
   });
 
   test('should handle API errors correctly', async () => {

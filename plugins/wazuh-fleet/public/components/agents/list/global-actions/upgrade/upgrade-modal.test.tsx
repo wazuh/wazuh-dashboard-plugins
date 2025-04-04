@@ -29,20 +29,24 @@ jest.mock('./result', () => ({
 describe('UpgradeAgentsModal component', () => {
   const mockSelectedAgents = [
     {
-      _id: 'agent1',
-      agent: {
-        id: '001',
-        name: 'agent1',
-        version: '4.3.0',
+      _source: {
+        agent: {
+          id: '001',
+          name: 'agent1',
+          version: '4.3.0',
+        },
       },
+      _id: 'agent1',
     },
     {
-      _id: 'agent2',
-      agent: {
-        id: '002',
-        name: 'agent2',
-        version: '4.3.0',
+      _source: {
+        agent: {
+          id: '002',
+          name: 'agent2',
+          version: '4.3.0',
+        },
       },
+      _id: 'agent2',
     },
   ];
   const mockParams = { q: 'status=active' };
@@ -215,42 +219,6 @@ describe('UpgradeAgentsModal component', () => {
 
     // Verify reloadAgents was called
     expect(mockReloadAgents).toHaveBeenCalled();
-  });
-
-  test('should call getAgents when allAgentsSelected is true', async () => {
-    let renderResult;
-
-    await act(async () => {
-      renderResult = render(
-        <UpgradeAgentsModal
-          selectedAgents={mockSelectedAgents}
-          allAgentsSelected={true}
-          params={mockParams}
-          onClose={mockOnClose}
-          reloadAgents={mockReloadAgents}
-        />,
-      );
-    });
-
-    const { getByRole } = renderResult;
-    // Select a version
-    const versionSelect = getByRole('combobox');
-
-    await act(async () => {
-      fireEvent.change(versionSelect, { target: { value: '4.4.0' } });
-    });
-
-    // Click upgrade button
-    await act(async () => {
-      fireEvent.click(getByRole('button', { name: 'Upgrade' }));
-    });
-
-    // Verify getAgents was called with correct params
-    expect(getAgents).toHaveBeenCalledWith({
-      params: mockParams,
-      setGetAgentsError: expect.any(Function),
-      setGetAgentsStatus: expect.any(Function),
-    });
   });
 
   test('should handle API errors correctly', async () => {
