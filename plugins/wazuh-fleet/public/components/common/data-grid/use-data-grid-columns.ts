@@ -284,11 +284,11 @@ function useDataGridColumns({
     (): EuiDataGridColumn[] =>
       visibleColumns.map(columnId => {
         const column = columnDefinitionsMap[columnId];
-        const initialWidth =
+        const savedColumnWidth =
           columnWidthStateManagement.retrieveState(appId)[columnId];
 
-        if (initialWidth) {
-          column.initialWidth = initialWidth;
+        if (savedColumnWidth) {
+          column.initialWidth = savedColumnWidth;
         }
 
         return column;
