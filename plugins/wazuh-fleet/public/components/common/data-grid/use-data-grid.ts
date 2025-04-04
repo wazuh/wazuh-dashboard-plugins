@@ -156,22 +156,23 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     ],
     [results],
   );
-  const columnDefinitions = parseColumns(
-    indexPattern?.fields || [],
-    defaultColumns,
+  const columnSchemaDefinitions = useMemo(
+    () => parseColumns(indexPattern?.fields || [], defaultColumns),
+    [indexPattern?.fields, defaultColumns],
   );
-  const { columnsAvailable, columns, columnVisibility } = useDataGridColumns({
-    appId,
-    defaultColumns: defaultColumns.map(({ id }) => id),
-    columnDefinitions,
-    allColumns: new Set(indexPattern?.fields?.map(({ name }) => name) || []),
-  });
+  const { columnsAvailable, columns, columnVisibility, onColumnResize } =
+    useDataGridColumns({
+      appId,
+      defaultColumns,
+      columnSchemaDefinitions,
+    });
 
   return {
     'aria-labelledby': props.ariaLabelledBy,
     columnsAvailable, // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
     columns,
     columnVisibility,
+    onColumnResize,
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,
     trailingControlColumns: trailingControlColumns,
