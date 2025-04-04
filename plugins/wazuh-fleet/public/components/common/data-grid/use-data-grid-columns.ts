@@ -280,18 +280,21 @@ function useDataGridColumns({
     }
   };
 
-  const retrieveVisibleDataGridColumns = (): EuiDataGridColumn[] =>
-    visibleColumns.map(columnId => {
-      const column = columnDefinitionsMap[columnId];
-      const initialWidth =
-        columnWidthStateManagement.retrieveState(appId)[columnId];
+  const retrieveVisibleDataGridColumns = useMemo(
+    (): EuiDataGridColumn[] =>
+      visibleColumns.map(columnId => {
+        const column = columnDefinitionsMap[columnId];
+        const initialWidth =
+          columnWidthStateManagement.retrieveState(appId)[columnId];
 
-      if (initialWidth) {
-        column.initialWidth = initialWidth;
-      }
+        if (initialWidth) {
+          column.initialWidth = initialWidth;
+        }
 
-      return column;
-    });
+        return column;
+      }),
+    [visibleColumns, JSON.stringify(columnDefinitionsMap), appId],
+  );
 
   return {
     // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
@@ -299,7 +302,7 @@ function useDataGridColumns({
       columnDefinitions,
       visibleColumns,
     ),
-    columns: retrieveVisibleDataGridColumns(),
+    columns: retrieveVisibleDataGridColumns,
     columnVisibility: {
       visibleColumns,
       setVisibleColumns: setVisibleColumnsHandler,
