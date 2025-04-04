@@ -1,8 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
+import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
 import { tDataGridColumn } from './types';
 import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
 import { DataGridState } from './data-grid-state-persistence/types';
 import { localStorageColumnsStateManagement } from './data-grid-state-persistence/local-storage-columns-state-management';
+import { localStorageColumnsWidthStateManagement } from './data-grid-state-persistence/local-storage-columns-width-state-management';
+
+const MINIMUM_COLUMN_WIDTH = 40;
+const MAXIMUM_COLUMN_WIDTH = 1000;
 
 interface UseDataGridColumnsProps {
   appId: string;
@@ -73,8 +78,68 @@ function useDataGridColumns({
     DataGridState['columns']
   >({
     stateManagement: localStorageColumnsStateManagement,
-    defaultState: defaultColumns,
-    validateState: validateColumns,
+    defaultState: defaultColumnsIds,
+    validateState: state => {
+      // Validate that the state is an array
+      if (!Array.isArray(state)) {
+        throw new TypeError('Invalid state: expected an array');
+      }
+
+      // Validate that all elements in the state are strings
+      for (const columnId of state) {
+        if (typeof columnId !== 'string') {
+          throw new TypeError(`Invalid column ID: ${columnId}`);
+        }
+
+        // Check the length of the column ID
+        if (columnId.length === 0) {
+          throw new Error(`Invalid column ID: ${columnId}`);
+        }
+      }
+
+      return validateColumns(state);
+    },
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const columnWidthStateManagement = useDataGridStateManagement<
+    DataGridState['columnsWidth']
+  >({
+    stateManagement: localStorageColumnsWidthStateManagement,
+    defaultState: {},
+    validateState: state => {
+      // Validate that the state is an object
+      if (typeof state !== 'object' || state === null) {
+        throw new Error('Invalid state: expected an object');
+      }
+
+      // Validate that all keys in the state are valid column IDs
+      for (const columnId of Object.keys(state)) {
+        if (typeof columnId !== 'string') {
+          throw new TypeError(`Invalid column ID: ${columnId}`);
+        }
+
+        // Check the length of the column ID
+        if (columnId.length === 0) {
+          throw new Error(`Invalid column ID: ${columnId}`);
+        }
+      }
+
+      // Validate that the column widths are numbers
+      for (const width of Object.values(state)) {
+        if (
+          typeof width !== 'number' ||
+          Number.isNaN(width) ||
+          !Number.isSafeInteger(width) ||
+          width < MINIMUM_COLUMN_WIDTH ||
+          width > MAXIMUM_COLUMN_WIDTH
+        ) {
+          throw new Error(`Invalid column width: ${width}`);
+        }
+      }
+
+      // Validate that the column IDs exist in the column definitions
+      return validateColumns(Object.keys(state));
+    },
   });
   // Prevent infinite loop by checking if visibleColumns actually need updating
   const setVisibleColumnsHandler = useCallback(
