@@ -12,8 +12,7 @@ const MAXIMUM_COLUMN_WIDTH = 1000;
 interface UseDataGridColumnsProps {
   appId: string;
   defaultColumns: EuiDataGridColumn[];
-  columnDefinitions: tDataGridColumn[];
-  allColumns: Set<string>;
+  columnSchemaDefinitions: tDataGridColumn[];
 }
 
 export interface DataGridColumnsReturn {
@@ -26,12 +25,19 @@ export interface DataGridColumnsReturn {
 function useDataGridColumns({
   appId,
   defaultColumns,
-  columnDefinitions,
-  allColumns,
+  columnSchemaDefinitions,
 }: UseDataGridColumnsProps) {
   const defaultColumnsIds = defaultColumns.map(column => column.id) || [];
   const [visibleColumns, setVisibleColumns] =
     useState<string[]>(defaultColumnsIds);
+  // Convert column definitions to Record<string, EuiDataGridColumn>
+  const columnSchemaDefinitionsMap: Record<string, EuiDataGridColumn> = useMemo(
+    () =>
+      Object.fromEntries(
+        columnSchemaDefinitions.map(column => [column.id, column]),
+      ),
+    [columnSchemaDefinitions],
+  );
   // Fix potential circular dependency with columnStateManagement
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
@@ -45,14 +51,17 @@ function useDataGridColumns({
       }
 
       // Only perform column existence validation if allColumns is initialized and has items
-      if (allColumns && allColumns.size > 0) {
+      if (
+        columnSchemaDefinitionsMap &&
+        Object.keys(columnSchemaDefinitionsMap).length > 0
+      ) {
         for (const columnId of columnsIds) {
           // Skip columns without ID (shouldn't happen, but for safety)
           if (!columnId) {
             continue;
           }
 
-          if (!allColumns.has(columnId)) {
+          if (columnSchemaDefinitionsMap[columnId] === undefined) {
             throw new Error(
               `Column ${columnId} does not exist in column definitions`,
             );
@@ -71,7 +80,7 @@ function useDataGridColumns({
       return true;
     },
     // Create state management with memoized validation function
-    [JSON.stringify([...allColumns])],
+    [JSON.stringify(columnSchemaDefinitionsMap)],
   );
   // Create state management with memoized validation function
   const columnStateManagement = useDataGridStateManagement<
@@ -144,7 +153,10 @@ function useDataGridColumns({
   // Prevent infinite loop by checking if visibleColumns actually need updating
   const setVisibleColumnsHandler = useCallback(
     (columns: string[]) => {
-      if (!allColumns || allColumns.size === 0) {
+      if (
+        !columnSchemaDefinitionsMap ||
+        Object.keys(columnSchemaDefinitionsMap).length === 0
+      ) {
         return;
       }
 
@@ -162,7 +174,9 @@ function useDataGridColumns({
 
       // Filter and persist valid columns
       const columnsToPersist = columns
-        .map(columnId => (allColumns.has(columnId) ? columnId : null))
+        .map(columnId =>
+          columnSchemaDefinitionsMap[columnId] === undefined ? null : columnId,
+        )
         .filter(Boolean) // Remove falsy values
         .filter(column => column !== null)
         .filter(column => column !== undefined);
@@ -171,14 +185,17 @@ function useDataGridColumns({
     },
     [
       visibleColumns,
-      JSON.stringify([...allColumns]),
+      JSON.stringify(columnSchemaDefinitionsMap),
       columnStateManagement,
       appId,
     ],
   );
 
   useEffect(() => {
-    if (allColumns && allColumns.size > 0) {
+    if (
+      columnSchemaDefinitionsMap &&
+      Object.keys(columnSchemaDefinitionsMap).length > 0
+    ) {
       try {
         // Get current persisted state for validation
         const persistedColumns = columnStateManagement.retrieveState(appId);
@@ -205,7 +222,7 @@ function useDataGridColumns({
         }
       }
     }
-  }, [appId, JSON.stringify([...allColumns])]);
+  }, [appId, JSON.stringify(columnSchemaDefinitionsMap)]);
 
   const sortFirstMatchedColumns = (
     firstMatchedColumns: tDataGridColumn[],
@@ -256,20 +273,13 @@ function useDataGridColumns({
       setVisibleColumnsHandler(defaultColumnsIds);
     }
     // I need AllColumns to trigger updates when it changes, because when I retrieve the persisted column state, I need to verify that those persisted columns actually exist within the columns defined in the Index Pattern. That’s why I need both.
-  }, [appId, JSON.stringify([...allColumns])]);
-
-  // Convert column definitions to Record<string, EuiDataGridColumn>
-  const columnDefinitionsMap: Record<string, EuiDataGridColumn> = useMemo(
-    () =>
-      Object.fromEntries(columnDefinitions.map(column => [column.id, column])),
-    [columnDefinitions],
-  );
+  }, [appId, JSON.stringify(columnSchemaDefinitionsMap)]);
 
   const onColumnResize: EuiDataGridProps['onColumnResize'] = ({
     columnId,
     width,
   }) => {
-    const column = columnDefinitionsMap[columnId];
+    const column = columnSchemaDefinitionsMap[columnId];
 
     if (column) {
       columnWidthStateManagement.persistState(appId, {
@@ -282,7 +292,7 @@ function useDataGridColumns({
   const retrieveVisibleDataGridColumns = useMemo(
     (): EuiDataGridColumn[] =>
       visibleColumns.map(columnId => {
-        const column = columnDefinitionsMap[columnId];
+        const column = columnSchemaDefinitionsMap[columnId];
         const savedColumnWidth =
           columnWidthStateManagement.retrieveState(appId)[columnId];
 
@@ -292,13 +302,13 @@ function useDataGridColumns({
 
         return column;
       }),
-    [visibleColumns, JSON.stringify(columnDefinitionsMap), appId],
+    [visibleColumns, JSON.stringify(columnSchemaDefinitionsMap), appId],
   );
 
   return {
     // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
     columnsAvailable: orderFirstMatchedColumns(
-      columnDefinitions,
+      columnSchemaDefinitions,
       visibleColumns,
     ),
     columns: retrieveVisibleDataGridColumns,

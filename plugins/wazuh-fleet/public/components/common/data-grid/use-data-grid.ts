@@ -156,7 +156,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     ],
     [results],
   );
-  const columnDefinitions = useMemo(
+  const columnSchemaDefinitions = useMemo(
     () => parseColumns(indexPattern?.fields || [], defaultColumns),
     [indexPattern?.fields, defaultColumns],
   );
@@ -164,8 +164,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     useDataGridColumns({
       appId,
       defaultColumns,
-      columnDefinitions,
-      allColumns: new Set(columnDefinitions?.map(({ id }) => id) || []),
+      columnSchemaDefinitions,
     });
 
   return {
