@@ -272,7 +272,6 @@ function useDataGridColumns({
     const column = columnDefinitionsMap[columnId];
 
     if (column) {
-      column.initialWidth = width;
       columnWidthStateManagement.persistState(appId, {
         ...columnWidthStateManagement.retrieveState(appId),
         [columnId]: width,
