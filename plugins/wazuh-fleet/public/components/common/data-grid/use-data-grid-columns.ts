@@ -129,7 +129,7 @@ function useDataGridColumns({
         if (
           typeof width !== 'number' ||
           Number.isNaN(width) ||
-          !Number.isSafeInteger(width) ||
+          !Number.isFinite(width) ||
           width < MINIMUM_COLUMN_WIDTH ||
           width > MAXIMUM_COLUMN_WIDTH
         ) {
