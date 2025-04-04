@@ -11,6 +11,13 @@ interface UseDataGridColumnsProps {
   allColumns: Set<string>;
 }
 
+export interface DataGridColumnsReturn {
+  columnsAvailable: tDataGridColumn[];
+  columns: EuiDataGridProps['columns'];
+  columnVisibility: EuiDataGridProps['columnVisibility'];
+  onColumnResize: EuiDataGridProps['onColumnResize'];
+}
+
 function useDataGridColumns({
   appId,
   defaultColumns,
@@ -198,7 +205,7 @@ function useDataGridColumns({
       visibleColumns,
       setVisibleColumns: setVisibleColumnsHandler,
     },
-  };
+  } satisfies DataGridColumnsReturn;
 }
 
 export default useDataGridColumns;
