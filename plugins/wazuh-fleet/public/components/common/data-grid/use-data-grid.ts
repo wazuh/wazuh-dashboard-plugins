@@ -156,9 +156,9 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     ],
     [results],
   );
-  const columnDefinitions = parseColumns(
-    indexPattern?.fields || [],
-    defaultColumns,
+  const columnDefinitions = useMemo(
+    () => parseColumns(indexPattern?.fields || [], defaultColumns),
+    [indexPattern?.fields, defaultColumns],
   );
   const { columnsAvailable, columns, columnVisibility, onColumnResize } =
     useDataGridColumns({

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
 import { tDataGridColumn } from './types';
 import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
@@ -258,11 +258,18 @@ function useDataGridColumns({
     // I need AllColumns to trigger updates when it changes, because when I retrieve the persisted column state, I need to verify that those persisted columns actually exist within the columns defined in the Index Pattern. That’s why I need both.
   }, [appId, JSON.stringify([...allColumns])]);
 
+  // Convert column definitions to Record<string, EuiDataGridColumn>
+  const columnDefinitionsMap: Record<string, EuiDataGridColumn> = useMemo(
+    () =>
+      Object.fromEntries(columnDefinitions.map(column => [column.id, column])),
+    [columnDefinitions],
+  );
+
   const onColumnResize: EuiDataGridProps['onColumnResize'] = ({
     columnId,
     width,
   }) => {
-    const column = columnDefinitions.find(({ id }) => id === columnId);
+    const column = columnDefinitionsMap[columnId];
 
     if (column) {
       column.initialWidth = width;
@@ -275,7 +282,7 @@ function useDataGridColumns({
 
   const retrieveVisibleDataGridColumns = (): EuiDataGridColumn[] =>
     visibleColumns.map(columnId => {
-      const column = columnDefinitions.find(({ id }) => id === columnId);
+      const column = columnDefinitionsMap[columnId];
       const initialWidth =
         columnWidthStateManagement.retrieveState(appId)[columnId];
 
