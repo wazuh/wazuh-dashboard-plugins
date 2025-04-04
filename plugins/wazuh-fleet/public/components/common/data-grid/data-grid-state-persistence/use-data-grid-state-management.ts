@@ -15,6 +15,10 @@ const useDataGridStateManagement = <
   defaultState,
   validateState,
 }: UseDataGridStateManagementProps<State>) => {
+  const clearState = (moduleId: string) => {
+    stateManagement.clearState(moduleId);
+  };
+
   const retrieveState = (moduleId: string): State => {
     const state = stateManagement.retrieveState(moduleId);
     let isValid = false;
@@ -27,6 +31,7 @@ const useDataGridStateManagement = <
       isValid = validateState?.(state) || false;
     } catch (error) {
       console.error('Error validating state:', error);
+      clearState(moduleId);
     }
 
     if (isValid) {
@@ -38,10 +43,6 @@ const useDataGridStateManagement = <
 
   const persistState = (moduleId: string, payload: State): void => {
     stateManagement.persistState(moduleId, payload);
-  };
-
-  const clearState = (moduleId: string) => {
-    stateManagement.clearState(moduleId);
   };
 
   return {
