@@ -16,14 +16,14 @@ import { IndexPattern, SearchResponse } from 'src/plugins/data/public';
 import { useDataGrid, exportSearchToCSV, TDataGridColumn } from '../data-grid';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
-import useDataGridStateManagement from '../data-grid/data-grid-state-persistence/use-data-grid-state-management';
-import { DataGridState } from '../data-grid/data-grid-state-persistence/types';
+import useDataGridStatePersistenceManager from '../data-grid/data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
+import { DataGridState } from '../data-grid/data-grid-state-persistence-manager/types';
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGINATION_OPTIONS,
   MAX_ENTRIES_PER_QUERY,
 } from '../data-grid/constants';
-import { localStoragePageSizeStateManagement } from '../data-grid/data-grid-state-persistence/local-storage-page-size-state-management';
+import { localStoragePageSizeStatePersistenceManager } from '../data-grid/data-grid-state-persistence-manager/local-storage-page-size-state-persistence-manager';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import './wazuh-data-grid.scss';
 import { wzDiscoverRenderColumns } from './render-columns';
@@ -98,8 +98,8 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
   };
 
   const { retrieveState: retrievePageSize, persistState: persistPageSize } =
-    useDataGridStateManagement<DataGridState['pageSize']>({
-      stateManagement: localStoragePageSizeStateManagement,
+    useDataGridStatePersistenceManager<DataGridState['pageSize']>({
+      stateManagement: localStoragePageSizeStatePersistenceManager,
       defaultState: DEFAULT_PAGE_SIZE,
       validateState(state) {
         return typeof state === 'number' && Number.isInteger(state);

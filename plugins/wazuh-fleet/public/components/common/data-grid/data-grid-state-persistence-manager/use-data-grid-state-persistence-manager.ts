@@ -1,14 +1,14 @@
-import { DataGridState, DataGridStateManagement } from './types';
+import { DataGridState, DataGridStatePersistenceManager } from './types';
 
 interface UseDataGridStateManagementProps<
   State extends DataGridState[keyof DataGridState],
 > {
-  stateManagement: DataGridStateManagement<State>;
+  stateManagement: DataGridStatePersistenceManager<State>;
   defaultState: State;
   validateState?: (state: State) => boolean;
 }
 
-const useDataGridStateManagement = <
+const useDataGridStatePersistenceManager = <
   State extends DataGridState[keyof DataGridState],
 >({
   stateManagement,
@@ -52,4 +52,4 @@ const useDataGridStateManagement = <
   };
 };
 
-export default useDataGridStateManagement;
+export default useDataGridStatePersistenceManager;

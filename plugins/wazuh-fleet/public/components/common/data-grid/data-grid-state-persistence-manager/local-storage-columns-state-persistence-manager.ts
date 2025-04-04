@@ -1,6 +1,6 @@
 import { buildKey } from './build-key';
 import { KEY_STATE } from './constants';
-import { DataGridState, DataGridStateManagement } from './types';
+import { DataGridState, DataGridStatePersistenceManager } from './types';
 
 type DataGridColumns = DataGridState['columns'];
 
@@ -13,7 +13,7 @@ type DataGridColumns = DataGridState['columns'];
 // stringifying the data as needed. The retrieve methods return the parsed
 // state, while the persist methods store the state as a string in localStorage.
 // The clearState method removes the stored state for the given moduleId.
-export const localStorageColumnsStateManagement: DataGridStateManagement<DataGridColumns> =
+export const localStorageColumnsStatePersistenceManager: DataGridStatePersistenceManager<DataGridColumns> =
   {
     retrieveState(moduleId: string) {
       const state = localStorage.getItem(buildKey(moduleId, KEY_STATE.COLUMN));

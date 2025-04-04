@@ -4,7 +4,7 @@ export interface DataGridState {
   pageSize: number;
 }
 
-export interface DataGridStateManagement<
+export interface DataGridStatePersistenceManager<
   T extends DataGridState[keyof DataGridState],
 > {
   retrieveState: (moduleId: string) => T | null;

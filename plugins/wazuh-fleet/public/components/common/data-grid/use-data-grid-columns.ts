@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
 import { tDataGridColumn } from './types';
-import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
-import { DataGridState } from './data-grid-state-persistence/types';
-import { localStorageColumnsStateManagement } from './data-grid-state-persistence/local-storage-columns-state-management';
-import { localStorageColumnsWidthStateManagement } from './data-grid-state-persistence/local-storage-columns-width-state-management';
+import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
+import { DataGridState } from './data-grid-state-persistence-manager/types';
+import { localStorageColumnsStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-columns-state-persistence-manager';
+import { localStorageColumnsWidthStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-columns-width-state-persistence-manager';
 
 const MINIMUM_COLUMN_WIDTH = 40;
 const MAXIMUM_COLUMN_WIDTH = 1000;
@@ -83,10 +83,10 @@ function useDataGridColumns({
     [JSON.stringify(columnSchemaDefinitionsMap)],
   );
   // Create state management with memoized validation function
-  const columnStateManagement = useDataGridStateManagement<
+  const columnStateManagement = useDataGridStatePersistenceManager<
     DataGridState['columns']
   >({
-    stateManagement: localStorageColumnsStateManagement,
+    stateManagement: localStorageColumnsStatePersistenceManager,
     defaultState: defaultColumnsIds,
     validateState: state => {
       // Validate that the state is an array
@@ -110,10 +110,10 @@ function useDataGridColumns({
     },
   });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const columnWidthStateManagement = useDataGridStateManagement<
+  const columnWidthStateManagement = useDataGridStatePersistenceManager<
     DataGridState['columnsWidth']
   >({
-    stateManagement: localStorageColumnsWidthStateManagement,
+    stateManagement: localStorageColumnsWidthStatePersistenceManager,
     defaultState: {},
     validateState: state => {
       // Validate that the state is an object
