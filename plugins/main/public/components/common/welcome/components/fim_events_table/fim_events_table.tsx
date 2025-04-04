@@ -23,7 +23,7 @@ import {
   EuiFlexGroup,
   EuiToolTip,
   EuiLoadingContent,
-  EuiLoadingSpinner,
+  EuiProgress,
   EuiEmptyPrompt,
 } from '@elastic/eui';
 // @ts-ignore
@@ -145,13 +145,7 @@ const FlyoutDetailsFIM = compose(
       }
       return result;
     },
-    LoadingDataSourceComponent: () => (
-      <EuiFlexGroup justifyContent='center'>
-        <EuiFlexItem>
-          <EuiLoadingSpinner />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    ),
+    LoadingDataSourceComponent: () => <EuiProgress size='xs' color='primary' />,
     FetchingDataComponent: () => <EuiLoadingContent lines={6} />,
     ErrorFetchDataComponent: PromptErrorFetchingDocumentDataData,
   }),
