@@ -1,5 +1,6 @@
 export const KEY_STATE = {
   COLUMN: 'column',
+  COLUMN_WIDTH: 'column-width',
   PAGE_SIZE: 'page-size',
 } as const;
 
