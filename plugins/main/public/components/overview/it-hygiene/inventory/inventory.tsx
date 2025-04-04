@@ -108,7 +108,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem>
+          {/* For a table in the same row has not the problem when exit from full screen, but the panel could grow to fit the column, overflowing the width of the window. Set the widt as 100% fix the responsive problem.*/}
+          <EuiFlexItem style={{ width: '100%' }}>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
