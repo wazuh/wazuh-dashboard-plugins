@@ -1,32 +1,12 @@
 import { localStorageColumnsStatePersistenceManager } from './local-storage-columns-state-persistence-manager';
 import { buildKey } from './build-key';
 import { KEY_STATE } from './constants';
+import { setupLocalStorageMock } from './mocks/local-storage-mock';
 import type { DataGridState } from './types';
 
 describe('localStorageColumnsStatePersistenceManager', () => {
-  // Mock localStorage
-  const localStorageMock = (() => {
-    let store: Record<string, string> = {};
-
-    return {
-      getItem: jest.fn((key: string) => store[key] || null),
-      setItem: jest.fn((key: string, value: string) => {
-        store[key] = value;
-      }),
-      removeItem: jest.fn((key: string) => {
-        delete store[key];
-      }),
-      clear: jest.fn(() => {
-        store = {};
-      }),
-    };
-  })();
-
-  // Replace the global localStorage with our mock
-  Object.defineProperty(globalThis, 'localStorage', {
-    value: localStorageMock,
-    writable: true,
-  });
+  // Setup localStorage mock
+  const localStorageMock = setupLocalStorageMock();
 
   beforeEach(() => {
     // Clear all mocks before each test
