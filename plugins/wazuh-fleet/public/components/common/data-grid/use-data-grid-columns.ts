@@ -65,7 +65,6 @@ function useDataGridColumns({
             throw new Error(
               `Column ${columnId} does not exist in column definitions`,
             );
-            // Check if columns are unique
           }
         }
       }
@@ -282,8 +281,11 @@ function useDataGridColumns({
     const column = columnSchemaDefinitionsMap[columnId];
 
     if (column) {
+      const currentWidths =
+        columnWidthStateManagement.retrieveState(appId) || {};
+
       columnWidthStateManagement.persistState(appId, {
-        ...columnWidthStateManagement.retrieveState(appId),
+        ...currentWidths,
         [columnId]: width,
       });
     }
