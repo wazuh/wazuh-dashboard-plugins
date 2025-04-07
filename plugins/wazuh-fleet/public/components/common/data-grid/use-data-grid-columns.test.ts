@@ -71,7 +71,7 @@ describe('useDataGridColumns', () => {
       }),
     );
 
-    expect(result.current.columns).toHaveLength(2);
+    expect(result.current.columns).toHaveLength(defaultColumns.length);
     expect(result.current.columnVisibility.visibleColumns).toEqual(
       defaultColumns.map(col => col.id),
     );
@@ -172,6 +172,136 @@ describe('useDataGridColumns', () => {
       col1: testColumnWidth,
       col2: 200,
     });
+  });
+
+  it('should handle resize of column not in current width state', () => {
+    const testColumnId = 'col3';
+    const testColumnWidth = 180;
+
+    // Mock column widths with only some columns
+    mockRetrieveColumnsWidthState.mockReturnValue({
+      col1: 250,
+    });
+
+    const { result } = renderHook(() =>
+      useDataGridColumns({
+        appId,
+        defaultColumns,
+        columnSchemaDefinitions,
+      }),
+    );
+
+    act(() => {
+      result.current.onColumnResize({
+        columnId: testColumnId,
+        width: testColumnWidth,
+      });
+    });
+
+    // Should add the new column to the existing widths
+    expect(mockPersistColumnsWidthState).toHaveBeenCalledWith(appId, {
+      col1: 250,
+      col3: testColumnWidth,
+    });
+  });
+
+  it('should initialize with empty column widths when none are persisted', () => {
+    // Mock empty column widths
+    mockRetrieveColumnsWidthState.mockReturnValue({});
+
+    const { result } = renderHook(() =>
+      useDataGridColumns({
+        appId,
+        defaultColumns,
+        columnSchemaDefinitions,
+      }),
+    );
+    const testColumnId = 'col1';
+    const testColumnWidth = 150;
+
+    act(() => {
+      result.current.onColumnResize({
+        columnId: testColumnId,
+        width: testColumnWidth,
+      });
+    });
+
+    // Should persist only the resized column
+    expect(mockPersistColumnsWidthState).toHaveBeenCalledWith(appId, {
+      col1: testColumnWidth,
+    });
+  });
+
+  it('should handle multiple column resizes', () => {
+    // Initial column widths
+    mockRetrieveColumnsWidthState.mockReturnValue({
+      col1: 200,
+      col2: 200,
+    });
+
+    const { result } = renderHook(() =>
+      useDataGridColumns({
+        appId,
+        defaultColumns,
+        columnSchemaDefinitions,
+      }),
+    );
+
+    // First resize
+    act(() => {
+      result.current.onColumnResize({
+        columnId: 'col1',
+        width: 250,
+      });
+    });
+
+    mockRetrieveColumnsWidthState.mockReturnValue({
+      col1: 250,
+      col2: 200,
+    });
+
+    expect(mockPersistColumnsWidthState).toHaveBeenCalledWith(appId, {
+      col1: 250,
+      col2: 200,
+    });
+
+    // Second resize
+    act(() => {
+      result.current.onColumnResize({
+        columnId: 'col2',
+        width: 300,
+      });
+    });
+
+    expect(mockPersistColumnsWidthState).toHaveBeenLastCalledWith(appId, {
+      col1: 250,
+      col2: 300,
+    });
+  });
+
+  it('should handle resize with invalid column ID', () => {
+    mockRetrieveColumnsWidthState.mockReturnValue({
+      col1: 200,
+      col2: 200,
+    });
+
+    const { result } = renderHook(() =>
+      useDataGridColumns({
+        appId,
+        defaultColumns,
+        columnSchemaDefinitions,
+      }),
+    );
+
+    // Resize with invalid column ID
+    act(() => {
+      result.current.onColumnResize({
+        columnId: 'nonexistent',
+        width: 300,
+      });
+    });
+
+    expect(mockPersistColumnsWidthState).toHaveBeenCalledTimes(0);
   });
 
   it('should handle missing columns gracefully', () => {
