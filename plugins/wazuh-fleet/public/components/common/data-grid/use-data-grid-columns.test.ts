@@ -34,19 +34,26 @@ describe('useDataGridColumns', () => {
     (useDataGridStatePersistenceManager as jest.Mock).mockImplementation(
       params => {
         // Determine which state manager to return based on the stateManagementId
-        if (params.stateManagementId === 'columns') {
+        if (params.stateManagementId === 'column') {
           // This is the columns visibility state manager
           return {
             persistState: mockPersistColumnsState,
             retrieveState: mockRetrieveColumnsState,
           };
-        } else if (params.stateManagementId === 'columnsWidth') {
+        } else if (params.stateManagementId === 'column-width') {
           // This is the columns width state manager
           return {
             persistState: mockPersistColumnsWidthState,
             retrieveState: mockRetrieveColumnsWidthState,
           };
         }
+
+        // Default case, return empty functions
+        return {
+          persistState: jest.fn(),
+          retrieveState: jest.fn(),
+          clearState: jest.fn(),
+        };
       },
     );
 

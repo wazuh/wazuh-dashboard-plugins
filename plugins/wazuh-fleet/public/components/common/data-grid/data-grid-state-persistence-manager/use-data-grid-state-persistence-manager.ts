@@ -1,10 +1,11 @@
+import { KeyState } from './constants';
 import { DataGridState, DataGridStatePersistenceManager } from './types';
 
 interface UseDataGridStateManagementProps<
   State extends DataGridState[keyof DataGridState],
 > {
   /** Only for tests */
-  stateManagementId: keyof DataGridState;
+  stateManagementId: KeyState;
   stateManagement: DataGridStatePersistenceManager<State>;
   defaultState: State;
   validateState?: (state: State) => boolean;

@@ -85,7 +85,7 @@ function useDataGridColumns({
   const columnStateManagement = useDataGridStatePersistenceManager<
     DataGridState['columns']
   >({
-    stateManagementId: 'columns',
+    stateManagementId: 'column',
     stateManagement: localStorageColumnsStatePersistenceManager,
     defaultState: defaultColumnsIds,
     validateState: state => {
@@ -113,7 +113,7 @@ function useDataGridColumns({
   const columnWidthStateManagement = useDataGridStatePersistenceManager<
     DataGridState['columnsWidth']
   >({
-    stateManagementId: 'columnsWidth',
+    stateManagementId: 'column-width',
     stateManagement: localStorageColumnsWidthStatePersistenceManager,
     defaultState: {},
     validateState: state => {
