@@ -8,6 +8,8 @@ type MockState = number;
 describe('useDataGridStatePersistenceManager', () => {
   // Mock module ID for testing
   const moduleId = 'test-module';
+  // Mock stateManagement ID for testing
+  const stateManagementId = 'test-state-management';
   // Mock default state
   const defaultState: MockState = 10;
   // Mock persisted state
@@ -35,6 +37,7 @@ describe('useDataGridStatePersistenceManager', () => {
 
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
+        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
         validateState: mockValidateState,
@@ -52,6 +55,7 @@ describe('useDataGridStatePersistenceManager', () => {
 
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
+        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
         validateState: mockValidateState,
@@ -70,6 +74,7 @@ describe('useDataGridStatePersistenceManager', () => {
 
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
+        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
         validateState: mockValidateState,
@@ -91,6 +96,7 @@ describe('useDataGridStatePersistenceManager', () => {
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
+        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
         validateState: mockValidateState,
@@ -110,6 +116,7 @@ describe('useDataGridStatePersistenceManager', () => {
   it('should persist state correctly', () => {
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
+        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
         validateState: mockValidateState,
@@ -127,6 +134,7 @@ describe('useDataGridStatePersistenceManager', () => {
   it('should clear state correctly', () => {
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
+        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
         validateState: mockValidateState,
