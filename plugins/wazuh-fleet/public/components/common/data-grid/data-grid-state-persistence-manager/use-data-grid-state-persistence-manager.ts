@@ -3,6 +3,8 @@ import { DataGridState, DataGridStatePersistenceManager } from './types';
 interface UseDataGridStateManagementProps<
   State extends DataGridState[keyof DataGridState],
 > {
+  /** Only for tests */
+  stateManagementId: keyof DataGridState;
   stateManagement: DataGridStatePersistenceManager<State>;
   defaultState: State;
   validateState?: (state: State) => boolean;
