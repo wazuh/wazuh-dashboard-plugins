@@ -125,7 +125,7 @@ export const AgentDetails = ({
           panel: 1,
         },
         {
-          name: 'Threat intelligencey',
+          name: 'Threat intelligence',
           icon: 'lensApp',
           panel: 2,
         },
@@ -159,7 +159,7 @@ export const AgentDetails = ({
     {
       id: 2,
       initialFocusedItemIndex: 1,
-      title: 'Threat intelligencey',
+      title: 'Threat intelligence',
       items: [
         {
           name: 'Threat Hunting',

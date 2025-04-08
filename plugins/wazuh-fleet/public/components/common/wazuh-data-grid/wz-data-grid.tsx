@@ -270,7 +270,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
                 <DocumentViewTableAndJson
                   document={inspectedHit}
                   indexPattern={indexPattern as IndexPattern}
-                  renderFields={defaultColumns}
+                  renderFields={defaultColumns.filter(item => item.render)}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>

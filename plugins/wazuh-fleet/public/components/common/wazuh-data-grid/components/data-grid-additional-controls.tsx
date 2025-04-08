@@ -90,7 +90,7 @@ const DiscoverDataGridAdditionalControls = (
         className='euiDataGrid__controlBtn'
         onClick={onHandleExportResults}
       >
-        Export Formated
+        Export Formatted
       </EuiButtonEmpty>
       <DataGridVisibleColumnsSelector
         availableColumns={columnsAvailable}

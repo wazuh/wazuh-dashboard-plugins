@@ -195,9 +195,12 @@ export const AgentsTableGlobalActions = ({
           // setIsUpgradePanelClosed={setIsUpgradePanelClosed}
         />
       )}
+      {/*
+        TODO: Display as upgrade modal
+      */}
       <ConfirmModal
         isVisible={isDeleteAgentsVisible}
-        title='Delete agent'
+        title='Delete agents'
         message='Are you sure you want to delete this agent?'
         onConfirm={confirmDelete}
         onCancel={() => setIsDeleteAgentsVisible(false)}

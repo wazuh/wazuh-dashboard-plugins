@@ -141,9 +141,7 @@ export const EditAgentsGroupsModal = ({
   };
 
   const groupsText =
-    editAction === EditActionGroups.ADD
-      ? 'Select groups to add'
-      : 'Select groups to remove';
+    editAction === EditActionGroups.ADD ? 'Groups to add' : 'Groups to remove';
 
   const handleOnChangeGroupsSelect = (selectedGroups: Option[]) => {
     setSelectedGroups(selectedGroups);
