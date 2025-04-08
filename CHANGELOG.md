@@ -25,6 +25,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agent view not showing the latest agent state [#7336](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7336)
 - Fixed saved queries not displaying in the search bar [#7377](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7377)
 
+### Removed
+
+- Removed revision number from about page [#7390](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7390)
+
 ## Wazuh v4.11.2 - OpenSearch Dashboards 2.16.0 - Revision 02
 
 ### Added
