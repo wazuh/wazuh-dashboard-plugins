@@ -23,12 +23,10 @@ export const localStorageColumnsWidthStatePersistenceManager: DataGridStatePersi
       if (state) {
         try {
           return JSON.parse(state) as DataGridColumnsWidth;
-        } catch {
-          return {};
-        }
+        } catch {}
       }
 
-      return {};
+      return null;
     },
 
     persistState(moduleId: string, columns: DataGridColumnsWidth) {

@@ -24,12 +24,10 @@ export const localStoragePageSizeStatePersistenceManager: DataGridStatePersisten
       if (state) {
         try {
           return JSON.parse(state) as DataGridPageSize;
-        } catch {
-          return DEFAULT_PAGE_SIZE;
-        }
+        } catch {}
       }
 
-      return DEFAULT_PAGE_SIZE;
+      return null;
     },
 
     persistState(moduleId: string, pageSize: DataGridPageSize) {

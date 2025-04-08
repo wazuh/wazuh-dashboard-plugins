@@ -21,12 +21,10 @@ export const localStorageColumnsStatePersistenceManager: DataGridStatePersistenc
       if (state) {
         try {
           return JSON.parse(state) as DataGridColumns;
-        } catch {
-          return [];
-        }
+        } catch {}
       }
 
-      return [];
+      return null;
     },
 
     persistState(moduleId: string, columns: DataGridColumns) {

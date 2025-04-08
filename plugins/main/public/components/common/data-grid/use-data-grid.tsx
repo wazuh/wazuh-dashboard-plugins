@@ -52,7 +52,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     defaultColumns,
     renderColumns,
     useDefaultPagination = false,
-    pagination: paginationProps = {},
+    pagination: paginationProps = {} as typeof DEFAULT_PAGINATION_OPTIONS,
     filters = [],
     setFilters = () => {},
   } = props;
@@ -112,7 +112,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     useDataGridStatePersistenceManager<DataGridState['pageSize']>({
       stateManagementId: 'page-size',
       stateManagement: localStoragePageSizeStatePersistenceManager,
-      defaultState: DEFAULT_PAGE_SIZE,
+      defaultState: paginationProps.pageSize || DEFAULT_PAGE_SIZE,
       validateState(state) {
         return typeof state === 'number' && Number.isInteger(state);
       },
