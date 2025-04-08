@@ -33,9 +33,6 @@ import useSearchBar from '../search-bar/use-search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
-
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 import { withErrorBoundary } from '../hocs';
 import {
@@ -53,6 +50,9 @@ import DocDetailsHeader from './components/doc-details-header';
 import { tDataGridColumn } from '../data-grid/types';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
+
+const DashboardByRenderer =
+  getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 export type WazuhDiscoverProps = {
   moduleId: string;
