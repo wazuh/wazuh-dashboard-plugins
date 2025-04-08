@@ -1,7 +1,7 @@
 import { DEFAULT_PAGE_SIZE } from '../constants';
 import { buildKey } from './build-key';
-import { KeyState } from './constants';
-import { DataGridState, DataGridStateManagement } from './types';
+import { KEY_STATE } from './constants';
+import { DataGridState, DataGridStatePersistenceManager } from './types';
 
 type DataGridPageSize = DataGridState['pageSize'];
 
@@ -14,12 +14,13 @@ type DataGridPageSize = DataGridState['pageSize'];
 // stringifying the data as needed. The retrieve methods return the parsed
 // state, while the persist methods store the state as a string in localStorage.
 // The clearState method removes the stored state for the given moduleId.
-export const localStoragePageSizeStateManagement: DataGridStateManagement<DataGridPageSize> =
+export const localStoragePageSizeStatePersistenceManager: DataGridStatePersistenceManager<DataGridPageSize> =
   {
     retrieveState(moduleId: string) {
       const state = localStorage.getItem(
-        buildKey(moduleId, KeyState.PAGE_SIZE),
+        buildKey(moduleId, KEY_STATE.PAGE_SIZE),
       );
+
       if (state) {
         try {
           return JSON.parse(state) as DataGridPageSize;
@@ -27,17 +28,18 @@ export const localStoragePageSizeStateManagement: DataGridStateManagement<DataGr
           return DEFAULT_PAGE_SIZE;
         }
       }
+
       return DEFAULT_PAGE_SIZE;
     },
 
     persistState(moduleId: string, pageSize: DataGridPageSize) {
       localStorage.setItem(
-        buildKey(moduleId, KeyState.PAGE_SIZE),
+        buildKey(moduleId, KEY_STATE.PAGE_SIZE),
         String(pageSize),
       );
     },
 
     clearState(moduleId: string) {
-      localStorage.removeItem(buildKey(moduleId, KeyState.PAGE_SIZE));
+      localStorage.removeItem(buildKey(moduleId, KEY_STATE.PAGE_SIZE));
     },
   };

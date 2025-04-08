@@ -1,7 +1,6 @@
-import { DEFAULT_PAGE_SIZE } from '../constants';
 import { buildKey } from './build-key';
-import { KeyState } from './constants';
-import { DataGridState, DataGridStateManagement } from './types';
+import { KEY_STATE } from './constants';
+import { DataGridState, DataGridStatePersistenceManager } from './types';
 
 type DataGridColumns = DataGridState['columns'];
 
@@ -14,10 +13,11 @@ type DataGridColumns = DataGridState['columns'];
 // stringifying the data as needed. The retrieve methods return the parsed
 // state, while the persist methods store the state as a string in localStorage.
 // The clearState method removes the stored state for the given moduleId.
-export const localStorageColumnsStateManagement: DataGridStateManagement<DataGridColumns> =
+export const localStorageColumnsStatePersistenceManager: DataGridStatePersistenceManager<DataGridColumns> =
   {
     retrieveState(moduleId: string) {
-      const state = localStorage.getItem(buildKey(moduleId, KeyState.COLUMN));
+      const state = localStorage.getItem(buildKey(moduleId, KEY_STATE.COLUMN));
+
       if (state) {
         try {
           return JSON.parse(state) as DataGridColumns;
@@ -25,17 +25,18 @@ export const localStorageColumnsStateManagement: DataGridStateManagement<DataGri
           return [];
         }
       }
+
       return [];
     },
 
     persistState(moduleId: string, columns: DataGridColumns) {
       localStorage.setItem(
-        buildKey(moduleId, KeyState.COLUMN),
+        buildKey(moduleId, KEY_STATE.COLUMN),
         JSON.stringify(columns),
       );
     },
 
     clearState(moduleId: string) {
-      localStorage.removeItem(buildKey(moduleId, KeyState.COLUMN));
+      localStorage.removeItem(buildKey(moduleId, KEY_STATE.COLUMN));
     },
   };

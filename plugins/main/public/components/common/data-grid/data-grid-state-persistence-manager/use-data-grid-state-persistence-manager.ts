@@ -1,34 +1,51 @@
-import { DataGridState, DataGridStateManagement } from './types';
+import { KeyState } from './constants';
+import { DataGridState, DataGridStatePersistenceManager } from './types';
 
 interface UseDataGridStateManagementProps<
   State extends DataGridState[keyof DataGridState],
 > {
-  stateManagement: DataGridStateManagement<State>;
+  /** Only for tests */
+  stateManagementId: KeyState;
+  stateManagement: DataGridStatePersistenceManager<State>;
   defaultState: State;
   validateState?: (state: State) => boolean;
 }
 
-const useDataGridStateManagement = <
+const useDataGridStatePersistenceManager = <
   State extends DataGridState[keyof DataGridState],
 >({
   stateManagement,
   defaultState,
   validateState,
 }: UseDataGridStateManagementProps<State>) => {
+  const clearState = (moduleId: string) => {
+    stateManagement.clearState(moduleId);
+  };
+
   const retrieveState = (moduleId: string): State => {
     const state = stateManagement.retrieveState(moduleId);
-    if (state && validateState?.(state)) {
+    let isValid = false;
+
+    if (!state) {
+      return defaultState;
+    }
+
+    try {
+      isValid = validateState?.(state) || false;
+    } catch (error) {
+      console.error('Error validating state:', error);
+      clearState(moduleId);
+    }
+
+    if (isValid) {
       return state;
     }
+
     return defaultState;
   };
 
   const persistState = (moduleId: string, payload: State): void => {
     stateManagement.persistState(moduleId, payload);
-  };
-
-  const clearState = (moduleId: string) => {
-    stateManagement.clearState(moduleId);
   };
 
   return {
@@ -38,4 +55,4 @@ const useDataGridStateManagement = <
   };
 };
 
-export default useDataGridStateManagement;
+export default useDataGridStatePersistenceManager;
