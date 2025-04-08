@@ -1,6 +1,7 @@
 import {
   EuiDataGridCellValueElementProps,
   EuiDataGridProps,
+  EuiDataGridSorting,
 } from '@elastic/eui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
@@ -15,20 +16,16 @@ import {
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
 import dompurify from 'dompurify';
-import {
-  SortingColumns,
-  tDataGridColumn,
-  tDataGridRenderColumn,
-} from './types';
+import { tDataGridColumn, tDataGridRenderColumn } from './types';
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGINATION_OPTIONS,
   MAX_ENTRIES_PER_QUERY,
 } from './constants';
 import useDataGridColumns from './use-data-grid-columns';
-import useDataGridStateManagement from './data-grid-state-persistence/use-data-grid-state-management';
-import { DataGridState } from './data-grid-state-persistence/types';
-import { localStoragePageSizeStateManagement } from './data-grid-state-persistence/local-storage-page-size-state-management';
+import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
+import { DataGridState } from './data-grid-state-persistence-manager/types';
+import { localStoragePageSizeStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-page-size-state-persistence-manager';
 
 export type tDataGridProps = {
   moduleId: string;
@@ -62,12 +59,14 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
   const rowCount = results ? (results?.hits?.total as number) : 0;
+
   /** Sorting **/
   // get default sorting from default columns
   const getDefaultSorting = () => {
     const defaultSort = defaultColumns.find(
       column => column.isSortable || column.defaultSortDirection,
     );
+
     return defaultSort
       ? [
           {
@@ -77,11 +76,14 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         ]
       : [];
   };
-  const defaultSorting: SortingColumns = getDefaultSorting();
+
+  const defaultSorting: EuiDataGridSorting['columns'] = getDefaultSorting();
   const [sortingColumns, setSortingColumns] = useState(defaultSorting);
-  const onSort = (sortingColumns: SortingColumns) => {
+
+  const onSort = (sortingColumns: EuiDataGridSorting['columns']) => {
     setSortingColumns(sortingColumns);
   };
+
   /** Pagination **/
   const [pagination, setPagination] = useState<
     typeof DEFAULT_PAGINATION_OPTIONS
@@ -94,7 +96,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         },
   );
 
-  const columnDefinitions = useMemo(() => {
+  const columnSchemaDefinitions = useMemo(() => {
     return parseColumns(
       indexPattern?.fields || [],
       defaultColumns,
@@ -107,8 +109,9 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
 
   const { retrieveState: retrievePageSize, persistState: persistPageSize } =
-    useDataGridStateManagement<DataGridState['pageSize']>({
-      stateManagement: localStoragePageSizeStateManagement,
+    useDataGridStatePersistenceManager<DataGridState['pageSize']>({
+      stateManagementId: 'page-size',
+      stateManagement: localStoragePageSizeStatePersistenceManager,
       defaultState: DEFAULT_PAGE_SIZE,
       validateState(state) {
         return typeof state === 'number' && Number.isInteger(state);
@@ -122,13 +125,12 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     }));
   }, [moduleId]);
 
-  const { columnsAvailable, columns, columnVisibility } = useDataGridColumns({
-    moduleId,
-    defaultColumns: defaultColumns.map(({ id }) => id),
-    columnDefinitions,
-    allColumns: new Set(indexPattern?.fields?.map(({ name }) => name) || []),
-  });
-
+  const { columnsAvailable, columns, columnVisibility, onColumnResize } =
+    useDataGridColumns({
+      moduleId,
+      defaultColumns,
+      columnSchemaDefinitions,
+    });
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) => {
       setPagination(pagination => ({
@@ -158,11 +160,12 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     rowIndex: number;
     columnId: string;
   }) => {
-    const rowsParsed = parseData(rows);
+    const rowsParsed = parseData(rows) || [];
     // On the context data always is stored the current page data (pagination)
     // then the rowIndex is relative to the current page
     const relativeRowIndex = rowIndex % pagination.pageSize;
-    if (rowsParsed.hasOwnProperty(relativeRowIndex)) {
+
+    if (Object.prototype.hasOwnProperty.call(rowsParsed, relativeRowIndex)) {
       const fieldFormatted = getFieldFormatted(
         relativeRowIndex,
         columnId,
@@ -171,13 +174,16 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       );
       // check if column have render method initialized
       const column = defaultColumns.find(column => column.id === columnId);
+
       if (column && column.render) {
         return column.render(fieldFormatted, rowsParsed[relativeRowIndex]);
       }
+
       // check if column have render method in renderColumns prop
       const renderColumn = renderColumns?.find(
         column => column.id === columnId,
       );
+
       if (renderColumn) {
         return renderColumn.render(
           fieldFormatted,
@@ -224,6 +230,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     columnsAvailable, // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
     columns,
     columnVisibility,
+    onColumnResize,
     renderCellValue: renderCellValue,
     leadingControlColumns: leadingControlColumns,
     rowCount: Math.min(rowCount, MAX_ENTRIES_PER_QUERY),
