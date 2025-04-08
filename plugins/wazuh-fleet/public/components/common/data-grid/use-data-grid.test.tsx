@@ -144,9 +144,12 @@ describe('useDataGrid hook', () => {
 
     it('should reset to page 0 when results change', () => {
       const props = createBaseProps();
-      const { result, rerender } = renderHook(props => useDataGrid(props), {
-        initialProps: props,
-      });
+      const { result, rerender } = renderHook(
+        (props: DataGridProps) => useDataGrid(props),
+        {
+          initialProps: props,
+        },
+      );
 
       // Go to page 2
       act(() => {
@@ -225,9 +228,12 @@ describe('useDataGrid hook', () => {
       const props = createBaseProps({
         results: createMockSearchResponse(5, 5),
       });
-      const { result, rerender } = renderHook(props => useDataGrid(props), {
-        initialProps: props,
-      });
+      const { result, rerender } = renderHook(
+        (props: DataGridProps) => useDataGrid(props),
+        {
+          initialProps: props,
+        },
+      );
 
       expect(result.current.rowCount).toBe(5);
 
