@@ -1,4 +1,3 @@
-import { DEFAULT_PAGE_SIZE } from '../constants';
 import { localStoragePageSizeStatePersistenceManager } from './local-storage-page-size-state-persistence-manager';
 import { buildKey } from './build-key';
 import { KEY_STATE } from './constants';
@@ -51,7 +50,7 @@ describe('localStoragePageSizeStatePersistenceManager', () => {
         localStoragePageSizeStatePersistenceManager.retrieveState(moduleId);
 
       // Assert
-      expect(result).toEqual(DEFAULT_PAGE_SIZE);
+      expect(result).toEqual(null);
       expect(localStorage.getItem).toHaveBeenCalledWith(
         buildKey(moduleId, KEY_STATE.PAGE_SIZE),
       );
@@ -65,7 +64,7 @@ describe('localStoragePageSizeStatePersistenceManager', () => {
         localStoragePageSizeStatePersistenceManager.retrieveState(moduleId);
 
       // Assert
-      expect(result).toEqual(DEFAULT_PAGE_SIZE);
+      expect(result).toEqual(null);
       expect(localStorage.getItem).toHaveBeenCalledWith(
         buildKey(moduleId, KEY_STATE.PAGE_SIZE),
       );

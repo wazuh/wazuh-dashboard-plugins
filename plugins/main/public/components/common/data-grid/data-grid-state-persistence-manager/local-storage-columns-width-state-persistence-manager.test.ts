@@ -53,7 +53,7 @@ describe('localStorageColumnsWidthStatePersistenceManager', () => {
         localStorageColumnsWidthStatePersistenceManager.retrieveState(moduleId);
 
       // Assert
-      expect(result).toEqual({});
+      expect(result).toEqual(null);
       expect(localStorage.getItem).toHaveBeenCalledWith(
         buildKey(moduleId, KEY_STATE.COLUMN_WIDTH),
       );
@@ -67,7 +67,7 @@ describe('localStorageColumnsWidthStatePersistenceManager', () => {
         localStorageColumnsWidthStatePersistenceManager.retrieveState(moduleId);
 
       // Assert
-      expect(result).toEqual({});
+      expect(result).toEqual(null);
       expect(localStorage.getItem).toHaveBeenCalledWith(
         buildKey(moduleId, KEY_STATE.COLUMN_WIDTH),
       );

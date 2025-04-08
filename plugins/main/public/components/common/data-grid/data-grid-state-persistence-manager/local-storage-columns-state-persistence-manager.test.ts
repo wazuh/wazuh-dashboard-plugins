@@ -50,7 +50,7 @@ describe('localStorageColumnsStatePersistenceManager', () => {
         localStorageColumnsStatePersistenceManager.retrieveState(moduleId);
 
       // Assert
-      expect(result).toEqual([]);
+      expect(result).toEqual(null);
       expect(localStorage.getItem).toHaveBeenCalledWith(
         buildKey(moduleId, KEY_STATE.COLUMN),
       );
@@ -64,7 +64,7 @@ describe('localStorageColumnsStatePersistenceManager', () => {
         localStorageColumnsStatePersistenceManager.retrieveState(moduleId);
 
       // Assert
-      expect(result).toEqual([]);
+      expect(result).toEqual(null);
       expect(localStorage.getItem).toHaveBeenCalledWith(
         buildKey(moduleId, KEY_STATE.COLUMN),
       );
