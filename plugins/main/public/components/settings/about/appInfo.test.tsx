@@ -13,7 +13,6 @@ describe('SettingsAboutAppInfo component', () => {
       <SettingsAboutAppInfo
         appInfo={{
           'app-version': '4.8.0',
-          revision: '01',
         }}
       />,
     );
@@ -22,7 +21,5 @@ describe('SettingsAboutAppInfo component', () => {
 
     expect(getByText('App version:')).toBeInTheDocument();
     expect(getByText('4.8.0')).toBeInTheDocument();
-    expect(getByText('App revision:')).toBeInTheDocument();
-    expect(getByText('01')).toBeInTheDocument();
   });
 });
