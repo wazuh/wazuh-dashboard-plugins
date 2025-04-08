@@ -101,7 +101,7 @@ describe('EditAgentsGroupsModal component', () => {
 
     // Check form elements
     expect(getByText('Selected agents')).toBeInTheDocument();
-    expect(getByLabelText('Select groups to add')).toBeInTheDocument();
+    expect(getByLabelText('Groups to add')).toBeInTheDocument();
     // Number of selected agents
     expect(getByText('2')).toBeInTheDocument();
 
@@ -137,7 +137,7 @@ describe('EditAgentsGroupsModal component', () => {
     expect(getByText('Remove groups from agents')).toBeInTheDocument();
 
     // Check form elements
-    expect(getByLabelText('Select groups to remove')).toBeInTheDocument();
+    expect(getByLabelText('Groups to remove')).toBeInTheDocument();
 
     // Warning should not be shown when allAgentsSelected is false
     expect(
