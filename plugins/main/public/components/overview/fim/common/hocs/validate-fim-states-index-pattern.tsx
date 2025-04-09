@@ -10,9 +10,7 @@ import {
 
 const errorPromptTypes = {
   [ERROR_NO_INDICES_FOUND]: {
-    title: () => (
-      <h2>File integrity monitoring could be disabled or has a problem</h2>
-    ),
+    title: () => 'File integrity monitoring could be disabled or has a problem',
     body: ({ message }: { message: React.ReactNode }) => (
       <>
         <p>{message}</p>
