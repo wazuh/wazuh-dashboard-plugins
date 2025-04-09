@@ -7,7 +7,7 @@ const MAXIMUM_COLUMN_WIDTH = 1000;
 
 interface UseDataGridStateManagementProps {
   stateManagement: ReturnType<DataGridStatePersistenceManager<DataGridState>>;
-  defaultState: DataGridState;
+  defaultState: Partial<DataGridState>;
   columnSchemaDefinitionsMap: Record<string, unknown>;
   updateCallback?: (state: Partial<DataGridState>) => void;
 }
