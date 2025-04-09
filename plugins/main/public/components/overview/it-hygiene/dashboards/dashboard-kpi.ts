@@ -1,10 +1,10 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 
-const getVisStateStatWindowsUpdates = (indexPatternId: string) => {
+const getVisStateStatOperatingSystems = (indexPatternId: string) => {
   return {
-    id: 'it-hygiene-stat-windows-updates',
-    title: 'Windows updates',
+    id: 'it-hygiene-stat-unique-operating-systems',
+    title: 'Unique operating systems',
     type: 'metric',
     params: {
       addTooltip: true,
@@ -54,8 +54,11 @@ const getVisStateStatWindowsUpdates = (indexPatternId: string) => {
         {
           id: '1',
           enabled: true,
-          type: 'count',
-          params: {},
+          type: 'cardinality',
+          params: {
+            field: 'host.os.full',
+            customLabel: 'Unique count',
+          },
           schema: 'metric',
         },
         {
@@ -66,10 +69,10 @@ const getVisStateStatWindowsUpdates = (indexPatternId: string) => {
             filters: [
               {
                 input: {
-                  query: 'package.hotfix.name:*',
+                  query: 'host.os.full:*',
                   language: 'kuery',
                 },
-                label: 'Windows updates',
+                label: 'Operating systems',
               },
             ],
           },
@@ -378,7 +381,7 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's4',
-        savedVis: getVisStateStatWindowsUpdates(indexPatternId),
+        savedVis: getVisStateStatOperatingSystems(indexPatternId),
       },
     },
   };

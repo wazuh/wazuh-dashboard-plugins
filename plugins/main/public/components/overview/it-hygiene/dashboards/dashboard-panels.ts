@@ -57,7 +57,7 @@ const getVisStateTopOSFamilies = (indexPatternId: string) => {
         {
           show: true,
           type: 'histogram',
-          mode: 'stacked',
+          mode: 'normal',
           data: {
             label: 'Count',
             id: '1',
@@ -69,7 +69,7 @@ const getVisStateTopOSFamilies = (indexPatternId: string) => {
         },
       ],
       addTooltip: true,
-      addLegend: false,
+      addLegend: true,
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
@@ -81,11 +81,7 @@ const getVisStateTopOSFamilies = (indexPatternId: string) => {
         style: 'full',
         color: '#E7664C',
       },
-    },
-    uiState: {
-      vis: {
-        legendOpen: false,
-      },
+      row: true,
     },
     data: {
       searchSource: {
@@ -108,9 +104,7 @@ const getVisStateTopOSFamilies = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: {
-            customLabel: 'Count',
-          },
+          params: {},
           schema: 'metric',
         },
         {
@@ -126,19 +120,18 @@ const getVisStateTopOSFamilies = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Host OS type',
           },
-          schema: 'segment',
+          schema: 'group',
         },
       ],
     },
   };
 };
 
-const getVisStateTopAgentsWithMoreListeningPorts = (indexPatternId: string) => {
+const getVisStateTopAgentsByRemotePorts = (indexPatternId: string) => {
   return {
     id: 'it-hygiene-top-10-agents-with-more-ports',
-    title: 'Top 10 agents with more ports',
+    title: 'Top 10 agents by remote ports',
     type: 'pie',
     params: {
       type: 'pie',
@@ -460,7 +453,7 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateTopAgentsWithMoreListeningPorts(indexPatternId),
+        savedVis: getVisStateTopAgentsByRemotePorts(indexPatternId),
       },
     },
     '2': {

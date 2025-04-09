@@ -160,9 +160,9 @@ export const getDashboardTables = (
         savedVis: getVisStateFilter(
           'it-hygiene-top-operating-system-names',
           indexPatternId,
-          'Top installed Windows updates',
-          'Top 5 Windows updates',
-          'package.hotfix.name',
+          'Top ports',
+          'Top 5 local ports',
+          'destination.port',
         ),
       },
     },
