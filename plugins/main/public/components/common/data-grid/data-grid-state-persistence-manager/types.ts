@@ -4,8 +4,10 @@ export interface DataGridState {
   pageSize: number;
 }
 
-export interface DataGridStatePersistenceManager<T extends DataGridState> {
-  retrieveState: (moduleId: string) => Partial<T> | null;
-  persistState: (moduleId: string, payload: Partial<T>) => void;
-  clearState: (moduleId: string) => void;
-}
+export type DataGridStatePersistenceManager<T extends DataGridState> = (
+  moduleId: string,
+) => {
+  retrieveState: () => Partial<T> | null;
+  persistState: (payload: Partial<T>) => void;
+  clearState: () => void;
+};

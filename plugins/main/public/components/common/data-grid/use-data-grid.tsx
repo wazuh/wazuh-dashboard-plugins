@@ -121,8 +121,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   );
 
   const dataGridStateManager = useDataGridStatePersistenceManager({
-    moduleId,
-    stateManagement: localStorageStatePersistenceManager,
+    stateManagement: localStorageStatePersistenceManager(moduleId),
     defaultState: {
       columns: defaultColumns.map(column => column.id),
       columnsWidth: {},

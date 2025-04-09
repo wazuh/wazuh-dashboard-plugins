@@ -30,8 +30,7 @@ function useDataGridColumns({
 
   // Create state management with memoized validation function
   const dataGridStateManager = useDataGridStatePersistenceManager({
-    moduleId,
-    stateManagement: localStorageStatePersistenceManager,
+    stateManagement: localStorageStatePersistenceManager(moduleId),
     defaultState: {
       columns: defaultColumnsIds,
       columnsWidth: {},

@@ -6,15 +6,13 @@ const MINIMUM_COLUMN_WIDTH = 40;
 const MAXIMUM_COLUMN_WIDTH = 1000;
 
 interface UseDataGridStateManagementProps {
-  moduleId: string;
-  stateManagement: DataGridStatePersistenceManager<DataGridState>;
+  stateManagement: ReturnType<DataGridStatePersistenceManager<DataGridState>>;
   defaultState: DataGridState;
   columnSchemaDefinitionsMap: Record<string, unknown>;
   updateCallback?: (state: Partial<DataGridState>) => void;
 }
 
 const useDataGridStatePersistenceManager = ({
-  moduleId,
   stateManagement,
   defaultState,
   columnSchemaDefinitionsMap,
@@ -96,7 +94,7 @@ const useDataGridStatePersistenceManager = ({
         }
       }
     }
-  }, [moduleId, JSON.stringify(columnSchemaDefinitionsMap)]);
+  }, [JSON.stringify(columnSchemaDefinitionsMap)]);
 
   const validateColumnsState = (columnIds: DataGridState['columns']) => {
     // Validate that the state is an array
@@ -171,14 +169,14 @@ const useDataGridStatePersistenceManager = ({
   };
 
   const clearState = () => {
-    stateManagement.clearState(moduleId);
+    stateManagement.clearState();
   };
 
   const retrieveState = (): DataGridState => {
     const state: DataGridState = Object.assign(
       {},
       defaultState,
-      stateManagement.retrieveState(moduleId),
+      stateManagement.retrieveState(),
     );
     let isValid = false;
 
@@ -223,7 +221,7 @@ const useDataGridStatePersistenceManager = ({
   };
 
   const persistState = (payload: Partial<DataGridState>): void => {
-    stateManagement.persistState(moduleId, payload);
+    stateManagement.persistState(payload);
   };
 
   const updateState = (payload: Partial<DataGridState>): void => {

@@ -10,27 +10,28 @@ import { DataGridState, DataGridStatePersistenceManager } from './types';
 // stringifying the data as needed. The retrieve methods return the parsed
 // state, while the persist methods store the state as a string in localStorage.
 // The clearState method removes the stored state for the given moduleId.
-export const localStorageStatePersistenceManager: DataGridStatePersistenceManager<DataGridState> =
-  {
-    retrieveState(moduleId: string) {
-      const state = localStorage.getItem(buildKey(moduleId)) || '{}';
+export const localStorageStatePersistenceManager: DataGridStatePersistenceManager<
+  DataGridState
+> = (moduleId: string) => ({
+  retrieveState() {
+    const state = localStorage.getItem(buildKey(moduleId)) || '{}';
 
-      if (state) {
-        try {
-          return JSON.parse(state) as DataGridState;
-        } catch {
-          return {};
-        }
+    if (state) {
+      try {
+        return JSON.parse(state) as DataGridState;
+      } catch {
+        return {};
       }
+    }
 
-      return {};
-    },
+    return {};
+  },
 
-    persistState(moduleId: string, payload: Partial<DataGridState>) {
-      localStorage.setItem(buildKey(moduleId), JSON.stringify(payload));
-    },
+  persistState(payload: Partial<DataGridState>) {
+    localStorage.setItem(buildKey(moduleId), JSON.stringify(payload));
+  },
 
-    clearState(moduleId: string) {
-      localStorage.removeItem(buildKey(moduleId));
-    },
-  };
+  clearState() {
+    localStorage.removeItem(buildKey(moduleId));
+  },
+});
