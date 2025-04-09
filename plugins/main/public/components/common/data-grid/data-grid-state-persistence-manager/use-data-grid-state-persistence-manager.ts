@@ -61,41 +61,6 @@ const useDataGridStatePersistenceManager = ({
     [JSON.stringify(columnSchemaDefinitionsMap)],
   );
 
-  useEffect(() => {
-    if (
-      columnSchemaDefinitionsMap &&
-      Object.keys(columnSchemaDefinitionsMap).length > 0
-    ) {
-      try {
-        // Get current persisted state for validation
-        const persistedColumns = retrieveState().columns;
-
-        if (
-          persistedColumns &&
-          Array.isArray(persistedColumns) &&
-          persistedColumns.length > 0
-        ) {
-          validateColumns(persistedColumns);
-        }
-      } catch (error) {
-        console.error(
-          'Column validation failed after allColumns changed:',
-          error,
-        );
-
-        // If validation fails, reset to default columns
-        try {
-          const prevState = retrieveState();
-          const newState = { ...prevState, columns: defaultState.columns };
-          updateState(newState);
-          updateCallback?.(newState);
-        } catch (resetError) {
-          console.error('Failed to reset columns to defaults:', resetError);
-        }
-      }
-    }
-  }, [JSON.stringify(columnSchemaDefinitionsMap)]);
-
   const validateColumnsState = (columnIds: DataGridState['columns']) => {
     // Validate that the state is an array
     if (!Array.isArray(columnIds)) {
