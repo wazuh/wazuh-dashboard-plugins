@@ -9,18 +9,24 @@ jest.mock(
 );
 
 describe('useDataGridColumns', () => {
-  // Mock functions for column visibility state
-  const mockPersistColumnsState = jest.fn();
-  const mockRetrieveColumnsState = jest.fn();
-  // Mock functions for column width state
-  const mockPersistColumnsWidthState = jest.fn();
-  const mockRetrieveColumnsWidthState = jest.fn();
+  // Mock functions for state persistence manager
+  const mockPersistState = jest.fn();
+  const mockRetrieveState = jest.fn();
+  const mockUpdateState = jest.fn();
+  const mockClearState = jest.fn();
+
   // Sample test data
   const moduleId = 'test-app';
   const defaultColumns: TDataGridColumn[] = [
     { id: 'col1', display: 'Column 1' },
     { id: 'col2', display: 'Column 2' },
   ];
+  // Add a mapping for column definitions
+  const columnSchemaDefinitionsMap = {
+    col1: { id: 'col1', display: 'Column 1' },
+    col2: { id: 'col2', display: 'Column 2' },
+    col3: { id: 'col3', display: 'Column 3' },
+  };
   const columnSchemaDefinitions: TDataGridColumn[] = [
     { id: 'col1', display: 'Column 1' },
     { id: 'col2', display: 'Column 2' },
@@ -30,36 +36,22 @@ describe('useDataGridColumns', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Setup mock implementation to return different values for each call
-    (useDataGridStatePersistenceManager as jest.Mock).mockImplementation(
-      params => {
-        // Determine which state manager to return based on the stateManagementId
-        if (params.stateManagementId === 'column') {
-          // This is the columns visibility state manager
-          return {
-            persistState: mockPersistColumnsState,
-            retrieveState: mockRetrieveColumnsState,
-          };
-        } else if (params.stateManagementId === 'column-width') {
-          // This is the columns width state manager
-          return {
-            persistState: mockPersistColumnsWidthState,
-            retrieveState: mockRetrieveColumnsWidthState,
-          };
-        }
+    // Setup mock implementation for the persistence manager
+    (useDataGridStatePersistenceManager as jest.Mock).mockImplementation(() => {
+      return {
+        persistState: mockPersistState,
+        retrieveState: mockRetrieveState,
+        updateState: mockUpdateState,
+        clearState: mockClearState,
+      };
+    });
 
-        // Default case, return empty functions
-        return {
-          persistState: jest.fn(),
-          retrieveState: jest.fn(),
-          clearState: jest.fn(),
-        };
-      },
-    );
-
-    // Default behavior for retrieveState functions
-    mockRetrieveColumnsState.mockReturnValue([]);
-    mockRetrieveColumnsWidthState.mockReturnValue({});
+    // Default behavior for retrieveState function
+    mockRetrieveState.mockReturnValue({
+      columns: [],
+      columnsWidth: {},
+      pageSize: 10,
+    });
   });
 
   it('should initialize with default columns', () => {
@@ -67,7 +59,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
@@ -80,13 +72,17 @@ describe('useDataGridColumns', () => {
   it('should load persisted columns when available', () => {
     const persistedColumns = ['col2', 'col1'];
 
-    mockRetrieveColumnsState.mockReturnValue(persistedColumns);
+    mockRetrieveState.mockReturnValue({
+      columns: persistedColumns,
+      columnsWidth: {},
+      pageSize: 10,
+    });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
@@ -100,7 +96,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
     const newVisibleColumns = ['col2', 'col3'];
@@ -112,23 +108,24 @@ describe('useDataGridColumns', () => {
     expect(result.current.columnVisibility.visibleColumns).toEqual(
       newVisibleColumns,
     );
-    expect(mockPersistColumnsState).toHaveBeenCalledWith(
-      moduleId,
-      newVisibleColumns,
-    );
+    expect(mockUpdateState).toHaveBeenCalledWith({
+      columns: newVisibleColumns,
+    });
   });
 
   it('should order columns correctly in columnsAvailable', () => {
     // Use defaultColumns to get column IDs but in reversed order
-    mockRetrieveColumnsState.mockReturnValue(
-      defaultColumns.map(col => col.id).reverse(),
-    );
+    mockRetrieveState.mockReturnValue({
+      columns: defaultColumns.map(col => col.id).reverse(),
+      columnsWidth: {},
+      pageSize: 10,
+    });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
@@ -148,16 +145,20 @@ describe('useDataGridColumns', () => {
     const testColumnWidth = 150;
 
     // Mock column widths
-    mockRetrieveColumnsWidthState.mockReturnValue({
-      col1: 250,
-      col2: 200,
+    mockRetrieveState.mockReturnValue({
+      columns: ['col1', 'col2'],
+      columnsWidth: {
+        col1: 250,
+        col2: 200,
+      },
+      pageSize: 10,
     });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
@@ -168,9 +169,11 @@ describe('useDataGridColumns', () => {
       });
     });
 
-    expect(mockPersistColumnsWidthState).toHaveBeenCalledWith(moduleId, {
-      col1: testColumnWidth,
-      col2: 200,
+    expect(mockUpdateState).toHaveBeenCalledWith({
+      columnsWidth: {
+        col1: testColumnWidth,
+        col2: 200,
+      },
     });
   });
 
@@ -179,15 +182,19 @@ describe('useDataGridColumns', () => {
     const testColumnWidth = 180;
 
     // Mock column widths with only some columns
-    mockRetrieveColumnsWidthState.mockReturnValue({
-      col1: 250,
+    mockRetrieveState.mockReturnValue({
+      columns: ['col1', 'col2', 'col3'],
+      columnsWidth: {
+        col1: 250,
+      },
+      pageSize: 10,
     });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
@@ -199,21 +206,27 @@ describe('useDataGridColumns', () => {
     });
 
     // Should add the new column to the existing widths
-    expect(mockPersistColumnsWidthState).toHaveBeenCalledWith(moduleId, {
-      col1: 250,
-      col3: testColumnWidth,
+    expect(mockUpdateState).toHaveBeenCalledWith({
+      columnsWidth: {
+        col1: 250,
+        col3: testColumnWidth,
+      },
     });
   });
 
   it('should initialize with empty column widths when none are persisted', () => {
     // Mock empty column widths
-    mockRetrieveColumnsWidthState.mockReturnValue({});
+    mockRetrieveState.mockReturnValue({
+      columns: ['col1', 'col2'],
+      columnsWidth: {},
+      pageSize: 10,
+    });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
     const testColumnId = 'col1';
@@ -227,23 +240,29 @@ describe('useDataGridColumns', () => {
     });
 
     // Should persist only the resized column
-    expect(mockPersistColumnsWidthState).toHaveBeenCalledWith(moduleId, {
-      col1: testColumnWidth,
+    expect(mockUpdateState).toHaveBeenCalledWith({
+      columnsWidth: {
+        col1: testColumnWidth,
+      },
     });
   });
 
   it('should handle multiple column resizes', () => {
     // Initial column widths
-    mockRetrieveColumnsWidthState.mockReturnValue({
-      col1: 200,
-      col2: 200,
+    mockRetrieveState.mockReturnValue({
+      columns: ['col1', 'col2'],
+      columnsWidth: {
+        col1: 200,
+        col2: 200,
+      },
+      pageSize: 10,
     });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
@@ -255,14 +274,21 @@ describe('useDataGridColumns', () => {
       });
     });
 
-    mockRetrieveColumnsWidthState.mockReturnValue({
-      col1: 250,
-      col2: 200,
+    // Update the mock for the next call
+    mockRetrieveState.mockReturnValue({
+      columns: ['col1', 'col2'],
+      columnsWidth: {
+        col1: 250,
+        col2: 200,
+      },
+      pageSize: 10,
     });
 
-    expect(mockPersistColumnsWidthState).toHaveBeenCalledWith(moduleId, {
-      col1: 250,
-      col2: 200,
+    expect(mockUpdateState).toHaveBeenCalledWith({
+      columnsWidth: {
+        col1: 250,
+        col2: 200,
+      },
     });
 
     // Second resize
@@ -273,23 +299,29 @@ describe('useDataGridColumns', () => {
       });
     });
 
-    expect(mockPersistColumnsWidthState).toHaveBeenLastCalledWith(moduleId, {
-      col1: 250,
-      col2: 300,
+    expect(mockUpdateState).toHaveBeenLastCalledWith({
+      columnsWidth: {
+        col1: 250,
+        col2: 300,
+      },
     });
   });
 
   it('should handle resize with invalid column ID', () => {
-    mockRetrieveColumnsWidthState.mockReturnValue({
-      col1: 200,
-      col2: 200,
+    mockRetrieveState.mockReturnValue({
+      columns: ['col1', 'col2'],
+      columnsWidth: {
+        col1: 200,
+        col2: 200,
+      },
+      pageSize: 10,
     });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
@@ -301,7 +333,7 @@ describe('useDataGridColumns', () => {
       });
     });
 
-    expect(mockPersistColumnsWidthState).toHaveBeenCalledTimes(0);
+    expect(mockUpdateState).toHaveBeenCalledTimes(0);
   });
 
   it('should handle missing columns gracefully', () => {
@@ -311,13 +343,17 @@ describe('useDataGridColumns', () => {
     const mockPersistedColumns = [validColumnId, nonexistentColumnId];
 
     // Mock retrieving columns that don't exist in the schema
-    mockRetrieveColumnsState.mockReturnValue(mockPersistedColumns);
+    mockRetrieveState.mockReturnValue({
+      columns: mockPersistedColumns,
+      columnsWidth: {},
+      pageSize: 10,
+    });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
@@ -332,24 +368,28 @@ describe('useDataGridColumns', () => {
     });
 
     // Only the valid column should be persisted
-    expect(mockPersistColumnsState).toHaveBeenCalledWith(moduleId, [
-      validColumnId,
-    ]);
+    expect(mockUpdateState).toHaveBeenCalledWith({
+      columns: [validColumnId],
+    });
   });
 
   it('should reset to default columns when validation fails', () => {
-    // Setup mock to throw an error for column state
-    mockRetrieveColumnsState
+    // Setup mock to simulate error in retrieveState
+    mockRetrieveState
       .mockImplementationOnce(() => {
         throw new Error('Validation error');
       })
-      .mockReturnValueOnce([]);
+      .mockReturnValueOnce({
+        columns: [],
+        columnsWidth: {},
+        pageSize: 10,
+      });
 
     const { result } = renderHook(() =>
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitions,
+        columnSchemaDefinitionsMap,
       }),
     );
 
