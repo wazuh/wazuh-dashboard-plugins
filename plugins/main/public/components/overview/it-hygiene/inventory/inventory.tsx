@@ -104,6 +104,7 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               isDataSourceLoading={isDataSourceLoading}
               tableDefaultColumns={hotfixesColumns}
               title='Windows updates'
+              displayOnlyNoResultsCalloutOnNoResults={true}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -130,6 +131,7 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               isDataSourceLoading={isDataSourceLoading}
               tableDefaultColumns={systemColumns}
               title='System'
+              displayOnlyNoResultsCalloutOnNoResults={true}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -156,6 +158,7 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               isDataSourceLoading={isDataSourceLoading}
               tableDefaultColumns={processesColumns}
               title='Processes'
+              displayOnlyNoResultsCalloutOnNoResults={true}
             />
           </EuiFlexItem>
           {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
@@ -180,6 +183,7 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               isDataSourceLoading={isDataSourceLoading}
               tableDefaultColumns={portsColumns}
               title='Ports'
+              displayOnlyNoResultsCalloutOnNoResults={true}
             />
           </EuiFlexItem>
           {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
@@ -204,6 +208,7 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               isDataSourceLoading={isDataSourceLoading}
               tableDefaultColumns={interfacesColumns}
               title='Interfaces'
+              displayOnlyNoResultsCalloutOnNoResults={true}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

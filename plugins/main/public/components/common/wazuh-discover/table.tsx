@@ -78,16 +78,25 @@ export interface TableDiscoverBasicTableProps<K> {
 }
 
 const TableDiscoverBasicTable: React.FunctionComponent<TableDiscoverBasicTableProps> =
-  withGuard(
-    ({
-      displayOnlyNoResultsCalloutOnNoResults,
-      isDataSourceLoading,
-      results,
-    }) =>
-      displayOnlyNoResultsCalloutOnNoResults &&
-      !isDataSourceLoading &&
-      results?.hits?.total === 0,
-    DiscoverNoResults,
+  compose(
+    withGuard(
+      /* This avoids the table is rendered, waiting to the there are results. This and the usage of displayOnlyNoResultsCalloutOnNoResults=true avoids a problem when there is no data related to a sub data source (FIM>Files/Registries, System inventory>Ports/Interfaces/etc...)
+      If the useDataGrid would ensure the columns to render in the table exist in the index pattern, the table could be rendered before the request to fetch the data is done and this withGuard could be removed, removing the requirement to use displayOnlyNoResultsCalloutOnNoResults=true too.
+      */
+      ({ results }) => typeof results?.hits?.total === 'undefined',
+      () => null,
+    ),
+    withGuard(
+      ({
+        displayOnlyNoResultsCalloutOnNoResults,
+        isDataSourceLoading,
+        results,
+      }) =>
+        displayOnlyNoResultsCalloutOnNoResults &&
+        !isDataSourceLoading &&
+        results?.hits?.total === 0,
+      DiscoverNoResults,
+    ),
   )(
     ({
       dataGridProps,

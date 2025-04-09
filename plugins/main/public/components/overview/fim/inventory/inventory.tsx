@@ -144,6 +144,7 @@ const InventoryFIMDashboard = withDataSourceInitiated({
               additionalDocumentDetailsTabs={({ document }) => {
                 return [filesEventsDocumentDetailsTab({ document, agent })];
               }}
+              displayOnlyNoResultsCalloutOnNoResults={true}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -174,6 +175,7 @@ const InventoryFIMDashboard = withDataSourceInitiated({
                   registriesEventsDocumentDetailsTab({ document, agent }),
                 ];
               }}
+              displayOnlyNoResultsCalloutOnNoResults={true}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
