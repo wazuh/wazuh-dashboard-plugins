@@ -25,9 +25,6 @@ describe('useDataGridStatePersistenceManager', () => {
     clearState: jest.fn(),
   };
 
-  // Mock update callback
-  const mockUpdateCallback = jest.fn();
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -46,7 +43,6 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
-        updateCallback: mockUpdateCallback,
       }),
     );
 
@@ -71,7 +67,6 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
-        updateCallback: mockUpdateCallback,
       }),
     );
 
@@ -96,7 +91,6 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
-        updateCallback: mockUpdateCallback,
       }),
     );
 
@@ -118,7 +112,6 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
-        updateCallback: mockUpdateCallback,
       }),
     );
 
@@ -140,13 +133,12 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
-        updateCallback: mockUpdateCallback,
       }),
     );
 
     const retrievedState = result.current.retrieveState();
 
-    expect(mockStateManagement.retrieveState).toHaveBeenCalled();
+    expect(mockStateManagement.retrieveState).toHaveBeenCalledTimes(1);
     expect(retrievedState.pageSize).toEqual(DEFAULT_PAGE_SIZE);
   });
 
@@ -161,7 +153,6 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
-        updateCallback: mockUpdateCallback,
       }),
     );
 
@@ -188,7 +179,6 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
-        updateCallback: mockUpdateCallback,
       }),
     );
 
@@ -206,47 +196,11 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
-        updateCallback: mockUpdateCallback,
       }),
     );
 
     result.current.clearState();
 
     expect(mockStateManagement.clearState).toHaveBeenCalled();
-  });
-
-  it('should validate columns when column schema definitions change', () => {
-    const persistedState = {
-      columns: ['col1', 'col2'],
-    };
-
-    mockStateManagement.retrieveState.mockReturnValue(persistedState);
-
-    const { rerender } = renderHook(
-      props => useDataGridStatePersistenceManager(props),
-      {
-        initialProps: {
-          stateManagement: mockStateManagement,
-          defaultState,
-          columnSchemaDefinitionsMap,
-          updateCallback: mockUpdateCallback,
-        },
-      },
-    );
-
-    // Change column definitions to trigger useEffect
-    const newColumnSchemaDefinitionsMap = {
-      col1: { label: 'Column 1' },
-      col3: { label: 'Column 3' },
-    };
-
-    rerender({
-      stateManagement: mockStateManagement,
-      defaultState,
-      columnSchemaDefinitionsMap: newColumnSchemaDefinitionsMap,
-      updateCallback: mockUpdateCallback,
-    });
-
-    expect(mockUpdateCallback).toHaveBeenCalled();
   });
 });
