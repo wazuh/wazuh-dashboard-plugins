@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { getCore, getDataPlugin } from '../../../../kibana-services';
+import React, { useMemo } from 'react';
+import { getCore } from '../../../../kibana-services';
 import { AppState } from '../../../../react-services';
 import { PatternDataSourceFilterManager } from '../../data-source';
 import { withWrapComponent } from '../../hocs';
@@ -47,23 +47,16 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
       applicationTab,
       recentEventsSpecificFilters,
     }) => {
-      const [href, setHref] = useState(undefined);
-      useEffect(() => {
-        (async () => {
-          const indexPattern = await getDataPlugin().indexPatterns.get(
-            AppState.getCurrentPattern(),
-          );
-          setHref(
-            generatePathNavigate({
-              document,
-              agent,
-              indexPattern,
-              applicationId,
-              applicationTab,
-              getSpecificFilters: recentEventsSpecificFilters,
-            }),
-          );
-        })();
+      // const [href, setHref] = useState(undefined);
+      const href = useMemo(() => {
+        return generatePathNavigate({
+          document,
+          agent,
+          indexPattern: { id: AppState.getCurrentPattern() },
+          applicationId,
+          applicationTab,
+          getSpecificFilters: recentEventsSpecificFilters,
+        });
       }, [document, agent]); // Maybe it should be done when the index pattern is changed
 
       return (
