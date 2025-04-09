@@ -145,7 +145,7 @@ export const withMapErrorPromptErrorEnsureIndexPattern =
     return (
       <EuiEmptyPrompt
         iconType='alert'
-        title={title || <h2>TITLE</h2>}
+        title={title}
         body={body}
         actions={
           <EuiButton color='primary' fill onClick={props.check}>
