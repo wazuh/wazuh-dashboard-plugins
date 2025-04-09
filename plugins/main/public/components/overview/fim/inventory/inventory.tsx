@@ -24,7 +24,7 @@ import { withFIMDataSource } from '../common/hocs/validate-fim-states-index-patt
 import { WazuhFlyoutDiscoverNewFilterManagerRecentEvents } from '../../../common/wazuh-data-grid/recent-events/recent-events';
 import { fileIntegrityMonitoring } from '../../../../utils/applications';
 import * as filesUtils from './inventory-files';
-import * as registriesUtils from './inventory-files';
+import * as registriesUtils from './inventory-registries';
 
 export const InventoryFIMFilesDocumentDetailsEvents = ({ document, agent }) => (
   <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
