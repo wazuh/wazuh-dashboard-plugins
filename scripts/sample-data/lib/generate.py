@@ -1,5 +1,5 @@
-from constants import DEFAULT_PREFIX_INDEX_NAME, DEFAULT_SUFFIX_INDEX_NAME
-from randomize import randomize
+from lib.constants import DEFAULT_PREFIX_INDEX_NAME, DEFAULT_SUFFIX_INDEX_NAME
+from lib.randomize import randomize
 
 class Generate():
     """

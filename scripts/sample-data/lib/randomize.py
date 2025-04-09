@@ -1,6 +1,6 @@
 import datetime
 import random
-from constants import DATE_FORMAT
+from lib.constants import DATE_FORMAT
 
 class Randomize():
     def date(self):
