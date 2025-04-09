@@ -18,7 +18,7 @@ def generate_random_file():
         "inode": f"inode{random.randint(0, 1000)}",
         "mtime": randomize.date(),
         "owner": f"owner{random.randint(0, 1000)}",
-        "path": "/path/to/file",
+        "path": "/tmp/agent.conf",
         "size": random.randint(1000, 1000000),
         "uid": f"uid{random.randint(0, 1000)}",
     }

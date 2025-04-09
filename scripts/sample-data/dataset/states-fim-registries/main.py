@@ -22,7 +22,7 @@ def generate_random_registry():
         "key": r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe",
         "mtime": randomize.unix_timestamp(),
         "owner": f"owner{random.randint(0, 1000)}",
-        "path": "/path/to/file",
+        "path": "/tmp/agent.conf",
         "size": random.randint(1000, 1000000),
         "uid": f"uid{random.randint(0, 1000)}",
         "value": f"registry_value{random.randint(0, 1000)}",
