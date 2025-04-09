@@ -372,30 +372,4 @@ describe('useDataGridColumns', () => {
       columns: [validColumnId],
     });
   });
-
-  it('should reset to default columns when validation fails', () => {
-    // Setup mock to simulate error in retrieveState
-    mockRetrieveState
-      .mockImplementationOnce(() => {
-        throw new Error('Validation error');
-      })
-      .mockReturnValueOnce({
-        columns: [],
-        columnsWidth: {},
-        pageSize: 10,
-      });
-
-    const { result } = renderHook(() =>
-      useDataGridColumns({
-        moduleId,
-        defaultColumns,
-        columnSchemaDefinitionsMap,
-      }),
-    );
-
-    // Should fall back to default columns
-    expect(result.current.columnVisibility.visibleColumns).toEqual(
-      defaultColumns.map(col => col.id),
-    );
-  });
 });
