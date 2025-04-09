@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { DataGridState, DataGridStatePersistenceManager } from './types';
 import { DEFAULT_PAGE_SIZE } from '../constants';
 
@@ -9,14 +9,12 @@ interface UseDataGridStateManagementProps {
   stateManagement: ReturnType<DataGridStatePersistenceManager<DataGridState>>;
   defaultState: DataGridState;
   columnSchemaDefinitionsMap: Record<string, unknown>;
-  updateCallback?: (state: Partial<DataGridState>) => void;
 }
 
 const useDataGridStatePersistenceManager = ({
   stateManagement,
   defaultState,
   columnSchemaDefinitionsMap,
-  updateCallback,
 }: UseDataGridStateManagementProps) => {
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
@@ -121,8 +119,14 @@ const useDataGridStatePersistenceManager = ({
   };
 
   const validatePageSizeState = (pageSize: DataGridState['pageSize']) => {
-    if (typeof pageSize !== 'number' || !Number.isInteger(pageSize) || pageSize <= 0) {
-      throw new Error(`Invalid page size: ${pageSize}. Page size must be a positive integer.`);
+    if (
+      typeof pageSize !== 'number' ||
+      !Number.isInteger(pageSize) ||
+      pageSize <= 0
+    ) {
+      throw new Error(
+        `Invalid page size: ${pageSize}. Page size must be a positive integer.`,
+      );
     }
     return true;
   };

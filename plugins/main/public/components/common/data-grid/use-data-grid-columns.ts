@@ -37,9 +37,6 @@ function useDataGridColumns({
       pageSize: DEFAULT_PAGE_SIZE, // TODO: move this
     },
     columnSchemaDefinitionsMap,
-    updateCallback() {
-      setVisibleColumns(defaultColumnsIds);
-    },
   });
 
   // Prevent infinite loop by checking if visibleColumns actually need updating
