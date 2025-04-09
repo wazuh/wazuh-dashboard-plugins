@@ -76,8 +76,10 @@ import {
   ThreatHuntingDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
-import { InventoryITHygiene } from '../../overview/it-hygiene';
-import { DashboardITHygiene } from '../../overview/it-hygiene/dashboards';
+import {
+  InventoryITHygiene,
+  DashboardITHygiene,
+} from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
