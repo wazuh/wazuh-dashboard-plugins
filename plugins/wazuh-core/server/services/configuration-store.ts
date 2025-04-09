@@ -141,7 +141,7 @@ export class ConfigurationStore implements IConfigurationStore {
 ${printSection('App configuration file', { prefix: '# ', fill: '=' })}
 #
 # Please check the documentation for more information about configuration options:
-# ${webDocumentationLink('user-manual/wazuh-dashboard/config-file.html')}
+# ${webDocumentationLink('user-manual/wazuh-dashboard/settings.html')}
 #
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-dashboard-plugins`;

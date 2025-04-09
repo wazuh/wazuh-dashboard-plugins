@@ -1,8 +1,17 @@
+import _ from 'lodash';
 import store from '../../redux/store';
 import { updateCurrentAgentData } from '../../redux/actions/appStateActions';
 import { DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT } from '../../../common/constants';
 import { WzRequest } from '../../react-services';
 import NavigationService from '../../react-services/navigation-service';
+
+/**
+ * Options for the syncPinnedAgentSources method
+ * @param forceUpdate - Force the update of the pinned agent with a Wazuh API request
+ */
+type TsyncPinnedAgentSourcesOptions = {
+  forceUpdate?: boolean;
+};
 
 export class PinnedAgentManager {
   public static NO_AGENT_DATA = {};
@@ -22,7 +31,7 @@ export class PinnedAgentManager {
 
   private equalToPinnedAgent(agentData: any): boolean {
     const pinnedAgent = this.getPinnedAgent();
-    return pinnedAgent?.id === agentData?.id;
+    return _.isEqual(pinnedAgent, agentData);
   }
 
   private checkValidAgentId(agentId: string | null): boolean {
@@ -70,7 +79,7 @@ export class PinnedAgentManager {
     return !!this.store.getState().appStateReducers?.currentAgentData?.id;
   }
 
-  async syncPinnedAgentSources() {
+  async syncPinnedAgentSources(options?: TsyncPinnedAgentSourcesOptions) {
     const locationHref = window.location.href;
     const keyToMatch: string = locationHref.includes(this.AGENT_VIEW_URL)
       ? PinnedAgentManager.AGENT_ID_VIEW_KEY
@@ -89,7 +98,8 @@ export class PinnedAgentManager {
         !pinnedAgentByUrl === pinnedAgentByStore ||
         (pinnedAgentByUrl &&
           pinnedAgentByStore &&
-          agentIdValueUrl !== this.getPinnedAgent().id);
+          agentIdValueUrl !== this.getPinnedAgent().id) ||
+        options?.forceUpdate;
       if (mustBeSynchronized) {
         try {
           if (isValidAgentId) {
