@@ -156,7 +156,10 @@ const useDataGridStatePersistenceManager = ({
   };
 
   const validatePageSizeState = (pageSize: DataGridState['pageSize']) => {
-    return typeof pageSize === 'number' && Number.isInteger(pageSize);
+    if (typeof pageSize !== 'number' || !Number.isInteger(pageSize) || pageSize <= 0) {
+      throw new Error(`Invalid page size: ${pageSize}. Page size must be a positive integer.`);
+    }
+    return true;
   };
 
   const validateState = (state: Partial<DataGridState>) => {
