@@ -26,7 +26,7 @@ const errorPromptTypes = {
           Please, review the server and indexer logs. Also, you can check the{' '}
           <EuiLink
             href={webDocumentationLink(
-              'user-manual/capabilities/vulnerability-detection/index.html',
+              'user-manual/capabilities/file-integrity/index.html',
             )}
             target='_blank'
             rel='noopener noreferrer'
