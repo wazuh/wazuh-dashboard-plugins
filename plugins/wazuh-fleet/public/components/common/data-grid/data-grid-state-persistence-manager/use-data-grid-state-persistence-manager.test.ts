@@ -1,148 +1,197 @@
 import { renderHook } from '@testing-library/react-hooks';
+import { DEFAULT_PAGE_SIZE } from '../constants';
 import useDataGridStatePersistenceManager from './use-data-grid-state-persistence-manager';
-import { DataGridStatePersistenceManager } from './types';
-
-// Mock state type that extends DataGridState
-type MockState = number;
+import { DataGridState } from './types';
 
 describe('useDataGridStatePersistenceManager', () => {
-  // Mock module ID for testing
-  const moduleId = 'test-module';
-  // Mock stateManagement ID for testing
-  const stateManagementId = 'test-state-management';
   // Mock default state
-  const defaultState: MockState = 10;
-  // Mock persisted state
-  const persistedState: MockState = 20;
+  const defaultState = {
+    columns: ['col1', 'col2'],
+    columnsWidth: { col1: 100, col2: 200 },
+    pageSize: DEFAULT_PAGE_SIZE,
+  } as const satisfies DataGridState;
+  // Mock column schema definitions
+  const columnSchemaDefinitionsMap = {
+    col1: { label: 'Column 1' },
+    col2: { label: 'Column 2' },
+    col3: { label: 'Column 3' },
+  };
   // Mock state management
-  const mockStateManagement: jest.MockedObject<
-    DataGridStatePersistenceManager<MockState>
-  > = {
+  const mockStateManagement = {
     retrieveState: jest.fn(),
     persistState: jest.fn(),
     clearState: jest.fn(),
   };
-  // Mock validation function
-  const mockValidateState = jest.fn(
-    (state: MockState) => typeof state === 'number',
-  );
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should retrieve persisted state when available and valid', () => {
-    mockStateManagement.retrieveState.mockReturnValueOnce(persistedState);
-    mockValidateState.mockReturnValueOnce(true);
+  it('should retrieve state correctly when valid', () => {
+    const persistedState = {
+      columns: ['col1', 'col3'],
+      columnsWidth: { col1: 150, col3: 250 },
+      pageSize: 50,
+    } satisfies Partial<DataGridState>;
+
+    mockStateManagement.retrieveState.mockReturnValue(persistedState);
 
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
-        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
-        validateState: mockValidateState,
+        columnSchemaDefinitionsMap,
       }),
     );
-    const retrievedState = result.current.retrieveState(moduleId);
+    const retrievedState = result.current.retrieveState();
 
-    expect(mockStateManagement.retrieveState).toHaveBeenCalledWith(moduleId);
-    expect(mockValidateState).toHaveBeenCalledWith(persistedState);
-    expect(retrievedState).toEqual(persistedState);
-  });
-
-  it('should return default state when persisted state is not available', () => {
-    mockStateManagement.retrieveState.mockReturnValueOnce(null);
-
-    const { result } = renderHook(() =>
-      useDataGridStatePersistenceManager({
-        stateManagementId,
-        stateManagement: mockStateManagement,
-        defaultState,
-        validateState: mockValidateState,
-      }),
-    );
-    const retrievedState = result.current.retrieveState(moduleId);
-
-    expect(mockStateManagement.retrieveState).toHaveBeenCalledWith(moduleId);
-    expect(mockValidateState).not.toHaveBeenCalled();
-    expect(retrievedState).toEqual(defaultState);
-  });
-
-  it('should return default state when persisted state is invalid', () => {
-    mockStateManagement.retrieveState.mockReturnValueOnce(persistedState);
-    mockValidateState.mockReturnValueOnce(false);
-
-    const { result } = renderHook(() =>
-      useDataGridStatePersistenceManager({
-        stateManagementId,
-        stateManagement: mockStateManagement,
-        defaultState,
-        validateState: mockValidateState,
-      }),
-    );
-    const retrievedState = result.current.retrieveState(moduleId);
-
-    expect(mockStateManagement.retrieveState).toHaveBeenCalledWith(moduleId);
-    expect(mockValidateState).toHaveBeenCalledWith(persistedState);
-    expect(retrievedState).toEqual(defaultState);
-  });
-
-  it('should clear state when validation throws an error', () => {
-    mockStateManagement.retrieveState.mockReturnValueOnce(persistedState);
-    mockValidateState.mockImplementationOnce(() => {
-      throw new Error('Validation error');
+    expect(mockStateManagement.retrieveState).toHaveBeenCalled();
+    expect(retrievedState).toEqual({
+      ...defaultState,
+      ...persistedState,
     });
+  });
 
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+  it('should return merged state when persisted state is partial', () => {
+    const persistedState = {
+      columns: ['col2', 'col3'],
+    };
+
+    mockStateManagement.retrieveState.mockReturnValue(persistedState);
+
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
-        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
-        validateState: mockValidateState,
+        columnSchemaDefinitionsMap,
       }),
     );
-    const retrievedState = result.current.retrieveState(moduleId);
+    const retrievedState = result.current.retrieveState();
 
-    expect(mockStateManagement.retrieveState).toHaveBeenCalledWith(moduleId);
-    expect(mockValidateState).toHaveBeenCalledWith(persistedState);
-    expect(mockStateManagement.clearState).toHaveBeenCalledWith(moduleId);
-    expect(consoleSpy).toHaveBeenCalled();
-    expect(retrievedState).toEqual(defaultState);
+    expect(mockStateManagement.retrieveState).toHaveBeenCalled();
+    expect(retrievedState).toEqual({
+      ...defaultState,
+      columns: ['col2', 'col3'],
+    });
+  });
 
-    consoleSpy.mockRestore();
+  it('should reset columns when invalid column ids are found', () => {
+    const persistedState = {
+      columns: ['col1', 'nonExistentColumn'],
+    };
+
+    mockStateManagement.retrieveState.mockReturnValue(persistedState);
+
+    const { result } = renderHook(() =>
+      useDataGridStatePersistenceManager({
+        stateManagement: mockStateManagement,
+        defaultState,
+        columnSchemaDefinitionsMap,
+      }),
+    );
+    const retrievedState = result.current.retrieveState();
+
+    expect(mockStateManagement.retrieveState).toHaveBeenCalled();
+    expect(retrievedState.columns).toEqual([]);
+  });
+
+  it('should reset column widths when invalid', () => {
+    const persistedState = {
+      columnsWidth: { col1: 5 }, // Too small width
+    };
+
+    mockStateManagement.retrieveState.mockReturnValue(persistedState);
+
+    const { result } = renderHook(() =>
+      useDataGridStatePersistenceManager({
+        stateManagement: mockStateManagement,
+        defaultState,
+        columnSchemaDefinitionsMap,
+      }),
+    );
+    const retrievedState = result.current.retrieveState();
+
+    expect(mockStateManagement.retrieveState).toHaveBeenCalled();
+    expect(retrievedState.columnsWidth).toEqual({});
+  });
+
+  it('should reset page size when invalid', () => {
+    const persistedState = {
+      pageSize: 'invalid' as unknown as number,
+    };
+
+    mockStateManagement.retrieveState.mockReturnValue(persistedState);
+
+    const { result } = renderHook(() =>
+      useDataGridStatePersistenceManager({
+        stateManagement: mockStateManagement,
+        defaultState,
+        columnSchemaDefinitionsMap,
+      }),
+    );
+    const retrievedState = result.current.retrieveState();
+
+    expect(mockStateManagement.retrieveState).toHaveBeenCalledTimes(1);
+    expect(retrievedState.pageSize).toEqual(DEFAULT_PAGE_SIZE);
   });
 
   it('should persist state correctly', () => {
+    const newState = {
+      columns: ['col3'],
+      pageSize: 25,
+    };
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
-        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
-        validateState: mockValidateState,
+        columnSchemaDefinitionsMap,
       }),
     );
 
-    result.current.persistState(moduleId, persistedState);
+    result.current.persistState(newState);
 
-    expect(mockStateManagement.persistState).toHaveBeenCalledWith(
-      moduleId,
-      persistedState,
+    expect(mockStateManagement.persistState).toHaveBeenCalledWith(newState);
+  });
+
+  it('should update state by merging with existing state', () => {
+    const currentState = {
+      columns: ['col1', 'col2'],
+      columnsWidth: { col1: 100, col2: 200 },
+      pageSize: 15,
+    };
+    const updatePayload = {
+      columns: ['col2', 'col3'],
+    };
+
+    mockStateManagement.retrieveState.mockReturnValue(currentState);
+
+    const { result } = renderHook(() =>
+      useDataGridStatePersistenceManager({
+        stateManagement: mockStateManagement,
+        defaultState,
+        columnSchemaDefinitionsMap,
+      }),
     );
+
+    result.current.updateState(updatePayload);
+
+    expect(mockStateManagement.persistState).toHaveBeenCalledWith({
+      ...currentState,
+      ...updatePayload,
+    });
   });
 
   it('should clear state correctly', () => {
     const { result } = renderHook(() =>
       useDataGridStatePersistenceManager({
-        stateManagementId,
         stateManagement: mockStateManagement,
         defaultState,
-        validateState: mockValidateState,
+        columnSchemaDefinitionsMap,
       }),
     );
 
-    result.current.clearState(moduleId);
+    result.current.clearState();
 
-    expect(mockStateManagement.clearState).toHaveBeenCalledWith(moduleId);
+    expect(mockStateManagement.clearState).toHaveBeenCalled();
   });
 });
