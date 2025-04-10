@@ -48,7 +48,7 @@ describe('useDataGridColumns', () => {
     // Default behavior for retrieveState function
     mockRetrieveState.mockReturnValue({
       columns: [],
-      columnsWidth: {},
+      columnWidths: {},
       pageSize: 10,
     });
   });
@@ -73,7 +73,7 @@ describe('useDataGridColumns', () => {
 
     mockRetrieveState.mockReturnValue({
       columns: persistedColumns,
-      columnsWidth: {},
+      columnWidths: {},
       pageSize: 10,
     });
 
@@ -116,7 +116,7 @@ describe('useDataGridColumns', () => {
     // Use defaultColumns to get column IDs but in reversed order
     mockRetrieveState.mockReturnValue({
       columns: defaultColumns.map(col => col.id).reverse(),
-      columnsWidth: {},
+      columnWidths: {},
       pageSize: 10,
     });
 
@@ -146,7 +146,7 @@ describe('useDataGridColumns', () => {
     // Mock column widths
     mockRetrieveState.mockReturnValue({
       columns: ['col1', 'col2'],
-      columnsWidth: {
+      columnWidths: {
         col1: 250,
         col2: 200,
       },
@@ -169,7 +169,7 @@ describe('useDataGridColumns', () => {
     });
 
     expect(mockUpdateState).toHaveBeenCalledWith({
-      columnsWidth: {
+      columnWidths: {
         col1: testColumnWidth,
         col2: 200,
       },
@@ -183,7 +183,7 @@ describe('useDataGridColumns', () => {
     // Mock column widths with only some columns
     mockRetrieveState.mockReturnValue({
       columns: ['col1', 'col2', 'col3'],
-      columnsWidth: {
+      columnWidths: {
         col1: 250,
       },
       pageSize: 10,
@@ -206,7 +206,7 @@ describe('useDataGridColumns', () => {
 
     // Should add the new column to the existing widths
     expect(mockUpdateState).toHaveBeenCalledWith({
-      columnsWidth: {
+      columnWidths: {
         col1: 250,
         col3: testColumnWidth,
       },
@@ -217,7 +217,7 @@ describe('useDataGridColumns', () => {
     // Mock empty column widths
     mockRetrieveState.mockReturnValue({
       columns: ['col1', 'col2'],
-      columnsWidth: {},
+      columnWidths: {},
       pageSize: 10,
     });
 
@@ -240,7 +240,7 @@ describe('useDataGridColumns', () => {
 
     // Should persist only the resized column
     expect(mockUpdateState).toHaveBeenCalledWith({
-      columnsWidth: {
+      columnWidths: {
         col1: testColumnWidth,
       },
     });
@@ -250,7 +250,7 @@ describe('useDataGridColumns', () => {
     // Initial column widths
     mockRetrieveState.mockReturnValue({
       columns: ['col1', 'col2'],
-      columnsWidth: {
+      columnWidths: {
         col1: 200,
         col2: 200,
       },
@@ -276,7 +276,7 @@ describe('useDataGridColumns', () => {
     // Update the mock for the next call
     mockRetrieveState.mockReturnValue({
       columns: ['col1', 'col2'],
-      columnsWidth: {
+      columnWidths: {
         col1: 250,
         col2: 200,
       },
@@ -284,7 +284,7 @@ describe('useDataGridColumns', () => {
     });
 
     expect(mockUpdateState).toHaveBeenCalledWith({
-      columnsWidth: {
+      columnWidths: {
         col1: 250,
         col2: 200,
       },
@@ -299,7 +299,7 @@ describe('useDataGridColumns', () => {
     });
 
     expect(mockUpdateState).toHaveBeenLastCalledWith({
-      columnsWidth: {
+      columnWidths: {
         col1: 250,
         col2: 300,
       },
@@ -309,7 +309,7 @@ describe('useDataGridColumns', () => {
   it('should handle resize with invalid column ID', () => {
     mockRetrieveState.mockReturnValue({
       columns: ['col1', 'col2'],
-      columnsWidth: {
+      columnWidths: {
         col1: 200,
         col2: 200,
       },
@@ -344,7 +344,7 @@ describe('useDataGridColumns', () => {
     // Mock retrieving columns that don't exist in the schema
     mockRetrieveState.mockReturnValue({
       columns: mockPersistedColumns,
-      columnsWidth: {},
+      columnWidths: {},
       pageSize: 10,
     });
 

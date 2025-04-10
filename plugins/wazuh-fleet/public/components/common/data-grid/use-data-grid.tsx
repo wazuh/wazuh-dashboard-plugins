@@ -189,7 +189,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     stateManagement: localStorageStatePersistenceManager(appId),
     defaultState: {
       columns: defaultColumns.map(column => column.id),
-      columnsWidth: {},
+      columnWidths: {},
       pageSize: pagination?.pageSize || DEFAULT_PAGE_SIZE,
     },
     columnSchemaDefinitionsMap,

@@ -32,7 +32,7 @@ function useDataGridColumns({
     stateManagement: localStorageStatePersistenceManager(appId),
     defaultState: {
       columns: defaultColumnsIds,
-      columnsWidth: {},
+      columnWidths: {},
       pageSize: DEFAULT_PAGE_SIZE, // TODO: move this
     },
     columnSchemaDefinitionsMap,
@@ -136,10 +136,10 @@ function useDataGridColumns({
     const column = columnSchemaDefinitionsMap[columnId];
 
     if (column) {
-      const currentWidths = dataGridStateManager.retrieveState().columnsWidth;
+      const currentWidths = dataGridStateManager.retrieveState().columnWidths;
 
       dataGridStateManager.updateState({
-        columnsWidth: {
+        columnWidths: {
           ...currentWidths,
           [columnId]: width,
         },
@@ -152,7 +152,7 @@ function useDataGridColumns({
       visibleColumns.map((columnId: string) => {
         const column = columnSchemaDefinitionsMap[columnId];
         const savedColumnWidth =
-          dataGridStateManager.retrieveState().columnsWidth[columnId];
+          dataGridStateManager.retrieveState().columnWidths[columnId];
 
         if (savedColumnWidth) {
           column.initialWidth = savedColumnWidth;

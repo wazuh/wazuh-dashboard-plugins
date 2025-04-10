@@ -1,6 +1,6 @@
 export interface DataGridState {
   columns: string[];
-  columnsWidth: Record<string, number>;
+  columnWidths: Record<string, number>;
   pageSize: number;
 }
 

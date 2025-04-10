@@ -7,7 +7,7 @@ describe('useDataGridStatePersistenceManager', () => {
   // Mock default state
   const defaultState = {
     columns: ['col1', 'col2'],
-    columnsWidth: { col1: 100, col2: 200 },
+    columnWidths: { col1: 100, col2: 200 },
     pageSize: DEFAULT_PAGE_SIZE,
   } as const satisfies DataGridState;
   // Mock column schema definitions
@@ -30,7 +30,7 @@ describe('useDataGridStatePersistenceManager', () => {
   it('should retrieve state correctly when valid', () => {
     const persistedState = {
       columns: ['col1', 'col3'],
-      columnsWidth: { col1: 150, col3: 250 },
+      columnWidths: { col1: 150, col3: 250 },
       pageSize: 50,
     } satisfies Partial<DataGridState>;
 
@@ -97,7 +97,7 @@ describe('useDataGridStatePersistenceManager', () => {
 
   it('should reset column widths when invalid', () => {
     const persistedState = {
-      columnsWidth: { col1: 5 }, // Too small width
+      columnWidths: { col1: 5 }, // Too small width
     };
 
     mockStateManagement.retrieveState.mockReturnValue(persistedState);
@@ -112,7 +112,7 @@ describe('useDataGridStatePersistenceManager', () => {
     const retrievedState = result.current.retrieveState();
 
     expect(mockStateManagement.retrieveState).toHaveBeenCalled();
-    expect(retrievedState.columnsWidth).toEqual({});
+    expect(retrievedState.columnWidths).toEqual({});
   });
 
   it('should reset page size when invalid', () => {
@@ -156,7 +156,7 @@ describe('useDataGridStatePersistenceManager', () => {
   it('should update state by merging with existing state', () => {
     const currentState = {
       columns: ['col1', 'col2'],
-      columnsWidth: { col1: 100, col2: 200 },
+      columnWidths: { col1: 100, col2: 200 },
       pageSize: 15,
     };
     const updatePayload = {

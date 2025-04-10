@@ -81,15 +81,15 @@ const useDataGridStatePersistenceManager = ({
   };
 
   const validateColumnWidthsState = (
-    columnsWidth: DataGridState['columnsWidth'],
+    columnWidths: DataGridState['columnWidths'],
   ) => {
     // Validate that the state is an object
-    if (typeof columnsWidth !== 'object' || columnsWidth === null) {
+    if (typeof columnWidths !== 'object' || columnWidths === null) {
       throw new Error('Invalid state: expected an object');
     }
 
     // Validate that all keys in the state are valid column IDs
-    for (const columnId of Object.keys(columnsWidth)) {
+    for (const columnId of Object.keys(columnWidths)) {
       if (typeof columnId !== 'string') {
         throw new TypeError(`Invalid column ID: ${columnId}`);
       }
@@ -101,7 +101,7 @@ const useDataGridStatePersistenceManager = ({
     }
 
     // Validate that the column widths are numbers
-    for (const width of Object.values(columnsWidth)) {
+    for (const width of Object.values(columnWidths)) {
       if (
         typeof width !== 'number' ||
         Number.isNaN(width) ||
@@ -113,7 +113,7 @@ const useDataGridStatePersistenceManager = ({
       }
     }
 
-    const columnsIds = Object.keys(columnsWidth);
+    const columnsIds = Object.keys(columnWidths);
 
     // Validate that the column IDs exist in the column definitions
     return validateColumns(columnsIds);
@@ -186,10 +186,10 @@ const useDataGridStatePersistenceManager = ({
     }
 
     try {
-      validateColumnWidthsState(state.columnsWidth ?? {});
+      validateColumnWidthsState(state.columnWidths ?? {});
     } catch {
-      state.columnsWidth = {};
-      updateState({ columnsWidth: {} });
+      state.columnWidths = {};
+      updateState({ columnWidths: {} });
       console.warn('Columns width state was invalid, resetting to default.');
     }
 
