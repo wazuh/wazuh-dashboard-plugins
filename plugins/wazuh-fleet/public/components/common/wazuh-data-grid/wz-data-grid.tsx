@@ -13,7 +13,7 @@ import {
   EuiDataGridControlColumn,
 } from '@elastic/eui';
 import { IndexPattern, SearchResponse } from 'src/plugins/data/public';
-import { useDataGrid, exportSearchToCSV, TDataGridColumn } from '../data-grid';
+import { useDataGrid, exportSearchToCSV } from '../data-grid';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
 import useDataGridStatePersistenceManager from '../data-grid/data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
@@ -23,7 +23,7 @@ import {
   DEFAULT_PAGINATION_OPTIONS,
   MAX_ENTRIES_PER_QUERY,
 } from '../data-grid/constants';
-import { localStoragePageSizeStatePersistenceManager } from '../data-grid/data-grid-state-persistence-manager/local-storage-page-size-state-persistence-manager';
+import { DataGridColumn } from '../data-grid/types';
 import DiscoverDataGridAdditionalControls from './components/data-grid-additional-controls';
 import './wazuh-data-grid.scss';
 import { wzDiscoverRenderColumns } from './render-columns';
@@ -35,7 +35,7 @@ export interface TWazuhDataGridProps {
   appId: string;
   indexPattern: IndexPattern;
   results: SearchResponse;
-  defaultColumns: TDataGridColumn[];
+  defaultColumns: DataGridColumn[];
   leadingControlColumns?: EuiDataGridControlColumn[];
   trailingControlColumns?: EuiDataGridControlColumn[];
   isLoading: boolean;

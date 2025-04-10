@@ -5,7 +5,10 @@ export interface RenderColumn {
   render: (value: any, rowItem: object) => string | React.ReactNode;
 }
 
-export type TDataGridColumn = Partial<RenderColumn> & EuiDataGridColumn;
+export type DataGridColumn = Partial<RenderColumn> & EuiDataGridColumn;
+
+export type DataGridRenderColumn = Required<Pick<DataGridColumn, 'render'>> &
+  Omit<DataGridColumn, 'render'>;
 
 export interface PaginationOptions
   extends Pick<

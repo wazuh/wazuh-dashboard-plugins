@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import useDataGridColumns from './use-data-grid-columns';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
-import { TDataGridColumn } from './types';
+import { DataGridColumn } from './types';
 
 // Mock the persistence manager hook
 jest.mock(
@@ -16,7 +16,7 @@ describe('useDataGridColumns', () => {
   const mockClearState = jest.fn();
   // Sample test data
   const moduleId = 'test-app';
-  const defaultColumns: TDataGridColumn[] = [
+  const defaultColumns: DataGridColumn[] = [
     { id: 'col1', display: 'Column 1' },
     { id: 'col2', display: 'Column 2' },
   ];
@@ -26,7 +26,7 @@ describe('useDataGridColumns', () => {
     col2: { id: 'col2', display: 'Column 2' },
     col3: { id: 'col3', display: 'Column 3' },
   };
-  const columnSchemaDefinitions: TDataGridColumn[] = [
+  const columnSchemaDefinitions: DataGridColumn[] = [
     { id: 'col1', display: 'Column 1' },
     { id: 'col2', display: 'Column 2' },
     { id: 'col3', display: 'Column 3' },

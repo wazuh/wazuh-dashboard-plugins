@@ -1,14 +1,14 @@
 /*
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { tDataGridRenderColumn } from '../data-grid';
+import { DataGridRenderColumn } from '../data-grid';
 import { WzLink } from '../wz-link/wz-link';
 */
 export const wzDiscoverRenderColumns = [];
 
 // ToDo: Check if we want to hardcode fields for every
 /*
-export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
+export const wzDiscoverRenderColumns: DataGridRenderColumn[] = [
   {
     id: 'agent.id',
     render: value => {

@@ -10,9 +10,9 @@ import { getCore } from '../../../plugin-services';
 import { IAgentResponse } from '../../../../common/types';
 import { AgentGroups, HostOS } from '../../common';
 import { AGENTS_SUMMARY_ID } from '../../../groups/agents/applications';
-import { tDataGridColumn } from '../../common/data-grid';
+import { DataGridColumn } from '../../common/data-grid';
 
-export const agentsTableColumns: tDataGridColumn[] = [
+export const agentsTableColumns: DataGridColumn[] = [
   {
     id: 'agent.name',
     displayAsText: 'Name',

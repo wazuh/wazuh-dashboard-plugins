@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
-import { tDataGridColumn } from './types';
+import { DataGridColumn } from './types';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
 import { DEFAULT_PAGE_SIZE } from './constants';
@@ -8,11 +8,11 @@ import { DEFAULT_PAGE_SIZE } from './constants';
 interface UseDataGridColumnsProps {
   moduleId: string;
   defaultColumns: EuiDataGridColumn[];
-  columnSchemaDefinitionsMap: Record<string, tDataGridColumn>;
+  columnSchemaDefinitionsMap: Record<string, DataGridColumn>;
 }
 
 export interface DataGridColumnsReturn {
-  columnsAvailable: tDataGridColumn[];
+  columnsAvailable: DataGridColumn[];
   columns: EuiDataGridProps['columns'];
   columnVisibility: EuiDataGridProps['columnVisibility'];
   onColumnResize: EuiDataGridProps['onColumnResize'];
@@ -79,7 +79,7 @@ function useDataGridColumns({
   );
 
   const sortFirstMatchedColumns = (
-    firstMatchedColumns: tDataGridColumn[],
+    firstMatchedColumns: DataGridColumn[],
     visibleColumnsOrdered: string[],
   ) => {
     firstMatchedColumns.sort(
@@ -92,11 +92,11 @@ function useDataGridColumns({
   };
 
   const orderFirstMatchedColumns = (
-    columns: tDataGridColumn[],
+    columns: DataGridColumn[],
     visibleColumnsOrdered: string[],
   ) => {
-    const firstMatchedColumns: tDataGridColumn[] = [];
-    const nonMatchedColumns: tDataGridColumn[] = [];
+    const firstMatchedColumns: DataGridColumn[] = [];
+    const nonMatchedColumns: DataGridColumn[] = [];
     const visibleColumnsSet = new Set(visibleColumnsOrdered);
 
     for (const column of columns) {
