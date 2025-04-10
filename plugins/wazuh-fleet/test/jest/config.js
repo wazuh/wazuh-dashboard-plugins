@@ -18,7 +18,7 @@ export default {
     `${kbnDir}/src/dev/jest/setup/babel_polyfill.js`,
     `${kbnDir}/src/dev/jest/setup/enzyme.js`,
   ],
-  collectCoverage: true,
+  collectCoverage: process.env.CI === 'true',
   coverageDirectory: './target/test-coverage',
   coverageReporters: ['html', 'text-summary', 'json-summary'],
   globals: {
