@@ -17,6 +17,7 @@ export default {
   setupFiles: [
     `${kbnDir}/src/dev/jest/setup/babel_polyfill.js`,
     `${kbnDir}/src/dev/jest/setup/enzyme.js`,
+    '<rootDir>/test/__mocks__/localStorage.setup.ts',
   ],
   collectCoverage: process.env.CI === 'true',
   coverageDirectory: './target/test-coverage',
