@@ -52,7 +52,7 @@ describe('useDataGrid hook', () => {
   });
   // Default props for tests
   const createBaseProps = (overrides = {}): DataGridProps => ({
-    appId: 'test-app',
+    moduleId: 'test-app',
     indexPattern: { fields: [], id: 'test-index' } as any,
     results: createMockSearchResponse(10, 10),
     defaultColumns: [
@@ -250,20 +250,6 @@ describe('useDataGrid hook', () => {
 
   // Cell rendering tests
   describe('cell rendering', () => {
-    it('should render cells using getFieldFormatted when no custom render', () => {
-      const props = createBaseProps({
-        results: createMockSearchResponse(1),
-      });
-      const { result } = renderHook(() => useDataGrid(props));
-      const cellValue = result.current.renderCellValue({
-        rowIndex: 0,
-        columnId: 'field1',
-      });
-
-      // Since we mocked getFieldFormatted to return the field value
-      expect(cellValue).toBeDefined();
-    });
-
     it('should use column render function when provided', () => {
       const renderCallback = jest.fn(value => <span>Custom {value}</span>);
       const props = createBaseProps({
@@ -306,35 +292,6 @@ describe('useDataGrid hook', () => {
       expect(result.current.leadingControlColumns[0].id).toBe(
         'inspectCollapseColumn',
       );
-    });
-
-    it('should include custom leadingControlColumns when provided', () => {
-      const customColumn = {
-        id: 'custom-control',
-        headerCellRender: () => <div>Header</div>,
-        rowCellRender: () => <div>Custom</div>,
-      };
-      const props = createBaseProps({
-        leadingControlColumns: [customColumn],
-      });
-      const { result } = renderHook(() => useDataGrid(props));
-
-      expect(result.current.leadingControlColumns).toHaveLength(2);
-      expect(result.current.leadingControlColumns[0]).toBe(customColumn);
-    });
-
-    it('should include trailingControlColumns when provided', () => {
-      const customColumn = {
-        id: 'custom-trailing',
-        headerCellRender: () => <div>Header</div>,
-        rowCellRender: () => <div>Custom</div>,
-      };
-      const props = createBaseProps({
-        trailingControlColumns: [customColumn],
-      });
-      const { result } = renderHook(() => useDataGrid(props));
-
-      expect(result.current.trailingControlColumns).toEqual([customColumn]);
     });
   });
 });

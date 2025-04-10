@@ -6,7 +6,7 @@ import { localStorageStatePersistenceManager } from './data-grid-state-persisten
 import { DEFAULT_PAGE_SIZE } from './constants';
 
 interface UseDataGridColumnsProps {
-  moduleId: string;
+  appId: string;
   defaultColumns: EuiDataGridColumn[];
   columnSchemaDefinitionsMap: Record<string, DataGridColumn>;
 }
@@ -19,7 +19,7 @@ export interface DataGridColumnsReturn {
 }
 
 function useDataGridColumns({
-  moduleId,
+  appId,
   defaultColumns,
   columnSchemaDefinitionsMap,
 }: UseDataGridColumnsProps) {
@@ -29,7 +29,7 @@ function useDataGridColumns({
     useState<string[]>(defaultColumnsIds);
   // Create state management with memoized validation function
   const dataGridStateManager = useDataGridStatePersistenceManager({
-    stateManagement: localStorageStatePersistenceManager(moduleId),
+    stateManagement: localStorageStatePersistenceManager(appId),
     defaultState: {
       columns: defaultColumnsIds,
       columnsWidth: {},
@@ -74,7 +74,7 @@ function useDataGridColumns({
       visibleColumns,
       JSON.stringify(columnSchemaDefinitionsMap),
       dataGridStateManager,
-      moduleId,
+      appId,
     ],
   );
 
@@ -127,7 +127,7 @@ function useDataGridColumns({
       setVisibleColumnsHandler(defaultColumnsIds);
     }
     // I need AllColumns to trigger updates when it changes, because when I retrieve the persisted column state, I need to verify that those persisted columns actually exist within the columns defined in the Index Pattern. That’s why I need both.
-  }, [moduleId, JSON.stringify(columnSchemaDefinitionsMap)]);
+  }, [appId, JSON.stringify(columnSchemaDefinitionsMap)]);
 
   const onColumnResize: EuiDataGridProps['onColumnResize'] = ({
     columnId,
@@ -160,7 +160,7 @@ function useDataGridColumns({
 
         return column;
       }),
-    [visibleColumns, JSON.stringify(columnSchemaDefinitionsMap), moduleId],
+    [visibleColumns, JSON.stringify(columnSchemaDefinitionsMap), appId],
   );
 
   return {
