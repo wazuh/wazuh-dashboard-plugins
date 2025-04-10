@@ -17,6 +17,7 @@ import { getAgentManagement } from '../../../plugin-services';
 import { SearchBarProps } from '../../../../../wazuh-core/public/components';
 import WazuhDataGrid from '../wazuh-data-grid/wz-data-grid';
 import { agentsTableSelection } from '../../agents/list/actions/actions';
+import { DEFAULT_PAGE_SIZE_OPTIONS } from '../data-grid/constants';
 import useSearchBar, {
   TUseSearchBarProps,
 } from './components/search-bar/use-search-bar';
@@ -144,7 +145,15 @@ export const TableIndexer = (props: {
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 15,
+    // Initialize `pageSize` to 0 to avoid unnecessary multiple fetches. The
+    // `WazuhDataGrid` component internally uses a hook (`useDataGrid`) that
+    // also manages pagination state. When the component mounts, the local state
+    // and the hook's internal state can conflict, causing multiple pagination
+    // updates and triggering 2–3 redundant fetches to the indexer. By starting
+    // with `pageSize = 0` and adding a conditional check to prevent fetching
+    // until a valid `pageSize` is set, we ensure the data is fetched only once
+    // correctly.
+    pageSize: 0,
   });
   const [sorting, setSorting] = useState<{
     columns: {
@@ -178,6 +187,13 @@ export const TableIndexer = (props: {
   }, [agentSelected]);
 
   const search = () => {
+    // By starting with `pageSize = 0` and adding a conditional check to prevent
+    // fetching until a valid `pageSize` is set, we ensure the data is fetched
+    // only once correctly.
+    if (pagination.pageSize === 0) {
+      return;
+    }
+
     setLoadingSearch(true);
     getAgentManagement()
       .getAll({
@@ -215,7 +231,7 @@ export const TableIndexer = (props: {
   const tablePagination = {
     ...pagination,
     totalItemCount: total,
-    pageSizeOptions: [15, 25, 50, 100],
+    pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
     hidePerPageOptions: false,
   };
 
@@ -253,8 +269,7 @@ export const TableIndexer = (props: {
           onChangePagination={pagination => {
             setPagination(prev => ({
               ...prev,
-              pageIndex: pagination.pageIndex,
-              pageSize: pagination.pageSize,
+              ...pagination,
             }));
           }}
           onChangeSorting={({ columns }) => {
