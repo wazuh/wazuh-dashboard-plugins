@@ -13,7 +13,11 @@ import {
   getFieldFormatted,
   parseColumns,
 } from './data-grid-service';
-import { DataGridColumn, DataGridRenderColumn } from './types';
+import {
+  DataGridColumn,
+  DataGridRenderColumn,
+  PaginationOptions,
+} from './types';
 import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_PAGINATION_OPTIONS,
@@ -78,7 +82,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
   };
 
   /** Pagination **/
-  const [pagination, setPagination] = useState<EuiDataGridProps['pagination']>({
+  const [pagination, setPagination] = useState<PaginationOptions>({
     ...DEFAULT_PAGINATION_OPTIONS,
     ...defaultPagination,
   });
@@ -186,7 +190,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     defaultState: {
       columns: defaultColumns.map(column => column.id),
       columnsWidth: {},
-      pageSize: defaultPagination.pageSize || DEFAULT_PAGE_SIZE,
+      pageSize: pagination?.pageSize || DEFAULT_PAGE_SIZE,
     },
     columnSchemaDefinitionsMap,
   });
