@@ -172,12 +172,16 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     rowIndex: number;
     columnId: string;
   }) => {
-    const rowsParsed = parseData(rows) || [];
+    // Ensure rowsParsed is always an array
+    const parsed = parseData(rows);
+    const rowsParsed = Array.isArray(parsed) ? parsed : [];
+
     // On the context data always is stored the current page data (pagination)
     // then the rowIndex is relative to the current page
     const relativeRowIndex = rowIndex % pagination.pageSize;
 
-    if (Object.prototype.hasOwnProperty.call(rowsParsed, relativeRowIndex)) {
+    // Safer check for array index
+    if (rowsParsed.length > relativeRowIndex && relativeRowIndex >= 0) {
       const fieldFormatted = getFieldFormatted(
         relativeRowIndex,
         columnId,
