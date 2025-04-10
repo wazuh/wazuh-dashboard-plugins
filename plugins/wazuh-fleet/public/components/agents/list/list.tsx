@@ -10,6 +10,7 @@ import {
   EuiTitle,
   EuiLink,
 } from '@elastic/eui';
+import { Subject } from 'rxjs';
 import { Agent, IAgentResponse } from '../../../../common/types';
 import { AgentResume } from '../details/resume';
 import {
@@ -41,6 +42,7 @@ export interface AgentListProps {
 }
 
 export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
+  const refresh$ = new Subject<void>();
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [agent, setAgent] = useState<IAgentResponse>();
@@ -50,7 +52,6 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
   const [isEditNameVisible, setIsEditNameVisible] = useState(false);
   const [agentSelected, setAgentSelected] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState<boolean>(false);
-  const [needReload, setNeedReload] = useState<boolean>(false);
   const [params, setParams] = useState({
     filters: [],
     query: '',
@@ -73,7 +74,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
   const reloadAgents = useCallback(() => {
     setAgentSelected([]);
     setAllAgentsSelected(false);
-    setNeedReload(true);
+    refresh$.next();
   }, []);
 
   const closeModal = () => {
@@ -129,8 +130,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
       {indexPatterns ? (
         <TableIndexer
           appId={AGENTS_ID}
-          needReload={needReload}
-          setNeedReload={setNeedReload}
+          refresh$={refresh$.asObservable()}
           setParams={setParams}
           setAllAgentsSelected={setAllAgentsSelected}
           filters={filters}

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiBasicTableProps,
   EuiPopover,
   EuiPopoverTitle,
   EuiButtonIcon,
 } from '@elastic/eui';
+import { Observable } from 'rxjs';
 import { SearchResponse } from '../../../../../../src/core/server';
 import {
   IndexPattern,
@@ -36,19 +36,18 @@ export interface TableAction {
   enabled?: (row, rowData) => boolean;
 }
 export interface TableIndexerProps {
+  appId: string;
   indexPatterns: IndexPattern;
   columns: any;
   filters: Filter[];
   tableSortingInitialField?: string;
   tableSortingInitialDirection?: string;
   topTableComponent?: (searchBarProps: TUseSearchBarProps) => React.ReactNode;
-  tablePropsIgnored?: EuiBasicTableProps;
   setAllAgentsSelected: (allAgentsSelected: boolean) => void;
   agentSelected: IAgentResponse[];
   setParams: (params: { filters: Filter[]; query: SearchBarProps }) => void;
-  needReload: boolean;
-  setNeedReload: (needReload: boolean) => void;
   actionsColumn?: TableAction[];
+  refresh$: Observable<void>;
 }
 
 export const actionsDropdown = (
@@ -114,21 +113,7 @@ export const actionsDropdown = (
   },
 ];
 
-export const TableIndexer = (props: {
-  appId: string;
-  indexPatterns: IndexPattern;
-  columns: any;
-  filters: Filter[];
-  tableSortingInitialField?: string;
-  tableSortingInitialDirection?: string;
-  topTableComponent?: (searchBarProps: TUseSearchBarProps) => React.ReactNode;
-  setAllAgentsSelected: (allAgentsSelected: boolean) => void;
-  agentSelected: IAgentResponse[];
-  setParams: (params: { filters: Filter[]; query: SearchBarProps }) => void;
-  needReload: boolean;
-  setNeedReload: (needReload: boolean) => void;
-  actionsColumn?: any;
-}) => {
+export const TableIndexer: React.FC<TableIndexerProps> = props => {
   const {
     appId,
     indexPatterns,
@@ -139,8 +124,7 @@ export const TableIndexer = (props: {
     filters: filtersDefault,
     agentSelected,
     setParams,
-    needReload,
-    setNeedReload,
+    refresh$,
   } = props;
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [pagination, setPagination] = useState({
@@ -222,11 +206,14 @@ export const TableIndexer = (props: {
   ]);
 
   useEffect(() => {
-    if (needReload) {
+    const subscription = refresh$.subscribe(() => {
       search();
-      setNeedReload(false);
-    }
-  }, [needReload]);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [refresh$]);
 
   const tablePagination = {
     ...pagination,
