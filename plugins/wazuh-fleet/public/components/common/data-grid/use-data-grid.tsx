@@ -1,27 +1,27 @@
 import {
   EuiDataGridCellValueElementProps,
-  EuiDataGridColumn,
   EuiDataGridProps,
   EuiDataGridSorting,
+  EuiDataGridColumn,
 } from '@elastic/eui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
-// ToDo: check how create this methods
+import dompurify from 'dompurify';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import {
   parseData,
   getFieldFormatted,
   parseColumns,
 } from './data-grid-service';
-import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
+import { DataGridColumn, DataGridRenderColumn } from './types';
+import {
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_PAGINATION_OPTIONS,
+  MAX_ENTRIES_PER_QUERY,
+} from './constants';
 import useDataGridColumns from './use-data-grid-columns';
-
-export type DataGridColumn = {
-  render?: (value: any, rowItem: object) => string | React.ReactNode;
-} & EuiDataGridColumn;
-
-export type DataGridRenderColumn = Required<Pick<DataGridColumn, 'render'>> &
-  Omit<DataGridColumn, 'render'>;
+import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
+import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
 
 export interface DataGridProps {
   appId: string;
@@ -73,7 +73,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
   const defaultSorting: EuiDataGridSorting['columns'] = getDefaultSorting();
   const [sortingColumns, setSortingColumns] = useState(defaultSorting);
 
-  const onSort = sortingColumns => {
+  const onSort = (sortingColumns: EuiDataGridSorting['columns']) => {
     setSortingColumns(sortingColumns);
   };
 
@@ -82,16 +82,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     ...DEFAULT_PAGINATION_OPTIONS,
     ...defaultPagination,
   });
-  const onChangeItemsPerPage = useMemo(
-    () => pageSize =>
-      setPagination(pagination => ({
-        ...pagination,
-        pageSize,
-        pageIndex: 0,
-      })),
-    [rows, rowCount],
-  );
-  const onChangePage = pageIndex =>
+  const onChangePage = (pageIndex: number) =>
     setPagination(pagination => ({ ...pagination, pageIndex }));
 
   useEffect(() => {
@@ -102,8 +93,14 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     setPagination(pagination => ({ ...pagination, pageIndex: 0 }));
   }, [rowCount]);
 
-  const renderCellValue = ({ rowIndex, columnId }) => {
-    const rowsParsed = parseData(rows);
+  const renderCellValue = ({
+    rowIndex,
+    columnId,
+  }: {
+    rowIndex: number;
+    columnId: string;
+  }) => {
+    const rowsParsed = parseData(rows) || [];
     // On the context data always is stored the current page data (pagination)
     // then the rowIndex is relative to the current page
     const relativeRowIndex = rowIndex % pagination.pageSize;
@@ -134,7 +131,23 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
         );
       }
 
-      return fieldFormatted;
+      // Format the value using the field formatter
+      // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.19.1/src/plugins/discover/public/application/components/data_grid/data_grid_table_cell_value.tsx#L80-L89
+      const formattedValue = indexPattern.formatField(
+        rows[relativeRowIndex],
+        columnId,
+      );
+
+      if (formattedValue === undefined) {
+        return <span>-</span>;
+      } else {
+        const sanitizedCellValue = dompurify.sanitize(formattedValue);
+
+        return (
+          // eslint-disable-next-line react/no-danger
+          <span dangerouslySetInnerHTML={{ __html: sanitizedCellValue }} />
+        );
+      }
     }
 
     return null;
@@ -146,7 +159,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
       {
         id: 'inspectCollapseColumn',
         headerCellRender: () => null,
-        rowCellRender: props =>
+        rowCellRender: (props: EuiDataGridCellValueElementProps) =>
           DocViewInspectButton({
             ...props,
             rowIndex: props.rowIndex % pagination.pageSize,
@@ -160,11 +173,49 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     () => parseColumns(indexPattern?.fields || [], defaultColumns),
     [indexPattern?.fields, defaultColumns],
   );
+  // Convert column definitions to Record<string, EuiDataGridColumn>
+  const columnSchemaDefinitionsMap: Record<string, EuiDataGridColumn> = useMemo(
+    () =>
+      Object.fromEntries(
+        columnSchemaDefinitions.map(column => [column.id, column]),
+      ),
+    [columnSchemaDefinitions],
+  );
+  const dataGridStateManager = useDataGridStatePersistenceManager({
+    stateManagement: localStorageStatePersistenceManager(appId),
+    defaultState: {
+      columns: defaultColumns.map(column => column.id),
+      columnsWidth: {},
+      pageSize: defaultPagination.pageSize || DEFAULT_PAGE_SIZE,
+    },
+    columnSchemaDefinitionsMap,
+  });
+  const onChangeItemsPerPage = useMemo(
+    () => (pageSize: number) => {
+      setPagination(pagination => ({
+        ...pagination,
+        pageSize,
+        pageIndex: 0,
+      }));
+      dataGridStateManager.updateState({
+        pageSize,
+      });
+    },
+    [rows, rowCount],
+  );
+
+  useEffect(() => {
+    setPagination(pagination => ({
+      ...pagination,
+      pageSize: dataGridStateManager.retrieveState().pageSize,
+    }));
+  }, [appId]);
+
   const { columnsAvailable, columns, columnVisibility, onColumnResize } =
     useDataGridColumns({
       appId,
       defaultColumns,
-      columnSchemaDefinitions,
+      columnSchemaDefinitionsMap,
     });
 
   return {
@@ -174,8 +225,8 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     columnVisibility,
     onColumnResize,
     renderCellValue: renderCellValue,
-    leadingControlColumns: leadingControlColumns,
-    trailingControlColumns: trailingControlColumns,
+    trailingControlColumns,
+    leadingControlColumns,
     rowCount: Math.min(rowCount, MAX_ENTRIES_PER_QUERY),
     sorting: { columns: sortingColumns, onSort },
     pagination: {
@@ -183,5 +234,6 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
       onChangeItemsPerPage: onChangeItemsPerPage,
       onChangePage: onChangePage,
     },
-  };
+    setPagination,
+  } as EuiDataGridProps;
 };

@@ -16,10 +16,7 @@ import { IndexPattern, SearchResponse } from 'src/plugins/data/public';
 import { useDataGrid, exportSearchToCSV } from '../data-grid';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
-import useDataGridStatePersistenceManager from '../data-grid/data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
-import { DataGridState } from '../data-grid/data-grid-state-persistence-manager/types';
 import {
-  DEFAULT_PAGE_SIZE,
   DEFAULT_PAGINATION_OPTIONS,
   MAX_ENTRIES_PER_QUERY,
 } from '../data-grid/constants';
@@ -97,14 +94,6 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     );
   };
 
-  const { retrieveState: retrievePageSize, persistState: persistPageSize } =
-    useDataGridStatePersistenceManager<DataGridState['pageSize']>({
-      stateManagement: localStoragePageSizeStatePersistenceManager,
-      defaultState: DEFAULT_PAGE_SIZE,
-      validateState(state) {
-        return typeof state === 'number' && Number.isInteger(state);
-      },
-    });
   const dataGridProps = useDataGrid({
     appId,
     ariaLabelledBy: 'Actions data grid',
@@ -118,24 +107,13 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     pagination: {
       ...DEFAULT_PAGINATION_OPTIONS,
       ...defaultPagination,
-      pageSize: retrievePageSize(appId),
     },
   });
   const { pagination, sorting, columnVisibility } = dataGridProps;
 
   useEffect(() => {
-    onChangePagination({
-      ...pagination,
-      pageSize: retrievePageSize(appId),
-    });
-  }, [appId]);
-
-  useEffect(() => {
-    if (onChangePagination) {
-      onChangePagination(pagination);
-      persistPageSize(appId, pagination.pageSize);
-    }
-  }, [JSON.stringify(pagination)]);
+    onChangePagination(pagination);
+  }, [appId, JSON.stringify(pagination)]);
 
   useEffect(() => {
     if (onChangeSorting) {
