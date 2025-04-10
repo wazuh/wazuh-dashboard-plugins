@@ -45,6 +45,7 @@ import {
 import { Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
+import { AppInfo } from './types';
 
 const configurationTabID = 'configuration';
 
@@ -81,7 +82,7 @@ class SettingsComponent extends React.Component {
   apiIsDown;
   googleGroupsSVG;
   currentDefault;
-  appInfo;
+  appInfo: AppInfo | undefined;
 
   constructor(props) {
     super(props);
@@ -295,7 +296,6 @@ class SettingsComponent extends React.Component {
       const response = data.data.data;
       this.appInfo = {
         'app-version': response['app-version'],
-        revision: response['revision'],
       };
 
       this.setState({ load: false });
