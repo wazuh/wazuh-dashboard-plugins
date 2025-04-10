@@ -138,7 +138,7 @@ describe('useDataGridStatePersistenceManager', () => {
 
     const retrievedState = result.current.retrieveState();
 
-    expect(mockStateManagement.retrieveState).toHaveBeenCalledTimes(1);
+    expect(mockStateManagement.retrieveState).toHaveBeenCalledTimes(2);
     expect(retrievedState.pageSize).toEqual(DEFAULT_PAGE_SIZE);
   });
 
