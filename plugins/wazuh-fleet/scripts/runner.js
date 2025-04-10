@@ -46,7 +46,9 @@ function getJestArgs() {
   const index = process.argv.indexOf('test');
   const args = process.argv.slice(index + 1);
   // Remove duplicates using set
-  return Array.from(new Set([...args, '--runInBand'])).join(' ');
+  return Array.from(
+    new Set([...args, '--runInBand', '--collectCoverage=false']),
+  ).join(' ');
 }
 
 /**
@@ -87,6 +89,7 @@ function startRunner() {
     '--project-directory',
     COMPOSE_DIR,
     'up',
+    '--no-log-prefix',
   ]);
 
   runner.stdout.on('data', data => {
