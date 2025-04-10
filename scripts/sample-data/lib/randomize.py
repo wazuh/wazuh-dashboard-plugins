@@ -53,7 +53,7 @@ class Randomize():
             "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
         }
 
-    def mac_address():
+    def mac_address(self):
         mac = [random.randint(0x00, 0xFF) for _ in range(6)]
         return ':'.join(f'{octet:02x}' for octet in mac)
 

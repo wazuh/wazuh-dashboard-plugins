@@ -26,7 +26,7 @@ def generate_random_root_host():
             "minor": f"{random.randint(1, 100)}",
             "name": random.choice(["Linux", "Windows", "macOS"]),
             "patch": f"{random.randint(1, 100)}",
-            "platform": random.choice(["platform1", "platform2"]),
+            "platform": random.choice(["platform1", "platform2","platform3", "platform4","platform5", "platform6"]),
             "version": f"{random.randint(0, 9)}.{random.randint(0, 9)}.{random.randint(0, 9)}",
         },
     }

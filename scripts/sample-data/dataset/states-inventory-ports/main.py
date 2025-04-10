@@ -40,7 +40,7 @@ def generate_document(params):
     return generate.document({
         "destination": generate_random_destination(),
         "file": generate_random_file(),
-        "host": generate_random_root_host(True),
+        "host": generate_random_root_host(),
         "interface": {"state": random.choice(["LISTEN", "ESTABLISHED"])},
         "network": {"transport": random.choice(["TCP", "UDP", "ICMP"])},
         "process": generate_random_process(),

@@ -35,7 +35,7 @@ def generate_random_interface():
     }
 
 def generate_random_observer():
-    return {"ingress": {"interface": generate_random_interface(False)}}
+    return {"ingress": {"interface": generate_random_interface()}}
 
 def generate_document(params):
     # https://github.com/wazuh/wazuh-indexer/pull/744
