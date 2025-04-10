@@ -146,6 +146,17 @@ const useDataGridStatePersistenceManager = ({
     stateManagement.clearState();
   };
 
+  const persistState = (payload: Partial<DataGridState>): void => {
+    stateManagement.persistState(payload);
+  };
+
+  const updateState = (payload: Partial<DataGridState>): void => {
+    const currentState = stateManagement.retrieveState();
+    const newState = { ...currentState, ...payload };
+
+    persistState(newState);
+  };
+
   const retrieveState = (): DataGridState => {
     const state: DataGridState = Object.assign(
       {},
@@ -170,6 +181,7 @@ const useDataGridStatePersistenceManager = ({
       validateColumnsState(state.columns ?? []);
     } catch {
       state.columns = [];
+      updateState({ columns: [] });
       console.warn('Columns state was invalid, resetting to default.');
     }
 
@@ -177,6 +189,7 @@ const useDataGridStatePersistenceManager = ({
       validateColumnWidthsState(state.columnsWidth ?? {});
     } catch {
       state.columnsWidth = {};
+      updateState({ columnsWidth: {} });
       console.warn('Columns width state was invalid, resetting to default.');
     }
 
@@ -184,6 +197,7 @@ const useDataGridStatePersistenceManager = ({
       validatePageSizeState(state.pageSize ?? 0);
     } catch {
       state.pageSize = DEFAULT_PAGE_SIZE;
+      updateState({ pageSize: DEFAULT_PAGE_SIZE });
       console.warn('Page size state was invalid, resetting to default.');
     }
 
@@ -192,17 +206,6 @@ const useDataGridStatePersistenceManager = ({
     }
 
     return defaultState;
-  };
-
-  const persistState = (payload: Partial<DataGridState>): void => {
-    stateManagement.persistState(payload);
-  };
-
-  const updateState = (payload: Partial<DataGridState>): void => {
-    const currentState = retrieveState();
-    const newState = { ...currentState, ...payload };
-
-    persistState(newState);
   };
 
   return {
