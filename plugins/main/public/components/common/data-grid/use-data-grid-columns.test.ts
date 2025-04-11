@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import useDataGridColumns from './use-data-grid-columns';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
-import { TDataGridColumn } from './types';
+import { tDataGridColumn } from './types';
 
 // Mock the persistence manager hook
 jest.mock(
@@ -17,7 +17,7 @@ describe('useDataGridColumns', () => {
 
   // Sample test data
   const moduleId = 'test-app';
-  const defaultColumns: TDataGridColumn[] = [
+  const defaultColumns: tDataGridColumn[] = [
     { id: 'col1', display: 'Column 1' },
     { id: 'col2', display: 'Column 2' },
   ];
@@ -27,7 +27,7 @@ describe('useDataGridColumns', () => {
     col2: { id: 'col2', display: 'Column 2' },
     col3: { id: 'col3', display: 'Column 3' },
   };
-  const columnSchemaDefinitions: TDataGridColumn[] = [
+  const columnSchemaDefinitions: tDataGridColumn[] = [
     { id: 'col1', display: 'Column 1' },
     { id: 'col2', display: 'Column 2' },
     { id: 'col3', display: 'Column 3' },
@@ -60,6 +60,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -83,6 +84,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -97,6 +99,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const newVisibleColumns = ['col2', 'col3'];
@@ -126,6 +129,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -159,6 +163,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -195,6 +200,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -227,6 +233,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const testColumnId = 'col1';
@@ -263,6 +270,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -322,6 +330,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -354,6 +363,7 @@ describe('useDataGridColumns', () => {
         moduleId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
