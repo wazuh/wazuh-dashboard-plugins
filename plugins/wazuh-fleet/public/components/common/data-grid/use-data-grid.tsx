@@ -196,6 +196,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
       pageSize: pagination?.pageSize || DEFAULT_PAGE_SIZE,
     },
     columnSchemaDefinitionsMap,
+    indexPatternExists: !!indexPattern,
   });
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) => {
@@ -223,6 +224,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
       appId,
       defaultColumns,
       columnSchemaDefinitionsMap,
+      indexPatternExists: !!indexPattern,
     });
 
   return {
