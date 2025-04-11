@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   EuiPageHeader,
   EuiSpacer,
@@ -65,17 +65,22 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
     },
   });
 
+  useEffect(() => {
+    const subscription = refresh$.subscribe(() => {
+      setAgentSelected([]);
+      setAllAgentsSelected(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [refresh$]);
+
   const navigateToDeployNewAgent = () => {
     getWazuhCore()
       .navigationService.getInstance()
       .navigate(enrollmentAgent.path);
   };
-
-  const reloadAgents = useCallback(() => {
-    setAgentSelected([]);
-    setAllAgentsSelected(false);
-    refresh$.next();
-  }, []);
 
   const closeModal = () => {
     setIsDeleteModalVisible(false);
@@ -89,7 +94,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
         await getAgentManagement().delete(agent._source.agent.id);
         setIsLoadingModal(false);
         closeModal();
-        reloadAgents();
+        refresh$.next();
       } catch {
         setIsLoadingModal(false);
       }
@@ -120,7 +125,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             allowEditGroups
             allowGetTasks
             allowUpgrade
-            reloadAgents={() => reloadAgents()}
+            reloadAgents={() => refresh$.next()}
             allAgentsSelected={allAgentsSelected}
             params={params}
           />,
@@ -160,7 +165,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             setIsEditGroupsVisible(false);
             setAgent(undefined);
           }}
-          reloadAgents={() => reloadAgents()}
+          reloadAgents={() => refresh$.next()}
           agent={agent}
         />
       )}
@@ -177,7 +182,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
       {isUpgradeModalVisible && agent && (
         <UpgradeAgentModal
           agent={agent}
-          reloadAgents={() => reloadAgents()}
+          reloadAgents={() => refresh$.next()}
           onClose={() => {
             setIsUpgradeModalVisible(false);
             setAgent(undefined);
@@ -190,7 +195,7 @@ export const AgentList = ({ indexPatterns, filters }: AgentListProps) => {
             setIsEditNameVisible(false);
             setAgent(undefined);
           }}
-          reloadAgents={() => reloadAgents()}
+          reloadAgents={() => refresh$.next()}
           agent={agent}
         />
       )}
