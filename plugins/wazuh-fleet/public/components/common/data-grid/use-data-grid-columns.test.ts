@@ -15,7 +15,7 @@ describe('useDataGridColumns', () => {
   const mockUpdateState = jest.fn();
   const mockClearState = jest.fn();
   // Sample test data
-  const moduleId = 'test-app';
+  const appId = 'test-app';
   const defaultColumns: DataGridColumn[] = [
     { id: 'col1', display: 'Column 1' },
     { id: 'col2', display: 'Column 2' },
@@ -56,9 +56,10 @@ describe('useDataGridColumns', () => {
   it('should initialize with default columns', () => {
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -79,9 +80,10 @@ describe('useDataGridColumns', () => {
 
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -93,9 +95,10 @@ describe('useDataGridColumns', () => {
   it('should update visible columns when setVisibleColumns is called', () => {
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const newVisibleColumns = ['col2', 'col3'];
@@ -122,9 +125,10 @@ describe('useDataGridColumns', () => {
 
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -155,9 +159,10 @@ describe('useDataGridColumns', () => {
 
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -191,9 +196,10 @@ describe('useDataGridColumns', () => {
 
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -223,9 +229,10 @@ describe('useDataGridColumns', () => {
 
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const testColumnId = 'col1';
@@ -259,9 +266,10 @@ describe('useDataGridColumns', () => {
 
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -318,9 +326,10 @@ describe('useDataGridColumns', () => {
 
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -350,9 +359,10 @@ describe('useDataGridColumns', () => {
 
     const { result } = renderHook(() =>
       useDataGridColumns({
-        moduleId,
+        appId,
         defaultColumns,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
