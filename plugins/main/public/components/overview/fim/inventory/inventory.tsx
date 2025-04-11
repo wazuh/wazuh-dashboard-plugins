@@ -20,6 +20,10 @@ import { WazuhFlyoutDiscoverNewFilterManagerRecentEvents } from '../../../common
 import { fileIntegrityMonitoring } from '../../../../utils/applications';
 import * as filesUtils from './inventory-files';
 import * as registriesUtils from './inventory-registries';
+import {
+  WzTableFlexGroup,
+  WzTableFlexItem,
+} from '../../../common/wazuh-discover/flex-layout';
 
 export const InventoryFIMFilesDocumentDetailsEvents = ({ document, agent }) => (
   <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
@@ -108,13 +112,8 @@ const InventoryFIMDashboard = withDataSourceInitiated({
         showQueryBar={true}
         showSaveQuery={true}
       />
-      <EuiPanel
-        paddingSize='s'
-        hasShadow={false}
-        hasBorder={false}
-        color='transparent'
-      >
-        <div>
+      <WzTableFlexGroup gutterSize='s'>
+        <WzTableFlexItem>
           <WzTableUseParentDataSource
             dataSource={dataSource}
             fetchFilters={[
@@ -140,9 +139,10 @@ const InventoryFIMDashboard = withDataSourceInitiated({
             }}
             displayOnlyNoResultsCalloutOnNoResults={true}
           />
-        </div>
-        <EuiSpacer size='s' />
-        <div>
+        </WzTableFlexItem>
+      </WzTableFlexGroup>
+      <WzTableFlexGroup gutterSize='s'>
+        <WzTableFlexItem>
           <WzTableUseParentDataSource
             dataSource={dataSource}
             fetchFilters={[
@@ -168,8 +168,8 @@ const InventoryFIMDashboard = withDataSourceInitiated({
             }}
             displayOnlyNoResultsCalloutOnNoResults={true}
           />
-        </div>
-      </EuiPanel>
+        </WzTableFlexItem>
+      </WzTableFlexGroup>
     </>
   ),
 );
