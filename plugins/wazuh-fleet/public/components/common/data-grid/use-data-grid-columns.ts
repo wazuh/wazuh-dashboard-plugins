@@ -150,7 +150,7 @@ function useDataGridColumns({
   const retrieveVisibleDataGridColumns = useMemo(
     (): EuiDataGridColumn[] =>
       visibleColumns.map((columnId: string) => {
-        const column = columnSchemaDefinitionsMap[columnId];
+        const column = { ...columnSchemaDefinitionsMap[columnId] };
         const savedColumnWidth =
           dataGridStateManager.retrieveState().columnWidths[columnId];
 
