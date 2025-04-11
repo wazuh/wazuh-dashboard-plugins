@@ -9,6 +9,7 @@ interface UseDataGridColumnsProps {
   moduleId: string;
   defaultColumns: EuiDataGridColumn[];
   columnSchemaDefinitionsMap: Record<string, tDataGridColumn>;
+  indexPatternExists: boolean;
 }
 
 export interface DataGridColumnsReturn {
@@ -22,6 +23,7 @@ function useDataGridColumns({
   moduleId,
   defaultColumns,
   columnSchemaDefinitionsMap,
+  indexPatternExists,
 }: UseDataGridColumnsProps) {
   const defaultColumnsIds: string[] =
     defaultColumns.map(column => column.id as string) || [];
@@ -37,6 +39,7 @@ function useDataGridColumns({
       pageSize: DEFAULT_PAGE_SIZE, // TODO: move this
     },
     columnSchemaDefinitionsMap,
+    indexPatternExists,
   });
 
   // Prevent infinite loop by checking if visibleColumns actually need updating
@@ -72,12 +75,7 @@ function useDataGridColumns({
 
       dataGridStateManager.updateState({ columns: columnsToPersist });
     },
-    [
-      visibleColumns,
-      JSON.stringify(columnSchemaDefinitionsMap),
-      dataGridStateManager,
-      moduleId,
-    ],
+    [visibleColumns, indexPatternExists, dataGridStateManager, moduleId],
   );
 
   const sortFirstMatchedColumns = (
@@ -116,6 +114,10 @@ function useDataGridColumns({
   };
 
   useEffect(() => {
+    if (!indexPatternExists) {
+      return;
+    }
+
     try {
       const persistedColumns = dataGridStateManager.retrieveState().columns;
 
@@ -129,7 +131,7 @@ function useDataGridColumns({
       setVisibleColumnsHandler(defaultColumnsIds);
     }
     // I need AllColumns to trigger updates when it changes, because when I retrieve the persisted column state, I need to verify that those persisted columns actually exist within the columns defined in the Index Pattern. That’s why I need both.
-  }, [moduleId, JSON.stringify(columnSchemaDefinitionsMap)]);
+  }, [moduleId, indexPatternExists]);
 
   const onColumnResize: EuiDataGridProps['onColumnResize'] = ({
     columnId,

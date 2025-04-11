@@ -9,12 +9,14 @@ interface UseDataGridStateManagementProps {
   stateManagement: ReturnType<DataGridStatePersistenceManager<DataGridState>>;
   defaultState: DataGridState;
   columnSchemaDefinitionsMap: Record<string, unknown>;
+  indexPatternExists: boolean;
 }
 
 const useDataGridStatePersistenceManager = ({
   stateManagement,
   defaultState,
   columnSchemaDefinitionsMap,
+  indexPatternExists,
 }: UseDataGridStateManagementProps) => {
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
@@ -29,6 +31,7 @@ const useDataGridStatePersistenceManager = ({
 
       // Only perform column existence validation if allColumns is initialized and has items
       if (
+        indexPatternExists &&
         columnSchemaDefinitionsMap &&
         Object.keys(columnSchemaDefinitionsMap).length > 0
       ) {
@@ -56,7 +59,7 @@ const useDataGridStatePersistenceManager = ({
       return true;
     },
     // Create state management with memoized validation function
-    [JSON.stringify(columnSchemaDefinitionsMap)],
+    [indexPatternExists],
   );
 
   const validateColumnsState = (columnIds: DataGridState['columns']) => {
