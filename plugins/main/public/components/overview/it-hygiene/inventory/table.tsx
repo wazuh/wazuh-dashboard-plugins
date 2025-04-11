@@ -23,7 +23,11 @@ export interface WzTableDiscoverProps {
 }
 
 export const WzTableUseParentDataSource = compose(
-  withPanel({ paddingSize: 's', hasShadow: false, hasBorder: true }),
+  withPanel({
+    paddingSize: 's',
+    hasShadow: false,
+    hasBorder: true,
+  }),
   withErrorBoundary,
 )(
   ({

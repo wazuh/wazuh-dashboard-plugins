@@ -1,0 +1,32 @@
+/* Create a table for equal height columns */
+.wz-table-flex-row {
+  display: table;
+  width: 100%;
+  table-layout: fixed; /* Ensures equal width for each cell */
+
+  &.wz-table-flex-row-gutter-size-s {
+    border-spacing: 8px; /* Sets a 8px gutter between the cells */
+  }
+
+  &.wz-table-flex-row-gutter-size-m {
+    border-spacing: 12px; /* Sets a 12px gutter between the cells */
+  }
+
+  &.wz-table-flex-row-gutter-size-l {
+    border-spacing: 16px; /* Sets a 16px gutter between the cells */
+  }
+
+  &.wz-table-flex-row-grow-height {
+    height: 200px; // WORKAROUND: this fixes a problem to match the height in the cell items, doing the cell items grow to match the tallest cell item. Defining any value in px seems to fix the problem.
+  }
+}
+
+/* Each container acts as a table cell */
+.wz-table-flex-item {
+  display: table-cell;
+  vertical-align: top;
+
+  & > * {
+    height: 100%; // WORKAROUND: this fixes a problem to match the height in the cell items, doing the cell items grow to match the tallest cell item.
+  }
+}

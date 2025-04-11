@@ -24,6 +24,10 @@ import portsColumns from './table-columns/ports';
 import interfacesColumns from './table-columns/interfaces';
 import { withSystemInventoryDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
 import { withDataSourceInitiated } from '../../../common/hocs';
+import {
+  WzTableFlexGroup,
+  WzTableFlexItem,
+} from '../../../common/wazuh-discover/flex-layout';
 
 const InventoryITHygieneDashboard = withDataSourceInitiated({
   dataSourceNameProp: 'dataSource',
@@ -52,14 +56,13 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
         showSaveQuery={true}
       />
       <EuiPanel
-        paddingSize='m'
+        paddingSize='s'
         hasShadow={false}
         hasBorder={false}
         color='transparent'
       >
-        <EuiFlexGroup gutterSize='s'>
-          {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
-          <EuiFlexItem style={{ width: 'calc(50% - 4px)' }}>
+        <WzTableFlexGroup>
+          <WzTableFlexItem>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -81,9 +84,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               tableDefaultColumns={packagesColumns}
               title='Packages'
             />
-          </EuiFlexItem>
-          {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
-          <EuiFlexItem style={{ width: 'calc(50% - 4px)' }}>
+          </WzTableFlexItem>
+          <WzTableFlexItem>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -106,11 +108,10 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               title='Windows updates'
               displayOnlyNoResultsCalloutOnNoResults={true}
             />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup gutterSize='s'>
-          {/* For a table in the same row has not the problem when exit from full screen, but the panel could grow to fit the column, overflowing the width of the window. Set the widt as 100% fix the responsive problem.*/}
-          <EuiFlexItem style={{ width: '100%' }}>
+          </WzTableFlexItem>
+        </WzTableFlexGroup>
+        <WzTableFlexGroup>
+          <WzTableFlexItem>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -133,11 +134,10 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               title='System'
               displayOnlyNoResultsCalloutOnNoResults={true}
             />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
-        <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem style={{ width: 'calc(33.33% - 8px)' }}>
+          </WzTableFlexItem>
+        </WzTableFlexGroup>
+        <WzTableFlexGroup>
+          <WzTableFlexItem>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -160,9 +160,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               title='Processes'
               displayOnlyNoResultsCalloutOnNoResults={true}
             />
-          </EuiFlexItem>
-          {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
-          <EuiFlexItem style={{ width: 'calc(33.33% - 8px)' }}>
+          </WzTableFlexItem>
+          <WzTableFlexItem>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -185,9 +184,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               title='Ports'
               displayOnlyNoResultsCalloutOnNoResults={true}
             />
-          </EuiFlexItem>
-          {/* Fix a width to avoid a problem when exit from full screen on data grid rendered in the same row */}
-          <EuiFlexItem style={{ width: 'calc(33.33% - 8px)' }}>
+          </WzTableFlexItem>
+          <WzTableFlexItem>
             <WzTableUseParentDataSource
               dataSource={dataSource}
               fetchFilters={[
@@ -210,8 +208,8 @@ const InventoryITHygieneDashboard = withDataSourceInitiated({
               title='Interfaces'
               displayOnlyNoResultsCalloutOnNoResults={true}
             />
-          </EuiFlexItem>
-        </EuiFlexGroup>
+          </WzTableFlexItem>
+        </WzTableFlexGroup>
       </EuiPanel>
     </>
   ),
