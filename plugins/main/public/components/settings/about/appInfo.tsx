@@ -1,11 +1,9 @@
 import { EuiCallOut, EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 import React from 'react';
+import { AppInfo } from '../types';
 
 interface SettingsAboutAppInfoProps {
-  appInfo?: {
-    'app-version': string;
-    revision: string;
-  };
+  appInfo?: AppInfo;
 }
 
 export const SettingsAboutAppInfo = ({
@@ -22,12 +20,6 @@ export const SettingsAboutAppInfo = ({
           <EuiText>
             App version:{' '}
             <b>{appInfo?.['app-version'] ? appInfo['app-version'] : ''}</b>
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem>
-          <EuiText>
-            App revision:{' '}
-            <b>{appInfo?.['revision'] ? appInfo['revision'] : ''}</b>
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
