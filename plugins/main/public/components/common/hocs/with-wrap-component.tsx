@@ -15,4 +15,34 @@ export const withWrapComponent =
     );
 
 export const withPanel = optionsPanel =>
-  withWrapComponent(EuiPanel, () => optionsPanel);
+  withWrapComponent(
+    ({
+      paddingSize,
+      hasShadow,
+      hasBorder,
+      borderRadius,
+      grow,
+      panelRef,
+      color,
+      className,
+      'aria-label': ariaLabel,
+      'data-test-subj': dataTestSubject,
+      children,
+    }) => {
+      const panelProps = {
+        paddingSize,
+        hasShadow,
+        hasBorder,
+        borderRadius,
+        grow,
+        panelRef,
+        color,
+        className,
+        'aria-label': ariaLabel,
+        'data-test-subj': dataTestSubject,
+        children,
+      };
+      return <EuiPanel {...panelProps}>{children}</EuiPanel>;
+    },
+    () => optionsPanel,
+  );

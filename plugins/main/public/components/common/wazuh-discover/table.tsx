@@ -65,6 +65,7 @@ import {
   withWrapComponent,
 } from '../hocs';
 import { compose } from 'redux';
+import { omit } from 'lodash';
 
 export interface TableDiscoverBasicTableProps<K> {
   dataGridProps: TDataGridReturn;
@@ -76,6 +77,12 @@ export interface TableDiscoverBasicTableProps<K> {
   isDataSourceLoading: boolean;
   displayOnlyNoResultsCalloutOnNoResults?: boolean;
 }
+
+const Padding = ({ children, style }: { children; style?: object }) => (
+  <div className='euiPanel--paddingSmall' {...{ style }}>
+    {children}
+  </div>
+);
 
 const TableDiscoverBasicTable: React.FunctionComponent<TableDiscoverBasicTableProps> =
   compose(
@@ -135,64 +142,55 @@ const TableDiscoverBasicTable: React.FunctionComponent<TableDiscoverBasicTablePr
       };
 
       return (
-        <EuiPanel
-          paddingSize='s'
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
-        >
-          <div>
-            <EuiDataGrid
-              {...dataGridProps}
-              className={sideNavDocked ? 'dataGridDockedNav' : ''}
-              toolbarVisibility={{
-                showColumnSelector: { allowHide: false },
-                additionalControls: (
-                  <>
-                    <HitsCounter
-                      hits={results?.hits?.total ?? 0}
-                      showResetButton={false}
-                      tooltip={
-                        results?.hits?.total &&
-                        results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                          ? {
-                              ariaLabel: 'Info',
-                              content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                                MAX_ENTRIES_PER_QUERY,
-                              )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                MAX_ENTRIES_PER_QUERY,
-                              )} hits.`,
-                              iconType: 'iInCircle',
-                              position: 'top',
-                            }
-                          : undefined
-                      }
-                    />
-                    <EuiButtonEmpty
-                      disabled={
-                        results?.hits?.total === 0 ||
-                        !dataGridProps?.columnVisibility?.visibleColumns?.length
-                      }
-                      size='xs'
-                      iconType='exportAction'
-                      color='text'
-                      isLoading={isExporting}
-                      className='euiDataGrid__controlBtn'
-                      onClick={onClickExportResults}
-                    >
-                      Export Formatted
-                    </EuiButtonEmpty>
+        <EuiDataGrid
+          {...omit(dataGridProps, ['columnsAvailable', 'setPagination'])}
+          className={sideNavDocked ? 'dataGridDockedNav' : ''}
+          toolbarVisibility={{
+            showColumnSelector: { allowHide: false },
+            additionalControls: (
+              <>
+                <HitsCounter
+                  hits={results?.hits?.total ?? 0}
+                  showResetButton={false}
+                  tooltip={
+                    results?.hits?.total &&
+                    results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                      ? {
+                          ariaLabel: 'Info',
+                          content: `The query results has exceeded the limit of ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits.`,
+                          iconType: 'iInCircle',
+                          position: 'top',
+                        }
+                      : undefined
+                  }
+                />
+                <EuiButtonEmpty
+                  disabled={
+                    results?.hits?.total === 0 ||
+                    !dataGridProps?.columnVisibility?.visibleColumns?.length
+                  }
+                  size='xs'
+                  iconType='exportAction'
+                  color='text'
+                  isLoading={isExporting}
+                  className='euiDataGrid__controlBtn'
+                  onClick={onClickExportResults}
+                >
+                  Export Formatted
+                </EuiButtonEmpty>
 
-                    <DataGridVisibleColumnsSelector
-                      availableColumns={dataGridProps.columnsAvailable}
-                      columnVisibility={dataGridProps.columnVisibility}
-                    />
-                  </>
-                ),
-              }}
-            />
-          </div>
-        </EuiPanel>
+                <DataGridVisibleColumnsSelector
+                  availableColumns={dataGridProps.columnsAvailable}
+                  columnVisibility={dataGridProps.columnVisibility}
+                />
+              </>
+            ),
+          }}
+        />
       );
     },
   );
@@ -226,9 +224,11 @@ const EnhancedTable: React.FunctionComponent<EnhancedTableProps<K>> =
     }: EnhancedTableProps<K>) => (
       <>
         {title && (
-          <EuiTitle data-test-subj='wz-discover-title' size='s'>
-            <h1>{title}</h1>
-          </EuiTitle>
+          <Padding style={{ paddingBottom: 0, paddingTop: 0 }}>
+            <EuiTitle data-test-subj='wz-discover-title' size='s'>
+              <h1>{title}</h1>
+            </EuiTitle>
+          </Padding>
         )}
         {showSearchBar && (
           <WzSearchBar
@@ -242,17 +242,19 @@ const EnhancedTable: React.FunctionComponent<EnhancedTableProps<K>> =
             }
           />
         )}
-        <TableDiscoverBasicTable
-          dataGridProps={dataGridProps}
-          results={results}
-          dataSource={dataSource}
-          fetchFilters={fetchFilters}
-          query={query}
-          displayOnlyNoResultsCalloutOnNoResults={
-            displayOnlyNoResultsCalloutOnNoResults
-          }
-          isDataSourceLoading={isDataSourceLoading}
-        />
+        <Padding>
+          <TableDiscoverBasicTable
+            dataGridProps={dataGridProps}
+            results={results}
+            dataSource={dataSource}
+            fetchFilters={fetchFilters}
+            query={query}
+            displayOnlyNoResultsCalloutOnNoResults={
+              displayOnlyNoResultsCalloutOnNoResults
+            }
+            isDataSourceLoading={isDataSourceLoading}
+          />
+        </Padding>
       </>
     ),
   );
