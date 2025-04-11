@@ -9,7 +9,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.13.0
 - Add persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
 
-## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 00
+## Wazuh v4.12.1 - OpenSearch Dashboards 2.19.1 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.12.1
+
+## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 01
 
 ### Added
 
@@ -31,6 +37,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed CSV export not filtering by timerange [#7304](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7304)
 - Fixed agent view not showing the latest agent state [#7336](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7336)
 - Fixed saved queries not displaying in the search bar [#7377](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7377)
+
+### Removed
+
+- Removed revision number from about page [#7390](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7390)
 
 ## Wazuh v4.11.2 - OpenSearch Dashboards 2.16.0 - Revision 02
 
