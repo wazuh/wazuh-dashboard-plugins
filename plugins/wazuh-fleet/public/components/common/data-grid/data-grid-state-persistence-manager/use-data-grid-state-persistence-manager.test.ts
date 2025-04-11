@@ -41,6 +41,7 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const retrievedState = result.current.retrieveState();
@@ -64,6 +65,7 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const retrievedState = result.current.retrieveState();
@@ -87,6 +89,7 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const retrievedState = result.current.retrieveState();
@@ -107,6 +110,7 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const retrievedState = result.current.retrieveState();
@@ -127,6 +131,7 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
     const retrievedState = result.current.retrieveState();
@@ -145,6 +150,7 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -170,6 +176,7 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
@@ -187,6 +194,7 @@ describe('useDataGridStatePersistenceManager', () => {
         stateManagement: mockStateManagement,
         defaultState,
         columnSchemaDefinitionsMap,
+        indexPatternExists: true,
       }),
     );
 
