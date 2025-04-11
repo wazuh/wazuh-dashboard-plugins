@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  EuiPageTemplate,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-} from '@elastic/eui';
+import { EuiPageTemplate, EuiPanel, EuiSpacer } from '@elastic/eui';
 import { useDataSourceWithSearchBar } from '../../../common/hooks/use-data-source-search-context';
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { IntlProvider } from 'react-intl';
@@ -114,71 +109,66 @@ const InventoryFIMDashboard = withDataSourceInitiated({
         showSaveQuery={true}
       />
       <EuiPanel
-        paddingSize='m'
+        paddingSize='s'
         hasShadow={false}
         hasBorder={false}
         color='transparent'
       >
-        <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem>
-            <WzTableUseParentDataSource
-              dataSource={dataSource}
-              fetchFilters={[
-                ...fetchFilters,
-                PatternDataSourceFilterManager.createFilter(
-                  FILTER_OPERATOR.EXISTS,
-                  'file.path',
-                  null,
-                  dataSource.title,
-                ),
-              ]}
-              fixedFilters={fixedFilters}
-              filters={filters}
-              setFilters={setFilters}
-              searchBarProps={searchBarProps}
-              fetchData={fetchData}
-              fingerprint={fingerprint}
-              isDataSourceLoading={isDataSourceLoading}
-              tableDefaultColumns={filesColumns}
-              title='Files'
-              additionalDocumentDetailsTabs={({ document }) => {
-                return [filesEventsDocumentDetailsTab({ document, agent })];
-              }}
-              displayOnlyNoResultsCalloutOnNoResults={true}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup gutterSize='s'>
-          <EuiFlexItem>
-            <WzTableUseParentDataSource
-              dataSource={dataSource}
-              fetchFilters={[
-                ...fetchFilters,
-                PatternDataSourceFilterManager.createFilter(
-                  FILTER_OPERATOR.EXISTS,
-                  'registry.path',
-                  null,
-                  dataSource.title,
-                ),
-              ]}
-              fixedFilters={fixedFilters}
-              filters={filters}
-              setFilters={setFilters}
-              searchBarProps={searchBarProps}
-              fetchData={fetchData}
-              fingerprint={fingerprint}
-              isDataSourceLoading={isDataSourceLoading}
-              tableDefaultColumns={registriesColumns}
-              title='Registries'
-              additionalDocumentDetailsTabs={({ document }) => {
-                return [
-                  registriesEventsDocumentDetailsTab({ document, agent }),
-                ];
-              }}
-              displayOnlyNoResultsCalloutOnNoResults={true}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        <div>
+          <WzTableUseParentDataSource
+            dataSource={dataSource}
+            fetchFilters={[
+              ...fetchFilters,
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.EXISTS,
+                'file.path',
+                null,
+                dataSource.title,
+              ),
+            ]}
+            fixedFilters={fixedFilters}
+            filters={filters}
+            setFilters={setFilters}
+            searchBarProps={searchBarProps}
+            fetchData={fetchData}
+            fingerprint={fingerprint}
+            isDataSourceLoading={isDataSourceLoading}
+            tableDefaultColumns={filesColumns}
+            title='Files'
+            additionalDocumentDetailsTabs={({ document }) => {
+              return [filesEventsDocumentDetailsTab({ document, agent })];
+            }}
+            displayOnlyNoResultsCalloutOnNoResults={true}
+          />
+        </div>
+        <EuiSpacer size='s' />
+        <div>
+          <WzTableUseParentDataSource
+            dataSource={dataSource}
+            fetchFilters={[
+              ...fetchFilters,
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.EXISTS,
+                'registry.path',
+                null,
+                dataSource.title,
+              ),
+            ]}
+            fixedFilters={fixedFilters}
+            filters={filters}
+            setFilters={setFilters}
+            searchBarProps={searchBarProps}
+            fetchData={fetchData}
+            fingerprint={fingerprint}
+            isDataSourceLoading={isDataSourceLoading}
+            tableDefaultColumns={registriesColumns}
+            title='Registries'
+            additionalDocumentDetailsTabs={({ document }) => {
+              return [registriesEventsDocumentDetailsTab({ document, agent })];
+            }}
+            displayOnlyNoResultsCalloutOnNoResults={true}
+          />
+        </div>
       </EuiPanel>
     </>
   ),
