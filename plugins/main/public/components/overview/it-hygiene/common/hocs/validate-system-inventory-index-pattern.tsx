@@ -11,9 +11,9 @@ import {
 const errorPromptTypes = {
   [ERROR_NO_INDICES_FOUND]: {
     title: () => 'System inventory could be disabled or has a problem',
-    body: (props: { error: { message: React.ReactNode } }) => (
+    body: ({ message }: { message: React.ReactNode }) => (
       <>
-        <p>{props.error.message}</p>
+        <p>{message}</p>
         <p>
           If the system inventory is enabled, then this could be caused by an
           error in: server side, server-indexer connection, indexer side, index
