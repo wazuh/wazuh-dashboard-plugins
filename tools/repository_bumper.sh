@@ -123,6 +123,46 @@ CURRENT_MAJOR_MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f1,2)
 NEW_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
 log "Current major.minor: $CURRENT_MAJOR_MINOR"
 log "New major.minor: $NEW_MAJOR_MINOR"
+
+# --- Version Comparison ---
+log "Comparing new version ($VERSION) with current version ($CURRENT_VERSION)..."
+
+# Split versions into parts using '.' as delimiter
+IFS='.' read -r -a NEW_VERSION_PARTS <<<"$VERSION"
+IFS='.' read -r -a CURRENT_VERSION_PARTS <<<"$CURRENT_VERSION"
+
+# Ensure both versions have 3 parts (Major.Minor.Patch)
+if [ ${#NEW_VERSION_PARTS[@]} -ne 3 ] || [ ${#CURRENT_VERSION_PARTS[@]} -ne 3 ]; then
+  log "ERROR: Invalid version format detected during comparison. Both versions must be x.y.z."
+  exit 1
+fi
+
+# Compare Major version
+if ((${NEW_VERSION_PARTS[0]} < ${CURRENT_VERSION_PARTS[0]})); then
+  log "ERROR: New major version (${NEW_VERSION_PARTS[0]}) cannot be lower than current major version (${CURRENT_VERSION_PARTS[0]})."
+  exit 1
+elif ((${NEW_VERSION_PARTS[0]} > ${CURRENT_VERSION_PARTS[0]})); then
+  log "Version check passed: New version ($VERSION) is greater than current version ($CURRENT_VERSION)."
+else
+  # Major versions are equal, compare Minor version
+  if ((${NEW_VERSION_PARTS[1]} < ${CURRENT_VERSION_PARTS[1]})); then
+    log "ERROR: New minor version (${NEW_VERSION_PARTS[1]}) cannot be lower than current minor version (${CURRENT_VERSION_PARTS[1]}) when major versions are the same."
+    exit 1
+  elif ((${NEW_VERSION_PARTS[1]} > ${CURRENT_VERSION_PARTS[1]})); then
+    log "Version check passed: New version ($VERSION) is greater than current version ($CURRENT_VERSION)."
+  else
+    # Major and Minor versions are equal, compare Patch version
+    if ((${NEW_VERSION_PARTS[2]} < ${CURRENT_VERSION_PARTS[2]})); then
+      log "ERROR: New patch version (${NEW_VERSION_PARTS[2]}) cannot be lower than current patch version (${CURRENT_VERSION_PARTS[2]}) when major and minor versions are the same."
+      exit 1
+    else
+      # Patch is greater or equal
+      log "Version check passed: New version ($VERSION) is greater than or equal to current version ($CURRENT_VERSION)."
+    fi
+  fi
+fi
+# --- End Version Comparison ---
+
 # --- End Pre-update checks ---
 
 # Function to update JSON file using sed (basic, assumes simple structure)
