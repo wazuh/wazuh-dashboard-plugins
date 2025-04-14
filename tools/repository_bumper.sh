@@ -285,6 +285,10 @@ fi
 # --- File Bumping Logic ---
 log "Starting file modifications..."
 
+# Construct the combined version-revision string
+COMBINED_VERSION_REVISION="${VERSION}-${REVISION}"
+log "Combined version-revision string: $COMBINED_VERSION_REVISION"
+
 # Update VERSION.json at the root
 VERSION_JSON_FILE="${REPO_PATH}/VERSION.json"
 if [ -f "$VERSION_JSON_FILE" ]; then
@@ -310,6 +314,14 @@ git ls-files "$PLUGINS_DIR" | grep '/wazuh.yml$' | while IFS= read -r yml_file; 
   full_yml_path=$(realpath "${yml_file}") # Use realpath for consistency
   log "Processing $full_yml_path"
   update_yaml "$full_yml_path" "version" "$VERSION"
+done
+
+# Use git ls-files to find tracked opensearch_dashboards.json files within the plugins directory
+git ls-files "$PLUGINS_DIR" | grep '/opensearch_dashboards.json$' | while IFS= read -r osd_json_file; do
+  # Ensure the file path is relative to the repository root or absolute for jq/yq
+  full_osd_json_path=$(realpath "${osd_json_file}")
+  log "Processing $full_osd_json_path"
+  update_json "$full_osd_json_path" "version" "$COMBINED_VERSION_REVISION"
 done
 
 # Conditionally update endpoints.json if major.minor version changed
