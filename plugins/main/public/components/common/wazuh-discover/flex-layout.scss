@@ -1,36 +1,70 @@
 /* Create a table for equal height columns */
-.wz-table-flex-row {
-  display: table;
-  width: 100%;
-  table-layout: fixed; /* Ensures equal width for each cell */
+@media only screen and (min-width: 768px) {
+  .wz-table-flex-row {
+    display: table;
+    width: 100%;
+    table-layout: fixed; /* Ensures equal width for each cell */
 
-  &.wz-table-flex-row-gutter-size-xs {
-    border-spacing: 4px; /* Sets a 4px gutter between the cells */
+    &.wz-table-flex-row-gutter-size-xs {
+      border-spacing: 4px; /* Sets a 4px gutter between the cells */
+    }
+
+    &.wz-table-flex-row-gutter-size-s {
+      border-spacing: 8px; /* Sets a 8px gutter between the cells */
+    }
+
+    &.wz-table-flex-row-gutter-size-m {
+      border-spacing: 12px; /* Sets a 12px gutter between the cells */
+    }
+
+    &.wz-table-flex-row-gutter-size-l {
+      border-spacing: 16px; /* Sets a 16px gutter between the cells */
+    }
+
+    &.wz-table-flex-row-grow-height {
+      height: 200px; // WORKAROUND: this fixes a problem to match the height in the cell items, doing the cell items grow to match the tallest cell item. Defining any value in px seems to fix the problem.
+    }
   }
 
-  &.wz-table-flex-row-gutter-size-s {
-    border-spacing: 8px; /* Sets a 8px gutter between the cells */
-  }
+  /* Each container acts as a table cell */
+  .wz-table-flex-item {
+    display: table-cell;
+    vertical-align: top;
 
-  &.wz-table-flex-row-gutter-size-m {
-    border-spacing: 12px; /* Sets a 12px gutter between the cells */
-  }
-
-  &.wz-table-flex-row-gutter-size-l {
-    border-spacing: 16px; /* Sets a 16px gutter between the cells */
-  }
-
-  &.wz-table-flex-row-grow-height {
-    height: 200px; // WORKAROUND: this fixes a problem to match the height in the cell items, doing the cell items grow to match the tallest cell item. Defining any value in px seems to fix the problem.
+    & > * {
+      height: 100%; // WORKAROUND: this fixes a problem to match the height in the cell items, doing the cell items grow to match the tallest cell item.
+    }
   }
 }
 
-/* Each container acts as a table cell */
-.wz-table-flex-item {
-  display: table-cell;
-  vertical-align: top;
+@media only screen and (max-width: 767px) {
+  .wz-table-flex-row {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 
-  & > * {
-    height: 100%; // WORKAROUND: this fixes a problem to match the height in the cell items, doing the cell items grow to match the tallest cell item.
+    &.wz-table-flex-row-gutter-size-xs {
+      gap: 4px; /* Sets a 4px gutter between the cells */
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    &.wz-table-flex-row-gutter-size-s {
+      gap: 8px; /* Sets a 8px gutter between the cells */
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+
+    &.wz-table-flex-row-gutter-size-m {
+      gap: 12px; /* Sets a 12px gutter between the cells */
+      margin-top: 12px;
+      margin-bottom: 12px;
+    }
+
+    &.wz-table-flex-row-gutter-size-l {
+      gap: 16px; /* Sets a 16px gutter between the cells */
+      margin-top: 16px;
+      margin-bottom: 16px;
+    }
   }
 }
