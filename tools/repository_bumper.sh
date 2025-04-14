@@ -189,6 +189,27 @@ update_endpoints_json() {
   }
 }
 
+# Function to update specFile URL in docker/imposter/wazuh-config.yml
+update_imposter_config() {
+  local new_version="$1"
+  local imposter_config_file="${REPO_PATH}/docker/imposter/wazuh-config.yml"
+
+  if [ ! -f "$imposter_config_file" ]; then
+    log "WARNING: $imposter_config_file not found. Skipping specFile URL update."
+    return
+  fi
+
+  log "Updating specFile URL in $imposter_config_file to version $new_version"
+
+  # Use sed to replace the version string within the specFile URL
+  # This regex targets the version part (e.g., 4.13.0) in the specific URL structure
+  sed -i -E "s|(specFile: https://raw.githubusercontent.com/wazuh/wazuh/)[0-9]+\.[0-9]+\.[0-9]+(.*)|\1${new_version}\2|" "$imposter_config_file" && log "Successfully updated specFile URL in $imposter_config_file" || {
+    log "ERROR: Failed to update specFile URL in $imposter_config_file using sed."
+    # Consider adding error handling or attempting to restore a backup if needed
+    exit 1
+  }
+}
+
 # Determine the tag suffix based on the stage
 # Always add the stage as a suffix now
 TAG_SUFFIX="-$STAGE"
@@ -243,6 +264,10 @@ else
   log "Major.minor version ($CURRENT_MAJOR_MINOR) remains the same. Skipping endpoints.json update."
 fi
 
+# Update docker/imposter/wazuh-config.yml specFile URL
+log "Updating docker/imposter/wazuh-config.yml..."
+update_imposter_config "$VERSION"
+
 # --- Update CHANGELOG.md Start ---
 log "Updating CHANGELOG.md..."
 CHANGELOG_FILE="${REPO_PATH}/CHANGELOG.md"
@@ -285,50 +310,5 @@ log "File modifications completed."
 log "WARNING: API spec data generation (if applicable) needs to be done manually or with other tools."
 # --- File Bumping Logic End ---
 
-# # --- Git Operations Start ---
-# log "Checking for changes to commit..."
-# if git diff --exit-code --quiet; then
-#   log "No changes detected after bumping. Nothing to commit."
-#   CHANGES_COMMITTED=false
-# else
-#   log "Changes detected. Committing..."
-#   git diff --name-only # Log modified files
-#   COMMIT_MSG="Bump v${VERSION}${TAG_SUFFIX}"
-#   git commit -S -am "$COMMIT_MSG" || {
-#     log "ERROR: Failed to commit changes."
-#     exit 1
-#   }
-#   log "Commit successful: $COMMIT_MSG"
-#   CHANGES_COMMITTED=true
-# fi
-
-# log "Creating tag: $TAG_NAME"
-# TAG_MSG="Wazuh plugins for Wazuh dashboard ${TAG_NAME}"
-# # Create a signed and annotated tag
-# git tag -s -m "$TAG_MSG" "$TAG_NAME" || {
-#   log "ERROR: Failed to create tag $TAG_NAME."
-#   exit 1
-# }
-# log "Tag created successfully: $TAG_NAME"
-
-# log "Pushing tag $TAG_NAME to remote origin"
-# git push origin "$TAG_NAME" || {
-#   log "ERROR: Failed to push tag $TAG_NAME."
-#   exit 1
-# }
-# log "Tag pushed successfully."
-
-# log "Resetting branch $TARGET_BRANCH to remote state (origin/$TARGET_BRANCH)"
-# git reset --hard "origin/$TARGET_BRANCH" || {
-#   log "ERROR: Failed to reset branch $TARGET_BRANCH."
-#   exit 1
-# }
-# log "Branch reset successfully."
-
-# if [ "$CHANGES_COMMITTED" = true ]; then
-#   log "WARNING: A commit was added to the tag, but the local branch $TARGET_BRANCH was reset to the state of the remote."
-# fi
-# # --- Git Operations End ---
-
 # log "Repository bump completed successfully"
-# exit 0
+exit 0
