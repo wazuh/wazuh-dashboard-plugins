@@ -228,6 +228,7 @@ export const InventoryITHygiene = withSystemInventoryDataSource(() => {
   return (
     <IntlProvider locale='en'>
       <>
+        {/* TODO: the usage of EuiPageTemplate could cause the data is refetched when changing the window width. This could affecting to FIM > Inventory too */}
         <EuiPageTemplate
           className='wz-table-discover-container'
           restrictWidth='100%'
