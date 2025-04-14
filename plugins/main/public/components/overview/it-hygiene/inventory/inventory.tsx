@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  EuiPageTemplate,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-} from '@elastic/eui';
+import { EuiPageTemplate } from '@elastic/eui';
 import { useDataSourceWithSearchBar } from '../../../common/hooks/use-data-source-search-context';
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { IntlProvider } from 'react-intl';
@@ -228,7 +223,7 @@ export const InventoryITHygiene = withSystemInventoryDataSource(() => {
   return (
     <IntlProvider locale='en'>
       <>
-        {/* TODO: the usage of EuiPageTemplate could cause the data is refetched when changing the window width. This could affecting to FIM > Inventory too */}
+        {/* FIX: the usage of EuiPageTemplate could cause the data is refetched when changing the window width. This could affecting to FIM > Inventory too */}
         <EuiPageTemplate
           className='wz-table-discover-container'
           restrictWidth='100%'
