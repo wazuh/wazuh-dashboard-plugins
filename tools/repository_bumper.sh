@@ -168,6 +168,16 @@ log "Using revision: $REVISION"
 # --- File Bumping Logic ---
 log "Starting file modifications..."
 
+# Update VERSION.json at the root
+VERSION_JSON_FILE="${REPO_PATH}/VERSION.json"
+if [ -f "$VERSION_JSON_FILE" ]; then
+  log "Processing $VERSION_JSON_FILE"
+  update_json "$VERSION_JSON_FILE" "version" "$VERSION"
+  update_json "$VERSION_JSON_FILE" "stage" "$STAGE"
+else
+  log "WARNING: $VERSION_JSON_FILE not found. Skipping update."
+fi
+
 # Use git ls-files to find tracked package.json files within the plugins directory, excluding test/cypress/package.json
 git ls-files "$PLUGINS_DIR" | grep '/package.json$' | grep -v 'test/cypress/package.json' | while IFS= read -r pkg_file; do
   # Ensure the file path is relative to the repository root or absolute for jq/yq
