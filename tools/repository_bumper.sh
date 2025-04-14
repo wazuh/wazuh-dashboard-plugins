@@ -112,7 +112,7 @@ update_json() {
 
   # Use jq to update the key. The '.key = value' syntax updates the key at the top level.
   # Read the file, apply the filter, and write to a temporary file, then replace the original.
-  jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$file" >"${file}.tmp" && mv "${file}.tmp" "$file" || {
+  jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$file" >"${file}.tmp" && mv "${file}.tmp" "$file" && log "Successfully updated $file" || {
     log "ERROR: Failed to update $key in $file using jq."
     rm -f "${file}.tmp" # Clean up temp file on error
     exit 1
@@ -134,7 +134,7 @@ update_yaml() {
 
   # Use yq to update the key. The 'e' flag evaluates the expression, '.' selects the root,
   # .$key selects the key, = assigns the value. The '-i' flag modifies the file in-place.
-  yq e ".${key} = \"${value}\"" -i "$file" || {
+  yq e ".${key} = \"${value}\"" -i "$file" && log "Successfully updated $file" || {
     log "ERROR: Failed to update $key in $file using yq."
     # Attempt to restore from backup if yq created one (though -i usually doesn't)
     # Or handle the error more robustly depending on yq version/behavior
@@ -180,7 +180,7 @@ done
 # Use git ls-files to find tracked wazuh.yml files within the plugins directory
 git ls-files "$PLUGINS_DIR" | grep '/wazuh.yml$' | while IFS= read -r yml_file; do
   # Ensure the file path is relative to the repository root or absolute for jq/yq
-  full_yml_path="${REPO_PATH}/${yml_file}"
+  full_yml_path=$(realpath "${yml_file}") # Use realpath for consistency
   log "Processing $full_yml_path"
   update_yaml "$full_yml_path" "version" "$VERSION"
 done
