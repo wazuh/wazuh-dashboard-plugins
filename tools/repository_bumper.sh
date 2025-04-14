@@ -97,18 +97,40 @@ log "Version: $VERSION"
 log "Stage: $STAGE"
 log "Repository path: $REPO_PATH"
 
+# --- Pre-update checks and data gathering ---
+MAIN_PACKAGE_JSON="${REPO_PATH}/plugins/main/package.json"
+if [ ! -f "$MAIN_PACKAGE_JSON" ]; then
+  log "ERROR: Main package.json not found at $MAIN_PACKAGE_JSON"
+  exit 1
+fi
+
+# Check if jq is installed early
+if ! command -v jq &>/dev/null; then
+  log "ERROR: jq command could not be found. Please install jq (https://stedolan.github.io/jq/download/)."
+  exit 1
+fi
+
+# Read current version from main package.json BEFORE updating it
+CURRENT_VERSION=$(jq -r '.version' "$MAIN_PACKAGE_JSON")
+if [ -z "$CURRENT_VERSION" ] || [ "$CURRENT_VERSION" == "null" ]; then
+  log "ERROR: Could not read current version from $MAIN_PACKAGE_JSON"
+  exit 1
+fi
+log "Current version detected in package.json: $CURRENT_VERSION"
+
+# Extract major.minor from current and new versions
+CURRENT_MAJOR_MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f1,2)
+NEW_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
+log "Current major.minor: $CURRENT_MAJOR_MINOR"
+log "New major.minor: $NEW_MAJOR_MINOR"
+# --- End Pre-update checks ---
+
 # Function to update JSON file using sed (basic, assumes simple structure)
 update_json() {
   local file="$1"
   local key="$2"
   local value="$3"
   log "Updating $key to $value in $file using jq"
-
-  # Check if jq is installed
-  if ! command -v jq &>/dev/null; then
-    log "ERROR: jq command could not be found. Please install jq (https://stedolan.github.io/jq/download/)."
-    exit 1
-  fi
 
   # Use jq to update the key. The '.key = value' syntax updates the key at the top level.
   # Read the file, apply the filter, and write to a temporary file, then replace the original.
@@ -142,17 +164,35 @@ update_yaml() {
   }
 }
 
+# Function to update documentation URLs in endpoints.json
+update_endpoints_json() {
+  local old_doc_version="$1"
+  local new_doc_version="$2"
+  local endpoints_file="${REPO_PATH}/plugins/main/common/api-info/endpoints.json"
+
+  if [ ! -f "$endpoints_file" ]; then
+    log "WARNING: $endpoints_file not found. Skipping documentation URL update."
+    return
+  fi
+
+  log "Updating documentation URLs in $endpoints_file from $old_doc_version to $new_doc_version"
+
+  # Use sed to replace the version string within the documentation URLs
+  # Escape dots in the version strings for sed
+  local escaped_old_version=$(echo "$old_doc_version" | sed 's/\./\\./g')
+  local escaped_new_version=$(echo "$new_doc_version" | sed 's/\./\\./g')
+
+  sed -i "s|documentation.wazuh.com/${escaped_old_version}|documentation.wazuh.com/${escaped_new_version}|g" "$endpoints_file" && log "Successfully updated documentation URLs in $endpoints_file" || {
+    log "ERROR: Failed to update documentation URLs in $endpoints_file using sed."
+    # Consider adding error handling or attempting to restore a backup if needed
+    exit 1
+  }
+}
+
 # Determine the tag suffix based on the stage
 # Always add the stage as a suffix now
 TAG_SUFFIX="-$STAGE"
 log "Tag suffix set to: $TAG_SUFFIX"
-
-# Find package.json files to use as reference
-MAIN_PACKAGE_JSON="${REPO_PATH}/plugins/main/package.json"
-if [ ! -f "$MAIN_PACKAGE_JSON" ]; then
-  log "ERROR: Main package.json not found at $MAIN_PACKAGE_JSON"
-  exit 1
-fi
 
 # Determine plugins directory
 PLUGINS_DIR="${REPO_PATH}/plugins"
@@ -195,10 +235,18 @@ git ls-files "$PLUGINS_DIR" | grep '/wazuh.yml$' | while IFS= read -r yml_file; 
   update_yaml "$full_yml_path" "version" "$VERSION"
 done
 
+# Conditionally update endpoints.json if major.minor version changed
+if [ "$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR" ]; then
+  log "Major.minor version changed ($CURRENT_MAJOR_MINOR -> $NEW_MAJOR_MINOR). Updating endpoints.json..."
+  update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
+else
+  log "Major.minor version ($CURRENT_MAJOR_MINOR) remains the same. Skipping endpoints.json update."
+fi
+
 # --- Update CHANGELOG.md Start ---
 log "Updating CHANGELOG.md..."
 CHANGELOG_FILE="${REPO_PATH}/CHANGELOG.md"
-PACKAGE_JSON_FILE="${REPO_PATH}/plugins/main/package.json"
+PACKAGE_JSON_FILE="${REPO_PATH}/plugins/main/package.json" # Re-read after potential update
 
 # Check if package.json exists
 if [ ! -f "$PACKAGE_JSON_FILE" ]; then
