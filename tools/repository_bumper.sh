@@ -185,8 +185,45 @@ git ls-files "$PLUGINS_DIR" | grep '/wazuh.yml$' | while IFS= read -r yml_file; 
   update_yaml "$full_yml_path" "version" "$VERSION"
 done
 
+# --- Update CHANGELOG.md Start ---
+log "Updating CHANGELOG.md..."
+CHANGELOG_FILE="${REPO_PATH}/CHANGELOG.md"
+PACKAGE_JSON_FILE="${REPO_PATH}/plugins/main/package.json"
+
+# Check if package.json exists
+if [ ! -f "$PACKAGE_JSON_FILE" ]; then
+  log "ERROR: package.json not found at $PACKAGE_JSON_FILE"
+  exit 1
+fi
+
+# Extract OpenSearch Dashboards version from package.json
+OPENSEARCH_VERSION=$(jq -r '.pluginPlatform.version' "$PACKAGE_JSON_FILE")
+if [ -z "$OPENSEARCH_VERSION" ] || [ "$OPENSEARCH_VERSION" == "null" ]; then
+  log "ERROR: Could not extract pluginPlatform.version from $PACKAGE_JSON_FILE"
+  exit 1
+fi
+log "Detected OpenSearch Dashboards version: $OPENSEARCH_VERSION"
+
+# Construct the new changelog entry
+# Note: Using printf for better handling of newlines and potential special characters
+NEW_ENTRY=$(printf "## Wazuh v%s - OpenSearch Dashboards %s - Revision 00\n\n### Added\n\n- Support for Wazuh %s\n" "$VERSION" "$OPENSEARCH_VERSION" "$VERSION")
+
+# Use awk to insert the new entry after the title and description (lines 1-4)
+awk -v entry="$NEW_ENTRY" '
+NR == 1 { print; next } # Print line 1 (# Change Log)
+NR == 2 { print; next } # Print line 2 (blank)
+NR == 3 { print; next } # Print line 3 (description)
+NR == 4 { print; printf "%s\n\n", entry; next } # Print line 4 (blank) and insert entry
+{ print } # Print the rest of the lines starting from line 5
+' "$CHANGELOG_FILE" >temp_changelog && mv temp_changelog "$CHANGELOG_FILE" || {
+  log "ERROR: Failed to update $CHANGELOG_FILE"
+  rm -f temp_changelog # Clean up temp file on error
+  exit 1
+}
+log "CHANGELOG.md updated successfully."
+# --- Update CHANGELOG.md End ---
+
 log "File modifications completed."
-log "WARNING: Changelog update needs to be done manually."
 log "WARNING: API spec data generation (if applicable) needs to be done manually or with other tools."
 # --- File Bumping Logic End ---
 
