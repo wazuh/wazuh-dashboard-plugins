@@ -6,6 +6,7 @@ export enum API_UPDATES_STATUS {
 }
 
 export interface ResponseApiAvailableUpdates {
+  uuid?: string;
   current_version?: string;
   update_check?: boolean;
   last_available_major?: Update;

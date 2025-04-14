@@ -92,6 +92,7 @@ export const getUpdates = async (
           availableUpdates = response.data.data as ResponseApiAvailableUpdates;
 
           const {
+            uuid,
             update_check,
             last_available_major,
             last_available_minor,
@@ -105,6 +106,7 @@ export const getUpdates = async (
           }
 
           return {
+            uuid,
             current_version: currentVersion,
             update_check,
             last_available_major,

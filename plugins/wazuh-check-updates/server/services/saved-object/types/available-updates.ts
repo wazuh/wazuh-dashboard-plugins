@@ -44,6 +44,9 @@ export const availableUpdatesObject: SavedObjectsType = {
       apis_available_updates: {
         type: 'nested',
         properties: {
+          uuid: {
+            type: 'text',
+          },
           api_id: {
             type: 'text',
           },

@@ -23,6 +23,7 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiText,
+  EuiLink,
   EuiLoadingSpinner,
   EuiIcon,
   EuiCallOut,
@@ -115,9 +116,9 @@ export const ApiTable = compose(withErrorBoundary)(
       this.refresh();
       this.wazuhConfig = new WazuhConfig().getConfig();
       this.isUpdatesEnabled = !this.wazuhConfig?.['wazuh.updates.disabled'];
-      if (this.isUpdatesEnabled) {
-        this.getApisAvailableUpdates();
-      }
+      // if (this.isUpdatesEnabled) {
+      this.getApisAvailableUpdates();
+      // }
     }
 
     copyToClipBoard(msg) {
@@ -367,6 +368,7 @@ export const ApiTable = compose(withErrorBoundary)(
           name: 'ID',
           align: 'left',
           sortable: true,
+          render: id => <EuiLink>{id}</EuiLink>,
         },
         {
           field: 'cluster_info.cluster',
