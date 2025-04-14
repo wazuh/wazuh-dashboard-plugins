@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v5.0.0 - OpenSearch Dashboards 2.18.0 - Revision 00
+## Wazuh v5.0.0 - OpenSearch Dashboards 2.19.1 - Revision 00
 
 ### Added
 
@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added creation of report definition when creating dashboard by reference and the button to reset the report [#7091](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7091)
 - Added a frontend http client to core plugin [#7000](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7000)
 - Added serverSecurity service to core plugin [#7026](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7026)
-- Added an initilization service to core plugin to run the initilization tasks related to user scope [#7145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7145)
+- Added an initilization service to core plugin to run the initilization tasks related to user scope [#7145](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7145) [#7262](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7262) [#7263](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7263)
 
 ### Removed
 
@@ -67,6 +67,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added pinned agent data validation when rendering the Inventory data, Stats and Configuration tabs in Agent preview of Endpoints Summary [#6800](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6800)
 - Added wz-link component to make redirections [#6848](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6848)
 - Added embedded and customized `dom-to-image-more` dependency [#6902](https://github.com/wazuh/wazuh-dashboard-plugins/pull/6902)
+- Added `wazuh-fleet` plugin [#7289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7289)
+- Added enrollment agent assistant to `wazuh-fleet` plugin [#7289](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7289)
 
 ### Changed
 

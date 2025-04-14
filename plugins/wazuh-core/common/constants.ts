@@ -586,28 +586,31 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     type: EpluginSettingType.switch,
     validate: SettingsValidator.isBoolean,
   },
-  'enrollment.dns': {
-    title: 'Enrollment DNS',
-    description:
-      'Specifies the Wazuh registration server, used for the agent enrollment.',
+  'enrollment.url': {
+    title: 'Enrollment server URL',
+    description: 'Specifies the enrollment agent server URL.',
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
-    ),
+    // TODO: this should be enabled when the configuration service of core plugin provides a mechanism to retrieve this definition to be used in the enrollment agent wizard. See https://github.com/wazuh/wazuh-dashboard/issues/514#issuecomment-2656602679
+    // validate: SettingsValidator.compose(
+    //   SettingsValidator.isString,
+    //   SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
+    // ),
   },
-  'enrollment.password': {
-    title: 'Enrollment password',
-    description:
-      'Specifies the password used to authenticate during the agent enrollment.',
+  'enrollment.commsUrl': {
+    title: 'Enrollment communications URL',
+    description: 'Specifies the enrollment communications API URL.',
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
     defaultValue: '',
-    validate: SettingsValidator.compose(SettingsValidator.isString),
+    // TODO: this should be enabled when the configuration service of core plugin provides a mechanism to retrieve this definition to be used in the enrollment agent wizard. See https://github.com/wazuh/wazuh-dashboard/issues/514#issuecomment-2656602679
+    // validate: SettingsValidator.compose(
+    //   SettingsValidator.isString,
+    //   SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
+    // ),
   },
   hideManagerAlerts: {
     title: 'Hide manager alerts',
@@ -617,115 +620,6 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     type: EpluginSettingType.switch,
     defaultValue: false,
     validate: SettingsValidator.isBoolean,
-  },
-  /* `# The following configuration is the default structure to define a host.
-#
-# hosts:
-#   # Host ID / name,
-#   - env-1:
-#       # Host URL
-#       url: https://env-1.example
-#       # Host / API port
-#       port: 55000
-#       # Host / API username
-#       username: wazuh-wui
-#       # Host / API password
-#       password: wazuh-wui
-#       # Use RBAC or not. If set to true, the username must be "wazuh-wui".
-#       run_as: true
-#   - env-2:
-#       url: https://env-2.example
-#       port: 55000
-#       username: wazuh-wui
-#       password: wazuh-wui
-#       run_as: true
-
-hosts:
-  - default:
-      url: https://localhost
-      port: 55000
-      username: wazuh-wui
-      password: wazuh-wui
-      run_as: false`,
-  */
-  hosts: {
-    title: 'Server hosts',
-    description: 'Configure the API connections.',
-    source: EConfigurationProviders.INITIALIZER_CONTEXT,
-    category: SettingCategory.API_CONNECTION,
-    type: EpluginSettingType.objectOf,
-    defaultValue: [],
-    options: {
-      objectOf: {
-        url: {
-          title: 'URL',
-          description: 'Server URL address',
-          type: EpluginSettingType.text,
-          defaultValue: 'https://localhost',
-          validate: SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-          ),
-        },
-        port: {
-          title: 'Port',
-          description: 'Port',
-          type: EpluginSettingType.number,
-          defaultValue: 55000,
-          options: {
-            number: {
-              min: 0,
-              max: 65535,
-              integer: true,
-            },
-          },
-          validate: function (value) {
-            return SettingsValidator.number(this.options?.number)(value);
-          },
-        },
-        username: {
-          title: 'Username',
-          description: 'Server API username',
-          type: EpluginSettingType.text,
-          defaultValue: 'wazuh-wui',
-          validate: SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-          ),
-        },
-        password: {
-          title: 'Password',
-          description: "User's Password",
-          type: EpluginSettingType.password,
-          defaultValue: 'wazuh-wui',
-          validate: SettingsValidator.compose(
-            SettingsValidator.isString,
-            SettingsValidator.isNotEmptyString,
-          ),
-        },
-        run_as: {
-          title: 'Run as',
-          description: 'Use the authentication context.',
-          type: EpluginSettingType.switch,
-          defaultValue: false,
-          options: {
-            switch: {
-              values: {
-                disabled: { label: 'false', value: false },
-                enabled: { label: 'true', value: true },
-              },
-            },
-          },
-          validate: SettingsValidator.isBoolean,
-        },
-      },
-    },
-    isConfigurableFromSettings: false,
-    // TODO: add validation
-    // validate: SettingsValidator.isBoolean,
-    // validate: function (schema) {
-    //   return schema.boolean();
-    // },
   },
   'ip.ignore': {
     title: 'Index pattern ignore',
@@ -1020,7 +914,6 @@ export const CRON_PREFIX = 'cron.prefix';
 export const CUSTOMIZATION_ENABLED = 'customization.enabled';
 
 export const ENROLLMENT_DNS = 'enrollment.dns';
-export const ENROLLMENT_PASSWORD = 'enrollment.password';
 
 export const IP_IGNORE = 'ip.ignore';
 export const IP_SELECTOR = 'ip.selector';

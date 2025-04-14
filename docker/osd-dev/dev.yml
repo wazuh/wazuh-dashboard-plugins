@@ -1,5 +1,3 @@
-version: '2.2'
-
 # x-logging: &logging
 #   logging:
 #     driver: loki
@@ -239,6 +237,7 @@ services:
       - ${OSD_PORT}:5601
     environment:
       - 'LOGS=/proc/1/fd/1'
+    tty: true
     volumes:
       - osd_cache:/home/node/.cache
       - '${SRC}/main:/home/node/kbn/plugins/main'
@@ -246,9 +245,11 @@ services:
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
       - '${SRC}/wazuh-engine:/home/node/kbn/plugins/wazuh-engine'
       - '${SRC}/wazuh-fleet:/home/node/kbn/plugins/wazuh-fleet'
+      - '${SRC}/wazuh-analysis:/home/node/kbn/plugins/wazuh-analysis'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
+    entrypoint: ${ENTRYPOINT}
 
   idpsec:
     image: quay.io/keycloak/keycloak:19.0.1

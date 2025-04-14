@@ -1,0 +1,7 @@
+{
+  "prefix": "wazuhAnalysis",
+  "paths": {
+    "wazuhAnalysis": "."
+  },
+  "translations": ["translations/en-US.json"]
+}

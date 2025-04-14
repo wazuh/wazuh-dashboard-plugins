@@ -12,7 +12,6 @@ import {
   WAZUH_PLUGIN_PLATFORM_SETTING_MAX_BUCKETS,
   WAZUH_PLUGIN_PLATFORM_SETTING_METAFIELDS,
   WAZUH_PLUGIN_PLATFORM_SETTING_TIME_FILTER,
-  EConfigurationProviders,
   PLUGIN_SETTINGS,
 } from '../common/constants';
 import {
@@ -26,25 +25,28 @@ import {
   WazuhCorePluginStart,
 } from './types';
 import { setCore } from './plugin-services';
-import {
-  ManageHosts,
-  createDashboardSecurity,
-  ServerAPIClient,
-  InitializationService,
-} from './services';
+import { createDashboardSecurity, InitializationService } from './services';
 // configuration common
 // configuration server
-import { InitializerConfigProvider } from './services/configuration';
-import { initializationTaskCreatorServerAPIConnectionCompatibility } from './initialization/server-api';
 import {
   initializationTaskCreatorExistTemplate,
   initializationTaskCreatorIndexPattern,
   initializationTaskCreatorSetting,
 } from './initialization';
-import alertsIndexPatternDefaultFields from './initialization/index-patterns-fields/alerts-fields.json';
 import monitoringIndexPatternDefaultFields from './initialization/index-patterns-fields/monitoring-fields.json';
 import statisticsIndexPatternDefaultFields from './initialization/index-patterns-fields/statistics-fields.json';
-import vulnerabilitiesStatesFields from './initialization/index-patterns-fields/vulnerabibility-states-fields.json';
+import indexPatternFieldsAgent from './initialization/index-patterns-fields/fields-agent.json';
+import indexPatternFieldsAlerts from './initialization/index-patterns-fields/fields-alerts.json';
+import indexPatternFieldsCommands from './initialization/index-patterns-fields/fields-commands.json';
+import indexPatternFieldsFim from './initialization/index-patterns-fields/fields-fim.json';
+import indexPatternFieldsHardware from './initialization/index-patterns-fields/fields-hardware.json';
+import indexPatternFieldsHotfixes from './initialization/index-patterns-fields/fields-hotfixes.json';
+import indexPatternFieldsNetworks from './initialization/index-patterns-fields/fields-networks.json';
+import indexPatternFieldsPackages from './initialization/index-patterns-fields/fields-packages.json';
+import indexPatternFieldsPorts from './initialization/index-patterns-fields/fields-ports.json';
+import indexPatternFieldsProcesses from './initialization/index-patterns-fields/fields-processes.json';
+import indexPatternFieldsSystem from './initialization/index-patterns-fields/fields-system.json';
+import indexPatternFieldsVulnerabilities from './initialization/index-patterns-fields/fields-vulnerabilities.json';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -76,10 +78,11 @@ export class WazuhCorePlugin
     );
 
     // add the initializer context config to the configuration store
-    this.internal.configurationStore.registerProvider(
-      EConfigurationProviders.PLUGIN_UI_SETTINGS,
-      new InitializerConfigProvider(this.initializerContext),
-    );
+    // Uncomment if there is at least one setting of "wazuh_core" plugin
+    // this.internal.configurationStore.registerProvider(
+    //   EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    //   new InitializerConfigProvider(this.initializerContext),
+    // );
 
     // create the configuration service to use like a facede pattern
     this.services.configuration = new Configuration(
@@ -89,19 +92,6 @@ export class WazuhCorePlugin
 
     this.services.configuration.setup();
 
-    this.services.manageHosts = new ManageHosts(
-      this.logger.get('manage-hosts'),
-      this.services.configuration,
-    );
-
-    this.services.serverAPIClient = new ServerAPIClient(
-      this.logger.get('server-api-client'),
-      this.services.manageHosts,
-      this.services.dashboardSecurity,
-    );
-
-    this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
-
     this.services.initialization = new InitializationService(
       this.logger.get('initialization'),
       this.services,
@@ -110,23 +100,24 @@ export class WazuhCorePlugin
     this.services.initialization.setup({ core });
 
     // Register initialization tasks
-    this.services.initialization.register(
-      initializationTaskCreatorServerAPIConnectionCompatibility({
-        taskName: 'check-server-api-connection-compatibility',
-      }),
-    );
+    // TODO: remove because the server API management is not used
+    // this.services.initialization.register(
+    //   initializationTaskCreatorServerAPIConnectionCompatibility({
+    //     taskName: 'check-server-api-connection-compatibility',
+    //   }),
+    // );
 
     // Index pattern: alerts
     // TODO: this task should be registered by the related plugin
     this.services.initialization.register(
       initializationTaskCreatorIndexPattern({
-        getIndexPatternID: ctx => ctx.configuration.get('pattern'),
+        getIndexPatternID: async () => 'wazuh-alerts-5.x-*', // TODO: this should use a static value or configurable setting in the server side
         taskName: 'index-pattern:alerts',
         options: {
           savedObjectOverwrite: {
-            timeFieldName: 'timestamp',
+            timeFieldName: '@timestamp',
           },
-          fieldsNoIndices: alertsIndexPatternDefaultFields,
+          fieldsNoIndices: indexPatternFieldsAlerts,
         },
         configurationSettingKey: 'checks.pattern',
       }),
@@ -151,11 +142,10 @@ export class WazuhCorePlugin
     // TODO: this task should be registered by the related plugin
     this.services.initialization.register(
       initializationTaskCreatorIndexPattern({
-        getIndexPatternID: ctx =>
-          ctx.configuration.get('vulnerabilities.pattern'),
-        taskName: 'index-pattern:vulnerabilities-states',
+        getIndexPatternID: async () => 'wazuh-states-vulnerabilities*', // TODO: this should use a static value or configurable setting in the server side
+        taskName: 'index-pattern:states-vulnerabilities',
         options: {
-          fieldsNoIndices: vulnerabilitiesStatesFields,
+          fieldsNoIndices: indexPatternFieldsVulnerabilities,
         },
         configurationSettingKey: 'checks.vulnerability', // TODO: create new setting
       }),
@@ -186,6 +176,106 @@ export class WazuhCorePlugin
         configurationSettingKey: 'checks.statistics', // TODO: create new setting
       }),
     );
+
+    // TODO: this task should be registered by the related plugin
+    /*
+      Temporal: we register the index pattern initialization tasks using a static fields definition.
+                We could retrieve tihs data from the template indexed by Wazuh indexer and
+                transform into the index pattern field format
+    */
+
+    for (const {
+      indexPattern,
+      taskIndexPattern,
+      timeFieldName,
+      fieldsNoIndices,
+      configurationSettingKey,
+    } of [
+      {
+        indexPattern: 'wazuh-agents*',
+        taskIndexPattern: 'agents',
+        fieldsNoIndices: indexPatternFieldsAgent,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-commands*',
+        taskIndexPattern: 'commands',
+        fieldsNoIndices: indexPatternFieldsCommands,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-states-fim*',
+        taskIndexPattern: 'states-fim',
+        fieldsNoIndices: indexPatternFieldsFim,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-states-inventory-hardware*',
+        taskIndexPattern: 'states-inventory-hardware',
+        fieldsNoIndices: indexPatternFieldsHardware,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-states-inventory-hotfixes*',
+        taskIndexPattern: 'states-inventory-hotfixes',
+        fieldsNoIndices: indexPatternFieldsHotfixes,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-states-inventory-networks*',
+        taskIndexPattern: 'states-inventory-networks',
+        fieldsNoIndices: indexPatternFieldsNetworks,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-states-inventory-packages*',
+        taskIndexPattern: 'states-inventory-packages',
+        fieldsNoIndices: indexPatternFieldsPackages,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-states-inventory-ports*',
+        taskIndexPattern: 'states-inventory-ports',
+        fieldsNoIndices: indexPatternFieldsPorts,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-states-inventory-system*',
+        taskIndexPattern: 'states-system',
+        fieldsNoIndices: indexPatternFieldsSystem,
+        configurationSettingKey: '',
+      },
+      {
+        indexPattern: 'wazuh-states-inventory-processes*',
+        taskIndexPattern: 'states-inventory-processes',
+        fieldsNoIndices: indexPatternFieldsProcesses,
+        configurationSettingKey: '',
+      },
+    ] as {
+      indexPattern: string;
+      taskIndexPattern: string;
+      timeFieldName?: string;
+      fieldsNoIndices?: object;
+      configurationSettingKey: string;
+    }[]) {
+      this.services.initialization.register(
+        initializationTaskCreatorIndexPattern({
+          getIndexPatternID: async () => indexPattern, // TODO: this should use a static value or configurable setting in the server side
+          taskName: `index-pattern:${taskIndexPattern}`,
+          options: {
+            ...(timeFieldName
+              ? {
+                  savedObjectOverwrite: {
+                    timeFieldName,
+                  },
+                }
+              : {}),
+            ...(fieldsNoIndices ? { fieldsNoIndices } : {}),
+          },
+          configurationSettingKey: configurationSettingKey, // TODO: setting placehodler, create new setting
+        }),
+      );
+    }
 
     // Settings
     // TODO: this task should be registered by the related plugin
@@ -228,25 +318,10 @@ export class WazuhCorePlugin
       logger: this.logger.get(
         `${request.route.method.toUpperCase()} ${request.route.path}`,
       ),
-      api: {
-        client: {
-          asInternalUser: this.services.serverAPIClient.asInternalUser,
-          asCurrentUser: this.services.serverAPIClient.asScoped(
-            context,
-            request,
-          ),
-        },
-      },
     }));
 
     return {
       ...this.services,
-      api: {
-        client: {
-          asInternalUser: this.services.serverAPIClient.asInternalUser,
-          asScoped: this.services.serverAPIClient.asScoped,
-        },
-      },
     } as WazuhCorePluginSetup;
   }
 
@@ -256,17 +331,10 @@ export class WazuhCorePlugin
     setCore(core);
 
     await this.services.configuration.start();
-    await this.services.manageHosts.start();
     await this.services.initialization.start({ core });
 
     return {
       ...this.services,
-      api: {
-        client: {
-          asInternalUser: this.services.serverAPIClient.asInternalUser,
-          asScoped: this.services.serverAPIClient.asScoped,
-        },
-      },
     } as WazuhCorePluginSetup;
   }
 

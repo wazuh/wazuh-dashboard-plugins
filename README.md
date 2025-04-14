@@ -1,20 +1,12 @@
 <p align="center">
     <img width="640px" src="https://wazuh.com/uploads/2022/05/Logo-blogpost.png"/>
 </p>
-<p align="center">
-    <a href="https://wazuh.com/community/join-us-on-slack">
-        <img src="https://img.shields.io/badge/slack-join-blue.svg" />
-    </a>
-    <a href="https://groups.google.com/forum/#!forum/wazuh">
-        <img src="https://img.shields.io/badge/email-join-blue.svg" />
-    </a>
-    <a href="https://documentation.wazuh.com">
-        <img src="https://img.shields.io/badge/docs-view-green.svg" />
-    </a>
-    <a href="https://wazuh.com">
-        <img src="https://img.shields.io/badge/web-view-green.svg" />
-    </a>
-</p>
+
+[![Slack](https://img.shields.io/badge/slack-join-blue.svg)](https://wazuh.com/community/join-us-on-slack/)
+[![Forum](https://img.shields.io/badge/chat-on%20forums-blue)](https://groups.google.com/forum/#!forum/wazuh)
+[![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
+[![Web](https://img.shields.io/badge/web-view-green.svg)](https://wazuh.com)
+[![GH Pages](https://github.com/wazuh/wazuh-dashboard-plugins/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/wazuh/wazuh-dashboard-plugins/actions/workflows/deploy-docs.yml)
 
 - [Welcome](#welcome)
 - [Project resources](#project-resources)

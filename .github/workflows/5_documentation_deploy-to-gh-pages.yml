@@ -1,0 +1,56 @@
+# 🚀 GitHub Pages Deployment Workflow for mdBook
+#
+# ⚡ Overview:
+# This GitHub Action automatically deploys an mdBook site to GitHub Pages whenever
+# changes are pushed to the `main` branch or when manually triggered.
+#
+# 📚 Key Features:
+# - 📝 Uses `mdBook` for documentation building, with support for:
+#   - ✅ Link checking
+#   - 🗂️ Table of contents generation
+#   - 📈 Mermaid diagrams
+#
+# 🔗 Reference:
+# Source: https://github.com/rust-lang/mdBook/wiki/Automated-Deployment%3A-GitHub-Actions#GitHub-Pages-Deploy
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # To push a branch
+      pages: write # To push to a GitHub Pages site
+      id-token: write # To update the deployment status
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - name: Checkout repository with full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup mdBook with link checking, ToC, and Mermaid support
+        uses: jontze/action-mdbook@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          use-linkcheck: true
+          use-mermaid: true
+          use-toc: true
+      - name: Build the book from the `docs` directory
+        run: mdbook build
+        working-directory: docs
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload built book as a GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'docs/book'
+      - name: Deploy the artifact to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
