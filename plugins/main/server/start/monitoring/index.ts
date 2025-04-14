@@ -479,7 +479,7 @@ async function fetchAllAgentsFromApiHost(context, apiHost) {
           - Reduce (if possible) the quantity of data to index by document
 
         Requirements:
-          - Research about the neccesary data to index.
+          - Research about the necessary data to index.
 
         How to do:
           - Wazuh API request:
@@ -502,6 +502,7 @@ async function fetchAllAgentsFromApiHost(context, apiHost) {
             payload.offset
           }/${payload.limit}: ${error.message || error}`,
         );
+        throw error;
       }
     }
     return agents;
