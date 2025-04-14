@@ -287,11 +287,11 @@ const getVisStateAgentRemotePortByRemoteIP = (indexPatternId: string) => {
   };
 };
 
-const getVisStateInstalledDateByPackageName = (indexPatternId: string) => {
+const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
   return {
-    id: 'it-hygiene-top-packages-by-installation-date',
-    title: 'Packages by installation date',
-    type: 'histogram',
+    id: 'it-hygiene-used-memory-percentage',
+    title: 'Used memory by percentage',
+    type: 'horizontal_bar',
     params: {
       type: 'histogram',
       grid: {
@@ -301,7 +301,7 @@ const getVisStateInstalledDateByPackageName = (indexPatternId: string) => {
         {
           id: 'CategoryAxis-1',
           type: 'category',
-          position: 'bottom',
+          position: 'left',
           show: true,
           style: {},
           scale: {
@@ -309,8 +309,9 @@ const getVisStateInstalledDateByPackageName = (indexPatternId: string) => {
           },
           labels: {
             show: true,
-            filter: true,
-            truncate: 100,
+            rotate: 0,
+            filter: false,
+            truncate: 200,
           },
           title: {},
         },
@@ -320,18 +321,17 @@ const getVisStateInstalledDateByPackageName = (indexPatternId: string) => {
           id: 'ValueAxis-1',
           name: 'LeftAxis-1',
           type: 'value',
-          position: 'left',
+          position: 'bottom',
           show: true,
           style: {},
           scale: {
-            type: 'log',
+            type: 'linear',
             mode: 'normal',
-            defaultYExtents: true,
           },
           labels: {
             show: true,
-            rotate: 0,
-            filter: false,
+            rotate: 75,
+            filter: true,
             truncate: 100,
           },
           title: {
@@ -343,7 +343,7 @@ const getVisStateInstalledDateByPackageName = (indexPatternId: string) => {
         {
           show: true,
           type: 'histogram',
-          mode: 'stacked',
+          mode: 'normal',
           data: {
             label: 'Count',
             id: '1',
@@ -359,9 +359,7 @@ const getVisStateInstalledDateByPackageName = (indexPatternId: string) => {
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
-      labels: {
-        show: false,
-      },
+      labels: {},
       thresholdLine: {
         show: false,
         value: 10,
@@ -397,37 +395,34 @@ const getVisStateInstalledDateByPackageName = (indexPatternId: string) => {
         {
           id: '2',
           enabled: true,
-          type: 'date_histogram',
+          type: 'range',
           params: {
-            field: 'package.installed',
-            timeRange: {
-              from: 'now-24h',
-              to: 'now',
-            },
-            useNormalizedOpenSearchInterval: true,
-            scaleMetricValues: false,
-            interval: 'y',
-            drop_partials: false,
-            min_doc_count: 1,
-            extended_bounds: {},
+            field: 'host.memory.used',
+            ranges: [
+              {
+                from: 80,
+                to: 100,
+              },
+              {
+                from: 60,
+                to: 80,
+              },
+              {
+                from: 40,
+                to: 60,
+              },
+              {
+                from: 20,
+                to: 40,
+              },
+              {
+                from: 0,
+                to: 20,
+              },
+            ],
+            customLabel: '% used memory',
           },
           schema: 'segment',
-        },
-        {
-          id: '3',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: 'package.name',
-            orderBy: '1',
-            order: 'desc',
-            size: 10,
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-          },
-          schema: 'group',
         },
       ],
     },
@@ -481,7 +476,7 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '3',
-        savedVis: getVisStateInstalledDateByPackageName(indexPatternId),
+        savedVis: getVisStateUsedMemoryByPercentage(indexPatternId),
       },
     },
   };
@@ -534,7 +529,7 @@ const getAgentDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a3',
-        savedVis: getVisStateInstalledDateByPackageName(indexPatternId),
+        savedVis: getVisStateUsedMemoryByPercentage(indexPatternId),
       },
     },
   };
