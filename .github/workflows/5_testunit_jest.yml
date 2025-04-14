@@ -32,6 +32,10 @@ on:
           - 'yarn test:jest'
   pull_request:
 
+concurrency:
+  group: pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # Run unit tests with Jest
   test:

@@ -1,51 +1,32 @@
 import React from 'react';
 import { getPlugins } from '../../../../plugin-services';
-import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
+import { useTimeFilter } from '../../../common/table-indexer/components/search-bar/hooks/use-time-filter';
+import { LoadingSpinner } from '../../../common/loading-spinner/loading-spinner';
 import {
-  EuiPanel,
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiSpacer,
-  EuiText,
-} from '@elastic/eui';
+  Filter,
+  IndexPattern,
+} from '../../../../../../../src/plugins/data/common';
+import { getDashboardPanels } from './dashboard_panels';
 
 export interface EventsCountProps {
-  AlertsDataSource: any;
-  AlertsDataSourceRepository: any;
-  useDataSource: any;
-  useTimeFilter: any;
-  LoadingSpinner: any;
+  indexPattern: IndexPattern;
+  filters: Filter[];
 }
-export const EventsCount = ({
-  useDataSource,
-  AlertsDataSource,
-  AlertsDataSourceRepository,
-  useTimeFilter,
-  LoadingSpinner,
-}: EventsCountProps) => {
-  const {
-    dataSource,
-    fetchFilters,
-    isLoading: isDataSourceLoading,
-  } = useDataSource({
-    DataSource: AlertsDataSource,
-    repository: new AlertsDataSourceRepository(),
-  });
 
+export const EventsCount = ({ filters, indexPattern }: EventsCountProps) => {
   const plugins = getPlugins();
   const DashboardByRenderer =
     plugins.dashboard.DashboardContainerByValueRenderer;
-
   const { timeFilter } = useTimeFilter();
 
-  return !isDataSourceLoading && dataSource ? (
+  return indexPattern ? (
     <DashboardByRenderer
       input={{
         viewMode: ViewMode.VIEW,
-        panels: getDashboardPanels(dataSource?.id),
+        panels: getDashboardPanels(indexPattern.id),
         isFullScreenMode: false,
-        filters: fetchFilters ?? [],
+        filters: filters || [],
         useMargins: true,
         id: 'agent-events-count-evolution',
         timeRange: {

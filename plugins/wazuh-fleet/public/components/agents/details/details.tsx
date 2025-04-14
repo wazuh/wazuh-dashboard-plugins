@@ -8,68 +8,75 @@ import {
   EuiContextMenuPanel,
   EuiContextMenuItem,
   EuiHorizontalRule,
-  EuiTabbedContent,
+  // EuiTabbedContent,
   EuiLoadingContent,
   EuiContextMenu,
-  EuiIcon,
 } from '@elastic/eui';
-import { Agent } from '../../../../common/types';
+import { IAgentResponse } from '../../../../common/types';
+import { getAgentManagement, getWazuhCore } from '../../../plugin-services';
+import {
+  Filter,
+  IndexPattern,
+} from '../../../../../../src/plugins/data/common';
+import { EditAgentGroupsModal } from '../list/actions/edit-groups-modal';
+import { ConfirmModal } from '../../common/confirm-modal/confirm-modal';
+import { UpgradeAgentModal } from '../list/actions/upgrade-agent-modal';
+import { EditAgentNameModal } from '../list/actions/edit-name-agent-modal';
+import { summaryAgent } from '../../common/views';
 import { AgentResume } from './resume';
-import { AgentDashboard } from './dashboard';
-import { AgentNetworks } from './networks';
+// import { AgentDashboard } from './dashboard';
+// import { AgentNetworks } from './networks';
 
 export interface AgentDetailsProps {
-  useDataSource: any;
-  FleetDataSource: any;
-  FleetDataSourceRepository: any;
+  indexPatterns: IndexPattern;
+  filters: Filter[];
 }
 
 export const AgentDetails = ({
-  FleetDataSource,
-  FleetDataSourceRepository,
-  ...restProps
+  indexPatterns,
+  // filters,
+  // ...restProps
 }: AgentDetailsProps) => {
   const { id } = useParams();
-
-  const {
-    dataSource,
-    isLoading: isDataSourceLoading,
-    fetchData,
-    filterManager,
-    fetchFilters,
-  } = restProps.useDataSource({
-    DataSource: FleetDataSource,
-    repository: new FleetDataSourceRepository(),
-  });
-
   const [isAgentLoading, setIsAgentLoading] = useState(true);
-  const [agentData, setAgentData] = useState<Agent>();
+  const [agentData, setAgentData] = useState<IAgentResponse>();
   const [isActionsOpen, setIsActionsOpen] = useState(false);
   const [isNavigateToOpen, setIsNavigateToOpen] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
+  const [isUpgradeModalVisible, setIsUpgradeModalVisible] = useState(false);
+  const [isEditNameVisible, setIsEditNameVisible] = useState(false);
+  const [isEditGroupsVisible, setIsEditGroupsVisible] = useState(false);
+  const [needReload, setNeedReload] = useState(false);
 
-  useEffect(() => {
-    if (!filterManager || isDataSourceLoading) return;
-
-    const filterByAgentId = filterManager.createFilter(
-      'is',
-      'agent.id',
-      id,
-      dataSource?.indexPattern.id,
-    );
-
-    fetchData({
-      filters: [filterByAgentId, ...fetchFilters],
-    })
-      .then((results: any) => {
-        setAgentData(results.hits.hits?.[0]?._source);
+  const getAgent = async (id: string) => {
+    getAgentManagement()
+      .getByAgentId(id)
+      .then((results: IAgentResponse) => {
+        setAgentData(results);
         setIsAgentLoading(false);
       })
       .catch((error: any) => {
         console.log(error);
       });
-  }, [filterManager, isDataSourceLoading]);
+  };
 
-  if (isDataSourceLoading || isAgentLoading) {
+  useEffect(() => {
+    if (!indexPatterns) {
+      return;
+    }
+
+    getAgent(id);
+  }, [id]);
+
+  useEffect(() => {
+    if (needReload) {
+      getAgent(id);
+      setNeedReload(false);
+    }
+  }, [needReload]);
+
+  if (isAgentLoading) {
     return (
       <div>
         <EuiLoadingContent lines={3} />
@@ -85,6 +92,29 @@ export const AgentDetails = ({
     setIsActionsOpen(false);
   };
 
+  const closeModal = () => {
+    setIsDeleteModalVisible(false);
+  };
+
+  const confirmDelete = async () => {
+    if (agentData) {
+      try {
+        setIsLoadingModal(true);
+        await getAgentManagement().delete(agentData.agent.id);
+        setIsLoadingModal(false);
+        getWazuhCore()
+          .navigationService.getInstance()
+          .navigate(summaryAgent.path);
+      } catch {
+        setIsLoadingModal(false);
+      }
+    }
+  };
+
+  const reloadAgents = () => {
+    setNeedReload(true);
+  };
+
   const navigateToPanels = [
     {
       id: 0,
@@ -95,7 +125,7 @@ export const AgentDetails = ({
           panel: 1,
         },
         {
-          name: 'Threat intelligencey',
+          name: 'Threat intelligence',
           icon: 'lensApp',
           panel: 2,
         },
@@ -129,7 +159,7 @@ export const AgentDetails = ({
     {
       id: 2,
       initialFocusedItemIndex: 1,
-      title: 'Threat intelligencey',
+      title: 'Threat intelligence',
       items: [
         {
           name: 'Threat Hunting',
@@ -158,48 +188,54 @@ export const AgentDetails = ({
       ],
     },
   ];
-
-  const tabContent = (content: React.ReactNode) => (
-    <>
-      <EuiSpacer />
-      {content}
-    </>
-  );
-
-  const tabs = [
-    {
-      id: 'dashboard',
-      name: 'Dashboard',
-      content: tabContent(<AgentDashboard agentId={id} {...restProps} />),
-    },
-    {
-      id: 'networks',
-      name: 'Networks',
-      content: tabContent(<AgentNetworks agentId={id} />),
-    },
-    {
-      id: 'processes',
-      name: 'Processes',
-      content: tabContent(<div>Processes</div>),
-    },
-    {
-      id: 'packages',
-      name: 'Packages',
-      content: tabContent(<div>Packages</div>),
-    },
-    {
-      id: 'configuration',
-      name: 'Configuration',
-      content: tabContent(<div>Configuration</div>),
-    },
-  ];
-
-  return (
+  // TODO: Add tabs for each section of the agent details page when we have them implemented
+  // const tabContent = (content: React.ReactNode) => (
+  //   <>
+  //     <EuiSpacer />
+  //     {content}
+  //   </>
+  // );
+  // const tabs = [
+  //   {
+  //     id: 'dashboard',
+  //     name: 'Dashboard',
+  //     content: tabContent(
+  //       <AgentDashboard
+  //         indexPattern={indexPatterns}
+  //         agentId={id}
+  //         filters={filters}
+  //         {...restProps}
+  //       />,
+  //     ),
+  //   },
+  //   {
+  //     id: 'networks',
+  //     name: 'Networks',
+  //     content: tabContent(<AgentNetworks agentId={id} />),
+  //   },
+  //   {
+  //     id: 'processes',
+  //     name: 'Processes',
+  //     content: tabContent(<div>Processes</div>),
+  //   },
+  //   {
+  //     id: 'packages',
+  //     name: 'Packages',
+  //     content: tabContent(<div>Packages</div>),
+  //   },
+  //   {
+  //     id: 'configuration',
+  //     name: 'Configuration',
+  //     content: tabContent(<div>Configuration</div>),
+  //   },
+  // ];
+  const renderViewAgent = (
     <>
       <EuiPageHeader
         pageTitle={agentData?.agent?.name}
         rightSideItems={[
           <EuiPopover
+            key={'actions'}
             id='actions'
             button={
               <EuiButton
@@ -221,36 +257,49 @@ export const AgentDetails = ({
                 <EuiContextMenuItem
                   key='add-groups'
                   icon='plusInCircle'
-                  onClick={closeActions}
+                  onClick={() => {
+                    setIsEditGroupsVisible(true);
+                    closeActions();
+                  }}
                 >
-                  Add groups to agent
+                  Edit groups to agent
                 </EuiContextMenuItem>,
-                <EuiContextMenuItem
-                  key='remove-groups'
-                  icon='trash'
-                  onClick={closeActions}
-                >
-                  Remove groups from agent
-                </EuiContextMenuItem>,
-                <EuiHorizontalRule margin='xs' />,
+                <EuiHorizontalRule key='space' margin='xs' />,
                 <EuiContextMenuItem
                   key='upgrade-agents'
                   icon='package'
-                  onClick={closeActions}
+                  onClick={() => {
+                    setIsUpgradeModalVisible(true);
+                    closeActions();
+                  }}
                 >
                   Upgrade agent
                 </EuiContextMenuItem>,
                 <EuiContextMenuItem
-                  key='upgrade-tasks'
+                  key='edit-name'
                   icon='eye'
-                  onClick={closeActions}
+                  onClick={() => {
+                    setIsEditNameVisible(true);
+                    closeActions();
+                  }}
                 >
-                  Upgrade tasks details
+                  Edit Name
+                </EuiContextMenuItem>,
+                <EuiContextMenuItem
+                  key='edit-name'
+                  icon='eye'
+                  onClick={() => {
+                    setIsDeleteModalVisible(true);
+                    closeActions();
+                  }}
+                >
+                  Remove agent
                 </EuiContextMenuItem>,
               ]}
             />
           </EuiPopover>,
           <EuiPopover
+            key={'navigate-to'}
             id='navigate-to'
             button={
               <EuiButton
@@ -272,13 +321,56 @@ export const AgentDetails = ({
         ]}
       />
       <EuiSpacer />
-      <AgentResume agent={agentData} />
+      {agentData !== null && <AgentResume agent={agentData} />}
       <EuiSpacer />
+
+      {/*
+      TODO: Add tabs for each section of the agent details page when we have them implemented
       <EuiTabbedContent
         tabs={tabs}
         initialSelectedTab={tabs[0]}
         autoFocus='selected'
+      /> */}
+      {isEditGroupsVisible && agentData && (
+        <EditAgentGroupsModal
+          onClose={() => {
+            setIsEditGroupsVisible(false);
+          }}
+          reloadAgents={() => {}}
+          agent={agentData}
+        />
+      )}
+      <ConfirmModal
+        isVisible={isDeleteModalVisible}
+        title='Delete agent'
+        message='Are you sure you want to delete this agent?'
+        onConfirm={confirmDelete}
+        onCancel={closeModal}
+        confirmButtonText='Delete'
+        buttonColor='danger'
+        isLoading={isLoadingModal}
       />
+      {isUpgradeModalVisible && agentData && (
+        <UpgradeAgentModal
+          agent={agentData}
+          reloadAgents={reloadAgents}
+          onClose={() => {
+            setIsUpgradeModalVisible(false);
+          }}
+        />
+      )}
+      {isEditNameVisible && agentData && (
+        <EditAgentNameModal
+          onClose={() => {
+            setIsEditNameVisible(false);
+          }}
+          reloadAgents={reloadAgents}
+          agent={agentData}
+        />
+      )}
     </>
   );
+  const renderNoAgent = <EuiPageHeader pageTitle={'Agent not found'} />;
+
+  return agentData === null ? renderNoAgent : renderViewAgent;
 };

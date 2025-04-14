@@ -16,5 +16,8 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[dockercompose]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
