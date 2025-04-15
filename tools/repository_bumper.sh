@@ -102,6 +102,12 @@ update_endpoints_json() {
   local new_doc_version="$2"
   local endpoints_file="${REPO_PATH}/plugins/main/common/api-info/endpoints.json"
 
+  # If the versions are the same, no update is needed.
+  if [ "$old_doc_version" = "$new_doc_version" ]; then
+    log "Documentation version ($old_doc_version) hasn't changed. Skipping endpoints.json update."
+    return
+  fi
+
   if [ ! -f "$endpoints_file" ]; then
     log "WARNING: $endpoints_file not found. Skipping documentation URL update."
     return
