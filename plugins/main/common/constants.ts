@@ -65,10 +65,16 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
 export const WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING =
   'file-integrity-monitoring';
 export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
-export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 1000;
+export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 3000;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
-export const WAZUH_SETTING_FIM_FILES_PREFIX = 'fim_files.prefix';
-export const WAZUH_SETTING_FIM_REGISTRIES_PREFIX = 'fim_registries.prefix';
+export const WAZUH_SETTING_FIM_FILES_PREFIX = {
+  settingIndexPattern: 'fim_files.prefix',
+  dataSet: 'states-fim-files',
+};
+export const WAZUH_SETTING_FIM_REGISTRIES_PREFIX = {
+  settingIndexPattern: 'fim_registries.prefix',
+  dataSet: 'states-fim-registries',
+};
 export const WAZUH_SETTING_INVENTORY_HARDWARE = {
   settingIndexPattern: 'inventory_hardware.prefix',
   dataSet: 'states-inventory-hardware',
@@ -155,13 +161,13 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]: [
     {
       files: true,
-      settingIndexPattern: WAZUH_SETTING_FIM_FILES_PREFIX,
-      dataSet: 'states-fim-files',
+      settingIndexPattern: WAZUH_SETTING_FIM_FILES_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_FIM_FILES_PREFIX.dataSet,
     },
     {
       registries: true,
-      settingIndexPattern: WAZUH_SETTING_FIM_REGISTRIES_PREFIX,
-      dataSet: 'states-fim-registries',
+      settingIndexPattern: WAZUH_SETTING_FIM_REGISTRIES_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_FIM_REGISTRIES_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_INVENTORY_AGENT]: [

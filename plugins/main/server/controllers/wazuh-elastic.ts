@@ -15,6 +15,7 @@ import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import {
   WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+  WAZUH_ALERTS_PREFIX,
 } from '../../common/constants';
 import {
   OpenSearchDashboardsRequest,
@@ -573,92 +574,107 @@ export class WazuhElasticCtrl {
 
       const sampleDocumentsResponse = [];
 
-      sampleIndexNames.forEach(async indexName => {
-        try {
-          const bulkPrefix = JSON.stringify({
-            index: {
-              _index: indexName,
-            },
-          });
-          const alertGenerateParams =
-            (request.body && request.body.params) || {};
-
-          const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
-            request.params.category
-          ]
-            .map(typeAlert =>
-              generateAlerts(
-                { ...typeAlert, ...alertGenerateParams },
-                request.body.alerts ||
-                  typeAlert.alerts ||
-                  WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
-              ),
-            )
-            .flat();
-          const bulk = sampleAlerts
-            .map(
-              sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`,
-            )
-            .join('');
-
-          // Index alerts
-
-          // Check if wazuh sample alerts index exists
-          const existsSampleIndex =
-            await context.core.opensearch.client.asCurrentUser.indices.exists({
-              index: indexName,
-            });
-          if (!existsSampleIndex.body) {
-            // Create wazuh sample alerts index
-
-            const configuration = {
-              settings: {
+      try {
+        await Promise.all(
+          sampleIndexNames.map(async indexName => {
+            try {
+              const bulkPrefix = JSON.stringify({
                 index: {
-                  number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
-                  number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+                  _index: indexName,
                 },
-              },
-            };
+              });
+              const alertGenerateParams =
+                (request.body && request.body.params) || {};
 
-            await context.core.opensearch.client.asCurrentUser.indices.create({
-              index: indexName,
-              body: configuration,
-            });
-            context.wazuh.logger.info(`Index ${indexName} created`);
-          }
+              const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
+                request.params.category
+              ]
+                .map(typeAlert => {
+                  if (
+                    indexName.includes(
+                      typeAlert?.dataSet || WAZUH_ALERTS_PREFIX,
+                    )
+                  ) {
+                    return generateAlerts(
+                      { ...typeAlert, ...alertGenerateParams },
+                      request.body.alerts ||
+                        typeAlert.alerts ||
+                        WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
+                    );
+                  }
+                  return;
+                })
+                .flat();
+              const bulk = sampleAlerts
+                .map(
+                  sampleAlert =>
+                    `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`,
+                )
+                .join('');
 
-          await context.core.opensearch.client.asCurrentUser.bulk({
-            index: indexName,
-            body: bulk,
-          });
-          context.wazuh.logger.info(
-            `Added sample alerts to ${indexName} index`,
-          );
+              // Index alerts
 
-          return sampleDocumentsResponse.push({
-            index: indexName,
-            alertCount: sampleAlerts.length,
-          });
-        } catch (error) {
-          context.wazuh.logger.error(
-            `Error adding sample alerts to ${indexName} index: ${
-              error.message || error
-            }`,
-          );
+              // Check if wazuh sample alerts index exists
+              const existsSampleIndex =
+                await context.core.opensearch.client.asCurrentUser.indices.exists(
+                  {
+                    index: indexName,
+                  },
+                );
+              if (!existsSampleIndex.body) {
+                // Create wazuh sample alerts index
+                const configuration = {
+                  settings: {
+                    index: {
+                      number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
+                      number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+                    },
+                  },
+                };
 
-          const [statusCode, errorMessage] = this.getErrorDetails(error);
+                await context.core.opensearch.client.asCurrentUser.indices.create(
+                  {
+                    index: indexName,
+                    body: configuration,
+                  },
+                );
+                context.wazuh.logger.info(`Index ${indexName} created`);
+              }
 
-          return ErrorResponse(
-            errorMessage || error,
-            1000,
-            statusCode,
-            response,
-          );
-        }
-      });
-      return response.ok({
-        body: { sampleDocumentsResponse },
-      });
+              await context.core.opensearch.client.asCurrentUser.bulk({
+                index: indexName,
+                body: bulk,
+              });
+              context.wazuh.logger.info(
+                `Added sample alerts to ${indexName} index`,
+              );
+
+              sampleDocumentsResponse.push({
+                index: indexName,
+                alertCount: sampleAlerts.length,
+              });
+            } catch (error) {
+              context.wazuh.logger.error(
+                `Error adding sample alerts to ${indexName} index: ${
+                  error.message || error
+                }`,
+              );
+
+              const [statusCode, errorMessage] = this.getErrorDetails(error);
+              throw { statusCode, errorMessage };
+            }
+          }),
+        );
+
+        // Only return response after all operations are complete
+        return response.ok({
+          body: { sampleDocumentsResponse },
+        });
+      } catch (error) {
+        const statusCode = error?.statusCode || 500;
+        const errorMessage = error?.errorMessage || error.message || error;
+        return ErrorResponse(errorMessage, 1000, statusCode, response);
+      }
     },
   );
   /**
