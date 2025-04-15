@@ -351,22 +351,38 @@ update_changelog() {
   # Construct the new changelog entry
   # Note: Using printf for better handling of newlines and potential special characters
   # Use the calculated REVISION variable here
-  local new_entry
-  new_entry=$(printf "## Wazuh v%s - OpenSearch Dashboards %s - Revision %s\n\n### Added\n\n- Support for Wazuh %s\n" "$VERSION" "$OPENSEARCH_VERSION" "$REVISION" "$VERSION")
+  # Prepare the header to search for
+  local changelog_header="## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision "
+  local changelog_header_regex="^## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision [0-9]+"
 
-  # Use awk to insert the new entry after the title and description (lines 1-4)
-  awk -v entry="$new_entry" '
-  NR == 1 { print; next } # Print line 1 (# Change Log)
-  NR == 2 { print; next } # Print line 2 (blank)
-  NR == 3 { print; next } # Print line 3 (description)
-  NR == 4 { print; printf "%s\n\n", entry; next } # Print line 4 (blank) and insert entry
-  { print } # Print the rest of the lines starting from line 5
-  ' "$changelog_file" >temp_changelog && mv temp_changelog "$changelog_file" || {
-    log "ERROR: Failed to update $changelog_file"
-    rm -f temp_changelog # Clean up temp file on error
-    exit 1
-  }
-  log "CHANGELOG.md updated successfully."
+  # Check if an entry for this version and OpenSearch version already exists
+  if grep -qE "$changelog_header_regex" "$changelog_file"; then
+    log "Changelog entry for this version and OpenSearch Dashboards version exists. Updating revision only."
+    # Use sed to update only the revision number in the header
+    sed -i -E "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file" &&
+      log "CHANGELOG.md revision updated successfully." || {
+      log "ERROR: Failed to update revision in $changelog_file"
+      exit 1
+    }
+  else
+    log "No existing changelog entry for this version and OpenSearch Dashboards version. Inserting new entry."
+    local new_entry
+    new_entry=$(printf "## Wazuh v%s - OpenSearch Dashboards %s - Revision %s\n\n### Added\n\n- Support for Wazuh %s\n" "$VERSION" "$OPENSEARCH_VERSION" "$REVISION" "$VERSION")
+
+    # Use awk to insert the new entry after the title and description (lines 1-4)
+    awk -v entry="$new_entry" '
+    NR == 1 { print; next } # Print line 1 (# Change Log)
+    NR == 2 { print; next } # Print line 2 (blank)
+    NR == 3 { print; next } # Print line 3 (description)
+    NR == 4 { print; printf "%s\n\n", entry; next } # Print line 4 (blank) and insert entry
+    { print } # Print the rest of the lines starting from line 5
+    ' "$changelog_file" >temp_changelog && mv temp_changelog "$changelog_file" || {
+      log "ERROR: Failed to update $changelog_file"
+      rm -f temp_changelog # Clean up temp file on error
+      exit 1
+    }
+    log "CHANGELOG.md updated successfully."
+  fi
 }
 
 # --- Main Execution ---
