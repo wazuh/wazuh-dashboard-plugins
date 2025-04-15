@@ -28,8 +28,7 @@ This script simplifies the process of updating version numbers, stages, and rela
 
 - **`log`**: Logs messages with timestamps.
 - **`usage`**: Displays usage instructions.
-- **`update_json`**: Updates JSON files using `jq`.
-- **`update_yaml`**: Updates YAML files using `yq`.
+- **`update_json`**: Updates JSON files using `sed`.
 - **`update_endpoints_json`**: Updates documentation URLs in `endpoints.json`.
 - **`update_imposter_config`**: Updates the `specFile` URL in `wazuh-config.yml`.
 
@@ -73,11 +72,6 @@ Run the script with the following syntax:
 ./repository_bumper.sh --version 4.6.0 --stage alpha0
 ./repository_bumper.sh --version 4.6.0 --stage beta1
 ```
-
-### Prerequisites
-
-- **jq**: Ensure `jq` is installed for JSON file manipulation.
-- **yq**: Ensure `yq` is installed for YAML file manipulation.
 
 ### Log File
 

@@ -297,7 +297,6 @@ update_package_json_files() {
   log "Updating package.json files..."
   # Use git ls-files to find tracked package.json files within the plugins directory, excluding test/cypress/package.json
   git ls-files "$plugins_dir" | grep '/package.json$' | grep -v 'test/cypress/package.json' | while IFS= read -r pkg_file; do
-    # Ensure the file path is relative to the repository root or absolute for jq/yq
     local full_pkg_path
     full_pkg_path=$(realpath "${pkg_file}")
     log "Processing $full_pkg_path"
@@ -314,7 +313,6 @@ update_osd_json_files() {
   log "Updating opensearch_dashboards.json files..."
   # Use git ls-files to find tracked opensearch_dashboards.json files within the plugins directory
   git ls-files "$plugins_dir" | grep '/opensearch_dashboards.json$' | while IFS= read -r osd_json_file; do
-    # Ensure the file path is relative to the repository root or absolute for jq/yq
     local full_osd_json_path
     full_osd_json_path=$(realpath "${osd_json_file}")
     log "Processing $full_osd_json_path"
@@ -401,7 +399,7 @@ main() {
 
   # Parse and validate arguments
   parse_arguments "$@"
-  validate_input # This also checks for jq
+  validate_input
   log "Version: $VERSION"
   log "Stage: $STAGE"
 
