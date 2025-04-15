@@ -16,31 +16,31 @@ function generate_random_agent() {
 function generate_random_host(is_root_level = false) {
   if (is_root_level) {
     return {
-      architecture: random.choice(["x86_64", "arm64"]),
+      architecture: random.choice(['x86_64', 'arm64']),
       hostname: `host${random.int(0, 1000)}`,
       os: {
         build: `${random.int(0, 1000)}`,
-        codename: random.choice(["Jammy", "Noble", "Ventura"]),
+        codename: random.choice(['Jammy', 'Noble', 'Ventura']),
         distribution: {
-          release: `${random.int(1, 20)}.${random.int(1, 100)}`
+          release: `${random.int(1, 20)}.${random.int(1, 100)}`,
         },
         full: `${random.choice(['debian', 'ubuntu', 'macos', 'ios', 'android', 'RHEL'])} ${random.int(0, 99)}.${random.int(0, 99)}`,
         kernel: {
-          name: random.choice(["Linux", "Darwin", "NT"]),
+          name: random.choice(['Linux', 'Darwin', 'NT']),
           release: `${random.int(1, 1000)}`,
           version: `${random.int(1, 1000)}`,
         },
         major: `${random.int(1, 100)}`,
         minor: `${random.int(1, 100)}`,
-        name: random.choice(["Linux", "Windows", "macOS"]),
+        name: random.choice(['Linux', 'Windows', 'macOS']),
         patch: `${random.int(1, 100)}`,
-        platform: random.choice(["platform1", "platform2"]),
+        platform: random.choice(['platform1', 'platform2']),
         version: `${random.int(0, 9)}.${random.int(0, 9)}.${random.int(0, 9)}`,
       },
     };
   } else {
     return {
-      architecture: random.choice(["x86_64", "arm64"]),
+      architecture: random.choice(['x86_64', 'arm64']),
       ip: random.ip(),
     };
   }
@@ -52,14 +52,14 @@ function generate_random_wazuh() {
       name: `wazuh-cluster-${random.int(0, 10)}`,
       node: `wazuh-cluster-node-${random.int(0, 10)}`,
     },
-    schema: { version: "1.7.0" },
+    schema: { version: '1.7.0' },
   };
 }
 
 function generate_document(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
-    "@timestamp": random.date(),
+    '@timestamp': random.date(),
     agent: generate_random_agent(),
     host: generate_random_host(true),
     wazuh: generate_random_wazuh(),
@@ -69,5 +69,5 @@ function generate_document(params) {
 module.exports = {
   default_count,
   default_index_name,
-  generate_document
+  generate_document,
 };

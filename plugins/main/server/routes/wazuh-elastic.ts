@@ -17,6 +17,7 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+  WAZUH_SAMPLE_INVENTORY_AGENT,
 } from '../../common/constants';
 
 export function WazuhElasticRoutes(router: IRouter) {
@@ -27,6 +28,7 @@ export function WazuhElasticRoutes(router: IRouter) {
       WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
       WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+      WAZUH_SAMPLE_INVENTORY_AGENT,
     ].map(category => schema.literal(category)),
   );
 

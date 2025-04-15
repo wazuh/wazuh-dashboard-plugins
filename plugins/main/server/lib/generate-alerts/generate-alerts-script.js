@@ -1187,7 +1187,6 @@ function generateAlerts(
 ) {
   /** @type {import('./types').Alert[]} */
   const alerts = [];
-  console.log(params);
   if (settingIndexPattern === WAZUH_SETTING_ALERTS_SAMPLE_PREFIX) {
     for (let i = 0; i < numAlerts; i++) {
       alerts.push(generateAlert(params));

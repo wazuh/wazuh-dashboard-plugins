@@ -64,10 +64,47 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING =
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
 export const WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING =
   'file-integrity-monitoring';
-export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 3000;
+export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
+export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 1000;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
 export const WAZUH_SETTING_FIM_FILES_PREFIX = 'fim_files.prefix';
 export const WAZUH_SETTING_FIM_REGISTRIES_PREFIX = 'fim_registries.prefix';
+export const WAZUH_SETTING_INVENTORY_HARDWARE = {
+  settingIndexPattern: 'inventory_hardware.prefix',
+  dataSet: 'states-inventory-hardware',
+};
+export const WAZUH_SETTING_INVENTORY_HOTFIXES = {
+  settingIndexPattern: 'inventory_hotfixes.prefix',
+  dataSet: 'states-inventory-hotfixes',
+};
+export const WAZUH_SETTING_INVENTORY_INTERFACES = {
+  settingIndexPattern: 'inventory_interfaces.prefix',
+  dataSet: 'states-inventory-interfaces',
+};
+export const WAZUH_SETTING_INVENTORY_PACKAGES = {
+  settingIndexPattern: 'inventory_packages.prefix',
+  dataSet: 'states-inventory-packages',
+};
+export const WAZUH_SETTING_INVENTORY_PORTS = {
+  settingIndexPattern: 'inventory_ports.prefix',
+  dataSet: 'states-inventory-ports',
+};
+export const WAZUH_SETTING_INVENTORY_NETWORKS = {
+  settingIndexPattern: 'inventory_networks.prefix',
+  dataSet: 'states-inventory-networks',
+};
+export const WAZUH_SETTING_INVENTORY_PROCESSES = {
+  settingIndexPattern: 'inventory_processes.prefix',
+  dataSet: 'states-inventory-processes',
+};
+export const WAZUH_SETTING_INVENTORY_PROTOCOLS = {
+  settingIndexPattern: 'inventory_protocols.prefix',
+  dataSet: 'states-inventory-protocols',
+};
+export const WAZUH_SETTING_INVENTORY_SYSTEM = {
+  settingIndexPattern: 'inventory_system.prefix',
+  dataSet: 'states-inventory-system',
+};
 export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     { syscheck: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
@@ -125,6 +162,56 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
       registries: true,
       settingIndexPattern: WAZUH_SETTING_FIM_REGISTRIES_PREFIX,
       dataSet: 'states-fim-registries',
+    },
+  ],
+  [WAZUH_SAMPLE_INVENTORY_AGENT]: [
+    {
+      registries: true,
+      settingIndexPattern: WAZUH_SETTING_INVENTORY_HARDWARE.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_HARDWARE.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern: WAZUH_SETTING_INVENTORY_HOTFIXES.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_HOTFIXES.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_INTERFACES.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_INTERFACES.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern: WAZUH_SETTING_INVENTORY_NETWORKS.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_NETWORKS.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern: WAZUH_SETTING_INVENTORY_PACKAGES.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_PACKAGES.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern: WAZUH_SETTING_INVENTORY_PORTS.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_PORTS.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_PROCESSES.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_PROCESSES.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_PROTOCOLS.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_PROTOCOLS.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern: WAZUH_SETTING_INVENTORY_SYSTEM.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_SYSTEM.dataSet,
     },
   ],
 };

@@ -32,6 +32,7 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+  WAZUH_SAMPLE_INVENTORY_AGENT,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import {
@@ -66,6 +67,18 @@ const sampleThreatDetectionApplication = [
 const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 
 const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
+
+const sampleInventory = [
+  'hardware',
+  'hotfixes',
+  'interfaces',
+  'networks',
+  'packages',
+  'ports',
+  'processes',
+  'protocols',
+  'system',
+].join(', ');
 
 export default class WzSampleData extends Component {
   categories: {
@@ -111,6 +124,12 @@ export default class WzSampleData extends Component {
         description: `Sample data, visualizations and dashboards for (${sampleFileIntegrityMonitoring}).`,
         image: '',
         categorySampleAlertsIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+      },
+      {
+        title: 'Sample inventory',
+        description: `Sample data, visualizations and dashboards for (${sampleInventory}).`,
+        image: '',
+        categorySampleAlertsIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
       },
     ];
     this.state = {};

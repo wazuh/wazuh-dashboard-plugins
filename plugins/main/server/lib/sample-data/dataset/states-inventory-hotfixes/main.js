@@ -1,4 +1,4 @@
-const random = require('../lib/random');
+const random = require('../../lib/random');
 
 const default_count = '10000';
 const default_index_name_prefix = 'wazuh-states-inventory-hotfixes';
