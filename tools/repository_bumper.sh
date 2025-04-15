@@ -207,28 +207,28 @@ validate_input() {
 
 # Function to perform pre-update checks and gather initial data
 pre_update_checks() {
-  local main_package_json="${REPO_PATH}/plugins/main/package.json"
-  if [ ! -f "$main_package_json" ]; then
-    log "ERROR: Main package.json not found at $main_package_json"
+  local version_json_file="${REPO_PATH}/VERSION.json" # Use VERSION.json at the root
+  if [ ! -f "$version_json_file" ]; then
+    log "ERROR: Root VERSION.json not found at $version_json_file"
     exit 1
   fi
 
-  # Attempt to extract version using sed (Note: This is fragile and assumes simple key: "value" format on one line)
-  log "Attempting to extract current version from $main_package_json using sed..."
-  CURRENT_VERSION=$(sed -n 's/^\s*"version"\s*:\s*"\([^"]*\)".*$/\1/p' "$main_package_json" | head -n 1) # head -n 1 ensures only the first match is taken
+  # Attempt to extract version from VERSION.json using sed
+  log "Attempting to extract current version from $version_json_file using sed..."
+  CURRENT_VERSION=$(sed -n 's/^\s*"version"\s*:\s*"\([^"]*\)".*$/\1/p' "$version_json_file" | head -n 1) # head -n 1 ensures only the first match is taken
 
   # Check if sed successfully extracted a version
   if [ -z "$CURRENT_VERSION" ]; then
-    log "ERROR: Failed to extract 'version' from $main_package_json using sed. Check file format or key presence."
+    log "ERROR: Failed to extract 'version' from $version_json_file using sed. Check file format or key presence."
     exit 1 # Exit if sed fails
   fi
   log "Successfully extracted version using sed: $CURRENT_VERSION"
 
-  if [ -z "$CURRENT_VERSION" ] || [ "$CURRENT_VERSION" == "null" ]; then
-    log "ERROR: Could not read current version from $main_package_json"
+  if [ "$CURRENT_VERSION" == "null" ]; then # Check specifically for "null" string if sed might output that
+    log "ERROR: Could not read current version from $version_json_file (value was 'null')"
     exit 1
   fi
-  log "Current version detected in package.json: $CURRENT_VERSION"
+  log "Current version detected in VERSION.json: $CURRENT_VERSION"
 
   CURRENT_MAJOR_MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f1,2)
   NEW_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
