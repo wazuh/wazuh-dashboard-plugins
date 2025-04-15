@@ -25,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed agent view not showing the latest agent state [#7336](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7336)
 - Fixed saved queries not displaying in the search bar [#7377](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7377)
 - Fixed monitoring cronjob infinite retries in case of a request exception [#7401](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7401)
+- Fixed double scroll bar in discover [#7399](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7399)
 
 ### Removed
 
