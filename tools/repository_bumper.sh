@@ -87,29 +87,6 @@ update_json() {
   fi
 }
 
-# Function to update YAML file using yq
-update_yaml() {
-  local file="$1"
-  local key="$2"
-  local value="$3"
-  log "Updating $key to $value in $file using yq"
-
-  # Check if yq is installed
-  if ! command -v yq &>/dev/null; then
-    log "ERROR: yq command could not be found. Please install yq (https://github.com/mikefarah/yq)."
-    exit 1
-  fi
-
-  # Use yq to update the key. The 'e' flag evaluates the expression, '.' selects the root,
-  # .$key selects the key, = assigns the value. The '-i' flag modifies the file in-place.
-  yq e ".${key} = \"${value}\"" -i "$file" && log "Successfully updated $file" || {
-    log "ERROR: Failed to update $key in $file using yq."
-    # Attempt to restore from backup if yq created one (though -i usually doesn't)
-    # Or handle the error more robustly depending on yq version/behavior
-    exit 1
-  }
-}
-
 # Function to update documentation URLs in endpoints.json
 update_endpoints_json() {
   local old_doc_version="$1"
