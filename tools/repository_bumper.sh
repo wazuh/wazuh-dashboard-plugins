@@ -50,6 +50,16 @@ update_json() {
   local file="$1"
   local key="$2"
   local value="$3"
+
+  # Get the current value of the key
+  local current_value
+  current_value=$(grep -oE '"'$key'"\s*:\s*"[^"]*"' "$file" | sed -E 's/.*:\s*"([^"]*)"/\1/' | head -n1)
+
+  if [ "$current_value" = "$value" ]; then
+    # If the value is already correct, do nothing and don't report
+    return
+  fi
+
   log "Updating $key to $value in $file using sed"
 
   # Read the file, apply the filter, and write to a temporary file, then replace the original.
@@ -74,9 +84,8 @@ update_json() {
 
   # Check if sed actually made a change (simple check: compare files)
   if cmp -s "$file" "${file}.tmp"; then
-    log "WARNING: sed command did not modify $file for key '$key'. Key might be missing, value already correct, or format unexpected."
-    rm -f "${file}.tmp" # Clean up unchanged temp file
-    log "INFO: No changes made to $file for key '$key'."
+    rm -f "${file}.tmp"
+    return
   else
     # If files differ, move the temp file to the original file name
     mv "${file}.tmp" "$file" && log "Successfully updated $key in $file using sed" || {
