@@ -11,9 +11,11 @@
  */
 import { getDataPlugin, getUiSettings } from '../../../kibana-services';
 import { useState, useEffect, useMemo } from 'react';
-import { Filter } from '../../../../../../src/plugins/data/public';
+import {
+  Filter,
+  FilterManager,
+} from '../../../../../../src/plugins/data/public';
 import _ from 'lodash';
-import { FilterManager } from '../../../../../../src/plugins/data/public';
 import { Subscription } from 'rxjs';
 
 type tUseFilterManagerReturn = {

@@ -87,3 +87,5 @@ public/assets/custom/*
 #Vulnerabilities events injector config and data
 scripts/vulnerabilities-events-injector/DIS_Settings.json
 scripts/vulnerabilities-events-injector/generatedData.json
+
+venv/

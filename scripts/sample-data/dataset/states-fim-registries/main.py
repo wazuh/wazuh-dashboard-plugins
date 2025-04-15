@@ -1,53 +1,10 @@
 import random
-import datetime
+from lib.randomize import randomize
+from lib.constants import DEFAULT_COUNT
+from lib.generate import generate
 
-default_count='10000'
-default_index_name='wazuh-states-fim-registries-sample'
-DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
-
-def generate_random_date():
-    start_date = datetime.datetime.now()
-    end_date = start_date - datetime.timedelta(days=10)
-    random_date = start_date + (end_date - start_date) * random.random()
-    return random_date.strftime(DATE_FORMAT)
-
-
-def generate_random_unix_timestamp():
-  start_time = datetime.datetime(2000, 1, 1)
-  end_time = datetime.datetime.now()
-  random_time = start_time + datetime.timedelta(
-    seconds=random.randint(0, int((end_time - start_time).total_seconds()))
-  )
-  return int(random_time.timestamp())
-
-
-def generate_random_agent():
-    return {
-        "id": f"{random.randint(0, 99):03d}",
-        "name": f"Agent{random.randint(0, 99)}",
-        "version": f"v{random.randint(0, 9)}-stable",
-        "host": generate_random_host(),
-    }
-
-
-def generate_random_host():
-    return {
-        "architecture": random.choice(["x86_64", "arm64"]),
-        "ip": f"{random.randint(1, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}",
-    }
-
-
-def generate_random_data_stream():
-    data_stream = {"type": random.choice(["Scheduled", "Realtime"])}
-    return data_stream
-
-
-def generate_random_event():
-    return {
-        "category": random.choice(["registy_value", "registry_key", "file"]),
-        "type": random.choice(["added","modified","deleted"])
-    }
-
+default_count=DEFAULT_COUNT
+default_index_name=generate.index_name('fim-registries')
 
 def generate_random_registry():
     return {
@@ -63,33 +20,19 @@ def generate_random_registry():
         "group": f"group{random.randint(0, 1000)}",
         "hive": "HKLM",
         "key": r"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe",
-        "mtime": generate_random_unix_timestamp(),
+        "mtime": randomize.unix_timestamp(),
         "owner": f"owner{random.randint(0, 1000)}",
-        "path": "/path/to/file",
+        "path": "/tmp/agent.conf",
         "size": random.randint(1000, 1000000),
         "uid": f"uid{random.randint(0, 1000)}",
         "value": f"registry_value{random.randint(0, 1000)}",
     }
 
-def generate_random_wazuh():
-    return {
-        "cluster": {
-            "name": f"wazuh-cluster-{random.randint(0, 10)}",
-            "node": f"wazuh-cluster-node-{random.randint(0, 10)}",
-        },
-        "schema": {"version": "1.7.0"},
-    }
-
-
 def generate_document(params):
-  # https://github.com/wazuh/wazuh-indexer/pull/744
+    # https://github.com/wazuh/wazuh-indexer/pull/744
 
-  return {
-      "@timestamp": generate_random_date(),
-      "agent": generate_random_agent(),
-      "data_stream": generate_random_data_stream(),
-      "event": generate_random_event(),
-      "registry": generate_random_registry(),
-      "wazuh": generate_random_wazuh(),
-  }
-
+    return generate.document({
+        "data_stream": randomize.data_stream(),
+        "event": randomize.event(),
+        "registry": generate_random_registry(),
+    })

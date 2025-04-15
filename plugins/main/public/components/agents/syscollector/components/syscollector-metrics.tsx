@@ -112,6 +112,7 @@ export const InventoryMetrics = withSystemInventoryDataSource(
                     pageSize: 1,
                   },
                   filters: [
+                    ...itHygieneDataSource.fetchFilters,
                     PatternDataSourceFilterManager.createFilter(
                       FILTER_OPERATOR.EXISTS,
                       'host.cpu.name',
@@ -127,6 +128,7 @@ export const InventoryMetrics = withSystemInventoryDataSource(
                     pageSize: 1,
                   },
                   filters: [
+                    ...itHygieneDataSource.fetchFilters,
                     PatternDataSourceFilterManager.createFilter(
                       FILTER_OPERATOR.EXISTS,
                       'host.os.name',

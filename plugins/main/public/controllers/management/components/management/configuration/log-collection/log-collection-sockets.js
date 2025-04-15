@@ -29,7 +29,7 @@ const helpLinks = [
   {
     text: 'Using multiple outputs',
     href: webDocumentationLink(
-      'user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs',
+      'user-manual/capabilities/log-data-collection/monitoring-log-files.html',
     ),
   },
   {

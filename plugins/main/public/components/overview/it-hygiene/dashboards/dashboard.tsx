@@ -27,6 +27,8 @@ import { IndexPattern } from '../../../../../../../src/plugins/data/public';
 import { WzSearchBar } from '../../../common/search-bar';
 import { withSystemInventoryDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
+import { getDashboardKPIs } from './dashboard-kpi';
+import { getDashboardTables } from './dashboard-tables';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -112,7 +114,7 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
                 <DiscoverNoResults />
               ) : null}
               <div
-                className={`it-hygiene-dashboard-responsive ${
+                className={`wz-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls ${
                   dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
                 }`}
               >
@@ -123,8 +125,70 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
                     // but if it is undefined use the index pattern of the hoc
                     // because the first executions of the dataSource are undefined
                     // and embeddables need index pattern.
+                    panels: getDashboardKPIs(
+                      dataSource?.id || indexPattern?.id,
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'kpis-vulnerability-detector-dashboard-tab',
+                    timeRange: {
+                      from: searchBarProps.dateRangeFrom,
+                      to: searchBarProps.dateRangeTo,
+                    },
+                    title: 'KPIs Vulnerability detector dashboard',
+                    description: 'KPIs Dashboard of the Vulnerability detector',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: true,
+                    lastReloadRequestTime: fingerprint,
+                  }}
+                />
+                <div className='it-hygiene-filters-wrapper'>
+                  <DashboardByRenderer
+                    input={{
+                      viewMode: ViewMode.VIEW,
+                      // Try to use the index pattern that the dataSource has
+                      // but if it is undefined use the index pattern of the hoc
+                      // because the first executions of the dataSource are undefined
+                      // and embeddables need index pattern.
+                      panels: getDashboardTables(
+                        dataSource?.id || indexPattern?.id,
+                      ),
+                      isFullScreenMode: false,
+                      filters: fetchFilters ?? [],
+                      useMargins: false,
+                      id: 'it-hygiene-dashboard-tab-filters',
+                      timeRange: {
+                        from: searchBarProps.dateRangeFrom,
+                        to: searchBarProps.dateRangeTo,
+                      },
+                      title: 'IT Hygiene dashboard filters',
+                      description: 'Dashboard of the IT Hygiene filters',
+                      query: searchBarProps.query,
+                      refreshConfig: {
+                        pause: false,
+                        value: 15,
+                      },
+                      hidePanelTitles: true,
+                      lastReloadRequestTime: fingerprint,
+                    }}
+                  />
+                </div>
+
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    // Try to use the index pattern that the dataSource has
+                    // but if it is undefined use the index pattern of the hoc
+                    // because the first executions of the dataSource are undefined
+                    // and embeddables need index pattern.
                     panels: getDashboardPanels(
                       dataSource?.id || indexPattern?.id,
+                      Boolean(dataSource?.getPinnedAgentFilter()?.length),
                     ),
                     isFullScreenMode: false,
                     filters: fetchFilters ?? [],

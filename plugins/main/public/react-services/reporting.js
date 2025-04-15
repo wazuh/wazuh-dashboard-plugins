@@ -169,22 +169,15 @@ export class ReportingService {
       );
       const browserTimezone = moment.tz.guess(true);
 
-      /* The report for syscollector uses the keywords for from and to properties.
-      They are used with the format epoch_millis on the server side to get alerts data from
-      vulnerable packages. If these values are parsed, will cause an error due to unexpected format.
-      */
-      const time =
-        tab === 'syscollector'
-          ? { to: dataSourceContext.time.to, from: dataSourceContext.time.from }
-          : dataSourceContext.time
-          ? {
-              to: dateMath.parse(dataSourceContext.time.to, {
-                roundUp: true,
-                forceNow: getForceNow(),
-              }),
-              from: dateMath.parse(dataSourceContext.time.from),
-            }
-          : undefined;
+      const time = dataSourceContext.time
+        ? {
+            to: dateMath.parse(dataSourceContext.time.to, {
+              roundUp: true,
+              forceNow: getForceNow(),
+            }),
+            from: dateMath.parse(dataSourceContext.time.from),
+          }
+        : undefined;
 
       const data = {
         array: visualizations,
@@ -201,10 +194,7 @@ export class ReportingService {
         apiId: JSON.parse(AppState.getCurrentAPI()).id,
       };
 
-      const apiEndpoint =
-        tab === 'syscollector'
-          ? `/reports/agents/${agents}/inventory`
-          : `/reports/modules/${tab}`;
+      const apiEndpoint = `/reports/modules/${tab}`;
       const response = await WzRequest.genericReq('POST', apiEndpoint, data);
 
       this.renderSucessReportsToast({ filename: response.data.filename });

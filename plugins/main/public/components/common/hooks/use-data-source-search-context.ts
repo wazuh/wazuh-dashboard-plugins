@@ -88,6 +88,7 @@ export function useDataSourceSearchContext({
     isLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: DataSource,
     repository: new DataSourceRepositoryCreator(),
@@ -102,6 +103,7 @@ export function useDataSourceSearchContext({
     isLoading,
     fetchData,
     setFilters,
+    error,
   };
 }
 
@@ -120,6 +122,7 @@ export function useDataSourceWithSearchBar({
     isLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSourceSearchContext({
     createNewSearchContext,
     DataSource,
@@ -167,6 +170,7 @@ export function useDataSourceWithSearchBar({
     isLoading,
     fetchData: fetchDataWrapQueryDateRange,
     setFilters,
+    error,
     searchBarProps,
     fingerprint,
     autoRefreshFingerprint,

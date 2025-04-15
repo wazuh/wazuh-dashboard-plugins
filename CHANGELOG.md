@@ -7,6 +7,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.13.0
+- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Added hardware and system information to agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Added `fim.pattern` and `system_inventory.pattern` settings [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+
+### Removed
+
+- Removed `Inventory data` view from agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Removed `GET /api/syscollector` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 
 ## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 00
 
@@ -15,8 +24,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.12.0
 - Add setting to limit the number of rows in csv reports [#7182](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7182)
 - Add new `vulnerability.scanner.reference` field which contains the CTI reference of the vulnerability [#7306](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7306)
-- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
-- Added hardware and system information to agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 
 ### Changed
 
@@ -30,13 +37,20 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed logging UI logs due to logger undefined property [#7267](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7267)
 - Fixed TOP-5-SO filter management in Endpoints > Summary [#7278](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7278)
 - Fixed CSV export not filtering by timerange [#7304](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7304)
+- Fixed agent view not showing the latest agent state [#7336](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7336)
+- Fixed saved queries not displaying in the search bar [#7377](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7377)
 
-### Removed
+## Wazuh v4.11.2 - OpenSearch Dashboards 2.16.0 - Revision 02
 
-- Removed `Inventory data` from agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
-- Removed `GET /api/syscollector` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+### Added
 
-## Wazuh v4.11.1 - OpenSearch Dashboards 2.16.0 - Revision 01
+- Support for Wazuh 4.11.2
+
+### Fixed
+
+- Fixed several broken Wazuh documentation links [#7370](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7370) [#7371](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7371)
+
+## Wazuh v4.11.1 - OpenSearch Dashboards 2.16.0 - Revision 02
 
 ### Added
 

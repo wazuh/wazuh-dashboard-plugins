@@ -22,17 +22,33 @@ import {
   EuiButtonIcon,
   EuiFlexGroup,
   EuiToolTip,
+  EuiLoadingContent,
+  EuiProgress,
+  EuiEmptyPrompt,
 } from '@elastic/eui';
 // @ts-ignore
 import { getFimAlerts } from './lib';
 import { formatUIDate } from '../../../../../react-services/time-service';
-import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout';
 import { EuiLink } from '@elastic/eui';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { fileIntegrityMonitoring } from '../../../../../utils/applications';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
+import {
+  DocumentDetails,
+  withFlyoutDocumentDetails,
+} from '../../../wazuh-discover/table';
+import {
+  FILTER_OPERATOR,
+  FIMStatesDataSource,
+  FIMStatesDataSourceRepository,
+  PatternDataSourceFilterManager,
+} from '../../../data-source';
+import filesColumns from '../../../../overview/fim/inventory/table-columns/files';
+import { withDataSourceFetch } from '../../../hocs';
+import { compose } from 'redux';
+import { filesEventsDocumentDetailsTab } from '../../../../overview/fim';
 
 export function FimEventsTable({ agent }) {
   return (
@@ -83,6 +99,74 @@ export function useTimeFilter() {
   return timeFilter;
 }
 
+const PromptErrorFetchingDocumentDataData = (props: { error?: string }) => {
+  return (
+    <EuiEmptyPrompt
+      iconType='alert'
+      title={<h2>Cannot get inventory details</h2>}
+      body={
+        <>
+          {typeof props?.error?.message === 'string' && (
+            <p>{props.error.message}</p>
+          )}
+        </>
+      }
+    />
+  );
+};
+
+const FlyoutDetailsFIM = compose(
+  withFlyoutDocumentDetails,
+  withDataSourceFetch({
+    DataSource: FIMStatesDataSource,
+    DataSourceRepositoryCreator: FIMStatesDataSourceRepository,
+    mapRequestParams: ({ dataSource, file }) => ({
+      pagination: {
+        // Get the first item
+        pageIndex: 0,
+        pageSize: 1,
+      },
+      filters: [
+        ...dataSource.fetchFilters,
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS,
+          'file.path',
+          file,
+          dataSource.title,
+        ),
+      ],
+    }),
+    mapResponse: (response, { file }) => {
+      const result = response?.hits?.hits?.[0];
+      if (!result) {
+        throw new Error(
+          `No data was found for [${file}] file in file integrity monitoring inventory data. This could indicate a problem in indexed states inventory data, caused by an error in: server side, server-indexer connection, indexer side, index creation, index data, index pattern name misconfiguration or user permissions related to read the inventory indices`,
+        );
+      }
+      return result;
+    },
+    LoadingDataSourceComponent: () => <EuiProgress size='xs' color='primary' />,
+    FetchingDataComponent: () => <EuiLoadingContent lines={6} />,
+    ErrorFetchDataComponent: PromptErrorFetchingDocumentDataData,
+  }),
+)(props => {
+  const { dataSourceAction, dataSource, onFilter, agent } = props;
+  return (
+    <DocumentDetails
+      document={dataSourceAction.data}
+      indexPattern={dataSource.dataSource.indexPattern}
+      tableDefaultColumns={filesColumns}
+      filters={dataSource.filters}
+      setFilters={dataSource.setFilters}
+      onFilter={onFilter}
+      additionalTabs={({ document }) => {
+        return [filesEventsDocumentDetailsTab({ document, agent })];
+      }}
+      showFilterButtons={false}
+    />
+  );
+});
+
 function FimTable({ agent }) {
   const [fimAlerts, setFimAlerts] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -95,6 +179,8 @@ function FimTable({ agent }) {
   useEffect(() => {
     getFimAlerts(agent.id, timeFilter, sort).then(setFimAlerts);
   }, [timeFilter, sort, agent.id]);
+
+  const closeFlyout = () => setIsOpen(false);
   return (
     <Fragment>
       <EuiBasicTable
@@ -107,12 +193,12 @@ function FimTable({ agent }) {
         noItemsMessage='No recent events'
       />
       {isOpen && (
-        <FlyoutDetail
-          agentId={agent.id}
-          closeFlyout={() => setIsOpen(false)}
-          fileName={file}
-          view='extern'
-          {...{ agent }}
+        <FlyoutDetailsFIM
+          title={`Details: ${file}`}
+          file={file}
+          agent={agent}
+          onClose={closeFlyout}
+          onFilter={closeFlyout}
         />
       )}
     </Fragment>

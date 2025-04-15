@@ -139,44 +139,6 @@ export function WazuhReportingRoutes(router: IRouter) {
       ctrl.createReportsAgentsConfiguration(context, request, response),
   );
 
-  router.post(
-    {
-      path: '/reports/agents/{agentID}/inventory',
-      validate: {
-        body: schema.object({
-          array: schema.any(),
-          browserTimezone: schema.string(),
-          serverSideQuery: schema.maybe(schema.any()),
-          filters: schema.maybe(schema.any()),
-          agents: schema.maybe(
-            schema.oneOf([schema.string(), schema.boolean()]),
-          ),
-          components: schema.maybe(schema.any()),
-          searchBar: schema.maybe(
-            schema.oneOf([schema.string(), schema.boolean()]),
-          ),
-          section: schema.maybe(schema.string()),
-          tab: schema.string(),
-          tables: schema.maybe(schema.any()),
-          time: schema.oneOf([
-            schema.object({
-              from: schema.string(),
-              to: schema.string(),
-            }),
-            schema.string(),
-          ]),
-          indexPatternTitle: schema.string(),
-          apiId: schema.string(),
-        }),
-        params: schema.object({
-          agentID: agentIDValidation,
-        }),
-      },
-    },
-    (context, request, response) =>
-      ctrl.createReportsAgentsInventory(context, request, response),
-  );
-
   // Fetch specific report
   router.get(
     {

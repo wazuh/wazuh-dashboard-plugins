@@ -12,7 +12,6 @@
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
-import { MainFim } from '../../agents/fim';
 import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
@@ -77,10 +76,11 @@ import {
   ThreatHuntingDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
-import { InventoryFIMFiles } from '../../overview/fim/inventory-files';
-import { InventoryFIMRegistries } from '../../overview/fim/inventory-registries';
-import { InventoryITHygiene } from '../../overview/it-hygiene';
-import { DashboardITHygiene } from '../../overview/it-hygiene/dashboards';
+import {
+  InventoryITHygiene,
+  DashboardITHygiene,
+} from '../../overview/it-hygiene';
+import { InventoryFIM } from '../../overview/fim';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -118,22 +118,10 @@ export const ModulesDefaults = {
         component: DashboardFIM,
       },
       {
-        id: 'inventory-files',
-        name: 'Inventory - Files',
+        id: 'inventory',
+        name: 'Inventory',
         buttons: [ButtonExploreAgent],
-        component: InventoryFIMFiles,
-      },
-      {
-        id: 'inventory-registries',
-        name: 'Inventory - Registries',
-        buttons: [ButtonExploreAgent],
-        component: InventoryFIMRegistries,
-      },
-      {
-        id: 'inventory-og',
-        name: 'InventoryOG',
-        buttons: [ButtonExploreAgent],
-        component: MainFim,
+        component: InventoryFIM,
       },
       renderDiscoverTab({
         tableColumns: fileIntegrityMonitoringColumns,
