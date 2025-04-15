@@ -45,20 +45,46 @@ usage() {
   echo "  $0 --version 4.6.0 --stage beta1"
 }
 
-# Function to update JSON file using jq
+# Function to update JSON file using sed
 update_json() {
   local file="$1"
   local key="$2"
   local value="$3"
-  log "Updating $key to $value in $file using jq"
+  log "Updating $key to $value in $file using sed"
 
-  # Use jq to update the key. The '.key = value' syntax updates the key at the top level.
   # Read the file, apply the filter, and write to a temporary file, then replace the original.
-  jq --arg key "$key" --arg value "$value" '.[$key] = $value' "$file" >"${file}.tmp" && mv "${file}.tmp" "$file" && log "Successfully updated $file" || {
-    log "ERROR: Failed to update $key in $file using jq."
-    rm -f "${file}.tmp" # Clean up temp file on error
-    exit 1
-  }
+  # WARNING: Using sed for JSON manipulation is fragile and not recommended.
+  # This attempts to replace simple top-level "key": "value" pairs where the value is expected to be a string.
+  # It assumes the key-value pair exists on a single line.
+  log "Attempting to update $key to $value in $file using sed (Note: This is fragile)"
+
+  # Escape key and value for use in sed regex and replacement string
+  # Basic escaping for common sed special characters: &, /, \
+  local escaped_key=$(printf '%s\n' "$key" | sed -e 's/[&/\]/\\&/g')
+  local escaped_value=$(printf '%s\n' "$value" | sed -e 's/[&/\]/\\&/g')
+
+  # The sed command tries to find a line matching:
+  # ^(\s*"escaped_key"\s*:\s*") - Capture group 1: Start of line, optional space, quoted key, optional space, colon, optional space, opening quote for the value
+  # [^"]*                       - Match the existing value (any characters except a quote)
+  # ("\s*,?)                    - Capture group 2: Closing quote, optional space, optional comma
+  # $                           - End of line
+  # It replaces the line with: \1 (captured group 1) + escaped_value + \2 (captured group 2)
+  # Use sed address range 0,/pattern/ to apply substitution only up to the first matching line
+  sed -E '0,/^\s*"'$escaped_key'"\s*:\s*"[^"]*"\s*,?$/{s/^(\s*"'$escaped_key'"\s*:\s*")[^"]*("\s*,?)$/\1'$escaped_value'\2/}' "$file" >"${file}.tmp"
+
+  # Check if sed actually made a change (simple check: compare files)
+  if cmp -s "$file" "${file}.tmp"; then
+    log "WARNING: sed command did not modify $file for key '$key'. Key might be missing, value already correct, or format unexpected."
+    rm -f "${file}.tmp" # Clean up unchanged temp file
+    log "INFO: No changes made to $file for key '$key'."
+  else
+    # If files differ, move the temp file to the original file name
+    mv "${file}.tmp" "$file" && log "Successfully updated $key in $file using sed" || {
+      log "ERROR: Failed to move temporary file after updating $key in $file using sed."
+      rm -f "${file}.tmp" # Clean up temp file on error
+      exit 1
+    }
+  fi
 }
 
 # Function to update YAML file using yq
