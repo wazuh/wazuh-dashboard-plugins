@@ -255,7 +255,14 @@ compare_versions_and_set_revision() {
         # Versions are identical (Major, Minor, Patch are equal)
         log "New version ($VERSION) is identical to current version ($CURRENT_VERSION). Incrementing revision."
         local main_package_json="${REPO_PATH}/plugins/main/package.json" # Need path again
-        local current_revision_val=$(jq -r '.revision' "$main_package_json")
+        log "Attempting to extract current revision from $main_package_json using sed (Note: This is fragile)"
+        local current_revision_val=$(sed -n 's/^\s*"revision"\s*:\s*"\([^"]*\)".*$/\1/p' "$main_package_json" | head -n 1)
+        # Check if sed successfully extracted a revision
+        if [ -z "$current_revision_val" ]; then
+          log "ERROR: Failed to extract 'revision' from $main_package_json using sed. Check file format or key presence."
+          exit 1 # Exit if sed fails
+        fi
+        log "Successfully extracted revision using sed: $current_revision_val"
         if [ -z "$current_revision_val" ] || [ "$current_revision_val" == "null" ]; then
           log "ERROR: Could not read current revision from $main_package_json"
           exit 1
