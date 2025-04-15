@@ -176,7 +176,7 @@ validate_input() {
     log "ERROR: Version must be in the format x.y.z (e.g., 4.6.0)"
     exit 1
   fi
-  if ! [[ $STAGE =~ ^[a-zA-Z]+[0-9]*$ ]]; then
+  if ! [[ $STAGE =~ ^[a-zA-Z]+[0-9]+$ ]]; then
     log "ERROR: Stage must be alphanumeric (e.g., alpha0, beta1, rc2)"
     exit 1
   fi
