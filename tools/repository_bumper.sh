@@ -333,7 +333,13 @@ update_changelog() {
   fi
 
   # Extract OpenSearch Dashboards version from package.json
-  OPENSEARCH_VERSION=$(jq -r '.pluginPlatform.version' "$package_json_file")
+  # Attempt to extract OpenSearch Dashboards version using sed (WARNING: Fragile!)
+  # This assumes "pluginPlatform": { ... "version": "x.y.z" ... } structure
+  # It looks for the block starting with "pluginPlatform": { and ending with }
+  # Within that block, it finds the line starting with "version": "..." and extracts the value.
+  # This is significantly less reliable than using jq.
+  log "Attempting to extract pluginPlatform.version from $package_json_file using sed (Note: This is fragile)"
+  OPENSEARCH_VERSION=$(sed -n '/"pluginPlatform":\s*{/,/}/ { /^\s*"version":\s*"\([^"]*\)"/ { s//\1/p; q; } }' "$package_json_file")
   if [ -z "$OPENSEARCH_VERSION" ] || [ "$OPENSEARCH_VERSION" == "null" ]; then
     log "ERROR: Could not extract pluginPlatform.version from $package_json_file for changelog"
     exit 1
