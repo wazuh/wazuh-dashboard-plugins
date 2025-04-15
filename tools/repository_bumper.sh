@@ -195,7 +195,17 @@ pre_update_checks() {
     exit 1
   fi
 
-  CURRENT_VERSION=$(jq -r '.version' "$main_package_json")
+  # Attempt to extract version using sed (Note: This is fragile and assumes simple key: "value" format on one line)
+  log "Attempting to extract current version from $main_package_json using sed..."
+  CURRENT_VERSION=$(sed -n 's/^\s*"version"\s*:\s*"\([^"]*\)".*$/\1/p' "$main_package_json" | head -n 1) # head -n 1 ensures only the first match is taken
+
+  # Check if sed successfully extracted a version
+  if [ -z "$CURRENT_VERSION" ]; then
+    log "ERROR: Failed to extract 'version' from $main_package_json using sed. Check file format or key presence."
+    exit 1 # Exit if sed fails
+  fi
+  log "Successfully extracted version using sed: $CURRENT_VERSION"
+
   if [ -z "$CURRENT_VERSION" ] || [ "$CURRENT_VERSION" == "null" ]; then
     log "ERROR: Could not read current version from $main_package_json"
     exit 1
