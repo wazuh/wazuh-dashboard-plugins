@@ -10,6 +10,7 @@ SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_PATH=$(git rev-parse --show-toplevel 2>/dev/null)
 DATE_TIME=$(date "+%Y-%m-%d_%H-%M-%S-%3N")
 LOG_FILE="${SCRIPT_PATH}/repository_bumper_${DATE_TIME}.log"
+VERSION_FILE="${REPO_PATH}/VERSION.json"
 VERSION=""
 STAGE=""
 REVISION="00"
@@ -207,25 +208,24 @@ validate_input() {
 
 # Function to perform pre-update checks and gather initial data
 pre_update_checks() {
-  local version_json_file="${REPO_PATH}/VERSION.json" # Use VERSION.json at the root
-  if [ ! -f "$version_json_file" ]; then
-    log "ERROR: Root VERSION.json not found at $version_json_file"
+  if [ ! -f "$VERSION_FILE" ]; then
+    log "ERROR: Root VERSION.json not found at $VERSION_FILE"
     exit 1
   fi
 
   # Attempt to extract version from VERSION.json using sed
-  log "Attempting to extract current version from $version_json_file using sed..."
-  CURRENT_VERSION=$(sed -n 's/^\s*"version"\s*:\s*"\([^"]*\)".*$/\1/p' "$version_json_file" | head -n 1) # head -n 1 ensures only the first match is taken
+  log "Attempting to extract current version from $VERSION_FILE using sed..."
+  CURRENT_VERSION=$(sed -n 's/^\s*"version"\s*:\s*"\([^"]*\)".*$/\1/p' "$VERSION_FILE" | head -n 1) # head -n 1 ensures only the first match is taken
 
   # Check if sed successfully extracted a version
   if [ -z "$CURRENT_VERSION" ]; then
-    log "ERROR: Failed to extract 'version' from $version_json_file using sed. Check file format or key presence."
+    log "ERROR: Failed to extract 'version' from $VERSION_FILE using sed. Check file format or key presence."
     exit 1 # Exit if sed fails
   fi
   log "Successfully extracted version using sed: $CURRENT_VERSION"
 
   if [ "$CURRENT_VERSION" == "null" ]; then # Check specifically for "null" string if sed might output that
-    log "ERROR: Could not read current version from $version_json_file (value was 'null')"
+    log "ERROR: Could not read current version from $VERSION_FILE (value was 'null')"
     exit 1
   fi
   log "Current version detected in VERSION.json: $CURRENT_VERSION"
@@ -304,13 +304,12 @@ compare_versions_and_set_revision() {
 
 # Function to update VERSION.json
 update_root_version_json() {
-  local version_json_file="${REPO_PATH}/VERSION.json"
-  if [ -f "$version_json_file" ]; then
-    log "Processing $version_json_file"
-    update_json "$version_json_file" "version" "$VERSION"
-    update_json "$version_json_file" "stage" "$STAGE"
+  if [ -f "$VERSION_FILE" ]; then
+    log "Processing $VERSION_FILE"
+    update_json "$VERSION_FILE" "version" "$VERSION"
+    update_json "$VERSION_FILE" "stage" "$STAGE"
   else
-    log "WARNING: $version_json_file not found. Skipping update."
+    log "WARNING: $VERSION_FILE not found. Skipping update."
   fi
 }
 
