@@ -180,11 +180,6 @@ validate_input() {
     log "ERROR: Stage must be alphanumeric (e.g., alpha0, beta1, rc2)"
     exit 1
   fi
-  # Check for jq early
-  if ! command -v jq &>/dev/null; then
-    log "ERROR: jq command could not be found. Please install jq (https://stedolan.github.io/jq/download/)."
-    exit 1
-  fi
 }
 
 # Function to perform pre-update checks and gather initial data
