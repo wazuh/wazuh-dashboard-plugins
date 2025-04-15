@@ -291,20 +291,6 @@ update_package_json_files() {
   done
 }
 
-# Function to update wazuh.yml files
-update_wazuh_yml_files() {
-  local plugins_dir="${REPO_PATH}/plugins"
-  log "Updating wazuh.yml files..."
-  # Use git ls-files to find tracked wazuh.yml files within the plugins directory
-  git ls-files "$plugins_dir" | grep '/wazuh.yml$' | while IFS= read -r yml_file; do
-    # Ensure the file path is relative to the repository root or absolute for jq/yq
-    local full_yml_path
-    full_yml_path=$(realpath "${yml_file}") # Use realpath for consistency
-    log "Processing $full_yml_path"
-    update_yaml "$full_yml_path" "version" "$VERSION"
-  done
-}
-
 # Function to update opensearch_dashboards.json files
 update_osd_json_files() {
   local plugins_dir="${REPO_PATH}/plugins"
@@ -404,7 +390,6 @@ main() {
 
   update_root_version_json
   update_package_json_files
-  update_wazuh_yml_files
   update_osd_json_files
 
   # Conditionally update endpoints.json
