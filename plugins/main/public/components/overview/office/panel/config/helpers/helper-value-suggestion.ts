@@ -13,7 +13,7 @@
 /** UserTypes Office365 module filter
  *  https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-management-activity-api-schema#user-type
  */
-const OFFICE_365_USER_TYPE: string[] = [
+const OFFICE_365_USER_TYPE = [
   '[0] Regular',
   '[1] Reserved',
   '[2] Admin',
@@ -28,13 +28,15 @@ const OFFICE_365_USER_TYPE: string[] = [
 /** UserTypes Office365 module filter
  * https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-management-activity-api-schema#auditlogscope
  */
-const OFFICE_365_AUDIT_LOG_SCOPE: string[] = ['[0] Online', '[1] Onprem'];
+const OFFICE_365_AUDIT_LOG_SCOPE = ['[0] Online', '[1] Onprem'];
 
-const dataFields = {
+const office365FieldMappings = {
   'data.office365.UserType': OFFICE_365_USER_TYPE,
   'data.office365.AuditLogScope': OFFICE_365_AUDIT_LOG_SCOPE,
 };
 
-export const getCustomValueSuggestion = (fieldName: string): string[] => {
-  return dataFields[fieldName] || [];
+export const getCustomValueSuggestion = (
+  fieldName: keyof typeof office365FieldMappings,
+): string[] => {
+  return office365FieldMappings[fieldName] || [];
 };
