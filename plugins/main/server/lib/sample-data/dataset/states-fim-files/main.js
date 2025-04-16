@@ -1,4 +1,8 @@
 const random = require('../../lib/random');
+const {
+  generate_random_agent,
+  generate_random_wazuh,
+} = require('../shared-utils');
 
 const default_count = '10000';
 const default_index_name = 'wazuh-states-fim-files-sample';
@@ -17,22 +21,6 @@ function generate_random_date() {
 
   // Format date to match the Python format
   return random_date.toISOString();
-}
-
-function generate_random_agent() {
-  return {
-    id: String(random.int(0, 99)).padStart(3, '0'),
-    name: `Agent${random.int(0, 99)}`,
-    version: `v${random.int(0, 9)}-stable`,
-    host: generate_random_host(),
-  };
-}
-
-function generate_random_host() {
-  return {
-    architecture: random.choice(['x86_64', 'arm64']),
-    ip: `${random.int(1, 255)}.${random.int(0, 255)}.${random.int(0, 255)}.${random.int(0, 255)}`,
-  };
 }
 
 function generate_random_data_stream() {
@@ -66,16 +54,6 @@ function generate_random_file() {
   };
 }
 
-function generate_random_wazuh() {
-  return {
-    cluster: {
-      name: `wazuh-cluster-${random.int(0, 10)}`,
-      node: `wazuh-cluster-node-${random.int(0, 10)}`,
-    },
-    schema: { version: '1.7.0' },
-  };
-}
-
 function generate_document(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
@@ -84,7 +62,7 @@ function generate_document(params) {
     data_stream: generate_random_data_stream(),
     event: generate_random_event(),
     file: generate_random_file(),
-    wazuh: generate_random_wazuh(),
+    wazuh: generate_random_wazuh(params),
   };
 }
 

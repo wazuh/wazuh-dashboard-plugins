@@ -1,23 +1,11 @@
 const random = require('../../lib/random');
+const {
+  generate_random_wazuh,
+  generate_random_agent,
+} = require('../shared-utils');
 
 const default_count = '10000';
 const default_index_name = 'wazuh-states-fim-registries-sample';
-
-function generate_random_agent() {
-  return {
-    id: String(random.int(0, 99)).padStart(3, '0'),
-    name: `Agent${random.int(0, 99)}`,
-    version: `v${random.int(0, 9)}-stable`,
-    host: generate_random_host(),
-  };
-}
-
-function generate_random_host() {
-  return {
-    architecture: random.choice(['x86_64', 'arm64']),
-    ip: random.ip(),
-  };
-}
 
 function generate_random_data_stream() {
   return {
@@ -55,16 +43,6 @@ function generate_random_registry() {
   };
 }
 
-function generate_random_wazuh() {
-  return {
-    cluster: {
-      name: `wazuh-cluster-${random.int(0, 10)}`,
-      node: `wazuh-cluster-node-${random.int(0, 10)}`,
-    },
-    schema: { version: '1.7.0' },
-  };
-}
-
 function generate_document(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
@@ -73,7 +51,7 @@ function generate_document(params) {
     data_stream: generate_random_data_stream(),
     event: generate_random_event(),
     registry: generate_random_registry(),
-    wazuh: generate_random_wazuh(),
+    wazuh: generate_random_wazuh(params),
   };
 }
 
