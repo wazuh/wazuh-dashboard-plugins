@@ -43,7 +43,6 @@ export const ITHygieneInventoryDashboardTable = ({
   DataSource,
   DataSourceRepositoryCreator,
   tableDefaultColumns,
-  managedFilters,
   getDashboardPanels,
 }: ITHygieneInventoryTabLayoutProps) => {
   const {
@@ -88,7 +87,7 @@ export const ITHygieneInventoryDashboardTable = ({
                 indexPattern={dataSource?.indexPattern}
                 setFilters={setFilters}
                 fixedFilters={fixedFilters}
-                filterInputs={managedFilters || []}
+                filterInputs={[]}
               />
               {getDashboardPanels && (
                 <DashboardByRenderer
