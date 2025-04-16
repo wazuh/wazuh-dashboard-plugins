@@ -88,4 +88,8 @@ public/assets/custom/*
 scripts/vulnerabilities-events-injector/DIS_Settings.json
 scripts/vulnerabilities-events-injector/generatedData.json
 
-venv/
+# Python environment
+bin/
+site-packages/
+pyvenv.cfg
+lib64
