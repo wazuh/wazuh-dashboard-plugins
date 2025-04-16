@@ -48,3 +48,66 @@ export const withSystemInventoryDataSource =
     validate: ensureIndexPatternIsCreated(),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
+
+export const withSystemInventoryNetworksDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_networks.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });
+
+export const withSystemInventoryInterfacesDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_interfaces.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });
+
+export const withSystemInventoryProtocolsDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_protocols.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });
+
+export const withSystemInventoryProcessesDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_processes.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });
+
+export const withSystemInventoryPortsDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_ports.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });
+
+export const withSystemInventoryPackagesDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_packages.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });
+
+export const withSystemInventoryHotfixesDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_hotfixes.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });
+
+export const withSystemInventorySystemDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_system.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });
+
+export const withSystemInventoryHardwareDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'system_inventory_hardware.pattern',
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });

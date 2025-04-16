@@ -81,6 +81,8 @@ import {
   DashboardITHygiene,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
+import { ITHygieneNetworksInventory } from '../../overview/it-hygiene/networks/inventory';
+import { ITHygieneProcessesInventory } from '../../overview/it-hygiene/processes';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -458,10 +460,22 @@ export const ModulesDefaults = {
         component: DashboardITHygiene,
       },
       {
-        id: 'inventory',
+        id: 'inventory', // TODO: remove me
         name: 'Inventory',
         buttons: [ButtonExploreAgent],
         component: InventoryITHygiene,
+      },
+      {
+        id: 'networks',
+        name: 'Networks',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneNetworksInventory,
+      },
+      {
+        id: 'processes',
+        name: 'Processes',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneProcessesInventory,
       },
     ],
     availableFor: ['manager', 'agent'],
