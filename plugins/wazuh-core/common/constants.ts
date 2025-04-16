@@ -81,43 +81,48 @@ export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
 // Sample data
 export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-4.x-';
-export const WAZUH_SAMPLE_FIM_FILES_PREFIX = 'wazuh-states-fim-files-';
-export const WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX =
-  'wazuh-states-fim-registries-';
+export const WAZUH_SAMPLE_FIM_FILES_PREFIX = {
+  key: 'fim_files.sample.prefix',
+  defaultValue: 'wazuh-states-fim-files-',
+};
+export const WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX = {
+  key: 'fim_registries.sample.prefix',
+  defaultValue: 'wazuh-states-fim-registries-',
+};
 export const WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX = {
-  key: 'inventory_hardware.prefix',
+  key: 'inventory_hardware.sample.prefix',
   defaultValue: 'wazuh-states-inventory-hardware-',
 };
 export const WAZUH_SAMPLE_INVENTORY_HOTFIXES_PREFIX = {
-  key: 'inventory_hotfixes.prefix',
+  key: 'inventory_hotfixes.sample.prefix',
   defaultValue: 'wazuh-states-inventory-hotfixes-',
 };
 export const WAZUH_SAMPLE_INVENTORY_INTERFACES_PREFIX = {
-  key: 'inventory_interfaces.prefix',
+  key: 'inventory_interfaces.sample.prefix',
   defaultValue: 'wazuh-states-inventory-interfaces-',
 };
 export const WAZUH_SAMPLE_INVENTORY_NETWORKS_PREFIX = {
-  key: 'inventory_networks.prefix',
+  key: 'inventory_networks.sample.prefix',
   defaultValue: 'wazuh-states-inventory-networks-',
 };
 export const WAZUH_SAMPLE_INVENTORY_PACKAGES_PREFIX = {
-  key: 'inventory_packages.prefix',
+  key: 'inventory_packages.sample.prefix',
   defaultValue: 'wazuh-states-inventory-packages-',
 };
 export const WAZUH_SAMPLE_INVENTORY_PORTS_PREFIX = {
-  key: 'inventory_ports.prefix',
+  key: 'inventory_ports.sample.prefix',
   defaultValue: 'wazuh-states-inventory-ports-',
 };
 export const WAZUH_SAMPLE_INVENTORY_PROCESSES_PREFIX = {
-  key: 'inventory_processes.prefix',
+  key: 'inventory_processes.sample.prefix',
   defaultValue: 'wazuh-states-inventory-processes-',
 };
 export const WAZUH_SAMPLE_INVENTORY_PROTOCOLS_PREFIX = {
-  key: 'inventory_protocols.prefix',
+  key: 'inventory_protocols.sample.prefix',
   defaultValue: 'wazuh-states-inventory-protocols-',
 };
 export const WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX = {
-  key: 'inventory_system.prefix',
+  key: 'inventory_system.sample.prefix',
   defaultValue: 'wazuh-states-inventory-system-',
 };
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
@@ -742,7 +747,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       ),
     ),
   },
-  'fim_files.prefix': {
+  [WAZUH_SAMPLE_FIM_FILES_PREFIX.key]: {
     title: 'Sample alerts prefix',
     description:
       'Define the index name prefix of sample data to files of file integrity monitoring. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
@@ -753,7 +758,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
-    defaultValue: WAZUH_SAMPLE_FIM_FILES_PREFIX,
+    defaultValue: WAZUH_SAMPLE_FIM_FILES_PREFIX.defaultValue,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validateUIForm: function (value) {
@@ -779,7 +784,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       ),
     ),
   },
-  'fim_registries.prefix': {
+  [WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX.key]: {
     title: 'Sample fim registries prefix',
     description:
       'Define the index name prefix of sample data to registries of file integrity monitoring. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
@@ -790,7 +795,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     },
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
-    defaultValue: WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX,
+    defaultValue: WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX.defaultValue,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: true,
     validateUIForm: function (value) {

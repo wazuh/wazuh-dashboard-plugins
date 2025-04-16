@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { ErrorResponse } from '../lib/error-response';
-
-import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
 import {
   WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
@@ -28,6 +26,7 @@ import {
 } from '../../common/constants';
 import { WAZUH_INDEXER_NAME } from '../../common/constants';
 import { routeDecoratorProtectedAdministrator } from './decorators';
+import { generateSampleData } from '../lib/generateSampleData';
 
 export class WazuhElasticCtrl {
   constructor() {}
@@ -586,25 +585,31 @@ export class WazuhElasticCtrl {
               const alertGenerateParams =
                 (request.body && request.body.params) || {};
 
-              const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
-                request.params.category
-              ]
-                .map(typeAlert => {
-                  if (
-                    indexName.includes(
-                      typeAlert?.dataSet || WAZUH_ALERTS_PREFIX,
-                    )
-                  ) {
-                    return generateAlerts(
-                      { ...typeAlert, ...alertGenerateParams },
-                      request.body.alerts ||
-                        typeAlert.alerts ||
-                        WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
-                    );
-                  }
-                  return;
-                })
-                .flat();
+              const [sampleAlertsAndTemplate] =
+                WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
+                  request.params.category
+                ]
+                  .map(typeAlert => {
+                    if (
+                      indexName.includes(
+                        typeAlert?.dataSet || WAZUH_ALERTS_PREFIX,
+                      )
+                    ) {
+                      return generateSampleData(
+                        { ...typeAlert, ...alertGenerateParams },
+                        request.body.alerts ||
+                          typeAlert.alerts ||
+                          WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
+                        context,
+                      );
+                    }
+                    return;
+                  })
+                  .filter(item => item !== undefined)
+                  .flat();
+
+              const { alerts: sampleAlerts } = sampleAlertsAndTemplate;
+
               const bulk = sampleAlerts
                 .map(
                   sampleAlert =>
@@ -622,15 +627,29 @@ export class WazuhElasticCtrl {
                   },
                 );
               if (!existsSampleIndex.body) {
-                // Create wazuh sample alerts index
-                const configuration = {
-                  settings: {
-                    index: {
-                      number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
-                      number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+                // Create wazuh sample data index
+                let configuration;
+
+                if (sampleAlertsAndTemplate?.template) {
+                  configuration = sampleAlertsAndTemplate.template;
+
+                  delete configuration.index_patterns;
+                  delete configuration.order;
+
+                  configuration.settings.index.number_of_shards =
+                    WAZUH_SAMPLE_ALERTS_INDEX_SHARDS;
+                  configuration.settings.index.number_of_replicas =
+                    WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS;
+                } else {
+                  configuration = {
+                    settings: {
+                      index: {
+                        number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
+                        number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+                      },
                     },
-                  },
-                };
+                  };
+                }
 
                 await context.core.opensearch.client.asCurrentUser.indices.create(
                   {

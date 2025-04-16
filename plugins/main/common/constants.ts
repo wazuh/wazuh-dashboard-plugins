@@ -68,47 +68,47 @@ export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 3000;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
 export const WAZUH_SETTING_FIM_FILES_PREFIX = {
-  settingIndexPattern: 'fim_files.prefix',
+  settingIndexPattern: 'fim_files.sample.prefix',
   dataSet: 'states-fim-files',
 };
 export const WAZUH_SETTING_FIM_REGISTRIES_PREFIX = {
-  settingIndexPattern: 'fim_registries.prefix',
+  settingIndexPattern: 'fim_registries.sample.prefix',
   dataSet: 'states-fim-registries',
 };
 export const WAZUH_SETTING_INVENTORY_HARDWARE = {
-  settingIndexPattern: 'inventory_hardware.prefix',
+  settingIndexPattern: 'inventory_hardware.sample.prefix',
   dataSet: 'states-inventory-hardware',
 };
 export const WAZUH_SETTING_INVENTORY_HOTFIXES = {
-  settingIndexPattern: 'inventory_hotfixes.prefix',
+  settingIndexPattern: 'inventory_hotfixes.sample.prefix',
   dataSet: 'states-inventory-hotfixes',
 };
 export const WAZUH_SETTING_INVENTORY_INTERFACES = {
-  settingIndexPattern: 'inventory_interfaces.prefix',
+  settingIndexPattern: 'inventory_interfaces.sample.prefix',
   dataSet: 'states-inventory-interfaces',
 };
 export const WAZUH_SETTING_INVENTORY_PACKAGES = {
-  settingIndexPattern: 'inventory_packages.prefix',
+  settingIndexPattern: 'inventory_packages.sample.prefix',
   dataSet: 'states-inventory-packages',
 };
 export const WAZUH_SETTING_INVENTORY_PORTS = {
-  settingIndexPattern: 'inventory_ports.prefix',
+  settingIndexPattern: 'inventory_ports.sample.prefix',
   dataSet: 'states-inventory-ports',
 };
 export const WAZUH_SETTING_INVENTORY_NETWORKS = {
-  settingIndexPattern: 'inventory_networks.prefix',
+  settingIndexPattern: 'inventory_networks.sample.prefix',
   dataSet: 'states-inventory-networks',
 };
 export const WAZUH_SETTING_INVENTORY_PROCESSES = {
-  settingIndexPattern: 'inventory_processes.prefix',
+  settingIndexPattern: 'inventory_processes.sample.prefix',
   dataSet: 'states-inventory-processes',
 };
 export const WAZUH_SETTING_INVENTORY_PROTOCOLS = {
-  settingIndexPattern: 'inventory_protocols.prefix',
+  settingIndexPattern: 'inventory_protocols.sample.prefix',
   dataSet: 'states-inventory-protocols',
 };
 export const WAZUH_SETTING_INVENTORY_SYSTEM = {
-  settingIndexPattern: 'inventory_system.prefix',
+  settingIndexPattern: 'inventory_system.sample.prefix',
   dataSet: 'states-inventory-system',
 };
 export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
@@ -166,7 +166,8 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
     },
     {
       registries: true,
-      settingIndexPattern: WAZUH_SETTING_FIM_REGISTRIES_PREFIX.settingIndexPattern,
+      settingIndexPattern:
+        WAZUH_SETTING_FIM_REGISTRIES_PREFIX.settingIndexPattern,
       dataSet: WAZUH_SETTING_FIM_REGISTRIES_PREFIX.dataSet,
     },
   ],
