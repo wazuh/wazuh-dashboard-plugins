@@ -12,7 +12,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
-import { useIndexPattern } from '../hooks';
 import { IFieldType, IIndexPattern } from 'src/plugins/data/public';
 import {
   UI_ERROR_SEVERITIES,
@@ -29,7 +28,7 @@ export interface IValueSuggestion {
   setQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-interface BoolFilter {
+export interface BoolFilter {
   field: string;
   value: string;
 }
@@ -41,19 +40,25 @@ export const useValueSuggestion = (
     value: '',
   },
   options?: string[],
-  type: 'string' | 'boolean' = 'string'
+  type: 'string' | 'boolean' = 'string',
+  indexPattern?: IIndexPattern,
 ): IValueSuggestion => {
-  const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>([]);
+  const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>(
+    [],
+  );
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const data = getDataPlugin();
-  const indexPattern = useIndexPattern();
 
   const getOptions = (): string[] => {
-    return options?.filter((element) => element.toLowerCase().includes(query.toLowerCase())) || [];
+    return (
+      options?.filter(element =>
+        element.toLowerCase().includes(query.toLowerCase()),
+      ) || []
+    );
   };
 
-  const getValueSuggestions = async (field) => {
+  const getValueSuggestions = async field => {
     const boolFilter =
       boolFilterValue.value !== ''
         ? [
@@ -69,7 +74,7 @@ export const useValueSuggestion = (
       : await data.autocomplete.getValueSuggestions({
           query,
           indexPattern: indexPattern as IIndexPattern,
-          field: { ...field, toSpec: (options) => field },
+          field: { ...field, toSpec: () => field },
           boolFilter: boolFilter,
         });
   };
@@ -101,8 +106,11 @@ export const useValueSuggestion = (
           setIsLoading(false);
         }
       })();
+    } else {
+      setSuggestedValues([]);
+      setIsLoading(false);
     }
-  }, [indexPattern, query, filterField, type, boolFilterValue]);
+  }, [indexPattern, query, filterField, type, boolFilterValue, options]);
 
   return { suggestedValues, isLoading, setQuery };
 };
