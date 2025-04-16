@@ -129,6 +129,11 @@ def main():
         logger.debug('main method is not defined, trying the pre-defined flows')
         if hasattr(module, 'generate_document') and hasattr(module, 'default_index_name') and hasattr(module, 'default_count'):
 
+            # TODO: Add flag to manage the cluster
+            def generate_document(*args,**kwargs):
+                doc = module.generate_document(*args,**kwargs)
+                doc['wazuh']['cluster']['name'] = 'wazuh'
+                return doc
             logger.debug(f'Running main method from dataset [{dataset}]')
             setup_dataset_index_index_pattern({
               "dataset": dataset,
@@ -138,7 +143,7 @@ def main():
               "dashboard_client": dashboard_client,
             },
               template_file=os.path.join(datasets_dir, dataset, 'template.json'),
-              generate_document=module.generate_document,
+              generate_document=generate_document,
               default_index_name=module.default_index_name,
               default_count=module.default_count
             )
