@@ -83,6 +83,8 @@ import {
 import { InventoryFIM } from '../../overview/fim';
 import { ITHygieneNetworksInventory } from '../../overview/it-hygiene/networks/inventory';
 import { ITHygieneProcessesInventory } from '../../overview/it-hygiene/processes';
+import { ITHygienePackagesInventory } from '../../overview/it-hygiene/packages';
+import { ITHygieneSystemInventory } from '../../overview/it-hygiene/system';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -476,6 +478,18 @@ export const ModulesDefaults = {
         name: 'Processes',
         buttons: [ButtonExploreAgent],
         component: ITHygieneProcessesInventory,
+      },
+      {
+        id: 'packages',
+        name: 'Packages',
+        buttons: [ButtonExploreAgent],
+        component: ITHygienePackagesInventory,
+      },
+      {
+        id: 'system',
+        name: 'System',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneSystemInventory,
       },
     ],
     availableFor: ['manager', 'agent'],

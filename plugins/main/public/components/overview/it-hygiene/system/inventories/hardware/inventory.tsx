@@ -1,20 +1,20 @@
 import React from 'react';
 import {
   SystemInventoryStatesDataSource,
-  SystemInventoryPortsStatesDataSourceRepository,
+  SystemInventoryHardwareStatesDataSourceRepository,
 } from '../../../../../common/data-source';
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
-import { withSystemInventoryPortsDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
+import { withSystemInventoryHardwareDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
 
-export const ITHygieneProccessesInventoryPorts =
-  withSystemInventoryPortsDataSource(props => {
+export const ITHygieneSystemInventoryHardware =
+  withSystemInventoryHardwareDataSource(props => {
     return (
       <ITHygieneInventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
-          SystemInventoryPortsStatesDataSourceRepository
+          SystemInventoryHardwareStatesDataSourceRepository
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}

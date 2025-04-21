@@ -4,6 +4,7 @@ import {
   SystemInventoryInterfacesStatesDataSourceRepository,
 } from '../../../../../common/data-source';
 import tableColumns from './table-columns';
+import managedFilters from './managed-filters';
 import { withSystemInventoryInterfacesDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
 
@@ -16,6 +17,7 @@ export const ITHygieneNetworksInventoryInterfaces =
           SystemInventoryInterfacesStatesDataSourceRepository
         }
         tableDefaultColumns={tableColumns}
+        managedFilters={managedFilters}
       />
     );
   });
