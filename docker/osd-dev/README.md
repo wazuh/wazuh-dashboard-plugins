@@ -4,9 +4,17 @@
 
 - vm.max_map_count=262144
 
-  To modify the vm.max_map_count, you can run this command:
-  `sudo sysctl -w vm.max_map_count=262144`
+  To modify the vm.max_map_count:
 
+    **Linux:**
+  `sudo sysctl -w vm.max_map_count=262144`
+  
+    **MacOs:**  
+  For Docker Desktop on Mac, this setting needs to be applied to the Linux VM that runs Docker
+
+  `docker run --rm --privileged alpine sysctl -w vm.max_map_count=262144`
+  This command temporarily increases the memory map count limit in the Docker VM, which is required for Elasticsearch/OpenSearch to function properly. The setting will persist until Docker Desktop is restarted.
+  
 - jq
 
   To install jq, you can run this command:
