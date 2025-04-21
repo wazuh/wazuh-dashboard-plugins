@@ -1,43 +1,42 @@
-import React, { useState } from 'react';
-import { EuiTabs, EuiTab, EuiPageTemplate } from '@elastic/eui';
+import React from 'react';
+import { EuiPageTemplate } from '@elastic/eui';
 import { EnhancedTableUseParentDataSourceSearchBar } from '../../../../common/wazuh-discover/table';
 import { useDataSourceWithSearchBar } from '../../../../common/hooks/use-data-source-search-context';
 import { IntlProvider } from 'react-intl';
 import { CustomSearchBar } from '../../../../common/custom-search-bar';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-
-export interface ITHygieneInventoryTabLayoutProps {
-  tabs: { id: string; name: string; component: any }[];
-}
+import {
+  TabsManagedBySearchParam,
+  TabsManagedBySearchParamProps,
+} from '../../../../navigation/tabs-managed-by-search-params';
 
 export const ITHygieneInventoryTabLayout = ({
   tabs,
-}: ITHygieneInventoryTabLayoutProps) => {
-  const [selectedTab, setSelectedTab] = useState(tabs[0].id);
-
-  const Component = tabs.find(({ id }) => id === selectedTab)?.component; // TODO: use navigation based on URL
-
+}: TabsManagedBySearchParamProps) => {
   return (
-    <>
-      <EuiTabs size='s'>
-        {tabs.map(tab => (
-          <EuiTab
-            key={tab.id}
-            isSelected={tab.id === selectedTab}
-            onClick={() => setSelectedTab(tab.id)}
-          >
-            {tab.name}
-          </EuiTab>
-        ))}
-      </EuiTabs>
-      {Component && <Component />}
-    </>
+    <TabsManagedBySearchParam
+      tabs={tabs}
+      searchParamNavigation='tabSubView'
+      tabsProps={{ size: 's' }}
+    />
   );
 };
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
+
+export interface ITHygieneInventoryDashboardTableProps {
+  DataSource: any;
+  DataSourceRepositoryCreator: any;
+  tableDefaultColumns: { id: string }[];
+  getDashboardPanels: (indexPatternID: string) => any;
+  managedFilters: {
+    type: string;
+    key: string;
+    placeholder: string;
+  }[];
+}
 
 export const ITHygieneInventoryDashboardTable = ({
   DataSource,
@@ -45,7 +44,7 @@ export const ITHygieneInventoryDashboardTable = ({
   tableDefaultColumns,
   getDashboardPanels,
   managedFilters,
-}: ITHygieneInventoryTabLayoutProps) => {
+}: ITHygieneInventoryDashboardTableProps) => {
   const {
     dataSource,
     filters,
