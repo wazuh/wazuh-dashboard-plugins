@@ -2,16 +2,16 @@ export default [
   {
     type: 'multiSelect',
     key: 'observer.ingress.interface.name',
-    placeholder: 'Interface name',
+    placeholder: 'Name',
   },
   {
     type: 'multiSelect',
     key: 'observer.ingress.interface.state',
-    placeholder: 'Interface state',
+    placeholder: 'State',
   },
   {
     type: 'multiSelect',
     key: 'observer.ingress.interface.type',
-    placeholder: 'Interface type',
+    placeholder: 'Type',
   },
 ];

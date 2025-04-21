@@ -17,6 +17,6 @@ export default [
   {
     type: 'multiSelect',
     key: 'interface.state',
-    placeholder: 'Interface state',
+    placeholder: 'State',
   },
 ];
