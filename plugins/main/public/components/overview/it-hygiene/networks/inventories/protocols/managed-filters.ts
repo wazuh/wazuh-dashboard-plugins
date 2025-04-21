@@ -7,11 +7,11 @@ export default [
   {
     type: 'multiSelect',
     key: 'network.dhcp',
-    placeholder: 'Network DHCP',
+    placeholder: 'DHCP',
   },
   {
     type: 'multiSelect',
     key: 'network.type',
-    placeholder: 'Network type',
+    placeholder: 'Type',
   },
 ];

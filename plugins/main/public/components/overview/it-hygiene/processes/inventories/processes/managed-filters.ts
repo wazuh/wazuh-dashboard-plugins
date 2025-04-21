@@ -2,17 +2,12 @@ export default [
   {
     type: 'multiSelect',
     key: 'process.name',
-    placeholder: 'Process name',
+    placeholder: 'Name',
   },
   {
     type: 'multiSelect',
-    key: 'process.pid',
-    placeholder: 'Process ID',
-  },
-  {
-    type: 'multiSelect',
-    key: 'process.parent.pid',
-    placeholder: 'Process parent ID',
+    key: 'process.state',
+    placeholder: 'State',
   },
   {
     type: 'multiSelect',

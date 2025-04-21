@@ -1,22 +1,17 @@
 export default [
   {
     type: 'multiSelect',
-    key: 'package.vendor',
-    placeholder: 'Vendor',
+    key: 'host.cpu.name',
+    placeholder: 'CPU name',
   },
-  {
-    type: 'multiSelect',
-    key: 'package.name',
-    placeholder: 'Package',
-  },
-  {
-    type: 'multiSelect',
-    key: 'package.version',
-    placeholder: 'Version',
-  },
-  {
-    type: 'multiSelect',
-    key: 'package.architecture',
-    placeholder: 'Architecture',
-  },
+  // {
+  //   type: 'multiSelect',
+  //   key: 'host.cpu.cores',
+  //   placeholder: 'CPU cores',
+  // },
+  // {
+  //   type: 'multiSelect',
+  //   key: 'host.memory.total',
+  //   placeholder: 'Total memory',
+  // },
 ];
