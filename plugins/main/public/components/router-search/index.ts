@@ -16,10 +16,21 @@ const childrenMatchSearchRoute = (routeSearch, search) => {
 the search params */
 export const Switch = ({ children }) => {
   const search = useRouterSearch();
-  const child = (Array.isArray(children) ? children : [children]).find(child =>
-    child.props.path
-      ? childrenMatchSearchRoute(child.props.path, search)
-      : child.props.to,
+  /* children.flat() allows the usage of computed components as array. Example:
+    <Switch>
+      {routes.map(({searchParamValue, component: Component}) => (
+        <Route path={`?param=${searchParamValue}`}>
+          <Component />
+        </Route>
+      ))}
+      <Redirect to='?param=defaultValue' />
+    </Switch>
+  */
+  const child = (Array.isArray(children) ? children.flat() : [children]).find(
+    child =>
+      child.props.path
+        ? childrenMatchSearchRoute(child.props.path, search)
+        : child.props.to,
   );
 
   return (
