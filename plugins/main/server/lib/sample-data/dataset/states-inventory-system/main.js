@@ -1,4 +1,5 @@
 const random = require('../../lib/random');
+
 const {
   generate_random_wazuh,
   generate_random_agent,
@@ -18,7 +19,14 @@ function generate_random_host_system() {
       distribution: {
         release: `${random.int(1, 20)}.${random.int(1, 100)}`,
       },
-      full: `${random.choice(['debian', 'ubuntu', 'macos', 'ios', 'android', 'RHEL'])} ${random.int(0, 99)}.${random.int(0, 99)}`,
+      full: `${random.choice([
+        'debian',
+        'ubuntu',
+        'macos',
+        'ios',
+        'android',
+        'RHEL',
+      ])} ${random.int(0, 99)}.${random.int(0, 99)}`,
       kernel: {
         name: random.choice(['Linux', 'Darwin', 'NT']),
         release: `${random.int(1, 1000)}`,
