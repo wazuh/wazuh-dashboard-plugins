@@ -57,15 +57,23 @@ const usage = `
 Usage: node cli.js [options]
 
 Options:
-  --dataset <name>     Dataset name to use (required) (available datasets: ${datasets.join(', ')})
+  --dataset <name>     Dataset name to use (required) (available datasets: ${datasets.join(
+    ', ',
+  )})
   --count <number>     Number of alerts to generate (default: 100)
   --output <file>      Output file to save the generated sample data (optional)
   --format <format>    Output format (default: ndjson)
                        Available formats: ${Object.keys(formats).join(', ')}
   --index <name>       Index name for bulk-api format (required when using bulk-api format)
-  --param-manager-name <name>  Set the manager name (default: ${defaultAlertGenerationParams.manager.name})
-  --param-cluster-name <name>  Set the cluster name (default: ${defaultAlertGenerationParams.cluster.name})
-  --param-cluster-node <name>  Set the cluster node (default: ${defaultAlertGenerationParams.cluster.node})
+  --param-manager-name <name>  Set the manager name (default: ${
+    defaultAlertGenerationParams.manager.name
+  })
+  --param-cluster-name <name>  Set the cluster name (default: ${
+    defaultAlertGenerationParams.cluster.name
+  })
+  --param-cluster-node <name>  Set the cluster node (default: ${
+    defaultAlertGenerationParams.cluster.node
+  })
   --help               Show this help message
 
 Example:
@@ -107,7 +115,9 @@ for (let i = 0; i < args.length; i++) {
       format = requestedFormat;
     } else {
       console.error(
-        `Error: unsupported format '${requestedFormat}'. Supported formats: ${Object.keys(formats).join(', ')}`,
+        `Error: unsupported format '${requestedFormat}'. Supported formats: ${Object.keys(
+          formats,
+        ).join(', ')}`,
       );
       console.log(usage);
       process.exit(1);
