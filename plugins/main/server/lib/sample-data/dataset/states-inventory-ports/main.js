@@ -1,5 +1,8 @@
 const random = require('../../lib/random');
-const { generate_random_agent, generate_random_wazuh } = require('../shared-utils');
+const {
+  generate_random_agent,
+  generate_random_wazuh,
+} = require('../shared-utils');
 
 const default_count = '10000';
 const default_index_name_prefix = 'wazuh-states-inventory-ports';

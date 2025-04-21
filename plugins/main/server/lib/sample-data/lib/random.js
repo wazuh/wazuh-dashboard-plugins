@@ -37,10 +37,13 @@ function date() {
   const start_date = new Date();
   const end_date = new Date(start_date);
   end_date.setDate(end_date.getDate() - 10);
-  
+
   // Random date between start_date and end_date
-  const random_date = new Date(end_date.getTime() + Math.random() * (start_date.getTime() - end_date.getTime()));
-  
+  const random_date = new Date(
+    end_date.getTime() +
+      Math.random() * (start_date.getTime() - end_date.getTime()),
+  );
+
   // Format date to match the Python format
   return random_date.toISOString();
 }
@@ -69,7 +72,9 @@ function ip() {
  * @returns {string} Random MAC address
  */
 function macAddress() {
-  const mac = Array(6).fill().map(() => int(0, 255));
+  const mac = Array(6)
+    .fill()
+    .map(() => int(0, 255));
   return mac.map(octet => octet.toString(16).padStart(2, '0')).join(':');
 }
 
@@ -80,5 +85,5 @@ module.exports = {
   date,
   unixTimestamp,
   ip,
-  macAddress
+  macAddress,
 };
