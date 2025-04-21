@@ -77,14 +77,13 @@ import {
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
-  InventoryITHygiene,
   DashboardITHygiene,
+  ITHygieneNetworksInventory,
+  ITHygienePackagesInventory,
+  ITHygieneProcessesInventory,
+  ITHygieneSystemInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
-import { ITHygieneNetworksInventory } from '../../overview/it-hygiene/networks/inventory';
-import { ITHygieneProcessesInventory } from '../../overview/it-hygiene/processes';
-import { ITHygienePackagesInventory } from '../../overview/it-hygiene/packages';
-import { ITHygieneSystemInventory } from '../../overview/it-hygiene/system';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -460,12 +459,6 @@ export const ModulesDefaults = {
         name: 'Dashboard',
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
         component: DashboardITHygiene,
-      },
-      {
-        id: 'inventory', // TODO: remove me
-        name: 'Inventory',
-        buttons: [ButtonExploreAgent],
-        component: InventoryITHygiene,
       },
       {
         id: 'networks',
