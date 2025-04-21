@@ -461,9 +461,6 @@ main() {
   log "Updating docker/imposter/wazuh-config.yml..."
   update_imposter_config "$VERSION"
 
-  # Update CHANGELOG.md
-  update_changelog
-
   log "File modifications completed."
   log "WARNING: API spec data generation (if applicable) needs to be done manually or with other tools."
   log "Repository bump completed successfully. Log file: $LOG_FILE"
