@@ -1,68 +1,90 @@
-# Sample data injector
+# Sample data generator
 
-This script generates sample data for different datasets and injects the data into an index on a Wazuh indexer instance and optionally creates the index pattern.
+This is a utility for generating sample data for Wazuh.
 
-## Files
+The code is based in a feature included in the Wazuh plugin for Wazuh dashboard.
 
-- `script.py`: main script file
-- `config.json`: persistence of configuration
-- `datasets`: directory that contains the available datasets
+A command line interface was created to use it.
 
-# Getting started
+## Requirements
 
-1.  Install the dependencies:
+- Node.js or Docker
 
-```console
-pip install -r requirements.txt
+## Usage
+
+Use `--help` or `--examples` to show the help or examples, respectively.
+
+```sh
+node cli.js [options]
 ```
 
-For some operating systems it will fail and suggest a different way to install it (`sudo pacman -S python-xyz`, `sudo apt install python-xyz`, etc.).
+### Usage with Docker
 
-If the package is not found in this way, we can install it running `pip install -r requirements.txt --break-system-packages` (It is recommended to avoid this option if possible)
+If you want to use Docker, use this command to create and access the container:
 
-2.  Run the script selecting the dataset:
-
-```console
-python3 script.py <dataset>
+```sh
+docker run -it --rm \
+    --name wazuh-sample-data-generator \
+    --workdir "/home/node/app" \
+    --volume "$(pwd):/home/node/app" \
+    node:lts-alpine /bin/sh
 ```
 
-where:
+Then, use the command line interface as usual: `node cli.js --help`.
 
-- `<dataset>`: is the name of the dataset. See the [available datasets](#datasets).
+You can also run the tool directly with Docker:
 
-3.  Follow the instructions that it will show on the console.
+```sh
+docker run --rm \
+    --workdir "/home/node/app" \
+    --volume "$(pwd):/home/node/app" \
+    node:lts-alpine node cli.js <options>
+```
 
-# Datasets
+Replace `<options>` with valid CLI options.
 
-Built-in datasets:
+- Show the help:
 
-- states-fim
-- system-inventory-packages
+  ```sh
+  docker run --rm \
+      --workdir "/home/node/app" \
+      --volume "$(pwd):/home/node/app" \
+      node:lts-alpine node cli.js --help
+  ```
 
-## Create dataset
+- Show the examples:
 
-1. Create a new folder on `datasets` directory. The directory name will be the name of the dataset.
+  ```sh
+  docker run --rm \
+      --workdir "/home/node/app" \
+      --volume "$(pwd):/home/node/app" \
+      node:lts-alpine node cli.js --examples
+  ```
 
-2. Dataset directory:
+## Use cases
 
-Create a `main.py`.
-This script must define a `main` function that is run when the dataset creator is called.
+Generate sample data for the `states-inventory-hardware` index, using
+the Bulk API format and save the output to a file:
 
-This receives the following parameters:
+```sh
+docker run --rm -w "/home/node/app" -v "$(pwd):/home/node/app" node:lts-alpine \
+    node cli.js \
+    --dataset states-inventory-hardware \
+    --format bulk-api \
+    --index states-inventory-hardware-sample-data > output.ndjson
+```
 
-- context:
-  - dataset: dataset name
-  - logger: dataset logger
-  - configuration: configuration client
-  - indexer_client: OpenSearch client to interact with the Wazuh indexer instance
-  - dashboard_client: HTTP client to interact with the Wazuh dashboard API
+Insert the data into the index, using the Bulk API:
 
-See some built-in dataset to know more.
+- Without authentication (HTTP):
 
-# Exploring the data on Wazuh dashboard
+  ```sh
+  curl <server_address>/_bulk -H "Content-Type: application/x-ndjson" --data-binary "@output.ndjson"
+  ```
 
-The indexed data needs an index pattern that match with the index of the data to be explorable on
-on Wazuh dashboard. So, if this is not created by another source, it could be necessary to create
-the index pattern manually if it was not previously created.
+- With authentication (HTTPS):
+  ```sh
+  curl -k -u <username>:<password> <server_address>/_bulk -H "Content-Type: application/x-ndjson" --data-binary "@output.ndjson"
+  ```
 
-In the case it does not exist, create it with from Dashboard management > Dashboard Management > Index patterns:
+Replace the placeholders.
