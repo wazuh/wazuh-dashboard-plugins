@@ -228,12 +228,10 @@ const InventoryVulsComponent = () => {
                 filters={excludeUnderEvaluationFilter(filters)}
                 fixedFilters={fixedFilters}
                 postFixedFilters={[
-                  () => (
-                    <VulsEvaluationFilter
-                      value={underEvaluation}
-                      setValue={handleFilterChange}
-                    />
-                  ),
+                  <VulsEvaluationFilter
+                    value={underEvaluation}
+                    setValue={handleFilterChange}
+                  />,
                 ]}
                 showDatePicker={false}
                 showQueryInput={true}

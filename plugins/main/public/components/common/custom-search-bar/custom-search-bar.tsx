@@ -17,13 +17,17 @@ import { I18nProvider } from '@osd/i18n/react';
 import { tUseSearchBarProps } from '../search-bar/use-search-bar';
 import { WzSearchBar } from '../search-bar/search-bar';
 
+interface FilterInput {
+  type: string;
+  key: string;
+  placeholder: string;
+  filterByKey?: boolean;
+  options?: string[];
+}
+
 type CustomSearchBarProps = {
-  filterInputs: {
-    type: string;
-    key: string;
-    placeholder: string;
-  }[];
-  filterDrillDownValue: { field: string; value: string };
+  filterInputs: FilterInput[];
+  filterDrillDownValue?: { field: string; value: string };
   searchBarProps: tUseSearchBarProps;
   indexPattern: IndexPattern;
   fixedFilters: Filter[];
@@ -41,7 +45,7 @@ export const CustomSearchBar = ({
   const { filters } = searchBarProps;
 
   const defaultSelectedOptions = () => {
-    const array = [];
+    const array: string[][] = [];
     filterInputs.forEach(item => {
       array[item.key] = [];
     });
@@ -49,22 +53,22 @@ export const CustomSearchBar = ({
     return array;
   };
   const [avancedFiltersState, setAvancedFiltersState] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState(
-    defaultSelectedOptions,
+  const [selectedOptions, setSelectedOptions] = useState<string[][]>(
+    defaultSelectedOptions(),
   );
-  const [values, setValues] = useState(Array);
-  const [selectReference, setSelectReference] = useState('');
+  const [values, setValues] = useState<any[]>([]);
+  const [selectReference, setSelectReference] = useState<string>('');
 
   useEffect(() => {
     setPluginPlatformFilters(values, selectReference);
     refreshCustomSelectedFilter();
-  }, [values]);
+  }, [values, selectReference]);
 
   useEffect(() => {
     refreshCustomSelectedFilter();
   }, [filters, fixedFilters]);
 
-  const checkSelectDrillDownValue = key => {
+  const checkSelectDrillDownValue = (key: string) => {
     return filterDrillDownValue.field === key &&
       filterDrillDownValue.value != ''
       ? true
@@ -79,8 +83,8 @@ export const CustomSearchBar = ({
     setAvancedFiltersState(state => !state);
   };
 
-  const buildCustomFilter = (values?: any): Filter => {
-    const newFilters = values.map(element => ({
+  const buildCustomFilter = (values?: FilterInput[]): Filter => {
+    const newFilters = values?.map(element => ({
       match_phrase: {
         [element.value]: {
           query: element.filterByKey ? element.key : element.label,
@@ -196,6 +200,7 @@ export const CustomSearchBar = ({
           onRemove={onRemove}
           isDisabled={checkSelectDrillDownValue(item.key)}
           filterDrillDownValue={filterDrillDownValue}
+          indexPattern={indexPattern}
         />
       ),
     };

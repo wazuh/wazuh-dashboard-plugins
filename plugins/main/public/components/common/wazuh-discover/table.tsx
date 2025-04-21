@@ -541,22 +541,23 @@ export const TableDiscover = ({
  * @param param0
  * @returns
  */
-export const WzTableDiscover = compose(
-  withWrapComponent(({ children }) => (
-    <IntlProvider locale='en'>
-      <>
-        <EuiPageTemplate
-          className='wz-table-discover-container'
-          restrictWidth='100%'
-          fullHeight={true}
-          grow
-          paddingSize='none'
-          pageContentProps={{ color: 'transparent' }}
-        >
-          {children}
-        </EuiPageTemplate>
-      </>
-    </IntlProvider>
-  )),
-  withErrorBoundary,
-)(TableDiscover);
+export const WzTableDiscover: React.FunctionComponent<WzTableDiscoverProps> =
+  compose(
+    withWrapComponent(({ children }) => (
+      <IntlProvider locale='en'>
+        <>
+          <EuiPageTemplate
+            className='wz-table-discover-container'
+            restrictWidth='100%'
+            fullHeight={true}
+            grow
+            paddingSize='none'
+            pageContentProps={{ color: 'transparent' }}
+          >
+            {children}
+          </EuiPageTemplate>
+        </>
+      </IntlProvider>
+    )),
+    withErrorBoundary,
+  )(TableDiscover);
