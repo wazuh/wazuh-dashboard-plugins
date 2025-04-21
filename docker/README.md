@@ -66,11 +66,22 @@ In general, the environment consist of:
     read-only. To prevent this, a new group named `docker-desktop` and GUID 100999
     needs to be created, then added to your user and the source code folder:
 
+    **For Linux:**
     ```bash
     sudo groupadd -g 100999 docker-desktop
     sudo useradd -u 100999 -g 100999 -M docker-desktop
     sudo chown -R $USER:docker-desktop $WZ_HOME
     sudo usermod -aG docker-desktop $USER
+    ```
+
+    **For MacOS:**
+    ```bash
+    sudo dscl . -create /Groups/docker-desktop
+    sudo dscl . -create /Groups/docker-desktop PrimaryGroupID 100999
+    sudo dscl . -create /Users/docker-desktop
+    sudo dscl . -create /Users/docker-desktop UniqueID 100999
+    sudo dscl . -create /Users/docker-desktop PrimaryGroupID 100999
+    sudo chown -R $USER:staff $WZ_HOME
     ```
 
 ## Understanding Docker contexts
@@ -107,9 +118,30 @@ This brings up a Dev environment for the `wazuh-dashboard-plugins` development b
 ```bash
 ./dev.sh $WZ_HOME up
 ```
+### Important Note for Version 5.0.0 and Later
+Starting from version 5.0.0, the Wazuh Dashboard container automatically:
+
+- Installs dependencies
+- Starts the server with yarn start --no-base-path
+This means you don't need to manually enter the container to run these commands. Instead:
+
+1. Check the container logs to monitor the startup process:
+   
+   ```bash
+   docker logs -f <container_name>
+    ```
+2. Access the dashboard at https://localhost:5601 (note the HTTPS protocol)
+3. If you see "Wazuh dashboard server is not ready yet", check the container logs for more details.
+
+For older versions (before 5.0.0), you'll need to:
+
+1. Once the containers are up, attach a shell to the development container
+2. Move to the kbn\plugins\wazuh-core directory
+3. Run yarn to install dependencies
+4. Move back to the root folder and run yarn start
 
 Once the containers are up, **attach a shell to the development container**,
-move to the `kbn\plugins\wazuh` and run `yarn` to install the dependencies of
+move to the `kbn\plugins\wazuh-core` and run `yarn` to install the dependencies of
 the project. After that, move back to the root folder of the platform and run
 `yarn start` to start the App.
 
@@ -283,3 +315,10 @@ error getting credentials - err: exit status 1, out: `error getting credentials 
 [3]: https://prometheus.io/docs/visualization/grafana/ 'Prometheus'
 [4]: https://quay.io/organization/wazuh 'quay.io/wazuh'
 [5]: https://github.com/wazuh/wazuh-dashboard-plugins/issues/3872#issuecomment-1305507626 'App permissions'
+
+3. "Wazuh dashboard server is not ready yet" error
+**Solution:** Check the container logs with docker logs -f <container_name> . Common causes include:
+
+- Connection issues between services
+- Problems with Wazuh indexer
+- Initialization still in progress (wait a few minutes)
