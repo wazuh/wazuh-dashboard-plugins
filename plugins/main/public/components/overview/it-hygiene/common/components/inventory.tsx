@@ -20,7 +20,7 @@ export const ITHygieneInventoryTabLayout = ({
 
   return (
     <>
-      <EuiTabs>
+      <EuiTabs size='s'>
         {tabs.map(tab => (
           <EuiTab
             key={tab.id}
