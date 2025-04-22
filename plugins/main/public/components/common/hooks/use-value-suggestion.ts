@@ -21,6 +21,7 @@ import {
 } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { get, map } from 'lodash';
 
 export interface IValueSuggestion {
   suggestedValues: string[] | boolean[];
@@ -33,6 +34,99 @@ export interface BoolFilter {
   value: string;
 }
 
+/**
+ * Use the provided mechanism to retrieve the suggetions. It only supports the boolean and string
+ * types.
+ * @param param0
+ * @returns
+ */
+async function getValueSuggestionResolverAutocomplete({
+  query,
+  indexPattern,
+  field,
+  boolFilter,
+}) {
+  return getDataPlugin().autocomplete.getValueSuggestions({
+    query,
+    indexPattern: indexPattern as IIndexPattern,
+    field: { ...field, toSpec: () => field },
+    boolFilter: boolFilter,
+  });
+}
+
+/**
+ * Custom mechanism to retrieve the suggestions for field, based on an aggregation using script
+ * @param param0
+ * @returns
+ */
+async function getValueSuggestionResolverAggregation({
+  query,
+  indexPattern,
+  field,
+}) {
+  const searchSource = await getDataPlugin().search.searchSource.create();
+  const searchParams = searchSource
+    .setParent(undefined)
+    .setField('size', 0) // no return hits
+    .setField('index', indexPattern)
+    .setField('aggs', {
+      suggestions: {
+        terms: {
+          script: {
+            lang: 'painless',
+            source: `doc['${field.name}'].value.toString()`,
+          },
+          order: {
+            _key: 'asc', // Lexically ascending order based on the string value
+          },
+          size: 10,
+        },
+      },
+    });
+
+  if (query) {
+    searchParams.setField('query', {
+      language: 'lucene',
+      query: {
+        script: {
+          /* Performance: Script queries can be slower than native queries, especially on large
+            datasets. If the substring search is a common operation, consider enhancing your field
+            mapping or using an ingest pipeline to prepare a searchable version of the IP. */
+          script: {
+            lang: 'painless',
+            source: `doc['${field.name}'].value.toString().contains(params.searchQuery)`,
+            params: {
+              searchQuery: query,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  const response = await searchParams.fetch();
+  const buckets = get(response, 'aggregations.suggestions.buckets');
+  return map(buckets || [], 'key');
+}
+
+const getValueSuggestionResolversByFieldType = {
+  string: getValueSuggestionResolverAutocomplete,
+  boolean: getValueSuggestionResolverAutocomplete,
+  _default: getValueSuggestionResolverAggregation,
+};
+
+const getValueSuggestionResolver = ({
+  query,
+  indexPattern,
+  field,
+  boolFilter,
+}) => {
+  const resolver =
+    getValueSuggestionResolversByFieldType[field.type] ||
+    getValueSuggestionResolversByFieldType._default;
+  return resolver({ query, indexPattern, field, boolFilter });
+};
+
 export const useValueSuggestion = (
   filterField: string,
   boolFilterValue: BoolFilter = {
@@ -40,7 +134,6 @@ export const useValueSuggestion = (
     value: '',
   },
   options?: string[],
-  type: 'string' | 'boolean' = 'string',
   indexPattern?: IIndexPattern,
 ): IValueSuggestion => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>(
@@ -71,7 +164,7 @@ export const useValueSuggestion = (
         : [];
     return options
       ? getOptions()
-      : await data.autocomplete.getValueSuggestions({
+      : getValueSuggestionResolver({
           query,
           indexPattern: indexPattern as IIndexPattern,
           field: { ...field, toSpec: () => field },
@@ -83,13 +176,12 @@ export const useValueSuggestion = (
     if (indexPattern) {
       setIsLoading(true);
       (async () => {
-        const field = {
-          type: type,
-          name: filterField,
-          aggregatable: true,
-        } as IFieldType;
         try {
-          setSuggestedValues(await getValueSuggestions(field));
+          const field = indexPattern.fields.find(
+            ({ spec: { name } }) => name === filterField,
+          );
+          const suggestions = await getValueSuggestions(field.spec);
+          setSuggestedValues(suggestions);
         } catch (error) {
           const options: UIErrorLog = {
             context: `${useValueSuggestion.name}.getValueSuggestions`,
@@ -110,7 +202,7 @@ export const useValueSuggestion = (
       setSuggestedValues([]);
       setIsLoading(false);
     }
-  }, [indexPattern, query, filterField, type, boolFilterValue, options]);
+  }, [indexPattern, query, filterField, boolFilterValue, options]);
 
   return { suggestedValues, isLoading, setQuery };
 };
