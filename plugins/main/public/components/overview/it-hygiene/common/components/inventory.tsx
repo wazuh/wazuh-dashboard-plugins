@@ -11,6 +11,8 @@ import {
   TabsManagedBySearchParamProps,
 } from '../../../../navigation/tabs-managed-by-search-params';
 import { CustomSearchBarProps } from '../../../../common/custom-search-bar/custom-search-bar';
+import { SampleDataWarning } from '../../../../visualize/components';
+import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../../common/constants';
 
 export const ITHygieneInventoryTabLayout = ({
   tabs,
@@ -88,6 +90,9 @@ export const ITHygieneInventoryDashboardTable = ({
                 fixedFilters={fixedFilters}
                 filterInputs={managedFilters || []}
                 filterInputsProps={managedFiltersProps}
+              />
+              <SampleDataWarning
+                categorySampleData={WAZUH_SAMPLE_INVENTORY_AGENT}
               />
               {getDashboardPanels && (
                 <DashboardByRenderer
