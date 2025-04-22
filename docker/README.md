@@ -140,11 +140,6 @@ For older versions (before 5.0.0), you'll need to:
 3. Run yarn to install dependencies
 4. Move back to the root folder and run yarn start
 
-Once the containers are up, **attach a shell to the development container**,
-move to the `kbn\plugins\wazuh-core` and run `yarn` to install the dependencies of
-the project. After that, move back to the root folder of the platform and run
-`yarn start` to start the App.
-
 The dependencies of the platform (Kibana \ OSD) are already installed, but it
 might take a while to optimize all the bundles. We might include the cache in the
 image in the future.
