@@ -125,13 +125,20 @@ Starting from version 5.0.0, the Wazuh Dashboard container automatically:
 - Starts the server with yarn start --no-base-path
 This means you don't need to manually enter the container to run these commands. Instead:
 
-1. Check the container logs to monitor the startup process:
-   
-   ```bash
+1. Access the dashboard at https://localhost:5601 (note the HTTPS protocol)
+2. If you encounter the message "Wazuh dashboard server is not ready yet", please be patient while the services initialize.
+
+Optional: You can monitor the startup process by checking the container logs:
+```bash
    docker logs -f <container_name>
-    ```
-2. Access the dashboard at https://localhost:5601 (note the HTTPS protocol)
-3. If you encounter the message "Wazuh dashboard server is not ready yet", please be patient while the services initialize. You can monitor the progress by checking the container logs for more detailed information.
+```
+
+If you need to prevent automatic startup and manually control the initialization process, use the `--no-start` flag:
+
+```bash
+./dev.sh --no-start -a up
+```
+This will keep the container running without starting the dashboard service, allowing you to connect to it and run commands manually.
 
 For older versions (before 5.0.0), you'll need to:
 

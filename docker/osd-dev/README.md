@@ -34,7 +34,7 @@ Use always the provided script to bring up or down the development
 environment. For example:
 
 ```
-./dev.sh [-os <os_version>] [-osd <osd_version>] [--wz-home <wazuh_app_source>] [-saml] [--server <server_version>] -a, --action <action>
+./dev.sh [-os <os_version>] [-osd <osd_version>] [--wz-home <wazuh_app_source>] [-saml] [--server <server_version>] [--no-start] -a, --action <action>
 ```
 
 use `--help` for more info.
@@ -46,6 +46,25 @@ located.
 
 Use the `saml` flag to bring up KeyCloak IDP. **Add idp to your hosts and start
 the server using the `--no-base-path`**.
+
+Use the `--no-start` flag if you want to prevent the automatic startup of the dashboard service. This keeps the container running without starting the service, allowing you to connect to it and run commands manually:
+
+``bash
+  For example:
+  ### Start the environment without automatically starting the dashboard service
+  ./dev.sh -os 2.19.1 -osd 2.19.1-5.0.0 --no-start -a up
+
+  ### Then connect to the container
+  docker exec -it os-dev-2191-osd-1 bash
+
+  ### Manually install dependencies
+  cd /kbn/plugins/wazuh-core
+  yarn installl
+
+  ### And manually start the service
+  cd /kbn
+  yarn start
+```
 
 ```apacheconf
 # Linux systems: /etc/hosts
