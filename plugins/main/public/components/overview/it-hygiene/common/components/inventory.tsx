@@ -94,7 +94,7 @@ export const ITHygieneInventoryDashboardTable = ({
               <SampleDataWarning
                 categorySampleData={WAZUH_SAMPLE_INVENTORY_AGENT}
               />
-              {getDashboardPanels && (
+              {getDashboardPanels && dataSource && (
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,

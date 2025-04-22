@@ -57,6 +57,9 @@ interface MultiSelectProps {
   indexPattern?: IndexPattern; // Add indexPattern type
 }
 
+const mapToString = (value: any) =>
+  typeof value === 'string' ? value : String(value);
+
 export const MultiSelect: React.FC<MultiSelectProps> = ({
   item,
   onChange,
@@ -72,22 +75,10 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       item.key,
       filterDrillDownValue,
       item?.options,
-      'string', // Assuming type is string, adjust if needed
       indexPattern, // Pass indexPattern to the hook
     );
   const [items, setItems] = useState<Item[]>([]);
   const [activeFilters, setActiveFilters] = useState<number>(0);
-
-  const addCheckedOptions = () => {
-    selectedOptions.map(value => {
-      if (
-        Switch.ON === value.checked &&
-        suggestedValues.indexOf(value.label) === -1
-      ) {
-        suggestedValues.push(value.label);
-      }
-    });
-  };
 
   const orderByLabel = items => {
     return _.orderBy(items, 'label', 'asc');
@@ -98,22 +89,40 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   };
 
   const buildSuggestedValues = () => {
-    const result = suggestedValues.map((value, key) => ({
-      key: key,
-      label: value,
-      value: item.key,
-      filterByKey: item.filterByKey,
-      checked: selectedOptions.find(element => element.label === value)
-        ? (Switch.ON as FilterChecked)
-        : (Switch.OFF as FilterChecked),
-    }));
+    // Get the selected options that are not included in the suggested values
+    const selectedOptionsNotInSuggestedValues = selectedOptions
+      .filter(
+        value =>
+          Switch.ON === value.checked &&
+          suggestedValues.indexOf(value.label) === -1,
+      )
+      .map(value => value.label);
+
+    // Compose the selected options and suggested values and only accept unique values
+    const uniqueSuggestions = [
+      ...new Set(
+        [...selectedOptionsNotInSuggestedValues, ...suggestedValues].map(
+          mapToString,
+        ),
+      ),
+    ];
+    const result = uniqueSuggestions.map((value, key) => {
+      return {
+        key: key,
+        label: value,
+        value: item.key,
+        filterByKey: item.filterByKey,
+        checked: selectedOptions.find(element => element.label === value)
+          ? (Switch.ON as FilterChecked)
+          : (Switch.OFF as FilterChecked),
+      };
+    });
 
     return orderByChecked(orderByLabel(result));
   };
 
   useEffect(() => {
     if (!isLoading) {
-      addCheckedOptions();
       setItems(buildSuggestedValues());
     }
   }, [suggestedValues, isLoading]);
@@ -140,7 +149,6 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   };
 
   useEffect(() => {
-    addCheckedOptions();
     setItems(buildSelectedOptions());
     setActiveFilters(selectedOptions.length);
   }, [selectedOptions]);

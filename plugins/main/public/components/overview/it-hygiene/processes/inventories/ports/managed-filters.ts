@@ -1,22 +1,22 @@
 export default [
   {
     type: 'multiSelect',
-    key: 'process.name',
-    placeholder: 'Process name',
-  },
-  {
-    type: 'multiSelect',
     key: 'destination.port',
-    placeholder: 'Remote port',
-  },
-  {
-    type: 'multiSelect',
-    key: 'destination.ip',
-    placeholder: 'Remote IP',
+    placeholder: 'Local port',
   },
   {
     type: 'multiSelect',
     key: 'interface.state',
     placeholder: 'State',
+  },
+  {
+    type: 'multiSelect',
+    key: 'network.transport',
+    placeholder: 'Protocol',
+  },
+  {
+    type: 'multiSelect',
+    key: 'process.name',
+    placeholder: 'Process name',
   },
 ];
