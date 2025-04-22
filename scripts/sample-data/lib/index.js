@@ -1,5 +1,5 @@
 const {
-  generateAlertsWithDataset,
+  generateSampleDataWithDataset,
 } = require('../../../plugins/main/server/lib/sample-data/index');
 
-module.exports = { generateAlertsWithDataset };
+module.exports = { generateSampleDataWithDataset };

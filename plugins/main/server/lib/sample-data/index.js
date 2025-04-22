@@ -1,6 +1,6 @@
-function generateAlertsWithDataset(dataset, options) {
+function generateSampleDataWithDataset(dataset, options) {
   const datasetDefinition = require(`./dataset/${dataset}/main`);
   return datasetDefinition.generate_document(options);
 }
 
-module.exports.generateAlertsWithDataset = generateAlertsWithDataset;
+module.exports.generateSampleDataWithDataset = generateSampleDataWithDataset;

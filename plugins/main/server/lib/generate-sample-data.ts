@@ -3,7 +3,7 @@ import path from 'path';
 import { RequestHandlerContext } from 'opensearch-dashboards/server';
 import { WAZUH_SETTING_ALERTS_SAMPLE_PREFIX } from '../../common/constants';
 import { generateAlert } from './generate-alerts/generate-alerts-script';
-import { generateAlertsWithDataset } from './sample-data';
+import { generateSampleDataWithDataset } from './sample-data';
 
 /**
  * Reads a template file from the filesystem
@@ -60,24 +60,24 @@ export const generateSampleData = (
     dataSet: string;
     settingIndexPattern: string;
   },
-  numAlerts: number = 1,
+  numDocuments: number = 1,
   context: RequestHandlerContext,
 ) => {
   /** @type {import('./types').Alert[]} */
-  const alerts = [];
+  const sampleData = [];
   if (settingIndexPattern === WAZUH_SETTING_ALERTS_SAMPLE_PREFIX) {
-    for (let i = 0; i < numAlerts; i++) {
-      alerts.push(generateAlert(params));
+    for (let i = 0; i < numDocuments; i++) {
+      sampleData.push(generateAlert(params));
     }
-    return { alerts };
+    return { sampleData };
   } else {
     // Get template
     const template = readTemplateFile(dataSet, context);
 
-    // Generate alerts with dataset
-    for (let i = 0; i < numAlerts; i++) {
-      alerts.push(generateAlertsWithDataset(dataSet, params));
+    // Generate sample data with dataset
+    for (let i = 0; i < numDocuments; i++) {
+      sampleData.push(generateSampleDataWithDataset(dataSet, params));
     }
-    return { alerts, template };
+    return { sampleData, template };
   }
 };

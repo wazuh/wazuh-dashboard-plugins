@@ -14,19 +14,17 @@ import {
   WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
   WAZUH_ALERTS_PREFIX,
+  WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
+  WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
+  WAZUH_INDEXER_NAME,
 } from '../../common/constants';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
-import {
-  WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS,
-  WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
-} from '../../common/constants';
-import { WAZUH_INDEXER_NAME } from '../../common/constants';
 import { routeDecoratorProtectedAdministrator } from './decorators';
-import { generateSampleData } from '../lib/generateSampleData';
+import { generateSampleData } from '../lib/generate-sample-data';
 
 export class WazuhElasticCtrl {
   constructor() {}
@@ -41,7 +39,7 @@ export class WazuhElasticCtrl {
   ): Promise<string[]> {
     const settingsIndexPatterns: string[] = [];
 
-    WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[category].forEach(item => {
+    WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[category].forEach(item => {
       if (settingsIndexPatterns.includes(item.settingIndexPattern)) {
         return;
       }
@@ -460,7 +458,7 @@ export class WazuhElasticCtrl {
     try {
       // Check if wazuh sample alerts index exists
       const categoryPromises = Object.keys(
-        WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS,
+        WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
       ).map(async category => {
         const indexNames = await this.buildSampleIndexByCategory(
           context,
@@ -585,21 +583,19 @@ export class WazuhElasticCtrl {
               const alertGenerateParams =
                 (request.body && request.body.params) || {};
 
-              const [sampleAlertsAndTemplate] =
-                WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
-                  request.params.category
-                ]
-                  .map(typeAlert => {
+              const [sampleDataAndTemplate] =
+                WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[request.params.category]
+                  .map(typeSample => {
                     if (
                       indexName.includes(
-                        typeAlert?.dataSet || WAZUH_ALERTS_PREFIX,
+                        typeSample?.dataSet || WAZUH_ALERTS_PREFIX,
                       )
                     ) {
                       return generateSampleData(
-                        { ...typeAlert, ...alertGenerateParams },
-                        request.body.alerts ||
-                          typeAlert.alerts ||
-                          WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
+                        { ...typeSample, ...alertGenerateParams },
+                        request.body.count ||
+                          typeSample.count ||
+                          WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
                         context,
                       );
                     }
@@ -608,13 +604,10 @@ export class WazuhElasticCtrl {
                   .filter(item => item !== undefined)
                   .flat();
 
-              const { alerts: sampleAlerts } = sampleAlertsAndTemplate;
+              const { sampleData } = sampleDataAndTemplate;
 
-              const bulk = sampleAlerts
-                .map(
-                  sampleAlert =>
-                    `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`,
-                )
+              const bulk = sampleData
+                .map(document => `${bulkPrefix}\n${JSON.stringify(document)}\n`)
                 .join('');
 
               // Index alerts
@@ -630,8 +623,8 @@ export class WazuhElasticCtrl {
                 // Create wazuh sample data index
                 let configuration;
 
-                if (sampleAlertsAndTemplate?.template) {
-                  configuration = sampleAlertsAndTemplate.template;
+                if (sampleDataAndTemplate?.template) {
+                  configuration = sampleDataAndTemplate.template;
 
                   delete configuration.index_patterns;
                   delete configuration.order;
@@ -660,21 +653,24 @@ export class WazuhElasticCtrl {
                 context.wazuh.logger.info(`Index ${indexName} created`);
               }
 
-              await context.core.opensearch.client.asCurrentUser.bulk({
-                index: indexName,
-                body: bulk,
-              });
+              const response =
+                await context.core.opensearch.client.asCurrentUser.bulk({
+                  index: indexName,
+                  body: bulk,
+                });
+
+              console.log({ indexName, response: response });
               context.wazuh.logger.info(
-                `Added sample alerts to ${indexName} index`,
+                `Added sample data to ${indexName} index`,
               );
 
               sampleDocumentsResponse.push({
                 index: indexName,
-                alertCount: sampleAlerts.length,
+                sampleDataCount: sampleData.length,
               });
             } catch (error) {
               context.wazuh.logger.error(
-                `Error adding sample alerts to ${indexName} index: ${
+                `Error adding sample data to ${indexName} index: ${
                   error.message || error
                 }`,
               );

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { generateAlertsWithDataset } = require('./lib/index');
+const { generateSampleDataWithDataset } = require('./lib/index');
 const path = require('path');
 const fs = require('fs');
 
@@ -157,7 +157,7 @@ try {
 
   for (let i = 0; i < count; i++) {
     resultOrPromise.push(
-      generateAlertsWithDataset(dataset, alertGenerationParams),
+      generateSampleDataWithDataset(dataset, alertGenerationParams),
     );
   }
 

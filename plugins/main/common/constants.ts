@@ -65,7 +65,7 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
 export const WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING =
   'file-integrity-monitoring';
 export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
-export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS = 3000;
+export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 3000;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
 export const WAZUH_SETTING_FIM_FILES_PREFIX = {
   settingIndexPattern: 'fim_files.sample.prefix',
@@ -111,7 +111,7 @@ export const WAZUH_SETTING_INVENTORY_SYSTEM = {
   settingIndexPattern: 'inventory_system.sample.prefix',
   dataSet: 'states-inventory-system',
 };
-export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
+export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     { syscheck: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
     { aws: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
@@ -124,13 +124,13 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
     { ssh: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
     {
       apache: true,
-      alerts: 2000,
+      count: 2000,
       settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
     },
     { web: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
     {
       windows: { service_control_manager: true },
-      alerts: 1000,
+      count: 1000,
       settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX,
     },
     { github: true, settingIndexPattern: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX },
