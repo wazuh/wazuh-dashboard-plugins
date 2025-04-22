@@ -18,6 +18,7 @@ export const ITHygienePackagesInventoryHotfixes =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        managedFiltersProps={{ style: { flexGrow: 0.25, minWidth: '300px' } }}
       />
     );
   });

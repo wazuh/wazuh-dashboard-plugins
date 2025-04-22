@@ -10,6 +10,7 @@ import {
   TabsManagedBySearchParam,
   TabsManagedBySearchParamProps,
 } from '../../../../navigation/tabs-managed-by-search-params';
+import { CustomSearchBarProps } from '../../../../common/custom-search-bar/custom-search-bar';
 
 export const ITHygieneInventoryTabLayout = ({
   tabs,
@@ -31,11 +32,8 @@ export interface ITHygieneInventoryDashboardTableProps {
   DataSourceRepositoryCreator: any;
   tableDefaultColumns: { id: string }[];
   getDashboardPanels: (indexPatternID: string) => any;
-  managedFilters: {
-    type: string;
-    key: string;
-    placeholder: string;
-  }[];
+  managedFilters: CustomSearchBarProps['filterInputs'];
+  managedFiltersProps?: CustomSearchBarProps['filterInputsProps'];
 }
 
 export const ITHygieneInventoryDashboardTable = ({
@@ -44,6 +42,7 @@ export const ITHygieneInventoryDashboardTable = ({
   tableDefaultColumns,
   getDashboardPanels,
   managedFilters,
+  managedFiltersProps,
 }: ITHygieneInventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -88,6 +87,7 @@ export const ITHygieneInventoryDashboardTable = ({
                 setFilters={setFilters}
                 fixedFilters={fixedFilters}
                 filterInputs={managedFilters || []}
+                filterInputsProps={managedFiltersProps}
               />
               {getDashboardPanels && (
                 <DashboardByRenderer
