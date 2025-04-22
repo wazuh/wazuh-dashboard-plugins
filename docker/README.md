@@ -118,7 +118,7 @@ This brings up a Dev environment for the `wazuh-dashboard-plugins` development b
 ```bash
 ./dev.sh $WZ_HOME up
 ```
-### Important Note for Version 5.0.0 and Later
+### Important Note for Dashboard Initialization
 Starting from version 5.0.0, the Wazuh Dashboard container automatically:
 
 - Installs dependencies
@@ -132,20 +132,6 @@ Optional: You can monitor the startup process by checking the container logs:
 ```bash
    docker logs -f <container_name>
 ```
-
-If you need to prevent automatic startup and manually control the initialization process, use the `--no-start` flag:
-
-```bash
-./dev.sh --no-start -a up
-```
-This will keep the container running without starting the dashboard service, allowing you to connect to it and run commands manually.
-
-For older versions (before 5.0.0), you'll need to:
-
-1. Once the containers are up, attach a shell to the development container
-2. Move to the kbn\plugins\wazuh-core directory
-3. Run yarn to install dependencies
-4. Move back to the root folder and run yarn start
 
 The dependencies of the platform (Kibana \ OSD) are already installed, but it
 might take a while to optimize all the bundles. We might include the cache in the
