@@ -49,8 +49,8 @@ the server using the `--no-base-path`**.
 
 Use the `--no-start` flag if you want to prevent the automatic startup of the dashboard service. This keeps the container running without starting the service, allowing you to connect to it and run commands manually:
 
-``bash
-  For example:
+```bash
+  ### For example:
   ### Start the environment without automatically starting the dashboard service
   ./dev.sh -os 2.19.1 -osd 2.19.1-5.0.0 --no-start -a up
 
@@ -59,7 +59,7 @@ Use the `--no-start` flag if you want to prevent the automatic startup of the da
 
   ### Manually install dependencies
   cd /kbn/plugins/wazuh-core
-  yarn installl
+  yarn install
 
   ### And manually start the service
   cd /kbn
