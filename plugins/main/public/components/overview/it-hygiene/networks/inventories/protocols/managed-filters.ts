@@ -2,7 +2,7 @@ export default [
   {
     type: 'multiSelect',
     key: 'observer.ingress.interface.name',
-    placeholder: 'Interface name',
+    placeholder: 'Name',
   },
   {
     type: 'multiSelect',

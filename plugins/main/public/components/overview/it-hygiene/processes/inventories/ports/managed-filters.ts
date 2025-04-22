@@ -7,12 +7,12 @@ export default [
   {
     type: 'multiSelect',
     key: 'destination.port',
-    placeholder: 'Remote port',
+    placeholder: 'Local port',
   },
   {
     type: 'multiSelect',
     key: 'destination.ip',
-    placeholder: 'Remote IP',
+    placeholder: 'Local IP',
   },
   {
     type: 'multiSelect',
