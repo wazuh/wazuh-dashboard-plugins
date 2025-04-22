@@ -7,6 +7,7 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryNetworksDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
+import { getOverviewNetworksTab } from './dashboard';
 
 export const ITHygieneNetworksInventoryNetworks =
   withSystemInventoryNetworksDataSource(props => {
@@ -18,6 +19,7 @@ export const ITHygieneNetworksInventoryNetworks =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        getDashboardPanels={getOverviewNetworksTab}
       />
     );
   });
