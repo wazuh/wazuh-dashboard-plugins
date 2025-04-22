@@ -100,20 +100,19 @@ const getVisStateNetworkAveragePriorityOfRoutes = (
   };
 };
 
-const getVisStateNetworkPorcentageOfUDPTraffic = (
+const getVisStateUDPOnlyInterfacesMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'it-hygiene-porcentage-of-udp-traffic',
-    title: 'KPI - % of UDP Traffic',
-    type: 'metrics',
+    id: 'it-hygiene-network-interfaces-only-udp',
+    title: 'Interfaces operating only on UDP',
+    type: 'metric',
     params: {
-      id: '61ca57f0-469d-11e7-af02-69e470af7417',
       addTooltip: true,
       addLegend: false,
       type: 'metric',
       metric: {
-        percentageMode: true,
+        percentageMode: false,
         useRanges: false,
         colorSchema: 'Green to Red',
         metricColorMode: 'None',
@@ -129,63 +128,38 @@ const getVisStateNetworkPorcentageOfUDPTraffic = (
         invertColors: false,
         style: STYLE,
       },
-      series: [
-        {
-          id: '61ca57f1-469d-11e7-af02-69e470af7417',
-          color: '#000',
-          split_mode: 'everything',
-          split_color_mode: 'opensearchDashboards',
-          metrics: [
-            {
-              id: '61ca57f2-469d-11e7-af02-69e470af7417',
-              type: 'filter_ratio',
-              numerator: {
-                query: 'network.protocol: UDP',
-                language: 'kuery',
-              },
-              denominator: {
-                query: '*',
-                language: 'kuery',
-              },
-              metric_agg: 'count',
-            },
-          ],
-          separate_axis: 0,
-          axis_position: 'right',
-          axis_scale: 'normal',
-          formatter: 'percent',
-          chart_type: 'line',
-          line_width: 1,
-          point_size: 1,
-          fill: 0.5,
-          stacked: 'none',
-          label: 'UDP Traffic',
-          filter: {
-            query: 'network.protocol: *',
-            language: 'kuery',
-          },
-          value_template: '',
-          offset_time: '',
-        },
-      ],
-      time_field: '@timestamp',
-      index_pattern: indexPatternId,
-      interval: '',
-      axis_position: 'left',
-      axis_formatter: 'number',
-      axis_scale: 'normal',
-      show_legend: 1,
-      show_grid: 1,
-      tooltip_mode: 'show_all',
-      default_index_pattern: 'wazuh-alerts-*',
-      default_timefield: 'timestamp',
-      isModelInvalid: false,
-      time_range_mode: 'entire_time_range',
     },
     data: {
       searchSource: createSearchSource(indexPatternId),
       references: createIndexPatternReferences(indexPatternId),
-      aggs: [],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'UDP',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'network.protocol:"UDP"',
+                  language: 'kuery',
+                },
+                label: 'Protocols',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
     },
   };
 };
@@ -278,7 +252,7 @@ export const getOverviewNetworksTab = (indexPatternId: string) => {
       height: HEIGHT,
       positionX: 24,
       positionY: 6,
-      savedVis: getVisStateNetworkPorcentageOfUDPTraffic(indexPatternId),
+      savedVis: getVisStateUDPOnlyInterfacesMetric(indexPatternId),
     }),
     ...generateVisualization({
       key: '3',
