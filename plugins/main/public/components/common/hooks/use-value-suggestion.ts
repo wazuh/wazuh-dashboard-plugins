@@ -141,7 +141,6 @@ export const useValueSuggestion = (
   );
   const [query, setQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
-  const data = getDataPlugin();
 
   const getOptions = (): string[] => {
     return (
