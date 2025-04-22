@@ -33,6 +33,7 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
   WAZUH_SAMPLE_INVENTORY_AGENT,
+  WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import {
@@ -79,6 +80,8 @@ const sampleInventory = [
   'protocols',
   'system',
 ].join(', ');
+
+const sampleVulnerability = ['vulnerabilities'].join(', ');
 
 export default class WzSampleData extends Component {
   categories: {
@@ -130,6 +133,12 @@ export default class WzSampleData extends Component {
         description: `Sample data, visualizations and dashboards for (${sampleInventory}).`,
         image: '',
         categorySampleAlertsIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
+      },
+      {
+        title: 'Sample vulnerability detection',
+        description: `Sample data, visualizations and dashboards for (${sampleVulnerability}).`,
+        image: '',
+        categorySampleAlertsIndex: WAZUH_SAMPLE_VULNERABILITIES,
       },
     ];
     this.state = {};

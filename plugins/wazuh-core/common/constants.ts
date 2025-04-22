@@ -124,6 +124,10 @@ export const WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX = {
   key: 'inventory_system.sample.prefix',
   defaultValue: 'wazuh-states-inventory-system-',
 };
+export const WAZUH_SAMPLE_VULNERABILITIES_PREFIX = {
+  key: 'vulnerabilities.sample.prefix',
+  defaultValue: 'wazuh-states-vulnerabilities-',
+};
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
@@ -820,6 +824,12 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       ),
     ),
   },
+  [WAZUH_SAMPLE_VULNERABILITIES_PREFIX.key]: pluginSettings({
+    title: 'Sample vulnerabilities prefix',
+    description:
+      'Define the index name prefix of sample data to vulnerabilities. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+    defaultValue: WAZUH_SAMPLE_VULNERABILITIES_PREFIX.defaultValue,
+  }),
   [WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX.key]: pluginSettings({
     title: 'Sample inventory hardware prefix',
     description:

@@ -34,18 +34,18 @@ function boolean() {
  * @returns {string} Random date string
  */
 function date() {
-  const start_date = new Date();
-  const end_date = new Date(start_date);
-  end_date.setDate(end_date.getDate() - 10);
+  const startDate = new Date();
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() - 10);
 
   // Random date between start_date and end_date
-  const random_date = new Date(
-    end_date.getTime() +
-      Math.random() * (start_date.getTime() - end_date.getTime()),
+  const randomDate = new Date(
+    endDate.getTime() +
+      Math.random() * (startDate.getTime() - endDate.getTime()),
   );
 
   // Format date to match the Python format
-  return random_date.toISOString();
+  return randomDate.toISOString();
 }
 
 /**
@@ -53,10 +53,10 @@ function date() {
  * @returns {number} Random unix timestamp
  */
 function unixTimestamp() {
-  const start_time = new Date(2000, 0, 1).getTime();
-  const end_time = new Date().getTime();
-  const random_time = start_time + Math.random() * (end_time - start_time);
-  return Math.floor(random_time / 1000);
+  const startTime = new Date(2000, 0, 1).getTime();
+  const endTime = new Date().getTime();
+  const randomTime = startTime + Math.random() * (endTime - startTime);
+  return Math.floor(randomTime / 1000);
 }
 
 /**
@@ -78,6 +78,19 @@ function macAddress() {
   return mac.map(octet => octet.toString(16).padStart(2, '0')).join(':');
 }
 
+/**
+ * Generate a random float between min and max (inclusive)
+ * @param {number} min - Minimum value
+ * @param {number} max - Maximum value
+ * @param {number} decimals - Number of decimal places (default: 2)
+ * @returns {number} Random float
+ */
+function float(min = 0, max = 1, decimals = 2) {
+  const randomFloat = Math.random() * (max - min) + min;
+  const factor = Math.pow(10, decimals);
+  return Math.round(randomFloat * factor) / factor;
+}
+
 module.exports = {
   int,
   choice,
@@ -86,4 +99,5 @@ module.exports = {
   unixTimestamp,
   ip,
   macAddress,
+  float, // Exportamos la nueva función
 };

@@ -65,51 +65,56 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
 export const WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING =
   'file-integrity-monitoring';
 export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
+export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 3000;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = 'alerts.sample.prefix';
-export const WAZUH_SETTING_FIM_FILES_PREFIX = {
+export const WAZUH_SETTING_FIM_FILES_SAMPLE_PREFIX = {
   settingIndexPattern: 'fim_files.sample.prefix',
   dataSet: 'states-fim-files',
 };
-export const WAZUH_SETTING_FIM_REGISTRIES_PREFIX = {
+export const WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX = {
   settingIndexPattern: 'fim_registries.sample.prefix',
   dataSet: 'states-fim-registries',
 };
-export const WAZUH_SETTING_INVENTORY_HARDWARE = {
+export const WAZUH_SETTING_INVENTORY_HARDWARE_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_hardware.sample.prefix',
   dataSet: 'states-inventory-hardware',
 };
-export const WAZUH_SETTING_INVENTORY_HOTFIXES = {
+export const WAZUH_SETTING_INVENTORY_HOTFIXES_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_hotfixes.sample.prefix',
   dataSet: 'states-inventory-hotfixes',
 };
-export const WAZUH_SETTING_INVENTORY_INTERFACES = {
+export const WAZUH_SETTING_INVENTORY_INTERFACES_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_interfaces.sample.prefix',
   dataSet: 'states-inventory-interfaces',
 };
-export const WAZUH_SETTING_INVENTORY_PACKAGES = {
+export const WAZUH_SETTING_INVENTORY_PACKAGES_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_packages.sample.prefix',
   dataSet: 'states-inventory-packages',
 };
-export const WAZUH_SETTING_INVENTORY_PORTS = {
+export const WAZUH_SETTING_INVENTORY_PORTS_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_ports.sample.prefix',
   dataSet: 'states-inventory-ports',
 };
-export const WAZUH_SETTING_INVENTORY_NETWORKS = {
+export const WAZUH_SETTING_INVENTORY_NETWORKS_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_networks.sample.prefix',
   dataSet: 'states-inventory-networks',
 };
-export const WAZUH_SETTING_INVENTORY_PROCESSES = {
+export const WAZUH_SETTING_INVENTORY_PROCESSES_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_processes.sample.prefix',
   dataSet: 'states-inventory-processes',
 };
-export const WAZUH_SETTING_INVENTORY_PROTOCOLS = {
+export const WAZUH_SETTING_INVENTORY_PROTOCOLS_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_protocols.sample.prefix',
   dataSet: 'states-inventory-protocols',
 };
-export const WAZUH_SETTING_INVENTORY_SYSTEM = {
+export const WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX = {
   settingIndexPattern: 'inventory_system.sample.prefix',
   dataSet: 'states-inventory-system',
+};
+export const WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX = {
+  settingIndexPattern: 'vulnerabilities.sample.prefix',
+  dataSet: 'states-vulnerabilities',
 };
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
@@ -161,64 +166,79 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]: [
     {
       files: true,
-      settingIndexPattern: WAZUH_SETTING_FIM_FILES_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_FIM_FILES_PREFIX.dataSet,
+      settingIndexPattern:
+        WAZUH_SETTING_FIM_FILES_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_FIM_FILES_SAMPLE_PREFIX.dataSet,
     },
     {
       registries: true,
       settingIndexPattern:
-        WAZUH_SETTING_FIM_REGISTRIES_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_FIM_REGISTRIES_PREFIX.dataSet,
+        WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_INVENTORY_AGENT]: [
     {
       registries: true,
-      settingIndexPattern: WAZUH_SETTING_INVENTORY_HARDWARE.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_HARDWARE.dataSet,
-    },
-    {
-      registries: true,
-      settingIndexPattern: WAZUH_SETTING_INVENTORY_HOTFIXES.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_HOTFIXES.dataSet,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_HARDWARE_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_HARDWARE_SAMPLE_PREFIX.dataSet,
     },
     {
       registries: true,
       settingIndexPattern:
-        WAZUH_SETTING_INVENTORY_INTERFACES.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_INTERFACES.dataSet,
-    },
-    {
-      registries: true,
-      settingIndexPattern: WAZUH_SETTING_INVENTORY_NETWORKS.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_NETWORKS.dataSet,
-    },
-    {
-      registries: true,
-      settingIndexPattern: WAZUH_SETTING_INVENTORY_PACKAGES.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_PACKAGES.dataSet,
-    },
-    {
-      registries: true,
-      settingIndexPattern: WAZUH_SETTING_INVENTORY_PORTS.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_PORTS.dataSet,
+        WAZUH_SETTING_INVENTORY_HOTFIXES_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_HOTFIXES_SAMPLE_PREFIX.dataSet,
     },
     {
       registries: true,
       settingIndexPattern:
-        WAZUH_SETTING_INVENTORY_PROCESSES.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_PROCESSES.dataSet,
+        WAZUH_SETTING_INVENTORY_INTERFACES_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_INTERFACES_SAMPLE_PREFIX.dataSet,
     },
     {
       registries: true,
       settingIndexPattern:
-        WAZUH_SETTING_INVENTORY_PROTOCOLS.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_PROTOCOLS.dataSet,
+        WAZUH_SETTING_INVENTORY_NETWORKS_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_NETWORKS_SAMPLE_PREFIX.dataSet,
     },
     {
       registries: true,
-      settingIndexPattern: WAZUH_SETTING_INVENTORY_SYSTEM.settingIndexPattern,
-      dataSet: WAZUH_SETTING_INVENTORY_SYSTEM.dataSet,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_PACKAGES_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_PACKAGES_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_PORTS_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_PORTS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_PROCESSES_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_PROCESSES_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_PROTOCOLS_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_PROTOCOLS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      settingIndexPattern:
+        WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.dataSet,
+    },
+  ],
+  [WAZUH_SAMPLE_VULNERABILITIES]: [
+    {
+      vulnerabilities: true,
+      settingIndexPattern:
+        WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX.dataSet,
     },
   ],
 };

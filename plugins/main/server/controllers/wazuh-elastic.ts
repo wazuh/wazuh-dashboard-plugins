@@ -653,10 +653,15 @@ export class WazuhElasticCtrl {
                 context.wazuh.logger.info(`Index ${indexName} created`);
               }
 
-              await context.core.opensearch.client.asCurrentUser.bulk({
-                index: indexName,
-                body: bulk,
-              });
+              const response =
+                await context.core.opensearch.client.asCurrentUser.bulk({
+                  index: indexName,
+                  body: bulk,
+                });
+
+              if (response.body.errors) {
+                console.log(response.body.items[0].index.error);
+              }
 
               context.wazuh.logger.info(
                 `Added sample data to ${indexName} index`,
