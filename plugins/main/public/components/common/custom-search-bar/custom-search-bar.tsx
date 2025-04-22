@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, HTMLAttributes } from 'react';
 import {
   Filter,
   IndexPattern,
@@ -8,7 +8,7 @@ import {
   FilterState,
   FilterStateStore,
 } from '../../../../../../src/plugins/data/common';
-import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiSwitch, EuiFlexItemProps, CommonProps } from '@elastic/eui';
 import { tFilter } from '../data-source';
 //@ts-ignore
 import { MultiSelect } from './components';
@@ -25,13 +25,16 @@ interface FilterInput {
   options?: string[];
 }
 
-type CustomSearchBarProps = {
+export type CustomSearchBarProps = {
   filterInputs: FilterInput[];
   filterDrillDownValue?: { field: string; value: string };
   searchBarProps: tUseSearchBarProps;
   indexPattern: IndexPattern;
   fixedFilters: Filter[];
   setFilters: (filters: tFilter[]) => void;
+  filterInputsProps: CommonProps &  EuiFlexItemProps & {
+    style: HTMLAttributes<HTMLDivElement | HTMLSpanElement>['style']
+  };
 };
 
 export const CustomSearchBar = ({
@@ -41,6 +44,7 @@ export const CustomSearchBar = ({
   indexPattern,
   setFilters,
   fixedFilters,
+  filterInputsProps,
 }: CustomSearchBarProps) => {
   const { filters } = searchBarProps;
 
@@ -223,7 +227,9 @@ export const CustomSearchBar = ({
                 gutterSize='s'
               >
                 {filterInputs.map((item, key) => (
-                  <EuiFlexItem key={key}>{getComponent(item)}</EuiFlexItem>
+                  <EuiFlexItem key={key} {...filterInputsProps}>
+                    {getComponent(item)}
+                  </EuiFlexItem>
                 ))}
               </EuiFlexGroup>
             ) : null
