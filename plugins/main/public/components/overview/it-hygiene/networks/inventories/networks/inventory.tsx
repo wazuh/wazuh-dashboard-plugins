@@ -10,7 +10,7 @@ import {
   ITHygieneInventoryDashboardTable,
   ITHygieneInventoryDashboardTableProps,
 } from '../../../common/components/inventory';
-import { getOverviewNetworksTab } from './dashboard';
+import { getOverviewNetworksNetworksTab } from './dashboard';
 
 export const ITHygieneNetworksInventoryNetworks =
   withSystemInventoryNetworksDataSource(
@@ -23,7 +23,7 @@ export const ITHygieneNetworksInventoryNetworks =
           }
           tableDefaultColumns={tableColumns}
           managedFilters={managedFilters}
-          getDashboardPanels={getOverviewNetworksTab}
+          getDashboardPanels={getOverviewNetworksNetworksTab}
         />
       );
     },

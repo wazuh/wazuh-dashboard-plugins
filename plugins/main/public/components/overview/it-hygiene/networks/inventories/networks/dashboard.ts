@@ -228,7 +228,7 @@ const getVisStateNetworkInterfacesWithDHCPEnabled = (
   };
 };
 
-export const getOverviewNetworksTab = (indexPatternId: string) => {
+export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
   return {
     ...generateVisualization({
       key: '0',
