@@ -131,7 +131,7 @@ This means you don't need to manually enter the container to run these commands.
    docker logs -f <container_name>
     ```
 2. Access the dashboard at https://localhost:5601 (note the HTTPS protocol)
-3. If you see "Wazuh dashboard server is not ready yet", check the container logs for more details.
+3. If you encounter the message "Wazuh dashboard server is not ready yet", please be patient while the services initialize. You can monitor the progress by checking the container logs for more detailed information.
 
 For older versions (before 5.0.0), you'll need to:
 
