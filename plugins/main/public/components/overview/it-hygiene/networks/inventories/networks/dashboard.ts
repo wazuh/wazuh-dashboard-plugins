@@ -202,7 +202,7 @@ const getVisStateNetworkInterfacesWithDHCPEnabled = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Interfaces',
+            customLabel: 'enabled',
           },
           schema: 'metric',
         },
@@ -217,7 +217,7 @@ const getVisStateNetworkInterfacesWithDHCPEnabled = (
                   query: 'network.dhcp:true',
                   language: 'kuery',
                 },
-                label: 'DHCP enabled',
+                label: 'DHCP',
               },
             ],
           },
