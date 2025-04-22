@@ -8,23 +8,31 @@ const default_count = '10000';
 const default_index_name_prefix = 'wazuh-states-inventory-protocols';
 const default_index_name = `${default_index_name_prefix}-sample`;
 
-function generate_random_protocol() {
+function generate_random_network() {
   return {
-    description: `description${random.int(0, 9999)}`,
+    dhcp: random.boolean(),
     gateway: random.ip(),
-    name: `protocol${random.int(0, 9999)}`,
-    remote_ip: random.ip(),
-    status: random.choice(['Active', 'Inactive']),
-    type: random.choice(['TCP', 'UDP', 'ICMP']),
+    metric: random.int(0, 1000),
+    type: random.choice(['Ethernet', 'WiFi', 'VPN', 'Bluetooth', 'Cellular'])
+  };
+}
+
+function generate_random_observer() {
+  return {
+    ingress: {
+      interface: {
+        name: `interface${random.int(0, 100)}`
+      }
+    }
   };
 }
 
 function generate_document(params) {
-  // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     '@timestamp': random.date(),
     agent: generate_random_agent(),
-    protocol: generate_random_protocol(),
+    network: generate_random_network(),
+    observer: generate_random_observer(),
     wazuh: generate_random_wazuh(params),
   };
 }
