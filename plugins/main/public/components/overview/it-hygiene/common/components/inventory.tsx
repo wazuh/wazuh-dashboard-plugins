@@ -89,7 +89,7 @@ export const ITHygieneInventoryDashboardTable = ({
                 filterInputs={managedFilters || []}
                 filterInputsProps={managedFiltersProps}
               />
-              {getDashboardPanels && (
+              {getDashboardPanels && dataSource && (
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,
