@@ -1,14 +1,7 @@
 const random = require('../../lib/random');
-const {
-  generate_random_wazuh,
-  generate_random_agent,
-} = require('../shared-utils');
+const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
 
-const default_count = '10000';
-const default_index_name_prefix = 'wazuh-states-inventory-processes';
-const default_index_name = `${default_index_name_prefix}-sample`;
-
-function generate_random_process() {
+function generateRandomProcess() {
   return {
     args: `arg${random.int(0, 9999)}`,
     command_line: `command${random.int(0, 9999)}`,
@@ -27,18 +20,16 @@ function generate_random_process() {
   };
 }
 
-function generate_document(params) {
+function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     '@timestamp': random.date(),
-    agent: generate_random_agent(),
-    process: generate_random_process(),
-    wazuh: generate_random_wazuh(params),
+    agent: generateRandomAgent(),
+    process: generateRandomProcess(),
+    wazuh: generateRandomWazuh(params),
   };
 }
 
 module.exports = {
-  default_count,
-  default_index_name,
-  generate_document,
+  generateDocument,
 };

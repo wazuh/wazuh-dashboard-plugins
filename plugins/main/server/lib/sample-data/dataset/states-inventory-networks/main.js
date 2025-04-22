@@ -1,41 +1,32 @@
 const random = require('../../lib/random');
-const {
-  generate_random_agent,
-  generate_random_wazuh,
-} = require('../shared-utils');
+const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
-const default_count = '10000';
-const default_index_name_prefix = 'wazuh-states-inventory-networks';
-const default_index_name = `${default_index_name_prefix}-sample`;
+function generateRandomInterface() {
+  return `name${random.int(0, 9999)}`;
+}
 
-function generate_random_network() {
+function generateRandomNetwork() {
   return {
     broadcast: random.ip(),
     dhcp: random.boolean(),
     ip: random.ip(),
     metric: random.int(1, 100),
-    name: generate_random_interface(),
+    name: generateRandomInterface(),
     netmask: random.ip(),
     protocol: random.choice(['TCP', 'UDP', 'ICMP']),
   };
 }
 
-function generate_random_interface() {
-  return `name${random.int(0, 9999)}`;
-}
-
-function generate_document(params) {
+function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     '@timestamp': random.date(),
-    agent: generate_random_agent(),
-    network: generate_random_network(),
-    wazuh: generate_random_wazuh(params),
+    agent: generateRandomAgent(),
+    network: generateRandomNetwork(),
+    wazuh: generateRandomWazuh(params),
   };
 }
 
 module.exports = {
-  default_count,
-  default_index_name,
-  generate_document,
+  generateDocument,
 };

@@ -1,15 +1,7 @@
 const random = require('../../lib/random');
+const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
 
-const {
-  generate_random_wazuh,
-  generate_random_agent,
-} = require('../shared-utils');
-
-const default_count = '10000';
-const default_index_name_prefix = 'wazuh-states-inventory-system';
-const default_index_name = `${default_index_name_prefix}-sample`;
-
-function generate_random_host_system() {
+function generateRandomHostSystem() {
   return {
     architecture: random.choice(['x86_64', 'arm64']),
     hostname: `host${random.int(0, 1000)}`,
@@ -42,18 +34,16 @@ function generate_random_host_system() {
   };
 }
 
-function generate_document(params) {
+function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     '@timestamp': random.date(),
-    agent: generate_random_agent(),
-    host: generate_random_host_system(),
-    wazuh: generate_random_wazuh(params),
+    agent: generateRandomAgent(),
+    host: generateRandomHostSystem(),
+    wazuh: generateRandomWazuh(params),
   };
 }
 
 module.exports = {
-  default_count,
-  default_index_name,
-  generate_document,
+  generateDocument,
 };

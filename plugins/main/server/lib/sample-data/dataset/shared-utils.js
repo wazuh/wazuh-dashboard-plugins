@@ -1,24 +1,10 @@
 const random = require('../lib/random');
 
 /**
- * Generates a random agent object
- * @returns {Object} Random agent object
- */
-function generate_random_agent() {
-  const agent = {
-    id: String(random.int(0, 99)).padStart(3, '0'),
-    name: `Agent${random.int(0, 99)}`,
-    version: `v${random.int(0, 9)}-stable`,
-    host: generate_random_host(),
-  };
-  return agent;
-}
-
-/**
  * Generates a random host object
  * @returns {Object} Random host object
  */
-function generate_random_host() {
+function generateRandomHost() {
   return {
     architecture: random.choice(['x86_64', 'arm64']),
     ip: random.ip(),
@@ -26,11 +12,25 @@ function generate_random_host() {
 }
 
 /**
+ * Generates a random agent object
+ * @returns {Object} Random agent object
+ */
+function generateRandomAgent() {
+  const agent = {
+    id: String(random.int(0, 99)).padStart(3, '0'),
+    name: `Agent${random.int(0, 99)}`,
+    version: `v${random.int(0, 9)}-stable`,
+    host: generateRandomHost(),
+  };
+  return agent;
+}
+
+/**
  * Generates a random wazuh object
  * @param {Object} params - Parameters that may contain cluster information
  * @returns {Object} Random wazuh object
  */
-function generate_random_wazuh(params) {
+function generateRandomWazuh(params) {
   return {
     cluster: {
       name: params?.cluster?.name || `wazuh-cluster-${random.int(0, 10)}`,
@@ -41,7 +41,7 @@ function generate_random_wazuh(params) {
 }
 
 module.exports = {
-  generate_random_agent,
-  generate_random_host,
-  generate_random_wazuh,
+  generateRandomAgent,
+  generateRandomHost,
+  generateRandomWazuh,
 };

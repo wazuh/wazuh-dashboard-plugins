@@ -1,14 +1,7 @@
 const random = require('../../lib/random');
-const {
-  generate_random_wazuh,
-  generate_random_agent,
-} = require('../shared-utils');
+const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
 
-const default_count = '10000';
-const default_index_name_prefix = 'wazuh-states-inventory-interfaces';
-const default_index_name = `${default_index_name_prefix}-sample`;
-
-function generate_random_host_interfaces() {
+function generateRandomHostInterfaces() {
   return {
     network: {
       egress: {
@@ -28,7 +21,7 @@ function generate_random_host_interfaces() {
   };
 }
 
-function generate_random_interface(is_root_level = false) {
+function generateRandomInterface() {
   return {
     alias: `alias${random.int(0, 9999)}`,
     mtu: `${random.int(1000000, 99999999)}`,
@@ -38,23 +31,21 @@ function generate_random_interface(is_root_level = false) {
   };
 }
 
-function generate_random_observer() {
-  return { ingress: { interface: generate_random_interface(false) } };
+function generateRandomObserver() {
+  return { ingress: { interface: generateRandomInterface() } };
 }
 
-function generate_document(params) {
+function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     '@timestamp': random.date(),
-    agent: generate_random_agent(),
-    host: generate_random_host_interfaces(),
-    observer: generate_random_observer(),
-    wazuh: generate_random_wazuh(params),
+    agent: generateRandomAgent(),
+    host: generateRandomHostInterfaces(),
+    observer: generateRandomObserver(),
+    wazuh: generateRandomWazuh(params),
   };
 }
 
 module.exports = {
-  default_count,
-  default_index_name,
-  generate_document,
+  generateDocument,
 };

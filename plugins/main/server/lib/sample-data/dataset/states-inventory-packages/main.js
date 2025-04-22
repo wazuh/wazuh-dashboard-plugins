@@ -1,14 +1,7 @@
 const random = require('../../lib/random');
-const {
-  generate_random_agent,
-  generate_random_wazuh,
-} = require('../shared-utils');
+const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
-const default_count = '10000';
-const default_index_name_prefix = 'wazuh-states-inventory-packages';
-const default_index_name = `${default_index_name_prefix}-sample`;
-
-function generate_random_package() {
+function generateRandomPackage() {
   return {
     architecture: random.choice(['x86_64', 'arm64']),
     description: `description${random.int(0, 9999)}`,
@@ -21,17 +14,15 @@ function generate_random_package() {
   };
 }
 
-function generate_document(params) {
+function generateDocument(params) {
   return {
     '@timestamp': random.date(),
-    agent: generate_random_agent(),
-    package: generate_random_package(),
-    wazuh: generate_random_wazuh(params),
+    agent: generateRandomAgent(),
+    package: generateRandomPackage(),
+    wazuh: generateRandomWazuh(params),
   };
 }
 
 module.exports = {
-  default_count,
-  default_index_name,
-  generate_document,
+  generateDocument,
 };

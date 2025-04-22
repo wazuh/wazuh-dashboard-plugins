@@ -1,26 +1,20 @@
 const random = require('../../lib/random');
-const {
-  generate_random_wazuh,
-  generate_random_agent,
-} = require('../shared-utils');
+const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
 
-const default_count = '10000';
-const default_index_name = 'wazuh-states-fim-registries-sample';
-
-function generate_random_data_stream() {
+function generateRandomDataStream() {
   return {
     type: random.choice(['Scheduled', 'Realtime']),
   };
 }
 
-function generate_random_event() {
+function generateRandomEvent() {
   return {
     category: random.choice(['registy_value', 'registry_key', 'file']),
     type: random.choice(['added', 'modified', 'deleted']),
   };
 }
 
-function generate_random_registry() {
+function generateRandomRegistry() {
   return {
     data: {
       hash: {
@@ -43,20 +37,18 @@ function generate_random_registry() {
   };
 }
 
-function generate_document(params) {
+function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     '@timestamp': random.date(),
-    agent: generate_random_agent(),
-    data_stream: generate_random_data_stream(),
-    event: generate_random_event(),
-    registry: generate_random_registry(),
-    wazuh: generate_random_wazuh(params),
+    agent: generateRandomAgent(),
+    data_stream: generateRandomDataStream(),
+    event: generateRandomEvent(),
+    registry: generateRandomRegistry(),
+    wazuh: generateRandomWazuh(params),
   };
 }
 
 module.exports = {
-  default_count,
-  default_index_name,
-  generate_document,
+  generateDocument,
 };

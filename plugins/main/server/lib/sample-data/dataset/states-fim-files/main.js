@@ -1,42 +1,35 @@
 const random = require('../../lib/random');
-const {
-  generate_random_agent,
-  generate_random_wazuh,
-} = require('../shared-utils');
+const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
-const default_count = '10000';
-const default_index_name = 'wazuh-states-fim-files-sample';
-const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
-
-function generate_random_date() {
-  const start_date = new Date();
-  const end_date = new Date(start_date);
-  end_date.setDate(end_date.getDate() - 10);
+function generateRandomDate() {
+  const startDate = new Date();
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() - 10);
 
   // Random date between start_date and end_date
-  const random_date = new Date(
-    end_date.getTime() +
-      Math.random() * (start_date.getTime() - end_date.getTime()),
+  const randomDate = new Date(
+    endDate.getTime() +
+      Math.random() * (startDate.getTime() - endDate.getTime()),
   );
 
   // Format date to match the Python format
-  return random_date.toISOString();
+  return randomDate.toISOString();
 }
 
-function generate_random_data_stream() {
+function generateRandomDataStream() {
   return {
     type: random.choice(['Scheduled', 'Realtime']),
   };
 }
 
-function generate_random_event() {
+function generateRandomEvent() {
   return {
     category: random.choice(['registy_value', 'registry_key', 'file']),
     type: random.choice(['added', 'modified', 'deleted']),
   };
 }
 
-function generate_random_file() {
+function generateRandomFile() {
   return {
     gid: `gid${random.int(0, 1000)}`,
     group: `group${random.int(0, 1000)}`,
@@ -46,7 +39,7 @@ function generate_random_file() {
       sha256: `${random.int(0, 9999)}`,
     },
     inode: `inode${random.int(0, 1000)}`,
-    mtime: generate_random_date(),
+    mtime: generateRandomDate(),
     owner: `owner${random.int(0, 1000)}`,
     path: '/path/to/file',
     size: random.int(1000, 1000000),
@@ -54,20 +47,18 @@ function generate_random_file() {
   };
 }
 
-function generate_document(params) {
+function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
-    '@timestamp': generate_random_date(),
-    agent: generate_random_agent(),
-    data_stream: generate_random_data_stream(),
-    event: generate_random_event(),
-    file: generate_random_file(),
-    wazuh: generate_random_wazuh(params),
+    '@timestamp': generateRandomDate(),
+    agent: generateRandomAgent(),
+    data_stream: generateRandomDataStream(),
+    event: generateRandomEvent(),
+    file: generateRandomFile(),
+    wazuh: generateRandomWazuh(params),
   };
 }
 
 module.exports = {
-  default_count,
-  default_index_name,
-  generate_document,
+  generateDocument,
 };
