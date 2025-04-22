@@ -5,3 +5,5 @@ export const STYLE = {
   subText: '',
   fontSize: 40,
 } as const;
+
+export const HEIGHT = 6;

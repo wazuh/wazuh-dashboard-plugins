@@ -1,5 +1,5 @@
 import { generateVisualization } from '../../../common/create-new-visualization';
-import { STYLE } from '../../../common/saved-vis/constants';
+import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
@@ -259,7 +259,7 @@ export const getOverviewNetworksTab = (indexPatternId: string) => {
     ...generateVisualization({
       key: '0',
       width: 12,
-      height: 6,
+      height: HEIGHT,
       positionX: 0,
       positionY: 0,
       savedVis: getVisStateNetworkByIP(indexPatternId),
@@ -267,7 +267,7 @@ export const getOverviewNetworksTab = (indexPatternId: string) => {
     ...generateVisualization({
       key: '1',
       width: 12,
-      height: 6,
+      height: HEIGHT,
       positionX: 12,
       positionY: 0,
       savedVis: getVisStateNetworkAveragePriorityOfRoutes(indexPatternId),
@@ -275,7 +275,7 @@ export const getOverviewNetworksTab = (indexPatternId: string) => {
     ...generateVisualization({
       key: '2',
       width: 12,
-      height: 6,
+      height: HEIGHT,
       positionX: 24,
       positionY: 6,
       savedVis: getVisStateNetworkPorcentageOfUDPTraffic(indexPatternId),
@@ -283,7 +283,7 @@ export const getOverviewNetworksTab = (indexPatternId: string) => {
     ...generateVisualization({
       key: '3',
       width: 12,
-      height: 6,
+      height: HEIGHT,
       positionX: 36,
       positionY: 6,
       savedVis: getVisStateNetworkInterfacesWithDHCPEnabled(indexPatternId),
