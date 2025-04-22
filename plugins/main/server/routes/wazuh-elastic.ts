@@ -79,7 +79,7 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/samplealerts',
+      path: '/indexer/sampledata',
       validate: false,
     },
     async (context, request, response) =>
@@ -88,7 +88,7 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/samplealerts/{category}',
+      path: '/indexer/sampledata/{category}',
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,
@@ -101,7 +101,7 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.post(
     {
-      path: '/elastic/samplealerts/{category}',
+      path: '/indexer/sampledata/{category}',
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,
@@ -110,12 +110,12 @@ export function WazuhElasticRoutes(router: IRouter) {
       },
     },
     async (context, request, response) =>
-      ctrl.createSampleAlerts(context, request, response),
+      ctrl.createSampleData(context, request, response),
   );
 
   router.delete(
     {
-      path: '/elastic/samplealerts/{category}',
+      path: '/indexer/sampledata/{category}',
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,

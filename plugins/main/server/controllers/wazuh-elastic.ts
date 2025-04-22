@@ -444,7 +444,7 @@ export class WazuhElasticCtrl {
 
   /**
    * This checks if there is sample alerts
-   * GET /elastic/samplealerts
+   * GET /indexer/sampledata
    * @param {*} context
    * @param {*} request
    * @param {*} response
@@ -499,7 +499,7 @@ export class WazuhElasticCtrl {
   }
   /**
    * This creates sample alerts in wazuh-sample-alerts
-   * GET /elastic/samplealerts/{category}
+   * GET /indexer/sampledata/{category}
    * @param {*} context
    * @param {*} request
    * @param {*} response
@@ -543,7 +543,7 @@ export class WazuhElasticCtrl {
   }
   /**
    * This creates sample alerts in wazuh-sample-alerts
-   * POST /elastic/samplealerts/{category}
+   * POST /indexer/sampledata/{category}
    * {
    *   "manager": {
    *      "name": "manager_name"
@@ -558,7 +558,7 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {index: string, alerts: [...], count: number} or ErrorResponse
    */
-  createSampleAlerts = routeDecoratorProtectedAdministrator(1000)(
+  createSampleData = routeDecoratorProtectedAdministrator(1000)(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest<{ category: string }>,

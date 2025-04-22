@@ -30,9 +30,8 @@ export const SampleDataWarning = ({
 
   const requestAlerts = async () => {
     try {
-      const result = (
-        await WzRequest.genericReq('GET', '/elastic/samplealerts')
-      ).data.sampleAlertsInstalled;
+      const result = (await WzRequest.genericReq('GET', '/indexer/sampledata'))
+        .data.sampleAlertsInstalled;
       setIsSampleData(result);
     } catch (error) {
       const options = {
@@ -54,7 +53,7 @@ export const SampleDataWarning = ({
       const result = (
         await WzRequest.genericReq(
           'GET',
-          `/elastic/samplealerts/${categorySampleData}`,
+          `/indexer/sampledata/${categorySampleData}`,
         )
       ).data.exists;
       setIsSampleData(result);
