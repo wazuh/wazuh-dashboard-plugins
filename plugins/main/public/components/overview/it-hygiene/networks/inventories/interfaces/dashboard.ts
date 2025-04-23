@@ -1,5 +1,5 @@
 import { generateVisualization } from '../../../common/create-new-visualization';
-import { STYLE } from '../../../common/saved-vis/constants';
+import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
@@ -66,16 +66,88 @@ const getVisStateNetworkInterfacesGlobalPacketLossRate = (
   };
 };
 
+const getVisStateNetworkInterfacesStateInactive = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'it-hygiene-network-interfaces-state-inactive',
+    title: 'Interfaces state Inactive',
+    type: 'metric',
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: 0,
+            to: 10000,
+          },
+        ],
+        labels: {
+          show: true,
+        },
+        invertColors: false,
+        style: STYLE,
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Inactive',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'observer.ingress.interface.state: Inactive',
+                  language: 'kuery',
+                },
+                label: 'Interfaces',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
+
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
   return {
     ...generateVisualization({
       key: '0',
       width: 12,
-      height: 6,
+      height: HEIGHT,
       positionX: 0,
       positionY: 0,
       savedVis:
         getVisStateNetworkInterfacesGlobalPacketLossRate(indexPatternId),
+    }),
+    ...generateVisualization({
+      key: '1',
+      width: 12,
+      height: HEIGHT,
+      positionX: 12,
+      positionY: 0,
+      savedVis: getVisStateNetworkInterfacesStateInactive(indexPatternId),
     }),
   };
 };
