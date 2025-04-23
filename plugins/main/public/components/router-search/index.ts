@@ -16,7 +16,7 @@ const childrenMatchSearchRoute = (routeSearch, search) => {
 the search params */
 export const Switch = ({ children }) => {
   const search = useRouterSearch();
-  /* children.flat() allows the usage of computed components as array. Example:
+  /* children.flat() allows the usage of evaluated components as array. Example:
     <Switch>
       {routes.map(({searchParamValue, component: Component}) => (
         <Route path={`?param=${searchParamValue}`}>

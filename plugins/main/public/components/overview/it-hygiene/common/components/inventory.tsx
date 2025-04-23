@@ -103,7 +103,7 @@ export const ITHygieneInventoryDashboardTable = ({
                       to: searchBarProps.dateRangeTo,
                     },
                     title: 'IT Hygiene inventory dahsboard',
-                    description: 'IT Hygiene dashboard ',
+                    description: 'IT Hygiene dashboard',
                     query: searchBarProps.query,
                     refreshConfig: {
                       pause: false,

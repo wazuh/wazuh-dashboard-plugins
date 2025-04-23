@@ -47,7 +47,6 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
       applicationTab,
       recentEventsSpecificFilters,
     }) => {
-      // const [href, setHref] = useState(undefined);
       const href = useMemo(() => {
         return generatePathNavigate({
           document,

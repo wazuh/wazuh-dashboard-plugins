@@ -110,7 +110,7 @@ export const WAZUH_MODULES = {
     // This appId is not used, for consistency was added.
     appId: 'system-inventory',
     description:
-      'Applications, hotfixes, system, network interfaces, ports, and processes running on your monitored systems.',
+      'Networks, interfaces, protocols, processes, ports, packages, hotfixes, system and hardware information of your monitored endpoints.',
   },
   stats: {
     title: 'Stats',
