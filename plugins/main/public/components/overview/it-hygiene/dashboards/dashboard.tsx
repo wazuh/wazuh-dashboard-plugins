@@ -5,7 +5,6 @@ import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import './styles.scss';
 import { withErrorBoundary } from '../../../common/hocs';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';

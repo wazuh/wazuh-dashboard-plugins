@@ -26,16 +26,17 @@ export const createPatternDataSourceRepositoryUseSettingValue = (
 
     validate(dataSource): boolean {
       const fieldsToCheck = ['id', 'attributes.title']; // search in these attributes
+      /* WORKAROUND: Get the index pattern configurared in the plugin setting. This imports from
+    the Redux store, but this should use some service as indejected dependency instead
+    Caveats:
+      - configuration should be loaded and set the Redux store
+    */
       return fieldsToCheck.some(
         key =>
           store.getState()?.appConfig?.data?.[settingKey] &&
           get(dataSource, key) ===
             store.getState()?.appConfig?.data?.[settingKey],
-      ); /* WORKAROUND: Get the index pattern configurared in the plugin setting. This imports from
-    the Redux store, but this should use some service as indejected dependency instead
-    Caveats:
-      - configuration should be loaded and set the Redux store
-    */
+      );
     }
 
     getDefault() {

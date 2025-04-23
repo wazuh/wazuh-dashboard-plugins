@@ -34,7 +34,6 @@ export const TabsManagedBySearchParam = ({
   tabsProps = {},
 }: TabsManagedBySearchParamProps) => {
   const search = useRouterSearch();
-  // const [selectedTab, setSelectedTab] = useState(tabs[0].id);
 
   const switchTab = (view: string) => {
     const navigationService = NavigationService.getInstance();

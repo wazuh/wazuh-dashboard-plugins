@@ -48,7 +48,7 @@ export const withFIMDataSource = withIndexPatternFromSettingDataSource({
   validate: ensureIndexPatternIsCreated({
     mapSavedObjectAttributesCreation: ({ fields }) => {
       const mappedFields = fields
-        ?.filter(({ name }) => ['file.size', 'regsitry.size'].includes(name))
+        ?.filter(({ name }) => ['file.size', 'registry.size'].includes(name))
         .map(({ name }) => `"${name}":{"id":"bytes"}`);
 
       if (mappedFields.length) {

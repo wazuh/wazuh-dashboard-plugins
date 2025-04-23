@@ -58,7 +58,7 @@ function useDateRangeContext({ createNewSearchContext, dataSource }) {
     transformDateRange({ from: dateRange.from, to: dateRange.to }),
   );
 
-  const setAbsoluteDateRangeTransfrom = ({ from, to }) =>
+  const setAbsoluteDateRangeTransform = ({ from, to }) =>
     setAbsoluteDateRange(transformDateRange({ from, to }));
 
   return dataSource?.indexPattern?.timeField
@@ -66,7 +66,7 @@ function useDateRangeContext({ createNewSearchContext, dataSource }) {
         dateRange,
         setDateRange,
         absoluteDateRange,
-        setAbsoluteDateRange: setAbsoluteDateRangeTransfrom,
+        setAbsoluteDateRange: setAbsoluteDateRangeTransform,
       }
     : {};
 }

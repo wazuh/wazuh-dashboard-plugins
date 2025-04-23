@@ -54,7 +54,7 @@ interface MultiSelectProps {
   onRemove: (id: string) => void;
   isDisabled?: boolean;
   filterDrillDownValue?: BoolFilter;
-  indexPattern?: IndexPattern; // Add indexPattern type
+  indexPattern: IndexPattern;
 }
 
 const mapToString = (value: any) =>
@@ -67,7 +67,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   onRemove,
   isDisabled,
   filterDrillDownValue,
-  indexPattern, // Add indexPattern to props
+  indexPattern,
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState<boolean>(false);
   const { suggestedValues, isLoading, setQuery }: IValueSuggestion =
@@ -75,7 +75,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       item.key,
       filterDrillDownValue,
       item?.options,
-      indexPattern, // Pass indexPattern to the hook
+      indexPattern,
     );
   const [items, setItems] = useState<Item[]>([]);
   const [activeFilters, setActiveFilters] = useState<number>(0);
