@@ -17,8 +17,8 @@ const getVisStateProcessesState = (
   processState: ProcessState,
 ): SavedVis => {
   return {
-    id: 'it-hygiene-processes-state',
-    title: 'Processes state',
+    id: `it-hygiene-processes-state-${processState}`,
+    title: `Processes state ${processState}`,
     type: 'metric',
     params: {
       addLegend: false,
