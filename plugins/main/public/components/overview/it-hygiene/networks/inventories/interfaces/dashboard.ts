@@ -8,7 +8,7 @@ import {
 import { SavedVis } from '../../../common/types';
 
 // You can apply the same logic here using ERRORS instead of DROPS. In both cases, a lower percentage indicates everything is working fine. If the percentage rises too much, it means there's a problem that needs attention.
-const getVisStateNetworkInterfacesGlobalPacketLossRate = (
+const getVisStateGlobalPacketLossMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
@@ -68,7 +68,7 @@ const getVisStateNetworkInterfacesGlobalPacketLossRate = (
   };
 };
 
-const getVisStateNetworkInterfacesStateInactive = (
+const getVisStateInactiveNetworkInterfacesMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
@@ -132,7 +132,7 @@ const getVisStateNetworkInterfacesStateInactive = (
   };
 };
 
-const getVisStateNetworkInterfacesStateUnknown = (
+const getVisStateUnknownStateNetworkInterfacesMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
@@ -196,7 +196,7 @@ const getVisStateNetworkInterfacesStateUnknown = (
   };
 };
 
-const getVisStateNetworkInterfacesTypeWireless = (
+const getVisStateWirelessNetworkInterfacesMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
@@ -262,9 +262,9 @@ const getVisStateNetworkInterfacesTypeWireless = (
 
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateNetworkInterfacesGlobalPacketLossRate(indexPatternId),
-    getVisStateNetworkInterfacesStateInactive(indexPatternId),
-    getVisStateNetworkInterfacesStateUnknown(indexPatternId),
-    getVisStateNetworkInterfacesTypeWireless(indexPatternId),
+    getVisStateGlobalPacketLossMetric(indexPatternId),
+    getVisStateInactiveNetworkInterfacesMetric(indexPatternId),
+    getVisStateUnknownStateNetworkInterfacesMetric(indexPatternId),
+    getVisStateWirelessNetworkInterfacesMetric(indexPatternId),
   ]);
 };
