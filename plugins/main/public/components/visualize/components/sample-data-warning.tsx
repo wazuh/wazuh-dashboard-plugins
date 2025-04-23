@@ -21,62 +21,42 @@ import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashb
 import NavigationService from '../../../react-services/navigation-service';
 
 export const SampleDataWarning = ({
-  categorySampleData,
+  categoriesSampleData,
   ...props
 }: {
-  categorySampleData?: string | null;
+  categoriesSampleData: string[];
 }) => {
   const [isSampleData, setIsSampleData] = useState(false);
 
-  const requestAlerts = async () => {
-    try {
-      const result = (await WzRequest.genericReq('GET', '/indexer/sampledata'))
-        .data.sampleAlertsInstalled;
-      setIsSampleData(result);
-    } catch (error) {
-      const options = {
-        context: `${SampleDataWarning.name}.usesSampleData`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  };
-
-  const requestSampleData = async () => {
-    try {
-      const result = (
-        await WzRequest.genericReq(
-          'GET',
-          `/indexer/sampledata/${categorySampleData}`,
-        )
-      ).data.exists;
-      setIsSampleData(result);
-    } catch (error) {
-      const options = {
-        context: `${SampleDataWarning.name}.usesSampleData`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.UI,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: error.name || error,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  };
-
   const request = async () => {
-    if (categorySampleData) {
-      await requestSampleData();
-    } else {
-      await requestAlerts();
+    try {
+      if (!categoriesSampleData.length) {
+        return;
+      }
+      const result = await Promise.all(
+        categoriesSampleData.map(
+          async (category: string) =>
+            (
+              await WzRequest.genericReq(
+                'GET',
+                `/indexer/sampledata/${category}`,
+              )
+            ).data.exists,
+        ),
+      );
+      setIsSampleData(result.some((item: boolean) => item === true));
+    } catch (error) {
+      const options = {
+        context: `${SampleDataWarning.name}.usesSampleData`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.UI,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
     }
   };
 

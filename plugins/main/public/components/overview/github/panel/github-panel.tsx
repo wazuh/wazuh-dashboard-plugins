@@ -28,6 +28,7 @@ import {
 } from '../../../common/data-source';
 import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
 import { IndexPattern } from '../../../../../../src/plugins/data/public';
+import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
 
 export const GitHubPanel = withErrorBoundary(() => {
   const [drillDownValue, setDrillDownValue] = useState({
@@ -106,6 +107,7 @@ export const GitHubPanel = withErrorBoundary(() => {
               indexPattern: dataSource?.indexPattern,
             }}
             isLoading={isDataSourceLoading}
+            categoriesSampleData={[WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]}
           />
         </>
       )}

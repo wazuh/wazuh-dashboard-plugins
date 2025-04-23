@@ -516,12 +516,20 @@ export class WazuhElasticCtrl {
         request.params.category,
       );
       // Check if wazuh sample alerts index exists
-      const existsSampleIndex =
-        await context.core.opensearch.client.asCurrentUser.indices.exists({
-          index: sampleAlertsIndex,
-        });
+      const existsSampleIndex = await Promise.all(
+        sampleAlertsIndex.map(async indexName => {
+          return await context.core.opensearch.client.asCurrentUser.indices.exists(
+            {
+              index: indexName,
+            },
+          );
+        }),
+      );
       return response.ok({
-        body: { index: sampleAlertsIndex, exists: existsSampleIndex.body },
+        body: {
+          index: sampleAlertsIndex,
+          exists: existsSampleIndex.some(result => result.body),
+        },
       });
     } catch (error) {
       context.wazuh.logger.error(

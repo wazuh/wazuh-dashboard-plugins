@@ -36,6 +36,8 @@ import VulsEvaluationFilter, {
   excludeUnderEvaluationFilter,
   getUnderEvaluationFilterValue,
 } from '../../common/components/vuls-evaluation-filter';
+import { SampleDataWarning } from '../../../../visualize/components';
+import { WAZUH_SAMPLE_VULNERABILITIES } from '../../../../../../common/constants';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -149,7 +151,9 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
                 showQueryBar={true}
                 showSaveQuery={true}
               />
-
+              <SampleDataWarning
+                categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
+              />
               {dataSource && results?.hits?.total === 0 ? (
                 <DiscoverNoResults />
               ) : null}

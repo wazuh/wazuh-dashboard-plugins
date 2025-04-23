@@ -92,7 +92,7 @@ export const ITHygieneInventoryDashboardTable = ({
                 filterInputsProps={managedFiltersProps}
               />
               <SampleDataWarning
-                categorySampleData={WAZUH_SAMPLE_INVENTORY_AGENT}
+                categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
               />
               {getDashboardPanels && dataSource && (
                 <DashboardByRenderer

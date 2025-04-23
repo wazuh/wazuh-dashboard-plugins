@@ -115,7 +115,7 @@ const InventoryFIMDashboard = withDataSourceInitiated({
         showSaveQuery={true}
       />
       <SampleDataWarning
-        categorySampleData={WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING}
+        categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
       <WzTableFlexGroup gutterSize='s'>
         <WzTableFlexItem>

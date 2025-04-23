@@ -120,7 +120,7 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
                 }`}
               >
                 <SampleDataWarning
-                  categorySampleData={WAZUH_SAMPLE_INVENTORY_AGENT}
+                  categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
                 />
                 <DashboardByRenderer
                   input={{
