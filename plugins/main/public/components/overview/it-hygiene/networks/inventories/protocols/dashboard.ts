@@ -1,77 +1,12 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { STYLE } from '../../../common/saved-vis/constants';
 import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
-import { SavedVis } from '../../../common/types';
-
-const getVisStateDHCPEnabledInterfacesMetric = (
-  indexPatternId: string,
-): SavedVis => {
-  return {
-    id: 'it-hygiene-network-interfaces-with-dhcp-enabled',
-    title: 'Interfaces with DHCP enabled',
-    type: 'metric',
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        invertColors: false,
-        style: STYLE,
-      },
-    },
-    data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {
-            customLabel: 'enabled',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'network.dhcp:true',
-                  language: 'kuery',
-                },
-                label: 'DHCP',
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
+  getVisStateDHCPEnabledInterfacesMetric,
+  getVisStateNetworkAveragePriorityMetric,
+} from '../common/dashboard';
 
 export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
+    getVisStateNetworkAveragePriorityMetric(indexPatternId),
     getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
   ]);
 };
