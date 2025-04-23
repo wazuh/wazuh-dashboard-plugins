@@ -46,14 +46,14 @@ export class WazuhElasticCtrl {
       settingsIndexPatterns.push(item.settingIndexPattern);
     });
 
-    const indexNames = [];
-    for (const settingsIndexPattern of settingsIndexPatterns) {
-      indexNames.push(
-        `${await context.wazuh_core.configuration.get(
+    const indexNames = await Promise.all(
+      settingsIndexPatterns.map(async settingsIndexPattern => {
+        const configValue = await context.wazuh_core.configuration.get(
           settingsIndexPattern,
-        )}sample-${category}`,
-      );
-    }
+        );
+        return `${configValue}sample-${category}`;
+      }),
+    );
 
     return indexNames;
   }
@@ -490,7 +490,7 @@ export class WazuhElasticCtrl {
       });
     } catch (error) {
       return ErrorResponse(
-        'Sample Alerts category not valid',
+        'Sample data category not valid',
         1000,
         500,
         response,
@@ -569,7 +569,10 @@ export class WazuhElasticCtrl {
         request.params.category,
       );
 
-      const sampleDocumentsResponse = [];
+      const sampleDocumentsResponse: Array<{
+        index: string;
+        sampleDataCount: number;
+      }> = [];
 
       try {
         await Promise.all(
@@ -580,29 +583,48 @@ export class WazuhElasticCtrl {
                   _index: indexName,
                 },
               });
-              const alertGenerateParams =
+              const sampleDataGenerateParams =
                 (request.body && request.body.params) || {};
 
-              const [sampleDataAndTemplate] =
-                WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[request.params.category]
-                  .map(typeSample => {
-                    if (
-                      indexName.includes(
-                        typeSample?.dataSet || WAZUH_ALERTS_PREFIX,
-                      )
-                    ) {
-                      return generateSampleData(
-                        { ...typeSample, ...alertGenerateParams },
-                        request.body.count ||
-                          typeSample.count ||
-                          WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
-                        context,
-                      );
-                    }
-                    return;
-                  })
-                  .filter(item => item !== undefined)
-                  .flat();
+              const mappedData = WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[
+                request.params.category
+              ]
+                .map((typeSample: { dataSet?: string; count?: number }) => {
+                  if (
+                    indexName.includes(
+                      typeSample?.dataSet || WAZUH_ALERTS_PREFIX,
+                    )
+                  ) {
+                    return generateSampleData(
+                      { ...typeSample, ...sampleDataGenerateParams },
+                      request.body.count ||
+                        typeSample.count ||
+                        WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
+                      context,
+                    );
+                  }
+                  return;
+                })
+                .filter(
+                  (item: { sampleData: []; template?: string } | undefined) =>
+                    item !== undefined,
+                )
+                .flat();
+
+              let sampleDataAndTemplate: {
+                sampleData: [];
+                template?: { index_patterns: string; order: number };
+              } = { sampleData: [] };
+
+              if (mappedData.length > 1) {
+                mappedData.forEach((item: { sampleData: [] }) =>
+                  sampleDataAndTemplate.sampleData.push(...item.sampleData),
+                );
+              }
+
+              if (mappedData.length === 1 && mappedData[0].template) {
+                sampleDataAndTemplate = mappedData[0];
+              }
 
               const { sampleData } = sampleDataAndTemplate;
 
@@ -653,15 +675,10 @@ export class WazuhElasticCtrl {
                 context.wazuh.logger.info(`Index ${indexName} created`);
               }
 
-              const response =
-                await context.core.opensearch.client.asCurrentUser.bulk({
-                  index: indexName,
-                  body: bulk,
-                });
-
-              if (response.body.errors) {
-                console.log(response.body.items[0].index.error);
-              }
+              await context.core.opensearch.client.asCurrentUser.bulk({
+                index: indexName,
+                body: bulk,
+              });
 
               context.wazuh.logger.info(
                 `Added sample data to ${indexName} index`,
