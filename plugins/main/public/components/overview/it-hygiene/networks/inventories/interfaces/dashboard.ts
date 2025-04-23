@@ -130,24 +130,99 @@ const getVisStateNetworkInterfacesStateInactive = (
   };
 };
 
+const getVisStateNetworkInterfacesStateUnknown = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'it-hygiene-network-interfaces-state-unknown',
+    title: 'Interfaces state Unknown',
+    type: 'metric',
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: 0,
+            to: 10000,
+          },
+        ],
+        labels: {
+          show: true,
+        },
+        invertColors: false,
+        style: STYLE,
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Unknown',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'observer.ingress.interface.state: Unknown',
+                  language: 'kuery',
+                },
+                label: 'Interfaces',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
+
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
+  const MAX_WIDTH = 48;
+  const COLS = 4;
+  const WIDTH = MAX_WIDTH / COLS;
   return {
     ...generateVisualization({
       key: '0',
-      width: 12,
+      width: WIDTH,
       height: HEIGHT,
-      positionX: 0,
+      positionX: WIDTH * 0,
       positionY: 0,
       savedVis:
         getVisStateNetworkInterfacesGlobalPacketLossRate(indexPatternId),
     }),
     ...generateVisualization({
       key: '1',
-      width: 12,
+      width: WIDTH,
       height: HEIGHT,
-      positionX: 12,
+      positionX: WIDTH * 1,
       positionY: 0,
       savedVis: getVisStateNetworkInterfacesStateInactive(indexPatternId),
+    }),
+    ...generateVisualization({
+      key: '2',
+      width: WIDTH,
+      height: HEIGHT,
+      positionX: WIDTH * 2,
+      positionY: 0,
+      savedVis: getVisStateNetworkInterfacesStateUnknown(indexPatternId),
     }),
   };
 };
