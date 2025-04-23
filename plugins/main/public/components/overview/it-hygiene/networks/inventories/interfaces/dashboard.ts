@@ -45,7 +45,18 @@ const getVisStateNetworkInterfacesGlobalPacketLossRate = (
           type: 'sum',
           params: {
             field: 'host.network.ingress.drops',
-            json: "{\r\n  \"script\": {\r\n    \"source\": \"double d=(doc['host.network.ingress.drops'].size()!=0?doc['host.network.ingress.drops'].value:0)+(doc['host.network.egress.drops'].size()!=0?doc['host.network.egress.drops'].value:0); double p=(doc['host.network.ingress.packets'].size()!=0?doc['host.network.ingress.packets'].value:0)+(doc['host.network.egress.packets'].size()!=0?doc['host.network.egress.packets'].value:0); return p==0?0:(d/p)*100;\",\r\n    \"lang\": \"painless\"\r\n  }\r\n}\r\n",
+            json: "\
+              {\
+                \"script\": {\
+                  \"source\": \" \
+                    double d=(doc['host.network.ingress.drops'].size() != 0 ? doc['host.network.ingress.drops'].value : 0) \
+                      + (doc['host.network.egress.drops'].size() != 0 ? doc['host.network.egress.drops'].value : 0); \
+                    double p=(doc['host.network.ingress.packets'].size() != 0 ? doc['host.network.ingress.packets'].value : 0) \
+                      + (doc['host.network.egress.packets'].size() != 0 ? doc['host.network.egress.packets'].value : 0); \
+                    return p == 0 ? 0 : (d/p);\", \
+                  \"lang\": \"painless\" \
+                }\
+              }",
             customLabel: 'Global packet loss rate',
           },
           schema: 'metric',
