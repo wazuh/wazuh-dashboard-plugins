@@ -1,3 +1,4 @@
+import { createDashboardPanelsKPIs } from '../../../common/create-dashboard-panels-kpis';
 import { generateVisualization } from '../../../common/create-new-visualization';
 import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -229,41 +230,10 @@ const getVisStateNetworkInterfacesWithDHCPEnabled = (
 };
 
 export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
-  const MAX_WIDTH = 48;
-  const COLS = 4;
-  const WIDTH = MAX_WIDTH / COLS;
-  return {
-    ...generateVisualization({
-      key: '0',
-      width: WIDTH,
-      height: HEIGHT,
-      positionX: WIDTH * 0,
-      positionY: 0,
-      savedVis: getVisStateNetworkByIP(indexPatternId),
-    }),
-    ...generateVisualization({
-      key: '1',
-      width: WIDTH,
-      height: HEIGHT,
-      positionX: WIDTH * 1,
-      positionY: 0,
-      savedVis: getVisStateNetworkAveragePriorityOfRoutes(indexPatternId),
-    }),
-    ...generateVisualization({
-      key: '2',
-      width: WIDTH,
-      height: HEIGHT,
-      positionX: WIDTH * 2,
-      positionY: 0,
-      savedVis: getVisStateUDPOnlyInterfacesMetric(indexPatternId),
-    }),
-    ...generateVisualization({
-      key: '3',
-      width: WIDTH,
-      height: HEIGHT,
-      positionX: WIDTH * 3,
-      positionY: 0,
-      savedVis: getVisStateNetworkInterfacesWithDHCPEnabled(indexPatternId),
-    }),
-  };
+  return createDashboardPanelsKPIs([
+    getVisStateNetworkByIP(indexPatternId),
+    getVisStateNetworkAveragePriorityOfRoutes(indexPatternId),
+    getVisStateUDPOnlyInterfacesMetric(indexPatternId),
+    getVisStateNetworkInterfacesWithDHCPEnabled(indexPatternId),
+  ]);
 };
