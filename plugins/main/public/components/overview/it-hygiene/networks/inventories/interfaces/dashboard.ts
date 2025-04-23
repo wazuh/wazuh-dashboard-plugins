@@ -194,6 +194,70 @@ const getVisStateNetworkInterfacesStateUnknown = (
   };
 };
 
+const getVisStateNetworkInterfacesTypeWireless = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'it-hygiene-network-interfaces-type-wireless',
+    title: 'Interfaces type Wireless',
+    type: 'metric',
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: 0,
+            to: 10000,
+          },
+        ],
+        labels: {
+          show: true,
+        },
+        invertColors: false,
+        style: STYLE,
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Wireless',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'observer.ingress.interface.type: wireless',
+                  language: 'kuery',
+                },
+                label: 'Interfaces type',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
+
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
   const MAX_WIDTH = 48;
   const COLS = 4;
@@ -223,6 +287,14 @@ export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
       positionX: WIDTH * 2,
       positionY: 0,
       savedVis: getVisStateNetworkInterfacesStateUnknown(indexPatternId),
+    }),
+    ...generateVisualization({
+      key: '3',
+      width: WIDTH,
+      height: HEIGHT,
+      positionX: WIDTH * 3,
+      positionY: 0,
+      savedVis: getVisStateNetworkInterfacesTypeWireless(indexPatternId),
     }),
   };
 };
