@@ -1,4 +1,4 @@
-import { createDashboardPanelsKPIs } from '../../../common/create-dashboard-panels-kpis';
+import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { generateVisualization } from '../../../common/create-new-visualization';
 import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -230,7 +230,7 @@ const getVisStateNetworkInterfacesWithDHCPEnabled = (
 };
 
 export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
-  return createDashboardPanelsKPIs([
+  return buildDashboardKPIPanels([
     getVisStateNetworkByIP(indexPatternId),
     getVisStateNetworkAveragePriorityOfRoutes(indexPatternId),
     getVisStateUDPOnlyInterfacesMetric(indexPatternId),

@@ -3,7 +3,7 @@ import { generateVisualization } from './create-new-visualization';
 import { HEIGHT } from './saved-vis/constants';
 import { SavedVis } from './types';
 
-export const createDashboardPanelsKPIs = (savedVises: SavedVis[]) => {
+export const buildDashboardKPIPanels = (savedVises: SavedVis[]) => {
   const WIDTH = DASHBOARD_WIDTH_LIMIT / savedVises.length;
   return savedVises.reduce((acc, savedVis, currentIndex) => {
     return {

@@ -1,4 +1,4 @@
-import { createDashboardPanelsKPIs } from '../../../common/create-dashboard-panels-kpis';
+import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { generateVisualization } from '../../../common/create-new-visualization';
 import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -261,7 +261,7 @@ const getVisStateNetworkInterfacesTypeWireless = (
 };
 
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
-  return createDashboardPanelsKPIs([
+  return buildDashboardKPIPanels([
     getVisStateNetworkInterfacesGlobalPacketLossRate(indexPatternId),
     getVisStateNetworkInterfacesStateInactive(indexPatternId),
     getVisStateNetworkInterfacesStateUnknown(indexPatternId),
