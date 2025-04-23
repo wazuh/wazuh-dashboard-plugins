@@ -7,7 +7,9 @@ import {
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { SavedVis } from '../../../common/types';
 
-const getVisStateNetworkByIP = (indexPatternId: string): SavedVis => {
+const getVisStateUniqueNetworkIPsVisualization = (
+  indexPatternId: string,
+): SavedVis => {
   return {
     id: 'it-hygiene-network-by-ip',
     title: 'Unique networks IPs',
@@ -53,7 +55,7 @@ const getVisStateNetworkByIP = (indexPatternId: string): SavedVis => {
   };
 };
 
-const getVisStateNetworkAveragePriorityOfRoutes = (
+const getVisStateNetworkAveragePriorityMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
@@ -101,9 +103,7 @@ const getVisStateNetworkAveragePriorityOfRoutes = (
   };
 };
 
-const getVisStateUDPOnlyInterfacesMetric = (
-  indexPatternId: string,
-): SavedVis => {
+const getVisStateForUDPPackets = (indexPatternId: string): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-only-udp',
     title: 'Interfaces operating only on UDP',
@@ -165,7 +165,7 @@ const getVisStateUDPOnlyInterfacesMetric = (
   };
 };
 
-const getVisStateNetworkInterfacesWithDHCPEnabled = (
+const getVisStateForDHCPEnabledInterfaces = (
   indexPatternId: string,
 ): SavedVis => {
   return {
@@ -231,9 +231,9 @@ const getVisStateNetworkInterfacesWithDHCPEnabled = (
 
 export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateNetworkByIP(indexPatternId),
-    getVisStateNetworkAveragePriorityOfRoutes(indexPatternId),
-    getVisStateUDPOnlyInterfacesMetric(indexPatternId),
-    getVisStateNetworkInterfacesWithDHCPEnabled(indexPatternId),
+    getVisStateUniqueNetworkIPsVisualization(indexPatternId),
+    getVisStateNetworkAveragePriorityMetric(indexPatternId),
+    getVisStateForUDPPackets(indexPatternId),
+    getVisStateForDHCPEnabledInterfaces(indexPatternId),
   ]);
 };
