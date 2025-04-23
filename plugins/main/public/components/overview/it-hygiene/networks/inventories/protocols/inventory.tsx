@@ -18,6 +18,7 @@ export const ITHygieneNetworksInventoryProtocols =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        tableID='it-hygiene-inventory-protocols'
       />
     );
   });

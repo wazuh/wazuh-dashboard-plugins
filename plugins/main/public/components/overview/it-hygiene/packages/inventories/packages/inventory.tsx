@@ -18,6 +18,7 @@ export const ITHygienePackagesInventoryPackages =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        tableID='it-hygiene-inventory-packages'
       />
     );
   });

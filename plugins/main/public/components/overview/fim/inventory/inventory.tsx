@@ -138,6 +138,7 @@ const InventoryFIMDashboard = withDataSourceInitiated({
               return [filesEventsDocumentDetailsTab({ document, agent })];
             }}
             displayOnlyNoResultsCalloutOnNoResults={true}
+            tableID='fim-inventory-files'
           />
         </WzTableFlexItem>
       </WzTableFlexGroup>
@@ -167,6 +168,7 @@ const InventoryFIMDashboard = withDataSourceInitiated({
               return [registriesEventsDocumentDetailsTab({ document, agent })];
             }}
             displayOnlyNoResultsCalloutOnNoResults={true}
+            tableID='fim-inventory-registries'
           />
         </WzTableFlexItem>
       </WzTableFlexGroup>

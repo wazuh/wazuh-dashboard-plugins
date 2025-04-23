@@ -18,6 +18,7 @@ export const ITHygieneSystemInventoryHardware =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        tableID='it-hygiene-inventory-hardware'
       />
     );
   });

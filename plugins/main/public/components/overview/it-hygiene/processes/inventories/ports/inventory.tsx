@@ -18,6 +18,7 @@ export const ITHygieneProccessesInventoryPorts =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        tableID='it-hygiene-inventory-ports'
       />
     );
   });

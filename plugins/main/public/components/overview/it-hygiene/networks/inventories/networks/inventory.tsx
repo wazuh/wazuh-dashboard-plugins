@@ -24,6 +24,7 @@ export const ITHygieneNetworksInventoryNetworks =
           tableDefaultColumns={tableColumns}
           managedFilters={managedFilters}
           getDashboardPanels={getOverviewNetworksNetworksTab}
+          tableID='it-hygiene-inventory-networks'
         />
       );
     },

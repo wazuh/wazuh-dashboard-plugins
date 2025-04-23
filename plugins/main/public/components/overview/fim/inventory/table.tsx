@@ -41,6 +41,7 @@ export const WzTableUseParentDataSource = compose(
     title,
     inspectDetailsTitle,
     additionalDocumentDetailsTabs,
+    tableID,
   }) => (
     <EnhancedTableUseParentDataSourceSearchBar
       dataSource={dataSource}
@@ -60,6 +61,7 @@ export const WzTableUseParentDataSource = compose(
       inspectDetailsTitle={inspectDetailsTitle}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       showSearchBar={false}
+      tableID={tableID}
     />
   ),
 );

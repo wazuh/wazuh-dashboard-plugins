@@ -18,6 +18,7 @@ export const ITHygieneProccessesInventoryProcesses =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        tableID='it-hygiene-inventory-processes'
       />
     );
   });
