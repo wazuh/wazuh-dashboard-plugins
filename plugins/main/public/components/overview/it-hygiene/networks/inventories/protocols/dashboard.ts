@@ -6,7 +6,7 @@ import {
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { SavedVis } from '../../../common/types';
 
-const getVisStateForDHCPEnabledNetworkMetrics = (
+const getVisStateDHCPEnabledInterfacesMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
@@ -72,6 +72,6 @@ const getVisStateForDHCPEnabledNetworkMetrics = (
 
 export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateForDHCPEnabledNetworkMetrics(indexPatternId),
+    getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
   ]);
 };
