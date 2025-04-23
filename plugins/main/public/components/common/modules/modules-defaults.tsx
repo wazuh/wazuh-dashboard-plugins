@@ -105,6 +105,7 @@ export const ModulesDefaults = {
         component: DashboardThreatHunting,
       },
       renderDiscoverTab({
+        moduleId: 'threat-hunting',
         tableColumns: threatHuntingColumns,
         DataSource: ThreatHuntingDataSource,
       }),
@@ -127,6 +128,7 @@ export const ModulesDefaults = {
         component: InventoryFIM,
       },
       renderDiscoverTab({
+        moduleId: 'fim',
         tableColumns: fileIntegrityMonitoringColumns,
         DataSource: FIMDataSource,
       }),
@@ -143,6 +145,7 @@ export const ModulesDefaults = {
         component: DashboardAWS,
       },
       renderDiscoverTab({
+        moduleId: 'aws',
         tableColumns: amazonWebServicesColumns,
         DataSource: AWSDataSource,
       }),
@@ -159,6 +162,7 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
       },
       renderDiscoverTab({
+        moduleId: 'gcp',
         tableColumns: googleCloudColumns,
         DataSource: GoogleCloudDataSource,
       }),
@@ -176,6 +180,7 @@ export const ModulesDefaults = {
         component: DashboardMalwareDetection,
       },
       renderDiscoverTab({
+        moduleId: 'pm',
         tableColumns: malwareDetectionColumns,
         DataSource: MalwareDetectionDataSource,
       }),
@@ -198,6 +203,7 @@ export const ModulesDefaults = {
         component: MainSca,
       },
       renderDiscoverTab({
+        moduleId: 'sca',
         tableColumns: configurationAssessmentColumns,
         DataSource: ConfigurationAssessmentDataSource,
       }),
@@ -221,6 +227,7 @@ export const ModulesDefaults = {
         component: OfficePanel,
       },
       renderDiscoverTab({
+        moduleId: 'office',
         tableColumns: office365Columns,
         DataSource: Office365DataSource,
       }),
@@ -243,6 +250,7 @@ export const ModulesDefaults = {
         component: GitHubPanel,
       },
       renderDiscoverTab({
+        moduleId: 'github',
         tableColumns: githubColumns,
         DataSource: GitHubDataSource,
       }),
@@ -281,6 +289,7 @@ export const ModulesDefaults = {
         ],
       },
       renderDiscoverTab({
+        moduleId: 'vuls',
         tableColumns: vulnerabilitiesColumns,
         DataSource: AlertsVulnerabilitiesDataSource,
       }),
@@ -309,6 +318,7 @@ export const ModulesDefaults = {
         component: MainMitre,
       },
       renderDiscoverTab({
+        moduleId: 'mitre',
         DataSource: MitreAttackDataSource,
         tableColumns: mitreAttackColumns,
       }),
@@ -325,6 +335,7 @@ export const ModulesDefaults = {
         component: DashboardDocker,
       },
       renderDiscoverTab({
+        moduleId: 'docker',
         tableColumns: dockerColumns,
         DataSource: DockerDataSource,
       }),
@@ -349,6 +360,7 @@ export const ModulesDefaults = {
         ),
       },
       renderDiscoverTab({
+        moduleId: 'pci',
         tableColumns: pciColumns,
         DataSource: PCIDSSDataSource,
       }),
@@ -373,6 +385,7 @@ export const ModulesDefaults = {
         ),
       },
       renderDiscoverTab({
+        moduleId: 'hipaa',
         tableColumns: hipaaColumns,
         DataSource: HIPAADataSource,
       }),
@@ -397,6 +410,7 @@ export const ModulesDefaults = {
         ),
       },
       renderDiscoverTab({
+        moduleId: 'nist',
         tableColumns: nistColumns,
         DataSource: NIST80053DataSource,
       }),
@@ -421,6 +435,7 @@ export const ModulesDefaults = {
         ),
       },
       renderDiscoverTab({
+        moduleId: 'gdpr',
         tableColumns: gdprColumns,
         DataSource: GDPRDataSource,
       }),
@@ -445,6 +460,7 @@ export const ModulesDefaults = {
         ),
       },
       renderDiscoverTab({
+        moduleId: 'tsc',
         tableColumns: tscColumns,
         DataSource: TSCDataSource,
       }),
