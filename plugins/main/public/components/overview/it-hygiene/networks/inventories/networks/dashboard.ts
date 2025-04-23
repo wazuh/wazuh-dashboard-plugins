@@ -229,37 +229,40 @@ const getVisStateNetworkInterfacesWithDHCPEnabled = (
 };
 
 export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
+  const MAX_WIDTH = 48;
+  const COLS = 4;
+  const WIDTH = MAX_WIDTH / COLS;
   return {
     ...generateVisualization({
       key: '0',
-      width: 12,
+      width: WIDTH,
       height: HEIGHT,
-      positionX: 0,
+      positionX: WIDTH * 0,
       positionY: 0,
       savedVis: getVisStateNetworkByIP(indexPatternId),
     }),
     ...generateVisualization({
       key: '1',
-      width: 12,
+      width: WIDTH,
       height: HEIGHT,
-      positionX: 12,
+      positionX: WIDTH * 1,
       positionY: 0,
       savedVis: getVisStateNetworkAveragePriorityOfRoutes(indexPatternId),
     }),
     ...generateVisualization({
       key: '2',
-      width: 12,
+      width: WIDTH,
       height: HEIGHT,
-      positionX: 24,
-      positionY: 6,
+      positionX: WIDTH * 2,
+      positionY: 0,
       savedVis: getVisStateUDPOnlyInterfacesMetric(indexPatternId),
     }),
     ...generateVisualization({
       key: '3',
-      width: 12,
+      width: WIDTH,
       height: HEIGHT,
-      positionX: 36,
-      positionY: 6,
+      positionX: WIDTH * 3,
+      positionY: 0,
       savedVis: getVisStateNetworkInterfacesWithDHCPEnabled(indexPatternId),
     }),
   };
