@@ -9,3 +9,4 @@ export const DEFAULT_PAGINATION_OPTIONS = {
   pageSize: DEFAULT_PAGE_SIZE,
   pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
 } as const satisfies PaginationOptions;
+export const ALWAYS_VISIBLE_COLUMNS = ['agent.name'];

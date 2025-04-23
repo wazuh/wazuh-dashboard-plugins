@@ -3,7 +3,7 @@ import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
 import { DataGridColumn } from './types';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
-import { DEFAULT_PAGE_SIZE } from './constants';
+import { DEFAULT_PAGE_SIZE, ALWAYS_VISIBLE_COLUMNS } from './constants';
 
 interface UseDataGridColumnsProps {
   appId: string;
@@ -165,12 +165,18 @@ function useDataGridColumns({
     [visibleColumns, JSON.stringify(columnSchemaDefinitionsMap), appId],
   );
 
-  return {
-    // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
-    columnsAvailable: orderFirstMatchedColumns(
+  const columnsAvailable = useMemo(() => {
+    let excludedColumns: string[] = ALWAYS_VISIBLE_COLUMNS;
+
+    return orderFirstMatchedColumns(
       Object.values(columnSchemaDefinitionsMap),
       visibleColumns,
-    ),
+    ).filter(column => !excludedColumns.includes(column.id));
+  }, [columnSchemaDefinitionsMap, visibleColumns]);
+
+  return {
+    // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
+    columnsAvailable,
     columns: retrieveVisibleDataGridColumns,
     columnVisibility: {
       visibleColumns,
