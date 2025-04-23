@@ -9,7 +9,7 @@ export const createDashboardPanelsKPIs = (savedVises: SavedVis[]) => {
     return {
       ...acc,
       ...generateVisualization({
-        key: currentIndex.toString(),
+        key: savedVis.id + currentIndex.toString(),
         width: WIDTH,
         height: HEIGHT,
         positionX: WIDTH * currentIndex,
