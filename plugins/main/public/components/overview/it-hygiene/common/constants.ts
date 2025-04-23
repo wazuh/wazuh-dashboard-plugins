@@ -1,1 +1,1 @@
-export const MAX_WIDTH_DASHBOARD = 48;
+export const DASHBOARD_WIDTH_LIMIT = 48;
