@@ -1,3 +1,4 @@
+import { createDashboardPanelsKPIs } from '../../../common/create-dashboard-panels-kpis';
 import { generateVisualization } from '../../../common/create-new-visualization';
 import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -260,42 +261,10 @@ const getVisStateNetworkInterfacesTypeWireless = (
 };
 
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
-  const MAX_WIDTH = 48;
-  const COLS = 4;
-  const WIDTH = MAX_WIDTH / COLS;
-  return {
-    ...generateVisualization({
-      key: '0',
-      width: WIDTH,
-      height: HEIGHT,
-      positionX: WIDTH * 0,
-      positionY: 0,
-      savedVis:
-        getVisStateNetworkInterfacesGlobalPacketLossRate(indexPatternId),
-    }),
-    ...generateVisualization({
-      key: '1',
-      width: WIDTH,
-      height: HEIGHT,
-      positionX: WIDTH * 1,
-      positionY: 0,
-      savedVis: getVisStateNetworkInterfacesStateInactive(indexPatternId),
-    }),
-    ...generateVisualization({
-      key: '2',
-      width: WIDTH,
-      height: HEIGHT,
-      positionX: WIDTH * 2,
-      positionY: 0,
-      savedVis: getVisStateNetworkInterfacesStateUnknown(indexPatternId),
-    }),
-    ...generateVisualization({
-      key: '3',
-      width: WIDTH,
-      height: HEIGHT,
-      positionX: WIDTH * 3,
-      positionY: 0,
-      savedVis: getVisStateNetworkInterfacesTypeWireless(indexPatternId),
-    }),
-  };
+  return createDashboardPanelsKPIs([
+    getVisStateNetworkInterfacesGlobalPacketLossRate(indexPatternId),
+    getVisStateNetworkInterfacesStateInactive(indexPatternId),
+    getVisStateNetworkInterfacesStateUnknown(indexPatternId),
+    getVisStateNetworkInterfacesTypeWireless(indexPatternId),
+  ]);
 };
