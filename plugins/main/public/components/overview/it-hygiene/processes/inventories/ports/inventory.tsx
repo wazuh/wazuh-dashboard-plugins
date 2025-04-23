@@ -7,6 +7,7 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryPortsDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
+import { getOverviewProcessesProcessesTab } from '../processes/dashboard';
 
 export const ITHygieneProccessesInventoryPorts =
   withSystemInventoryPortsDataSource(props => {
@@ -18,6 +19,7 @@ export const ITHygieneProccessesInventoryPorts =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        getDashboardPanels={getOverviewProcessesProcessesTab}
       />
     );
   });
