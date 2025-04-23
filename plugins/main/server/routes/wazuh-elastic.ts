@@ -83,7 +83,7 @@ export function WazuhElasticRoutes(router: IRouter) {
       validate: false,
     },
     async (context, request, response) =>
-      ctrl.haveSampleAlerts(context, request, response),
+      ctrl.haveSampleData(context, request, response),
   );
 
   router.get(
@@ -96,7 +96,7 @@ export function WazuhElasticRoutes(router: IRouter) {
       },
     },
     async (context, request, response) =>
-      ctrl.haveSampleAlertsOfCategory(context, request, response),
+      ctrl.haveSampleDataOfCategory(context, request, response),
   );
 
   router.post(
@@ -123,7 +123,7 @@ export function WazuhElasticRoutes(router: IRouter) {
       },
     },
     async (context, request, response) =>
-      ctrl.deleteSampleAlerts(context, request, response),
+      ctrl.deleteSampleData(context, request, response),
   );
 
   router.post(

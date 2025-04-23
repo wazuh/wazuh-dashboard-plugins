@@ -443,20 +443,20 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * This checks if there is sample alerts
+   * This checks if there is sample data
    * GET /indexer/sampledata
    * @param {*} context
    * @param {*} request
    * @param {*} response
-   * {alerts: [...]} or ErrorResponse
+   * {data: [...]} or ErrorResponse
    */
-  async haveSampleAlerts(
+  async haveSampleData(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      // Check if wazuh sample alerts index exists
+      // Check if wazuh sample data index exists
       const categoryPromises = Object.keys(
         WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
       ).map(async category => {
@@ -486,7 +486,7 @@ export class WazuhElasticCtrl {
       const results = await Promise.all(categoryPromises);
 
       return response.ok({
-        body: { sampleAlertsInstalled: results.some(result => result) },
+        body: { sampleDataInstalled: results.some(result => result) },
       });
     } catch (error) {
       return ErrorResponse(
@@ -498,26 +498,26 @@ export class WazuhElasticCtrl {
     }
   }
   /**
-   * This creates sample alerts in wazuh-sample-alerts
+   * This creates sample data in wazuh-sample-data
    * GET /indexer/sampledata/{category}
    * @param {*} context
    * @param {*} request
    * @param {*} response
    * {alerts: [...]} or ErrorResponse
    */
-  async haveSampleAlertsOfCategory(
+  async haveSampleDataOfCategory(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest<{ category: string }>,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+      const sampleDataIndex = await this.buildSampleIndexByCategory(
         context,
         request.params.category,
       );
-      // Check if wazuh sample alerts index exists
+      // Check if wazuh sample data index exists
       const existsSampleIndex = await Promise.all(
-        sampleAlertsIndex.map(async indexName => {
+        sampleDataIndex.map(async indexName => {
           return await context.core.opensearch.client.asCurrentUser.indices.exists(
             {
               index: indexName,
@@ -527,20 +527,20 @@ export class WazuhElasticCtrl {
       );
       return response.ok({
         body: {
-          index: sampleAlertsIndex,
+          index: sampleDataIndex,
           exists: existsSampleIndex.some(result => result.body),
         },
       });
     } catch (error) {
       context.wazuh.logger.error(
-        `Error checking if there are sample alerts indices: ${
+        `Error checking if there are sample data indices: ${
           error.message || error
         }`,
       );
 
       const [statusCode, errorMessage] = this.getErrorDetails(error);
       return ErrorResponse(
-        `Error checking if there are sample alerts indices: ${
+        `Error checking if there are sample data indices: ${
           errorMessage || error
         }`,
         1000,
@@ -550,7 +550,7 @@ export class WazuhElasticCtrl {
     }
   }
   /**
-   * This creates sample alerts in wazuh-sample-alerts
+   * This creates sample data in wazuh-sample-data
    * POST /indexer/sampledata/{category}
    * {
    *   "manager": {
@@ -564,7 +564,7 @@ export class WazuhElasticCtrl {
    * @param {*} context
    * @param {*} request
    * @param {*} response
-   * {index: string, alerts: [...], count: number} or ErrorResponse
+   * {index: string, data: [...], count: number} or ErrorResponse
    */
   createSampleData = routeDecoratorProtectedAdministrator(1000)(
     async (
@@ -640,9 +640,9 @@ export class WazuhElasticCtrl {
                 .map(document => `${bulkPrefix}\n${JSON.stringify(document)}\n`)
                 .join('');
 
-              // Index alerts
+              // Index data
 
-              // Check if wazuh sample alerts index exists
+              // Check if wazuh sample data index exists
               const existsSampleIndex =
                 await context.core.opensearch.client.asCurrentUser.indices.exists(
                   {
@@ -721,42 +721,42 @@ export class WazuhElasticCtrl {
     },
   );
   /**
-   * This deletes sample alerts
+   * This deletes sample data
    * @param {*} context
    * @param {*} request
    * @param {*} response
    * {result: "deleted", index: string} or ErrorResponse
    */
-  deleteSampleAlerts = routeDecoratorProtectedAdministrator(1000)(
+  deleteSampleData = routeDecoratorProtectedAdministrator(1000)(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest<{ category: string }>,
       response: OpenSearchDashboardsResponseFactory,
     ) => {
-      // Delete Wazuh sample alert index
-      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+      // Delete Wazuh sample data index
+      const sampleDataIndex = await this.buildSampleIndexByCategory(
         context,
         request.params.category,
       );
 
       try {
-        // Check if Wazuh sample alerts index exists
+        // Check if Wazuh sample data index exists
         const existsSampleIndex =
           await context.core.opensearch.client.asCurrentUser.indices.exists({
-            index: sampleAlertsIndex,
+            index: sampleDataIndex,
           });
         if (existsSampleIndex.body) {
-          // Delete Wazuh sample alerts index
+          // Delete Wazuh sample data index
           await context.core.opensearch.client.asCurrentUser.indices.delete({
-            index: sampleAlertsIndex,
+            index: sampleDataIndex,
           });
-          context.wazuh.logger.info(`Deleted ${sampleAlertsIndex} index`);
+          context.wazuh.logger.info(`Deleted ${sampleDataIndex} index`);
           return response.ok({
-            body: { result: 'deleted', index: sampleAlertsIndex },
+            body: { result: 'deleted', index: sampleDataIndex },
           });
         } else {
           return ErrorResponse(
-            `${sampleAlertsIndex} index doesn't exist`,
+            `${sampleDataIndex} index doesn't exist`,
             1000,
             500,
             response,
@@ -764,7 +764,7 @@ export class WazuhElasticCtrl {
         }
       } catch (error) {
         context.wazuh.logger.error(
-          `Error deleting sample alerts of ${sampleAlertsIndex} index: ${
+          `Error deleting sample data of ${sampleDataIndex} index: ${
             error.message || error
           }`,
         );
