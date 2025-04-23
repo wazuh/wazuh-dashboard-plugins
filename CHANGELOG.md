@@ -8,8 +8,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.13.0
 - Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
-- Added hardware and system information to agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
-- Added `fim.pattern` and `system_inventory.pattern` settings [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Added settings to manage the FIM and IT Hygiene inventories data [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 
 ### Removed
 
