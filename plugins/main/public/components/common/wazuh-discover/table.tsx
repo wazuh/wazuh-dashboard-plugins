@@ -296,7 +296,7 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
     displayOnlyNoResultsCalloutOnNoResults,
     title,
     showSearchBar,
-    tableId,
+    tableID,
   }: EnhancedTableUseParentDataSourceSearchBarProps) => {
     const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
@@ -329,7 +329,7 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
     };
 
     const dataGridProps = useDataGrid({
-      moduleId: tableId,
+      moduleId: tableID,
       ariaLabelledBy: 'Table',
       defaultColumns: tableDefaultColumns,
       renderColumns: wzDiscoverRenderColumns,
