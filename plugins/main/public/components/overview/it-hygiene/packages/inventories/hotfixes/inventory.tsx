@@ -7,6 +7,7 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryHotfixesDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
+import { getOverviewPackagesHotfixesTab } from './dashboard';
 
 export const ITHygienePackagesInventoryHotfixes =
   withSystemInventoryHotfixesDataSource(props => {
@@ -19,6 +20,7 @@ export const ITHygienePackagesInventoryHotfixes =
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
         managedFiltersProps={{ style: { flexGrow: 0.25, minWidth: '300px' } }}
+        getDashboardPanels={getOverviewPackagesHotfixesTab}
         tableID='it-hygiene-inventory-hotfixes'
       />
     );

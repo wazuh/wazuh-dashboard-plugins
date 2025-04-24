@@ -9,6 +9,7 @@ export const getVisStatePieByField = (
   field: string,
   title: string,
   visIDPrefix: string,
+  orderAggregation: 'asc' | 'desc' = 'desc',
 ) => {
   return {
     id: `${visIDPrefix}-${field}`,
@@ -45,8 +46,127 @@ export const getVisStatePieByField = (
           params: {
             field: field,
             orderBy: '1',
-            order: 'desc',
+            order: orderAggregation,
             size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+          schema: 'segment',
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateHorizontalBarByField = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  orderAggregation: 'asc' | 'desc' = 'desc',
+) => {
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title: title,
+    type: 'horizontal_bar',
+    params: {
+      type: 'histogram',
+      grid: {
+        categoryLines: false,
+      },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+          },
+          labels: {
+            show: true,
+            rotate: 0,
+            filter: false,
+            truncate: 200,
+          },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+            mode: 'normal',
+          },
+          labels: {
+            show: true,
+            rotate: 75,
+            filter: true,
+            truncate: 100,
+          },
+          title: {
+            text: 'Count',
+          },
+        },
+      ],
+      seriesParams: [
+        {
+          show: true,
+          type: 'histogram',
+          mode: 'normal',
+          data: {
+            label: 'Count',
+            id: '1',
+          },
+          valueAxis: 'ValueAxis-1',
+          drawLinesBetweenPoints: true,
+          lineWidth: 2,
+          showCircles: true,
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      labels: {},
+      thresholdLine: {
+        show: false,
+        value: 10,
+        width: 1,
+        style: 'full',
+        color: '#E7664C',
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {},
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: field,
+            orderBy: '1',
+            order: orderAggregation,
+            size: 5,
             otherBucket: false,
             otherBucketLabel: 'Other',
             missingBucket: false,
