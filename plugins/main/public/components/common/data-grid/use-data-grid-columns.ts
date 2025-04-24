@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
+import { IndexPattern } from 'src/plugins/data/public';
 import { tDataGridColumn } from './types';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
@@ -8,8 +9,7 @@ import { DEFAULT_PAGE_SIZE } from './constants';
 interface UseDataGridColumnsProps {
   moduleId: string;
   defaultColumns: EuiDataGridColumn[];
-  columnSchemaDefinitionsMap: Record<string, tDataGridColumn>;
-  indexPatternExists: boolean;
+  indexPattern: IndexPattern;
 }
 
 export interface DataGridColumnsReturn {
@@ -22,9 +22,16 @@ export interface DataGridColumnsReturn {
 function useDataGridColumns({
   moduleId,
   defaultColumns,
-  columnSchemaDefinitionsMap,
-  indexPatternExists,
+  indexPattern,
 }: UseDataGridColumnsProps) {
+  const indexPatternExists = !!indexPattern;
+  const columnSchemaDefinitionsMap: Record<string, tDataGridColumn> =
+    Object.fromEntries(
+      indexPattern?.fields.map(field => [
+        field.name,
+        { ...field, id: field.name },
+      ]) || [],
+    );
   const defaultColumnsIds: string[] =
     defaultColumns.map(column => column.id as string) || [];
   const [visibleColumns, setVisibleColumns] =
@@ -36,10 +43,9 @@ function useDataGridColumns({
     defaultState: {
       columns: defaultColumnsIds,
       columnWidths: {},
-      pageSize: DEFAULT_PAGE_SIZE, // TODO: move this
+      pageSize: DEFAULT_PAGE_SIZE,
     },
     columnSchemaDefinitionsMap,
-    indexPatternExists,
   });
 
   // Prevent infinite loop by checking if visibleColumns actually need updating
@@ -151,26 +157,28 @@ function useDataGridColumns({
     }
   };
 
-  const retrieveVisibleDataGridColumns = useMemo(
-    (): EuiDataGridColumn[] =>
-      visibleColumns.map((columnId: string) => {
-        let column = { ...columnSchemaDefinitionsMap[columnId] };
-        const savedColumnWidth =
-          dataGridStateManager.retrieveState().columnWidths[columnId];
+  // Don't use `useMemo` here because otherwise the DataGrid cell filter doesn't work
+  const retrieveVisibleDataGridColumns = visibleColumns.map(
+    (columnId: string) => {
+      let column = { ...columnSchemaDefinitionsMap[columnId] };
+      const savedColumnWidth =
+        dataGridStateManager.retrieveState().columnWidths[columnId];
 
-        if (savedColumnWidth) {
-          column.initialWidth = savedColumnWidth;
-        }
+      if (savedColumnWidth) {
+        column.initialWidth = savedColumnWidth;
+      }
 
-        return column;
-      }),
-    [visibleColumns, JSON.stringify(columnSchemaDefinitionsMap), moduleId],
+      return column;
+    },
   );
 
   return {
     // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
     columnsAvailable: orderFirstMatchedColumns(
-      Object.values(columnSchemaDefinitionsMap),
+      Object.values(columnSchemaDefinitionsMap).map(column => ({
+        ...column,
+        id: column.name,
+      })),
       visibleColumns,
     ),
     columns: retrieveVisibleDataGridColumns,

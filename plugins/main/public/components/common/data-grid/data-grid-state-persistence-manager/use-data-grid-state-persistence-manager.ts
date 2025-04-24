@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { DataGridState, DataGridStatePersistenceManager } from './types';
 import { DEFAULT_PAGE_SIZE } from '../constants';
+import { tDataGridColumn } from '../types';
 
 const MINIMUM_COLUMN_WIDTH = 40;
 const MAXIMUM_COLUMN_WIDTH = 1000;
@@ -8,15 +9,13 @@ const MAXIMUM_COLUMN_WIDTH = 1000;
 interface UseDataGridStateManagementProps {
   stateManagement: ReturnType<DataGridStatePersistenceManager<DataGridState>>;
   defaultState: DataGridState;
-  columnSchemaDefinitionsMap: Record<string, unknown>;
-  indexPatternExists: boolean;
+  columnSchemaDefinitionsMap: Record<string, tDataGridColumn>;
 }
 
 const useDataGridStatePersistenceManager = ({
   stateManagement,
   defaultState,
   columnSchemaDefinitionsMap,
-  indexPatternExists,
 }: UseDataGridStateManagementProps) => {
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
@@ -31,7 +30,6 @@ const useDataGridStatePersistenceManager = ({
 
       // Only perform column existence validation if allColumns is initialized and has items
       if (
-        indexPatternExists &&
         columnSchemaDefinitionsMap &&
         Object.keys(columnSchemaDefinitionsMap).length > 0
       ) {
@@ -59,7 +57,7 @@ const useDataGridStatePersistenceManager = ({
       return true;
     },
     // Create state management with memoized validation function
-    [indexPatternExists],
+    [columnSchemaDefinitionsMap],
   );
 
   const validateColumnsState = (columnIds: DataGridState['columns']) => {
