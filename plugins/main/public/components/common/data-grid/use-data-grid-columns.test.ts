@@ -22,10 +22,12 @@ describe('useDataGridColumns', () => {
     { id: 'col2', display: 'Column 2' },
   ];
   // Add a mapping for column definitions
-  const columnSchemaDefinitionsMap = {
-    col1: { id: 'col1', display: 'Column 1' },
-    col2: { id: 'col2', display: 'Column 2' },
-    col3: { id: 'col3', display: 'Column 3' },
+  const indexPattern = {
+    fields: [
+      { name: 'col1', display: 'Column 1' },
+      { name: 'col2', display: 'Column 2' },
+      { name: 'col3', display: 'Column 3' },
+    ],
   };
   const columnSchemaDefinitions: tDataGridColumn[] = [
     { id: 'col1', display: 'Column 1' },
@@ -59,8 +61,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
 
@@ -83,8 +84,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
 
@@ -98,8 +98,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
     const newVisibleColumns = ['col2', 'col3'];
@@ -128,16 +127,15 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
 
     // First columns should be the visible ones in the correct order
-    expect(result.current.columnsAvailable[0].id).toBe('col2');
-    expect(result.current.columnsAvailable[1].id).toBe('col1');
+    expect(result.current.columnsAvailable[0].name).toBe('col2');
+    expect(result.current.columnsAvailable[1].name).toBe('col1');
     // The last column should be col3 which is defined in columnSchemaDefinitions but not in visibleColumns
-    expect(result.current.columnsAvailable[2].id).toBe('col3');
+    expect(result.current.columnsAvailable[2].name).toBe('col3');
     // Ensure all columns from columnSchemaDefinitions are present
     expect(result.current.columnsAvailable.length).toBe(
       columnSchemaDefinitions.length,
@@ -162,8 +160,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
 
@@ -199,8 +196,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
 
@@ -232,8 +228,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
     const testColumnId = 'col1';
@@ -269,8 +264,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
 
@@ -329,8 +323,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
 
@@ -362,8 +355,7 @@ describe('useDataGridColumns', () => {
       useDataGridColumns({
         moduleId,
         defaultColumns,
-        columnSchemaDefinitionsMap,
-        indexPatternExists: true,
+        indexPattern,
       }),
     );
 
