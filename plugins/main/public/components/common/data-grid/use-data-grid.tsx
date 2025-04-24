@@ -131,7 +131,8 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       columnWidths: {},
       pageSize: paginationProps.pageSize || DEFAULT_PAGE_SIZE,
     },
-    columnSchemaDefinitionsMap: Object.fromEntries(indexPattern?.fields.map(field => [field.name, field]) || []),
+    columnSchemaDefinitionsMap,
+    indexPatternExists: !!indexPattern,
   });
 
   useEffect(() => {
@@ -146,7 +147,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       moduleId,
       defaultColumns,
       columnSchemaDefinitionsMap,
-      indexPattern,
+      indexPatternExists: !!indexPattern,
     });
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) => {

@@ -1,6 +1,5 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
-import { IndexPattern } from 'src/plugins/data/public'
 import { tDataGridColumn } from './types';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
@@ -9,7 +8,8 @@ import { DEFAULT_PAGE_SIZE } from './constants';
 interface UseDataGridColumnsProps {
   moduleId: string;
   defaultColumns: EuiDataGridColumn[];
-  indexPattern: IndexPattern;
+  columnSchemaDefinitionsMap: Record<string, tDataGridColumn>;
+  indexPatternExists: boolean;
 }
 
 export interface DataGridColumnsReturn {
@@ -22,10 +22,9 @@ export interface DataGridColumnsReturn {
 function useDataGridColumns({
   moduleId,
   defaultColumns,
-  indexPattern,
+  columnSchemaDefinitionsMap,
+  indexPatternExists,
 }: UseDataGridColumnsProps) {
-  const indexPatternExists = !!indexPattern;
-  const columnSchemaDefinitionsMap = Object.fromEntries(indexPattern?.fields.map(field => [field.name, field]) || []);
   const defaultColumnsIds: string[] =
     defaultColumns.map(column => column.id as string) || [];
   const [visibleColumns, setVisibleColumns] =
@@ -40,6 +39,7 @@ function useDataGridColumns({
       pageSize: DEFAULT_PAGE_SIZE,
     },
     columnSchemaDefinitionsMap,
+    indexPatternExists,
   });
 
   // Prevent infinite loop by checking if visibleColumns actually need updating
