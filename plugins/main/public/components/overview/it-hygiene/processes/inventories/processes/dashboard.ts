@@ -89,7 +89,7 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
     getVisStatePieByField(
       indexPatternId,
       'process.state',
-      'State',
+      'States',
       'it-hygiene-packages',
     ),
   ]);

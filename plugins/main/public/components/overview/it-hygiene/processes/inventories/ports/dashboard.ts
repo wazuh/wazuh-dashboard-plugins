@@ -150,7 +150,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
     getVisStatePieByField(
       indexPatternId,
       'interface.state',
-      'State',
+      'States',
       'it-hygiene-ports',
     ),
     getVisStatePieByField(
