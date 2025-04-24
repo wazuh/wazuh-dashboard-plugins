@@ -7,6 +7,7 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryHardwareDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
+import { getOverviewSystemHardwareTab } from './dashboard';
 
 export const ITHygieneSystemInventoryHardware =
   withSystemInventoryHardwareDataSource(props => {
@@ -18,6 +19,7 @@ export const ITHygieneSystemInventoryHardware =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        getDashboardPanels={getOverviewSystemHardwareTab}
         tableID='it-hygiene-inventory-hardware'
       />
     );

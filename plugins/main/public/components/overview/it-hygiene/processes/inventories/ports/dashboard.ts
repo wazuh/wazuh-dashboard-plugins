@@ -1,22 +1,20 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { generateVisualization } from '../../../common/create-new-visualization';
-import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
+import { STYLE } from '../../../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { SavedVis } from '../../../common/types';
-import {
-  getVisStateDHCPEnabledInterfacesMetric,
-  getVisStateNetworkAveragePriorityMetric,
-} from '../common/dashboard';
 
-const getVisStateUniqueNetworkIPsMetric = (
+type InterfaceState = 'LISTEN' | 'ESTABLISHED';
+
+const getVisStateInterfaceState = (
   indexPatternId: string,
+  interfaceState: InterfaceState,
 ): SavedVis => {
   return {
-    id: 'it-hygiene-network-by-ip',
-    title: 'Unique networks IPs',
+    id: `it-hygiene-network-interfaces-${interfaceState}`,
+    title: `Interfaces in ${interfaceState} state`,
     type: 'metric',
     params: {
       addTooltip: true,
@@ -43,28 +41,45 @@ const getVisStateUniqueNetworkIPsMetric = (
     data: {
       searchSource: createSearchSource(indexPatternId),
       references: createIndexPatternReferences(indexPatternId),
+
       aggs: [
         {
           id: '1',
           enabled: true,
-          type: 'cardinality',
+          type: 'count',
           params: {
-            field: 'network.ip',
-            customLabel: 'Unique networks',
+            customLabel: interfaceState,
           },
           schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: `interface.state: ${interfaceState}`,
+                  language: 'kuery',
+                },
+                label: 'Interface State',
+              },
+            ],
+          },
+          schema: 'group',
         },
       ],
     },
   };
 };
 
-const getVisStateUDPOnlyInterfacesMetric = (
+const getVisStateUDPOnlyTransportsMetric = (
   indexPatternId: string,
 ): SavedVis => {
   return {
-    id: 'it-hygiene-network-interfaces-only-udp',
-    title: 'Interfaces operating only on UDP',
+    id: 'it-hygiene-network-Transports-only-udp',
+    title: 'Transports operating only on UDP',
     type: 'metric',
     params: {
       addTooltip: true,
@@ -109,7 +124,7 @@ const getVisStateUDPOnlyInterfacesMetric = (
             filters: [
               {
                 input: {
-                  query: 'network.protocol:"UDP"',
+                  query: 'network.transport:"UDP"',
                   language: 'kuery',
                 },
                 label: 'Protocols',
@@ -123,11 +138,10 @@ const getVisStateUDPOnlyInterfacesMetric = (
   };
 };
 
-export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
+export const getOverviewProcessesPortTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateUniqueNetworkIPsMetric(indexPatternId),
-    getVisStateNetworkAveragePriorityMetric(indexPatternId),
-    getVisStateUDPOnlyInterfacesMetric(indexPatternId),
-    getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
+    getVisStateUDPOnlyTransportsMetric(indexPatternId),
+    getVisStateInterfaceState(indexPatternId, 'LISTEN'),
+    getVisStateInterfaceState(indexPatternId, 'ESTABLISHED'),
   ]);
 };
