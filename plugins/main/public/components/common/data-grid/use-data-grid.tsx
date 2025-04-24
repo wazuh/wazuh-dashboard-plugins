@@ -29,6 +29,7 @@ import {
 import useDataGridColumns from './use-data-grid-columns';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
+import { DataGridStatePersistenceManager } from './data-grid-state-persistence-manager/types';
 
 export type tDataGridProps = {
   moduleId: string;
@@ -63,6 +64,8 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     filters = [],
     setFilters = () => {},
   } = props;
+  const stateManagement: ReturnType<DataGridStatePersistenceManager> =
+    localStorageStatePersistenceManager(moduleId);
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
   const rowCount = results ? (results?.hits?.total as number) : 0;
@@ -100,6 +103,10 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       : {
           ...DEFAULT_PAGINATION_OPTIONS,
           ...paginationProps,
+          pageSize:
+            stateManagement.retrieveState()?.pageSize ||
+            paginationProps.pageSize ||
+            DEFAULT_PAGE_SIZE,
         },
   );
 
