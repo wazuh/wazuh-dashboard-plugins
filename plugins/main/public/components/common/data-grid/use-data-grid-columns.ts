@@ -26,10 +26,7 @@ function useDataGridColumns({
 }: UseDataGridColumnsProps) {
   const indexPatternExists = !!indexPattern;
   const columnSchemaDefinitionsMap = Object.fromEntries(
-    indexPattern?.fields.map(field => [
-      field.name,
-      { ...field, id: field.name },
-    ]) || [],
+    indexPattern?.fields.map(field => [field.name, field]) || [],
   );
   const defaultColumnsIds: string[] =
     defaultColumns.map(column => column.id as string) || [];
