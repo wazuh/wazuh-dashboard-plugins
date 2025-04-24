@@ -115,15 +115,6 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     );
   }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
 
-  // Convert column definitions to Record<string, EuiDataGridColumn>
-  const columnSchemaDefinitionsMap: Record<string, EuiDataGridColumn> = useMemo(
-    () =>
-      Object.fromEntries(
-        columnSchemaDefinitions.map(column => [column.id, column]),
-      ),
-    [columnSchemaDefinitions],
-  );
-
   const dataGridStateManager = useDataGridStatePersistenceManager({
     stateManagement: localStorageStatePersistenceManager(moduleId),
     defaultState: {
@@ -132,7 +123,10 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       pageSize: pagination.pageSize,
     },
     columnSchemaDefinitionsMap: Object.fromEntries(
-      indexPattern?.fields.map(field => [field.name, field]) || [],
+      indexPattern?.fields.map(field => [
+        field.name,
+        { ...field, id: field.name },
+      ]) || [],
     ),
   });
 
