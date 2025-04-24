@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { DataGridState, DataGridStatePersistenceManager } from './types';
 import { DEFAULT_PAGE_SIZE } from '../constants';
-import { tDataGridColumn } from '../types';
 
 const MINIMUM_COLUMN_WIDTH = 40;
 const MAXIMUM_COLUMN_WIDTH = 1000;
@@ -9,7 +8,7 @@ const MAXIMUM_COLUMN_WIDTH = 1000;
 interface UseDataGridStateManagementProps {
   stateManagement: ReturnType<DataGridStatePersistenceManager<DataGridState>>;
   defaultState: DataGridState;
-  columnSchemaDefinitionsMap: Record<string, tDataGridColumn>;
+  columnSchemaDefinitionsMap: Record<string, unknown>;
 }
 
 const useDataGridStatePersistenceManager = ({
