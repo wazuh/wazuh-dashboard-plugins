@@ -5,6 +5,7 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
+import { getVisStatePieByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 import {
   getVisStateDHCPEnabledInterfacesMetric,
@@ -125,9 +126,13 @@ const getVisStateUDPOnlyInterfacesMetric = (
 
 export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateUniqueNetworkIPsMetric(indexPatternId),
-    getVisStateNetworkAveragePriorityMetric(indexPatternId),
-    getVisStateUDPOnlyInterfacesMetric(indexPatternId),
+    getVisStatePieByField(
+      indexPatternId,
+      'network.protocol',
+      'Protocols',
+      'it-hygiene-networks',
+    ),
     getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
+    getVisStateUniqueNetworkIPsMetric(indexPatternId),
   ]);
 };

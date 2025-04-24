@@ -4,6 +4,7 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
+import { getVisStatePieByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 
 type HostArchitecture = 'x86_64' | 'arm64';
@@ -75,7 +76,23 @@ const getVisStateHostArchitectureMetric = (
 
 export const getOverviewSystemSystemTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateHostArchitectureMetric(indexPatternId, 'arm64'),
-    getVisStateHostArchitectureMetric(indexPatternId, 'x86_64'),
+    getVisStatePieByField(
+      indexPatternId,
+      'host.os.platform',
+      'Platform',
+      'it-hygiene-system',
+    ),
+    getVisStatePieByField(
+      indexPatternId,
+      'host.os.name',
+      'Operating system name',
+      'it-hygiene-system',
+    ),
+    getVisStatePieByField(
+      indexPatternId,
+      'host.architecture',
+      'Architecture',
+      'it-hygiene-system',
+    ),
   ]);
 };

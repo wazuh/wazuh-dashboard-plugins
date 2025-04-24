@@ -1,4 +1,6 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
+import { getVisStateMetricUniqueCountByField } from '../../../common/saved-vis/generators';
+
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
@@ -75,7 +77,26 @@ const getVisStatePackageArchitectureMetric = (
 
 export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStatePackageArchitectureMetric(indexPatternId, 'arm64'),
-    getVisStatePackageArchitectureMetric(indexPatternId, 'x86_64'),
+    getVisStateMetricUniqueCountByField(
+      indexPatternId,
+      'package.vendor',
+      '',
+      'it-hygiene-packages',
+      'Package vendors',
+    ),
+    getVisStateMetricUniqueCountByField(
+      indexPatternId,
+      'package.name',
+      '',
+      'it-hygiene-packages',
+      'Packages',
+    ),
+    getVisStateMetricUniqueCountByField(
+      indexPatternId,
+      'package.version',
+      '',
+      'it-hygiene-packages',
+      'Package versions',
+    ),
   ]);
 };

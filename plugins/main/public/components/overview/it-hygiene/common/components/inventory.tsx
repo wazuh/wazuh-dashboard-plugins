@@ -114,7 +114,7 @@ export const ITHygieneInventoryDashboardTable = ({
                       pause: false,
                       value: 15,
                     },
-                    hidePanelTitles: true,
+                    hidePanelTitles: false,
                     lastReloadRequestTime: fingerprint,
                   }}
                 />
