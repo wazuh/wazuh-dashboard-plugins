@@ -37,7 +37,7 @@ function useDataGridColumns({
     defaultState: {
       columns: defaultColumnsIds,
       columnWidths: {},
-      pageSize: DEFAULT_PAGE_SIZE, // TODO: move this
+      pageSize: DEFAULT_PAGE_SIZE,
     },
     columnSchemaDefinitionsMap,
   });
