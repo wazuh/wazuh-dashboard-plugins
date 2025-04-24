@@ -267,6 +267,7 @@ export type EnhancedTableUseParentDataSourceSearchBarProps<K> =
     fingerprint: number;
     inspectDetailsTitle?: string;
     additionalDocumentDetailsTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
+    tableId: string;
   };
 
 export const EnhancedTableUseParentDataSourceSearchBar = compose(
@@ -295,6 +296,7 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
     displayOnlyNoResultsCalloutOnNoResults,
     title,
     showSearchBar,
+    tableId,
   }: EnhancedTableUseParentDataSourceSearchBarProps) => {
     const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
@@ -327,6 +329,7 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
     };
 
     const dataGridProps = useDataGrid({
+      moduleId: tableId,
       ariaLabelledBy: 'Table',
       defaultColumns: tableDefaultColumns,
       renderColumns: wzDiscoverRenderColumns,
