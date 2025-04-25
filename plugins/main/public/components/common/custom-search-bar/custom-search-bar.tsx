@@ -8,7 +8,13 @@ import {
   FilterState,
   FilterStateStore,
 } from '../../../../../../src/plugins/data/common';
-import { EuiFlexGroup, EuiFlexItem, EuiSwitch, EuiFlexItemProps, CommonProps } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSwitch,
+  EuiFlexItemProps,
+  CommonProps,
+} from '@elastic/eui';
 import { tFilter } from '../data-source';
 //@ts-ignore
 import { MultiSelect } from './components';
@@ -32,14 +38,21 @@ export type CustomSearchBarProps = {
   indexPattern: IndexPattern;
   fixedFilters: Filter[];
   setFilters: (filters: tFilter[]) => void;
-  filterInputsProps: CommonProps &  EuiFlexItemProps & {
-    style: HTMLAttributes<HTMLDivElement | HTMLSpanElement>['style']
-  };
+  filterInputsProps: CommonProps &
+    EuiFlexItemProps & {
+      style: HTMLAttributes<HTMLDivElement | HTMLSpanElement>['style'];
+    };
 };
+
+const frozenFilterDrillDownValue = Object.freeze({ field: '', value: '' });
 
 export const CustomSearchBar = ({
   filterInputs,
-  filterDrillDownValue = { field: '', value: '' },
+  /* Using a frozen value when this prop is not
+  provided, it avoids the MultiSelect component fetches again when this component is rendered due
+  to the filterDrillDownValue passed to that component was creating a new reference in each render
+  and it is used as effect to fetch the suggestions */
+  filterDrillDownValue = frozenFilterDrillDownValue,
   searchBarProps,
   indexPattern,
   setFilters,
