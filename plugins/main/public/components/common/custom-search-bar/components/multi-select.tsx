@@ -206,7 +206,6 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
         isOpen={isPopoverOpen}
         closePopover={closePopover}
         panelPaddingSize='none'
-        withTitle
       >
         <EuiPopoverTitle>
           <EuiFieldSearch onChange={onSearch} />
