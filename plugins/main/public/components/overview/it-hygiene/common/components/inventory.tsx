@@ -2,7 +2,7 @@ import React from 'react';
 import { EuiPageTemplate } from '@elastic/eui';
 import {
   EnhancedTableUseParentDataSourceSearchBar,
-  EnhancedTableUseParentDataSourceSearchBarTableID,
+  EnhancedTableUseParentDataSourceSearchBarTableId,
 } from '../../../../common/wazuh-discover/table';
 import { useDataSourceWithSearchBar } from '../../../../common/hooks/use-data-source-search-context';
 import { IntlProvider } from 'react-intl';
@@ -37,7 +37,7 @@ export interface ITHygieneInventoryDashboardTableProps {
   getDashboardPanels: (indexPatternID: string) => any;
   managedFilters: CustomSearchBarProps['filterInputs'];
   managedFiltersProps?: CustomSearchBarProps['filterInputsProps'];
-  tableID: EnhancedTableUseParentDataSourceSearchBarTableID;
+  tableId: EnhancedTableUseParentDataSourceSearchBarTableId;
 }
 
 export const ITHygieneInventoryDashboardTable = ({
@@ -47,7 +47,7 @@ export const ITHygieneInventoryDashboardTable = ({
   getDashboardPanels,
   managedFilters,
   managedFiltersProps,
-  tableID,
+  tableId,
 }: ITHygieneInventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -132,7 +132,7 @@ export const ITHygieneInventoryDashboardTable = ({
                 tableDefaultColumns={tableDefaultColumns}
                 displayOnlyNoResultsCalloutOnNoResults={true}
                 showSearchBar={false}
-                tableID={tableID}
+                tableId={tableId}
               />
             </>
           )}

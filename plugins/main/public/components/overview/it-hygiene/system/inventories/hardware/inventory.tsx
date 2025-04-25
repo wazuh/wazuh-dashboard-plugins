@@ -20,7 +20,7 @@ export const ITHygieneSystemInventoryHardware =
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewSystemHardwareTab}
-        tableID='it-hygiene-inventory-hardware'
+        tableId='it-hygiene-inventory-hardware'
       />
     );
   });

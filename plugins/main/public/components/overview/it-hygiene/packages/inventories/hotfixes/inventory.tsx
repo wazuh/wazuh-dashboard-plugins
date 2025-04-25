@@ -21,7 +21,7 @@ export const ITHygienePackagesInventoryHotfixes =
         managedFilters={managedFilters}
         managedFiltersProps={{ style: { flexGrow: 0.25, minWidth: '300px' } }}
         getDashboardPanels={getOverviewPackagesHotfixesTab}
-        tableID='it-hygiene-inventory-hotfixes'
+        tableId='it-hygiene-inventory-hotfixes'
       />
     );
   });

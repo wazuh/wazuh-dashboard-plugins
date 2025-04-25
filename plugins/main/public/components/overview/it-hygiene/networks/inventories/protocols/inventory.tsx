@@ -20,7 +20,7 @@ export const ITHygieneNetworksInventoryProtocols =
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewNetworksProtocolsTab}
-        tableID='it-hygiene-inventory-protocols'
+        tableId='it-hygiene-inventory-protocols'
       />
     );
   });

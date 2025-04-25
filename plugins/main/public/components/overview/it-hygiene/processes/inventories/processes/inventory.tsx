@@ -20,7 +20,7 @@ export const ITHygieneProccessesInventoryProcesses =
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewProcessesProcessesTab}
-        tableID='it-hygiene-inventory-processes'
+        tableId='it-hygiene-inventory-processes'
       />
     );
   });

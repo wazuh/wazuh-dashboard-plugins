@@ -29,6 +29,7 @@ import {
 import useDataGridColumns from './use-data-grid-columns';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
+import { DataGridStatePersistenceManager } from './data-grid-state-persistence-manager/types';
 
 export type tDataGridProps = {
   moduleId: string;
@@ -63,6 +64,8 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     filters = [],
     setFilters = () => {},
   } = props;
+  const stateManagement: ReturnType<DataGridStatePersistenceManager> =
+    localStorageStatePersistenceManager(moduleId);
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
   const rowCount = results ? (results?.hits?.total as number) : 0;
@@ -100,6 +103,10 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       : {
           ...DEFAULT_PAGINATION_OPTIONS,
           ...paginationProps,
+          pageSize:
+            stateManagement.retrieveState()?.pageSize ||
+            paginationProps.pageSize ||
+            DEFAULT_PAGE_SIZE,
         },
   );
 
@@ -115,19 +122,24 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     );
   }, [indexPattern, rows, pagination.pageSize, filters, setFilters]);
 
+  // Convert column definitions to Record<string, EuiDataGridColumn>
+  const columnSchemaDefinitionsMap: Record<string, EuiDataGridColumn> = useMemo(
+    () =>
+      Object.fromEntries(
+        columnSchemaDefinitions.map(column => [column.id, column]),
+      ),
+    [columnSchemaDefinitions],
+  );
+
   const dataGridStateManager = useDataGridStatePersistenceManager({
     stateManagement: localStorageStatePersistenceManager(moduleId),
     defaultState: {
       columns: defaultColumns.map(column => column.id),
       columnWidths: {},
-      pageSize: pagination.pageSize,
+      pageSize: paginationProps.pageSize || DEFAULT_PAGE_SIZE,
     },
-    columnSchemaDefinitionsMap: Object.fromEntries(
-      indexPattern?.fields.map(field => [
-        field.name,
-        { ...field, id: field.name },
-      ]) || [],
-    ),
+    columnSchemaDefinitionsMap,
+    indexPatternExists: !!indexPattern,
   });
 
   useEffect(() => {
@@ -141,7 +153,8 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     useDataGridColumns({
       moduleId,
       defaultColumns,
-      indexPattern,
+      columnSchemaDefinitionsMap,
+      indexPatternExists: !!indexPattern,
     });
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) => {

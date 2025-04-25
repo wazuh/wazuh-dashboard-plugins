@@ -259,7 +259,7 @@ const EnhancedTable: React.FunctionComponent<EnhancedTableProps<K>> =
     ),
   );
 
-export type EnhancedTableUseParentDataSourceSearchBarTableID = string;
+export type EnhancedTableUseParentDataSourceSearchBarTableId = string;
 
 export type EnhancedTableUseParentDataSourceSearchBarProps<K> =
   EnhancedTableProps<K> & {
@@ -268,7 +268,7 @@ export type EnhancedTableUseParentDataSourceSearchBarProps<K> =
     searchBarProps: any;
     fingerprint: number;
     autoRefreshFingerprint: number;
-    tableID: EnhancedTableUseParentDataSourceSearchBarTableID;
+    tableId: EnhancedTableUseParentDataSourceSearchBarTableId;
     inspectDetailsTitle?: string;
     additionalDocumentDetailsTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
   };
@@ -302,7 +302,7 @@ export const EnhancedTableUseParentDataSourceSearchBar: React.FunctionComponent<
     displayOnlyNoResultsCalloutOnNoResults,
     title,
     showSearchBar,
-    tableID,
+    tableId,
   }: EnhancedTableUseParentDataSourceSearchBarProps) => {
     const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
@@ -335,7 +335,7 @@ export const EnhancedTableUseParentDataSourceSearchBar: React.FunctionComponent<
     };
 
     const dataGridProps = useDataGrid({
-      moduleId: tableID,
+      moduleId: tableId,
       ariaLabelledBy: 'Table',
       defaultColumns: tableDefaultColumns,
       renderColumns: wzDiscoverRenderColumns,
@@ -502,7 +502,7 @@ export interface WzTableDiscoverProps {
   additionalDocumentDetailsTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
   showSearchBar: boolean;
   searchBarProps: any;
-  tableID: EnhancedTableUseParentDataSourceSearchBarTableID;
+  tableId: EnhancedTableUseParentDataSourceSearchBarTableId;
 }
 
 export const TableDiscover = ({
@@ -517,7 +517,7 @@ export const TableDiscover = ({
   additionalDocumentDetailsTabs,
   showSearchBar,
   searchBarProps = {},
-  tableID,
+  tableId,
 }: WzTableDiscoverProps) => {
   const {
     dataSource,
@@ -562,7 +562,7 @@ export const TableDiscover = ({
       inspectDetailsTitle={inspectDetailsTitle}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       showSearchBar={showSearchBar}
-      tableID={tableID}
+      tableId={tableId}
     />
   );
 };

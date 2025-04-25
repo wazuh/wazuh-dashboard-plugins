@@ -20,7 +20,7 @@ export const ITHygieneProccessesInventoryPorts =
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewProcessesPortTab}
-        tableID='it-hygiene-inventory-ports'
+        tableId='it-hygiene-inventory-ports'
       />
     );
   });

@@ -20,7 +20,7 @@ export const ITHygienePackagesInventoryPackages =
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewPackagesPackagesTab}
-        tableID='it-hygiene-inventory-packages'
+        tableId='it-hygiene-inventory-packages'
       />
     );
   });
