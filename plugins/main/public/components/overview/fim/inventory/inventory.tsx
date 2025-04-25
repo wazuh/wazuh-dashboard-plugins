@@ -197,7 +197,7 @@ export const InventoryFIM = withFIMDataSource(({ agent }) => {
     <IntlProvider locale='en'>
       <>
         <EuiPageTemplate
-          className='wz-table-discover-container'
+          className='wz-table-data-grid'
           restrictWidth='100%'
           fullHeight={true}
           grow

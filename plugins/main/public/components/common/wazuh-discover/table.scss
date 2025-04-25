@@ -1,6 +1,4 @@
-.wz-table-discover-container {
-  height: calc(100vh - 104px);
-
+.wz-table-data-grid {
   .euiDataGrid__virtualized {
     height: max-content !important;
   }
@@ -17,6 +15,11 @@
   }
 }
 
-.headerIsExpanded .wz-table-discover-container {
+// Fix the height of data grid. It should be used by views with only the data grid
+.wz-table-data-grid-y-scroll {
+  height: calc(100vh - 104px);
+}
+
+.headerIsExpanded .wz-table-data-grid-y-scroll {
   height: calc(100vh - 153px);
 }
