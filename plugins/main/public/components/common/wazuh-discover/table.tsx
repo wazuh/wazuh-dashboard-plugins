@@ -17,7 +17,6 @@ import {
 import { SearchResponse } from '../../../../../../src/core/server';
 import { HitsCounter } from '../../../kibana-integrations/discover/application/components/hits_counter';
 import { formatNumWithCommas } from '../../../kibana-integrations/discover/application/helpers';
-formatNumWithCommas;
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
   ErrorHandler,
@@ -66,6 +65,7 @@ import {
 } from '../hocs';
 import { compose } from 'redux';
 import { omit } from 'lodash';
+import { useEffectAvoidOnNotMount } from '../hooks';
 
 export interface TableDiscoverBasicTableProps<K> {
   dataGridProps: TDataGridReturn;
@@ -259,17 +259,23 @@ const EnhancedTable: React.FunctionComponent<EnhancedTableProps<K>> =
     ),
   );
 
+export type EnhancedTableUseParentDataSourceSearchBarTableID = string;
+
 export type EnhancedTableUseParentDataSourceSearchBarProps<K> =
   EnhancedTableProps<K> & {
     fetchData: any;
     setFilters: any;
     searchBarProps: any;
     fingerprint: number;
+    autoRefreshFingerprint: number;
+    tableID: EnhancedTableUseParentDataSourceSearchBarTableID;
     inspectDetailsTitle?: string;
     additionalDocumentDetailsTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
   };
 
-export const EnhancedTableUseParentDataSourceSearchBar = compose(
+export const EnhancedTableUseParentDataSourceSearchBar: React.FunctionComponent<
+  EnhancedTableUseParentDataSourceSearchBarProps<K>
+> = compose(
   withGuard(
     ({ isDataSourceLoading }) => isDataSourceLoading,
     LoadingSearchbarProgress,
@@ -289,12 +295,14 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
     searchBarProps,
     isDataSourceLoading,
     fingerprint,
+    autoRefreshFingerprint,
     tableDefaultColumns,
     inspectDetailsTitle = 'Details',
     additionalDocumentDetailsTabs = [],
     displayOnlyNoResultsCalloutOnNoResults,
     title,
     showSearchBar,
+    tableID,
   }: EnhancedTableUseParentDataSourceSearchBarProps) => {
     const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
@@ -327,6 +335,7 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
     };
 
     const dataGridProps = useDataGrid({
+      moduleId: tableID,
       ariaLabelledBy: 'Table',
       defaultColumns: tableDefaultColumns,
       renderColumns: wzDiscoverRenderColumns,
@@ -337,13 +346,16 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
       setFilters,
     });
 
-    const { pagination, sorting } = dataGridProps;
+    const [reloadFetch, setReloadFetch] = useState(0);
+
+    const { pagination, setPagination, sorting } = dataGridProps;
 
     useEffect(() => {
       if (isDataSourceLoading) {
         return;
       }
       fetchData({
+        query: searchBarProps.query,
         pagination,
         sorting,
         filters: fetchFilters,
@@ -362,16 +374,30 @@ export const EnhancedTableUseParentDataSourceSearchBar = compose(
           });
           ErrorHandler.handleError(searchError);
         });
+    }, [reloadFetch, JSON.stringify(sorting), JSON.stringify(pagination)]);
+
+    // Reset the pagination and reload fetch time when the filters changed.
+    useEffectAvoidOnNotMount(() => {
+      if (isDataSourceLoading) {
+        return;
+      }
+      setPagination(pagination => ({
+        ...pagination,
+        pageIndex: 0,
+      }));
+      setReloadFetch(state => state + 1);
+      // setAbsoluteDateRange( // TODO: add support for absolute date range
+      //   transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
+      // );
     }, [
       JSON.stringify(fetchFilters),
       JSON.stringify(query),
-      JSON.stringify(pagination),
-      JSON.stringify(sorting),
-      fingerprint,
-      isDataSourceLoading,
       // Support for index pattern with timeFields
       dataSource?.indexPattern?.timeFieldName && dateRangeFrom,
       dataSource?.indexPattern?.timeFieldName && dateRangeTo,
+      // fingerprints
+      fingerprint,
+      autoRefreshFingerprint,
     ]);
 
     const closeFlyoutHandler = () => setInspectedHit(undefined);
@@ -476,6 +502,7 @@ export interface WzTableDiscoverProps {
   additionalDocumentDetailsTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
   showSearchBar: boolean;
   searchBarProps: any;
+  tableID: EnhancedTableUseParentDataSourceSearchBarTableID;
 }
 
 export const TableDiscover = ({
@@ -490,6 +517,7 @@ export const TableDiscover = ({
   additionalDocumentDetailsTabs,
   showSearchBar,
   searchBarProps = {},
+  tableID,
 }: WzTableDiscoverProps) => {
   const {
     dataSource,
@@ -501,6 +529,7 @@ export const TableDiscover = ({
     setFilters,
     searchBarProps: managedSearchBarProps,
     fingerprint,
+    autoRefreshFingerprint,
   } = useDataSourceWithSearchBar({
     DataSource,
     DataSourceRepositoryCreator,
@@ -524,6 +553,7 @@ export const TableDiscover = ({
       setFilters={setFilters}
       searchBarProps={composedSearchBarProps}
       fingerprint={fingerprint}
+      autoRefreshFingerprint={autoRefreshFingerprint}
       tableDefaultColumns={tableDefaultColumns}
       displayOnlyNoResultsCalloutOnNoResults={
         displayOnlyNoResultsCalloutOnNoResults
@@ -532,6 +562,7 @@ export const TableDiscover = ({
       inspectDetailsTitle={inspectDetailsTitle}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       showSearchBar={showSearchBar}
+      tableID={tableID}
     />
   );
 };
