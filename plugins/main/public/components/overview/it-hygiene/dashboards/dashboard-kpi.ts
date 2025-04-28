@@ -57,27 +57,27 @@ const getVisStateStatOperatingSystems = (indexPatternId: string) => {
           type: 'cardinality',
           params: {
             field: 'host.os.full',
-            customLabel: 'Unique count',
+            customLabel: 'Operating systems',
           },
           schema: 'metric',
         },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'host.os.full:*',
-                  language: 'kuery',
-                },
-                label: 'Operating systems',
-              },
-            ],
-          },
-          schema: 'group',
-        },
+        // {
+        //   id: '2',
+        //   enabled: true,
+        //   type: 'filters',
+        //   params: {
+        //     filters: [
+        //       {
+        //         input: {
+        //           query: 'host.os.full:*',
+        //           language: 'kuery',
+        //         },
+        //         label: 'Operating systems',
+        //       },
+        //     ],
+        //   },
+        //   schema: 'group',
+        // },
       ],
     },
   };
@@ -136,27 +136,30 @@ const getVisStateStatPackages = (indexPatternId: string) => {
         {
           id: '1',
           enabled: true,
-          type: 'count',
-          params: {},
+          type: 'cardinality',
+          params: {
+            field: 'package.name',
+            customLabel: 'Packages',
+          },
           schema: 'metric',
         },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'package.name:*',
-                  language: 'kuery',
-                },
-                label: 'Packages',
-              },
-            ],
-          },
-          schema: 'group',
-        },
+        // {
+        //   id: '2',
+        //   enabled: true,
+        //   type: 'filters',
+        //   params: {
+        //     filters: [
+        //       {
+        //         input: {
+        //           query: 'package.name:*',
+        //           language: 'kuery',
+        //         },
+        //         label: 'Packages',
+        //       },
+        //     ],
+        //   },
+        //   schema: 'group',
+        // },
       ],
     },
   };
@@ -227,10 +230,10 @@ const getVisStateStatProcesses = (indexPatternId: string) => {
             filters: [
               {
                 input: {
-                  query: 'process.command_line:*',
+                  query: 'process.state:Zombie',
                   language: 'kuery',
                 },
-                label: 'Processes',
+                label: 'Zombie processes',
               },
             ],
           },
@@ -243,8 +246,8 @@ const getVisStateStatProcesses = (indexPatternId: string) => {
 
 const getVisStateStatNetworkInterfaces = (indexPatternId: string) => {
   return {
-    id: 'it-hygiene-stat-network-interfaces',
-    title: 'Network interfaces',
+    id: 'it-hygiene-stat-network-dhcp-enabled',
+    title: 'Interfaces with DHCP enabled',
     type: 'metric',
     params: {
       addTooltip: true,
@@ -295,7 +298,9 @@ const getVisStateStatNetworkInterfaces = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: {},
+          params: {
+            customLabel: 'enabled',
+          },
           schema: 'metric',
         },
         {
@@ -306,10 +311,10 @@ const getVisStateStatNetworkInterfaces = (indexPatternId: string) => {
             filters: [
               {
                 input: {
-                  query: 'observer.ingress.interface.name:*',
+                  query: 'network.dhcp:true',
                   language: 'kuery',
                 },
-                label: 'Network interfaces',
+                label: 'DHCP',
               },
             ],
           },
@@ -367,7 +372,7 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's3',
-        savedVis: getVisStateStatNetworkInterfaces(indexPatternId),
+        savedVis: getVisStateStatOperatingSystems(indexPatternId),
       },
     },
     s4: {
@@ -381,7 +386,7 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's4',
-        savedVis: getVisStateStatOperatingSystems(indexPatternId),
+        savedVis: getVisStateStatNetworkInterfaces(indexPatternId),
       },
     },
   };
