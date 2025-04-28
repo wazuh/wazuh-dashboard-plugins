@@ -143,6 +143,7 @@ const InventoryFIMDashboard = withDataSourceInitiated({
               return [filesEventsDocumentDetailsTab({ document, agent })];
             }}
             displayOnlyNoResultsCalloutOnNoResults={true}
+            tableId='fim-inventory-files'
           />
         </WzTableFlexItem>
       </WzTableFlexGroup>
@@ -172,6 +173,7 @@ const InventoryFIMDashboard = withDataSourceInitiated({
               return [registriesEventsDocumentDetailsTab({ document, agent })];
             }}
             displayOnlyNoResultsCalloutOnNoResults={true}
+            tableId='fim-inventory-registries'
           />
         </WzTableFlexItem>
       </WzTableFlexGroup>
@@ -200,7 +202,7 @@ export const InventoryFIM = withFIMDataSource(({ agent }) => {
     <IntlProvider locale='en'>
       <>
         <EuiPageTemplate
-          className='wz-table-discover-container'
+          className='wz-table-data-grid'
           restrictWidth='100%'
           fullHeight={true}
           grow

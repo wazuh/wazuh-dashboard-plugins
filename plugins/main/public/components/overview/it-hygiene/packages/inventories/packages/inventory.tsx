@@ -7,6 +7,7 @@ import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryPackagesDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
+import { getOverviewPackagesPackagesTab } from './dashboard';
 
 export const ITHygienePackagesInventoryPackages =
   withSystemInventoryPackagesDataSource(props => {
@@ -18,6 +19,8 @@ export const ITHygienePackagesInventoryPackages =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        getDashboardPanels={getOverviewPackagesPackagesTab}
+        tableId='it-hygiene-inventory-packages'
       />
     );
   });

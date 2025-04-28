@@ -1,26 +1,7 @@
 import React from 'react';
-import { DocumentViewTableAndJsonPropsAdditionalTabs } from '../../../common/wazuh-discover/components/document-view-table-and-json';
 import { withErrorBoundary, withPanel } from '../../../common/hocs';
 import { compose } from 'redux';
-import { EnhancedTableUseParentDataSourceSearchBar } from '../../../common/wazuh-discover/table';
-
-export interface WzTableDiscoverProps {
-  dataSource: any;
-  fetchFilters: any;
-  searchBarProps: any;
-  filters: any;
-  setFilters: any;
-  fetchData: any;
-  fingerprint: any;
-  isDataSourceLoading: any;
-  tableDefaultColumns: tDataGridColumn[];
-  createNewSearchContext?: CreateNewSearchContext;
-  useAbsoluteDateRange?: boolean;
-  displayOnlyNoResultsCalloutOnNoResults?: boolean;
-  title?: React.ReactNode;
-  inspectDetailsTitle?: string;
-  additionalDocumentDetailsTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
-}
+import { TableDataGridWithSearchBarInspectedHitFetchData } from '../../../common/wazuh-discover/table';
 
 export const WzTableUseParentDataSource = compose(
   withPanel({ paddingSize: 's', hasShadow: false, hasBorder: true }),
@@ -41,8 +22,9 @@ export const WzTableUseParentDataSource = compose(
     title,
     inspectDetailsTitle,
     additionalDocumentDetailsTabs,
+    tableId,
   }) => (
-    <EnhancedTableUseParentDataSourceSearchBar
+    <TableDataGridWithSearchBarInspectedHitFetchData
       dataSource={dataSource}
       filters={filters}
       fetchFilters={fetchFilters}
@@ -60,6 +42,7 @@ export const WzTableUseParentDataSource = compose(
       inspectDetailsTitle={inspectDetailsTitle}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       showSearchBar={false}
+      tableId={tableId}
     />
   ),
 );

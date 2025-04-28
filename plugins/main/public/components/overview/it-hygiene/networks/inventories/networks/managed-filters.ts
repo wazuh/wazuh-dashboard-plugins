@@ -14,9 +14,4 @@ export default [
     key: 'network.dhcp',
     placeholder: 'DHCP',
   },
-  {
-    type: 'multiSelect',
-    key: 'network.ip',
-    placeholder: 'IP',
-  },
 ];

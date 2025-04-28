@@ -12,7 +12,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { getDataPlugin } from '../../../kibana-services';
-import { IFieldType, IIndexPattern } from 'src/plugins/data/public';
+import { IIndexPattern } from 'src/plugins/data/public';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -63,6 +63,7 @@ async function getValueSuggestionResolverAggregation({
   query,
   indexPattern,
   field,
+  boolFilter,
 }) {
   const searchSource = await getDataPlugin().search.searchSource.create();
   const searchParams = searchSource
@@ -85,6 +86,8 @@ async function getValueSuggestionResolverAggregation({
     });
 
   if (query) {
+    const [boolFilterTermQuery] = boolFilter;
+
     searchParams.setField('query', {
       language: 'lucene',
       query: {
@@ -94,6 +97,9 @@ async function getValueSuggestionResolverAggregation({
             mapping or using an ingest pipeline to prepare a searchable version of the IP. */
           script: {
             lang: 'painless',
+            /* TODO: add the boolFilter for drilldown views such as Office365 or GitHub. This is not
+            required at this time, but it should be enhanced for the commented use case.
+            */
             source: `doc['${field.name}'].value.toString().contains(params.searchQuery)`,
             params: {
               searchQuery: query,
@@ -160,7 +166,8 @@ export const useValueSuggestion = (
               },
             },
           ]
-        : [];
+        : []; /* FIX: This should create a query depending on the field type. This is using term
+        and this could not be supported for other types */
     return options
       ? getOptions()
       : getValueSuggestionResolver({

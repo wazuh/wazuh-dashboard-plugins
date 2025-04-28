@@ -36,7 +36,7 @@ function useDataGridColumns({
     defaultState: {
       columns: defaultColumnsIds,
       columnWidths: {},
-      pageSize: DEFAULT_PAGE_SIZE, // TODO: move this
+      pageSize: DEFAULT_PAGE_SIZE,
     },
     columnSchemaDefinitionsMap,
     indexPatternExists,
@@ -151,21 +151,20 @@ function useDataGridColumns({
     }
   };
 
-  const retrieveVisibleDataGridColumns = useMemo(
-    (): EuiDataGridColumn[] =>
-      visibleColumns.map((columnId: string) => {
-        let column = { ...columnSchemaDefinitionsMap[columnId] };
-        const savedColumnWidth =
-          dataGridStateManager.retrieveState().columnWidths[columnId];
+  // Don't use `useMemo` here because otherwise the DataGrid cell filter doesn't work
+  const retrieveVisibleDataGridColumns =
+    visibleColumns.map((columnId: string) => {
+      let column = { ...columnSchemaDefinitionsMap[columnId] };
+      const savedColumnWidth =
+        dataGridStateManager.retrieveState().columnWidths[columnId];
 
-        if (savedColumnWidth) {
-          column.initialWidth = savedColumnWidth;
-        }
+      if (savedColumnWidth) {
+        column.initialWidth = savedColumnWidth;
+      }
 
-        return column;
-      }),
-    [visibleColumns, JSON.stringify(columnSchemaDefinitionsMap), moduleId],
-  );
+      return column;
+    });
+
 
   return {
     // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
