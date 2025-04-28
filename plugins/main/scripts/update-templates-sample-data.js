@@ -29,7 +29,8 @@ const getBranch = () => {
 // Configuration
 const config = {
   // GitHub repository base URL with dynamic branch
-  githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/${getBranch()}/plugins/setup/src/main/resources`,
+  githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/inventory_harvester/indexer/template`,
+  githubRepoBaseUrlVulnerabilities: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json`,
   // Local directory where datasets are located
   localDatasetDir: path.join(__dirname, '../server/lib/sample-data/dataset'),
   // List of datasets to update (obtained from local directory)
@@ -53,14 +54,15 @@ function getDatasets() {
 
 // Function to download a file from GitHub
 function downloadFile(dataset) {
-  const arrayDatasetName = dataset.split('-');
-
-  const templateFile = `index-template-${
-    arrayDatasetName[arrayDatasetName.length - 1]
-  }.json`;
+  const templateFile = `wazuh-${dataset}.json`;
 
   return new Promise((resolve, reject) => {
-    const url = `${config.githubRepoBaseUrl}/${templateFile}`;
+    // Use different URL for vulnerabilities dataset
+    const url =
+      dataset === 'states-vulnerabilities'
+        ? config.githubRepoBaseUrlVulnerabilities
+        : `${config.githubRepoBaseUrl}/${templateFile}`;
+
     console.log(`Downloading: ${url}`);
 
     https
@@ -89,13 +91,6 @@ function downloadFile(dataset) {
 function saveFile(dataset, filename, content) {
   return new Promise((resolve, reject) => {
     const filePath = path.join(config.localDatasetDir, dataset, filename);
-
-    // Create a backup of the original file
-    if (fs.existsSync(filePath)) {
-      const backupPath = `${filePath}.backup`;
-      fs.copyFileSync(filePath, backupPath);
-      console.log(`Backup created: ${backupPath}`);
-    }
 
     // Save the new content
     fs.writeFile(filePath, content, 'utf8', error => {
