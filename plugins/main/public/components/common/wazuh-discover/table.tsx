@@ -407,6 +407,7 @@ export type TableDataGridWithSearchBarInspectedHitProps<K> =
     results: any; // Enhance
     inspectedHit: any; // Enhance
     removeInspectedHit: () => void;
+    tableDefaultColumns: tDataGridColumn[];
   };
 
 /**
@@ -570,6 +571,7 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
         removeInspectedHit={removeInspectedHit}
         inspectDetailsTitle={inspectDetailsTitle}
         additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
+        tableDefaultColumns={tableDefaultColumns}
       />
     );
   },
@@ -587,21 +589,23 @@ export const DocumentDetails = withWrapComponent(({ children }) => (
     onFilter,
     additionalTabs,
     showFilterButtons,
-  }) => (
-    <DocumentViewTableAndJson
-      document={document}
-      indexPattern={indexPattern}
-      renderFields={getAllCustomRenders(
-        tableDefaultColumns,
-        wzDiscoverRenderColumns,
-      )}
-      filters={filters}
-      setFilters={setFilters}
-      onFilter={onFilter}
-      additionalTabs={additionalTabs}
-      showFilterButtons={showFilterButtons}
-    />
-  ),
+  }) => {
+    return (
+      <DocumentViewTableAndJson
+        document={document}
+        indexPattern={indexPattern}
+        renderFields={getAllCustomRenders(
+          tableDefaultColumns,
+          wzDiscoverRenderColumns,
+        )}
+        filters={filters}
+        setFilters={setFilters}
+        onFilter={onFilter}
+        additionalTabs={additionalTabs}
+        showFilterButtons={showFilterButtons}
+      />
+    );
+  },
 );
 
 export const FlyoutDocumentDetails = ({

@@ -2,7 +2,6 @@ import React from 'react';
 import { EuiPageTemplate } from '@elastic/eui';
 import {
   TableDataGridWithSearchBarInspectedHit,
-  TableDataGridWithSearchBarInspectedHitFetchData,
   TableDataGridWithSearchBarInspectedHitFetchDataTableId,
   useTableDataGridFetch,
 } from '../../../../common/wazuh-discover/table';
@@ -60,34 +59,37 @@ const ITHygieneInventoryDashboardOnResults = compose(
     results,
     inspectedHit,
     removeInspectedHit,
+    tableDefaultColumns,
   }: ITHygieneInventoryDashboardTableProps) => {
     return (
       <>
-        {getDashboardPanels && dataSource && (
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getDashboardPanels(dataSource?.id),
-              isFullScreenMode: false,
-              filters: fetchFilters ?? [],
-              useMargins: true,
-              id: 'it-hygiene-inventory-dashboard',
-              timeRange: {
-                from: searchBarProps.dateRangeFrom,
-                to: searchBarProps.dateRangeTo,
-              },
-              title: 'IT Hygiene inventory dahsboard',
-              description: 'IT Hygiene dashboard',
-              query: searchBarProps.query,
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: false,
-              lastReloadRequestTime: fingerprint,
-            }}
-          />
-        )}
+        <div className='wz-dashboard-responsive'>
+          {getDashboardPanels && dataSource && (
+            <DashboardByRenderer
+              input={{
+                viewMode: ViewMode.VIEW,
+                panels: getDashboardPanels(dataSource?.id),
+                isFullScreenMode: false,
+                filters: fetchFilters ?? [],
+                useMargins: true,
+                id: 'it-hygiene-inventory-dashboard',
+                timeRange: {
+                  from: searchBarProps.dateRangeFrom,
+                  to: searchBarProps.dateRangeTo,
+                },
+                title: 'IT Hygiene inventory dahsboard',
+                description: 'IT Hygiene dashboard',
+                query: searchBarProps.query,
+                refreshConfig: {
+                  pause: false,
+                  value: 15,
+                },
+                hidePanelTitles: false,
+                lastReloadRequestTime: fingerprint,
+              }}
+            />
+          )}
+        </div>
         <IntlProvider locale='en'>
           <>
             <EuiPageTemplate
@@ -112,6 +114,7 @@ const ITHygieneInventoryDashboardOnResults = compose(
                 results={results}
                 inspectedHit={inspectedHit}
                 removeInspectedHit={removeInspectedHit}
+                tableDefaultColumns={tableDefaultColumns}
               />
             </EuiPageTemplate>
           </>
@@ -188,6 +191,7 @@ const ITHygieneInventoryDashboard = compose(
           results={results}
           inspectedHit={inspectedHit}
           removeInspectedHit={removeInspectedHit}
+          tableDefaultColumns={tableDefaultColumns}
         />
       </>
     );
