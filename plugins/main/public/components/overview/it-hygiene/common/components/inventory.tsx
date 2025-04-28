@@ -178,6 +178,9 @@ const ITHygieneInventoryDashboard = compose(
           filterInputs={managedFilters || []}
           filterInputsProps={managedFiltersProps}
         />
+        <SampleDataWarning
+          categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
+        />
         <ITHygieneInventoryDashboardOnResults
           dataSource={dataSource}
           filters={filters}
