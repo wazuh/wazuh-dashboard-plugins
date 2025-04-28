@@ -2,55 +2,7 @@ const random = require('../../lib/random');
 
 function generateRandomHost() {
   return {
-    architecture: ['x86', 'x64', 'arm', 'arm64'][Math.floor(Math.random() * 4)],
-    boot: {
-      id: random.int(0, 1000),
-    },
-    cpu: {
-      usage: random.int(0, 100),
-    },
-    disk: {
-      read: {
-        bytes: random.int(0, 1000000),
-      },
-      write: {
-        bytes: random.int(0, 1000000),
-      },
-    },
-    domain: `domain${Math.floor(Math.random() * 10000)}`,
-    geo: {
-      city_name: `city${Math.floor(Math.random() * 10000)}`,
-      continent_code: `continent${Math.floor(Math.random() * 10000)}`,
-      continent_name: `continent${Math.floor(Math.random() * 10000)}`,
-      country_iso_code: `country${Math.floor(Math.random() * 10000)}`,
-      country_name: `country${Math.floor(Math.random() * 10000)}`,
-      location: {
-        lat: random.float(0, 90),
-        lon: random.float(0, 180),
-      },
-      name: `name${Math.floor(Math.random() * 10000)}`,
-      postal_code: `postal${Math.floor(Math.random() * 10000)}`,
-      region_iso_code: `region${Math.floor(Math.random() * 10000)}`,
-      region_name: `region${Math.floor(Math.random() * 10000)}`,
-      timezone: `timezone${Math.floor(Math.random() * 10000)}`,
-    },
-    hostname: `hostname${Math.floor(Math.random() * 10000)}`,
-    id: `00${Math.floor(Math.random() * 99) + 1}`,
-    ip: random.ip(),
-    mac: random.macAddress(),
-    name: `name${Math.floor(Math.random() * 10000)}`,
-    network: {
-      egress: {
-        bytes: random.int(0, 1000000),
-        packets: random.int(0, 10000),
-      },
-      ingress: {
-        bytes: random.int(0, 1000000),
-        packets: random.int(0, 10000),
-      },
-    },
     os: {
-      family: `family${Math.floor(Math.random() * 10000)}`,
       full: `full${Math.floor(Math.random() * 10000)}`,
       kernel: `kernel${Math.floor(Math.random() * 10000)}`,
       name: `name${Math.floor(Math.random() * 10000)}`,
@@ -58,26 +10,15 @@ function generateRandomHost() {
       type: `type${Math.floor(Math.random() * 10000)}`,
       version: `version${Math.floor(Math.random() * 10000)}`,
     },
-    pid_ns_ino: `pid_ns_ino${random.int(0, 1000000)}`,
-    risk: {
-      calculated_level: `calculated_level${Math.floor(Math.random() * 10000)}`,
-      calculated_score: Math.floor(Math.random() * 10000),
-      calculated_score_norm: Math.floor(Math.random() * 10000),
-      static_level: `static_level${Math.floor(Math.random() * 10000)}`,
-      static_score: Math.floor(Math.random() * 10000),
-      static_score_norm: Math.floor(Math.random() * 10000),
-    },
-    type: ['filebeat', 'windows', 'linux', 'macos'][
-      Math.floor(Math.random() * 4)
-    ],
-    uptime: random.int(0, 100), // Changed from object to direct integer
   };
 }
 
 function generateRandomAgent() {
   return {
-    groups: ['group1', 'group2'],
-    host: generateRandomHost(),
+    build: {
+      original: `original${Math.floor(Math.random() * 10000)}`,
+    },
+    ephemeral_id: `ephemeral_id${Math.floor(Math.random() * 10000)}`,
     id: `00${Math.floor(Math.random() * 99) + 1}`,
     name: `Agent${Math.floor(Math.random() * 100)}`,
     type: ['filebeat', 'windows', 'linux', 'macos'][
@@ -130,23 +71,6 @@ function generateRandomPackage() {
     type: types[Math.floor(Math.random() * 22)],
     version: `v${Math.floor(Math.random() * 10)}-stable`,
   };
-}
-
-function generateRandomTags() {
-  const tags = [];
-  const numTags = Math.floor(Math.random() * 10);
-
-  for (let i = 0; i < numTags; i++) {
-    let newTag = `tag${Math.floor(Math.random() * 100)}`;
-
-    while (tags.includes(newTag)) {
-      newTag = `tag${Math.floor(Math.random() * 100)}`;
-    }
-
-    tags.push(`tag${Math.floor(Math.random() * 100)}`);
-  }
-
-  return tags;
 }
 
 function generateRandomReference(vulnerabilityID) {
@@ -202,6 +126,11 @@ function generateRandomWazuh() {
     cluster: {
       name: clusterNames[Math.floor(Math.random() * clusterNames.length)],
       node: nodeTypes[Math.floor(Math.random() * nodeTypes.length)],
+    },
+    schema: {
+      version: `1.${Math.floor(Math.random() * 10)}.${Math.floor(
+        Math.random() * 10,
+      )}`,
     },
   };
 }

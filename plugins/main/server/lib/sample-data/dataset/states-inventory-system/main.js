@@ -29,6 +29,7 @@ function generateRandomHostSystem() {
       name: random.choice(['Linux', 'Windows', 'macOS']),
       patch: `${random.int(1, 100)}`,
       platform: random.choice(['platform1', 'platform2']),
+      type: random.choice(['desktop', 'server']),
       version: `${random.int(0, 9)}.${random.int(0, 9)}.${random.int(0, 9)}`,
     },
   };

@@ -16,19 +16,6 @@ function generateRandomDate() {
   return randomDate.toISOString();
 }
 
-function generateRandomDataStream() {
-  return {
-    type: random.choice(['Scheduled', 'Realtime']),
-  };
-}
-
-function generateRandomEvent() {
-  return {
-    category: random.choice(['registy_value', 'registry_key', 'file']),
-    type: random.choice(['added', 'modified', 'deleted']),
-  };
-}
-
 function generateRandomFile() {
   return {
     gid: `gid${random.int(0, 1000)}`,
@@ -52,8 +39,6 @@ function generateDocument(params) {
   return {
     '@timestamp': generateRandomDate(),
     agent: generateRandomAgent(),
-    data_stream: generateRandomDataStream(),
-    event: generateRandomEvent(),
     file: generateRandomFile(),
     wazuh: generateRandomWazuh(params),
   };

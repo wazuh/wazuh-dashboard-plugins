@@ -1,21 +1,16 @@
 const random = require('../../lib/random');
 const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
 
-function generateRandomDataStream() {
-  return {
-    type: random.choice(['Scheduled', 'Realtime']),
-  };
-}
-
 function generateRandomEvent() {
   return {
     category: random.choice(['registy_value', 'registry_key', 'file']),
-    type: random.choice(['added', 'modified', 'deleted']),
+    action: random.choice(['added', 'modified', 'deleted']),
   };
 }
 
 function generateRandomRegistry() {
   return {
+    architecture: random.choice(['x86_64', 'arm64']),
     data: {
       hash: {
         md5: `${random.int(0, 9999)}`,
@@ -28,7 +23,7 @@ function generateRandomRegistry() {
     group: `group${random.int(0, 1000)}`,
     hive: 'HKLM',
     key: 'SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\winword.exe',
-    mtime: random.unixTimestamp(),
+    mtime: random.date(),
     owner: `owner${random.int(0, 1000)}`,
     path: '/path/to/file',
     size: random.int(1000, 1000000),
@@ -42,7 +37,6 @@ function generateDocument(params) {
   return {
     '@timestamp': random.date(),
     agent: generateRandomAgent(),
-    data_stream: generateRandomDataStream(),
     event: generateRandomEvent(),
     registry: generateRandomRegistry(),
     wazuh: generateRandomWazuh(params),

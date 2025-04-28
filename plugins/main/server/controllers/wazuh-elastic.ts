@@ -621,7 +621,11 @@ export class WazuhElasticCtrl {
 
               let sampleDataAndTemplate: {
                 sampleData: [];
-                template?: { index_patterns: string; order: number };
+                templateFile?: {
+                  index_patterns: string;
+                  priority: number;
+                  template: any;
+                };
               } = { sampleData: [] };
 
               if (mappedData.length > 1) {
@@ -653,11 +657,11 @@ export class WazuhElasticCtrl {
                 // Create wazuh sample data index
                 let configuration;
 
-                if (sampleDataAndTemplate?.template) {
-                  configuration = sampleDataAndTemplate.template;
+                if (sampleDataAndTemplate?.templateFile) {
+                  configuration = sampleDataAndTemplate.templateFile.template;
 
                   delete configuration.index_patterns;
-                  delete configuration.order;
+                  delete configuration.priority;
 
                   configuration.settings.index.number_of_shards =
                     WAZUH_SAMPLE_ALERTS_INDEX_SHARDS;
