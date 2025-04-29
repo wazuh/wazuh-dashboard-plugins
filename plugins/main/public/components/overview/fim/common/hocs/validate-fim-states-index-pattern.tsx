@@ -6,6 +6,7 @@ import {
   withIndexPatternFromSettingDataSource,
   ERROR_NO_INDICES_FOUND,
   withMapErrorPromptErrorEnsureIndexPattern,
+  mapFieldsFormatBytes,
 } from '../../../../common/hocs/with-index-pattern';
 
 const errorPromptTypes = {
@@ -45,16 +46,7 @@ const errorPromptTypes = {
 export const withFIMDataSource = withIndexPatternFromSettingDataSource({
   indexPatternSetting: 'fim.pattern',
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  validate: ensureIndexPatternIsCreated({
-    mapSavedObjectAttributesCreation: ({ fields }) => {
-      const mappedFields = fields
-        ?.filter(({ name }) => ['file.size', 'registry.size'].includes(name))
-        .map(({ name }) => `"${name}":{"id":"bytes"}`);
-
-      if (mappedFields.length) {
-        return { fieldFormatMap: `{${mappedFields.join(',')}}` }; // Add format map for file.size and registry.path field
-      }
-      return {};
-    },
-  }),
+  validate: ensureIndexPatternIsCreated(
+    mapFieldsFormatBytes(['file.size', 'registry.size']),
+  ),
 });
