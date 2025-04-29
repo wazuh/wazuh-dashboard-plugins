@@ -297,207 +297,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * Replaces visualizations main fields to fit a certain pattern.
-   * @param {Array<Object>} app_objects Object containing raw visualizations.
-   * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
-   */
-  async buildVisualizationsRaw(context, app_objects, id, namespace = false) {
-    const config = await context.wazuh_core.configuration.get();
-    let monitoringPattern = `${config['wazuh.monitoring.pattern']}`;
-    context.wazuh.logger.debug(`Building ${app_objects.length} visualizations`);
-    context.wazuh.logger.debug(`Index pattern ID: ${id}`);
-    const visArray = [];
-    let aux_source, bulk_content;
-    for (let element of app_objects) {
-      aux_source = JSON.parse(JSON.stringify(element._source));
-
-      // Replace index-pattern for visualizations
-      if (
-        aux_source &&
-        aux_source.kibanaSavedObjectMeta &&
-        aux_source.kibanaSavedObjectMeta.searchSourceJSON &&
-        typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
-      ) {
-        const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
-
-        const isMonitoring = defaultStr.includes('wazuh-monitoring');
-        if (isMonitoring) {
-          if (namespace && namespace !== 'default') {
-            if (
-              monitoringPattern.includes(namespace) &&
-              monitoringPattern.includes('index-pattern:')
-            ) {
-              monitoringPattern = monitoringPattern.split('index-pattern:')[1];
-            }
-          }
-          aux_source.kibanaSavedObjectMeta.searchSourceJSON =
-            defaultStr.replace(
-              /wazuh-monitoring/g,
-              monitoringPattern[monitoringPattern.length - 1] === '*' ||
-                (namespace && namespace !== 'default')
-                ? monitoringPattern
-                : monitoringPattern + '*',
-            );
-        } else {
-          aux_source.kibanaSavedObjectMeta.searchSourceJSON =
-            defaultStr.replace(/wazuh-alerts/g, id);
-        }
-      }
-
-      // Replace index-pattern for selector visualizations
-      if (typeof (aux_source || {}).visState === 'string') {
-        aux_source.visState = aux_source.visState.replace(/wazuh-alerts/g, id);
-      }
-
-      // Bulk source
-      bulk_content = {};
-      bulk_content[element._type] = aux_source;
-
-      visArray.push({
-        attributes: bulk_content.visualization,
-        type: element._type,
-        id: element._id,
-        _version: bulk_content.visualization.version,
-      });
-    }
-    return visArray;
-  }
-
-  /**
-   * Replaces cluster visualizations main fields.
-   * @param {Array<Object>} app_objects Object containing raw visualizations.
-   * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
-   * @param {Array<String>} nodes Array of node names. Eg: ['node01', 'node02']
-   * @param {String} name Cluster name. Eg: 'wazuh'
-   * @param {String} master_node Master node name. Eg: 'node01'
-   */
-  buildClusterVisualizationsRaw(
-    context,
-    app_objects,
-    id,
-    nodes = [],
-    name,
-    master_node,
-    pattern_name = '*',
-  ) {
-    try {
-      const visArray = [];
-      let aux_source, bulk_content;
-
-      for (const element of app_objects) {
-        // Stringify and replace index-pattern for visualizations
-        aux_source = JSON.stringify(element._source);
-        aux_source = aux_source.replace(/wazuh-alerts/g, id);
-        aux_source = JSON.parse(aux_source);
-
-        // Bulk source
-        bulk_content = {};
-        bulk_content[element._type] = aux_source;
-
-        const visState = JSON.parse(bulk_content.visualization.visState);
-        const title = visState.title;
-
-        if (title.startsWith('App Statistics')) {
-          const filter =
-            bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON.replace(
-              '"filter":[]',
-              `"filter":[{"bool":{"must":[{"match":{"apiName":"'${master_node}'"}}${
-                name && name !== 'all'
-                  ? `,{"match":{"nodeName":"'${name}'"}}`
-                  : ''
-              }]}}]`,
-            );
-
-          bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON =
-            filter;
-        }
-
-        if (visState.type && visState.type === 'timelion') {
-          let query = '';
-          if (title === 'App Cluster Overview') {
-            for (const node of nodes) {
-              query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${node.name}").label("${node.name}"),`;
-            }
-            query = query.substring(0, query.length - 1);
-          } else if (title === 'App Cluster Overview Manager') {
-            query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
-          }
-
-          visState.params.expression = query.replace(/'/g, '"');
-          bulk_content.visualization.visState = JSON.stringify(visState);
-        }
-
-        visArray.push({
-          attributes: bulk_content.visualization,
-          type: element._type,
-          id: element._id,
-          _version: bulk_content.visualization.version,
-        });
-      }
-
-      return visArray;
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * This checks if there is sample data
-   * GET /indexer/sampledata
-   * @param {*} context
-   * @param {*} request
-   * @param {*} response
-   * {data: [...]} or ErrorResponse
-   */
-  async haveSampleData(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      // Check if wazuh sample data index exists
-      const categoryPromises = Object.keys(
-        WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
-      ).map(async category => {
-        const indexNames = await this.buildSampleIndexByCategory(
-          context,
-          category,
-        );
-
-        try {
-          const indexResults = await Promise.all(
-            indexNames.map(async indexName => {
-              return await context.core.opensearch.client.asCurrentUser.indices.get(
-                {
-                  index: indexName,
-                },
-              );
-            }),
-          );
-          return indexResults.some(result => result.body);
-        } catch (error) {
-          // If indices.get fails, the index doesn't exist
-          return false;
-        }
-      });
-
-      // Wait for all category checks to complete
-      const results = await Promise.all(categoryPromises);
-
-      return response.ok({
-        body: { sampleDataInstalled: results.some(result => result) },
-      });
-    } catch (error) {
-      return ErrorResponse(
-        'Sample data category not valid',
-        1000,
-        500,
-        response,
-      );
-    }
-  }
-  /**
    * This creates sample data in wazuh-sample-data
    * GET /indexer/sampledata/{category}
    * @param {*} context
@@ -621,7 +420,7 @@ export class WazuhElasticCtrl {
 
               let sampleDataAndTemplate: {
                 sampleData: [];
-                templateFile?: {
+                template?: {
                   index_patterns: string;
                   priority: number;
                   template: any;
@@ -653,12 +452,12 @@ export class WazuhElasticCtrl {
                     index: indexName,
                   },
                 );
-              if (!existsSampleIndex.body) {
+              if (existsSampleIndex.body === false) {
                 // Create wazuh sample data index
                 let configuration;
 
-                if (sampleDataAndTemplate?.templateFile) {
-                  configuration = sampleDataAndTemplate.templateFile.template;
+                if (sampleDataAndTemplate?.template) {
+                  configuration = sampleDataAndTemplate.template.template;
 
                   delete configuration.index_patterns;
                   delete configuration.priority;

@@ -79,15 +79,6 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/indexer/sampledata',
-      validate: false,
-    },
-    async (context, request, response) =>
-      ctrl.haveSampleData(context, request, response),
-  );
-
-  router.get(
-    {
       path: '/indexer/sampledata/{category}',
       validate: {
         params: schema.object({
