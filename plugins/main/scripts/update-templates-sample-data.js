@@ -1,11 +1,28 @@
 /**
  * Script to download and update template files from a public GitHub repository
  * This script updates the template.json files in each dataset
+ * 
+ * Usage:
+ *   node update-templates-sample-data.js [--branch=<branch-name>]
  */
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+
+// Parse command line arguments
+const parseArgs = () => {
+  const args = process.argv.slice(2);
+  const params = {};
+  
+  args.forEach(arg => {
+    if (arg.startsWith('--branch=')) {
+      params.branch = arg.split('=')[1];
+    }
+  });
+  
+  return params;
+};
 
 // Read version from VERSION.json file
 const getVersionInfo = () => {
@@ -19,10 +36,17 @@ const getVersionInfo = () => {
   }
 };
 
-// Determine branch based on version
+// Determine branch based on version or command line argument
 const getBranch = () => {
+  const args = parseArgs();
+  if (args.branch) {
+    console.log(`Using specified branch: ${args.branch}`);
+    return args.branch;
+  }
+  
   const versionInfo = getVersionInfo();
   const version = versionInfo.version;
+  console.log(`Using version as branch: ${version}`);
   return version;
 };
 
