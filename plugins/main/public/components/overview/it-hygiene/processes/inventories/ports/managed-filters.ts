@@ -1,11 +1,6 @@
 export default [
   {
     type: 'multiSelect',
-    key: 'destination.port',
-    placeholder: 'Local port',
-  },
-  {
-    type: 'multiSelect',
     key: 'interface.state',
     placeholder: 'State',
   },
