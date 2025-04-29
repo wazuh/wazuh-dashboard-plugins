@@ -130,13 +130,13 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
                     isFullScreenMode: false,
                     filters: fetchFilters ?? [],
                     useMargins: true,
-                    id: 'kpis-vulnerability-detector-dashboard-tab',
+                    id: 'it-hygiene-dashboard-kpis',
                     timeRange: {
                       from: searchBarProps.dateRangeFrom,
                       to: searchBarProps.dateRangeTo,
                     },
-                    title: 'KPIs Vulnerability detector dashboard',
-                    description: 'KPIs Dashboard of the Vulnerability detector',
+                    title: 'IT Hygiene dashboard KPIs',
+                    description: 'Dashboard of the IT Hygiene KPIs',
                     query: searchBarProps.query,
                     refreshConfig: {
                       pause: false,
