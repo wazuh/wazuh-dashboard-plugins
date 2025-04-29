@@ -142,7 +142,7 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
                       pause: false,
                       value: 15,
                     },
-                    hidePanelTitles: true,
+                    hidePanelTitles: false,
                     lastReloadRequestTime: fingerprint,
                   }}
                 />

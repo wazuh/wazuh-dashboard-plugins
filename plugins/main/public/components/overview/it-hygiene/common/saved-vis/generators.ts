@@ -60,6 +60,62 @@ export const getVisStatePieByField = (
   };
 };
 
+export const getVisStateDonutByField = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  orderAggregation: 'asc' | 'desc' = 'desc',
+) => {
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title: title,
+    type: 'pie',
+    params: {
+      type: 'pie',
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      isDonut: true,
+      labels: {
+        show: false,
+        values: true,
+        last_level: true,
+        truncate: 100,
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {},
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: field,
+            orderBy: '1',
+            order: orderAggregation,
+            size: 10,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+          },
+          schema: 'segment',
+        },
+      ],
+    },
+  };
+};
+
 export const getVisStateHorizontalBarByField = (
   indexPatternId: string,
   field: string,
