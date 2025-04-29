@@ -6,11 +6,6 @@ import {
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStatePieByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
-import {
-  getVisStateDHCPEnabledInterfacesMetric,
-  getVisStateNetworkAveragePriorityMetric,
-} from '../common/dashboard';
-
 const getVisStateWirelessNetworkInterfacesMetric = (
   indexPatternId: string,
 ): SavedVis => {
@@ -77,8 +72,12 @@ const getVisStateWirelessNetworkInterfacesMetric = (
 
 export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateNetworkAveragePriorityMetric(indexPatternId),
-    getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
+    getVisStatePieByField(
+      indexPatternId,
+      'network.dhcp',
+      'DHCP',
+      'it-hygiene-protocols',
+    ),
     getVisStatePieByField(
       indexPatternId,
       'network.type',

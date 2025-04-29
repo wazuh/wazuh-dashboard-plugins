@@ -1,5 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { getVisStateDonutByField } from '../common/saved-vis/generators';
 
 const getVisStateStatOperatingSystems = (indexPatternId: string) => {
   return {
@@ -344,7 +345,12 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's1',
-        savedVis: getVisStateStatPackages(indexPatternId),
+        savedVis: getVisStateDonutByField(
+          indexPatternId,
+          'host.cpu.name',
+          'Top 10 CPUs',
+          'it-hygiene-stat',
+        ),
       },
     },
     s2: {
@@ -358,7 +364,12 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's2',
-        savedVis: getVisStateStatProcesses(indexPatternId),
+        savedVis: getVisStateDonutByField(
+          indexPatternId,
+          'process.state',
+          'Process state',
+          'it-hygiene-stat',
+        ),
       },
     },
     s3: {
@@ -372,7 +383,12 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's3',
-        savedVis: getVisStateStatOperatingSystems(indexPatternId),
+        savedVis: getVisStateDonutByField(
+          indexPatternId,
+          'host.memory.total',
+          'Total memory',
+          'it-hygiene-stat',
+        ),
       },
     },
     s4: {
