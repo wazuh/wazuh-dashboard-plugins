@@ -4,6 +4,7 @@ import { EuiLink } from '@elastic/eui';
 import {
   ensureIndexPatternIsCreated,
   ERROR_NO_INDICES_FOUND,
+  mapFieldsFormatBytes,
   withIndexPatternFromSettingDataSource,
   withMapErrorPromptErrorEnsureIndexPattern,
 } from '../../../../common/hocs';
@@ -59,7 +60,12 @@ export const withSystemInventoryNetworksDataSource =
 export const withSystemInventoryInterfacesDataSource =
   withIndexPatternFromSettingDataSource({
     indexPatternSetting: 'system_inventory_interfaces.pattern',
-    validate: ensureIndexPatternIsCreated(),
+    validate: ensureIndexPatternIsCreated(
+      mapFieldsFormatBytes([
+        'host.network.egress.bytes',
+        'host.network.ingress.bytes',
+      ]),
+    ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
 
@@ -108,6 +114,12 @@ export const withSystemInventorySystemDataSource =
 export const withSystemInventoryHardwareDataSource =
   withIndexPatternFromSettingDataSource({
     indexPatternSetting: 'system_inventory_hardware.pattern',
-    validate: ensureIndexPatternIsCreated(),
+    validate: ensureIndexPatternIsCreated(
+      mapFieldsFormatBytes([
+        'host.memory.free',
+        'host.memory.total',
+        'host.memory.used',
+      ]),
+    ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });

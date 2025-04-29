@@ -236,3 +236,23 @@ export const withIndexPatternsFromSettingDataSource = ({
     ),
   );
 };
+
+export function mapFieldsFormatBytes(expectedFields: string[]) {
+  return {
+    mapSavedObjectAttributesCreation: ({ fields }) => {
+      const mappedFields = fields
+        ?.filter(
+          ({ name, type }) =>
+            expectedFields.includes(name) && type === 'number',
+        )
+        .map(({ name }) => [name, { id: 'bytes' }]);
+
+      if (mappedFields.length) {
+        return {
+          fieldFormatMap: JSON.stringify(Object.fromEntries(mappedFields)),
+        }; // Add format map for expected fields
+      }
+      return {};
+    },
+  };
+}
