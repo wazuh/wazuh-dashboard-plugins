@@ -10,7 +10,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added settings to manage the FIM and IT Hygiene inventories data [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
-- Add persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
+- Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
+- Added the option to add sample data from FIM, Inventory and vulnerabilities. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
 
 ### Removed
 
