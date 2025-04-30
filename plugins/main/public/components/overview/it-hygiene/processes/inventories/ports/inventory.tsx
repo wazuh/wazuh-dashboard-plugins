@@ -21,6 +21,7 @@ export const ITHygieneProccessesInventoryPorts =
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewProcessesPortTab}
         tableId='it-hygiene-inventory-ports'
+        indexPattern={props.indexPattern}
       />
     );
   });

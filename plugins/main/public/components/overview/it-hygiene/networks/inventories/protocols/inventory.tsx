@@ -21,6 +21,7 @@ export const ITHygieneNetworksInventoryProtocols =
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewNetworksProtocolsTab}
         tableId='it-hygiene-inventory-protocols'
+        indexPattern={props.indexPattern}
       />
     );
   });

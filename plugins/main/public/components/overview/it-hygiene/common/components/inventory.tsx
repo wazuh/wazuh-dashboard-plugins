@@ -15,10 +15,13 @@ import {
   TabsManagedBySearchParamProps,
 } from '../../../../navigation/tabs-managed-by-search-params';
 import { CustomSearchBarProps } from '../../../../common/custom-search-bar/custom-search-bar';
-import { withDataSourceInitiated, withGuard } from '../../../../common/hocs';
+import {
+  HideOnErrorInitializatingDataSource,
+  PromptErrorInitializatingDataSource,
+} from '../../../../common/hocs';
 import { LoadingSearchbarProgress } from '../../../../common/loading-searchbar-progress/loading-searchbar-progress';
-import { compose } from 'redux';
 import { DiscoverNoResults } from '../../../../common/no-results/no-results';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/public/';
 
 export const ITHygieneInventoryTabLayout = ({
   tabs,
@@ -35,168 +38,141 @@ export const ITHygieneInventoryTabLayout = ({
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
-const ITHygieneInventoryDashboardOnResults = compose(
-  withGuard(
-    ({ results }) => typeof results?.hits?.total === 'undefined',
-    () => null,
-  ),
-  withGuard(
-    ({ results }) => results?.hits?.total === 0,
-    () => <DiscoverNoResults />,
-  ),
-)(
-  ({
-    dataSource,
-    filters,
-    fixedFilters,
-    fetchFilters,
-    setFilters,
-    fingerprint,
-    searchBarProps,
-    isDataSourceLoading,
-    getDashboardPanels,
-    dataGridProps,
-    results,
-    inspectedHit,
-    removeInspectedHit,
-    tableDefaultColumns,
-  }: ITHygieneInventoryDashboardTableProps) => {
-    return (
-      <>
-        <div className='wz-dashboard-responsive'>
-          {getDashboardPanels && dataSource && (
-            <DashboardByRenderer
-              input={{
-                viewMode: ViewMode.VIEW,
-                panels: getDashboardPanels(dataSource?.id),
-                isFullScreenMode: false,
-                filters: fetchFilters ?? [],
-                useMargins: true,
-                id: 'it-hygiene-inventory-dashboard',
-                timeRange: {
-                  from: searchBarProps.dateRangeFrom,
-                  to: searchBarProps.dateRangeTo,
-                },
-                title: 'IT Hygiene inventory dahsboard',
-                description: 'IT Hygiene dashboard',
-                query: searchBarProps.query,
-                refreshConfig: {
-                  pause: false,
-                  value: 15,
-                },
-                hidePanelTitles: false,
-                lastReloadRequestTime: fingerprint,
-              }}
+const ITHygieneInventoryDashboard = ({
+  dataSource,
+  filters,
+  fixedFilters,
+  fetchFilters,
+  setFilters,
+  fetchData,
+  fingerprint,
+  autoRefreshFingerprint,
+  searchBarProps,
+  isDataSourceLoading,
+  tableDefaultColumns,
+  getDashboardPanels,
+  managedFilters,
+  managedFiltersProps,
+  tableId,
+  indexPattern,
+  error,
+}: ITHygieneInventoryDashboardTableProps) => {
+  const { results, dataGridProps, inspectedHit, removeInspectedHit } =
+    useTableDataGridFetch({
+      searchBarProps,
+      tableId,
+      tableDefaultColumns,
+      dataSource,
+      filters,
+      fetchFilters,
+      setFilters,
+      fetchData,
+      fingerprint,
+      autoRefreshFingerprint,
+      isDataSourceLoading,
+    });
+
+  return (
+    <>
+      {isDataSourceLoading && !dataSource ? (
+        <LoadingSearchbarProgress />
+      ) : (
+        <>
+          {/* WORKAROUND1: Taking into account the workaround to mitigate the embedable dashboard
+              breaks due to navigation while this is being created, we are rendering the dashboard
+              with the index pattern provided by a HOC that checks if the index pattern exists
+              instead of the provided by the creation of he dataSource, this move does the dashboard
+              is created early, reducing the wait time and possibility to navigate to another view.
+
+              If there is an error with the creation of the dataSource, using the "wz-no-display"
+              class, "hides" the search bar, that with an additional optional rendering of a prompt
+              (for example: PromptErrorInitializatingDataSource), could similate the view is
+              protected, despite there are some components that are rendered.*/}
+          <HideOnErrorInitializatingDataSource error={error}>
+            <CustomSearchBar
+              searchBarProps={searchBarProps}
+              indexPattern={dataSource?.indexPattern}
+              setFilters={setFilters}
+              fixedFilters={fixedFilters}
+              filterInputs={managedFilters || []}
+              filterInputsProps={managedFiltersProps}
             />
-          )}
-        </div>
-        <IntlProvider locale='en'>
-          <>
-            <EuiPageTemplate
-              className='wz-table-data-grid'
-              restrictWidth='100%'
-              fullHeight={true}
-              grow
-              paddingSize='none'
-              pageContentProps={{ color: 'transparent' }}
-            >
-              <TableDataGridWithSearchBarInspectedHit
-                dataSource={dataSource}
-                filters={filters}
-                fetchFilters={fetchFilters}
-                fixedFilters={fixedFilters}
-                isDataSourceLoading={isDataSourceLoading}
-                setFilters={setFilters}
-                searchBarProps={searchBarProps}
-                displayOnlyNoResultsCalloutOnNoResults={true}
-                showSearchBar={false}
-                dataGridProps={dataGridProps}
-                results={results}
-                inspectedHit={inspectedHit}
-                removeInspectedHit={removeInspectedHit}
-                tableDefaultColumns={tableDefaultColumns}
+          </HideOnErrorInitializatingDataSource>
+
+          {dataSource && results?.hits?.total === 0 ? (
+            <DiscoverNoResults />
+          ) : null}
+          <div
+            className={`wz-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls ${
+              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+            }`}
+          >
+            {getDashboardPanels && (
+              <DashboardByRenderer
+                input={{
+                  viewMode: ViewMode.VIEW,
+                  panels: getDashboardPanels(
+                    dataSource?.id || indexPattern?.id,
+                  ),
+                  isFullScreenMode: false,
+                  filters: fetchFilters ?? [],
+                  useMargins: true,
+                  id: 'it-hygiene-inventory-dashboard',
+                  timeRange: {
+                    from: searchBarProps.dateRangeFrom,
+                    to: searchBarProps.dateRangeTo,
+                  },
+                  title: 'IT Hygiene inventory dahsboard',
+                  description: 'IT Hygiene dashboard',
+                  query: searchBarProps.query,
+                  refreshConfig: {
+                    pause: false,
+                    value: 15,
+                  },
+                  hidePanelTitles: false,
+                  lastReloadRequestTime: fingerprint,
+                }}
               />
-            </EuiPageTemplate>
-          </>
-        </IntlProvider>
-      </>
-    );
-  },
-);
-
-const ITHygieneInventoryDashboard = compose(
-  withGuard(
-    ({ isDataSourceLoading }) => isDataSourceLoading,
-    LoadingSearchbarProgress,
-  ),
-  withDataSourceInitiated({
-    dataSourceNameProp: 'dataSource',
-    isLoadingNameProp: 'isDataSourceLoading',
-  }),
-)(
-  ({
-    dataSource,
-    filters,
-    fixedFilters,
-    fetchFilters,
-    setFilters,
-    fetchData,
-    fingerprint,
-    autoRefreshFingerprint,
-    searchBarProps,
-    isDataSourceLoading,
-    tableDefaultColumns,
-    getDashboardPanels,
-    managedFilters,
-    managedFiltersProps,
-    tableId,
-  }: ITHygieneInventoryDashboardTableProps) => {
-    const { results, dataGridProps, inspectedHit, removeInspectedHit } =
-      useTableDataGridFetch({
-        searchBarProps,
-        tableId,
-        tableDefaultColumns,
-        dataSource,
-        filters,
-        fetchFilters,
-        setFilters,
-        fetchData,
-        fingerprint,
-        autoRefreshFingerprint,
-        isDataSourceLoading,
-      });
-
-    return (
-      <>
-        <CustomSearchBar
-          searchBarProps={searchBarProps}
-          indexPattern={dataSource?.indexPattern}
-          setFilters={setFilters}
-          fixedFilters={fixedFilters}
-          filterInputs={managedFilters || []}
-          filterInputsProps={managedFiltersProps}
-        />
-        <ITHygieneInventoryDashboardOnResults
-          dataSource={dataSource}
-          filters={filters}
-          fetchFilters={fetchFilters}
-          fixedFilters={fixedFilters}
-          isDataSourceLoading={isDataSourceLoading}
-          setFilters={setFilters}
-          searchBarProps={searchBarProps}
-          displayOnlyNoResultsCalloutOnNoResults={true}
-          showSearchBar={false}
-          getDashboardPanels={getDashboardPanels}
-          dataGridProps={dataGridProps}
-          results={results}
-          inspectedHit={inspectedHit}
-          removeInspectedHit={removeInspectedHit}
-          tableDefaultColumns={tableDefaultColumns}
-        />
-      </>
-    );
-  },
-);
+            )}
+          </div>
+          {dataSource && results?.hits?.total > 0 && (
+            <IntlProvider locale='en'>
+              <>
+                <EuiPageTemplate
+                  className='wz-table-data-grid'
+                  restrictWidth='100%'
+                  fullHeight={true}
+                  grow
+                  paddingSize='none'
+                  pageContentProps={{ color: 'transparent' }}
+                >
+                  <TableDataGridWithSearchBarInspectedHit
+                    dataSource={dataSource}
+                    filters={filters}
+                    fetchFilters={fetchFilters}
+                    fixedFilters={fixedFilters}
+                    isDataSourceLoading={isDataSourceLoading}
+                    setFilters={setFilters}
+                    searchBarProps={searchBarProps}
+                    displayOnlyNoResultsCalloutOnNoResults={true}
+                    showSearchBar={false}
+                    dataGridProps={dataGridProps}
+                    results={results}
+                    inspectedHit={inspectedHit}
+                    removeInspectedHit={removeInspectedHit}
+                    tableDefaultColumns={tableDefaultColumns}
+                  />
+                </EuiPageTemplate>
+              </>
+            </IntlProvider>
+          )}
+          {/* Read WORKAROUND1 */}
+          {error && <PromptErrorInitializatingDataSource error={error} />}
+        </>
+      )}
+    </>
+  );
+};
 
 export interface ITHygieneInventoryDashboardTableProps {
   DataSource: any;
@@ -206,6 +182,7 @@ export interface ITHygieneInventoryDashboardTableProps {
   managedFilters: CustomSearchBarProps['filterInputs'];
   managedFiltersProps?: CustomSearchBarProps['filterInputsProps'];
   tableId: TableDataGridWithSearchBarInspectedHitFetchDataTableId;
+  indexPattern: IndexPattern;
 }
 
 export const ITHygieneInventoryDashboardTable = ({
@@ -216,6 +193,7 @@ export const ITHygieneInventoryDashboardTable = ({
   managedFilters,
   managedFiltersProps,
   tableId,
+  indexPattern,
 }: ITHygieneInventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -260,6 +238,7 @@ export const ITHygieneInventoryDashboardTable = ({
       managedFiltersProps={managedFiltersProps}
       tableId={tableId}
       error={error}
+      indexPattern={indexPattern}
     />
   );
 };
