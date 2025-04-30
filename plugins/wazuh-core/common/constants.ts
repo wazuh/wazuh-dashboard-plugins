@@ -667,17 +667,15 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
   },
 };
 
-const pluginSettings = ({
-  title,
-  description,
+const pluginSettingsSampleData = ({
+  nameCategory,
   defaultValue,
 }: {
-  title: string;
-  description: string;
+  nameCategory: string;
   defaultValue: string;
 }) => ({
-  title: title,
-  description: description,
+  title: `Sample inventory ${nameCategory} prefix`,
+  description: `Define the index name prefix of sample data to ${nameCategory}. It must match the template used by the index pattern to avoid unknown fields in dashboards.`,
   store: {
     file: {
       configurableManaged: true,
@@ -824,64 +822,44 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       ),
     ),
   },
-  [WAZUH_SAMPLE_VULNERABILITIES_PREFIX.key]: pluginSettings({
-    title: 'Sample vulnerabilities prefix',
-    description:
-      'Define the index name prefix of sample data to vulnerabilities. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_VULNERABILITIES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'vulnerabilities',
     defaultValue: WAZUH_SAMPLE_VULNERABILITIES_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory hardware prefix',
-    description:
-      'Define the index name prefix of sample data to hardware of  inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards',
+  [WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'hardware',
     defaultValue: WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_HOTFIXES_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory hotfixes prefix',
-    description:
-      'Define the index name prefix of sample data to hotfixes of inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_INVENTORY_HOTFIXES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'hotfixes',
     defaultValue: WAZUH_SAMPLE_INVENTORY_HOTFIXES_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_INTERFACES_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory interfaces prefix',
-    description:
-      'Define the index name prefix of sample data to interfaces of inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_INVENTORY_INTERFACES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'interfaces',
     defaultValue: WAZUH_SAMPLE_INVENTORY_INTERFACES_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_NETWORKS_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory networks prefix',
-    description:
-      'Define the index name prefix of sample data to networks of inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_INVENTORY_NETWORKS_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'networks',
     defaultValue: WAZUH_SAMPLE_INVENTORY_NETWORKS_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_PACKAGES_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory packages prefix',
-    description:
-      'Define the index name prefix of sample data to packages of inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_INVENTORY_PACKAGES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'packages',
     defaultValue: WAZUH_SAMPLE_INVENTORY_PACKAGES_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_PROCESSES_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory processes prefix',
-    description:
-      'Define the index name prefix of sample data to processes of inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_INVENTORY_PROCESSES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'processes',
     defaultValue: WAZUH_SAMPLE_INVENTORY_PROCESSES_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_PORTS_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory ports prefix',
-    description:
-      'Define the index name prefix of sample data to ports of inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_INVENTORY_PORTS_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'ports',
     defaultValue: WAZUH_SAMPLE_INVENTORY_PORTS_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_PROTOCOLS_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory protocols prefix',
-    description:
-      'Define the index name prefix of sample data to protocols of inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_INVENTORY_PROTOCOLS_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'protocols',
     defaultValue: WAZUH_SAMPLE_INVENTORY_PROTOCOLS_PREFIX.defaultValue,
   }),
-  [WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX.key]: pluginSettings({
-    title: 'Sample inventory system prefix',
-    description:
-      'Define the index name prefix of sample data to system of inventory. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+  [WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'system',
     defaultValue: WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX.defaultValue,
   }),
   'checks.api': {

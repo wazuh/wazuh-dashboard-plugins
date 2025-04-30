@@ -3,12 +3,12 @@ const random = require('../../lib/random');
 function generateRandomHost() {
   return {
     os: {
-      full: `full${Math.floor(Math.random() * 10000)}`,
-      kernel: `kernel${Math.floor(Math.random() * 10000)}`,
-      name: `name${Math.floor(Math.random() * 10000)}`,
-      platform: `platform${Math.floor(Math.random() * 10000)}`,
-      type: `type${Math.floor(Math.random() * 10000)}`,
-      version: `version${Math.floor(Math.random() * 10000)}`,
+      full: `full${random.int(0, 10000)}`,
+      kernel: `kernel${random.int(0, 10000)}`,
+      name: `name${random.int(0, 10000)}`,
+      platform: `platform${random.int(0, 10000)}`,
+      type: `type${random.int(0, 10000)}`,
+      version: `version${random.int(0, 10000)}`,
     },
   };
 }
@@ -16,17 +16,13 @@ function generateRandomHost() {
 function generateRandomAgent() {
   return {
     build: {
-      original: `original${Math.floor(Math.random() * 10000)}`,
+      original: `original${random.int(0, 10000)}`,
     },
-    ephemeral_id: `ephemeral_id${Math.floor(Math.random() * 10000)}`,
-    id: `00${Math.floor(Math.random() * 99) + 1}`,
-    name: `Agent${Math.floor(Math.random() * 100)}`,
-    type: ['filebeat', 'windows', 'linux', 'macos'][
-      Math.floor(Math.random() * 4)
-    ],
-    version: `1.${Math.floor(Math.random() * 10)}.${Math.floor(
-      Math.random() * 10,
-    )}`,
+    ephemeral_id: `ephemeral_id${random.int(0, 10000)}`,
+    id: `00${random.int(0, 99) + 1}`,
+    name: `Agent${random.int(0, 100)}`,
+    type: ['filebeat', 'windows', 'linux', 'macos'][random.int(0, 4)],
+    version: `1.${random.int(0, 10)}.${random.int(0, 10)}`,
   };
 }
 
@@ -57,19 +53,19 @@ function generateRandomPackage() {
   ];
 
   return {
-    architecture: ['x86', 'x64', 'arm', 'arm64'][Math.floor(Math.random() * 4)],
-    build_version: `build${Math.floor(Math.random() * 10000)}`,
-    checksum: `checksum${Math.floor(Math.random() * 10000)}`,
-    description: `description${Math.floor(Math.random() * 10000)}`,
-    install_scope: ['user', 'system'][Math.floor(Math.random() * 2)],
+    architecture: ['x86', 'x64', 'arm', 'arm64'][random.int(0, 4)],
+    build_version: `build${random.int(0, 10000)}`,
+    checksum: `checksum${random.int(0, 10000)}`,
+    description: `description${random.int(0, 10000)}`,
+    install_scope: ['user', 'system'][random.int(0, 2)],
     installed: random.date(),
-    license: `license${Math.floor(Math.random() * 10)}`,
-    name: `name${Math.floor(Math.random() * 100)}`,
-    path: `/path/to/package${Math.floor(Math.random() * 100)}`,
-    reference: `package-reference-${Math.floor(Math.random() * 100)}`,
-    size: Math.floor(Math.random() * 100000),
-    type: types[Math.floor(Math.random() * 22)],
-    version: `v${Math.floor(Math.random() * 10)}-stable`,
+    license: `license${random.int(0, 10)}`,
+    name: `name${random.int(0, 100)}`,
+    path: `/path/to/package${random.int(0, 100)}`,
+    reference: `package-reference-${random.int(0, 100)}`,
+    size: random.int(0, 100000),
+    type: types[random.int(0, 22)],
+    version: `v${random.int(0, 10)}-stable`,
   };
 }
 
@@ -85,35 +81,32 @@ function generateRandomReference(vulnerabilityID) {
 function generateRandomVulnerability() {
   return {
     category: ['security', 'config', 'os', 'package', 'custom'][
-      Math.floor(Math.random() * 5)
+      random.int(0, 5)
     ],
-    classification: `classification${Math.floor(Math.random() * 10000)}`,
-    description: `description${Math.floor(Math.random() * 10000)}`,
+    classification: `classification${random.int(0, 10000)}`,
+    description: `description${random.int(0, 10000)}`,
     detected_at: random.date(),
     enumeration: 'CVE',
-    id: `CVE-${Math.floor(Math.random() * 10000)}`,
+    id: `CVE-${random.int(0, 10000)}`,
     published_at: random.date(),
-    reference: generateRandomReference(
-      `CVE-${Math.floor(Math.random() * 10000)}`,
-    ),
-    report_id: `report-${Math.floor(Math.random() * 10000)}`,
+    reference: generateRandomReference(`CVE-${random.int(0, 10000)}`),
+    report_id: `report-${random.int(0, 10000)}`,
     scanner: {
-      condition: `condition${Math.floor(Math.random() * 10000)}`,
-      source: `source${Math.floor(Math.random() * 10000)}`,
-      vendor: `vendor-${Math.floor(Math.random() * 10)}`,
-      reference: `https://cti.wazuh.com/vulnerabilities/cves/CVE-${Math.floor(
-        Math.random() * 10000,
+      condition: `condition${random.int(0, 10000)}`,
+      source: `source${random.int(0, 10000)}`,
+      vendor: `vendor-${random.int(0, 10)}`,
+      reference: `https://cti.wazuh.com/vulnerabilities/cves/CVE-${random.int(
+        1,
+        10000,
       )}`,
     },
     score: {
-      base: Math.round(Math.random() * 10 * 10) / 10,
-      environmental: Math.round(Math.random() * 10 * 10) / 10,
-      temporal: Math.round(Math.random() * 10 * 10) / 10,
-      version: `${Math.round(Math.random() * 10 * 10) / 10}`,
+      base: random.int(0, 10),
+      environmental: random.int(0, 10),
+      temporal: random.int(0, 10),
+      version: `${random.int(0, 10)}`,
     },
-    severity: ['Low', 'Medium', 'High', 'Critical'][
-      Math.floor(Math.random() * 4)
-    ],
+    severity: ['Low', 'Medium', 'High', 'Critical'][random.int(0, 4)],
     under_evaluation: Math.random() < 0.5,
   };
 }
@@ -124,13 +117,11 @@ function generateRandomWazuh() {
 
   return {
     cluster: {
-      name: clusterNames[Math.floor(Math.random() * clusterNames.length)],
-      node: nodeTypes[Math.floor(Math.random() * nodeTypes.length)],
+      name: clusterNames[random.int(0, clusterNames.length)],
+      node: nodeTypes[random.int(0, nodeTypes.length)],
     },
     schema: {
-      version: `1.${Math.floor(Math.random() * 10)}.${Math.floor(
-        Math.random() * 10,
-      )}`,
+      version: `1.${random.int(0, 10)}.${random.int(0, 10)}`,
     },
   };
 }

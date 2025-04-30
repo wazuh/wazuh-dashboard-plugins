@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ErrorResponse } from '../lib/error-response';
+import { ErrorResponse, WAZUH_STATUS_CODES } from '../lib/error-response';
 import {
   WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
@@ -17,6 +17,7 @@ import {
   WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
   WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
   WAZUH_INDEXER_NAME,
+  HTTP_STATUS_CODES,
 } from '../../common/constants';
 import {
   OpenSearchDashboardsRequest,
@@ -517,9 +518,15 @@ export class WazuhElasticCtrl {
           body: { sampleDocumentsResponse },
         });
       } catch (error) {
-        const statusCode = error?.statusCode || 500;
+        const statusCode =
+          error?.statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
         const errorMessage = error?.errorMessage || error.message || error;
-        return ErrorResponse(errorMessage, 1000, statusCode, response);
+        return ErrorResponse(
+          errorMessage,
+          WAZUH_STATUS_CODES.UNKNOWN,
+          statusCode,
+          response,
+        );
       }
     },
   );
@@ -530,7 +537,9 @@ export class WazuhElasticCtrl {
    * @param {*} response
    * {result: "deleted", index: string} or ErrorResponse
    */
-  deleteSampleData = routeDecoratorProtectedAdministrator(1000)(
+  deleteSampleData = routeDecoratorProtectedAdministrator(
+    WAZUH_STATUS_CODES.UNKNOWN,
+  )(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest<{ category: string }>,
