@@ -12,6 +12,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added settings to manage the FIM and IT Hygiene inventories data [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Add persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
 
+### Fixed
+
+- Fixed a problem in Vulnerabilities > Dashboard and Inventory when there is no indices matching with the index pattern [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+
 ### Removed
 
 - Removed `Inventory data` view from agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
