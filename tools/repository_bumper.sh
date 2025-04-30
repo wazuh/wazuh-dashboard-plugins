@@ -448,6 +448,7 @@ main() {
   update_root_version_json
   update_package_json_files
   update_osd_json_files
+  update_changelog
 
   # Conditionally update endpoints.json
   if [ "$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR" ]; then
