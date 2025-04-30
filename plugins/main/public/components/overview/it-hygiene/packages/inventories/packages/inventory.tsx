@@ -21,6 +21,7 @@ export const ITHygienePackagesInventoryPackages =
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewPackagesPackagesTab}
         tableId='it-hygiene-inventory-packages'
+        indexPattern={props.indexPattern}
       />
     );
   });

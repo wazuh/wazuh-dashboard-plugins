@@ -5,7 +5,11 @@ import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
 import { getDashboardPanels } from './dashboard-panels';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { withErrorBoundary } from '../../../common/hocs';
+import {
+  HideOnErrorInitializatingDataSource,
+  PromptErrorInitializatingDataSource,
+  withErrorBoundary,
+} from '../../../common/hocs';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 import {
@@ -51,6 +55,7 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: SystemInventoryStatesDataSource,
     repository: new SystemInventoryStatesDataSourceRepository(),
@@ -98,16 +103,28 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
             <LoadingSearchbarProgress />
           ) : (
             <>
-              <WzSearchBar
-                appName='it-hygiene-searchbar'
-                {...searchBarProps}
-                filters={filters}
-                fixedFilters={fixedFilters}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
+              {/* WORKAROUND1: Taking into account the workaround to mitigate the embedable dashboard
+              breaks due to navigation while this is being created, we are rendering the dashboard
+              with the index pattern provided by a HOC that checks if the index pattern exists
+              instead of the provided by the creation of he dataSource, this move does the dashboard
+              is created early, reducing the wait time and possibility to navigate to another view.
+
+              If there is an error with the creation of the dataSource, using the "wz-no-display"
+              class, "hides" the search bar, that with an additional optional rendering of a prompt
+              (for example: PromptErrorInitializatingDataSource), could similate the view is
+              protected, despite there are some components that are rendered.*/}
+              <HideOnErrorInitializatingDataSource error={error}>
+                <WzSearchBar
+                  appName='it-hygiene-searchbar'
+                  {...searchBarProps}
+                  filters={filters}
+                  fixedFilters={fixedFilters}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              </HideOnErrorInitializatingDataSource>
 
               {dataSource && results?.hits?.total === 0 ? (
                 <DiscoverNoResults />
@@ -212,6 +229,8 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
                   }}
                 />
               </div>
+              {/* Read WORKAROUND1 */}
+              {error && <PromptErrorInitializatingDataSource error={error} />}
             </>
           )}
         </>

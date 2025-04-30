@@ -21,6 +21,7 @@ export const ITHygieneProccessesInventoryProcesses =
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewProcessesProcessesTab}
         tableId='it-hygiene-inventory-processes'
+        indexPattern={props.indexPattern}
       />
     );
   });

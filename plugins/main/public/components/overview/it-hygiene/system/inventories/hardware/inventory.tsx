@@ -21,6 +21,7 @@ export const ITHygieneSystemInventoryHardware =
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewSystemHardwareTab}
         tableId='it-hygiene-inventory-hardware'
+        indexPattern={props.indexPattern}
       />
     );
   });

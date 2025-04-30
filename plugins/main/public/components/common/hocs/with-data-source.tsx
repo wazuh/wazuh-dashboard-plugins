@@ -10,7 +10,9 @@ import {
 } from '../data-source';
 import { useAsyncActionRunOnStart } from '../hooks';
 
-const PromptErrorInitializatingDataSource = (props: { error?: string }) => {
+export const PromptErrorInitializatingDataSource = (props: {
+  error?: string;
+}) => {
   return (
     <EuiEmptyPrompt
       iconType='alert'
@@ -19,6 +21,14 @@ const PromptErrorInitializatingDataSource = (props: { error?: string }) => {
     />
   );
 };
+
+export const HideOnErrorInitializatingDataSource = ({
+  error,
+  children,
+}: {
+  error: string | null | undefined;
+  children: React.ReactNode;
+}) => <div {...(error ? { className: 'wz-no-display' } : {})}>{children}</div>;
 
 export const withDataSourceLoading = ({
   isLoadingNameProp = 'isDataSourceLoading',
