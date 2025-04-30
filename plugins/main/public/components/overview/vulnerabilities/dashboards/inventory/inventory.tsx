@@ -34,7 +34,11 @@ import { LoadingSearchbarProgress } from '../../../../../../public/components/co
 // common components/hooks
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
-import { withErrorBoundary } from '../../../../common/hocs';
+import {
+  HideOnErrorInitializatingDataSource,
+  PromptErrorInitializatingDataSource,
+  withErrorBoundary,
+} from '../../../../common/hocs';
 import { exportSearchToCSV } from '../../../../common/data-grid/data-grid-service';
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../common/hocs/validate-vulnerabilities-states-index-pattern';
@@ -66,6 +70,7 @@ const InventoryVulsComponent = () => {
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository(),
@@ -216,6 +221,9 @@ const InventoryVulsComponent = () => {
     <IntlProvider locale='en'>
       <>
         <ModuleEnabledCheck />
+        {/* TODO: Using a page template wrapping these components causes different y render position
+        of data source error prompt. We should unify the different views. In the Dashboard tab, the
+        same prompt is rendered at top of view */}
         <EuiPageTemplate
           className='vulsInventoryContainer'
           restrictWidth='100%'
@@ -228,24 +236,26 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSearchbarProgress />
             ) : (
-              <WzSearchBar
-                appName='inventory-vuls'
-                {...searchBarProps}
-                filters={excludeUnderEvaluationFilter(filters)}
-                fixedFilters={fixedFilters}
-                postFixedFilters={[
-                  () => (
-                    <VulsEvaluationFilter
-                      value={underEvaluation}
-                      setValue={handleFilterChange}
-                    />
-                  ),
-                ]}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
+              <HideOnErrorInitializatingDataSource error={error}>
+                <WzSearchBar
+                  appName='inventory-vuls'
+                  {...searchBarProps}
+                  filters={excludeUnderEvaluationFilter(filters)}
+                  fixedFilters={fixedFilters}
+                  postFixedFilters={[
+                    () => (
+                      <VulsEvaluationFilter
+                        value={underEvaluation}
+                        setValue={handleFilterChange}
+                      />
+                    ),
+                  ]}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              </HideOnErrorInitializatingDataSource>
             )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
@@ -335,6 +345,7 @@ const InventoryVulsComponent = () => {
               </EuiFlyout>
             )}
           </>
+          {error && <PromptErrorInitializatingDataSource error={error} />}
         </EuiPageTemplate>
       </>
     </IntlProvider>

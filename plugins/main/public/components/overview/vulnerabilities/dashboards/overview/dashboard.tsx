@@ -8,7 +8,11 @@ import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getDashboardFilters } from './dashboard_panels_filters';
 import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
-import { withErrorBoundary } from '../../../../common/hocs';
+import {
+  HideOnErrorInitializatingDataSource,
+  PromptErrorInitializatingDataSource,
+  withErrorBoundary,
+} from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSearchbarProgress } from '../../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 import {
@@ -59,6 +63,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository(),
@@ -131,24 +136,26 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
             <LoadingSearchbarProgress />
           ) : (
             <>
-              <WzSearchBar
-                appName='vulnerability-detector-searchbar'
-                {...searchBarProps}
-                filters={excludeUnderEvaluationFilter(filters)}
-                fixedFilters={fixedFilters}
-                postFixedFilters={[
-                  () => (
-                    <VulsEvaluationFilter
-                      value={underEvaluation}
-                      setValue={handleFilterChange}
-                    />
-                  ),
-                ]}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
+              <HideOnErrorInitializatingDataSource error={error}>
+                <WzSearchBar
+                  appName='vulnerability-detector-searchbar'
+                  {...searchBarProps}
+                  filters={excludeUnderEvaluationFilter(filters)}
+                  fixedFilters={fixedFilters}
+                  postFixedFilters={[
+                    () => (
+                      <VulsEvaluationFilter
+                        value={underEvaluation}
+                        setValue={handleFilterChange}
+                      />
+                    ),
+                  ]}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              </HideOnErrorInitializatingDataSource>
 
               {dataSource && results?.hits?.total === 0 ? (
                 <DiscoverNoResults />
@@ -247,6 +254,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
                   }}
                 />
               </div>
+              {error && <PromptErrorInitializatingDataSource error={error} />}
             </>
           )}
         </>
