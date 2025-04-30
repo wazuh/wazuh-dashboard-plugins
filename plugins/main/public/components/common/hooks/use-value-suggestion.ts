@@ -208,7 +208,7 @@ export const useValueSuggestion = (
       setSuggestedValues([]);
       setIsLoading(false);
     }
-  }, [indexPattern, query, filterField, boolFilterValue, options]);
+  }, [indexPattern, query, filterField, boolFilterValue]);
 
   return { suggestedValues, isLoading, setQuery };
 };

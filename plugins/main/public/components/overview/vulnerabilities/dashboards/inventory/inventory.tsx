@@ -130,8 +130,6 @@ const InventoryVulsComponent = () => {
 
   const { pagination, sorting, columnVisibility } = dataGridProps;
 
-  // console.log('VULS', { pagination });
-
   const onClickExportResults = async () => {
     const params = {
       indexPattern: indexPattern as IndexPattern,
@@ -159,16 +157,13 @@ const InventoryVulsComponent = () => {
   };
 
   useEffect(() => {
-    console.log('PREFETCH', { pagination, isDataSourceLoading });
     if (isDataSourceLoading) {
       return;
     }
-    console.log('FETCHING', { pagination, isDataSourceLoading });
     setUnderEvaluation(getUnderEvaluation(filters || []));
     setIndexPattern(dataSource?.indexPattern);
     fetchData({ query, pagination, sorting })
       .then(results => {
-        console.log({ results }, results?.hits?.total);
         setResults(results);
       })
       .catch(error => {

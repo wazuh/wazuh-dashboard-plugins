@@ -821,7 +821,7 @@ export const ITHygiene = {
   description: i18n.translate('wz-app-it-hygiene-description', {
     defaultMessage: 'Show information about IT Hygiene.',
   }),
-  euiIconType: 'packetbeatApp',
+  euiIconType: 'indexPatternApp',
   order: 405,
   showInOverviewApp: true,
   showInAgentMenu: true,

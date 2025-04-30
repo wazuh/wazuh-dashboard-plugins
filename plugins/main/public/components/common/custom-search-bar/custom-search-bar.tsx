@@ -51,7 +51,7 @@ export const CustomSearchBar = ({
   /* Using a frozen value when this prop is not
   provided, it avoids the MultiSelect component fetches again when this component is rendered due
   to the filterDrillDownValue passed to that component was creating a new reference in each render
-  and it is used as effect to fetch the suggestions */
+  and it is used as effect dependency to fetch the suggestions */
   filterDrillDownValue = frozenFilterDrillDownValue,
   searchBarProps,
   indexPattern,

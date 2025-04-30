@@ -11,7 +11,7 @@ import { EuiButton, EuiEmptyPrompt } from '@elastic/eui';
 import { LoadingSpinnerDataSource } from '../loading/loading-spinner-data-source';
 import { HTTP_STATUS_CODES } from '../../../../common/constants';
 
-export const ERROR_NO_INDICES_FOUND = 'NO_INDICES_FOUND';
+export const ERROR_NO_INDICES_FOUND = 'ERROR_NO_INDICES_FOUND';
 export const ERROR_INDEX_PATTERN_CREATION = 'ERROR_INDEX_PATTERN_CREATION';
 export const ERROR_ENSURE_INDEX_PATTERN = 'ERROR_ENSURE_INDEX_PATTERN';
 

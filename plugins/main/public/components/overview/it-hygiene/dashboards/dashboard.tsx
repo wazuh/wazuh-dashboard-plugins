@@ -34,9 +34,7 @@ import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../common/constants';
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-/* The vulnerabilities dashboard is made up of 3 dashboards because the filters need
-a wrapper for visual adjustments, while the Kpi, the Open vs Close visualization and
-the rest of the visualizations have different configurations at the dashboard level. */
+/* The IT Hygiene dashboard is made up of 3 dashboards due to diferent dashboard configuration */
 
 interface DashboardITHygieneProps {
   indexPattern: IndexPattern;
