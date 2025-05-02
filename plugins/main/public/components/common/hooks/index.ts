@@ -26,4 +26,4 @@ export { useEsSearch } from './use-es-search';
 export { useValueSuggestion, IValueSuggestion } from './use-value-suggestion';
 export * from './use-state-storage';
 export * from './use-router-search';
-export * from './use-effect-avoid-no-mount';
+export * from './use-effect-ensure-mounted';

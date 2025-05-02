@@ -64,7 +64,7 @@ import {
 } from '../hocs';
 import { compose } from 'redux';
 import { omit } from 'lodash';
-import { useEffectAvoidOnNotMount } from '../hooks';
+import { useEffectEnsureComponentMounted } from '../hooks';
 
 export interface TableDataGridBasicProps<K> {
   dataGridProps: TDataGridReturn;
@@ -218,6 +218,7 @@ const TableDataGridWithSearchBar: React.FunctionComponent<
 > = withDataSourceInitiated({
   dataSourceNameProp: 'dataSource',
   isLoadingNameProp: 'isDataSourceLoading',
+  dataSourceErrorNameProp: 'error',
 })(
   ({
     searchBarProps,
@@ -365,7 +366,7 @@ export const useTableDataGridFetch = ({
   }, [reloadFetch, JSON.stringify(sorting), JSON.stringify(pagination)]);
 
   // Reset the pagination and reload fetch time when the filters changed.
-  useEffectAvoidOnNotMount(() => {
+  useEffectEnsureComponentMounted(() => {
     if (isDataSourceLoading) {
       return;
     }
@@ -427,6 +428,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
   withDataSourceInitiated({
     dataSourceNameProp: 'dataSource',
     isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceErrorNameProp: 'error',
   }),
 )(
   ({
@@ -514,6 +516,7 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
   withDataSourceInitiated({
     dataSourceNameProp: 'dataSource',
     isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceErrorNameProp: 'error',
   }),
 )(
   ({

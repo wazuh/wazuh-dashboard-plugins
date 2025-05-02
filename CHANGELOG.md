@@ -13,6 +13,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
 - Added the option to add sample data from FIM, Inventory and vulnerabilities. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
 
+### Fixed
+
+- Fixed a problem in Vulnerabilities > Dashboard and Inventory when there is no indices matching with the index pattern [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+
 ### Removed
 
 - Removed `Inventory data` view from agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)

@@ -29,7 +29,7 @@ import { endpointSummary } from '../../../utils/applications';
 import { withAgentSync } from '../../common/hocs/withAgentSync';
 import { AgentTabs } from './agent-tabs';
 import { SECTIONS } from '../../../sections';
-import { useEffectAvoidOnNotMount } from '../../common/hooks';
+import { useEffectEnsureComponentMounted } from '../../common/hooks';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers?.currentAgentData,
@@ -99,7 +99,7 @@ export const AgentView = compose(
     setIsLoadingAgent(false);
   };
 
-  useEffectAvoidOnNotMount(() => {
+  useEffectEnsureComponentMounted(() => {
     /* The component has the withAgentSync hook that synchronizes the agent data and this
     effect would trigger on mount causing the views are mounted 2 times, that causes problems with
     the views that are wrapped with index pattern creation due to conflict document errors (same index pattern could be tried to create despite it exist). Avoiding the effect is triggered on mount mitigates the problem or canceling the async operations (index patten validation/creation)

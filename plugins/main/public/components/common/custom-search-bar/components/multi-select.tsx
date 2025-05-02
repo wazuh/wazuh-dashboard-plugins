@@ -192,6 +192,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       hasActiveFilters={activeFilters > 0}
       numActiveFilters={activeFilters}
       isDisabled={isDisabled}
+      size='s'
     >
       {item.placeholder}
     </EuiFilterButton>

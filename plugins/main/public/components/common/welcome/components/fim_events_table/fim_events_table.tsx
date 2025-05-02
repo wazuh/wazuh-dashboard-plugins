@@ -49,6 +49,7 @@ import filesColumns from '../../../../overview/fim/inventory/table-columns/files
 import { withDataSourceFetch } from '../../../hocs';
 import { compose } from 'redux';
 import { filesEventsDocumentDetailsTab } from '../../../../overview/fim';
+import { withFIMDataSource } from '../../../../overview/fim/common/hocs/validate-fim-states-index-pattern';
 
 export function FimEventsTable({ agent }) {
   return (
@@ -117,6 +118,7 @@ const PromptErrorFetchingDocumentDataData = (props: { error?: string }) => {
 
 const FlyoutDetailsFIM = compose(
   withFlyoutDocumentDetails,
+  withFIMDataSource,
   withDataSourceFetch({
     DataSource: FIMStatesDataSource,
     DataSourceRepositoryCreator: FIMStatesDataSourceRepository,

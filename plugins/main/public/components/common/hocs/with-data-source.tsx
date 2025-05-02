@@ -38,10 +38,18 @@ export const withDataSourceLoading = ({
 export const withDataSourceInitiated = ({
   dataSourceNameProp = 'dataSource.dataSource',
   isLoadingNameProp = 'dataSource.isLoading',
+  dataSourceErrorNameProp = 'dataSource.error',
 }) =>
-  withGuard(props => {
-    return !get(props, isLoadingNameProp) && !get(props, dataSourceNameProp);
-  }, PromptErrorInitializatingDataSource);
+  withGuard(
+    props => {
+      return !get(props, isLoadingNameProp) && !get(props, dataSourceNameProp);
+    },
+    props => (
+      <PromptErrorInitializatingDataSource
+        error={get(props, dataSourceErrorNameProp)}
+      ></PromptErrorInitializatingDataSource>
+    ),
+  );
 
 export const withDataSource =
   ({ DataSource, DataSourceRepositoryCreator, nameProp = 'dataSource' }) =>
@@ -126,6 +134,7 @@ export const withDataSourceFetch = ({
     withDataSourceInitiated({
       dataSourceNameProp: `${nameProp}.dataSource`,
       isLoadingNameProp: `${nameProp}.isLoading`,
+      dataSourceErrorNameProp: `${nameProp}.error`,
     }),
     withDataSourceFetchOnStart({
       nameProp,
