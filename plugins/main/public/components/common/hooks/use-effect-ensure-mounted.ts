@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export const useEffectAvoidOnNotMount = (fn, deps) => {
+export const useEffectEnsureComponentMounted = (fn, deps) => {
   const isMountedRef = useRef(false);
   useEffect(() => {
     if (isMountedRef.current) {

@@ -64,7 +64,7 @@ import {
 } from '../hocs';
 import { compose } from 'redux';
 import { omit } from 'lodash';
-import { useEffectAvoidOnNotMount } from '../hooks';
+import { useEffectEnsureComponentMounted } from '../hooks';
 
 export interface TableDataGridBasicProps<K> {
   dataGridProps: TDataGridReturn;
@@ -365,7 +365,7 @@ export const useTableDataGridFetch = ({
   }, [reloadFetch, JSON.stringify(sorting), JSON.stringify(pagination)]);
 
   // Reset the pagination and reload fetch time when the filters changed.
-  useEffectAvoidOnNotMount(() => {
+  useEffectEnsureComponentMounted(() => {
     if (isDataSourceLoading) {
       return;
     }
