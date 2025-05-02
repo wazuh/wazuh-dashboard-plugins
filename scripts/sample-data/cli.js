@@ -79,7 +79,7 @@ Options:
 Example:
   node cli.js --dataset states-fim-files --count 500
   node cli.js --dataset states-fim-files --count 500 --output sample-data.ndjson
-  node cli.js --dataset states-fim-files --count 500 --format bulk-api --index wazuh-alerts --output bulk-data.json
+  node cli.js --dataset states-fim-files --count 500 --format bulk-api --index wazuh-states-fim-files-sample --output bulk-data.json
   node cli.js --dataset states-fim-files --param-manager-name my-manager --param-cluster-name my-cluster
 `;
 

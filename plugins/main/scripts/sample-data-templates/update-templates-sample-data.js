@@ -27,7 +27,7 @@ const parseArgs = () => {
 // Read version from VERSION.json file
 const getVersionInfo = () => {
   try {
-    const versionPath = path.join(__dirname, '../../../VERSION.json');
+    const versionPath = path.join(__dirname, '../../../../VERSION.json');
     const versionContent = fs.readFileSync(versionPath, 'utf8');
     return JSON.parse(versionContent);
   } catch (error) {
@@ -56,7 +56,7 @@ const config = {
   githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/inventory_harvester/indexer/template`,
   githubRepoBaseUrlVulnerabilities: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json`,
   // Local directory where datasets are located
-  localDatasetDir: path.join(__dirname, '../server/lib/sample-data/dataset'),
+  localDatasetDir: path.join(__dirname, '../../server/lib/sample-data/dataset'),
   // List of datasets to update (obtained from local directory)
   datasets: [],
 };

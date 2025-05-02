@@ -81,8 +81,6 @@ const sampleInventory = [
   'system',
 ].join(', ');
 
-const sampleVulnerability = ['vulnerabilities'].join(', ');
-
 export default class WzSampleData extends Component {
   categories: {
     title: string;
@@ -123,19 +121,19 @@ export default class WzSampleData extends Component {
       },
       {
         title: 'Sample file integrity monitoring',
-        description: `Sample data, visualizations and dashboards for (${sampleFileIntegrityMonitoring}).`,
+        description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       },
       {
         title: 'Sample inventory',
-        description: `Sample data, visualizations and dashboards for (${sampleInventory}).`,
+        description: `Sample data, visualizations and dashboards for system inventory (${sampleInventory}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
       },
       {
         title: 'Sample vulnerability detection',
-        description: `Sample data, visualizations and dashboards for (${sampleVulnerability}).`,
+        description: `Sample data, visualizations and dashboards for vulnerabilities inventory.`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_VULNERABILITIES,
       },
