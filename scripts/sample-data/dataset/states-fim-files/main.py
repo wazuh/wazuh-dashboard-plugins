@@ -18,7 +18,27 @@ def generate_random_file():
         "inode": f"inode{random.randint(0, 1000)}",
         "mtime": randomize.date(),
         "owner": f"owner{random.randint(0, 1000)}",
-        "path": "/tmp/agent.conf",
+        "path": random.choice([
+          # same path the UI sample data generator related to alerts, so the alerts and inventory
+          # data match in the paths that is required for some features
+          "/etc/resolv.conf",
+          "/var/wazuh/queue/fim/db/fim.db-journal",
+          "/var/wazuh/queue/fim/db/fim.db",
+          "/var/osquery/osquery.db/CURRENT",
+          "/etc/sysconfig/network-scripts/ifcfg-eth1",
+          "/etc/filebeat/fields.yml",
+          "/var/log/lastlog",
+          "/tmp/agent.conf",
+          "/etc/elasticsearch/elasticsearch.yml",
+          "/etc/elasticsearch/users",
+          "/etc/elasticsearch/config",
+          "/tmp/wazuh-config",
+          "/run/utmp",
+          "/etc/resolv.conf",
+          "/var/wazuh/queue/fim/db/fim.db",
+          "/var/osquery/osquery.db/CURRENT",
+          "/run/utmp",
+        ]),
         "size": random.randint(1000, 1000000),
         "uid": f"uid{random.randint(0, 1000)}",
     }
@@ -31,3 +51,4 @@ def generate_document(params):
         "event": randomize.event(),
         "file": generate_random_file(),
     })
+
