@@ -1,5 +1,8 @@
 const random = require('../../lib/random');
 const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
+const {
+  pathsLinux,
+} = require('../../../generate-alerts/sample-data/integrity-monitoring');
 
 function generateRandomFile() {
   return {
@@ -13,7 +16,7 @@ function generateRandomFile() {
     inode: `inode${random.int(0, 1000)}`,
     mtime: random.date(),
     owner: `owner${random.int(0, 1000)}`,
-    path: '/path/to/file',
+    path: random.choice(pathsLinux),
     size: random.int(1000, 1000000),
     uid: `uid${random.int(0, 1000)}`,
   };
