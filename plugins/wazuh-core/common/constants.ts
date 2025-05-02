@@ -89,39 +89,39 @@ export const WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX = {
   defaultValue: 'wazuh-states-fim-registries-',
 };
 export const WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX = {
-  key: 'inventory_hardware.sample.prefix',
+  key: 'system_inventory_hardware.sample.prefix',
   defaultValue: 'wazuh-states-inventory-hardware-',
 };
 export const WAZUH_SAMPLE_INVENTORY_HOTFIXES_PREFIX = {
-  key: 'inventory_hotfixes.sample.prefix',
+  key: 'system_inventory_hotfixes.sample.prefix',
   defaultValue: 'wazuh-states-inventory-hotfixes-',
 };
 export const WAZUH_SAMPLE_INVENTORY_INTERFACES_PREFIX = {
-  key: 'inventory_interfaces.sample.prefix',
+  key: 'system_inventory_interfaces.sample.prefix',
   defaultValue: 'wazuh-states-inventory-interfaces-',
 };
 export const WAZUH_SAMPLE_INVENTORY_NETWORKS_PREFIX = {
-  key: 'inventory_networks.sample.prefix',
+  key: 'system_inventory_networks.sample.prefix',
   defaultValue: 'wazuh-states-inventory-networks-',
 };
 export const WAZUH_SAMPLE_INVENTORY_PACKAGES_PREFIX = {
-  key: 'inventory_packages.sample.prefix',
+  key: 'system_inventory_packages.sample.prefix',
   defaultValue: 'wazuh-states-inventory-packages-',
 };
 export const WAZUH_SAMPLE_INVENTORY_PORTS_PREFIX = {
-  key: 'inventory_ports.sample.prefix',
+  key: 'system_inventory_ports.sample.prefix',
   defaultValue: 'wazuh-states-inventory-ports-',
 };
 export const WAZUH_SAMPLE_INVENTORY_PROCESSES_PREFIX = {
-  key: 'inventory_processes.sample.prefix',
+  key: 'system_inventory_processes.sample.prefix',
   defaultValue: 'wazuh-states-inventory-processes-',
 };
 export const WAZUH_SAMPLE_INVENTORY_PROTOCOLS_PREFIX = {
-  key: 'inventory_protocols.sample.prefix',
+  key: 'system_inventory_protocols.sample.prefix',
   defaultValue: 'wazuh-states-inventory-protocols-',
 };
 export const WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX = {
-  key: 'inventory_system.sample.prefix',
+  key: 'system_inventory_system.sample.prefix',
   defaultValue: 'wazuh-states-inventory-system-',
 };
 export const WAZUH_SAMPLE_VULNERABILITIES_PREFIX = {
