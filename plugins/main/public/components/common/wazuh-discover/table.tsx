@@ -218,6 +218,7 @@ const TableDataGridWithSearchBar: React.FunctionComponent<
 > = withDataSourceInitiated({
   dataSourceNameProp: 'dataSource',
   isLoadingNameProp: 'isDataSourceLoading',
+  dataSourceErrorNameProp: 'error',
 })(
   ({
     searchBarProps,
@@ -427,6 +428,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
   withDataSourceInitiated({
     dataSourceNameProp: 'dataSource',
     isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceErrorNameProp: 'error',
   }),
 )(
   ({
@@ -514,6 +516,7 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
   withDataSourceInitiated({
     dataSourceNameProp: 'dataSource',
     isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceErrorNameProp: 'error',
   }),
 )(
   ({

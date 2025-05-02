@@ -88,6 +88,7 @@ export const registriesEventsDocumentDetailsTab = ({ document, agent }) => ({
 const InventoryFIMDashboard = withDataSourceInitiated({
   dataSourceNameProp: 'dataSource',
   isLoadingNameProp: 'isDataSourceLoading',
+  dataSourceErrorNameProp: 'error',
 })(
   ({
     dataSource,
