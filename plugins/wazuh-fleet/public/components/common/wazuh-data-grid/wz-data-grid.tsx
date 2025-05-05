@@ -1,10 +1,6 @@
-import React, { useState, useMemo, useEffect, useReducer } from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import {
   EuiFlexItem,
-  EuiToolTip,
-  EuiButtonIcon,
-  EuiDataGridCellValueElementProps,
-  EuiDataGrid,
   EuiFlyout,
   EuiFlyoutHeader,
   EuiTitle,
@@ -27,6 +23,8 @@ import { wzDiscoverRenderColumns } from './render-columns';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import DocDetailsHeader from './components/doc-details-header';
 import { WazuhDataGridContextProvider } from './wz-data-grid-context';
+import { useStickyDataGrid } from './components/sticky-data-grid/hooks';
+import StickyDataGrid from './components/sticky-data-grid/sticky-data-grid';
 
 export interface TWazuhDataGridProps {
   appId: string;
@@ -49,6 +47,13 @@ export interface TWazuhDataGridProps {
     pageSize: number;
   }) => void;
   onChangeSorting: (sorting: { columns: any[]; onSort: any }) => void;
+  actionsColumn?: Array<{
+    name: string;
+    description: string;
+    icon: string;
+    onClick: (row: any, agent: any) => void;
+    [key: string]: any;
+  }>;
 }
 
 const WazuhDataGrid = (props: TWazuhDataGridProps) => {
@@ -64,35 +69,10 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     onChangeSorting,
     query,
     dateRange,
+    actionsColumn
   } = props;
   const [inspectedHit, setInspectedHit] = useState<any>();
   const [isExporting, setIsExporting] = useState<boolean>(false);
-  // const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
-  const sideNavDocked = false; // Placeholder for sideNavDocked
-  const onClickInspectDoc = useMemo(
-    () => (index: number) => {
-      const rowClicked = results.hits.hits[index];
-
-      setInspectedHit(rowClicked);
-    },
-    [results],
-  );
-
-  const DocViewInspectButton = ({
-    rowIndex,
-  }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect document details';
-
-    return (
-      <EuiToolTip content={inspectHintMsg}>
-        <EuiButtonIcon
-          onClick={() => onClickInspectDoc(rowIndex)}
-          iconType='inspect'
-          aria-label={inspectHintMsg}
-        />
-      </EuiToolTip>
-    );
-  };
 
   const dataGridProps = useDataGrid({
     appId,
@@ -101,7 +81,6 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     renderColumns: wzDiscoverRenderColumns,
     results,
     indexPattern: indexPattern as IndexPattern,
-    DocViewInspectButton,
     leadingControlColumns: props.leadingControlColumns,
     trailingControlColumns: props.trailingControlColumns,
     pagination: {
@@ -110,6 +89,10 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     },
   });
   const { pagination, sorting, columnVisibility } = dataGridProps;
+
+  const stickyDataGridProps = useStickyDataGrid({
+    columns: dataGridProps.columns,
+  });
 
   useEffect(() => {
     onChangePagination(pagination);
@@ -194,7 +177,6 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     new Set(),
   );
   const [selectedRows, _dispatchRowSelection] = rowSelection;
-
   return (
     <>
       {isLoading ? <LoadingSpinner /> : null}
@@ -204,13 +186,15 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
       {!isLoading && results?.hits?.total > 0 ? (
         <div className='wazuhDataGridContainer'>
           <WazuhDataGridContextProvider value={rowSelection}>
-            <EuiDataGrid
-              /* TODO: this component is not used in the current plugins so this could be removed.
-              If this is used in future versions, we should add the functionality to manage the
-              visibility of columns thorugh the Available fields button.
-              */
-              {...dataGridProps}
-              className={sideNavDocked ? 'dataGridDockedNav' : ''}
+            <StickyDataGrid
+              dataGridProps={dataGridProps}
+              stickyDataGridProps={{
+                ...stickyDataGridProps,
+                onClickInspectDoc: setInspectedHit,
+                actionsColumn: actionsColumn || [],
+                agentsRows: results?.hits?.hits,
+                rowCount: results?.hits?.total,
+              }}
               toolbarVisibility={{
                 showColumnSelector: { allowHide: false },
                 additionalControls: (

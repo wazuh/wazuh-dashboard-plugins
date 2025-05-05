@@ -59,7 +59,37 @@ function useDataGridColumns({
         return;
       }
 
-      // Update visible columns
+      // Check if the "name" column is present in visible columns
+      const nameColumnId = 'name'; // Make sure this is the correct ID for the Name column
+      const nameColumnIndex = columns.indexOf(nameColumnId);
+
+      // If the "name" column is present, ensure it's in the first position
+      // (after the control columns that are not in this array)
+      if (nameColumnIndex > 0) {
+        // Create a new array with "name" at the beginning and the rest of columns after
+        const reorderedColumns = [
+          nameColumnId,
+          ...columns.filter(col => col !== nameColumnId)
+        ];
+
+        // Update visible columns with the new order
+        setVisibleColumns(reorderedColumns);
+
+        // Filter and persist valid columns
+        const columnsToPersist = reorderedColumns
+          .map(columnId =>
+            columnSchemaDefinitionsMap[columnId] === undefined ? null : columnId,
+          )
+          .filter(Boolean) // Remove falsy values
+          .filter(column => column !== null)
+          .filter(column => column !== undefined);
+
+        dataGridStateManager.updateState({ columns: columnsToPersist });
+        return;
+      }
+
+      // If we get here, either "name" is not present or it's already in the first position
+      // Continue with normal behavior
       setVisibleColumns(columns);
 
       // Filter and persist valid columns

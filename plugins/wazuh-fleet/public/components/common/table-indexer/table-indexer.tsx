@@ -48,6 +48,8 @@ export interface TableIndexerProps {
   setParams: (params: { filters: Filter[]; query: SearchBarProps }) => void;
   actionsColumn?: TableAction[];
   refresh$: Observable<void>;
+  onSelectAll?: (isAllChecked: boolean) => void;
+  onSelectRow?: (selectedRows: Set<any>) => void;
 }
 
 export const actionsDropdown = (
@@ -251,6 +253,7 @@ export const TableIndexer: React.FC<TableIndexerProps> = props => {
             props.actionsColumn || [],
             items,
           )}
+          actionsColumn={props.actionsColumn}
           indexPattern={indexPatterns}
           defaultPagination={tablePagination}
           onChangePagination={pagination => {

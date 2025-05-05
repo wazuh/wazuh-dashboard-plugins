@@ -1,0 +1,250 @@
+/* Variables for common colors and dimensions */
+$border-color: #d3dae6;
+$header-bg-color: #f5f7fa;
+$hover-bg-color: #f0f4f8;
+$link-color: #006BB4;
+$shadow-light: 2px 0 5px -2px rgba(0, 0, 0, 0.1);
+$shadow-light-reverse: -2px 0 5px -2px rgba(0, 0, 0, 0.1);
+$cell-height: 34px;
+$checkbox-width: 32px;
+$inspect-width: 36px;
+$name-width: 200px;
+$actions-width: 40px;
+
+.sticky-grid-container {
+  position: relative;
+  width: 100%;
+}
+
+.euiDataGrid {
+  position: relative;
+}
+
+.sticky-column-wrapper {
+  position: absolute;
+  top: $cell-height;
+  left: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Base styles for cells */
+.sticky-cell {
+  height: $cell-height;
+  width: $cell-height;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border-right: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  pointer-events: auto;
+
+  &:hover {
+    background-color: $hover-bg-color;
+  }
+}
+
+.sticky-header {
+  height: $cell-height;
+  background-color: $header-bg-color;
+  font-weight: bold;
+}
+
+/* Styles for header cells */
+.sticky-header-cell {
+  position: absolute;
+  height: $cell-height;
+  display: flex;
+  align-items: center;
+  background-color: $header-bg-color;
+  border-right: 1px solid $border-color;
+  border-bottom: 1px solid $border-color;
+  pointer-events: auto;
+}
+
+.sticky-header-name {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  background-color: $header-bg-color;
+  padding: 8px 12px;
+  font-weight: bold;
+  border-bottom: 1px solid $border-color;
+  border-right: 1px solid $border-color;
+  cursor: pointer;
+  z-index: 20;
+}
+
+.checkbox-cell {
+  width: $checkbox-width;
+  justify-content: center;
+  padding: 0;
+  border-left: 1px solid $border-color;
+}
+
+.inspect-cell {
+  width: $inspect-width;
+  justify-content: center;
+  padding: 0;
+  z-index: 10;
+}
+
+.name-cell {
+  width: $name-width;
+  padding: 6px;
+  justify-content: flex-start;
+  font-size: 14px;
+
+  > div {
+    color: $link-color;
+    cursor: pointer;
+    font-weight: 500;
+  }
+}
+
+.name-header {
+  width: 150px;
+  padding-left: 12px;
+  justify-content: flex-start;
+}
+
+/* Visual separation for name column */
+.name-cell,
+.name-header {
+  box-shadow: $shadow-light;
+}
+
+.actions-cell {
+  width: $actions-width;
+  justify-content: center;
+  padding: 0;
+  z-index: 10;
+  background-color: white;
+  border-left: 1px solid $border-color;
+  border-right: 1px solid $border-color;
+  pointer-events: auto;
+}
+
+.actions-header {
+  width: $actions-width;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Visual separation for actions column */
+.actions-cell,
+.actions-header {
+  box-shadow: $shadow-light-reverse;
+  border-left: 1px solid $border-color;
+  background-color: $header-bg-color;
+}
+
+.actions-popover-panel {
+  min-width: 200px;
+}
+
+.actions-popover-header {
+  padding: 12px 16px;
+  font-weight: bold;
+  border-bottom: 1px solid $border-color;
+}
+
+.actions-popover-content {
+  padding: 8px 0;
+}
+
+.actions-popover-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $header-bg-color;
+  }
+
+  .euiIcon {
+    margin-right: 8px;
+    color: $link-color;
+  }
+}
+
+.actions-wrapper {
+  position: absolute;
+  right: 0;
+  left: auto;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  background-color: $header-bg-color;
+}
+
+/* Sticky columns configuration in container */
+.sticky-grid-container {
+  /* Sticky checkbox column */
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-checkbox"],
+  .euiDataGridRowCell[data-test-subj="dataGridRowCell-checkbox"] {
+    position: sticky !important;
+    left: 0;
+    z-index: 2;
+  }
+
+  /* Sticky inspect column */
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-inspect"],
+  .euiDataGridRowCell[data-test-subj="dataGridRowCell-inspect"] {
+    position: sticky !important;
+    left: $checkbox-width;
+    z-index: 2;
+  }
+
+  /* Sticky name column */
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-name"],
+  .euiDataGridRowCell[data-test-subj="dataGridRowCell-name"] {
+    position: sticky !important;
+    left: $checkbox-width + $inspect-width;
+    z-index: 2;
+
+    &.euiDataGridHeaderCell {
+      z-index: 3;
+    }
+  }
+
+  /* Higher z-index for header cells */
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-checkbox"],
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-inspect"] {
+    z-index: 3;
+  }
+
+  /* Subtle shadow to create visual separation */
+  .euiDataGridRowCell[data-test-subj="dataGridRowCell-name"],
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-name"] {
+    box-shadow: $shadow-light;
+  }
+
+  /* Sticky actions column on the right */
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-actions"],
+  .euiDataGridRowCell[data-test-subj="dataGridRowCell-actions"] {
+    position: sticky !important;
+    right: 0;
+    z-index: 2;
+    box-shadow: $shadow-light-reverse;
+
+    &.euiDataGridHeaderCell {
+      z-index: 3;
+    }
+  }
+
+  /* Style for sticky cells */
+  .euiDataGridHeaderCell--sticky,
+  .euiDataGridRowCell--sticky {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+  }
+}

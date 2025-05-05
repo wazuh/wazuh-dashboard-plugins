@@ -45,11 +45,11 @@ const SelectionRowCell = ({ row, items, onClickSelectRow }) => {
   const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
-    setIsChecked(
-      [...selectedRows].some(
+      setIsChecked(
+        [...selectedRows].some(
         (agent: IAgentResponse) => agent?._id === agentData?._id,
-      ),
-    );
+        ),
+      );
   }, [selectedRows]);
 
   return (
@@ -63,14 +63,14 @@ const SelectionRowCell = ({ row, items, onClickSelectRow }) => {
             updateSelectedRows({
               action: 'add',
               visibleRowIndex,
-              rowData: items?.hits?.hits[visibleRowIndex],
+              rowData: agentData,
               onClickSelectRow,
             });
           } else {
             updateSelectedRows({
               action: 'delete',
               visibleRowIndex,
-              rowData: items?.hits?.hits[visibleRowIndex],
+              rowData: agentData,
               onClickSelectRow,
             });
           }
@@ -184,14 +184,17 @@ export const agentsTableSelection = ({
   onClickSelectRow,
 }): EuiDataGridControlColumn[] => [
   {
-    id: 'selection',
+    id: 'checkbox',
     width: 32,
     headerCellRender: row =>
       SelectionHeaderCell({ row, items, onClickSelectAll, onClickSelectRow }),
-    rowCellRender: row => SelectionRowCell({ row, items, onClickSelectRow }),
+     rowCellRender: () => null,
+    rowStickyCellRender: row => SelectionRowCell({ row, items, onClickSelectRow }),
   },
+  {
+    id: 'inspect',
+    width: 36,
+    headerCellRender: () => null,
+    rowCellRender: () => null,
+  }
 ];
-// allowEditGroups: boolean,
-// allowUpgrade: boolean,
-// setIsUpgradeModalVisible: (visible: boolean) => void,
-// outdatedAgents: Agent[],

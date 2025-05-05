@@ -1,5 +1,4 @@
 import {
-  EuiDataGridCellValueElementProps,
   EuiDataGridProps,
   EuiDataGridSorting,
   EuiDataGridColumn,
@@ -33,9 +32,6 @@ export interface DataGridProps {
   results: SearchResponse;
   defaultColumns: DataGridColumn[];
   renderColumns?: DataGridRenderColumn[];
-  DocViewInspectButton: ({
-    rowIndex,
-  }: EuiDataGridCellValueElementProps) => React.JSX.Element;
   ariaLabelledBy: string;
   pagination?: Partial<EuiDataGridProps['pagination']>;
   leadingControlColumns?: EuiDataGridProps['leadingControlColumns'];
@@ -46,12 +42,12 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
   const {
     appId,
     indexPattern,
-    DocViewInspectButton,
     results,
     defaultColumns,
     renderColumns,
     trailingControlColumns,
     pagination: defaultPagination,
+    leadingControlColumns
   } = props;
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
@@ -66,11 +62,11 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
 
     return defaultSort
       ? [
-          {
-            id: defaultSort.id,
-            direction: defaultSort.defaultSortDirection || 'desc',
-          },
-        ]
+        {
+          id: defaultSort.id,
+          direction: defaultSort.defaultSortDirection || 'desc',
+        },
+      ]
       : [];
   };
 
@@ -160,22 +156,6 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     return null;
   };
 
-  const leadingControlColumns = useMemo(
-    () => [
-      ...(props?.leadingControlColumns || []),
-      {
-        id: 'inspectCollapseColumn',
-        headerCellRender: () => null,
-        rowCellRender: (props: EuiDataGridCellValueElementProps) =>
-          DocViewInspectButton({
-            ...props,
-            rowIndex: props.rowIndex % pagination.pageSize,
-          }),
-        width: 40,
-      },
-    ],
-    [results],
-  );
   const columnSchemaDefinitions = useMemo(
     () => parseColumns(indexPattern?.fields || [], defaultColumns),
     [indexPattern?.fields, defaultColumns],
