@@ -245,87 +245,6 @@ const getVisStateStatProcesses = (indexPatternId: string) => {
   };
 };
 
-const getVisStateStatNetworkInterfaces = (indexPatternId: string) => {
-  return {
-    id: 'it-hygiene-stat-network-dhcp-enabled',
-    title: 'Interfaces with DHCP enabled',
-    type: 'metric',
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        invertColors: false,
-        style: {
-          bgFill: '#000',
-          bgColor: false,
-          labelColor: false,
-          subText: '',
-          fontSize: 40,
-        },
-      },
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {
-            customLabel: 'enabled',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'network.dhcp:true',
-                  language: 'kuery',
-                },
-                label: 'DHCP',
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
-
 export const getDashboardKPIs = (
   indexPatternId: string,
 ): {
@@ -336,7 +255,7 @@ export const getDashboardKPIs = (
   return {
     s1: {
       gridData: {
-        w: 12,
+        w: 16,
         h: 6,
         x: 0,
         y: 0,
@@ -355,9 +274,9 @@ export const getDashboardKPIs = (
     },
     s2: {
       gridData: {
-        w: 12,
+        w: 16,
         h: 6,
-        x: 12,
+        x: 16,
         y: 0,
         i: 's2',
       },
@@ -374,9 +293,9 @@ export const getDashboardKPIs = (
     },
     s3: {
       gridData: {
-        w: 12,
+        w: 16,
         h: 6,
-        x: 24,
+        x: 32,
         y: 0,
         i: 's3',
       },
@@ -389,20 +308,6 @@ export const getDashboardKPIs = (
           'Total memory',
           'it-hygiene-stat',
         ),
-      },
-    },
-    s4: {
-      gridData: {
-        w: 12,
-        h: 6,
-        x: 36,
-        y: 0,
-        i: 's4',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 's4',
-        savedVis: getVisStateStatNetworkInterfaces(indexPatternId),
       },
     },
   };
