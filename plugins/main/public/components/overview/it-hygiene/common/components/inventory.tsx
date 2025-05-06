@@ -100,9 +100,7 @@ const ITHygieneInventoryDashboard = ({
               filterInputsProps={managedFiltersProps}
             />
           </HideOnErrorInitializatingDataSource>
-          <SampleDataWarning
-            categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
-          />
+
           {dataSource && results?.hits?.total === 0 ? (
             <DiscoverNoResults />
           ) : null}
@@ -111,6 +109,9 @@ const ITHygieneInventoryDashboard = ({
               dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
             }`}
           >
+            <SampleDataWarning
+              categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
+            />
             {getDashboardPanels && (
               <DashboardByRenderer
                 input={{

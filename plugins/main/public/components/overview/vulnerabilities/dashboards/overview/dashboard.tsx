@@ -158,9 +158,6 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
                   showSaveQuery={true}
                 />
               </HideOnErrorInitializatingDataSource>
-              <SampleDataWarning
-                categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
-              />
               {dataSource && results?.hits?.total === 0 ? (
                 <DiscoverNoResults />
               ) : null}
@@ -169,6 +166,9 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
                   dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
                 }`}
               >
+                <SampleDataWarning
+                  categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
+                />
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,

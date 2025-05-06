@@ -258,10 +258,10 @@ const InventoryVulsComponent = () => {
                     showQueryBar={true}
                     showSaveQuery={true}
                   />
+                  <SampleDataWarning
+                    categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
+                  />
                 </HideOnErrorInitializatingDataSource>
-                <SampleDataWarning
-                  categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
-                />
               </>
             )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
