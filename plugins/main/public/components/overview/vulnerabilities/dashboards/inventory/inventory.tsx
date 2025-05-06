@@ -60,6 +60,8 @@ import VulsEvaluationFilter, {
   getUnderEvaluationFilterValue,
 } from '../../common/components/vuls-evaluation-filter';
 import { DataGridVisibleColumnsSelector } from '../../../../common/wazuh-discover/components/visible-columns-selector';
+import { SampleDataWarning } from '../../../../visualize/components';
+import { WAZUH_SAMPLE_VULNERABILITIES } from '../../../../../../common/constants';
 
 const InventoryVulsComponent = () => {
   const {
@@ -236,26 +238,31 @@ const InventoryVulsComponent = () => {
             {isDataSourceLoading ? (
               <LoadingSearchbarProgress />
             ) : (
-              <HideOnErrorInitializatingDataSource error={error}>
-                <WzSearchBar
-                  appName='inventory-vuls'
-                  {...searchBarProps}
-                  filters={excludeUnderEvaluationFilter(filters)}
-                  fixedFilters={fixedFilters}
-                  postFixedFilters={[
-                    () => (
-                      <VulsEvaluationFilter
-                        value={underEvaluation}
-                        setValue={handleFilterChange}
-                      />
-                    ),
-                  ]}
-                  showDatePicker={false}
-                  showQueryInput={true}
-                  showQueryBar={true}
-                  showSaveQuery={true}
-                />
-              </HideOnErrorInitializatingDataSource>
+              <>
+                <HideOnErrorInitializatingDataSource error={error}>
+                  <WzSearchBar
+                    appName='inventory-vuls'
+                    {...searchBarProps}
+                    filters={excludeUnderEvaluationFilter(filters)}
+                    fixedFilters={fixedFilters}
+                    postFixedFilters={[
+                      () => (
+                        <VulsEvaluationFilter
+                          value={underEvaluation}
+                          setValue={handleFilterChange}
+                        />
+                      ),
+                    ]}
+                    showDatePicker={false}
+                    showQueryInput={true}
+                    showQueryBar={true}
+                    showSaveQuery={true}
+                  />
+                  <SampleDataWarning
+                    categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
+                  />
+                </HideOnErrorInitializatingDataSource>
+              </>
             )}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />

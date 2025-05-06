@@ -1,68 +1,87 @@
-# Sample data injector
+# Sample data generator
 
-This script generates sample data for different datasets and injects the data into an index on a Wazuh indexer instance and optionally creates the index pattern.
+This is a utility for generating sample data for Wazuh.
 
-## Files
+The code is based in a feature included in the Wazuh plugin for Wazuh dashboard.
 
-- `script.py`: main script file
-- `config.json`: persistence of configuration
-- `datasets`: directory that contains the available datasets
+A command line interface was created to use it.
 
-# Getting started
+## Requirements
 
-1.  Install the dependencies:
+- Node.js
 
-```console
-pip install -r requirements.txt
+## Usage
+
+Use `--help` or `--examples` to show the help or examples, respectively.
+
+```sh
+node cli.js [options]
 ```
 
-For some operating systems it will fail and suggest a different way to install it (`sudo pacman -S python-xyz`, `sudo apt install python-xyz`, etc.).
+## Use cases
 
-If the package is not found in this way, we can install it running `pip install -r requirements.txt --break-system-packages` (It is recommended to avoid this option if possible)
+Generate sample data for the `states-inventory-hardware` index, using
+the Bulk API format and save the output to a file.
 
-2.  Run the script selecting the dataset:
+Requirements:
 
-```console
-python3 script.py <dataset>
+- jq
+- cURL
+
+0. Define the variable to use in the steps:
+
+```sh
+export SAMPLE_DATA_DATASET_DIR="../../plugins/main/server/lib/sample-data/dataset"
+export SAMPLE_DATA_DATASET_DIR_NAME="states-inventory-hardware"
+export SAMPLE_DATA_INDEX_PATTERN_NAME="wazuh-states-inventory-hardware-sample-data"
+export SAMPLE_DATA_USERNAME="admin"
+export SAMPLE_DATA_USER_PASSWORD="admin"
+export SAMPLE_DATA_SERVER_ADDRESS="https://localhost:9200"
 ```
 
 where:
 
-- `<dataset>`: is the name of the dataset. See the [available datasets](#datasets).
+- SAMPLE_DATA_DATASET_DIR: is the path to the datasets directories.
+- SAMPLE_DATA_DATASET_DIR_NAME: is the directory name of the dataset. To see the available datasets: `find $SAMPLE_DATA_DATASET_DIR/ -maxdepth 1 -type d -exec basename {} \;`
+- SAMPLE_DATA_INDEX_PATTERN_NAME: is the index name. If the data will be indexed to be used by Wazuh dashboard, this could need a specific name according to your index pattern configuration for the dataset to use.
+- SAMPLE_DATA_USERNAME: username with priviliegies to create the index
+- SAMPLE_DATA_USER_PASSWORD: user's password
+- SAMPLE_DATA_SERVER_ADDRESS: server address of the Wazuh indexer, Opensearch or Elasticsearch including the protocol and port
 
-3.  Follow the instructions that it will show on the console.
+1. Generate the sample data
 
-# Datasets
+```sh
+node cli.js \
+    --dataset $SAMPLE_DATA_DATASET_DIR_NAME \
+    --format bulk-api \
+    --index $SAMPLE_DATA_INDEX_PATTERN_NAME > output.ndjson
+```
 
-Built-in datasets:
+> Note: if you pretend to use the sample data in a Wazuh dashboard, you should do the cluster name field matches with the value that you are using. Add the flag `--param-cluster-name VALUE` and/or `--param-manager-name VALUE` replacing the `VALUE` with the expected values.
 
-- states-fim
-- system-inventory-packages
+2. Optional. If you pretend to use the data in the Wazuh dashboard or some dashboard for OpenSearch or Kibana you could need the index has a specific mappings.
 
-## Create dataset
+- Without authentication (HTTP):
 
-1. Create a new folder on `datasets` directory. The directory name will be the name of the dataset.
+```sh
+jq 'del(.index_patterns, .priority) | .template' $SAMPLE_DATA_DATASET_DIR/$SAMPLE_DATA_DATASET_DIR_NAME/template.json | curl -X PUT -k "$SAMPLE_DATA_SERVER_ADDRESS/$SAMPLE_DATA_INDEX_PATTERN_NAME" -H "Content-Type: application/json" -d @-
+```
 
-2. Dataset directory:
+- With authentication (HTTPS):
 
-Create a `main.py`.
-This script must define a `main` function that is run when the dataset creator is called.
+```sh
+jq 'del(.index_patterns, .priority) | .template' $SAMPLE_DATA_DATASET_DIR/$SAMPLE_DATA_DATASET_DIR_NAME/template.json | curl -X PUT -k -u $SAMPLE_DATA_USERNAME:$SAMPLE_DATA_USER_PASSWORD "$SAMPLE_DATA_SERVER_ADDRESS/$SAMPLE_DATA_INDEX_PATTERN_NAME" -H "Content-Type: application/json" -d @-
+```
 
-This receives the following parameters:
+3. Insert the data into the index, using the Bulk API:
 
-- context:
-  - dataset: dataset name
-  - logger: dataset logger
-  - configuration: configuration client
-  - indexer_client: OpenSearch client to interact with the Wazuh indexer instance
-  - dashboard_client: HTTP client to interact with the Wazuh dashboard API
+- Without authentication (HTTP):
 
-See some built-in dataset to know more.
+  ```sh
+  curl $SAMPLE_DATA_SERVER_ADDRESS/_bulk -H "Content-Type: application/x-ndjson" --data-binary "@output.ndjson"
+  ```
 
-# Exploring the data on Wazuh dashboard
-
-The indexed data needs an index pattern that match with the index of the data to be explorable on
-on Wazuh dashboard. So, if this is not created by another source, it could be necessary to create
-the index pattern manually if it was not previously created.
-
-In the case it does not exist, create it with from Dashboard management > Dashboard Management > Index patterns:
+- With authentication (HTTPS):
+  ```sh
+  curl -k -u $SAMPLE_DATA_USERNAME:$SAMPLE_DATA_USER_PASSWORD $SAMPLE_DATA_SERVER_ADDRESS/_bulk -H "Content-Type: application/x-ndjson" --data-binary "@output.ndjson"
+  ```

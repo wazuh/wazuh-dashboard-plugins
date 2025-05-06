@@ -32,6 +32,8 @@ import { withSystemInventoryDataSource } from '../common/hocs/validate-system-in
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { getDashboardKPIs } from './dashboard-kpi';
 import { getDashboardTables } from './dashboard-tables';
+import { SampleDataWarning } from '../../../visualize/components';
+import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../common/constants';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -132,6 +134,9 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
                   dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
                 }`}
               >
+                <SampleDataWarning
+                  categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
+                />
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,

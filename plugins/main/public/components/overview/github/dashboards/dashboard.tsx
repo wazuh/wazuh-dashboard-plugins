@@ -26,6 +26,7 @@ import {
 import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../../../common/search-bar';
+import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
 
 const plugins = getPlugins();
 
@@ -115,7 +116,9 @@ const DashboardGitHubComponent: React.FC = () => {
                   dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
                 }`}
               >
-                <SampleDataWarning />
+                <SampleDataWarning
+                  categoriesSampleData={[WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]}
+                />
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,

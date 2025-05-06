@@ -80,6 +80,54 @@ export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
 // Sample data
 export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-4.x-';
+export const WAZUH_SAMPLE_FIM_FILES_PREFIX = {
+  key: 'fim_files.sample.prefix',
+  defaultValue: 'wazuh-states-fim-files-',
+};
+export const WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX = {
+  key: 'fim_registries.sample.prefix',
+  defaultValue: 'wazuh-states-fim-registries-',
+};
+export const WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX = {
+  key: 'system_inventory_hardware.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-hardware-',
+};
+export const WAZUH_SAMPLE_INVENTORY_HOTFIXES_PREFIX = {
+  key: 'system_inventory_hotfixes.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-hotfixes-',
+};
+export const WAZUH_SAMPLE_INVENTORY_INTERFACES_PREFIX = {
+  key: 'system_inventory_interfaces.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-interfaces-',
+};
+export const WAZUH_SAMPLE_INVENTORY_NETWORKS_PREFIX = {
+  key: 'system_inventory_networks.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-networks-',
+};
+export const WAZUH_SAMPLE_INVENTORY_PACKAGES_PREFIX = {
+  key: 'system_inventory_packages.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-packages-',
+};
+export const WAZUH_SAMPLE_INVENTORY_PORTS_PREFIX = {
+  key: 'system_inventory_ports.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-ports-',
+};
+export const WAZUH_SAMPLE_INVENTORY_PROCESSES_PREFIX = {
+  key: 'system_inventory_processes.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-processes-',
+};
+export const WAZUH_SAMPLE_INVENTORY_PROTOCOLS_PREFIX = {
+  key: 'system_inventory_protocols.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-protocols-',
+};
+export const WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX = {
+  key: 'system_inventory_system.sample.prefix',
+  defaultValue: 'wazuh-states-inventory-system-',
+};
+export const WAZUH_SAMPLE_VULNERABILITIES_PREFIX = {
+  key: 'vulnerabilities.sample.prefix',
+  defaultValue: 'wazuh-states-vulnerabilities-',
+};
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY = 'security';
@@ -619,6 +667,49 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
   },
 };
 
+const pluginSettingsSampleData = ({
+  nameCategory,
+  defaultValue,
+}: {
+  nameCategory: string;
+  defaultValue: string;
+}) => ({
+  title: `Sample inventory ${nameCategory} prefix`,
+  description: `Define the index name prefix of sample data to ${nameCategory}. It must match the template used by the index pattern to avoid unknown fields in dashboards.`,
+  store: {
+    file: {
+      configurableManaged: true,
+    },
+  },
+  category: SettingCategory.GENERAL,
+  type: EpluginSettingType.text,
+  defaultValue: defaultValue,
+  isConfigurableFromSettings: true,
+  requiresRunningHealthCheck: true,
+  validateUIForm: function (value) {
+    return this.validate(value);
+  },
+  // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+  validate: SettingsValidator.compose(
+    SettingsValidator.isString,
+    SettingsValidator.isNotEmptyString,
+    SettingsValidator.hasNoSpaces,
+    SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+    SettingsValidator.hasNotInvalidCharacters(
+      '\\',
+      '/',
+      '?',
+      '"',
+      '<',
+      '>',
+      '|',
+      ',',
+      '#',
+      '*',
+    ),
+  ),
+});
+
 export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
   'alerts.sample.prefix': {
     title: 'Sample alerts prefix',
@@ -657,6 +748,120 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       ),
     ),
   },
+  [WAZUH_SAMPLE_FIM_FILES_PREFIX.key]: {
+    title: 'Sample alerts prefix',
+    description:
+      'Define the index name prefix of sample data to files of file integrity monitoring. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SAMPLE_FIM_FILES_PREFIX.defaultValue,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+        '*',
+      ),
+    ),
+  },
+  [WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX.key]: {
+    title: 'Sample fim registries prefix',
+    description:
+      'Define the index name prefix of sample data to registries of file integrity monitoring. It must match the template used by the index pattern to avoid unknown fields in dashboards.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.GENERAL,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX.defaultValue,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: true,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    // Validation: https://github.com/elastic/elasticsearch/blob/v7.10.2/docs/reference/indices/create-index.asciidoc
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+        '*',
+      ),
+    ),
+  },
+  [WAZUH_SAMPLE_VULNERABILITIES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'vulnerabilities',
+    defaultValue: WAZUH_SAMPLE_VULNERABILITIES_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'hardware',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_HARDWARE_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_HOTFIXES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'hotfixes',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_HOTFIXES_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_INTERFACES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'interfaces',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_INTERFACES_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_NETWORKS_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'networks',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_NETWORKS_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_PACKAGES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'packages',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_PACKAGES_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_PROCESSES_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'processes',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_PROCESSES_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_PORTS_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'ports',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_PORTS_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_PROTOCOLS_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'protocols',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_PROTOCOLS_PREFIX.defaultValue,
+  }),
+  [WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX.key]: pluginSettingsSampleData({
+    nameCategory: 'system',
+    defaultValue: WAZUH_SAMPLE_INVENTORY_SYSTEM_PREFIX.defaultValue,
+  }),
   'checks.api': {
     title: 'API connection',
     description: 'Enable or disable the API health check when opening the app.',

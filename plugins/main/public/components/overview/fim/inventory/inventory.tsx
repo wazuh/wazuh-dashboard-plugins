@@ -24,6 +24,8 @@ import {
   WzTableFlexGroup,
   WzTableFlexItem,
 } from '../../../common/wazuh-discover/flex-layout';
+import { SampleDataWarning } from '../../../visualize/components';
+import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../common/constants';
 
 export const InventoryFIMFilesDocumentDetailsEvents = ({ document, agent }) => (
   <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
@@ -112,6 +114,9 @@ const InventoryFIMDashboard = withDataSourceInitiated({
         showQueryInput={true}
         showQueryBar={true}
         showSaveQuery={true}
+      />
+      <SampleDataWarning
+        categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
       <WzTableFlexGroup gutterSize='s'>
         <WzTableFlexItem>

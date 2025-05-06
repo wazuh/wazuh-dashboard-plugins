@@ -26,7 +26,15 @@ import { getToasts } from '../../kibana-services';
 import { WzRequest } from '../../react-services/wz-request';
 import { AppState } from '../../react-services/app-state';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+  WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  WAZUH_SAMPLE_VULNERABILITIES,
+} from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import {
   amazonWebServices,
@@ -59,12 +67,26 @@ const sampleThreatDetectionApplication = [
 
 const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 
+const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
+
+const sampleInventory = [
+  'hardware',
+  'hotfixes',
+  'interfaces',
+  'networks',
+  'packages',
+  'ports',
+  'processes',
+  'protocols',
+  'system',
+].join(', ');
+
 export default class WzSampleData extends Component {
   categories: {
     title: string;
     description: string;
     image: string;
-    categorySampleAlertsIndex: string;
+    categorySampleDataIndex: string;
   }[];
   generateAlertsParams: any;
   state: {
@@ -82,24 +104,43 @@ export default class WzSampleData extends Component {
         title: 'Sample security information',
         description: `Sample data, visualizations and dashboards for security information (${sampleSecurityInformationApplication}).`,
         image: '',
-        categorySampleAlertsIndex: 'security',
+        categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       },
       {
         title: `Sample ${malwareDetection.title}`,
         description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
         image: '',
-        categorySampleAlertsIndex: 'auditing-policy-monitoring',
+        categorySampleDataIndex:
+          WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       },
       {
         title: 'Sample threat detection and response',
         description: `Sample data, visualizations and dashboards for threat events of detection and response (${sampleThreatDetectionApplication}).`,
         image: '',
-        categorySampleAlertsIndex: 'threat-detection',
+        categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+      },
+      {
+        title: 'Sample file integrity monitoring inventory',
+        description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+      },
+      {
+        title: 'Sample system inventory',
+        description: `Sample data, visualizations and dashboards for system inventory (${sampleInventory}).`,
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
+      },
+      {
+        title: 'Sample vulnerability detection inventory',
+        description: `Sample data, visualizations and dashboards for vulnerabilities inventory.`,
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_VULNERABILITIES,
       },
     ];
     this.state = {};
     this.categories.forEach(category => {
-      this.state[category.categorySampleAlertsIndex] = {
+      this.state[category.categorySampleDataIndex] = {
         exists: false,
         addDataLoading: false,
         removeDataLoading: false,
@@ -113,9 +154,9 @@ export default class WzSampleData extends Component {
       try {
         const results = await PromiseAllRecursiveObject(
           this.categories.reduce((accum, cur) => {
-            accum[cur.categorySampleAlertsIndex] = WzRequest.genericReq(
+            accum[cur.categorySampleDataIndex] = WzRequest.genericReq(
               'GET',
-              `/elastic/samplealerts/${cur.categorySampleAlertsIndex}`,
+              `/indexer/sampledata/${cur.categorySampleDataIndex}`,
             );
             return accum;
           }, {}),
@@ -183,25 +224,25 @@ export default class WzSampleData extends Component {
   async addSampleData(category) {
     try {
       this.setState({
-        [category.categorySampleAlertsIndex]: {
-          ...this.state[category.categorySampleAlertsIndex],
+        [category.categorySampleDataIndex]: {
+          ...this.state[category.categorySampleDataIndex],
           addDataLoading: true,
         },
       });
       await WzRequest.genericReq(
         'POST',
-        `/elastic/samplealerts/${category.categorySampleAlertsIndex}`,
+        `/indexer/sampledata/${category.categorySampleDataIndex}`,
         { params: this.generateAlertsParams },
       );
       this.showToast(
         'success',
-        `${category.title} alerts added`,
+        `${category.title} sample data added`,
         'Date range for sample data is now-7 days ago',
         5000,
       );
       this.setState({
-        [category.categorySampleAlertsIndex]: {
-          ...this.state[category.categorySampleAlertsIndex],
+        [category.categorySampleDataIndex]: {
+          ...this.state[category.categorySampleDataIndex],
           exists: true,
           addDataLoading: false,
         },
@@ -219,8 +260,8 @@ export default class WzSampleData extends Component {
       };
       getErrorOrchestrator().handleError(options);
       this.setState({
-        [category.categorySampleAlertsIndex]: {
-          ...this.state[category.categorySampleAlertsIndex],
+        [category.categorySampleDataIndex]: {
+          ...this.state[category.categorySampleDataIndex],
           addDataLoading: false,
         },
       });
@@ -229,18 +270,18 @@ export default class WzSampleData extends Component {
   async removeSampleData(category) {
     try {
       this.setState({
-        [category.categorySampleAlertsIndex]: {
-          ...this.state[category.categorySampleAlertsIndex],
+        [category.categorySampleDataIndex]: {
+          ...this.state[category.categorySampleDataIndex],
           removeDataLoading: true,
         },
       });
       await WzRequest.genericReq(
         'DELETE',
-        `/elastic/samplealerts/${category.categorySampleAlertsIndex}`,
+        `/indexer/sampledata/${category.categorySampleDataIndex}`,
       );
       this.setState({
-        [category.categorySampleAlertsIndex]: {
-          ...this.state[category.categorySampleAlertsIndex],
+        [category.categorySampleDataIndex]: {
+          ...this.state[category.categorySampleDataIndex],
           exists: false,
           removeDataLoading: false,
         },
@@ -259,8 +300,8 @@ export default class WzSampleData extends Component {
       };
       getErrorOrchestrator().handleError(options);
       this.setState({
-        [category.categorySampleAlertsIndex]: {
-          ...this.state[category.categorySampleAlertsIndex],
+        [category.categorySampleDataIndex]: {
+          ...this.state[category.categorySampleDataIndex],
           removeDataLoading: false,
         },
       });
@@ -268,7 +309,7 @@ export default class WzSampleData extends Component {
   }
   renderCard(category) {
     const { addDataLoading, exists, removeDataLoading } =
-      this.state[category.categorySampleAlertsIndex];
+      this.state[category.categorySampleDataIndex];
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
         <EuiCard

@@ -9,24 +9,23 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { ErrorResponse } from '../lib/error-response';
-
-import { generateAlerts } from '../lib/generate-alerts/generate-alerts-script';
+import { ErrorResponse, WAZUH_STATUS_CODES } from '../lib/error-response';
 import {
   WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+  WAZUH_ALERTS_PREFIX,
+  WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
+  WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
+  WAZUH_INDEXER_NAME,
+  HTTP_STATUS_CODES,
 } from '../../common/constants';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
   OpenSearchDashboardsResponseFactory,
 } from 'src/core/server';
-import {
-  WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS,
-  WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
-} from '../../common/constants';
-import { WAZUH_INDEXER_NAME } from '../../common/constants';
 import { routeDecoratorProtectedAdministrator } from './decorators';
+import { generateSampleData } from '../lib/generate-sample-data';
 
 export class WazuhElasticCtrl {
   constructor() {}
@@ -38,10 +37,26 @@ export class WazuhElasticCtrl {
   async buildSampleIndexByCategory(
     context: RequestHandlerContext,
     category: string,
-  ): Promise<string> {
-    return `${await context.wazuh_core.configuration.get(
-      'alerts.sample.prefix',
-    )}sample-${category}`;
+  ): Promise<string[]> {
+    const settingsIndexPatterns: string[] = [];
+
+    WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[category].forEach(item => {
+      if (settingsIndexPatterns.includes(item.settingIndexPattern)) {
+        return;
+      }
+      settingsIndexPatterns.push(item.settingIndexPattern);
+    });
+
+    const indexNames = await Promise.all(
+      settingsIndexPatterns.map(async settingsIndexPattern => {
+        const configValue = await context.wazuh_core.configuration.get(
+          settingsIndexPattern,
+        );
+        return `${configValue}sample-${category}`;
+      }),
+    );
+
+    return indexNames;
   }
 
   /**
@@ -283,222 +298,49 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * Replaces visualizations main fields to fit a certain pattern.
-   * @param {Array<Object>} app_objects Object containing raw visualizations.
-   * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
-   */
-  async buildVisualizationsRaw(context, app_objects, id, namespace = false) {
-    const config = await context.wazuh_core.configuration.get();
-    let monitoringPattern = `${config['wazuh.monitoring.pattern']}`;
-    context.wazuh.logger.debug(`Building ${app_objects.length} visualizations`);
-    context.wazuh.logger.debug(`Index pattern ID: ${id}`);
-    const visArray = [];
-    let aux_source, bulk_content;
-    for (let element of app_objects) {
-      aux_source = JSON.parse(JSON.stringify(element._source));
-
-      // Replace index-pattern for visualizations
-      if (
-        aux_source &&
-        aux_source.kibanaSavedObjectMeta &&
-        aux_source.kibanaSavedObjectMeta.searchSourceJSON &&
-        typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
-      ) {
-        const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
-
-        const isMonitoring = defaultStr.includes('wazuh-monitoring');
-        if (isMonitoring) {
-          if (namespace && namespace !== 'default') {
-            if (
-              monitoringPattern.includes(namespace) &&
-              monitoringPattern.includes('index-pattern:')
-            ) {
-              monitoringPattern = monitoringPattern.split('index-pattern:')[1];
-            }
-          }
-          aux_source.kibanaSavedObjectMeta.searchSourceJSON =
-            defaultStr.replace(
-              /wazuh-monitoring/g,
-              monitoringPattern[monitoringPattern.length - 1] === '*' ||
-                (namespace && namespace !== 'default')
-                ? monitoringPattern
-                : monitoringPattern + '*',
-            );
-        } else {
-          aux_source.kibanaSavedObjectMeta.searchSourceJSON =
-            defaultStr.replace(/wazuh-alerts/g, id);
-        }
-      }
-
-      // Replace index-pattern for selector visualizations
-      if (typeof (aux_source || {}).visState === 'string') {
-        aux_source.visState = aux_source.visState.replace(/wazuh-alerts/g, id);
-      }
-
-      // Bulk source
-      bulk_content = {};
-      bulk_content[element._type] = aux_source;
-
-      visArray.push({
-        attributes: bulk_content.visualization,
-        type: element._type,
-        id: element._id,
-        _version: bulk_content.visualization.version,
-      });
-    }
-    return visArray;
-  }
-
-  /**
-   * Replaces cluster visualizations main fields.
-   * @param {Array<Object>} app_objects Object containing raw visualizations.
-   * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
-   * @param {Array<String>} nodes Array of node names. Eg: ['node01', 'node02']
-   * @param {String} name Cluster name. Eg: 'wazuh'
-   * @param {String} master_node Master node name. Eg: 'node01'
-   */
-  buildClusterVisualizationsRaw(
-    context,
-    app_objects,
-    id,
-    nodes = [],
-    name,
-    master_node,
-    pattern_name = '*',
-  ) {
-    try {
-      const visArray = [];
-      let aux_source, bulk_content;
-
-      for (const element of app_objects) {
-        // Stringify and replace index-pattern for visualizations
-        aux_source = JSON.stringify(element._source);
-        aux_source = aux_source.replace(/wazuh-alerts/g, id);
-        aux_source = JSON.parse(aux_source);
-
-        // Bulk source
-        bulk_content = {};
-        bulk_content[element._type] = aux_source;
-
-        const visState = JSON.parse(bulk_content.visualization.visState);
-        const title = visState.title;
-
-        if (title.startsWith('App Statistics')) {
-          const filter =
-            bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON.replace(
-              '"filter":[]',
-              `"filter":[{"bool":{"must":[{"match":{"apiName":"'${master_node}'"}}${
-                name && name !== 'all'
-                  ? `,{"match":{"nodeName":"'${name}'"}}`
-                  : ''
-              }]}}]`,
-            );
-
-          bulk_content.visualization.kibanaSavedObjectMeta.searchSourceJSON =
-            filter;
-        }
-
-        if (visState.type && visState.type === 'timelion') {
-          let query = '';
-          if (title === 'App Cluster Overview') {
-            for (const node of nodes) {
-              query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${node.name}").label("${node.name}"),`;
-            }
-            query = query.substring(0, query.length - 1);
-          } else if (title === 'App Cluster Overview Manager') {
-            query += `.es(index=${pattern_name},q="cluster.name: ${name}").label("${name} cluster")`;
-          }
-
-          visState.params.expression = query.replace(/'/g, '"');
-          bulk_content.visualization.visState = JSON.stringify(visState);
-        }
-
-        visArray.push({
-          attributes: bulk_content.visualization,
-          type: element._type,
-          id: element._id,
-          _version: bulk_content.visualization.version,
-        });
-      }
-
-      return visArray;
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * This checks if there is sample alerts
-   * GET /elastic/samplealerts
+   * This creates sample data in wazuh-sample-data
+   * GET /indexer/sampledata/{category}
    * @param {*} context
    * @param {*} request
    * @param {*} response
    * {alerts: [...]} or ErrorResponse
    */
-  async haveSampleAlerts(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      // Check if wazuh sample alerts index exists
-      const results = await Promise.all(
-        Object.keys(WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS).map(
-          async category =>
-            context.core.opensearch.client.asCurrentUser.indices.exists({
-              index: await this.buildSampleIndexByCategory(context, category),
-            }),
-        ),
-      );
-      return response.ok({
-        body: { sampleAlertsInstalled: results.some(result => result.body) },
-      });
-    } catch (error) {
-      return ErrorResponse(
-        'Sample Alerts category not valid',
-        1000,
-        500,
-        response,
-      );
-    }
-  }
-  /**
-   * This creates sample alerts in wazuh-sample-alerts
-   * GET /elastic/samplealerts/{category}
-   * @param {*} context
-   * @param {*} request
-   * @param {*} response
-   * {alerts: [...]} or ErrorResponse
-   */
-  async haveSampleAlertsOfCategory(
+  async haveSampleDataOfCategory(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest<{ category: string }>,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+      const sampleDataIndex = await this.buildSampleIndexByCategory(
         context,
         request.params.category,
       );
-      // Check if wazuh sample alerts index exists
-      const existsSampleIndex =
-        await context.core.opensearch.client.asCurrentUser.indices.exists({
-          index: sampleAlertsIndex,
-        });
+      // Check if wazuh sample data index exists
+      const existsSampleIndex = await Promise.all(
+        sampleDataIndex.map(async indexName => {
+          return await context.core.opensearch.client.asCurrentUser.indices.exists(
+            {
+              index: indexName,
+            },
+          );
+        }),
+      );
       return response.ok({
-        body: { index: sampleAlertsIndex, exists: existsSampleIndex.body },
+        body: {
+          index: sampleDataIndex,
+          exists: existsSampleIndex.some(result => result.body),
+        },
       });
     } catch (error) {
       context.wazuh.logger.error(
-        `Error checking if there are sample alerts indices: ${
+        `Error checking if there are sample data indices: ${
           error.message || error
         }`,
       );
 
       const [statusCode, errorMessage] = this.getErrorDetails(error);
       return ErrorResponse(
-        `Error checking if there are sample alerts indices: ${
+        `Error checking if there are sample data indices: ${
           errorMessage || error
         }`,
         1000,
@@ -508,8 +350,8 @@ export class WazuhElasticCtrl {
     }
   }
   /**
-   * This creates sample alerts in wazuh-sample-alerts
-   * POST /elastic/samplealerts/{category}
+   * This creates sample data in wazuh-sample-data
+   * POST /indexer/sampledata/{category}
    * {
    *   "manager": {
    *      "name": "manager_name"
@@ -522,129 +364,211 @@ export class WazuhElasticCtrl {
    * @param {*} context
    * @param {*} request
    * @param {*} response
-   * {index: string, alerts: [...], count: number} or ErrorResponse
+   * {index: string, data: [...], count: number} or ErrorResponse
    */
-  createSampleAlerts = routeDecoratorProtectedAdministrator(1000)(
+  createSampleData = routeDecoratorProtectedAdministrator(1000)(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest<{ category: string }>,
       response: OpenSearchDashboardsResponseFactory,
     ) => {
-      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+      const sampleIndexNames = await this.buildSampleIndexByCategory(
         context,
         request.params.category,
       );
 
+      const sampleDocumentsResponse: Array<{
+        index: string;
+        sampleDataCount: number;
+      }> = [];
+
       try {
-        const bulkPrefix = JSON.stringify({
-          index: {
-            _index: sampleAlertsIndex,
-          },
-        });
-        const alertGenerateParams = (request.body && request.body.params) || {};
+        await Promise.all(
+          sampleIndexNames.map(async indexName => {
+            try {
+              const bulkPrefix = JSON.stringify({
+                index: {
+                  _index: indexName,
+                },
+              });
+              const sampleDataGenerateParams =
+                (request.body && request.body.params) || {};
 
-        const sampleAlerts = WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS[
-          request.params.category
-        ]
-          .map(typeAlert =>
-            generateAlerts(
-              { ...typeAlert, ...alertGenerateParams },
-              request.body.alerts ||
-                typeAlert.alerts ||
-                WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_ALERTS,
-            ),
-          )
-          .flat();
-        const bulk = sampleAlerts
-          .map(sampleAlert => `${bulkPrefix}\n${JSON.stringify(sampleAlert)}\n`)
-          .join('');
+              const mappedData = WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[
+                request.params.category
+              ]
+                .map((typeSample: { dataSet?: string; count?: number }) => {
+                  if (
+                    indexName.includes(
+                      typeSample?.dataSet || WAZUH_ALERTS_PREFIX,
+                    )
+                  ) {
+                    return generateSampleData(
+                      { ...typeSample, ...sampleDataGenerateParams },
+                      request.body.count ||
+                        typeSample.count ||
+                        WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
+                      context,
+                    );
+                  }
+                  return;
+                })
+                .filter(
+                  (item: { sampleData: []; template?: string } | undefined) =>
+                    item !== undefined,
+                )
+                .flat();
 
-        // Index alerts
+              let sampleDataAndTemplate: {
+                sampleData: [];
+                template?: {
+                  index_patterns: string;
+                  priority: number;
+                  template: any;
+                };
+              } = { sampleData: [] };
 
-        // Check if wazuh sample alerts index exists
-        const existsSampleIndex =
-          await context.core.opensearch.client.asCurrentUser.indices.exists({
-            index: sampleAlertsIndex,
-          });
-        if (!existsSampleIndex.body) {
-          // Create wazuh sample alerts index
+              if (mappedData.length > 1) {
+                mappedData.forEach((item: { sampleData: [] }) =>
+                  sampleDataAndTemplate.sampleData.push(...item.sampleData),
+                );
+              }
 
-          const configuration = {
-            settings: {
-              index: {
-                number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
-                number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
-              },
-            },
-          };
+              if (mappedData.length === 1 && mappedData[0].template) {
+                sampleDataAndTemplate = mappedData[0];
+              }
 
-          await context.core.opensearch.client.asCurrentUser.indices.create({
-            index: sampleAlertsIndex,
-            body: configuration,
-          });
-          context.wazuh.logger.info(`Index ${sampleAlertsIndex} created`);
-        }
+              const { sampleData } = sampleDataAndTemplate;
 
-        await context.core.opensearch.client.asCurrentUser.bulk({
-          index: sampleAlertsIndex,
-          body: bulk,
-        });
-        context.wazuh.logger.info(
-          `Added sample alerts to ${sampleAlertsIndex} index`,
+              const bulk = sampleData
+                .map(document => `${bulkPrefix}\n${JSON.stringify(document)}\n`)
+                .join('');
+
+              // Index data
+
+              // Check if wazuh sample data index exists
+              const existsSampleIndex =
+                await context.core.opensearch.client.asCurrentUser.indices.exists(
+                  {
+                    index: indexName,
+                  },
+                );
+              if (existsSampleIndex.body === false) {
+                // Create wazuh sample data index
+                let configuration;
+
+                if (sampleDataAndTemplate?.template) {
+                  configuration = sampleDataAndTemplate.template.template;
+
+                  delete configuration.index_patterns;
+                  delete configuration.priority;
+
+                  configuration.settings.index.number_of_shards =
+                    WAZUH_SAMPLE_ALERTS_INDEX_SHARDS;
+                  configuration.settings.index.number_of_replicas =
+                    WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS;
+                } else {
+                  configuration = {
+                    settings: {
+                      index: {
+                        number_of_shards: WAZUH_SAMPLE_ALERTS_INDEX_SHARDS,
+                        number_of_replicas: WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
+                      },
+                    },
+                  };
+                }
+
+                await context.core.opensearch.client.asCurrentUser.indices.create(
+                  {
+                    index: indexName,
+                    body: configuration,
+                  },
+                );
+                context.wazuh.logger.info(`Index ${indexName} created`);
+              }
+
+              await context.core.opensearch.client.asCurrentUser.bulk({
+                index: indexName,
+                body: bulk,
+              });
+
+              context.wazuh.logger.info(
+                `Added sample data to ${indexName} index`,
+              );
+
+              sampleDocumentsResponse.push({
+                index: indexName,
+                sampleDataCount: sampleData.length,
+              });
+            } catch (error) {
+              context.wazuh.logger.error(
+                `Error adding sample data to ${indexName} index: ${
+                  error.message || error
+                }`,
+              );
+
+              const [statusCode, errorMessage] = this.getErrorDetails(error);
+              throw { statusCode, errorMessage };
+            }
+          }),
         );
+
+        // Only return response after all operations are complete
         return response.ok({
-          body: { index: sampleAlertsIndex, alertCount: sampleAlerts.length },
+          body: { sampleDocumentsResponse },
         });
       } catch (error) {
-        context.wazuh.logger.error(
-          `Error adding sample alerts to ${sampleAlertsIndex} index: ${
-            error.message || error
-          }`,
+        const statusCode =
+          error?.statusCode || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
+        const errorMessage = error?.errorMessage || error.message || error;
+        return ErrorResponse(
+          errorMessage,
+          WAZUH_STATUS_CODES.UNKNOWN,
+          statusCode,
+          response,
         );
-
-        const [statusCode, errorMessage] = this.getErrorDetails(error);
-
-        return ErrorResponse(errorMessage || error, 1000, statusCode, response);
       }
     },
   );
   /**
-   * This deletes sample alerts
+   * This deletes sample data
    * @param {*} context
    * @param {*} request
    * @param {*} response
    * {result: "deleted", index: string} or ErrorResponse
    */
-  deleteSampleAlerts = routeDecoratorProtectedAdministrator(1000)(
+  deleteSampleData = routeDecoratorProtectedAdministrator(
+    WAZUH_STATUS_CODES.UNKNOWN,
+  )(
     async (
       context: RequestHandlerContext,
       request: OpenSearchDashboardsRequest<{ category: string }>,
       response: OpenSearchDashboardsResponseFactory,
     ) => {
-      // Delete Wazuh sample alert index
-      const sampleAlertsIndex = await this.buildSampleIndexByCategory(
+      // Delete Wazuh sample data index
+      const sampleDataIndex = await this.buildSampleIndexByCategory(
         context,
         request.params.category,
       );
 
       try {
-        // Check if Wazuh sample alerts index exists
+        // Check if Wazuh sample data index exists
         const existsSampleIndex =
           await context.core.opensearch.client.asCurrentUser.indices.exists({
-            index: sampleAlertsIndex,
+            index: sampleDataIndex,
           });
         if (existsSampleIndex.body) {
-          // Delete Wazuh sample alerts index
+          // Delete Wazuh sample data index
           await context.core.opensearch.client.asCurrentUser.indices.delete({
-            index: sampleAlertsIndex,
+            index: sampleDataIndex,
           });
-          context.wazuh.logger.info(`Deleted ${sampleAlertsIndex} index`);
+          context.wazuh.logger.info(`Deleted ${sampleDataIndex} index`);
           return response.ok({
-            body: { result: 'deleted', index: sampleAlertsIndex },
+            body: { result: 'deleted', index: sampleDataIndex },
           });
         } else {
           return ErrorResponse(
-            `${sampleAlertsIndex} index doesn't exist`,
+            `${sampleDataIndex} index doesn't exist`,
             1000,
             500,
             response,
@@ -652,7 +576,7 @@ export class WazuhElasticCtrl {
         }
       } catch (error) {
         context.wazuh.logger.error(
-          `Error deleting sample alerts of ${sampleAlertsIndex} index: ${
+          `Error deleting sample data of ${sampleDataIndex} index: ${
             error.message || error
           }`,
         );

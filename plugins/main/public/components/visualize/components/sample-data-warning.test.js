@@ -51,9 +51,11 @@ jest.mock('../../../react-services/navigation-service', () => ({
 describe('Check sample data component', () => {
   it('should render if there is sample data', async () => {
     WzRequest.genericReq.mockResolvedValue({
-      data: { sampleAlertsInstalled: true },
+      data: { exists: true },
     });
-    const wrapper = await mount(<SampleDataWarning />);
+    const wrapper = await mount(
+      <SampleDataWarning categoriesSampleData={['security']} />,
+    );
     await awaitForMyComponent(wrapper);
     expect(wrapper.find('EuiCallOut').exists());
     expect(wrapper.find('EuiCallOut').props().title).toEqual(
@@ -63,9 +65,11 @@ describe('Check sample data component', () => {
 
   it('should not render if there is no sample data', async () => {
     WzRequest.genericReq.mockResolvedValue({
-      data: { sampleAlertsInstalled: false },
+      data: { exists: false },
     });
-    const wrapper = await mount(<SampleDataWarning />);
+    const wrapper = await mount(
+      <SampleDataWarning categoriesSampleData={['security']} />,
+    );
     await awaitForMyComponent(wrapper);
     expect(wrapper.contains('EuiCallOut')).toBe(false);
   });
@@ -93,7 +97,9 @@ describe('Check sample data component', () => {
       };
     });
     WzRequest.genericReq.mockRejectedValue(error);
-    const wrapper = await mount(<SampleDataWarning />);
+    const wrapper = await mount(
+      <SampleDataWarning categoriesSampleData={['security']} />,
+    );
     await awaitForMyComponent(wrapper);
   });
 });

@@ -21,6 +21,8 @@ import {
 } from '../../../../common/hocs';
 import { LoadingSearchbarProgress } from '../../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { DiscoverNoResults } from '../../../../common/no-results/no-results';
+import { SampleDataWarning } from '../../../../visualize/components';
+import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../../common/constants';
 import { IndexPattern } from '../../../../../../../../src/plugins/data/public/';
 
 export const ITHygieneInventoryTabLayout = ({
@@ -107,6 +109,9 @@ const ITHygieneInventoryDashboard = ({
               dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
             }`}
           >
+            <SampleDataWarning
+              categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
+            />
             {getDashboardPanels && (
               <DashboardByRenderer
                 input={{
