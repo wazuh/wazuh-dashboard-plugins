@@ -21,7 +21,12 @@ node cli.js [options]
 ## Use cases
 
 Generate sample data for the `states-inventory-hardware` index, using
-the Bulk API format and save the output to a file:
+the Bulk API format and save the output to a file.
+
+Requirements:
+
+- jq
+- cURL
 
 0. Define the variable to use in the steps:
 
