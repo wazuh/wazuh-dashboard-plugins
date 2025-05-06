@@ -152,8 +152,8 @@ function useDataGridColumns({
   };
 
   // Don't use `useMemo` here because otherwise the DataGrid cell filter doesn't work
-  const retrieveVisibleDataGridColumns =
-    visibleColumns.map((columnId: string) => {
+  const retrieveVisibleDataGridColumns = visibleColumns.map(
+    (columnId: string) => {
       let column = { ...columnSchemaDefinitionsMap[columnId] };
       const savedColumnWidth =
         dataGridStateManager.retrieveState().columnWidths[columnId];
@@ -163,8 +163,8 @@ function useDataGridColumns({
       }
 
       return column;
-    });
-
+    },
+  );
 
   return {
     // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
