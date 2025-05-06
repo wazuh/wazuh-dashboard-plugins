@@ -1,6 +1,6 @@
 ---
 plugin: openapi
-specFile: https://raw.githubusercontent.com/wazuh/wazuh/4.12.1/api/api/spec/spec.yaml
+specFile: https://raw.githubusercontent.com/wazuh/wazuh/4.12.2/api/api/spec/spec.yaml
 system:
   stores:
     # this store is preloaded from file
