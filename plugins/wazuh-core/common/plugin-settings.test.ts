@@ -141,6 +141,23 @@ describe('[settings] Input validation', () => {
     ${'enrollment.password'}                       | ${'test'}                                                              | ${undefined}
     ${'enrollment.password'}                       | ${''}                                                                  | ${'Value can not be empty.'}
     ${'enrollment.password'}                       | ${'test space'}                                                        | ${undefined}
+    ${'fim.pattern'}                               | ${'test'}                                                              | ${undefined}
+    ${'fim.pattern'}                               | ${'test*'}                                                             | ${undefined}
+    ${'fim.pattern'}                               | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'fim.pattern'}                               | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'fim.pattern'}                               | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim.pattern'}                               | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim.pattern'}                               | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim.pattern'}                               | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim.pattern'}                               | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim.pattern'}                               | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim.pattern'}                               | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim.pattern'}                               | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim.pattern'}                               | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim.pattern'}                               | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim.pattern'}                               | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim.pattern'}                               | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim.pattern'}                               | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'fim_registries.sample.prefix'}              | ${'test'}                                                              | ${undefined}
     ${'fim_registries.sample.prefix'}              | ${''}                                                                  | ${'Value can not be empty.'}
     ${'fim_registries.sample.prefix'}              | ${'test space'}                                                        | ${'No whitespaces allowed.'}
@@ -213,6 +230,176 @@ describe('[settings] Input validation', () => {
     ${'pattern'}                                   | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'pattern'}                                   | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'pattern'}                                   | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test'}                                                              | ${undefined}
+    ${'system_inventory.pattern'}                  | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory.pattern'}                  | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory.pattern'}                  | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory.pattern'}                  | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory.pattern'}                  | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory.pattern'}                  | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory.pattern'}                  | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory.pattern'}                  | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory.pattern'}                  | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_hardware.pattern'}         | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_hardware.pattern'}         | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_hardware.pattern'}         | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_hardware.pattern'}         | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_hardware.pattern'}         | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_hardware.pattern'}         | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_hardware.pattern'}         | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hardware.pattern'}         | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_hotfixes.pattern'}         | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_hotfixes.pattern'}         | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_hotfixes.pattern'}         | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_hotfixes.pattern'}         | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_hotfixes.pattern'}         | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_interfaces.pattern'}       | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_interfaces.pattern'}       | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_interfaces.pattern'}       | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_interfaces.pattern'}       | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_interfaces.pattern'}       | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_interfaces.pattern'}       | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_interfaces.pattern'}       | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_networks.pattern'}         | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_networks.pattern'}         | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_networks.pattern'}         | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_networks.pattern'}         | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_networks.pattern'}         | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_networks.pattern'}         | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_networks.pattern'}         | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_networks.pattern'}         | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_networks.pattern'}         | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_packages.pattern'}         | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_packages.pattern'}         | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_packages.pattern'}         | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_packages.pattern'}         | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_packages.pattern'}         | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_packages.pattern'}         | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_packages.pattern'}         | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_packages.pattern'}         | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_packages.pattern'}         | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_ports.pattern'}            | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_ports.pattern'}            | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_ports.pattern'}            | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_ports.pattern'}            | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_ports.pattern'}            | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_ports.pattern'}            | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_ports.pattern'}            | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_ports.pattern'}            | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_ports.pattern'}            | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_processes.pattern'}        | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_processes.pattern'}        | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_processes.pattern'}        | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_processes.pattern'}        | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_processes.pattern'}        | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_processes.pattern'}        | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_processes.pattern'}        | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_processes.pattern'}        | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_processes.pattern'}        | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_protocols.pattern'}        | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_protocols.pattern'}        | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_protocols.pattern'}        | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_protocols.pattern'}        | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_protocols.pattern'}        | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_protocols.pattern'}        | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_protocols.pattern'}        | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_protocols.pattern'}        | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test'}                                                              | ${undefined}
+    ${'system_inventory_system.pattern'}           | ${'test*'}                                                             | ${undefined}
+    ${'system_inventory_system.pattern'}           | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'system_inventory_system.pattern'}           | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'system_inventory_system.pattern'}           | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_system.pattern'}           | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_system.pattern'}           | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_system.pattern'}           | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'system_inventory_system.pattern'}           | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'system_inventory_system.pattern'}           | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'system_inventory_hardware.sample.prefix'}   | ${'test'}                                                              | ${undefined}
     ${'system_inventory_hardware.sample.prefix'}   | ${''}                                                                  | ${'Value can not be empty.'}
     ${'system_inventory_hardware.sample.prefix'}   | ${'test space'}                                                        | ${'No whitespaces allowed.'}
@@ -421,6 +608,23 @@ describe('[settings] Input validation', () => {
     ${'vulnerabilities.pattern'}                   | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'vulnerabilities.pattern'}                   | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'vulnerabilities.pattern'}                   | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test'}                                                              | ${undefined}
+    ${'vulnerabilities.sample.prefix'}             | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'vulnerabilities.sample.prefix'}             | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'vulnerabilities.sample.prefix'}             | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'vulnerabilities.sample.prefix'}             | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'vulnerabilities.sample.prefix'}             | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
+    ${'vulnerabilities.sample.prefix'}             | ${'test*'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
   `(
     '$setting | $value | $expectedValidation',
     ({ setting, value, expectedValidation }) => {
