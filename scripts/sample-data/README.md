@@ -59,7 +59,7 @@ node cli.js \
 
 > Note: if you pretend to use the sample data in a Wazuh dashboard, you should do the cluster name field matches with the value that you are using. Add the flag `--param-cluster-name VALUE` and/or `--param-manager-name VALUE` replacing the `VALUE` with the expected values.
 
-2. Optional. If you pretend to use the data in the Wazuh dashboard or some dashboard for OpenSearch or Kibana you could need the index has a specific manppings.
+2. Optional. If you pretend to use the data in the Wazuh dashboard or some dashboard for OpenSearch or Kibana you could need the index has a specific mappings.
 
 - Without authentication (HTTP):
 
