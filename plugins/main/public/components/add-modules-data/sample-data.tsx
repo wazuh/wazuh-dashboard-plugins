@@ -120,19 +120,19 @@ export default class WzSampleData extends Component {
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
       },
       {
-        title: 'Sample file integrity monitoring',
+        title: 'Sample file integrity monitoring inventory',
         description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       },
       {
-        title: 'Sample inventory',
+        title: 'Sample system inventory',
         description: `Sample data, visualizations and dashboards for system inventory (${sampleInventory}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
       },
       {
-        title: 'Sample vulnerability detection',
+        title: 'Sample vulnerability detection inventory',
         description: `Sample data, visualizations and dashboards for vulnerabilities inventory.`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_VULNERABILITIES,

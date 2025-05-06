@@ -77,39 +77,39 @@ export const WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX = {
   dataSet: 'states-fim-registries',
 };
 export const WAZUH_SETTING_INVENTORY_HARDWARE_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_hardware.sample.prefix',
+  settingIndexPattern: 'system_inventory_hardware.sample.prefix',
   dataSet: 'states-inventory-hardware',
 };
 export const WAZUH_SETTING_INVENTORY_HOTFIXES_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_hotfixes.sample.prefix',
+  settingIndexPattern: 'system_inventory_hotfixes.sample.prefix',
   dataSet: 'states-inventory-hotfixes',
 };
 export const WAZUH_SETTING_INVENTORY_INTERFACES_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_interfaces.sample.prefix',
+  settingIndexPattern: 'system_inventory_interfaces.sample.prefix',
   dataSet: 'states-inventory-interfaces',
 };
 export const WAZUH_SETTING_INVENTORY_PACKAGES_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_packages.sample.prefix',
+  settingIndexPattern: 'system_inventory_packages.sample.prefix',
   dataSet: 'states-inventory-packages',
 };
 export const WAZUH_SETTING_INVENTORY_PORTS_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_ports.sample.prefix',
+  settingIndexPattern: 'system_inventory_ports.sample.prefix',
   dataSet: 'states-inventory-ports',
 };
 export const WAZUH_SETTING_INVENTORY_NETWORKS_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_networks.sample.prefix',
+  settingIndexPattern: 'system_inventory_networks.sample.prefix',
   dataSet: 'states-inventory-networks',
 };
 export const WAZUH_SETTING_INVENTORY_PROCESSES_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_processes.sample.prefix',
+  settingIndexPattern: 'system_inventory_processes.sample.prefix',
   dataSet: 'states-inventory-processes',
 };
 export const WAZUH_SETTING_INVENTORY_PROTOCOLS_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_protocols.sample.prefix',
+  settingIndexPattern: 'system_inventory_protocols.sample.prefix',
   dataSet: 'states-inventory-protocols',
 };
 export const WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX = {
-  settingIndexPattern: 'inventory_system.sample.prefix',
+  settingIndexPattern: 'system_inventory_system.sample.prefix',
   dataSet: 'states-inventory-system',
 };
 export const WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX = {
