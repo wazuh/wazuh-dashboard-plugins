@@ -395,9 +395,32 @@ export const ApiTable = compose(withErrorBoundary)(
                 <EuiPopover
                   button={
                     <EuiLink
-                      onClick={() => this.setState({ popoverOpened: row.id })}
+                      onClick={() =>
+                        this.setState({
+                          popoverOpened:
+                            this.state.popoverOpened === row.id ? null : row.id,
+                        })
+                      }
+                      style={{
+                        fontWeight: 'normal',
+                      }}
+                      color='text'
                     >
-                      {item}
+                      <EuiFlexGroup
+                        alignItems='center'
+                        gutterSize='xs'
+                        responsive={false}
+                      >
+                        <EuiFlexItem grow={false}>{item}</EuiFlexItem>
+                        <EuiFlexItem grow={false}>
+                          <EuiToolTip
+                            position='top'
+                            content='Show UUID information'
+                          >
+                            <EuiIcon type='iInCircle' color='primary' />
+                          </EuiToolTip>
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
                     </EuiLink>
                   }
                   isOpen={this.state.popoverOpened === row.id}
@@ -418,6 +441,7 @@ export const ApiTable = compose(withErrorBoundary)(
                       <EuiToolTip position='top' content='Copy to clipboard'>
                         <EuiButtonIcon
                           iconType='copy'
+                          size='s'
                           aria-label='copy UUID'
                           onClick={() =>
                             this.copyToClipBoard(row.cluster_info.uuid)
