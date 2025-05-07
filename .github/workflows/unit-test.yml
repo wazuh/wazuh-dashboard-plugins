@@ -27,6 +27,7 @@ on:
 jobs:
   # Run unit tests with Jest
   test:
+    if: github.event.pull_request.draft == false
     name: Run unit tests
     uses: ./.github/workflows/dev-environment.yml
     with:
