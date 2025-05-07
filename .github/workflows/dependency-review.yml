@@ -13,6 +13,7 @@ permissions:
 jobs:
   dependency-review:
     runs-on: ubuntu-24.04
+    if: github.event.pull_request.draft == false
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
