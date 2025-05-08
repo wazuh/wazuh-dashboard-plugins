@@ -361,19 +361,3 @@
   outline: none !important;
   outline-color: transparent !important;
 }
-
-.globalQueryBar:not(:empty) {
-  padding: 8px !important;
-}
-
-.dscWrapper {
-  .table > thead > tr > th,
-  .table > tbody > tr > th,
-  .table > tfoot > tr > th,
-  .table > thead > tr > td,
-  .table > tbody > tr > td,
-  .table > tfoot > tr > td {
-    font-size: 12px !important;
-    font-kerning: normal !important;
-  }
-}
