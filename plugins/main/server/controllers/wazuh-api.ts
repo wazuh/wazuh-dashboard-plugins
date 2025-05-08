@@ -352,7 +352,7 @@ export class WazuhApiCtrl {
           context.wazuh.logger.warn('Could not obtain manager UUID');
           return ErrorResponse(
             'Could not obtain manager UUID',
-            3030,
+            null,
             HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
             response,
           );
