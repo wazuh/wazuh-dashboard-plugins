@@ -343,6 +343,16 @@ export const ApiTable = compose(withErrorBoundary)(
       }
     }
 
+    /**
+     * Show/close info UUID
+     * @param {String | Null} id
+     */
+    togglePopoverUUID = id => {
+      this.setState({
+        popoverOpened: this.state.popoverOpened === id ? null : id,
+      });
+    };
+
     render() {
       const { DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
 
@@ -395,12 +405,7 @@ export const ApiTable = compose(withErrorBoundary)(
                 <EuiPopover
                   button={
                     <EuiLink
-                      onClick={() =>
-                        this.setState({
-                          popoverOpened:
-                            this.state.popoverOpened === row.id ? null : row.id,
-                        })
-                      }
+                      onClick={() => this.togglePopoverUUID(row.id)}
                       style={{
                         fontWeight: 'normal',
                       }}
@@ -424,7 +429,7 @@ export const ApiTable = compose(withErrorBoundary)(
                     </EuiLink>
                   }
                   isOpen={this.state.popoverOpened === row.id}
-                  closePopover={() => this.setState({ popoverOpened: null })}
+                  closePopover={() => this.togglePopoverUUID(null)}
                   anchorPosition='upCenter'
                   hasArrow={true}
                   panelPaddingSize='s'
