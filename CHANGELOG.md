@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.12.1
 
+### Fixed
+
+- Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
+
 ## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 03
 
 ### Added
