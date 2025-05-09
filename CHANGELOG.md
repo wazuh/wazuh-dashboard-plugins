@@ -9,6 +9,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.13.0
 - Add persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
 
+### Fixed 
+
+- Fixed double backslash warning on xml editor [#7425](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7425)
+
 ## Wazuh v4.12.2 - OpenSearch Dashboards 2.19.1 - Revision 00
 
 ### Added
