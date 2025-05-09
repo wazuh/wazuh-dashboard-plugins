@@ -403,6 +403,7 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
+            customLabel: 'Year published',
           },
           schema: 'segment',
         },
