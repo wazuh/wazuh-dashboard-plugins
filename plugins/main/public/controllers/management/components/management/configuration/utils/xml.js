@@ -45,8 +45,17 @@ export const replaceIllegalXML = text => {
   const lines = oDOM.documentElement.textContent.split('\n');
 
   for (const line of lines) {
-    const sanitized = replaceXML(line.trim(), '&', '&amp;');
-
+    let sanitized = replaceXML(line.trim(), '&', '&amp;');
+    
+    /*
+      This lines escapes the backslashes to avoid code editor 
+      error validation. The case is when a windows path is used inside a XML tag
+      or as an attribute value.
+    */
+    if (sanitized.includes('\\') && !sanitized.includes('&amp;#92;')) {
+      sanitized = replaceXML(sanitized, '\\', '&amp;#92;');
+    }
+    
     /**
      * Do not remove this condition. We don't want to replace
      * non-sanitized lines.
