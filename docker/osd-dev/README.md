@@ -55,14 +55,14 @@ Use the `--no-start` flag if you want to prevent the automatic startup of the da
   ./dev.sh -os 2.19.1 -osd 2.19.1-5.0.0 --no-start -a up
 
   ### Then connect to the container
-  docker exec -it os-dev-2191-osd-1 bash
+  docker exec -it os-dev-2191-500-osd-1 bash
 
-  ### Manually install dependencies
-  cd /kbn/plugins/wazuh-core
+  ### Manually install dependencies in all plugin folders for example:
+  cd plugins/wazuh-core
   yarn install
 
   ### And manually start the service
-  cd /kbn
+  cd /home/node/kbn
   yarn start --no-base-path
 ```
 
