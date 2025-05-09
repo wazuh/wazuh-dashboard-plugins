@@ -81,7 +81,7 @@ In general, the environment consist of:
     sudo dscl . -create /Users/docker-desktop
     sudo dscl . -create /Users/docker-desktop UniqueID 100999
     sudo dscl . -create /Users/docker-desktop PrimaryGroupID 100999
-    sudo chown -R $USER:staff $WZ_HOME
+    sudo chown -R $(whoami):staff $WZ_HOME
     ```
 
 ## Understanding Docker contexts
