@@ -337,11 +337,26 @@ export class WazuhApiCtrl {
         responseManagerInfo.status === HTTP_STATUS_CODES.OK &&
         responseManagerInfo.data
       ) {
-        const result =
-          await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
-        return response.ok({
-          body: result,
-        });
+        // Check if UUID exists in the response
+        if (responseManagerInfo.data?.data?.affected_items?.[0]?.uuid) {
+          const uuid = responseManagerInfo.data.data.affected_items[0].uuid;
+          const result =
+            await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
+          return response.ok({
+            body: {
+              ...result,
+              uuid,
+            },
+          });
+        } else {
+          context.wazuh.logger.warn('Could not obtain manager UUID');
+          return ErrorResponse(
+            'Could not obtain manager UUID',
+            null,
+            HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+            response,
+          );
+        }
       }
     } catch (error) {
       context.wazuh.logger.warn(error.message || error);
