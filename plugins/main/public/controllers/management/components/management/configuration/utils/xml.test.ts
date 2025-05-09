@@ -1,55 +1,41 @@
-/*
- * Wazuh app - XML utils tests.
- * Copyright (C) 2015-2022 Wazuh, Inc.
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Find more information about this on the LICENSE file.
- */
-
+/* eslint-disable */
 import { validateXML, replaceIllegalXML, replaceXML } from './xml';
-
-// Mock DOMParser
 global.DOMParser = class DOMParser {
   parseFromString(string, contentType) {
     if (contentType !== 'text/xml' && contentType !== 'text/html') {
       throw new Error('Invalid content type');
     }
 
-    // For text/html parsing
     if (contentType === 'text/html') {
       return {
         documentElement: {
-          textContent: string
-        }
+          textContent: string,
+        },
       };
     }
 
-    // For XML validation
     if (string.includes('invalid-xml')) {
       return {
-        getElementsByTagName: (tagName) => {
+        getElementsByTagName: tagName => {
           if (tagName === 'parsererror') {
-            return [{
-              textContent: 'error parsing XML\nLine 1: Invalid XML'
-            }];
+            return [
+              {
+                textContent: 'error parsing XML\nLine 1: Invalid XML',
+              },
+            ];
           }
           return [];
-        }
+        },
       };
     }
 
-    // Valid XML
     return {
-      getElementsByTagName: (tagName) => {
+      getElementsByTagName: tagName => {
         if (tagName === 'parsererror') {
           return [];
         }
         return [];
-      }
+      },
     };
   }
 };
@@ -63,7 +49,8 @@ describe('XML Utils', () => {
     });
 
     it('should handle XML with declaration', () => {
-      const xmlWithDeclaration = '<?xml version="1.0" encoding="UTF-8"?><root><child>Test</child></root>';
+      const xmlWithDeclaration =
+        '<?xml version="1.0" encoding="UTF-8"?><root><child>Test</child></root>';
       const result = validateXML(xmlWithDeclaration);
       expect(result).toBe(false);
     });
@@ -73,7 +60,6 @@ describe('XML Utils', () => {
       const result = validateXML(xmlWithEscapedBrackets);
       expect(result).toBe(false);
     });
-
   });
 
   describe('replaceIllegalXML', () => {
