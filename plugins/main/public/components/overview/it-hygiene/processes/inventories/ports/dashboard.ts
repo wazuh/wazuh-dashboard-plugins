@@ -4,7 +4,10 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStatePieByField } from '../../../common/saved-vis/generators';
+import {
+  getVisStateHorizontalBarByField,
+  getVisStateDonutByField,
+} from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 
 type InterfaceState = 'LISTEN' | 'ESTABLISHED';
@@ -141,29 +144,31 @@ const getVisStateUDPOnlyTransportsMetric = (
 
 export const getOverviewProcessesPortTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'destination.port',
-      'Most common local ports',
+      'Top 5 local ports',
       'it-hygiene-ports',
+      'Local ports',
     ),
-    getVisStatePieByField(
+    getVisStateDonutByField(
       indexPatternId,
       'interface.state',
       'States',
       'it-hygiene-ports',
     ),
-    getVisStatePieByField(
+    getVisStateDonutByField(
       indexPatternId,
       'network.transport',
       'Protocols',
       'it-hygiene-ports',
     ),
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'process.name',
-      'Most common processes',
+      'Top 5 processes',
       'it-hygiene-ports',
+      'Processes',
     ),
   ]);
 };

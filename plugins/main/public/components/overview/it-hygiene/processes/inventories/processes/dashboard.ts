@@ -4,7 +4,7 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStatePieByField } from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 
 type ProcessState =
@@ -80,17 +80,19 @@ const getVisStateProcessesState = (
 
 export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'process.name',
-      'Most common processes',
+      'Top 5 processes',
       'it-hygiene-packages',
+      'Processes',
     ),
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'process.state',
       'States',
       'it-hygiene-packages',
+      'States',
     ),
   ]);
 };

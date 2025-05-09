@@ -1,5 +1,8 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { getVisStateMetricUniqueCountByField } from '../../../common/saved-vis/generators';
+import {
+  getVisStateMetricUniqueCountByField,
+  getVisStateHorizontalBarByField,
+} from '../../../common/saved-vis/generators';
 
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -77,10 +80,10 @@ const getVisStatePackageArchitectureMetric = (
 
 export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateMetricUniqueCountByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'package.vendor',
-      '',
+      'Top 5 vendors',
       'it-hygiene-packages',
       'Package vendors',
     ),

@@ -6,17 +6,20 @@ import {
 
 export const getOverviewPackagesHotfixesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'package.hotfix.name',
       'Most common hotfixes',
       'it-hygiene-hotfixes',
+      'Hotfixes',
     ),
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'package.hotfix.name',
       'Less common hotfixes',
       'it-hygiene-hotfixes',
+      'Hotfixes',
+      false,
       'asc',
     ),
   ]);
