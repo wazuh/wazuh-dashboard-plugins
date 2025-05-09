@@ -307,6 +307,6 @@ error getting credentials - err: exit status 1, out: `error getting credentials 
 3. "Wazuh dashboard server is not ready yet" error
 **Solution:** Check the container logs with docker logs -f <container_name> . Common causes include:
 
+- Initialization still in progress (wait a few minutes and wait until you see a message like "[success][@osd/optimizer] bundles compiled successfully" in the logs)
 - Connection issues between services
 - Problems with Wazuh indexer
-- Initialization still in progress (wait a few minutes)
