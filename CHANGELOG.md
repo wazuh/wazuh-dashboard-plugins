@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.10.2
+- Added a test to check the tables columns fields are known and new fields are added to the known fields of alerts index [#7433](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7433)
 
 ## Wazuh v4.10.1 - OpenSearch Dashboards 2.16.0 - Revision 01
 
