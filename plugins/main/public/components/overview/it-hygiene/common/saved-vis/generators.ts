@@ -121,6 +121,8 @@ export const getVisStateHorizontalBarByField = (
   field: string,
   title: string,
   visIDPrefix: string,
+  fieldCustomLabel: string,
+  addLegend: boolean = false,
   orderAggregation: 'asc' | 'desc' = 'desc',
 ) => {
   return {
@@ -170,7 +172,7 @@ export const getVisStateHorizontalBarByField = (
             truncate: 100,
           },
           title: {
-            text: 'Count',
+            text: '',
           },
         },
       ],
@@ -190,7 +192,7 @@ export const getVisStateHorizontalBarByField = (
         },
       ],
       addTooltip: true,
-      addLegend: true,
+      addLegend,
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
@@ -227,6 +229,7 @@ export const getVisStateHorizontalBarByField = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
+            customLabel: fieldCustomLabel,
           },
           schema: 'segment',
         },

@@ -1,6 +1,9 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateDonutByField } from '../common/saved-vis/generators';
+import {
+  getVisStateDonutByField,
+  getVisStateHorizontalBarByField,
+} from '../common/saved-vis/generators';
 
 const getVisStateStatOperatingSystems = (indexPatternId: string) => {
   return {
@@ -256,7 +259,7 @@ export const getDashboardKPIs = (
     s1: {
       gridData: {
         w: 16,
-        h: 6,
+        h: 8,
         x: 0,
         y: 0,
         i: 's1',
@@ -264,18 +267,19 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's1',
-        savedVis: getVisStateDonutByField(
+        savedVis: getVisStateHorizontalBarByField(
           indexPatternId,
           'host.cpu.name',
-          'Top 10 CPUs',
+          'Top 5 CPUs',
           'it-hygiene-stat',
+          'Hosts CPUs',
         ),
       },
     },
     s2: {
       gridData: {
         w: 16,
-        h: 6,
+        h: 8,
         x: 16,
         y: 0,
         i: 's2',
@@ -294,7 +298,7 @@ export const getDashboardKPIs = (
     s3: {
       gridData: {
         w: 16,
-        h: 6,
+        h: 8,
         x: 32,
         y: 0,
         i: 's3',
@@ -302,11 +306,12 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's3',
-        savedVis: getVisStateDonutByField(
+        savedVis: getVisStateHorizontalBarByField(
           indexPatternId,
           'host.memory.total',
-          'Total memory',
+          'Top 5 host total memory',
           'it-hygiene-stat',
+          'Hosts total memory',
         ),
       },
     },

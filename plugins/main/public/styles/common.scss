@@ -1136,7 +1136,8 @@ wz-xml-file-editor {
 .reqCard:hover,
 .reqCard:focus {
   transform: translateY(0px) !important;
-  box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3),
+  box-shadow:
+    0 2px 2px -1px rgba(152, 162, 179, 0.3),
     0 1px 5px -2px rgba(152, 162, 179, 0.3) !important;
 }
 
@@ -1385,16 +1386,6 @@ md-chips .md-chips {
 
 .WzNotReadyButton:focus {
   background-color: transparent !important;
-}
-
-div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
-  max-height: 500px;
-  overflow-y: scroll;
-}
-
-div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu-popover {
-  overflow-y: unset;
-  padding-right: 0;
 }
 
 .euiSuggestItem .euiSuggestItem__label {
@@ -1840,8 +1831,10 @@ iframe.width-changed {
   .euiButtonGroup__buttons {
     height: 30px;
     border-radius: 2px;
-    box-shadow: 0 1px 1px -1px rgba(152, 162, 179, 0.2),
-      0 3px 2px -2px rgba(152, 162, 179, 0.2), inset 0 0 0 1px #bcc3ce !important;
+    box-shadow:
+      0 1px 1px -1px rgba(152, 162, 179, 0.2),
+      0 3px 2px -2px rgba(152, 162, 179, 0.2),
+      inset 0 0 0 1px #bcc3ce !important;
     border: none !important;
 
     .euiButtonGroupButton {

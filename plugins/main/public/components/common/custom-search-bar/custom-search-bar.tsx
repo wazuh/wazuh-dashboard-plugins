@@ -13,6 +13,8 @@ import {
   EuiFlexItem,
   EuiSwitch,
   EuiFlexItemProps,
+  EuiPopover,
+  EuiButtonEmpty,
   CommonProps,
 } from '@elastic/eui';
 import { tFilter } from '../data-source';
@@ -248,14 +250,49 @@ export const CustomSearchBar = ({
             ) : null
           }
           postFilters={
-            <EuiSwitch
-              label='Advanced filters'
-              checked={avancedFiltersState}
-              onChange={() => changeSwitch()}
-            />
+            <>
+              <div
+                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+              >
+                {!avancedFiltersState && searchBarProps?.query?.query && (
+                  <QueryPopover query={searchBarProps.query.query} />
+                )}
+                <div>
+                  <EuiSwitch
+                    label='Advanced filters'
+                    checked={avancedFiltersState}
+                    onChange={() => changeSwitch()}
+                  />
+                </div>
+              </div>
+            </>
           }
         />
       </div>
     </I18nProvider>
+  );
+};
+
+const QueryPopover = ({ query }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <EuiPopover
+      button={
+        <EuiButtonEmpty
+          iconType='wsSearch'
+          iconSide='right'
+          size='s'
+          isDisabled={!query}
+          onClick={() => setIsOpen(state => !state)}
+        >
+          Query
+        </EuiButtonEmpty>
+      }
+      isOpen={isOpen}
+      closePopover={() => setIsOpen(false)}
+    >
+      {query}
+    </EuiPopover>
   );
 };

@@ -1,5 +1,8 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { getVisStatePieByField } from '../../../common/saved-vis/generators';
+import {
+  getVisStatePieByField,
+  getVisStateHorizontalBarByField,
+} from '../../../common/saved-vis/generators';
 
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -60,23 +63,26 @@ const getVisStateAverageMetric = (
 
 export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'host.cpu.name',
       'CPU processors',
       'it-hygiene-hardware',
+      'CPUs',
     ),
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'host.cpu.cores',
       'Cores count',
       'it-hygiene-hardware',
+      'Cores count',
     ),
-    getVisStatePieByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'host.memory.total',
       'Total memory',
       'it-hygiene-hardware',
+      'Total memory',
     ),
   ]);
 };

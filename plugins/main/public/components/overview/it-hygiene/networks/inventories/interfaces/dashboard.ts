@@ -5,7 +5,7 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStatePieByField } from '../../../common/saved-vis/generators';
+import { getVisStateDonutByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 
 // You can apply the same logic here using ERRORS instead of DROPS. In both cases, a lower percentage indicates everything is working fine. If the percentage rises too much, it means there's a problem that needs attention.
@@ -264,13 +264,13 @@ const getVisStateWirelessNetworkInterfacesMetric = (
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateGlobalPacketLossMetric(indexPatternId),
-    getVisStatePieByField(
+    getVisStateDonutByField(
       indexPatternId,
       'observer.ingress.interface.state',
       'States',
       'it-hygiene-interfaces',
     ),
-    getVisStatePieByField(
+    getVisStateDonutByField(
       indexPatternId,
       'observer.ingress.interface.type',
       'Types',
