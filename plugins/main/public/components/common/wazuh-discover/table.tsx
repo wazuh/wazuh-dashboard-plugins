@@ -363,7 +363,12 @@ export const useTableDataGridFetch = ({
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [reloadFetch, JSON.stringify(sorting), JSON.stringify(pagination)]);
+  }, [
+    isDataSourceLoading,
+    reloadFetch,
+    JSON.stringify(sorting),
+    JSON.stringify(pagination),
+  ]);
 
   // Reset the pagination and reload fetch time when the filters changed.
   useEffectEnsureComponentMounted(() => {
