@@ -15,7 +15,7 @@ on:
       - 2.*
       - 3.*
       - 4.*
-
+    types: [opened, synchronize, reopened, ready_for_review]
 jobs:
   linter:
     name: Ensure the code format on the changed files
