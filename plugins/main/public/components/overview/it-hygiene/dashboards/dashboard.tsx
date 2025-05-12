@@ -93,7 +93,11 @@ const DashboardITHygieneComponent: React.FC<DashboardITHygieneProps> = ({
         });
         ErrorHandler.handleError(searchError);
       });
-  }, [JSON.stringify(fetchFilters), JSON.stringify(query)]);
+  }, [
+    isDataSourceLoading,
+    JSON.stringify(fetchFilters),
+    JSON.stringify(query),
+  ]);
 
   return (
     <>
