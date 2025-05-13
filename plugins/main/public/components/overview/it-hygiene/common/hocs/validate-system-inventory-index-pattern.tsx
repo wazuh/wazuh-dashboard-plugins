@@ -4,7 +4,7 @@ import { EuiLink } from '@elastic/eui';
 import {
   ensureIndexPatternIsCreated,
   ERROR_NO_INDICES_FOUND,
-  mapFieldsFormatBytes,
+  mapFieldsFormat,
   withIndexPatternFromSettingDataSource,
   withMapErrorPromptErrorEnsureIndexPattern,
 } from '../../../../common/hocs';
@@ -46,7 +46,20 @@ const errorPromptTypes = {
 export const withSystemInventoryDataSource =
   withIndexPatternFromSettingDataSource({
     indexPatternSetting: 'system_inventory.pattern',
-    validate: ensureIndexPatternIsCreated(),
+    validate: ensureIndexPatternIsCreated(
+      mapFieldsFormat({
+        'destination.port': 'integer',
+        'host.memory.free': 'bytes',
+        'host.memory.total': 'bytes',
+        'host.memory.used': 'bytes',
+        'host.network.egress.bytes': 'bytes',
+        'host.network.ingress.bytes': 'bytes',
+        'package.size': 'bytes',
+        'process.parent.pid': 'integer',
+        'process.pid': 'integer',
+        'source.port': 'integer',
+      }),
+    ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
 
@@ -61,10 +74,10 @@ export const withSystemInventoryInterfacesDataSource =
   withIndexPatternFromSettingDataSource({
     indexPatternSetting: 'system_inventory_interfaces.pattern',
     validate: ensureIndexPatternIsCreated(
-      mapFieldsFormatBytes([
-        'host.network.egress.bytes',
-        'host.network.ingress.bytes',
-      ]),
+      mapFieldsFormat({
+        'host.network.egress.bytes': 'bytes',
+        'host.network.ingress.bytes': 'bytes',
+      }),
     ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
@@ -79,21 +92,36 @@ export const withSystemInventoryProtocolsDataSource =
 export const withSystemInventoryProcessesDataSource =
   withIndexPatternFromSettingDataSource({
     indexPatternSetting: 'system_inventory_processes.pattern',
-    validate: ensureIndexPatternIsCreated(),
+    validate: ensureIndexPatternIsCreated(
+      mapFieldsFormat({
+        'process.parent.pid': 'integer',
+        'process.pid': 'integer',
+      }),
+    ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
 
 export const withSystemInventoryPortsDataSource =
   withIndexPatternFromSettingDataSource({
     indexPatternSetting: 'system_inventory_ports.pattern',
-    validate: ensureIndexPatternIsCreated(),
+    validate: ensureIndexPatternIsCreated(
+      mapFieldsFormat({
+        'destination.port': 'integer',
+        'process.pid': 'integer',
+        'source.port': 'integer',
+      }),
+    ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
 
 export const withSystemInventoryPackagesDataSource =
   withIndexPatternFromSettingDataSource({
     indexPatternSetting: 'system_inventory_packages.pattern',
-    validate: ensureIndexPatternIsCreated(),
+    validate: ensureIndexPatternIsCreated(
+      mapFieldsFormat({
+        'package.size': 'bytes',
+      }),
+    ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
 
@@ -115,11 +143,11 @@ export const withSystemInventoryHardwareDataSource =
   withIndexPatternFromSettingDataSource({
     indexPatternSetting: 'system_inventory_hardware.pattern',
     validate: ensureIndexPatternIsCreated(
-      mapFieldsFormatBytes([
-        'host.memory.free',
-        'host.memory.total',
-        'host.memory.used',
-      ]),
+      mapFieldsFormat({
+        'host.memory.free': 'bytes',
+        'host.memory.total': 'bytes',
+        'host.memory.used': 'bytes',
+      }),
     ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
