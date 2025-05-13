@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { EuiButtonIcon } from '@elastic/eui';
 import { StickyInspectColumnProps } from '../types/sticky-data-grid.types';
 
-export const StickyInspectColumn: React.FC<StickyInspectColumnProps> = ({
+export const StickyInspectColumn = forwardRef<HTMLDivElement, StickyInspectColumnProps>(({
   data,
   onClickInspectDoc,
-  marginTop
-}) => {
+  style
+}, ref) => {
   return (
     <div
-      className="sticky-column-wrapper"
+      className="sticky-column-wrapper with-scroll sync-scroll"
       style={{
         left: 32, // Width of checkbox column
-        top: marginTop,
-        zIndex: 3
+        ...style
       }}
+      ref={ref}
     >
       {data.map((agent, i) => (
         <div key={i} className="sticky-cell inspect-cell">
@@ -28,4 +28,4 @@ export const StickyInspectColumn: React.FC<StickyInspectColumnProps> = ({
       ))}
     </div>
   );
-};
+});

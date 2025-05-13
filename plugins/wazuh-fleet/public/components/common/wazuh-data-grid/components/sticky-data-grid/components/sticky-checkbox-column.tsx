@@ -1,7 +1,5 @@
-import React, { memo } from 'react';
+import React, { memo, forwardRef } from 'react';
 import { StickyCheckboxColumnProps } from '../types/sticky-data-grid.types';
-
-
 
 const StableCheckboxRow = memo(({ index, renderCheckboxRow }: {
   index: number,
@@ -17,19 +15,18 @@ const StableCheckboxRow = memo(({ index, renderCheckboxRow }: {
   );
 });
 
-export const StickyCheckboxColumn: React.FC<StickyCheckboxColumnProps> = memo(({
+export const StickyCheckboxColumn = memo(forwardRef<HTMLDivElement, StickyCheckboxColumnProps>(({
   maxRows,
-  marginTop,
-  renderCheckboxRow
-}) => {
+  renderCheckboxRow,
+  style
+}, ref) => {
   const rowIndices = Array.from({ length: maxRows }, (_, i) => i);
 
   return (
     <div
-      className="sticky-column-wrapper"
-      style={{
-        top: marginTop,
-      }}
+      className="sticky-column-wrapper with-scroll sync-scroll"
+      style={style}
+      ref={ref}
     >
       {rowIndices.map(index => (
         <StableCheckboxRow
@@ -40,4 +37,4 @@ export const StickyCheckboxColumn: React.FC<StickyCheckboxColumnProps> = memo(({
       ))}
     </div>
   );
-});
+}));

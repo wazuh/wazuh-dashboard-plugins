@@ -23,7 +23,7 @@ import { wzDiscoverRenderColumns } from './render-columns';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import DocDetailsHeader from './components/doc-details-header';
 import { WazuhDataGridContextProvider } from './wz-data-grid-context';
-import { useStickyDataGrid } from './components/sticky-data-grid/hooks';
+import { useStickyDataGrid } from './components/sticky-data-grid/hooks/use-sticky-data-grid';
 import StickyDataGrid from './components/sticky-data-grid/sticky-data-grid';
 
 export interface TWazuhDataGridProps {

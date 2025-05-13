@@ -1,10 +1,10 @@
 import { EuiDataGridColumn, EuiDataGridRowHeightsOptions, EuiDataGridSorting } from '@elastic/eui';
 
-// Interfaces para las props de los componentes sticky
+// Interfaces for sticky component props
 export interface StickyInspectColumnProps {
   data: any[];
   onClickInspectDoc: (agent: any) => void;
-  marginTop: number;
+  style?: React.CSSProperties;
 }
 
 export interface StickyNameHeaderProps {
@@ -25,13 +25,13 @@ export interface StickyNameColumnProps {
   column: EuiDataGridColumn;
   nameColumnWidth: number;
   renderCellValue: any;
-  marginTop: number;
+  style?: React.CSSProperties;
 }
 
 export interface StickyCheckboxColumnProps {
   maxRows: number;
-  marginTop: number;
   renderCheckboxRow: (props: any) => React.ReactNode;
+  style?: React.CSSProperties;
 }
 
 export interface StickyActionsColumnProps {
@@ -45,7 +45,7 @@ export interface StickyActionsColumnProps {
   }>;
   toggleActionPopover: (rowIndex: number) => void;
   actionPopoverOpen: number | null;
-  marginTop: number;
+  style?: React.CSSProperties;
 }
 
 /**
@@ -84,6 +84,13 @@ export interface StickyDataGridProps {
     [key: string]: any;
   }>;
   rowCount: number;
+  actionsColumnRight?: number;
+  isFullScreen?: boolean;
+  checkboxColumnRef?: React.RefObject<HTMLDivElement>;
+  inspectColumnRef?: React.RefObject<HTMLDivElement>;
+  nameColumnRef?: React.RefObject<HTMLDivElement>;
+  actionsColumnRef?: React.RefObject<HTMLDivElement>;
+  getStickyColumnStyle?: () => React.CSSProperties;
 }
 
 /**

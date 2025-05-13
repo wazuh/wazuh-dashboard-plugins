@@ -1,23 +1,23 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { StickyNameColumnProps } from '../types/sticky-data-grid.types';
 
-export const StickyNameColumn: React.FC<StickyNameColumnProps> = ({
+export const StickyNameColumn = forwardRef<HTMLDivElement, StickyNameColumnProps>(({
   data,
   column,
   nameColumnWidth,
   renderCellValue,
-  marginTop
-}) => {
+  style
+}, ref) => {
   return (
     <div
-      className="sticky-column-wrapper name-column"
+      className="sticky-column-wrapper with-scroll sync-scroll name-column"
       style={{
         left: 68, // Width of checkbox + inspect columns
-        top: marginTop,
-        zIndex: 3,
         width: nameColumnWidth,
-        minWidth: nameColumnWidth
+        minWidth: nameColumnWidth,
+        ...style
       }}
+      ref={ref}
     >
       {data.map((agent, i) => (
         <div
@@ -26,7 +26,6 @@ export const StickyNameColumn: React.FC<StickyNameColumnProps> = ({
           style={{
             width: nameColumnWidth,
             minWidth: nameColumnWidth,
-            overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap'
           }}
@@ -47,4 +46,4 @@ export const StickyNameColumn: React.FC<StickyNameColumnProps> = ({
       ))}
     </div>
   );
-};
+});

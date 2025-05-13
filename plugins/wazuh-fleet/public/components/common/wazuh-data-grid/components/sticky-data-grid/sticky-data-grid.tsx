@@ -1,13 +1,10 @@
 import React from 'react';
 import {
-  EuiDataGrid,
-  EuiDataGridColumn,
-  EuiDataGridSorting,
-  EuiDataGridRowHeightsOptions,
+  EuiDataGrid
 } from '@elastic/eui';
 import { StickyNameHeader } from './components/sticky-name-header';
 import { StickyCheckboxColumn } from './components/sticky-checkbox-column';
-import '../../sticky-grid.scss';
+import './sticky-grid.scss';
 
 import { StickyInspectColumn } from './components/sticky-inspect-column';
 import { StickyNameColumn } from './components/sticky-name-column';
@@ -36,7 +33,14 @@ const StickyDataGrid: React.FC<StickyGridViewProps> = ({
     agentsRows,
     onClickInspectDoc,
     actionsColumn,
-    rowCount
+    rowCount,
+    actionsColumnRight,
+    isFullScreen,
+    checkboxColumnRef,
+    inspectColumnRef,
+    nameColumnRef,
+    actionsColumnRef,
+    getStickyColumnStyle
   } = stickyDataGridProps;
 
   const { columns, renderCellValue, sorting } = dataGridProps;
@@ -44,14 +48,22 @@ const StickyDataGrid: React.FC<StickyGridViewProps> = ({
   const renderCheckboxRow = dataGridProps.leadingControlColumns.find((column) => column.id === 'checkbox')?.rowStickyCellRender;
   const columnName = columns?.[0];
 
+  const stickyColumnStyle = getStickyColumnStyle?.();
+
   return (
-    <div style={{ position: 'relative', marginBottom: 0 }}>
+    <div
+      style={{
+        position: isFullScreen ? 'static' : 'relative',
+        marginBottom: 0
+      }}
+    >
       {/* STICKY COMPONENTS - Left side columns */}
       {columns.length > 0 && renderCheckboxRow && (
         <StickyCheckboxColumn
           maxRows={agentsRows.length}
-          marginTop={dataGridControlsHeight + rowSizes.headerRowHeight}
           renderCheckboxRow={renderCheckboxRow}
+          style={stickyColumnStyle}
+          ref={checkboxColumnRef}
         />
       )}
 
@@ -59,7 +71,8 @@ const StickyDataGrid: React.FC<StickyGridViewProps> = ({
       <StickyInspectColumn
         data={agentsRows}
         onClickInspectDoc={onClickInspectDoc}
-        marginTop={dataGridControlsHeight + rowSizes.headerRowHeight}
+        style={stickyColumnStyle}
+        ref={inspectColumnRef}
       />
 
       {/* STICKY COMPONENTS - Name column header */}
@@ -78,7 +91,8 @@ const StickyDataGrid: React.FC<StickyGridViewProps> = ({
           column={columnName}
           nameColumnWidth={nameColumnWidth}
           renderCellValue={renderCellValue}
-          marginTop={dataGridControlsHeight + rowSizes.headerRowHeight}
+          style={stickyColumnStyle}
+          ref={nameColumnRef}
         />
       )}
 
@@ -88,7 +102,11 @@ const StickyDataGrid: React.FC<StickyGridViewProps> = ({
         actionsColumn={actionsColumn}
         toggleActionPopover={toggleActionPopover}
         actionPopoverOpen={actionPopoverOpen}
-        marginTop={dataGridControlsHeight + rowSizes.headerRowHeight}
+        style={{
+          ...stickyColumnStyle,
+          right: actionsColumnRight
+        }}
+        ref={actionsColumnRef}
       />
 
       {/* ELASTIC UI COMPONENT - Main data grid */}

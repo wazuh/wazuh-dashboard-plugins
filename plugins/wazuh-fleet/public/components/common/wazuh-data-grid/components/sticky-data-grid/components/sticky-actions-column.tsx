@@ -1,21 +1,19 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { EuiButtonIcon, EuiPopover, EuiIcon } from '@elastic/eui';
 import { StickyActionsColumnProps } from '../types/sticky-data-grid.types';
 
-
-export const StickyActionsColumn: React.FC<StickyActionsColumnProps> = ({
+export const StickyActionsColumn = forwardRef<HTMLDivElement, StickyActionsColumnProps>(({
   data,
   actionsColumn,
   toggleActionPopover,
   actionPopoverOpen,
-  marginTop
-}) => {
+  style,
+}, ref) => {
   return (
     <div
-      className="sticky-column-wrapper actions-wrapper"
-      style={{
-        top: marginTop
-      }}
+      className="sticky-column-wrapper with-scroll sync-scroll actions-wrapper"
+      style={style}
+      ref={ref}
     >
       {data.map((agent, i) => (
         <div key={i} className="sticky-cell actions-cell">
@@ -56,4 +54,4 @@ export const StickyActionsColumn: React.FC<StickyActionsColumnProps> = ({
       ))}
     </div>
   );
-};
+});

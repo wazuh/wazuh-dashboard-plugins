@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { StickyDataGridProps } from '../types/sticky-data-grid.types';
+import { useFullScreenGrid } from './useFullScreenGrid';
 
 /**
  * Custom hook that manages the sticky behavior and dimensions of a data grid
@@ -29,6 +30,11 @@ export const useStickyDataGrid = ({
     timestamp: 0
   });
   const [sizesInitialized, setSizesInitialized] = useState(false);
+  // New state for the right position of the actions column
+  const [actionsColumnRight, setActionsColumnRight] = useState(0);
+
+  // Use the new hook to handle fullscreen mode and dimensions
+  const fullScreenGridState = useFullScreenGrid(gridRef, rowSizes.headerRowHeight);
 
   // Function to handle opening/closing the action column popover
   const toggleActionPopover = useCallback((rowIndex: number) => {
@@ -106,6 +112,30 @@ export const useStickyDataGrid = ({
     return null;
   }
 
+  // New function to calculate the right position of the actions column
+  function calculateActionsColumnRight() {
+    if (!gridRef.current) return null;
+
+    // Get the width of the grid controls
+    const controlsElement = gridRef.current.querySelector('.euiDataGrid__controls') as HTMLElement;
+    // Get the width of the grid header
+    const headerElement = gridRef.current.querySelector('.euiDataGridHeader') as HTMLElement;
+
+    if (controlsElement && headerElement) {
+      const controlsWidth = controlsElement.getBoundingClientRect().width;
+      const headerWidth = headerElement.getBoundingClientRect().width;
+
+      // Calculate the difference for the right position
+      const rightPosition = controlsWidth - headerWidth;
+
+      if (rightPosition >= 0) {
+        return rightPosition;
+      }
+    }
+
+    return null;
+  }
+
   // Function to update initial sizes
   const updateInitialSizes = useCallback(() => {
     if (!gridRef.current) return false;
@@ -137,8 +167,32 @@ export const useStickyDataGrid = ({
       updated = true;
     }
 
+    // Update the right position of the actions column
+    const rightPosition = calculateActionsColumnRight();
+    if (rightPosition !== null) {
+      setActionsColumnRight(rightPosition);
+      updated = true;
+    }
+
     return updated;
   }, [columns]);
+
+  // Handle sticky column positioning when fullscreen mode changes
+  useEffect(() => {
+    if (!gridRef.current) return;
+
+    const stickyContainer = gridRef.current.querySelector('.sticky-grid-container') as HTMLElement;
+    if (stickyContainer) {
+      if (fullScreenGridState.isFullScreen) {
+        stickyContainer.style.position = 'static';
+      } else {
+        stickyContainer.style.position = 'relative';
+      }
+    }
+
+    // Update sticky column positions when mode changes
+    updateInitialSizes();
+  }, [fullScreenGridState.isFullScreen, updateInitialSizes]);
 
   // useEffect for initialization - Attempts to initialize sizes with polling until success or timeout
   useEffect(() => {
@@ -218,6 +272,12 @@ export const useStickyDataGrid = ({
         }
       }
 
+      // Update the right position of the actions column
+      const rightPosition = calculateActionsColumnRight();
+      if (rightPosition !== null) {
+        setActionsColumnRight(rightPosition);
+      }
+
       // Reset the flag after a short delay
       setTimeout(() => {
         isUpdating = false;
@@ -257,6 +317,11 @@ export const useStickyDataGrid = ({
     };
   }, [columns, sizesInitialized]);
 
+  // Get the style for sticky columns
+  const getStickyColumnStyle = useCallback(() => {
+    return fullScreenGridState.getStickyColumnStyle(dataGridControlsHeight);
+  }, [fullScreenGridState, dataGridControlsHeight]);
+
   return {
     gridRef,
     isPopoverOpen,
@@ -265,6 +330,13 @@ export const useStickyDataGrid = ({
     setIsPopoverOpen,
     nameColumnWidth,
     dataGridControlsHeight,
-    rowSizes
+    rowSizes,
+    isFullScreen: fullScreenGridState.isFullScreen,
+    actionsColumnRight,
+    checkboxColumnRef: fullScreenGridState.checkboxColumnRef,
+    inspectColumnRef: fullScreenGridState.inspectColumnRef,
+    nameColumnRef: fullScreenGridState.nameColumnRef,
+    actionsColumnRef: fullScreenGridState.actionsColumnRef,
+    getStickyColumnStyle
   };
 };
