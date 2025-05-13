@@ -9,6 +9,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.12.1
 - Add UUID field to APIs table [#7412](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7412)
 
+### Changed
+
+- Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
+
 ### Fixed
 
 - Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
@@ -24,7 +28,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Refined queue usage visualizations in Statistics [#7192](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7192)
-- Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
 
 ### Fixed
 
