@@ -685,7 +685,7 @@ const pluginSettingsSampleData = ({
   type: EpluginSettingType.text,
   defaultValue: defaultValue,
   isConfigurableFromSettings: true,
-  requiresRunningHealthCheck: true,
+  requiresRunningHealthCheck: false,
   validateUIForm: function (value) {
     return this.validate(value);
   },
@@ -761,7 +761,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.text,
     defaultValue: WAZUH_SAMPLE_FIM_FILES_PREFIX.defaultValue,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
+    requiresRunningHealthCheck: false,
     validateUIForm: function (value) {
       return this.validate(value);
     },
@@ -798,7 +798,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.text,
     defaultValue: WAZUH_SAMPLE_FIM_REGISTRIES_PREFIX.defaultValue,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
+    requiresRunningHealthCheck: false,
     validateUIForm: function (value) {
       return this.validate(value);
     },

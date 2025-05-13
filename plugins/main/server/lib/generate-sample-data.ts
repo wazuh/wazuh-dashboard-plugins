@@ -1,8 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { RequestHandlerContext } from 'opensearch-dashboards/server';
-import { WAZUH_SETTING_ALERTS_SAMPLE_PREFIX } from '../../common/constants';
-import { generateAlert } from './generate-alerts/generate-alerts-script';
 import { generateSampleDataWithDataset } from './sample-data';
 
 /**
@@ -65,19 +63,12 @@ export const generateSampleData = (
 ) => {
   /** @type {import('./types').Alert[]} */
   const sampleData = [];
-  if (settingIndexPattern === WAZUH_SETTING_ALERTS_SAMPLE_PREFIX) {
-    for (let i = 0; i < numDocuments; i++) {
-      sampleData.push(generateAlert(params));
-    }
-    return { sampleData };
-  } else {
-    // Get template
-    const template = readTemplateFile(dataSet, context);
+  // Get template
+  const template = readTemplateFile(dataSet, context);
 
-    // Generate sample data with dataset
-    for (let i = 0; i < numDocuments; i++) {
-      sampleData.push(generateSampleDataWithDataset(dataSet, params));
-    }
-    return { sampleData, template };
+  // Generate sample data
+  for (let i = 0; i < numDocuments; i++) {
+    sampleData.push(generateSampleDataWithDataset(dataSet, params));
   }
+  return { sampleData, template };
 };
