@@ -85,7 +85,7 @@ export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
       'package.vendor',
       'Top 5 vendors',
       'it-hygiene-packages',
-      'Package vendors',
+      'Vendors',
     ),
     getVisStateMetricUniqueCountByField(
       indexPatternId,

@@ -1,6 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-
+import { getVisStateDonutByField } from '../common/saved-vis/generators';
 const getVisStateTopOSFamilies = (indexPatternId: string) => {
   return {
     id: 'it-hygiene-os-by-platform',
@@ -128,23 +128,88 @@ const getVisStateTopOSFamilies = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTopAgentsByRemotePorts = (indexPatternId: string) => {
+const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
   return {
-    id: 'it-hygiene-top-10-agents-with-more-ports',
-    title: 'Top 10 agents by remote ports',
-    type: 'pie',
+    id: 'it-hygiene-processes-by-interface-state',
+    title: 'Top processes by interface state',
+    type: 'histogram',
     params: {
-      type: 'pie',
-      addTooltip: true,
       addLegend: true,
-      legendPosition: 'right',
-      isDonut: true,
+      addTimeMarker: false,
+      addTooltip: true,
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          labels: {
+            filter: true,
+            show: true,
+            truncate: 100,
+            rotate: 75,
+          },
+          position: 'bottom',
+          scale: {
+            type: 'linear',
+          },
+          show: true,
+          style: {},
+          title: {},
+          type: 'category',
+        },
+      ],
+      grid: {
+        categoryLines: false,
+      },
       labels: {
         show: false,
-        values: true,
-        last_level: true,
-        truncate: 100,
       },
+      legendPosition: 'right',
+      seriesParams: [
+        {
+          data: {
+            id: '1',
+            label: 'Count',
+          },
+          drawLinesBetweenPoints: true,
+          lineWidth: 2,
+          mode: 'stacked',
+          show: true,
+          showCircles: true,
+          type: 'histogram',
+          valueAxis: 'ValueAxis-1',
+        },
+      ],
+      thresholdLine: {
+        color: '#E7664C',
+        show: false,
+        style: 'full',
+        value: 10,
+        width: 1,
+      },
+      times: [],
+      type: 'histogram',
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          labels: {
+            filter: false,
+            rotate: 0,
+            show: true,
+            truncate: 100,
+          },
+          name: 'LeftAxis-1',
+          position: 'left',
+          scale: {
+            mode: 'normal',
+            type: 'linear',
+          },
+          show: true,
+          style: {},
+          title: {
+            text: 'Count',
+          },
+          type: 'value',
+        },
+      ],
     },
     data: {
       searchSource: {
@@ -171,19 +236,18 @@ const getVisStateTopAgentsByRemotePorts = (indexPatternId: string) => {
           schema: 'metric',
         },
         {
-          id: '2',
+          id: '4',
           enabled: true,
-          type: 'filters',
+          type: 'terms',
           params: {
-            filters: [
-              {
-                input: {
-                  query: 'interface.state:*',
-                  language: 'kuery',
-                },
-                label: '',
-              },
-            ],
+            field: 'interface.state',
+            orderBy: '_key',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
           },
           schema: 'segment',
         },
@@ -192,16 +256,16 @@ const getVisStateTopAgentsByRemotePorts = (indexPatternId: string) => {
           enabled: true,
           type: 'terms',
           params: {
-            field: 'agent.id',
-            orderBy: '1',
+            field: 'process.name',
+            orderBy: '_key',
             order: 'desc',
-            size: 10,
+            size: 5,
             otherBucket: false,
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
           },
-          schema: 'segment',
+          schema: 'group',
         },
       ],
     },
@@ -290,83 +354,84 @@ const getVisStateAgentRemotePortByRemoteIP = (indexPatternId: string) => {
 const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
   return {
     id: 'it-hygiene-used-memory-percentage',
-    title: 'Used memory by percentage',
+    title: 'Average network metric by agent',
     type: 'horizontal_bar',
     params: {
-      type: 'histogram',
-      grid: {
-        categoryLines: false,
-      },
+      addLegend: false,
+      addTimeMarker: false,
+      addTooltip: true,
       categoryAxes: [
         {
           id: 'CategoryAxis-1',
-          type: 'category',
+          labels: {
+            filter: false,
+            rotate: 0,
+            show: true,
+            truncate: 200,
+          },
           position: 'left',
-          show: true,
-          style: {},
           scale: {
             type: 'linear',
           },
-          labels: {
-            show: true,
-            rotate: 0,
-            filter: false,
-            truncate: 200,
-          },
+          show: true,
+          style: {},
           title: {},
+          type: 'category',
         },
       ],
+      grid: {
+        categoryLines: false,
+      },
+      labels: {},
+      legendPosition: 'right',
+      seriesParams: [
+        {
+          data: {
+            id: '1',
+            label: 'Average network metric',
+          },
+          drawLinesBetweenPoints: true,
+          lineWidth: 2,
+          mode: 'normal',
+          show: true,
+          showCircles: true,
+          type: 'histogram',
+          valueAxis: 'ValueAxis-1',
+        },
+      ],
+      thresholdLine: {
+        color: '#E7664C',
+        show: false,
+        style: 'full',
+        value: 10,
+        width: 1,
+      },
+      times: [],
+      type: 'histogram',
       valueAxes: [
         {
           id: 'ValueAxis-1',
-          name: 'LeftAxis-1',
-          type: 'value',
-          position: 'bottom',
-          show: true,
-          style: {},
-          scale: {
-            type: 'linear',
-            mode: 'normal',
-          },
           labels: {
-            show: true,
-            rotate: 75,
             filter: true,
+            rotate: 75,
+            show: true,
             truncate: 100,
           },
-          title: {
-            text: 'Count',
+          name: 'LeftAxis-1',
+          position: 'bottom',
+          scale: {
+            mode: 'normal',
+            type: 'linear',
           },
-        },
-      ],
-      seriesParams: [
-        {
           show: true,
-          type: 'histogram',
-          mode: 'normal',
-          data: {
-            label: 'Count',
-            id: '1',
+          style: {},
+          title: {
+            text: 'Average network metric',
           },
-          valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          showCircles: true,
+          type: 'value',
         },
       ],
-      addTooltip: true,
-      addLegend: true,
-      legendPosition: 'right',
-      times: [],
-      addTimeMarker: false,
-      labels: {},
-      thresholdLine: {
-        show: false,
-        value: 10,
-        width: 1,
-        style: 'full',
-        color: '#E7664C',
-      },
+      orderBucketsBySum: false,
     },
     data: {
       searchSource: {
@@ -388,39 +453,27 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
         {
           id: '1',
           enabled: true,
-          type: 'count',
-          params: {},
+          type: 'avg',
+          params: {
+            field: 'network.metric',
+            customLabel: 'Average network metric',
+          },
           schema: 'metric',
         },
         {
           id: '2',
           enabled: true,
-          type: 'range',
+          type: 'terms',
           params: {
-            field: 'host.memory.used',
-            ranges: [
-              {
-                from: 80,
-                to: 100,
-              },
-              {
-                from: 60,
-                to: 80,
-              },
-              {
-                from: 40,
-                to: 60,
-              },
-              {
-                from: 20,
-                to: 40,
-              },
-              {
-                from: 0,
-                to: 20,
-              },
-            ],
-            customLabel: '% used memory',
+            field: 'agent.id',
+            orderBy: '1',
+            order: 'asc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Agent ID',
           },
           schema: 'segment',
         },
@@ -448,7 +501,13 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateTopAgentsByRemotePorts(indexPatternId),
+        // savedVis: getVisStateProcessesByInterfaceState(indexPatternId),
+        savedVis: getVisStateDonutByField(
+          indexPatternId,
+          'interface.state',
+          'Interface state',
+          'it-hygiene-stat',
+        ),
       },
     },
     '2': {

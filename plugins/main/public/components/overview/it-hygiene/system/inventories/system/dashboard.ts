@@ -79,11 +79,12 @@ const getVisStateHostArchitectureMetric = (
 
 export const getOverviewSystemSystemTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateDonutByField(
+    getVisStateHorizontalBarByField(
       indexPatternId,
       'host.os.platform',
       'Platform',
       'it-hygiene-system',
+      'Platforms',
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,

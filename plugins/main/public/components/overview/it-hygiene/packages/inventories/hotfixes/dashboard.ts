@@ -16,7 +16,7 @@ export const getOverviewPackagesHotfixesTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'package.hotfix.name',
-      'Less common hotfixes',
+      'Least common hotfixes',
       'it-hygiene-hotfixes',
       'Hotfixes',
       false,
