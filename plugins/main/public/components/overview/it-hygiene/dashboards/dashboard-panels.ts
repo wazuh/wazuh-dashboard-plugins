@@ -354,10 +354,10 @@ const getVisStateAgentRemotePortByRemoteIP = (indexPatternId: string) => {
 const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
   return {
     id: 'it-hygiene-used-memory-percentage',
-    title: 'Average network metric by agent',
+    title: 'Min and max observer ingress interface name network metrics',
     type: 'horizontal_bar',
     params: {
-      addLegend: false,
+      addLegend: true,
       addTimeMarker: false,
       addTooltip: true,
       categoryAxes: [
@@ -365,9 +365,9 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
           id: 'CategoryAxis-1',
           labels: {
             filter: false,
-            rotate: 0,
+            rotate: 75,
             show: true,
-            truncate: 200,
+            truncate: 20,
           },
           position: 'left',
           scale: {
@@ -384,11 +384,25 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
       },
       labels: {},
       legendPosition: 'right',
+      orderBucketsBySum: false,
       seriesParams: [
         {
           data: {
             id: '1',
-            label: 'Average network metric',
+            label: 'Min network metric',
+          },
+          drawLinesBetweenPoints: true,
+          lineWidth: 2,
+          mode: 'normal',
+          show: true,
+          showCircles: true,
+          type: 'histogram',
+          valueAxis: 'ValueAxis-1',
+        },
+        {
+          data: {
+            id: '3',
+            label: 'Max network metric',
           },
           drawLinesBetweenPoints: true,
           lineWidth: 2,
@@ -426,12 +440,11 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
           show: true,
           style: {},
           title: {
-            text: 'Average network metric',
+            text: 'Network metrics',
           },
           type: 'value',
         },
       ],
-      orderBucketsBySum: false,
     },
     data: {
       searchSource: {
@@ -451,31 +464,41 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
       ],
       aggs: [
         {
-          id: '1',
           enabled: true,
-          type: 'avg',
+          id: '1',
           params: {
+            customLabel: 'Min network metric',
             field: 'network.metric',
-            customLabel: 'Average network metric',
           },
           schema: 'metric',
+          type: 'min',
         },
         {
-          id: '2',
           enabled: true,
-          type: 'terms',
+          id: '2',
           params: {
-            field: 'agent.id',
-            orderBy: '1',
-            order: 'asc',
-            size: 5,
-            otherBucket: false,
-            otherBucketLabel: 'Other',
+            customLabel: 'Observer ingress interface name',
+            field: 'observer.ingress.interface.name',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Agent ID',
+            order: 'asc',
+            orderBy: '1',
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            size: 5,
           },
           schema: 'segment',
+          type: 'terms',
+        },
+        {
+          enabled: true,
+          id: '3',
+          params: {
+            customLabel: 'Max network metric',
+            field: 'network.metric',
+          },
+          schema: 'metric',
+          type: 'max',
         },
       ],
     },
@@ -501,7 +524,6 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        // savedVis: getVisStateProcessesByInterfaceState(indexPatternId),
         savedVis: getVisStateDonutByField(
           indexPatternId,
           'interface.state',

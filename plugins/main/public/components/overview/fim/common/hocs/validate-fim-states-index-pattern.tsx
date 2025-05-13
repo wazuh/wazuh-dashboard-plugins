@@ -6,7 +6,7 @@ import {
   withIndexPatternFromSettingDataSource,
   ERROR_NO_INDICES_FOUND,
   withMapErrorPromptErrorEnsureIndexPattern,
-  mapFieldsFormatBytes,
+  mapFieldsFormat,
 } from '../../../../common/hocs/with-index-pattern';
 
 const errorPromptTypes = {
@@ -47,6 +47,9 @@ export const withFIMDataSource = withIndexPatternFromSettingDataSource({
   indexPatternSetting: 'fim.pattern',
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   validate: ensureIndexPatternIsCreated(
-    mapFieldsFormatBytes(['file.size', 'registry.size']),
+    mapFieldsFormat({
+      'file.size': 'bytes',
+      'registry.size': 'bytes',
+    }),
   ),
 });

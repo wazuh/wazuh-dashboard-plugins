@@ -6,12 +6,9 @@ import {
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateDonutByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
-const getVisStateWirelessNetworkInterfacesMetric = (
-  indexPatternId: string,
-): SavedVis => {
+const getVisStateNetworkMetricsMinMax = (indexPatternId: string): SavedVis => {
   return {
-    id: 'it-hygiene-network-interfaces-type-wireless',
-    title: 'Interfaces type Wireless',
+    id: 'it-hygiene-network-metrics-min-max',
     type: 'metric',
     params: {
       addTooltip: true,
@@ -32,7 +29,13 @@ const getVisStateWirelessNetworkInterfacesMetric = (
           show: true,
         },
         invertColors: false,
-        style: STYLE,
+        style: {
+          bgFill: '#000',
+          bgColor: false,
+          labelColor: false,
+          subText: '',
+          fontSize: 40,
+        },
       },
     },
     data: {
@@ -42,28 +45,22 @@ const getVisStateWirelessNetworkInterfacesMetric = (
         {
           id: '1',
           enabled: true,
-          type: 'count',
+          type: 'min',
           params: {
-            customLabel: 'Wireless',
+            field: 'network.metric',
+            customLabel: 'Min network metric',
           },
           schema: 'metric',
         },
         {
           id: '2',
           enabled: true,
-          type: 'filters',
+          type: 'max',
           params: {
-            filters: [
-              {
-                input: {
-                  query: 'network.type: wireless',
-                  language: 'kuery',
-                },
-                label: 'Network type',
-              },
-            ],
+            field: 'network.metric',
+            customLabel: 'Max network metric',
           },
-          schema: 'group',
+          schema: 'metric',
         },
       ],
     },
@@ -78,6 +75,7 @@ export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
       'DHCP',
       'it-hygiene-protocols',
     ),
+    getVisStateNetworkMetricsMinMax(indexPatternId),
     getVisStateDonutByField(
       indexPatternId,
       'network.type',

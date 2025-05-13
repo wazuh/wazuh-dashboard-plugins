@@ -237,15 +237,35 @@ export const withIndexPatternsFromSettingDataSource = ({
   );
 };
 
-export function mapFieldsFormatBytes(expectedFields: string[]) {
+const fieldMappers = {
+  bytes: ({ type }) => (type === 'number' ? { id: 'bytes' } : undefined),
+  // integer, remove thousands and decimals separator thorugh the params.pattern
+  integer: ({ type }) =>
+    type === 'number' ? { id: 'number', params: { pattern: '0' } } : undefined,
+};
+
+export function mapFieldsFormat(expectedFields: {
+  [key: keyof typeof fieldMappers]: (field: any) => any;
+}) {
   return {
     mapSavedObjectAttributesCreation: ({ fields }) => {
+      const fieldsToMap = Object.keys(expectedFields);
       const mappedFields = fields
-        ?.filter(
-          ({ name, type }) =>
-            expectedFields.includes(name) && type === 'number',
-        )
-        .map(({ name }) => [name, { id: 'bytes' }]);
+        ?.filter(({ name }) => fieldsToMap.includes(name))
+        .map(field => {
+          const { name } = field;
+          const mapper = fieldMappers[expectedFields[name]] || undefined;
+
+          if (!mapper) {
+            return undefined;
+          }
+          const result = mapper(field);
+          if (!result) {
+            return undefined;
+          }
+          return [name, result];
+        })
+        .filter(Boolean);
 
       if (mappedFields.length) {
         return {
