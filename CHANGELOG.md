@@ -27,13 +27,23 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `GET /api/syscollector` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 
+### Fixed
+
+- Fixed double backslash warning on xml editor [#7425](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7425)
+
+## Wazuh v4.12.2 - OpenSearch Dashboards 2.19.1 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.12.2
+
 ## Wazuh v4.12.1 - OpenSearch Dashboards 2.19.1 - Revision 00
 
 ### Added
 
 - Support for Wazuh 4.12.1
 
-## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 01
+## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 03
 
 ### Added
 
@@ -55,6 +65,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed CSV export not filtering by timerange [#7304](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7304)
 - Fixed agent view not showing the latest agent state [#7336](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7336)
 - Fixed saved queries not displaying in the search bar [#7377](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7377)
+- Fixed monitoring cronjob infinite retries in case of a request exception [#7401](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7401)
+- Fixed double scroll bar in discover [#7399](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7399)
 
 ### Removed
 
