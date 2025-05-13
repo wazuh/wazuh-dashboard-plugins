@@ -1,5 +1,7 @@
-const { generateAlert: generateDocument } = require("../../../generate-alerts/generate-alerts-script");
+const {
+  generateAlert: generateDocument,
+} = require('../../../generate-alerts/generate-alerts-script');
 
 module.exports = {
-    generateDocument 
-  };
+  generateDocument,
+};
