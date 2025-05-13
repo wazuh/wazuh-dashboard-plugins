@@ -1,6 +1,6 @@
 {
   "name": "wazuh-engine",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "revision": "00",
   "pluginPlatform": {
     "version": "2.19.1"

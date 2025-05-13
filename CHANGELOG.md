@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v6.0.0 - OpenSearch Dashboards 2.19.1 - Revision 00
+
+### Added
+
+- Support for Wazuh 6.0.0
+
 ## Wazuh v5.0.0 - OpenSearch Dashboards 2.19.1 - Revision 00
 
 ### Added
