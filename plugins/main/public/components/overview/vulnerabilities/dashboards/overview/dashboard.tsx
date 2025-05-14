@@ -8,7 +8,11 @@ import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getDashboardFilters } from './dashboard_panels_filters';
 import './vulnerability_detector_filters.scss';
 import { getKPIsPanel } from './dashboard_panels_kpis';
-import { withErrorBoundary } from '../../../../common/hocs';
+import {
+  HideOnErrorInitializatingDataSource,
+  PromptErrorInitializatingDataSource,
+  withErrorBoundary,
+} from '../../../../common/hocs';
 import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSearchbarProgress } from '../../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 import {
@@ -36,6 +40,8 @@ import VulsEvaluationFilter, {
   excludeUnderEvaluationFilter,
   getUnderEvaluationFilterValue,
 } from '../../common/components/vuls-evaluation-filter';
+import { SampleDataWarning } from '../../../../visualize/components';
+import { WAZUH_SAMPLE_VULNERABILITIES } from '../../../../../../common/constants';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -59,6 +65,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository(),
@@ -131,25 +138,26 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
             <LoadingSearchbarProgress />
           ) : (
             <>
-              <WzSearchBar
-                appName='vulnerability-detector-searchbar'
-                {...searchBarProps}
-                filters={excludeUnderEvaluationFilter(filters)}
-                fixedFilters={fixedFilters}
-                postFixedFilters={[
-                  () => (
-                    <VulsEvaluationFilter
-                      value={underEvaluation}
-                      setValue={handleFilterChange}
-                    />
-                  ),
-                ]}
-                showDatePicker={false}
-                showQueryInput={true}
-                showQueryBar={true}
-                showSaveQuery={true}
-              />
-
+              <HideOnErrorInitializatingDataSource error={error}>
+                <WzSearchBar
+                  appName='vulnerability-detector-searchbar'
+                  {...searchBarProps}
+                  filters={excludeUnderEvaluationFilter(filters)}
+                  fixedFilters={fixedFilters}
+                  postFixedFilters={[
+                    () => (
+                      <VulsEvaluationFilter
+                        value={underEvaluation}
+                        setValue={handleFilterChange}
+                      />
+                    ),
+                  ]}
+                  showDatePicker={false}
+                  showQueryInput={true}
+                  showQueryBar={true}
+                  showSaveQuery={true}
+                />
+              </HideOnErrorInitializatingDataSource>
               {dataSource && results?.hits?.total === 0 ? (
                 <DiscoverNoResults />
               ) : null}
@@ -158,6 +166,9 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
                   dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
                 }`}
               >
+                <SampleDataWarning
+                  categoriesSampleData={[WAZUH_SAMPLE_VULNERABILITIES]}
+                />
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,
@@ -247,6 +258,7 @@ const DashboardVulsComponent: React.FC<DashboardVulsProps> = ({
                   }}
                 />
               </div>
+              {error && <PromptErrorInitializatingDataSource error={error} />}
             </>
           )}
         </>

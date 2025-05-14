@@ -11,25 +11,8 @@
  */
 
 import React, { Component, Fragment } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiButtonEmpty,
-  EuiTabs,
-  EuiTab,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiTabs, EuiTab } from '@elastic/eui';
 import '../../common/modules/module.scss';
-import store from '../../../redux/store';
-import { ReportingService } from '../../../react-services/reporting';
-import {
-  AlertsDataSource,
-  AlertsDataSourceRepository,
-  PatternDataSource,
-  tFilter,
-  tParsedIndexPattern,
-  useDataSource,
-} from '../data-source';
-import { useAsyncAction } from '../hooks';
 import { toTitleCase } from '../util/change-case';
 import clsx from 'clsx';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
@@ -48,32 +31,15 @@ export class MainModuleAgent extends Component {
     unPinAgent?: () => void;
   };
 
-  inventoryTabs = [AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES];
-
   renderTitle() {
-    const { agent, section, switchTab } = this.props;
+    const { section } = this.props;
     return (
       <EuiFlexGroup style={{ marginInline: 8 }}>
         <EuiFlexItem style={{ marginInline: 0 }}>
           <EuiTabs data-test-subj='agent-tabs'>
-            {this.inventoryTabs.includes(section) ? (
-              <>
-                {this.inventoryTabs.map(tab => (
-                  <EuiTab
-                    key={`agent-tab-${tab}`}
-                    data-test-subj={`agent-tab-${tab}`}
-                    isSelected={section === tab}
-                    onClick={() => switchTab?.(tab)}
-                  >
-                    {toTitleCase(tab)}
-                  </EuiTab>
-                ))}
-              </>
-            ) : (
-              <EuiTab data-test-subj={`agent-tab-${section}`} isSelected={true}>
-                {toTitleCase(section)}
-              </EuiTab>
-            )}
+            <EuiTab data-test-subj={`agent-tab-${section}`} isSelected={true}>
+              {toTitleCase(section)}
+            </EuiTab>
           </EuiTabs>
         </EuiFlexItem>
         <EuiFlexItem
@@ -83,17 +49,6 @@ export class MainModuleAgent extends Component {
         >
           <ButtonExploreAgent onUnpinAgent={this.props.unPinAgent} />
         </EuiFlexItem>
-        {[AgentTabs.SOFTWARE, AgentTabs.NETWORK, AgentTabs.PROCESSES].includes(
-          section,
-        ) && (
-          <EuiFlexItem
-            grow={false}
-            style={{ marginTop: 13.25, marginInline: 0, paddingInline: 12 }}
-            className='euiTabs'
-          >
-            <GenerateReportButton agent={agent} />
-          </EuiFlexItem>
-        )}
       </EuiFlexGroup>
     );
   }
@@ -153,55 +108,3 @@ export class MainModuleAgent extends Component {
     );
   }
 }
-
-export class AgentInventoryDataSource extends AlertsDataSource {
-  constructor(id: string, title: string) {
-    super(id, title);
-  }
-
-  getFixedFilters(): tFilter[] {
-    return [
-      ...super.getFixedFiltersClusterManager(),
-      ...super.getFixedFilters(),
-    ];
-  }
-}
-
-const GenerateReportButton = ({ agent }: { agent: Agent }) => {
-  const {
-    dataSource,
-    fetchFilters,
-    isLoading: isDataSourceLoading,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
-    DataSource: AgentInventoryDataSource,
-  });
-
-  const action = useAsyncAction(async () => {
-    const reportingService = new ReportingService();
-    const agentID =
-      (agent || store.getState().appStateReducers.currentAgentData || {}).id ||
-      false;
-    await reportingService.startVis2Png('syscollector', agentID, {
-      indexPattern: dataSource?.indexPattern,
-      query: { query: '', language: 'kuery' },
-      filters: fetchFilters,
-      time: {
-        from: 'now-1d/d',
-        to: 'now',
-      },
-    });
-  }, [dataSource]);
-
-  return (
-    <EuiButtonEmpty
-      data-test-subj='generate-report-button'
-      iconType='document'
-      isLoading={action.running}
-      isDisabled={isDataSourceLoading}
-      onClick={action.run}
-    >
-      Generate report
-    </EuiButtonEmpty>
-  );
-};

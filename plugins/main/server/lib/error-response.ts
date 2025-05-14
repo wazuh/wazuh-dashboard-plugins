@@ -21,7 +21,7 @@ enum ERROR_TYPE {
   ENOENT = 'ENOENT',
 }
 
-enum WAZUH_STATUS_CODES {
+export enum WAZUH_STATUS_CODES {
   UNKNOWN = 1000,
 }
 

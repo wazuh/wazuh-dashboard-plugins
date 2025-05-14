@@ -16,5 +16,6 @@
   "typescript.updateImportsOnFileMove.enabled": "always",
   "[ignore]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
-  }
+  },
+  "eslint.enable": false
 }

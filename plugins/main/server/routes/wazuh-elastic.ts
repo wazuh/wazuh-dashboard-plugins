@@ -16,6 +16,9 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+  WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+  WAZUH_SAMPLE_INVENTORY_AGENT,
+  WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../common/constants';
 
 export function WazuhElasticRoutes(router: IRouter) {
@@ -25,6 +28,9 @@ export function WazuhElasticRoutes(router: IRouter) {
       WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+      WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+      WAZUH_SAMPLE_INVENTORY_AGENT,
+      WAZUH_SAMPLE_VULNERABILITIES,
     ].map(category => schema.literal(category)),
   );
 
@@ -73,16 +79,7 @@ export function WazuhElasticRoutes(router: IRouter) {
 
   router.get(
     {
-      path: '/elastic/samplealerts',
-      validate: false,
-    },
-    async (context, request, response) =>
-      ctrl.haveSampleAlerts(context, request, response),
-  );
-
-  router.get(
-    {
-      path: '/elastic/samplealerts/{category}',
+      path: '/indexer/sampledata/{category}',
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,
@@ -90,12 +87,12 @@ export function WazuhElasticRoutes(router: IRouter) {
       },
     },
     async (context, request, response) =>
-      ctrl.haveSampleAlertsOfCategory(context, request, response),
+      ctrl.haveSampleDataOfCategory(context, request, response),
   );
 
   router.post(
     {
-      path: '/elastic/samplealerts/{category}',
+      path: '/indexer/sampledata/{category}',
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,
@@ -104,12 +101,12 @@ export function WazuhElasticRoutes(router: IRouter) {
       },
     },
     async (context, request, response) =>
-      ctrl.createSampleAlerts(context, request, response),
+      ctrl.createSampleData(context, request, response),
   );
 
   router.delete(
     {
-      path: '/elastic/samplealerts/{category}',
+      path: '/indexer/sampledata/{category}',
       validate: {
         params: schema.object({
           category: schemaSampleAlertsCategories,
@@ -117,7 +114,7 @@ export function WazuhElasticRoutes(router: IRouter) {
       },
     },
     async (context, request, response) =>
-      ctrl.deleteSampleAlerts(context, request, response),
+      ctrl.deleteSampleData(context, request, response),
   );
 
   router.post(

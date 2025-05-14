@@ -26,6 +26,7 @@ import {
 import { HIPAADataSource } from '../../../common/data-source/pattern/alerts/hipaa/hipaa-data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../../../common/search-bar';
+import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
 
 const plugins = getPlugins();
 
@@ -114,7 +115,9 @@ const DashboardHIPAAComponent: React.FC = () => {
                 dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
               }
             >
-              <SampleDataWarning />
+              <SampleDataWarning
+                categoriesSampleData={[WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]}
+              />
               <div className='hipaa-dashboard-responsive'>
                 <DashboardByRenderer
                   input={{

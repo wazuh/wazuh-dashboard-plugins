@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress, EuiLink } from '@elastic/eui';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
-import { MainSyscollector } from '../../agents/syscollector/main';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
 import {
@@ -30,6 +29,7 @@ import { endpointSummary } from '../../../utils/applications';
 import { withAgentSync } from '../../common/hocs/withAgentSync';
 import { AgentTabs } from './agent-tabs';
 import { SECTIONS } from '../../../sections';
+import { useEffectEnsureComponentMounted } from '../../common/hooks';
 
 const mapStateToProps = state => ({
   agent: state.appStateReducers?.currentAgentData,
@@ -91,7 +91,7 @@ export const AgentView = compose(
 
   const pinnedAgentManager = new PinnedAgentManager();
 
-  const [isLoadingAgent, setIsLoadingAgent] = useState(true);
+  const [isLoadingAgent, setIsLoadingAgent] = useState(false);
 
   const syncAgent = async () => {
     setIsLoadingAgent(true);
@@ -99,7 +99,11 @@ export const AgentView = compose(
     setIsLoadingAgent(false);
   };
 
-  useEffect(() => {
+  useEffectEnsureComponentMounted(() => {
+    /* The component has the withAgentSync hook that synchronizes the agent data and this
+    effect would trigger on mount causing the views are mounted 2 times, that causes problems with
+    the views that are wrapped with index pattern creation due to conflict document errors (same index pattern could be tried to create despite it exist). Avoiding the effect is triggered on mount mitigates the problem or canceling the async operations (index patten validation/creation)
+    */
     syncAgent();
   }, [tab]);
 
@@ -124,33 +128,6 @@ export const AgentView = compose(
 
   return (
     <Switch>
-      <Route path={`?tab=${AgentTabs.SOFTWARE}`}>
-        <MainModuleAgent
-          agent={agentData}
-          section={tab}
-          switchTab={switchTab}
-          unPinAgent={unPinAgent}
-        />
-        <MainSyscollector agent={agentData} section={tab} />
-      </Route>
-      <Route path={`?tab=${AgentTabs.NETWORK}`}>
-        <MainModuleAgent
-          agent={agentData}
-          section={tab}
-          switchTab={switchTab}
-          unPinAgent={unPinAgent}
-        />
-        <MainSyscollector agent={agentData} section={tab} />
-      </Route>
-      <Route path={`?tab=${AgentTabs.PROCESSES}`}>
-        <MainModuleAgent
-          agent={agentData}
-          section={tab}
-          switchTab={switchTab}
-          unPinAgent={unPinAgent}
-        />
-        <MainSyscollector agent={agentData} section={tab} />
-      </Route>
       <Route path={`?tab=${AgentTabs.STATS}`}>
         <MainModuleAgent
           agent={agentData}

@@ -22,3 +22,6 @@ export * from './error-boundary/with-error-boundary';
 export * from './with_module_not_for_agent';
 export * from './route-resolver';
 export * from './with-router-search';
+export * from './with-index-pattern';
+export * from './with-data-source';
+export * from './with-wrap-component';

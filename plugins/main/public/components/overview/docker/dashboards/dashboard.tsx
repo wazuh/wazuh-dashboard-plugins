@@ -26,6 +26,7 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../../../common/search-bar';
+import { WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../../../../common/constants';
 
 const plugins = getPlugins();
 
@@ -113,7 +114,11 @@ const DashboardDockerComponent: React.FC = ({}) => {
                 dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
               }
             >
-              <SampleDataWarning />
+              <SampleDataWarning
+                categoriesSampleData={[
+                  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+                ]}
+              />
               <div className='docker-dashboard-responsive'>
                 <DashboardByRenderer
                   input={{

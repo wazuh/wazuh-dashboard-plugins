@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, HTMLAttributes } from 'react';
 import {
   Filter,
   IndexPattern,
@@ -8,7 +8,15 @@ import {
   FilterState,
   FilterStateStore,
 } from '../../../../../../src/plugins/data/common';
-import { EuiFlexGroup, EuiFlexItem, EuiSwitch } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSwitch,
+  EuiFlexItemProps,
+  EuiPopover,
+  EuiButtonEmpty,
+  CommonProps,
+} from '@elastic/eui';
 import { tFilter } from '../data-source';
 //@ts-ignore
 import { MultiSelect } from './components';
@@ -17,31 +25,46 @@ import { I18nProvider } from '@osd/i18n/react';
 import { tUseSearchBarProps } from '../search-bar/use-search-bar';
 import { WzSearchBar } from '../search-bar/search-bar';
 
-type CustomSearchBarProps = {
-  filterInputs: {
-    type: string;
-    key: string;
-    placeholder: string;
-  }[];
-  filterDrillDownValue: { field: string; value: string };
+interface FilterInput {
+  type: string;
+  key: string;
+  placeholder: string;
+  filterByKey?: boolean;
+  options?: string[];
+}
+
+export type CustomSearchBarProps = {
+  filterInputs: FilterInput[];
+  filterDrillDownValue?: { field: string; value: string };
   searchBarProps: tUseSearchBarProps;
   indexPattern: IndexPattern;
   fixedFilters: Filter[];
   setFilters: (filters: tFilter[]) => void;
+  filterInputsProps: CommonProps &
+    EuiFlexItemProps & {
+      style: HTMLAttributes<HTMLDivElement | HTMLSpanElement>['style'];
+    };
 };
+
+const frozenFilterDrillDownValue = Object.freeze({ field: '', value: '' });
 
 export const CustomSearchBar = ({
   filterInputs,
-  filterDrillDownValue = { field: '', value: '' },
+  /* Using a frozen value when this prop is not
+  provided, it avoids the MultiSelect component fetches again when this component is rendered due
+  to the filterDrillDownValue passed to that component was creating a new reference in each render
+  and it is used as effect dependency to fetch the suggestions */
+  filterDrillDownValue = frozenFilterDrillDownValue,
   searchBarProps,
   indexPattern,
   setFilters,
   fixedFilters,
+  filterInputsProps,
 }: CustomSearchBarProps) => {
   const { filters } = searchBarProps;
 
   const defaultSelectedOptions = () => {
-    const array = [];
+    const array: string[][] = [];
     filterInputs.forEach(item => {
       array[item.key] = [];
     });
@@ -49,22 +72,22 @@ export const CustomSearchBar = ({
     return array;
   };
   const [avancedFiltersState, setAvancedFiltersState] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState(
-    defaultSelectedOptions,
+  const [selectedOptions, setSelectedOptions] = useState<string[][]>(
+    defaultSelectedOptions(),
   );
-  const [values, setValues] = useState(Array);
-  const [selectReference, setSelectReference] = useState('');
+  const [values, setValues] = useState<any[]>([]);
+  const [selectReference, setSelectReference] = useState<string>('');
 
   useEffect(() => {
     setPluginPlatformFilters(values, selectReference);
     refreshCustomSelectedFilter();
-  }, [values]);
+  }, [values, selectReference]);
 
   useEffect(() => {
     refreshCustomSelectedFilter();
   }, [filters, fixedFilters]);
 
-  const checkSelectDrillDownValue = key => {
+  const checkSelectDrillDownValue = (key: string) => {
     return filterDrillDownValue.field === key &&
       filterDrillDownValue.value != ''
       ? true
@@ -79,8 +102,8 @@ export const CustomSearchBar = ({
     setAvancedFiltersState(state => !state);
   };
 
-  const buildCustomFilter = (values?: any): Filter => {
-    const newFilters = values.map(element => ({
+  const buildCustomFilter = (values?: FilterInput[]): Filter => {
+    const newFilters = values?.map(element => ({
       match_phrase: {
         [element.value]: {
           query: element.filterByKey ? element.key : element.label,
@@ -196,6 +219,7 @@ export const CustomSearchBar = ({
           onRemove={onRemove}
           isDisabled={checkSelectDrillDownValue(item.key)}
           filterDrillDownValue={filterDrillDownValue}
+          indexPattern={indexPattern}
         />
       ),
     };
@@ -218,20 +242,57 @@ export const CustomSearchBar = ({
                 gutterSize='s'
               >
                 {filterInputs.map((item, key) => (
-                  <EuiFlexItem key={key}>{getComponent(item)}</EuiFlexItem>
+                  <EuiFlexItem key={key} {...filterInputsProps}>
+                    {getComponent(item)}
+                  </EuiFlexItem>
                 ))}
               </EuiFlexGroup>
             ) : null
           }
           postFilters={
-            <EuiSwitch
-              label='Advanced filters'
-              checked={avancedFiltersState}
-              onChange={() => changeSwitch()}
-            />
+            <>
+              <div
+                style={{ display: 'flex', gap: '6px', alignItems: 'center' }}
+              >
+                {!avancedFiltersState && searchBarProps?.query?.query && (
+                  <QueryPopover query={searchBarProps.query.query} />
+                )}
+                <div>
+                  <EuiSwitch
+                    label='Advanced filters'
+                    checked={avancedFiltersState}
+                    onChange={() => changeSwitch()}
+                  />
+                </div>
+              </div>
+            </>
           }
         />
       </div>
     </I18nProvider>
+  );
+};
+
+const QueryPopover = ({ query }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <EuiPopover
+      button={
+        <EuiButtonEmpty
+          iconType='wsSearch'
+          iconSide='right'
+          size='s'
+          isDisabled={!query}
+          onClick={() => setIsOpen(state => !state)}
+        >
+          Query
+        </EuiButtonEmpty>
+      }
+      isOpen={isOpen}
+      closePopover={() => setIsOpen(false)}
+    >
+      {query}
+    </EuiPopover>
   );
 };

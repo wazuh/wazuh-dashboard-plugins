@@ -114,20 +114,6 @@ export function WazuhApiRoutes(router: IRouter) {
       ctrl.getSetupInfo(context, request, response),
   );
 
-  // Return basic information of syscollector for given agent
-  router.get(
-    {
-      path: '/api/syscollector/{agent}',
-      validate: {
-        params: schema.object({
-          agent: schema.string(),
-        }),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.getSyscollector(context, request, response),
-  );
-
   // Return app logos configuration
   router.get(
     {

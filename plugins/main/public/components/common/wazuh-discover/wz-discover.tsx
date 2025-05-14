@@ -48,6 +48,7 @@ import { WzSearchBar } from '../search-bar';
 import { transformDateRange } from '../search-bar/search-bar-service';
 import DocDetailsHeader from './components/doc-details-header';
 import { tDataGridColumn } from '../data-grid/types';
+import { SampleDataWarning } from '../../visualize/components';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -58,10 +59,16 @@ export type WazuhDiscoverProps = {
   moduleId: string;
   tableColumns: tDataGridColumn[];
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
+  categoriesSampleData: string[];
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
-  const { moduleId, DataSource, tableColumns: defaultTableColumns } = props;
+  const {
+    moduleId,
+    DataSource,
+    tableColumns: defaultTableColumns,
+    categoriesSampleData,
+  } = props;
 
   if (!DataSource) {
     throw new Error('DataSource is required');
@@ -235,6 +242,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             showQueryBar={true}
             showSaveQuery={true}
           />
+          <SampleDataWarning categoriesSampleData={categoriesSampleData} />
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}

@@ -91,7 +91,6 @@ scripts/vulnerabilities-events-injector/generatedData.json
 __pycache__
 python3.*
 bin/
+site-packages/
 lib64
 pyvenv.cfg
-
-scripts/sample-data/config.json

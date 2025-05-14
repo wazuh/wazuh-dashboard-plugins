@@ -21,6 +21,13 @@ jest.mock('../../../../../react-services/common-services', () => ({
   }),
 }));
 
+// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
+// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
+
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
+}));
+
 describe('EditAgentsGroupsModal component', () => {
   test('should return the component with save disabled', async () => {
     (useGetGroups as jest.Mock).mockReturnValue({

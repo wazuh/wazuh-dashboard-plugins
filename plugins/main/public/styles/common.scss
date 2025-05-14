@@ -1387,16 +1387,6 @@ md-chips .md-chips {
   background-color: transparent !important;
 }
 
-div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom {
-  max-height: 500px;
-  overflow-y: scroll;
-}
-
-div.euiPopover__panel.euiPopover__panel-isOpen.euiPopover__panel--bottom.wz-menu-popover {
-  overflow-y: unset;
-  padding-right: 0;
-}
-
 .euiSuggestItem .euiSuggestItem__label {
   flex-basis: 25%;
   min-width: 25%;

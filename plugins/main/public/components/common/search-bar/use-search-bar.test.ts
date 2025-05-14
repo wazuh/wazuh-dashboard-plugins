@@ -31,6 +31,13 @@ jest.mock('../../../kibana-services', () => {
   };
 });
 
+// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
+// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
+
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
+}));
+
 /* using osd mock utils */
 const mockDataPlugin = dataPluginMock.createStartContract();
 const mockedGetDataPlugin = getDataPlugin as jest.Mock<Start>;

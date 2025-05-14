@@ -37,7 +37,7 @@ type tUseDataSourceProps<T extends object, K extends PatternDataSource> = {
   fixedFilters?: tFilter[];
 };
 
-type tUseDataSourceLoadedReturns<K> = {
+export type tUseDataSourceLoadedReturns<K> = {
   isLoading: boolean;
   dataSource: K;
   /*
@@ -55,6 +55,7 @@ type tUseDataSourceLoadedReturns<K> = {
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: PatternDataSourceFilterManager;
+  error: string | null;
 };
 
 type tUseDataSourceNotLoadedReturns = {
@@ -75,6 +76,7 @@ type tUseDataSourceNotLoadedReturns = {
   fetchData: (params: Omit<tSearchParams, 'filters'>) => Promise<any>;
   setFilters: (filters: tFilter[]) => void;
   filterManager: null;
+  error: null;
 };
 
 export function useDataSource<
@@ -115,6 +117,7 @@ export function useDataSource<
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
   const [fixedFilters, setFixedFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
   const { isComponentMounted, getAbortController } = useIsMounted();
@@ -179,7 +182,8 @@ export function useDataSource<
         setFetchFilters(dataSourceFilterManager.getFetchFilters());
         setFixedFilters(dataSourceFilterManager.getFixedFilters());
         setDataSourceFilterManager(dataSourceFilterManager);
-      } catch {
+      } catch (e) {
+        setError(e?.message);
       } finally {
         setIsLoading(false);
       }
@@ -209,6 +213,7 @@ export function useDataSource<
       fetchData,
       setFilters,
       filterManager: null,
+      error: null,
     };
   } else {
     return {
@@ -220,6 +225,7 @@ export function useDataSource<
       fetchData,
       setFilters,
       filterManager: dataSourceFilterManager as PatternDataSourceFilterManager,
+      error,
     };
   }
 }

@@ -809,6 +809,30 @@ const about = {
   redirectTo: () => '/settings?tab=about',
 };
 
+export const ITHygiene = {
+  category: 'wz-category-security-operations',
+  id: 'it-hygiene',
+  title: i18n.translate('wz-app-it-hygiene-title', {
+    defaultMessage: 'IT Hygiene',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-it-hygiene-breadcrumbLabel', {
+    defaultMessage: 'IT Hygiene',
+  }),
+  description: i18n.translate('wz-app-it-hygiene-description', {
+    defaultMessage: 'Show information about IT Hygiene.',
+  }),
+  euiIconType: 'indexPatternApp',
+  order: 405,
+  showInOverviewApp: true,
+  showInAgentMenu: true,
+  redirectTo: () =>
+    `/overview/?tab=it-hygiene&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
@@ -845,6 +869,7 @@ export const Applications = [
   sampleData,
   appSettings,
   about,
+  ITHygiene,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {
@@ -905,6 +930,14 @@ export const Categories = [
     }),
     order: 600,
     euiIconType: 'graphApp',
+  },
+  {
+    id: 'wz-category-system-inventory',
+    label: i18n.translate('wz-app-category-system-inventory', {
+      defaultMessage: 'System inventory',
+    }),
+    order: 650,
+    euiIconType: 'packetbeatApp',
   },
   {
     id: 'wz-category-server-management',

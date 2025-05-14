@@ -26,6 +26,7 @@ import {
 } from '../../../common/data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../../../common/search-bar';
+import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
 
 const plugins = getPlugins();
 
@@ -114,7 +115,9 @@ const DashboardTSCComponent: React.FC = () => {
                 dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
               }
             >
-              <SampleDataWarning />
+              <SampleDataWarning
+                categoriesSampleData={[WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]}
+              />
               <div className='tsc-dashboard-responsive'>
                 <DashboardByRenderer
                   input={{

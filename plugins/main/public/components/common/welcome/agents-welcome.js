@@ -60,6 +60,7 @@ import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent
 import NavigationService from '../../../react-services/navigation-service';
 import VulsPanel from './components/vuls_panel/vuls_welcome_panel';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
+import { InventoryMetrics } from '../../agents/syscollector/components';
 
 export const AgentsWelcome = compose(
   withErrorBoundary,
@@ -333,21 +334,7 @@ export const AgentsWelcome = compose(
               >
                 <ButtonExploreAgent onUnpinAgent={this.props.unPinAgent} />
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                <WzButton
-                  buttonType='empty'
-                  iconType='inspect'
-                  onClick={() => this.props.switchTab(AgentTabs.SOFTWARE)}
-                  className='wz-it-hygiene-header-button'
-                  tooltip={
-                    this.state.maxModules === null
-                      ? { position: 'bottom', content: 'Inventory data' }
-                      : undefined
-                  }
-                >
-                  {this.state.maxModules !== null ? 'Inventory data' : ''}
-                </WzButton>
-              </EuiFlexItem>
+              <EuiFlexItem grow={false} style={{ marginTop: 7 }}></EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
                 <WzButton
                   buttonType='empty'
@@ -471,6 +458,14 @@ export const AgentsWelcome = compose(
                     hideActions={true}
                     {...this.props}
                   ></AgentInfo>
+                  <EuiSpacer size='l' />
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <InventoryMetrics
+                        agent={this.props.agent}
+                      ></InventoryMetrics>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                   <EuiFlexGroup>
                     <EuiFlexItem />
                     <EuiFlexItem

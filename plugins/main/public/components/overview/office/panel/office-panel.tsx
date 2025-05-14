@@ -28,6 +28,7 @@ import {
 } from '../../../common/data-source';
 import { Office365DataSource } from '../../../common/data-source/pattern/alerts/office-365/office-365-data-source';
 import { IndexPattern } from '../../../../../../src/plugins/data/public';
+import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
 
 export const OfficePanel = withErrorBoundary(() => {
   const [drillDownValue, setDrillDownValue] = useState({
@@ -107,6 +108,7 @@ export const OfficePanel = withErrorBoundary(() => {
               indexPattern: dataSource?.indexPattern,
             }}
             isLoading={isDataSourceLoading}
+            categoriesSampleData={[WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]}
           />
         </>
       )}

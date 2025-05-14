@@ -40,6 +40,7 @@ import DocDetailsHeader from '../wazuh-discover/components/doc-details-header';
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
 export type tWazuhDataGridProps = {
+  moduleId: string;
   indexPattern: IndexPattern;
   results: SearchResponse;
   defaultColumns: tDataGridColumn[];
@@ -59,6 +60,7 @@ export type tWazuhDataGridProps = {
 
 const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   const {
+    moduleId,
     results,
     defaultColumns,
     indexPattern,
@@ -100,6 +102,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   };
 
   const dataGridProps = useDataGrid({
+    moduleId,
     ariaLabelledBy: 'Actions data grid',
     defaultColumns,
     renderColumns: wzDiscoverRenderColumns,

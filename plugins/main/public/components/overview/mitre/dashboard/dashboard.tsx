@@ -24,6 +24,10 @@ import {
 } from '../../../common/data-source';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../../../common/search-bar';
+import {
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+} from '../../../../../common/constants';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -111,7 +115,12 @@ export const DashboardMITRE: React.FC = () => {
                 dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
               }`}
             >
-              <SampleDataWarning />
+              <SampleDataWarning
+                categoriesSampleData={[
+                  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+                  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+                ]}
+              />
               <div className='mitre-dashboard-filters-wrapper'>
                 <DashboardByRenderer
                   input={{

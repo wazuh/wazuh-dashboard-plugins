@@ -48,6 +48,8 @@ export enum FILTER_OPERATOR {
   IS_NOT_ONE_OF = 'is not one of',
   IS_BETWEEN = 'is between',
   IS_NOT_BETWEEN = 'is not between',
+  WILDCARD = 'wildcard',
+  WILDCARD_NOT = 'wildcard not',
 }
 
 export class PatternDataSourceFilterManager
@@ -428,6 +430,23 @@ export class PatternDataSourceFilterManager
               lte: value[1] || NaN,
             },
           },
+          $state: { store: FilterStateStore.APP_STATE },
+        };
+      case FILTER_OPERATOR.WILDCARD:
+      case FILTER_OPERATOR.WILDCARD_NOT:
+        const wildcard = { [key]: value };
+        return {
+          meta: {
+            index: indexPatternId,
+            type: 'custom',
+            disabled: false,
+            negate: type === FILTER_OPERATOR.WILDCARD_NOT,
+            alias: null,
+            key: 'wildcard',
+            value: JSON.stringify(wildcard),
+            controlledBy,
+          },
+          wildcard,
           $state: { store: FilterStateStore.APP_STATE },
         };
       default:

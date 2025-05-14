@@ -7,7 +7,7 @@ import {
 import DocViewer from '../../doc-viewer/doc-viewer';
 import { useDocViewer } from '../../doc-viewer';
 
-interface DocumentViewTableAndJsonProps {
+interface DocumentViewTableAndJsonPropsDoc {
   document: any;
   indexPattern: IndexPattern;
   renderFields?: any;
@@ -16,6 +16,23 @@ interface DocumentViewTableAndJsonProps {
   onFilter?: () => void;
 }
 
+type DocumentViewTableAndJsonPropsAdditionalTabsObject = {
+  id: string;
+  name: string;
+  content: React.ReactNode;
+}[];
+
+export type DocumentViewTableAndJsonPropsAdditionalTabs =
+  | DocumentViewTableAndJsonPropsAdditionalTabsObject
+  | ((
+      options: DocumentViewTableAndJsonPropsDoc,
+    ) => DocumentViewTableAndJsonPropsAdditionalTabsObject);
+
+type DocumentViewTableAndJsonProps = DocumentViewTableAndJsonPropsDoc & {
+  additionalTabs?: DocumentViewTableAndJsonPropsAdditionalTabs;
+  showFilterButtons: boolean;
+};
+
 export const DocumentViewTableAndJson = ({
   document,
   indexPattern,
@@ -23,6 +40,8 @@ export const DocumentViewTableAndJson = ({
   filters,
   setFilters,
   onFilter,
+  additionalTabs = [],
+  showFilterButtons,
 }: DocumentViewTableAndJsonProps) => {
   const docViewerProps = useDocViewer({
     doc: document,
@@ -43,6 +62,7 @@ export const DocumentViewTableAndJson = ({
                 filters={filters}
                 setFilters={setFilters}
                 onFilter={onFilter}
+                showFilterButtons={showFilterButtons}
               />
             ),
           },
@@ -60,6 +80,16 @@ export const DocumentViewTableAndJson = ({
               </EuiCodeBlock>
             ),
           },
+          ...(Array.isArray(additionalTabs)
+            ? additionalTabs
+            : additionalTabs({
+                document,
+                indexPattern,
+                renderFields,
+                filters,
+                setFilters,
+                onFilter,
+              })),
         ]}
       />
     </EuiFlexItem>

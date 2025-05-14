@@ -37,6 +37,7 @@ type MainPanelProps = {
     searchBarProps: tUseSearchBarProps;
     indexPattern: IndexPattern;
   };
+  categoriesSampleData: string[];
 };
 
 export const MainPanel = (props: MainPanelProps) => {
@@ -47,6 +48,7 @@ export const MainPanel = (props: MainPanelProps) => {
     onChangeView,
     dataSourceProps,
     isLoading,
+    categoriesSampleData,
   } = props;
   const [viewId, setViewId] = useState('main');
   const [selectedFilter, setSelectedFilter] = useState({
@@ -99,7 +101,7 @@ export const MainPanel = (props: MainPanelProps) => {
           <ModuleSidePanel>{sidePanelChildren}</ModuleSidePanel>
         )}
         <EuiPageBody>
-          <SampleDataWarning />
+          <SampleDataWarning categoriesSampleData={categoriesSampleData} />
           <ModuleContent />
         </EuiPageBody>
       </EuiFlexItem>
