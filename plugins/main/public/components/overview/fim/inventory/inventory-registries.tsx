@@ -109,10 +109,23 @@ export function getImplicitFilters({ file }: { file: string }) {
       'syscheck',
       AppState.getCurrentPattern(),
     ),
+    /* WORKAROUND: this uses a wildcard query, because the alerts contain a prefix related
+      to the hive (HKEY_LOCAL_MACHINE, etc...), that is not included in the registr.key used
+      as "file" parameter of this method. The registry.hive of inventory data includes a reference
+      to the hive but this uses an acronym (HKLM instead of HKEY_LOCAL_MACHINE) in the current
+      state, so we could not rebuild the expected syscheck.path in the alert. This should be
+      changed if:
+      - the registry.hive is fixed to represent the real hive name (HKEY_LOCAL_MACHINE, etc...)
+        composing the syscheck.path = registry.hive + "\" + registry.key
+      - registry.key or other property includes all the path to the registry.key so the
+        syscheck.path = registry.key or <related_prop>
+
+      See: https://github.com/wazuh/wazuh/issues/27903#issuecomment-2879882694
+    */
     PatternDataSourceFilterManager.createFilter(
-      FILTER_OPERATOR.IS,
-      'syscheck.key',
-      file,
+      FILTER_OPERATOR.WILDCARD,
+      'syscheck.path',
+      `*${file.split('\\').join(String.raw`\\`)}`,
       AppState.getCurrentPattern(),
     ),
   ];
@@ -155,14 +168,33 @@ export function renderDiscoverExpandedRow(props: {
 }
 
 export const getRecentEventsSpecificFilters = ({ document, indexPattern }) => {
-  const file = document._source.registry.path;
+  const file = document._source.registry.key;
 
   return [
+    /* WORKAROUND: this uses a wildcard query, because the alerts contain a prefix related
+      to the hive (HKEY_LOCAL_MACHINE, etc...), that is not included in the registr.key used
+      as "file" parameter of this method. The registry.hive of inventory data includes a reference
+      to the hive but this uses an acronym (HKLM instead of HKEY_LOCAL_MACHINE) in the current
+      state, so we could not rebuild the expected syscheck.path in the alert. This should be
+      changed if:
+      - the registry.hive is fixed to represent the real hive name (HKEY_LOCAL_MACHINE, etc...)
+        composing the syscheck.path = registry.hive + "\" + registry.key
+      - registry.key or other property includes all the path to the registry.key so the
+        syscheck.path = registry.key or <related_prop>
+
+      See: https://github.com/wazuh/wazuh/issues/27903#issuecomment-2879882694
+    */
     PatternDataSourceFilterManager.createFilter(
-      FILTER_OPERATOR.IS,
+      FILTER_OPERATOR.WILDCARD,
       'syscheck.path',
-      file,
+      `*${file.split('\\').join(String.raw`\\`)}`,
       indexPattern.id,
     ),
+    // PatternDataSourceFilterManager.createFilter(
+    //   FILTER_OPERATOR.IS,
+    //   'syscheck.path',
+    //   file,
+    //   indexPattern.id,
+    // ),
   ];
 };
