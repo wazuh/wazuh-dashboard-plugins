@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { getAgentsInfo } from './get-agents-info';
 import { WzRequest } from '../../../react-services/wz-request';
 import { getColorPaletteByIndex } from './get-color-palette-by-index';
@@ -32,24 +33,26 @@ describe('getAgents', () => {
   it('should return grouped data', async () => {
     const responseData = {
       data: {
-        status: {
-          active: 24,
-          disconnected: 0,
-          never_connected: 11,
-          pending: 15,
+        data: {
+          status: {
+            active: 24,
+            disconnected: 0,
+            never_connected: 11,
+            pending: 15,
+          },
+          os: {
+            debian: 45,
+            ubuntu: 4,
+            windows: 1,
+          },
+          groups: {
+            default: 1,
+            test: 2,
+            test2: 3,
+          },
         },
-        os: {
-          debian: 45,
-          ubuntu: 4,
-          windows: 1,
-        },
-        groups: {
-          default: 1,
-          test: 2,
-          test2: 3,
-        },
+        error: 0,
       },
-      error: 0,
     };
     const expectedGroupedData = {
       osData: [

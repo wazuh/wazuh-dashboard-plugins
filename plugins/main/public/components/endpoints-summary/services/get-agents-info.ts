@@ -107,7 +107,7 @@ export const getAgentsInfo = async (): Promise<AgentsInfoResult> => {
       error: {
         error: error,
         message: error?.message || error,
-        title: 'No se pudieron obtener los datos de los agentes',
+        title: 'Could not get agents info',
       },
     };
     getErrorOrchestrator().handleError(options);
