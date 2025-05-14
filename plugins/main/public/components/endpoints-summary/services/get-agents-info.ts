@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   UI_LOGGER_LEVELS,
   UI_ORDER_AGENT_STATUS,
@@ -11,45 +12,53 @@ import {
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
 
-export const getAgentsInfo = async () => {
+/* eslint-enable */
+export interface IAgentsSummaryResponse {
+  status: {
+    active: number;
+    disconnected: number;
+    never_connected: number;
+    pending: number;
+  };
+  os: {
+    [key: string]: number;
+  };
+  groups: {
+    [key: string]: number;
+  };
+}
+
+interface AgentDataItem {
+  label: string;
+  value: number;
+  color: string;
+  status?: string;
+}
+
+interface AgentsInfoResult {
+  osData: AgentDataItem[];
+  groupsData: AgentDataItem[];
+  statusData: AgentDataItem[];
+}
+
+export const getAgentsInfo = async (): Promise<AgentsInfoResult> => {
   const DEFAULT_COUNT = 1;
+  const agentsInfoEmpty: AgentsInfoResult = {
+    osData: [],
+    groupsData: [],
+    statusData: [],
+  };
+
   try {
-    // Uncomment before merge
-    // const { data }: any = await WzRequest.apiReq('GET', '/decoders', '{}');
+    const apiResponse = await WzRequest.apiReq('GET', '/agents/summary', {});
+    const agentSummaryData = apiResponse?.data?.data as IAgentsSummaryResponse;
 
-    // MOCK - TO DELETE BEFORE MERGE
-    const responseMock = {
-      data: {
-        status: {
-          active: 24,
-          disconnected: 0,
-          never_connected: 11,
-          pending: 15,
-        },
-        os: {
-          debian: 45,
-          ubuntu: 4,
-          windows: 1,
-        },
-        groups: {
-          default: 1,
-          test: 2,
-          test2: 3,
-        },
-      },
-      error: 0,
-    };
+    if (!agentSummaryData) {
+      return agentsInfoEmpty;
+    }
 
-    const { data }: any = await new Promise(resolve => {
-      setTimeout(() => {
-        resolve(responseMock);
-      }, 300);
-    });
-
-    // END OF MOCK - TO DELETE BEFORE MERGE
-
-    const osData: any[] = [];
-    const groupsData: any[] = [];
+    const osData: AgentDataItem[] = [];
+    const groupsData: AgentDataItem[] = [];
 
     const AGENT_STATUS = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
       status: agentStatus,
@@ -57,27 +66,31 @@ export const getAgentsInfo = async () => {
       color: agentStatusColorByAgentStatus(agentStatus),
     }));
 
-    Object.entries(data?.os).forEach(([osName, count], index) => {
-      osData.push({
-        label: osName,
-        value: count ?? DEFAULT_COUNT,
-        color: getColorPaletteByIndex(index),
-      });
-    });
+    Object.entries(agentSummaryData.os || {}).forEach(
+      ([osName, count], index) => {
+        osData.push({
+          label: osName,
+          value: count ?? DEFAULT_COUNT,
+          color: getColorPaletteByIndex(index),
+        });
+      },
+    );
 
-    Object.entries(data?.groups).forEach(([groupName, count], index) => {
-      groupsData.push({
-        label: groupName,
-        value: count ?? DEFAULT_COUNT,
-        color: getColorPaletteByIndex(index),
-      });
-    });
+    Object.entries(agentSummaryData.groups || {}).forEach(
+      ([groupName, count], index) => {
+        groupsData.push({
+          label: groupName,
+          value: count ?? DEFAULT_COUNT,
+          color: getColorPaletteByIndex(index),
+        });
+      },
+    );
 
     const statusData = AGENT_STATUS.map(({ label, status, color }) => ({
       status,
-      label: label,
-      value: data?.status[status] || 0,
-      color: color,
+      label,
+      value: agentSummaryData.status?.[status] ?? 0,
+      color,
     }));
 
     return {
@@ -93,11 +106,11 @@ export const getAgentsInfo = async () => {
       store: true,
       error: {
         error: error,
-        message: error.message || error,
-        title: `Could not get agents info`,
+        message: error?.message || error,
+        title: 'No se pudieron obtener los datos de los agentes',
       },
     };
     getErrorOrchestrator().handleError(options);
-    return [];
+    return agentsInfoEmpty;
   }
 };
