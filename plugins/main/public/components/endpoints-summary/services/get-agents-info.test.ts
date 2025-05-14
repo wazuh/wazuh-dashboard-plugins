@@ -127,7 +127,11 @@ describe('getAgents', () => {
 
     const groupedData = await getAgentsInfo();
 
-    expect(groupedData).toEqual([]);
+    expect(groupedData).toEqual({
+      osData: [],
+      groupsData: [],
+      statusData: [],
+    });
     expect(mockHandleError).toHaveBeenCalledWith({
       context: 'EndpointsSummary.getSummary',
       level: UI_LOGGER_LEVELS.ERROR,
