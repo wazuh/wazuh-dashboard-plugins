@@ -23,10 +23,12 @@ on:
         options:
           - 'yarn test:jest'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   # Run unit tests with Jest
   test:
+    if: github.event.pull_request.draft == false
     name: Run unit tests
     uses: ./.github/workflows/dev-environment.yml
     with:
