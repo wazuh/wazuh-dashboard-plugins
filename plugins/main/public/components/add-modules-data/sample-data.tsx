@@ -275,7 +275,7 @@ export default class WzSampleData extends Component {
           removeDataLoading: true,
         },
       });
-      await WzRequest.genericReq(
+      const { data: deleteResponse } = await WzRequest.genericReq(
         'DELETE',
         `/indexer/sampledata/${category.categorySampleDataIndex}`,
       );
@@ -286,7 +286,33 @@ export default class WzSampleData extends Component {
           removeDataLoading: false,
         },
       });
-      this.showToast('success', `${category.title} alerts removed`);
+
+      if (deleteResponse?.errors) {
+        deleteResponse.errors.forEach(error =>
+          this.showToast(
+            'danger',
+            `Failed to remove index: ${error.index}`,
+            `Error: ${error.message}`,
+            5000,
+          ),
+        );
+
+        if (deleteResponse.indices.length > 0) {
+          this.showToast(
+            'success',
+            `Successfully removed ${deleteResponse.indices.length} indices`,
+            deleteResponse.indices.join(', '),
+            5000,
+          );
+        }
+      } else {
+        this.showToast(
+          'success',
+          `${category.title} sample data removed`,
+          'All indices were successfully deleted',
+          4000,
+        );
+      }
     } catch (error) {
       const options = {
         context: `${WzSampleData.name}.removeSampleData`,

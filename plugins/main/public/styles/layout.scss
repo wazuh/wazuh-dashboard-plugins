@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Layouts stylesheet
- * Copyright (C) 2015-2022 Wazuh, Inc.
+ * Copyright (C) 2015-2025 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -360,22 +360,6 @@
 :focus {
   outline: none !important;
   outline-color: transparent !important;
-}
-
-.globalQueryBar:not(:empty) {
-  padding: 8px !important;
-}
-
-.dscWrapper {
-  .table > thead > tr > th,
-  .table > tbody > tr > th,
-  .table > tfoot > tr > th,
-  .table > thead > tr > td,
-  .table > tbody > tr > td,
-  .table > tfoot > tr > td {
-    font-size: 12px !important;
-    font-kerning: normal !important;
-  }
 }
 
 .wz-app .euiDataGrid__virtualized {

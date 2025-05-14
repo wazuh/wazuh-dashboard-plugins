@@ -38,7 +38,7 @@ import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../common/constants';
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-/* The IT Hygiene dashboard is made up of 3 dashboards due to diferent dashboard configuration */
+/* The IT Hygiene dashboard is made up of 3 dashboards due to different dashboard configuration */
 
 interface DashboardITHygieneProps {
   indexPattern: IndexPattern;

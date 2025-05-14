@@ -37,22 +37,40 @@ export class WazuhElasticCtrl {
   async buildSampleIndexByCategory(
     context: RequestHandlerContext,
     category: string,
-  ): Promise<string[]> {
-    const settingsIndexPatterns: string[] = [];
+  ): Promise<{ indexName: string; dataSet: string }[]> {
+    const settingsIndexPatterns: {
+      settingIndexPattern: string;
+      dataSet: string;
+    }[] = [];
 
     WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[category].forEach(item => {
-      if (settingsIndexPatterns.includes(item.settingIndexPattern)) {
+      // Check if the index pattern already exists in the array
+      // If it does, skip adding it
+      // If it doesn't, add it to the array
+      if (
+        settingsIndexPatterns.some(
+          itemSome => itemSome.settingIndexPattern === item.settingIndexPattern,
+        )
+      ) {
         return;
       }
-      settingsIndexPatterns.push(item.settingIndexPattern);
+      settingsIndexPatterns.push({
+        settingIndexPattern: item.settingIndexPattern,
+        dataSet: item?.dataSet,
+      });
     });
 
+    // Return an array of index names and settingsIndexPatterns
+    // by mapping the settingsIndexPatterns
     const indexNames = await Promise.all(
-      settingsIndexPatterns.map(async settingsIndexPattern => {
+      settingsIndexPatterns.map(async ({ settingIndexPattern, dataSet }) => {
         const configValue = await context.wazuh_core.configuration.get(
-          settingsIndexPattern,
+          settingIndexPattern,
         );
-        return `${configValue}sample-${category}`;
+        return {
+          indexName: `${configValue}sample-${category}`,
+          dataSet: dataSet,
+        };
       }),
     );
 
@@ -317,7 +335,7 @@ export class WazuhElasticCtrl {
       );
       // Check if wazuh sample data index exists
       const existsSampleIndex = await Promise.all(
-        sampleDataIndex.map(async indexName => {
+        sampleDataIndex.map(async ({ indexName }) => {
           return await context.core.opensearch.client.asCurrentUser.indices.exists(
             {
               index: indexName,
@@ -384,7 +402,7 @@ export class WazuhElasticCtrl {
 
       try {
         await Promise.all(
-          sampleIndexNames.map(async indexName => {
+          sampleIndexNames.map(async ({ indexName, dataSet }) => {
             try {
               const bulkPrefix = JSON.stringify({
                 index: {
@@ -397,27 +415,16 @@ export class WazuhElasticCtrl {
               const mappedData = WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[
                 request.params.category
               ]
+                .filter((item: { dataSet: string }) => item.dataSet === dataSet)
                 .map((typeSample: { dataSet?: string; count?: number }) => {
-                  if (
-                    indexName.includes(
-                      typeSample?.dataSet || WAZUH_ALERTS_PREFIX,
-                    )
-                  ) {
-                    return generateSampleData(
-                      { ...typeSample, ...sampleDataGenerateParams },
-                      request.body.count ||
-                        typeSample.count ||
-                        WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
-                      context,
-                    );
-                  }
-                  return;
-                })
-                .filter(
-                  (item: { sampleData: []; template?: string } | undefined) =>
-                    item !== undefined,
-                )
-                .flat();
+                  return generateSampleData(
+                    { ...typeSample, ...sampleDataGenerateParams },
+                    request.body.count ||
+                      typeSample.count ||
+                      WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
+                    context,
+                  );
+                });
 
               let sampleDataAndTemplate: {
                 sampleData: [];
@@ -545,43 +552,114 @@ export class WazuhElasticCtrl {
       request: OpenSearchDashboardsRequest<{ category: string }>,
       response: OpenSearchDashboardsResponseFactory,
     ) => {
-      // Delete Wazuh sample data index
-      const sampleDataIndex = await this.buildSampleIndexByCategory(
-        context,
-        request.params.category,
-      );
-
       try {
-        // Check if Wazuh sample data index exists
-        const existsSampleIndex =
-          await context.core.opensearch.client.asCurrentUser.indices.exists({
-            index: sampleDataIndex,
-          });
-        if (existsSampleIndex.body) {
-          // Delete Wazuh sample data index
-          await context.core.opensearch.client.asCurrentUser.indices.delete({
-            index: sampleDataIndex,
-          });
-          context.wazuh.logger.info(`Deleted ${sampleDataIndex} index`);
+        // Get sample data indexes
+        const sampleDataIndexAndDataSet = await this.buildSampleIndexByCategory(
+          context,
+          request.params.category,
+        );
+
+        // Get only index names
+        const sampleDataIndex = sampleDataIndexAndDataSet.map(
+          ({ indexName }) => indexName,
+        );
+
+        if (!sampleDataIndex.length) {
+          return ErrorResponse(
+            `No indices found for category ${request.params.category}`,
+            1000,
+            404,
+            response,
+          );
+        }
+
+        // Delete sample data indexes
+        // return success or error for each index
+        const results = await Promise.all(
+          sampleDataIndex.map(async index => {
+            try {
+              // Check if Wazuh sample data index exists
+              const existsSampleIndex =
+                await context.core.opensearch.client.asCurrentUser.indices.exists(
+                  {
+                    index,
+                  },
+                );
+
+              if (existsSampleIndex.body) {
+                // Delete Wazuh sample data index
+                await context.core.opensearch.client.asCurrentUser.indices.delete(
+                  {
+                    index: [index],
+                  },
+                );
+                context.wazuh.logger.info(`Deleted ${index} index`);
+                return { success: true, index, message: 'deleted' };
+              } else {
+                return {
+                  success: false,
+                  index,
+                  message: `Index doesn't exist`,
+                };
+              }
+            } catch (error) {
+              context.wazuh.logger.error(
+                `Error deleting sample data of ${index} index: ${
+                  error.message || error
+                }`,
+              );
+              const [statusCode, errorMessage] = this.getErrorDetails(error);
+              return {
+                success: false,
+                index,
+                message: errorMessage || error,
+                statusCode,
+              };
+            }
+          }),
+        );
+
+        // Check if all results are successful
+        const successResults = results.filter(result => result.success);
+        const failedResults = results.filter(result => !result.success);
+
+        if (successResults.length > 0) {
+          context.wazuh.logger.info(
+            `Deleted ${successResults.length} indices: ${successResults
+              .map(r => r.index)
+              .join(', ')}`,
+          );
+          if (failedResults.length > 0) {
+            context.wazuh.logger.error(
+              `Failed to delete ${failedResults.length} indices: ${failedResults
+                .map(r => r.index)
+                .join(', ')}`,
+            );
+          }
+
           return response.ok({
-            body: { result: 'deleted', index: sampleDataIndex },
+            body: {
+              result: 'deleted',
+              successCount: successResults.length,
+              failedCount: failedResults.length,
+              indices: successResults.map(r => r.index),
+              errors: failedResults.length ? failedResults : undefined,
+            },
           });
         } else {
+          const firstError = failedResults[0];
           return ErrorResponse(
-            `${sampleDataIndex} index doesn't exist`,
+            `Failed to delete indices: ${firstError.message}`,
             1000,
-            500,
+            firstError.statusCode || 500,
             response,
           );
         }
       } catch (error) {
         context.wazuh.logger.error(
-          `Error deleting sample data of ${sampleDataIndex} index: ${
-            error.message || error
-          }`,
+          `Error deleting sample data: ${error.message || error}`,
         );
         const [statusCode, errorMessage] = this.getErrorDetails(error);
-
         return ErrorResponse(errorMessage || error, 1000, statusCode, response);
       }
     },

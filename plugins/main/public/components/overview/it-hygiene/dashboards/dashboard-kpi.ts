@@ -65,23 +65,6 @@ const getVisStateStatOperatingSystems = (indexPatternId: string) => {
           },
           schema: 'metric',
         },
-        // {
-        //   id: '2',
-        //   enabled: true,
-        //   type: 'filters',
-        //   params: {
-        //     filters: [
-        //       {
-        //         input: {
-        //           query: 'host.os.full:*',
-        //           language: 'kuery',
-        //         },
-        //         label: 'Operating systems',
-        //       },
-        //     ],
-        //   },
-        //   schema: 'group',
-        // },
       ],
     },
   };
@@ -147,23 +130,6 @@ const getVisStateStatPackages = (indexPatternId: string) => {
           },
           schema: 'metric',
         },
-        // {
-        //   id: '2',
-        //   enabled: true,
-        //   type: 'filters',
-        //   params: {
-        //     filters: [
-        //       {
-        //         input: {
-        //           query: 'package.name:*',
-        //           language: 'kuery',
-        //         },
-        //         label: 'Packages',
-        //       },
-        //     ],
-        //   },
-        //   schema: 'group',
-        // },
       ],
     },
   };
