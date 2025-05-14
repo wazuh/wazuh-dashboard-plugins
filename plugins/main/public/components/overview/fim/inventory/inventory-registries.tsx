@@ -111,7 +111,7 @@ export function getImplicitFilters({ file }: { file: string }) {
     ),
     PatternDataSourceFilterManager.createFilter(
       FILTER_OPERATOR.IS,
-      'syscheck.path',
+      'syscheck.key',
       file,
       AppState.getCurrentPattern(),
     ),

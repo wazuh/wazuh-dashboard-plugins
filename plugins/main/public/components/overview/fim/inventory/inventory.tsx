@@ -68,7 +68,7 @@ export const InventoryFIMRegistriesDocumentDetailsEvents = ({
       agent,
     })}
     initialFetchFilters={registriesUtils.getImplicitFilters({
-      file: document._source.registry.path,
+      file: document._source.registry.key,
     })}
     expandedRowComponent={(...args) =>
       registriesUtils.renderDiscoverExpandedRow(...args)
@@ -156,7 +156,7 @@ const InventoryFIMDashboard = withDataSourceInitiated({
               ...fetchFilters,
               PatternDataSourceFilterManager.createFilter(
                 FILTER_OPERATOR.EXISTS,
-                'registry.path',
+                'registry.key',
                 null,
                 dataSource.title,
               ),
