@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.12.2
 
+### Changed
+
+- Improve the number of API calls to access agents' summary information [#7434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7434)
+
 ## Wazuh v4.12.1 - OpenSearch Dashboards 2.19.1 - Revision 00
 
 ### Added
