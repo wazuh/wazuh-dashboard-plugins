@@ -33,7 +33,7 @@ PACKAGE_PATH="../../plugins/wazuh-core/package.json"
 os_version=""
 osd_version=""
 
-while getopts ":o:d:a:" opt; do
+while getopts ":o:d:" opt; do
   case ${opt} in
   o)
     os_version=$OPTARG
