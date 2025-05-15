@@ -17,6 +17,11 @@ hosts:
       username: wazuh-wui
       password: MyS3cr37P450r.*-
       run_as: false
-
+  - manager-dev:
+      url: 'https://wazuh.manager.dev'
+      port: 55000
+      username: wazuh-wui
+      password: wazuh-wui
+      run_as: false
 
 wazuh.updates.disabled: true
