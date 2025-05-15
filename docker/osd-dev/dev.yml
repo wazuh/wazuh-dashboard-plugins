@@ -63,38 +63,38 @@ services:
       -c '
         export certs=/tmp/certs
         mkdir $$certs
-      	cd $$certs
+        cd $$certs
 
-      	echo "Generating CA"
-      	cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
+        echo "Generating CA"
+        cfssl gencert -initca /conf/ca.json | cfssljson -bare ca
 
-      	echo "Generating servers certificates"
-      	for i in os1 osd imposter; do
-      		echo "Generating cert for $$i"
-      		cat /conf/host.json | \
-      		sed "s/HOST/$$i/g" | \
-      		cfssl gencert \
-      			-ca $$certs/ca.pem \
-      			-ca-key $$certs/ca-key.pem \
-      			-config /conf/cfssl.json \
-      			-profile=server - | \
-      		cfssljson -bare $$i
-      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-      	done
+        echo "Generating servers certificates"
+        for i in os1 osd imposter wazuh.manager.dev; do
+          echo "Generating cert for $$i"
+          cat /conf/host.json | \
+          sed "s/HOST/$$i/g" | \
+          cfssl gencert \
+            -ca $$certs/ca.pem \
+            -ca-key $$certs/ca-key.pem \
+            -config /conf/cfssl.json \
+            -profile=server - | \
+          cfssljson -bare $$i
+          openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+        done
 
-      	echo "Generating clients certificates"
-        	for i in admin filebeat saml; do
-        		echo "Generating cert for $$i"
-      		cat /conf/host.json | \
-      		sed "s/HOST/$$i/g" | \
-      		cfssl gencert \
-      			-ca $$certs/ca.pem \
-      			-ca-key $$certs/ca-key.pem \
-      			-config /conf/cfssl.json \
-      			-profile=client - | \
-      		cfssljson -bare $$i
-      		openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
-      	done
+        echo "Generating clients certificates"
+          for i in admin filebeat saml; do
+            echo "Generating cert for $$i"
+          cat /conf/host.json | \
+          sed "s/HOST/$$i/g" | \
+          cfssl gencert \
+            -ca $$certs/ca.pem \
+            -ca-key $$certs/ca-key.pem \
+            -config /conf/cfssl.json \
+            -profile=client - | \
+          cfssljson -bare $$i
+          openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
+        done
 
           echo "Setting up permissions"
 
@@ -250,6 +250,61 @@ services:
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
 
+  wazuh.manager.dev:
+    platform: linux/amd64
+    depends_on:
+      os1:
+        condition: service_healthy
+    image: ubuntu:24.04
+    # profiles:
+    #   - 'server'
+    hostname: wazuh.manager.dev
+    # <<: *logging
+    networks:
+      - os-dev
+      - mon
+    environment:
+      - INDEXER_URL=https://os1:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=admin
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
+      - SSL_KEY=/etc/ssl/wazuh/filebeat.key
+      # - API_USERNAME=wazuh-wui
+      # - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - ./packages:/tmp/packages
+      - wm_certs:/etc/ssl/wazuh
+    ports:
+      - '514:514'
+      - '1514:1514'
+      - '1515:1515'
+      - '1516:1516'
+      - '55000:55000'
+    command:
+      - /bin/bash
+      - -c
+      - |
+        apt update
+        apt install -y curl sudo
+        curl -sO https://packages-dev.wazuh.com/4.13/wazuh-install.sh
+        curl -sO https://packages-dev.wazuh.com/4.13/config.yml
+
+        sed -i "s/<indexer-node-ip>/127.0.0.1/g" ./config.yml
+        sed -i "s/<wazuh-manager-ip>/127.0.0.1/g" ./config.yml
+        sed -i "s/<dashboard-node-ip>/127.0.0.1/g" ./config.yml
+
+        echo "Applying sed to config.yml"
+        sed -i 's|installCommon_aptInstall "wazuh-manager" .*$|dpkg -i /tmp/packages/wazuh-manager.deb|' wazuh-install.sh
+        grep -n "dpkg -i /tmp/packages/wazuh-manager.deb" wazuh-install.sh
+        mv /tmp/packages/wazuh-manager*.deb /tmp/packages/wazuh-manager.deb
+        bash wazuh-install.sh --generate-config-files
+
+        bash wazuh-install.sh --wazuh-server wazuh-1 -i -v
+
+        /var/ossec/bin/wazuh-control start
+
   idpsec:
     image: quay.io/keycloak/keycloak:19.0.1
     depends_on:
@@ -329,9 +384,9 @@ services:
     entrypoint: /bin/sh
     command: >
       -c '
-       apk add bash
-       bash /enable_saml.sh
-       exit 0
+        apk add bash
+        bash /enable_saml.sh
+        exit 0
       '
   wazuh.manager:
     depends_on:
