@@ -17,6 +17,7 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
+      - 'server-local'
     networks:
       - os-dev
       - mon
@@ -47,6 +48,7 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
+      - 'server-local'
     volumes:
       - wi_certs:/certs/wi
       - wd_certs:/certs/wd
@@ -83,7 +85,7 @@ services:
         done
 
         echo "Generating clients certificates"
-          for i in admin filebeat saml wazuh.manager.dev; do
+          for i in admin filebeat saml wazuh.manager.local; do
             echo "Generating cert for $$i"
           cat /conf/host.json | \
           sed "s/HOST/$$i/g" | \
@@ -140,6 +142,7 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
+      - 'server-local'
     environment:
       - cluster.name=os-dev-cluster
       - node.name=os1
@@ -189,6 +192,7 @@ services:
     profiles:
       - 'saml'
       - 'standard'
+      - 'server-local'
     hostname: filebeat
     user: '0:0'
     networks:
@@ -227,6 +231,7 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
+      - 'server-local'
     hostname: osd
     networks:
       - os-dev
@@ -364,30 +369,20 @@ services:
       - '1516:1516'
       - '55000:55000'
 
-  wazuh.manager.dev:
+  wazuh.manager.local:
     platform: linux/amd64
     depends_on:
       os1:
         condition: service_healthy
     image: wazuh-manager-pkg:4.13.0
     build: ./manager
-    # profiles:
-    #   - 'server'
-    hostname: wazuh.manager.dev
+    profiles:
+      - 'server-local'
+    hostname: wazuh.manager.local
     # <<: *logging
     networks:
       - os-dev
       - mon
-    environment:
-      - INDEXER_URL=https://os1:9200
-      - INDEXER_USERNAME=admin
-      - INDEXER_PASSWORD=admin
-      - FILEBEAT_SSL_VERIFICATION_MODE=full
-      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
-      - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
-      - SSL_KEY=/etc/ssl/wazuh/filebeat.key
-      - API_USERNAME=wazuh-wui
-      - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
       - ./packages:/tmp/packages
       - wm_certs:/etc/filebeat/certs
@@ -397,6 +392,28 @@ services:
       - '1515:1515'
       - '1516:1516'
       - '55000:55000'
+
+  wazuh.agent.deb.local:
+    platform: linux/amd64
+    image: ubuntu:24.04
+    profiles:
+      - 'server-local'
+    hostname: wazuh.agent.deb.local
+    networks:
+      - os-dev
+      - mon
+    volumes:
+      - ./agents:/packages-agents
+    command:
+      - /bin/bash
+      - -c
+      - |
+        apt update -y
+        apt install -y curl lsb-release adduser
+        WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' dpkg -i /packages-agents/wazuh-agent*.deb
+
+        /etc/init.d/wazuh-agent start
+        tail -f /var/ossec/logs/ossec.log
 
 networks:
   os-dev:
