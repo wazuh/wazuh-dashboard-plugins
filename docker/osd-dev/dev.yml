@@ -409,10 +409,34 @@ services:
       - -c
       - |
         apt update -y
-        apt install -y curl lsb-release adduser
+        apt install -y lsb-release adduser
         WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' dpkg -i /packages-agents/wazuh-agent*.deb
 
         /etc/init.d/wazuh-agent start
+        tail -f /var/ossec/logs/ossec.log
+
+  wazuh.agent.rpm.local:
+    platform: linux/amd64
+    image: centos:8
+    profiles:
+      - 'server-local'
+    hostname: wazuh.agent.rpm.local
+    networks:
+      - os-dev
+      - mon
+    volumes:
+      - ./agents:/packages-agents
+    command:
+      - /bin/bash
+      - -c
+      - |
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        yum clean all
+        yum makecache
+        yum upgrade -y
+        WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' yum localinstall -y /packages-agents/wazuh-agent*.rpm
+        /var/ossec/bin/wazuh-control start
         tail -f /var/ossec/logs/ossec.log
 
 networks:
