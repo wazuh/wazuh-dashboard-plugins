@@ -250,40 +250,6 @@ services:
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
 
-  wazuh.manager.dev:
-    platform: linux/amd64
-    depends_on:
-      os1:
-        condition: service_healthy
-    image: wazuh-manager-pkg:4.13.0
-    build: ./manager
-    # profiles:
-    #   - 'server'
-    hostname: wazuh.manager.dev
-    # <<: *logging
-    networks:
-      - os-dev
-      - mon
-    environment:
-      - INDEXER_URL=https://os1:9200
-      - INDEXER_USERNAME=admin
-      - INDEXER_PASSWORD=admin
-      - FILEBEAT_SSL_VERIFICATION_MODE=full
-      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
-      - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
-      - SSL_KEY=/etc/ssl/wazuh/filebeat.key
-      - API_USERNAME=wazuh-wui
-      - API_PASSWORD=MyS3cr37P450r.*-
-    volumes:
-      - ./packages:/tmp/packages
-      - wm_certs:/etc/filebeat/certs
-    ports:
-      - '514:514'
-      - '1514:1514'
-      - '1515:1515'
-      - '1516:1516'
-      - '55000:55000'
-
   idpsec:
     image: quay.io/keycloak/keycloak:19.0.1
     depends_on:
@@ -391,6 +357,40 @@ services:
       - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
       - wm_certs:/etc/ssl/wazuh
+    ports:
+      - '514:514'
+      - '1514:1514'
+      - '1515:1515'
+      - '1516:1516'
+      - '55000:55000'
+
+  wazuh.manager.dev:
+    platform: linux/amd64
+    depends_on:
+      os1:
+        condition: service_healthy
+    image: wazuh-manager-pkg:4.13.0
+    build: ./manager
+    # profiles:
+    #   - 'server'
+    hostname: wazuh.manager.dev
+    # <<: *logging
+    networks:
+      - os-dev
+      - mon
+    environment:
+      - INDEXER_URL=https://os1:9200
+      - INDEXER_USERNAME=admin
+      - INDEXER_PASSWORD=admin
+      - FILEBEAT_SSL_VERIFICATION_MODE=full
+      - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/ca.pem
+      - SSL_CERTIFICATE=/etc/ssl/wazuh/filebeat.pem
+      - SSL_KEY=/etc/ssl/wazuh/filebeat.key
+      - API_USERNAME=wazuh-wui
+      - API_PASSWORD=MyS3cr37P450r.*-
+    volumes:
+      - ./packages:/tmp/packages
+      - wm_certs:/etc/filebeat/certs
     ports:
       - '514:514'
       - '1514:1514'
