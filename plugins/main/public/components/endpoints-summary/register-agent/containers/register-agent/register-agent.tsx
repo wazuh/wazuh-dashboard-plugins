@@ -18,7 +18,10 @@ import { ErrorHandler } from '../../../../../react-services/error-management';
 import './register-agent.scss';
 import { Steps } from '../steps/steps';
 import { InputForm } from '../../../../common/form';
-import { getGroups, getMasterConfiguration } from '../../services/register-agent-services';
+import {
+  getGroups,
+  getMasterConfiguration,
+} from '../../services/register-agent-services';
 import { useForm } from '../../../../common/form/hooks';
 import { FormConfiguration } from '../../../../common/form/types';
 import { useSelector } from 'react-redux';
@@ -35,7 +38,12 @@ import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { enableMenu, ip, nestedResolve, savedSearch } from '../../../../../services/resolves';
+import {
+  enableMenu,
+  ip,
+  nestedResolve,
+  savedSearch,
+} from '../../../../../services/resolves';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { SECTIONS } from '../../../../../sections';
 
@@ -49,9 +57,13 @@ export const RegisterAgent = compose(
     },
     { text: 'Deploy new agent' },
   ]),
-  withUserAuthorizationPrompt([[{ action: 'agent:create', resource: '*:*:*' }]])
+  withUserAuthorizationPrompt([
+    [{ action: 'agent:create', resource: '*:*:*' }],
+  ]),
 )(() => {
-  const configuration = useSelector((state: { appConfig: { data: any } }) => state.appConfig.data);
+  const configuration = useSelector(
+    (state: { appConfig: { data: any } }) => state.appConfig.data,
+  );
   const [wazuhVersion, setWazuhVersion] = useState('');
   const [haveUdpProtocol, setHaveUdpProtocol] = useState<boolean | null>(false);
   const [loading, setLoading] = useState(false);
@@ -63,7 +75,7 @@ export const RegisterAgent = compose(
     operatingSystemSelection: {
       type: 'custom',
       initialValue: '',
-      component: (props) => {
+      component: props => {
         return <OsCard {...props} />;
       },
       options: {
@@ -73,7 +85,9 @@ export const RegisterAgent = compose(
     serverAddress: {
       type: 'text',
       initialValue: configuration['enrollment.dns'] || '',
-      validate: getWazuhCorePlugin().configuration._settings.get('enrollment.dns').validate,
+      validate:
+        getWazuhCorePlugin().configuration._settings.get('enrollment.dns')
+          .validate,
     },
     agentName: {
       type: 'text',
@@ -84,7 +98,7 @@ export const RegisterAgent = compose(
     agentGroups: {
       type: 'custom',
       initialValue: [],
-      component: (props) => {
+      component: props => {
         return <GroupInput {...props} />;
       },
       options: {
@@ -133,7 +147,9 @@ export const RegisterAgent = compose(
         const needsPassword = authConfig?.auth?.use_password === 'yes';
         if (needsPassword) {
           wazuhPassword =
-            configuration?.['enrollment.password'] || authConfig?.['authd.pass'] || '';
+            configuration?.['enrollment.password'] ||
+            authConfig?.['authd.pass'] ||
+            '';
         }
         const groups = await getGroups();
         setNeedsPassword(needsPassword);
@@ -163,7 +179,9 @@ export const RegisterAgent = compose(
     fetchData();
   }, []);
 
-  const osCard = <InputForm {...form.fields.operatingSystemSelection}></InputForm>;
+  const osCard = (
+    <InputForm {...form.fields.operatingSystemSelection}></InputForm>
+  );
 
   const goBackEndpointSummary = () => {
     NavigationService.getInstance().navigate(`/${SECTIONS.AGENTS_PREVIEW}`);
@@ -175,24 +193,27 @@ export const RegisterAgent = compose(
         <EuiPageBody>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiPanel className="register-agent-wizard-container">
+              <EuiPanel className='register-agent-wizard-container'>
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiFlexGroup>
                       <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-                        <EuiToolTip position="right" content={`Back to Endpoints`}>
+                        <EuiToolTip
+                          position='right'
+                          content={`Back to Endpoints`}
+                        >
                           <EuiButtonIcon
-                            aria-label="Back"
+                            aria-label='Back'
                             style={{ marginTop: 4 }}
-                            color="primary"
-                            iconSize="l"
-                            iconType="arrowLeft"
+                            color='primary'
+                            iconSize='l'
+                            iconType='arrowLeft'
                             onClick={() => goBackEndpointSummary()}
                           />
                         </EuiToolTip>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiTitle size="s">
+                        <EuiTitle size='s'>
                           <h1>Deploy new agent</h1>
                         </EuiTitle>
                       </EuiFlexItem>
@@ -203,7 +224,7 @@ export const RegisterAgent = compose(
                 {loading ? (
                   <>
                     <EuiFlexItem>
-                      <EuiProgress size="xs" color="primary" />
+                      <EuiProgress size='xs' color='primary' />
                     </EuiFlexItem>
                     <EuiSpacer></EuiSpacer>
                   </>
