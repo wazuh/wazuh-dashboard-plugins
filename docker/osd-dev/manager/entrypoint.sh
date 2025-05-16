@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Change permissions to ceritificates
+# Change permissions to certificates
 chmod 500 /etc/filebeat/certs
 chmod 400 /etc/filebeat/certs/*
 chown -R root:root /etc/filebeat/certs
