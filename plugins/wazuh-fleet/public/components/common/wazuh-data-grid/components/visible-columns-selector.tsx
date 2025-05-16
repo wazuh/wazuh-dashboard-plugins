@@ -13,6 +13,9 @@ import {
   EuiDataGridColumnVisibility,
   EuiToolTip,
   EuiIcon,
+  EuiDragDropContext,
+  EuiDroppable,
+  EuiDraggable,
 } from '@elastic/eui';
 
 // Based on https://github.com/opensearch-project/oui/blob/1.8.1/src/components/datagrid/column_selector.tsx
@@ -32,16 +35,95 @@ export const DataGridVisibleColumnsSelector = ({
   const searchValueLowerCase = searchValue.toLowerCase();
   const filteredColumns = (
     searchValue
-      ? availableColumns.filter(({ name }) =>
-          name.toLowerCase().includes(searchValueLowerCase),
-        )
+      ? availableColumns.filter(({ name, displayAsText }) => {
+          const displayName = displayAsText || name;
+          return displayName.toLowerCase().includes(searchValueLowerCase);
+        })
       : availableColumns
   ).slice(0, maxAvailableColumns);
+
+  // Sort filtered columns according to the current order of visibleColumns
+  const orderedFilteredColumns = [...filteredColumns].sort((a, b) => {
+    const aIndex = visibleColumns.indexOf(a.id);
+    const bIndex = visibleColumns.indexOf(b.id);
+
+    // If both columns are in visibleColumns, sort by position
+    if (aIndex >= 0 && bIndex >= 0) {
+      return aIndex - bIndex;
+    }
+
+    // If only one column is in visibleColumns, put it first
+    if (aIndex >= 0) return -1;
+    if (bIndex >= 0) return 1;
+
+    // If neither is in visibleColumns, maintain original order
+    return 0;
+  });
+
   const controlBtnClasses = classNames('euiDataGrid__controlBtn', {
     // TODO: research if this is required
     // 'euiDataGrid__controlBtn--active':
     //   availableColumns.length - visibleColumns.length > 0,
   });
+
+  // Handle reordering event
+  const onDragEnd = ({ source, destination }) => {
+    if (!destination) {
+      return;
+    }
+
+    const sourceIdx = source.index;
+    const destinationIdx = destination.index;
+
+    if (sourceIdx === destinationIdx) {
+      return;
+    }
+
+    const reorderedVisibleColumns = [...visibleColumns];
+
+    // Get the ID of the column being moved
+    const movedColumnId = orderedFilteredColumns[sourceIdx].id;
+
+    // If the column is not in visible columns, do nothing
+    if (!visibleColumns.includes(movedColumnId)) {
+      return;
+    }
+
+    const currentIndex = reorderedVisibleColumns.indexOf(movedColumnId);
+
+    // Calculate new index based on destination
+    let newIndex = currentIndex;
+
+    // Determine direction of movement
+    if (sourceIdx < destinationIdx) {
+      // Moving downward
+      const targetColumnId = orderedFilteredColumns[destinationIdx].id;
+      if (visibleColumns.includes(targetColumnId)) {
+        newIndex = visibleColumns.indexOf(targetColumnId);
+      } else {
+        // If destination is not in visible columns, move to end
+        newIndex = visibleColumns.length - 1;
+      }
+    } else {
+      // Moving upward
+      const targetColumnId = orderedFilteredColumns[destinationIdx].id;
+      if (visibleColumns.includes(targetColumnId)) {
+        newIndex = visibleColumns.indexOf(targetColumnId);
+      } else {
+        // If destination is not in visible columns, move to start
+        newIndex = 0;
+      }
+    }
+
+    // Remove column from current position
+    reorderedVisibleColumns.splice(currentIndex, 1);
+
+    // Insert column in new position
+    reorderedVisibleColumns.splice(newIndex, 0, movedColumnId);
+
+    // Update visible columns
+    setVisibleColumns(reorderedVisibleColumns);
+  };
 
   return (
     <EuiPopover
@@ -100,43 +182,66 @@ export const DataGridVisibleColumnsSelector = ({
         />
       </EuiPopoverTitle>
       <div className='euiDataGrid__controlScroll'>
-        {filteredColumns.map(({ name, id }) => (
-          <div key={id} className='euiDataGridColumnSelector__item'>
-            <EuiFlexGroup responsive={false} gutterSize='m' alignItems='center'>
-              <EuiFlexItem>
-                <EuiSwitch
-                  name={id}
-                  label={name}
-                  checked={visibleColumns.includes(id)}
-                  compressed
-                  className='euiSwitch--mini'
-                  onChange={event => {
-                    const {
-                      target: { checked },
-                    } = event;
-                    let nextVisibleColumns;
+        <EuiDragDropContext onDragEnd={onDragEnd}>
+          <EuiDroppable droppableId="columnsList">
+            {orderedFilteredColumns.map(({ name, displayAsText, id }, index) => (
+              <EuiDraggable key={id} index={index} draggableId={id} customDragHandle={true}>
+                {(provided) => (
+                  <div className='euiDataGridColumnSelector__item'>
+                    <EuiFlexGroup responsive={false} gutterSize='m' alignItems='center'>
+                      {/* Switch to enable/disable column */}
+                      <EuiFlexItem>
+                        <EuiSwitch
+                          name={id}
+                          label={displayAsText || name}
+                          checked={visibleColumns.includes(id)}
+                          compressed
+                          className='euiSwitch--mini'
+                          onChange={event => {
+                            const {
+                              target: { checked },
+                            } = event;
+                            let nextVisibleColumns;
 
-                    if (checked) {
-                      if (!visibleColumns.includes(id)) {
-                        nextVisibleColumns = [...visibleColumns, id];
-                      }
-                    } else {
-                      if (visibleColumns.includes(id)) {
-                        nextVisibleColumns = visibleColumns.filter(
-                          (visibleColumnId: string) => visibleColumnId !== id,
-                        );
-                      }
-                    }
+                            if (checked) {
+                              if (!visibleColumns.includes(id)) {
+                                nextVisibleColumns = [...visibleColumns, id];
+                              }
+                            } else {
+                              if (visibleColumns.includes(id)) {
+                                nextVisibleColumns = visibleColumns.filter(
+                                  (visibleColumnId: string) => visibleColumnId !== id,
+                                );
+                              }
+                            }
 
-                    if (nextVisibleColumns) {
-                      setVisibleColumns(nextVisibleColumns);
-                    }
-                  }}
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </div>
-        ))}
+                            if (nextVisibleColumns) {
+                              setVisibleColumns(nextVisibleColumns);
+                            }
+                          }}
+                        />
+                      </EuiFlexItem>
+
+                      {/* Sort icon */}
+                      <EuiFlexItem grow={false}>
+                        <div
+                          {...provided.dragHandleProps}
+                          style={{
+                            cursor: visibleColumns.includes(id) ? 'grab' : 'default',
+                            visibility: visibleColumns.includes(id) ? 'visible' : 'hidden',
+                            width: '16px'
+                          }}
+                        >
+                          <EuiIcon type="grab" color="subdued" />
+                        </div>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </div>
+                )}
+              </EuiDraggable>
+            ))}
+          </EuiDroppable>
+        </EuiDragDropContext>
       </div>
     </EuiPopover>
   );

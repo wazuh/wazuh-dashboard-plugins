@@ -196,7 +196,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
                 rowCount: results?.hits?.total,
               }}
               toolbarVisibility={{
-                showColumnSelector: { allowHide: false },
+                showColumnSelector: false,
                 additionalControls: (
                   <>
                     <DiscoverDataGridAdditionalControls
