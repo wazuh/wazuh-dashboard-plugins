@@ -13,7 +13,6 @@ NODE="wazuh.manager.dev"
 INDEXER_HOST="os1"
 CERTS_PATH="/etc/filebeat/certs"
 WAZUH_VERSION="v4.12.0"
-#mkdir -p /etc/filebeat/certs
 
 sed -i "s|https://0.0.0.0:9200|https://$INDEXER_HOST:9200|g" /var/ossec/etc/ossec.conf
 sed -i "s|/etc/filebeat/certs/root-ca.pem|$CERTS_PATH/ca.pem|g" /var/ossec/etc/ossec.conf
