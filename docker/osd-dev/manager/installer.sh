@@ -12,7 +12,6 @@ echo 'admin' | /var/ossec/bin/wazuh-keystore -f indexer -k password
 NODE="wazuh.manager.local"
 INDEXER_HOST="os1"
 CERTS_PATH="/etc/filebeat/certs"
-WAZUH_VERSION="v4.12.0"
 
 sed -i "s|https://0.0.0.0:9200|https://$INDEXER_HOST:9200|g" /var/ossec/etc/ossec.conf
 sed -i "s|/etc/filebeat/certs/root-ca.pem|$CERTS_PATH/ca.pem|g" /var/ossec/etc/ossec.conf
@@ -27,7 +26,13 @@ apt-get update
 apt-get -y install filebeat
 
 # Configure Filebeat
-curl -so /etc/filebeat/filebeat.yml https://packages.wazuh.com/4.12/tpl/wazuh/filebeat/filebeat.yml
+# Extract X.Y version from WAZUH_VERSION (e.g., v4.12.0 -> 4.12)
+WAZUH_VERSION_FILEBEAT_XY=$(echo "${WAZUH_VERSION_FILEBEAT#v}" | cut -d. -f1,2)
+# Extract X.x series from WAZUH_VERSION (e.g., v4.12.0 -> 4.x)
+WAZUH_MAJOR_VERSION_FILEBEAT=$(echo "${WAZUH_VERSION_FILEBEAT#v}" | cut -d. -f1)
+WAZUH_SERIES_X_FILEBEAT="${WAZUH_MAJOR_VERSION_FILEBEAT}.x"
+
+curl -so /etc/filebeat/filebeat.yml https://packages.wazuh.com/${WAZUH_VERSION_FILEBEAT_XY}/tpl/wazuh/filebeat/filebeat.yml
 sed -i "s|127.0.0.1|$INDEXER_HOST|g" /etc/filebeat/filebeat.yml
 sed -i "s|/etc/filebeat/certs/root-ca.pem|$CERTS_PATH/ca.pem|g" /etc/filebeat/filebeat.yml
 sed -i "s|/etc/filebeat/certs/filebeat.pem|$CERTS_PATH/$NODE.pem|g" /etc/filebeat/filebeat.yml
@@ -35,6 +40,6 @@ sed -i "s|/etc/filebeat/certs/filebeat-key.pem|$CERTS_PATH/$NODE-key.pem|g" /etc
 filebeat keystore create
 echo admin | filebeat keystore add username --stdin --force
 echo admin | filebeat keystore add password --stdin --force
-curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/$WAZUH_VERSION/extensions/elasticsearch/7.x/wazuh-template.json
+curl -so /etc/filebeat/wazuh-template.json https://raw.githubusercontent.com/wazuh/wazuh/$WAZUH_VERSION_DEVELOPMENT/extensions/elasticsearch/7.x/wazuh-template.json
 chmod go+r /etc/filebeat/wazuh-template.json
-curl -s https://packages.wazuh.com/4.x/filebeat/wazuh-filebeat-0.4.tar.gz | tar -xvz -C /usr/share/filebeat/module
+curl -s https://packages.wazuh.com/${WAZUH_SERIES_X_FILEBEAT}/filebeat/wazuh-filebeat-0.4.tar.gz | tar -xvz -C /usr/share/filebeat/module

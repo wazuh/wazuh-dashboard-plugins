@@ -17,7 +17,10 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
-      - 'server-local'
+      - 'server-local' # server profile to use the local packages with agents deb and rpm
+      - 'server-local-rpm' # server profile to use the local packages with agent rpm
+      - 'server-local-deb' # server profile to use the local packages with agent deb
+      - 'server-local-without' # server profile to use the local packages without agent
     networks:
       - os-dev
       - mon
@@ -48,7 +51,10 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
-      - 'server-local'
+      - 'server-local' # server profile to use the local packages with agents deb and rpm
+      - 'server-local-rpm' # server profile to use the local packages with agent rpm
+      - 'server-local-deb' # server profile to use the local packages with agent deb
+      - 'server-local-without' # server profile to use the local packages without agent
     volumes:
       - wi_certs:/certs/wi
       - wd_certs:/certs/wd
@@ -142,7 +148,10 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
-      - 'server-local'
+      - 'server-local' # server profile to use the local packages with agents deb and rpm
+      - 'server-local-rpm' # server profile to use the local packages with agent rpm
+      - 'server-local-deb' # server profile to use the local packages with agent deb
+      - 'server-local-without' # server profile to use the local packages without agent
     environment:
       - cluster.name=os-dev-cluster
       - node.name=os1
@@ -192,7 +201,10 @@ services:
     profiles:
       - 'saml'
       - 'standard'
-      - 'server-local'
+      - 'server-local' # server profile to use the local packages with agents deb and rpm
+      - 'server-local-rpm' # server profile to use the local packages with agent rpm
+      - 'server-local-deb' # server profile to use the local packages with agent deb
+      - 'server-local-without' # server profile to use the local packages without agent
     hostname: filebeat
     user: '0:0'
     networks:
@@ -231,7 +243,10 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
-      - 'server-local'
+      - 'server-local' # server profile to use the local packages with agents deb and rpm
+      - 'server-local-rpm' # server profile to use the local packages with agent rpm
+      - 'server-local-deb' # server profile to use the local packages with agent deb
+      - 'server-local-without' # server profile to use the local packages without agent
     hostname: osd
     networks:
       - os-dev
@@ -370,14 +385,21 @@ services:
       - '55000:55000'
 
   wazuh.manager.local:
-    platform: linux/amd64
+    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     depends_on:
       os1:
         condition: service_healthy
-    image: wazuh-manager-pkg:4.13.0
-    build: ./manager
+    image: wazuh-manager-pkg:${IMAGE_TAG}
+    build:
+      context: ./manager
+      args:
+        WAZUH_VERSION_FILEBEAT: 'v4.12.0' # Version to download and install filebeat (Version released in wazuh-manager)
+        WAZUH_VERSION_DEVELOPMENT: ${WAZUH_VERSION_DEVELOPMENT} # Version to download the template from github
     profiles:
-      - 'server-local'
+      - 'server-local' # server profile to use the local packages with agents deb and rpm
+      - 'server-local-rpm' # server profile to use the local packages with agent rpm
+      - 'server-local-deb' # server profile to use the local packages with agent deb
+      - 'server-local-without' # server profile to use the local packages without agent
     hostname: wazuh.manager.local
     # <<: *logging
     networks:
@@ -394,10 +416,11 @@ services:
       - '55000:55000'
 
   wazuh.agent.deb.local:
-    platform: linux/amd64
+    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     image: ubuntu:24.04
     profiles:
-      - 'server-local'
+      - 'server-local' # server profile to use the local packages with agents deb and rpm
+      - 'server-local-deb' # server profile to use the local packages with agent deb
     hostname: wazuh.agent.deb.local
     networks:
       - os-dev
@@ -408,18 +431,23 @@ services:
       - /bin/bash
       - -c
       - |
+        # Update and install dependencies
         apt update -y
         apt install -y lsb-release adduser
+
+        # Install Wazuh agent
         WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' dpkg -i /packages-agents/wazuh-agent*.deb
 
+        # Start Wazuh agent
         /etc/init.d/wazuh-agent start
         tail -f /var/ossec/logs/ossec.log
 
   wazuh.agent.rpm.local:
-    platform: linux/amd64
+    platform: linux/amd64 # if you want to try packages for other architectures change this value to linux/arm64 or linux/arm/v7
     image: centos:8
     profiles:
-      - 'server-local'
+      - 'server-local' # server profile to use the local packages with agents deb and rpm
+      - 'server-local-rpm' # server profile to use the local packages with agent rpm
     hostname: wazuh.agent.rpm.local
     networks:
       - os-dev
@@ -430,12 +458,17 @@ services:
       - /bin/bash
       - -c
       - |
+        # Update CentOS 8
         sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
         sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
         yum clean all
         yum makecache
         yum upgrade -y
+
+        # Install wazuh-agent
         WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' yum localinstall -y /packages-agents/wazuh-agent*.rpm
+
+        # Start wazuh-agent
         /var/ossec/bin/wazuh-control start
         tail -f /var/ossec/logs/ossec.log
 

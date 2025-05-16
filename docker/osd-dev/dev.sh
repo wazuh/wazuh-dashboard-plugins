@@ -2,13 +2,14 @@
 
 usage() {
   echo
-  echo "./dev.sh [-os os_version] [-osd osd_version] /wazuh_app_src action [saml/server] [server_version]"
+  echo "./dev.sh [-os os_version] [-osd osd_version] [-a agents_up] /wazuh_app_src action [saml/server/server-local] [server_version]"
   echo
   echo "where"
   echo "  -o os_version Specify the OS version (optional)"
   echo "  -d osd_version Specify the OSD version (optional)"
+  echo "  -a agents_up Specify 'rpm' or 'deb' to deploy an agent with server-local, or 'without' to deploy no agent  (optional) (default: deploy 2 agents)"
   echo "  wazuh_app_src is the path to the wazuh application source code"
-  echo "  action is one of up | down | stop"
+  echo "  action is one of up | down | stop | start"
   echo "  saml to deploy a saml enabled environment (optional)"
   echo "  server to deploy a real server enabled environment (optional)"
   echo "  server-local to deploy a real server enabled environment (optional)"
@@ -32,14 +33,18 @@ fi
 PACKAGE_PATH="../../plugins/wazuh-core/package.json"
 os_version=""
 osd_version=""
+agents_up=""
 
-while getopts ":o:d:" opt; do
+while getopts ":o:d:a:" opt; do
   case ${opt} in
   o)
     os_version=$OPTARG
     ;;
   d)
     osd_version=$OPTARG
+    ;;
+  a)
+    agents_up=$OPTARG
     ;;
   \?)
     echo "Invalid option: -$OPTARG" >&2
@@ -52,6 +57,12 @@ while getopts ":o:d:" opt; do
   esac
 done
 shift $((OPTIND - 1))
+
+if [[ -n "$agents_up" && "$agents_up" != "rpm" && "$agents_up" != "deb" && "$agents_up" != "without" ]]; then
+  echo "[ERROR] Invalid value for -a option. Allowed values are 'rpm', 'deb' 'without', or an empty string." >&2
+  usage
+  exit 1
+fi
 
 if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
   if [ ! -f $PACKAGE_PATH ]; then
@@ -100,6 +111,7 @@ export SRC=$1
 export OSD_MAJOR_NUMBER=$(echo $OSD_VERSION | cut -d. -f1)
 export COMPOSE_PROJECT_NAME=os-dev-${OSD_VERSION//./}
 export WAZUH_STACK=""
+export WAZUH_VERSION_DEVELOPMENT=$(jq -r '.version' $PACKAGE_PATH)
 
 if [[ "$OSD_MAJOR_NUMBER" -ge 2 ]]; then
   export OSD_MAJOR="2.x"
@@ -124,8 +136,13 @@ if [[ "$3" =~ "server" ]]; then
 fi
 
 if [[ "$3" =~ "server-local" ]]; then
-  profile="server-local"
-  export WAZUH_STACK="${4}"
+
+  if [[ -n "$agents_up" ]]; then
+    profile="server-local-${agents_up}"
+  else
+    profile="server-local"
+  fi
+  export IMAGE_TAG="${4}"
 fi
 
 export SEC_CONFIG_PATH=/usr/share/opensearch/plugins/opensearch-security/securityconfig
