@@ -9,7 +9,7 @@ dpkg -i /installer/wazuh-manager.deb
 echo 'admin' | /var/ossec/bin/wazuh-keystore -f indexer -k username
 echo 'admin' | /var/ossec/bin/wazuh-keystore -f indexer -k password
 
-NODE="wazuh.manager.dev"
+NODE="wazuh.manager.local"
 INDEXER_HOST="os1"
 CERTS_PATH="/etc/filebeat/certs"
 WAZUH_VERSION="v4.12.0"
@@ -30,8 +30,8 @@ apt-get -y install filebeat
 curl -so /etc/filebeat/filebeat.yml https://packages.wazuh.com/4.12/tpl/wazuh/filebeat/filebeat.yml
 sed -i "s|127.0.0.1|$INDEXER_HOST|g" /etc/filebeat/filebeat.yml
 sed -i "s|/etc/filebeat/certs/root-ca.pem|$CERTS_PATH/ca.pem|g" /etc/filebeat/filebeat.yml
-sed -i "s|/etc/filebeat/certs/filebeat.pem|$CERTS_PATH/$NODE-key.pem|g" /etc/filebeat/filebeat.yml
-sed -i "s|/etc/filebeat/certs/filebeat-key.pem|$CERTS_PATH/$NODE.pem|g" /etc/filebeat/filebeat.yml
+sed -i "s|/etc/filebeat/certs/filebeat.pem|$CERTS_PATH/$NODE.pem|g" /etc/filebeat/filebeat.yml
+sed -i "s|/etc/filebeat/certs/filebeat-key.pem|$CERTS_PATH/$NODE-key.pem|g" /etc/filebeat/filebeat.yml
 filebeat keystore create
 echo admin | filebeat keystore add username --stdin --force
 echo admin | filebeat keystore add password --stdin --force

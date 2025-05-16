@@ -159,6 +159,9 @@ up)
     echo
   fi
   ;;
+start)
+  docker compose --profile $profile -f dev.yml start
+  ;;
 down)
   docker compose --profile $profile -f dev.yml down -v --remove-orphans
   ;;
