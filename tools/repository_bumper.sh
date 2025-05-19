@@ -150,7 +150,7 @@ update_imposter_config() {
   log "Updating specFile URL in $imposter_config_file to version $new_version"
 
   # Use sed to replace the version string within the specFile URL
-  # This regex targets the version part (e.g., 4.13.0) in the specific URL structure
+  # This regex targets the version part (e.g., 4.14.0) in the specific URL structure
   sed -i -E "s|(specFile: https://raw.githubusercontent.com/wazuh/wazuh/)[0-9]+\.[0-9]+\.[0-9]+(.*)|\1${new_version}\2|" "$imposter_config_file" && log "Successfully updated specFile URL in $imposter_config_file" || {
     log "ERROR: Failed to update specFile URL in $imposter_config_file using sed."
     exit 1
