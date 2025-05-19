@@ -185,6 +185,9 @@ down)
 stop)
   docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} stop
   ;;
+manager-local-up)
+  docker compose --profile $profile -f dev.yml -p ${COMPOSE_PROJECT_NAME} up -d wazuh.manager.local
+  ;;
 *)
   echo "[ERROR] Action must be up | down | stop: "
   echo
