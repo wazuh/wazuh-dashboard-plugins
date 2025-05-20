@@ -33,7 +33,10 @@ function generateRandomAgent() {
 function generateRandomWazuh(params) {
   return {
     cluster: {
-      name: params?.cluster?.name || `wazuh-cluster-${random.int(0, 10)}`,
+      name:
+        params?.cluster?.name ||
+        params?.manager?.name ||
+        `wazuh-cluster-${random.int(0, 10)}`,
       node: params?.cluster?.node || `wazuh-cluster-node-${random.int(0, 10)}`,
     },
     schema: { version: '1.7.0' },
