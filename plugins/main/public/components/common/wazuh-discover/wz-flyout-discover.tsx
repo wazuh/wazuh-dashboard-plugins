@@ -25,7 +25,7 @@ import {
 } from '../../../react-services/error-management';
 import useSearchBar, { tUseSearchBarProps } from '../search-bar/use-search-bar';
 import { withErrorBoundary } from '../hocs';
-import { useTimeFilter } from '../hooks';
+import { useNewFilterManager, useTimeFilter } from '../hooks';
 import {
   IDataSourceFactoryConstructor,
   useDataSource,
@@ -43,6 +43,7 @@ export const DEFAULT_PAGE_SIZE_OPTIONS = [20, 50, 100];
 export const DEFAULT_PAGE_SIZE = 20;
 const INDEX_FIELD_NAME = '_id';
 import { formatUIDate } from '../../../react-services/time-service';
+import { compose } from 'redux';
 
 export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
@@ -374,3 +375,32 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
 export const WazuhFlyoutDiscover = withErrorBoundary(
   WazuhFlyoutDiscoverComponent,
 );
+
+// eslint-disable-next-line react/display-name
+const withNewFilterManager = WrappedComponent => props => {
+  const { filterManager } = useNewFilterManager();
+
+  return <WrappedComponent {...props} filterManager={filterManager} />;
+};
+
+// eslint-disable-next-line react/prop-types
+const withEnhanceExpandedRowComponentWithFilterManager =
+  WrappedComponent => props => {
+    const expandedRowComponent = args =>
+      props.expandedRowComponent({
+        ...args,
+        filterManager: props.filterManager,
+      });
+
+    return (
+      <WrappedComponent
+        {...props}
+        expandedRowComponent={expandedRowComponent}
+      />
+    );
+  };
+
+export const WazuhFlyoutDiscoverNewFilterManager = compose(
+  withNewFilterManager,
+  withEnhanceExpandedRowComponentWithFilterManager,
+)(WazuhFlyoutDiscover);
