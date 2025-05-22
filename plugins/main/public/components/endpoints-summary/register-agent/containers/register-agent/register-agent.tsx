@@ -142,10 +142,7 @@ export const RegisterAgent = compose(
         let wazuhPassword = '';
         const needsPassword = authConfig?.auth?.use_password === 'yes';
         if (needsPassword) {
-          wazuhPassword =
-            configuration?.['enrollment.password'] ||
-            authConfig?.['authd.pass'] ||
-            '';
+          wazuhPassword = authConfig?.['authd.pass'] || '';
         }
         const groups = await getGroups();
         setNeedsPassword(needsPassword);
