@@ -46,7 +46,7 @@ jobs:
   test-packages:
     needs: build
     name: Test packages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         plugin: [wazuh-core, wazuh-check-updates]
