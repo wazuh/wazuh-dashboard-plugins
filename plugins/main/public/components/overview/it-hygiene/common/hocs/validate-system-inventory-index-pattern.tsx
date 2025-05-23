@@ -51,7 +51,7 @@ export const withSystemInventoryDataSource =
         'destination.port': 'integer',
         'host.memory.free': 'bytes',
         'host.memory.total': 'bytes',
-        'host.memory.used': 'percent',
+        'host.memory.used': 'bytes',
         'host.network.egress.bytes': 'bytes',
         'host.network.ingress.bytes': 'bytes',
         'package.size': 'bytes',
@@ -146,7 +146,7 @@ export const withSystemInventoryHardwareDataSource =
       mapFieldsFormat({
         'host.memory.free': 'bytes',
         'host.memory.total': 'bytes',
-        'host.memory.used': 'percent',
+        'host.memory.used': 'bytes',
       }),
     ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
