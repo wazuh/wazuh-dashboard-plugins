@@ -15,11 +15,12 @@ import {
   Filter,
   FilterManager,
 } from '../../../../../../../../../src/plugins/data/public';
-import { getPlugins } from '../../../../../../plugin-services';
+import { getPlugins } from '../../../../../../../plugin-services';
 
 interface IUseFilterManagerReturn {
   filterManager: FilterManager;
   filters: Filter[];
+  addFilters: (filters: Filter[]) => void;
 }
 
 export const useFilterManager = (): IUseFilterManagerReturn => {
@@ -44,5 +45,15 @@ export const useFilterManager = (): IUseFilterManagerReturn => {
     };
   }, [filterManager]);
 
-  return { filterManager, filters };
+  const applyFilters = (newFilters: Filter[]) => {
+    filterManager.addFilters(newFilters);
+    const newFiltersUpdated = filterManager.getFilters();
+    setFilters(newFiltersUpdated);
+  };
+
+  return {
+    filterManager,
+    filters,
+    addFilters: applyFilters,
+  };
 };

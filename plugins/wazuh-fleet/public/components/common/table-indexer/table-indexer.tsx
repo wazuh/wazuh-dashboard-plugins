@@ -154,7 +154,8 @@ export const TableIndexer: React.FC<TableIndexerProps> = props => {
       },
     ],
   });
-  const { filters } = useFilterManager();
+
+  const { filters, addFilters } = useFilterManager();
   const { searchBarProps } = useSearchBar({
     indexPattern: indexPatterns,
     filters: [...filtersDefault, ...filters],
@@ -239,6 +240,8 @@ export const TableIndexer: React.FC<TableIndexerProps> = props => {
       {topTableComponent && topTableComponent(searchBarProps)}
       <EuiFlexItem>
         <WazuhDataGrid
+          filters={filters}
+          addFilters={addFilters}
           appId={appId}
           isLoading={loadingSearch}
           defaultColumns={columns}

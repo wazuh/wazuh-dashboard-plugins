@@ -5,6 +5,8 @@ import { beautifyDate } from '../../../utils/beautify-date';
 import { getPlugins } from '../../../plugin-services';
 import { DataGridColumn } from './use-data-grid';
 import { MAX_ENTRIES_PER_QUERY } from './constants';
+import { cellFilterActions } from './cell-filter-actions';
+import { FILTER_OPERATOR, generateFilter, isNullish } from '../table-indexer/components/search-bar/hooks/use-filter-manager';
 
 export interface TSearchParams {
   filters?: Filter[];
@@ -133,7 +135,7 @@ export const parseData = (
       return {};
     }
 
-    const source = hit._source as object;
+    const source = hit?._source as object;
     const data = {
       ...source,
       _id: hit._id,
@@ -315,36 +317,85 @@ export const exportSearchToCSV = async (params: any): Promise<void> => {
   }
 };
 
-export const parseColumns = (
+export const onFilterCellActions = (
+  indexPatternId: string,
+  addFilters: (filters: Filter[]) => void,
+) => {
+  return (
+    field: string,
+    operation:
+      | FILTER_OPERATOR.EXISTS
+      | FILTER_OPERATOR.IS
+      | FILTER_OPERATOR.IS_NOT,
+    values?: boolean | number | string | (boolean | number | string)[],
+  ) => {
+    // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/4e34a7a5141d089f6c341a535be5a7ba2737d965/src/plugins/data/public/query/filter_manager/lib/generate_filters.ts#L89
+    const negated = [FILTER_OPERATOR.IS_NOT].includes(operation);
+    let _operation: FILTER_OPERATOR = operation;
+    if (isNullish(values) && ![FILTER_OPERATOR.EXISTS].includes(operation)) {
+      if (negated) {
+        _operation = FILTER_OPERATOR.EXISTS;
+      } else {
+        _operation = FILTER_OPERATOR.DOES_NOT_EXISTS;
+      }
+    }
+
+    const newFilters: Filter[] = [];
+    if (isNullish(values)) {
+      newFilters.push(
+        generateFilter({
+          type: _operation,
+          key: field,
+          value: values,
+          indexPatternId: indexPatternId,
+        }),
+      );
+    } else {
+      values = Array.isArray(values) ? values : [values];
+      values.forEach(item => {
+        newFilters.push(
+          generateFilter({
+          type: _operation,
+          key: field,
+          value: item,
+          indexPatternId: indexPatternId,
+        })
+        );
+      });
+    }
+
+    addFilters([ ...newFilters]);
+  };
+};
+
+
+export const addFilterActions = (
   fields: IFieldType[],
   defaultColumns: DataGridColumn[] = [],
+  indexPattern: IndexPattern,
+  rows: any[],
+  pageSize: number,
+  addFilters: (filters: Filter[]) => void = () => {},
 ): DataGridColumn[] => {
-  // remove _source field becuase is a object field and is not supported
-  // merge the properties of the field with the default columns
-  if (!fields?.length) {
-    return defaultColumns;
-  }
+  if (!fields?.length) return defaultColumns;
 
-  const columns = fields
+return fields
     .filter(field => field.name !== '_source')
-    .map(field => {
-      const defaultColumn = defaultColumns.find(
-        column => column.id === field.name,
-      );
-
-      return {
-        ...field,
-        id: field.name,
-        name: field.name,
-        schema: field.type,
-        actions: {
-          showHide: true,
-        },
-        ...defaultColumn,
-      };
-    }) as DataGridColumn[];
-
-  return columns;
+    .map(field =>
+      {
+         const defaultColumn = defaultColumns.find(column => column.id === field.name);
+        return {
+            ...defaultColumn,
+            cellActions: cellFilterActions(
+              field,
+              indexPattern,
+              rows,
+              pageSize,
+              onFilterCellActions(indexPattern.id as string, addFilters),
+            ),
+        } as tDataGridColumn;
+      }
+    );
 };
 
 /**

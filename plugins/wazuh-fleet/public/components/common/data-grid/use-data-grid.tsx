@@ -3,14 +3,14 @@ import {
   EuiDataGridSorting,
   EuiDataGridColumn,
 } from '@elastic/eui';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
 import dompurify from 'dompurify';
-import { IndexPattern } from '../../../../../../src/plugins/data/common';
+import { IndexPattern, Filter } from '../../../../../../src/plugins/data/common';
 import {
   parseData,
   getFieldFormatted,
-  parseColumns,
+  addFilterActions,
 } from './data-grid-service';
 import {
   DataGridColumn,
@@ -36,6 +36,8 @@ export interface DataGridProps {
   pagination?: Partial<EuiDataGridProps['pagination']>;
   leadingControlColumns?: EuiDataGridProps['leadingControlColumns'];
   trailingControlColumns?: EuiDataGridProps['trailingControlColumns'];
+  filters?: Filter[];
+  addFilters?: (filters: Filter[]) => void;
 }
 
 export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
@@ -47,11 +49,14 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     renderColumns,
     trailingControlColumns,
     pagination: defaultPagination,
-    leadingControlColumns
+    leadingControlColumns,
+    filters = [],
+    addFilters = () => {},
   } = props;
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
   const rowCount = results ? (results?.hits?.total as number) : 0;
+  const rowsRef = useRef([]);
 
   /** Sorting **/
   // get default sorting from default columns
@@ -86,6 +91,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     setPagination(pagination => ({ ...pagination, pageIndex }));
 
   useEffect(() => {
+    rowsRef.current = results?.hits?.hits || [];
     setRows(results?.hits?.hits || []);
   }, [results, results?.hits, results?.hits?.total]);
 
@@ -157,9 +163,17 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
   };
 
   const columnSchemaDefinitions = useMemo(
-    () => parseColumns(indexPattern?.fields || [], defaultColumns),
-    [indexPattern?.fields, defaultColumns],
+    () => addFilterActions(
+      indexPattern?.fields || [],
+      defaultColumns,
+      indexPattern,
+      rowsRef,
+      pagination.pageSize,
+      addFilters
+    ),
+    [indexPattern?.fields, defaultColumns, rows, pagination.pageSize, filters, addFilters],
   );
+
   // Convert column definitions to Record<string, EuiDataGridColumn>
   const columnSchemaDefinitionsMap: Record<string, EuiDataGridColumn> = useMemo(
     () =>
@@ -168,6 +182,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
       ),
     [columnSchemaDefinitions],
   );
+
   const dataGridStateManager = useDataGridStatePersistenceManager({
     stateManagement: localStorageStatePersistenceManager(appId),
     defaultState: {
@@ -178,6 +193,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     columnSchemaDefinitionsMap,
     indexPatternExists: !!indexPattern,
   });
+
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) => {
       setPagination(pagination => ({

@@ -8,7 +8,7 @@ import {
   EuiFlexGroup,
   EuiDataGridControlColumn,
 } from '@elastic/eui';
-import { IndexPattern, SearchResponse } from 'src/plugins/data/public';
+import { Filter, IndexPattern, SearchResponse } from 'src/plugins/data/public';
 import { useDataGrid, exportSearchToCSV } from '../data-grid';
 import { LoadingSpinner } from '../loading-spinner/loading-spinner';
 import { DiscoverNoResults } from '../no-results/no-results';
@@ -54,6 +54,8 @@ export interface TWazuhDataGridProps {
     onClick: (row: any, agent: any) => void;
     [key: string]: any;
   }>;
+  filters?: Filter[];
+  addFilters?: (filters: Filter[]) => void;
 }
 
 const WazuhDataGrid = (props: TWazuhDataGridProps) => {
@@ -69,7 +71,9 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     onChangeSorting,
     query,
     dateRange,
-    actionsColumn
+    actionsColumn,
+    addFilters,
+    filters
   } = props;
   const [inspectedHit, setInspectedHit] = useState<any>();
   const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -83,6 +87,8 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     indexPattern: indexPattern as IndexPattern,
     leadingControlColumns: props.leadingControlColumns,
     trailingControlColumns: props.trailingControlColumns,
+    filters,
+    addFilters,
     pagination: {
       ...DEFAULT_PAGINATION_OPTIONS,
       ...defaultPagination,
