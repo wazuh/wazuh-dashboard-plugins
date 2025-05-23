@@ -38,7 +38,7 @@ describe('checkAppServerCompatibility', () => {
 describe('serverAPIConnectionCompatibility', () => {
   it.each`
     apiHostID    | apiVersionResponse                     | isCompatible
-    ${'server1'} | ${{ api_version: '5.0.0' }}            | ${true}
+    ${'server1'} | ${{ api_version: '6.0.0' }}            | ${true}
     ${'server2'} | ${{ api_version: '0.0.0' }}            | ${false}
     ${'server3'} | ${{ missing_api_version_field: null }} | ${false}
   `(
