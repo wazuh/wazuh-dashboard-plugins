@@ -135,7 +135,7 @@ exports[`Enrollment key input match the snapshopt 1`] = `
           The agent name must be unique. It can’t be changed once the agent has been enrolled.
           <a
             class="euiLink euiLink--primary"
-            href="https://documentation.wazuh.com/5.0/user-manual/reference/ossec-conf/client.html#enrollment-agent-name"
+            href="https://documentation.wazuh.com/6.0/user-manual/reference/ossec-conf/client.html#enrollment-agent-name"
             rel="noopener noreferrer"
             target="_blank"
           >

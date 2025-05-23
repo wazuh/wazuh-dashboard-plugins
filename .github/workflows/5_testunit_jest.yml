@@ -31,6 +31,7 @@ on:
         options:
           - 'yarn test:jest'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
   group: pr-${{ github.event.pull_request.number || github.ref }}
@@ -39,6 +40,7 @@ concurrency:
 jobs:
   # Run unit tests with Jest
   test:
+    if: github.event.pull_request.draft == false
     name: Run unit tests
     uses: ./.github/workflows/5_builderprecompiled_base-dev-environment.yml
     with:
