@@ -243,7 +243,6 @@ const fieldMappers = {
   integer: ({ type }) =>
     type === 'number' ? { id: 'number', params: { pattern: '0' } } : undefined,
   percent: ({ type }) => {
-    console.log({ type });
     return type === 'number'
       ? { id: 'percent', params: { pattern: '0,0.[00]%' } }
       : undefined;
@@ -256,7 +255,6 @@ export function mapFieldsFormat(expectedFields: {
   return {
     mapSavedObjectAttributesCreation: ({ fields }) => {
       const fieldsToMap = Object.keys(expectedFields);
-      console.log({ fieldsToMap });
       const mappedFields = fields
         ?.filter(({ name }) => fieldsToMap.includes(name))
         .map(field => {
