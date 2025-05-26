@@ -413,10 +413,6 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
     ${'enrollment.dns'}                 | ${''}                                                            | ${200}             | ${null}
     ${'enrollment.dns'}                 | ${'test space'}                                                  | ${400}             | ${'[request body.enrollment.dns]: No whitespaces allowed.'}
     ${'enrollment.dns'}                 | ${true}                                                          | ${400}             | ${'[request body.enrollment.dns]: expected value of type [string] but got [boolean]'}
-    ${'enrollment.password'}            | ${'test'}                                                        | ${200}             | ${null}
-    ${'enrollment.password'}            | ${''}                                                            | ${400}             | ${'[request body.enrollment.password]: Value can not be empty.'}
-    ${'enrollment.password'}            | ${'test space'}                                                  | ${200}             | ${null}
-    ${'enrollment.password'}            | ${true}                                                          | ${400}             | ${'[request body.enrollment.password]: expected value of type [string] but got [boolean]'}
     ${'ip.ignore'}                      | ${['test']}                                                      | ${200}             | ${null}
     ${'ip.ignore'}                      | ${['test*']}                                                     | ${200}             | ${null}
     ${'ip.ignore'}                      | ${['']}                                                          | ${400}             | ${'[request body.ip.ignore.0]: Value can not be empty.'}

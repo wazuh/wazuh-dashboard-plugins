@@ -138,9 +138,6 @@ describe('[settings] Input validation', () => {
     ${'enrollment.dns'}                 | ${'2001:0db8:85a3:0000:0000:8a2e:0370:7334:KL12'}                      | ${'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6'}
     ${'enrollment.dns'}                 | ${'example.'}                                                          | ${'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6'}
     ${'enrollment.dns'}                 | ${'127.0.0.1'}                                                         | ${undefined}
-    ${'enrollment.password'}            | ${'test'}                                                              | ${undefined}
-    ${'enrollment.password'}            | ${''}                                                                  | ${'Value can not be empty.'}
-    ${'enrollment.password'}            | ${'test space'}                                                        | ${undefined}
     ${'ip.ignore'}                      | ${'["test"]'}                                                          | ${undefined}
     ${'ip.ignore'}                      | ${'["test*"]'}                                                         | ${undefined}
     ${'ip.ignore'}                      | ${'[""]'}                                                              | ${'Value can not be empty.'}

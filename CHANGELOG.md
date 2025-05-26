@@ -9,6 +9,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.12.2
 - Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 
+### Removed
+
+- Removed the `enrollment.password` field from the `/utils/configuration` endpoint response to prevent unauthorized agent registration by users with read-only API roles. [#7462](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7462)
+
 ## Wazuh v4.12.1 - OpenSearch Dashboards 2.19.1 - Revision 00
 
 ### Added
