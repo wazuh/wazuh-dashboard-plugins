@@ -6,7 +6,7 @@
 # 🛠️ **Key Features:**
 # - 🏷️ Triggered by tag creation (`v*`), ideal for versioned releases.
 # - 📦 Produces a tagged artifact named `wazuh-<tag>`.
-# - 🔄 Reuses the `5_builderprecompiled_base-dev-environment` workflow to maintain consistency across builds.
+# - 🔄 Reuses the `6_builderprecompiled_base-dev-environment` workflow to maintain consistency across builds.
 #
 # ⚠️ **Notes:**
 # - Ensure tag names follow the `v*` convention (e.g., `v1.2.3`).
@@ -20,7 +20,7 @@ on:
 jobs:
   build:
     name: Build app package (auto)
-    uses: ./.github/workflows/5_builderprecompiled_base-dev-environment.yml
+    uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
     with:
       reference: ${{ github.ref_name }}
       command: 'yarn build'

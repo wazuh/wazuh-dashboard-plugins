@@ -8,7 +8,7 @@
 # - 💡 Allows execution of custom commands (e.g., `yarn test:jest`, `npm run lint`).
 # - 🐳 Supports additional Docker run parameters for flexible environment configurations.
 # - 📦 Enables artifact creation with customizable names and paths.
-# - ♻️ Reuses the `5_builderprecompiled_base-dev-environment` workflow for consistency.
+# - ♻️ Reuses the `6_builderprecompiled_base-dev-environment` workflow for consistency.
 #
 # ⚠️ **Notes:**
 # - Ensure that commands specified are compatible with the project’s dependencies.
@@ -48,7 +48,7 @@ on:
 jobs:
   deploy_and_run_command:
     name: Deploy and run command
-    uses: ./.github/workflows/5_builderprecompiled_base-dev-environment.yml
+    uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
     with:
       reference: ${{ github.event.inputs.reference }}
       command: ${{ github.event.inputs.command }}
