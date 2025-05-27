@@ -1,4 +1,4 @@
-# 📝 Based on: `5_builderprecompiled_base-dev-environment.yml`
+# 📝 Based on: `6_builderprecompiled_base-dev-environment.yml`
 #
 # 📦 Manual Build Workflow for Wazuh Dashboard Plugins
 #
@@ -36,7 +36,7 @@ jobs:
   # Build an app package from the given source code reference.
   build:
     name: Build app package
-    uses: ./.github/workflows/5_builderprecompiled_base-dev-environment.yml
+    uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
     with:
       reference: ${{ inputs.reference }}
       command: 'yarn build'
@@ -46,7 +46,7 @@ jobs:
   test-packages:
     needs: build
     name: Test packages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         plugin: [wazuh-core, wazuh-check-updates]

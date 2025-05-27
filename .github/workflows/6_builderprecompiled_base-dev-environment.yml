@@ -52,7 +52,7 @@ jobs:
   # using a pre-built Docker image, hosted in Quay.io.
   deploy_and_run_command:
     name: Deploy and run command
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         plugins:
