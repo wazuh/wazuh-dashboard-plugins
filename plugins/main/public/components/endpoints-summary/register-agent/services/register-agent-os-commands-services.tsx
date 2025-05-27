@@ -172,5 +172,5 @@ export const getMacOsInstallCommand = (
 export const getMacosStartCommand = (
   _props: tOSEntryProps<tOptionalParameters>,
 ) => {
-  return `sudo /Library/Ossec/bin/wazuh-control start`;
+  return 'sudo launchctl load /Library/LaunchDaemons/com.wazuh.agent.plist';
 };

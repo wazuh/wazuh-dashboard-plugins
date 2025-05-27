@@ -288,39 +288,6 @@ describe('[endpoint][security] POST /reports/agents/{agentID} - Parameters valid
   );
 });
 
-describe('[endpoint][security] POST /reports/agents/{agentID}/inventory - Parameters validation', () => {
-  it.each`
-    testTitle               | username       | agentID       | responseStatusCode | responseBodyMessage
-    ${'Invalid parameters'} | ${'admin'}     | ${'..001'}    | ${400}             | ${/\[request params.agentID\]: must be 0-9 are allowed/}
-    ${'Route not found'}    | ${'admin'}     | ${'../001'}   | ${404}             | ${/Not Found/}
-    ${'Invalid parameters'} | ${'admin'}     | ${'..%2f001'} | ${400}             | ${/\[request params.agentID\]: must be 0-9 are allowed/}
-    ${'Invalid parameters'} | ${'admin'}     | ${'1'}        | ${400}             | ${/\[request params.agentID\]: value has length \[1\] but it must have a minimum length of \[3\]./}
-    ${'Invalid parameters'} | ${'../../etc'} | ${'..001'}    | ${400}             | ${/\[request params.agentID\]: must be 0-9 are allowed/}
-    ${'Route not found'}    | ${'../../etc'} | ${'../001'}   | ${404}             | ${/Not Found/}
-    ${'Invalid parameters'} | ${'../../etc'} | ${'..%2f001'} | ${400}             | ${/\[request params.agentID\]: must be 0-9 are allowed/}
-    ${'Invalid parameters'} | ${'../../etc'} | ${'1'}        | ${400}             | ${/\[request params.agentID\]: value has length \[1\] but it must have a minimum length of \[3\]./}
-  `(
-    `$testTitle: GET /reports/agents/$agentID/inventory - $responseStatusCode
-        username: $username
-        responseBodyMessage: $responseBodyMessage`,
-    async ({ username, agentID, responseStatusCode, responseBodyMessage }) => {
-      const response = await supertest(innerServer.listener)
-        .post(`/reports/agents/${agentID}/inventory`)
-        .set('x-test-username', username)
-        .send({
-          browserTimezone: '',
-          components: { '1': true },
-          section: '',
-          apiId: 'default',
-        })
-        .expect(responseStatusCode);
-      if (responseBodyMessage) {
-        expect(response.body.message).toMatch(responseBodyMessage);
-      }
-    },
-  );
-});
-
 describe('[endpoint][security] DELETE /reports/{name} - Parameters validation', () => {
   it.each`
     testTitle               | username       | filename                                               | responseStatusCode | responseBodyMessage

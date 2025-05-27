@@ -18,6 +18,13 @@ import { ModuleMitreAttackIntelligence } from './intelligence';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
 
+// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
+// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
+
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
+}));
+
 jest.mock('../../../common/hooks/use-app-config', () => ({
   useAppConfig: () => ({
     isReady: true,

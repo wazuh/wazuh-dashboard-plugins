@@ -27,6 +27,11 @@ import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../../../common/hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../../../common/search-bar';
+import {
+  WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+} from '../../../../../common/constants';
 
 const plugins = getPlugins();
 
@@ -119,7 +124,13 @@ const DashboardTH: React.FC = () => {
                 : 'wz-no-display'
             }`}
           >
-            <SampleDataWarning />
+            <SampleDataWarning
+              categoriesSampleData={[
+                WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+                WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+                WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+              ]}
+            />
             <div className='th-dashboard-responsive'>
               <DashboardByRenderer
                 input={{

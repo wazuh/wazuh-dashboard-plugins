@@ -337,11 +337,26 @@ export class WazuhApiCtrl {
         responseManagerInfo.status === HTTP_STATUS_CODES.OK &&
         responseManagerInfo.data
       ) {
-        const result =
-          await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
-        return response.ok({
-          body: result,
-        });
+        // Check if UUID exists in the response
+        if (responseManagerInfo.data?.data?.affected_items?.[0]?.uuid) {
+          const uuid = responseManagerInfo.data.data.affected_items[0].uuid;
+          const result =
+            await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
+          return response.ok({
+            body: {
+              ...result,
+              uuid,
+            },
+          });
+        } else {
+          context.wazuh.logger.warn('Could not obtain manager UUID');
+          return ErrorResponse(
+            'Could not obtain manager UUID',
+            null,
+            HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+            response,
+          );
+        }
       }
     } catch (error) {
       context.wazuh.logger.warn(error.message || error);
@@ -945,71 +960,6 @@ export class WazuhApiCtrl {
           error.message || error
         }`,
         4005,
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        response,
-      );
-    }
-  }
-
-  /**
-   * Get basic syscollector information for given agent.
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} Basic syscollector information
-   */
-  async getSyscollector(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const apiHostID = getCookieValueByName(request.headers.cookie, 'wz-api');
-      if (!request.params || !apiHostID || !request.params.agent) {
-        throw new Error('Agent ID and API ID are required');
-      }
-
-      const { agent } = request.params;
-
-      const data = await Promise.all([
-        context.wazuh.api.client.asInternalUser.request(
-          'GET',
-          `/syscollector/${agent}/hardware`,
-          {},
-          { apiHostID },
-        ),
-        context.wazuh.api.client.asInternalUser.request(
-          'GET',
-          `/syscollector/${agent}/os`,
-          {},
-          { apiHostID },
-        ),
-      ]);
-
-      const result = data.map(item => (item.data || {}).data || []);
-      const [hardwareResponse, osResponse] = result;
-
-      // Fill syscollector object
-      const syscollector = {
-        hardware:
-          typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
-            ? { ...hardwareResponse.affected_items[0] }
-            : false,
-        os:
-          typeof osResponse === 'object' && Object.keys(osResponse).length
-            ? { ...osResponse.affected_items[0] }
-            : false,
-      };
-
-      return response.ok({
-        body: syscollector,
-      });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        error.message || error,
-        3035,
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
       );
