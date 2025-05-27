@@ -16,6 +16,13 @@ jest.mock('../../../common/hooks/use-service', () => ({
   useService: jest.fn(),
 }));
 
+// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
+// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
+
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
+}));
+
 describe('DonutCard', () => {
   const mockLoading = false;
   const mockData = [
@@ -45,39 +52,58 @@ describe('DonutCard', () => {
     },
   ];
   const mockGetInfo = jest.fn().mockResolvedValue(mockData);
-  const useServiceMock = jest.fn(() => ({data: mockData, isLoading: mockLoading}));
+  const useServiceMock = jest.fn(() => ({
+    data: mockData,
+    isLoading: mockLoading,
+  }));
   const mockGetInfoNoData = jest.fn().mockResolvedValue([]);
-  const useServiceMockNoData = jest.fn(() => ({data: [], isLoading: mockLoading}));
-  
+  const useServiceMockNoData = jest.fn(() => ({
+    data: [],
+    isLoading: mockLoading,
+  }));
+
   it('renders with data', async () => {
     require('../../../common/hooks/use-service').useService = useServiceMock;
-    
+
     await act(async () => {
       const { getByText } = render(
-        <DonutCard title='Component title example' description='Component description example' betaBadgeLabel='Component betaBadgeLabel example' getInfo={mockGetInfo} />,
+        <DonutCard
+          title='Component title example'
+          description='Component description example'
+          betaBadgeLabel='Component betaBadgeLabel example'
+          getInfo={mockGetInfo}
+        />,
       );
 
       expect(getByText('Component title example')).toBeInTheDocument();
       expect(getByText('Component description example')).toBeInTheDocument();
       expect(getByText('Component betaBadgeLabel example')).toBeInTheDocument();
       mockData.forEach(element => {
-        expect(getByText(`${element.label} (${element.value})`)).toBeInTheDocument();  
+        expect(
+          getByText(`${element.label} (${element.value})`),
+        ).toBeInTheDocument();
       });
     });
   });
 
   it('handles click on data', async () => {
     require('../../../common/hooks/use-service').useService = useServiceMock;
-    
+
     const handleClick = jest.fn();
     const firstMockData = mockData[0];
-   
+
     await act(async () => {
       const { getByText } = render(
-        <DonutCard title="Component title example" getInfo={mockGetInfo} onClickLabel={handleClick} />
+        <DonutCard
+          title='Component title example'
+          getInfo={mockGetInfo}
+          onClickLabel={handleClick}
+        />,
       );
-      
-      fireEvent.click(getByText(`${firstMockData.label} (${firstMockData.value})`));
+
+      fireEvent.click(
+        getByText(`${firstMockData.label} (${firstMockData.value})`),
+      );
 
       expect(handleClick).toHaveBeenCalledTimes(1);
 
@@ -86,15 +112,24 @@ describe('DonutCard', () => {
   });
 
   it('show noDataTitle and noDataMessage when no data', async () => {
-    require('../../../common/hooks/use-service').useService = useServiceMockNoData;
-    
+    require('../../../common/hooks/use-service').useService =
+      useServiceMockNoData;
+
     await act(async () => {
       const { getByText } = render(
-        <DonutCard getInfo={mockGetInfoNoData} noDataTitle='Component no data title example message' noDataMessage='Component no data example message' />
+        <DonutCard
+          getInfo={mockGetInfoNoData}
+          noDataTitle='Component no data title example message'
+          noDataMessage='Component no data example message'
+        />,
       );
 
-      expect(getByText('Component no data title example message')).toBeInTheDocument();
-      expect(getByText('Component no data example message')).toBeInTheDocument();
+      expect(
+        getByText('Component no data title example message'),
+      ).toBeInTheDocument();
+      expect(
+        getByText('Component no data example message'),
+      ).toBeInTheDocument();
     });
   });
 });

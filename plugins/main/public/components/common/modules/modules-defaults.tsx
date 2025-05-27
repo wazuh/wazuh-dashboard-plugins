@@ -12,7 +12,6 @@
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
-import { MainFim } from '../../agents/fim';
 import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
@@ -39,7 +38,12 @@ import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
-import { WAZUH_VULNERABILITIES_PATTERN } from '../../../../common/constants';
+import {
+  WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+  WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+  WAZUH_VULNERABILITIES_PATTERN,
+} from '../../../../common/constants';
 import {
   DashboardGitHub,
   DashboardGDPR,
@@ -77,6 +81,14 @@ import {
   ThreatHuntingDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
+import {
+  DashboardITHygiene,
+  ITHygieneNetworksInventory,
+  ITHygienePackagesInventory,
+  ITHygieneProcessesInventory,
+  ITHygieneSystemInventory,
+} from '../../overview/it-hygiene';
+import { InventoryFIM } from '../../overview/fim';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -101,6 +113,11 @@ export const ModulesDefaults = {
         moduleId: 'threat-hunting',
         tableColumns: threatHuntingColumns,
         DataSource: ThreatHuntingDataSource,
+        categoriesSampleData: [
+          WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+          WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+          WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+        ],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -118,12 +135,13 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonExploreAgent],
-        component: MainFim,
+        component: InventoryFIM,
       },
       renderDiscoverTab({
         moduleId: 'fim',
         tableColumns: fileIntegrityMonitoringColumns,
         DataSource: FIMDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -141,6 +159,7 @@ export const ModulesDefaults = {
         moduleId: 'aws',
         tableColumns: amazonWebServicesColumns,
         DataSource: AWSDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -158,6 +177,7 @@ export const ModulesDefaults = {
         moduleId: 'gcp',
         tableColumns: googleCloudColumns,
         DataSource: GoogleCloudDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -176,6 +196,9 @@ export const ModulesDefaults = {
         moduleId: 'pm',
         tableColumns: malwareDetectionColumns,
         DataSource: MalwareDetectionDataSource,
+        categoriesSampleData: [
+          WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+        ],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -199,6 +222,7 @@ export const ModulesDefaults = {
         moduleId: 'sca',
         tableColumns: configurationAssessmentColumns,
         DataSource: ConfigurationAssessmentDataSource,
+        categoriesSampleData: [],
       }),
     ],
     buttons: ['settings'],
@@ -223,6 +247,7 @@ export const ModulesDefaults = {
         moduleId: 'office',
         tableColumns: office365Columns,
         DataSource: Office365DataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -246,6 +271,7 @@ export const ModulesDefaults = {
         moduleId: 'github',
         tableColumns: githubColumns,
         DataSource: GitHubDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -285,6 +311,7 @@ export const ModulesDefaults = {
         moduleId: 'vuls',
         tableColumns: vulnerabilitiesColumns,
         DataSource: AlertsVulnerabilitiesDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
       }),
     ],
     buttons: ['settings'],
@@ -314,6 +341,10 @@ export const ModulesDefaults = {
         moduleId: 'mitre',
         DataSource: MitreAttackDataSource,
         tableColumns: mitreAttackColumns,
+        categoriesSampleData: [
+          WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+          WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+        ],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -331,6 +362,7 @@ export const ModulesDefaults = {
         moduleId: 'docker',
         tableColumns: dockerColumns,
         DataSource: DockerDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -356,6 +388,7 @@ export const ModulesDefaults = {
         moduleId: 'pci',
         tableColumns: pciColumns,
         DataSource: PCIDSSDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -381,6 +414,7 @@ export const ModulesDefaults = {
         moduleId: 'hipaa',
         tableColumns: hipaaColumns,
         DataSource: HIPAADataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -406,6 +440,7 @@ export const ModulesDefaults = {
         moduleId: 'nist',
         tableColumns: nistColumns,
         DataSource: NIST80053DataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -431,6 +466,7 @@ export const ModulesDefaults = {
         moduleId: 'gdpr',
         tableColumns: gdprColumns,
         DataSource: GDPRDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -456,7 +492,44 @@ export const ModulesDefaults = {
         moduleId: 'tsc',
         tableColumns: tscColumns,
         DataSource: TSCDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  'it-hygiene': {
+    init: 'dashboard',
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardITHygiene,
+      },
+      {
+        id: 'networks',
+        name: 'Networks',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneNetworksInventory,
+      },
+      {
+        id: 'processes',
+        name: 'Processes',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneProcessesInventory,
+      },
+      {
+        id: 'packages',
+        name: 'Packages',
+        buttons: [ButtonExploreAgent],
+        component: ITHygienePackagesInventory,
+      },
+      {
+        id: 'system',
+        name: 'System',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneSystemInventory,
+      },
     ],
     availableFor: ['manager', 'agent'],
   },
