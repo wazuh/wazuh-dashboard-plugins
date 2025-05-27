@@ -41,11 +41,11 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
     help={
       Array [
         Object {
-          "href": "https://documentation.wazuh.com/4.12/cloud-security/office365/index.html",
+          "href": "https://documentation.wazuh.com/4.13/cloud-security/office365/index.html",
           "text": "Monitoring Office 365",
         },
         Object {
-          "href": "https://documentation.wazuh.com/4.12/user-manual/reference/ossec-conf/office365-module.html",
+          "href": "https://documentation.wazuh.com/4.13/user-manual/reference/ossec-conf/office365-module.html",
           "text": "Configuration options for the module",
         },
       ]
@@ -92,11 +92,11 @@ exports[`ApiAuthTab component renders correctly to match the snapshot 1`] = `
                     links={
                       Array [
                         Object {
-                          "href": "https://documentation.wazuh.com/4.12/cloud-security/office365/index.html",
+                          "href": "https://documentation.wazuh.com/4.13/cloud-security/office365/index.html",
                           "text": "Monitoring Office 365",
                         },
                         Object {
-                          "href": "https://documentation.wazuh.com/4.12/user-manual/reference/ossec-conf/office365-module.html",
+                          "href": "https://documentation.wazuh.com/4.13/user-manual/reference/ossec-conf/office365-module.html",
                           "text": "Configuration options for the module",
                         },
                       ]

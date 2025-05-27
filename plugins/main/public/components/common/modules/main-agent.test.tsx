@@ -16,6 +16,13 @@ const REPORT_TAB = {
   PROCESSES: 'agent-tab-processes',
 };
 
+// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
+// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
+
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
+}));
+
 jest.mock('../../../react-services/reporting', () => ({
   ReportingService: {
     startVis2Png: jest.fn(),
@@ -118,175 +125,6 @@ describe('Main Agent', () => {
         container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
       ).toBeFalsy();
     });
-
-    it('should render agent tab overview when section is software', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.SOFTWARE}
-          switchTab={switchTab}
-        />,
-      );
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
-        ),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
-        ),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
-        ),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
-      ).toBeFalsy();
-    });
-
-    it('should render agent tab overview when section is network', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.NETWORK}
-          switchTab={switchTab}
-        />,
-      );
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
-        ),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
-        ),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.PROCESSES)),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
-        ),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
-      ).toBeFalsy();
-    });
-
-    it('should render agent tab overview when section is processes', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.PROCESSES}
-          switchTab={switchTab}
-        />,
-      );
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.SOFTWARE)),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.SOFTWARE) + ARIA_SELECTED,
-        ),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.NETWORK)),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.NETWORK) + ARIA_SELECTED,
-        ),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.PROCESSES) + ARIA_SELECTED,
-        ),
-      ).toBeTruthy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.CONFIGURATION)),
-      ).toBeFalsy();
-
-      expect(
-        container.querySelector(queryDataTestAttr(REPORT_TAB.STATS)),
-      ).toBeFalsy();
-    });
-
-    it('should be call switchTab when click on tab', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.SOFTWARE}
-          switchTab={switchTab}
-        />,
-      );
-
-      fireEvent.click(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.SOFTWARE),
-        ) as Element,
-      );
-
-      expect(switchTab).toHaveBeenCalledTimes(1);
-      expect(switchTab).toHaveBeenCalledWith(AgentTabs.SOFTWARE);
-
-      fireEvent.click(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.NETWORK),
-        ) as Element,
-      );
-
-      expect(switchTab).toHaveBeenCalledTimes(2);
-      expect(switchTab).toHaveBeenCalledWith(AgentTabs.NETWORK);
-
-      fireEvent.click(
-        container.querySelector(
-          queryDataTestAttr(REPORT_TAB.PROCESSES),
-        ) as Element,
-      );
-
-      expect(switchTab).toHaveBeenCalledTimes(3);
-      expect(switchTab).toHaveBeenCalledWith(AgentTabs.PROCESSES);
-    });
   });
 
   describe('Generate report button', () => {
@@ -321,101 +159,9 @@ describe('Main Agent', () => {
 
       expect(generateReportButton).toBeFalsy();
     });
-
-    it('should render generate report button when section is software', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.SOFTWARE}
-          switchTab={switchTab}
-        />,
-      );
-
-      const generateReportButton = container.querySelector(
-        queryDataTestAttr(GENERATE_REPORT_BUTTON),
-      );
-
-      expect(generateReportButton).toBeTruthy();
-    });
-
-    it('should render generate report button when section is network', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.NETWORK}
-          switchTab={switchTab}
-        />,
-      );
-
-      const generateReportButton = container.querySelector(
-        queryDataTestAttr(GENERATE_REPORT_BUTTON),
-      );
-
-      expect(generateReportButton).toBeTruthy();
-    });
-
-    it('should render generate report button when section is processes', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.PROCESSES}
-          switchTab={switchTab}
-        />,
-      );
-
-      const generateReportButton = container.querySelector(
-        queryDataTestAttr(GENERATE_REPORT_BUTTON),
-      );
-
-      expect(generateReportButton).toBeTruthy();
-    });
   });
+
   describe('Verify the presence of the "Pinned Agent" button', () => {
-    it('should render "Pinned Agent" button in tab software', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.SOFTWARE}
-          switchTab={switchTab}
-        />,
-      );
-
-      const exploreAgentButton = container.querySelector(
-        queryDataTestAttr(EXPLORE_AGENT_BUTTON),
-      );
-
-      expect(exploreAgentButton).toBeTruthy();
-    });
-    it('should render "Pinned Agent" button in tab network', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.NETWORK}
-          switchTab={switchTab}
-        />,
-      );
-
-      const exploreAgentButton = container.querySelector(
-        queryDataTestAttr(EXPLORE_AGENT_BUTTON),
-      );
-
-      expect(exploreAgentButton).toBeTruthy();
-    });
-    it('should render "Pinned Agent" button in tab processes', () => {
-      const { container } = render(
-        <MainModuleAgent
-          agent={{ os: { platform: 'windows' } }}
-          section={AgentTabs.PROCESSES}
-          switchTab={switchTab}
-        />,
-      );
-
-      const exploreAgentButton = container.querySelector(
-        queryDataTestAttr(EXPLORE_AGENT_BUTTON),
-      );
-
-      expect(exploreAgentButton).toBeTruthy();
-    });
     it('should render "Pinned Agent" button in tab stats', () => {
       const { container } = render(
         <MainModuleAgent

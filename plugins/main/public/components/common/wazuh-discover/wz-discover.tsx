@@ -20,7 +20,6 @@ import { DiscoverNoResults } from '../no-results/no-results';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import {
   useDataGrid,
-  tDataGridColumn,
   exportSearchToCSV,
   getAllCustomRenders,
 } from '../data-grid';
@@ -34,9 +33,6 @@ import useSearchBar from '../search-bar/use-search-bar';
 import { getPlugins } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
 import { getWazuhCorePlugin } from '../../../kibana-services';
-
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
 import './discover.scss';
 import { withErrorBoundary } from '../hocs';
 import {
@@ -51,16 +47,28 @@ import { wzDiscoverRenderColumns } from './render-columns';
 import { WzSearchBar } from '../search-bar';
 import { transformDateRange } from '../search-bar/search-bar-service';
 import DocDetailsHeader from './components/doc-details-header';
+import { tDataGridColumn } from '../data-grid/types';
+import { SampleDataWarning } from '../../visualize/components';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
+const DashboardByRenderer =
+  getPlugins().dashboard.DashboardContainerByValueRenderer;
+
 export type WazuhDiscoverProps = {
+  moduleId: string;
   tableColumns: tDataGridColumn[];
   DataSource: IDataSourceFactoryConstructor<PatternDataSource>;
+  categoriesSampleData: string[];
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
-  const { DataSource, tableColumns: defaultTableColumns } = props;
+  const {
+    moduleId,
+    DataSource,
+    tableColumns: defaultTableColumns,
+    categoriesSampleData,
+  } = props;
 
   if (!DataSource) {
     throw new Error('DataSource is required');
@@ -122,6 +130,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     transformDateRange({ from: dateRangeFrom, to: dateRangeTo }),
   );
   const dataGridProps = useDataGrid({
+    moduleId,
     ariaLabelledBy: 'Discover events table',
     defaultColumns: defaultTableColumns,
     renderColumns: wzDiscoverRenderColumns,
@@ -233,6 +242,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             showQueryBar={true}
             showSaveQuery={true}
           />
+          <SampleDataWarning categoriesSampleData={categoriesSampleData} />
           {!isDataSourceLoading && results?.hits?.total === 0 ? (
             <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
           ) : null}

@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 # Parameters:
 # -------------
@@ -11,11 +11,12 @@ version: "3"
 services:
   test_runner:
     container_name: runner
-    image:  quay.io/wazuh/$APP-dev:$VERSION
+    image: quay.io/wazuh/$APP-dev:$VERSION
     working_dir: /home/node/kbn/plugins/wazuh
     volumes:
       - $REPO:/home/node/kbn/plugins/wazuh
+    tty: true
     command: /bin/bash -c '
-        yarn;
-        yarn $CMD $ARGS
+      yarn;
+      yarn $CMD $ARGS
       '
