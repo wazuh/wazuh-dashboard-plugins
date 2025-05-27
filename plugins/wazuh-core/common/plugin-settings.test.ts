@@ -158,6 +158,40 @@ describe('[settings] Input validation', () => {
     ${'fim.pattern'}                               | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'fim.pattern'}                               | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'fim.pattern'}                               | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test'}                                                              | ${undefined}
+    ${'fim_files.pattern'}                         | ${'test*'}                                                             | ${undefined}
+    ${'fim_files.pattern'}                         | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'fim_files.pattern'}                         | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'fim_files.pattern'}                         | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim_files.pattern'}                         | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim_files.pattern'}                         | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim_files.pattern'}                         | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim_files.pattern'}                         | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_files.pattern'}                         | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test'}                                                              | ${undefined}
+    ${'fim_registries.pattern'}                    | ${'test*'}                                                             | ${undefined}
+    ${'fim_registries.pattern'}                    | ${''}                                                                  | ${'Value can not be empty.'}
+    ${'fim_registries.pattern'}                    | ${'test space'}                                                        | ${'No whitespaces allowed.'}
+    ${'fim_registries.pattern'}                    | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim_registries.pattern'}                    | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim_registries.pattern'}                    | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim_registries.pattern'}                    | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
+    ${'fim_registries.pattern'}                    | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
+    ${'fim_registries.pattern'}                    | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'fim_registries.sample.prefix'}              | ${'test'}                                                              | ${undefined}
     ${'fim_registries.sample.prefix'}              | ${''}                                                                  | ${'Value can not be empty.'}
     ${'fim_registries.sample.prefix'}              | ${'test space'}                                                        | ${'No whitespaces allowed.'}

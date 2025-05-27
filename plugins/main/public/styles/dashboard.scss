@@ -1,4 +1,18 @@
 /* Dashboards */
+
+/* Responsive */
+.wz-dashboard-responsive {
+  @media (max-width: 767px) {
+    .react-grid-layout {
+      height: auto !important;
+    }
+    .dshLayout-isMaximizedPanel {
+      height: calc(100vh - 44px) !important;
+    }
+  }
+}
+
+/* Hide the export CSV controls of table visualizations*/
 .wz-dashboard-hide-tables-pagination-export-csv-controls {
   .euiDataGrid__controls,
   .euiDataGrid__pagination {
@@ -9,13 +23,9 @@
   }
 }
 
-.wz-dashboard-responsive {
-  @media (max-width: 767px) {
-    .react-grid-layout {
-      height: auto !important;
-    }
-    .dshLayout-isMaximizedPanel {
-      height: calc(100vh - 44px) !important;
-    }
+/* Reduce the font size of the table visualizations */
+.wz-dashboard-set-font-size-table-vis .visTable {
+  .euiDataGridRowCell {
+    font-size: 10px;
   }
 }

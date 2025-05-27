@@ -26,6 +26,10 @@ import {
 } from '../../../common/wazuh-discover/flex-layout';
 import { SampleDataWarning } from '../../../visualize/components';
 import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../common/constants';
+import { InventoryFIMFiles } from './inventories';
+import { ModuleSubTabs } from '../../../common/tabs';
+import { InventoryFIMRegistryKeys } from './inventories/registry-keys/inventory';
+import { InventoryFIMRegistryValues } from './inventories/registry-values/inventory';
 
 export const InventoryFIMFilesDocumentDetailsEvents = ({ document, agent }) => (
   <WazuhFlyoutDiscoverNewFilterManagerRecentEvents
@@ -182,7 +186,8 @@ const InventoryFIMDashboard = withDataSourceInitiated({
   ),
 );
 
-export const InventoryFIM = withFIMDataSource(({ agent }) => {
+// TODO: remove me
+export const InventoryFIM2 = withFIMDataSource(({ agent }) => {
   const {
     dataSource,
     filters,
@@ -234,3 +239,25 @@ export const InventoryFIM = withFIMDataSource(({ agent }) => {
     </IntlProvider>
   );
 });
+
+const tabs = [
+  {
+    id: 'files',
+    name: 'Files',
+    component: InventoryFIMFiles,
+  },
+  {
+    id: 'registry-keys',
+    name: 'Registry keys',
+    component: InventoryFIMRegistryKeys,
+  },
+  {
+    id: 'registry-values',
+    name: 'Registry values',
+    component: InventoryFIMRegistryValues,
+  },
+];
+
+export const InventoryFIM = () => {
+  return <ModuleSubTabs tabs={tabs} />;
+};
