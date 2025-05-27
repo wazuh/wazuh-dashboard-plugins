@@ -3,7 +3,7 @@ const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
 
 function generateRandomEvent() {
   return {
-    category: random.choice(['registy_value', 'registry_key', 'file']),
+    category: random.choice(['registry_value', 'registry_key', 'file']),
     action: random.choice(['added', 'modified', 'deleted']),
   };
 }
