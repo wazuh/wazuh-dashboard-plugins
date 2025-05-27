@@ -14,7 +14,6 @@ import {
 } from './data-grid-service';
 import {
   DataGridColumn,
-  DataGridRenderColumn,
   PaginationOptions,
 } from './types';
 import {
@@ -22,7 +21,7 @@ import {
   DEFAULT_PAGINATION_OPTIONS,
   MAX_ENTRIES_PER_QUERY,
 } from './constants';
-import useDataGridColumns from './use-data-grid-columns';
+import useDataGridColumnManager from './use-data-grid-column-manager';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
 
@@ -31,7 +30,6 @@ export interface DataGridProps {
   indexPattern: IndexPattern;
   results: SearchResponse;
   defaultColumns: DataGridColumn[];
-  renderColumns?: DataGridRenderColumn[];
   ariaLabelledBy: string;
   pagination?: Partial<EuiDataGridProps['pagination']>;
   leadingControlColumns?: EuiDataGridProps['leadingControlColumns'];
@@ -46,7 +44,6 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     indexPattern,
     results,
     defaultColumns,
-    renderColumns,
     trailingControlColumns,
     pagination: defaultPagination,
     leadingControlColumns,
@@ -128,18 +125,6 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
         return column.render(fieldFormatted, rowsParsed[relativeRowIndex]);
       }
 
-      // check if column have render method in renderColumns prop
-      const renderColumn = renderColumns?.find(
-        column => column.id === columnId,
-      );
-
-      if (renderColumn) {
-        return renderColumn.render(
-          fieldFormatted,
-          rowsParsed[relativeRowIndex],
-        );
-      }
-
       // Format the value using the field formatter
       // https://github.com/opensearch-project/OpenSearch-Dashboards/blob/2.19.1/src/plugins/discover/public/application/components/data_grid/data_grid_table_cell_value.tsx#L80-L89
       const formattedValue = indexPattern.formatField(
@@ -216,7 +201,7 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
   }, [appId]);
 
   const { columnsAvailable, columns, columnVisibility, onColumnResize } =
-    useDataGridColumns({
+    useDataGridColumnManager({
       appId,
       defaultColumns,
       columnSchemaDefinitionsMap,

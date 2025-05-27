@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import useDataGridColumns from './use-data-grid-columns';
+import useDataGridColumns from './use-data-grid-column-manager';
 import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { DataGridColumn } from './types';
 

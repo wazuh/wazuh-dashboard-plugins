@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
 
-const DocDetailsHeader = ({ _doc, _indexPattern }) => (
+const DocDetailsHeader = () => (
   <EuiFlexGroup>
     <EuiFlexItem>
       <EuiTitle>

@@ -60,7 +60,7 @@ const StickyDataGrid: React.FC<StickyGridViewProps> = ({
       {/* STICKY COMPONENTS - Left side columns */}
       {columns.length > 0 && renderCheckboxRow && (
         <StickyCheckboxColumn
-          maxRows={agentsRows.length}
+          maxRows={agentsRows?.length}
           renderCheckboxRow={renderCheckboxRow}
           style={stickyColumnStyle}
           ref={checkboxColumnRef}

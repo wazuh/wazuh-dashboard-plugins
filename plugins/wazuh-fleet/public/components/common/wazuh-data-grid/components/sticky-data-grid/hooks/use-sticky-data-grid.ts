@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { StickyDataGridProps } from '../types/sticky-data-grid.types';
 import { useFullScreenGrid } from './useFullScreenGrid';
-
+import { DataGridColumn } from '../../../../data-grid/types';
 /**
  * Custom hook that manages the sticky behavior and dimensions of a data grid
  * @description
@@ -9,12 +9,12 @@ import { useFullScreenGrid } from './useFullScreenGrid';
  * It manages column widths, row heights, and popover states while providing responsive
  * behavior through window resize and DOM mutation observations.
  *
- * @param {StickyDataGridProps} props - Props object for the sticky data grid
- * @returns {Object} An object containing grid references, dimensions, and control functions
+ * @param {DataGridColumn} props - Props object for the sticky data grid
+ * @returns {StickyDataGridProps} An object containing grid references, dimensions, and control functions
  */
 export const useStickyDataGrid = ({
   columns
-}: StickyDataGridProps) => {
+}: DataGridColumn[]): StickyDataGridProps => {
   const [dataGridControlsHeight, setDataGridControlsHeight] = useState(61.8);
   const gridRef = useRef<HTMLDivElement>(null);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);

@@ -1,4 +1,5 @@
 import { EuiDataGridColumn, EuiDataGridRowHeightsOptions, EuiDataGridSorting } from '@elastic/eui';
+import { DataGridColumn } from '../../../../data-grid/types';
 
 // Interfaces for sticky component props
 export interface StickyInspectColumnProps {
@@ -68,6 +69,7 @@ export interface DataGridProps {
  * @description Specific props for sticky components
  */
 export interface StickyDataGridProps {
+  columns: DataGridColumn[];
   gridRef: React.RefObject<HTMLDivElement>;
   actionPopoverOpen: number | null;
   toggleActionPopover: (index: number) => void;

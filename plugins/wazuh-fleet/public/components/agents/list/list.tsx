@@ -27,7 +27,7 @@ import {
 } from '../../../../../../src/plugins/data/common';
 import { AGENTS_SUMMARY_ID } from '../../../groups/agents/applications';
 import { AGENTS_ID } from '../../../groups/agents/constants';
-import { agentsTableColumns } from './columns';
+import { agentsTableColumns } from './columns/index';
 import { AgentsVisualizations } from './visualizations';
 import { EditAgentGroupsModal } from './actions/edit-groups-modal';
 import { UpgradeAgentModal } from './actions/upgrade-agent-modal';

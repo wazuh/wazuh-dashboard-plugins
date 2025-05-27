@@ -19,7 +19,20 @@ export interface DataGridColumnsReturn {
   onColumnResize: EuiDataGridProps['onColumnResize'];
 }
 
-function useDataGridColumns({
+/**
+ * Hook to manage columns of an EuiDataGrid component
+ *
+ * This hook is responsible for:
+ * - Managing which columns are visible and in what order
+ * - Persisting user preferences (visible columns and widths) in localStorage
+ * - Ensuring important columns (like "name") maintain specific positions
+ * - Handling column resizing
+ * - Filtering columns that should always be visible
+ *
+ * @param {UseDataGridColumnsProps} props - Properties to configure the column manager
+ * @returns {DataGridColumnsReturn} Object with properties and methods to manage columns
+ */
+export default function useDataGridColumnManager({
   appId,
   defaultColumns,
   columnSchemaDefinitionsMap,
@@ -215,5 +228,3 @@ function useDataGridColumns({
     onColumnResize,
   };
 }
-
-export default useDataGridColumns;
