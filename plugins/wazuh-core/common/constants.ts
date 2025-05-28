@@ -1696,41 +1696,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       SettingsValidator.isNotEmptyString,
     ),
   },
-  'fim.pattern': {
-    title: 'Index pattern',
-    description: 'Default index pattern to use for file integrity monitoring.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.FIM,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_FIM_PATTERN,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: false,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noLiteralString('.', '..'),
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-      ),
-    ),
-  },
   'fim_files.pattern': {
     title: 'Index pattern',
     description: 'Default index pattern to use for file integrity monitoring.',

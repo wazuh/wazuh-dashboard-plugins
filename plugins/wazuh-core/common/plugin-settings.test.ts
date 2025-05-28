@@ -141,23 +141,6 @@ describe('[settings] Input validation', () => {
     ${'enrollment.password'}                       | ${'test'}                                                              | ${undefined}
     ${'enrollment.password'}                       | ${''}                                                                  | ${'Value can not be empty.'}
     ${'enrollment.password'}                       | ${'test space'}                                                        | ${undefined}
-    ${'fim.pattern'}                               | ${'test'}                                                              | ${undefined}
-    ${'fim.pattern'}                               | ${'test*'}                                                             | ${undefined}
-    ${'fim.pattern'}                               | ${''}                                                                  | ${'Value can not be empty.'}
-    ${'fim.pattern'}                               | ${'test space'}                                                        | ${'No whitespaces allowed.'}
-    ${'fim.pattern'}                               | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
-    ${'fim.pattern'}                               | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
-    ${'fim.pattern'}                               | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
-    ${'fim.pattern'}                               | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
-    ${'fim.pattern'}                               | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'fim.pattern'}                               | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'fim.pattern'}                               | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'fim.pattern'}                               | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'fim.pattern'}                               | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'fim.pattern'}                               | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'fim.pattern'}                               | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'fim.pattern'}                               | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'fim.pattern'}                               | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
     ${'fim_files.pattern'}                         | ${'test'}                                                              | ${undefined}
     ${'fim_files.pattern'}                         | ${'test*'}                                                             | ${undefined}
     ${'fim_files.pattern'}                         | ${''}                                                                  | ${'Value can not be empty.'}
