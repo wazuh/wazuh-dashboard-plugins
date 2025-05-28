@@ -11,7 +11,6 @@ import { withSystemInventoryHardwareDataSource } from '../../../../it-hygiene/co
 import { withFIMFilesDataSource } from '../../../common/hocs/validate-fim-states-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
 import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../../../common/constants';
-import { filesEventsDocumentDetailsTab } from '../../inventory';
 import { compose } from 'redux';
 import { withAgent } from '../hocs';
 
@@ -29,11 +28,6 @@ export const InventoryFIMFiles = compose(
       tableId='fim-files-inventory'
       indexPattern={props.indexPattern}
       categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
-      additionalDocumentDetailsTabs={({ document }) => {
-        return [
-          filesEventsDocumentDetailsTab({ document, agent: props.agent }),
-        ];
-      }}
     />
   );
 });

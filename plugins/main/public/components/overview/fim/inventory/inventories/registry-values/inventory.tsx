@@ -13,7 +13,6 @@ import { InventoryDashboardTable } from '../../../../../common/dashboards';
 import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../../../common/constants';
 import { compose } from 'redux';
 import { withAgent } from '../hocs';
-import { registriesEventsDocumentDetailsTab } from '../../inventory';
 
 export const InventoryFIMRegistryValues = compose(
   withAgent,
@@ -29,11 +28,6 @@ export const InventoryFIMRegistryValues = compose(
       tableId='fim-registry-values-inventory'
       indexPattern={props.indexPattern}
       categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
-      additionalDocumentDetailsTabs={({ document }) => {
-        return [
-          registriesEventsDocumentDetailsTab({ document, agent: props.agent }),
-        ];
-      }}
     />
   );
 });
