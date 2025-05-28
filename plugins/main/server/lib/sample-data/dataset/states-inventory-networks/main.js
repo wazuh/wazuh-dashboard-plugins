@@ -8,7 +8,7 @@ function generateRandomNetwork() {
     ip: random.ip(),
     metric: random.int(1, 100),
     netmask: random.ip(),
-    protocol: random.choice(['TCP', 'UDP', 'ICMP']),
+    type: random.choice(['ipv4', 'ipv6']),
   };
 }
 
