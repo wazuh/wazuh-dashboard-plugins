@@ -17,7 +17,7 @@ import { getAgentManagement } from '../../../plugin-services';
 import { SearchBarProps } from '../../../../../wazuh-core/public/components';
 import WazuhDataGrid from '../wazuh-data-grid/wz-data-grid';
 import { agentsTableSelection } from '../../agents/list/actions/actions';
-import { DEFAULT_PAGE_SIZE_OPTIONS } from '../data-grid/constants';
+import { DEFAULT_PAGE_SIZE_OPTIONS, DATA_GRID_MODE_STICKY } from '../data-grid/constants';
 import useSearchBar, {
   TUseSearchBarProps,
 } from './components/search-bar/use-search-bar';
@@ -240,6 +240,7 @@ export const TableIndexer: React.FC<TableIndexerProps> = props => {
       {topTableComponent && topTableComponent(searchBarProps)}
       <EuiFlexItem>
         <WazuhDataGrid
+          dataGridMode={DATA_GRID_MODE_STICKY}
           filters={filters}
           addFilters={addFilters}
           appId={appId}

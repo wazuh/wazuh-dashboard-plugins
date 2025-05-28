@@ -17,7 +17,8 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
   const { indexPattern, results, defaultColumns, isLoading, onChangeSorting, onChangePagination, appId } = props;
   const [inspectedHit, setInspectedHit] = useState<any>();
   const timeField = indexPattern?.timeFieldName;
-  const dataGridProps = useDataGrid({ ...props, ariaLabelledBy: 'Actions data grid', });
+
+  const dataGridProps = useDataGrid({ ...props, ariaLabelledBy: 'Actions data grid', setInspectedHit });
   const stickyProps = useStickyDataGrid({ columns: dataGridProps.columns });
 
   useEffect(() => {

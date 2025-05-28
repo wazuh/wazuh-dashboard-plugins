@@ -183,16 +183,16 @@ $actions-width: 40px;
 /* Sticky columns configuration in container */
 .sticky-grid-container {
   /* Sticky checkbox column */
-  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-checkbox"],
-  .euiDataGridRowCell[data-test-subj="dataGridRowCell-checkbox"] {
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-checkbox-sticky"],
+  .euiDataGridRowCell[data-test-subj="dataGridRowCell-checkbox-sticky"] {
     position: sticky !important;
     left: 0;
     z-index: 2;
   }
 
   /* Sticky inspect column */
-  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-inspect"],
-  .euiDataGridRowCell[data-test-subj="dataGridRowCell-inspect"] {
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-inspect-sticky"],
+  .euiDataGridRowCell[data-test-subj="dataGridRowCell-inspect-sticky"] {
     position: sticky !important;
     left: $checkbox-width;
     z-index: 2;
@@ -211,8 +211,8 @@ $actions-width: 40px;
   }
 
   /* Higher z-index for header cells */
-  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-checkbox"],
-  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-inspect"] {
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-checkbox-sticky"],
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-inspect-sticky"] {
     z-index: 3;
   }
 
@@ -223,8 +223,8 @@ $actions-width: 40px;
   }
 
   /* Sticky actions column on the right */
-  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-actions"],
-  .euiDataGridRowCell[data-test-subj="dataGridRowCell-actions"] {
+  .euiDataGridHeaderCell[data-test-subj="dataGridHeaderCell-actions-sticky"],
+  .euiDataGridRowCell[data-test-subj="dataGridRowCell-actions-sticky"] {
     position: sticky !important;
     right: 0;
     z-index: 2;

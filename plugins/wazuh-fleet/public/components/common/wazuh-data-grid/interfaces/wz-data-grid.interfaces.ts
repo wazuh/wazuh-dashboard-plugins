@@ -37,4 +37,5 @@ export interface TWazuhDataGridProps {
     }>;
     filters?: Filter[];
     addFilters?: (filters: Filter[]) => void;
+    dataGridMode?: 'sticky'|'normal';
 }

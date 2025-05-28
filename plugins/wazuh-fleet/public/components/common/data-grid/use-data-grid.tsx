@@ -2,6 +2,9 @@ import {
   EuiDataGridProps,
   EuiDataGridSorting,
   EuiDataGridColumn,
+  EuiToolTip,
+  EuiButtonIcon,
+  EuiDataGridCellValueElementProps
 } from '@elastic/eui';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
@@ -36,6 +39,10 @@ export interface DataGridProps {
   trailingControlColumns?: EuiDataGridProps['trailingControlColumns'];
   filters?: Filter[];
   addFilters?: (filters: Filter[]) => void;
+  setInspectedHit?: (hit: any) => void;
+  dataGridMode?: 'sticky' | 'default';
+  setInspectedHit?: (hit: any) => void;
+  dataGridMode?: 'sticky' | 'default';
 }
 
 export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
@@ -49,6 +56,8 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     leadingControlColumns,
     filters = [],
     addFilters = () => {},
+    setInspectedHit,
+    dataGridMode
   } = props;
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
@@ -208,6 +217,43 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
       indexPatternExists: !!indexPattern,
     });
 
+    const leadingControlColumnsByDataGridMode = useMemo(() => {
+      if(dataGridMode === 'sticky') {
+        return (leadingControlColumns || []).filter(controlColumn => controlColumn.id.includes('sticky'));
+      } else {
+        const leadingControlColumnsDefault = [
+          ...(leadingControlColumns || []),
+          {
+            id: 'inspectCollapseColumn',
+            headerCellRender: () => null,
+            rowCellRender: (props: EuiDataGridCellValueElementProps) =>
+              <EuiToolTip content={'Inspect document details'}>
+                <EuiButtonIcon
+                  onClick={() => setInspectedHit(rowsRef.current[props.rowIndex] || undefined)}
+                  iconType='inspect'
+                  aria-label={'Inspect document details'}
+                />
+              </EuiToolTip>,
+            width: 40,
+          },
+        ]
+        return leadingControlColumnsDefault.filter(controlColumn => !controlColumn.id.includes('sticky'));
+      }
+  }, [dataGridMode, rowsRef, results]);
+
+  const trailingControlColumnsByDataGridMode = useMemo(() => {
+    if(dataGridMode ==='sticky') {
+      return trailingControlColumns.map(controlColumn =>{
+        if(!controlColumn.id.includes('sticky')){
+          controlColumn.id += '-sticky'
+        }
+        return controlColumn;
+        });
+    } else {
+      return (trailingControlColumns || []).filter(controlColumn => !controlColumn.id.includes('sticky'));
+    }
+  }, [dataGridMode])
+
   return {
     'aria-labelledby': props.ariaLabelledBy,
     columnsAvailable, // This is a custom property used by the Available fields and is not part of EuiDataGrid component specification
@@ -215,8 +261,9 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
     columnVisibility,
     onColumnResize,
     renderCellValue: renderCellValue,
-    trailingControlColumns,
-    leadingControlColumns,
+    //trailingControlColumns,
+     trailingControlColumns: trailingControlColumnsByDataGridMode,
+    leadingControlColumns: leadingControlColumnsByDataGridMode,
     rowCount: Math.min(rowCount, MAX_ENTRIES_PER_QUERY),
     sorting: { columns: sortingColumns, onSort },
     pagination: {
@@ -225,5 +272,6 @@ export const useDataGrid = (props: DataGridProps): EuiDataGridProps => {
       onChangePage: onChangePage,
     },
     setPagination,
+    dataGridMode
   } as EuiDataGridProps;
 };

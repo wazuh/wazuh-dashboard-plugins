@@ -10,3 +10,5 @@ export const DEFAULT_PAGINATION_OPTIONS = {
   pageSizeOptions: DEFAULT_PAGE_SIZE_OPTIONS,
 } as const satisfies PaginationOptions;
 export const ALWAYS_VISIBLE_COLUMNS = ['agent.name'];
+
+export const DATA_GRID_MODE_STICKY = 'sticky';

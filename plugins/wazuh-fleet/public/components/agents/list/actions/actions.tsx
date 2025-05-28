@@ -178,23 +178,31 @@ export const actionsButtons = ({
   },
 ];
 
+// IDs with 'sticky' will remain in the datagrid's sticky mode
 export const agentsTableSelection = ({
   items,
   onClickSelectAll,
   onClickSelectRow,
 }): EuiDataGridControlColumn[] => [
   {
-    id: 'checkbox',
+    id: 'checkbox-sticky',
     width: 32,
     headerCellRender: row =>
       SelectionHeaderCell({ row, items, onClickSelectAll, onClickSelectRow }),
-     rowCellRender: () => null,
+    rowCellRender: () => null,
     rowStickyCellRender: row => SelectionRowCell({ row, items, onClickSelectRow }),
   },
   {
-    id: 'inspect',
+    id: 'inspect-sticky',
     width: 36,
     headerCellRender: () => null,
     rowCellRender: () => null,
-  }
+  },
+  {
+    id: 'selection',
+    width: 32,
+    headerCellRender: row =>
+      SelectionHeaderCell({ row, items, onClickSelectAll, onClickSelectRow }),
+    rowCellRender: row => SelectionRowCell({ row, items, onClickSelectRow }),
+  },
 ];
