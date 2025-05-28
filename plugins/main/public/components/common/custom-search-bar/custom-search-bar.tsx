@@ -41,9 +41,9 @@ export type CustomSearchBarProps = {
   fixedFilters: Filter[];
   setFilters: (filters: tFilter[]) => void;
   filterInputsProps: CommonProps &
-    EuiFlexItemProps & {
-      style: HTMLAttributes<HTMLDivElement | HTMLSpanElement>['style'];
-    };
+  EuiFlexItemProps & {
+    style: HTMLAttributes<HTMLDivElement | HTMLSpanElement>['style'];
+  };
 };
 
 const frozenFilterDrillDownValue = Object.freeze({ field: '', value: '' });
@@ -228,7 +228,7 @@ export const CustomSearchBar = ({
 
   return (
     <I18nProvider>
-      <div style={{ margin: '20px 20px 0px 20px' }}>
+      <div>
         <WzSearchBar
           {...searchBarProps}
           fixedFilters={fixedFilters}

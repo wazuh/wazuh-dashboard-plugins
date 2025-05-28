@@ -105,9 +105,8 @@ const ITHygieneInventoryDashboard = ({
             <DiscoverNoResults />
           ) : null}
           <div
-            className={`wz-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls ${
-              dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-            }`}
+            className={`wz-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+              }`}
           >
             <SampleDataWarning
               categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
