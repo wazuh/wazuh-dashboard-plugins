@@ -1,7 +1,7 @@
 export default [
   {
     type: 'multiSelect',
-    key: 'network.name',
+    key: 'interface.name',
     placeholder: 'Name',
   },
   {

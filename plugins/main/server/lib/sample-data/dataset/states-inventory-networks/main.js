@@ -1,19 +1,20 @@
 const random = require('../../lib/random');
 const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
-function generateRandomInterface() {
-  return `name${random.int(0, 9999)}`;
-}
-
 function generateRandomNetwork() {
   return {
     broadcast: random.ip(),
     dhcp: random.boolean(),
     ip: random.ip(),
     metric: random.int(1, 100),
-    name: generateRandomInterface(),
     netmask: random.ip(),
     protocol: random.choice(['TCP', 'UDP', 'ICMP']),
+  };
+}
+
+function generateRandomInterface() {
+  return {
+    name: `name${random.int(0, 9999)}`,
   };
 }
 
@@ -23,6 +24,7 @@ function generateDocument(params) {
     '@timestamp': random.date(),
     agent: generateRandomAgent(),
     network: generateRandomNetwork(),
+    interface: generateRandomInterface(),
     wazuh: generateRandomWazuh(params),
   };
 }
