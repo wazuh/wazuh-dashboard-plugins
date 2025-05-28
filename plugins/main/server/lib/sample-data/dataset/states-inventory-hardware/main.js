@@ -24,7 +24,6 @@ function generateRandomHostHardware() {
 function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
-    '@timestamp': random.date(),
     agent: generateRandomAgent(),
     host: generateRandomHostHardware(),
     wazuh: generateRandomWazuh(params),

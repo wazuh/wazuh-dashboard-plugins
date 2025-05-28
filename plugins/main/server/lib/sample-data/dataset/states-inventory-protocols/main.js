@@ -22,7 +22,6 @@ function generateRandomObserver() {
 
 function generateDocument(params) {
   return {
-    '@timestamp': random.date(),
     agent: generateRandomAgent(),
     network: generateRandomNetwork(),
     observer: generateRandomObserver(),
