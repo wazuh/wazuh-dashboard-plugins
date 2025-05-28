@@ -110,7 +110,7 @@ export function getImplicitFilters({ file }: { file: string }) {
       AppState.getCurrentPattern(),
     ),
     /* WORKAROUND: this uses a wildcard query, because the alerts contain a prefix related
-      to the hive (HKEY_LOCAL_MACHINE, etc...), that is not included in the registr.key used
+      to the hive (HKEY_LOCAL_MACHINE, etc...), that is not included in the registry.key used
       as "file" parameter of this method. The registry.hive of inventory data includes a reference
       to the hive but this uses an acronym (HKLM instead of HKEY_LOCAL_MACHINE) in the current
       state, so we could not rebuild the expected syscheck.path in the alert. This should be
