@@ -212,9 +212,9 @@ export const InventoryMetrics = withSystemInventoryDataSource(
         style: { maxWidth: 100 },
       },
       {
-        key: 'board-serial',
-        label: 'Board serial',
-        value: data?.hardware?.observer?.serial_number,
+        key: 'serial_number',
+        label: 'Serial number',
+        value: data?.hardware?.host?.serial_number,
         isLoading: isLoading,
         style: { maxWidth: 100 },
       },

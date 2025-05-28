@@ -6,7 +6,7 @@
       "index": {
         "number_of_replicas": "0",
         "number_of_shards": "1",
-        "query.default_field": ["observer.board_serial"],
+        "query.default_field": ["host.serial_number"],
         "refresh_interval": "5s"
       }
     },
@@ -46,6 +46,10 @@
         },
         "host": {
           "properties": {
+            "serial_number": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "cpu": {
               "properties": {
                 "cores": {
@@ -74,14 +78,6 @@
                 }
               },
               "type": "object"
-            }
-          }
-        },
-        "observer": {
-          "properties": {
-            "serial_number": {
-              "ignore_above": 1024,
-              "type": "keyword"
             }
           }
         },

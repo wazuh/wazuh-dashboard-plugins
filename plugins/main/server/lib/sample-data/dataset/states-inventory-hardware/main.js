@@ -1,8 +1,13 @@
 const random = require('../../lib/random');
 const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
+function generateRandomSerialNumber() {
+  return `serial${random.int(0, 9999)}`;
+}
+
 function generateRandomHostHardware() {
   return {
+    serial_number: generateRandomSerialNumber(),
     cpu: {
       cores: random.int(1, 16),
       name: `CPU${random.int(1, 999)}`,
@@ -16,17 +21,12 @@ function generateRandomHostHardware() {
   };
 }
 
-function generateRandomObserver() {
-  return { serial_number: `serial${random.int(0, 9999)}` };
-}
-
 function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
     '@timestamp': random.date(),
     agent: generateRandomAgent(),
     host: generateRandomHostHardware(),
-    observer: generateRandomObserver(),
     wazuh: generateRandomWazuh(params),
   };
 }
