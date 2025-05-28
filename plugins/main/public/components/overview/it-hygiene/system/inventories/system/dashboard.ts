@@ -82,7 +82,7 @@ export const getOverviewSystemSystemTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.os.platform',
-      'Platform',
+      'Top 5 platforms',
       'it-hygiene-system',
       'Platforms',
     ),
