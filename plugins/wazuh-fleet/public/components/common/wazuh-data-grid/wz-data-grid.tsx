@@ -36,9 +36,7 @@ const WazuhDataGrid = (props: TWazuhDataGridProps) => {
     results, sorting: dataGridProps.sorting
   });
 
-  const [selectedRows, dispatchRowSelection] = useRowSelection(
-    () => { }, results
-  );
+  const [selectedRows, dispatchRowSelection] = useRowSelection(results);
 
   if (isLoading || results?.hits?.total === undefined) return <LoadingSpinner />;
   if (!isLoading && results?.hits?.total === 0) return <DiscoverNoResults timeField={timeField} queryLanguage={''} />;

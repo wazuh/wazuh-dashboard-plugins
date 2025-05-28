@@ -1,8 +1,8 @@
 import { useReducer } from 'react';
 
-export const useRowSelection = (onClickSelectRow: (selection: Set<any>) => void, results: any) => {
+export const useRowSelection = (results: any) => {
   return useReducer(
-    (rowSelection: Set<any>, { action, rowData }: any) => {
+    (rowSelection: Set<any>, { action, rowData, onClickSelectRow }: any) => {
       let next = new Set(rowSelection);
 
       switch (action) {
