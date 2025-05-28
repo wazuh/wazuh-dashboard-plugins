@@ -105,12 +105,12 @@ export const WAZUH_MODULES = {
     description:
       'Explore security alerts mapped to adversary tactics and techniques for better threat understanding.',
   },
-  syscollector: {
-    title: 'Inventory data',
+  'system-inventory': {
+    title: 'System inventory',
     // This appId is not used, for consistency was added.
-    appId: 'endpoint-summary',
+    appId: 'system-inventory',
     description:
-      'Applications, network configuration, open ports and processes running on your monitored systems.',
+      'Networks, interfaces, protocols, processes, ports, packages, hotfixes, system and hardware information of your monitored endpoints.',
   },
   stats: {
     title: 'Stats',
@@ -148,6 +148,11 @@ export const WAZUH_MODULES = {
     appId: 'github',
     description:
       'Monitoring events from audit logs of your GitHub organizations.',
+  },
+  'it-hygiene': {
+    title: 'IT Hygiene',
+    appId: 'it-hygiene',
+    description: 'Collect data about the system inventory.',
   },
   devTools: {
     title: 'API console',

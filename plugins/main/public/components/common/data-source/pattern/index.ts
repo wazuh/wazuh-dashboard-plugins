@@ -4,4 +4,6 @@ export * from './pattern-data-source-factory';
 export * from './pattern-data-source-selector';
 export * from './pattern-data-source-filter-manager';
 export * from './alerts';
+export * from './fim';
+export * from './system-inventory';
 export * from './vulnerabilities';

@@ -9,8 +9,15 @@ jest.mock('../../services', () => ({
 
 jest.mock('../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({
-    handleError: () => { },
+    handleError: () => {},
   }),
+}));
+
+// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
+// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
+
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
 }));
 
 describe('UpgradeAgentModal component', () => {
@@ -22,11 +29,11 @@ describe('UpgradeAgentModal component', () => {
           name: 'agent1',
           version: 'v4.8.0',
           group: ['default'],
-          os: { name: 'Ubuntu', uname: 'Linux', platform: 'ubuntu' }
+          os: { name: 'Ubuntu', uname: 'Linux', platform: 'ubuntu' },
         }}
-        onClose={() => { }}
-        reloadAgents={() => { }}
-        setIsUpgradePanelClosed={() => { }}
+        onClose={() => {}}
+        reloadAgents={() => {}}
+        setIsUpgradePanelClosed={() => {}}
       />,
     );
 
@@ -44,7 +51,6 @@ describe('UpgradeAgentModal component', () => {
     const os = getByText('Ubuntu');
     expect(os).toBeInTheDocument();
 
-
     const saveButton = getByRole('button', { name: 'Upgrade' });
     expect(saveButton).toBeInTheDocument();
 
@@ -60,11 +66,11 @@ describe('UpgradeAgentModal component', () => {
           name: 'agent1',
           version: 'v4.8.0',
           group: ['default'],
-          os: { name: 'Ubuntu', uname: 'Linux', platform: 'ubuntu' }
+          os: { name: 'Ubuntu', uname: 'Linux', platform: 'ubuntu' },
         }}
-        onClose={() => { }}
-        reloadAgents={() => { }}
-        setIsUpgradePanelClosed={() => { }}
+        onClose={() => {}}
+        reloadAgents={() => {}}
+        setIsUpgradePanelClosed={() => {}}
       />,
     );
 

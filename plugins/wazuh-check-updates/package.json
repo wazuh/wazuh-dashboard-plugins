@@ -8,7 +8,8 @@
   "description": "Wazuh Check Updates",
   "private": true,
   "resolutions": {
-    "**/follow-redirects": "^1.15.6"
+    "**/follow-redirects": "^1.15.6",
+    "cross-spawn": "^7.0.5"
   },
   "scripts": {
     "build": "yarn plugin-helpers build --opensearch-dashboards-version=$OPENSEARCH_DASHBOARDS_VERSION",
@@ -23,7 +24,7 @@
     "knip": "knip --files"
   },
   "dependencies": {
-    "axios": "^1.7.4",
+    "axios": "^1.1.3",
     "md5": "^2.3.0",
     "node-cron": "^3.0.2"
   },
