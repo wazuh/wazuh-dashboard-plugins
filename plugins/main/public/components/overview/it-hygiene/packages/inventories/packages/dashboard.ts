@@ -1,7 +1,6 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import {
   getVisStateMetricUniqueCountByField,
-  getVisStateHorizontalBarByField,
 } from '../../../common/saved-vis/generators';
 
 import { STYLE } from '../../../common/saved-vis/constants';

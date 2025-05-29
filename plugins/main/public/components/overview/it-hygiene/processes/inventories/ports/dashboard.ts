@@ -131,7 +131,7 @@ const getVisStateUDPOnlyTransportsMetric = (
                   query: 'network.transport:"UDP"',
                   language: 'kuery',
                 },
-                label: 'Protocols',
+                label: 'Transport Protocols',
               },
             ],
           },
@@ -147,9 +147,9 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'destination.port',
-      'Top 5 local ports',
+      'Top 5 source ports',
       'it-hygiene-ports',
-      'Local ports',
+      'Source ports',
     ),
     getVisStateDonutByField(
       indexPatternId,
@@ -160,7 +160,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
     getVisStateDonutByField(
       indexPatternId,
       'network.transport',
-      'Protocols',
+      'Transport protocols',
       'it-hygiene-ports',
     ),
     getVisStateHorizontalBarByField(
