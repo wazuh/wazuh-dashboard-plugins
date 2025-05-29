@@ -140,18 +140,18 @@ export const RegisterAgent = compose(
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const wazuhVersion = await getWazuhVersion();
-        const { auth: authConfig } = await getMasterConfig();
+        const [wazuhVersion, masterConfig, groups] = await Promise.all([
+          getWazuhVersion(),
+          getMasterConfig(),
+          getGroups(),
+        ]);
+        const { auth: authConfig } = masterConfig;
         // get wazuh password configuration
         let wazuhPassword = '';
         const needsPassword = authConfig?.auth?.use_password === 'yes';
         if (needsPassword) {
-          wazuhPassword =
-            configuration?.['enrollment.password'] ||
-            authConfig?.['authd.pass'] ||
-            '';
+          wazuhPassword = authConfig?.['authd.pass'] || '';
         }
-        const groups = await getGroups();
         setNeedsPassword(needsPassword);
         setWazuhPassword(wazuhPassword);
         setWazuhVersion(wazuhVersion);
