@@ -842,10 +842,10 @@ eslint-plugin-cypress@^2.12.1:
   dependencies:
     globals "^13.20.0"
 
-eslint-plugin-filenames-simple@^0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-filenames-simple/-/eslint-plugin-filenames-simple-0.8.0.tgz#71fb9fc975f5e12835bf9b58fa11a06ad0933432"
-  integrity sha512-8+uBzNBE5gSUMQv7bmMBiOD26eKzD4/5flPtD5Vl3dzZLXotSwXK3W7ZZqKQfU0Qyoborh+LqbN76EfmbBcU8A==
+eslint-plugin-filenames-simple@^0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-filenames-simple/-/eslint-plugin-filenames-simple-0.9.0.tgz#15e1afc65ed52e894132f561f8b41822603d727f"
+  integrity sha512-eIs+fIO/YXjjlNRdMK3H2HiF0BJ6zj3Of1+REBMnHMbqqgxX1VReIV/gf+ZfP3/bbCAHk5PE3SXi7Fjt3uzUGw==
   dependencies:
     pluralize "^8.0.0"
 

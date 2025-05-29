@@ -23,7 +23,7 @@ describe('AgentStatus component', () => {
       );
 
       expect(wrapper).toMatchSnapshot();
-      expect(wrapper.find('svg').prop('style')).toHaveProperty(
+      expect(wrapper.find('span').eq(1).attr()).toHaveProperty(
         'color',
         input.color,
       );

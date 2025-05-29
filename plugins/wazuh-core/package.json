@@ -3,7 +3,7 @@
   "version": "5.0.0",
   "revision": "00",
   "pluginPlatform": {
-    "version": "2.19.2"
+    "version": "3.0.0"
   },
   "description": "Wazuh Core",
   "private": true,
@@ -41,7 +41,7 @@
     "eslint-import-resolver-typescript": "3.5.5",
     "eslint-plugin-async-await": "^0.0.0",
     "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-filenames-simple": "^0.8.0",
+    "eslint-plugin-filenames-simple": "^0.9.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",

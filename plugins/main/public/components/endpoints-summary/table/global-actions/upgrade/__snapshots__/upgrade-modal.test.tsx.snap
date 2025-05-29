@@ -1,8 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`UpgradeAgentsModal component should return the component 1`] = `
-<div
-  aria-hidden="true"
-  data-aria-hidden="true"
-/>
-`;
+exports[`UpgradeAgentsModal component should return the component 1`] = `<div />`;

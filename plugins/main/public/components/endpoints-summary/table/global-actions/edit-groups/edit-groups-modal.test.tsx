@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import { useGetGroups } from '../../../hooks';
 import { EditAgentsGroupsModal } from './edit-groups-modal';
 import { Agent } from '../../../types';
+import { addAgentsToGroupService } from '../../../services';
 
 jest.mock('../../../services', () => ({
   addAgentsToGroupService: jest.fn(),
@@ -70,6 +71,12 @@ describe('EditAgentsGroupsModal component', () => {
       groups: ['default', 'group1', 'group2'],
     });
 
+    (addAgentsToGroupService as jest.Mock).mockResolvedValue({
+      data: {
+        success: true,
+      },
+    });
+
     const { getByText, getAllByText, getByRole } = render(
       <EditAgentsGroupsModal
         selectedAgents={[
@@ -90,17 +97,22 @@ describe('EditAgentsGroupsModal component', () => {
     const saveButton = getByRole('button', { name: 'Save' });
     expect(saveButton).toBeInTheDocument();
 
-    const select = getAllByText('Select groups to add')[0];
+    const select = getAllByText('Select groups to add')[1];
     expect(select).toBeInTheDocument();
 
-    act(() => {
+    await act(() => {
       fireEvent.click(select);
     });
 
-    await waitFor(() => expect(getByText('group1')).toBeInTheDocument());
+    await waitFor(() => {
+      expect(getByText('group1')).toBeInTheDocument();
+    });
 
-    act(() => {
+    await act(async () => {
       fireEvent.click(getByText('group1'));
+    });
+
+    await act(async () => {
       fireEvent.click(saveButton);
     });
   });

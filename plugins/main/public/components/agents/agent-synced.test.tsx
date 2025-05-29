@@ -8,7 +8,7 @@ describe('AgentStatus component', () => {
     const wrapper = render(<AgentSynced synced={AGENT_SYNCED_STATUS.SYNCED} />);
 
     expect(wrapper).toMatchSnapshot();
-    expect(wrapper.find('svg').prop('class')).toContain('euiIcon--success');
+    expect(wrapper.find('span').attr('color')).toContain('success');
     expect(wrapper[1].children[0].data).toEqual(AGENT_SYNCED_STATUS.SYNCED);
   });
 
@@ -18,7 +18,7 @@ describe('AgentStatus component', () => {
     );
 
     expect(wrapper).toMatchSnapshot();
-    expect(wrapper.find('svg').prop('class')).toContain('euiIcon--subdued');
+    expect(wrapper.find('span').attr('color')).toContain('subdued');
     expect(wrapper[1].children[0].data).toEqual(AGENT_SYNCED_STATUS.NOT_SYNCED);
   });
 });
