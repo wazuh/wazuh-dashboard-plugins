@@ -24,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added settings to manage the FIM and IT Hygiene inventories data [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
 - Added the ability to manage the sample data from FIM, IT Higiene and vulnerabilities inventories and new settings to define the index names prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449)
+- Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 
 ## Changed
 
@@ -42,13 +43,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed double backslash warning on xml editor [#7425](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7425)
-
-## Wazuh v4.12.2 - OpenSearch Dashboards 2.19.1 - Revision 00
-
-### Added
-
-- Support for Wazuh 4.12.2
-- Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 
 ## Wazuh v4.12.1 - OpenSearch Dashboards 2.19.1 - Revision 00
 
