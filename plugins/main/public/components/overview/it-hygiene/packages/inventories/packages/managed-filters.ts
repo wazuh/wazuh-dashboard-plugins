@@ -12,6 +12,6 @@ export default [
   {
     type: 'multiSelect',
     key: 'package.type',
-    placeholder: 'Version',
+    placeholder: 'Type',
   },
 ];
