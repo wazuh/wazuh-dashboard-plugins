@@ -35,20 +35,11 @@ exports[`Cluster settings should render the cluster settings 1`] = `
                 <span
                   class="euiButtonContent euiButtonEmpty__content"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                    />
-                  </svg>
+                  <span
+                    class="euiButtonContent__icon"
+                    color="inherit"
+                    data-euiicon-type="questionInCircle"
+                  />
                   <span
                     class="euiButtonEmpty__text"
                   />
@@ -420,20 +411,11 @@ exports[`Cluster settings should render the cluster settings with HAProxy helper
                 <span
                   class="euiButtonContent euiButtonEmpty__content"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12Zm0-1A5 5 0 1 0 8 3a5 5 0 0 0 0 10Zm-.186-1.065A.785.785 0 0 1 7 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815ZM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105Z"
-                    />
-                  </svg>
+                  <span
+                    class="euiButtonContent__icon"
+                    color="inherit"
+                    data-euiicon-type="questionInCircle"
+                  />
                   <span
                     class="euiButtonEmpty__text"
                   />
@@ -1277,21 +1259,10 @@ exports[`Cluster settings should render the error message when the cluster setti
         <div
           style="text-align: center;"
         >
-          <svg
-            aria-hidden="true"
-            class="euiIcon euiIcon--medium euiIcon-isLoading"
-            focusable="false"
-            height="16"
-            role="img"
+          <span
+            data-euiicon-type="help"
             style="margin-right: 4px;"
-            viewBox="0 0 16 16"
-            width="16"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-            />
-          </svg>
+          />
           <span>
             Configuration not available
           </span>
@@ -1309,20 +1280,11 @@ exports[`Cluster settings should render the error message when the cluster setti
                 <span
                   class="euiButtonContent euiButtonEmpty__content"
                 >
-                  <svg
-                    aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon--inherit euiButtonContent__icon"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12Zm0-1A5 5 0 1 0 8 3a5 5 0 0 0 0 10Zm-.186-1.065A.785.785 0 0 1 7 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815ZM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105Z"
-                    />
-                  </svg>
+                  <span
+                    class="euiButtonContent__icon"
+                    color="inherit"
+                    data-euiicon-type="questionInCircle"
+                  />
                   <span
                     class="euiButtonEmpty__text"
                   />
@@ -1342,20 +1304,9 @@ exports[`Cluster settings should render the error message when the cluster setti
           <div>
             <p>
               Click on the 
-              <svg
-                aria-hidden="true"
-                class="euiIcon euiIcon--medium"
-                focusable="false"
-                height="16"
-                role="img"
-                viewBox="0 0 16 16"
-                width="16"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M8 14A6 6 0 1 1 8 2a6 6 0 0 1 0 12Zm0-1A5 5 0 1 0 8 3a5 5 0 0 0 0 10Zm-.186-1.065A.785.785 0 0 1 7 11.12c0-.48.34-.82.814-.82.475 0 .809.34.809.82 0 .475-.334.815-.809.815ZM5.9 6.317C5.96 5.168 6.755 4.4 8.048 4.4c1.218 0 2.091.759 2.091 1.8 0 .736-.36 1.304-1.03 1.707-.56.33-.717.56-.717 1.022v.305l-.1.1H7.47l-.1-.1v-.431c-.005-.646.302-1.104.987-1.514.527-.322.708-.59.708-1.047 0-.536-.416-.91-1.05-.91-.652 0-1.064.374-1.112.998l-.1.092H6l-.1-.105Z"
-                />
-              </svg>
+              <span
+                data-euiicon-type="questionInCircle"
+              />
                icon for help. Check the documentation links to learn more about how to configure it.
             </p>
           </div>

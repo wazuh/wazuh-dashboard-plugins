@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from 'enzyme';
-import { AgentStatus } from './agent-status';
 import {
   UI_COLOR_AGENT_STATUS,
   UI_LABEL_NAME_AGENT_STATUS,
   UI_ORDER_AGENT_STATUS,
 } from '../../../common/constants';
+import { AgentStatus } from './agent-status';
 
 describe('AgentStatus component', () => {
   test.each(
@@ -23,7 +23,7 @@ describe('AgentStatus component', () => {
       );
 
       expect(wrapper).toMatchSnapshot();
-      expect(wrapper.find('svg').prop('style')).toHaveProperty(
+      expect(wrapper.find('span').eq(1).attr()).toHaveProperty(
         'color',
         input.color,
       );
