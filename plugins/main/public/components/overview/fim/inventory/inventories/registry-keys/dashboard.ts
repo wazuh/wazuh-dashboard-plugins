@@ -1,32 +1,43 @@
 import {
-  getVisStateDonutByField,
-  getVisStateHorizontalBarByField,
+  getVisStateHorizontalBarSplitSeries,
   getVisStateTableByField,
 } from '../../../../../../services/visualizations';
 import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-dashboard-panels-kpis';
 
 export const getDashboard = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.owner',
-      'Top 5 owners',
+      'Top 5 registry owners',
       'registry-keys-inventory',
-      { size: 5, otherBucket: true },
+      {
+        fieldSize: 5,
+        metricCustomLabel: 'Registry owner count',
+        valueAxesTitleText: 'Registry owner count',
+        fieldCustomLabel: 'Registry owner',
+        seriesLabel: 'Registry owner',
+      },
     ),
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.group',
       'Top 5 groups',
       'registry-keys-inventory',
-      { size: 5, otherBucket: true },
+      {
+        fieldSize: 5,
+        metricCustomLabel: 'Registry groups count',
+        valueAxesTitleText: 'Registry groups count',
+        fieldCustomLabel: 'Registry group',
+        seriesLabel: 'Registry group',
+      },
     ),
     getVisStateTableByField(
       indexPatternId,
       'registry.path',
-      'Top 5 paths',
+      '',
       'registry-keys-inventory',
-      { size: 3, fieldCustomLabel: 'Registry path' },
+      { size: 5, fieldCustomLabel: 'Top 5 registry paths' },
     ),
   ]);
 };

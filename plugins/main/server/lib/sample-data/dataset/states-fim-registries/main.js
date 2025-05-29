@@ -25,7 +25,7 @@ function generateRandomRegistry() {
     key: 'SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\winword.exe',
     mtime: random.date(),
     owner: `owner${random.int(0, 1000)}`,
-    path: '/path/to/file',
+    path: `/path/to/file_${random.int(0, 20)}`,
     size: random.int(1000, 1000000),
     uid: `uid${random.int(0, 1000)}`,
     value: `registry_value${random.int(0, 1000)}`,

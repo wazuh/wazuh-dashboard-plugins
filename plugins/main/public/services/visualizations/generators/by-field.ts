@@ -295,6 +295,159 @@ export const getVisStateHorizontalBarByField = (
     },
   };
 };
+export const getVisStateHorizontalBarSplitSeries = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  options: {
+    orderAggregation?: 'asc' | 'desc';
+    fieldSize?: number;
+    size?: number;
+    fieldCustomLabel?: string;
+    metricCustomLabel?: string;
+    valueAxesTitleText?: string;
+    seriesLabel?: string;
+    // Define the label, and if this exists, enable the other bucket
+    otherBucket?: boolean | string;
+    // Define the label, and if this exists, enable the missing bucket
+    missingBucket?: boolean | string;
+  } = {},
+) => {
+  const {
+    orderAggregation = 'desc',
+    fieldSize = 10,
+    size = 10,
+    fieldCustomLabel,
+    metricCustomLabel,
+    valueAxesTitleText = '',
+    seriesLabel = '',
+    otherBucket,
+    missingBucket,
+  } = options;
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title: title,
+    type: 'horizontal_bar',
+    params: {
+      addLegend: true,
+      addTimeMarker: false,
+      addTooltip: true,
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          labels: {
+            filter: false,
+            rotate: 0,
+            show: false,
+            truncate: 30,
+          },
+          position: 'left',
+          scale: {
+            type: 'linear',
+          },
+          show: false,
+          style: {},
+          title: {},
+          type: 'category',
+        },
+      ],
+      grid: {
+        categoryLines: false,
+      },
+      labels: {
+        show: false,
+      },
+      legendPosition: 'right',
+      seriesParams: [
+        {
+          data: {
+            id: '1',
+            label: seriesLabel,
+          },
+          drawLinesBetweenPoints: true,
+          lineWidth: 2,
+          mode: 'stacked',
+          show: true,
+          showCircles: true,
+          type: 'histogram',
+          valueAxis: 'ValueAxis-1',
+        },
+      ],
+      thresholdLine: {
+        color: '#E7664C',
+        show: false,
+        style: 'full',
+        value: size,
+        width: 1,
+      },
+      times: [],
+      type: 'histogram',
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          labels: {
+            filter: true,
+            rotate: 75,
+            show: true,
+            truncate: 100,
+          },
+          name: 'LeftAxis-1',
+          position: 'bottom',
+          scale: {
+            mode: 'normal',
+            type: 'linear',
+            defaultYExtents: false,
+          },
+          show: true,
+          style: {},
+          title: {
+            text: valueAxesTitleText,
+          },
+          type: 'value',
+        },
+      ],
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: metricCustomLabel, //'File owner count',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: field,
+            orderBy: '1',
+            order: orderAggregation,
+            size: fieldSize,
+            otherBucket: Boolean(otherBucket),
+            otherBucketLabel:
+              otherBucket && typeof otherBucket === 'boolean'
+                ? 'Other'
+                : otherBucket,
+            missingBucket: Boolean(missingBucket),
+            missingBucketLabel:
+              missingBucket && typeof missingBucket === 'boolean'
+                ? 'Missing'
+                : missingBucket,
+            customLabel: fieldCustomLabel,
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
 
 export const getVisStateMetricUniqueCountByField = (
   indexPatternId: string,

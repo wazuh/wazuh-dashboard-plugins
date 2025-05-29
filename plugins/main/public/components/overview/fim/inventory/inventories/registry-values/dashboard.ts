@@ -1,25 +1,30 @@
 import {
-  getVisStateDonutByField,
-  getVisStateHorizontalBarByField,
+  getVisStateHorizontalBarSplitSeries,
   getVisStateTableByField,
 } from '../../../../../../services/visualizations';
 import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-dashboard-panels-kpis';
 
 export const getDashboard = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.data.type',
       'Top 5 data type',
       'registry-values-inventory',
-      { size: 5 },
+      {
+        fieldSize: 5,
+        metricCustomLabel: 'Registry data type count',
+        valueAxesTitleText: 'Registry data type count',
+        fieldCustomLabel: 'Registry data type',
+        seriesLabel: 'Registry data type',
+      },
     ),
     getVisStateTableByField(
       indexPatternId,
       'registry.path',
-      'Top 5 paths',
+      '',
       'registry-values-inventory',
-      { size: 5, fieldCustomLabel: 'Registry path' },
+      { size: 5, fieldCustomLabel: 'Top 5 registry paths' },
     ),
   ]);
 };

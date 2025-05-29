@@ -1,14 +1,30 @@
-import { getVisStateDonutByField } from '../../../../../../services/visualizations';
+import {
+  getVisStateHorizontalBarSplitSeries,
+  getVisStateTableByField,
+} from '../../../../../../services/visualizations';
 import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-dashboard-panels-kpis';
 
 export const getDashboard = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'file.owner',
-      'Top 5 owners',
+      'Top 5 file owners',
       'fim-files-inventory',
-      { size: 5, otherBucket: true },
+      {
+        fieldSize: 5,
+        metricCustomLabel: 'File owner count',
+        valueAxesTitleText: 'File owner count',
+        seriesLabel: 'File owner count',
+        fieldCustomLabel: 'File owner',
+      },
+    ),
+    getVisStateTableByField(
+      indexPatternId,
+      'file.path',
+      '',
+      'fim-files-inventory',
+      { size: 5, fieldCustomLabel: 'Top 5 file paths' },
     ),
     // TODO: add another visualization, see https://github.com/wazuh/wazuh-dashboard-plugins/issues/7460#issuecomment-2912512333
   ]);
