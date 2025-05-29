@@ -6,11 +6,7 @@
       "index": {
         "number_of_replicas": "0",
         "number_of_shards": "1",
-        "query.default_field": [
-          "agent.id",
-          "agent.host.ip",
-          "observer.ingress.interface.name"
-        ],
+        "query.default_field": ["agent.id", "agent.host.ip", "interface.name"],
         "refresh_interval": "5s"
       }
     },
@@ -65,20 +61,11 @@
             }
           }
         },
-        "observer": {
+        "interface": {
           "properties": {
-            "ingress": {
-              "properties": {
-                "interface": {
-                  "properties": {
-                    "name": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                }
-              },
-              "type": "object"
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
             }
           }
         },

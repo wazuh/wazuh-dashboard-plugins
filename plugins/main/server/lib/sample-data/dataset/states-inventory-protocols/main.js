@@ -10,13 +10,9 @@ function generateRandomNetwork() {
   };
 }
 
-function generateRandomObserver() {
+function generateRandomInterface() {
   return {
-    ingress: {
-      interface: {
-        name: `interface${random.int(0, 100)}`,
-      },
-    },
+    name: `interface${random.int(0, 100)}`,
   };
 }
 
@@ -24,7 +20,7 @@ function generateDocument(params) {
   return {
     agent: generateRandomAgent(),
     network: generateRandomNetwork(),
-    observer: generateRandomObserver(),
+    interface: generateRandomInterface(),
     wazuh: generateRandomWazuh(params),
   };
 }
