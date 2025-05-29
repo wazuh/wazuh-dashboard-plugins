@@ -31,17 +31,12 @@ function generateRandomInterface() {
   };
 }
 
-function generateRandomObserver() {
-  return { ingress: { interface: generateRandomInterface() } };
-}
-
 function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
-    '@timestamp': random.date(),
     agent: generateRandomAgent(),
     host: generateRandomHostInterfaces(),
-    observer: generateRandomObserver(),
+    interface: generateRandomInterface(),
     wazuh: generateRandomWazuh(params),
   };
 }

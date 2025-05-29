@@ -60,75 +60,11 @@ const getVisStateUniqueNetworkIPsMetric = (
   };
 };
 
-const getVisStateUDPOnlyInterfacesMetric = (
-  indexPatternId: string,
-): SavedVis => {
-  return {
-    id: 'it-hygiene-network-interfaces-only-udp',
-    title: 'Interfaces operating only on UDP',
-    type: 'metric',
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        invertColors: false,
-        style: STYLE,
-      },
-    },
-    data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {
-            customLabel: 'UDP',
-          },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'network.protocol:"UDP"',
-                  language: 'kuery',
-                },
-                label: 'Protocols',
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
-
 export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateDonutByField(
       indexPatternId,
-      'network.protocol',
+      'network.type',
       'Protocols',
       'it-hygiene-networks',
     ),
