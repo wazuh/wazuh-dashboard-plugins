@@ -73,7 +73,7 @@ export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.cpu.cores',
-      'Cores count',
+      'Top 5 CPU cores',
       'it-hygiene-hardware',
       'Cores count',
     ),
