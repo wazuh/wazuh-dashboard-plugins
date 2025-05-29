@@ -31,6 +31,8 @@ import {
   EuiCopy,
   EuiCodeBlock,
   EuiButton,
+  EuiLink,
+  EuiPopover,
 } from '@elastic/eui';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { AppState } from '../../../react-services/app-state';
@@ -48,7 +50,6 @@ import { AddApi } from './add-api';
 import {
   WzButtonOpenFlyout,
   WzButtonPermissionsOpenFlyout,
-  WzButtonPermissionsModalConfirm,
 } from '../../common/buttons';
 import {
   ApiCheck,
@@ -78,6 +79,7 @@ export const ApiTable = compose(withErrorBoundary)(
         refreshingEntries: false,
         availableUpdates: {},
         refreshingAvailableUpdates: false,
+        popoverOpened: null,
       };
     }
 
@@ -121,13 +123,33 @@ export const ApiTable = compose(withErrorBoundary)(
     }
 
     copyToClipBoard(msg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard
+          .writeText(msg)
+          .then(() => {
+            ErrorHandler.info('Text copied to clipboard');
+          })
+          .catch(() => {
+            this.fallbackCopyToClipboard(msg);
+          });
+      } else {
+        this.fallbackCopyToClipboard(msg); // old method
+      }
+    }
+
+    fallbackCopyToClipboard(msg) {
       const el = document.createElement('textarea');
       el.value = msg;
       document.body.appendChild(el);
       el.select();
-      document.execCommand('copy');
+      let successful = false;
+      successful = document.execCommand('copy');
       document.body.removeChild(el);
-      ErrorHandler.info('Error copied to the clipboard');
+      if (successful) {
+        ErrorHandler.info('Text copied to clipboard');
+      } else {
+        ErrorHandler.error('Could not copy text');
+      }
     }
 
     async checkManager(APIConnection, silent = false) {
@@ -321,6 +343,16 @@ export const ApiTable = compose(withErrorBoundary)(
       }
     }
 
+    /**
+     * Show/close info UUID
+     * @param {String | Null} id
+     */
+    togglePopoverUUID = id => {
+      this.setState({
+        popoverOpened: this.state.popoverOpened === id ? null : id,
+      });
+    };
+
     render() {
       const { DismissNotificationCheck } = getWazuhCheckUpdatesPlugin();
 
@@ -367,6 +399,67 @@ export const ApiTable = compose(withErrorBoundary)(
           name: 'ID',
           align: 'left',
           sortable: true,
+          render: (item, row) => {
+            if (row.cluster_info.uuid) {
+              return (
+                <EuiPopover
+                  button={
+                    <EuiLink
+                      onClick={() => this.togglePopoverUUID(row.id)}
+                      style={{
+                        fontWeight: 'normal',
+                      }}
+                      color='text'
+                    >
+                      <EuiFlexGroup
+                        alignItems='center'
+                        gutterSize='xs'
+                        responsive={false}
+                      >
+                        <EuiFlexItem grow={false}>{item}</EuiFlexItem>
+                        <EuiFlexItem grow={false}>
+                          <EuiToolTip
+                            position='top'
+                            content='Show UUID information'
+                          >
+                            <EuiIcon type='iInCircle' color='primary' />
+                          </EuiToolTip>
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </EuiLink>
+                  }
+                  isOpen={this.state.popoverOpened === row.id}
+                  closePopover={() => this.togglePopoverUUID(null)}
+                  anchorPosition='upCenter'
+                  hasArrow={true}
+                  panelPaddingSize='s'
+                >
+                  <EuiFlexGroup alignItems='center' gutterSize='s'>
+                    <EuiFlexItem>
+                      <EuiText size='s'>
+                        <p>
+                          <strong>UUID:</strong> {row.cluster_info.uuid}
+                        </p>
+                      </EuiText>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      <EuiToolTip position='top' content='Copy to clipboard'>
+                        <EuiButtonIcon
+                          iconType='copy'
+                          size='s'
+                          aria-label='copy UUID'
+                          onClick={() =>
+                            this.copyToClipBoard(row.cluster_info.uuid)
+                          }
+                        />
+                      </EuiToolTip>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiPopover>
+              );
+            }
+            return <EuiText size='s'>{item}</EuiText>;
+          },
         },
         {
           field: 'cluster_info.cluster',

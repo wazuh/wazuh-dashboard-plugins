@@ -1,8 +1,8 @@
 export default [
   { id: 'agent.name' },
-  { id: 'network.name' },
-  { id: 'network.protocol' },
-  { id: 'network.ip' },
+  { id: 'interface.name' },
+  { id: 'agent.host.ip' },
   { id: 'network.netmask' },
+  { id: 'network.type' },
   { id: 'network.broadcast' },
 ];

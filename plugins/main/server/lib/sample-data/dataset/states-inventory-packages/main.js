@@ -21,7 +21,6 @@ function generateRandomPackage() {
 
 function generateDocument(params) {
   return {
-    '@timestamp': random.date(),
     agent: generateRandomAgent(),
     package: generateRandomPackage(),
     wazuh: generateRandomWazuh(params),

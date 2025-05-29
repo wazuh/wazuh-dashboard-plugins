@@ -52,14 +52,24 @@ const getVisStateGlobalPacketLossMetric = (
               {\
                 \"script\": {\
                   \"source\": \" \
-                    double d=(doc['host.network.ingress.drops'].size() != 0 ? doc['host.network.ingress.drops'].value : 0) \
-                      + (doc['host.network.egress.drops'].size() != 0 ? doc['host.network.egress.drops'].value : 0); \
-                    double p=(doc['host.network.ingress.packets'].size() != 0 ? doc['host.network.ingress.packets'].value : 0) \
-                      + (doc['host.network.egress.packets'].size() != 0 ? doc['host.network.egress.packets'].value : 0); \
-                    return p == 0 ? 0 : (d/p);\", \
+                    float in_drops=(doc['host.network.ingress.drops'].size() != 0 ? doc['host.network.ingress.drops'].value : 0); \
+                    float in_errors=(doc['host.network.ingress.errors'].size() != 0 ? doc['host.network.ingress.errors'].value : 0); \
+                    float in_packets=(doc['host.network.ingress.packets'].size() != 0 ? doc['host.network.ingress.packets'].value : 0); \
+                    float out_drops=(doc['host.network.egress.drops'].size() != 0 ? doc['host.network.egress.drops'].value : 0); \
+                    float out_errors=(doc['host.network.egress.errors'].size() != 0 ? doc['host.network.egress.errors'].value : 0); \
+                    float out_packets=(doc['host.network.egress.packets'].size() != 0 ? doc['host.network.egress.packets'].value : 0); \
+                    float d=(in_drops + out_drops); \
+                    float p=(in_drops + in_errors + in_packets + out_drops + out_errors + out_packets); \
+                    return p == 0 ? 0 : Math.round((d/p)*100*100);\", \
                   \"lang\": \"painless\" \
                 }\
-              }",
+              }" /*
+                The total packets is the sum of: packets, drops and erros.
+                The result is multiplied by:
+                - 100 to convert the value (d/p) to percent (%)
+                WORKAROUND: multiply 100 to equilibrate the division by 100 done when the `isPercentMode` is true
+              */,
+
             customLabel: 'Global packet loss rate',
           },
           schema: 'metric',
@@ -119,7 +129,7 @@ const getVisStateInactiveNetworkInterfacesMetric = (
             filters: [
               {
                 input: {
-                  query: 'observer.ingress.interface.state: Inactive',
+                  query: 'interface.state: Inactive',
                   language: 'kuery',
                 },
                 label: 'Interfaces',
@@ -183,7 +193,7 @@ const getVisStateUnknownStateNetworkInterfacesMetric = (
             filters: [
               {
                 input: {
-                  query: 'observer.ingress.interface.state: Unknown',
+                  query: 'interface.state: Unknown',
                   language: 'kuery',
                 },
                 label: 'Interfaces',
@@ -247,7 +257,7 @@ const getVisStateWirelessNetworkInterfacesMetric = (
             filters: [
               {
                 input: {
-                  query: 'observer.ingress.interface.type: wireless',
+                  query: 'interface.type: wireless',
                   language: 'kuery',
                 },
                 label: 'Interfaces type',
@@ -266,13 +276,13 @@ export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
     getVisStateGlobalPacketLossMetric(indexPatternId),
     getVisStateDonutByField(
       indexPatternId,
-      'observer.ingress.interface.state',
+      'interface.state',
       'States',
       'it-hygiene-interfaces',
     ),
     getVisStateDonutByField(
       indexPatternId,
-      'observer.ingress.interface.type',
+      'interface.type',
       'Types',
       'it-hygiene-interfaces',
     ),

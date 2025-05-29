@@ -380,3 +380,125 @@ export const getVisStateMetricFilterBy = (
     },
   };
 };
+
+export const getVisStateHistrogramBy = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  interval: string = 'd',
+) => {
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title: title,
+    type: 'area',
+    params: {
+      type: 'area',
+      grid: {
+        categoryLines: false,
+      },
+      categoryAxes: [
+        {
+          id: 'CategoryAxis-1',
+          type: 'category',
+          position: 'bottom',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+          },
+          labels: {
+            show: true,
+            filter: true,
+            truncate: 100,
+          },
+          title: {},
+        },
+      ],
+      valueAxes: [
+        {
+          id: 'ValueAxis-1',
+          name: 'LeftAxis-1',
+          type: 'value',
+          position: 'left',
+          show: true,
+          style: {},
+          scale: {
+            type: 'linear',
+            mode: 'normal',
+          },
+          labels: {
+            show: true,
+            rotate: 0,
+            filter: false,
+            truncate: 100,
+          },
+          title: {
+            text: 'Count',
+          },
+        },
+      ],
+      seriesParams: [
+        {
+          show: true,
+          type: 'area',
+          mode: 'stacked',
+          data: {
+            label: 'Count',
+            id: '1',
+          },
+          drawLinesBetweenPoints: true,
+          lineWidth: 2,
+          showCircles: true,
+          interpolate: 'linear',
+          valueAxis: 'ValueAxis-1',
+        },
+      ],
+      addTooltip: true,
+      addLegend: true,
+      legendPosition: 'right',
+      times: [],
+      addTimeMarker: false,
+      thresholdLine: {
+        show: false,
+        value: 10,
+        width: 1,
+        style: 'full',
+        color: '#E7664C',
+      },
+      labels: {},
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {},
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'date_histogram',
+          params: {
+            field: field,
+            timeRange: {
+              from: 'now-24h',
+              to: 'now',
+            },
+            useNormalizedOpenSearchInterval: true,
+            scaleMetricValues: false,
+            interval: interval,
+            drop_partials: false,
+            min_doc_count: 1,
+            extended_bounds: {},
+          },
+          schema: 'segment',
+        },
+      ],
+    },
+  };
+};

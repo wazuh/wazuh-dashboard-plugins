@@ -1,7 +1,7 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import {
-  getVisStateDonutByField,
+  getVisStateHistrogramBy,
   getVisStateHorizontalBarByField,
   getVisStateHorizontalBarByFieldWithColors,
   getVisStateHorizontalBarByFieldWithDynamicColors,
@@ -255,11 +255,12 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's2',
-        savedVis: getVisStateDonutByField(
+        savedVis: getVisStateHistrogramBy(
           indexPatternId,
-          'process.state',
-          'Process state',
-          'it-hygiene-stat',
+          'process.start',
+          'Processes initiation',
+          'it-hygiene-processes',
+          'h',
         ),
       },
     },

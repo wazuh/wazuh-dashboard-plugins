@@ -1,13 +1,13 @@
 export default [
   {
     type: 'multiSelect',
-    key: 'network.name',
+    key: 'interface.name',
     placeholder: 'Name',
   },
   {
     type: 'multiSelect',
-    key: 'network.ip',
-    placeholder: 'IP',
+    key: 'network.type',
+    placeholder: 'IP Version',
   },
   {
     type: 'multiSelect',
