@@ -17,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Changed
 
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
+- Change normalized inventory data by renaming fields in network and hardware replacing protocol with type and removing random timestamps from sample documents [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476)
 
 ### Fixed
 
