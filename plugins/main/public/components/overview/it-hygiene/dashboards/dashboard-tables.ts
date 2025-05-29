@@ -158,11 +158,11 @@ export const getDashboardTables = (
       explicitInput: {
         id: 't4',
         savedVis: getVisStateFilter(
-          'it-hygiene-top-operating-system-names',
+          'it-hygiene-stat',
           indexPatternId,
-          'Top ports',
-          'Top 5 local ports',
-          'destination.port',
+          'Top 5 CPUs',
+          'Hosts CPUs',
+          'host.cpu.name',
         ),
       },
     },

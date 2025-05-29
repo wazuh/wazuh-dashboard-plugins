@@ -3,6 +3,8 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 import {
   getVisStateDonutByField,
   getVisStateHorizontalBarByField,
+  getVisStateHorizontalBarByFieldWithColors,
+  getVisStateHorizontalBarByFieldWithDynamicColors,
 } from '../common/saved-vis/generators';
 
 const getVisStateStatOperatingSystems = (indexPatternId: string) => {
@@ -233,12 +235,12 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's1',
-        savedVis: getVisStateHorizontalBarByField(
+        savedVis: getVisStateHorizontalBarByFieldWithDynamicColors(
           indexPatternId,
-          'host.cpu.name',
-          'Top 5 CPUs',
-          'it-hygiene-stat',
-          'Hosts CPUs',
+          'destination.port',
+          'Top 5 local ports',
+          'it-hygiene-top-operating-system-names',
+          'Top ports',
         ),
       },
     },

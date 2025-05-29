@@ -238,6 +238,28 @@ export const getVisStateHorizontalBarByField = (
   };
 };
 
+export const getVisStateHorizontalBarByFieldWithDynamicColors = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  fieldCustomLabel: string,
+  addLegend: boolean = true,
+  orderAggregation: 'asc' | 'desc' = 'desc',
+) => {
+  const visState = getVisStateHorizontalBarByField(
+    indexPatternId,
+    field,
+    title,
+    visIDPrefix,
+    fieldCustomLabel,
+    addLegend,
+    orderAggregation,
+  );
+
+  return visState;
+};
+
 export const getVisStateMetricUniqueCountByField = (
   indexPatternId: string,
   field: string,
