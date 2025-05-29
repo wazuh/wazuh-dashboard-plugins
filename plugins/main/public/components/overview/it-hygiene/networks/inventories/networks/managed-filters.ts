@@ -6,8 +6,8 @@ export default [
   },
   {
     type: 'multiSelect',
-    key: 'network.protocol',
-    placeholder: 'Protocol',
+    key: 'network.ip',
+    placeholder: 'IP',
   },
   {
     type: 'multiSelect',
