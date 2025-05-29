@@ -4,5 +4,4 @@ export default [
   { id: 'process.pid' },
   { id: 'process.parent.pid' },
   { id: 'process.command_line' },
-  { id: 'process.args' },
 ];
