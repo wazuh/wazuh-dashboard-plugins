@@ -91,7 +91,7 @@ export const getOverviewSystemSystemTab = (indexPatternId: string) => {
       'host.os.name',
       'Top 5 operating systems',
       'it-hygiene-system',
-      'Operating systems',
+      'OS',
     ),
     getVisStateDonutByField(
       indexPatternId,
