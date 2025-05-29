@@ -129,7 +129,7 @@ const getVisStateInactiveNetworkInterfacesMetric = (
             filters: [
               {
                 input: {
-                  query: 'observer.ingress.interface.state: Inactive',
+                  query: 'interface.state: Inactive',
                   language: 'kuery',
                 },
                 label: 'Interfaces',
@@ -193,7 +193,7 @@ const getVisStateUnknownStateNetworkInterfacesMetric = (
             filters: [
               {
                 input: {
-                  query: 'observer.ingress.interface.state: Unknown',
+                  query: 'interface.state: Unknown',
                   language: 'kuery',
                 },
                 label: 'Interfaces',
@@ -257,7 +257,7 @@ const getVisStateWirelessNetworkInterfacesMetric = (
             filters: [
               {
                 input: {
-                  query: 'observer.ingress.interface.type: wireless',
+                  query: 'interface.type: wireless',
                   language: 'kuery',
                 },
                 label: 'Interfaces type',
@@ -276,13 +276,13 @@ export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
     getVisStateGlobalPacketLossMetric(indexPatternId),
     getVisStateDonutByField(
       indexPatternId,
-      'observer.ingress.interface.state',
+      'interface.state',
       'States',
       'it-hygiene-interfaces',
     ),
     getVisStateDonutByField(
       indexPatternId,
-      'observer.ingress.interface.type',
+      'interface.type',
       'Types',
       'it-hygiene-interfaces',
     ),

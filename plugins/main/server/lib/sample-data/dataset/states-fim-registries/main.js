@@ -35,7 +35,6 @@ function generateRandomRegistry() {
 function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
   return {
-    '@timestamp': random.date(),
     agent: generateRandomAgent(),
     event: generateRandomEvent(),
     registry: generateRandomRegistry(),
