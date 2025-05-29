@@ -16,7 +16,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Changed
 
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
-- Improved the number of API calls to access agents' summary information [#7434](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7434)
+- Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
 
 ### Fixed
 
