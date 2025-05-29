@@ -451,6 +451,9 @@ resources:
   # Get information
   - method: GET
     path: /manager/info
+    response:
+      statusCode: 200
+      staticFile: manager/info.json
 
   # Get configuration
   - method: GET
