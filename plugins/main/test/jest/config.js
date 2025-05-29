@@ -8,11 +8,12 @@ export default {
   modulePaths: [`${kbnDir}/node_modules`],
   collectCoverageFrom: ['**/*.{js,jsx,ts,tsx}', './!**/node_modules/**'],
   moduleNameMapper: {
+    '@elastic/eui$': `${kbnDir}/node_modules/@elastic/eui/test-env`,
+    '@elastic/eui/lib/(.*)?': `${kbnDir}/node_modules/@elastic/eui/test-env/$1`,
     '^ui/(.*)': `${kbnDir}/src/ui/public/$1`,
     // eslint-disable-next-line max-len
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': `${kbnDir}/src/dev/jest/mocks/file_mock.js`,
     '\\.(css|less|scss)$': `${kbnDir}/src/dev/jest/mocks/style_mock.js`,
-    axios: 'axios/dist/node/axios.cjs',
   },
   setupFiles: [
     `${kbnDir}/src/dev/jest/setup/babel_polyfill.js`,
@@ -35,7 +36,9 @@ export default {
     '^.+\\.tsx?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
     '^.+\\.html?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
   },
-  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.js$'],
+  transformIgnorePatterns: [
+    '[/\\\\]node_modules(?![\\/\\\\](monaco-editor|react-monaco-editor|weak-lru-cache|ordered-binary|d3-color|axios|@smithy|@aws-crypto|@aws-sdk|uuid))[/\\\\].+\\.js$',
+  ],
   snapshotSerializers: [`${kbnDir}/node_modules/enzyme-to-json/serializer`],
   testEnvironment: 'jest-environment-jsdom',
   reporters: ['default', `${kbnDir}/src/dev/jest/junit_reporter.js`],
