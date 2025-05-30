@@ -9,6 +9,9 @@ import {
   getVisStateHorizontalBarByField,
 } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
+import {
+  getVisStateHorizontalBarSplitSeries,
+} from '../../../../../../services/visualizations/index';
 
 type HostArchitecture = 'x86_64' | 'arm64';
 
@@ -93,11 +96,19 @@ export const getOverviewSystemSystemTab = (indexPatternId: string) => {
       'it-hygiene-system',
       { customLabel: 'OS' },
     ),
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'host.architecture',
       'Architecture',
       'it-hygiene-system',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Host architecture count',
+        valueAxesTitleText: 'Host architecture count',
+        fieldCustomLabel: 'Host architecture',
+        seriesLabel: 'Host architecture',
+      },
     ),
   ]);
 };

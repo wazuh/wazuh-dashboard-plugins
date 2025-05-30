@@ -90,12 +90,12 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
       'it-hygiene-processes',
       { customLabel: 'Processes', excludeTerm: '.*wazuh.*' },
     ),
-    getVisStateHistrogramBy(
+    getVisStateHorizontalBarByField(
       indexPatternId,
-      'process.start',
-      'Processes initiation',
+      'agent.name',
+      'Top 5 agents',
       'it-hygiene-processes',
-      'h',
+      { customLabel: 'Processes', excludeTerm: '.*wazuh.*' },
     ),
   ]);
 };

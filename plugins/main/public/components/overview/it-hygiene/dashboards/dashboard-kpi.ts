@@ -5,6 +5,100 @@ import {
   getVisStateHorizontalBarByField,
   getVisStateHorizontalBarByFieldWithDynamicColors,
 } from '../common/saved-vis/generators';
+import { HEIGHT, STYLE } from '../common/saved-vis/constants';
+import {
+  createIndexPatternReferences,
+  createSearchSource,
+} from '../common/saved-vis/create-saved-vis-data';
+
+const getVisStateHostsTotalFreeMemoryTable = (
+   indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  options: {
+    excludeTerm?: string;
+    size?: number;
+    perPage?: number;
+    customLabel?: string;
+  } = {},
+) => {
+  const { excludeTerm, size = 5, perPage = 5, customLabel } = options;
+
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title,
+    type: 'table',
+    params: {
+      perPage: perPage,
+      percentageCol: '',
+      row: true,
+      showMetricsAtAllLevels: false,
+      showPartialRows: false,
+      showTotal: false,
+      totalFunc: 'sum',
+    },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 75,
+          },
+        ],
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Count',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field,
+            orderBy: '1',
+            order: 'asc',
+            size,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel,
+            ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
+            /*json: "\
+              {\
+                \"script\": {\
+                  \"source\": \" \
+                    float in_drops=(doc['host.network.ingress.drops'].size() != 0 ? doc['host.network.ingress.drops'].value : 0); \
+                    float in_errors=(doc['host.network.ingress.errors'].size() != 0 ? doc['host.network.ingress.errors'].value : 0); \
+                    float in_packets=(doc['host.network.ingress.packets'].size() != 0 ? doc['host.network.ingress.packets'].value : 0); \
+                    float out_drops=(doc['host.network.egress.drops'].size() != 0 ? doc['host.network.egress.drops'].value : 0); \
+                    float out_errors=(doc['host.network.egress.errors'].size() != 0 ? doc['host.network.egress.errors'].value : 0); \
+                    float out_packets=(doc['host.network.egress.packets'].size() != 0 ? doc['host.network.egress.packets'].value : 0); \
+                    float d=(in_drops + out_drops); \
+                    float p=(in_drops + in_errors + in_packets + out_drops + out_errors + out_packets); \
+                    return p == 0 ? 0 : Math.round((d/p)*100*100);\", \
+                  \"lang\": \"painless\" \
+                }\
+              }"*/
+          },
+          schema: 'bucket',
+        },
+      ],
+    },
+  };
+};
 
 const getVisStateStatOperatingSystems = (indexPatternId: string) => {
   return {
@@ -226,7 +320,7 @@ export const getDashboardKPIs = (
     s1: {
       gridData: {
         w: 16,
-        h: 8,
+        h: 9,
         x: 0,
         y: 0,
         i: 's1',
@@ -246,7 +340,7 @@ export const getDashboardKPIs = (
     s2: {
       gridData: {
         w: 16,
-        h: 8,
+        h: 9,
         x: 16,
         y: 0,
         i: 's2',
@@ -266,7 +360,7 @@ export const getDashboardKPIs = (
     s3: {
       gridData: {
         w: 16,
-        h: 8,
+        h: 9,
         x: 32,
         y: 0,
         i: 's3',
@@ -274,13 +368,13 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's3',
-        savedVis: getVisStateHorizontalBarByField(
-          indexPatternId,
-          'host.memory.total',
-          'Top 5 host total memory',
-          'it-hygiene-stat',
-          { customLabel: 'Hosts total memory' },
-        ),
+       savedVis: getVisStateHostsTotalFreeMemoryTable(
+        indexPatternId,
+        'host.memory.total',
+        'Top 5 host total memory',
+        'it-hygiene-stat',
+        { customLabel: 'Hosts total memory' }
+        )
       },
     },
   };
