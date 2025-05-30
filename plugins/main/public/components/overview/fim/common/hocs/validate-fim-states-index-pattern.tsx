@@ -43,13 +43,23 @@ const errorPromptTypes = {
   },
 };
 
-export const withFIMDataSource = withIndexPatternFromSettingDataSource({
-  indexPatternSetting: 'fim.pattern',
+export const withFIMFilesDataSource = withIndexPatternFromSettingDataSource({
+  indexPatternSetting: 'fim_files.pattern',
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   validate: ensureIndexPatternIsCreated(
     mapFieldsFormat({
       'file.size': 'bytes',
-      'registry.size': 'bytes',
     }),
   ),
 });
+
+export const withFIMRegistriesDataSource =
+  withIndexPatternFromSettingDataSource({
+    indexPatternSetting: 'fim_registries.pattern',
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+    validate: ensureIndexPatternIsCreated(
+      mapFieldsFormat({
+        'registry.size': 'bytes',
+      }),
+    ),
+  });
