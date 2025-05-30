@@ -6,6 +6,9 @@ export default [
     id: 'registry.path',
   },
   {
-    id: '@timestamp',
+    id: 'registry.group',
+  },
+  {
+    id: 'registry.owner',
   },
 ];
