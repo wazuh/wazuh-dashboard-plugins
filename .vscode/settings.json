@@ -17,8 +17,5 @@
   "[ignore]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   },
-  "eslint.enable": false,
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
-  }
+  "eslint.enable": false
 }
