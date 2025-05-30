@@ -9,10 +9,11 @@ export const getDashboard = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'file.owner',
-      'Top 5 file owners',
+      'File owners',
       'fim-files-inventory',
       {
-        fieldSize: 5,
+        fieldSize: 4,
+        otherBucket: 'Others',
         metricCustomLabel: 'File owner count',
         valueAxesTitleText: 'File owner count',
         seriesLabel: 'File owner count',
@@ -22,7 +23,6 @@ export const getDashboard = (indexPatternId: string) => {
     getVisStateTable(indexPatternId, 'file.path', '', 'fim-files-inventory', {
       size: 5,
       fieldCustomLabel: 'Top 5 file paths',
-      excludeTerm: '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
     }),
   ]);
 };

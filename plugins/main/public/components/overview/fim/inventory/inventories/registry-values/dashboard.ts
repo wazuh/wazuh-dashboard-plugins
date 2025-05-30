@@ -9,10 +9,11 @@ export const getDashboard = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.data.type',
-      'Top 5 data type',
+      'Data types',
       'registry-values-inventory',
       {
-        fieldSize: 5,
+        fieldSize: 4,
+        otherBucket: 'Others',
         metricCustomLabel: 'Registry data type count',
         valueAxesTitleText: 'Registry data type count',
         fieldCustomLabel: 'Registry data type',
@@ -27,7 +28,6 @@ export const getDashboard = (indexPatternId: string) => {
       {
         size: 5,
         fieldCustomLabel: 'Top 5 registry paths',
-        excludeTerm: '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
       },
     ),
   ]);

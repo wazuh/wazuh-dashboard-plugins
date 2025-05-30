@@ -9,10 +9,11 @@ export const getDashboard = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.owner',
-      'Top 5 registry owners',
+      'Registry owners',
       'registry-keys-inventory',
       {
-        fieldSize: 5,
+        fieldSize: 4,
+        otherBucket: 'Others',
         metricCustomLabel: 'Registry owner count',
         valueAxesTitleText: 'Registry owner count',
         fieldCustomLabel: 'Registry owner',
@@ -22,10 +23,11 @@ export const getDashboard = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.group',
-      'Top 5 registry groups',
+      'Registry groups',
       'registry-keys-inventory',
       {
-        fieldSize: 5,
+        fieldSize: 4,
+        otherBucket: 'Others',
         metricCustomLabel: 'Registry groups count',
         valueAxesTitleText: 'Registry groups count',
         fieldCustomLabel: 'Registry group',
@@ -40,7 +42,6 @@ export const getDashboard = (indexPatternId: string) => {
       {
         size: 5,
         fieldCustomLabel: 'Top 5 registry paths',
-        excludeTerm: '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
       },
     ),
   ]);
