@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 // Eui components
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-  EuiPage,
-  EuiSpacer,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiPage } from '@elastic/eui';
 
 // Wazuh components
 import {
@@ -22,15 +16,12 @@ import '../../common/layout-overview.scss';
 import { rules } from '../../../../../../utils/applications';
 
 function WzRulesetOverview(props) {
-
   return (
     <EuiPage style={{ background: 'transparent' }}>
       <EuiPanel>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <RulesetTable
-              {...props}
-            />
+            <RulesetTable {...props} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>

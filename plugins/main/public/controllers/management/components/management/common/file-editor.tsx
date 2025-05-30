@@ -151,11 +151,11 @@ class WzFileEditor extends Component {
         let toastMessage;
 
         if (this.props.addingFile != false) {
-          //remove current invalid file if the file is new.
+          // remove current invalid file if the file is new.
           await this.resourcesHandler.deleteFile(name, relativeDirname);
           toastMessage = 'The new file was deleted.';
         } else {
-          //restore file to previous version
+          // restore file to previous version
           await this.resourcesHandler.updateFile(
             name,
             this.state.initContent,
@@ -179,7 +179,7 @@ class WzFileEditor extends Component {
         'Success',
         `The ${this.props.section} ${name} has been saved successfully.`,
         3000,
-      )
+      );
     } catch (error) {
       let errorMessage;
       if (error instanceof Error) {
@@ -250,7 +250,7 @@ class WzFileEditor extends Component {
           )}
           buttonProps={{
             buttonType: 'empty',
-            permissions: [{ action: 'logtest:run', resource: `*:*:*` }],
+            permissions: [{ action: 'logtest:run', resource: '*:*:*' }],
             color: 'primary',
             iconType: 'documentEdit',
             style: { margin: '0px 8px', cursor: 'pointer' },
@@ -411,12 +411,11 @@ class WzFileEditor extends Component {
                           theme='textmate'
                           width='100%'
                           height={`calc(100vh - ${
-                            (!xmlError) ||
-                            wazuhNotReadyYet
+                            !xmlError || wazuhNotReadyYet
                               ? 300
                               : xmlError
-                              ?  245
-                              : 230
+                                ? 245
+                                : 230
                           }px)`}
                           value={content}
                           onChange={newContent => {

@@ -1,14 +1,7 @@
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
+import React from 'react';
 
 // Eui components
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-  EuiPage,
-  EuiSpacer,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiPage } from '@elastic/eui';
 
 // Wazuh components
 import {
@@ -28,9 +21,7 @@ function WzDecodersOverview(props) {
       <EuiPanel>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <DecodersTable
-              {...props}
-            />
+            <DecodersTable {...props} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
