@@ -1,5 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { getVisStateTable } from '../common/saved-vis/generators';
 
 const getVisStateFilter = (
   id: string,
@@ -97,12 +98,16 @@ export const getDashboardTables = (
       type: 'visualization',
       explicitInput: {
         id: 't1',
-        savedVis: getVisStateFilter(
-          'it-hygiene-top-packages',
+        savedVis: getVisStateTable(
           indexPatternId,
-          'Top packages',
-          'Top 5 packages',
           'package.name',
+          'Top 5 packages',
+          'it-hygiene-top-packages',
+          {
+            customLabel: 'Top 5 packages',
+            excludeTerm:
+              '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
+          },
         ),
       },
     },
@@ -117,12 +122,16 @@ export const getDashboardTables = (
       type: 'visualization',
       explicitInput: {
         id: 't2',
-        savedVis: getVisStateFilter(
-          'it-hygiene-top-packages',
+        savedVis: getVisStateTable(
           indexPatternId,
-          'Top processes',
+          'process.command_line' /* This uses process.command_line because this field is only on Processes */,
           'Top 5 processes',
-          'process.command_line',
+          'it-hygiene-top-processes',
+          {
+            customLabel: 'Top 5 processes',
+            excludeTerm:
+              '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
+          },
         ),
       },
     },
@@ -137,12 +146,14 @@ export const getDashboardTables = (
       type: 'visualization',
       explicitInput: {
         id: 't3',
-        savedVis: getVisStateFilter(
-          'it-hygiene-top-operating-system-names',
+        savedVis: getVisStateTable(
           indexPatternId,
-          'Top OS',
-          'Top 5 operating systems',
           'host.os.name',
+          'Top 5 operating systems',
+          'it-hygiene-top-operating-system-names',
+          {
+            customLabel: 'Top 5 operating systems',
+          },
         ),
       },
     },
@@ -157,12 +168,14 @@ export const getDashboardTables = (
       type: 'visualization',
       explicitInput: {
         id: 't4',
-        savedVis: getVisStateFilter(
-          'it-hygiene-stat',
+        savedVis: getVisStateTable(
           indexPatternId,
-          'Top 5 CPUs',
-          'Hosts CPUs',
           'host.cpu.name',
+          'Top 5 CPUs',
+          'it-hygiene-stat',
+          {
+            customLabel: 'Top 5 hosts CPUs',
+          },
         ),
       },
     },

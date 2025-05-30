@@ -84,14 +84,14 @@ export const getOverviewSystemSystemTab = (indexPatternId: string) => {
       'host.os.platform',
       'Top 5 platforms',
       'it-hygiene-system',
-      'Platforms',
+      { customLabel: 'Platforms' },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.os.name',
       'Top 5 operating systems',
       'it-hygiene-system',
-      'OS',
+      { customLabel: 'OS' },
     ),
     getVisStateDonutByField(
       indexPatternId,

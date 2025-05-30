@@ -11,16 +11,14 @@ export const getOverviewPackagesHotfixesTab = (indexPatternId: string) => {
       'package.hotfix.name',
       'Most common hotfixes',
       'it-hygiene-hotfixes',
-      'Hotfixes',
+      { customLabel: 'Hotfixes' },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'package.hotfix.name',
       'Least common hotfixes',
       'it-hygiene-hotfixes',
-      'Hotfixes',
-      false,
-      'asc',
+      { customLabel: 'Hotfixes', orderAggregation: 'asc' },
     ),
   ]);
 };

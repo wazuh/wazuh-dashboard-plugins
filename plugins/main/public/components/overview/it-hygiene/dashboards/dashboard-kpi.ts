@@ -3,7 +3,6 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 import {
   getVisStateHistrogramBy,
   getVisStateHorizontalBarByField,
-  getVisStateHorizontalBarByFieldWithColors,
   getVisStateHorizontalBarByFieldWithDynamicColors,
 } from '../common/saved-vis/generators';
 
@@ -280,7 +279,7 @@ export const getDashboardKPIs = (
           'host.memory.total',
           'Top 5 host total memory',
           'it-hygiene-stat',
-          'Hosts total memory',
+          { customLabel: 'Hosts total memory' },
         ),
       },
     },

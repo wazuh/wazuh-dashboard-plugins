@@ -149,7 +149,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
       'destination.port',
       'Top 5 source ports',
       'it-hygiene-ports',
-      'Source ports',
+      { customLabel: 'Source ports' },
     ),
     getVisStateDonutByField(
       indexPatternId,
@@ -168,7 +168,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
       'process.name',
       'Top 5 processes',
       'it-hygiene-ports',
-      'Processes',
+      { customLabel: 'Processes', excludeTerm: '.*wazuh.*' },
     ),
   ]);
 };
