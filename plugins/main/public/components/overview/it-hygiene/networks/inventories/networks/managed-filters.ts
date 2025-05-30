@@ -5,13 +5,13 @@ export default [
     placeholder: 'Name',
   },
   {
-    type: 'multiSelect',
-    key: 'network.type',
-    placeholder: 'IP Version',
+    type: 'multiSelect', // TODO: replace by input tbd
+    key: 'network.ip',
+    placeholder: 'IP',
   },
   {
     type: 'multiSelect',
-    key: 'network.dhcp',
-    placeholder: 'DHCP',
+    key: 'network.type',
+    placeholder: 'Type',
   },
 ];
