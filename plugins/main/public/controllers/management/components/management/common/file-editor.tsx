@@ -96,8 +96,7 @@ class WzFileEditor extends Component {
    */
   contentHasChanged() {
     return (
-      !!this.state.content.trim() &&
-      this.state.content.trim() !== this.state.initContent.trim()
+      !!this.state.content.trim() && this.state.content.trim() !== this.state.initContent.trim()
     );
   }
 
@@ -114,7 +113,7 @@ class WzFileEditor extends Component {
         'warning',
         'Warning',
         `The ${this.props.section} name must not contain spaces.`,
-        3000,
+        3000
       );
       return;
     }
@@ -123,12 +122,7 @@ class WzFileEditor extends Component {
 
       this.setState({ isSaving: true, error: false });
 
-      await this.resourcesHandler.updateFile(
-        name,
-        content,
-        overwrite,
-        relativeDirname,
-      );
+      await this.resourcesHandler.updateFile(name, content, overwrite, relativeDirname);
       try {
         await validateConfigAfterSent();
       } catch (error) {
@@ -160,7 +154,7 @@ class WzFileEditor extends Component {
             name,
             this.state.initContent,
             overwrite,
-            relativeDirname,
+            relativeDirname
           );
           toastMessage = 'The content file was restored to previous state.';
         }
@@ -178,7 +172,7 @@ class WzFileEditor extends Component {
         'success',
         'Success',
         `The ${this.props.section} ${name} has been saved successfully.`,
-        3000,
+        3000
       );
     } catch (error) {
       let errorMessage;
@@ -209,7 +203,7 @@ class WzFileEditor extends Component {
     });
   };
 
-  goToEdit = name => {
+  goToEdit = (name) => {
     const { content, path } = this.state;
     const file = { name: name, content: content, path: path };
     this.props.updateFileContent(file);
@@ -218,7 +212,7 @@ class WzFileEditor extends Component {
   /**
    * onChange the input value in case adding new file
    */
-  onChange = e => {
+  onChange = (e) => {
     this.setState({
       inputValue: e.target.value,
     });
@@ -230,13 +224,9 @@ class WzFileEditor extends Component {
     const { name, content, path } = this.state;
     const isRules = path.includes('rules') ? 'Ruleset Test' : 'Decoders Test';
 
-    const isEditable = addingFile
-      ? true
-      : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
+    const isEditable = addingFile ? true : path !== 'ruleset/rules' && path !== 'ruleset/decoders';
     let nameForSaving = addingFile ? this.state.inputValue : name;
-    nameForSaving = nameForSaving.endsWith('.xml')
-      ? nameForSaving
-      : `${nameForSaving}.xml`;
+    nameForSaving = nameForSaving.endsWith('.xml') ? nameForSaving : `${nameForSaving}.xml`;
     const overwrite = fileContent ? true : false;
 
     const xmlError = validateXML(content);
@@ -245,9 +235,7 @@ class WzFileEditor extends Component {
       return (
         <WzButtonPermissionsOpenFlyout
           flyoutTitle={isRules}
-          flyoutBody={({ onClose, onUpdateCanClose }) => (
-            <Logtest onFlyout={true}></Logtest>
-          )}
+          flyoutBody={({ onClose, onUpdateCanClose }) => <Logtest onFlyout={true}></Logtest>}
           buttonProps={{
             buttonType: 'empty',
             permissions: [{ action: 'logtest:run', resource: '*:*:*' }],
@@ -268,17 +256,14 @@ class WzFileEditor extends Component {
           permissions={[
             {
               action: `${section}:update`,
-              resource:
-                resourceDictionary[section].permissionResource(nameForSaving),
+              resource: resourceDictionary[section].permissionResource(nameForSaving),
             },
           ]}
           fill
           iconType={isEditable && xmlError ? 'alert' : 'save'}
           isLoading={this.state.isSaving}
           isDisabled={
-            nameForSaving.length <= 4 ||
-            !!(isEditable && xmlError) ||
-            !this.contentHasChanged()
+            nameForSaving.length <= 4 || !!(isEditable && xmlError) || !this.contentHasChanged()
           }
           onClick={() => this.save(nameForSaving, overwrite, path)}
         >
@@ -295,14 +280,14 @@ class WzFileEditor extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Unsubmitted changes'
+            title="Unsubmitted changes"
             onConfirm={() => {
               closeModal;
               this.props.cleanEditState();
             }}
             onCancel={closeModal}
             cancelButtonText="No, don't do it"
-            confirmButtonText='Yes, do it'
+            confirmButtonText="Yes, do it"
           >
             <p style={{ textAlign: 'center' }}>
               There are unsaved changes. Are you sure you want to proceed?
@@ -323,21 +308,16 @@ class WzFileEditor extends Component {
                     {(!fileContent && (
                       <EuiFlexGroup>
                         <EuiFlexItem grow={false}>
-                          <EuiToolTip
-                            position='right'
-                            content={`Back to ${section}`}
-                          >
+                          <EuiToolTip position="right" content={`Back to ${section}`}>
                             <EuiButtonIcon
-                              aria-label='Back'
-                              color='primary'
-                              iconSize='l'
-                              iconType='arrowLeft'
+                              aria-label="Back"
+                              color="primary"
+                              iconSize="l"
+                              iconType="arrowLeft"
                               onClick={() => {
                                 if (
-                                  this.state.content !==
-                                    this.state.initContent ||
-                                  this.state.inputValue !==
-                                    this.state.initialInputValue
+                                  this.state.content !== this.state.initContent ||
+                                  this.state.inputValue !== this.state.initialInputValue
                                 ) {
                                   showModal();
                                 } else {
@@ -353,28 +333,23 @@ class WzFileEditor extends Component {
                             placeholder={`Type your new ${section} file name here`}
                             value={this.state.inputValue}
                             onChange={this.onChange}
-                            aria-label='aria-label to prevent react warning'
+                            aria-label="aria-label to prevent react warning"
                           />
                         </EuiFlexItem>
                       </EuiFlexGroup>
                     )) || (
                       <EuiTitle>
                         <span style={{ fontSize: '22px' }}>
-                          <EuiToolTip
-                            position='right'
-                            content={`Back to ${section}`}
-                          >
+                          <EuiToolTip position="right" content={`Back to ${section}`}>
                             <EuiButtonIcon
-                              aria-label='Back'
-                              color='primary'
-                              iconSize='l'
-                              iconType='arrowLeft'
+                              aria-label="Back"
+                              color="primary"
+                              iconSize="l"
+                              iconType="arrowLeft"
                               onClick={() => {
                                 if (
-                                  this.state.content !==
-                                    this.state.initContent ||
-                                  this.state.inputValue !==
-                                    this.state.initialInputValue
+                                  this.state.content !== this.state.initContent ||
+                                  this.state.inputValue !== this.state.initialInputValue
                                 ) {
                                   showModal();
                                 } else {
@@ -396,36 +371,32 @@ class WzFileEditor extends Component {
                     </EuiFlexItem>
                   )}
                 </EuiFlexGroup>
-                <EuiSpacer size='m' />
+                <EuiSpacer size="m" />
                 {xmlError && (
                   <Fragment>
                     <span style={{ color: 'red' }}> {xmlError}</span>
-                    <EuiSpacer size='s' />
+                    <EuiSpacer size="s" />
                   </Fragment>
                 )}
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiFlexGroup>
-                      <EuiFlexItem className='codeEditorWrapper'>
+                      <EuiFlexItem className="codeEditorWrapper">
                         <EuiCodeEditor
-                          theme='textmate'
-                          width='100%'
+                          theme="textmate"
+                          width="100%"
                           height={`calc(100vh - ${
-                            !xmlError || wazuhNotReadyYet
-                              ? 300
-                              : xmlError
-                                ? 245
-                                : 230
+                            !xmlError || wazuhNotReadyYet ? 300 : xmlError ? 245 : 230
                           }px)`}
                           value={content}
-                          onChange={newContent => {
+                          onChange={(newContent) => {
                             this.setState({ content: newContent });
                           }}
-                          mode='xml'
+                          mode="xml"
                           isReadOnly={!isEditable}
                           wrapEnabled
                           setOptions={this.codeEditorOptions}
-                          aria-label='Code Editor'
+                          aria-label="Code Editor"
                         />
                       </EuiFlexItem>
                     </EuiFlexGroup>
@@ -441,16 +412,16 @@ class WzFileEditor extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     wazuhNotReadyYet: state.appStateReducers.wazuhNotReadyYet,
     showFlyout: state.appStateReducers.showFlyoutLogtest,
   };
 };
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    updateWazuhNotReadyYet: wazuhNotReadyYet =>
+    updateWazuhNotReadyYet: (wazuhNotReadyYet) =>
       dispatch(updateWazuhNotReadyYet(wazuhNotReadyYet)),
   };
 };
