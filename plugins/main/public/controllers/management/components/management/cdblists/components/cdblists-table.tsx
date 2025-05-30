@@ -145,7 +145,7 @@ function CDBListsTable(props) {
     }
   };
 
-  const { updateRestartClusterManager, updateListContent } = props;
+  const { updateListContent } = props;
   const columns = getColumns();
 
   /**
@@ -170,9 +170,6 @@ function CDBListsTable(props) {
     <UploadFilesButton
       section={SECTION_CDBLIST_SECTION}
       showingFiles={showingFiles}
-      onSuccess={() => {
-        updateRestartClusterManager && updateRestartClusterManager();
-      }}
     />,
   ];
 

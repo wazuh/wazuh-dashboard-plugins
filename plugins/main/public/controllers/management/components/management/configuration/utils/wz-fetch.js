@@ -535,30 +535,3 @@ export const clusterNodes = async () => {
     throw error;
   }
 };
-
-/**
- * Restart cluster or Manager
- */
-export const restartClusterOrManager = async updateWazuhNotReadyYet => {
-  try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    getToasts().add({
-      color: 'success',
-      title: isCluster
-        ? 'Restarting cluster, it will take up to 30 seconds.'
-        : 'The manager is being restarted',
-      toastLifeTimeMs: 3000,
-    });
-    isCluster ? await restartCluster() : await restartManager();
-    // Dispatch a Redux action
-    updateWazuhNotReadyYet(
-      `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`,
-    );
-    await makePing(updateWazuhNotReadyYet, isCluster);
-    return { restarted: isCluster ? 'Cluster' : 'Manager' };
-  } catch (error) {
-    throw error;
-  }
-};
