@@ -1,12 +1,7 @@
 import React from 'react';
 
 // Eui components
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-  EuiPage,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiPage } from '@elastic/eui';
 
 // Wazuh components
 import {
@@ -21,15 +16,12 @@ import '../../common/layout-overview.scss';
 import { cdbLists } from '../../../../../../utils/applications';
 
 function WzCDBListsOverview(props) {
-
   return (
     <EuiPage style={{ background: 'transparent' }}>
       <EuiPanel>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <CDBListsTable
-              {...props}
-            />
+            <CDBListsTable {...props} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
