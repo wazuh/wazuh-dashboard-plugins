@@ -1,6 +1,6 @@
 import {
   getVisStateHorizontalBarSplitSeries,
-  getVisStateTableByField,
+  getVisStateTable,
 } from '../../../../../../services/visualizations';
 import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-dashboard-panels-kpis';
 
@@ -32,12 +32,16 @@ export const getDashboard = (indexPatternId: string) => {
         seriesLabel: 'Registry group',
       },
     ),
-    getVisStateTableByField(
+    getVisStateTable(
       indexPatternId,
       'registry.path',
       '',
       'registry-keys-inventory',
-      { size: 5, fieldCustomLabel: 'Top 5 registry paths' },
+      {
+        size: 5,
+        fieldCustomLabel: 'Top 5 registry paths',
+        excludeTerm: '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
+      },
     ),
   ]);
 };

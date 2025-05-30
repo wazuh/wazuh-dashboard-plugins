@@ -1,6 +1,6 @@
 import {
   getVisStateHorizontalBarSplitSeries,
-  getVisStateTableByField,
+  getVisStateTable,
 } from '../../../../../../services/visualizations';
 import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-dashboard-panels-kpis';
 
@@ -19,13 +19,11 @@ export const getDashboard = (indexPatternId: string) => {
         fieldCustomLabel: 'File owner',
       },
     ),
-    getVisStateTableByField(
-      indexPatternId,
-      'file.path',
-      '',
-      'fim-files-inventory',
-      { size: 5, fieldCustomLabel: 'Top 5 file paths' },
-    ),
+    getVisStateTable(indexPatternId, 'file.path', '', 'fim-files-inventory', {
+      size: 5,
+      fieldCustomLabel: 'Top 5 file paths',
+      excludeTerm: '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
+    }),
     // TODO: add another visualization, see https://github.com/wazuh/wazuh-dashboard-plugins/issues/7460#issuecomment-2912512333
   ]);
 };

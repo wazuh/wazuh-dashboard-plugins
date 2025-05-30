@@ -501,37 +501,42 @@ export const getVisStateMetricUniqueCountByField = (
   };
 };
 
-export const getVisStateTableByField = (
+export const getVisStateTable = (
   indexPatternId: string,
   field: string,
   title: string,
   visIDPrefix: string,
   options: {
     orderAggregation?: 'asc' | 'desc';
+    excludeTerm?: string;
     size?: number;
+    perPage?: number;
+    customLabel?: string;
     fieldCustomLabel?: string;
+    metricCustomLabel;
     addLegend?: boolean;
     // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
-    itemsPerPage?: number;
   } = {},
 ) => {
   const {
     orderAggregation = 'desc',
-    size = 10,
+    excludeTerm,
+    perPage = 5,
+    size = 5,
     fieldCustomLabel,
     otherBucket,
     missingBucket,
-    itemsPerPage = 5,
+    metricCustomLabel = 'Count',
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title,
     type: 'table',
     params: {
-      perPage: itemsPerPage,
+      perPage: perPage,
       percentageCol: '',
       row: true,
       showMetricsAtAllLevels: false,
@@ -558,7 +563,7 @@ export const getVisStateTableByField = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Count',
+            customLabel: metricCustomLabel,
           },
           schema: 'metric',
         },
@@ -567,10 +572,11 @@ export const getVisStateTableByField = (
           enabled: true,
           type: 'terms',
           params: {
-            field: field,
+            field,
             orderBy: '1',
             order: orderAggregation,
             size: size,
+            otherBucket: Boolean(otherBucket),
             otherBucketLabel:
               otherBucket && typeof otherBucket === 'boolean'
                 ? 'Other'
@@ -581,6 +587,7 @@ export const getVisStateTableByField = (
                 ? 'Missing'
                 : missingBucket,
             customLabel: fieldCustomLabel,
+            ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
           },
           schema: 'bucket',
         },
