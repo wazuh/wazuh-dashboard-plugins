@@ -24,6 +24,5 @@ export const getDashboard = (indexPatternId: string) => {
       fieldCustomLabel: 'Top 5 file paths',
       excludeTerm: '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
     }),
-    // TODO: add another visualization, see https://github.com/wazuh/wazuh-dashboard-plugins/issues/7460#issuecomment-2912512333
   ]);
 };

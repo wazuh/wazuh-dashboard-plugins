@@ -22,7 +22,7 @@ export const getDashboard = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.group',
-      'Top 5 groups',
+      'Top 5 registry groups',
       'registry-keys-inventory',
       {
         fieldSize: 5,
