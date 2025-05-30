@@ -17,7 +17,6 @@ import {
   PromptErrorInitializatingDataSource,
 } from '../hocs';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
-// import { DiscoverNoResults } from '../../../../common/no-results/no-results';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { IndexPattern } from '../../../../../../src/plugins/data/public/';
