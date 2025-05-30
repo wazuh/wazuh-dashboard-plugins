@@ -1675,27 +1675,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
     ),
   },
-  'enrollment.password': {
-    title: 'Enrollment password',
-    description:
-      'Specifies the password used to authenticate during the agent enrollment.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.text,
-    defaultValue: '',
-    isConfigurableFromSettings: false,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-    ),
-  },
   'fim_files.pattern': {
     title: 'Index pattern',
     description: 'Default index pattern to use for file integrity monitoring.',
