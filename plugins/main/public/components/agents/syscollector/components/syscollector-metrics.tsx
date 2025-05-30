@@ -172,15 +172,8 @@ export const InventoryMetrics = withSystemInventoryDataSource(
         key: 'memory',
         label: 'Memory',
         value: data?.hardware?.host?.memory?.total
-          ? `${(data?.hardware?.host?.memory?.total / 1024).toFixed(2)} MB`
+          ? `${(data?.hardware?.host?.memory?.total / 1024).toFixed(2)} MB` // TODO: use the field formatter from index pattern instead
           : '-',
-        isLoading: isLoading,
-        style: { maxWidth: 100 },
-      },
-      {
-        key: 'arch',
-        label: 'Arch',
-        value: data?.hardware?.agent?.host?.architecture,
         isLoading: isLoading,
         style: { maxWidth: 100 },
       },
@@ -217,15 +210,6 @@ export const InventoryMetrics = withSystemInventoryDataSource(
         value: data?.hardware?.host?.serial_number,
         isLoading: isLoading,
         style: { maxWidth: 100 },
-      },
-      {
-        key: 'last-scan',
-        label: 'Last scan',
-        value: data?.software?.['@timestamp']
-          ? offsetTimestamp('', data?.software?.['@timestamp']) // there are 2 dates (hardware/software) Should we indicate each value?
-          : '-',
-        isLoading: isLoading,
-        style: { maxWidth: 180 },
       },
     ];
 
