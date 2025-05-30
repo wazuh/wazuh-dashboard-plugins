@@ -4,10 +4,7 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import {
-  getVisStateHistrogramBy,
-  getVisStateHorizontalBarByField,
-} from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 
 type ProcessState =

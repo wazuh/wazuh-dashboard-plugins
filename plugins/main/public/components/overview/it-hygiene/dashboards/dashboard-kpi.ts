@@ -1,10 +1,7 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import {
-  getVisStateHistrogramBy,
-  getVisStateHorizontalBarByField,
-  getVisStateHorizontalBarByFieldWithDynamicColors,
-} from '../common/saved-vis/generators';
+import { getVisStateHistogramBy } from '../common/saved-vis/generators';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
 import { HEIGHT, STYLE } from '../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
@@ -12,7 +9,7 @@ import {
 } from '../common/saved-vis/create-saved-vis-data';
 
 const getVisStateHostsTotalFreeMemoryTable = (
-   indexPatternId: string,
+  indexPatternId: string,
   field: string,
   title: string,
   visIDPrefix: string,
@@ -30,20 +27,27 @@ const getVisStateHostsTotalFreeMemoryTable = (
     title,
     type: 'table',
     params: {
-      perPage: perPage,
-      percentageCol: '',
-      row: true,
-      showMetricsAtAllLevels: false,
+      perPage: 10,
       showPartialRows: false,
+      showMetricsAtAllLevels: false,
       showTotal: false,
       totalFunc: 'sum',
+      percentageCol: '',
     },
     uiState: {
       vis: {
+        sortColumn: {
+          colIndex: 2,
+          direction: 'asc',
+        },
         columnsWidth: [
           {
             colIndex: 1,
-            width: 75,
+            width: 125,
+          },
+          {
+            colIndex: 2,
+            width: 120,
           },
         ],
       },
@@ -55,9 +59,10 @@ const getVisStateHostsTotalFreeMemoryTable = (
         {
           id: '1',
           enabled: true,
-          type: 'count',
+          type: 'min',
           params: {
-            customLabel: 'Count',
+            field: 'host.memory.free',
+            customLabel: 'Free memory',
           },
           schema: 'metric',
         },
@@ -66,32 +71,39 @@ const getVisStateHostsTotalFreeMemoryTable = (
           enabled: true,
           type: 'terms',
           params: {
-            field,
-            orderBy: '1',
-            order: 'asc',
-            size,
+            field: 'agent.name',
+            orderBy: '_key',
+            order: 'desc',
+            size: 5,
             otherBucket: false,
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel,
-            ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
-            /*json: "\
-              {\
-                \"script\": {\
-                  \"source\": \" \
-                    float in_drops=(doc['host.network.ingress.drops'].size() != 0 ? doc['host.network.ingress.drops'].value : 0); \
-                    float in_errors=(doc['host.network.ingress.errors'].size() != 0 ? doc['host.network.ingress.errors'].value : 0); \
-                    float in_packets=(doc['host.network.ingress.packets'].size() != 0 ? doc['host.network.ingress.packets'].value : 0); \
-                    float out_drops=(doc['host.network.egress.drops'].size() != 0 ? doc['host.network.egress.drops'].value : 0); \
-                    float out_errors=(doc['host.network.egress.errors'].size() != 0 ? doc['host.network.egress.errors'].value : 0); \
-                    float out_packets=(doc['host.network.egress.packets'].size() != 0 ? doc['host.network.egress.packets'].value : 0); \
-                    float d=(in_drops + out_drops); \
-                    float p=(in_drops + in_errors + in_packets + out_drops + out_errors + out_packets); \
-                    return p == 0 ? 0 : Math.round((d/p)*100*100);\", \
-                  \"lang\": \"painless\" \
-                }\
-              }"*/
+            customLabel: 'Agent name',
+          },
+          schema: 'bucket',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'host.memory.total',
+            orderBy: 'custom',
+            orderAgg: {
+              id: '3-orderAgg',
+              enabled: true,
+              type: 'count',
+              params: {},
+              schema: 'orderAgg',
+            },
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Total memory',
           },
           schema: 'bucket',
         },
@@ -328,12 +340,19 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's1',
-        savedVis: getVisStateHorizontalBarByFieldWithDynamicColors(
+        savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'destination.port',
           'Top 5 local ports',
           'it-hygiene-top-operating-system-names',
-          'Top ports',
+          {
+            fieldSize: 5,
+            metricCustomLabel: 'Top ports count',
+            valueAxesTitleText: 'Top ports count',
+            seriesLabel: 'Top ports',
+            seriesMode: 'normal',
+            fieldCustomLabel: 'Top ports',
+          },
         ),
       },
     },
@@ -348,7 +367,7 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's2',
-        savedVis: getVisStateHistrogramBy(
+        savedVis: getVisStateHistogramBy(
           indexPatternId,
           'process.start',
           'Processes initiation',
@@ -368,13 +387,13 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's3',
-       savedVis: getVisStateHostsTotalFreeMemoryTable(
-        indexPatternId,
-        'host.memory.total',
-        'Top 5 host total memory',
-        'it-hygiene-stat',
-        { customLabel: 'Hosts total memory' }
-        )
+        savedVis: getVisStateHostsTotalFreeMemoryTable(
+          indexPatternId,
+          'host.memory.total',
+          'Top 5 host least free memory',
+          'it-hygiene-stat',
+          { customLabel: 'Hosts total memory' },
+        ),
       },
     },
   };

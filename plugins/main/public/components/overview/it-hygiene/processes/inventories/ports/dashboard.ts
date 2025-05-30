@@ -4,10 +4,8 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import {
-  getVisStateHorizontalBarByField,
-  getVisStateDonutByField,
-} from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import { SavedVis } from '../../../common/types';
 
 type InterfaceState = 'LISTEN' | 'ESTABLISHED';
@@ -151,17 +149,35 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
       'it-hygiene-ports',
       { customLabel: 'Source ports' },
     ),
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.state',
-      'States',
+      'State',
       'it-hygiene-ports',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Interface state count',
+        valueAxesTitleText: 'Interface state count',
+        seriesLabel: 'Interface state',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'Interface state',
+      },
     ),
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.transport',
       'Transport protocols',
       'it-hygiene-ports',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Transport protocols count',
+        valueAxesTitleText: 'Transport protocols count',
+        seriesLabel: 'Transport protocols',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'Transport protocols',
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
