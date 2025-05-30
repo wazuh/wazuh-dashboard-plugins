@@ -54,6 +54,8 @@ export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim-*';
+export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
+export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
 
 // System inventory
 export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory-*';
@@ -1673,7 +1675,7 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
       SettingsValidator.serverAddressHostnameFQDNIPv4IPv6,
     ),
   },
-  'fim.pattern': {
+  'fim_files.pattern': {
     title: 'Index pattern',
     description: 'Default index pattern to use for file integrity monitoring.',
     store: {
@@ -1683,7 +1685,42 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     },
     category: SettingCategory.FIM,
     type: EpluginSettingType.text,
-    defaultValue: WAZUH_FIM_PATTERN,
+    defaultValue: WAZUH_FIM_FILES_PATTERN,
+    isConfigurableFromSettings: true,
+    requiresRunningHealthCheck: false,
+    validateUIForm: function (value) {
+      return this.validate(value);
+    },
+    validate: SettingsValidator.compose(
+      SettingsValidator.isString,
+      SettingsValidator.isNotEmptyString,
+      SettingsValidator.hasNoSpaces,
+      SettingsValidator.noLiteralString('.', '..'),
+      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
+      SettingsValidator.hasNotInvalidCharacters(
+        '\\',
+        '/',
+        '?',
+        '"',
+        '<',
+        '>',
+        '|',
+        ',',
+        '#',
+      ),
+    ),
+  },
+  'fim_registries.pattern': {
+    title: 'Index pattern',
+    description: 'Default index pattern to use for file integrity monitoring.',
+    store: {
+      file: {
+        configurableManaged: true,
+      },
+    },
+    category: SettingCategory.FIM,
+    type: EpluginSettingType.text,
+    defaultValue: WAZUH_FIM_REGISTRIES_PATTERN,
     isConfigurableFromSettings: true,
     requiresRunningHealthCheck: false,
     validateUIForm: function (value) {

@@ -1,14 +1,6 @@
 /* Dashboards */
-.wz-dashboard-hide-tables-pagination-export-csv-controls {
-  .euiDataGrid__controls,
-  .euiDataGrid__pagination {
-    display: none !important;
-  }
-  .visTable {
-    overflow: hidden !important;
-  }
-}
 
+/* Responsive */
 .wz-dashboard-responsive {
   @media (max-width: 767px) {
     .react-grid-layout {
@@ -17,5 +9,16 @@
     .dshLayout-isMaximizedPanel {
       height: calc(100vh - 44px) !important;
     }
+  }
+}
+
+/* Hide the export CSV controls of table visualizations*/
+.wz-dashboard-hide-tables-pagination-export-csv-controls {
+  .euiDataGrid__controls,
+  .euiDataGrid__pagination {
+    display: none !important;
+  }
+  .visTable {
+    overflow: hidden !important;
   }
 }
