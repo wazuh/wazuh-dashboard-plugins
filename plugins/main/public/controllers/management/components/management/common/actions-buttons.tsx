@@ -86,7 +86,7 @@ export const AddNewFileButton = ({ section, updateAddingFile }) => (
         buttonType='empty'
         iconType='plusInCircle'
         onClick={() =>
-          updateAddingFile({
+            updateAddingFile({
             name: '',
             content: '<!-- Modify it at your will. -->',
             path: `etc/${section}`,
@@ -172,7 +172,7 @@ const uploadFile = async (files, resource, overwrite) => {
 export const UploadFilesButton = ({
   section,
   showingFiles,
-  onSuccess,
+  onSuccess = (param: any) => {},
   ...props
 }) => {
   return (
