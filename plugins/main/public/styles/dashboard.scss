@@ -22,10 +22,3 @@
     overflow: hidden !important;
   }
 }
-
-/* Reduce the font size of the table visualizations */
-.wz-dashboard-set-font-size-table-vis .visTable {
-  .euiDataGridRowCell {
-    font-size: 10px;
-  }
-}
