@@ -7,7 +7,7 @@ export default [
   {
     type: 'multiSelect',
     key: 'source.port',
-    placeholder: 'Source Port',
+    placeholder: 'Source port',
   },
   {
     type: 'multiSelect',
