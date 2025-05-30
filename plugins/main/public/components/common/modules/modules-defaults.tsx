@@ -507,29 +507,30 @@ export const ModulesDefaults = {
         component: DashboardITHygiene,
       },
       {
-        id: 'networks',
-        name: 'Networks',
-        buttons: [ButtonExploreAgent],
-        component: ITHygieneNetworksInventory,
-      },
-      {
-        id: 'processes',
-        name: 'Processes',
-        buttons: [ButtonExploreAgent],
-        component: ITHygieneProcessesInventory,
-      },
-      {
-        id: 'packages',
-        name: 'Packages',
-        buttons: [ButtonExploreAgent],
-        component: ITHygienePackagesInventory,
-      },
-      {
         id: 'system',
         name: 'System',
         buttons: [ButtonExploreAgent],
         component: ITHygieneSystemInventory,
       },
+      {
+        id: 'software',
+        name: 'Software',
+        buttons: [ButtonExploreAgent],
+        component: ITHygienePackagesInventory,
+      },
+      {
+        id: 'runtime',
+        name: 'Runtime',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneProcessesInventory,
+      },
+      {
+        id: 'networks',
+        name: 'Networks',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneNetworksInventory,
+      },
+
     ],
     availableFor: ['manager', 'agent'],
   },

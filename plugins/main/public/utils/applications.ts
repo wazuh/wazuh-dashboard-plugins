@@ -48,10 +48,9 @@ export const overview = {
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () =>
-    `/overview/${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `?agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `?agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -76,10 +75,9 @@ export const configurationAssessment = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=sca&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=sca&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -101,10 +99,9 @@ export const malwareDetection = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pm&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=pm&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -129,10 +126,9 @@ export const fileIntegrityMonitoring = {
   showInAgentMenu: true,
   order: 202,
   redirectTo: () =>
-    `/overview/?tab=fim&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=fim&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -154,10 +150,9 @@ export const threatHunting = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=general&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=general&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -182,10 +177,9 @@ export const vulnerabilityDetection = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=vuls&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=vuls&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -207,10 +201,32 @@ export const mitreAttack = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=mitre&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=mitre&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
+    }`,
+};
+
+export const ITHygiene = {
+  category: 'wz-category-security-operations',
+  id: 'it-hygiene',
+  title: i18n.translate('wz-app-it-hygiene-title', {
+    defaultMessage: 'IT Hygiene',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-it-hygiene-breadcrumbLabel', {
+    defaultMessage: 'IT Hygiene',
+  }),
+  description: i18n.translate('wz-app-it-hygiene-description', {
+    defaultMessage: 'Gain comprehensive visibility into your assets.',
+  }),
+  euiIconType: 'indexPatternApp',
+  order: 400,
+  showInOverviewApp: true,
+  showInAgentMenu: true,
+  redirectTo: () =>
+    `/overview/?tab=it-hygiene&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -228,14 +244,13 @@ const pciDss = {
       'Global security standard for entities that process, store, or transmit payment cardholder data.',
   }),
   euiIconType: 'visTagCloud',
-  order: 400,
+  order: 401,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=pci&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=pci&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -253,14 +268,13 @@ const gdpr = {
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   }),
   euiIconType: 'visBarVertical',
-  order: 401,
+  order: 402,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=gdpr&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=gdpr&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -278,14 +292,13 @@ const hipaa = {
       'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
   }),
   euiIconType: 'monitoringApp',
-  order: 402,
+  order: 403,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=hipaa&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=hipaa&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -305,12 +318,11 @@ const nist80053 = {
   euiIconType: 'notebookApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
-  order: 403,
+  order: 404,
   redirectTo: () =>
-    `/overview/?tab=nist&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=nist&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -328,14 +340,13 @@ const tsc = {
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
   }),
   euiIconType: 'packetbeatApp',
-  order: 404,
+  order: 405,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=tsc&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=tsc&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -357,10 +368,9 @@ export const docker = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=docker&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=docker&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -385,10 +395,9 @@ export const amazonWebServices = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=aws&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=aws&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -410,10 +419,9 @@ export const googleCloud = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=gcp&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=gcp&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -435,10 +443,9 @@ export const github = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=github&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=github&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -459,10 +466,9 @@ export const office365 = {
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=office&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
+    `/overview/?tab=office&tabView=dashboard${store.getState()?.appStateReducers?.currentAgentData?.id
+      ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+      : ''
     }`,
 };
 
@@ -807,30 +813,6 @@ const about = {
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=about',
-};
-
-export const ITHygiene = {
-  category: 'wz-category-security-operations',
-  id: 'it-hygiene',
-  title: i18n.translate('wz-app-it-hygiene-title', {
-    defaultMessage: 'IT Hygiene',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-it-hygiene-breadcrumbLabel', {
-    defaultMessage: 'IT Hygiene',
-  }),
-  description: i18n.translate('wz-app-it-hygiene-description', {
-    defaultMessage: 'Show information about IT Hygiene.',
-  }),
-  euiIconType: 'indexPatternApp',
-  order: 405,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=it-hygiene&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
 };
 
 export const Applications = [
