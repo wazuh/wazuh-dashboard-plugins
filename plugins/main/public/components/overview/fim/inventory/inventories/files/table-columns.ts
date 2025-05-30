@@ -15,12 +15,6 @@ export default [
     id: 'file.uid',
   },
   {
-    id: 'file.group',
-  },
-  {
-    id: 'file.gid',
-  },
-  {
     id: 'file.size',
   },
 ];
