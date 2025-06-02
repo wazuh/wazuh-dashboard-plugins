@@ -32,6 +32,7 @@ import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { IndexPatternFormattedField } from '../../../common/index-pattern';
 
 interface SyscollectorMetricsProps {
   agent: Agent;
@@ -171,25 +172,16 @@ export const InventoryMetrics = withSystemInventoryDataSource(
       {
         key: 'memory',
         label: 'Memory',
-        value: data?.hardware?.host?.memory?.total
-          ? `${(data?.hardware?.host?.memory?.total / 1024).toFixed(2)} MB` // TODO: use the field formatter from index pattern instead
-          : '-',
+        render: () => (
+          <IndexPatternFormattedField // This could be used to render the rest of fields to take into account the
+            indexPattern={itHygieneDataSource?.dataSource?.indexPattern}
+            doc={{ _source: data?.hardware }}
+            field='host.memory.total'
+          />
+        ),
         isLoading: isLoading,
         style: { maxWidth: 100 },
       },
-      // {
-      //   key: RibbonItemLabel.OPERATING_SYSTEM,
-      //   value: data?.software?.host,
-      //   label: 'Operating system',
-      //   isLoading: isLoading,
-      //   style: { maxWidth: 200 },
-      //   render: (value: Agent) => (
-      //     <>
-      //       {getPlatformIcon(value)}
-      //       {getOsName(value)}
-      //     </>
-      //   ),
-      // },
       {
         key: 'cpu',
         label: 'CPU',
