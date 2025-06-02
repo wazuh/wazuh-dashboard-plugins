@@ -1,6 +1,6 @@
 /*
  * Wazuh app - React component Multi-select
- * Copyright (C) 2015-2025 Wazuh, Inc.
+ * Copyright (C) 2015-202 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@ import {
   EuiPopover,
   EuiPopoverTitle,
   FilterChecked,
+  EuiButtonIcon,
+  EuiToolTip,
 } from '@elastic/eui';
 import { IndexPattern } from 'src/plugins/data/public';
 import _ from 'lodash';
@@ -194,13 +196,30 @@ export const MultiSelectInput: React.FC<MultiSelectProps> = ({
             isInvalid={isInvalid}
             error={form.fields.query.error}
           >
-            <EuiFieldSearch
-              onChange={form.fields.query.onChange}
-              onSearch={onSearchInput}
-              value={form.fields.query.currentValue}
-              isInvalid={isInvalid}
-              isClearable={true}
-            />
+            <>
+              <div style={{ display: 'flex' }}>
+                <EuiFieldSearch
+                  onChange={form.fields.query.onChange}
+                  onSearch={onSearchInput}
+                  value={form.fields.query.value}
+                  isInvalid={isInvalid}
+                  isClearable={true}
+                  append={
+                    <EuiToolTip content='Add filter'>
+                      <EuiButtonIcon
+                        iconType='plusInCircle'
+                        color='primary'
+                        className='EuiButtonIcon'
+                        isDisabled={isInvalid}
+                        onClick={() => {
+                          onSearchInput(form.fields.query.value);
+                        }}
+                      />
+                    </EuiToolTip>
+                  }
+                />
+              </div>
+            </>
           </EuiFormRow>
         </EuiPopoverTitle>
         <div className='euiFilterSelect__items'>
