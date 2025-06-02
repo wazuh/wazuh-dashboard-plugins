@@ -173,7 +173,7 @@ export const InventoryMetrics = withSystemInventoryDataSource(
         key: 'memory',
         label: 'Memory',
         render: () => (
-          <IndexPatternFormattedField // This could be used to render the rest of fields to take into account the
+          <IndexPatternFormattedField // This could be used to render the rest of fields to take into account the field formatter
             indexPattern={itHygieneDataSource?.dataSource?.indexPattern}
             doc={{ _source: data?.hardware }}
             field='host.memory.total'
