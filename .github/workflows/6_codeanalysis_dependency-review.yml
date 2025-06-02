@@ -18,7 +18,9 @@
 # - 🚨 Automatically blocks insecure dependency additions when configured.
 
 name: 'Dependency Review'
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
   group: pr-${{ github.event.pull_request.number || github.ref }}
@@ -29,7 +31,8 @@ permissions:
 
 jobs:
   dependency-review:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    if: github.event.pull_request.draft == false
     steps:
       - name: 'Checkout Repository'
         uses: actions/checkout@v4
