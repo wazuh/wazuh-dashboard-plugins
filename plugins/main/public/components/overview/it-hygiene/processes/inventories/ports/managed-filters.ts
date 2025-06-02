@@ -13,7 +13,12 @@ export default [
   },
   {
     type: 'multiSelect',
+    key: 'network.transport',
+    placeholder: 'Transport protocol',
+  },
+  {
+    type: 'multiSelect',
     key: 'interface.state',
-    placeholder: 'Status',
+    placeholder: 'State',
   },
 ];

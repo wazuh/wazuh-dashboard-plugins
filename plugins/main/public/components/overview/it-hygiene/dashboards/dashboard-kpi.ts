@@ -8,7 +8,7 @@ import {
   createSearchSource,
 } from '../common/saved-vis/create-saved-vis-data';
 
-const getVisStateHostsTotalFreeMemoryTable = (
+export const getVisStateHostsTotalFreeMemoryTable = (
   indexPatternId: string,
   field: string,
   title: string,
@@ -20,8 +20,6 @@ const getVisStateHostsTotalFreeMemoryTable = (
     customLabel?: string;
   } = {},
 ) => {
-  const { excludeTerm, size = 5, perPage = 5, customLabel } = options;
-
   return {
     id: `${visIDPrefix}-${field}`,
     title,

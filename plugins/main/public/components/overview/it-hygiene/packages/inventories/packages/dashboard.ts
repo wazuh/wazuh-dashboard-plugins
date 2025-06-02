@@ -1,7 +1,5 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import {
-  getVisStateMetricUniqueCountByField,
-} from '../../../common/saved-vis/generators';
+import { getVisStateMetricUniqueCountByField } from '../../../common/saved-vis/generators';
 
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -9,6 +7,7 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { SavedVis } from '../../../common/types';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations/generators';
 
 type PackageArchitecture = 'x86_64' | 'arm64';
 
@@ -170,12 +169,19 @@ export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
       'it-hygiene-packages',
       'Packages',
     ),
-    getVisStateMetricUniqueCountByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
-      'package.version',
-      '',
+      'package.type',
+      'Package type',
       'it-hygiene-packages',
-      'Package versions',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Package type count',
+        valueAxesTitleText: 'Package type count',
+        seriesLabel: 'Package type count',
+        fieldCustomLabel: 'Package type',
+      },
     ),
   ]);
 };

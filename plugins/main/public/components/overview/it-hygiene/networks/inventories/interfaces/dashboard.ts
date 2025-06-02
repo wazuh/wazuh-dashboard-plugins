@@ -44,7 +44,7 @@ const getVisStateGlobalPacketLossMetric = (
         {
           id: '1',
           enabled: true,
-          type: 'sum',
+          type: 'avg',
           params: {
             field: 'host.network.ingress.drops',
             json: "\
