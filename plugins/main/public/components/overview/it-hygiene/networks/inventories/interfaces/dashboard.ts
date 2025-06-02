@@ -13,7 +13,7 @@ const getVisStateGlobalPacketLossMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-global-packet-loss-rate',
-    title: 'Global packet loss rate',
+    title: 'Average packet loss rate',
     type: 'metric',
     params: {
       addTooltip: true,
@@ -69,7 +69,7 @@ const getVisStateGlobalPacketLossMetric = (
                 WORKAROUND: multiply 100 to equilibrate the division by 100 done when the `isPercentMode` is true
               */,
 
-            customLabel: 'Global packet loss rate',
+            customLabel: 'Average packet loss rate',
           },
           schema: 'metric',
         },
