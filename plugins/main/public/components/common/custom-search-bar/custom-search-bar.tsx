@@ -24,6 +24,7 @@ import { getCustomValueSuggestion } from '../../../components/overview/office/pa
 import { I18nProvider } from '@osd/i18n/react';
 import { tUseSearchBarProps } from '../search-bar/use-search-bar';
 import { WzSearchBar } from '../search-bar/search-bar';
+import { MultiSelectInput } from './components/multi-select-input';
 
 interface FilterInput {
   type: string;
@@ -41,9 +42,9 @@ export type CustomSearchBarProps = {
   fixedFilters: Filter[];
   setFilters: (filters: tFilter[]) => void;
   filterInputsProps: CommonProps &
-  EuiFlexItemProps & {
-    style: HTMLAttributes<HTMLDivElement | HTMLSpanElement>['style'];
-  };
+    EuiFlexItemProps & {
+      style: HTMLAttributes<HTMLDivElement | HTMLSpanElement>['style'];
+    };
 };
 
 const frozenFilterDrillDownValue = Object.freeze({ field: '', value: '' });
@@ -213,6 +214,17 @@ export const CustomSearchBar = ({
       default: <></>,
       multiSelect: (
         <MultiSelect
+          item={item}
+          selectedOptions={selectedOptions[item.key] || []}
+          onChange={onChange}
+          onRemove={onRemove}
+          isDisabled={checkSelectDrillDownValue(item.key)}
+          filterDrillDownValue={filterDrillDownValue}
+          indexPattern={indexPattern}
+        />
+      ),
+      multiSelectInput: (
+        <MultiSelectInput
           item={item}
           selectedOptions={selectedOptions[item.key] || []}
           onChange={onChange}
