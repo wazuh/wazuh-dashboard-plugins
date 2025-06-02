@@ -144,7 +144,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateHorizontalBarByField(
       indexPatternId,
-      'destination.port',
+      'source.port',
       'Top 5 source ports',
       'it-hygiene-ports',
       { customLabel: 'Source ports' },

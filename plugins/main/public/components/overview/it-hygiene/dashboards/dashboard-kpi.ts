@@ -342,8 +342,8 @@ export const getDashboardKPIs = (
         id: 's1',
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
-          'destination.port',
-          'Top 5 local ports',
+          'source.port',
+          'Top 5 source ports',
           'it-hygiene-top-operating-system-names',
           {
             fieldSize: 5,

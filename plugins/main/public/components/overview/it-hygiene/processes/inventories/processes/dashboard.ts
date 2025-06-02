@@ -92,7 +92,7 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
       'agent.name',
       'Top 5 agents',
       'it-hygiene-processes',
-      { customLabel: 'Processes', excludeTerm: '.*wazuh.*' },
+      { customLabel: 'Processes' },
     ),
   ]);
 };
