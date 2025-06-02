@@ -81,7 +81,7 @@ export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
     getVisStateHostsTotalFreeMemoryTable(
       indexPatternId,
       'host.memory.total',
-      'Top 5 host least free memory',
+      '',
       'it-hygiene-stat',
       { customLabel: 'Hosts total memory' },
     ),

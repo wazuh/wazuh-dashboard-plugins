@@ -35,17 +35,13 @@ export const getVisStateHostsTotalFreeMemoryTable = (
     uiState: {
       vis: {
         sortColumn: {
-          colIndex: 2,
+          colIndex: 1,
           direction: 'asc',
         },
         columnsWidth: [
           {
             colIndex: 1,
             width: 125,
-          },
-          {
-            colIndex: 2,
-            width: 120,
           },
         ],
       },
@@ -60,7 +56,7 @@ export const getVisStateHostsTotalFreeMemoryTable = (
           type: 'min',
           params: {
             field: 'host.memory.free',
-            customLabel: 'Free memory',
+            customLabel: 'Memory',
           },
           schema: 'metric',
         },
@@ -77,31 +73,7 @@ export const getVisStateHostsTotalFreeMemoryTable = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Agent name',
-          },
-          schema: 'bucket',
-        },
-        {
-          id: '3',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: 'host.memory.total',
-            orderBy: 'custom',
-            orderAgg: {
-              id: '3-orderAgg',
-              enabled: true,
-              type: 'count',
-              params: {},
-              schema: 'orderAgg',
-            },
-            order: 'desc',
-            size: 5,
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Total memory',
+            customLabel: 'Top 5 agents least free memory',
           },
           schema: 'bucket',
         },
@@ -347,6 +319,7 @@ export const getDashboardKPIs = (
             fieldSize: 5,
             metricCustomLabel: 'Top ports count',
             valueAxesTitleText: 'Top ports count',
+            categoryAxesShow: true,
             seriesLabel: 'Top ports',
             seriesMode: 'normal',
             fieldCustomLabel: 'Top ports',
@@ -388,7 +361,7 @@ export const getDashboardKPIs = (
         savedVis: getVisStateHostsTotalFreeMemoryTable(
           indexPatternId,
           'host.memory.total',
-          'Top 5 host least free memory',
+          '',
           'it-hygiene-stat',
           { customLabel: 'Hosts total memory' },
         ),

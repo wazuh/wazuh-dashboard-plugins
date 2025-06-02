@@ -70,22 +70,6 @@ export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
-      'network.dhcp',
-      'DHCP',
-      'it-hygiene-protocols',
-      {
-        fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Network DHCP count',
-        valueAxesTitleText: 'Network DHCP count',
-        seriesLabel: 'DHCP',
-        seriesMode: 'stacked',
-        fieldCustomLabel: 'DHCP',
-      },
-    ),
-    getVisStateNetworkMetricsMinMax(indexPatternId),
-    getVisStateHorizontalBarSplitSeries(
-      indexPatternId,
       'network.type',
       'Network type',
       'it-hygiene-protocols',
@@ -97,6 +81,22 @@ export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
         seriesLabel: 'Type',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Type',
+      },
+    ),
+    getVisStateNetworkMetricsMinMax(indexPatternId),
+    getVisStateHorizontalBarSplitSeries(
+      indexPatternId,
+      'network.dhcp',
+      'DHCP',
+      'it-hygiene-protocols',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Network DHCP count',
+        valueAxesTitleText: 'Network DHCP count',
+        seriesLabel: 'DHCP',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'DHCP',
       },
     ),
   ]);

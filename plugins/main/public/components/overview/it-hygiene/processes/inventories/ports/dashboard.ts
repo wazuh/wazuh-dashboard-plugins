@@ -142,12 +142,20 @@ const getVisStateUDPOnlyTransportsMetric = (
 
 export const getOverviewProcessesPortTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateHorizontalBarByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'source.port',
       'Top 5 source ports',
       'it-hygiene-ports',
-      { customLabel: 'Source ports' },
+      {
+        fieldSize: 5,
+        metricCustomLabel: 'Top ports count',
+        valueAxesTitleText: 'Top ports count',
+        categoryAxesShow: true,
+        seriesLabel: 'Top ports',
+        seriesMode: 'normal',
+        fieldCustomLabel: 'Top ports',
+      },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,

@@ -4,7 +4,10 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
+import {
+  getVisStateHorizontalBarByField,
+  getVisStateHistogramBy,
+} from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 
 type ProcessState =
@@ -87,12 +90,12 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
       'it-hygiene-processes',
       { customLabel: 'Processes', excludeTerm: '.*wazuh.*' },
     ),
-    getVisStateHorizontalBarByField(
+    getVisStateHistogramBy(
       indexPatternId,
-      'agent.name',
-      'Top 5 agents',
+      'process.start',
+      'Processes initiation',
       'it-hygiene-processes',
-      { customLabel: 'Processes' },
+      'h',
     ),
   ]);
 };

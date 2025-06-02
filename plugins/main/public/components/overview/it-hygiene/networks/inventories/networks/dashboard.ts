@@ -76,7 +76,7 @@ export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
         fieldCustomLabel: 'Type',
       },
     ),
-    getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
     getVisStateUniqueNetworkIPsMetric(indexPatternId),
+    getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
   ]);
 };

@@ -2,12 +2,12 @@ export default [
   {
     type: 'multiSelect',
     key: 'interface.name',
-    placeholder: 'Name',
+    placeholder: 'Interface name',
   },
   {
     type: 'multiSelect',
     key: 'network.type',
-    placeholder: 'Type',
+    placeholder: 'Network type',
   },
   {
     type: 'multiSelect',

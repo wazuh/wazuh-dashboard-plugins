@@ -1,10 +1,5 @@
 export default [
   {
-    type: 'multiSelect',
-    key: 'interface.name',
-    placeholder: 'Name',
-  },
-  {
     type: 'multiSelectInput',
     key: 'network.ip', // The default columns does not display this field
     placeholder: 'IP',
@@ -12,6 +7,11 @@ export default [
   {
     type: 'multiSelect',
     key: 'network.type',
-    placeholder: 'Type',
+    placeholder: 'Network type',
+  },
+  {
+    type: 'multiSelect',
+    key: 'interface.name',
+    placeholder: 'Interface name',
   },
 ];
