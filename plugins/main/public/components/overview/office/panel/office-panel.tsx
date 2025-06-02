@@ -88,12 +88,12 @@ export const OfficePanel = withErrorBoundary(() => {
         <LoadingSearchbarProgress />
       ) : (
         <>
-          <div className="wz-custom-searchbar-wrapper">
+          <div className='wz-custom-searchbar-wrapper'>
             <CustomSearchBar
               filterInputs={filtersValues}
               filterDrillDownValue={drillDownValue}
               fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
-              searchBarProps={{ ...searchBarProps }}
+              searchBarProps={{ ...searchBarProps, showDatePicker: true }}
               setFilters={setFilters}
               indexPattern={dataSource?.indexPattern}
             />
