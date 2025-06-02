@@ -7,7 +7,7 @@
 # 🛠️ **Key Features:**
 # - 🧬 Runs Jest tests on specified Git references (branches, tags, or commit SHAs).
 # - 🔄 Supports manual execution with selectable test commands.
-# - 📦 Reuses the `5_builderprecompiled_base-dev-environment` workflow for consistent test environments.
+# - 📦 Reuses the `6_builderprecompiled_base-dev-environment` workflow for consistent test environments.
 # - 📊 Generates and notifies about Jest coverage summaries after execution.
 #
 # 🔗 Reference:
@@ -31,6 +31,7 @@ on:
         options:
           - 'yarn test:jest'
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
   group: pr-${{ github.event.pull_request.number || github.ref }}
@@ -39,8 +40,9 @@ concurrency:
 jobs:
   # Run unit tests with Jest
   test:
+    if: github.event.pull_request.draft == false
     name: Run unit tests
-    uses: ./.github/workflows/5_builderprecompiled_base-dev-environment.yml
+    uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
     with:
       reference: ${{ github.event.inputs.reference }}
       command: ${{ github.event.inputs.command || 'yarn test:jest' }}
