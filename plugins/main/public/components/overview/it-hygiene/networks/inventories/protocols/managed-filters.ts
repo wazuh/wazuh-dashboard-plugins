@@ -6,12 +6,12 @@ export default [
   },
   {
     type: 'multiSelect',
-    key: 'network.dhcp',
-    placeholder: 'DHCP',
+    key: 'network.type',
+    placeholder: 'Type',
   },
   {
     type: 'multiSelect',
-    key: 'network.type',
-    placeholder: 'Type',
+    key: 'network.dhcp',
+    placeholder: 'DHCP',
   },
 ];

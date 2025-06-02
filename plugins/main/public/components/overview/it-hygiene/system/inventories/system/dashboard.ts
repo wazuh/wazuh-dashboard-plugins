@@ -5,7 +5,6 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import {
-  getVisStateDonutByField,
   getVisStateHorizontalBarByField,
 } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';

@@ -4,5 +4,4 @@ export default [
   { id: 'host.mac' },
   { id: 'interface.state' },
   { id: 'interface.mtu' },
-  { id: 'interface.type' },
 ];

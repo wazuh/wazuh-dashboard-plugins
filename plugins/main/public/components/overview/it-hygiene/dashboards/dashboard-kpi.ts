@@ -8,7 +8,7 @@ import {
   createSearchSource,
 } from '../common/saved-vis/create-saved-vis-data';
 
-const getVisStateHostsTotalFreeMemoryTable = (
+export const getVisStateHostsTotalFreeMemoryTable = (
   indexPatternId: string,
   field: string,
   title: string,
@@ -20,8 +20,6 @@ const getVisStateHostsTotalFreeMemoryTable = (
     customLabel?: string;
   } = {},
 ) => {
-  const { excludeTerm, size = 5, perPage = 5, customLabel } = options;
-
   return {
     id: `${visIDPrefix}-${field}`,
     title,
@@ -342,8 +340,8 @@ export const getDashboardKPIs = (
         id: 's1',
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
-          'destination.port',
-          'Top 5 local ports',
+          'source.port',
+          'Top 5 source ports',
           'it-hygiene-top-operating-system-names',
           {
             fieldSize: 5,

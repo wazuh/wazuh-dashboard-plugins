@@ -19,7 +19,7 @@ const tabs = [
   },
   {
     id: 'protocols',
-    name: 'Types',
+    name: 'Protocols',
     component: ITHygieneNetworksInventoryProtocols,
   },
 ];

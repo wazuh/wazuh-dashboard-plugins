@@ -1,3 +1,4 @@
+import { getVisStateHostsTotalFreeMemoryTable } from '../../../dashboards/dashboard-kpi';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import {
   getVisStatePieByField,
@@ -66,7 +67,7 @@ export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.cpu.name',
-      'CPU processors',
+      'Top 5 CPU names',
       'it-hygiene-hardware',
       { customLabel: 'CPUs' },
     ),
@@ -77,10 +78,10 @@ export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
       'it-hygiene-hardware',
       { customLabel: 'Cores count' },
     ),
-    getVisStateHorizontalBarByField(
+    getVisStateHostsTotalFreeMemoryTable(
       indexPatternId,
       'host.memory.total',
-      'Top 5 host total memory',
+      'Top 5 host least free memory',
       'it-hygiene-stat',
       { customLabel: 'Hosts total memory' },
     ),
