@@ -80,9 +80,9 @@ export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.memory.total',
-      'Total memory',
-      'it-hygiene-hardware',
-      { customLabel: 'Total memory' },
+      'Top 5 host total memory',
+      'it-hygiene-stat',
+      { customLabel: 'Hosts total memory' },
     ),
   ]);
 };

@@ -1,10 +1,116 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { getVisStateHistogramBy } from '../common/saved-vis/generators';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
+import { HEIGHT, STYLE } from '../common/saved-vis/constants';
 import {
-  getVisStateHistrogramBy,
-  getVisStateHorizontalBarByField,
-  getVisStateHorizontalBarByFieldWithDynamicColors,
-} from '../common/saved-vis/generators';
+  createIndexPatternReferences,
+  createSearchSource,
+} from '../common/saved-vis/create-saved-vis-data';
+
+const getVisStateHostsTotalFreeMemoryTable = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  options: {
+    excludeTerm?: string;
+    size?: number;
+    perPage?: number;
+    customLabel?: string;
+  } = {},
+) => {
+  const { excludeTerm, size = 5, perPage = 5, customLabel } = options;
+
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title,
+    type: 'table',
+    params: {
+      perPage: 10,
+      showPartialRows: false,
+      showMetricsAtAllLevels: false,
+      showTotal: false,
+      totalFunc: 'sum',
+      percentageCol: '',
+    },
+    uiState: {
+      vis: {
+        sortColumn: {
+          colIndex: 2,
+          direction: 'asc',
+        },
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 125,
+          },
+          {
+            colIndex: 2,
+            width: 120,
+          },
+        ],
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'min',
+          params: {
+            field: 'host.memory.free',
+            customLabel: 'Free memory',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'agent.name',
+            orderBy: '_key',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Agent name',
+          },
+          schema: 'bucket',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'host.memory.total',
+            orderBy: 'custom',
+            orderAgg: {
+              id: '3-orderAgg',
+              enabled: true,
+              type: 'count',
+              params: {},
+              schema: 'orderAgg',
+            },
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Total memory',
+          },
+          schema: 'bucket',
+        },
+      ],
+    },
+  };
+};
 
 const getVisStateStatOperatingSystems = (indexPatternId: string) => {
   return {
@@ -226,7 +332,7 @@ export const getDashboardKPIs = (
     s1: {
       gridData: {
         w: 16,
-        h: 8,
+        h: 9,
         x: 0,
         y: 0,
         i: 's1',
@@ -234,19 +340,26 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's1',
-        savedVis: getVisStateHorizontalBarByFieldWithDynamicColors(
+        savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'destination.port',
           'Top 5 local ports',
           'it-hygiene-top-operating-system-names',
-          'Top ports',
+          {
+            fieldSize: 5,
+            metricCustomLabel: 'Top ports count',
+            valueAxesTitleText: 'Top ports count',
+            seriesLabel: 'Top ports',
+            seriesMode: 'normal',
+            fieldCustomLabel: 'Top ports',
+          },
         ),
       },
     },
     s2: {
       gridData: {
         w: 16,
-        h: 8,
+        h: 9,
         x: 16,
         y: 0,
         i: 's2',
@@ -254,7 +367,7 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's2',
-        savedVis: getVisStateHistrogramBy(
+        savedVis: getVisStateHistogramBy(
           indexPatternId,
           'process.start',
           'Processes initiation',
@@ -266,7 +379,7 @@ export const getDashboardKPIs = (
     s3: {
       gridData: {
         w: 16,
-        h: 8,
+        h: 9,
         x: 32,
         y: 0,
         i: 's3',
@@ -274,10 +387,10 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's3',
-        savedVis: getVisStateHorizontalBarByField(
+        savedVis: getVisStateHostsTotalFreeMemoryTable(
           indexPatternId,
           'host.memory.total',
-          'Top 5 host total memory',
+          'Top 5 host least free memory',
           'it-hygiene-stat',
           { customLabel: 'Hosts total memory' },
         ),

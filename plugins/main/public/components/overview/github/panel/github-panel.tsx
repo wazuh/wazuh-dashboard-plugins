@@ -87,14 +87,16 @@ export const GitHubPanel = withErrorBoundary(() => {
         <LoadingSearchbarProgress />
       ) : (
         <>
-          <CustomSearchBar
-            filterInputs={filtersValues}
-            filterDrillDownValue={drillDownValue}
-            fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
-            searchBarProps={{ ...searchBarProps }}
-            setFilters={setFilters}
-            indexPattern={dataSource?.indexPattern}
-          />
+          <div className="wz-custom-searchbar-wrapper">
+            <CustomSearchBar
+              filterInputs={filtersValues}
+              filterDrillDownValue={drillDownValue}
+              fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
+              searchBarProps={{ ...searchBarProps }}
+              setFilters={setFilters}
+              indexPattern={dataSource?.indexPattern}
+            />
+          </div>
           <MainPanel
             moduleConfig={ModuleConfig}
             filterDrillDownValue={filterDrillDownValue}

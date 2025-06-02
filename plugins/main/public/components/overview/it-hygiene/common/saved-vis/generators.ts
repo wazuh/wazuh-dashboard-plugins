@@ -389,7 +389,7 @@ export const getVisStateMetricFilterBy = (
   };
 };
 
-export const getVisStateHistrogramBy = (
+export const getVisStateHistogramBy = (
   indexPatternId: string,
   field: string,
   title: string,
