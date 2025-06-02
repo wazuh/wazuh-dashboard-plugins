@@ -5,9 +5,11 @@ export default [
     placeholder: 'Process name',
   },
   {
-    type: 'multiSelect',
+    type: 'multiSelectInput',
     key: 'source.port',
     placeholder: 'Source port',
+    validate: value =>
+      !value || /^\d+$/.test(value) ? undefined : 'Only numbers are allowed',
   },
   {
     type: 'multiSelect',

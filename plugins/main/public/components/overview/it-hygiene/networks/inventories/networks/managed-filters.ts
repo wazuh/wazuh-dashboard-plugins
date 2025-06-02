@@ -5,8 +5,8 @@ export default [
     placeholder: 'Name',
   },
   {
-    type: 'multiSelect', // TODO: replace by input tbd
-    key: 'network.ip',
+    type: 'multiSelectInput',
+    key: 'network.ip', // The default columns does not display this field
     placeholder: 'IP',
   },
   {
