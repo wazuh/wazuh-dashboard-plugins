@@ -119,7 +119,7 @@ This brings up a Dev environment for the `wazuh-dashboard-plugins` development b
 ./dev.sh $WZ_HOME up
 ```
 ### Important Note for Dashboard Initialization
-Starting from version 5.0.0, the Wazuh Dashboard container automatically:
+Starting from version 6.0.0, the Wazuh Dashboard container automatically:
 
 - Installs dependencies
 - Starts the server with yarn start --no-base-path
