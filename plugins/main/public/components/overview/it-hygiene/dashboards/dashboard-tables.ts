@@ -105,8 +105,6 @@ export const getDashboardTables = (
           'it-hygiene-top-packages',
           {
             customLabel: 'Top 5 packages',
-            excludeTerm:
-              '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
           },
         ),
       },
@@ -129,8 +127,6 @@ export const getDashboardTables = (
           'it-hygiene-top-processes',
           {
             customLabel: 'Top 5 processes',
-            excludeTerm:
-              '.*wazuh.*' /* Exclude by values that contains "wazuh" */,
           },
         ),
       },

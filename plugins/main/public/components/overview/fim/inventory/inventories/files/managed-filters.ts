@@ -2,7 +2,7 @@ export default [
   {
     type: 'multiSelect',
     key: 'file.path',
-    placeholder: 'Path',
+    placeholder: 'File path',
   },
   {
     type: 'multiSelect',

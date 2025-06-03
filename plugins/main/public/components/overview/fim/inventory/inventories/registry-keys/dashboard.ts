@@ -6,6 +6,16 @@ import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-da
 
 export const getDashboard = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
+    getVisStateTable(
+      indexPatternId,
+      'registry.path',
+      '',
+      'registry-keys-inventory',
+      {
+        size: 5,
+        fieldCustomLabel: 'Top 5 registry paths',
+      },
+    ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.owner',
@@ -32,16 +42,6 @@ export const getDashboard = (indexPatternId: string) => {
         valueAxesTitleText: 'Registry groups count',
         fieldCustomLabel: 'Registry group',
         seriesLabel: 'Registry group',
-      },
-    ),
-    getVisStateTable(
-      indexPatternId,
-      'registry.path',
-      '',
-      'registry-keys-inventory',
-      {
-        size: 5,
-        fieldCustomLabel: 'Top 5 registry paths',
       },
     ),
   ]);

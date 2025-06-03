@@ -88,7 +88,7 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
       'process.name',
       'Top 5 processes',
       'it-hygiene-processes',
-      { customLabel: 'Processes', excludeTerm: '.*wazuh.*' },
+      { customLabel: 'Processes' },
     ),
     getVisStateHistogramBy(
       indexPatternId,
