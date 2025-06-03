@@ -4,13 +4,9 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import {
-  getVisStateHorizontalBarByField,
-} from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
-import {
-  getVisStateHorizontalBarSplitSeries,
-} from '../../../../../../services/visualizations/index';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations/index';
 
 type HostArchitecture = 'x86_64' | 'arm64';
 

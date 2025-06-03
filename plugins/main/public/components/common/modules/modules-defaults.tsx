@@ -530,7 +530,6 @@ export const ModulesDefaults = {
         buttons: [ButtonExploreAgent],
         component: ITHygieneNetworksInventory,
       },
-
     ],
     availableFor: ['manager', 'agent'],
   },
