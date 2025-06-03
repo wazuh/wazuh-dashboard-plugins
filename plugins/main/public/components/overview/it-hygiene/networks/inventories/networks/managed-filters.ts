@@ -1,7 +1,7 @@
 export default [
   {
     type: 'multiSelectInput',
-    key: 'network.ip', // The default columns does not display this field
+    key: 'network.ip',
     placeholder: 'IP',
   },
   {
