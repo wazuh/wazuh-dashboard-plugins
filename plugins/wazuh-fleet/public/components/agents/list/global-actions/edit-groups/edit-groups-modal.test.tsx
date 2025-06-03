@@ -85,7 +85,7 @@ describe('EditAgentsGroupsModal component', () => {
   });
 
   test('should render the add groups modal correctly', () => {
-    const { getByText, queryByText, getByLabelText, getByRole } = render(
+    const { getByText, queryByText, getByRole, getAllByText } = render(
       <EditAgentsGroupsModal
         selectedAgents={mockSelectedAgents}
         allAgentsSelected={false}
@@ -101,7 +101,7 @@ describe('EditAgentsGroupsModal component', () => {
 
     // Check form elements
     expect(getByText('Selected agents')).toBeInTheDocument();
-    expect(getByLabelText('Groups to add')).toBeInTheDocument();
+    expect(getAllByText('Groups to add')[0]).toBeInTheDocument();
     // Number of selected agents
     expect(getByText('2')).toBeInTheDocument();
 
@@ -122,7 +122,7 @@ describe('EditAgentsGroupsModal component', () => {
   });
 
   test('should render the remove groups modal correctly', () => {
-    const { getByText, getByLabelText, queryByText, getByRole } = render(
+    const { getByText, queryByText, getByRole, getAllByText } = render(
       <EditAgentsGroupsModal
         selectedAgents={mockSelectedAgents}
         allAgentsSelected={false}
@@ -137,7 +137,7 @@ describe('EditAgentsGroupsModal component', () => {
     expect(getByText('Remove groups from agents')).toBeInTheDocument();
 
     // Check form elements
-    expect(getByLabelText('Groups to remove')).toBeInTheDocument();
+    expect(getAllByText('Groups to remove')[0]).toBeInTheDocument();
 
     // Warning should not be shown when allAgentsSelected is false
     expect(
