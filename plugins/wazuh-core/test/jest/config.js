@@ -8,6 +8,8 @@ export default {
   modulePaths: [`${kbnDir}/node_modules`],
   collectCoverageFrom: ['**/*.{js,jsx,ts,tsx}', './!**/node_modules/**'],
   moduleNameMapper: {
+    '@elastic/eui$': `${kbnDir}/node_modules/@elastic/eui/test-env`,
+    '@elastic/eui/lib/(.*)?': `${kbnDir}/node_modules/@elastic/eui/test-env/$1`,
     '^ui/(.*)': `${kbnDir}/src/ui/public/$1`,
     // eslint-disable-next-line max-len
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': `${kbnDir}/src/dev/jest/mocks/file_mock.js`,
