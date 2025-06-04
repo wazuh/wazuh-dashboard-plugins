@@ -96,6 +96,7 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
       'Processes start time',
       'it-hygiene-processes',
       'h',
+      { addLegend: false },
     ),
   ]);
 };

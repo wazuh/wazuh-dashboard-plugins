@@ -2,7 +2,7 @@ export default [
   {
     type: 'multiSelect',
     key: 'process.name',
-    placeholder: 'Process name',
+    placeholder: 'Name',
   },
   {
     type: 'multiSelect',

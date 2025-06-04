@@ -395,7 +395,11 @@ export const getVisStateHistogramBy = (
   title: string,
   visIDPrefix: string,
   interval: string = 'd',
+  options: {
+    addLegend?: boolean;
+  },
 ) => {
+  const { addLegend = true } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
@@ -463,7 +467,7 @@ export const getVisStateHistogramBy = (
         },
       ],
       addTooltip: true,
-      addLegend: true,
+      addLegend,
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
