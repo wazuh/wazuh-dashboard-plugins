@@ -397,9 +397,15 @@ export const getVisStateHistogramBy = (
   interval: string = 'd',
   options: {
     addLegend?: boolean;
+    customLabel?: string;
+    valueAxesTitleText?: string;
   },
 ) => {
-  const { addLegend = true } = options;
+  const {
+    addLegend = true,
+    customLabel = '',
+    valueAxesTitleText = 'Count',
+  } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
@@ -446,7 +452,7 @@ export const getVisStateHistogramBy = (
             truncate: 100,
           },
           title: {
-            text: 'Count',
+            text: valueAxesTitleText,
           },
         },
       ],
@@ -496,6 +502,7 @@ export const getVisStateHistogramBy = (
           enabled: true,
           type: 'date_histogram',
           params: {
+            customLabel,
             field: field,
             timeRange: {
               from: 'now-24h',

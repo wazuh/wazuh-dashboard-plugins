@@ -525,8 +525,8 @@ export const ModulesDefaults = {
         component: ITHygieneProcessesInventory,
       },
       {
-        id: 'networks',
-        name: 'Networks',
+        id: 'network',
+        name: 'Network',
         buttons: [ButtonExploreAgent],
         component: ITHygieneNetworksInventory,
       },
