@@ -39,7 +39,6 @@ import { getToasts } from '../../../../../../kibana-services';
 import exportCsv from '../../../../../../react-services/wz-csv';
 
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
@@ -73,7 +72,6 @@ class WzListEditor extends Component {
       addingValue: '',
       editingValue: '',
       newListName: '',
-      showWarningRestart: false,
       isInvalid: [],
     };
     this.items = {};
@@ -179,7 +177,6 @@ class WzListEditor extends Component {
       await this.resourcesHandler.updateFile(name, raw, overwrite);
       if (!addingNew) {
         const file = { name: name, content: raw, path: path };
-        this.setState({ showWarningRestart: true });
         this.showToast(
           'success',
           'Success',
@@ -188,7 +185,6 @@ class WzListEditor extends Component {
         );
         this.props.updateListContent(file);
       } else {
-        this.setState({ showWarningRestart: true });
         this.showToast('success', 'Success', 'CBD List updated', 3000);
       }
     } catch (error) {
@@ -791,19 +787,6 @@ class WzListEditor extends Component {
                     this.state.items,
                   )}
               </EuiFlexGroup>
-              {this.state.showWarningRestart && (
-                <Fragment>
-                  <EuiSpacer size='s' />
-                  <WzRestartClusterManagerCallout
-                    onRestarted={() =>
-                      this.setState({ showWarningRestart: false })
-                    }
-                    onRestartedError={() =>
-                      this.setState({ showWarningRestart: true })
-                    }
-                  />
-                </Fragment>
-              )}
               {/* CDB list table */}
               {this.renderAdd()}
               <EuiFlexGroup>

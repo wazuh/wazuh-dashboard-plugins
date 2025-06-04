@@ -25,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
+- Removed the cluster restart warning on rules, decoders and CDB lists [#7489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7489)
 - Removed `Inventory data` view from agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed `GET /api/syscollector` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)

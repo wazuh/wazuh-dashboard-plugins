@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 // Eui components
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-  EuiPage,
-  EuiSpacer,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiPage } from '@elastic/eui';
 
 // Wazuh components
 import {
@@ -19,38 +13,15 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_CDBLIST_KEY } from '../../common/constants';
 import CDBListsTable from '../components/cdblists-table';
 import '../../common/layout-overview.scss';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
 import { cdbLists } from '../../../../../../utils/applications';
 
 function WzCDBListsOverview(props) {
-  const [showWarningRestart, setShowWarningRestart] = useState(false);
-
-  const updateRestartManagers = showWarningRestart => {
-    setShowWarningRestart(showWarningRestart);
-  };
-
   return (
     <EuiPage style={{ background: 'transparent' }}>
       <EuiPanel>
-        {showWarningRestart && (
-          <>
-            <EuiSpacer size='s' />
-            <WzRestartClusterManagerCallout
-              onRestarted={() => updateRestartManagers(false)}
-              onRestartedError={() => updateRestartManagers(true)}
-            />
-            <EuiSpacer size='s' />
-          </>
-        )}
-
         <EuiFlexGroup>
           <EuiFlexItem>
-            <CDBListsTable
-              {...props}
-              updateRestartClusterManager={showWarningRestart =>
-                updateRestartManagers(showWarningRestart)
-              }
-            />
+            <CDBListsTable {...props} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
