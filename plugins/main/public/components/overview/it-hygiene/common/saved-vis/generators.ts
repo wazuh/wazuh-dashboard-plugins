@@ -521,9 +521,16 @@ export const getVisStateTable = (
     size?: number;
     perPage?: number;
     customLabel?: string;
+    filter?: any[];
   } = {},
 ) => {
-  const { excludeTerm, size = 5, perPage = 5, customLabel } = options;
+  const {
+    excludeTerm,
+    size = 5,
+    perPage = 5,
+    customLabel,
+    filter = [],
+  } = options;
 
   return {
     id: `${visIDPrefix}-${field}`,
@@ -549,7 +556,7 @@ export const getVisStateTable = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, { filter }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {

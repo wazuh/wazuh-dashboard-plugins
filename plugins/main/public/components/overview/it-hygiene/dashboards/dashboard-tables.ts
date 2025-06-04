@@ -122,11 +122,30 @@ export const getDashboardTables = (
         id: 't2',
         savedVis: getVisStateTable(
           indexPatternId,
-          'process.command_line' /* This uses process.command_line because this field is only on Processes */,
+          'process.name' /* This uses process.command_line because this field is only on Processes */,
           'Top 5 processes',
           'it-hygiene-top-processes',
           {
             customLabel: 'Top 5 processes',
+            filter: [
+              {
+                $state: {
+                  store: 'appState',
+                },
+                exists: {
+                  field: 'process.command_line',
+                },
+                meta: {
+                  alias: null,
+                  disabled: false,
+                  key: 'process.command_line',
+                  negate: false,
+                  type: 'exists',
+                  value: 'exists',
+                  index: indexPatternId,
+                },
+              },
+            ],
           },
         ),
       },
