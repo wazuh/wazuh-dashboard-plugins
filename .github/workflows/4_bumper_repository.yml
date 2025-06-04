@@ -2,6 +2,7 @@ name: Repository bumper
 run-name: Bump ${{ github.ref_name }} to ${{ inputs.version }} ${{ inputs.stage }} (${{ inputs.id }})
 
 on:
+  push:
   workflow_dispatch:
     inputs:
       version:
@@ -76,11 +77,11 @@ jobs:
       - name: Determine branch name
         id: vars
         run: |
-          declare bump_dest
           declare script_params
           declare version="${{ github.event.inputs.version }}"
           declare stage="${{ github.event.inputs.stage }}"
           declare tag="${{ github.event.inputs.tag }}"
+          declare bump_dest="${version}-${stage}"
 
           # Both version and stage provided
           if [[ -n $version && -n $stage && "$tag" != "true" ]]; then
