@@ -5,6 +5,7 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 import {
   getVisStateDHCPEnabledInterfacesMetric,
@@ -16,7 +17,7 @@ const getVisStateUniqueNetworkIPsMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-by-ip',
-    title: 'Unique networks IPs',
+    title: 'Unique network IPs',
     type: 'metric',
     params: {
       addTooltip: true,
@@ -77,6 +78,12 @@ export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
       },
     ),
     getVisStateUniqueNetworkIPsMetric(indexPatternId),
-    getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
+    getVisStateHorizontalBarByField(
+      indexPatternId,
+      'interface.name',
+      'Top 5 interface names',
+      'it-hygiene-networks',
+      { customLabel: 'Interface name' },
+    ),
   ]);
 };

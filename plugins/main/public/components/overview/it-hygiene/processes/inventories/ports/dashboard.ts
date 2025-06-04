@@ -151,7 +151,6 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
         fieldSize: 5,
         metricCustomLabel: 'Top ports count',
         valueAxesTitleText: 'Top ports count',
-        categoryAxesShow: true,
         seriesLabel: 'Top ports',
         seriesMode: 'normal',
         fieldCustomLabel: 'Top ports',
@@ -160,7 +159,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.state',
-      'State',
+      'Interface state',
       'it-hygiene-ports',
       {
         fieldSize: 4,
@@ -192,7 +191,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
       'process.name',
       'Top 5 processes',
       'it-hygiene-ports',
-      { customLabel: 'Processes', excludeTerm: '.*wazuh.*' },
+      { customLabel: 'Processes' },
     ),
   ]);
 };

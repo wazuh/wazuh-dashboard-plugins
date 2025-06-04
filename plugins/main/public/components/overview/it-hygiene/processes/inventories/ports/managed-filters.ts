@@ -9,7 +9,7 @@ export default [
   {
     type: 'multiSelect',
     key: 'interface.state',
-    placeholder: 'State',
+    placeholder: 'Interface state',
   },
   {
     type: 'multiSelect',

@@ -1,4 +1,5 @@
 export default [
+  { id: 'agent.name' },
   { id: 'source.port' },
   { id: 'source.ip' },
   { id: 'destination.port' },

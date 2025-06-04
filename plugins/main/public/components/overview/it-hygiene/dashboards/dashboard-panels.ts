@@ -1,6 +1,10 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateDonutByField } from '../common/saved-vis/generators';
+import {
+  getVisStateDonutByField,
+  getVisStateHistogramBy,
+} from '../common/saved-vis/generators';
+
 const getVisStateTopOSFamilies = (indexPatternId: string) => {
   return {
     id: 'it-hygiene-os-by-platform',
@@ -557,7 +561,13 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '3',
-        savedVis: getVisStateUsedMemoryByPercentage(indexPatternId),
+        savedVis: getVisStateHistogramBy(
+          indexPatternId,
+          'process.start',
+          'Processes start time',
+          'it-hygiene-processes',
+          'h',
+        ),
       },
     },
   };
@@ -610,7 +620,13 @@ const getAgentDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a3',
-        savedVis: getVisStateUsedMemoryByPercentage(indexPatternId),
+        savedVis: getVisStateHistogramBy(
+          indexPatternId,
+          'process.start',
+          'Processes start time',
+          'it-hygiene-processes',
+          'h',
+        ),
       },
     },
   };

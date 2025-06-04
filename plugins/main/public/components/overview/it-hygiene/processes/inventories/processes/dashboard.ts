@@ -93,7 +93,7 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
     getVisStateHistogramBy(
       indexPatternId,
       'process.start',
-      'Processes initiation',
+      'Processes start time',
       'it-hygiene-processes',
       'h',
     ),

@@ -319,7 +319,6 @@ export const getDashboardKPIs = (
             fieldSize: 5,
             metricCustomLabel: 'Top ports count',
             valueAxesTitleText: 'Top ports count',
-            categoryAxesShow: true,
             seriesLabel: 'Top ports',
             seriesMode: 'normal',
             fieldCustomLabel: 'Top ports',
@@ -338,12 +337,19 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's2',
-        savedVis: getVisStateHistogramBy(
+        savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
-          'process.start',
-          'Processes initiation',
-          'it-hygiene-processes',
-          'h',
+          'package.type',
+          'Package types',
+          'it-hygiene-system',
+          {
+            fieldSize: 4,
+            otherBucket: 'Others',
+            metricCustomLabel: 'Package types count',
+            valueAxesTitleText: 'Package types count',
+            fieldCustomLabel: 'Package type',
+            seriesLabel: 'Package type',
+          },
         ),
       },
     },
