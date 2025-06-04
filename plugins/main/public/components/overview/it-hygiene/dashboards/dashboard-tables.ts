@@ -133,13 +133,13 @@ export const getDashboardTables = (
                   store: 'appState',
                 },
                 exists: {
-                  field: 'process.command_line',
+                  field: 'source.port',
                 },
                 meta: {
                   alias: null,
                   disabled: false,
-                  key: 'process.command_line',
-                  negate: false,
+                  key: 'source.port',
+                  negate: true,
                   type: 'exists',
                   value: 'exists',
                   index: indexPatternId,
