@@ -478,7 +478,7 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
           id: '2',
           params: {
             customLabel: 'Observer ingress interface name',
-            field: 'observer.ingress.interface.name',
+            field: 'interface.name',
             missingBucket: false,
             missingBucketLabel: 'Missing',
             order: 'asc',

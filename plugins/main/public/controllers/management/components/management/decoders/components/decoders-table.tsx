@@ -257,7 +257,7 @@ export default compose(withUserPermissions)(function DecodersTable({
     }
   };
 
-  const { updateRestartClusterManager, updateFileContent } = props;
+  const { updateFileContent } = props;
   const columns = getColumns();
 
   /**
@@ -281,9 +281,6 @@ export default compose(withUserPermissions)(function DecodersTable({
         <UploadFilesButton
           section={SECTION_DECODERS_SECTION}
           showingFiles={showingFiles}
-          onSuccess={() => {
-            updateRestartClusterManager && updateRestartClusterManager();
-          }}
         />,
       );
     return buttons;
