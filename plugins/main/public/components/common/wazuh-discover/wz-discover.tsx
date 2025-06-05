@@ -290,6 +290,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                       additionalControls: (
                         <>
                           <DiscoverDataGridAdditionalControls
+                            dataGridStateManager={
+                              dataGridProps.dataGridStateManager
+                            }
                             totalHits={results?.hits?.total || 0}
                             isExporting={isExporting}
                             columnsAvailable={dataGridProps.columnsAvailable}

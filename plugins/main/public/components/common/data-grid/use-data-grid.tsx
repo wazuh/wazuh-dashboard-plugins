@@ -145,7 +145,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   useEffect(() => {
     setPagination(pagination => ({
       ...pagination,
-      pageSize: dataGridStateManager.retrieveState().pageSize,
+      pageSize: dataGridStateManager.state.pageSize,
     }));
   }, [moduleId]);
 
@@ -270,5 +270,6 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       onChangePage: onChangePage,
     },
     setPagination,
+    dataGridStateManager,
   } as TDataGridReturn;
 };

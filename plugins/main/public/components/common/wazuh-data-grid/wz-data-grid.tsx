@@ -173,6 +173,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
               additionalControls: (
                 <>
                   <DiscoverDataGridAdditionalControls
+                    dataGridStateManager={dataGridProps.dataGridStateManager}
                     totalHits={results.hits.total}
                     isExporting={isExporting}
                     onClickExportResults={onClickExportResults}

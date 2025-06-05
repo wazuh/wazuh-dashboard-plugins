@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { DataGridState, DataGridStatePersistenceManager } from './types';
 import { DEFAULT_PAGE_SIZE } from '../constants';
 
@@ -18,6 +18,9 @@ const useDataGridStatePersistenceManager = ({
   columnSchemaDefinitionsMap,
   indexPatternExists,
 }: UseDataGridStateManagementProps) => {
+  const [internalState, setInternalState] =
+    useState<Partial<DataGridState>>(defaultState);
+
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
       // Avoid validation if we have no columns to validate
@@ -145,6 +148,7 @@ const useDataGridStatePersistenceManager = ({
 
   const clearState = () => {
     stateManagement.clearState();
+    setInternalState(defaultState);
   };
 
   const retrieveState = (): DataGridState => {
@@ -200,6 +204,7 @@ const useDataGridStatePersistenceManager = ({
 
   const persistState = (payload: Partial<DataGridState>): void => {
     stateManagement.persistState(payload);
+    setInternalState(payload);
   };
 
   const updateState = (payload: Partial<DataGridState>): void => {
@@ -208,11 +213,19 @@ const useDataGridStatePersistenceManager = ({
     persistState(newState);
   };
 
+  // Check if the state is equal to the default state
+  const isStateEqualToDefault =
+    JSON.stringify(internalState) === JSON.stringify(defaultState);
+
+  console.log(isStateEqualToDefault);
+
   return {
     retrieveState,
     persistState,
     updateState,
     clearState,
+    state: internalState,
+    isStateEqualToDefault,
   };
 };
 

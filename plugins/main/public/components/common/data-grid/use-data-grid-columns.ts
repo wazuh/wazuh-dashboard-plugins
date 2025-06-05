@@ -119,7 +119,7 @@ function useDataGridColumns({
     }
 
     try {
-      const persistedColumns = dataGridStateManager.retrieveState().columns;
+      const persistedColumns = dataGridStateManager.state.columns;
 
       if (!persistedColumns || persistedColumns.length === 0) {
         return;
@@ -133,6 +133,24 @@ function useDataGridColumns({
     // I need AllColumns to trigger updates when it changes, because when I retrieve the persisted column state, I need to verify that those persisted columns actually exist within the columns defined in the Index Pattern. That’s why I need both.
   }, [moduleId, indexPatternExists]);
 
+  // New effect to sync state changes with visible columns
+  useEffect(() => {
+    if (!indexPatternExists || !dataGridStateManager.state.columns) {
+      return;
+    }
+
+    const stateColumns = dataGridStateManager.state.columns;
+
+    // Check if state columns are different from current visible columns
+    const isDifferent =
+      stateColumns.length !== visibleColumns.length ||
+      stateColumns.some((col, index) => col !== visibleColumns[index]);
+
+    if (isDifferent) {
+      setVisibleColumns(stateColumns);
+    }
+  }, [dataGridStateManager.state.columns, indexPatternExists]);
+
   const onColumnResize: EuiDataGridProps['onColumnResize'] = ({
     columnId,
     width,
@@ -140,7 +158,7 @@ function useDataGridColumns({
     const column = columnSchemaDefinitionsMap[columnId];
 
     if (column) {
-      const currentWidths = dataGridStateManager.retrieveState().columnWidths;
+      const currentWidths = dataGridStateManager.state.columnWidths;
 
       dataGridStateManager.updateState({
         columnWidths: {
@@ -156,7 +174,7 @@ function useDataGridColumns({
     (columnId: string) => {
       let column = { ...columnSchemaDefinitionsMap[columnId] };
       const savedColumnWidth =
-        dataGridStateManager.retrieveState().columnWidths[columnId];
+        dataGridStateManager.state.columnWidths[columnId];
 
       if (savedColumnWidth) {
         column.initialWidth = savedColumnWidth;

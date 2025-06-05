@@ -12,6 +12,8 @@ import { formatNumWithCommas } from '../../../../kibana-integrations/discover/ap
 import { MAX_ENTRIES_PER_QUERY } from '../../data-grid/data-grid-service';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { DataGridVisibleColumnsSelector } from './visible-columns-selector';
+import RestoreStateColumnsButton from './restore-state-columns';
+import useDataGridStatePersistenceManager from '../../data-grid/data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 
 type tDiscoverDataGridAdditionalControlsProps = {
   totalHits: number;
@@ -21,6 +23,7 @@ type tDiscoverDataGridAdditionalControlsProps = {
   dateRange: TimeRange;
   columnsAvailable: EuiDataGridColumn[];
   columnVisibility: EuiDataGridColumnVisibility;
+  dataGridStateManager: ReturnType<typeof useDataGridStatePersistenceManager>;
 };
 
 const DiscoverDataGridAdditionalControls = (
@@ -34,6 +37,7 @@ const DiscoverDataGridAdditionalControls = (
     dateRange,
     columnsAvailable,
     columnVisibility,
+    dataGridStateManager,
   } = props;
   const onHandleExportResults = () => {
     onClickExportResults && onClickExportResults();
@@ -82,6 +86,8 @@ const DiscoverDataGridAdditionalControls = (
       >
         Export Formatted
       </EuiButtonEmpty>
+
+      <RestoreStateColumnsButton dataGridStateManager={dataGridStateManager} />
 
       <DataGridVisibleColumnsSelector
         availableColumns={columnsAvailable}
