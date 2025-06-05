@@ -1,0 +1,54 @@
+{
+  "data": {
+    "affected_items": [
+      {
+        "filename": "0015-ossec_rules.xml",
+        "relative_dirname": "ruleset/rules",
+        "id": 505,
+        "level": 3,
+        "status": "enabled",
+        "details": {
+          "if_sid": "500",
+          "match": {
+            "pattern": "Agent removed"
+          }
+        },
+        "pci_dss": ["10.6.1", "10.2.6"],
+        "gpg13": ["10.1"],
+        "gdpr": ["IV_35.7.d"],
+        "hipaa": ["164.312.b"],
+        "nist_800_53": ["AU.6", "AU.14", "AU.5"],
+        "tsc": ["CC7.2", "CC7.3", "CC6.8"],
+        "mitre": ["T1562.001"],
+        "groups": ["ossec"],
+        "description": "Wazuh agent removed."
+      },
+      {
+        "filename": "0020-syslog_rules.xml",
+        "relative_dirname": "ruleset/rules",
+        "id": 1001,
+        "level": 2,
+        "status": "enabled",
+        "details": {
+          "match": {
+            "pattern": "^Couldn't open /etc/securetty"
+          }
+        },
+        "pci_dss": ["0.2.4"],
+        "gpg13": ["4.1"],
+        "gdpr": ["IV_35.7.d"],
+        "hipaa": ["164.312.b"],
+        "nist_800_53": ["AU.14", "AC.7"],
+        "tsc": ["CC6.1", "CC6.8", "CC7.2", "CC7.3"],
+        "mitre": [],
+        "groups": ["syslog", "errors"],
+        "description": "File missing. Root access unrestricted."
+      }
+    ],
+    "total_affected_items": 2,
+    "total_failed_items": 0,
+    "failed_items": []
+  },
+  "message": "All selected rules were returned",
+  "error": 0
+}
