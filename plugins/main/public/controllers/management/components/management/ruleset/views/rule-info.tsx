@@ -42,11 +42,11 @@ export default withRouterSearch(
     constructor(props) {
       super(props);
       this.complianceEquivalences = {
-        pci: 'PCI DSS',
+        pci_dss: 'PCI DSS',
         gdpr: 'GDPR',
         gpg13: 'GPG 13',
         hipaa: 'HIPAA',
-        'nist-800-53': 'NIST-800-53',
+        nist_800_53: 'NIST-800-53',
         tsc: 'TSC',
         mitreTactics: 'MITRE Tactics',
         mitreTechniques: 'MITRE Techniques',
@@ -245,8 +245,8 @@ export default withRouterSearch(
         'gdpr',
         'gpg13',
         'hipaa',
-        'nist-800-53',
-        'pci',
+        'nist_800_53',
+        'pci_dss',
         'tsc',
         'mitre',
       ];
