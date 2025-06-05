@@ -224,7 +224,8 @@ export const ITHygiene = {
     defaultMessage: 'IT Hygiene',
   }),
   description: i18n.translate('wz-app-it-hygiene-description', {
-    defaultMessage: 'Gain comprehensive visibility into your assets.',
+    defaultMessage:
+      'Assess system, software, runtime, and network layers to detect misconfigurations, unauthorized changes, and anomalies.',
   }),
   euiIconType: 'indexPatternApp',
   order: 400,
