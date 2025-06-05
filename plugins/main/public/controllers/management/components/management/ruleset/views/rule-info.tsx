@@ -201,7 +201,7 @@ export default withRouterSearch(
 
         const compliance = this.buildCompliance(currentRule);
         if (compliance?.mitre?.length && currentRuleId !== mitreRuleId) {
-          mitreState = this.addMitreInformation(
+          mitreState = await this.addMitreInformation(
             compliance.mitre,
             currentRuleId,
           );
