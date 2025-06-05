@@ -91,5 +91,19 @@ export const getOverviewSystemSystemTab = (indexPatternId: string) => {
       'it-hygiene-system',
       { customLabel: 'OS' },
     ),
+    getVisStateHorizontalBarSplitSeries(
+      indexPatternId,
+      'host.architecture',
+      'Architecture',
+      'it-hygiene-system',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Host architecture count',
+        valueAxesTitleText: ' ',
+        fieldCustomLabel: 'Host architecture',
+        seriesLabel: 'Host architecture',
+      },
+    ),
   ]);
 };

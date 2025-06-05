@@ -172,13 +172,13 @@ export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'package.type',
-      'Package type',
+      'Package types',
       'it-hygiene-packages',
       {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Package type count',
-        valueAxesTitleText: 'Package type count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'Package type count',
         fieldCustomLabel: 'Package type',
       },

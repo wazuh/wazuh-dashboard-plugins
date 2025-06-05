@@ -2,7 +2,7 @@ export default [
   {
     type: 'multiSelect',
     key: 'registry.path',
-    placeholder: 'Registry path',
+    placeholder: 'Path',
   },
   {
     type: 'multiSelect',

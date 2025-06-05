@@ -4,133 +4,7 @@ import {
   getVisStateDonutByField,
   getVisStateHistogramBy,
 } from '../common/saved-vis/generators';
-
-const getVisStateTopOSFamilies = (indexPatternId: string) => {
-  return {
-    id: 'it-hygiene-os-by-platform',
-    title: 'Operating system families',
-    type: 'horizontal_bar',
-    params: {
-      type: 'histogram',
-      grid: {
-        categoryLines: false,
-      },
-      categoryAxes: [
-        {
-          id: 'CategoryAxis-1',
-          type: 'category',
-          position: 'left',
-          show: true,
-          style: {},
-          scale: {
-            type: 'linear',
-          },
-          labels: {
-            show: true,
-            rotate: 0,
-            filter: false,
-            truncate: 200,
-          },
-          title: {},
-        },
-      ],
-      valueAxes: [
-        {
-          id: 'ValueAxis-1',
-          name: 'LeftAxis-1',
-          type: 'value',
-          position: 'bottom',
-          show: true,
-          style: {},
-          scale: {
-            type: 'linear',
-            mode: 'normal',
-          },
-          labels: {
-            show: true,
-            rotate: 75,
-            filter: true,
-            truncate: 100,
-          },
-          title: {
-            text: 'Count',
-          },
-        },
-      ],
-      seriesParams: [
-        {
-          show: true,
-          type: 'histogram',
-          mode: 'normal',
-          data: {
-            label: 'Count',
-            id: '1',
-          },
-          valueAxis: 'ValueAxis-1',
-          drawLinesBetweenPoints: true,
-          lineWidth: 2,
-          showCircles: true,
-        },
-      ],
-      addTooltip: true,
-      addLegend: true,
-      legendPosition: 'right',
-      times: [],
-      addTimeMarker: false,
-      labels: {},
-      thresholdLine: {
-        show: false,
-        value: 10,
-        width: 1,
-        style: 'full',
-        color: '#E7664C',
-      },
-      row: true,
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {},
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'terms',
-          params: {
-            field: 'host.os.platform',
-            orderBy: '1',
-            order: 'desc',
-            size: 10,
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
+import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
 
 const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
   return {
@@ -531,8 +405,30 @@ const getOverviewDashboardPanels = (
         savedVis: getVisStateDonutByField(
           indexPatternId,
           'interface.state',
-          'Interface state',
+          'TPC connection status',
           'it-hygiene-stat',
+          'desc',
+          {
+            filter: [
+              {
+                $state: {
+                  store: 'appState',
+                },
+                exists: {
+                  field: 'interface.name',
+                },
+                meta: {
+                  alias: null,
+                  disabled: false,
+                  key: 'interface.name',
+                  negate: true,
+                  type: 'exists',
+                  value: 'exists',
+                  index: indexPatternId,
+                },
+              },
+            ],
+          },
         ),
       },
     },
@@ -547,7 +443,20 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '2',
-        savedVis: getVisStateTopOSFamilies(indexPatternId),
+        savedVis: getVisStateHorizontalBarSplitSeries(
+          indexPatternId,
+          'source.port',
+          'Top 5 source ports',
+          'it-hygiene-top-operating-system-names',
+          {
+            fieldSize: 5,
+            metricCustomLabel: 'Top ports count',
+            valueAxesTitleText: ' ',
+            seriesLabel: 'Top ports',
+            seriesMode: 'normal',
+            fieldCustomLabel: 'Top ports',
+          },
+        ),
       },
     },
     '3': {
@@ -593,7 +502,34 @@ const getAgentDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a1',
-        savedVis: getVisStateAgentRemotePortByRemoteIP(indexPatternId),
+        savedVis: getVisStateDonutByField(
+          indexPatternId,
+          'interface.state',
+          'TPC connection status',
+          'it-hygiene-stat',
+          'desc',
+          {
+            filter: [
+              {
+                $state: {
+                  store: 'appState',
+                },
+                exists: {
+                  field: 'interface.name',
+                },
+                meta: {
+                  alias: null,
+                  disabled: false,
+                  key: 'interface.name',
+                  negate: true,
+                  type: 'exists',
+                  value: 'exists',
+                  index: indexPatternId,
+                },
+              },
+            ],
+          },
+        ),
       },
     },
     a2: {
@@ -607,7 +543,20 @@ const getAgentDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a2',
-        savedVis: getVisStateTopOSFamilies(indexPatternId),
+        savedVis: getVisStateHorizontalBarSplitSeries(
+          indexPatternId,
+          'source.port',
+          'Top 5 source ports',
+          'it-hygiene-top-operating-system-names',
+          {
+            fieldSize: 5,
+            metricCustomLabel: 'Top ports count',
+            valueAxesTitleText: ' ',
+            seriesLabel: 'Top ports',
+            seriesMode: 'normal',
+            fieldCustomLabel: 'Top ports',
+          },
+        ),
       },
     },
     a3: {

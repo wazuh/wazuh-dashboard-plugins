@@ -19,7 +19,7 @@ export const getDashboard = (indexPatternId: string) => {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'File owner count',
-        valueAxesTitleText: 'File owner count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'File owner count',
         fieldCustomLabel: 'File owner',
       },

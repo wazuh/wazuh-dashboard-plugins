@@ -101,10 +101,10 @@ export const getDashboardTables = (
         savedVis: getVisStateTable(
           indexPatternId,
           'package.name',
-          'Top 5 packages',
+          'Top 5 installed packages',
           'it-hygiene-top-packages',
           {
-            customLabel: 'Top 5 packages',
+            customLabel: 'Top 5 installed packages',
           },
         ),
       },
@@ -122,11 +122,11 @@ export const getDashboardTables = (
         id: 't2',
         savedVis: getVisStateTable(
           indexPatternId,
-          'process.name' /* This uses process.command_line because this field is only on Processes */,
-          'Top 5 processes',
+          'process.name',
+          'Top 5 running processes',
           'it-hygiene-top-processes',
           {
-            customLabel: 'Top 5 processes',
+            customLabel: 'Top 5 running processes',
             filter: [
               {
                 $state: {
@@ -189,7 +189,7 @@ export const getDashboardTables = (
           'Top 5 CPUs',
           'it-hygiene-stat',
           {
-            customLabel: 'Top 5 hosts CPUs',
+            customLabel: 'Top 5 host CPUs',
           },
         ),
       },

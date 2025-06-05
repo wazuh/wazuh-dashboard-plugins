@@ -276,13 +276,13 @@ export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.state',
-      'Interfaces state',
+      'Interface states',
       'it-hygiene-interfaces',
       {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Interfaces state count',
-        valueAxesTitleText: 'Interfaces state count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'Interfaces state',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Interfaces state',
@@ -291,13 +291,13 @@ export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.type',
-      'Interfaces type',
+      'Interface types',
       'it-hygiene-interfaces',
       {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Interfaces type count',
-        valueAxesTitleText: 'Interfaces type count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'Type',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Type',

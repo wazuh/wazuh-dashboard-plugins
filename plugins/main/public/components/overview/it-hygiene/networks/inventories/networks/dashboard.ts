@@ -65,13 +65,13 @@ export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.type',
-      'Network type',
+      'Network types',
       'it-hygiene-networks',
       {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Network type count',
-        valueAxesTitleText: 'Network type count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'Type',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Type',

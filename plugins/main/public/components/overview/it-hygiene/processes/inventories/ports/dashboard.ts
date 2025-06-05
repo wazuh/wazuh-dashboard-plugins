@@ -150,7 +150,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
       {
         fieldSize: 5,
         metricCustomLabel: 'Top ports count',
-        valueAxesTitleText: 'Top ports count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'Top ports',
         seriesMode: 'normal',
         fieldCustomLabel: 'Top ports',
@@ -159,13 +159,13 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.state',
-      'Interface state',
+      'Interface states',
       'it-hygiene-ports',
       {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Interface state count',
-        valueAxesTitleText: 'Interface state count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'Interface state',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Interface state',
@@ -180,7 +180,7 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Transport protocols count',
-        valueAxesTitleText: 'Transport protocols count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'Transport protocols',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Transport protocols',

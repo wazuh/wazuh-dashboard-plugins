@@ -16,6 +16,16 @@ export const getDashboard = (indexPatternId: string) => {
         fieldCustomLabel: 'Top 5 registry paths',
       },
     ),
+    getVisStateTable(
+      indexPatternId,
+      'registry.value',
+      '',
+      'registry-values-inventory',
+      {
+        size: 5,
+        fieldCustomLabel: 'Top 5 registry values',
+      },
+    ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.data.type',
@@ -25,7 +35,7 @@ export const getDashboard = (indexPatternId: string) => {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Registry data type count',
-        valueAxesTitleText: 'Registry data type count',
+        valueAxesTitleText: ' ',
         fieldCustomLabel: 'Registry data type',
         seriesLabel: 'Registry data type',
       },

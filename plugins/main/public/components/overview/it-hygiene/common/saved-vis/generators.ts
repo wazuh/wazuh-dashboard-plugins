@@ -66,7 +66,11 @@ export const getVisStateDonutByField = (
   title: string,
   visIDPrefix: string,
   orderAggregation: 'asc' | 'desc' = 'desc',
+  options: {
+    filter?: any[];
+  },
 ) => {
+  const { filter = [] } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
@@ -85,7 +89,7 @@ export const getVisStateDonutByField = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, { filter }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {

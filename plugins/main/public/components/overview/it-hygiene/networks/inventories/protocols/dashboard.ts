@@ -71,13 +71,13 @@ export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.type',
-      'Network type',
+      'Network types',
       'it-hygiene-protocols',
       {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Network type count',
-        valueAxesTitleText: 'Network type count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'Type',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Type',
@@ -87,16 +87,16 @@ export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.dhcp',
-      'DHCP',
+      'DHCP enabled',
       'it-hygiene-protocols',
       {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'Network DHCP count',
-        valueAxesTitleText: 'Network DHCP count',
-        seriesLabel: 'DHCP',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'DHCP enabled',
         seriesMode: 'stacked',
-        fieldCustomLabel: 'DHCP',
+        fieldCustomLabel: 'DHCP enabled',
       },
     ),
   ]);

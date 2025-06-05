@@ -82,215 +82,6 @@ export const getVisStateHostsTotalFreeMemoryTable = (
   };
 };
 
-const getVisStateStatOperatingSystems = (indexPatternId: string) => {
-  return {
-    id: 'it-hygiene-stat-unique-operating-systems',
-    title: 'Unique operating systems',
-    type: 'metric',
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        invertColors: false,
-        style: {
-          bgFill: '#000',
-          bgColor: false,
-          labelColor: false,
-          subText: '',
-          fontSize: 40,
-        },
-      },
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'cardinality',
-          params: {
-            field: 'host.os.full',
-            customLabel: 'Operating systems',
-          },
-          schema: 'metric',
-        },
-      ],
-    },
-  };
-};
-
-const getVisStateStatPackages = (indexPatternId: string) => {
-  return {
-    id: 'it-hygiene-stat-packages',
-    title: 'Packages',
-    type: 'metric',
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        invertColors: false,
-        style: {
-          bgFill: '#000',
-          bgColor: false,
-          labelColor: false,
-          subText: '',
-          fontSize: 40,
-        },
-      },
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'cardinality',
-          params: {
-            field: 'package.name',
-            customLabel: 'Packages',
-          },
-          schema: 'metric',
-        },
-      ],
-    },
-  };
-};
-
-const getVisStateStatProcesses = (indexPatternId: string) => {
-  return {
-    id: 'it-hygiene-stat-processes',
-    title: 'Processes',
-    type: 'metric',
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        invertColors: false,
-        style: {
-          bgFill: '#000',
-          bgColor: false,
-          labelColor: false,
-          subText: '',
-          fontSize: 40,
-        },
-      },
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {},
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'process.state:Zombie',
-                  language: 'kuery',
-                },
-                label: 'Zombie processes',
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
-
 export const getDashboardKPIs = (
   indexPatternId: string,
 ): {
@@ -312,16 +103,17 @@ export const getDashboardKPIs = (
         id: 's1',
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
-          'source.port',
-          'Top 5 source ports',
+          'host.os.platform',
+          'Operating system families',
           'it-hygiene-top-operating-system-names',
           {
-            fieldSize: 5,
-            metricCustomLabel: 'Top ports count',
-            valueAxesTitleText: 'Top ports count',
-            seriesLabel: 'Top ports',
+            fieldSize: 9,
+            otherBucket: 'Others',
+            metricCustomLabel: 'OS families',
+            valueAxesTitleText: ' ',
+            seriesLabel: 'OS families',
             seriesMode: 'normal',
-            fieldCustomLabel: 'Top ports',
+            fieldCustomLabel: 'OS families',
           },
         ),
       },
@@ -346,7 +138,7 @@ export const getDashboardKPIs = (
             fieldSize: 4,
             otherBucket: 'Others',
             metricCustomLabel: 'Package types count',
-            valueAxesTitleText: 'Package types count',
+            valueAxesTitleText: ' ',
             fieldCustomLabel: 'Package type',
             seriesLabel: 'Package type',
           },
