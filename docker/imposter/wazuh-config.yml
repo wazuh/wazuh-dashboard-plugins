@@ -592,7 +592,7 @@ resources:
     path: /rules
     response:
       statusCode: 200
-      staticFile: rules/rules.json
+      scriptFile: rules/rules.js
 
   # Get groups
   - method: GET
