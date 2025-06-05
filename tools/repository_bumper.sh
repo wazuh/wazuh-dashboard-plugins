@@ -14,6 +14,7 @@ VERSION_FILE="${REPO_PATH}/VERSION.json"
 VERSION=""
 STAGE=""
 REVISION="00"
+TAG=false
 CURRENT_VERSION=""
 CURRENT_MAJOR_MINOR=""
 NEW_MAJOR_MINOR=""
@@ -34,16 +35,23 @@ log() {
 
 # Function to show usage
 usage() {
-  echo "Usage: $0 --version VERSION --stage STAGE [--help]"
+  echo "Usage: $0 [--version VERSION --stage STAGE | --tag] [--help]"
   echo ""
   echo "Parameters:"
   echo "  --version VERSION   Specify the version (e.g., 4.6.0)"
+  echo "                      Required if --tag is not used"
   echo "  --stage STAGE       Specify the stage (e.g., alpha0, beta1, rc2, etc.)"
+  echo "                      Required if --tag is not used"
+  echo "  --tag               Generate a tag"
+  echo "                      If --stage is not set, it will be stageless(e.g., v4.6.0)"
+  echo "                      Otherwise it will be with the provided stage (e.g., v4.6.0-alpha1)"
+  echo "                      If this is set, --version and --stage are not required."
   echo "  --help              Display this help message"
   echo ""
-  echo "Example:"
+  echo "Examples:"
   echo "  $0 --version 4.6.0 --stage alpha0"
-  echo "  $0 --version 4.6.0 --stage beta1"
+  echo "  $0 --tag --stage alpha1"
+  echo "  $0 --tag"
 }
 
 # Function to update JSON file using sed
@@ -138,20 +146,29 @@ update_imposter_config() {
     return
   fi
 
-  # Read the current version from specFile
-  local current_spec_version
-  current_spec_version=$(grep -oE 'specFile: https://raw.githubusercontent.com/wazuh/wazuh/[0-9]+\.[0-9]+\.[0-9]+' "$imposter_config_file" | sed -E 's/.*wazuh\/([0-9]+\.[0-9]+\.[0-9]+)$/\1/' | head -n1)
+  local replacement
+  if [ "$TAG" = true ]; then
+    replacement="v${VERSION}"
+    if [ -n "$STAGE" ]; then
+      replacement+="-${STAGE}"
+    fi
+  else
+    replacement="${VERSION}"
+  fi
 
-  if [ "$current_spec_version" = "$new_version" ]; then
-    # If the version is already correct, do nothing and don't report
+# Extract current reference from URL
+  local current_spec_ref
+  current_spec_ref=$(grep -oE 'specFile: https://raw.githubusercontent.com/wazuh/wazuh/[^/]+/' "$imposter_config_file" | sed -E 's|.*/wazuh/([^/]+)/.*|\1|' | head -n1)
+
+  if [ "$current_spec_ref" = "$replacement" ]; then
     return
   fi
 
   log "Updating specFile URL in $imposter_config_file to version $new_version"
 
   # Use sed to replace the version string within the specFile URL
-  # This regex targets the version part (e.g., 5.0.0) in the specific URL structure
-  sed -i -E "s|(specFile: https://raw.githubusercontent.com/wazuh/wazuh/)[0-9]+\.[0-9]+\.[0-9]+(.*)|\1${new_version}\2|" "$imposter_config_file" && log "Successfully updated specFile URL in $imposter_config_file" || {
+ sed -i -E "s|(specFile: https://raw.githubusercontent.com/wazuh/wazuh/)[^/]+|\1${replacement}|" "$imposter_config_file" && \
+    log "Successfully updated specFile URL in $imposter_config_file" || {
     log "ERROR: Failed to update specFile URL in $imposter_config_file using sed."
     exit 1
   }
@@ -175,6 +192,10 @@ parse_arguments() {
       usage
       exit 0
       ;;
+      --tag)
+      TAG=true
+      shift
+  ;;
     *)
       log "ERROR: Unknown option: $1" # Log error instead of just echo
       usage
@@ -186,21 +207,24 @@ parse_arguments() {
 
 # Function to validate input parameters
 validate_input() {
-  if [ -z "$VERSION" ]; then
-    log "ERROR: Version parameter is required"
+   if [ -z "$VERSION" ] && [ "$TAG" != true ]; then
+    log "ERROR: --version is required unless --tag is set"
     usage
     exit 1
   fi
-  if [ -z "$STAGE" ]; then
-    log "ERROR: Stage parameter is required"
+
+  if [ -z "$STAGE" ] && [ "$TAG" != true ]; then
+    log "ERROR: --stage is required unless --tag is set"
     usage
     exit 1
   fi
-  if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+
+  if [ -n "$VERSION" ] && ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     log "ERROR: Version must be in the format x.y.z (e.g., 4.6.0)"
     exit 1
   fi
-  if ! [[ $STAGE =~ ^[a-zA-Z]+[0-9]+$ ]]; then
+
+  if [ -n "$STAGE" ] && ! [[ $STAGE =~ ^[a-zA-Z]+[0-9]+$ ]]; then
     log "ERROR: Stage must be alphanumeric (e.g., alpha0, beta1, rc2)"
     exit 1
   fi
@@ -231,7 +255,12 @@ pre_update_checks() {
   log "Current version detected in VERSION.json: $CURRENT_VERSION"
 
   CURRENT_MAJOR_MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f1,2)
-  NEW_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
+  if [ -z "$VERSION" ]; then # Check specifically for "null" string if sed might output that
+    NEW_MAJOR_MINOR=$CURRENT_MAJOR_MINOR
+  else
+    NEW_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
+  fi
+
   log "Current major.minor: $CURRENT_MAJOR_MINOR"
   log "New major.minor: $NEW_MAJOR_MINOR"
   log "Default revision set to: $REVISION" # Log default revision here
@@ -276,26 +305,29 @@ compare_versions_and_set_revision() {
         REVISION="00" # Reset revision on patch increase
       else
         # Versions are identical (Major, Minor, Patch are equal)
-        log "New version ($VERSION) is identical to current version ($CURRENT_VERSION). Incrementing revision."
-        local main_package_json="${REPO_PATH}/plugins/main/package.json" # Need path again
-        log "Attempting to extract current revision from $main_package_json using sed (Note: This is fragile)"
-        local current_revision_val=$(sed -n 's/^\s*"revision"\s*:\s*"\([^"]*\)".*$/\1/p' "$main_package_json" | head -n 1)
-        # Check if sed successfully extracted a revision
-        if [ -z "$current_revision_val" ]; then
-          log "ERROR: Failed to extract 'revision' from $main_package_json using sed. Check file format or key presence."
-          exit 1 # Exit if sed fails
+        log "New version ($VERSION) is identical to current version ($CURRENT_VERSION)"
+        if [ -n "$STAGE" ]; then
+          log "Incrementing revision."
+          local main_package_json="${REPO_PATH}/plugins/main/package.json" # Need path again
+          log "Attempting to extract current revision from $main_package_json using sed (Note: This is fragile)"
+          local current_revision_val=$(sed -n 's/^\s*"revision"\s*:\s*"\([^"]*\)".*$/\1/p' "$main_package_json" | head -n 1)
+          # Check if sed successfully extracted a revision
+          if [ -z "$current_revision_val" ]; then
+            log "ERROR: Failed to extract 'revision' from $main_package_json using sed. Check file format or key presence."
+            exit 1 # Exit if sed fails
+          fi
+          log "Successfully extracted revision using sed: $current_revision_val"
+          if [ -z "$current_revision_val" ] || [ "$current_revision_val" == "null" ]; then
+            log "ERROR: Could not read current revision from $main_package_json"
+            exit 1
+          fi
+          # Ensure CURRENT_REVISION is treated as a number (remove leading zeros for arithmetic if necessary, handle base 10)
+          local current_revision_int=$((10#$current_revision_val))
+          local new_revision_int=$((current_revision_int + 1))
+          # Format back to two digits with leading zero
+          REVISION=$(printf "%02d" "$new_revision_int")
+          log "Current revision: $current_revision_val. New revision set to: $REVISION"
         fi
-        log "Successfully extracted revision using sed: $current_revision_val"
-        if [ -z "$current_revision_val" ] || [ "$current_revision_val" == "null" ]; then
-          log "ERROR: Could not read current revision from $main_package_json"
-          exit 1
-        fi
-        # Ensure CURRENT_REVISION is treated as a number (remove leading zeros for arithmetic if necessary, handle base 10)
-        local current_revision_int=$((10#$current_revision_val))
-        local new_revision_int=$((current_revision_int + 1))
-        # Format back to two digits with leading zero
-        REVISION=$(printf "%02d" "$new_revision_int")
-        log "Current revision: $current_revision_val. New revision set to: $REVISION"
       fi
     fi
   fi
@@ -306,8 +338,12 @@ compare_versions_and_set_revision() {
 update_root_version_json() {
   if [ -f "$VERSION_FILE" ]; then
     log "Processing $VERSION_FILE"
-    update_json "$VERSION_FILE" "version" "$VERSION"
-    update_json "$VERSION_FILE" "stage" "$STAGE"
+    if [ -n "$VERSION" ]; then
+      update_json "$VERSION_FILE" "version" "$VERSION"
+    fi
+    if [ -n "$STAGE" ]; then
+      update_json "$VERSION_FILE" "stage" "$STAGE"
+    fi
   else
     log "WARNING: $VERSION_FILE not found. Skipping update."
   fi
@@ -377,13 +413,15 @@ update_changelog() {
 
   # Check if an entry for this version and OpenSearch version already exists
   if grep -qE "$changelog_header_regex" "$changelog_file"; then
-    log "Changelog entry for this version and OpenSearch Dashboards version exists. Updating revision only."
-    # Use sed to update only the revision number in the header
-    sed -i -E "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file" &&
+    if [ -n "$STAGE" ]; then
+      log "Changelog entry for this version and OpenSearch Dashboards version exists. Updating revision only."
+      # Use sed to update only the revision number in the header
+      sed -i -E "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file" &&
       log "CHANGELOG.md revision updated successfully." || {
       log "ERROR: Failed to update revision in $changelog_file"
       exit 1
-    }
+      }
+    fi
   else
     log "No existing changelog entry for this version and OpenSearch Dashboards version. Inserting new entry."
     local new_entry
@@ -427,6 +465,10 @@ main() {
 
   # Perform pre-update checks
   pre_update_checks
+  if [ -z "$VERSION" ]; then
+    VERSION=$CURRENT_VERSION # If no version provided, use current version
+  fi
+
 
   # Compare versions and determine revision
   compare_versions_and_set_revision
@@ -450,8 +492,9 @@ main() {
   update_osd_json_files
   update_changelog
 
+
   # Conditionally update endpoints.json
-  if [ "$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR" ]; then
+  if [[ -n "$VERSION" && "$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR" ]]; then
     log "Major.minor version changed ($CURRENT_MAJOR_MINOR -> $NEW_MAJOR_MINOR). Updating endpoints.json..."
     update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
   else

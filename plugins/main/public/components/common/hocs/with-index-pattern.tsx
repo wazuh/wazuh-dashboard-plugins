@@ -242,6 +242,11 @@ const fieldMappers = {
   // integer, remove thousands and decimals separator thorugh the params.pattern
   integer: ({ type }) =>
     type === 'number' ? { id: 'number', params: { pattern: '0' } } : undefined,
+  percent: ({ type }) => {
+    return type === 'number'
+      ? { id: 'percent', params: { pattern: '0,0.[00]%' } }
+      : undefined;
+  },
 };
 
 export function mapFieldsFormat(expectedFields: {

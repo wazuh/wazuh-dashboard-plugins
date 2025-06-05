@@ -1,8 +1,8 @@
 export default [
   { id: 'agent.name' },
-  { id: 'observer.ingress.interface.name' },
+  { id: 'interface.name' },
   { id: 'host.mac' },
-  { id: 'observer.ingress.interface.state' },
-  { id: 'observer.ingress.interface.mtu' },
-  { id: 'observer.ingress.interface.type' },
+  { id: 'interface.state' },
+  { id: 'interface.mtu' },
+  { id: 'interface.type' },
 ];
