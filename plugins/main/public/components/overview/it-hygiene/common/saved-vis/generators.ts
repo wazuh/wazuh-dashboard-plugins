@@ -66,7 +66,11 @@ export const getVisStateDonutByField = (
   title: string,
   visIDPrefix: string,
   orderAggregation: 'asc' | 'desc' = 'desc',
+  options: {
+    filter?: any[];
+  },
 ) => {
+  const { filter = [] } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
@@ -85,7 +89,7 @@ export const getVisStateDonutByField = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, { filter }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {
@@ -121,10 +125,19 @@ export const getVisStateHorizontalBarByField = (
   field: string,
   title: string,
   visIDPrefix: string,
-  fieldCustomLabel: string,
-  addLegend: boolean = false,
-  orderAggregation: 'asc' | 'desc' = 'desc',
+  options: {
+    excludeTerm?: string;
+    addLegend?: boolean;
+    orderAggregation?: 'asc' | 'desc';
+    customLabel?: string;
+  } = {},
 ) => {
+  const {
+    excludeTerm,
+    addLegend = false,
+    orderAggregation = 'desc',
+    customLabel,
+  } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
@@ -229,13 +242,34 @@ export const getVisStateHorizontalBarByField = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: fieldCustomLabel,
+            customLabel,
+            ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
           },
           schema: 'segment',
         },
       ],
     },
   };
+};
+
+export const getVisStateHorizontalBarByFieldWithDynamicColors = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  fieldCustomLabel: string,
+  addLegend: boolean = true,
+  orderAggregation: 'asc' | 'desc' = 'desc',
+) => {
+  const visState = getVisStateHorizontalBarByField(
+    indexPatternId,
+    field,
+    title,
+    visIDPrefix,
+    { customLabel: fieldCustomLabel, addLegend, orderAggregation },
+  );
+
+  return visState;
 };
 
 export const getVisStateMetricUniqueCountByField = (
@@ -359,13 +393,23 @@ export const getVisStateMetricFilterBy = (
   };
 };
 
-export const getVisStateHistrogramBy = (
+export const getVisStateHistogramBy = (
   indexPatternId: string,
   field: string,
   title: string,
   visIDPrefix: string,
   interval: string = 'd',
+  options: {
+    addLegend?: boolean;
+    customLabel?: string;
+    valueAxesTitleText?: string;
+  },
 ) => {
+  const {
+    addLegend = true,
+    customLabel = '',
+    valueAxesTitleText = 'Count',
+  } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
@@ -412,7 +456,7 @@ export const getVisStateHistrogramBy = (
             truncate: 100,
           },
           title: {
-            text: 'Count',
+            text: valueAxesTitleText,
           },
         },
       ],
@@ -433,7 +477,7 @@ export const getVisStateHistrogramBy = (
         },
       ],
       addTooltip: true,
-      addLegend: true,
+      addLegend,
       legendPosition: 'right',
       times: [],
       addTimeMarker: false,
@@ -462,6 +506,7 @@ export const getVisStateHistrogramBy = (
           enabled: true,
           type: 'date_histogram',
           params: {
+            customLabel,
             field: field,
             timeRange: {
               from: 'now-24h',
@@ -475,6 +520,86 @@ export const getVisStateHistrogramBy = (
             extended_bounds: {},
           },
           schema: 'segment',
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateTable = (
+  indexPatternId: string,
+  field: string,
+  title: string,
+  visIDPrefix: string,
+  options: {
+    excludeTerm?: string;
+    size?: number;
+    perPage?: number;
+    customLabel?: string;
+    filter?: any[];
+  } = {},
+) => {
+  const {
+    excludeTerm,
+    size = 5,
+    perPage = 5,
+    customLabel,
+    filter = [],
+  } = options;
+
+  return {
+    id: `${visIDPrefix}-${field}`,
+    title,
+    type: 'table',
+    params: {
+      perPage: perPage,
+      percentageCol: '',
+      row: true,
+      showMetricsAtAllLevels: false,
+      showPartialRows: false,
+      showTotal: false,
+      totalFunc: 'sum',
+    },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 75,
+          },
+        ],
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId, { filter }),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Count',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field,
+            orderBy: '1',
+            order: 'desc',
+            size,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel,
+            ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
+          },
+          schema: 'bucket',
         },
       ],
     },

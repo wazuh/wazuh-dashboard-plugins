@@ -5,8 +5,8 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import {
-  getVisStateHistrogramBy,
   getVisStateHorizontalBarByField,
+  getVisStateHistogramBy,
 } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 
@@ -88,14 +88,15 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
       'process.name',
       'Top 5 processes',
       'it-hygiene-processes',
-      'Processes',
+      { customLabel: 'Processes' },
     ),
-    getVisStateHistrogramBy(
+    getVisStateHistogramBy(
       indexPatternId,
       'process.start',
-      'Processes initiation',
+      'Processes start time',
       'it-hygiene-processes',
       'h',
+      { addLegend: false, customLabel: ' ', valueAxesTitleText: '' },
     ),
   ]);
 };

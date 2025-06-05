@@ -307,7 +307,9 @@ export const getVisStateHorizontalBarSplitSeries = (
     fieldCustomLabel?: string;
     metricCustomLabel?: string;
     valueAxesTitleText?: string;
+    categoryAxesShow?: boolean;
     seriesLabel?: string;
+    seriesMode?: 'stacked' | 'normal';
     // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
@@ -321,7 +323,9 @@ export const getVisStateHorizontalBarSplitSeries = (
     fieldCustomLabel,
     metricCustomLabel,
     valueAxesTitleText = '',
+    categoryAxesShow = false,
     seriesLabel = '',
+    seriesMode = 'stacked',
     otherBucket,
     missingBucket,
   } = options;
@@ -346,7 +350,7 @@ export const getVisStateHorizontalBarSplitSeries = (
           scale: {
             type: 'linear',
           },
-          show: false,
+          show: categoryAxesShow,
           style: {},
           title: {},
           type: 'category',
@@ -367,7 +371,7 @@ export const getVisStateHorizontalBarSplitSeries = (
           },
           drawLinesBetweenPoints: true,
           lineWidth: 2,
-          mode: 'stacked',
+          mode: seriesMode,
           show: true,
           showCircles: true,
           type: 'histogram',

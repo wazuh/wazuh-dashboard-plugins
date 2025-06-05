@@ -1,9 +1,8 @@
 import { PatternDataSourceRepository } from './pattern-data-source-repository';
-import store from '../../../../redux/store';
 import { get } from 'lodash';
 
-export const createPatternDataSourceRepositoryUseSettingValue = (
-  settingKey: string,
+export const createPatternDataSourceRepositoryUseValue = (
+  indexPattern: string,
 ) => {
   return class PatternDataSourceRepositoryUseSettingValue extends PatternDataSourceRepository {
     constructor() {
@@ -31,12 +30,7 @@ export const createPatternDataSourceRepositoryUseSettingValue = (
     Caveats:
       - configuration should be loaded and set the Redux store
     */
-      return fieldsToCheck.some(
-        key =>
-          store.getState()?.appConfig?.data?.[settingKey] &&
-          get(dataSource, key) ===
-            store.getState()?.appConfig?.data?.[settingKey],
-      );
+      return fieldsToCheck.some(key => get(dataSource, key) === indexPattern);
     }
 
     getDefault() {

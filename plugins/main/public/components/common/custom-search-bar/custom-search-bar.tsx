@@ -24,6 +24,7 @@ import { getCustomValueSuggestion } from '../../../components/overview/office/pa
 import { I18nProvider } from '@osd/i18n/react';
 import { tUseSearchBarProps } from '../search-bar/use-search-bar';
 import { WzSearchBar } from '../search-bar/search-bar';
+import { MultiSelectInput } from './components/multi-select-input';
 
 interface FilterInput {
   type: string;
@@ -222,13 +223,24 @@ export const CustomSearchBar = ({
           indexPattern={indexPattern}
         />
       ),
+      multiSelectInput: (
+        <MultiSelectInput
+          item={item}
+          selectedOptions={selectedOptions[item.key] || []}
+          onChange={onChange}
+          onRemove={onRemove}
+          isDisabled={checkSelectDrillDownValue(item.key)}
+          filterDrillDownValue={filterDrillDownValue}
+          indexPattern={indexPattern}
+        />
+      ),
     };
     return types[item.type] || types.default;
   };
 
   return (
     <I18nProvider>
-      <div style={{ margin: '20px 20px 0px 20px' }}>
+      <div>
         <WzSearchBar
           {...searchBarProps}
           fixedFilters={fixedFilters}

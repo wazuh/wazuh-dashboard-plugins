@@ -9,7 +9,7 @@ import { ITHygieneInventoryTabLayout } from '../common/components/inventory';
 const tabs = [
   {
     id: 'networks',
-    name: 'Networks',
+    name: 'Addresses',
     component: ITHygieneNetworksInventoryNetworks,
   },
   {
