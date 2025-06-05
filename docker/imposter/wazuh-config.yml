@@ -590,6 +590,9 @@ resources:
   # List rules
   - method: GET
     path: /rules
+    response:
+      statusCode: 200
+      staticFile: rules/rules.json
 
   # Get groups
   - method: GET
