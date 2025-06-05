@@ -493,7 +493,6 @@ main() {
     update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
   else
     log "Major.minor version ($CURRENT_MAJOR_MINOR) remains the same. Skipping endpoints.json update."
-    log "New major minor is $NEW_MAJOR_MINOR"
   fi
 
   # Update docker/imposter/wazuh-config.yml
