@@ -3,11 +3,15 @@ import { EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import {
   ensureIndexPatternIsCreated,
-  withIndexPatternFromSettingDataSource,
+  withIndexPatternFromValue,
   ERROR_NO_INDICES_FOUND,
   withMapErrorPromptErrorEnsureIndexPattern,
   mapFieldsFormat,
 } from '../../../../common/hocs/with-index-pattern';
+import {
+  WAZUH_FIM_FILES_PATTERN,
+  WAZUH_FIM_REGISTRIES_PATTERN,
+} from '../../../../../../common/constants';
 
 const errorPromptTypes = {
   [ERROR_NO_INDICES_FOUND]: {
@@ -43,8 +47,8 @@ const errorPromptTypes = {
   },
 };
 
-export const withFIMFilesDataSource = withIndexPatternFromSettingDataSource({
-  indexPatternSetting: 'fim_files.pattern',
+export const withFIMFilesDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_FIM_FILES_PATTERN,
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   validate: ensureIndexPatternIsCreated(
     mapFieldsFormat({
@@ -53,13 +57,12 @@ export const withFIMFilesDataSource = withIndexPatternFromSettingDataSource({
   ),
 });
 
-export const withFIMRegistriesDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'fim_registries.pattern',
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-    validate: ensureIndexPatternIsCreated(
-      mapFieldsFormat({
-        'registry.size': 'bytes',
-      }),
-    ),
-  });
+export const withFIMRegistriesDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_FIM_REGISTRIES_PATTERN,
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  validate: ensureIndexPatternIsCreated(
+    mapFieldsFormat({
+      'registry.size': 'bytes',
+    }),
+  ),
+});

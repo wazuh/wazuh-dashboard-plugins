@@ -1,7 +1,6 @@
 import React from 'react';
 import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { withGuardAsync } from '../../../../common/hocs';
+import { withGuardAsync, withInjectProps } from '../../../../common/hocs';
 import {
   existsIndices,
   existsIndexPattern,
@@ -9,10 +8,11 @@ import {
 } from '../../../../../react-services';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { vulnerabilityDetection } from '../../../../../utils/applications';
 import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
-import NavigationService from '../../../../../react-services/navigation-service';
-import { HTTP_STATUS_CODES } from '../../../../../../common/constants';
+import {
+  HTTP_STATUS_CODES,
+  WAZUH_VULNERABILITIES_PATTERN,
+} from '../../../../../../common/constants';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
@@ -109,13 +109,10 @@ export const PromptCheckIndex = props => {
   );
 };
 
-const mapStateToProps = state => ({
-  vulnerabilitiesStatesindexPatternID:
-    state.appConfig.data['vulnerabilities.pattern'],
-});
-
 export const withVulnerabilitiesStateDataSource = compose(
-  connect(mapStateToProps),
+  withInjectProps({
+    vulnerabilitiesStatesindexPatternID: WAZUH_VULNERABILITIES_PATTERN,
+  }),
   withGuardAsync(
     validateVulnerabilitiesStateDataSources,
     ({ error, check }) => <PromptCheckIndex error={error} refresh={check} />,
