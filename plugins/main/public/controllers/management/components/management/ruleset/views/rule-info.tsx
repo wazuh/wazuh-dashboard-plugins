@@ -582,6 +582,7 @@ export default withRouterSearch(
             mitreIds,
             mitreTactics: uniqueTactics,
             mitreTechniques: mitreName,
+            mitreLoading: false,
           });
         }
       } catch (error) {
