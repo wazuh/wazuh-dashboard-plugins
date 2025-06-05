@@ -68,7 +68,6 @@ typings/
 # dotenv environment variables file
 .env
 
-
 target/
 build/
 
@@ -87,3 +86,11 @@ public/assets/custom/*
 #Vulnerabilities events injector config and data
 scripts/vulnerabilities-events-injector/DIS_Settings.json
 scripts/vulnerabilities-events-injector/generatedData.json
+
+# Python Virtual Environments
+__pycache__
+python3.*
+bin/
+site-packages/
+lib64
+pyvenv.cfg

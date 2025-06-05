@@ -1,3 +1,4 @@
+/* eslint-disable */
 /*
  * Wazuh app - XML utils.
  * Copyright (C) 2015-2022 Wazuh, Inc.
@@ -9,30 +10,17 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
 const parser = new DOMParser();
 
 /**
- * Validate XML
- * @param {string} xml
- * @returns {string|boolean}
+ * Replace string in a XML
+ * @param {string} str
+ * @param {string} split
+ * @param {string} newstr
+ * @returns {string}
  */
-export const validateXML = xml => {
-  const xmlReplaced = replaceIllegalXML(xml)
-    .replace(/..xml.+\?>/, '')
-    .replace(/\\</gm, '');
-  const xmlDoc = parser.parseFromString(
-    `<file>${xmlReplaced}</file>`,
-    'text/xml'
-  );
-  const parsererror = xmlDoc.getElementsByTagName('parsererror');
-  if (parsererror.length) {
-    const xmlFullError = parsererror[0].textContent;
-    return (
-      (xmlFullError.match('error\\s.+\n') || [])[0] || 'Error validating XML'
-    );
-  }
-  return false;
+export const replaceXML = function (str, split, newstr) {
+  return str.split(split).join(newstr);
 };
 
 /**
@@ -45,7 +33,16 @@ export const replaceIllegalXML = text => {
   const lines = oDOM.documentElement.textContent.split('\n');
 
   for (const line of lines) {
-    const sanitized = replaceXML(line.trim(), '&', '&amp;');
+    let sanitized = replaceXML(line.trim(), '&', '&amp;');
+
+    /*
+      This lines escapes the backslashes to avoid code editor
+      error validation. The case is when a windows path is used inside a XML tag
+      or as an attribute value.
+    */
+    if (sanitized.includes('\\') && !sanitized.includes('&amp;#92;')) {
+      sanitized = replaceXML(sanitized, '\\', '&amp;#92;');
+    }
 
     /**
      * Do not remove this condition. We don't want to replace
@@ -59,12 +56,24 @@ export const replaceIllegalXML = text => {
 };
 
 /**
- * Replace string in a XML
- * @param {string} str
- * @param {string} split
- * @param {string} newstr
- * @returns {string}
+ * Validate XML
+ * @param {string} xml
+ * @returns {string|boolean}
  */
-export const replaceXML = function(str, split, newstr) {
-  return str.split(split).join(newstr);
+export const validateXML = xml => {
+  const xmlReplaced = replaceIllegalXML(xml)
+    .replace(/..xml.+\?>/, '')
+    .replace(/\\</gm, '');
+  const xmlDoc = parser.parseFromString(
+    `<file>${xmlReplaced}</file>`,
+    'text/xml',
+  );
+  const parsererror = xmlDoc.getElementsByTagName('parsererror');
+  if (parsererror.length) {
+    const xmlFullError = parsererror[0].textContent;
+    return (
+      (xmlFullError.match('error\\s.+\n') || [])[0] || 'Error validating XML'
+    );
+  }
+  return false;
 };

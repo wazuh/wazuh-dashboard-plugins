@@ -8,6 +8,8 @@ import {
   EuiPageBody,
   EuiSpacer,
   EuiProgress,
+  EuiToolTip,
+  EuiButtonIcon,
 } from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -42,6 +44,8 @@ import {
   nestedResolve,
   savedSearch,
 } from '../../../../../services/resolves';
+import NavigationService from '../../../../../react-services/navigation-service';
+import { SECTIONS } from '../../../../../sections';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
@@ -136,18 +140,18 @@ export const RegisterAgent = compose(
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const wazuhVersion = await getWazuhVersion();
-        const { auth: authConfig } = await getMasterConfig();
+        const [wazuhVersion, masterConfig, groups] = await Promise.all([
+          getWazuhVersion(),
+          getMasterConfig(),
+          getGroups(),
+        ]);
+        const { auth: authConfig } = masterConfig;
         // get wazuh password configuration
         let wazuhPassword = '';
         const needsPassword = authConfig?.auth?.use_password === 'yes';
         if (needsPassword) {
-          wazuhPassword =
-            configuration?.['enrollment.password'] ||
-            authConfig?.['authd.pass'] ||
-            '';
+          wazuhPassword = authConfig?.['authd.pass'] || '';
         }
-        const groups = await getGroups();
         setNeedsPassword(needsPassword);
         setWazuhPassword(wazuhPassword);
         setWazuhVersion(wazuhVersion);
@@ -179,6 +183,10 @@ export const RegisterAgent = compose(
     <InputForm {...form.fields.operatingSystemSelection}></InputForm>
   );
 
+  const goBackEndpointSummary = () => {
+    NavigationService.getInstance().navigate(`/${SECTIONS.AGENTS_PREVIEW}`);
+  };
+
   return (
     <div>
       <EuiPage style={{ background: 'transparent' }}>
@@ -188,9 +196,28 @@ export const RegisterAgent = compose(
               <EuiPanel className='register-agent-wizard-container'>
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <EuiTitle size='s'>
-                      <h1>Deploy new agent</h1>
-                    </EuiTitle>
+                    <EuiFlexGroup>
+                      <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
+                        <EuiToolTip
+                          position='right'
+                          content={`Back to Endpoints`}
+                        >
+                          <EuiButtonIcon
+                            aria-label='Back'
+                            style={{ marginTop: 4 }}
+                            color='primary'
+                            iconSize='l'
+                            iconType='arrowLeft'
+                            onClick={() => goBackEndpointSummary()}
+                          />
+                        </EuiToolTip>
+                      </EuiFlexItem>
+                      <EuiFlexItem grow={false}>
+                        <EuiTitle size='s'>
+                          <h1>Deploy new agent</h1>
+                        </EuiTitle>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
                   </EuiFlexItem>
                 </EuiFlexGroup>
                 <EuiSpacer />

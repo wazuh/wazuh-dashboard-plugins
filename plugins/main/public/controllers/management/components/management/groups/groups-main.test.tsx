@@ -43,6 +43,13 @@ const mockProps = {
 const mockStore = configureMockStore();
 const store = mockStore({});
 
+// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
+// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
+
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
+}));
+
 describe('Group main component', () => {
   it('renders correctly to match the snapshot', () => {
     const wrapper = shallow(

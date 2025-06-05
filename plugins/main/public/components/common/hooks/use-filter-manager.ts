@@ -9,11 +9,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { getDataPlugin } from '../../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../../kibana-services';
 import { useState, useEffect, useMemo } from 'react';
-import { Filter } from '../../../../../../src/plugins/data/public';
+import {
+  Filter,
+  FilterManager,
+} from '../../../../../../src/plugins/data/public';
 import _ from 'lodash';
-import { FilterManager } from '../../../../../../src/plugins/data/public';
 import { Subscription } from 'rxjs';
 
 type tUseFilterManagerReturn = {
@@ -34,7 +36,7 @@ export const useFilterManager = (): tUseFilterManagerReturn => {
           const newFilters = filterManager.getFilters();
           setFilters(newFilters);
         },
-      })
+      }),
     );
 
     return () => {
@@ -43,4 +45,9 @@ export const useFilterManager = (): tUseFilterManagerReturn => {
   }, [filterManager]);
 
   return { filterManager, filters };
+};
+
+export const useNewFilterManager = () => {
+  const filterManager = useMemo(() => new FilterManager(getUiSettings()), []);
+  return { filterManager, filters: filterManager.filters };
 };

@@ -26,8 +26,6 @@ import {
 // @ts-ignore
 import { getFimAlerts } from './lib';
 import { formatUIDate } from '../../../../../react-services/time-service';
-import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout';
-import { EuiLink } from '@elastic/eui';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { fileIntegrityMonitoring } from '../../../../../utils/applications';
@@ -85,8 +83,6 @@ export function useTimeFilter() {
 
 function FimTable({ agent }) {
   const [fimAlerts, setFimAlerts] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [file, setFile] = useState('');
   const [sort, setSort] = useState({
     field: '_source.timestamp',
     direction: 'desc',
@@ -95,27 +91,17 @@ function FimTable({ agent }) {
   useEffect(() => {
     getFimAlerts(agent.id, timeFilter, sort).then(setFimAlerts);
   }, [timeFilter, sort, agent.id]);
+
   return (
-    <Fragment>
-      <EuiBasicTable
-        items={fimAlerts}
-        columns={columns(setFile, setIsOpen)}
-        loading={false}
-        sorting={{ sort }}
-        onChange={e => setSort(e.sort)}
-        itemId='fim-alerts'
-        noItemsMessage='No recent events'
-      />
-      {isOpen && (
-        <FlyoutDetail
-          agentId={agent.id}
-          closeFlyout={() => setIsOpen(false)}
-          fileName={file}
-          view='extern'
-          {...{ agent }}
-        />
-      )}
-    </Fragment>
+    <EuiBasicTable
+      items={fimAlerts}
+      columns={columns}
+      loading={false}
+      sorting={{ sort }}
+      onChange={e => setSort(e.sort)}
+      itemId='fim-alerts'
+      noItemsMessage='No recent events'
+    />
   );
 }
 
@@ -124,7 +110,7 @@ function navigateToFim(agent) {
   pinnedAgentManager.pinAgent(agent);
 }
 
-const columns = (setFile, setIsOpen) => [
+const columns = [
   {
     field: '_source.timestamp',
     name: 'Time',
@@ -137,7 +123,6 @@ const columns = (setFile, setIsOpen) => [
     name: 'Path',
     sortable: true,
     truncateText: true,
-    render: path => renderPath(path, setFile, setIsOpen),
   },
   {
     field: '_source.syscheck.event',
@@ -159,14 +144,3 @@ const columns = (setFile, setIsOpen) => [
   },
   { field: '_source.rule.id', name: 'Rule Id', sortable: true, width: '75px' },
 ];
-
-const renderPath = (path, setFile, setIsOpen) => (
-  <EuiLink
-    className='euiTableCellContent__text euiTableCellContent--truncateText'
-    onClick={() => {
-      setFile(path), setIsOpen(true);
-    }}
-  >
-    {path}
-  </EuiLink>
-);

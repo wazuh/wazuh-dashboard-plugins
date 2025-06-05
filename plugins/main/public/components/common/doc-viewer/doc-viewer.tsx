@@ -25,6 +25,7 @@ export type tDocViewerProps = {
   filters: Filter[];
   setFilters: (filters: Filter[]) => void;
   onFilter?: () => void;
+  showFilterButtons?: boolean;
 };
 
 /**
@@ -102,6 +103,7 @@ const DocViewer = (props: tDocViewerProps) => {
     filters,
     setFilters,
     onFilter: onClose,
+    showFilterButtons = true,
   } = props;
 
   const onFilter = (
@@ -183,35 +185,37 @@ const DocViewer = (props: tDocViewerProps) => {
                       </EuiFlexGroup>
                     </td>
                     <td>
-                      <div className='wzDocViewer__buttons'>
-                        <DocViewTableRowBtnFilterAdd
-                          disabled={!fieldMapping || !fieldMapping.filterable}
-                          onClick={() =>
-                            onFilter(
-                              field,
-                              FILTER_OPERATOR.IS,
-                              flattened[field],
-                            )
-                          }
-                        />
-                        <DocViewTableRowBtnFilterRemove
-                          disabled={!fieldMapping || !fieldMapping.filterable}
-                          onClick={() =>
-                            onFilter(
-                              field,
-                              FILTER_OPERATOR.IS_NOT,
-                              flattened[field],
-                            )
-                          }
-                        />
-                        <DocViewTableRowBtnFilterExists
-                          disabled={!fieldMapping || !fieldMapping.filterable}
-                          onClick={() =>
-                            onFilter(field, FILTER_OPERATOR.EXISTS)
-                          }
-                          scripted={fieldMapping && fieldMapping.scripted}
-                        />
-                      </div>
+                      {showFilterButtons && (
+                        <div className='wzDocViewer__buttons'>
+                          <DocViewTableRowBtnFilterAdd
+                            disabled={!fieldMapping || !fieldMapping.filterable}
+                            onClick={() =>
+                              onFilter(
+                                field,
+                                FILTER_OPERATOR.IS,
+                                flattened[field],
+                              )
+                            }
+                          />
+                          <DocViewTableRowBtnFilterRemove
+                            disabled={!fieldMapping || !fieldMapping.filterable}
+                            onClick={() =>
+                              onFilter(
+                                field,
+                                FILTER_OPERATOR.IS_NOT,
+                                flattened[field],
+                              )
+                            }
+                          />
+                          <DocViewTableRowBtnFilterExists
+                            disabled={!fieldMapping || !fieldMapping.filterable}
+                            onClick={() =>
+                              onFilter(field, FILTER_OPERATOR.EXISTS)
+                            }
+                            scripted={fieldMapping && fieldMapping.scripted}
+                          />
+                        </div>
+                      )}
                       {renderFields &&
                       renderFields?.find(
                         (field: string) => field?.id === displayName,

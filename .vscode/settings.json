@@ -13,5 +13,9 @@
   "explorer.confirmDelete": true,
   "files.autoSave": "off",
   "javascript.updateImportsOnFileMove.enabled": "always",
-  "typescript.updateImportsOnFileMove.enabled": "always"
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "[ignore]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "eslint.enable": false
 }
