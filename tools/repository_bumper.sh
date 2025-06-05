@@ -255,7 +255,12 @@ pre_update_checks() {
   log "Current version detected in VERSION.json: $CURRENT_VERSION"
 
   CURRENT_MAJOR_MINOR=$(echo "$CURRENT_VERSION" | cut -d. -f1,2)
-  NEW_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
+  if [ -z "$VERSION" ]; then # Check specifically for "null" string if sed might output that
+    NEW_MAJOR_MINOR=$CURRENT_MAJOR_MINOR
+  else
+    NEW_MAJOR_MINOR=$(echo "$VERSION" | cut -d. -f1,2)
+  fi
+
   log "Current major.minor: $CURRENT_MAJOR_MINOR"
   log "New major.minor: $NEW_MAJOR_MINOR"
   log "Default revision set to: $REVISION" # Log default revision here
@@ -460,10 +465,11 @@ main() {
 
   # Perform pre-update checks
   pre_update_checks
-
   if [ -z "$VERSION" ]; then
     VERSION=$CURRENT_VERSION # If no version provided, use current version
   fi
+
+
   # Compare versions and determine revision
   compare_versions_and_set_revision
 
