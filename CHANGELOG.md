@@ -24,6 +24,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed a problem in Vulnerabilities > Dashboard and Inventory when there are no indices matching with the index pattern [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Fixed double backslash warning on xml editor [#7425](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7425)
+- Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
 
 ### Removed
 
@@ -32,11 +34,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed `GET /api/syscollector` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed the `enrollment.password` field from the `/utils/configuration` endpoint response to prevent unauthorized agent registration by users with read-only API roles. [#7483](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7483)
-
-### Fixed
-
-- Fixed double backslash warning on xml editor [#7425](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7425)
-- Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
 
 ## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 03
 
