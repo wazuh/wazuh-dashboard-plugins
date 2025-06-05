@@ -1,19 +1,22 @@
 name: Repository bumper
-run-name: Bump ${{ github.ref_name }} to ${{ inputs.version }} ${{ inputs.stage }} (${{ inputs.id }})
+run-name: Bump ${{ github.ref_name }} (${{ inputs.id }})
 
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Target version (e.g. 4.13.0)'
+        description: 'Target version (e.g. 4.12.0)'
+        default: ''
         required: false
         type: string
       stage:
         description: 'Version stage (e.g. alpha0)'
+        default: ''
         required: false
         type: string
       tag:
-        description: 'Change branches references to tag-like references (e.g. v4.13.0-alpha7)'
+        description: 'Change branches references to tag-like references (e.g. v4.12.0-alpha7)'
+        default: false
         required: false
         type: boolean
       issue-link:
@@ -28,7 +31,7 @@ on:
 jobs:
   bump:
     name: Repository bumper
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     permissions:
       contents: write
       pull-requests: write
@@ -75,26 +78,28 @@ jobs:
 
       - name: Determine branch name
         id: vars
+        env:
+          VERSION: ${{ inputs.version }}
+          STAGE: ${{ inputs.stage }}
+          TAG: ${{ inputs.tag }}
         run: |
-          declare script_params
-          declare version="${{ github.event.inputs.version }}"
-          declare stage="${{ github.event.inputs.stage }}"
-          declare tag="${{ github.event.inputs.tag }}"
-          declare bump_dest="${version}-${stage}"
+          script_params=""
+          version=${{ env.VERSION }}
+          stage=${{ env.STAGE }}
+          tag=${{ env.TAG }}
 
           # Both version and stage provided
-          if [[ -n $version && -n $stage && "$tag" != "true" ]]; then
+          if [[ -n "$version" && -n "$stage" && "$tag" != "true" ]]; then
             script_params="--version ${version} --stage ${stage}"
-          elif [[ -z $version && -n $stage && "$tag" == "true" ]]; then
+          elif [[ -z "$version" && -n "$stage" && "$tag" == "true" ]]; then
             script_params="--stage ${stage} --tag"
-          elif [[ -z $version && -z $stage && "$tag" == "true" ]]; then
+          elif [[ -z "$version" && -z "$stage" && "$tag" == "true" ]]; then
             script_params="--tag"
           fi
 
-          issue_number=$(echo "${{ github.event.inputs.issue-link }}" | awk -F'/' '{print $NF}')
-          BRANCH_NAME="enhancement/wqa${issue_number}-bump-${{ github.ref_name }}-to-${bump_dest}"
+          issue_number=$(echo "${{ inputs.issue-link }}" | awk -F'/' '{print $NF}')
+          BRANCH_NAME="enhancement/wqa${issue_number}-bump-${{ github.ref_name }}"
           echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
-          echo "bump_dest=${bump_dest}" >> $GITHUB_OUTPUT
           echo "script_params=${script_params}" >> $GITHUB_OUTPUT
 
       - name: Create and switch to bump branch
@@ -109,7 +114,7 @@ jobs:
       - name: Commit and push changes
         run: |
           git add .
-          git commit -m "feat: bump to ${{ steps.vars.outputs.bump_dest }}"
+          git commit -m "feat: bump ${{ github.ref_name }}"
           git push origin ${{ steps.vars.outputs.branch_name }}
 
       - name: Create pull request
@@ -117,8 +122,8 @@ jobs:
         run: |
           gh auth setup-git
           PR_URL=$(gh pr create \
-            --title "Bump ${{ steps.vars.outputs.branch_name }} branch to ${{ steps.vars.outputs.bump_dest }}" \
-            --body "Issue: ${{ github.event.inputs.issue-link }}" \
+            --title "Bump ${{ github.ref_name }} branch" \
+            --body "Issue: ${{ inputs.issue-link }}" \
             --base ${{ github.ref_name }} \
             --head ${{ steps.vars.outputs.branch_name }})
 
@@ -132,7 +137,7 @@ jobs:
 
       - name: Show logs
         run: |
-          echo "Bump complete for version ${{ steps.vars.outputs.bump_dest }}"
+          echo "Bump complete."
           echo "Branch: ${{ steps.vars.outputs.branch_name }}"
           echo "PR: https://github.com/${{ github.repository }}/pull/${{ steps.create_pr.outputs.pull_request_number }}"
           echo "Bumper scripts logs:"
