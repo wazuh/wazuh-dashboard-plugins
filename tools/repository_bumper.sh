@@ -486,12 +486,14 @@ main() {
   update_osd_json_files
   update_changelog
 
+
   # Conditionally update endpoints.json
-  if [  [ -n "$VERSION" ] && ["$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR"] ]; then
+  if [[ -n "$VERSION" && "$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR" ]]; then
     log "Major.minor version changed ($CURRENT_MAJOR_MINOR -> $NEW_MAJOR_MINOR). Updating endpoints.json..."
     update_endpoints_json "$CURRENT_MAJOR_MINOR" "$NEW_MAJOR_MINOR"
   else
     log "Major.minor version ($CURRENT_MAJOR_MINOR) remains the same. Skipping endpoints.json update."
+    log "New major minor is $NEW_MAJOR_MINOR"
   fi
 
   # Update docker/imposter/wazuh-config.yml
