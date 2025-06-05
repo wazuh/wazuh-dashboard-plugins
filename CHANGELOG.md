@@ -11,23 +11,26 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added settings to manage the FIM and IT Hygiene inventories data [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
-- Added the ability to manage the sample data from FIM, IT Higiene and vulnerabilities inventories and new settings to define the index names prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449)
+- Added the ability to manage the sample data from FIM, IT Hygiene and vulnerabilities inventories and new settings to define the index names prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449)
 - Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 
 ## Changed
 
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
 - Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
+- Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482)
 
 ### Fixed
 
-- Fixed a problem in Vulnerabilities > Dashboard and Inventory when there is no indices matching with the index pattern [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Fixed a problem in Vulnerabilities > Dashboard and Inventory when there are no indices matching with the index pattern [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 
 ### Removed
 
+- Removed the cluster restart warning on rules, decoders and CDB lists [#7489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7489)
 - Removed `Inventory data` view from agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed `GET /api/syscollector` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
+- Removed the `enrollment.password` field from the `/utils/configuration` endpoint response to prevent unauthorized agent registration by users with read-only API roles. [#7483](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7483)
 
 ### Fixed
 
