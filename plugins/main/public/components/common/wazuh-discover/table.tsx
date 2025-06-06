@@ -65,6 +65,7 @@ import {
 import { compose } from 'redux';
 import { omit } from 'lodash';
 import { useEffectEnsureComponentMounted } from '../hooks';
+import RestoreStateColumnsButton from './components/restore-state-columns';
 
 export interface TableDataGridBasicProps<K> {
   dataGridProps: TDataGridReturn;
@@ -186,6 +187,12 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
                 >
                   Export Formatted
                 </EuiButtonEmpty>
+
+                <RestoreStateColumnsButton
+                  dataGridStatePersistenceManager={
+                    dataGridProps.dataGridStatePersistenceManager
+                  }
+                />
 
                 <DataGridVisibleColumnsSelector
                   availableColumns={dataGridProps.columnsAvailable}

@@ -104,7 +104,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
           ...DEFAULT_PAGINATION_OPTIONS,
           ...paginationProps,
           pageSize:
-            stateManagement.retrieveState()?.pageSize ||
+            stateManagement.state?.pageSize ||
             paginationProps.pageSize ||
             DEFAULT_PAGE_SIZE,
         },
@@ -131,7 +131,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     [columnSchemaDefinitions],
   );
 
-  const dataGridStateManager = useDataGridStatePersistenceManager({
+  const dataGridStatePersistenceManager = useDataGridStatePersistenceManager({
     stateManagement: localStorageStatePersistenceManager(moduleId),
     defaultState: {
       columns: defaultColumns.map(column => column.id),
@@ -145,7 +145,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   useEffect(() => {
     setPagination(pagination => ({
       ...pagination,
-      pageSize: dataGridStateManager.retrieveState().pageSize,
+      pageSize: dataGridStatePersistenceManager.state.pageSize,
     }));
   }, [moduleId]);
 
@@ -155,6 +155,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       defaultColumns,
       columnSchemaDefinitionsMap,
       indexPatternExists: !!indexPattern,
+      dataGridStatePersistenceManager,
     });
   const onChangeItemsPerPage = useMemo(
     () => (pageSize: number) => {
@@ -163,7 +164,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
         pageSize,
         pageIndex: 0,
       }));
-      dataGridStateManager.updateState({ pageSize });
+      dataGridStatePersistenceManager.updateState({ pageSize });
     },
     [rows, rowCount],
   );
@@ -270,5 +271,6 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       onChangePage: onChangePage,
     },
     setPagination,
+    dataGridStatePersistenceManager,
   } as TDataGridReturn;
 };
