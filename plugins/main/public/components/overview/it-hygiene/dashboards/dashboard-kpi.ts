@@ -35,12 +35,16 @@ export const getVisStateHostsTotalFreeMemoryTable = (
     uiState: {
       vis: {
         sortColumn: {
-          colIndex: 1,
-          direction: 'asc',
+          colIndex: 2,
+          direction: 'desc',
         },
         columnsWidth: [
           {
             colIndex: 1,
+            width: 125,
+          },
+          {
+            colIndex: 2,
             width: 125,
           },
         ],
@@ -53,10 +57,10 @@ export const getVisStateHostsTotalFreeMemoryTable = (
         {
           id: '1',
           enabled: true,
-          type: 'min',
+          type: 'max',
           params: {
-            field: 'host.memory.free',
-            customLabel: 'Memory',
+            field: 'host.memory.used_percentage',
+            customLabel: 'Used',
           },
           schema: 'metric',
         },
@@ -66,14 +70,31 @@ export const getVisStateHostsTotalFreeMemoryTable = (
           type: 'terms',
           params: {
             field: 'agent.name',
-            orderBy: '_key',
+            orderBy: '1',
             order: 'desc',
             size: 5,
             otherBucket: false,
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Top 5 agents least free memory',
+            customLabel: 'Top 5 endpoints most used memory',
+          },
+          schema: 'bucket',
+        },
+        {
+          id: '3',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: 'host.memory.total',
+            orderBy: '1',
+            order: 'desc',
+            size: 1,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: 'Total memory',
           },
           schema: 'bucket',
         },

@@ -17,6 +17,7 @@ function generateRandomHostHardware() {
       free: random.int(1000, 100000),
       total: random.int(1000, 100000),
       used: random.int(0, 100),
+      used_percentage: random.float(0, 1),
     },
   };
 }
