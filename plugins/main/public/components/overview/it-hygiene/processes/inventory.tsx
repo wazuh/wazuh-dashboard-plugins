@@ -1,5 +1,27 @@
 import React from 'react';
-import { ITHygieneProccessesInventoryProcesses } from './inventories';
-export const ITHygieneProcessesInventory = () => (
-  <ITHygieneProccessesInventoryProcesses />
-);
+import {
+  SystemInventoryStatesDataSource,
+  SystemInventoryProcessesStatesDataSourceRepository,
+} from '../../../common/data-source';
+import tableColumns from './table-columns';
+import managedFilters from './managed-filters';
+import { withSystemInventoryProcessesDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
+import { ITHygieneInventoryDashboardTable } from '../common/components/inventory';
+import { getOverviewProcessesProcessesTab } from './dashboard';
+
+export const ITHygieneProcessesInventory =
+  withSystemInventoryProcessesDataSource(props => {
+    return (
+      <ITHygieneInventoryDashboardTable
+        DataSource={SystemInventoryStatesDataSource}
+        DataSourceRepositoryCreator={
+          SystemInventoryProcessesStatesDataSourceRepository
+        }
+        tableDefaultColumns={tableColumns}
+        managedFilters={managedFilters}
+        getDashboardPanels={getOverviewProcessesProcessesTab}
+        tableId='it-hygiene-inventory-processes'
+        indexPattern={props.indexPattern}
+      />
+    );
+  });

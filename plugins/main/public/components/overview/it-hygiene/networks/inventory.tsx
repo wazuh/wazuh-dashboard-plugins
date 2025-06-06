@@ -3,9 +3,9 @@ import {
   ITHygieneNetworksInventoryInterfaces,
   ITHygieneNetworksInventoryNetworks,
   ITHygieneNetworksInventoryProtocols,
+  ITHygieneNetworksInventoryPorts,
 } from './inventories';
 import { ITHygieneInventoryTabLayout } from '../common/components/inventory';
-import { ITHygieneProccessesInventoryPorts } from '../processes/inventories';
 
 const tabs = [
   {
@@ -26,7 +26,7 @@ const tabs = [
   {
     id: 'ports',
     name: 'Ports',
-    component: ITHygieneProccessesInventoryPorts,
+    component: ITHygieneNetworksInventoryPorts,
   },
 ];
 

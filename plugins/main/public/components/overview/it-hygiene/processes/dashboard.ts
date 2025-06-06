@@ -1,14 +1,14 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { STYLE } from '../../../common/saved-vis/constants';
+import { buildDashboardKPIPanels } from '../common/create-dashboard-panels-kpis';
+import { STYLE } from '../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
+} from '../common/saved-vis/create-saved-vis-data';
 import {
   getVisStateHorizontalBarByField,
   getVisStateHistogramBy,
-} from '../../../common/saved-vis/generators';
-import { SavedVis } from '../../../common/types';
+} from '../common/saved-vis/generators';
+import { SavedVis } from '../common/types';
 
 type ProcessState =
   | 'Stopped'
