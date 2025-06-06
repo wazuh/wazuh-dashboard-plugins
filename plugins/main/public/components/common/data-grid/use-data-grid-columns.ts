@@ -116,7 +116,8 @@ function useDataGridColumns({
     }
 
     try {
-      const persistedColumns = dataGridStatePersistenceManager.state.columns;
+      const persistedColumns =
+        dataGridStatePersistenceManager.retrieveState().columns;
 
       if (!persistedColumns || persistedColumns.length === 0) {
         return;
@@ -132,11 +133,15 @@ function useDataGridColumns({
 
   // New effect to sync state changes with visible columns
   useEffect(() => {
-    if (!indexPatternExists || !dataGridStatePersistenceManager.state.columns) {
+    if (
+      !indexPatternExists ||
+      !dataGridStatePersistenceManager.retrieveState().columns
+    ) {
       return;
     }
 
-    const stateColumns = dataGridStatePersistenceManager.state.columns;
+    const stateColumns =
+      dataGridStatePersistenceManager.retrieveState().columns;
 
     // Check if state columns are different from current visible columns
     const isDifferent =
@@ -146,7 +151,10 @@ function useDataGridColumns({
     if (isDifferent) {
       setVisibleColumns(stateColumns);
     }
-  }, [dataGridStatePersistenceManager.state.columns, indexPatternExists]);
+  }, [
+    dataGridStatePersistenceManager.retrieveState().columns,
+    indexPatternExists,
+  ]);
 
   const onColumnResize: EuiDataGridProps['onColumnResize'] = ({
     columnId,
@@ -155,7 +163,8 @@ function useDataGridColumns({
     const column = columnSchemaDefinitionsMap[columnId];
 
     if (column) {
-      const currentWidths = dataGridStatePersistenceManager.state.columnWidths;
+      const currentWidths =
+        dataGridStatePersistenceManager.retrieveState().columnWidths;
 
       dataGridStatePersistenceManager.updateState({
         columnWidths: {
@@ -171,7 +180,9 @@ function useDataGridColumns({
     (columnId: string) => {
       let column = { ...columnSchemaDefinitionsMap[columnId] };
       const savedColumnWidth =
-        dataGridStatePersistenceManager.state.columnWidths?.[columnId];
+        dataGridStatePersistenceManager.retrieveState().columnWidths?.[
+          columnId
+        ];
 
       if (savedColumnWidth) {
         column.initialWidth = savedColumnWidth;

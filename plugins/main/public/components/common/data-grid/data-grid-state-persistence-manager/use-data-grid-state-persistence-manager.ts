@@ -223,7 +223,6 @@ const useDataGridStatePersistenceManager = ({
     persistState,
     updateState,
     clearState,
-    state: internalState,
     isStateEqualToDefault,
   };
 };
