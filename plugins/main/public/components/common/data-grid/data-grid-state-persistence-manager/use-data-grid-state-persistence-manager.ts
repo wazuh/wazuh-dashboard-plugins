@@ -18,8 +18,9 @@ const useDataGridStatePersistenceManager = ({
   columnSchemaDefinitionsMap,
   indexPatternExists,
 }: UseDataGridStateManagementProps) => {
-  const [internalState, setInternalState] =
-    useState<Partial<DataGridState>>(defaultState);
+  const [internalState, setInternalState] = useState<Partial<DataGridState>>(
+    Object.assign({}, defaultState, stateManagement.retrieveState()),
+  );
 
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
