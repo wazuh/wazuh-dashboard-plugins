@@ -1,7 +1,7 @@
-import { AQL, getSuggestions, tokenizer } from './aql';
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { SearchBar } from '../index';
+import { AQL, getSuggestions, tokenizer } from './aql';
 
 describe('SearchBar component', () => {
   const componentProps = {
@@ -31,9 +31,8 @@ describe('SearchBar component', () => {
     const wrapper = render(<SearchBar {...componentProps} />);
 
     await waitFor(() => {
-      const elementImplicitQuery = wrapper.container.querySelector(
-        '.euiCodeBlock__code',
-      );
+      const elementImplicitQuery = wrapper.container.querySelector('code');
+
       expect(elementImplicitQuery?.innerHTML).toEqual('id!=000;');
       expect(wrapper.container).toMatchSnapshot();
     });
@@ -103,19 +102,21 @@ describe('Query language - AQL', () => {
           },
           value(currentValue = '', { previousField }) {
             switch (previousField) {
-              case 'field':
+              case 'field': {
                 return ['value', 'value2', 'value3', 'value4']
                   .filter(value => value.startsWith(currentValue))
                   .map(value => ({ type: 'value', label: value }));
-                break;
-              case 'field2':
+              }
+
+              case 'field2': {
                 return ['127.0.0.1', '127.0.0.2', '190.0.0.1', '190.0.0.2']
                   .filter(value => value.startsWith(currentValue))
                   .map(value => ({ type: 'value', label: value }));
-                break;
-              default:
+              }
+
+              default: {
                 return [];
-                break;
+              }
             }
           },
         },
@@ -157,7 +158,6 @@ describe('Query language - AQL', () => {
     async ({ AQL: currentInput, clikedSuggestion, changedInput }) => {
       // Mock input
       let input = currentInput;
-
       const qlOutput = await AQL.run(input, {
         setInput: (value: string): void => {
           input = value;
@@ -172,7 +172,9 @@ describe('Query language - AQL', () => {
           },
         },
       });
+
       qlOutput.searchBarProps.onItemClick('')(clikedSuggestion);
+
       expect(input).toEqual(changedInput);
     },
   );

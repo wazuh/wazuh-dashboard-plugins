@@ -56,20 +56,11 @@ exports[`Enrollment key input match the snapshopt 1`] = `
                   <span
                     class="euiButtonContent euiButtonEmpty__content"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                      />
-                    </svg>
+                    <span
+                      class="euiButtonContent__icon"
+                      color="inherit"
+                      data-euiicon-type="questionInCircle"
+                    />
                     <span
                       class="euiButtonEmpty__text"
                     />
@@ -114,20 +105,12 @@ exports[`Enrollment key input match the snapshopt 1`] = `
     <div
       class="euiCallOutHeader"
     >
-      <svg
+      <span
         aria-hidden="true"
-        class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiCallOutHeader__icon"
-        focusable="false"
-        height="16"
-        role="img"
-        viewBox="0 0 16 16"
-        width="16"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-        />
-      </svg>
+        class="euiCallOutHeader__icon"
+        color="inherit"
+        data-euiicon-type="iInCircle"
+      />
       <span
         class="euiCallOutHeader__title"
       >
@@ -139,21 +122,11 @@ exports[`Enrollment key input match the snapshopt 1`] = `
             rel="noopener noreferrer"
             target="_blank"
           >
-            <svg
-              aria-hidden="true"
+            <span
               aria-label="External link"
-              class="euiIcon euiIcon--small euiIcon-isLoading euiLink__externalIcon"
-              focusable="false"
-              height="16"
-              role="img"
-              viewBox="0 0 16 16"
-              width="16"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-              />
-            </svg>
+              class="euiLink__externalIcon"
+              data-euiicon-type="popout"
+            />
             <span
               class="euiScreenReaderOnly"
             >
@@ -205,20 +178,11 @@ exports[`Enrollment key input match the snapshopt 1`] = `
                   <span
                     class="euiButtonContent euiButtonEmpty__content"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                      />
-                    </svg>
+                    <span
+                      class="euiButtonContent__icon"
+                      color="inherit"
+                      data-euiicon-type="questionInCircle"
+                    />
                     <span
                       class="euiButtonEmpty__text"
                     />
@@ -255,20 +219,11 @@ exports[`Enrollment key input match the snapshopt 1`] = `
                 <span
                   class="euiFormControlLayoutCustomIcon"
                 >
-                  <svg
+                  <span
                     aria-hidden="true"
-                    class="euiIcon euiIcon--medium euiIcon-isLoading euiFormControlLayoutCustomIcon__icon"
-                    focusable="false"
-                    height="16"
-                    role="img"
-                    viewBox="0 0 16 16"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                    />
-                  </svg>
+                    class="euiFormControlLayoutCustomIcon__icon"
+                    data-euiicon-type="arrowDown"
+                  />
                 </span>
               </div>
             </div>
@@ -318,20 +273,11 @@ exports[`Enrollment key input match the snapshopt 1`] = `
                   <span
                     class="euiButtonContent euiButtonEmpty__content"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                      />
-                    </svg>
+                    <span
+                      class="euiButtonContent__icon"
+                      color="inherit"
+                      data-euiicon-type="questionInCircle"
+                    />
                     <span
                       class="euiButtonEmpty__text"
                     />
@@ -384,20 +330,12 @@ exports[`Enrollment key input match the snapshopt 1`] = `
                 disabled=""
                 type="button"
               >
-                <svg
+                <span
                   aria-hidden="true"
-                  class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonIcon__icon"
-                  focusable="false"
-                  height="16"
-                  role="img"
-                  viewBox="0 0 16 16"
-                  width="16"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                  />
-                </svg>
+                  class="euiButtonIcon__icon"
+                  color="inherit"
+                  data-euiicon-type="save"
+                />
               </button>
             </span>
           </div>
@@ -452,20 +390,11 @@ exports[`Enrollment key input match the snapshopt 1`] = `
                   <span
                     class="euiButtonContent euiButtonEmpty__content"
                   >
-                    <svg
-                      aria-hidden="true"
-                      class="euiIcon euiIcon--medium euiIcon--inherit euiIcon-isLoading euiButtonContent__icon"
-                      focusable="false"
-                      height="16"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M5.277 10.088c.02.014.04.03.057.047.582.55 1.134.812 1.666.812.586 0 1.84-.293 3.713-.88L9 6.212V2H7v4.212l-1.723 3.876Zm-.438.987L3.539 14h8.922l-1.32-2.969C9.096 11.677 7.733 12 7 12c-.74 0-1.463-.315-2.161-.925ZM6 2H5V1h6v1h-1v4l3.375 7.594A1 1 0 0 1 12.461 15H3.54a1 1 0 0 1-.914-1.406L6 6V2Z"
-                      />
-                    </svg>
+                    <span
+                      class="euiButtonContent__icon"
+                      color="inherit"
+                      data-euiicon-type="questionInCircle"
+                    />
                     <span
                       class="euiButtonEmpty__text"
                     />

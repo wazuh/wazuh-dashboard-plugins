@@ -1,15 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`EditAgentGroupsModal component should return the component 1`] = `
-<div
-  aria-hidden="true"
-  data-aria-hidden="true"
-/>
-`;
+exports[`EditAgentGroupsModal component should return the component 1`] = `<div />`;
 
-exports[`EditAgentGroupsModal component should return the component with save disabled 1`] = `
-<div
-  aria-hidden="true"
-  data-aria-hidden="true"
-/>
-`;
+exports[`EditAgentGroupsModal component should return the component with save disabled 1`] = `<div />`;
