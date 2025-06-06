@@ -14,9 +14,4 @@ export default [
     key: 'package.version',
     placeholder: 'Version',
   },
-  {
-    type: 'multiSelect',
-    key: 'package.architecture',
-    placeholder: 'Architecture',
-  },
 ];

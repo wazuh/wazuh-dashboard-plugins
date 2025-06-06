@@ -6,4 +6,4 @@ export const STYLE = {
   fontSize: 40,
 } as const;
 
-export const HEIGHT = 6;
+export const HEIGHT = 9;
