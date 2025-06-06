@@ -1,11 +1,10 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { generateVisualization } from '../../../common/create-new-visualization';
 import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStateDonutByField } from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import { SavedVis } from '../../../common/types';
 
 // You can apply the same logic here using ERRORS instead of DROPS. In both cases, a lower percentage indicates everything is working fine. If the percentage rises too much, it means there's a problem that needs attention.
@@ -14,7 +13,7 @@ const getVisStateGlobalPacketLossMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-global-packet-loss-rate',
-    title: 'Global packet loss rate',
+    title: 'Average packet loss rate',
     type: 'metric',
     params: {
       addTooltip: true,
@@ -45,7 +44,7 @@ const getVisStateGlobalPacketLossMetric = (
         {
           id: '1',
           enabled: true,
-          type: 'sum',
+          type: 'avg',
           params: {
             field: 'host.network.ingress.drops',
             json: "\
@@ -70,7 +69,7 @@ const getVisStateGlobalPacketLossMetric = (
                 WORKAROUND: multiply 100 to equilibrate the division by 100 done when the `isPercentMode` is true
               */,
 
-            customLabel: 'Global packet loss rate',
+            customLabel: 'Average packet loss rate',
           },
           schema: 'metric',
         },
@@ -274,17 +273,35 @@ const getVisStateWirelessNetworkInterfacesMetric = (
 export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateGlobalPacketLossMetric(indexPatternId),
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.state',
-      'States',
+      'Interface states',
       'it-hygiene-interfaces',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Interfaces state count',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'Interfaces state',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'Interfaces state',
+      },
     ),
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.type',
-      'Types',
+      'Interface types',
       'it-hygiene-interfaces',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Interfaces type count',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'Type',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'Type',
+      },
     ),
   ]);
 };

@@ -19,7 +19,6 @@ export const ITHygieneSystemInventoryHardware =
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        managedFiltersProps={{ style: { flexGrow: 0.25, minWidth: '300px' } }}
         getDashboardPanels={getOverviewSystemHardwareTab}
         tableId='it-hygiene-inventory-hardware'
         indexPattern={props.indexPattern}

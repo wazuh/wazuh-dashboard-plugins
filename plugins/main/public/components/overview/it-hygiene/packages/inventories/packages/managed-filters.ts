@@ -7,11 +7,11 @@ export default [
   {
     type: 'multiSelect',
     key: 'package.name',
-    placeholder: 'Package',
+    placeholder: 'Name',
   },
   {
     type: 'multiSelect',
-    key: 'package.version',
-    placeholder: 'Version',
+    key: 'package.type',
+    placeholder: 'Type',
   },
 ];
