@@ -4,9 +4,17 @@
 
 - vm.max_map_count=262144
 
-  To modify the vm.max_map_count, you can run this command:
-  `sudo sysctl -w vm.max_map_count=262144`
+  To modify the vm.max_map_count:
 
+    **Linux:**
+  `sudo sysctl -w vm.max_map_count=262144`
+  
+    **MacOs:**  
+  For Docker Desktop on Mac, this setting needs to be applied to the Linux VM that runs Docker
+
+  `docker run --rm --privileged alpine sysctl -w vm.max_map_count=262144`
+  This command temporarily increases the memory map count limit in the Docker VM, which is required for Elasticsearch/OpenSearch to function properly. The setting will persist until Docker Desktop is restarted.
+  
 - jq
 
   To install jq, you can run this command:
@@ -26,7 +34,7 @@ Use always the provided script to bring up or down the development
 environment. For example:
 
 ```
-./dev.sh [-os <os_version>] [-osd <osd_version>] [--wz-home <wazuh_app_source>] [-saml] [--server <server_version>] -a, --action <action>
+./dev.sh [-os <os_version>] [-osd <osd_version>] [--wz-home <wazuh_app_source>] [-saml] [--server <server_version>] [--no-start] -a, --action <action>
 ```
 
 use `--help` for more info.
@@ -38,6 +46,25 @@ located.
 
 Use the `saml` flag to bring up KeyCloak IDP. **Add idp to your hosts and start
 the server using the `--no-base-path`**.
+
+Use the `--no-start` flag if you want to prevent the automatic startup of the dashboard service. This keeps the container running without starting the service, allowing you to connect to it and run commands manually:
+
+```bash
+  ###For example:
+  ### Start the environment without automatically starting the dashboard service
+  ./dev.sh -os 2.19.1 -osd 2.19.1-5.0.0 --no-start -a up
+
+  ### Then connect to the container
+  docker exec -it os-dev-2191-500-osd-1 bash
+
+  ### Manually install dependencies in all plugin folders for example:
+  cd plugins/wazuh-core
+  yarn install
+
+  ### And manually start the service
+  cd /home/node/kbn
+  yarn start --no-base-path
+```
 
 ```apacheconf
 # Linux systems: /etc/hosts
