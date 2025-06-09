@@ -40,7 +40,13 @@ concurrency:
 jobs:
   # Run unit tests with Jest
   test:
-    if: github.event.pull_request.draft == false
+    # Only runs if NOT a draft and base_ref is branch 6.x or tag v6.x
+    if: |
+      github.event.pull_request.draft == false &&
+      (
+        startsWith(github.base_ref, '6.') ||
+        startsWith(github.base_ref, 'v6.')
+      )
     name: Run unit tests
     uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
     with:
