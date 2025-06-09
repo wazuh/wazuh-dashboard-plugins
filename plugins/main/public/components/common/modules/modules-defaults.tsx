@@ -146,6 +146,24 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
+  azure: {
+    init: 'dashboard',
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardAWS,
+      },
+      renderDiscoverTab({
+        moduleId: 'aws',
+        tableColumns: amazonWebServicesColumns,
+        DataSource: AWSDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+      }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
   aws: {
     init: 'dashboard',
     tabs: [

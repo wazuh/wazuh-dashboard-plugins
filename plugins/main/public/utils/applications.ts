@@ -466,6 +466,31 @@ export const office365 = {
     }`,
 };
 
+export const azure = {
+  category: 'wz-category-cloud-security',
+  id: 'azure',
+  title: i18n.translate('wz-app-azure-title', {
+    defaultMessage: 'Azure',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-azure-breadcrumbLabel', {
+    defaultMessage: 'Azure',
+  }),
+  description: i18n.translate('wz-app-azure-description', {
+    defaultMessage:
+      'Security events related to your Azure services, collected directly via Azure API.',
+  }),
+  euiIconType: 'logoAzure',
+  order: 505,
+  showInOverviewApp: true,
+  showInAgentMenu: true,
+  redirectTo: () =>
+    `/overview/?tab=azure&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 export const endpointSummary = {
   category: 'wz-category-agents-management',
   id: 'endpoints-summary',
@@ -849,6 +874,7 @@ export const Applications = [
   devTools,
   rulesetTest,
   security,
+  azure,
   amazonWebServices,
   googleCloud,
   github,
