@@ -59,8 +59,8 @@ export const getVisStateHostsTotalFreeMemoryTable = (
           enabled: true,
           type: 'max',
           params: {
-            field: 'host.memory.used_percentage',
-            customLabel: 'Used',
+            field: 'host.memory.usage',
+            customLabel: 'Usage',
           },
           schema: 'metric',
         },
