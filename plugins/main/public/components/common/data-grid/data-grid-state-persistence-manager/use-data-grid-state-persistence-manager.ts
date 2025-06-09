@@ -152,6 +152,14 @@ const useDataGridStatePersistenceManager = ({
     setInternalState(defaultState);
   };
 
+  const clearStateColumns = () => {
+    const newState: Partial<DataGridState> = {
+      pageSize: internalState.pageSize ?? DEFAULT_PAGE_SIZE,
+    };
+    stateManagement.persistState(newState);
+    setInternalState(newState);
+  };
+
   const retrieveState = (): DataGridState => {
     const state: DataGridState = Object.assign(
       {},
@@ -223,6 +231,7 @@ const useDataGridStatePersistenceManager = ({
     persistState,
     updateState,
     clearState,
+    clearStateColumns,
     isStateEqualToDefault,
   };
 };
