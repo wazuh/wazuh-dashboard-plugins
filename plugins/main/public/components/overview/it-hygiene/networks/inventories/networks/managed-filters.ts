@@ -1,17 +1,17 @@
 export default [
   {
     type: 'multiSelect',
-    key: 'interface.name',
-    placeholder: 'Name',
-  },
-  {
-    type: 'multiSelect',
     key: 'network.type',
-    placeholder: 'IP Version',
+    placeholder: 'Network type',
+  },
+  {
+    type: 'multiSelectInput',
+    key: 'network.ip',
+    placeholder: 'IP',
   },
   {
     type: 'multiSelect',
-    key: 'network.dhcp',
-    placeholder: 'DHCP',
+    key: 'interface.name',
+    placeholder: 'Interface name',
   },
 ];
