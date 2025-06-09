@@ -19,7 +19,7 @@ const useDataGridStatePersistenceManager = ({
   indexPatternExists,
 }: UseDataGridStateManagementProps) => {
   const [internalState, setInternalState] = useState<Partial<DataGridState>>(
-    Object.assign({}, defaultState, stateManagement.retrieveState()),
+    Object.assign({}, stateManagement.retrieveState()),
   );
 
   const validateColumns = useCallback(
@@ -223,8 +223,13 @@ const useDataGridStatePersistenceManager = ({
   };
 
   // Check if the state is equal to the default state
-  const isStateEqualToDefault =
-    JSON.stringify(internalState) === JSON.stringify(defaultState);
+  const isStateColumnsMatchingDefaults =
+    (internalState.columns === undefined ||
+      JSON.stringify(internalState.columns) ===
+        JSON.stringify(defaultState.columns)) &&
+    (internalState.columnWidths === undefined ||
+      JSON.stringify(internalState.columnWidths) ===
+        JSON.stringify(defaultState.columnWidths));
 
   return {
     retrieveState,
@@ -232,7 +237,7 @@ const useDataGridStatePersistenceManager = ({
     updateState,
     clearState,
     clearStateColumns,
-    isStateEqualToDefault,
+    isStateColumnsMatchingDefaults,
   };
 };
 
