@@ -1,13 +1,30 @@
-# Dependency Review Action
+# 🔒 Dependency Review Workflow
 #
-# This Action will scan dependency manifest files that change as part of a Pull Request, surfacing known-vulnerable versions of the packages declared or updated in the PR. Once installed, if the workflow run is marked as required, PRs introducing known-vulnerable packages will be blocked from merging.
+# ⚡ Overview:
+# This GitHub Action scans dependency manifest files modified in a Pull Request (PR)
+# to detect any declared or updated packages with known vulnerabilities.
 #
-# Source repository: https://github.com/actions/dependency-review-action
-# Public documentation: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review#dependency-review-enforcement
+# 🚫 Automatic PR Blocking:
+# If this workflow is marked as required, PRs introducing known-vulnerable packages
+# will be blocked from merging, helping maintain a secure codebase.
+#
+# 📚 Resources:
+# - 🗂️ Source repository: https://github.com/actions/dependency-review-action
+# - 📖 Public documentation: https://docs.github.com/en/code-security/supply-chain-security/understanding-your-software-supply-chain/about-dependency-review#dependency-review-enforcement
+#
+# 🔄 Key Features:
+# - 📝 Scans dependency manifest files for changes in PRs.
+# - 🛡️ Surfaces known-vulnerable versions of dependencies.
+# - 🚨 Automatically blocks insecure dependency additions when configured.
+
 name: 'Dependency Review'
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
