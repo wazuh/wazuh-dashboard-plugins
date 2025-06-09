@@ -7,9 +7,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.13.0
-- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
+- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
 - Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
-- Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379)
+- Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
 - Added the ability to manage the sample data from FIM, IT Hygiene and vulnerabilities inventories prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
 - Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 - Add UUID field to APIs table [#7412](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7412)
