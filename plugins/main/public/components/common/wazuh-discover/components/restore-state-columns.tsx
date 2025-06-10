@@ -31,7 +31,7 @@ const RestoreStateColumnsButton = (props: RestoreStateColumnsButtonProps) => {
       >
         <FormattedMessage
           id='wz.discover.restoreState'
-          defaultMessage='Restore state'
+          defaultMessage='Reset view'
         />
       </EuiButtonEmpty>
     </EuiToolTip>
