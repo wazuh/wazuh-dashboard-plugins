@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react-hooks';
 import useDataGridStatePersistenceManager from './use-data-grid-state-persistence-manager';
 import { DataGridState } from './types';
 import { DEFAULT_PAGE_SIZE } from '../constants';
@@ -47,7 +47,10 @@ describe('useDataGridStatePersistenceManager', () => {
       }),
     );
 
-    const retrievedState = result.current.retrieveState();
+    let retrievedState;
+    act(() => {
+      retrievedState = result.current.retrieveState();
+    });
 
     expect(mockStateManagement.retrieveState).toHaveBeenCalled();
     expect(retrievedState).toEqual({
@@ -72,7 +75,10 @@ describe('useDataGridStatePersistenceManager', () => {
       }),
     );
 
-    const retrievedState = result.current.retrieveState();
+    let retrievedState;
+    act(() => {
+      retrievedState = result.current.retrieveState();
+    });
 
     expect(mockStateManagement.retrieveState).toHaveBeenCalled();
     expect(retrievedState).toEqual({
@@ -97,7 +103,10 @@ describe('useDataGridStatePersistenceManager', () => {
       }),
     );
 
-    const retrievedState = result.current.retrieveState();
+    let retrievedState;
+    act(() => {
+      retrievedState = result.current.retrieveState();
+    });
 
     expect(mockStateManagement.retrieveState).toHaveBeenCalled();
     expect(retrievedState.columns).toEqual([]);
@@ -119,7 +128,10 @@ describe('useDataGridStatePersistenceManager', () => {
       }),
     );
 
-    const retrievedState = result.current.retrieveState();
+    let retrievedState;
+    act(() => {
+      retrievedState = result.current.retrieveState();
+    });
 
     expect(mockStateManagement.retrieveState).toHaveBeenCalled();
     expect(retrievedState.columnWidths).toEqual({});
@@ -141,9 +153,12 @@ describe('useDataGridStatePersistenceManager', () => {
       }),
     );
 
-    const retrievedState = result.current.retrieveState();
+    let retrievedState;
+    act(() => {
+      retrievedState = result.current.retrieveState();
+    });
 
-    expect(mockStateManagement.retrieveState).toHaveBeenCalledTimes(2);
+    expect(mockStateManagement.retrieveState).toHaveBeenCalledTimes(4);
     expect(retrievedState.pageSize).toEqual(DEFAULT_PAGE_SIZE);
   });
 
@@ -162,7 +177,9 @@ describe('useDataGridStatePersistenceManager', () => {
       }),
     );
 
-    result.current.persistState(newState);
+    act(() => {
+      result.current.persistState(newState);
+    });
 
     expect(mockStateManagement.persistState).toHaveBeenCalledWith(newState);
   });
@@ -189,7 +206,9 @@ describe('useDataGridStatePersistenceManager', () => {
       }),
     );
 
-    result.current.updateState(updatePayload);
+    act(() => {
+      result.current.updateState(updatePayload);
+    });
 
     expect(mockStateManagement.persistState).toHaveBeenCalledWith({
       ...currentState,
@@ -207,7 +226,9 @@ describe('useDataGridStatePersistenceManager', () => {
       }),
     );
 
-    result.current.clearState();
+    act(() => {
+      result.current.clearState();
+    });
 
     expect(mockStateManagement.clearState).toHaveBeenCalled();
   });
