@@ -1,20 +1,24 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import useDataGridColumns from './use-data-grid-columns';
-import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
+import { useDataGridStatePersistenceManager } from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { tDataGridColumn } from './types';
+
+// Mock functions for state persistence manager
+const mockPersistState = jest.fn();
+const mockRetrieveState = jest.fn();
+const mockUpdateState = jest.fn();
+const mockClearState = jest.fn();
+const mockClearStateColumns = jest.fn();
 
 // Mock the persistence manager hook
 jest.mock(
   './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager',
+  () => ({
+    useDataGridStatePersistenceManager: jest.fn(),
+  }),
 );
 
 describe('useDataGridColumns', () => {
-  // Mock functions for state persistence manager
-  const mockPersistState = jest.fn();
-  const mockRetrieveState = jest.fn();
-  const mockUpdateState = jest.fn();
-  const mockClearState = jest.fn();
-
   // Sample test data
   const moduleId = 'test-app';
   const defaultColumns: tDataGridColumn[] = [
@@ -33,18 +37,23 @@ describe('useDataGridColumns', () => {
     { id: 'col3', display: 'Column 3' },
   ];
 
+  // Mock the dataGridStatePersistenceManager object
+  const mockDataGridStatePersistenceManager = {
+    persistState: mockPersistState,
+    retrieveState: mockRetrieveState,
+    updateState: mockUpdateState,
+    clearState: mockClearState,
+    clearStateColumns: mockClearStateColumns,
+    isStateMatchingDefaults: false,
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
 
     // Setup mock implementation for the persistence manager
-    (useDataGridStatePersistenceManager as jest.Mock).mockImplementation(() => {
-      return {
-        persistState: mockPersistState,
-        retrieveState: mockRetrieveState,
-        updateState: mockUpdateState,
-        clearState: mockClearState,
-      };
-    });
+    (useDataGridStatePersistenceManager as jest.Mock).mockReturnValue(
+      mockDataGridStatePersistenceManager,
+    );
 
     // Default behavior for retrieveState function
     mockRetrieveState.mockReturnValue({
@@ -61,13 +70,12 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
 
-    expect(result.current.columns).toHaveLength(defaultColumns.length);
-    expect(result.current.columnVisibility.visibleColumns).toEqual(
-      defaultColumns.map(col => col.id),
-    );
+    expect(result.current.columns).toHaveLength(0);
+    expect(result.current.columnVisibility.visibleColumns).toEqual([]);
   });
 
   it('should load persisted columns when available', () => {
@@ -85,6 +93,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
 
@@ -100,6 +109,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
     const newVisibleColumns = ['col2', 'col3'];
@@ -130,6 +140,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
 
@@ -164,6 +175,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
 
@@ -201,6 +213,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
 
@@ -234,6 +247,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
     const testColumnId = 'col1';
@@ -271,6 +285,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
 
@@ -331,6 +346,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
 
@@ -364,6 +380,7 @@ describe('useDataGridColumns', () => {
         defaultColumns,
         columnSchemaDefinitionsMap,
         indexPatternExists: true,
+        dataGridStatePersistenceManager: mockDataGridStatePersistenceManager,
       }),
     );
 

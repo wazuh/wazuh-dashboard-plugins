@@ -1,15 +1,16 @@
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
 import { tDataGridColumn } from './types';
-import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
-import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
-import { DEFAULT_PAGE_SIZE } from './constants';
+import { useDataGridStatePersistenceManager } from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 
 interface UseDataGridColumnsProps {
   moduleId: string;
   defaultColumns: EuiDataGridColumn[];
   columnSchemaDefinitionsMap: Record<string, tDataGridColumn>;
   indexPatternExists: boolean;
+  dataGridStatePersistenceManager: ReturnType<
+    typeof useDataGridStatePersistenceManager
+  >;
 }
 
 export interface DataGridColumnsReturn {
@@ -24,23 +25,12 @@ function useDataGridColumns({
   defaultColumns,
   columnSchemaDefinitionsMap,
   indexPatternExists,
+  dataGridStatePersistenceManager,
 }: UseDataGridColumnsProps) {
   const defaultColumnsIds: string[] =
     defaultColumns.map(column => column.id as string) || [];
   const [visibleColumns, setVisibleColumns] =
     useState<string[]>(defaultColumnsIds);
-
-  // Create state management with memoized validation function
-  const dataGridStateManager = useDataGridStatePersistenceManager({
-    stateManagement: localStorageStatePersistenceManager(moduleId),
-    defaultState: {
-      columns: defaultColumnsIds,
-      columnWidths: {},
-      pageSize: DEFAULT_PAGE_SIZE,
-    },
-    columnSchemaDefinitionsMap,
-    indexPatternExists,
-  });
 
   // Prevent infinite loop by checking if visibleColumns actually need updating
   const setVisibleColumnsHandler = useCallback(
@@ -73,9 +63,16 @@ function useDataGridColumns({
         .filter(column => column !== null)
         .filter(column => column !== undefined);
 
-      dataGridStateManager.updateState({ columns: columnsToPersist });
+      dataGridStatePersistenceManager.updateState({
+        columns: columnsToPersist,
+      });
     },
-    [visibleColumns, indexPatternExists, dataGridStateManager, moduleId],
+    [
+      visibleColumns,
+      indexPatternExists,
+      dataGridStatePersistenceManager,
+      moduleId,
+    ],
   );
 
   const sortFirstMatchedColumns = (
@@ -119,7 +116,8 @@ function useDataGridColumns({
     }
 
     try {
-      const persistedColumns = dataGridStateManager.retrieveState().columns;
+      const persistedColumns =
+        dataGridStatePersistenceManager.retrieveState().columns;
 
       if (!persistedColumns || persistedColumns.length === 0) {
         return;
@@ -133,6 +131,33 @@ function useDataGridColumns({
     // I need AllColumns to trigger updates when it changes, because when I retrieve the persisted column state, I need to verify that those persisted columns actually exist within the columns defined in the Index Pattern. That’s why I need both.
   }, [moduleId, indexPatternExists]);
 
+  // New effect to sync state changes with visible columns
+  useEffect(() => {
+    if (!indexPatternExists) {
+      return;
+    }
+
+    const currentState = dataGridStatePersistenceManager.retrieveState();
+
+    if (!currentState.columns) {
+      return;
+    }
+
+    const stateColumns = currentState.columns;
+
+    // Check if state columns are different from current visible columns
+    const isDifferent =
+      stateColumns.length !== visibleColumns.length ||
+      stateColumns.some((col, index) => col !== visibleColumns[index]);
+
+    if (isDifferent) {
+      setVisibleColumns(stateColumns);
+    }
+  }, [
+    dataGridStatePersistenceManager.retrieveState().columns,
+    indexPatternExists,
+  ]);
+
   const onColumnResize: EuiDataGridProps['onColumnResize'] = ({
     columnId,
     width,
@@ -140,9 +165,10 @@ function useDataGridColumns({
     const column = columnSchemaDefinitionsMap[columnId];
 
     if (column) {
-      const currentWidths = dataGridStateManager.retrieveState().columnWidths;
+      const currentWidths =
+        dataGridStatePersistenceManager.retrieveState().columnWidths;
 
-      dataGridStateManager.updateState({
+      dataGridStatePersistenceManager.updateState({
         columnWidths: {
           ...currentWidths,
           [columnId]: width,
@@ -156,7 +182,9 @@ function useDataGridColumns({
     (columnId: string) => {
       let column = { ...columnSchemaDefinitionsMap[columnId] };
       const savedColumnWidth =
-        dataGridStateManager.retrieveState().columnWidths[columnId];
+        dataGridStatePersistenceManager.retrieveState().columnWidths?.[
+          columnId
+        ];
 
       if (savedColumnWidth) {
         column.initialWidth = savedColumnWidth;
