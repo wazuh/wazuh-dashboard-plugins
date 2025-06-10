@@ -44,8 +44,7 @@ jobs:
   # using a pre-built Docker image, hosted in Quay.io.
   deploy_and_run_command:
     permissions:
-      actions: read
-      contents: read
+      contents: none
     name: Deploy and run command
     runs-on: ubuntu-24.04
     strategy:
