@@ -2,8 +2,9 @@ import React from 'react';
 import { render, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useGetGroups } from '../../../hooks';
-import { EditAgentsGroupsModal } from './edit-groups-modal';
 import { Agent } from '../../../types';
+import { addAgentsToGroupService } from '../../../services';
+import { EditAgentsGroupsModal } from './edit-groups-modal';
 
 jest.mock('../../../services', () => ({
   addAgentsToGroupService: jest.fn(),
@@ -47,13 +48,16 @@ describe('EditAgentsGroupsModal component', () => {
     expect(container).toMatchSnapshot();
 
     const agentCount = getByText('1');
+
     expect(agentCount).toBeInTheDocument();
 
     const saveButton = getByRole('button', { name: 'Save' });
+
     expect(saveButton).toBeInTheDocument();
     expect(saveButton).toBeDisabled();
 
     const cancelButton = getByRole('button', { name: 'Cancel' });
+
     expect(cancelButton).toBeInTheDocument();
   });
 
@@ -61,6 +65,12 @@ describe('EditAgentsGroupsModal component', () => {
     (useGetGroups as jest.Mock).mockReturnValue({
       isLoading: false,
       groups: ['default', 'group1', 'group2'],
+    });
+
+    (addAgentsToGroupService as jest.Mock).mockResolvedValue({
+      data: {
+        success: true,
+      },
     });
 
     const { getByText, getAllByText, getByRole } = render(
@@ -79,21 +89,27 @@ describe('EditAgentsGroupsModal component', () => {
         addOrRemove='add'
       />,
     );
-
     const saveButton = getByRole('button', { name: 'Save' });
+
     expect(saveButton).toBeInTheDocument();
 
-    const select = getAllByText('Select groups to add')[0];
+    const select = getAllByText('Select groups to add')[1];
+
     expect(select).toBeInTheDocument();
 
-    act(() => {
+    await act(() => {
       fireEvent.click(select);
     });
 
-    await waitFor(() => expect(getByText('group1')).toBeInTheDocument());
+    await waitFor(() => {
+      expect(getByText('group1')).toBeInTheDocument();
+    });
 
-    act(() => {
+    await act(async () => {
       fireEvent.click(getByText('group1'));
+    });
+
+    await act(async () => {
       fireEvent.click(saveButton);
     });
   });

@@ -3,7 +3,7 @@
   "version": "6.0.0",
   "revision": "00",
   "pluginPlatform": {
-    "version": "2.19.2"
+    "version": "3.0.0"
   },
   "description": "Wazuh Core",
   "private": true,
@@ -20,7 +20,7 @@
     "knip": "knip --files"
   },
   "dependencies": {
-    "axios": "^1.7.4",
+    "axios": "^1.8.4",
     "json2csv": "^4.1.2",
     "jwt-decode": "^3.1.2",
     "md5": "^2.3.0",
