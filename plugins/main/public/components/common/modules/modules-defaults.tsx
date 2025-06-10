@@ -519,8 +519,8 @@ export const ModulesDefaults = {
         component: ITHygienePackagesInventory,
       },
       {
-        id: 'runtime',
-        name: 'Runtime',
+        id: 'processes',
+        name: 'Processes',
         buttons: [ButtonExploreAgent],
         component: ITHygieneProcessesInventory,
       },

@@ -19,15 +19,17 @@ export const InventoryFIMRegistryKeys = compose(
   withFIMRegistriesDataSource,
 )(props => {
   return (
-    <InventoryDashboardTable
-      DataSource={FIMRegistryKeysStatesDataSource}
-      DataSourceRepositoryCreator={FIMRegistriesStatesDataSourceRepository}
-      tableDefaultColumns={tableColumns}
-      managedFilters={managedFilters}
-      getDashboardPanels={getDashboard}
-      tableId='fim-registry-keys-inventory'
-      indexPattern={props.indexPattern}
-      categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
-    />
+    <div style={{ margin: '0 12px' }}>
+      <InventoryDashboardTable
+        DataSource={FIMRegistryKeysStatesDataSource}
+        DataSourceRepositoryCreator={FIMRegistriesStatesDataSourceRepository}
+        tableDefaultColumns={tableColumns}
+        managedFilters={managedFilters}
+        getDashboardPanels={getDashboard}
+        tableId='fim-registry-keys-inventory'
+        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
+      />
+    </div>
   );
 });

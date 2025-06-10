@@ -99,5 +99,5 @@ module.exports = {
   unixTimestamp,
   ip,
   macAddress,
-  float, // Exportamos la nueva función
+  float,
 };
