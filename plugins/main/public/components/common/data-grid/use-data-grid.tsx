@@ -27,7 +27,7 @@ import {
   MAX_ENTRIES_PER_QUERY,
 } from './constants';
 import useDataGridColumns from './use-data-grid-columns';
-import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
+import { useDataGridStatePersistenceManager } from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 import { localStorageStatePersistenceManager } from './data-grid-state-persistence-manager/local-storage-state-persistence-manager';
 import { DataGridStatePersistenceManager } from './data-grid-state-persistence-manager/types';
 
