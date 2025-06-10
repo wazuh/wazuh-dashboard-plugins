@@ -149,7 +149,7 @@ const useDataGridStatePersistenceManager = ({
 
   const clearState = () => {
     stateManagement.clearState();
-    setInternalState(defaultState);
+    setInternalState({});
   };
 
   const clearStateColumns = () => {
@@ -222,7 +222,6 @@ const useDataGridStatePersistenceManager = ({
     persistState(newState);
   };
 
-  // Check if the state is equal to the default state
   const isStateColumnsMatchingDefaults =
     (internalState.columns === undefined ||
       JSON.stringify(internalState.columns) ===
@@ -231,13 +230,19 @@ const useDataGridStatePersistenceManager = ({
       JSON.stringify(internalState.columnWidths) ===
         JSON.stringify(defaultState.columnWidths));
 
+  // Check if the state is equal to the default state
+  const isStateMatchingDefaults =
+    (internalState.pageSize === undefined ||
+      internalState.pageSize === defaultState.pageSize) &&
+    isStateColumnsMatchingDefaults;
+
   return {
     retrieveState,
     persistState,
     updateState,
     clearState,
     clearStateColumns,
-    isStateColumnsMatchingDefaults,
+    isStateMatchingDefaults,
   };
 };
 

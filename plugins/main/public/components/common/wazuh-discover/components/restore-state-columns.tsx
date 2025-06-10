@@ -26,10 +26,8 @@ const RestoreStateColumnsButton = (props: RestoreStateColumnsButtonProps) => {
         color='text'
         className='euiDataGrid__controlBtn'
         data-test-subj='dataGridColumnRestoreStateButton'
-        onClick={props.dataGridStatePersistenceManager.clearStateColumns}
-        disabled={
-          props.dataGridStatePersistenceManager.isStateColumnsMatchingDefaults
-        }
+        onClick={props.dataGridStatePersistenceManager.clearState}
+        disabled={props.dataGridStatePersistenceManager.isStateMatchingDefaults}
       >
         <FormattedMessage
           id='wz.discover.restoreState'

@@ -147,7 +147,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       ...pagination,
       pageSize: dataGridStatePersistenceManager.retrieveState().pageSize,
     }));
-  }, [moduleId]);
+  }, [moduleId, dataGridStatePersistenceManager.retrieveState().pageSize]);
 
   const { columnsAvailable, columns, columnVisibility, onColumnResize } =
     useDataGridColumns({
