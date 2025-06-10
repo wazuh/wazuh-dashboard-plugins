@@ -26,6 +26,9 @@ jobs:
   build:
     name: Build app package
     uses: ./.github/workflows/dev-environment.yml
+    permissions:
+      actions: read
+      contents: read
     with:
       reference: ${{ inputs.reference }}
       command: 'yarn build'
