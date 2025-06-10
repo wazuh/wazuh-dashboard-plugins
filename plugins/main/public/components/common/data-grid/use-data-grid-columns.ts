@@ -133,15 +133,17 @@ function useDataGridColumns({
 
   // New effect to sync state changes with visible columns
   useEffect(() => {
-    if (
-      !indexPatternExists ||
-      !dataGridStatePersistenceManager.retrieveState().columns
-    ) {
+    if (!indexPatternExists) {
       return;
     }
 
-    const stateColumns =
-      dataGridStatePersistenceManager.retrieveState().columns;
+    const currentState = dataGridStatePersistenceManager.retrieveState();
+
+    if (!currentState.columns) {
+      return;
+    }
+
+    const stateColumns = currentState.columns;
 
     // Check if state columns are different from current visible columns
     const isDifferent =
