@@ -13,3 +13,4 @@ export { DashboardOffice365 } from './office/dashboard';
 export { DashboardThreatHunting } from './threat-hunting/dashboard';
 export { DashboardTSC } from './tsc/dashboards';
 export { DashboardVuls, InventoryVuls } from './vulnerabilities';
+export { DashboardAzure } from './azure/dashboards';
