@@ -479,7 +479,7 @@ export const azure = {
     defaultMessage:
       'Security events related to your Azure services, collected directly via Azure API.',
   }),
-  euiIconType: 'logoAzure',
+  euiIconType: 'logoAzureMono',
   order: 505,
   showInOverviewApp: true,
   showInAgentMenu: true,

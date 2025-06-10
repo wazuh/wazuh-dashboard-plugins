@@ -16,7 +16,6 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
-import { withModuleNotForAgent } from '../hocs';
 import {
   WazuhDiscover,
   WazuhDiscoverProps,
@@ -38,6 +37,7 @@ import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
+import { azureColumns } from '../../overview/azure/events/azure-columns';
 import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
@@ -61,6 +61,7 @@ import {
   DashboardGoogleCloud,
   DashboardVuls,
   InventoryVuls,
+  DashboardAzure,
 } from '../../overview';
 import {
   DockerDataSource,
@@ -79,6 +80,7 @@ import {
   PCIDSSDataSource,
   Office365DataSource,
   ThreatHuntingDataSource,
+  AzureDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
@@ -153,13 +155,13 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardAWS,
+        component: DashboardAzure,
       },
       renderDiscoverTab({
-        moduleId: 'aws',
-        tableColumns: amazonWebServicesColumns,
-        DataSource: AWSDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        moduleId: 'azure',
+        tableColumns: azureColumns,
+        DataSource: AzureDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY], // TODO: Change this when sample data is available for Azure
       }),
     ],
     availableFor: ['manager', 'agent'],
