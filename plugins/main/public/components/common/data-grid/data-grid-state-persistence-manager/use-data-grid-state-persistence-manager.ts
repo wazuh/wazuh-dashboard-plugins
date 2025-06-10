@@ -12,7 +12,7 @@ interface UseDataGridStateManagementProps {
   indexPatternExists: boolean;
 }
 
-const useDataGridStatePersistenceManager = ({
+export const useDataGridStatePersistenceManager = ({
   stateManagement,
   defaultState,
   columnSchemaDefinitionsMap,
@@ -245,5 +245,3 @@ const useDataGridStatePersistenceManager = ({
     isStateMatchingDefaults,
   };
 };
-
-export default useDataGridStatePersistenceManager;

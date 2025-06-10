@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { EuiDataGridColumn, EuiDataGridProps } from '@elastic/eui';
 import { tDataGridColumn } from './types';
-import useDataGridStatePersistenceManager from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
+import { useDataGridStatePersistenceManager } from './data-grid-state-persistence-manager/use-data-grid-state-persistence-manager';
 
 interface UseDataGridColumnsProps {
   moduleId: string;
