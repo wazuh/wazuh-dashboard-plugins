@@ -14,9 +14,6 @@
       "date_detection": false,
       "dynamic": "strict",
       "properties": {
-        "@timestamp": {
-          "type": "date"
-        },
         "agent": {
           "properties": {
             "host": {

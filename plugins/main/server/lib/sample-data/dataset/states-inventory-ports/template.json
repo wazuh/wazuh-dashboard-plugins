@@ -19,9 +19,6 @@
       "date_detection": false,
       "dynamic": "strict",
       "properties": {
-        "@timestamp": {
-          "type": "date"
-        },
         "agent": {
           "properties": {
             "host": {
@@ -108,11 +105,6 @@
         "process": {
           "properties": {
             "name": {
-              "fields": {
-                "text": {
-                  "type": "text"
-                }
-              },
               "ignore_above": 1024,
               "type": "keyword"
             },
