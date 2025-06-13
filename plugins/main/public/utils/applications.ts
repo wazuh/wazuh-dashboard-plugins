@@ -214,6 +214,31 @@ export const mitreAttack = {
     }`,
 };
 
+export const ITHygiene = {
+  category: 'wz-category-security-operations',
+  id: 'it-hygiene',
+  title: i18n.translate('wz-app-it-hygiene-title', {
+    defaultMessage: 'IT Hygiene',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-it-hygiene-breadcrumbLabel', {
+    defaultMessage: 'IT Hygiene',
+  }),
+  description: i18n.translate('wz-app-it-hygiene-description', {
+    defaultMessage:
+      'Assess system, software, runtime, and network layers to detect misconfigurations, unauthorized changes, and anomalies.',
+  }),
+  euiIconType: 'indexPatternApp',
+  order: 400,
+  showInOverviewApp: true,
+  showInAgentMenu: true,
+  redirectTo: () =>
+    `/overview/?tab=it-hygiene&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 const pciDss = {
   category: 'wz-category-security-operations',
   id: 'pci-dss',
@@ -228,7 +253,7 @@ const pciDss = {
       'Global security standard for entities that process, store, or transmit payment cardholder data.',
   }),
   euiIconType: 'visTagCloud',
-  order: 400,
+  order: 401,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -253,7 +278,7 @@ const gdpr = {
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.',
   }),
   euiIconType: 'visBarVertical',
-  order: 401,
+  order: 402,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -278,7 +303,7 @@ const hipaa = {
       'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.',
   }),
   euiIconType: 'monitoringApp',
-  order: 402,
+  order: 403,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -305,7 +330,7 @@ const nist80053 = {
   euiIconType: 'notebookApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
-  order: 403,
+  order: 404,
   redirectTo: () =>
     `/overview/?tab=nist&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
@@ -328,7 +353,7 @@ const tsc = {
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.',
   }),
   euiIconType: 'packetbeatApp',
-  order: 404,
+  order: 405,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
@@ -807,30 +832,6 @@ const about = {
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=about',
-};
-
-export const ITHygiene = {
-  category: 'wz-category-security-operations',
-  id: 'it-hygiene',
-  title: i18n.translate('wz-app-it-hygiene-title', {
-    defaultMessage: 'IT Hygiene',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-it-hygiene-breadcrumbLabel', {
-    defaultMessage: 'IT Hygiene',
-  }),
-  description: i18n.translate('wz-app-it-hygiene-description', {
-    defaultMessage: 'Show information about IT Hygiene.',
-  }),
-  euiIconType: 'indexPatternApp',
-  order: 405,
-  showInOverviewApp: true,
-  showInAgentMenu: true,
-  redirectTo: () =>
-    `/overview/?tab=it-hygiene&tabView=dashboard${
-      store.getState()?.appStateReducers?.currentAgentData?.id
-        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
-        : ''
-    }`,
 };
 
 export const Applications = [

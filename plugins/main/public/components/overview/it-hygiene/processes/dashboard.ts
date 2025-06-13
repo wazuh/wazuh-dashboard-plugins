@@ -1,14 +1,14 @@
-import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { STYLE } from '../../../common/saved-vis/constants';
+import { buildDashboardKPIPanels } from '../common/create-dashboard-panels-kpis';
+import { STYLE } from '../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
-} from '../../../common/saved-vis/create-saved-vis-data';
+} from '../common/saved-vis/create-saved-vis-data';
 import {
-  getVisStateHistrogramBy,
   getVisStateHorizontalBarByField,
-} from '../../../common/saved-vis/generators';
-import { SavedVis } from '../../../common/types';
+  getVisStateHistogramBy,
+} from '../common/saved-vis/generators';
+import { SavedVis } from '../common/types';
 
 type ProcessState =
   | 'Stopped'
@@ -88,14 +88,15 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
       'process.name',
       'Top 5 processes',
       'it-hygiene-processes',
-      'Processes',
+      { customLabel: 'Processes' },
     ),
-    getVisStateHistrogramBy(
+    getVisStateHistogramBy(
       indexPatternId,
       'process.start',
-      'Processes initiation',
+      'Processes start time',
       'it-hygiene-processes',
       'h',
+      { addLegend: false, customLabel: ' ', valueAxesTitleText: '' },
     ),
   ]);
 };

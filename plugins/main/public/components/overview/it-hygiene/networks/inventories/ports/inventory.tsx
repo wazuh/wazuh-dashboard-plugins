@@ -9,7 +9,7 @@ import { withSystemInventoryPortsDataSource } from '../../../common/hocs/validat
 import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
 import { getOverviewProcessesPortTab } from './dashboard';
 
-export const ITHygieneProccessesInventoryPorts =
+export const ITHygieneNetworksInventoryPorts =
   withSystemInventoryPortsDataSource(props => {
     return (
       <ITHygieneInventoryDashboardTable
