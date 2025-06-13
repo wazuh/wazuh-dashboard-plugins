@@ -12,6 +12,9 @@ jobs:
   build:
     name: Build app package (auto)
     uses: ./.github/workflows/dev-environment.yml
+    permissions:
+      actions: read
+      contents: read
     with:
       reference: ${{ github.ref_name }}
       command: 'yarn build'
