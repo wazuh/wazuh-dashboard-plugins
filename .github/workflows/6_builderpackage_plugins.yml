@@ -1,0 +1,81 @@
+# 📝 Based on: `6_builderprecompiled_base-dev-environment.yml`
+#
+# 📦 Manual Build Workflow for Wazuh Dashboard Plugins
+#
+# ⚡ Overview:
+# This workflow builds and tests production-ready packages for Wazuh Dashboard plugins,
+# either manually or triggered by other workflows.
+#
+# 🚀 Key Features:
+# - 🖇️ Manual or Automated Builds: Supports manual execution or invocation from other workflows,
+#   specifying any valid code reference (branch, tag, or commit SHA).
+# - 🏗️ Production-Ready Package Generation: Builds a production-ready package from the provided code reference.
+# - 🌐 Reusable Build Environment: Reuses a preconfigured build environment, ensuring consistency and easier maintenance.
+# - 🧪 Automated Testing: Automatically downloads and tests generated artifacts using a dynamically configured Docker environment.
+#
+
+name: Build app package (on demand)
+
+on:
+  workflow_call:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: main
+        description: 'Git reference (branch, tag, or commit SHA) to build from.'
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: main
+        description: 'Git reference (branch, tag, or commit SHA) to build from.'
+
+jobs:
+  # Build an app package from the given source code reference.
+  build:
+    name: Build app package
+    uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
+    with:
+      reference: ${{ inputs.reference }}
+      command: 'yarn build'
+      artifact_name: 'wazuh-dashboard-plugins'
+    secrets: inherit
+
+  test-packages:
+    needs: build
+    name: Test packages
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        plugin: [wazuh-core, wazuh-check-updates]
+
+    steps:
+      - name: Step 01 - Download the plugin's source code
+        uses: actions/checkout@v4
+        with:
+          repository: wazuh/wazuh-dashboard-plugins
+          ref: ${{ inputs.reference }}
+          path: wazuh
+
+      - name: Step 02 - Set variables
+        run: |
+          echo "GITHUB_REFERENCE=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
+          echo "CURRENT_DIR=$(pwd -P)" >> $GITHUB_ENV
+          echo "VERSION=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+          echo "REVISION=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+          echo "VERSION_PLATFORM=$(jq -r '.pluginPlatform.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+
+      - name: Step 03 - Download plugin artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wazuh-dashboard-plugins_${{ matrix.plugin }}_${{ env.VERSION }}-${{ env.REVISION }}_${{ env.GITHUB_REFERENCE }}.zip
+          path: ${{ env.CURRENT_DIR }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_${{ matrix.plugin }}_${{ env.VERSION }}-${{ env.REVISION }}_${{ env.GITHUB_REFERENCE }}.zip
+          overwrite: true
+
+      - name: Step 04 - Build the Docker image
+        run: |
+          echo "current=${{ env.CURRENT_DIR }}"
+          cd ./wazuh/scripts/test-packages
+          docker build --build-arg OSD_VERSION=${{ env.VERSION_PLATFORM }} --build-arg PACKAGE_NAME=wazuh-dashboard-plugins_${{ env.VERSION }}-${{ env.REVISION }}_${{ env.GITHUB_REFERENCE }}.zip -f osd-test-packages.Dockerfile ./
