@@ -34,7 +34,9 @@ export default {
     '^.+\\.tsx?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
     '^.+\\.html?$': `${kbnDir}/src/dev/jest/babel_transform.js`,
   },
-  transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.js$'],
+  transformIgnorePatterns: [
+    '[/\\\\]node_modules(?![\\/\\\\](node-cron|uuid))[/\\\\].+\\.js$',
+  ],
   snapshotSerializers: [`${kbnDir}/node_modules/enzyme-to-json/serializer`],
   testEnvironment: 'jest-environment-jsdom',
   reporters: ['default', `${kbnDir}/src/dev/jest/junit_reporter.js`],
