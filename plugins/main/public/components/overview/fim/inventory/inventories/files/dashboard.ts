@@ -6,6 +6,10 @@ import { buildDashboardKPIPanels } from '../../../../it-hygiene/common/create-da
 
 export const getDashboard = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
+    getVisStateTable(indexPatternId, 'file.path', '', 'fim-files-inventory', {
+      size: 5,
+      fieldCustomLabel: 'Top 5 file paths',
+    }),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'file.owner',
@@ -15,14 +19,10 @@ export const getDashboard = (indexPatternId: string) => {
         fieldSize: 4,
         otherBucket: 'Others',
         metricCustomLabel: 'File owner count',
-        valueAxesTitleText: 'File owner count',
+        valueAxesTitleText: ' ',
         seriesLabel: 'File owner count',
         fieldCustomLabel: 'File owner',
       },
     ),
-    getVisStateTable(indexPatternId, 'file.path', '', 'fim-files-inventory', {
-      size: 5,
-      fieldCustomLabel: 'Top 5 file paths',
-    }),
   ]);
 };

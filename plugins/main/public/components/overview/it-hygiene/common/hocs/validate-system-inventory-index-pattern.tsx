@@ -5,9 +5,21 @@ import {
   ensureIndexPatternIsCreated,
   ERROR_NO_INDICES_FOUND,
   mapFieldsFormat,
-  withIndexPatternFromSettingDataSource,
+  withIndexPatternFromValue,
   withMapErrorPromptErrorEnsureIndexPattern,
 } from '../../../../common/hocs';
+import {
+  WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
+  WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
+  WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
+  WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
+  WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
+  WAZUH_IT_HYGIENE_PATTERN,
+  WAZUH_IT_HYGIENE_PORTS_PATTERN,
+  WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
+  WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
+  WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+} from '../../../../../../common/constants';
 
 const errorPromptTypes = {
   [ERROR_NO_INDICES_FOUND]: {
@@ -43,36 +55,35 @@ const errorPromptTypes = {
   },
 };
 
-export const withSystemInventoryDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory.pattern',
-    validate: ensureIndexPatternIsCreated(
-      mapFieldsFormat({
-        'destination.port': 'integer',
-        'host.memory.free': 'bytes',
-        'host.memory.total': 'bytes',
-        'host.memory.used': 'bytes',
-        'host.network.egress.bytes': 'bytes',
-        'host.network.ingress.bytes': 'bytes',
-        'package.size': 'bytes',
-        'process.parent.pid': 'integer',
-        'process.pid': 'integer',
-        'source.port': 'integer',
-      }),
-    ),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+export const withSystemInventoryDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_PATTERN,
+  validate: ensureIndexPatternIsCreated(
+    mapFieldsFormat({
+      'destination.port': 'integer',
+      'host.memory.free': 'bytes',
+      'host.memory.total': 'bytes',
+      'host.memory.used': 'bytes',
+      'host.memory.usage': 'percent',
+      'host.network.egress.bytes': 'bytes',
+      'host.network.ingress.bytes': 'bytes',
+      'package.size': 'bytes',
+      'process.parent.pid': 'integer',
+      'process.pid': 'integer',
+      'source.port': 'integer',
+    }),
+  ),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
 
-export const withSystemInventoryNetworksDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_networks.pattern',
-    validate: ensureIndexPatternIsCreated(),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+export const withSystemInventoryNetworksDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
+  validate: ensureIndexPatternIsCreated(),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
 
 export const withSystemInventoryInterfacesDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_interfaces.pattern',
+  withIndexPatternFromValue({
+    indexPattern: WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
     validate: ensureIndexPatternIsCreated(
       mapFieldsFormat({
         'host.network.egress.bytes': 'bytes',
@@ -82,16 +93,17 @@ export const withSystemInventoryInterfacesDataSource =
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   });
 
-export const withSystemInventoryProtocolsDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_protocols.pattern',
+export const withSystemInventoryProtocolsDataSource = withIndexPatternFromValue(
+  {
+    indexPattern: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
     validate: ensureIndexPatternIsCreated(),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+  },
+);
 
-export const withSystemInventoryProcessesDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_processes.pattern',
+export const withSystemInventoryProcessesDataSource = withIndexPatternFromValue(
+  {
+    indexPattern: WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
     validate: ensureIndexPatternIsCreated(
       mapFieldsFormat({
         'process.parent.pid': 'integer',
@@ -99,55 +111,52 @@ export const withSystemInventoryProcessesDataSource =
       }),
     ),
     ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+  },
+);
 
-export const withSystemInventoryPortsDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_ports.pattern',
-    validate: ensureIndexPatternIsCreated(
-      mapFieldsFormat({
-        'destination.port': 'integer',
-        'process.pid': 'integer',
-        'source.port': 'integer',
-      }),
-    ),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+export const withSystemInventoryPortsDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_PORTS_PATTERN,
+  validate: ensureIndexPatternIsCreated(
+    mapFieldsFormat({
+      'destination.port': 'integer',
+      'process.pid': 'integer',
+      'source.port': 'integer',
+    }),
+  ),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
 
-export const withSystemInventoryPackagesDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_packages.pattern',
-    validate: ensureIndexPatternIsCreated(
-      mapFieldsFormat({
-        'package.size': 'bytes',
-      }),
-    ),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+export const withSystemInventoryPackagesDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
+  validate: ensureIndexPatternIsCreated(
+    mapFieldsFormat({
+      'package.size': 'bytes',
+    }),
+  ),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
 
-export const withSystemInventoryHotfixesDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_hotfixes.pattern',
-    validate: ensureIndexPatternIsCreated(),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+export const withSystemInventoryHotfixesDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
+  validate: ensureIndexPatternIsCreated(),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
 
-export const withSystemInventorySystemDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_system.pattern',
-    validate: ensureIndexPatternIsCreated(),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+export const withSystemInventorySystemDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+  validate: ensureIndexPatternIsCreated(),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
 
-export const withSystemInventoryHardwareDataSource =
-  withIndexPatternFromSettingDataSource({
-    indexPatternSetting: 'system_inventory_hardware.pattern',
-    validate: ensureIndexPatternIsCreated(
-      mapFieldsFormat({
-        'host.memory.free': 'bytes',
-        'host.memory.total': 'bytes',
-        'host.memory.used': 'bytes',
-      }),
-    ),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
+export const withSystemInventoryHardwareDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
+  validate: ensureIndexPatternIsCreated(
+    mapFieldsFormat({
+      'host.memory.free': 'bytes',
+      'host.memory.total': 'bytes',
+      'host.memory.used': 'bytes',
+      'host.memory.usage': 'percent',
+    }),
+  ),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
