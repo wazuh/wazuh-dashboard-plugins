@@ -6,7 +6,8 @@
 # Jest is a third-party software https://jestjs.io/
 
 name: Run unit test
-
+permissions:
+  pull-requests: write
 on:
   workflow_dispatch:
     inputs:
