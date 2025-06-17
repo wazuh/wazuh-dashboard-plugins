@@ -22,8 +22,7 @@ jobs:
     name: Build app package (auto)
     uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
     permissions:
-      actions: read
-      contents: read
+      pull-requests: write
     with:
       reference: ${{ github.ref_name }}
       command: 'yarn build'
