@@ -27,6 +27,7 @@ jobs:
     name: Build app package
     uses: ./.github/workflows/dev-environment.yml
     permissions:
+      contents: read
       pull-requests: write
     with:
       reference: ${{ inputs.reference }}
