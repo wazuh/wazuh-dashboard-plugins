@@ -17,7 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Changed
 
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
-- Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482)
+- Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482) [#7538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7538)
 - Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
 
 ### Fixed
