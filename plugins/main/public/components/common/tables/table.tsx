@@ -21,22 +21,21 @@ function decorateRowProps(
 function _expandableItemGetId(id: any): string {
   return String(id);
 }
-function getItemWithExpandableId(items, id, isExpandableRowOnClickId: string) {
+function getItemWithExpandableId(items, id, itemId: string) {
   return items.find(
-    item =>
-      expandableItemGetId(item, isExpandableRowOnClickId) ===
-      _expandableItemGetId(id),
+    item => expandableItemGetId(item, itemId) === _expandableItemGetId(id),
   );
 }
 
-function expandableItemGetId(item, isExpandableRowOnClickId: string) {
-  return String(get(item, isExpandableRowOnClickId));
+function expandableItemGetId(item, itemId: string) {
+  return String(get(item, itemId));
 }
 
 export type TableBasicManageExpandedItemsProps = EuiBasicTableProps & {
-  isExpandableRowOnClickId?: string;
+  itemId?: string;
   expandableRowButtonSide: 'left' | ' right';
   ExpandableRowContent: any;
+  expandRowOnClick: boolean;
 };
 /* This is a wrapped of EuiBasicTable that manages the expanded row and resets the expanded rows
 visibility if any item changed. */
@@ -45,9 +44,10 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
     (
       {
         rowProps,
-        isExpandableRowOnClickId,
+        itemId,
         ExpandableRowContent,
         expandableRowButtonSide = 'right',
+        expandRowOnClick = false,
         columns,
         ...props
       }: TableBasicManageExpandedItemsProps,
@@ -63,7 +63,7 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
 
       const toggleExpandedRow = item => {
         setExpandableRows(state => {
-          const id = String(get(item, isExpandableRowOnClickId)); // Ensure this is a string
+          const id = String(get(item, itemId)); // Ensure this is a string
           const newState = { ...state };
           if (newState[id]) {
             delete newState[id];
@@ -74,10 +74,12 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
         });
       };
 
-      const enhancedRowProps = rowProps
-        ? decorateRowProps(rowProps, {
+      const internalRowProps = rowProps || (expandRowOnClick && (() => ({})));
+
+      const enhancedRowProps = internalRowProps
+        ? decorateRowProps(internalRowProps, {
             expandOnClick:
-              isExpandableRowOnClickId &&
+              expandRowOnClick &&
               ((onClick, item) => {
                 return (...args) => {
                   toggleExpandedRow(item);
@@ -85,7 +87,7 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
                 };
               }),
           })
-        : rowProps;
+        : internalRowProps;
 
       const itemIdToExpandedRowMap =
         expandableRows &&
@@ -93,17 +95,13 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
         Object.fromEntries(
           Object.keys(expandableRows)
             .map(key => {
-              const item = getItemWithExpandableId(
-                props.items,
-                key,
-                isExpandableRowOnClickId,
-              );
+              const item = getItemWithExpandableId(props.items, key, itemId);
               return [key, <ExpandableRowContent item={item} />];
             })
             .filter(([_, render]) => render), // Ensure there is a render
         );
 
-      const isExpandable = Boolean(isExpandableRowOnClickId);
+      const isExpandable = Boolean(itemId);
       const enhancedTableColumns = isExpandable
         ? [
             ...(expandableRowButtonSide === 'left'
@@ -113,9 +111,7 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
                     width: '40px',
                     isExpander: true,
                     render: item => {
-                      const id = _expandableItemGetId(
-                        get(item, isExpandableRowOnClickId),
-                      );
+                      const id = _expandableItemGetId(get(item, itemId));
                       const isExpanded = expandableRows[id];
                       return (
                         <EuiButtonIcon
@@ -140,9 +136,7 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
                     width: '40px',
                     isExpander: true,
                     render: item => {
-                      const id = _expandableItemGetId(
-                        get(item, isExpandableRowOnClickId),
-                      );
+                      const id = _expandableItemGetId(get(item, itemId));
                       const isExpanded = expandableRows[id];
                       return (
                         <EuiButtonIcon
@@ -168,7 +162,7 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
           rowProps={enhancedRowProps}
           isExpandable={isExpandable}
           itemIdToExpandedRowMap={isExpandable && itemIdToExpandedRowMap}
-          itemId={isExpandableRowOnClickId}
+          itemId={itemId}
           columns={enhancedTableColumns}
           {...props}
         />

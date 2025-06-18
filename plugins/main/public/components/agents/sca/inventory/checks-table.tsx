@@ -1,5 +1,5 @@
-import { EuiButtonIcon, EuiDescriptionList, EuiHealth } from '@elastic/eui';
 import React, { Component } from 'react';
+import { EuiDescriptionList, EuiHealth } from '@elastic/eui';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../common/constants';
 import { TableWzAPI } from '../../../common/tables';
 import { ComplianceText, RuleText } from '../components';
@@ -225,8 +225,9 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
         tablePageSizeOptions={[10, 25, 50, 100]}
         rowProps={getChecksRowProps}
         tableProps={{
-          isExpandableRowOnClickId: 'id',
+          itemId: 'id',
           ExpandableRowContent: TableRowExpand,
+          expandRowOnClick: true,
         }}
         downloadCsv
         showReload

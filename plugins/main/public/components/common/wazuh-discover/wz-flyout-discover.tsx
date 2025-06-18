@@ -317,7 +317,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                 </EuiPanel>
                 <TableBasicManageExpandedItems
                   items={parsedItems}
-                  isExpandableRowOnClickId={INDEX_FIELD_NAME}
+                  itemId={INDEX_FIELD_NAME}
                   expandableRowButtonSide='left'
                   ExpandableRowContent={({ item }) => (
                     <GetExpandedRow

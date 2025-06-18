@@ -126,7 +126,7 @@ export const EditRolesTable = ({
     <>
       <TableBasicManageExpandedItems
         items={pageOfItems}
-        isExpandableRowOnClickId='id'
+        itemId='id'
         ExpandableRowContent={ExpandedTableRow}
         loading={isLoading || loading}
         hasActions={true}
