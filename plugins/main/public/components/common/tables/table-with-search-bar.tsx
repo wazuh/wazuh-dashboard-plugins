@@ -17,6 +17,7 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { SearchBar, SearchBarProps } from '../../search-bar';
+import { WzBasicTableManageExpandedItems } from './table';
 
 export interface ITableWithSearcHBarProps<T> {
   /**
@@ -266,7 +267,7 @@ export function TableWithSearchBar<T>({
         }}
       />
       <EuiSpacer size='s' />
-      <EuiBasicTable
+      <WzBasicTableManageExpandedItems
         data-test-subj='table-with-search-bar'
         ref={tableRef}
         columns={tableColumns.map(
