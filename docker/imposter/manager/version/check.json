@@ -5,9 +5,9 @@
     "current_version": "v4.8.0",
     "update_check": true,
     "last_available_major": {
-      "tag": "v5.0.0",
-      "description": "Highlights of release 5.0.0",
-      "title": "Wazuh 5.0.0",
+      "tag": "v6.0.0",
+      "description": "Highlights of release 6.0.0",
+      "title": "Wazuh 6.0.0",
       "published_date": "2023-10-03T10:44:00Z",
       "semver": {
         "minor": 0,

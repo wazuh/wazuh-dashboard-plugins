@@ -1,25 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
+import { RedirectAppLinks } from 'src/plugins/opensearch_dashboards_react/public';
 import { EuiLink, EuiToolTip, EuiToolTipProps } from '@elastic/eui';
-import { getCore } from '../../kibana-services';
-import NavigationService from '../../react-services/navigation-service';
+import { CoreStart } from 'src/core/public';
+import { createGetterSetter } from 'src/opensearch_dashboards_utils/public';
 import useObservable from 'react-use/lib/useObservable';
+import NavigationService from '../../react-services/navigation-service';
 
-type tWzLinkProps = {
+export const [getCore, setCore] = createGetterSetter<CoreStart>('Core');
+
+interface TWzLinkProps {
   appId: string;
   path: string;
   children: React.ReactNode;
   toolTipProps?: EuiToolTipProps;
-};
+}
 
-export const WzLink = (props: tWzLinkProps) => {
+export const WzLink = (props: TWzLinkProps) => {
   const { appId, path, children, toolTipProps, ...otherProps } = props;
-
   const [isCurrentApp, setIsCurrentApp] = useState(false);
-  const currentAppId$ = useObservable(
-    getCore().application.currentAppId$,
-    undefined,
-  );
+  const currentAppId$ = useObservable(getCore().application.currentAppId$);
 
   useEffect(() => {
     setIsCurrentApp(currentAppId$ === appId);
@@ -37,7 +36,6 @@ export const WzLink = (props: tWzLinkProps) => {
       </EuiLink>
     </RedirectAppLinks>
   );
-
   const linkSameApp = (
     <EuiLink
       {...otherProps}
@@ -48,7 +46,6 @@ export const WzLink = (props: tWzLinkProps) => {
       {children}
     </EuiLink>
   );
-
   const finalLink = isCurrentApp ? linkSameApp : linkDiferentApps;
 
   return toolTipProps ? (

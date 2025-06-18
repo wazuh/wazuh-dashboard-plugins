@@ -29,9 +29,7 @@ describe('SearchBar component', () => {
     const wrapper = render(<SearchBar {...componentProps} />);
 
     await waitFor(() => {
-      const elementImplicitQuery = wrapper.container.querySelector(
-        '.euiCodeBlock__code',
-      );
+      const elementImplicitQuery = wrapper.container.querySelector('code');
 
       expect(elementImplicitQuery?.innerHTML).toEqual('id!=000;');
       expect(wrapper.container).toMatchSnapshot();

@@ -1,3 +1,5 @@
+import { i18n } from '@osd/i18n';
+
 export class AppUpdaterNotFoundError extends Error {
   constructor(appId: string) {
     super(

@@ -31,6 +31,8 @@
     - [Description](ref/modules/fleet-management/description.md)
     - [Architecture](ref/modules/fleet-management/architecture.md)
     - [API reference](ref/modules/fleet-management/api-reference.md)
+    - [Agent summary](ref/modules/fleet-management/summary.md)
+    - [Agent details](ref/modules/fleet-management/details.md)
     - [Enrollment agent assistant](ref/modules/fleet-management/enrollment-agent-assistant.md)
 - [Upgrade](ref/upgrade.md)
 - [Uninstall](ref/uninstall.md)

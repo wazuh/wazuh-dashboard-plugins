@@ -11,7 +11,11 @@ import { EConfigurationProviders } from '../common/constants';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
 import { Configuration } from '../common/services/configuration';
 import { NoopLogger } from '../common/logger/noop-logger';
-import { WazuhCorePluginSetup, WazuhCorePluginStart } from './types';
+import {
+  AppPluginStartDependencies,
+  WazuhCorePluginSetup,
+  WazuhCorePluginStart,
+} from './types';
 import { setChrome, setCore, setUiSettings } from './plugin-services';
 import { UISettingsConfigProvider } from './services/configuration/ui-settings-provider';
 import * as utils from './utils';
@@ -29,6 +33,7 @@ import { CoreServerSecurity, ServerSecurity } from './services';
 import { CoreHTTPClient } from './services/http/http-client';
 import { QueryManagerFactory } from './services/query-manager/query-manager-factory';
 import { ApplicationService } from './services/application/application';
+import { NavigationService } from './services/navigation/navigation-service';
 
 interface RuntimeSetup {
   dashboardSecurity: DashboardSecurityServiceSetupReturn;
@@ -183,6 +188,7 @@ export class WazuhCorePlugin
     };
 
     this.services.queryManagerFactory = new QueryManagerFactory(plugins.data);
+    this.services.navigationService = NavigationService;
 
     return {
       ...this.services,
