@@ -75,7 +75,7 @@ const ITHygieneInventoryDashboard = ({
     });
 
   return (
-    <>
+    <div style={{ margin: '0 12px' }}>
       {isDataSourceLoading && !dataSource ? (
         <LoadingSearchbarProgress />
       ) : (
@@ -175,7 +175,7 @@ const ITHygieneInventoryDashboard = ({
           {error && <PromptErrorInitializatingDataSource error={error} />}
         </>
       )}
-    </>
+    </div>
   );
 };
 

@@ -27,6 +27,26 @@ import {
 import { routeDecoratorProtectedAdministrator } from './decorators';
 import { generateSampleData } from '../lib/generate-sample-data';
 
+/**
+ * Get the an array of unique objects by settingIndexPattern-dataSet par
+ * @param arr
+ * @returns
+ */
+function getUniqueEntriesByIndiceDatasetPar(
+  array: { settingIndexPattern: string; dataSet: string }[],
+) {
+  const seen = new Set();
+  return array.filter(item => {
+    // Create a unique key by combining the two property values.
+    const key = `${item.settingIndexPattern}::${item.dataSet}`;
+    if (seen.has(key)) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
+
 export class WazuhElasticCtrl {
   constructor() {}
 
@@ -38,43 +58,19 @@ export class WazuhElasticCtrl {
     context: RequestHandlerContext,
     category: string,
   ): Promise<{ indexName: string; dataSet: string }[]> {
-    const settingsIndexPatterns: {
-      settingIndexPattern: string;
-      dataSet: string;
-    }[] = [];
-
-    WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[category].forEach(item => {
-      // Check if the index pattern already exists in the array
-      // If it does, skip adding it
-      // If it doesn't, add it to the array
-      if (
-        settingsIndexPatterns.some(
-          itemSome => itemSome.settingIndexPattern === item.settingIndexPattern,
-        )
-      ) {
-        return;
-      }
-      settingsIndexPatterns.push({
-        settingIndexPattern: item.settingIndexPattern,
-        dataSet: item?.dataSet,
-      });
-    });
-
-    // Return an array of index names and settingsIndexPatterns
-    // by mapping the settingsIndexPatterns
     const indexNames = await Promise.all(
-      settingsIndexPatterns.map(async ({ settingIndexPattern, dataSet }) => {
-        const configValue = await context.wazuh_core.configuration.get(
-          settingIndexPattern,
-        );
-        return {
-          indexName: `${configValue}sample-${category}`,
-          dataSet: dataSet,
-        };
-      }),
+      WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[category].map(async item => ({
+        indexName: `${
+          item.settingIndexPattern
+            ? await context.wazuh_core.configuration.get(
+                item.settingIndexPattern,
+              )
+            : item.indexPatternPrefix
+        }sample-${category}`,
+        dataSet: item?.dataSet,
+      })),
     );
-
-    return indexNames;
+    return getUniqueEntriesByIndiceDatasetPar(indexNames);
   }
 
   /**

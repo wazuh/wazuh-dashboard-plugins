@@ -13,7 +13,7 @@ const tabs = [
   },
   {
     id: 'hotfixes',
-    name: 'Hotfixes',
+    name: 'Windows KBs',
     component: ITHygienePackagesInventoryHotfixes,
   },
 ];

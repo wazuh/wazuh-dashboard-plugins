@@ -55,13 +55,16 @@ export const WzSearchBar = ({
           wrap={true}
         >
           {preQueryBar ? <EuiFlexItem>{preQueryBar}</EuiFlexItem> : null}
-          <EuiFlexItem grow={!preQueryBar}>
-            <SearchBar
-              {...restProps}
-              showFilterBar={showSaveQueryButton}
-              showSaveQuery={showSaveQuery}
-            />
-          </EuiFlexItem>
+          {/* WORKAROUND: The search bar is not displayed when the preQueryBar is enabled and the date picker is disabled to avoid rendering an empty flexItem */}
+          {!preQueryBar || restProps?.showDatePicker ? (
+            <EuiFlexItem grow={!preQueryBar}>
+              <SearchBar
+                {...restProps}
+                showFilterBar={showSaveQueryButton}
+                showSaveQuery={showSaveQuery}
+              />
+            </EuiFlexItem>
+          ) : null}
         </EuiFlexGroup>
       ) : null}
       {showFilters ? (

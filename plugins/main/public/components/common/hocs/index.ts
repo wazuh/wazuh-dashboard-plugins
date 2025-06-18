@@ -25,3 +25,4 @@ export * from './with-router-search';
 export * from './with-index-pattern';
 export * from './with-data-source';
 export * from './with-wrap-component';
+export * from './with-inject-props';

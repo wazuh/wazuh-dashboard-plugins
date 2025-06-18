@@ -21,7 +21,7 @@ export enum RibbonItemLabel {
 export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   key: React.Key;
   label: LABEL;
-  value: VALUE;
+  value?: VALUE;
   style?: React.CSSProperties;
   isLoading?: boolean;
   condensed?: boolean;

@@ -264,6 +264,23 @@ pre_update_checks() {
   log "Current major.minor: $CURRENT_MAJOR_MINOR"
   log "New major.minor: $NEW_MAJOR_MINOR"
   log "Default revision set to: $REVISION" # Log default revision here
+
+  # Attempt to extract stage from VERSION.json using sed
+  log "Attempting to extract current stage from $VERSION_FILE using sed..."
+  CURRENT_STAGE=$(sed -n 's/^\s*"stage"\s*:\s*"\([^"]*\)".*$/\1/p' "$VERSION_FILE" | head -n 1) # head -n 1 ensures only the first match is taken
+
+  # Check if sed successfully extracted a stage
+  if [ -z "$CURRENT_STAGE" ]; then
+    log "ERROR: Failed to extract 'stage' from $VERSION_FILE using sed. Check file format or key presence."
+    exit 1 # Exit if sed fails
+  fi
+  log "Successfully extracted stage using sed: $CURRENT_STAGE"
+
+  if [ "$CURRENT_STAGE" == "null" ]; then # Check specifically for "null" string if sed might output that
+    log "ERROR: Could not read current stage from $VERSION_FILE (value was 'null')"
+    exit 1
+  fi
+  log "Current stage detected in VERSION.json: $CURRENT_STAGE"
 }
 
 # Function to compare versions and determine revision
@@ -306,27 +323,30 @@ compare_versions_and_set_revision() {
       else
         # Versions are identical (Major, Minor, Patch are equal)
         log "New version ($VERSION) is identical to current version ($CURRENT_VERSION)"
-        if [ -n "$STAGE" ]; then
-          log "Incrementing revision."
-          local main_package_json="${REPO_PATH}/plugins/main/package.json" # Need path again
-          log "Attempting to extract current revision from $main_package_json using sed (Note: This is fragile)"
-          local current_revision_val=$(sed -n 's/^\s*"revision"\s*:\s*"\([^"]*\)".*$/\1/p' "$main_package_json" | head -n 1)
+        local main_package_json="${REPO_PATH}/plugins/main/package.json" # Need path again
+        log "Attempting to extract current revision from $main_package_json using sed (Note: This is fragile)"
+        local current_revision_val=$(sed -n 's/^\s*"revision"\s*:\s*"\([^"]*\)".*$/\1/p' "$main_package_json" | head -n 1)
           # Check if sed successfully extracted a revision
-          if [ -z "$current_revision_val" ]; then
-            log "ERROR: Failed to extract 'revision' from $main_package_json using sed. Check file format or key presence."
-            exit 1 # Exit if sed fails
-          fi
-          log "Successfully extracted revision using sed: $current_revision_val"
-          if [ -z "$current_revision_val" ] || [ "$current_revision_val" == "null" ]; then
-            log "ERROR: Could not read current revision from $main_package_json"
-            exit 1
-          fi
-          # Ensure CURRENT_REVISION is treated as a number (remove leading zeros for arithmetic if necessary, handle base 10)
-          local current_revision_int=$((10#$current_revision_val))
-          local new_revision_int=$((current_revision_int + 1))
+        if [ -z "$current_revision_val" ]; then
+          log "ERROR: Failed to extract 'revision' from $main_package_json using sed. Check file format or key presence."
+          exit 1 # Exit if sed fails
+        fi
+        log "Successfully extracted revision using sed: $current_revision_val"
+        if [ -z "$current_revision_val" ] || [ "$current_revision_val" == "null" ]; then
+          log "ERROR: Could not read current revision from $main_package_json"
+          exit 1
+        fi
+        # Ensure CURRENT_REVISION is treated as a number (remove leading zeros for arithmetic if necessary, handle base 10)
+        local current_revision_int=$((10#$current_revision_val))
+        local new_revision_int=$((current_revision_int + 1))
+        if [ -n "$STAGE" ] && [ "$STAGE" != "$CURRENT_STAGE" ]; then
           # Format back to two digits with leading zero
+          log "Incrementing revision."
           REVISION=$(printf "%02d" "$new_revision_int")
           log "Current revision: $current_revision_val. New revision set to: $REVISION"
+        else
+          REVISION=$(printf "%02d" "$current_revision_int")
+          log "Current revision: $current_revision_val."
         fi
       fi
     fi

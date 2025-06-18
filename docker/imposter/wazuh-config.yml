@@ -1,5 +1,6 @@
 ---
 plugin: openapi
+
 specFile: https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/api/api/spec/spec.yaml
 system:
   stores:

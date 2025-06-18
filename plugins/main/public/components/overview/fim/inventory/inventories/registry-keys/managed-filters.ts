@@ -6,12 +6,12 @@ export default [
   },
   {
     type: 'multiSelect',
-    key: 'registry.group',
-    placeholder: 'Group',
+    key: 'registry.owner',
+    placeholder: 'Owner',
   },
   {
     type: 'multiSelect',
-    key: 'registry.owner',
-    placeholder: 'Owner',
+    key: 'registry.group',
+    placeholder: 'Group',
   },
 ];

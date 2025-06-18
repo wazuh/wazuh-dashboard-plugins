@@ -1,8 +1,5 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import {
-  getVisStateMetricUniqueCountByField,
-  getVisStateHorizontalBarByField,
-} from '../../../common/saved-vis/generators';
+import { getVisStateMetricUniqueCountByField } from '../../../common/saved-vis/generators';
 
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -10,8 +7,86 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { SavedVis } from '../../../common/types';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations/generators';
 
 type PackageArchitecture = 'x86_64' | 'arm64';
+
+const getVisStateFilter = (
+  id: string,
+  indexPatternId: string,
+  title: string,
+  label: string,
+  fieldName: string,
+) => {
+  return {
+    id,
+    title,
+    type: 'table',
+    params: {
+      perPage: 5,
+      percentageCol: '',
+      row: true,
+      showMetricsAtAllLevels: false,
+      showPartialRows: false,
+      showTotal: false,
+      totalFunc: 'sum',
+    },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 75,
+          },
+        ],
+      },
+    },
+    data: {
+      searchSource: {
+        query: {
+          language: 'kuery',
+          query: '',
+        },
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: {
+            customLabel: 'Count',
+          },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          params: {
+            field: fieldName,
+            orderBy: '1',
+            order: 'desc',
+            size: 5,
+            otherBucket: false,
+            otherBucketLabel: 'Other',
+            missingBucket: false,
+            missingBucketLabel: 'Missing',
+            customLabel: label,
+          },
+          schema: 'bucket',
+        },
+      ],
+    },
+  };
+};
 
 const getVisStatePackageArchitectureMetric = (
   indexPatternId: string,
@@ -80,12 +155,12 @@ const getVisStatePackageArchitectureMetric = (
 
 export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateHorizontalBarByField(
-      indexPatternId,
-      'package.vendor',
-      'Top 5 vendors',
-      'it-hygiene-packages',
+    getVisStateFilter(
       'Vendors',
+      indexPatternId,
+      '',
+      'Top 5 vendors',
+      'package.vendor',
     ),
     getVisStateMetricUniqueCountByField(
       indexPatternId,
@@ -94,12 +169,19 @@ export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
       'it-hygiene-packages',
       'Packages',
     ),
-    getVisStateMetricUniqueCountByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
-      'package.version',
-      '',
+      'package.type',
+      'Package types',
       'it-hygiene-packages',
-      'Package versions',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Package type count',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'Package type count',
+        fieldCustomLabel: 'Package type',
+      },
     ),
   ]);
 };

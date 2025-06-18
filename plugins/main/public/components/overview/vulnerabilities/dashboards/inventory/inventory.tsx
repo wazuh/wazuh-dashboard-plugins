@@ -62,6 +62,7 @@ import VulsEvaluationFilter, {
 import { DataGridVisibleColumnsSelector } from '../../../../common/wazuh-discover/components/visible-columns-selector';
 import { SampleDataWarning } from '../../../../visualize/components';
 import { WAZUH_SAMPLE_VULNERABILITIES } from '../../../../../../common/constants';
+import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
 
 const InventoryVulsComponent = () => {
   const {
@@ -315,6 +316,12 @@ const InventoryVulsComponent = () => {
                           >
                             Export Formatted
                           </EuiButtonEmpty>
+
+                          <RestoreStateColumnsButton
+                            dataGridStatePersistenceManager={
+                              dataGridProps.dataGridStatePersistenceManager
+                            }
+                          />
 
                           <DataGridVisibleColumnsSelector
                             availableColumns={dataGridProps.columnsAvailable}

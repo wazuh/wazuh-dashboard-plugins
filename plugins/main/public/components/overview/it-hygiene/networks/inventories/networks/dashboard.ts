@@ -1,11 +1,11 @@
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
-import { generateVisualization } from '../../../common/create-new-visualization';
 import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStateDonutByField } from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 import {
   getVisStateDHCPEnabledInterfacesMetric,
@@ -17,7 +17,7 @@ const getVisStateUniqueNetworkIPsMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-by-ip',
-    title: 'Unique networks IPs',
+    title: 'Unique network IPs',
     type: 'metric',
     params: {
       addTooltip: true,
@@ -62,13 +62,28 @@ const getVisStateUniqueNetworkIPsMetric = (
 
 export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.type',
-      'Protocols',
+      'Network types',
       'it-hygiene-networks',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Network type count',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'Type',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'Type',
+      },
     ),
-    getVisStateDHCPEnabledInterfacesMetric(indexPatternId),
     getVisStateUniqueNetworkIPsMetric(indexPatternId),
+    getVisStateHorizontalBarByField(
+      indexPatternId,
+      'interface.name',
+      'Top 5 interface names',
+      'it-hygiene-networks',
+      { customLabel: 'Interface name' },
+    ),
   ]);
 };

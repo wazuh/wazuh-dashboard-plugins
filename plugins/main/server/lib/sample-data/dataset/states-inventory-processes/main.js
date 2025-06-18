@@ -1,5 +1,9 @@
 const random = require('../../lib/random');
 const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
+const { Random } = require('../../../generate-alerts/helpers/random');
+const {
+  DateFormatter,
+} = require('../../../generate-alerts/helpers/date-formatter');
 
 function generateRandomProcess() {
   return {
@@ -9,7 +13,10 @@ function generateRandomProcess() {
     name: `process${random.int(0, 9999)}`,
     parent: { pid: random.int(1, 9999) },
     pid: random.int(1, 9999),
-    start: random.unixTimestamp(),
+    start: DateFormatter.format(
+      Random.date(),
+      DateFormatter.DATE_FORMAT.ISO_TIMESTAMP,
+    ),
     state: random.choice([
       'Running',
       'Uninterruptible Sleep',

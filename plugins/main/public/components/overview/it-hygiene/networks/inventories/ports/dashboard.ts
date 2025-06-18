@@ -4,10 +4,8 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import {
-  getVisStateHorizontalBarByField,
-  getVisStateDonutByField,
-} from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import { SavedVis } from '../../../common/types';
 
 type InterfaceState = 'LISTEN' | 'ESTABLISHED';
@@ -131,7 +129,7 @@ const getVisStateUDPOnlyTransportsMetric = (
                   query: 'network.transport:"UDP"',
                   language: 'kuery',
                 },
-                label: 'Protocols',
+                label: 'Transport Protocols',
               },
             ],
           },
@@ -144,31 +142,56 @@ const getVisStateUDPOnlyTransportsMetric = (
 
 export const getOverviewProcessesPortTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateHorizontalBarByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
-      'destination.port',
-      'Top 5 local ports',
+      'source.port',
+      'Top 5 source ports',
       'it-hygiene-ports',
-      'Local ports',
+      {
+        fieldSize: 5,
+        metricCustomLabel: 'Top ports count',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'Top ports',
+        seriesMode: 'normal',
+        fieldCustomLabel: 'Top ports',
+      },
     ),
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.state',
-      'States',
+      'Interface states',
       'it-hygiene-ports',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Interface state count',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'Interface state',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'Interface state',
+      },
     ),
-    getVisStateDonutByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.transport',
-      'Protocols',
+      'Transport protocols',
       'it-hygiene-ports',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Transport protocols count',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'Transport protocols',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'Transport protocols',
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'process.name',
       'Top 5 processes',
       'it-hygiene-ports',
-      'Processes',
+      { customLabel: 'Processes' },
     ),
   ]);
 };

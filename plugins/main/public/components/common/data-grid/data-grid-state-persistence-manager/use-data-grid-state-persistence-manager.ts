@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { DataGridState, DataGridStatePersistenceManager } from './types';
 import { DEFAULT_PAGE_SIZE } from '../constants';
 
@@ -12,12 +12,16 @@ interface UseDataGridStateManagementProps {
   indexPatternExists: boolean;
 }
 
-const useDataGridStatePersistenceManager = ({
+export const useDataGridStatePersistenceManager = ({
   stateManagement,
   defaultState,
   columnSchemaDefinitionsMap,
   indexPatternExists,
 }: UseDataGridStateManagementProps) => {
+  const [internalState, setInternalState] = useState<Partial<DataGridState>>(
+    Object.assign({}, stateManagement.retrieveState()),
+  );
+
   const validateColumns = useCallback(
     (columnsIds: DataGridState['columns']) => {
       // Avoid validation if we have no columns to validate
@@ -145,6 +149,15 @@ const useDataGridStatePersistenceManager = ({
 
   const clearState = () => {
     stateManagement.clearState();
+    setInternalState({});
+  };
+
+  const clearStateColumns = () => {
+    const newState: Partial<DataGridState> = {
+      pageSize: internalState.pageSize ?? DEFAULT_PAGE_SIZE,
+    };
+    stateManagement.persistState(newState);
+    setInternalState(newState);
   };
 
   const retrieveState = (): DataGridState => {
@@ -200,6 +213,7 @@ const useDataGridStatePersistenceManager = ({
 
   const persistState = (payload: Partial<DataGridState>): void => {
     stateManagement.persistState(payload);
+    setInternalState(payload);
   };
 
   const updateState = (payload: Partial<DataGridState>): void => {
@@ -208,12 +222,26 @@ const useDataGridStatePersistenceManager = ({
     persistState(newState);
   };
 
+  const isStateColumnsMatchingDefaults =
+    (internalState.columns === undefined ||
+      JSON.stringify(internalState.columns) ===
+        JSON.stringify(defaultState.columns)) &&
+    (internalState.columnWidths === undefined ||
+      JSON.stringify(internalState.columnWidths) ===
+        JSON.stringify(defaultState.columnWidths));
+
+  // Check if the state is equal to the default state
+  const isStateMatchingDefaults =
+    (internalState.pageSize === undefined ||
+      internalState.pageSize === defaultState.pageSize) &&
+    isStateColumnsMatchingDefaults;
+
   return {
     retrieveState,
     persistState,
     updateState,
     clearState,
+    clearStateColumns,
+    isStateMatchingDefaults,
   };
 };
-
-export default useDataGridStatePersistenceManager;

@@ -43,6 +43,8 @@ jobs:
   # Deploy the plugin in a development environment and run a command
   # using a pre-built Docker image, hosted in Quay.io.
   deploy_and_run_command:
+    permissions:
+      pull-requests: write
     name: Deploy and run command
     runs-on: ubuntu-24.04
     strategy:

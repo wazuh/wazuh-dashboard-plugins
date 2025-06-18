@@ -1,5 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { getVisStateTable } from '../common/saved-vis/generators';
 
 const getVisStateFilter = (
   id: string,
@@ -97,12 +98,14 @@ export const getDashboardTables = (
       type: 'visualization',
       explicitInput: {
         id: 't1',
-        savedVis: getVisStateFilter(
-          'it-hygiene-top-packages',
+        savedVis: getVisStateTable(
           indexPatternId,
-          'Top packages',
-          'Top 5 packages',
           'package.name',
+          'Top 5 installed packages',
+          'it-hygiene-top-packages',
+          {
+            customLabel: 'Top 5 installed packages',
+          },
         ),
       },
     },
@@ -117,12 +120,33 @@ export const getDashboardTables = (
       type: 'visualization',
       explicitInput: {
         id: 't2',
-        savedVis: getVisStateFilter(
-          'it-hygiene-top-packages',
+        savedVis: getVisStateTable(
           indexPatternId,
-          'Top processes',
-          'Top 5 processes',
-          'process.command_line',
+          'process.name',
+          'Top 5 running processes',
+          'it-hygiene-top-processes',
+          {
+            customLabel: 'Top 5 running processes',
+            filter: [
+              {
+                $state: {
+                  store: 'appState',
+                },
+                exists: {
+                  field: 'source.port',
+                },
+                meta: {
+                  alias: null,
+                  disabled: false,
+                  key: 'source.port',
+                  negate: true,
+                  type: 'exists',
+                  value: 'exists',
+                  index: indexPatternId,
+                },
+              },
+            ],
+          },
         ),
       },
     },
@@ -137,12 +161,14 @@ export const getDashboardTables = (
       type: 'visualization',
       explicitInput: {
         id: 't3',
-        savedVis: getVisStateFilter(
-          'it-hygiene-top-operating-system-names',
+        savedVis: getVisStateTable(
           indexPatternId,
-          'Top OS',
-          'Top 5 operating systems',
           'host.os.name',
+          'Top 5 operating systems',
+          'it-hygiene-top-operating-system-names',
+          {
+            customLabel: 'Top 5 operating systems',
+          },
         ),
       },
     },
@@ -157,12 +183,14 @@ export const getDashboardTables = (
       type: 'visualization',
       explicitInput: {
         id: 't4',
-        savedVis: getVisStateFilter(
-          'it-hygiene-top-operating-system-names',
+        savedVis: getVisStateTable(
           indexPatternId,
-          'Top ports',
-          'Top 5 local ports',
-          'destination.port',
+          'host.cpu.name',
+          'Top 5 CPUs',
+          'it-hygiene-stat',
+          {
+            customLabel: 'Top 5 host CPUs',
+          },
         ),
       },
     },

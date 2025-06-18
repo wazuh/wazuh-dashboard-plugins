@@ -1,49 +1,45 @@
-import { createPatternDataSourceRepositoryUseSettingValue } from '../pattern-data-source-repository-use-setting-value';
+import {
+  WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
+  WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
+  WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
+  WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
+  WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
+  WAZUH_IT_HYGIENE_PATTERN,
+  WAZUH_IT_HYGIENE_PORTS_PATTERN,
+  WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
+  WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
+  WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+} from '../../../../../../common/constants';
+import { createPatternDataSourceRepositoryUseValue } from '../pattern-data-source-repository-use-setting-value';
 
 export const SystemInventoryStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue('system_inventory.pattern');
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_PATTERN);
 
 export const SystemInventoryNetworksStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_networks.pattern',
-  );
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_NETWORKS_PATTERN);
 
 export const SystemInventoryInterfacesStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_interfaces.pattern',
+  createPatternDataSourceRepositoryUseValue(
+    WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
   );
 
 export const SystemInventoryProtocolsStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_protocols.pattern',
-  );
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN);
 
 export const SystemInventoryProcessesStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_processes.pattern',
-  );
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_PROCESSES_PATTERN);
 
 export const SystemInventoryPortsStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_ports.pattern',
-  );
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_PORTS_PATTERN);
 
 export const SystemInventoryPackagesStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_packages.pattern',
-  );
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_PACKAGES_PATTERN);
 
 export const SystemInventoryHotfixesStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_hotfixes.pattern',
-  );
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_HOTFIXES_PATTERN);
 
 export const SystemInventorySystemStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_system.pattern',
-  );
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_SYSTEM_PATTERN);
 
 export const SystemInventoryHardwareStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue(
-    'system_inventory_hardware.pattern',
-  );
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_HARDWARE_PATTERN);

@@ -1,7 +1,11 @@
-import { createPatternDataSourceRepositoryUseSettingValue } from '../pattern-data-source-repository-use-setting-value';
+import {
+  WAZUH_FIM_FILES_PATTERN,
+  WAZUH_FIM_REGISTRIES_PATTERN,
+} from '../../../../../../common/constants';
+import { createPatternDataSourceRepositoryUseValue } from '../pattern-data-source-repository-use-setting-value';
 
 export const FIMFilesStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue('fim_files.pattern');
+  createPatternDataSourceRepositoryUseValue(WAZUH_FIM_FILES_PATTERN);
 
 export const FIMRegistriesStatesDataSourceRepository =
-  createPatternDataSourceRepositoryUseSettingValue('fim_registries.pattern');
+  createPatternDataSourceRepositoryUseValue(WAZUH_FIM_REGISTRIES_PATTERN);

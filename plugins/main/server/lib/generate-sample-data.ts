@@ -51,12 +51,12 @@ const readTemplateFile = (
  */
 export const generateSampleData = (
   {
-    settingIndexPattern,
+    indexPatterPrefix,
     dataSet,
     ...params
   }: {
     dataSet: string;
-    settingIndexPattern: string;
+    indexPatterPrefix: string;
   },
   numDocuments: number = 1,
   context: RequestHandlerContext,

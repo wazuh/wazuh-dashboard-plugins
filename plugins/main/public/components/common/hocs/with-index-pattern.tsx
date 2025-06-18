@@ -10,6 +10,7 @@ import {
 import { EuiButton, EuiEmptyPrompt } from '@elastic/eui';
 import { LoadingSpinnerDataSource } from '../loading/loading-spinner-data-source';
 import { HTTP_STATUS_CODES } from '../../../../common/constants';
+import { withInjectProps } from './with-inject-props';
 
 export const ERROR_NO_INDICES_FOUND = 'ERROR_NO_INDICES_FOUND';
 export const ERROR_INDEX_PATTERN_CREATION = 'ERROR_INDEX_PATTERN_CREATION';
@@ -99,7 +100,7 @@ interface WithIndexPatternFromSettingDataSourceError {
   type: string;
 }
 export interface WithIndexPatternFromSettingDataSourceParams {
-  indexPatternSetting: string;
+  indexPattern: string;
   ErrorComponent?: React.ElementRef;
   LoadingComponent?: React.ElementRef;
   validate?: (context: { indexPatternID: string }) => Promise<{
@@ -156,84 +157,17 @@ export const withMapErrorPromptErrorEnsureIndexPattern =
     );
   };
 
-export const withIndexPatternFromSettingDataSource = ({
-  indexPatternSetting,
+export const withIndexPatternFromValue = ({
+  indexPattern,
   validate,
   ErrorComponent,
   LoadingComponent = LoadingSpinnerDataSource,
 }: WithIndexPatternFromSettingDataSourceParams) => {
-  const mapStateToProps = state => {
-    return {
-      indexPatternID: state.appConfig.data[indexPatternSetting],
-    };
-  };
-
   return compose(
-    connect(mapStateToProps),
+    withInjectProps({
+      indexPatternID: indexPattern,
+    }),
     withGuardAsync(validate, ErrorComponent, LoadingComponent),
-  );
-};
-
-export const withIndexPatternsFromSettingDataSource = ({
-  indexPatternSettings,
-  validate,
-  ErrorComponent,
-  LoadingComponent = LoadingSpinnerDataSource,
-}: WithIndexPatternFromSettingDataSourceParams) => {
-  const mapStateToProps = state => {
-    return {
-      indexPatternIDs: indexPatternSettings.map(
-        indexPatternSetting => state.appConfig.data[indexPatternSetting],
-      ),
-    };
-  };
-
-  return compose(
-    connect(mapStateToProps),
-    withGuardAsync(
-      async ({ indexPatternIDs }) => {
-        const results = await Promise.all(
-          indexPatternIDs.map(indexPatternID => validate({ indexPatternID })),
-        );
-        const result = results.reduce(
-          (accum, result) => {
-            return {
-              ok: result.ok || accum.ok,
-              data: {
-                indexPatterns: [
-                  ...accum?.data?.indexPatterns,
-                  ...(result?.data?.indexPattern
-                    ? [result.data.indexPattern]
-                    : [null]),
-                ],
-                error: {
-                  title: accum?.data?.error?.title,
-                  message: accum?.data?.error?.message,
-                  errors: [
-                    ...accum.data.error.errors,
-                    ...(result.data?.error ? [result.data.error] : []),
-                  ],
-                },
-              },
-            };
-          },
-          {
-            ok: false,
-            data: {
-              indexPatterns: [],
-              error: {
-                title: 'Error checking the data sources',
-                message: '',
-                errors: [],
-              },
-            },
-          },
-        );
-        return result;
-      },
-      ErrorComponent,
-      LoadingComponent,
-    ),
   );
 };
 

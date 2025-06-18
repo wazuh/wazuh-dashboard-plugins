@@ -7,8 +7,8 @@ import { ITHygieneInventoryTabLayout } from '../common/components/inventory';
 
 const tabs = [
   {
-    id: 'system',
-    name: 'System',
+    id: 'os',
+    name: 'OS',
     component: ITHygieneSystemInventorySystem,
   },
   {
