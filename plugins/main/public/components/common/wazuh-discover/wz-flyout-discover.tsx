@@ -59,36 +59,38 @@ export type WazuhDiscoverProps = {
   initialFetchFilters?: tFilter[];
 };
 
-const GetExpandedRow = ({
-  item,
-  results,
-  expandedRowComponent,
-  indexPattern,
-  filters,
-  setFilters,
-}: {
-  item: any;
-}) => {
-  const doc = results?.hits?.hits?.find(
-    hit => hit[INDEX_FIELD_NAME] === item[INDEX_FIELD_NAME],
-  );
+const GetExpandedRow = withErrorBoundary(
+  ({
+    item,
+    results,
+    expandedRowComponent,
+    indexPattern,
+    filters,
+    setFilters,
+  }: {
+    item: any;
+  }) => {
+    const doc = results?.hits?.hits?.find(
+      hit => hit[INDEX_FIELD_NAME] === item[INDEX_FIELD_NAME],
+    );
 
-  return expandedRowComponent ? (
-    expandedRowComponent({
-      doc,
-      item,
-      indexPattern,
-    })
-  ) : (
-    <DocDetails
-      doc={doc}
-      item={item}
-      indexPattern={indexPattern}
-      filters={filters}
-      setFilters={setFilters}
-    />
-  );
-};
+    return expandedRowComponent ? (
+      expandedRowComponent({
+        doc,
+        item,
+        indexPattern,
+      })
+    ) : (
+      <DocDetails
+        doc={doc}
+        item={item}
+        indexPattern={indexPattern}
+        filters={filters}
+        setFilters={setFilters}
+      />
+    );
+  },
+);
 
 const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   const {

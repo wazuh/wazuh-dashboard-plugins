@@ -1,5 +1,6 @@
 import React, { useState, forwardRef } from 'react';
 import { EuiBasicTable, EuiBasicTableProps, EuiButtonIcon } from '@elastic/eui';
+import { RIGHT_ALIGNMENT, LEFT_ALIGNMENT } from '@elastic/eui/lib/services';
 import { get } from 'lodash';
 import { useEffectEnsureComponentMounted } from '../hooks';
 
@@ -135,7 +136,7 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
             ...(expandableRowButtonSide !== 'left'
               ? [
                   {
-                    align: 'right',
+                    align: RIGHT_ALIGNMENT,
                     width: '40px',
                     isExpander: true,
                     render: item => {
