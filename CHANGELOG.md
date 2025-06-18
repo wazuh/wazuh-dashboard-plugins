@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.13.1
 
+### Changed
+
+- Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
+
 ### Fixed
 
 - Fixed a problem in the expanded table row that allowed to see not updated inforamtion if using the Refresh button [#7544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7544)

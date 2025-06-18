@@ -24,7 +24,7 @@ jest.mock('@osd/monaco', () => ({
 }));
 
 describe('DonutCard', () => {
-  const mockLoading = false;
+  const mockIsLoading = false;
   const mockData = [
     {
       status: 'active',
@@ -51,27 +51,18 @@ describe('DonutCard', () => {
       color: '#646A77',
     },
   ];
-  const mockGetInfo = jest.fn().mockResolvedValue(mockData);
-  const useServiceMock = jest.fn(() => ({
-    data: mockData,
-    isLoading: mockLoading,
-  }));
-  const mockGetInfoNoData = jest.fn().mockResolvedValue([]);
-  const useServiceMockNoData = jest.fn(() => ({
-    data: [],
-    isLoading: mockLoading,
-  }));
+
+  const mockNoData = [];
 
   it('renders with data', async () => {
-    require('../../../common/hooks/use-service').useService = useServiceMock;
-
     await act(async () => {
       const { getByText } = render(
         <DonutCard
           title='Component title example'
           description='Component description example'
           betaBadgeLabel='Component betaBadgeLabel example'
-          getInfo={mockGetInfo}
+          data={mockData}
+          isLoading={mockIsLoading}
         />,
       );
 
@@ -87,8 +78,6 @@ describe('DonutCard', () => {
   });
 
   it('handles click on data', async () => {
-    require('../../../common/hooks/use-service').useService = useServiceMock;
-
     const handleClick = jest.fn();
     const firstMockData = mockData[0];
 
@@ -96,7 +85,8 @@ describe('DonutCard', () => {
       const { getByText } = render(
         <DonutCard
           title='Component title example'
-          getInfo={mockGetInfo}
+          data={mockData}
+          isLoading={mockIsLoading}
           onClickLabel={handleClick}
         />,
       );
@@ -112,13 +102,11 @@ describe('DonutCard', () => {
   });
 
   it('show noDataTitle and noDataMessage when no data', async () => {
-    require('../../../common/hooks/use-service').useService =
-      useServiceMockNoData;
-
     await act(async () => {
       const { getByText } = render(
         <DonutCard
-          getInfo={mockGetInfoNoData}
+          data={mockNoData}
+          isLoading={mockIsLoading}
           noDataTitle='Component no data title example message'
           noDataMessage='Component no data example message'
         />,
