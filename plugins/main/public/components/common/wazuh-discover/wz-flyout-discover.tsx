@@ -44,7 +44,7 @@ export const DEFAULT_PAGE_SIZE = 20;
 const INDEX_FIELD_NAME = '_id';
 import { formatUIDate } from '../../../react-services/time-service';
 import { compose } from 'redux';
-import { WzBasicTableManageExpandedItems } from '../tables';
+import { TableBasicManageExpandedItems } from '../tables';
 
 export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
@@ -313,7 +313,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>
-                <WzBasicTableManageExpandedItems
+                <TableBasicManageExpandedItems
                   items={parsedItems}
                   isExpandableRowOnClickId={INDEX_FIELD_NAME}
                   expandableRowButtonSide='left'

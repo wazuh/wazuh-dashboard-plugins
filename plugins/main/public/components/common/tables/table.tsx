@@ -32,14 +32,14 @@ function expandableItemGetId(item, isExpandableRowOnClickId: string) {
   return String(get(item, isExpandableRowOnClickId));
 }
 
-export type WzBasicTableManageExpandedItemsProps = EuiBasicTableProps & {
+export type TableBasicManageExpandedItemsProps = EuiBasicTableProps & {
   isExpandableRowOnClickId?: string;
   expandableRowButtonSide: 'left' | ' right';
   ExpandableRowContent: any;
 };
 /* This is a wrapped of EuiBasicTable that manages the expanded row and resets the expanded rows
 visibility if any item changed. */
-export const WzBasicTableManageExpandedItems: React.FunctionComponent<WzBasicTableManageExpandedItemsProps> =
+export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicManageExpandedItemsProps> =
   forwardRef(
     (
       {
@@ -49,7 +49,7 @@ export const WzBasicTableManageExpandedItems: React.FunctionComponent<WzBasicTab
         expandableRowButtonSide = 'right',
         columns,
         ...props
-      }: WzBasicTableManageExpandedItemsProps,
+      }: TableBasicManageExpandedItemsProps,
       ref,
     ) => {
       const [expandableRows, setExpandableRows] = useState({});
