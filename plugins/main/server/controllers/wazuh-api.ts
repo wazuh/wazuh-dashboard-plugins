@@ -12,7 +12,7 @@
 
 // Require some libraries
 import { ErrorResponse } from '../lib/error-response';
-import { Parser } from 'json2csv';
+import converter from 'json-2-csv';
 import { KeyEquivalence } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
@@ -876,10 +876,11 @@ export class WazuhApiCtrl {
           itemsArray = output.data.data.affected_items[0].items;
         }
         fields = fields.map(item => ({ value: item, default: '-' }));
+        const options = {
+          emptyFieldValue: '',
+        };
+        let csv = await converter.json2csvAsync(itemsArray, options);
 
-        const json2csvParser = new Parser({ fields });
-
-        let csv = json2csvParser.parse(itemsArray);
         for (const field of fields) {
           const { value } = field;
           if (csv.includes(value)) {
