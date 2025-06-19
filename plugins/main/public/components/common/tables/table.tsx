@@ -33,7 +33,7 @@ function expandableItemGetId(item, itemId: string) {
 
 export type TableBasicManageExpandedItemsProps = EuiBasicTableProps & {
   itemId?: string;
-  expandableRowButtonSide: 'left' | ' right';
+  expandableRowButtonSide: 'left' | 'right';
   ExpandableRowContent: any;
   expandRowOnClick: boolean;
 };
