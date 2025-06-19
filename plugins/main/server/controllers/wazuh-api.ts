@@ -878,15 +878,12 @@ export class WazuhApiCtrl {
         fields = fields.map(item => ({ value: item, default: '-' }));
         const options = {
           emptyFieldValue: '',
+          keys: fields.map(field => ({
+            field: field.value,
+            title: KeyEquivalence[field.value] || field.value,
+          })),
         };
         let csv = await converter.json2csvAsync(itemsArray, options);
-
-        for (const field of fields) {
-          const { value } = field;
-          if (csv.includes(value)) {
-            csv = csv.replace(value, KeyEquivalence[value] || value);
-          }
-        }
 
         return response.ok({
           headers: { 'Content-Type': 'text/csv' },
