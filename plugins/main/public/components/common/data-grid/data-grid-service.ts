@@ -162,7 +162,7 @@ export const exportSearchToCSV = async (
 
   const options = {
     emptyFieldValue: '',
-    keys: resultsFields.map(field => ({ field: field, title: field })), // This prevents dots from being escaped and also sorts the fields appropriately
+    keys: resultsFields,
   };
 
   let csv = await converter.json2csvAsync(data, options);
