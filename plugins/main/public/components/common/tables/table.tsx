@@ -1,6 +1,6 @@
 import React, { useState, forwardRef } from 'react';
 import { EuiBasicTable, EuiBasicTableProps, EuiButtonIcon } from '@elastic/eui';
-import { RIGHT_ALIGNMENT, LEFT_ALIGNMENT } from '@elastic/eui/lib/services';
+import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 import { get } from 'lodash';
 import { useEffectEnsureComponentMounted } from '../hooks';
 
@@ -101,7 +101,7 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
             .filter(([_, render]) => render), // Ensure there is a render
         );
 
-      const isExpandable = Boolean(itemId);
+      const isExpandable = Boolean(itemId && ExpandableRowContent);
       const enhancedTableColumns = isExpandable
         ? [
             ...(expandableRowButtonSide === 'left'
