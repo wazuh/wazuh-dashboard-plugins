@@ -11,6 +11,7 @@ export const MAX_ENTRIES_PER_QUERY = 10000;
 import { tDataGridColumn } from './use-data-grid';
 import { cellFilterActions } from './cell-filter-actions';
 import { onFilterCellActions } from './filter-cell-actions';
+import converter from 'json-2-csv';
 
 type ParseData<T> =
   | {
@@ -159,29 +160,14 @@ export const exportSearchToCSV = async (
 
   if (!data || data.length === 0) return;
 
-  const parsedData = data
-    .map(row => {
-      const parsedRow = resultsFields?.map(field => {
-        const value = row[field];
-        if (value === undefined || value === null) {
-          return '';
-        }
-        if (typeof value === 'object') {
-          return JSON.stringify(value);
-        }
-        // Escape double quotes and handle line breaks to prevent column misalignment
-        return `"${value
-          .toString()
-          .replaceAll(/"/g, '""')
-          .replaceAll(/\r\n/g, '\\r\\n')
-          .replaceAll(/\n/g, '\\n')}"`;
-      });
-      return parsedRow?.join(',');
-    })
-    .join('\n');
+  const options = {
+    emptyFieldValue: '',
+  };
+
+  let csv = await converter.json2csvAsync(data, options);
 
   // create a csv file using blob
-  const blobData = new Blob([`${resultsFields?.join(',')}\n${parsedData}`], {
+  const blobData = new Blob([csv], {
     type: 'text/csv',
   });
 
