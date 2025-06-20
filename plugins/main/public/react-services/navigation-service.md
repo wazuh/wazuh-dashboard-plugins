@@ -8,7 +8,7 @@ Use the `navigate(options)` or `updateAndNavigateSearchParams(params)` to naviga
 
 Use the `getPathname`, `getSearch` and other methods to retrieve information about the current navigation state.
 
-## Others apps
+## Other apps
 
 Use the `NavigationService.getInstance().navigateToApp(appId, options)` method to navigate to other apps (not current). This wraps the `getCore().application.navigateToApp(appId, options)`
 
