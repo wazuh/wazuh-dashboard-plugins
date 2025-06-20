@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.13.1
 
+### Fixed
+
+- Fixed some filter values could change on navigation or pin/unpin causing different searches with unexpected results [#7552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7552)
+
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 01
 
 ### Added
