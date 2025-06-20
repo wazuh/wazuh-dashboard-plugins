@@ -103,7 +103,6 @@ export class NavigationURLSearchParams {
       const value = rawValue == null ? '' : rawValue; // assume already encoded if non-empty
       parts.push(value === '' ? key : `${key}=${value}`);
     }
-    console.log({ parts });
     return parts.length ? '?' + parts.join('&') : '';
   }
 }
