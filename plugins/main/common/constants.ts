@@ -160,6 +160,13 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
+      azure: true,
+      count: 1000,
+      settingIndexPattern:
+        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
+    },
+    {
       office: true,
       settingIndexPattern:
         WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,

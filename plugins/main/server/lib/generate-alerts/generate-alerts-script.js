@@ -32,6 +32,7 @@ const {
 const Audit = require('./sample-data/audit');
 const Authentication = require('./sample-data/authentication');
 const AWS = require('./sample-data/aws');
+const Azure = require('./sample-data/azure');
 const IntegrityMonitoring = require('./sample-data/integrity-monitoring');
 const CISCAT = require('./sample-data/ciscat');
 const GCP = require('./sample-data/gcp');
@@ -357,6 +358,35 @@ function generateAlert(params) {
         /* empty */
       }
     }
+    alert.input = { type: 'log' };
+    alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
+  }
+
+  if (params.azure) {
+    const beforeDate = new Date(
+      new Date(alert.timestamp).getTime() - 3 * 24 * 60 * 60 * 1000,
+    );
+    const typeAlert = Azure.auditLogs;
+
+    alert.data = { ...typeAlert.data };
+    alert.data.TenantId = Random.arrayItem(Azure.TenantId);
+    alert.data.TimeGenerated = DateFormatter.format(
+      beforeDate,
+      DateFormatter.DATE_FORMAT.ISO_FULL,
+    );
+    alert.data.ResourceId = `tenants/${alert.data.TenantId}/providers/Microsoft.aadiam`;
+    alert.data.OperationName = Random.arrayItem(Azure.OperationName);
+    alert.data.Category = Random.arrayItem(Azure.category);
+    alert.data.Level = Random.number(1, RULE_MAX_LEVEL);
+    alert.data.Id = `Directory_${alert.data.TenantId}`;
+    alert.data.InitiatedBy.user.id = Random.createHash(32);
+    alert.data.InitiatedBy.user.displayName = Random.arrayItem(USERS);
+    alert.data.InitiatedBy.user.userPrincipalName = `${Random.arrayItem(
+      USERS,
+    )}@test.com`;
+
+    alert.rule.groups.push('azure');
+
     alert.input = { type: 'log' };
     alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
   }
