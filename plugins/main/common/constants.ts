@@ -75,6 +75,10 @@ export const WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN =
   'wazuh-states-inventory-protocols-*';
 export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN =
   'wazuh-states-inventory-system-*';
+export const WAZUH_IT_HYGIENE_USERS_PATTERN =
+  'wazuh-states-inventory-users-*';
+export const WAZUH_IT_HYGIENE_GROUPS_PATTERN =
+  'wazuh-states-inventory-groups-*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';

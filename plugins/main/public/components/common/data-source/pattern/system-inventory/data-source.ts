@@ -11,7 +11,9 @@ export class SystemInventoryStatesDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
+    return [
+      ...this.getClusterManagerFilters(), 
+      ...super.getFixedFilters()];
   }
 
   getClusterManagerFilters() {
