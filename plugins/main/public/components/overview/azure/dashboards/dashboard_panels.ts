@@ -5,10 +5,10 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 
 // TODO: Replace field or visualizations to match Azure data structure when available
 
-const getVisStateTopSources = (indexPatternId: string) => {
+const getVisStateResults = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_top_sources',
-    title: 'Sources',
+    id: 'azure_overview_results',
+    title: 'Results',
     type: 'pie',
     params: {
       type: 'pie',
@@ -53,7 +53,7 @@ const getVisStateTopSources = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.aws.source',
+            field: 'data.Result',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -68,10 +68,10 @@ const getVisStateTopSources = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTopAccounts = (indexPatternId: string) => {
+const getVisStateTopOperations = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_top_accounts',
-    title: 'Accounts',
+    id: 'azure_overview_top_operations',
+    title: 'Operations name',
     type: 'pie',
     params: {
       type: 'pie',
@@ -116,7 +116,7 @@ const getVisStateTopAccounts = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.aws.accountId',
+            field: 'data.OperationName',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -131,10 +131,10 @@ const getVisStateTopAccounts = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTopBuckets = (indexPatternId: string) => {
+const getVisStateTopCategories = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_top_buckets',
-    title: 'Buckets',
+    id: 'azure_overview_top_categories',
+    title: 'Categories',
     type: 'pie',
     params: {
       type: 'pie',
@@ -179,7 +179,7 @@ const getVisStateTopBuckets = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.aws.log_info.s3bucket',
+            field: 'data.Category',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -242,7 +242,7 @@ const getVisStateRegions = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.aws.region',
+            field: 'GeoLocation.region_name',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -257,10 +257,10 @@ const getVisStateRegions = (indexPatternId: string) => {
   };
 };
 
-const getVisStateEventsBySource = (indexPatternId: string) => {
+const getVisStateEventsByCategory = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_events_by_source',
-    title: 'Events by source over time',
+    id: 'azure_overview_events_by_category',
+    title: 'Events by Category over Time',
     type: 'area',
     params: {
       type: 'area',
@@ -342,7 +342,7 @@ const getVisStateEventsBySource = (indexPatternId: string) => {
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'data.aws.source',
+            field: 'data.Category',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -374,17 +374,15 @@ const getVisStateEventsBySource = (indexPatternId: string) => {
   };
 };
 
-const getVisStateEventsByBucket = (indexPatternId: string) => {
+const getVisStateUserActivity = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_events_by_bucket',
-    title: 'Events by S3 bucket over time',
-    type: 'area',
+    id: 'azure_overview_user_activity',
+    title: 'Top Users by Activity',
+    type: 'horizontal_bar',
     params: {
-      type: 'area',
       grid: {
         categoryLines: true,
         style: { color: '#eee' },
-        valueAxis: 'ValueAxis-1',
       },
       categoryAxes: [
         {
@@ -405,7 +403,6 @@ const getVisStateEventsByBucket = (indexPatternId: string) => {
           type: 'value',
           position: 'left',
           show: true,
-          style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
           title: { text: 'Count' },
@@ -413,28 +410,20 @@ const getVisStateEventsByBucket = (indexPatternId: string) => {
       ],
       seriesParams: [
         {
-          show: 'true',
-          type: 'area',
+          show: true,
+          type: 'histogram',
           mode: 'stacked',
           data: { label: 'Count', id: '1' },
-          drawLinesBetweenPoints: true,
-          showCircles: true,
-          interpolate: 'cardinal',
           valueAxis: 'ValueAxis-1',
         },
       ],
       addTooltip: true,
       addLegend: true,
       legendPosition: 'right',
-      times: [],
-      addTimeMarker: false,
     },
     data: {
       searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
+        query: { language: 'kuery', query: '' },
         filter: [],
         index: indexPatternId,
       },
@@ -454,36 +443,15 @@ const getVisStateEventsByBucket = (indexPatternId: string) => {
           params: {},
         },
         {
-          id: '3',
+          id: '2',
           enabled: true,
           type: 'terms',
-          schema: 'group',
+          schema: 'segment',
           params: {
-            field: 'data.aws.log_info.s3bucket',
+            field: 'data.InitiatedBy.user.displayName',
             size: 5,
             order: 'desc',
             orderBy: '1',
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-          },
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'date_histogram',
-          schema: 'segment',
-          params: {
-            field: 'timestamp',
-            timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
-            useNormalizedEsInterval: true,
-            interval: 'auto',
-            time_zone: 'Europe/Berlin',
-            drop_partials: false,
-            customInterval: '2h',
-            min_doc_count: 1,
-            extended_bounds: {},
           },
         },
       ],
@@ -576,10 +544,10 @@ const getVisStateGeolocationMap = (indexPatternId: string) => {
 
 // Agent
 
-const getVisStateAgentTopSources = (indexPatternId: string) => {
+const getVisStateAgentResults = (indexPatternId: string) => {
   return {
     id: 'azure_agent_top_sources',
-    title: 'Sources',
+    title: 'Results',
     type: 'pie',
     params: {
       type: 'pie',
@@ -624,7 +592,7 @@ const getVisStateAgentTopSources = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.aws.source',
+            field: 'data.Result',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -639,10 +607,10 @@ const getVisStateAgentTopSources = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentTopAccounts = (indexPatternId: string) => {
+const getVisStateAgentTopOperations = (indexPatternId: string) => {
   return {
     id: 'azure_agent_top_accounts',
-    title: 'Accounts',
+    title: 'Operations name',
     type: 'pie',
     params: {
       type: 'pie',
@@ -687,7 +655,7 @@ const getVisStateAgentTopAccounts = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.aws.accountId',
+            field: 'data.OperationName',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -702,10 +670,10 @@ const getVisStateAgentTopAccounts = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentTopBuckets = (indexPatternId: string) => {
+const getVisStateAgentTopCategories = (indexPatternId: string) => {
   return {
     id: 'azure_agent_top_buckets',
-    title: 'Buckets',
+    title: 'Categories',
     type: 'pie',
     params: {
       type: 'pie',
@@ -750,7 +718,7 @@ const getVisStateAgentTopBuckets = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.aws.log_info.s3bucket',
+            field: 'data.Category',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -813,7 +781,7 @@ const getVisStateAgentRegions = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.aws.region',
+            field: 'GeoLocation.region_name',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -828,10 +796,10 @@ const getVisStateAgentRegions = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentEventsBySource = (indexPatternId: string) => {
+const getVisStateAgentEventsByCategory = (indexPatternId: string) => {
   return {
-    id: 'azure_agent_events_by_source',
-    title: 'Events by source over time',
+    id: 'azure_agent_events_by_Category',
+    title: 'Events by Category over Time',
     type: 'area',
     params: {
       type: 'area',
@@ -913,7 +881,7 @@ const getVisStateAgentEventsBySource = (indexPatternId: string) => {
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'data.aws.source',
+            field: 'data.Category',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -945,13 +913,12 @@ const getVisStateAgentEventsBySource = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentEventsByBucket = (indexPatternId: string) => {
+const getVisStateAgentUserActivity = (indexPatternId: string) => {
   return {
-    id: 'azure_agent_events_by_bucket',
-    title: 'Events by S3 bucket over time',
-    type: 'area',
+    id: 'azure_agent_user_activity',
+    title: 'Top Users by Activity',
+    type: 'horizontal_bar',
     params: {
-      type: 'area',
       grid: {
         categoryLines: true,
         style: { color: '#eee' },
@@ -984,8 +951,8 @@ const getVisStateAgentEventsByBucket = (indexPatternId: string) => {
       ],
       seriesParams: [
         {
-          show: 'true',
-          type: 'area',
+          show: true,
+          type: 'histogram',
           mode: 'stacked',
           data: { label: 'Count', id: '1' },
           drawLinesBetweenPoints: true,
@@ -1025,12 +992,12 @@ const getVisStateAgentEventsByBucket = (indexPatternId: string) => {
           params: {},
         },
         {
-          id: '3',
+          id: '2',
           enabled: true,
           type: 'terms',
-          schema: 'group',
+          schema: 'segment',
           params: {
-            field: 'data.aws.log_info.s3bucket',
+            field: 'data.InitiatedBy.user.displayName',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -1038,23 +1005,6 @@ const getVisStateAgentEventsByBucket = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-          },
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'date_histogram',
-          schema: 'segment',
-          params: {
-            field: 'timestamp',
-            timeRange: { from: 'now-24h', to: 'now', mode: 'quick' },
-            useNormalizedEsInterval: true,
-            interval: 'auto',
-            time_zone: 'Europe/Berlin',
-            drop_partials: false,
-            customInterval: '2h',
-            min_doc_count: 1,
-            extended_bounds: {},
           },
         },
       ],
@@ -1165,7 +1115,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g1',
-        savedVis: getVisStateTopSources(indexPatternId),
+        savedVis: getVisStateResults(indexPatternId),
       },
     },
     g2: {
@@ -1179,7 +1129,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g2',
-        savedVis: getVisStateTopAccounts(indexPatternId),
+        savedVis: getVisStateTopOperations(indexPatternId),
       },
     },
     g3: {
@@ -1193,7 +1143,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g3',
-        savedVis: getVisStateTopBuckets(indexPatternId),
+        savedVis: getVisStateTopCategories(indexPatternId),
       },
     },
     g4: {
@@ -1221,7 +1171,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g5',
-        savedVis: getVisStateEventsBySource(indexPatternId),
+        savedVis: getVisStateEventsByCategory(indexPatternId),
       },
     },
     g6: {
@@ -1235,7 +1185,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g6',
-        savedVis: getVisStateEventsByBucket(indexPatternId),
+        savedVis: getVisStateUserActivity(indexPatternId),
       },
     },
     g7: {
@@ -1266,7 +1216,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a1',
-        savedVis: getVisStateAgentTopSources(indexPatternId),
+        savedVis: getVisStateAgentResults(indexPatternId),
       },
     },
     a2: {
@@ -1280,7 +1230,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a2',
-        savedVis: getVisStateAgentTopAccounts(indexPatternId),
+        savedVis: getVisStateAgentTopOperations(indexPatternId),
       },
     },
     a3: {
@@ -1294,7 +1244,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a3',
-        savedVis: getVisStateAgentTopBuckets(indexPatternId),
+        savedVis: getVisStateAgentTopCategories(indexPatternId),
       },
     },
     a4: {
@@ -1322,7 +1272,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a5',
-        savedVis: getVisStateAgentEventsBySource(indexPatternId),
+        savedVis: getVisStateAgentEventsByCategory(indexPatternId),
       },
     },
     a6: {
@@ -1336,7 +1286,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a6',
-        savedVis: getVisStateAgentEventsByBucket(indexPatternId),
+        savedVis: getVisStateAgentUserActivity(indexPatternId),
       },
     },
     a7: {
