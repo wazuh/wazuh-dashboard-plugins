@@ -20,13 +20,51 @@ const TenantId = [
   'abcdefab-cdef-abcd-efab-cdefabcdefab',
 ];
 
-const OperationName = [
-  'Add application',
-  'Update application',
-  'Delete application',
-  'Create application',
-  'Get application',
+const azureTags = ['azure-log-analytics', 'azure-ad-graph', 'azure-storage'];
+
+const ruleDescriptions = [
+  'Azure: Log analytics',
+  'Azure: AD Consent to application',
+  'Azure: AD Remove delegated permission grant',
+  'Azure: AD Add delegated permission grant',
+  'Azure: AD Update application',
+  'Azure: AD Update service principal',
+  'Azure: AD Add app role assignment to service principal',
+  'Azure: AD Add service principal',
+  'Azure: AD Add application',
+  'Azure: AD Update user',
+  'Azure: AD Add app role assignment grant to user',
+  'Azure: AD Update application – Certificates and secrets management',
+  'Azure: Storage: Update user',
+  'Azure: Storage: Add service principal',
+  'Azure: Storage: Add application',
+  'Azure: Storage: Add delegated permission grant',
+  'Azure: Storage: Add app role assignment grant to user',
+  'Azure: Storage: Update service principal',
+  'Azure: Storage: Update application',
+  'Azure: Storage: Add app role assignment to service principal',
+  'Azure: Storage: Consent to application',
+  'Azure: Storage: Update application – Certificates and secrets management',
+  'Azure: Storage: Remove delegated permission grant',
 ];
+
+const operationNames = [
+  'Update user',
+  'Add application',
+  'Add service principal',
+  'Consent to application',
+  'Add app role assignment grant to user',
+  'Update service principal',
+  'Update application',
+  'Add app role assignment to service principal',
+  'Add delegated permission grant',
+  'Update application – Certificates and secrets management',
+  'Remove delegated permission grant',
+];
+
+const operationTypes = ['Update', 'Add', 'Assign', 'Unassign'];
+
+const results = ['success', 'failure', 'timeout', 'unknownFutureValue'];
 
 const category = [
   'ApplicationManagement',
@@ -121,6 +159,10 @@ const auditLogs = {
 module.exports = {
   TenantId,
   auditLogs,
-  OperationName,
+  operationNames,
   category,
+  ruleDescriptions,
+  operationTypes,
+  results,
+  azureTags,
 };

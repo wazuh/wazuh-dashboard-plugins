@@ -6,8 +6,12 @@ import { commonColumns } from '../../common/data-grid-columns';
 export const azureColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   {
-    id: 'data.aws.source',
-    initialWidth: 144,
+    id: 'data.ActivityDisplayName',
+    initialWidth: 200,
+  },
+  {
+    id: 'data.Result',
+    initialWidth: 130,
   },
   commonColumns['rule.description'],
   commonColumns['rule.level'],

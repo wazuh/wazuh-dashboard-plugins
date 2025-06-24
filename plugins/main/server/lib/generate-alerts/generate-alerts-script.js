@@ -375,8 +375,11 @@ function generateAlert(params) {
       DateFormatter.DATE_FORMAT.ISO_FULL,
     );
     alert.data.ResourceId = `tenants/${alert.data.TenantId}/providers/Microsoft.aadiam`;
-    alert.data.OperationName = Random.arrayItem(Azure.OperationName);
+    alert.data.AADOperationType = Random.arrayItem(Azure.operationTypes);
+    alert.data.OperationType = Random.arrayItem(Azure.operationTypes);
+    alert.data.OperationName = Random.arrayItem(Azure.operationNames);
     alert.data.Category = Random.arrayItem(Azure.category);
+    alert.data.Result = Random.arrayItem(Azure.results);
     alert.data.Level = Random.number(1, RULE_MAX_LEVEL);
     alert.data.Id = `Directory_${alert.data.TenantId}`;
     alert.data.InitiatedBy.user.id = Random.createHash(32);
@@ -384,8 +387,12 @@ function generateAlert(params) {
     alert.data.InitiatedBy.user.userPrincipalName = `${Random.arrayItem(
       USERS,
     )}@test.com`;
-
-    alert.rule.groups.push('azure');
+    alert.data.ActivityDisplayName = Random.arrayItem(Azure.operationNames);
+    alert.rule = { ...typeAlert.rule };
+    alert.rule.description = Random.arrayItem(Azure.ruleDescriptions);
+    alert.rule.id = `${Random.number(1, ALERT_ID_MAX)}`;
+    alert.rule.level = Random.number(1, RULE_MAX_LEVEL);
+    alert.azure_tag = Random.arrayItem(Azure.azureTags);
 
     alert.input = { type: 'log' };
     alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
