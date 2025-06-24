@@ -33,6 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed double backslash warning on xml editor [#7425](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7425)
 - Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
 - Fixed a bug in Rule details flyout, where it didn't map all the compliances [#7501](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7501)
+- Fixed a bug that caused a format issue in csv reports [#7550](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7550)
 
 ### Removed
 
