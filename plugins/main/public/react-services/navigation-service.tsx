@@ -7,7 +7,7 @@ import rison from 'rison-node';
 
 /**
  * Custom implementation URLSearchParams-like to parse and serialize the URL query string.
- * This does not encode the URL avoind the _a and _g query parameters filters can be modified in
+ * This does not encode the URL avoid the _a and _g query parameters filters can be modified in
  * unexpected way breaking the filtering
  */
 export class NavigationURLSearchParams {
