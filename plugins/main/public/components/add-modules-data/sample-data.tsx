@@ -70,6 +70,7 @@ const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
 
 const sampleInventory = [
+  'groups',
   'hardware',
   'hotfixes',
   'interfaces',
@@ -79,6 +80,7 @@ const sampleInventory = [
   'processes',
   'protocols',
   'system',
+  'users'
 ].join(', ');
 
 export default class WzSampleData extends Component {

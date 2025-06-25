@@ -145,6 +145,14 @@ export const WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_IT_HYGIENE_SYSTEM_PATTERN.replace('*', ''),
   dataSet: 'states-inventory-system',
 };
+export const WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_GROUPS_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-groups',
+};
+export const WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_USERS_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-users',
+};
 export const WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_VULNERABILITIES_PATTERN.replace('*', ''),
   dataSet: 'states-vulnerabilities',
@@ -346,6 +354,18 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       indexPatternPrefix:
         WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
