@@ -1,5 +1,5 @@
 import { createHashHistory, History } from 'history';
-import NavigationService, { N } from './navigation-service';
+import NavigationService from './navigation-service';
 import { getCore } from '../kibana-services';
 
 jest.mock('../kibana-services');
