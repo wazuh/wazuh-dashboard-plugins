@@ -5,9 +5,7 @@ import {
 } from '../../../../../common/data-source';
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
-import {
-  withSystemInventoryUsersDataSource
-} from '../../../common/hocs/validate-system-inventory-index-pattern';
+import { withSystemInventoryUsersDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
 import {
   ITHygieneInventoryDashboardTable,
   ITHygieneInventoryDashboardTableProps,

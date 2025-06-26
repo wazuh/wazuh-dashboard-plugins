@@ -8,7 +8,7 @@
  * (at your option) any later version.
  *
  * Find more information about this on the LICENSE file.
-*/
+ */
 import React from 'react';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
@@ -17,10 +17,7 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
-import {
-  WazuhDiscover,
-  WazuhDiscoverProps,
-} from '../wazuh-discover/wz-discover';
+import { WazuhDiscover, WazuhDiscoverProps } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
@@ -196,9 +193,7 @@ export const ModulesDefaults = {
         moduleId: 'pm',
         tableColumns: malwareDetectionColumns,
         DataSource: MalwareDetectionDataSource,
-        categoriesSampleData: [
-          WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
-        ],
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -380,9 +375,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: (props: any) => (
-          <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
-        ),
+        component: (props: any) => <ComplianceTable {...props} DataSource={PCIDSSDataSource} />,
       },
       renderDiscoverTab({
         moduleId: 'pci',
@@ -406,9 +399,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: (props: any) => (
-          <ComplianceTable {...props} DataSource={HIPAADataSource} />
-        ),
+        component: (props: any) => <ComplianceTable {...props} DataSource={HIPAADataSource} />,
       },
       renderDiscoverTab({
         moduleId: 'hipaa',
@@ -432,9 +423,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: (props: any) => (
-          <ComplianceTable {...props} DataSource={NIST80053DataSource} />
-        ),
+        component: (props: any) => <ComplianceTable {...props} DataSource={NIST80053DataSource} />,
       },
       renderDiscoverTab({
         moduleId: 'nist',
@@ -458,9 +447,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: (props: any) => (
-          <ComplianceTable {...props} DataSource={GDPRDataSource} />
-        ),
+        component: (props: any) => <ComplianceTable {...props} DataSource={GDPRDataSource} />,
       },
       renderDiscoverTab({
         moduleId: 'gdpr',
@@ -484,9 +471,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: (props: any) => (
-          <ComplianceTable {...props} DataSource={TSCDataSource} />
-        ),
+        component: (props: any) => <ComplianceTable {...props} DataSource={TSCDataSource} />,
       },
       renderDiscoverTab({
         moduleId: 'tsc',

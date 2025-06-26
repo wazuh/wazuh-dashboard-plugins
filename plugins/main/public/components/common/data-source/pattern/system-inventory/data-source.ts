@@ -11,16 +11,14 @@ export class SystemInventoryStatesDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-      ...this.getClusterManagerFilters(), 
-      ...super.getFixedFilters()];
+    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
   }
 
   getClusterManagerFilters() {
     return PatternDataSourceFilterManager.getClusterManagerFilters(
       this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
-      VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
+      VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER
     );
   }
 }
