@@ -1,6 +1,11 @@
 const random = require('../../lib/random');
 const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
+function generateRandomLetters(count) {
+  const letters = 'abcdefghijqlmnopqrstuvwyz';
+  return Array.from({ length: count }, () => random.choice(letters.split(''))).join('');
+}
+
 function generateRandomGroup() {
   // Unified group data structure with all possible combinations
   const descriptions = [
@@ -76,9 +81,8 @@ function generateRandomGroup() {
     ['wazuh.service'],
   ];
 
-  const id = random.int(0, 1100);
-  const hasUuid = random.boolean();
-  const isHidden = random.choice([true, false, null]);
+  const id = random.int(0, 999);
+  const isHidden = random.choice([true, false]);
 
   return {
     description: random.choice(descriptions),
@@ -87,7 +91,7 @@ function generateRandomGroup() {
     is_hidden: isHidden,
     name: random.choice(names),
     users: random.choice(userGroups),
-    uuid: hasUuid ? `S-1-5-32-${random.int(544, 600)}` : null,
+    uuid: `${generateRandomLetters(5)}${random.int(100000000, 999999999)}${random.int(1000, 9999)}`,
   };
 }
 

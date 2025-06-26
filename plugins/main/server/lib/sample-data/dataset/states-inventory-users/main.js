@@ -1,106 +1,97 @@
 const random = require('../../lib/random');
 const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
-const { DateFormatter } = require('../../../generate-alerts/helpers/date-formatter');
-const { Random } = require('../../../generate-alerts/helpers/random');
+
+function generateRandomLetters(count) {
+  const letters = 'abcdefghijqlmnopqrstuvwyz';
+  return Array.from({ length: count }, () => random.choice(letters.split(''))).join('');
+}
 
 function generateRandomHost() {
   return {
-    ip: [random.ip()],
+    ip: random.ip(),
   };
 }
 
 function generateRandomLogin() {
   return {
     status: random.boolean(),
-    tty: [
-      random.choice([
-        'pts/0',
-        'pts/1',
-        'pts/2',
-        'pts/3',
-        'console',
-        'rdp-tcp#0',
-        'rdp-tcp#1',
-        'services',
-        'systemd',
-      ]),
-    ],
-    type: [random.choice(['user', 'admin', 'remote', 'service'])],
+    tty: random.choice([
+      'pts/0',
+      'pts/1',
+      'pts/2',
+      'pts/3',
+      'console',
+      'rdp-tcp#0',
+      'rdp-tcp#1',
+      'services',
+      'systemd',
+    ]),
+    type: random.choice(['user', 'admin', 'remote', 'service']),
   };
 }
 
 function generateRandomProcess() {
   return {
-    pid: [random.int(1000, 9999)],
+    pid: random.int(1000, 9999),
   };
 }
 
 function generateRandomUser() {
+  const names = [
+    'administrator',
+    'root',
+    'john.doe',
+    'marie.martin',
+    'admin.local',
+    'sysadmin',
+    'developer.user',
+    'support.tech',
+    'wazuh.agent',
+    'backup.service',
+    'system.service',
+    'web.service',
+  ];
+
+  const fullNames = [
+    'System Administrator',
+    'root',
+    'John Doe',
+    'Marie Martin',
+    'Local Administrator',
+    'Software Developer',
+    'Technical Support',
+    'Wazuh Agent Service',
+    'Backup Service Account',
+    'System Service',
+    'Web Service Account',
+  ];
+
+  const shells = ['/bin/bash', '/sbin/nologin', '/bin/sh', 'cmd.exe', 'powershell.exe'];
+
+  const homes = [
+    '/root',
+    '/home/john.doe',
+    '/home/sysadmin',
+    '/home/developer',
+    '/var/ossec',
+    'C:\\Users\\Administrator',
+    'C:\\Users\\admin.local',
+    'C:\\Users\\marie.martin',
+    'C:\\Windows\\ServiceProfiles\\BackupService',
+  ];
+
+  const roles = ['admin', 'user', 'service', 'sudo', 'support'];
+  const hashAlgorithms = ['SHA256', 'SHA512', 'NTLM'];
   const userTypes = ['local', 'domain', 'service'];
-  const userType = random.choice(userTypes);
-  const isService = userType === 'service';
-  const isWindows = random.boolean();
 
-  const names = isService
-    ? ['wazuh.agent', 'backup.service', 'system.service', 'web.service']
-    : [
-        'administrator',
-        'root',
-        'john.doe',
-        'marie.martin',
-        'admin.local',
-        'sysadmin',
-        'developer.user',
-        'support.tech',
-      ];
-
-  const fullNames = isService
-    ? ['Wazuh Agent Service', 'Backup Service Account', 'System Service', 'Web Service Account']
-    : [
-        'System Administrator',
-        'root',
-        'John Doe',
-        'Marie Martin',
-        'Local Administrator',
-        'System Administrator',
-        'Software Developer',
-        'Technical Support',
-      ];
-
-  const shells = isWindows
-    ? ['cmd.exe', 'powershell.exe']
-    : ['/bin/bash', '/sbin/nologin', '/bin/sh'];
-
-  const homes = isWindows
-    ? [
-        'C:\\Users\\Administrator',
-        'C:\\Users\\admin.local',
-        'C:\\Users\\marie.martin',
-        'C:\\Windows\\ServiceProfiles\\BackupService',
-      ]
-    : ['/root', '/home/john.doe', '/home/sysadmin', '/home/developer', '/var/ossec'];
-
-  const roles = isService
-    ? [['service']]
-    : [['admin'], ['user'], ['user', 'sudo'], ['admin', 'sudo'], ['support']];
-
-  const hashAlgorithms = isWindows ? ['NTLM'] : ['SHA256', 'SHA512'];
-
-  const groupId = random.int(0, 1100);
-  const userId = random.int(500, 1100);
-
-  const hasAuthFailures = random.boolean();
-  const authFailureCount = hasAuthFailures ? random.int(0, 5) : 0;
-
-  const passwordStatus = isService && random.boolean() ? 'locked' : 'active';
+  const groupId = random.int(0, 999);
+  const userId = random.int(500, 999);
+  const authFailureCount = random.int(0, 5);
 
   return {
     auth_failures: {
       count: authFailureCount,
-      timestamp:
-        authFailureCount > 0
-          ? random.date()
-          : '',
+      timestamp: authFailureCount > 0 ? random.date() : null,
     },
     created: random.date(),
     full_name: random.choice(fullNames),
@@ -111,36 +102,32 @@ function generateRandomUser() {
     groups: String(random.int(0, 1000)),
     home: random.choice(homes),
     id: random.choice(names),
-    is_hidden: isService ? random.boolean() : false,
+    is_hidden: random.boolean(),
     is_remote: random.boolean(),
     last_login: random.date(),
     name: random.choice(names),
     password: {
-      expiration_date:
-        passwordStatus === 'locked'
-          ? '1970-01-01T00:00:00.000Z'
-          : random.date(),
+      expiration_date: random.date(),
       hash_algorithm: random.choice(hashAlgorithms),
-      inactive_days: passwordStatus === 'locked' ? -1 : random.int(0, 30),
+      inactive_days: random.int(0, 30),
       last_change: random.int(20000, 20300),
       last_set_time: random.date(),
-      max_days_between_changes: passwordStatus === 'locked' ? -1 : random.int(90, 180),
-      min_days_between_changes: passwordStatus === 'locked' ? -1 : random.int(0, 1),
-      status: passwordStatus,
-      warning_days_before_expiration: passwordStatus === 'locked' ? -1 : random.int(7, 30),
+      max_days_between_changes: random.int(90, 180),
+      min_days_between_changes: random.int(0, 1),
+      status: random.choice(['active', 'locked']),
+      warning_days_before_expiration: random.int(7, 30),
     },
-    roles: random.choice(roles)[0],
+    roles: random.choice(roles),
     shell: random.choice(shells),
-    type: userType,
+    type: random.choice(userTypes),
     uid_signed: userId,
-    uuid: isWindows
-      ? `S-1-5-21-${random.int(123456789, 987654321)}-${random.int(1001, 1010)}`
-      : `LINUX-${isService ? 'SVC' : userType.toUpperCase()}-${userId}`,
+    uuid: `${generateRandomLetters(5)}${random.int(100000000, 999999999)}${random.int(1000, 9999)}`,
   };
 }
 
 function generateDocument(params) {
   return {
+    agent: generateRandomAgent(),
     host: generateRandomHost(),
     login: generateRandomLogin(),
     process: generateRandomProcess(),
