@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "wazuh-states-inventory-groups*"
-  ],
+  "index_patterns": ["wazuh-states-inventory-groups*"],
   "priority": 1,
   "template": {
     "settings": {

@@ -3,7 +3,9 @@ const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
 function generateRandomLetters(count) {
   const letters = 'abcdefghijqlmnopqrstuvwyz';
-  return Array.from({ length: count }, () => random.choice(letters.split(''))).join('');
+  return Array.from({ length: count }, () =>
+    random.choice(letters.split('')),
+  ).join('');
 }
 
 function generateRandomHost() {
@@ -66,7 +68,13 @@ function generateRandomUser() {
     'Web Service Account',
   ];
 
-  const shells = ['/bin/bash', '/sbin/nologin', '/bin/sh', 'cmd.exe', 'powershell.exe'];
+  const shells = [
+    '/bin/bash',
+    '/sbin/nologin',
+    '/bin/sh',
+    'cmd.exe',
+    'powershell.exe',
+  ];
 
   const homes = [
     '/root',
@@ -121,7 +129,10 @@ function generateRandomUser() {
     shell: random.choice(shells),
     type: random.choice(userTypes),
     uid_signed: userId,
-    uuid: `${generateRandomLetters(5)}${random.int(100000000, 999999999)}${random.int(1000, 9999)}`,
+    uuid: `${generateRandomLetters(5)}${random.int(
+      100000000,
+      999999999,
+    )}${random.int(1000, 9999)}`,
   };
 }
 

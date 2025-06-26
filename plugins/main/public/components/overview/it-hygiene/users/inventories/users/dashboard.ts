@@ -69,7 +69,7 @@ export const getOverviewUsersUsersTab = (indexPatternId: string) => {
         seriesLabel: 'Group',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Group',
-      }
+      },
     ),
     getVisStateUniqueUsersMetric(indexPatternId),
     getVisStateHorizontalBarByField(
@@ -77,7 +77,7 @@ export const getOverviewUsersUsersTab = (indexPatternId: string) => {
       'user.shell',
       'Top 5 user shells',
       'it-hygiene-users',
-      { customLabel: 'User shell' }
+      { customLabel: 'User shell' },
     ),
   ]);
 };

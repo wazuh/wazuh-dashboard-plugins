@@ -17,13 +17,15 @@ export const ITHygieneUsersInventoryUsers = withSystemInventoryUsersDataSource(
     return (
       <ITHygieneInventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
-        DataSourceRepositoryCreator={SystemInventoryUsersStatesDataSourceRepository}
+        DataSourceRepositoryCreator={
+          SystemInventoryUsersStatesDataSourceRepository
+        }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewUsersUsersTab}
-        tableId="it-hygiene-inventory-users"
+        tableId='it-hygiene-inventory-users'
         indexPattern={props.indexPattern}
       />
     );
-  }
+  },
 );

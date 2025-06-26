@@ -112,7 +112,8 @@ export default class WzSampleData extends Component {
         title: `Sample ${malwareDetection.title}`,
         description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
         image: '',
-        categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+        categorySampleDataIndex:
+          WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       },
       {
         title: 'Sample threat detection and response',
@@ -134,13 +135,14 @@ export default class WzSampleData extends Component {
       },
       {
         title: 'Sample vulnerability detection inventory',
-        description: 'Sample data, visualizations and dashboards for vulnerabilities inventory.',
+        description:
+          'Sample data, visualizations and dashboards for vulnerabilities inventory.',
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_VULNERABILITIES,
       },
     ];
     this.state = {};
-    this.categories.forEach((category) => {
+    this.categories.forEach(category => {
       this.state[category.categorySampleDataIndex] = {
         exists: false,
         addDataLoading: false,
@@ -157,10 +159,10 @@ export default class WzSampleData extends Component {
           this.categories.reduce((accum, cur) => {
             accum[cur.categorySampleDataIndex] = WzRequest.genericReq(
               'GET',
-              `/indexer/sampledata/${cur.categorySampleDataIndex}`
+              `/indexer/sampledata/${cur.categorySampleDataIndex}`,
             );
             return accum;
-          }, {})
+          }, {}),
         );
 
         this.setState(
@@ -172,8 +174,8 @@ export default class WzSampleData extends Component {
               };
               return accum;
             },
-            { ...this.state }
-          )
+            { ...this.state },
+          ),
         );
       } catch (error) {
         throw error;
@@ -209,7 +211,12 @@ export default class WzSampleData extends Component {
       getErrorOrchestrator().handleError(options);
     }
   }
-  showToast(color: string, title: string = '', text: string = '', time: number = 3000) {
+  showToast(
+    color: string,
+    title: string = '',
+    text: string = '',
+    time: number = 3000,
+  ) {
     getToasts().add({
       color: color,
       title: title,
@@ -228,13 +235,13 @@ export default class WzSampleData extends Component {
       await WzRequest.genericReq(
         'POST',
         `/indexer/sampledata/${category.categorySampleDataIndex}`,
-        { params: this.generateAlertsParams }
+        { params: this.generateAlertsParams },
       );
       this.showToast(
         'success',
         `${category.title} sample data added`,
         'Date range for sample data is now-7 days ago',
-        5000
+        5000,
       );
       this.setState({
         [category.categorySampleDataIndex]: {
@@ -273,7 +280,7 @@ export default class WzSampleData extends Component {
       });
       const { data: deleteResponse } = await WzRequest.genericReq(
         'DELETE',
-        `/indexer/sampledata/${category.categorySampleDataIndex}`
+        `/indexer/sampledata/${category.categorySampleDataIndex}`,
       );
       this.setState({
         [category.categorySampleDataIndex]: {
@@ -284,13 +291,13 @@ export default class WzSampleData extends Component {
       });
 
       if (deleteResponse?.errors) {
-        deleteResponse.errors.forEach((error) =>
+        deleteResponse.errors.forEach(error =>
           this.showToast(
             'danger',
             `Failed to remove index: ${error.index}`,
             `Error: ${error.message}`,
-            5000
-          )
+            5000,
+          ),
         );
 
         if (deleteResponse.indices.length > 0) {
@@ -298,7 +305,7 @@ export default class WzSampleData extends Component {
             'success',
             `Successfully removed ${deleteResponse.indices.length} indices`,
             deleteResponse.indices.join(', '),
-            5000
+            5000,
           );
         }
       } else {
@@ -306,7 +313,7 @@ export default class WzSampleData extends Component {
           'success',
           `${category.title} sample data removed`,
           'All indices were successfully deleted',
-          4000
+          4000,
         );
       }
     } catch (error) {
@@ -335,17 +342,17 @@ export default class WzSampleData extends Component {
     return (
       <EuiFlexItem key={`sample-data-${category.title}`}>
         <EuiCard
-          textAlign="left"
+          textAlign='left'
           title={category.title}
           description={category.description}
           image={category.image}
           betaBadgeLabel={exists ? 'Installed' : undefined}
           footer={
-            <EuiFlexGroup justifyContent="flexEnd">
+            <EuiFlexGroup justifyContent='flexEnd'>
               <EuiFlexItem grow={false}>
                 {(exists && (
                   <WzButtonPermissions
-                    color="danger"
+                    color='danger'
                     administrator
                     onClick={() => this.removeSampleData(category)}
                   >
@@ -371,12 +378,12 @@ export default class WzSampleData extends Component {
     return (
       <>
         <EuiCallOut
-          title="These actions require permissions on the managed indices."
-          iconType="iInCircle"
+          title='These actions require permissions on the managed indices.'
+          iconType='iInCircle'
         />
         <EuiSpacer />
         <EuiFlexGrid columns={3}>
-          {this.categories.map((category) => this.renderCard(category))}
+          {this.categories.map(category => this.renderCard(category))}
         </EuiFlexGrid>
       </>
     );
@@ -393,13 +400,13 @@ const zipObject = (keys = [], values = []) => {
 const PromiseAllRecursiveObject = function (obj) {
   const keys = Object.keys(obj);
   return Promise.all(
-    keys.map((key) => {
+    keys.map(key => {
       const value = obj[key];
       // Promise.resolve(value) !== value should work, but !value.then always works
       if (typeof value === 'object' && !value.then) {
         return PromiseAllRecursiveObject(value);
       }
       return value;
-    })
-  ).then((result) => zipObject(keys, result));
+    }),
+  ).then(result => zipObject(keys, result));
 };

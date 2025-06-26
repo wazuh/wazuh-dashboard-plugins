@@ -1,5 +1,8 @@
 import React from 'react';
-import { ITHygieneUsersInventoryUsers, ITHygieneUsersInventoryGroups } from './inventories';
+import {
+  ITHygieneUsersInventoryUsers,
+  ITHygieneUsersInventoryGroups,
+} from './inventories';
 import { ITHygieneInventoryTabLayout } from '../common/components/inventory';
 
 const tabs = [

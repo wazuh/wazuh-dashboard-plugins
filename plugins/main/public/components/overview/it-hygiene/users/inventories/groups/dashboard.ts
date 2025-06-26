@@ -69,7 +69,7 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
         seriesLabel: 'Type',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Type',
-      }
+      },
     ),
     getVisStateUniqueGroupsMetric(indexPatternId),
     getVisStateHorizontalBarByField(
@@ -77,7 +77,7 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
       'group.name',
       'Top 5 groups',
       'it-hygiene-groups',
-      { customLabel: 'Group name' }
+      { customLabel: 'Group name' },
     ),
   ]);
 };
