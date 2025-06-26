@@ -4,8 +4,10 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
-import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
+import {
+  getVisStateHorizontalBarSplitSeries,
+  getVisStateHorizontalBarByField,
+} from '../../../../../../services/visualizations';
 import { SavedVis } from '../../../common/types';
 
 const getVisStateUniqueGroupsMetric = (indexPatternId: string): SavedVis => {
@@ -56,28 +58,35 @@ const getVisStateUniqueGroupsMetric = (indexPatternId: string): SavedVis => {
 
 export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateHorizontalBarSplitSeries(
-      indexPatternId,
-      'group.is_hidden',
-      'Groups is hidden',
-      'it-hygiene-groups',
-      {
-        fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Groups is hidden count',
-        valueAxesTitleText: ' ',
-        seriesLabel: 'Type',
-        seriesMode: 'stacked',
-        fieldCustomLabel: 'Type',
-      },
-    ),
-    getVisStateUniqueGroupsMetric(indexPatternId),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'group.name',
       'Top 5 groups',
       'it-hygiene-groups',
-      { customLabel: 'Group name' },
+      { fieldCustomLabel: 'Group name' },
+    ),
+    // getVisStateHorizontalBarSplitSeries(
+    //   indexPatternId,
+    //   'group.is_hidden',
+    //   'Groups is hidden',
+    //   'it-hygiene-groups',
+    //   {
+    //     fieldSize: 4,
+    //     otherBucket: 'Others',
+    //     metricCustomLabel: 'Groups is hidden count',
+    //     valueAxesTitleText: ' ',
+    //     seriesLabel: 'Type',
+    //     seriesMode: 'stacked',
+    //     fieldCustomLabel: 'Type',
+    //   },
+    // ),
+    getVisStateUniqueGroupsMetric(indexPatternId),
+    getVisStateHorizontalBarByField(
+      indexPatternId,
+      'agent.name',
+      'Top 5 agents',
+      'it-hygiene-groups',
+      { fieldCustomLabel: 'Agent groups' },
     ),
   ]);
 };

@@ -5,10 +5,8 @@ export default [
     placeholder: 'Group name',
   },
   {
-    type: 'multiSelectInput',
-    key: 'group.id',
-    placeholder: 'Group ID',
-    validate: (value: string) =>
-      !value || /^\d+$/.test(value) ? undefined : 'Only numbers are allowed',
+    type: 'multiSelect',
+    key: 'group.users',
+    placeholder: 'Group users',
   },
 ];

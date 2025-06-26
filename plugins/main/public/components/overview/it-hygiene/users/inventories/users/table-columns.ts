@@ -1,7 +1,7 @@
 export default [
+  { id: 'agent.name' },
   { id: 'user.name' },
-  { id: 'user.id' },
-  { id: 'user.group.id' },
+  { id: 'user.groups' },
   { id: 'user.shell' },
   { id: 'user.home' },
 ];

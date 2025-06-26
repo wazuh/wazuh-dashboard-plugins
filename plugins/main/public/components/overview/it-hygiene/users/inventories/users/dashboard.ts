@@ -4,8 +4,10 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
-import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
+import {
+  getVisStateHorizontalBarSplitSeries,
+  getVisStateHorizontalBarByField,
+} from '../../../../../../services/visualizations';
 import { SavedVis } from '../../../common/types';
 
 const getVisStateUniqueUsersMetric = (indexPatternId: string): SavedVis => {
@@ -56,28 +58,30 @@ const getVisStateUniqueUsersMetric = (indexPatternId: string): SavedVis => {
 
 export const getOverviewUsersUsersTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
-    getVisStateHorizontalBarSplitSeries(
+    getVisStateHorizontalBarByField(
       indexPatternId,
-      'user.type',
-      'User types',
+      'user.name',
+      'Top 5 user auth failures count',
       'it-hygiene-users',
       {
-        fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'User types count',
-        valueAxesTitleText: ' ',
-        seriesLabel: 'Group',
-        seriesMode: 'stacked',
-        fieldCustomLabel: 'Group',
+        metricType: 'max',
+        metricField: 'user.auth_failures.count',
+        fieldCustomLabel: 'Auth failures count',
       },
     ),
-    getVisStateUniqueUsersMetric(indexPatternId),
+    getVisStateHorizontalBarByField(
+      indexPatternId,
+      'user.groups',
+      'Top 5 user groups',
+      'it-hygiene-users',
+      { fieldCustomLabel: 'User group' },
+    ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'user.shell',
       'Top 5 user shells',
       'it-hygiene-users',
-      { customLabel: 'User shell' },
+      { fieldCustomLabel: 'User shell' },
     ),
   ]);
 };
