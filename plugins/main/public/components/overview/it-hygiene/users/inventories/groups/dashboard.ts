@@ -8,9 +8,7 @@ import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { SavedVis } from '../../../common/types';
 
-const getVisStateUniqueGroupsMetric = (
-  indexPatternId: string,
-): SavedVis => {
+const getVisStateUniqueGroupsMetric = (indexPatternId: string): SavedVis => {
   return {
     id: 'it-hygiene-groups-unique-count',
     title: 'Unique groups',
@@ -71,7 +69,7 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
         seriesLabel: 'Type',
         seriesMode: 'stacked',
         fieldCustomLabel: 'Type',
-      },
+      }
     ),
     getVisStateUniqueGroupsMetric(indexPatternId),
     getVisStateHorizontalBarByField(
@@ -79,7 +77,7 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
       'group.name',
       'Top 5 groups',
       'it-hygiene-groups',
-      { customLabel: 'Group name' },
+      { customLabel: 'Group name' }
     ),
   ]);
 };

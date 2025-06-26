@@ -6,23 +6,41 @@ function generateRandomGroup() {
   const descriptions = [
     "Les membres du groupe Administrateurs disposent d'un accès complet et illimité à l'ordinateur et au domaine",
     "Les utilisateurs ne peuvent pas effectuer de modifications accidentelles ou intentionnelles à l'échelle du système",
-    "Groupe intégré utilisé par les services Internet (IIS)",
-    "Les membres de ce groupe ont le droit de se connecter à distance à cet ordinateur",
-    "Les membres de ce groupe peuvent sauvegarder et restaurer des fichiers sur cet ordinateur",
-    null
+    'Groupe intégré utilisé par les services Internet (IIS)',
+    'Les membres de ce groupe ont le droit de se connecter à distance à cet ordinateur',
+    'Les membres de ce groupe peuvent sauvegarder et restaurer des fichiers sur cet ordinateur',
+    null,
   ];
 
   const names = [
-    'Administrateurs', 'Administrators', 'Admin Group',
-    'root', 'wheel', 'sys',
-    'Utilisateurs', 'Users', 'Standard Users',
-    'sudo', 'adm',
-    'IIS_IUSRS', 'WWW-Data', 'Web Users',
-    'daemon', 'bin',
-    'Utilisateurs du Bureau à distance', 'Remote Desktop Users', 'RDP Users',
-    'docker', 'container', 'virtualization',
-    'Opérateurs de sauvegarde', 'Backup Operators', 'Backup Users',
-    'wazuh', 'security', 'monitoring'
+    'Administrateurs',
+    'Administrators',
+    'Admin Group',
+    'root',
+    'wheel',
+    'sys',
+    'Utilisateurs',
+    'Users',
+    'Standard Users',
+    'sudo',
+    'adm',
+    'IIS_IUSRS',
+    'WWW-Data',
+    'Web Users',
+    'daemon',
+    'bin',
+    'Utilisateurs du Bureau à distance',
+    'Remote Desktop Users',
+    'RDP Users',
+    'docker',
+    'container',
+    'virtualization',
+    'Opérateurs de sauvegarde',
+    'Backup Operators',
+    'Backup Users',
+    'wazuh',
+    'security',
+    'monitoring',
   ];
 
   const userGroups = [
@@ -55,13 +73,13 @@ function generateRandomGroup() {
     ['backup.operator'],
     ['wazuh.agent'],
     ['security.service', 'monitor.user'],
-    ['wazuh.service']
+    ['wazuh.service'],
   ];
 
   const id = random.int(0, 1100);
   const hasUuid = random.boolean();
   const isHidden = random.choice([true, false, null]);
-  
+
   return {
     description: random.choice(descriptions),
     id: id,
@@ -69,7 +87,7 @@ function generateRandomGroup() {
     is_hidden: isHidden,
     name: random.choice(names),
     users: random.choice(userGroups),
-    uuid: hasUuid ? `S-1-5-32-${random.int(544, 600)}` : null
+    uuid: hasUuid ? `S-1-5-32-${random.int(544, 600)}` : null,
   };
 }
 
