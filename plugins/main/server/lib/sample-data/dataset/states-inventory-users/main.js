@@ -99,37 +99,37 @@ function generateRandomUser() {
       count: authFailureCount,
       timestamp:
         authFailureCount > 0
-          ? DateFormatter.format(Random.date(), DateFormatter.DATE_FORMAT.ISO_TIMESTAMP)
-          : null,
+          ? random.date()
+          : '',
     },
-    created: DateFormatter.format(Random.date(), DateFormatter.DATE_FORMAT.ISO_TIMESTAMP),
+    created: random.date(),
     full_name: random.choice(fullNames),
     group: {
       id: groupId,
       id_signed: groupId,
     },
-    groups: [String(random.int(0, 1000)), String(random.int(500, 600))],
+    groups: String(random.int(0, 1000)),
     home: random.choice(homes),
     id: random.choice(names),
     is_hidden: isService ? random.boolean() : false,
     is_remote: random.boolean(),
-    last_login: DateFormatter.format(Random.date(), DateFormatter.DATE_FORMAT.ISO_TIMESTAMP),
+    last_login: random.date(),
     name: random.choice(names),
     password: {
       expiration_date:
         passwordStatus === 'locked'
           ? '1970-01-01T00:00:00.000Z'
-          : DateFormatter.format(Random.date(), DateFormatter.DATE_FORMAT.ISO_TIMESTAMP),
+          : random.date(),
       hash_algorithm: random.choice(hashAlgorithms),
       inactive_days: passwordStatus === 'locked' ? -1 : random.int(0, 30),
       last_change: random.int(20000, 20300),
-      last_set_time: DateFormatter.format(Random.date(), DateFormatter.DATE_FORMAT.ISO_TIMESTAMP),
+      last_set_time: random.date(),
       max_days_between_changes: passwordStatus === 'locked' ? -1 : random.int(90, 180),
       min_days_between_changes: passwordStatus === 'locked' ? -1 : random.int(0, 1),
       status: passwordStatus,
       warning_days_before_expiration: passwordStatus === 'locked' ? -1 : random.int(7, 30),
     },
-    roles: random.choice(roles),
+    roles: random.choice(roles)[0],
     shell: random.choice(shells),
     type: userType,
     uid_signed: userId,

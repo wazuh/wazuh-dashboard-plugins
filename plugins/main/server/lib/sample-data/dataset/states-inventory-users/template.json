@@ -192,6 +192,18 @@
                 "name": {
                   "ignore_above": 1024,
                   "type": "keyword"
+                },
+                "node": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "schema": {
+              "properties": {
+                "version": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
                 }
               }
             }
