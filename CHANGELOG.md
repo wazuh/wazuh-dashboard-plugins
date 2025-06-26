@@ -8,6 +8,14 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.13.1
 
+### Changed
+
+- Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
+
+### Fixed
+
+- Fixed a problem in the expanded table row that allowed to see not updated inforamtion if using the Refresh button [#7544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7544)
+
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 01
 
 ### Added
@@ -23,7 +31,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Changed
 
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
-- Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
 - Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482)
 - Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
 
