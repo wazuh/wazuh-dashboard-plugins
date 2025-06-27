@@ -4,6 +4,26 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzButtonPermissions } from '../../common/permissions/button';
+import { TableBasicManageExpandedItems } from '../../common/tables';
+import { withErrorBoundary } from '../../common/hocs';
+
+const ExpandedTableRow = withErrorBoundary(({ item }) => {
+  const listItems = [
+    {
+      title: 'Actions',
+      description: `${item.policy.actions}`,
+    },
+    {
+      title: 'Resources',
+      description: `${item.policy.resources}`,
+    },
+    {
+      title: 'Effect',
+      description: `${item.policy.effect}`,
+    },
+  ];
+  return <EuiDescriptionList listItems={listItems} />;
+});
 
 export const EditRolesTable = ({
   policies,
@@ -15,7 +35,6 @@ export const EditRolesTable = ({
   const [isLoading, setIsLoading] = useState(false);
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  const [itemIdToExpandedRowMap, setItemIdToExpandedRowMap] = useState({});
 
   const onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
@@ -42,31 +61,6 @@ export const EditRolesTable = ({
 
   const { pageOfItems, totalItemCount } = getItems();
 
-  const toggleDetails = item => {
-    const itemIdToExpandedRowMapValues = { ...itemIdToExpandedRowMap };
-    if (itemIdToExpandedRowMapValues[item.id]) {
-      delete itemIdToExpandedRowMapValues[item.id];
-    } else {
-      const listItems = [
-        {
-          title: 'Actions',
-          description: `${item.policy.actions}`,
-        },
-        {
-          title: 'Resources',
-          description: `${item.policy.resources}`,
-        },
-        {
-          title: 'Effect',
-          description: `${item.policy.effect}`,
-        },
-      ];
-      itemIdToExpandedRowMapValues[item.id] = (
-        <EuiDescriptionList listItems={listItems} />
-      );
-    }
-    setItemIdToExpandedRowMap(itemIdToExpandedRowMapValues);
-  };
   const columns = [
     {
       field: 'label',
@@ -119,18 +113,6 @@ export const EditRolesTable = ({
         },
       ],
     },
-    {
-      align: RIGHT_ALIGNMENT,
-      width: '40px',
-      isExpander: true,
-      render: item => (
-        <EuiButtonIcon
-          onClick={() => toggleDetails(item)}
-          aria-label={itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'}
-          iconType={itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'}
-        />
-      ),
-    },
   ];
 
   const pagination = {
@@ -142,12 +124,11 @@ export const EditRolesTable = ({
 
   return (
     <>
-      <EuiBasicTable
+      <TableBasicManageExpandedItems
         items={pageOfItems}
         itemId='id'
+        ExpandableRowContent={ExpandedTableRow}
         loading={isLoading || loading}
-        itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-        isExpandable={true}
         hasActions={true}
         columns={columns}
         pagination={pagination}
