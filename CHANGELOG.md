@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed a problem in the expanded table row that allowed to see not updated inforamtion if using the Refresh button [#7544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7544)
+- Fixed a bug that caused a format issue in csv reports [#7550](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7550)
 
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 01
 
@@ -31,7 +32,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ## Changed
 
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
-- Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482)
+- Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482) [#7538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7538)
 - Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
 
 ### Fixed
@@ -40,7 +41,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed double backslash warning on xml editor [#7425](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7425)
 - Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
 - Fixed a bug in Rule details flyout, where it didn't map all the compliances [#7501](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7501)
-- Fixed a bug that caused a format issue in csv reports [#7550](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7550)
+- Fixed the Windows service name in Deploy new agent [#7540](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7540)
 
 ### Removed
 
