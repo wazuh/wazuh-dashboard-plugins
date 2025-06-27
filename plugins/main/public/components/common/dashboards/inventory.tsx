@@ -199,6 +199,7 @@ export const InventoryDashboardTable = ({
   tableId,
   indexPattern,
   additionalDocumentDetailsTabs,
+  categoriesSampleData,
 }: InventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -246,6 +247,7 @@ export const InventoryDashboardTable = ({
       indexPattern={indexPattern}
       classNameDashboardWrapper={classNameDashboardWrapper}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
+      categoriesSampleData={categoriesSampleData}
     />
   );
 };

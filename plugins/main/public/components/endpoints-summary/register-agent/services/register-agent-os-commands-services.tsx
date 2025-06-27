@@ -119,7 +119,7 @@ export const getWindowsInstallCommand = (
 export const getWindowsStartCommand = (
   _props: tOSEntryProps<tOptionalParameters>,
 ) => {
-  return `NET START WazuhSvc`;
+  return `NET START Wazuh`;
 };
 
 /******** MacOS ********/

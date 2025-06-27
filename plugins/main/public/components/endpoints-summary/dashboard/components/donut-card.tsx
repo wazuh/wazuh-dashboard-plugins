@@ -1,7 +1,12 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiCard } from '@elastic/eui';
 import { VisualizationBasic } from '../../../common/charts/visualizations/basic';
-import { useService } from '../../../common/hooks/use-service';
+
+interface DonutChartItem {
+  label: string;
+  value: number;
+  color: string;
+}
 
 interface AgentsByStatusCardProps {
   title?: string;
@@ -9,8 +14,8 @@ interface AgentsByStatusCardProps {
   betaBadgeLabel?: string;
   noDataTitle?: string;
   noDataMessage?: string;
-  reload?: number;
-  getInfo: () => Promise<any[]>;
+  data: DonutChartItem[];
+  isLoading?: boolean;
   onClickLabel?: (status: any) => void;
   [key: string]: any;
 }
@@ -21,14 +26,12 @@ const DonutCard = ({
   betaBadgeLabel,
   noDataTitle = 'No results',
   noDataMessage = 'No results were found',
-  reload,
-  getInfo,
   onClickLabel,
+  data,
+  isLoading = false,
   ...props
 }: AgentsByStatusCardProps) => {
-  const { data, isLoading } = useService<any>(getInfo, undefined, reload);
-
-  const handleClick = (item: any) => {
+  const handleClick = (item: DonutChartItem) => {
     if (onClickLabel) {
       onClickLabel(item);
     }
