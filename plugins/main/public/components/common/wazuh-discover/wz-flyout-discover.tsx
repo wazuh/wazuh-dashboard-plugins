@@ -44,6 +44,7 @@ export const DEFAULT_PAGE_SIZE = 20;
 const INDEX_FIELD_NAME = '_id';
 import { formatUIDate } from '../../../react-services/time-service';
 import { compose } from 'redux';
+import { TableBasicManageExpandedItems } from '../tables';
 
 export type WazuhDiscoverProps = {
   tableColumns: tDataGridColumn[];
@@ -54,10 +55,42 @@ export type WazuhDiscoverProps = {
     indexPattern: IndexPattern;
   }) => JSX.Element;
   filterManager?: tFilterManager;
-  isExpanded?: boolean;
   initialFilters?: tFilter[];
   initialFetchFilters?: tFilter[];
 };
+
+const GetExpandedRow = withErrorBoundary(
+  ({
+    item,
+    results,
+    expandedRowComponent,
+    indexPattern,
+    filters,
+    setFilters,
+  }: {
+    item: any;
+  }) => {
+    const doc = results?.hits?.hits?.find(
+      hit => hit[INDEX_FIELD_NAME] === item[INDEX_FIELD_NAME],
+    );
+
+    return expandedRowComponent ? (
+      expandedRowComponent({
+        doc,
+        item,
+        indexPattern,
+      })
+    ) : (
+      <DocDetails
+        doc={doc}
+        item={item}
+        indexPattern={indexPattern}
+        filters={filters}
+        setFilters={setFilters}
+      />
+    );
+  },
+);
 
 const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   const {
@@ -65,7 +98,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     tableColumns: defaultTableColumns,
     filterManager,
     expandedRowComponent,
-    isExpanded = true,
     initialFilters,
     initialFetchFilters,
   } = props;
@@ -91,9 +123,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   const [sorting, setSorting] = useState<EuiBasicTableProps<any>['sorting']>({
     sort: { field: timeField || '@timestamp', direction: 'desc' },
   });
-  const [itemIdToExpandedRowMap, setItemIdToExpandedRowMap] = useState<
-    Record<string, JSX.Element>
-  >({});
 
   // use the global time filter to get the default date range
   const [query, setQuery] = useState<Query>({ query: '', language: 'kuery' });
@@ -191,21 +220,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     autoRefreshFingerprint,
   ]);
 
-  const toggleDetails = item => {
-    if (!isExpanded) {
-      setItemIdToExpandedRowMap({});
-      return;
-    }
-
-    if (itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])) {
-      setItemIdToExpandedRowMap({});
-    } else {
-      setItemIdToExpandedRowMap({
-        [item[INDEX_FIELD_NAME]]: getExpandedRow(item),
-      });
-    }
-  };
-
   const onTableChange = ({
     page = { index: 0, size: 10 },
     sort = { field: '', direction: '' },
@@ -217,26 +231,6 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       pageSize,
     });
     setSorting({ sort: { field, direction: direction as Direction } });
-  };
-
-  const onExpandRow = item => {
-    toggleDetails(item);
-  };
-
-  const expanderColumn = {
-    width: '40px',
-    isExpander: true,
-    render: item => (
-      <EuiButtonIcon
-        onClick={() => onExpandRow(item)}
-        aria-label='Info'
-        iconType={
-          itemIdToExpandedRowMap.hasOwnProperty(item[INDEX_FIELD_NAME])
-            ? 'arrowDown'
-            : 'arrowRight'
-        }
-      />
-    ),
   };
 
   const getColumns = (): EuiBasicTableProps<any>['columns'] => {
@@ -252,33 +246,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       };
     });
 
-    if (!isExpanded) {
-      return defaultCols;
-    }
-
-    return [expanderColumn, ...defaultCols];
-  };
-
-  const getExpandedRow = (item: any) => {
-    const doc = results?.hits?.hits?.find(
-      hit => hit[INDEX_FIELD_NAME] === item[INDEX_FIELD_NAME],
-    );
-
-    return expandedRowComponent ? (
-      expandedRowComponent({
-        doc,
-        item,
-        indexPattern,
-      })
-    ) : (
-      <DocDetails
-        doc={doc}
-        item={item}
-        indexPattern={indexPattern}
-        filters={filters}
-        setFilters={setFilters}
-      />
-    );
+    return defaultCols;
   };
 
   const parsedItems = useMemo(() => {
@@ -347,11 +315,20 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiPanel>
-                <EuiBasicTable
+                <TableBasicManageExpandedItems
                   items={parsedItems}
                   itemId={INDEX_FIELD_NAME}
-                  itemIdToExpandedRowMap={itemIdToExpandedRowMap}
-                  isExpandable={isExpanded}
+                  expandableRowButtonSide='left'
+                  ExpandableRowContent={({ item }) => (
+                    <GetExpandedRow
+                      item={item}
+                      results={results}
+                      expandedRowComponent={expandedRowComponent}
+                      indexPattern={indexPattern}
+                      filters={filters}
+                      setFilters={setFilters}
+                    />
+                  )}
                   columns={getColumns()}
                   pagination={{
                     ...pagination,

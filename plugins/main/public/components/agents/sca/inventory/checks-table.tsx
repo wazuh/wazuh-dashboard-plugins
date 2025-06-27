@@ -1,9 +1,10 @@
-import { EuiButtonIcon, EuiDescriptionList, EuiHealth } from '@elastic/eui';
 import React, { Component } from 'react';
+import { EuiDescriptionList, EuiHealth } from '@elastic/eui';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../common/constants';
 import { TableWzAPI } from '../../../common/tables';
 import { ComplianceText, RuleText } from '../components';
 import { getFilterValues } from './lib';
+import { withErrorBoundary } from '../../../common/hocs';
 
 type Props = {
   agent: { [key: string]: any };
@@ -14,7 +15,6 @@ type Props = {
 type State = {
   agent: { [key: string]: any };
   lookingPolicy: { [key: string]: any };
-  itemIdToExpandedRowMap: {};
   filters: any[];
   pageTableChecks: { pageIndex: 0 };
 };
@@ -53,6 +53,50 @@ const searchBarWQLOptions = {
   ],
 };
 
+const TableRowExpand = withErrorBoundary(({ item }) => {
+  let checks = '';
+  checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
+  checks += item.condition ? ` (Condition: ${item.condition})` : '';
+  const complianceText =
+    item.compliance && item.compliance.length
+      ? item.compliance.map(el => `${el.key}: ${el.value}`).join('\n')
+      : '';
+  const listItems = [
+    {
+      title: 'Check not applicable due to:',
+      description: item.reason,
+    },
+    {
+      title: 'Rationale',
+      description: item.rationale || '-',
+    },
+    {
+      title: 'Remediation',
+      description: item.remediation || '-',
+    },
+    {
+      title: 'Description',
+      description: item.description || '-',
+    },
+    {
+      title: (item.directory || '').includes(',') ? 'Paths' : 'Path',
+      description: item.directory,
+    },
+    {
+      title: checks,
+      description: <RuleText rules={item.rules.length ? item.rules : []} />,
+    },
+    {
+      title: 'Compliance',
+      description: <ComplianceText complianceText={complianceText} />,
+    },
+  ];
+  const itemsToShow = listItems.filter(x => {
+    return x.description;
+  });
+  return <EuiDescriptionList listItems={itemsToShow} />;
+});
+
 export class InventoryPolicyChecksTable extends Component<Props, State> {
   _isMount = false;
   columnsChecks: any;
@@ -62,7 +106,6 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
     this.state = {
       agent,
       lookingPolicy,
-      itemIdToExpandedRowMap: {},
       filters: filters || '',
       pageTableChecks: { pageIndex: 0 },
     };
@@ -118,24 +161,6 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
         width: '150px',
         render: this.addHealthResultRender,
       },
-      {
-        align: 'right',
-        width: '40px',
-        isExpander: true,
-        render: item => (
-          <EuiButtonIcon
-            onClick={() => this.toggleDetails(item)}
-            aria-label={
-              this.state.itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'
-            }
-            iconType={
-              this.state.itemIdToExpandedRowMap[item.id]
-                ? 'arrowUp'
-                : 'arrowDown'
-            }
-          />
-        ),
-      },
     ];
   }
 
@@ -149,63 +174,6 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
   componentWillUnmount() {
     this._isMount = false;
   }
-
-  /**
-   *
-   * @param item
-   */
-  toggleDetails = item => {
-    const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
-
-    if (itemIdToExpandedRowMap[item.id]) {
-      delete itemIdToExpandedRowMap[item.id];
-    } else {
-      let checks = '';
-      checks += (item.rules || []).length > 1 ? 'Checks' : 'Check';
-      checks += item.condition ? ` (Condition: ${item.condition})` : '';
-      const complianceText =
-        item.compliance && item.compliance.length
-          ? item.compliance.map(el => `${el.key}: ${el.value}`).join('\n')
-          : '';
-      const listItems = [
-        {
-          title: 'Check not applicable due to:',
-          description: item.reason,
-        },
-        {
-          title: 'Rationale',
-          description: item.rationale || '-',
-        },
-        {
-          title: 'Remediation',
-          description: item.remediation || '-',
-        },
-        {
-          title: 'Description',
-          description: item.description || '-',
-        },
-        {
-          title: (item.directory || '').includes(',') ? 'Paths' : 'Path',
-          description: item.directory,
-        },
-        {
-          title: checks,
-          description: <RuleText rules={item.rules.length ? item.rules : []} />,
-        },
-        {
-          title: 'Compliance',
-          description: <ComplianceText complianceText={complianceText} />,
-        },
-      ];
-      const itemsToShow = listItems.filter(x => {
-        return x.description;
-      });
-      itemIdToExpandedRowMap[item.id] = (
-        <EuiDescriptionList listItems={itemsToShow} />
-      );
-    }
-    this.setState({ itemIdToExpandedRowMap });
-  };
 
   /**
    *
@@ -241,7 +209,6 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
       return {
         'data-test-subj': `sca-check-row-${idx}`,
         className: 'customRowClass',
-        onClick: () => this.toggleDetails(item),
       };
     };
 
@@ -258,9 +225,9 @@ export class InventoryPolicyChecksTable extends Component<Props, State> {
         tablePageSizeOptions={[10, 25, 50, 100]}
         rowProps={getChecksRowProps}
         tableProps={{
-          isExpandable: true,
-          itemIdToExpandedRowMap: this.state.itemIdToExpandedRowMap,
           itemId: 'id',
+          ExpandableRowContent: TableRowExpand,
+          expandRowOnClick: true,
         }}
         downloadCsv
         showReload
