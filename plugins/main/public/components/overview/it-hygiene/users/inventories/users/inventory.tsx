@@ -6,16 +6,19 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryUsersDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import {
-  ITHygieneInventoryDashboardTable,
-  ITHygieneInventoryDashboardTableProps,
-} from '../../../common/components/inventory';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
+import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../../../common/constants';
+import { compose } from 'redux';
+import { withAgent } from '../hocs';
 import { getOverviewUsersUsersTab } from './dashboard';
 
-export const ITHygieneUsersInventoryUsers = withSystemInventoryUsersDataSource(
-  (props: ITHygieneInventoryDashboardTableProps) => {
-    return (
-      <ITHygieneInventoryDashboardTable
+export const ITHygieneUsersInventoryUsers = compose(
+  withAgent,
+  withSystemInventoryUsersDataSource,
+)((props: any) => {
+  return (
+    <div style={{ margin: '0 12px' }}>
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryUsersStatesDataSourceRepository
@@ -25,7 +28,8 @@ export const ITHygieneUsersInventoryUsers = withSystemInventoryUsersDataSource(
         getDashboardPanels={getOverviewUsersUsersTab}
         tableId='it-hygiene-inventory-users'
         indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
-    );
-  },
-);
+    </div>
+  );
+});
