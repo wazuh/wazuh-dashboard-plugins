@@ -163,7 +163,7 @@ describe('getWindowsInstallCommand', () => {
 
 describe('getWindowsStartCommand', () => {
   it('should return the correct start command', () => {
-    const expectedCommand = 'NET START WazuhSvc';
+    const expectedCommand = 'NET START Wazuh';
 
     const result = getWindowsStartCommand({});
 
