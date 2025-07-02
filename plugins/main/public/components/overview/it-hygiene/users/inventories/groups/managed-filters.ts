@@ -7,6 +7,6 @@ export default [
   {
     type: 'multiSelect',
     key: 'group.users',
-    placeholder: 'Users',
+    placeholder: 'User',
   },
 ];

@@ -7,7 +7,7 @@ export default [
   {
     type: 'multiSelect',
     key: 'user.groups',
-    placeholder: 'Groups',
+    placeholder: 'Group',
   },
   {
     type: 'multiSelect',
