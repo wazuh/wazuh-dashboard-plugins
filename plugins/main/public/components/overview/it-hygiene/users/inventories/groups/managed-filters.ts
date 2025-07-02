@@ -2,11 +2,11 @@ export default [
   {
     type: 'multiSelect',
     key: 'group.name',
-    placeholder: 'Group name',
+    placeholder: 'Name',
   },
   {
     type: 'multiSelect',
     key: 'group.users',
-    placeholder: 'Group users',
+    placeholder: 'Users',
   },
 ];

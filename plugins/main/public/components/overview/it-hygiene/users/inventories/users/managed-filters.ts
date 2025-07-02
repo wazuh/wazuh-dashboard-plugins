@@ -2,16 +2,16 @@ export default [
   {
     type: 'multiSelect',
     key: 'user.name',
-    placeholder: 'User name',
+    placeholder: 'Name',
   },
   {
     type: 'multiSelect',
     key: 'user.groups',
-    placeholder: 'User group',
+    placeholder: 'Group',
   },
   {
     type: 'multiSelect',
     key: 'user.shell',
-    placeholder: 'User shell',
+    placeholder: 'Shell',
   },
 ];

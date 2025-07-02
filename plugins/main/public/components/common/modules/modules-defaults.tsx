@@ -532,7 +532,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'users',
-        name: 'Users',
+        name: 'Identity',
         buttons: [ButtonExploreAgent],
         component: ITHygieneUsersInventory,
       },
