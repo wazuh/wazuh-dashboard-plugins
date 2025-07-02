@@ -86,6 +86,16 @@ if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
       echo "[ERROR] Could not retrieve the OSD version from package.json."
       exit 1
     fi
+    
+    wazuh_version=$(jq -r '.version' $PACKAGE_PATH)
+    if [ -z "$wazuh_version" ]; then
+      echo "[ERROR] Could not retrieve the Wazuh version from package.json."
+      exit 1
+    fi
+    
+   
+    osd_version="${osd_version}-${wazuh_version}"
+    echo "[INFO] Using combined version: $osd_version"
   fi
 fi
 
