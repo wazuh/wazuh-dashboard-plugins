@@ -100,6 +100,14 @@ jobs:
           # Support plugins whose version is defined under pluginPlatform or Kibana properties
           platform_version=$(jq -r '.pluginPlatform.version, .kibana.version | select(. != null)' ${{ matrix.plugins.path }}/package.json);
           echo "Plugin platform version: $platform_version";
+          
+          # Get Wazuh version and concatenate with platform version
+          wazuh_version=$(jq -r '.version' ${{ matrix.plugins.path }}/package.json);
+          echo "Wazuh version: $wazuh_version";
+          
+          # Concatenate versions in format: <Opensearch version>-<Wazuh version>
+          platform_version="${platform_version}-${wazuh_version}";
+          echo "Combined platform version: $platform_version";
 
           # Set the environment variable to the correct platform
           [ "$platform" = "kbn" ] && { docker_env_plugin_platform="KIBANA_VERSION"; };
