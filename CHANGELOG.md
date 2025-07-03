@@ -27,6 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
 - Fixed a bug in Rule details flyout, where it didn't map all the compliances [#7501](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7501)
 - Fixed the Windows service name in Deploy new agent [#7540](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7540)
+- Fixed IT Hygiene Dashboard visualizations [#7580](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7580)
 
 ### Removed
 
