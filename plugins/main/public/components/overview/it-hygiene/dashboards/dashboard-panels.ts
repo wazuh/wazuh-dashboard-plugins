@@ -405,7 +405,7 @@ const getOverviewDashboardPanels = (
         savedVis: getVisStateDonutByField(
           indexPatternId,
           'interface.state',
-          'TPC connection status',
+          'TCP connection status',
           'it-hygiene-stat',
           'desc',
           {
@@ -505,7 +505,7 @@ const getAgentDashboardPanels = (
         savedVis: getVisStateDonutByField(
           indexPatternId,
           'interface.state',
-          'TPC connection status',
+          'TCP connection status',
           'it-hygiene-stat',
           'desc',
           {
