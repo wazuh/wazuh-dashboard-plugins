@@ -1,8 +1,7 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateHistogramBy, getVisStateTable } from '../common/saved-vis/generators';
+import { getVisStateTable } from '../common/saved-vis/generators';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
-import { HEIGHT, STYLE } from '../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
