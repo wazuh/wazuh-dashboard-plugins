@@ -7,7 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.13.0
-- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
+- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513) [#7580](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7580) 
 - Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
 - Added the ability to manage the sample data from FIM, IT Hygiene and vulnerabilities inventories prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
@@ -27,7 +27,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
 - Fixed a bug in Rule details flyout, where it didn't map all the compliances [#7501](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7501)
 - Fixed the Windows service name in Deploy new agent [#7540](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7540)
-- Fixed IT Hygiene Dashboard visualizations [#7580](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7580)
 
 ### Removed
 
