@@ -53,7 +53,7 @@
     "knip": "knip --files"
   },
   "dependencies": {
-    "axios": "^1.7.4",
+    "axios": "^1.8.2",
     "dompurify": "3.2.4",
     "install": "^0.13.0",
     "js2xmlparser": "^5.0.0",
