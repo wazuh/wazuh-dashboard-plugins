@@ -86,6 +86,16 @@ if [ -z "$os_version" ] || [ -z "$osd_version" ]; then
       echo "[ERROR] Could not retrieve the OSD version from package.json."
       exit 1
     fi
+    
+    wazuh_version=$(jq -r '.version' $PACKAGE_PATH)
+    if [ -z "$wazuh_version" ]; then
+      echo "[ERROR] Could not retrieve the Wazuh version from package.json."
+      exit 1
+    fi
+    
+   
+    combined_osd_version="${osd_version}-${wazuh_version}"
+    echo "[INFO] Using combined version: $combined_osd_version"
   fi
 fi
 
@@ -104,7 +114,7 @@ fi
 
 export PASSWORD=${PASSWORD:-admin}
 export OS_VERSION=$os_version
-export OSD_VERSION=$osd_version
+export OSD_VERSION=${combined_osd_version}
 export OSD_PORT=${PORT:-5601}
 export IMPOSTER_VERSION=3.44.1
 export SRC=$1
