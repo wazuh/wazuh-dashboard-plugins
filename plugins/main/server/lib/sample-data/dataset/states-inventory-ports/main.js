@@ -13,7 +13,8 @@ function generateRandomHostPorts() {
 function generateRandomDestination() {
   return {
     ip: random.ip(),
-    port: random.int(0, 65535),
+    // This increases the possibility to get 0 that is used the destionation.port field in the Traffic and Services tabs of IT Hygiene
+    port: random.choice([0, random.int(1, 65535)]),
   };
 }
 
