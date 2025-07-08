@@ -91,6 +91,12 @@ export const getVisStateDonutByField = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    // Define the filter
+    searchFilter?: any[];
+    // showLegend
+    showLegend?: boolean;
+    // showLabels
+    showLabels?: boolean;
   } = {},
 ) => {
   const {
@@ -98,6 +104,9 @@ export const getVisStateDonutByField = (
     size = 10,
     otherBucket,
     missingBucket,
+    searchFilter = [],
+    showLegend = false,
+    showLabels = true,
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -106,18 +115,20 @@ export const getVisStateDonutByField = (
     params: {
       type: 'pie',
       addTooltip: true,
-      addLegend: false,
+      addLegend: showLegend,
       legendPosition: 'right',
       isDonut: true,
       labels: {
-        show: true,
+        show: showLabels,
         values: true,
         last_level: true,
         truncate: 100,
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, {
+        filter: searchFilter,
+      }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {

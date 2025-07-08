@@ -3,6 +3,7 @@ import {
   ITHygieneNetworksInventoryInterfaces,
   ITHygieneNetworksInventoryNetworks,
   ITHygieneNetworksInventoryProtocols,
+  ITHygieneNetworksInventoryServices,
   ITHygieneNetworksInventoryTraffic,
 } from './inventories';
 import { ITHygieneInventoryTabLayout } from '../common/components/inventory';
@@ -22,6 +23,11 @@ const tabs = [
     id: 'protocols',
     name: 'Protocols',
     component: ITHygieneNetworksInventoryProtocols,
+  },
+  {
+    id: 'services',
+    name: 'Services',
+    component: ITHygieneNetworksInventoryServices,
   },
   {
     id: 'traffic',

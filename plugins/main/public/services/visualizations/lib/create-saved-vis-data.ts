@@ -2,13 +2,14 @@ import { SavedVis } from '../types';
 
 export function createSearchSource(
   indexPatternId: string,
+  { filter = [] } = {},
 ): SavedVis['data']['searchSource'] {
   return {
     query: {
       query: '',
       language: 'kuery',
     },
-    filter: [],
+    filter,
     index: indexPatternId,
   };
 }

@@ -1,10 +1,14 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { getVisStateHistogramBy } from '../common/saved-vis/generators';
 import {
   getVisStateDonutByField,
-  getVisStateHistogramBy,
-} from '../common/saved-vis/generators';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
+  getVisStateHorizontalBarSplitSeries,
+} from '../../../../services/visualizations';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../../../common/data-source';
 
 const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
   return {
@@ -404,30 +408,28 @@ const getOverviewDashboardPanels = (
         id: '1',
         savedVis: getVisStateDonutByField(
           indexPatternId,
-          'interface.state',
-          'TCP connection status',
+          'destination.port',
+          'Top 5 destination ports',
           'it-hygiene-stat',
-          'desc',
           {
-            filter: [
-              {
-                $state: {
-                  store: 'appState',
-                },
-                exists: {
-                  field: 'interface.name',
-                },
-                meta: {
-                  alias: null,
-                  disabled: false,
-                  key: 'interface.name',
-                  negate: true,
-                  type: 'exists',
-                  value: 'exists',
-                  index: indexPatternId,
-                },
-              },
+            orderAggregation: 'desc',
+            size: 5,
+            searchFilter: [
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.EXISTS,
+                'destination.port',
+                null,
+                indexPatternId,
+              ),
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.IS_NOT,
+                'destination.port',
+                0,
+                indexPatternId,
+              ),
             ],
+            showLegend: true,
+            showLabels: false,
           },
         ),
       },
@@ -504,30 +506,28 @@ const getAgentDashboardPanels = (
         id: 'a1',
         savedVis: getVisStateDonutByField(
           indexPatternId,
-          'interface.state',
-          'TCP connection status',
+          'destination.port',
+          'Top 5 destination ports',
           'it-hygiene-stat',
-          'desc',
           {
-            filter: [
-              {
-                $state: {
-                  store: 'appState',
-                },
-                exists: {
-                  field: 'interface.name',
-                },
-                meta: {
-                  alias: null,
-                  disabled: false,
-                  key: 'interface.name',
-                  negate: true,
-                  type: 'exists',
-                  value: 'exists',
-                  index: indexPatternId,
-                },
-              },
+            orderAggregation: 'desc',
+            size: 5,
+            searchFilter: [
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.EXISTS,
+                'destination.port',
+                null,
+                indexPatternId,
+              ),
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.IS_NOT,
+                'destination.port',
+                0,
+                indexPatternId,
+              ),
             ],
+            showLegend: true,
+            showLabels: false,
           },
         ),
       },
