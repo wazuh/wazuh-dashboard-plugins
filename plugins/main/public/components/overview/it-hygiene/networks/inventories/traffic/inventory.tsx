@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  SystemInventoryStatesDataSource,
+  SystemInventoryTrafficStatesDataSource,
   SystemInventoryTrafficStatesDataSourceRepository,
 } from '../../../../../common/data-source';
 import tableColumns from './table-columns';
@@ -13,7 +13,7 @@ export const ITHygieneNetworksInventoryTraffic =
   withSystemInventoryTrafficDataSource(props => {
     return (
       <ITHygieneInventoryDashboardTable
-        DataSource={SystemInventoryStatesDataSource}
+        DataSource={SystemInventoryTrafficStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryTrafficStatesDataSourceRepository
         }
