@@ -406,14 +406,18 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateDonutByField(
+        savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'destination.port',
           'Top 5 destination ports',
-          'it-hygiene-stat',
+          'it-hygiene-dashboard-top-destination-ports',
           {
-            orderAggregation: 'desc',
-            size: 5,
+            fieldSize: 5,
+            metricCustomLabel: 'Top ports count',
+            valueAxesTitleText: ' ',
+            seriesLabel: 'Top ports',
+            seriesMode: 'normal',
+            fieldCustomLabel: 'Top ports',
             searchFilter: [
               PatternDataSourceFilterManager.createFilter(
                 FILTER_OPERATOR.EXISTS,
@@ -428,8 +432,6 @@ const getOverviewDashboardPanels = (
                 indexPatternId,
               ),
             ],
-            showLegend: true,
-            showLabels: false,
           },
         ),
       },
@@ -504,14 +506,18 @@ const getAgentDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a1',
-        savedVis: getVisStateDonutByField(
+        savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'destination.port',
           'Top 5 destination ports',
-          'it-hygiene-stat',
+          'it-hygiene-dashboard-top-destination-ports-agent',
           {
-            orderAggregation: 'desc',
-            size: 5,
+            fieldSize: 5,
+            metricCustomLabel: 'Top ports count',
+            valueAxesTitleText: ' ',
+            seriesLabel: 'Top ports',
+            seriesMode: 'normal',
+            fieldCustomLabel: 'Top ports',
             searchFilter: [
               PatternDataSourceFilterManager.createFilter(
                 FILTER_OPERATOR.EXISTS,
@@ -526,8 +532,6 @@ const getAgentDashboardPanels = (
                 indexPatternId,
               ),
             ],
-            showLegend: true,
-            showLabels: false,
           },
         ),
       },

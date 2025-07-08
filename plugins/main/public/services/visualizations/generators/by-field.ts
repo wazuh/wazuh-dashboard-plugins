@@ -325,6 +325,8 @@ export const getVisStateHorizontalBarSplitSeries = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    // Define the filter
+    searchFilter?: any[];
   } = {},
 ) => {
   const {
@@ -339,6 +341,7 @@ export const getVisStateHorizontalBarSplitSeries = (
     seriesMode = 'stacked',
     otherBucket,
     missingBucket,
+    searchFilter = [],
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -424,7 +427,9 @@ export const getVisStateHorizontalBarSplitSeries = (
       ],
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, {
+        filter: searchFilter,
+      }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {
