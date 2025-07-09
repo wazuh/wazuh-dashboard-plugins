@@ -409,6 +409,11 @@ export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
   'config',
 );
 
+export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
+  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
+  'wazuh-registry.json',
+);
+
 // Wazuh data path - downloads
 export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
   WAZUH_DATA_ABSOLUTE_PATH,
