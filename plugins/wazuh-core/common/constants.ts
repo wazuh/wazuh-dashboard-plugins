@@ -106,11 +106,10 @@ export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
 // Wazuh data path
 const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
-export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = path.join(
-  __dirname,
-  '../../../',
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH,
-);
+export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = process.env
+  .WAZUH_CONFIG_PATH
+  ? process.env.WAZUH_CONFIG_PATH
+  : path.join(__dirname, '../../../', WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH);
 export const WAZUH_DATA_ABSOLUTE_PATH = path.join(
   WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
   'wazuh',
