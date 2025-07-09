@@ -1,3 +1,4 @@
+import { Filter } from 'src/plugins/data/common';
 import { STYLE } from '../../../components/overview/it-hygiene/common/saved-vis/constants';
 import {
   createIndexPatternReferences,
@@ -92,7 +93,7 @@ export const getVisStateDonutByField = (
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
     // Define the filter
-    searchFilter?: any[];
+    searchFilter?: Filter[];
     // showLegend
     showLegend?: boolean;
     // showLabels
@@ -326,7 +327,7 @@ export const getVisStateHorizontalBarSplitSeries = (
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
     // Define the filter
-    searchFilter?: any[];
+    searchFilter?: Filter[];
   } = {},
 ) => {
   const {
