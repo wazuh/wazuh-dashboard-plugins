@@ -404,12 +404,9 @@ export const WAZUH_DATA_ABSOLUTE_PATH = path.join(
 );
 
 // Wazuh data path - config
-export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = process.env.WAZUH_CONFIG_PATH
-  ? path.dirname(process.env.WAZUH_CONFIG_PATH)
-  : path.join(WAZUH_DATA_ABSOLUTE_PATH, 'config');
-export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh-registry.json',
+export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
+  WAZUH_DATA_ABSOLUTE_PATH,
+  'config',
 );
 
 // Wazuh data path - downloads
