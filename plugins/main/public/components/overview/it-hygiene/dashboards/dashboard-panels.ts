@@ -1,10 +1,14 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { getVisStateHistogramBy } from '../common/saved-vis/generators';
 import {
   getVisStateDonutByField,
-  getVisStateHistogramBy,
-} from '../common/saved-vis/generators';
-import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
+  getVisStateHorizontalBarSplitSeries,
+} from '../../../../services/visualizations';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../../../common/data-source';
 
 const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
   return {
@@ -402,31 +406,31 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateDonutByField(
+        savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
-          'interface.state',
-          'TCP connection status',
-          'it-hygiene-stat',
-          'desc',
+          'destination.port',
+          'Top 5 destination ports',
+          'it-hygiene-dashboard-top-destination-ports',
           {
-            filter: [
-              {
-                $state: {
-                  store: 'appState',
-                },
-                exists: {
-                  field: 'interface.name',
-                },
-                meta: {
-                  alias: null,
-                  disabled: false,
-                  key: 'interface.name',
-                  negate: true,
-                  type: 'exists',
-                  value: 'exists',
-                  index: indexPatternId,
-                },
-              },
+            fieldSize: 5,
+            metricCustomLabel: 'Top ports count',
+            valueAxesTitleText: ' ',
+            seriesLabel: 'Top ports',
+            seriesMode: 'normal',
+            fieldCustomLabel: 'Top ports',
+            searchFilter: [
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.EXISTS,
+                'destination.port',
+                null,
+                indexPatternId,
+              ),
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.IS_NOT,
+                'destination.port',
+                0,
+                indexPatternId,
+              ),
             ],
           },
         ),
@@ -502,31 +506,31 @@ const getAgentDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a1',
-        savedVis: getVisStateDonutByField(
+        savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
-          'interface.state',
-          'TCP connection status',
-          'it-hygiene-stat',
-          'desc',
+          'destination.port',
+          'Top 5 destination ports',
+          'it-hygiene-dashboard-top-destination-ports-agent',
           {
-            filter: [
-              {
-                $state: {
-                  store: 'appState',
-                },
-                exists: {
-                  field: 'interface.name',
-                },
-                meta: {
-                  alias: null,
-                  disabled: false,
-                  key: 'interface.name',
-                  negate: true,
-                  type: 'exists',
-                  value: 'exists',
-                  index: indexPatternId,
-                },
-              },
+            fieldSize: 5,
+            metricCustomLabel: 'Top ports count',
+            valueAxesTitleText: ' ',
+            seriesLabel: 'Top ports',
+            seriesMode: 'normal',
+            fieldCustomLabel: 'Top ports',
+            searchFilter: [
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.EXISTS,
+                'destination.port',
+                null,
+                indexPatternId,
+              ),
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.IS_NOT,
+                'destination.port',
+                0,
+                indexPatternId,
+              ),
             ],
           },
         ),

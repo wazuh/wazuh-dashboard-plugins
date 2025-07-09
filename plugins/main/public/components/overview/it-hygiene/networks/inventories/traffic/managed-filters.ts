@@ -7,9 +7,11 @@ export default [
       !value || /^\d+$/.test(value) ? undefined : 'Only numbers are allowed',
   },
   {
-    type: 'multiSelect',
-    key: 'interface.state',
-    placeholder: 'Interface state',
+    type: 'multiSelectInput',
+    key: 'destination.port',
+    placeholder: 'Destination port',
+    validate: value =>
+      !value || /^\d+$/.test(value) ? undefined : 'Only numbers are allowed',
   },
   {
     type: 'multiSelect',
