@@ -72,6 +72,7 @@ const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
 
 const sampleInventory = [
+  'groups',
   'hardware',
   'hotfixes',
   'interfaces',
@@ -81,6 +82,7 @@ const sampleInventory = [
   'processes',
   'protocols',
   'system',
+  'users',
 ].join(', ');
 
 export default class WzSampleData extends Component {
@@ -135,7 +137,8 @@ export default class WzSampleData extends Component {
       },
       {
         title: 'Sample vulnerability detection inventory',
-        description: `Sample data, visualizations and dashboards for vulnerabilities inventory.`,
+        description:
+          'Sample data, visualizations and dashboards for vulnerabilities inventory.',
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_VULNERABILITIES,
       },
@@ -257,7 +260,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error trying to add sample data`,
+          title: 'Error trying to add sample data',
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -323,7 +326,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error trying to delete sample data`,
+          title: 'Error trying to delete sample data',
         },
       };
       getErrorOrchestrator().handleError(options);

@@ -163,6 +163,8 @@ export const getVisStateHorizontalBarByField = (
     orderAggregation?: 'asc' | 'desc';
     size?: number;
     fieldCustomLabel?: string;
+    metricType?: string;
+    metricField?: string;
     addLegend?: boolean;
     // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;
@@ -174,6 +176,8 @@ export const getVisStateHorizontalBarByField = (
     orderAggregation = 'desc',
     size = 10,
     fieldCustomLabel,
+    metricType = 'count',
+    metricField = undefined,
     addLegend = false,
     otherBucket,
     missingBucket,
@@ -265,8 +269,8 @@ export const getVisStateHorizontalBarByField = (
         {
           id: '1',
           enabled: true,
-          type: 'count',
-          params: {},
+          type: metricType,
+          params: { field: metricField },
           schema: 'metric',
         },
         {
@@ -306,6 +310,8 @@ export const getVisStateHorizontalBarSplitSeries = (
     size?: number;
     fieldCustomLabel?: string;
     metricCustomLabel?: string;
+    metricType?: string;
+    metricField?: string;
     valueAxesTitleText?: string;
     categoryAxesShow?: boolean;
     seriesLabel?: string;
@@ -322,6 +328,8 @@ export const getVisStateHorizontalBarSplitSeries = (
     size = 10,
     fieldCustomLabel,
     metricCustomLabel,
+    metricType = 'count',
+    metricField = undefined,
     valueAxesTitleText = '',
     categoryAxesShow = false,
     seriesLabel = '',
@@ -419,9 +427,10 @@ export const getVisStateHorizontalBarSplitSeries = (
         {
           id: '1',
           enabled: true,
-          type: 'count',
+          type: metricType,
           params: {
-            customLabel: metricCustomLabel, //'File owner count',
+            customLabel: metricCustomLabel,
+            field: metricField,
           },
           schema: 'metric',
         },

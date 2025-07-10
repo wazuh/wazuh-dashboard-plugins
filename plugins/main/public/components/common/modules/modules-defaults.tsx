@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import React from 'react';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
@@ -22,7 +23,6 @@ import {
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
-import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
@@ -89,6 +89,7 @@ import {
   ITHygienePackagesInventory,
   ITHygieneProcessesInventory,
   ITHygieneSystemInventory,
+  ITHygieneUsersInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
 
@@ -400,7 +401,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
         ),
       },
@@ -426,7 +427,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={HIPAADataSource} />
         ),
       },
@@ -452,7 +453,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={NIST80053DataSource} />
         ),
       },
@@ -478,7 +479,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={GDPRDataSource} />
         ),
       },
@@ -504,7 +505,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={TSCDataSource} />
         ),
       },
@@ -549,6 +550,12 @@ export const ModulesDefaults = {
         name: 'Network',
         buttons: [ButtonExploreAgent],
         component: ITHygieneNetworksInventory,
+      },
+      {
+        id: 'users',
+        name: 'Identity',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneUsersInventory,
       },
     ],
     availableFor: ['manager', 'agent'],
