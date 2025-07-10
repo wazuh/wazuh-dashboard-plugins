@@ -82,6 +82,12 @@ export const WAZUH_MODULES = {
     description:
       'Configuration assessment using Center of Internet Security scanner and SCAP checks.',
   },
+  azure: {
+    title: 'Azure',
+    appId: 'azure',
+    description:
+      'Security events related to your Azure services, collected directly via Azure API.',
+  },
   aws: {
     title: 'AWS',
     appId: 'amazon-web-services',

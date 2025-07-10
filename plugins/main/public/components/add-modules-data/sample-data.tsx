@@ -38,6 +38,7 @@ import {
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import {
   amazonWebServices,
+  azure,
   docker,
   fileIntegrityMonitoring,
   github,
@@ -54,6 +55,7 @@ const sampleSecurityInformationApplication = [
   office365.title,
   googleCloud.title,
   github.title,
+  azure.title,
   'authorization',
   'ssh',
   'web',
