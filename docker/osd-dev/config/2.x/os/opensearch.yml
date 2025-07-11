@@ -2,7 +2,7 @@ network.host: '0.0.0.0'
 node.name: 'os1'
 path.data: /var/lib/os1
 path.logs: /var/log/os1
-# comment compatibility.override_main_response_version for 2.0.0 or 3.0.0
+# comment compatibility.override_main_response_version for 2.0.0 or 3.x.x
 # compatibility.override_main_response_version: true
 plugins.security.ssl.http.pemcert_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.pem
 plugins.security.ssl.http.pemkey_filepath: ${OPENSEARCH_PATH_CONF}/certs/os1.key
