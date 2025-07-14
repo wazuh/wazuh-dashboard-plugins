@@ -1,6 +1,3 @@
-/* eslint-disable array-element-newline */
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 /**
 Runs URL checks using a Docker container with Node.js 20.
 
