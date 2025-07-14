@@ -1,16 +1,15 @@
 import { Project, SyntaxKind } from 'ts-morph';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import packageJson from '../package.json' with { type: "json" };
+import { getPluginVersion } from './ts-constants-extractor.mjs';
 
 const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
-export const PLUGIN_VERSION = packageJson.version;
-export const PLUGIN_VERSION_SHORT = PLUGIN_VERSION.split('.').splice(0, 2).join('.');
+const PLUGIN_VERSION = await getPluginVersion();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function webDocumentationLink(urlPath, version = PLUGIN_VERSION_SHORT) {
+export function webDocumentationLink(urlPath, version = PLUGIN_VERSION) {
   return `${DOCUMENTATION_WEB_BASE_URL}/${version}/${urlPath}`;
 }
 
@@ -34,7 +33,7 @@ async function checkUrlStatus(url) {
     return {
       status: 0,
       valid: false,
-      error: error.message
+      error: error.message,
     };
   }
 }
@@ -78,7 +77,9 @@ async function findUrlPaths(tsConfigPath) {
 
       const fullUrl = webDocumentationLink(
         firstArg.getLiteralValue(),
-        isValidStringLiteral(secondArg) ? secondArg.getLiteralValue() : undefined,
+        isValidStringLiteral(secondArg)
+          ? secondArg.getLiteralValue()
+          : undefined,
       );
 
       urlPaths.add({
@@ -146,7 +147,7 @@ function generateSummary(urlPaths) {
     invalid_urls: invalid,
     urls_with_errors: errors,
     status_code_breakdown: statusCodes,
-    success_rate: total > 0 ? ((valid / total) * 100).toFixed(2) + '%' : '0%'
+    success_rate: total > 0 ? ((valid / total) * 100).toFixed(2) + '%' : '0%',
   };
 }
 
@@ -188,7 +189,6 @@ async function main() {
 
       process.exit(1); // Exit with error code if invalid URLs found
     }
-
   } catch (error) {
     console.error('Error extracting URL paths:', error);
     process.exit(1);
