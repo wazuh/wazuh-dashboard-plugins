@@ -2,8 +2,8 @@ version: '3'
 
 # Parameters:
 # -------------
-#   - REPO:     Path to the Wazuh app local repository
-#   - NODE_VERSION: Node.js version to use (default: 20)
+#   - REPO:         Path to the Wazuh app local repository
+#   - NODE_VERSION: Node.js version (default: 20)
 
 services:
   url_checks:
@@ -11,10 +11,9 @@ services:
     image: node:${NODE_VERSION:-20}-alpine
     working_dir: /app
     volumes:
-      - $REPO:/app
+      - ${REPO}:/app
     tty: true
     command: /bin/sh -c '
-      npm init -y;
-      npm install ts-morph --no-package-lock --legacy-peer-deps;
-      node scripts/url-checks-extractor.mjs
+      npm install -g tsx ts-node typescript ts-morph --no-package-lock --legacy-peer-deps &&
+      tsx scripts/url-checks-extractor.mjs
       '
