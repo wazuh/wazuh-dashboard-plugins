@@ -5,13 +5,38 @@ import packageJson from '../package.json' with { type: "json" };
 
 const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
 export const PLUGIN_VERSION = packageJson.version;
-export const PLUGIN_VERSION_SHORT = packageJson.version.split('.').splice(0, 2).join('.');
+export const PLUGIN_VERSION_SHORT = PLUGIN_VERSION.split('.').splice(0, 2).join('.');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export function webDocumentationLink(urlPath, version = PLUGIN_VERSION_SHORT) {
   return `${DOCUMENTATION_WEB_BASE_URL}/${version}/${urlPath}`;
+}
+
+/**
+ * Check if a URL is valid by making a HEAD request
+ * @param {string} url - The URL to check
+ * @returns {Promise<{status: number, valid: boolean, error?: string}>}
+ */
+async function checkUrlStatus(url) {
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+      timeout: 5000, // 5 second timeout
+    });
+
+    const status = response.status;
+    const valid = status >= 200 && status < 400;
+
+    return { status, valid };
+  } catch (error) {
+    return {
+      status: 0,
+      valid: false,
+      error: error.message
+    };
+  }
 }
 
 async function findUrlPaths(tsConfigPath) {
@@ -21,6 +46,7 @@ async function findUrlPaths(tsConfigPath) {
   });
 
   const urlPaths = new Set();
+  const urlStrings = new Set(); // To track unique URLs for checking
 
   // 3. Walk each source file
   for (const sourceFile of project.getSourceFiles()) {
@@ -50,29 +76,119 @@ async function findUrlPaths(tsConfigPath) {
 
       if (!isValidStringLiteral(firstArg)) return;
 
+      const fullUrl = webDocumentationLink(
+        firstArg.getLiteralValue(),
+        isValidStringLiteral(secondArg) ? secondArg.getLiteralValue() : undefined,
+      );
+
       urlPaths.add({
         filename: filename,
-        wazuh_docs_sub_path: webDocumentationLink(
-          firstArg.getLiteralValue(),
-          isValidStringLiteral(secondArg) ? secondArg.getLiteralValue() : undefined,
-        ),
+        wazuh_docs_sub_path: firstArg.getLiteralValue(),
+        full_url: fullUrl,
       });
+
+      urlStrings.add(fullUrl);
     });
   }
 
-  return Array.from(urlPaths);
+  // Convert to array and check URLs
+  const urlPathsArray = Array.from(urlPaths);
+  console.log(`\nChecking ${urlStrings.size} unique URLs...`);
+
+  // Check each unique URL
+  const urlStatusMap = new Map();
+  let checkedCount = 0;
+
+  for (const url of urlStrings) {
+    checkedCount++;
+    console.log(`[${checkedCount}/${urlStrings.size}] Checking: ${url}`);
+    const status = await checkUrlStatus(url);
+    urlStatusMap.set(url, status);
+  }
+
+  // Add status to each URL path entry
+  for (const entry of urlPathsArray) {
+    const status = urlStatusMap.get(entry.full_url);
+    entry.status_code = status.status;
+    entry.is_valid = status.valid;
+    if (status.error) {
+      entry.error = status.error;
+    }
+  }
+
+  return urlPathsArray;
 }
 
 function isValidStringLiteral(arg) {
   return arg && arg.getKind() === SyntaxKind.StringLiteral;
 }
 
+/**
+ * Generate summary statistics
+ * @param {Array} urlPaths - Array of URL path objects
+ */
+function generateSummary(urlPaths) {
+  const total = urlPaths.length;
+  const valid = urlPaths.filter(entry => entry.is_valid).length;
+  const invalid = urlPaths.filter(entry => !entry.is_valid).length;
+  const errors = urlPaths.filter(entry => entry.error).length;
+
+  // Group by status code
+  const statusCodes = {};
+  urlPaths.forEach(entry => {
+    const code = entry.status_code;
+    statusCodes[code] = (statusCodes[code] || 0) + 1;
+  });
+
+  return {
+    total_urls_checked: total,
+    valid_urls: valid,
+    invalid_urls: invalid,
+    urls_with_errors: errors,
+    status_code_breakdown: statusCodes,
+    success_rate: total > 0 ? ((valid / total) * 100).toFixed(2) + '%' : '0%'
+  };
+}
+
 async function main() {
   try {
+    console.log('🔍 Starting URL validation process...');
     const tsConfigPath = path.join(__dirname, '..', 'tsconfig.json');
     console.log('Using tsconfig path:', tsConfigPath);
+
     const urlPaths = await findUrlPaths(tsConfigPath);
+
+    console.log('\n📊 URL Validation Results:');
+    console.log('='.repeat(50));
     console.log(JSON.stringify(urlPaths, null, 2));
+
+    console.log('\n📈 Summary:');
+    console.log('='.repeat(50));
+    const summary = generateSummary(urlPaths);
+    console.log(JSON.stringify(summary, null, 2));
+
+    // Log summary in a readable format
+    console.log('\n📋 Quick Summary:');
+    console.log(`Total URLs checked: ${summary.total_urls_checked}`);
+    console.log(`✅ Valid URLs: ${summary.valid_urls}`);
+    console.log(`❌ Invalid URLs: ${summary.invalid_urls}`);
+    console.log(`🚨 URLs with errors: ${summary.urls_with_errors}`);
+    console.log(`📊 Success rate: ${summary.success_rate}`);
+
+    if (summary.invalid_urls > 0) {
+      console.log('\n🔗 Invalid URLs found:');
+      urlPaths
+        .filter(entry => !entry.is_valid)
+        .forEach(entry => {
+          console.log(`  - ${entry.full_url} (Status: ${entry.status_code})`);
+          if (entry.error) {
+            console.log(`    Error: ${entry.error}`);
+          }
+        });
+
+      process.exit(1); // Exit with error code if invalid URLs found
+    }
+
   } catch (error) {
     console.error('Error extracting URL paths:', error);
     process.exit(1);
