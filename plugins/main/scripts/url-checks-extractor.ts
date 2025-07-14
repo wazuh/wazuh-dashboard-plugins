@@ -1,16 +1,18 @@
-import { Project, SyntaxKind } from 'ts-morph';
+import { Project, SyntaxKind, ts } from 'ts-morph';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getPluginVersion } from './ts-constants-extractor.mjs';
-
-const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
-const PLUGIN_VERSION = await getPluginVersion();
+import { webDocumentationLink } from '../common/services/web_documentation';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export function webDocumentationLink(urlPath, version = PLUGIN_VERSION) {
-  return `${DOCUMENTATION_WEB_BASE_URL}/${version}/${urlPath}`;
+interface UrlPath {
+  filename: string;
+  wazuh_docs_sub_path: string;
+  full_url: string;
+  status_code?: number;
+  is_valid?: boolean;
+  error?: string;
 }
 
 /**
@@ -18,49 +20,45 @@ export function webDocumentationLink(urlPath, version = PLUGIN_VERSION) {
  * @param {string} url - The URL to check
  * @returns {Promise<{status: number, valid: boolean, error?: string}>}
  */
-async function checkUrlStatus(url) {
+async function checkUrlStatus(url: string) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
     const response = await fetch(url, {
       method: 'HEAD',
-      timeout: 5000, // 5 second timeout
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     const status = response.status;
     const valid = status >= 200 && status < 400;
 
     return { status, valid };
   } catch (error) {
+    const _error = error as Error;
     return {
       status: 0,
       valid: false,
-      error: error.message,
+      error: _error.message,
     };
   }
 }
 
-async function findUrlPaths(tsConfigPath) {
+async function findUrlPaths(tsConfigPath: string) {
   // 1. Initialize a ts-morph Project
   const project = new Project({
     tsConfigFilePath: tsConfigPath,
   });
 
-  const urlPaths = new Set();
-  const urlStrings = new Set(); // To track unique URLs for checking
+  const urlPaths = new Set<UrlPath>();
+  const urlStrings = new Set<string>(); // To track unique URLs for checking
 
   // 3. Walk each source file
   for (const sourceFile of project.getSourceFiles()) {
     // Ignore test files
     const filename = sourceFile.getFilePath();
 
-    if (filename.includes('node_modules')) continue;
-    if (filename.includes('dist')) continue;
-    if (filename.includes('build')) continue;
-    if (filename.includes('coverage')) continue;
-    if (filename.includes('scripts')) continue;
-    if (filename.includes('test')) continue;
-    if (filename.includes('example')) continue;
-    if (filename.includes('demo')) continue;
-    if (filename.includes('mock')) continue;
     if (/\.test\.(js|ts)x?$/.test(filename)) continue;
 
     sourceFile.forEachDescendant(node => {
@@ -76,15 +74,15 @@ async function findUrlPaths(tsConfigPath) {
       if (!isValidStringLiteral(firstArg)) return;
 
       const fullUrl = webDocumentationLink(
-        firstArg.getLiteralValue(),
+        firstArg.getText().slice(1, -1),
         isValidStringLiteral(secondArg)
-          ? secondArg.getLiteralValue()
+          ? secondArg.getText().slice(1, -1)
           : undefined,
       );
 
       urlPaths.add({
         filename: filename,
-        wazuh_docs_sub_path: firstArg.getLiteralValue(),
+        wazuh_docs_sub_path: firstArg.getText().slice(1, -1),
         full_url: fullUrl,
       });
 
@@ -120,25 +118,29 @@ async function findUrlPaths(tsConfigPath) {
   return urlPathsArray;
 }
 
-function isValidStringLiteral(arg) {
-  return arg && arg.getKind() === SyntaxKind.StringLiteral;
+function isValidStringLiteral(arg: any): arg is ts.StringLiteral {
+  return arg && arg.getKind?.() === SyntaxKind.StringLiteral;
 }
 
 /**
  * Generate summary statistics
  * @param {Array} urlPaths - Array of URL path objects
  */
-function generateSummary(urlPaths) {
+function generateSummary(urlPaths: UrlPath[]) {
   const total = urlPaths.length;
   const valid = urlPaths.filter(entry => entry.is_valid).length;
   const invalid = urlPaths.filter(entry => !entry.is_valid).length;
   const errors = urlPaths.filter(entry => entry.error).length;
 
   // Group by status code
-  const statusCodes = {};
+  const statusCodes = {} as Record<string, number>;
   urlPaths.forEach(entry => {
     const code = entry.status_code;
-    statusCodes[code] = (statusCodes[code] || 0) + 1;
+    if (!code) return; // Skip entries without a status code
+    if (code < 100 || code >= 600) return; // Skip invalid status codes
+    if (isNaN(code)) return; // Skip non-numeric status codes
+    const statusCode = code.toString();
+    statusCodes[statusCode] = (statusCodes[statusCode] || 0) + 1;
   });
 
   return {
