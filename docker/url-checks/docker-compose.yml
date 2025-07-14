@@ -11,10 +11,10 @@ services:
     image: node:${NODE_VERSION:-20}-alpine
     working_dir: /app
     volumes:
-      - $REPO:/app/plugins/main
+      - $REPO:/app
     tty: true
     command: /bin/sh -c '
       npm init -y;
       npm install ts-morph --no-package-lock --legacy-peer-deps;
-      node plugins/main/scripts/url-checks-extractor.js
+      node scripts/url-checks-extractor.mjs
       '
