@@ -25,6 +25,7 @@ import {
   PLUGIN_SETTINGS_CATEGORIES,
   WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
   WAZUH_DATA_CONFIG_APP_PATH,
+  setWazuhDataBasePath,
 } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
 
@@ -46,6 +47,15 @@ export class WazuhCorePlugin
     plugins: PluginSetup,
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
+
+    // Set the wazuh data base path from path.data
+    const globalConfig =
+      await this.initializerContext.config.legacy.globalConfig$
+        .pipe(require('rxjs/operators').first())
+        .toPromise();
+    if (globalConfig.has('path.data')) {
+      setWazuhDataBasePath(globalConfig.get('path.data'));
+    }
 
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
 

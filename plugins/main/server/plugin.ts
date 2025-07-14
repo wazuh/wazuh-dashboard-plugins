@@ -37,6 +37,7 @@ import {
   jobSanitizeUploadedFilesTasksRun,
 } from './start';
 import { first } from 'rxjs/operators';
+import { setWazuhDataBasePath } from '../common/constants';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -117,6 +118,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       await this.initializerContext.config.legacy.globalConfig$
         .pipe(first())
         .toPromise();
+
+    // Set the wazuh data base path from path.data
+    if (globalConfiguration.has('path.data')) {
+      setWazuhDataBasePath(globalConfiguration.get('path.data'));
+    }
 
     const contextServer = {
       config: globalConfiguration,

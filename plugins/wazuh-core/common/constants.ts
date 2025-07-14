@@ -14,6 +14,41 @@ import { version } from '../package.json';
 // import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
 
+// Default wazuh data base path (can be overridden at runtime)
+let wazuhDataBasePath = 'data';
+
+// Function to override wazuh data base path
+export function setWazuhDataBasePath(newPath: string) {
+  wazuhDataBasePath = newPath;
+}
+
+export function getWazuhDataBasePath() {
+  return wazuhDataBasePath;
+}
+
+// All other paths are built from wazuhDataBasePath
+export const WAZUH_DATA_ABSOLUTE_PATH = path.join(wazuhDataBasePath, 'wazuh');
+export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
+  WAZUH_DATA_ABSOLUTE_PATH,
+  'config',
+);
+export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
+  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
+  'wazuh-registry.json',
+);
+export const WAZUH_DATA_CONFIG_APP_PATH = path.join(
+  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
+  'wazuh.yml',
+);
+export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
+  WAZUH_DATA_ABSOLUTE_PATH,
+  'downloads',
+);
+export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
+  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
+  'reports',
+);
+
 // Plugin
 export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
@@ -103,41 +138,6 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
-
-// Wazuh data path
-const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
-export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = process.env
-  .WAZUH_CONFIG_PATH
-  ? process.env.WAZUH_CONFIG_PATH
-  : path.join(__dirname, '../../../', WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH);
-export const WAZUH_DATA_ABSOLUTE_PATH = path.join(
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
-  'wazuh',
-);
-
-// Wazuh data path - config
-export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'config',
-);
-export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh-registry.json',
-);
-export const WAZUH_DATA_CONFIG_APP_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh.yml',
-);
-
-// Wazuh data path - downloads
-export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'downloads',
-);
-export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  'reports',
-);
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds

@@ -392,29 +392,32 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
-// Wazuh data path
-const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
-export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = process.env
-  .WAZUH_CONFIG_PATH
-  ? process.env.WAZUH_CONFIG_PATH
-  : path.join(__dirname, '../../../', WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH);
-export const WAZUH_DATA_ABSOLUTE_PATH = path.join(
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
-  'wazuh',
-);
+// Default wazuh data base path (can be overridden at runtime)
+let wazuhDataBasePath = 'data';
 
-// Wazuh data path - config
+// Function to override wazuh data base path
+export function setWazuhDataBasePath(newPath: string) {
+  wazuhDataBasePath = newPath;
+}
+
+export function getWazuhDataBasePath() {
+  return wazuhDataBasePath;
+}
+
+// All other paths are built from wazuhDataBasePath
+export const WAZUH_DATA_ABSOLUTE_PATH = path.join(wazuhDataBasePath, 'wazuh');
 export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
   WAZUH_DATA_ABSOLUTE_PATH,
   'config',
 );
-
 export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
   WAZUH_DATA_CONFIG_DIRECTORY_PATH,
   'wazuh-registry.json',
 );
-
-// Wazuh data path - downloads
+export const WAZUH_DATA_CONFIG_APP_PATH = path.join(
+  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
+  'wazuh.yml',
+);
 export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
   WAZUH_DATA_ABSOLUTE_PATH,
   'downloads',
