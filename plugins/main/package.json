@@ -48,6 +48,7 @@
     "test:browser": "plugin-helpers test:browser",
     "test:jest": "node scripts/jest --runInBand",
     "test:jest:runner": "node scripts/runner test",
+    "url-checks": "node scripts/url-checks.js",
     "generate:api-data": "node scripts/generate-api-data.js --spec https://raw.githubusercontent.com/wazuh/wazuh/$(node -e \"console.log(require('./package.json').version)\")/api/api/spec/spec.yaml --output file --output-directory common/api-info --display-configuration",
     "prebuild": "node scripts/generate-build-version",
     "knip": "knip --files"
