@@ -63,8 +63,8 @@ async function findUrlPaths(tsConfigPath) {
   return Array.from(urlPaths);
 }
 
-function isValidStringLiteral(firstArg) {
-  return firstArg && firstArg.getKind() === SyntaxKind.StringLiteral;
+function isValidStringLiteral(arg) {
+  return arg && arg.getKind() === SyntaxKind.StringLiteral;
 }
 
 async function main() {
