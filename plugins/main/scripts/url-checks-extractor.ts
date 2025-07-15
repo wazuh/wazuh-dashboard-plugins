@@ -32,7 +32,7 @@ async function checkUrlStatus(url: string) {
     clearTimeout(timeoutId);
 
     const status = response.status;
-    const valid = status >= 200 && status < 400;
+    const valid = status >= 200 && status < 300;
 
     return { status, valid };
   } catch (error) {
