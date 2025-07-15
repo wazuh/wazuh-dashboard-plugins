@@ -8,18 +8,14 @@ import {
   EuiButtonEmpty,
   EuiLink,
 } from '@elastic/eui';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import './group-input.scss';
+import { DOC_LINKS } from '../../../../../../common/doc-links';
 
 const popoverAgentGroup = (
   <span>
     Learn about{' '}
     <EuiLink
-      href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#groups',
-        PLUGIN_VERSION_SHORT,
-      )}
+      href={`${DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.CLIENT}#groups`}
       target='_blank'
       rel='noopener noreferrer'
     >

@@ -23,7 +23,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 
 import withWzConfig from '../util-hocs/wz-config';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const mainSettings = [
   { field: 'command', label: 'Command to execute' },
@@ -38,15 +38,11 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'Active response documentation',
-    href: webDocumentationLink(
-      'user-manual/capabilities/active-response/index.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.ACTIVE_RESPONSE.INDEX,
   },
   {
     text: 'Active response reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/active-response.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.ACTIVE_RESPONSE,
   },
 ];
 

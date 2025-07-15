@@ -13,12 +13,10 @@ import React, { Component } from 'react';
 import { EuiButton, EuiSpacer, EuiLink } from '@elastic/eui';
 import { ErrorComponentPrompt } from '../common/error-boundary-prompt/error-boundary-prompt';
 import {
-  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
   PLUGIN_PLATFORM_URL_GUIDE,
   PLUGIN_PLATFORM_URL_GUIDE_TITLE,
   UI_LOGGER_LEVELS,
 } from '../../../common/constants';
-import { webDocumentationLink } from '../../../common/services/web_documentation';
 import { AppState } from '../../react-services/app-state';
 import { WzMisc } from '../../factories/misc';
 import { getCore } from '../../kibana-services';
@@ -30,6 +28,7 @@ import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboar
 import { withRouteResolvers } from '../common/hocs';
 import { enableMenu } from '../../services/resolves/enable-menu';
 import NavigationService from '../../react-services/navigation-service';
+import { DOC_LINKS } from '../../../common/doc-links';
 
 export const WzBlankScreen = withRouteResolvers({ enableMenu })(
   class WzBlankScreen extends Component {
@@ -100,9 +99,7 @@ export const WzBlankScreen = withRouteResolvers({ enableMenu })(
                 <br />
                 <br />
                 <EuiLink
-                  href={webDocumentationLink(
-                    PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
-                  )}
+                  href={DOC_LINKS.USER_MANUAL.WAZUH_DASHBOARD.TROUBLESHOOTING}
                   target='_blank'
                   rel='noopener noreferrer'
                   external

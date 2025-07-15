@@ -11,9 +11,8 @@ import {
 } from '@elastic/eui';
 import { InputForm } from '../../../../common/form';
 import { OPTIONAL_PARAMETERS_TEXT } from '../../utils/register-agent-data';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
+import { DOC_LINKS } from '../../../../../../common/doc-links';
 interface OptionalsInputsProps {
   formFields: UseFormReturn['fields'];
 }
@@ -24,10 +23,7 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
   const onButtonAgentName = () =>
     setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
   const closeAgentName = () => setIsPopoverAgentName(false);
-  const agentNameDocLink = webDocumentationLink(
-    'user-manual/reference/ossec-conf/client.html#enrollment-agent-name',
-    PLUGIN_VERSION_SHORT,
-  );
+  const agentNameDocLink = `${DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.CLIENT}#enrollment-agent-name`;
   const popoverAgentName = (
     <span>
       Learn about{' '}

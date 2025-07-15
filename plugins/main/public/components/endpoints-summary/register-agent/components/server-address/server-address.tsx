@@ -11,13 +11,12 @@ import React, { Fragment, useEffect, useState } from 'react';
 import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
 import { EnhancedFieldConfiguration } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
 import { WzRequest } from '../../../../../react-services';
 import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
 import { WzButtonPermissions } from '../../../../common/permissions/button';
 import { useAppConfig } from '../../../../common/hooks';
+import { DOC_LINKS } from '../../../../../../common/doc-links';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -27,10 +26,7 @@ const popoverServerAddress = (
   <span>
     Learn about{' '}
     <EuiLink
-      href={webDocumentationLink(
-        'user-manual/reference/ossec-conf/client.html#manager-address',
-        PLUGIN_VERSION_SHORT,
-      )}
+      href={`${DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.CLIENT}#manager-address`}
       target='_blank'
       rel='noopener noreferrer'
     >

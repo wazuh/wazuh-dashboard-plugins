@@ -23,9 +23,9 @@ import {
   WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../common/constants';
 import { getDataPlugin, getSavedObjects } from '../kibana-services';
-import { webDocumentationLink } from '../../common/services/web_documentation';
 import { ErrorFactory } from './error-management';
 import { WarningError } from './error-management/error-factory/errors/WarningError';
+import { DOC_LINKS } from '../../common/doc-links';
 
 export class SavedObject {
   /**
@@ -337,9 +337,7 @@ export class SavedObject {
 
     if (!indexPatternsSavedObjectsCanBeFound) {
       throw new Error(`Saved object for index pattern not found.
-Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in troubleshooting guide: ${webDocumentationLink(
-        'user-manual/wazuh-dashboard/troubleshooting.html#saved-object-for-index-pattern-not-found',
-      )}.`);
+Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in troubleshooting guide: ${DOC_LINKS.USER_MANUAL.WAZUH_DASHBOARD.TROUBLESHOOTING}#saved-object-for-index-pattern-not-found.`);
     }
   }
 }

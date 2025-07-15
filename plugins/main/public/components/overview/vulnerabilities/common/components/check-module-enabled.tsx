@@ -4,12 +4,12 @@ import {
   clusterNodes,
 } from '../../../../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { WzRequest } from '../../../../../react-services';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { EuiCallOut, EuiLink } from '@elastic/eui';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { useUserPermissionsRequirements } from '../../../../common/hooks';
+import { DOC_LINKS } from '../../../../../../common/doc-links';
 
 async function checkVDIsEnabledCluster() {
   // Get nodes
@@ -99,9 +99,7 @@ export const ModuleEnabledCheck = () => {
         Vulnerabilies detection module is not enabled. You can learn to how to
         configure following the{' '}
         <EuiLink
-          href={webDocumentationLink(
-            'user-manual/capabilities/vulnerability-detection/configuring-scans.html#configuring-vulnerability-detection',
-          )}
+          href={`${DOC_LINKS.USER_MANUAL.CAPABILITIES.VULNERABILITY_DETECTION.CONFIGURING_SCANS}#configuring-vulnerability-detection`}
           external
           target='_blank'
           rel='noopener noreferrer'
