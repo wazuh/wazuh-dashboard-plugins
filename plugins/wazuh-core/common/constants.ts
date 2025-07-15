@@ -14,40 +14,11 @@ import { version } from '../package.json';
 // import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
 
-// Default wazuh data base path (can be overridden at runtime)
-let wazuhDataBasePath = 'data';
+// Wazuh data path - these are now handled by DataPathService
+const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
 
-// Function to override wazuh data base path
-export function setWazuhDataBasePath(newPath: string) {
-  wazuhDataBasePath = newPath;
-}
-
-export function getWazuhDataBasePath() {
-  return wazuhDataBasePath;
-}
-
-// All other paths are built from wazuhDataBasePath
-export const WAZUH_DATA_ABSOLUTE_PATH = path.join(wazuhDataBasePath, 'wazuh');
-export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'config',
-);
-export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh-registry.json',
-);
-export const WAZUH_DATA_CONFIG_APP_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh.yml',
-);
-export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'downloads',
-);
-export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  'reports',
-);
+// Note: All path-related constants are now provided by DataPathService
+// from wazuh-core plugin. Use plugins.wazuhCore.dataPathService instead.
 
 // Plugin
 export const PLUGIN_VERSION = version;

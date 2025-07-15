@@ -392,40 +392,11 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
-// Default wazuh data base path (can be overridden at runtime)
-let wazuhDataBasePath = 'data';
+// Wazuh data path - these are now handled by DataPathService
+const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
 
-// Function to override wazuh data base path
-export function setWazuhDataBasePath(newPath: string) {
-  wazuhDataBasePath = newPath;
-}
-
-export function getWazuhDataBasePath() {
-  return wazuhDataBasePath;
-}
-
-// All other paths are built from wazuhDataBasePath
-export const WAZUH_DATA_ABSOLUTE_PATH = path.join(wazuhDataBasePath, 'wazuh');
-export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'config',
-);
-export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh-registry.json',
-);
-export const WAZUH_DATA_CONFIG_APP_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh.yml',
-);
-export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'downloads',
-);
-export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  'reports',
-);
+// Note: All path-related constants are now provided by DataPathService
+// from wazuh-core plugin. Use plugins.wazuhCore.dataPathService instead.
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds

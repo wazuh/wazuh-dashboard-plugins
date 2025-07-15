@@ -27,8 +27,6 @@ import {
 } from '../lib/reporting/extended-information';
 import { ReportPrinter } from '../lib/reporting/printer';
 import {
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
   AUTHORIZED_AGENTS,
   API_NAME_AGENT_STATUS,
 } from '../../common/constants';
@@ -326,12 +324,12 @@ export class WazuhReportingCtrl {
           context.wazuh_core.configuration,
         );
 
-        createDataDirectoryIfNotExists();
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+        createDirectoryIfNotExists();
         createDirectoryIfNotExists(
           path.join(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+            context.wazuh_core.configuration.getSettingValue(
+              'reports_directory',
+            ),
             context.wazuhEndpointParams.hashUsername,
           ),
         );
@@ -422,12 +420,12 @@ export class WazuhReportingCtrl {
           context.wazuh_core.configuration,
         );
 
-        createDataDirectoryIfNotExists();
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+        createDirectoryIfNotExists();
         createDirectoryIfNotExists(
           path.join(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+            context.wazuh_core.configuration.getSettingValue(
+              'reports_directory',
+            ),
             context.wazuhEndpointParams.hashUsername,
           ),
         );
@@ -716,14 +714,12 @@ export class WazuhReportingCtrl {
             context.wazuh.logger.get('report-printer'),
             context.wazuh_core.configuration,
           );
-          createDataDirectoryIfNotExists();
-          createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-          createDirectoryIfNotExists(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-          );
+          createDirectoryIfNotExists();
           createDirectoryIfNotExists(
             path.join(
-              WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+              context.wazuh_core.configuration.getSettingValue(
+                'reports_directory',
+              ),
               context.wazuhEndpointParams.hashUsername,
             ),
           );
@@ -1051,11 +1047,15 @@ export class WazuhReportingCtrl {
         request,
         context,
       );
-      createDataDirectoryIfNotExists();
-      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+      createDirectoryIfNotExists();
+      createDirectoryIfNotExists(
+        path.join(
+          context.wazuh_core.configuration.getSettingValue('reports_directory'),
+          hashUsername,
+        ),
+      );
       const userReportsDirectoryPath = path.join(
-        WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+        context.wazuh_core.configuration.getSettingValue('reports_directory'),
         hashUsername,
       );
       createDirectoryIfNotExists(userReportsDirectoryPath);
@@ -1168,7 +1168,7 @@ export class WazuhReportingCtrl {
         const { username, hashUsername } =
           await context.wazuh.security.getCurrentUser(request, context);
         const userReportsDirectoryPath = path.join(
-          WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+          context.wazuh_core.configuration.getSettingValue('reports_directory'),
           hashUsername,
         );
         const filename = reportFileNameAccessor(request);

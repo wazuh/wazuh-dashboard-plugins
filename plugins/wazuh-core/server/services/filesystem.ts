@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { getWazuhDataBasePath } from '../../common/constants';
 
 export const createDirectoryIfNotExists = (directory: string): void => {
   if (!fs.existsSync(directory)) {
@@ -8,14 +7,18 @@ export const createDirectoryIfNotExists = (directory: string): void => {
   }
 };
 
-export const createDataDirectoryIfNotExists = (directory?: string) => {
-  const wazuhPath = path.join(getWazuhDataBasePath(), 'wazuh');
-  const absoluteRoute = directory ? path.join(wazuhPath, directory) : wazuhPath;
-  if (!fs.existsSync(absoluteRoute)) {
-    fs.mkdirSync(absoluteRoute, { recursive: true });
-  }
+// Compatibility function that delegates to DataPathService
+export const createDataDirectoryIfNotExists = (
+  dataPathService: any,
+  directory?: string,
+) => {
+  return dataPathService.createDataDirectoryIfNotExists(directory);
 };
 
-export const getDataDirectoryRelative = (directory: string) => {
-  return path.join(getWazuhDataBasePath(), 'wazuh', directory || '');
+// Compatibility function that delegates to DataPathService
+export const getDataDirectoryRelative = (
+  dataPathService: any,
+  directory?: string,
+) => {
+  return dataPathService.getDataDirectoryRelative(directory);
 };
