@@ -13,6 +13,7 @@ import path from 'path';
 import { version } from '../package.json';
 // import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
+import { webDocumentationLink } from './services/web_documentation';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -525,7 +526,9 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
     title: 'Custom branding',
     description:
       'If you want to use custom branding elements such as logos, you can do so by editing the settings below.',
-    documentationLink: 'user-manual/wazuh-dashboard/custom-branding.html',
+    documentationLink: webDocumentationLink(
+      'user-manual/wazuh-dashboard/custom-branding.html',
+    ),
     renderOrder: SettingCategory.CUSTOMIZATION,
   },
   [SettingCategory.API_CONNECTION]: {

@@ -81,7 +81,7 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                         aria-label='Help'
                         target='_blank'
                         rel='noopener noreferrer'
-                        href={webDocumentationLink(documentationLink)}
+                        href={documentationLink}
                       ></EuiButtonIcon>
                     </>
                   </EuiToolTip>
