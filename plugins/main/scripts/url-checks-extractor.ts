@@ -1,7 +1,7 @@
 import { Project, SyntaxKind, ts } from 'ts-morph';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { webDocumentationLink } from '../common/services/web_documentation';
+import { buildWebDocUrl } from '../common/services/web_documentation';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -73,7 +73,7 @@ async function findUrlPaths(tsConfigPath: string) {
 
       if (!isValidStringLiteral(firstArg)) return;
 
-      const fullUrl = webDocumentationLink(
+      const fullUrl = buildWebDocUrl(
         firstArg.getText().slice(1, -1),
         isValidStringLiteral(secondArg)
           ? secondArg.getText().slice(1, -1)

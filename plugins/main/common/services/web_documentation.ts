@@ -6,7 +6,7 @@ import { DOCUMENTATION_WEB_BASE_URL, PLUGIN_VERSION_SHORT } from '../constants';
  * @param version version. Optional. It will use the plugin short version by default.
  * @returns
  */
-export function webDocumentationLink<U extends string, V extends string>(
+export function buildWebDocUrl<U extends string, V extends string>(
   urlPath: U,
   version: V = PLUGIN_VERSION_SHORT as V,
 ): `${typeof DOCUMENTATION_WEB_BASE_URL}/${V}/${U}` {
