@@ -8,7 +8,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.0
 - Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554)
-- Added support for custom Wazuh data path configuration through WAZUH_CONFIG_PATH environment variable [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
+- Added ability to set the Wazuh data path (wazuh directory) within the directory defined through `path.data` setting [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
 
 ## Wazuh v4.13.1 - OpenSearch Dashboards 2.19.2 - Revision 00
 
