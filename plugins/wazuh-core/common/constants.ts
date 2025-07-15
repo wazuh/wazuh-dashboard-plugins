@@ -64,6 +64,7 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     { syscheck: true },
     { aws: true },
+    { azure: true },
     { office: true },
     { gcp: true },
     { authentication: true },
