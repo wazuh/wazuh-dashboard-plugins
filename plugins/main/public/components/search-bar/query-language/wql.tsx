@@ -8,7 +8,7 @@ import {
 } from '@elastic/eui';
 import { tokenizer as tokenizerUQL } from './aql';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT } from '../../../../common/constants';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../common/doc-links';
 
 /* UI Query language
 https://documentation.wazuh.com/current/user-manual/api/queries.html
@@ -959,9 +959,7 @@ export const WQL = {
   label: 'WQL',
   description:
     'WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.',
-  documentationLink: webDocumentationLink(
-    'user-manual/wazuh-dashboard/queries.html',
-  ),
+  documentationLink: DOC_LINKS.USER_MANUAL.WAZUH_DASHBOARD.QUERIES,
   getConfiguration() {
     return {
       isOpenPopoverImplicitFilter: false,

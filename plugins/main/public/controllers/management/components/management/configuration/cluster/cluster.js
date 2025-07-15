@@ -22,7 +22,7 @@ import { isString, renderValueOrNoValue } from '../utils/utils';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const mainSettings = [
   { field: 'disabled', label: 'Cluster status' },
@@ -72,13 +72,12 @@ const haproxySettings = [
 const helpLinks = [
   {
     text: 'Configuring a cluster',
-    href: webDocumentationLink(
-      'user-manual/wazuh-server-cluster/cluster-nodes-configuration.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.WAZUH_SERVER_CLUSTER
+      .CLUSTER_NODES_CONFIGURATION,
   },
   {
     text: 'Cluster reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/cluster.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.CLUSTER,
   },
 ];
 

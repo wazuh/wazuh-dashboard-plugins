@@ -15,11 +15,8 @@
 import { getToasts } from '../../../kibana-services';
 import { ApiCheck, AppState, GenericRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
-import {
-  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
-  PLUGIN_APP_NAME,
-} from '../../../../common/constants';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { PLUGIN_APP_NAME } from '../../../../common/constants';
+import { DOC_LINKS } from '../../../../common/doc-links';
 
 const trySetDefault = async (checkLogger: CheckLogger) => {
   try {
@@ -54,9 +51,7 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
         for (var j = 0; j < errors.length; j++) {
           if (errors[j].includes('ERROR3099 - 405: Method Not Allowed')) {
             return Promise.reject(
-              `No API available to connect. This may be related to a version mismatch between server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${webDocumentationLink(
-                PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
-              )}#wazuh-api-and-wazuh-app-version-mismatch-error-is-displayed.`,
+              `No API available to connect. This may be related to a version mismatch between server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${DOC_LINKS.USER_MANUAL.WAZUH_DASHBOARD.TROUBLESHOOTING}#wazuh-api-and-wazuh-app-version-mismatch-error-is-displayed.`,
             );
           }
         }

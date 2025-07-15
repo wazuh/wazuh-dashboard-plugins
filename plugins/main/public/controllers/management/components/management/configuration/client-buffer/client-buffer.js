@@ -21,20 +21,16 @@ import {
   renderValueNoThenEnabled,
   renderValueOrDefault,
 } from '../utils/utils';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Anti-flooding mechanism',
-    href: webDocumentationLink(
-      'user-manual/agent/agent-management/antiflooding.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.AGENT.AGENT_MANAGEMENT.ANTIFLOODING,
   },
   {
     text: 'Client buffer reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/client-buffer.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.CLIENT_BUFFER,
   },
 ];
 

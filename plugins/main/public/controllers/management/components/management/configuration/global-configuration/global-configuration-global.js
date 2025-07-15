@@ -18,16 +18,16 @@ import WzConfigurationSettingsHeader from '../util-components/configuration-sett
 import WzNoConfig from '../util-components/no-config';
 
 import { isString } from '../utils/utils';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Global reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/global.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.GLOBAL,
   },
   {
     text: 'Logging reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/logging.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.LOGGING,
   },
 ];
 

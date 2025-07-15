@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 export default [
   {
     text: 'Vulnerability detection',
-    href: webDocumentationLink('user-manual/capabilities/vulnerability-detection/index.html')
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.VULNERABILITY_DETECTION.INDEX,
   },
   {
     text: 'Vulnerability detector reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/vuln-detector.html')
-  }
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.VULN_DETECTOR,
+  },
 ];

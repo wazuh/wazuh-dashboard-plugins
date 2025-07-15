@@ -22,9 +22,9 @@ import {
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
+import { DOC_LINKS } from '../../../../common/doc-links';
 
 /**
  * Detect de groups of instructions
@@ -1052,7 +1052,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
         >
           <span className='wz-headline-title wz-dev-title'>
             <a
-              href={webDocumentationLink('user-manual/api/reference.html')}
+              href={DOC_LINKS.USER_MANUAL.API.REFERENCE}
               target='_blank'
               rel='noopener noreferrer'
             >
@@ -1062,7 +1062,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
               ></i>
             </a>
             {/* <i
-              href={webDocumentationLink('user-manual/api/reference.html')}
+              href={DOC_LINKS.USER_MANUAL.API.REFERENCE}
               // onClick={help}
               className='fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw'
               aria-hidden='true'

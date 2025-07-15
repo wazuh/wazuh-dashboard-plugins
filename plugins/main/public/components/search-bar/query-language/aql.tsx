@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../common/doc-links';
 
 type ITokenType =
   | 'field'
@@ -438,7 +438,7 @@ export const AQL = {
   id: 'aql',
   label: 'AQL',
   description: 'API Query Language (AQL) allows to do queries.',
-  documentationLink: webDocumentationLink('user-manual/api/queries.html'),
+  documentationLink: DOC_LINKS.USER_MANUAL.API.QUERIES,
   getConfiguration() {
     return {
       isOpenPopoverImplicitFilter: false,

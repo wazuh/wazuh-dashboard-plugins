@@ -4,7 +4,7 @@ import OutdatedAgentsCard from './outdated-agents-card';
 import '@testing-library/jest-dom/extend-expect';
 import { mount } from 'enzyme';
 import { EuiButtonEmpty, EuiLink } from '@elastic/eui';
-import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../common/doc-links';
 
 jest.mock('../../../common/hooks/use-service', () => ({
   __esModule: true,
@@ -120,9 +120,7 @@ describe('OutdatedAgentsCard', () => {
   });
 
   it('check documentation link to update agents', async () => {
-    const documentationLink = webDocumentationLink(
-      'upgrade-guide/wazuh-agent/index.html',
-    );
+    const documentationLink = DOC_LINKS.UPGRADE_GUIDE.WAZUH_AGENT.INDEX;
     const wrapper = await mount(
       <OutdatedAgentsCard
         isLoading={false}

@@ -7,12 +7,12 @@ import {
   createIndexPattern,
 } from '../../../../../react-services';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spinner-data-source';
 import {
   HTTP_STATUS_CODES,
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../../../../../../common/constants';
+import { DOC_LINKS } from '../../../../../../common/doc-links';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
 
@@ -77,9 +77,7 @@ const errorPromptBody = {
     <p>
       Please check the cluster status. Also, you can check the{' '}
       <EuiLink
-        href={webDocumentationLink(
-          'user-manual/capabilities/vulnerability-detection/index.html',
-        )}
+        href={DOC_LINKS.USER_MANUAL.CAPABILITIES.VULNERABILITY_DETECTION.INDEX}
         target='_blank'
         rel='noopener noreferrer'
         external

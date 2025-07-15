@@ -9,18 +9,16 @@ import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
 
 import { renderValueYesThenEnabled, isString } from '../utils/utils';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Monitoring GCP services',
-    href: webDocumentationLink('cloud-security/gcp/index.html'),
+    href: DOC_LINKS.CLOUD_SECURITY.GCP.INDEX,
   },
   {
     text: 'Google Cloud Pub/Sub module reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/gcp-pubsub.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.GCP_PUBSUB,
   },
 ];
 

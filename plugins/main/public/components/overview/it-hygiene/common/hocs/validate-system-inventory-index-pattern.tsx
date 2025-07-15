@@ -1,5 +1,4 @@
 import React from 'react';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { EuiLink } from '@elastic/eui';
 import {
   ensureIndexPatternIsCreated,
@@ -24,6 +23,7 @@ import {
   WAZUH_IT_HYGIENE_SERVICES_PATTERN,
   WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
 } from '../../../../../../common/constants';
+import { DOC_LINKS } from '../../../../../../common/doc-links';
 
 const errorPromptTypes = {
   [ERROR_NO_INDICES_FOUND]: {
@@ -40,9 +40,7 @@ const errorPromptTypes = {
         <p>
           Please, review the server and indexer logs. Also, you can check the{' '}
           <EuiLink
-            href={webDocumentationLink(
-              'user-manual/capabilities/system-inventory/index.html',
-            )}
+            href={DOC_LINKS.USER_MANUAL.CAPABILITIES.SYSTEM_INVENTORY.INDEX}
             target='_blank'
             rel='noopener noreferrer'
             external

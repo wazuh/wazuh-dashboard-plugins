@@ -21,7 +21,7 @@ import { ErrorToastOptions } from 'opensearch_dashboards/public';
 import React from 'react';
 import { ReactNode } from 'x-pack/node_modules/@types/react';
 import { PLUGIN_PLATFORM_NAME, PLUGIN_APP_NAME } from '../../common/constants';
-import { webDocumentationLink } from '../../common/services/web_documentation';
+import { DOC_LINKS } from '../../common/doc-links';
 
 type TAppInfo = {
   revision: string;
@@ -54,10 +54,8 @@ const checkClientAppVersion = (appInfo: TAppInfo) => {
       toastLifeTimeMs: 50000,
       toastMessage: `The version of the ${PLUGIN_APP_NAME} in your browser does not correspond with the app version installed in ${PLUGIN_PLATFORM_NAME}. Please, clear your browser cache. For more info check the full error.`,
     };
-    const troubleshootingUrl = webDocumentationLink(
-      'user-manual/elasticsearch/troubleshooting.html',
-      '4.4',
-    );
+    const troubleshootingUrl =
+      DOC_LINKS.USER_MANUAL.ELASTICSEARCH.TROUBLESHOOTING;
     const message: ReactNode = (
       <>
         <p>

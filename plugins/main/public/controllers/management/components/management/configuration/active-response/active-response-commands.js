@@ -21,20 +21,16 @@ import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
 
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Active response documentation',
-    href: webDocumentationLink(
-      'user-manual/capabilities/active-response/index.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.ACTIVE_RESPONSE.INDEX,
   },
   {
     text: 'Commands reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/commands.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.COMMANDS,
   },
 ];
 

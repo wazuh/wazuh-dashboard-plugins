@@ -23,18 +23,17 @@ import {
 } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 import { LOGCOLLECTOR_SOCKET_PROP } from './types';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Using multiple outputs',
-    href: webDocumentationLink(
-      'user-manual/capabilities/log-data-collection/monitoring-log-files.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.LOG_DATA_COLLECTION
+      .MONITORING_LOG_FILES,
   },
   {
     text: 'Socket reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/socket.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.SOCKET,
   },
 ];
 

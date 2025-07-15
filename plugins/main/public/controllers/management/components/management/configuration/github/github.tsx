@@ -24,7 +24,7 @@ import { isString, renderValueYesThenEnabled } from '../utils/utils';
 import { wodleBuilder, settingsListBuilder } from '../utils/builders';
 import { withGuard } from '../../../../../../components/common/hocs';
 import withWzConfig from '../util-hocs/wz-config';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const sections = [{ component: 'wmodules', configuration: 'wmodules' }];
 
@@ -62,13 +62,11 @@ const columns = [
 const helpLinks = [
   {
     text: 'Monitoring GitHub',
-    href: webDocumentationLink('cloud-security/github/index.html'),
+    href: DOC_LINKS.CLOUD_SECURITY.GITHUB.INDEX,
   },
   {
     text: 'GitHub module reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/github-module.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.GITHUB_MODULE,
   },
 ];
 

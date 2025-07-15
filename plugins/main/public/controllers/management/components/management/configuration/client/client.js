@@ -23,18 +23,16 @@ import {
   renderValueOrNoValue,
 } from '../utils/utils';
 import withWzConfig from '../util-hocs/wz-config';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Checking connection with manager',
-    href: webDocumentationLink(
-      'user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager',
-    ),
+    href: `${DOC_LINKS.USER_MANUAL.AGENT.AGENT_MANAGEMENT.AGENT_CONNECTION}#checking-connection-with-the-wazuh-manager`,
   },
   {
     text: 'Client reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/client.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.CLIENT,
   },
 ];
 

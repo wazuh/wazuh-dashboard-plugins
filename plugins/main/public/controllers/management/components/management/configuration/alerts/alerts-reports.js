@@ -21,19 +21,16 @@ import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
 
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Generating automatic reports',
-    href: webDocumentationLink(
-      'user-manual/manager/automatic-reports.html',
-      '4.6',
-    ),
+    href: DOC_LINKS.USER_MANUAL.MANAGER.AUTOMATIC_REPORTS,
   },
   {
     text: 'Reports reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/reports.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.REPORTS,
   },
 ];
 

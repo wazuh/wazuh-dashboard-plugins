@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 export default [
   {
     text: 'Log data collection documentation',
-    href: webDocumentationLink('user-manual/capabilities/log-data-collection/index.html')
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.LOG_DATA_COLLECTION.INDEX,
   },
   {
     text: 'Localfile reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/localfile.html')
-  }
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.LOCALFILE,
+  },
 ];

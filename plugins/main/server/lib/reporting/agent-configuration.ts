@@ -1,4 +1,4 @@
-import { webDocumentationLink } from '../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../common/doc-links';
 
 /*
  * Wazuh app - Agent configuration request objet for exporting it
@@ -30,9 +30,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Communication',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/client.html',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.CLIENT,
           desc: 'Settings related to the connection with the manager',
           config: [{ component: 'agent', configuration: 'client' }],
           labels: [
@@ -52,9 +50,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Anti-flooding settings',
-          docuLink: webDocumentationLink(
-            'user-manual/agent/agent-management/antiflooding.html',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.AGENT.AGENT_MANAGEMENT.ANTIFLOODING,
           desc: 'Agent bucket parameters to avoid event flooding',
           config: [{ component: 'agent', configuration: 'buffer' }],
           labels: [
@@ -67,9 +63,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Agent labels',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/labels.html',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.LABELS,
           desc: 'User-defined information about the agent included in alerts',
           config: [{ component: 'agent', configuration: 'labels' }],
         },
@@ -80,10 +74,7 @@ export const AgentConfiguration = {
       sections: [
         {
           subtitle: 'Policy monitoring',
-          docuLink: webDocumentationLink(
-            'pci-dss/policy-monitoring.html',
-            '4.2',
-          ),
+          docuLink: DOC_LINKS.PCI_DSS.POLICY_MONITORING,
           desc: 'Configuration to ensure compliance with security policies, standards and hardening guides',
           config: [{ component: 'syscheck', configuration: 'rootcheck' }],
           wodle: [{ name: 'sca' }],
@@ -115,10 +106,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'OpenSCAP',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-openscap.html',
-            '4.8',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_OPENSCAP,
           desc: 'Configuration assessment and automation of compliance monitoring using SCAP checks',
           wodle: [{ name: 'open-scap' }],
           labels: [
@@ -133,10 +121,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'CIS-CAT',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-ciscat.html',
-            '4.8',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_CISCAT,
           desc: 'Configuration assessment using CIS scanner and SCAP checks',
           wodle: [{ name: 'cis-cat' }],
           labels: [
@@ -158,9 +143,7 @@ export const AgentConfiguration = {
       sections: [
         {
           subtitle: 'Osquery',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-osquery.html',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_OSQUERY,
           desc: 'Expose an operating system as a high-performance relational database',
           wodle: [{ name: 'osquery' }],
           labels: [
@@ -175,9 +158,8 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Inventory data',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-syscollector.html',
-          ),
+          docuLink:
+            DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_SYSCOLLECTOR,
           desc: 'Gather relevant information about the operating system, hardware, networking and packages',
           wodle: [{ name: 'syscollector' }],
           labels: [
@@ -197,9 +179,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Active response',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/active-response.html',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.ACTIVE_RESPONSE,
           desc: 'Active threat addressing by immediate response',
           config: [{ component: 'com', configuration: 'active-response' }],
           labels: [
@@ -212,9 +192,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Commands',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-command.html',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_COMMAND,
           desc: 'Configuration options of the Command wodle',
           wodle: [{ name: 'command' }],
           labels: [
@@ -234,9 +212,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Docker listener',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-docker.html',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_DOCKER,
           desc: 'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
           wodle: [{ name: 'docker-listener' }],
           labels: [
@@ -256,9 +232,8 @@ export const AgentConfiguration = {
       sections: [
         {
           subtitle: 'Log collection',
-          docuLink: webDocumentationLink(
-            'user-manual/capabilities/log-data-collection/index.html',
-          ),
+          docuLink:
+            DOC_LINKS.USER_MANUAL.CAPABILITIES.LOG_DATA_COLLECTION.INDEX,
           desc: 'Log analysis from text files, Windows events or syslog outputs',
           config: [
             {
@@ -289,9 +264,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Integrity monitoring',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/syscheck.html',
-          ),
+          docuLink: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.SYSCHECK,
           desc: 'Identify changes in content, permissions, ownership, and attributes of files',
           config: [
             { component: 'syscheck', configuration: 'syscheck', matrix: true },

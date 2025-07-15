@@ -32,8 +32,8 @@ import {
   tFormFieldsLabel,
   tFormStepsLabel,
 } from '../../services/register-agent-steps-status-services';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import OsCommandWarning from '../../components/command-output/os-warning';
+import { DOC_LINKS } from '../../../../../../common/doc-links';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -159,9 +159,10 @@ export const Steps = ({
                     our{' '}
                     <EuiLink
                       target='_blank'
-                      href={webDocumentationLink(
-                        'user-manual/agent/agent-enrollment/security-options/using-password-authentication.html',
-                      )}
+                      href={
+                        DOC_LINKS.USER_MANUAL.AGENT.AGENT_ENROLLMENT
+                          .SECURITY_OPTIONS.USING_PASSWORD_AUTHENTICATION
+                      }
                       rel='noopener noreferrer'
                     >
                       documentation
