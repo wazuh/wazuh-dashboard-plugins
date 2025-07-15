@@ -7,7 +7,20 @@ export interface DataPathConfig {
   };
 }
 
-export class DataPathService {
+export interface IDataPathService {
+  getDataPath(): string;
+  getWazuhPath(): string;
+  getConfigPath(): string;
+  getDownloadsPath(): string;
+  getConfigFilePath(): string;
+  getRegistryFilePath(): string;
+  createDirectories(): void;
+  createDirectory(subDirectory?: string): void;
+  createDataDirectoryIfNotExists(directory?: string): void;
+  getDataDirectoryRelative(directory?: string): string;
+}
+
+export class DataPathService implements IDataPathService {
   private dataPath: string;
 
   constructor(globalConfig: DataPathConfig) {

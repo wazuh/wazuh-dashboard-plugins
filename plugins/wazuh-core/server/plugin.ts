@@ -26,7 +26,7 @@ import {
   WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
 } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
-import { DataPathService } from './services/data-path';
+import { DataPathService, IDataPathService } from './services/data-path';
 import path from 'path';
 import { first } from 'rxjs/operators';
 

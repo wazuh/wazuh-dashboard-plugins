@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { IDataPathService } from '../../../wazuh-core/server/services/data-path';
 
 export const createDirectoryIfNotExists = (directory: string): void => {
   if (!fs.existsSync(directory)) {
@@ -9,7 +10,7 @@ export const createDirectoryIfNotExists = (directory: string): void => {
 
 // Compatibility function that delegates to DataPathService
 export const createDataDirectoryIfNotExists = (
-  dataPathService: any,
+  dataPathService: IDataPathService,
   directory?: string,
 ) => {
   return dataPathService.createDataDirectoryIfNotExists(directory);
@@ -17,7 +18,7 @@ export const createDataDirectoryIfNotExists = (
 
 // Compatibility function that delegates to DataPathService
 export const getDataDirectoryRelative = (
-  dataPathService: any,
+  dataPathService: IDataPathService,
   directory?: string,
 ) => {
   return dataPathService.getDataDirectoryRelative(directory);
