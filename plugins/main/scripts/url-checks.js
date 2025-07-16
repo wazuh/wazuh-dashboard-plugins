@@ -19,7 +19,10 @@ const COMPOSE_DIR = '../../docker/url-checks';
 
 /**
  * Gets the project repository path.
- * @returns {String} Current working directory path.
+ * @returns {{
+ *   repo: string,
+ *   nodeVersion: string
+ * }} Current working directory path.
  */
 function getProjectInfo() {
   return {
@@ -30,7 +33,10 @@ function getProjectInfo() {
 
 /**
  * Generates the execution parameters.
- * @returns {Object} Environment variables for Docker Compose.
+ * @returns {{
+ *   REPO: string,
+ *   NODE_VERSION: string
+ * }} Environment variables for Docker Compose.
  */
 const buildEnvVars = ({ repo, nodeVersion }) => {
   return {
