@@ -14,6 +14,6 @@ services:
       - ${REPO}:/app
     tty: true
     command: /bin/sh -c '
-      npm install -g tsx ts-node typescript ts-morph --no-package-lock &&
+      npm install -g tsx typescript --no-package-lock &&
       tsx scripts/url-checks-extractor.ts
       '
