@@ -26,4 +26,4 @@ services:
     volumes:
       - ${REPO}:/app
     tty: true
-    command: -f detailed --no-progress scripts/extracted-urls.md
+    command: --max-redirects 0 --format detailed --no-progress scripts/extracted-urls.md
