@@ -9,7 +9,7 @@ import yml from 'js-yaml';
 import { IDataPathService } from './data-path';
 import { TPluginSettingWithKey } from '../../common/constants';
 import path from 'path';
-import { DOC_LINKS } from '../../common/doc-links';
+import { DOC_CORE_LINKS } from '../../common/doc-links';
 
 interface IConfigurationStoreOptions {
   cache_seconds: number;
@@ -145,7 +145,7 @@ export class ConfigurationStore implements IConfigurationStore {
 ${printSection('App configuration file', { prefix: '# ', fill: '=' })}
 #
 # Please check the documentation for more information about configuration options:
-# ${DOC_LINKS.USER_MANUAL.WAZUH_DASHBOARD.SETTINGS}
+# ${DOC_CORE_LINKS.USER_MANUAL.WAZUH_DASHBOARD.SETTINGS}
 #
 # Also, you can check our repository:
 # https://github.com/wazuh/wazuh-dashboard-plugins`;

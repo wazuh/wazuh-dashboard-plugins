@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import path from 'path';
-import { version } from '../package.json';
+import { version } from '../../../VERSION.json';
 
 // Plugin
 export const PLUGIN_VERSION = version;

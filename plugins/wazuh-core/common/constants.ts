@@ -10,14 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import path from 'path';
-import { version } from '../package.json';
 // import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
-import { DOC_LINKS } from './doc-links';
-
-// Plugin
-export const PLUGIN_VERSION = version;
-export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
+import { DOC_CORE_LINKS } from './doc-links';
 
 // Index patterns - Wazuh alerts
 export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
@@ -334,9 +329,6 @@ export const AGENT_STATUS_CODE = [
   },
 ];
 
-// Documentation
-export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
-
 // Default Elasticsearch user name context
 export const ELASTIC_NAME = 'elastic';
 
@@ -526,7 +518,8 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
     title: 'Custom branding',
     description:
       'If you want to use custom branding elements such as logos, you can do so by editing the settings below.',
-    documentationLink: DOC_LINKS.USER_MANUAL.WAZUH_DASHBOARD.CUSTOM_BRANDING,
+    documentationLink:
+      DOC_CORE_LINKS.USER_MANUAL.WAZUH_DASHBOARD.CUSTOM_BRANDING,
     renderOrder: SettingCategory.CUSTOMIZATION,
   },
   [SettingCategory.API_CONNECTION]: {

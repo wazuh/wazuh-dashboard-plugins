@@ -1,6 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { DOC_LINKS, DOC_LINKS_WITH_FRAGMENTS } from '../common/doc-links';
+import { DOC_CORE_LINKS } from '../../wazuh-core/common/doc-links';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,7 +31,10 @@ function extractUrlsFromObject(obj: any): string[] {
  * @returns {string[]} Array of URL path objects
  */
 function retrieveUrlList(): string[] {
-  return extractUrlsFromObject(DOC_LINKS);
+  return [
+    ...extractUrlsFromObject(DOC_LINKS),
+    ...extractUrlsFromObject(DOC_CORE_LINKS),
+  ];
 }
 
 function retrieveUrlListWithFragments(): string[] {
