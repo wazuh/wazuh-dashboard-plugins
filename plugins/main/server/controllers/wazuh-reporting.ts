@@ -324,11 +324,16 @@ export class WazuhReportingCtrl {
           context.wazuh_core.configuration,
         );
 
-        createDirectoryIfNotExists();
+        // Create base directories
+        createDataDirectoryIfNotExists(context.wazuh_core.dataPathService);
+        createDataDirectoryIfNotExists(
+          context.wazuh_core.dataPathService,
+          'downloads/reports',
+        );
         createDirectoryIfNotExists(
           path.join(
-            context.wazuh_core.configuration.getSettingValue(
-              'reports_directory',
+            context.wazuh_core.dataPathService.getDataDirectoryRelative(
+              'downloads/reports',
             ),
             context.wazuhEndpointParams.hashUsername,
           ),
@@ -420,11 +425,16 @@ export class WazuhReportingCtrl {
           context.wazuh_core.configuration,
         );
 
-        createDirectoryIfNotExists();
+        // Create base directories
+        createDataDirectoryIfNotExists(context.wazuh_core.dataPathService);
+        createDataDirectoryIfNotExists(
+          context.wazuh_core.dataPathService,
+          'downloads/reports',
+        );
         createDirectoryIfNotExists(
           path.join(
-            context.wazuh_core.configuration.getSettingValue(
-              'reports_directory',
+            context.wazuh_core.dataPathService.getDataDirectoryRelative(
+              'downloads/reports',
             ),
             context.wazuhEndpointParams.hashUsername,
           ),
@@ -714,11 +724,16 @@ export class WazuhReportingCtrl {
             context.wazuh.logger.get('report-printer'),
             context.wazuh_core.configuration,
           );
-          createDirectoryIfNotExists();
+          // Create base directories
+          createDataDirectoryIfNotExists(context.wazuh_core.dataPathService);
+          createDataDirectoryIfNotExists(
+            context.wazuh_core.dataPathService,
+            'downloads/reports',
+          );
           createDirectoryIfNotExists(
             path.join(
-              context.wazuh_core.configuration.getSettingValue(
-                'reports_directory',
+              context.wazuh_core.dataPathService.getDataDirectoryRelative(
+                'downloads/reports',
               ),
               context.wazuhEndpointParams.hashUsername,
             ),
@@ -1047,15 +1062,16 @@ export class WazuhReportingCtrl {
         request,
         context,
       );
-      createDirectoryIfNotExists();
-      createDirectoryIfNotExists(
-        path.join(
-          context.wazuh_core.configuration.getSettingValue('reports_directory'),
-          hashUsername,
-        ),
+      // Create base directories
+      createDataDirectoryIfNotExists(context.wazuh_core.dataPathService);
+      createDataDirectoryIfNotExists(
+        context.wazuh_core.dataPathService,
+        'downloads/reports',
       );
       const userReportsDirectoryPath = path.join(
-        context.wazuh_core.configuration.getSettingValue('reports_directory'),
+        context.wazuh_core.dataPathService.getDataDirectoryRelative(
+          'downloads/reports',
+        ),
         hashUsername,
       );
       createDirectoryIfNotExists(userReportsDirectoryPath);
@@ -1168,7 +1184,9 @@ export class WazuhReportingCtrl {
         const { username, hashUsername } =
           await context.wazuh.security.getCurrentUser(request, context);
         const userReportsDirectoryPath = path.join(
-          context.wazuh_core.configuration.getSettingValue('reports_directory'),
+          context.wazuh_core.dataPathService.getDataDirectoryRelative(
+            'downloads/reports',
+          ),
           hashUsername,
         );
         const filename = reportFileNameAccessor(request);
