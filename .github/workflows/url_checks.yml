@@ -11,7 +11,7 @@ jobs:
     if: github.event.pull_request.draft == false
 
     env:
-      NODE_VERSION: 20-alpine
+      NODE_VERSION: 20
 
     steps:
       - name: Checkout repository
