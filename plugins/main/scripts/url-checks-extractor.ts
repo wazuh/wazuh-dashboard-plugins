@@ -52,7 +52,7 @@ async function validateUrls(urls: string[]): Promise<boolean> {
 
       if (!isValidStatusCode(response.status)) {
         success = false;
-        console.log(`❌ ${url} - Status: ${response.status}`);
+        console.log(`🔴 ${url} - Status: ${response.status}`);
         continue;
       }
 
@@ -71,7 +71,7 @@ async function validateUrls(urls: string[]): Promise<boolean> {
         } else {
           success = false;
           console.log(
-            `❌ ${url} - Page accessible but anchor ID "${anchorId}" not found`,
+            `🔴 ${url} - Page accessible but anchor ID "${anchorId}" not found`,
           );
         }
       } else {
@@ -80,7 +80,7 @@ async function validateUrls(urls: string[]): Promise<boolean> {
     } catch (error) {
       success = false;
       console.log(
-        `❌ ${url} - Error: ${
+        `🔴 ${url} - Error: ${
           error instanceof Error ? error.message : 'Unknown error'
         }`,
       );
