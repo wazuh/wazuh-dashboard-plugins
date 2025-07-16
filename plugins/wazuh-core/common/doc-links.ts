@@ -1,6 +1,6 @@
 import { buildWebDocUrl } from './services/web_documentation';
 
-export const DOC_LINKS = {
+export const DOC_CORE_LINKS = {
   USER_MANUAL: {
     WAZUH_DASHBOARD: {
       SETTINGS: buildWebDocUrl('user-manual/wazuh-dashboard/settings.html'),

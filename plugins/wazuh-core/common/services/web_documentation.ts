@@ -1,4 +1,8 @@
-import { DOCUMENTATION_WEB_BASE_URL, PLUGIN_VERSION_SHORT } from '../constants';
+import { version } from '../../../../VERSION.json';
+
+// Documentation
+export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
+export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 
 /**
  * Generate a URL to the web documentation taking in account the plugin short version or specified version.
