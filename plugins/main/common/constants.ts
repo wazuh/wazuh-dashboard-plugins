@@ -56,6 +56,11 @@ export const WAZUH_FIM_PATTERN = 'wazuh-states-fim-*';
 export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
 export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
 
+// SCA
+export const WAZUH_SCA_PATTERN = 'wazuh-states-sca-*';
+// export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
+// export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
+
 // System inventory
 export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory-*';
 export const WAZUH_IT_HYGIENE_HARDWARE_PATTERN =
@@ -89,6 +94,8 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING =
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
 export const WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING =
   'file-integrity-monitoring';
+export const WAZUH_SAMPLE_SCA =
+  'states-sca';
 export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 3000;
@@ -769,13 +776,6 @@ export enum HTTP_STATUS_CODES {
   INSUFFICIENT_STORAGE = 507,
   NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
-
-// Module Security configuration assessment
-export const MODULE_SCA_CHECK_RESULT_LABEL = {
-  passed: 'Passed',
-  failed: 'Failed',
-  'not applicable': 'Not applicable',
-};
 
 // Search bar
 
