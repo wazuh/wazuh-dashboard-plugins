@@ -38,6 +38,7 @@ import {
   HEALTH_CHECK_REDIRECTION_TIME,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_MONITORING_PATTERN,
   WAZUH_STATISTICS_PATTERN,
 } from '../../../../common/constants';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
@@ -74,7 +75,7 @@ const checks = {
     label: 'Monitoring index pattern',
     validator: appConfig =>
       checkPatternSupportService(
-        appConfig.data['wazuh.monitoring.pattern'],
+        WAZUH_MONITORING_PATTERN,
         WAZUH_INDEX_TYPE_MONITORING,
       ),
     awaitFor: [],
