@@ -28,7 +28,7 @@ export class DataPathService implements IDataPathService {
   private dataPath: string;
 
   constructor(private logger: Logger, globalConfig: DataPathConfig) {
-    this.dataPath = globalConfig.path.data || './data';
+    this.dataPath = globalConfig.path.data;
   }
 
   /**

@@ -59,7 +59,6 @@ export class WazuhCorePlugin
       this.logger.get('data-path'),
       globalConfig,
     );
-
     // Setup and start DataPathService
     await this.services.dataPathService.setup();
     await this.services.dataPathService.start();
