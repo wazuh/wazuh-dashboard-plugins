@@ -1,0 +1,37 @@
+name: URL Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  check_urls:
+    name: Check URLs
+    runs-on: ubuntu-22.04
+    if: github.event.pull_request.draft == false
+
+    env:
+      NODE_VERSION: 20-alpine
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # - https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#node-version-file
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          npm install -g tsx typescript --no-package-lock
+
+      - name: Validate URLs and extract them
+        run: |
+          tsx plugins/main/scripts/url-checks-extractor.ts
+
+      - name: Check URLs with Lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --max-redirects 0 --format detailed --no-progress plugins/main/scripts/extracted-urls.md
