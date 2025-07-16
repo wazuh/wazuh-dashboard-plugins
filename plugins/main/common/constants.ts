@@ -392,12 +392,6 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
-// Wazuh data path - these are now handled by DataPathService
-const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
-
-// Note: All path-related constants are now provided by DataPathService
-// from wazuh-core plugin. Use plugins.wazuhCore.dataPathService instead.
-
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
 

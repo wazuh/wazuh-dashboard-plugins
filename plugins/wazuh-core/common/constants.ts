@@ -14,12 +14,6 @@ import { version } from '../package.json';
 // import { validate as validateNodeCronInterval } from 'node-cron';
 import { SettingsValidator } from '../common/services/settings-validator';
 
-// Wazuh data path - these are now handled by DataPathService
-const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
-
-// Note: All path-related constants are now provided by DataPathService
-// from wazuh-core plugin. Use plugins.wazuhCore.dataPathService instead.
-
 // Plugin
 export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
