@@ -8,7 +8,7 @@ version: '3'
 services:
   extracted-urls:
     image: node:${NODE_VERSION:-20}-alpine
-    working_dir: /app
+    working_dir: /app/plugins/main
     volumes:
       - ${REPO}:/app
     command: |
@@ -22,7 +22,7 @@ services:
     depends_on:
       extracted-urls:
         condition: service_completed_successfully
-    working_dir: /app
+    working_dir: /app/plugins/main
     volumes:
       - ${REPO}:/app
     tty: true

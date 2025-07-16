@@ -14,6 +14,7 @@ See /docker/url-checks/docker-compose.yml for available environment variables.
 */
 
 const childProcess = require('child_process');
+const path = require('path');
 
 const COMPOSE_DIR = '../../docker/url-checks';
 
@@ -26,7 +27,7 @@ const COMPOSE_DIR = '../../docker/url-checks';
  */
 function getProjectInfo() {
   return {
-    repo: process.cwd(),
+    repo: path.resolve(__dirname, '../../../'),
     nodeVersion: process.env.NODE_VERSION || '20',
   };
 }
