@@ -1,4 +1,7 @@
-import { DOCUMENTATION_WEB_BASE_URL, PLUGIN_VERSION_SHORT } from '../constants';
+import {
+  DOCUMENTATION_WEB_BASE_URL,
+  PLUGIN_VERSION_SHORT,
+} from './web_documentation';
 import { buildWebDocUrl } from './web_documentation';
 
 test(`Generate a web documentation URL using to the plugin short version`, () => {
