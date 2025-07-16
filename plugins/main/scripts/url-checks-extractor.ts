@@ -96,7 +96,7 @@ async function validateUrls(urls: string[]): Promise<boolean> {
 async function main() {
   console.log('🔍 Starting URL validation process...');
 
-  validateUrls(retrieveUrlListWithFragments());
+  await validateUrls(retrieveUrlListWithFragments());
 
   const urlList = retrieveUrlList();
 
