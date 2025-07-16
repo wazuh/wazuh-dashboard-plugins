@@ -400,7 +400,7 @@ export const ApiTable = compose(withErrorBoundary)(
           align: 'left',
           sortable: true,
           render: (item, row) => {
-            if (row.cluster_info.uuid) {
+            if (row?.cluster_info?.uuid) {
               return (
                 <EuiPopover
                   button={
