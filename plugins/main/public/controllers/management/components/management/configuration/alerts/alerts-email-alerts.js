@@ -21,7 +21,10 @@ import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
 
-import { DOC_LINKS } from '../../../../../../../common/doc-links';
+import {
+  DOC_LINKS,
+  DOC_LINKS_WITH_FRAGMENTS,
+} from '../../../../../../../common/doc-links';
 
 const mainSettings = [
   { field: 'email_to', label: 'Send alerts to this email address' },
@@ -52,15 +55,15 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'Configuring email alerts',
-    href: `${DOC_LINKS.USER_MANUAL.MANAGER.ALERT_MANAGEMENT}#configuring-email-alerts`,
+    href: DOC_LINKS_WITH_FRAGMENTS.ALERT_MANAGEMENT_CONFIGURING_EMAIL_ALERTS,
   },
   {
     text: 'SMTP server with authentication',
-    href: `${DOC_LINKS.USER_MANUAL.MANAGER.ALERT_MANAGEMENT}#smtp-server-with-authentication`,
+    href: DOC_LINKS_WITH_FRAGMENTS.ALERT_MANAGEMENT_SMTP_SERVER_WITH_AUTHENTICATION,
   },
   {
     text: 'Email alerts reference',
-    href: `${DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.EMAIL_ALERTS}`,
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.EMAIL_ALERTS,
   },
 ];
 
