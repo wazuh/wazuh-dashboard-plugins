@@ -29,6 +29,16 @@ jest.mock('../lib/reporting/printer', () => {
   };
 });
 
+// Mock the DataPathService for tests
+const mockDataPathService = {
+  getWazuhPath: () => '/tmp/wazuh',
+  getConfigPath: () => '/tmp/wazuh/config',
+  getDownloadsPath: () => '/tmp/wazuh/downloads',
+  getDataDirectoryRelative: (directory?: string) =>
+    `/tmp/wazuh/${directory || ''}`,
+  createDataDirectoryIfNotExists: jest.fn(),
+};
+
 const getMockerUserContext = (username: string) => ({
   username,
   hashUsername: md5(username),
@@ -54,6 +64,7 @@ const mockContext = (username: string) => ({
   },
   wazuh_core: {
     configuration: {},
+    dataPathService: mockDataPathService,
   },
 });
 

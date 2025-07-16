@@ -10,18 +10,22 @@ import { WazuhReportingRoutes } from './wazuh-reporting';
 import { WazuhUtilsCtrl } from '../controllers/wazuh-utils/wazuh-utils';
 import md5 from 'md5';
 import path from 'path';
-import {
-  createDataDirectoryIfNotExists,
-  createDirectoryIfNotExists,
-} from '../lib/filesystem';
-import {
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-  WAZUH_DATA_ABSOLUTE_PATH,
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-} from '../../common/constants';
-import { execSync } from 'child_process';
 import fs from 'fs';
+import { execSync } from 'child_process';
+import {
+  createDirectoryIfNotExists,
+  createDataDirectoryIfNotExists,
+} from '../lib/filesystem';
+
+// Mock the DataPathService for tests
+const mockDataPathService = {
+  getWazuhPath: () => '/tmp/wazuh',
+  getConfigPath: () => '/tmp/wazuh/config',
+  getDownloadsPath: () => '/tmp/wazuh/downloads',
+  getDataDirectoryRelative: (directory?: string) =>
+    `/tmp/wazuh/${directory || ''}`,
+  createDataDirectoryIfNotExists: jest.fn(),
+};
 
 jest.mock('../lib/reporting/extended-information', () => ({
   extendedInformation: jest.fn(),
@@ -57,6 +61,7 @@ const context = {
     },
   },
   wazuh_core: {
+    dataPathService: mockDataPathService,
     configuration: {
       _settings: new Map(),
       logger: {
@@ -82,10 +87,10 @@ let server, innerServer;
 // BEFORE ALL
 beforeAll(async () => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists();
+  createDataDirectoryIfNotExists(mockDataPathService);
 
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
-  createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
+  createDirectoryIfNotExists(mockDataPathService.getConfigPath());
 
   // Create server
   const config = {
@@ -136,7 +141,7 @@ afterAll(async () => {
   jest.clearAllMocks();
 
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
+  execSync(`rm -rf ${mockDataPathService.getWazuhPath()}`);
 });
 
 describe('[endpoint] GET /reports', () => {
@@ -146,26 +151,33 @@ describe('[endpoint] GET /reports', () => {
   ];
   beforeAll(() => {
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-    createDataDirectoryIfNotExists();
+    createDataDirectoryIfNotExists(mockDataPathService);
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+    createDirectoryIfNotExists(mockDataPathService.getDownloadsPath());
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+    createDirectoryIfNotExists(
+      mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+    );
 
     // Create directories and file/s within directory.
     directories.forEach(({ username, files }) => {
       const hashUsername = md5(username);
       createDirectoryIfNotExists(
-        path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername),
+        path.join(
+          mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+          hashUsername,
+        ),
       );
       if (files) {
         Array.from(Array(files).keys()).forEach(indexFile => {
           fs.closeSync(
             fs.openSync(
               path.join(
-                WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+                mockDataPathService.getDataDirectoryRelative(
+                  'downloads/reports',
+                ),
                 hashUsername,
                 `report_${indexFile}.pdf`,
               ),
@@ -179,7 +191,7 @@ describe('[endpoint] GET /reports', () => {
 
   afterAll(async () => {
     // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-    execSync(`rm -rf ${WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH}`);
+    execSync(`rm -rf ${mockDataPathService.getDownloadsPath()}`);
   });
 
   it.each(directories)(
@@ -330,7 +342,9 @@ describe('[endpoint] PUT /utils/configuration', () => {
       const fileName =
         responseReport.body?.message.match(/([A-Z-0-9]*\.pdf)/gi)[0];
       const userPath = md5(USER_NAME);
-      const reportPath = `${WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH}/${userPath}/${fileName}`;
+      const reportPath = `${mockDataPathService.getDataDirectoryRelative(
+        'downloads/reports',
+      )}/${userPath}/${fileName}`;
       const PDFbuffer = fs.readFileSync(reportPath);
       const PDFcontent = PDFbuffer.toString('utf8');
       const content = PDFcontent.replace(
