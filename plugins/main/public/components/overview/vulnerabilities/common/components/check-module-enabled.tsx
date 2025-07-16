@@ -99,9 +99,7 @@ export const ModuleEnabledCheck = () => {
         Vulnerabilies detection module is not enabled. You can learn to how to
         configure following the{' '}
         <EuiLink
-          href={
-            DOC_LINKS_WITH_FRAGMENTS.CONFIGURING_SCANS_CONFIGURING_VULNERABILITY_DETECTION
-          }
+          href={DOC_LINKS_WITH_FRAGMENTS.VULNERABILITY_DETECTION_CONFIGURATION}
           external
           target='_blank'
           rel='noopener noreferrer'
