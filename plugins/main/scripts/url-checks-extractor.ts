@@ -38,11 +38,11 @@ async function main() {
 
   const urlList = await retrieveUrlList();
 
-  console.log(
-    urlList.length
-      ? `Found ${urlList.length} URLs to validate.`
-      : 'No URLs found to validate.',
-  );
+  if (urlList.length > 0) {
+    console.info(`Found ${urlList.length} URLs to validate.`);
+  } else {
+    console.warn('⚠️ No URLs found to validate.');
+  }
 
   // Write URLs to markdown file
   const fs = await import('fs/promises');
