@@ -23,12 +23,15 @@ import {
   renderValueOrNoValue,
 } from '../utils/utils';
 import withWzConfig from '../util-hocs/wz-config';
-import { DOC_LINKS } from '../../../../../../../common/doc-links';
+import {
+  DOC_LINKS,
+  DOC_LINKS_WITH_FRAGMENTS,
+} from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Checking connection with manager',
-    href: `${DOC_LINKS.USER_MANUAL.AGENT.AGENT_MANAGEMENT.AGENT_CONNECTION}#checking-connection-with-the-wazuh-manager`,
+    href: DOC_LINKS_WITH_FRAGMENTS.AGENT_CONNECTION_CHECKING_CONNECTION_WITH_THE_WAZUH_MANAGER,
   },
   {
     text: 'Client reference',

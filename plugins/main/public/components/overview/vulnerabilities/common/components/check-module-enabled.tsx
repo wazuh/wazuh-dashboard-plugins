@@ -9,7 +9,7 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { useUserPermissionsRequirements } from '../../../../common/hooks';
-import { DOC_LINKS } from '../../../../../../common/doc-links';
+import { DOC_LINKS_WITH_FRAGMENTS } from '../../../../../../common/doc-links';
 
 async function checkVDIsEnabledCluster() {
   // Get nodes
@@ -99,7 +99,9 @@ export const ModuleEnabledCheck = () => {
         Vulnerabilies detection module is not enabled. You can learn to how to
         configure following the{' '}
         <EuiLink
-          href={`${DOC_LINKS.USER_MANUAL.CAPABILITIES.VULNERABILITY_DETECTION.CONFIGURING_SCANS}#configuring-vulnerability-detection`}
+          href={
+            DOC_LINKS_WITH_FRAGMENTS.CONFIGURING_SCANS_CONFIGURING_VULNERABILITY_DETECTION
+          }
           external
           target='_blank'
           rel='noopener noreferrer'

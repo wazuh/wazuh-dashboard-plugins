@@ -16,7 +16,7 @@ import { WzRequest } from '../../../../../react-services';
 import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
 import { WzButtonPermissions } from '../../../../common/permissions/button';
 import { useAppConfig } from '../../../../common/hooks';
-import { DOC_LINKS } from '../../../../../../common/doc-links';
+import { DOC_LINKS_WITH_FRAGMENTS } from '../../../../../../common/doc-links';
 
 interface ServerAddressInputProps {
   formField: EnhancedFieldConfiguration;
@@ -26,7 +26,7 @@ const popoverServerAddress = (
   <span>
     Learn about{' '}
     <EuiLink
-      href={`${DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.CLIENT}#manager-address`}
+      href={DOC_LINKS_WITH_FRAGMENTS.OSSEC_CONF_CLIENT_MANAGER_ADDRESS}
       target='_blank'
       rel='noopener noreferrer'
     >

@@ -14,7 +14,7 @@ import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton, EuiLink } from '@elastic/eui';
 import { useDispatch } from 'react-redux';
 import { showExploreAgentModalGlobal } from '../../../redux/actions/appStateActions';
-import { DOC_LINKS } from '../../../../common/doc-links';
+import { DOC_LINKS_WITH_FRAGMENTS } from '../../../../common/doc-links';
 
 export const PromptAgentNeverConnected = () => {
   const dispatch = useDispatch();
@@ -31,7 +31,9 @@ export const PromptAgentNeverConnected = () => {
             manager.
           </p>
           <EuiLink
-            href={`${DOC_LINKS.USER_MANUAL.AGENT.AGENT_MANAGEMENT.AGENT_CONNECTION}#checking-connection-with-the-wazuh-manager`}
+            href={
+              DOC_LINKS_WITH_FRAGMENTS.AGENT_CONNECTION_CHECKING_CONNECTION_WITH_THE_WAZUH_MANAGER
+            }
             target='_blank'
             rel='noopener noreferrer'
             external
