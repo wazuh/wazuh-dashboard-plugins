@@ -181,40 +181,6 @@ describe('[settings] Input validation', () => {
     ${'timeout'}                        | ${''}                                                                  | ${'Value should be greater or equal than 1500.'}
     ${'timeout'}                        | ${'1.2'}                                                               | ${'Number should be an integer.'}
     ${'timeout'}                        | ${1.2}                                                                 | ${'Number should be an integer.'}
-    ${'wazuh.monitoring.creation'}      | ${'h'}                                                                 | ${undefined}
-    ${'wazuh.monitoring.creation'}      | ${'d'}                                                                 | ${undefined}
-    ${'wazuh.monitoring.creation'}      | ${'w'}                                                                 | ${undefined}
-    ${'wazuh.monitoring.creation'}      | ${'m'}                                                                 | ${undefined}
-    ${'wazuh.monitoring.creation'}      | ${'test'}                                                              | ${'Invalid value. Allowed values: h, d, w, m.'}
-    ${'wazuh.monitoring.enabled'}       | ${true}                                                                | ${undefined}
-    ${'wazuh.monitoring.frequency'}     | ${100}                                                                 | ${undefined}
-    ${'wazuh.monitoring.frequency'}     | ${40}                                                                  | ${'Value should be greater or equal than 60.'}
-    ${'wazuh.monitoring.frequency'}     | ${'1.2'}                                                               | ${'Number should be an integer.'}
-    ${'wazuh.monitoring.frequency'}     | ${1.2}                                                                 | ${'Number should be an integer.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test'}                                                              | ${undefined}
-    ${'wazuh.monitoring.pattern'}       | ${'test*'}                                                             | ${undefined}
-    ${'wazuh.monitoring.pattern'}       | ${''}                                                                  | ${'Value can not be empty.'}
-    ${'wazuh.monitoring.pattern'}       | ${'-test'}                                                             | ${"It can't start with: -, _, +, .."}
-    ${'wazuh.monitoring.pattern'}       | ${'_test'}                                                             | ${"It can't start with: -, _, +, .."}
-    ${'wazuh.monitoring.pattern'}       | ${'+test'}                                                             | ${"It can't start with: -, _, +, .."}
-    ${'wazuh.monitoring.pattern'}       | ${'.test'}                                                             | ${"It can't start with: -, _, +, .."}
-    ${'wazuh.monitoring.pattern'}       | ${'test\\'}                                                            | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test/'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test?'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test"'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test<'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test>'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test|'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.replicas'}      | ${0}                                                                   | ${undefined}
-    ${'wazuh.monitoring.replicas'}      | ${-1}                                                                  | ${'Value should be greater or equal than 0.'}
-    ${'wazuh.monitoring.replicas'}      | ${'1.2'}                                                               | ${'Number should be an integer.'}
-    ${'wazuh.monitoring.replicas'}      | ${1.2}                                                                 | ${'Number should be an integer.'}
-    ${'wazuh.monitoring.shards'}        | ${1}                                                                   | ${undefined}
-    ${'wazuh.monitoring.shards'}        | ${-1}                                                                  | ${'Value should be greater or equal than 1.'}
-    ${'wazuh.monitoring.shards'}        | ${'1.2'}                                                               | ${'Number should be an integer.'}
-    ${'wazuh.monitoring.shards'}        | ${1.2}                                                                 | ${'Number should be an integer.'}
   `(
     '$setting | $value | $expectedValidation',
     ({ setting, value, expectedValidation }) => {

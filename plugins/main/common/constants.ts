@@ -23,15 +23,6 @@ export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
 
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
-export const WAZUH_MONITORING_PREFIX = 'wazuh-monitoring-';
-export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring-*';
-export const WAZUH_MONITORING_TEMPLATE_NAME = 'wazuh-agent';
-export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = 1;
-export const WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS = 0;
-export const WAZUH_MONITORING_DEFAULT_CREATION = 'w';
-export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
-export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
-export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
 
 // Job - Wazuh statistics
 export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';

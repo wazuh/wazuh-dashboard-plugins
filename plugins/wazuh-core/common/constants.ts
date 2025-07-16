@@ -23,18 +23,6 @@ export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
 export const WAZUH_ALERTS_PREFIX = 'wazuh-alerts-';
 export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
 
-// Job - Wazuh monitoring
-export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
-export const WAZUH_MONITORING_PREFIX = 'wazuh-monitoring-';
-export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring-*';
-export const WAZUH_MONITORING_TEMPLATE_NAME = 'wazuh-agent';
-export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = 1;
-export const WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS = 0;
-export const WAZUH_MONITORING_DEFAULT_CREATION = 'w';
-export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
-export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
-export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
-
 // Job - Wazuh statistics
 export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
 export const WAZUH_STATISTICS_DEFAULT_PREFIX = 'wazuh';
@@ -389,7 +377,6 @@ export const CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES = 1
 export enum SettingCategory {
   GENERAL,
   HEALTH_CHECK,
-  MONITORING,
   STATISTICS,
   SECURITY,
   CUSTOMIZATION,
@@ -544,12 +531,6 @@ export const PLUGIN_SETTINGS_CATEGORIES: {
     title: 'Security',
     description: 'Application security options such as unauthorized roles.',
     renderOrder: SettingCategory.SECURITY,
-  },
-  [SettingCategory.MONITORING]: {
-    title: 'Task:Monitoring',
-    description:
-      'Options related to the agent status monitoring job and its storage in indexes.',
-    renderOrder: SettingCategory.MONITORING,
   },
   [SettingCategory.STATISTICS]: {
     title: 'Task:Statistics',
@@ -1871,227 +1852,6 @@ hosts:
     isConfigurableFromSettings: true,
     options: {
       number: {
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'wazuh.monitoring.creation': {
-    title: 'Index creation',
-    description:
-      'Define the interval in which a new wazuh-monitoring index will be created.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.select,
-    options: {
-      select: [
-        {
-          text: 'Hourly',
-          value: 'h',
-        },
-        {
-          text: 'Daily',
-          value: 'd',
-        },
-        {
-          text: 'Weekly',
-          value: 'w',
-        },
-        {
-          text: 'Monthly',
-          value: 'm',
-        },
-      ],
-    },
-    defaultValue: WAZUH_MONITORING_DEFAULT_CREATION,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: function (value) {
-      return SettingsValidator.literal(
-        this.options.select.map(({ value }) => value),
-      )(value);
-    },
-  },
-  'wazuh.monitoring.enabled': {
-    title: 'Status',
-    description:
-      'Enable or disable the wazuh-monitoring index creation and/or visualization.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.switch,
-    defaultValue: WAZUH_MONITORING_DEFAULT_ENABLED,
-    isConfigurableFromSettings: true,
-    requiresRestartingPluginPlatform: true,
-    options: {
-      switch: {
-        values: {
-          disabled: { label: 'false', value: false },
-          enabled: { label: 'true', value: true },
-        },
-      },
-    },
-    uiFormTransformChangedInputValue: function (
-      value: boolean | string,
-    ): boolean {
-      return Boolean(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.isBoolean,
-  },
-  'wazuh.monitoring.frequency': {
-    title: 'Frequency',
-    description:
-      'Frequency, in seconds, of API requests to get the state of the agents and create a new document in the wazuh-monitoring index with this data.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.number,
-    defaultValue: WAZUH_MONITORING_DEFAULT_FREQUENCY,
-    isConfigurableFromSettings: true,
-    requiresRestartingPluginPlatform: true,
-    options: {
-      number: {
-        min: 60,
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'wazuh.monitoring.pattern': {
-    title: 'Index pattern',
-    description: 'Default index pattern to use for Wazuh monitoring.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.text,
-    defaultValue: WAZUH_MONITORING_PATTERN,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    validateUIForm: function (value) {
-      return this.validate(value);
-    },
-    validate: SettingsValidator.compose(
-      SettingsValidator.isString,
-      SettingsValidator.isNotEmptyString,
-      SettingsValidator.hasNoSpaces,
-      SettingsValidator.noLiteralString('.', '..'),
-      SettingsValidator.noStartsWithString('-', '_', '+', '.'),
-      SettingsValidator.hasNotInvalidCharacters(
-        '\\',
-        '/',
-        '?',
-        '"',
-        '<',
-        '>',
-        '|',
-        ',',
-        '#',
-      ),
-    ),
-  },
-  'wazuh.monitoring.replicas': {
-    title: 'Index replicas',
-    description:
-      'Define the number of replicas to use for the wazuh-monitoring-* indices.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.number,
-    defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    options: {
-      number: {
-        min: 0,
-        integer: true,
-      },
-    },
-    uiFormTransformConfigurationValueToInputValue: function (value: number) {
-      return String(value);
-    },
-    uiFormTransformInputValueToConfigurationValue: function (
-      value: string,
-    ): number {
-      return Number(value);
-    },
-    validateUIForm: function (value) {
-      return this.validate(
-        this.uiFormTransformInputValueToConfigurationValue(value),
-      );
-    },
-    validate: function (value) {
-      return SettingsValidator.number(this.options.number)(value);
-    },
-  },
-  'wazuh.monitoring.shards': {
-    title: 'Index shards',
-    description:
-      'Define the number of shards to use for the wazuh-monitoring-* indices.',
-    store: {
-      file: {
-        configurableManaged: true,
-      },
-    },
-    category: SettingCategory.MONITORING,
-    type: EpluginSettingType.number,
-    defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
-    isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
-    options: {
-      number: {
-        min: 1,
         integer: true,
       },
     },

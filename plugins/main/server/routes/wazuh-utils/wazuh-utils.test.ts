@@ -456,42 +456,6 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
     ${'timeout'}                        | ${1000}                                                          | ${400}             | ${'[request body.timeout]: Value should be greater or equal than 1500.'}
     ${'timeout'}                        | ${''}                                                            | ${400}             | ${'[request body.timeout]: expected value of type [number] but got [string]'}
     ${'timeout'}                        | ${1.2}                                                           | ${400}             | ${'[request body.timeout]: Number should be an integer.'}
-    ${'wazuh.monitoring.creation'}      | ${'h'}                                                           | ${200}             | ${null}
-    ${'wazuh.monitoring.creation'}      | ${'d'}                                                           | ${200}             | ${null}
-    ${'wazuh.monitoring.creation'}      | ${'w'}                                                           | ${200}             | ${null}
-    ${'wazuh.monitoring.creation'}      | ${'m'}                                                           | ${200}             | ${null}
-    ${'wazuh.monitoring.creation'}      | ${'test'}                                                        | ${400}             | ${'[request body.wazuh.monitoring.creation]: types that failed validation:\n- [request body.wazuh.monitoring.creation.0]: expected value to equal [h]\n- [request body.wazuh.monitoring.creation.1]: expected value to equal [d]\n- [request body.wazuh.monitoring.creation.2]: expected value to equal [w]\n- [request body.wazuh.monitoring.creation.3]: expected value to equal [m]'}
-    ${'wazuh.monitoring.enabled'}       | ${true}                                                          | ${200}             | ${null}
-    ${'wazuh.monitoring.enabled'}       | ${0}                                                             | ${400}             | ${'[request body.wazuh.monitoring.enabled]: expected value of type [boolean] but got [number]'}
-    ${'wazuh.monitoring.frequency'}     | ${100}                                                           | ${200}             | ${null}
-    ${'wazuh.monitoring.frequency'}     | ${40}                                                            | ${400}             | ${'[request body.wazuh.monitoring.frequency]: Value should be greater or equal than 60.'}
-    ${'wazuh.monitoring.frequency'}     | ${1.2}                                                           | ${400}             | ${'[request body.wazuh.monitoring.frequency]: Number should be an integer.'}
-    ${'wazuh.monitoring.frequency'}     | ${''}                                                            | ${400}             | ${'[request body.wazuh.monitoring.frequency]: expected value of type [number] but got [string]'}
-    ${'wazuh.monitoring.pattern'}       | ${'test'}                                                        | ${200}             | ${null}
-    ${'wazuh.monitoring.pattern'}       | ${'test*'}                                                       | ${200}             | ${null}
-    ${'wazuh.monitoring.pattern'}       | ${''}                                                            | ${400}             | ${'[request body.wazuh.monitoring.pattern]: value has length [0] but it must have a minimum length of [1].'}
-    ${'wazuh.monitoring.pattern'}       | ${true}                                                          | ${400}             | ${'[request body.wazuh.monitoring.pattern]: expected value of type [string] but got [boolean]'}
-    ${'wazuh.monitoring.pattern'}       | ${'-test'}                                                       | ${400}             | ${"[request body.wazuh.monitoring.pattern]: It can't start with: -, _, +, .."}
-    ${'wazuh.monitoring.pattern'}       | ${'_test'}                                                       | ${400}             | ${"[request body.wazuh.monitoring.pattern]: It can't start with: -, _, +, .."}
-    ${'wazuh.monitoring.pattern'}       | ${'+test'}                                                       | ${400}             | ${"[request body.wazuh.monitoring.pattern]: It can't start with: -, _, +, .."}
-    ${'wazuh.monitoring.pattern'}       | ${'.test'}                                                       | ${400}             | ${"[request body.wazuh.monitoring.pattern]: It can't start with: -, _, +, .."}
-    ${'wazuh.monitoring.pattern'}       | ${'test\\'}                                                      | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test/'}                                                       | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test?'}                                                       | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test"'}                                                       | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test<'}                                                       | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test>'}                                                       | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test|'}                                                       | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test,'}                                                       | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.pattern'}       | ${'test#'}                                                       | ${400}             | ${'[request body.wazuh.monitoring.pattern]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #.'}
-    ${'wazuh.monitoring.replicas'}      | ${0}                                                             | ${200}             | ${null}
-    ${'wazuh.monitoring.replicas'}      | ${-1}                                                            | ${400}             | ${'[request body.wazuh.monitoring.replicas]: Value should be greater or equal than 0.'}
-    ${'wazuh.monitoring.replicas'}      | ${1.2}                                                           | ${400}             | ${'[request body.wazuh.monitoring.replicas]: Number should be an integer.'}
-    ${'wazuh.monitoring.replicas'}      | ${'custom'}                                                      | ${400}             | ${'[request body.wazuh.monitoring.replicas]: expected value of type [number] but got [string]'}
-    ${'wazuh.monitoring.shards'}        | ${1}                                                             | ${200}             | ${null}
-    ${'wazuh.monitoring.shards'}        | ${-1}                                                            | ${400}             | ${'[request body.wazuh.monitoring.shards]: Value should be greater or equal than 1.'}
-    ${'wazuh.monitoring.shards'}        | ${1.2}                                                           | ${400}             | ${'[request body.wazuh.monitoring.shards]: Number should be an integer.'}
-    ${'wazuh.monitoring.shards'}        | ${'custom'}                                                      | ${400}             | ${'[request body.wazuh.monitoring.shards]: expected value of type [number] but got [string]'}
   `(
     `$setting: $value - PUT /utils/configuration - $responseStatusCode`,
     async ({ responseBodyMessage, responseStatusCode, setting, value }) => {
