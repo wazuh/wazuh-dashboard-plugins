@@ -195,8 +195,6 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   ABOUT = 'about',
 }
 
-export const AUTHORIZED_AGENTS = 'authorized-agents';
-
 // Wazuh links
 export const WAZUH_LINK_GITHUB = 'https://github.com/wazuh';
 export const WAZUH_LINK_GOOGLE_GROUPS =

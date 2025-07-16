@@ -463,7 +463,6 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   ABOUT = 'about',
 }
 
-export const AUTHORIZED_AGENTS = 'hidden-authorized-agents';
 export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER =
   'hidden-exclude-server';
 export const DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT = 'pinned-agent';
