@@ -26,16 +26,7 @@ export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
 
 // Job - Wazuh statistics
 export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
-export const WAZUH_STATISTICS_DEFAULT_PREFIX = 'wazuh';
-export const WAZUH_STATISTICS_DEFAULT_NAME = 'statistics';
-export const WAZUH_STATISTICS_PATTERN = `${WAZUH_STATISTICS_DEFAULT_PREFIX}-${WAZUH_STATISTICS_DEFAULT_NAME}-*`;
-export const WAZUH_STATISTICS_TEMPLATE_NAME = `${WAZUH_STATISTICS_DEFAULT_PREFIX}-${WAZUH_STATISTICS_DEFAULT_NAME}`;
-export const WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS = 1;
-export const WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS = 0;
-export const WAZUH_STATISTICS_DEFAULT_CREATION = 'w';
-export const WAZUH_STATISTICS_DEFAULT_STATUS = true;
-export const WAZUH_STATISTICS_DEFAULT_FREQUENCY = 900;
-export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
+export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics-*';
 
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities-*';
