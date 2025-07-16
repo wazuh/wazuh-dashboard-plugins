@@ -337,7 +337,7 @@ export class SavedObject {
 
     if (!indexPatternsSavedObjectsCanBeFound) {
       throw new Error(`Saved object for index pattern not found.
-Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in troubleshooting guide: ${DOC_LINKS_WITH_FRAGMENTS.WAZUH_DASHBOARD_TROUBLESHOOTING_SAVED_OBJECT_FOR_INDEX_PATTERN_NOT_FOUND}.`);
+Restart the ${PLUGIN_PLATFORM_NAME} service to initialize the index. More information in troubleshooting guide: ${DOC_LINKS_WITH_FRAGMENTS.WAZUH_DASHBOARD_TROUBLESHOOTING_SAVED_OBJECT_FOR_INDEX_PATTERN_NOT_FOUND_ERROR}.`);
     }
   }
 }

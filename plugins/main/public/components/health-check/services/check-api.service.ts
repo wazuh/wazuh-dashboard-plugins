@@ -51,7 +51,7 @@ const trySetDefault = async (checkLogger: CheckLogger) => {
         for (var j = 0; j < errors.length; j++) {
           if (errors[j].includes('ERROR3099 - 405: Method Not Allowed')) {
             return Promise.reject(
-              `No API available to connect. This may be related to a version mismatch between server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${DOC_LINKS_WITH_FRAGMENTS.WAZUH_DASHBOARD_TROUBLESHOOTING_WAZUH_API_AND_WAZUH_APP_VERSION_MISMATCH_ERROR_IS_DISPLAYED}.`,
+              `No API available to connect. This may be related to a version mismatch between server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${DOC_LINKS_WITH_FRAGMENTS.WAZUH_DASHBOARD_TROUBLESHOOTING_WAZUH_SERVER_AND_WAZUH_DASHBOARD_VERSION_MISMATCH_ERROR}.`,
             );
           }
         }
