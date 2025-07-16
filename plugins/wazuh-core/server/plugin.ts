@@ -16,7 +16,6 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  UpdateRegistry,
   ConfigurationStore,
 } from './services';
 import { Configuration } from '../common/services/configuration';
@@ -55,11 +54,15 @@ export class WazuhCorePlugin
         .pipe(first())
         .toPromise();
 
-    // Initialize DataPathService with global configuration
-    this.services.dataPathService = new DataPathService(globalConfig);
+    // Initialize DataPathService with logger and global configuration
+    this.services.dataPathService = new DataPathService(
+      this.logger.get('data-path'),
+      globalConfig,
+    );
 
-    // Create directories if they don't exist
-    this.services.dataPathService.createDirectories();
+    // Setup and start DataPathService
+    await this.services.dataPathService.setup();
+    await this.services.dataPathService.start();
 
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
 

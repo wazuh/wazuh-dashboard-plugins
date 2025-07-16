@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import { Logger } from 'opensearch-dashboards/server';
 
 export interface DataPathConfig {
   path: {
@@ -18,13 +19,48 @@ export interface IDataPathService {
   createDirectory(subDirectory?: string): void;
   createDataDirectoryIfNotExists(directory?: string): void;
   getDataDirectoryRelative(directory?: string): string;
+  setup(): Promise<void>;
+  start(): Promise<void>;
+  stop(): Promise<void>;
 }
 
 export class DataPathService implements IDataPathService {
   private dataPath: string;
 
-  constructor(globalConfig: DataPathConfig) {
+  constructor(private logger: Logger, globalConfig: DataPathConfig) {
     this.dataPath = globalConfig.path.data || './data';
+  }
+
+  /**
+   * Setup the service
+   */
+  async setup(): Promise<void> {
+    this.logger.debug('DataPathService: Setup');
+  }
+
+  /**
+   * Start the service
+   */
+  async start(): Promise<void> {
+    try {
+      this.logger.debug('DataPathService: Start');
+      this.createDirectories();
+      this.logger.debug('DataPathService: Directories created successfully');
+    } catch (error) {
+      this.logger.error(
+        `DataPathService: Error starting: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Stop the service
+   */
+  async stop(): Promise<void> {
+    this.logger.debug('DataPathService: Stop');
   }
 
   /**
@@ -73,6 +109,7 @@ export class DataPathService implements IDataPathService {
    * Create all necessary Wazuh directories
    */
   createDirectories(): void {
+    this.logger.debug('DataPathService: Creating directories');
     const directories = [
       this.getWazuhPath(),
       this.getConfigPath(),
@@ -81,7 +118,12 @@ export class DataPathService implements IDataPathService {
 
     directories.forEach(directory => {
       if (!fs.existsSync(directory)) {
+        this.logger.debug(`DataPathService: Creating directory [${directory}]`);
         fs.mkdirSync(directory, { recursive: true });
+      } else {
+        this.logger.debug(
+          `DataPathService: Directory already exists [${directory}]`,
+        );
       }
     });
   }
@@ -95,7 +137,12 @@ export class DataPathService implements IDataPathService {
       : this.getWazuhPath();
 
     if (!fs.existsSync(targetPath)) {
+      this.logger.debug(`DataPathService: Creating directory [${targetPath}]`);
       fs.mkdirSync(targetPath, { recursive: true });
+    } else {
+      this.logger.debug(
+        `DataPathService: Directory already exists [${targetPath}]`,
+      );
     }
   }
 
@@ -108,7 +155,14 @@ export class DataPathService implements IDataPathService {
       : this.getWazuhPath();
 
     if (!fs.existsSync(absoluteRoute)) {
+      this.logger.debug(
+        `DataPathService: Creating data directory [${absoluteRoute}]`,
+      );
       fs.mkdirSync(absoluteRoute, { recursive: true });
+    } else {
+      this.logger.debug(
+        `DataPathService: Data directory already exists [${absoluteRoute}]`,
+      );
     }
   }
 
