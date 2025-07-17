@@ -291,7 +291,7 @@ export default compose(
   return existStatisticsIndices && existStatisticsIndexPattern ? (
     <WzStatisticsOverview {...props} />
   ) : (
-    <PromptStatisticsNoIndices
+    <PromptStatisticsNoIndices // TODO: this should use the prompt as Vulnerabilities detection > Inventory instead
       indexPatternID={indexPatternID}
       existIndex={existStatisticsIndices}
     />
