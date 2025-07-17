@@ -32,7 +32,10 @@ import {
 } from '../../../../../components/common/hocs';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  WAZUH_STATISTICS_PATTERN,
+} from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getCore } from '../../../../../kibana-services';
 import { appSettings, statistics } from '../../../../../utils/applications';
