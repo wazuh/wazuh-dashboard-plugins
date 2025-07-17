@@ -16,7 +16,6 @@ export interface IDataPathService {
   getConfigFilePath(): string;
   getRegistryFilePath(): string;
   createDirectories(): void;
-  createDirectory(subDirectory?: string): void;
   createDataDirectoryIfNotExists(directory?: string): void;
   getDataDirectoryRelative(directory?: string): string;
   setup(): Promise<void>;
@@ -117,29 +116,8 @@ export class DataPathService implements IDataPathService {
     ];
 
     directories.forEach(directory => {
-      if (!fs.existsSync(directory)) {
-        this.logger.debug(`Creating directory [${directory}]`);
-        fs.mkdirSync(directory, { recursive: true });
-      } else {
-        this.logger.debug(`Directory already exists [${directory}]`);
-      }
+      this.ensureDirectoryExists(directory);
     });
-  }
-
-  /**
-   * Create a specific directory under Wazuh path
-   */
-  createDirectory(subDirectory?: string): void {
-    const targetPath = subDirectory
-      ? path.join(this.getWazuhPath(), subDirectory)
-      : this.getWazuhPath();
-
-    if (!fs.existsSync(targetPath)) {
-      this.logger.debug(`Creating directory [${targetPath}]`);
-      fs.mkdirSync(targetPath, { recursive: true });
-    } else {
-      this.logger.debug(`Directory already exists [${targetPath}]`);
-    }
   }
 
   /**
@@ -150,12 +128,7 @@ export class DataPathService implements IDataPathService {
       ? path.join(this.getWazuhPath(), directory)
       : this.getWazuhPath();
 
-    if (!fs.existsSync(absoluteRoute)) {
-      this.logger.debug(`Creating data directory [${absoluteRoute}]`);
-      fs.mkdirSync(absoluteRoute, { recursive: true });
-    } else {
-      this.logger.debug(`Data directory already exists [${absoluteRoute}]`);
-    }
+    this.ensureDirectoryExists(absoluteRoute);
   }
 
   /**
@@ -163,5 +136,17 @@ export class DataPathService implements IDataPathService {
    */
   getDataDirectoryRelative(directory?: string): string {
     return path.join(this.getWazuhPath(), directory || '');
+  }
+
+  /**
+   * Private method to ensure a directory exists, creating it if necessary
+   */
+  private ensureDirectoryExists(directoryPath: string): void {
+    if (!fs.existsSync(directoryPath)) {
+      this.logger.debug(`Creating directory [${directoryPath}]`);
+      fs.mkdirSync(directoryPath, { recursive: true });
+    } else {
+      this.logger.debug(`Directory already exists [${directoryPath}]`);
+    }
   }
 }

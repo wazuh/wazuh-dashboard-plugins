@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import { IDataPathService } from './data-path';
 
 export const createDirectoryIfNotExists = (directory: string): void => {
