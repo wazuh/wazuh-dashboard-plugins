@@ -11,10 +11,10 @@
  */
 
 import React from 'react';
-import { Inventory } from './index';
+import { SCAInventory } from './index';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
-import { PromptSelectAgent, PromptNoSelectedAgent } from '../prompts';
+import { PromptSelectAgent } from '../prompts';
 import {
   withGuard,
   withUserAuthorizationPrompt,
@@ -40,13 +40,6 @@ export const MainSca = compose(
     ],
   ]),
   connect(mapStateToProps),
-  withGuard(
-    props =>
-      !(props.currentAgentData && props.currentAgentData.id && props.agent),
-    () => (
-      <PromptNoSelectedAgent body='You need to select an agent to see Security Configuration Assessment inventory.' />
-    ),
-  ),
   withGuard(
     ({ currentAgentData, agent }) => {
       const agentData =
@@ -89,7 +82,7 @@ export const MainSca = compose(
   return (
     <>
       {selectView === 'inventory' ? (
-        <Inventory {...rest} agent={agentData} />
+        <SCAInventory {...rest} agent={agentData} />
       ) : (
         <Dashboard {...rest} agent={agentData} />
       )}
