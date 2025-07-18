@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { EuiLink, EuiEmptyPrompt } from '@elastic/eui';
 import { withErrorBoundary } from '../../common/hocs';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../common/doc-links';
 export const ClusterDisabled = withErrorBoundary(
   class ClusterDisabled extends Component {
     constructor(props) {
@@ -32,9 +32,10 @@ export const ClusterDisabled = withErrorBoundary(
                 <p>
                   Visit the documentation on{' '}
                   <EuiLink
-                    href={webDocumentationLink(
-                      'user-manual/wazuh-server-cluster/cluster-nodes-configuration.html',
-                    )}
+                    href={
+                      DOC_LINKS.USER_MANUAL.WAZUH_SERVER_CLUSTER
+                        .CLUSTER_NODES_CONFIGURATION
+                    }
                     external
                     target='_blank'
                     rel='noopener noreferrer'

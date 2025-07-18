@@ -22,20 +22,16 @@ import {
 } from '../utils/utils';
 import withWzConfig from '../util-hocs/wz-config';
 import { wodleBuilder } from '../utils/builders';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Monitoring containers activity',
-    href: webDocumentationLink(
-      'user-manual/capabilities/container-security/use-cases.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.CONTAINER_SECURITY.USE_CASES,
   },
   {
     text: 'Docker listener module reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/wodle-docker.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_DOCKER,
   },
 ];
 
@@ -98,8 +94,8 @@ class WzConfigurationDockerListener extends Component {
           )}
         {currentConfig && this.wodleConfig['docker-listener'] && (
           <WzConfigurationSettingsHeader
-            title="Main settings"
-            description="General Docker listener settings"
+            title='Main settings'
+            description='General Docker listener settings'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup

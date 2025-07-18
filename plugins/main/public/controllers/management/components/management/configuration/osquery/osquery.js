@@ -20,7 +20,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzNoConfig from '../util-components/no-config';
 import { isString, isArray, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const mainSettings = [
   {
@@ -38,15 +38,11 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'Osquery module documentation',
-    href: webDocumentationLink(
-      'user-manual/capabilities/system-inventory/osquery.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.SYSTEM_INVENTORY.OSQUERY,
   },
   {
     text: 'Osquery module reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/wodle-osquery.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_OSQUERY,
   },
 ];
 

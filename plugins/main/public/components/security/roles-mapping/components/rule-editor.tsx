@@ -31,8 +31,8 @@ import 'brace/snippets/json';
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
 import _ from 'lodash';
-import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { WzButtonPermissions } from '../../../common/permissions/button';
+import { DOC_LINKS } from '../../../../../common/doc-links';
 
 export const RuleEditor = ({
   save,
@@ -337,9 +337,7 @@ export const RuleEditor = ({
             <EuiText>
               <span>Assign roles to users who match these rules. </span>
               <EuiLink
-                href={webDocumentationLink(
-                  'user-manual/api/rbac/auth-context.html',
-                )}
+                href={DOC_LINKS.USER_MANUAL.API.RBAC.AUTH_CONTEXT}
                 external
                 target='_blank'
                 rel='noopener noreferrer'

@@ -21,16 +21,16 @@ import {
   renderValueNoThenEnabled,
   renderValueYesThenEnabled,
 } from '../utils/utils';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Agent enrollment',
-    href: webDocumentationLink('user-manual/agent/agent-enrollment/index.html'),
+    href: DOC_LINKS.USER_MANUAL.AGENT.AGENT_ENROLLMENT.INDEX,
   },
   {
     text: 'Registration service reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/auth.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.AUTH,
   },
 ];
 

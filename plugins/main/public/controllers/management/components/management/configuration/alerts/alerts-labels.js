@@ -23,7 +23,7 @@ import { isString, hasSize } from '../utils/utils';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const columns = [
   { field: 'key', name: 'Label key' },
@@ -34,13 +34,11 @@ const columns = [
 const helpLinks = [
   {
     text: 'Agent labels',
-    href: webDocumentationLink(
-      'user-manual/agent/agent-management/labels.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.AGENT.AGENT_MANAGEMENT.LABELS,
   },
   {
     text: 'Labels reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/labels.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.LABELS,
   },
 ];
 

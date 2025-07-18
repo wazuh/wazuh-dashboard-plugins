@@ -11,7 +11,7 @@ import {
   EuiButtonEmpty,
 } from '@elastic/eui';
 import './outdated-agents-card.scss';
-import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../common/doc-links';
 
 interface OutdatedAgentsCardProps {
   isLoading: boolean;
@@ -87,9 +87,7 @@ const OutdatedAgentsCard = ({
           <EuiPopoverFooter>
             <EuiTextColor color='subdued'>
               <EuiLink
-                href={webDocumentationLink(
-                  'upgrade-guide/wazuh-agent/index.html',
-                )}
+                href={DOC_LINKS.UPGRADE_GUIDE.WAZUH_AGENT.INDEX}
                 target='_blank'
                 external
                 rel='noopener noreferrer'
