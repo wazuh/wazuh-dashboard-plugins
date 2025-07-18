@@ -66,11 +66,6 @@ afterAll(() => {
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
   execSync(`rm -rf ${mockDataPathService.getWazuhPath()}`);
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-  execSync(
-    `rm -rf ${mockDataPathService.getDataDirectoryRelative(
-      'downloads/reports',
-    )}`,
-  );
 });
 
 describe("[migration] `reports` directory doesn't exist", () => {
