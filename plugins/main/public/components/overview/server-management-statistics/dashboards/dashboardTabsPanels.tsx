@@ -31,6 +31,8 @@ import {
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
 import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
 import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
+import { SampleDataWarning } from '../../../visualize/components';
+import { WAZUH_SAMPLE_SERVER_STATISTICS } from '../../../../../common/constants';
 
 const SearchBar = getPlugins().data.ui.SearchBar;
 
@@ -161,7 +163,6 @@ export const DashboardTabsPanels = ({
           />
         </EuiFlexGroup>
       )}
-
       <EuiSpacer size={'m'} />
       <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
         <EuiCallOut title={infoMessage[selectedTab]} iconType='iInCircle' />
@@ -169,6 +170,9 @@ export const DashboardTabsPanels = ({
       {dataSource && results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
       {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
         <>
+          <SampleDataWarning
+            categoriesSampleData={[WAZUH_SAMPLE_SERVER_STATISTICS]}
+          />
           {selectedTab === 'remoted' && !loadingNode && (
             <div>
               <DashboardListenerEngineStatistics
