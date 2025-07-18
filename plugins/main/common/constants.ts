@@ -55,6 +55,10 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim-*';
 export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
 export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
+export const WAZUH_FIM_REGISTRY_KEYS_PATTERN =
+  'wazuh-states-fim-registry-keys-*';
+export const WAZUH_FIM_REGISTRY_VALUES_PATTERN =
+  'wazuh-states-fim-registry-values-*';
 
 // System inventory
 export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory-*';
@@ -101,9 +105,13 @@ export const WAZUH_SETTING_FIM_FILES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_FIM_FILES_PATTERN.replace('*', ''),
   dataSet: 'states-fim-files',
 };
-export const WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX = {
-  indexPatternPrefix: WAZUH_FIM_REGISTRIES_PATTERN.replace('*', ''),
-  dataSet: 'states-fim-registries',
+export const WAZUH_SETTING_FIM_REGISTRY_KEYS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_FIM_REGISTRY_KEYS_PATTERN.replace('*', ''),
+  dataSet: 'states-fim-registry-keys',
+};
+export const WAZUH_SETTING_FIM_REGISTRY_VALUES_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_FIM_REGISTRY_VALUES_PATTERN.replace('*', ''),
+  dataSet: 'states-fim-registry-values',
 };
 export const WAZUH_SETTING_INVENTORY_HARDWARE_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_IT_HYGIENE_HARDWARE_PATTERN.replace('*', ''),
@@ -282,10 +290,14 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       dataSet: WAZUH_SETTING_FIM_FILES_SAMPLE_PREFIX.dataSet,
     },
     {
-      registries: true,
       indexPatternPrefix:
-        WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX.indexPatternPrefix,
-      dataSet: WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX.dataSet,
+        WAZUH_SETTING_FIM_REGISTRY_KEYS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_FIM_REGISTRY_KEYS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      indexPatternPrefix:
+        WAZUH_SETTING_FIM_REGISTRY_VALUES_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_FIM_REGISTRY_VALUES_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_INVENTORY_AGENT]: [
