@@ -9,14 +9,19 @@ import {
   createDataDirectoryIfNotExists,
   createDirectoryIfNotExists,
 } from '../lib/filesystem';
-import {
-  WAZUH_DATA_ABSOLUTE_PATH,
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-} from '../../common/constants';
-import { execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import { execSync } from 'child_process';
+
+// Mock the DataPathService for tests
+const mockDataPathService = {
+  getWazuhPath: () => '/tmp/wazuh',
+  getConfigPath: () => '/tmp/wazuh/config',
+  getDownloadsPath: () => '/tmp/wazuh/downloads',
+  getDataDirectoryRelative: (directory?: string) =>
+    `/tmp/wazuh/${directory || ''}`,
+  createDataDirectoryIfNotExists: jest.fn(),
+};
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
@@ -39,6 +44,9 @@ const context = {
       error: jest.fn(),
     },
   },
+  wazuh_core: {
+    dataPathService: mockDataPathService,
+  },
 };
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
   fn.bind(null, context);
@@ -46,11 +54,13 @@ let server, innerServer;
 
 beforeAll(async () => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists();
+  createDataDirectoryIfNotExists(mockDataPathService);
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-  createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+  createDirectoryIfNotExists(mockDataPathService.getDownloadsPath());
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-  createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+  createDirectoryIfNotExists(
+    mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+  );
   // Create report files
   [
     { name: md5('admin'), files: ['wazuh-module-overview-general-1234.pdf'] },
@@ -60,7 +70,10 @@ beforeAll(async () => {
     },
   ].forEach(({ name, files }) => {
     createDirectoryIfNotExists(
-      path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, name),
+      path.join(
+        mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+        name,
+      ),
     );
 
     if (files) {
@@ -68,7 +81,7 @@ beforeAll(async () => {
         fs.closeSync(
           fs.openSync(
             path.join(
-              WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+              mockDataPathService.getDataDirectoryRelative('downloads/reports'),
               name,
               filename,
             ),
@@ -113,7 +126,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
+  execSync(`rm -rf ${mockDataPathService.getWazuhPath()}`);
 
   // Stop server
   await server.stop();
