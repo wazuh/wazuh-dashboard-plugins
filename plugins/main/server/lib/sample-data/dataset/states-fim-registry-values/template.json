@@ -1,41 +1,7 @@
 {
-  "index_patterns": ["wazuh-states-fim-files*"],
+  "index_patterns": ["wazuh-states-fim-registry-values*"],
   "priority": 1,
   "template": {
-    "settings": {
-      "index": {
-        "auto_expand_replicas": "0-1",
-        "number_of_replicas": "0",
-        "number_of_shards": "1",
-        "query.default_field": [
-          "agent.host.architecture",
-          "agent.host.ip",
-          "agent.id",
-          "agent.name",
-          "agent.version",
-          "checksum.hash.sha1",
-          "file.attributes",
-          "file.device",
-          "file.gid",
-          "file.group",
-          "file.hash.md5",
-          "file.hash.sha1",
-          "file.hash.sha256",
-          "file.inode",
-          "file.mtime",
-          "file.owner",
-          "file.path",
-          "file.path.fields.text",
-          "file.permissions",
-          "file.size",
-          "file.uid",
-          "wazuh.cluster.name",
-          "wazuh.cluster.node",
-          "wazuh.schema.version"
-        ],
-        "refresh_interval": "5s"
-      }
-    },
     "mappings": {
       "date_detection": false,
       "dynamic": "strict",
@@ -79,48 +45,41 @@
             }
           }
         },
-        "file": {
+        "registry": {
           "properties": {
-            "attributes": {
+            "architecture": {
               "ignore_above": 1024,
               "type": "keyword"
             },
-            "device": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "gid": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "group": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "hash": {
+            "data": {
               "properties": {
-                "md5": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
+                "hash": {
+                  "properties": {
+                    "md5": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "sha1": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "sha256": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
                 },
-                "sha1": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "sha256": {
+                "type": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 }
               }
             },
-            "inode": {
+            "hive": {
               "ignore_above": 1024,
               "type": "keyword"
             },
-            "mtime": {
-              "type": "date"
-            },
-            "owner": {
+            "key": {
               "ignore_above": 1024,
               "type": "keyword"
             },
@@ -128,14 +87,10 @@
               "ignore_above": 1024,
               "type": "keyword"
             },
-            "permissions": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
             "size": {
               "type": "long"
             },
-            "uid": {
+            "value": {
               "ignore_above": 1024,
               "type": "keyword"
             }
@@ -165,6 +120,35 @@
             }
           }
         }
+      }
+    },
+    "settings": {
+      "index": {
+        "auto_expand_replicas": "0-1",
+        "number_of_replicas": "0",
+        "number_of_shards": "1",
+        "query.default_field": [
+          "agent.host.architecture",
+          "agent.host.ip",
+          "agent.id",
+          "agent.name",
+          "agent.version",
+          "checksum.hash.sha1",
+          "registry.architecture",
+          "registry.data.hash.md5",
+          "registry.data.hash.sha1",
+          "registry.data.hash.sha256",
+          "registry.data.type",
+          "registry.hive",
+          "registry.key",
+          "registry.path",
+          "registry.size",
+          "registry.value",
+          "wazuh.cluster.name",
+          "wazuh.cluster.node",
+          "wazuh.schema.version"
+        ],
+        "refresh_interval": "5s"
       }
     }
   }

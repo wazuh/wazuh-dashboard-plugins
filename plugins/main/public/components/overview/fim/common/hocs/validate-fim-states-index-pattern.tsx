@@ -10,7 +10,8 @@ import {
 } from '../../../../common/hocs/with-index-pattern';
 import {
   WAZUH_FIM_FILES_PATTERN,
-  WAZUH_FIM_REGISTRIES_PATTERN,
+  WAZUH_FIM_REGISTRY_KEYS_PATTERN,
+  WAZUH_FIM_REGISTRY_VALUES_PATTERN,
 } from '../../../../../../common/constants';
 
 const errorPromptTypes = {
@@ -57,8 +58,14 @@ export const withFIMFilesDataSource = withIndexPatternFromValue({
   ),
 });
 
-export const withFIMRegistriesDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_FIM_REGISTRIES_PATTERN,
+export const withFIMRegistryKeysDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_FIM_REGISTRY_KEYS_PATTERN,
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  validate: ensureIndexPatternIsCreated(),
+});
+
+export const withFIMRegistryValuesDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_FIM_REGISTRY_VALUES_PATTERN,
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   validate: ensureIndexPatternIsCreated(
     mapFieldsFormat({
