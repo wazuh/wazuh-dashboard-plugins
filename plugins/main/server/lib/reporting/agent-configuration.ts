@@ -308,6 +308,8 @@ export const AgentConfiguration = {
               ignore: 'Ignored files and directories',
               restart_audit: 'Restart audit',
               startup_healthcheck: 'Startup healthcheck',
+              provider: 'Provider',
+              queue_size: 'Queue size',
             },
           ],
           opts: {

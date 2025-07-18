@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 import { EuiBasicTable } from '@elastic/eui';
 
@@ -22,6 +22,8 @@ import helpLinks from './help-links';
 const mainSettings = [
   { field: 'restart_audit', label: 'Restart audit' },
   { field: 'startup_healthcheck', label: 'Startup healthcheck' },
+  { field: 'provider', label: 'Provider' },
+  { field: 'queue_size', label: 'Queue size' },
 ];
 
 const columns = [{ field: 'audit_key', name: 'Keys' }];
@@ -33,40 +35,33 @@ class WzConfigurationIntegrityMonitoringWhoData extends Component {
   render() {
     const { currentConfig } = this.props;
     return (
-      <Fragment>
-        {currentConfig &&
-          currentConfig['syscheck-syscheck'] &&
-          currentConfig['syscheck-syscheck'].syscheck &&
-          !currentConfig['syscheck-syscheck'].syscheck.whodata && (
-            <WzNoConfig error='not-present' help={helpLinks} />
-          )}
-        {currentConfig &&
-          currentConfig['syscheck-syscheck'] &&
-          currentConfig['syscheck-syscheck'].syscheck &&
-          currentConfig['syscheck-syscheck'].syscheck.whodata && (
-            <WzConfigurationSettingsHeader
-              title='Who-data audit keys'
-              description='Server will include in its FIM baseline those events being monitored by Audit using audit_key.'
-              help={helpLinks}
-            >
-              <WzConfigurationSettingsGroup
-                config={currentConfig['syscheck-syscheck'].syscheck.whodata}
-                items={mainSettings}
+      <>
+        {!currentConfig?.['syscheck-syscheck']?.syscheck?.whodata && (
+          <WzNoConfig error='not-present' help={helpLinks} />
+        )}
+        {currentConfig?.['syscheck-syscheck']?.syscheck?.whodata && (
+          <WzConfigurationSettingsHeader
+            title='Who-data audit keys'
+            description='Server will include in its FIM baseline those events being monitored by Audit using audit_key.'
+            help={helpLinks}
+          >
+            <WzConfigurationSettingsGroup
+              config={currentConfig['syscheck-syscheck'].syscheck.whodata}
+              items={mainSettings}
+            />
+            {currentConfig['syscheck-syscheck'].syscheck.whodata.audit_key && (
+              <EuiBasicTable
+                items={currentConfig[
+                  'syscheck-syscheck'
+                ].syscheck.whodata.audit_key.map(item => ({
+                  audit_key: item,
+                }))}
+                columns={columns}
               />
-              {currentConfig['syscheck-syscheck'].syscheck.whodata
-                .audit_key && (
-                <EuiBasicTable
-                  items={currentConfig[
-                    'syscheck-syscheck'
-                  ].syscheck.whodata.audit_key.map(item => ({
-                    audit_key: item,
-                  }))}
-                  columns={columns}
-                />
-              )}
-            </WzConfigurationSettingsHeader>
-          )}
-      </Fragment>
+            )}
+          </WzConfigurationSettingsHeader>
+        )}
+      </>
     );
   }
 }

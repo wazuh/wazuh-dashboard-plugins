@@ -97,12 +97,6 @@ export class DataPathService implements IDataPathService {
     return path.join(this.getConfigPath(), 'wazuh.yml');
   }
 
-  /**
-   * Get the Wazuh registry file path
-   */
-  getRegistryFilePath(): string {
-    return path.join(this.getConfigPath(), 'wazuh-registry.json');
-  }
 
   /**
    * Create all necessary Wazuh directories
