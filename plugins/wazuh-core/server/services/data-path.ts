@@ -97,7 +97,6 @@ export class DataPathService implements IDataPathService {
     return path.join(this.getConfigPath(), 'wazuh.yml');
   }
 
-
   /**
    * Create all necessary Wazuh directories
    */
