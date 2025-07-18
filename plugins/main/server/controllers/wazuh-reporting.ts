@@ -30,10 +30,7 @@ import {
   AUTHORIZED_AGENTS,
   API_NAME_AGENT_STATUS,
 } from '../../common/constants';
-import {
-  createDirectoryIfNotExists,
-  createDataDirectoryIfNotExists,
-} from '../lib/filesystem';
+import { createDirectoryIfNotExists } from '../lib/filesystem';
 import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
 
 interface AgentsFilter {
@@ -324,10 +321,7 @@ export class WazuhReportingCtrl {
           context.wazuh_core.configuration,
         );
 
-        // Create base directories
-        createDataDirectoryIfNotExists(context.wazuh_core.dataPathService);
-        createDataDirectoryIfNotExists(
-          context.wazuh_core.dataPathService,
+        context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
           'downloads/reports',
         );
         createDirectoryIfNotExists(
@@ -424,11 +418,7 @@ export class WazuhReportingCtrl {
           context.wazuh.logger.get('report-printer'),
           context.wazuh_core.configuration,
         );
-
-        // Create base directories
-        createDataDirectoryIfNotExists(context.wazuh_core.dataPathService);
-        createDataDirectoryIfNotExists(
-          context.wazuh_core.dataPathService,
+        context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
           'downloads/reports',
         );
         createDirectoryIfNotExists(
@@ -724,10 +714,8 @@ export class WazuhReportingCtrl {
             context.wazuh.logger.get('report-printer'),
             context.wazuh_core.configuration,
           );
-          // Create base directories
-          createDataDirectoryIfNotExists(context.wazuh_core.dataPathService);
-          createDataDirectoryIfNotExists(
-            context.wazuh_core.dataPathService,
+
+          context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
             'downloads/reports',
           );
           createDirectoryIfNotExists(
@@ -1062,10 +1050,7 @@ export class WazuhReportingCtrl {
         request,
         context,
       );
-      // Create base directories
-      createDataDirectoryIfNotExists(context.wazuh_core.dataPathService);
-      createDataDirectoryIfNotExists(
-        context.wazuh_core.dataPathService,
+      context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
         'downloads/reports',
       );
       const userReportsDirectoryPath = path.join(

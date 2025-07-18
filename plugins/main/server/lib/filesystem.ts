@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 import { IDataPathService } from '../../../wazuh-core/server/services/data-path';
 
 export const createDirectoryIfNotExists = (directory: string): void => {
