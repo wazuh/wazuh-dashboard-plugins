@@ -2,7 +2,6 @@ export * from './action-agents';
 export * from './app-state';
 export * from './check-daemons-status';
 export * from './error-handler';
-export * from './filter-authorization-agents';
 export * from './generic-request';
 export * from './group-handler';
 export * from './load-app-config.service';

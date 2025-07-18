@@ -25,7 +25,6 @@ import {
   setHeaderActionMenuMounter,
   setWazuhCorePlugin,
 } from './kibana-services';
-import { validate as validateNodeCronInterval } from 'node-cron';
 import {
   AppPluginStartDependencies,
   WazuhSetup,
@@ -139,23 +138,6 @@ export class WazuhPlugin
         order,
         mount: async (params: AppMountParameters) => {
           try {
-            /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
-            There is an optimization error of the frontend side source code due to some modules can
-            not be loaded
-            */
-            const setting = plugins.wazuhCore.configuration._settings.get(
-              'cron.statistics.interval',
-            );
-            !setting.validateUIForm &&
-              (setting.validateUIForm = function (value) {
-                return this.validate(value);
-              });
-            !setting.validate &&
-              (setting.validate = function (value: string) {
-                return validateNodeCronInterval(value)
-                  ? undefined
-                  : 'Interval is not valid.';
-              });
             setWzCurrentAppID(id);
             // Set the dynamic redirection
             setWzMainParams(redirectTo());

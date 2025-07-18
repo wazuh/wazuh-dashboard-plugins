@@ -74,24 +74,6 @@ export class WazuhCorePlugin
       this.services.configuration.registerCategory({ ...value, id: key });
     });
 
-    /* Workaround: Redefine the validation functions of cron.statistics.interval setting.
-      Because the settings are defined in the backend and frontend side using the same definitions,
-      the validation funtions are not defined there and has to be defined in the frontend side and backend side
-      */
-    const setting = this.services.configuration._settings.get(
-      'cron.statistics.interval',
-    );
-    !setting.validateUIForm &&
-      (setting.validateUIForm = function (value) {
-        return this.validate(value);
-      });
-    !setting.validate &&
-      (setting.validate = function (value: string) {
-        return validateNodeCronInterval(value)
-          ? undefined
-          : 'Interval is not valid.';
-      });
-
     this.services.configuration.setup();
 
     this.services.manageHosts = new ManageHosts(

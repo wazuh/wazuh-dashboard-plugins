@@ -490,6 +490,7 @@ export class WazuhElasticCtrl {
                 context.wazuh.logger.info(`Index ${indexName} created`);
               }
 
+              // FIX: This could not fail when there is a problem indexing data, for example when the template is strict and the document to index does not fullfil the data schema of the template
               await context.core.opensearch.client.asCurrentUser.bulk({
                 index: indexName,
                 body: bulk,

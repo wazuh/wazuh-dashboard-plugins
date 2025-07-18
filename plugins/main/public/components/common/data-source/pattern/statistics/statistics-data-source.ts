@@ -1,7 +1,7 @@
 import { AppState } from '../../../../../react-services';
 import { tFilter } from '../../index';
 import { PatternDataSource } from '../pattern-data-source';
-import store from '../../../../../redux/store';
+import { WAZUH_STATISTICS_PATTERN } from '../../../../../../common/constants';
 
 export class StatisticsDataSource extends PatternDataSource {
   constructor(id: string, title: string) {
@@ -10,8 +10,7 @@ export class StatisticsDataSource extends PatternDataSource {
 
   static getIdentifierDataSourcePattern(): string {
     // Return Statistics Identifier Index Pattern
-    const appConfig = store.getState().appConfig;
-    return `${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`;
+    return WAZUH_STATISTICS_PATTERN;
   }
 
   getFetchFilters(): tFilter[] {

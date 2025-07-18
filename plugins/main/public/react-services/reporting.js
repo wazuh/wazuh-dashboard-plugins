@@ -53,18 +53,6 @@ export class ReportingService {
     return attributes.type !== 'table';
   }
 
-  removeAgentStatusVis(idArray) {
-    const monitoringEnabled =
-      this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
-    if (!monitoringEnabled) {
-      const visArray = idArray.filter(vis => {
-        return vis !== 'Wazuh-App-Overview-General-Agents-status';
-      });
-      return visArray;
-    }
-    return idArray;
-  }
-
   renderSucessReportsToast({ filename }) {
     this.showToast(
       'success',

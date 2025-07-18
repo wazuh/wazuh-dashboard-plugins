@@ -10,7 +10,6 @@ import store from '../../../../redux/store';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT,
   DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER,
-  AUTHORIZED_AGENTS,
 } from '../../../../../common/constants';
 import {
   IndexPatternsService,
