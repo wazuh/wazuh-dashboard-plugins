@@ -1,4 +1,4 @@
-import { version } from '../../../../VERSION.json';
+import { version } from '../../package.json';
 
 // Documentation
 export const DOCUMENTATION_WEB_BASE_URL = 'https://documentation.wazuh.com';
