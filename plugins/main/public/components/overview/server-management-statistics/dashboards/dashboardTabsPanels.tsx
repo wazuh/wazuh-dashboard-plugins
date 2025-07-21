@@ -141,7 +141,12 @@ export const DashboardTabsPanels = ({
       {isDataSourceLoading && !dataSource ? (
         <LoadingSearchbarProgress />
       ) : (
-        <EuiFlexGroup alignItems='center' justifyContent='flexEnd'>
+        <EuiFlexGroup
+          alignItems='center'
+          justifyContent='flexEnd'
+          // WORKAROUND: This style aligns the search bar with the EuiCallOuts. The components should not include wrappers with margin/padding and this should be set by the layout instead
+          style={{ margin: 0 }}
+        >
           {!!(clusterNodes && clusterNodes.length && clusterNodeSelected) && (
             <EuiFlexItem grow={false}>
               <EuiSelect
@@ -164,10 +169,21 @@ export const DashboardTabsPanels = ({
         </EuiFlexGroup>
       )}
       <EuiSpacer size={'m'} />
-      <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
+      <div
+        // WORKAROUND: This style mitigates the include styles in the DiscoverNoResults component to align with the SampleDataWarning component and the EuiCallOut with information about the tab. The components should not include wrappers with margin/padding and this should be set by the layout instead
+        style={{ margin: '0 8px 16px 8px' }}
+      >
         <EuiCallOut title={infoMessage[selectedTab]} iconType='iInCircle' />
-      </EuiPanel>
-      {dataSource && results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
+      </div>
+
+      {dataSource && results?.hits?.total === 0 ? (
+        <div
+          // WORKAROUND: This style mitigates the include styles in the DiscoverNoResults component to align with the SampleDataWarning component and the EuiCallOut with information about the tab. The components should not include wrappers with margin/padding and this should be set by the layout instead
+          style={{ margin: '-8px' }}
+        >
+          <DiscoverNoResults />
+        </div>
+      ) : null}
       {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (
         <>
           <SampleDataWarning
