@@ -502,7 +502,7 @@ export const azure = {
   }),
   description: i18n.translate('wz-app-azure-description', {
     defaultMessage:
-      'Security events related to your Azure services, collected directly via Azure API.',
+      'Security events related to your Azure MS Graph services, collected directly via Azure API.',
   }),
   euiIconType: 'logoAzureMono',
   order: 505,

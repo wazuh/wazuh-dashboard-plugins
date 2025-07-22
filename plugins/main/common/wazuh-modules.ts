@@ -86,7 +86,7 @@ export const WAZUH_MODULES = {
     title: 'Azure',
     appId: 'azure',
     description:
-      'Security events related to your Azure services, collected directly via Azure API.',
+      'Security events related to your Azure MS Graph services, collected directly via Azure API.',
   },
   aws: {
     title: 'AWS',

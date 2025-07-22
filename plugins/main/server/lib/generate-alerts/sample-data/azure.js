@@ -20,6 +20,8 @@ const TenantId = [
   'abcdefab-cdef-abcd-efab-cdefabcdefab',
 ];
 
+const status = ['new', 'active', 'resolved', 'redirected'];
+
 const riskEventTypes = [
   'anomalousToken',
   'anonymizedIPAddress',
@@ -59,6 +61,14 @@ const riskDetail = [
 const detectionTimingType = ['offline', 'realTime'];
 
 const activity = ['signin', 'user'];
+
+const title = [
+  'Unfamiliar sign-in properties',
+  'Anomalous Token',
+  'Malicious IP address',
+  'Threat Intelligence Session',
+  'Email reported by user as malware or phish',
+];
 
 const auditLogs = {
   timestamp: '2025-07-22T13:22:10.213+0000',
@@ -218,5 +228,7 @@ module.exports = {
   riskDetail,
   detectionTimingType,
   activity,
+  status,
+  title,
   results,
 };

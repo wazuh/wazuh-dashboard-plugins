@@ -3,7 +3,7 @@ import { DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP } from '../../../../../.
 import { AlertsDataSource } from '../alerts-data-source';
 
 const AZURE_GROUP_KEY = 'rule.groups';
-const AZURE_GROUP_VALUE = 'azure';
+const AZURE_GROUP_VALUE = 'ms-graph';
 
 export class AzureDataSource extends AlertsDataSource {
   constructor(id: string, title: string) {

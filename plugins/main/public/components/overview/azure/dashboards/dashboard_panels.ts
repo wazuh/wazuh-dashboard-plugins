@@ -8,7 +8,7 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 const getVisStateResults = (indexPatternId: string) => {
   return {
     id: 'azure_overview_results',
-    title: 'Results',
+    title: 'Activity results',
     type: 'pie',
     params: {
       type: 'pie',
@@ -53,7 +53,7 @@ const getVisStateResults = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.Result',
+            field: 'data.ms-graph.activityResult',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -68,10 +68,10 @@ const getVisStateResults = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTopOperations = (indexPatternId: string) => {
+const getVisStateRiskLevel = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_top_operations',
-    title: 'Operations name',
+    id: 'azure_overview_risk_levels',
+    title: 'Risk Levels',
     type: 'pie',
     params: {
       type: 'pie',
@@ -116,7 +116,7 @@ const getVisStateTopOperations = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.OperationName',
+            field: 'data.ms-graph.riskLevel',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -131,10 +131,10 @@ const getVisStateTopOperations = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTopCategories = (indexPatternId: string) => {
+const getVisStateStatus = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_top_categories',
-    title: 'Categories',
+    id: 'azure_overview_status',
+    title: 'Status',
     type: 'pie',
     params: {
       type: 'pie',
@@ -179,7 +179,7 @@ const getVisStateTopCategories = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.Category',
+            field: 'data.ms-graph.status',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -342,7 +342,7 @@ const getVisStateEventsByCategory = (indexPatternId: string) => {
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'data.Category',
+            field: 'data.ms-graph.category',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -374,10 +374,10 @@ const getVisStateEventsByCategory = (indexPatternId: string) => {
   };
 };
 
-const getVisStateUserActivity = (indexPatternId: string) => {
+const getVisStateOperationsTypes = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_user_activity',
-    title: 'Top Users by Activity',
+    id: 'azure_overview_activity_operations_types',
+    title: 'Activity Operations Types',
     type: 'horizontal_bar',
     params: {
       grid: {
@@ -448,7 +448,7 @@ const getVisStateUserActivity = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.InitiatedBy.user.displayName',
+            field: 'data.ms-graph.activityOperationType',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -546,8 +546,8 @@ const getVisStateGeolocationMap = (indexPatternId: string) => {
 
 const getVisStateAgentResults = (indexPatternId: string) => {
   return {
-    id: 'azure_agent_top_sources',
-    title: 'Results',
+    id: 'azure_agent_activity_results',
+    title: 'Activities Results',
     type: 'pie',
     params: {
       type: 'pie',
@@ -592,7 +592,7 @@ const getVisStateAgentResults = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.Result',
+            field: 'data.ms-graph.activityResult',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -607,10 +607,10 @@ const getVisStateAgentResults = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentTopOperations = (indexPatternId: string) => {
+const getVisStateAgentRiskLevel = (indexPatternId: string) => {
   return {
-    id: 'azure_agent_top_accounts',
-    title: 'Operations name',
+    id: 'azure_agent_risk_level',
+    title: 'Risk Level',
     type: 'pie',
     params: {
       type: 'pie',
@@ -655,7 +655,7 @@ const getVisStateAgentTopOperations = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.OperationName',
+            field: 'data.ms-graph.riskLevel',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -670,10 +670,10 @@ const getVisStateAgentTopOperations = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentTopCategories = (indexPatternId: string) => {
+const getVisStateAgentStatus = (indexPatternId: string) => {
   return {
-    id: 'azure_agent_top_buckets',
-    title: 'Categories',
+    id: 'azure_agent_status',
+    title: 'Status',
     type: 'pie',
     params: {
       type: 'pie',
@@ -718,7 +718,7 @@ const getVisStateAgentTopCategories = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.Category',
+            field: 'data.ms-graph.status',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -881,7 +881,7 @@ const getVisStateAgentEventsByCategory = (indexPatternId: string) => {
           type: 'terms',
           schema: 'group',
           params: {
-            field: 'data.Category',
+            field: 'data.ms-graph.category',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -913,10 +913,10 @@ const getVisStateAgentEventsByCategory = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentUserActivity = (indexPatternId: string) => {
+const getVisStateAgentOperationsTypes = (indexPatternId: string) => {
   return {
-    id: 'azure_agent_user_activity',
-    title: 'Top Users by Activity',
+    id: 'azure_agent_operations_types',
+    title: 'Top Operations by Type',
     type: 'horizontal_bar',
     params: {
       grid: {
@@ -997,7 +997,7 @@ const getVisStateAgentUserActivity = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'data.InitiatedBy.user.displayName',
+            field: 'data.ms-graph.activityOperationType',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -1129,7 +1129,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g2',
-        savedVis: getVisStateTopOperations(indexPatternId),
+        savedVis: getVisStateRiskLevel(indexPatternId),
       },
     },
     g3: {
@@ -1143,7 +1143,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g3',
-        savedVis: getVisStateTopCategories(indexPatternId),
+        savedVis: getVisStateStatus(indexPatternId),
       },
     },
     g4: {
@@ -1185,7 +1185,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g6',
-        savedVis: getVisStateUserActivity(indexPatternId),
+        savedVis: getVisStateOperationsTypes(indexPatternId),
       },
     },
     g7: {
@@ -1230,7 +1230,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a2',
-        savedVis: getVisStateAgentTopOperations(indexPatternId),
+        savedVis: getVisStateAgentRiskLevel(indexPatternId),
       },
     },
     a3: {
@@ -1244,7 +1244,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a3',
-        savedVis: getVisStateAgentTopCategories(indexPatternId),
+        savedVis: getVisStateAgentStatus(indexPatternId),
       },
     },
     a4: {
@@ -1286,7 +1286,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a6',
-        savedVis: getVisStateAgentUserActivity(indexPatternId),
+        savedVis: getVisStateAgentOperationsTypes(indexPatternId),
       },
     },
     a7: {

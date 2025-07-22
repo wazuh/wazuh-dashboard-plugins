@@ -6,11 +6,11 @@ import { commonColumns } from '../../common/data-grid-columns';
 export const azureColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   {
-    id: 'data.ActivityDisplayName',
+    id: 'data.ms-graph.activity',
     initialWidth: 200,
   },
   {
-    id: 'data.Result',
+    id: 'data.ms-graph.activityResult',
     initialWidth: 130,
   },
   commonColumns['rule.description'],
