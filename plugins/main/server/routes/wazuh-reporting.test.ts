@@ -12,10 +12,6 @@ import md5 from 'md5';
 import path from 'path';
 import fs from 'fs';
 import { execSync } from 'child_process';
-import {
-  createDirectoryIfNotExists,
-  createDataDirectoryIfNotExists,
-} from '../lib/filesystem';
 
 // Mock the DataPathService for tests
 const mockDataPathService = {
@@ -24,7 +20,11 @@ const mockDataPathService = {
   getDownloadsPath: () => '/tmp/wazuh/downloads',
   getDataDirectoryRelative: (directory?: string) =>
     `/tmp/wazuh/${directory || ''}`,
-  createDataDirectoryIfNotExists: jest.fn(),
+  createDataDirectoryIfNotExists: jest.fn(path => {
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
+    }
+  }),
 };
 
 jest.mock('../lib/reporting/extended-information', () => ({
@@ -87,10 +87,14 @@ let server, innerServer;
 // BEFORE ALL
 beforeAll(async () => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists(mockDataPathService);
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getWazuhPath(),
+  );
 
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
-  createDirectoryIfNotExists(mockDataPathService.getConfigPath());
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getConfigPath(),
+  );
 
   // Create server
   const config = {
@@ -151,20 +155,24 @@ describe('[endpoint] GET /reports', () => {
   ];
   beforeAll(() => {
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-    createDataDirectoryIfNotExists(mockDataPathService);
+    mockDataPathService.createDataDirectoryIfNotExists(
+      mockDataPathService.getWazuhPath(),
+    );
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-    createDirectoryIfNotExists(mockDataPathService.getDownloadsPath());
+    mockDataPathService.createDataDirectoryIfNotExists(
+      mockDataPathService.getDownloadsPath(),
+    );
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-    createDirectoryIfNotExists(
+    mockDataPathService.createDataDirectoryIfNotExists(
       mockDataPathService.getDataDirectoryRelative('downloads/reports'),
     );
 
     // Create directories and file/s within directory.
     directories.forEach(({ username, files }) => {
       const hashUsername = md5(username);
-      createDirectoryIfNotExists(
+      mockDataPathService.createDataDirectoryIfNotExists(
         path.join(
           mockDataPathService.getDataDirectoryRelative('downloads/reports'),
           hashUsername,
@@ -331,6 +339,15 @@ describe('[endpoint] PUT /utils/configuration', () => {
           configurationBody,
         );
       }
+
+      // Create user directory for PDF generation
+      const userDirPath = md5(USER_NAME);
+      mockDataPathService.createDataDirectoryIfNotExists(
+        path.join(
+          mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+          userDirPath,
+        ),
+      );
 
       // Generate PDF report
       const responseReport = await supertest(innerServer.listener)

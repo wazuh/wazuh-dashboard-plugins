@@ -5,10 +5,7 @@ import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
 import { WazuhReportingRoutes } from '../routes/wazuh-reporting';
 import md5 from 'md5';
-import {
-  createDataDirectoryIfNotExists,
-  createDirectoryIfNotExists,
-} from '../lib/filesystem';
+
 import path from 'path';
 import fs from 'fs';
 import { execSync } from 'child_process';
@@ -20,7 +17,11 @@ const mockDataPathService = {
   getDownloadsPath: () => '/tmp/wazuh/downloads',
   getDataDirectoryRelative: (directory?: string) =>
     `/tmp/wazuh/${directory || ''}`,
-  createDataDirectoryIfNotExists: jest.fn(),
+  createDataDirectoryIfNotExists: jest.fn(path => {
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
+    }
+  }),
 };
 
 const loggingService = loggingSystemMock.create();
@@ -54,11 +55,15 @@ let server, innerServer;
 
 beforeAll(async () => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists(mockDataPathService);
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getWazuhPath(),
+  );
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-  createDirectoryIfNotExists(mockDataPathService.getDownloadsPath());
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getDownloadsPath(),
+  );
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-  createDirectoryIfNotExists(
+  mockDataPathService.createDataDirectoryIfNotExists(
     mockDataPathService.getDataDirectoryRelative('downloads/reports'),
   );
   // Create report files
@@ -69,7 +74,7 @@ beforeAll(async () => {
       files: ['wazuh-module-overview-general-1234.pdf'],
     },
   ].forEach(({ name, files }) => {
-    createDirectoryIfNotExists(
+    mockDataPathService.createDataDirectoryIfNotExists(
       path.join(
         mockDataPathService.getDataDirectoryRelative('downloads/reports'),
         name,

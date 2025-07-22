@@ -2,10 +2,6 @@ import fs from 'fs';
 import md5 from 'md5';
 import path from 'path';
 import { execSync } from 'child_process';
-import {
-  createDirectoryIfNotExists,
-  createDataDirectoryIfNotExists,
-} from '../../lib/filesystem';
 import migrateReportsDirectoryName, { isMD5 } from './reports_directory_name';
 
 // Mock the DataPathService for tests
@@ -15,7 +11,11 @@ const mockDataPathService = {
   getDownloadsPath: () => '/tmp/wazuh/downloads',
   getDataDirectoryRelative: (directory?: string) =>
     `/tmp/wazuh/${directory || ''}`,
-  createDataDirectoryIfNotExists: jest.fn(),
+  createDataDirectoryIfNotExists: jest.fn(path => {
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
+    }
+  }),
 };
 
 function mockContextCreator(loggerLevel: string) {
@@ -55,9 +55,13 @@ function mockContextCreator(loggerLevel: string) {
 
 beforeAll(() => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists(mockDataPathService);
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getWazuhPath(),
+  );
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-  createDirectoryIfNotExists(mockDataPathService.getDownloadsPath());
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getDownloadsPath(),
+  );
   // Note: We don't create the reports directory here because the first test
   // expects it to not exist
 });
@@ -109,7 +113,7 @@ describe('[migration] Rename the subdirectories of `reports` directory', () => {
   beforeEach(() => {
     mockContext = mockContextCreator('info');
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-    createDirectoryIfNotExists(
+    mockDataPathService.createDataDirectoryIfNotExists(
       mockDataPathService.getDataDirectoryRelative('downloads/reports'),
     );
   });
@@ -192,7 +196,7 @@ describe('[migration] Rename the subdirectories of `reports` directory', () => {
         foundRequireRenamingDirectories - renamedDirectories;
       // Create directories and file/s within directory.
       directories.forEach(({ name, files }) => {
-        createDirectoryIfNotExists(
+        mockDataPathService.createDataDirectoryIfNotExists(
           path.join(
             mockDataPathService.getDataDirectoryRelative('downloads/reports'),
             name,

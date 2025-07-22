@@ -185,10 +185,6 @@ describe('[security] GET /reports/{name}', () => {
 });
 
 describe('[security] POST /reports', () => {
-  jest.mock('../lib/filesystem', () => ({
-    createDataDirectoryIfNotExists: jest.fn(),
-  }));
-
   it.each`
     titleTest               | username       | moduleID        | valid
     ${'Create report'}      | ${'admin'}     | ${'general'}    | ${true}

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
 import path from 'path';
-import { createDirectoryIfNotExists } from '../../lib/filesystem';
+
 import sanitizeUploadedSVG from './sanitize-svg';
 import { sanitizeSVG } from '../../lib/sanitizer';
 import maliciousMockSVG from './__mocks__/malicious.customization.logo.app.svg.ts';
@@ -12,6 +12,20 @@ const customImageDirectory = path.join(
   '../../..',
   'public/assets/custom/images',
 );
+
+// Mock the DataPathService for tests
+const mockDataPathService = {
+  getWazuhPath: () => '/tmp/wazuh',
+  getConfigPath: () => '/tmp/wazuh/config',
+  getDownloadsPath: () => '/tmp/wazuh/downloads',
+  getDataDirectoryRelative: (directory?: string) =>
+    `/tmp/wazuh/${directory || ''}`,
+  createDataDirectoryIfNotExists: jest.fn(path => {
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
+    }
+  }),
+};
 
 function mockContextCreator(loggerLevel: string) {
   const logs = [];
@@ -56,7 +70,7 @@ function mockContextCreator(loggerLevel: string) {
 
 beforeAll(() => {
   // Create custom images directory
-  createDirectoryIfNotExists(customImageDirectory);
+  mockDataPathService.createDataDirectoryIfNotExists(customImageDirectory);
 });
 
 afterAll(() => {
