@@ -7,7 +7,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.14.0
-- Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554)
+- Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587)
+
+### Fixed
+
+- Fixed missing provider and queue_size fields in whodata configuration [#7596](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7596)
 
 ## Wazuh v4.13.1 - OpenSearch Dashboards 2.19.2 - Revision 00
 
