@@ -54,7 +54,6 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim-*';
 export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
-export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
 export const WAZUH_FIM_REGISTRY_KEYS_PATTERN =
   'wazuh-states-fim-registry-keys-*';
 export const WAZUH_FIM_REGISTRY_VALUES_PATTERN =
