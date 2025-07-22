@@ -1,0 +1,718 @@
+import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
+import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
+import { getVisStateTable } from '../../../../services/visualizations';
+
+const checkResultColors = {
+  passed: '#54b399',
+  failed: '#cc5642',
+  'Not run': '#6092c0',
+};
+
+
+// ---------------------
+// MÉTRICAS DE CHECK.RESULT
+// ---------------------
+
+const getVisStateCheckResultPassed = (indexPatternId: string) => {
+  return {
+    id: 'check_result_passed',
+    title: 'Passed',
+    type: 'metric',
+    uiState: {
+      vis: {
+        colors: checkResultColors,
+      },
+    },
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Greens',
+        metricColorMode: 'Labels',
+        colorsRange: [{ from: 0, to: 0 }],
+        labels: { show: true },
+        invertColors: false,
+        style: {
+          bgColor: false,
+          labelColor: false,
+          subText: '',
+          fontSize: 40,
+        },
+      },
+    },
+    data: {
+      searchSource: {
+        query: { language: 'kuery', query: '' },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: { customLabel: 'Checks Passed' },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'check.result: "passed"',
+                  language: 'kuery',
+                },
+                label: 'Passed',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateCheckResultFailed = (indexPatternId: string) => {
+  return {
+    id: 'check_result_failed',
+    title: 'failed',
+    type: 'metric',
+    uiState: {
+      vis: {
+        colors: checkResultColors,
+      },
+    },
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Reds',
+        metricColorMode: 'Labels',
+        colorsRange: [{ from: 0, to: 0 }],
+        labels: { show: true },
+        invertColors: false,
+        style: {
+          bgFill: '#000',
+          bgColor: false,
+          labelColor: false,
+          subText: '',
+          fontSize: 40,
+        },
+      },
+    },
+    data: {
+      searchSource: {
+        query: { language: 'kuery', query: '' },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: { customLabel: 'Checks failed' },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'check.result: "failed"',
+                  language: 'kuery',
+                },
+                label: 'failed',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateCheckResultNotRun = (indexPatternId: string) => {
+  return {
+    id: 'check_result_not_run',
+    title: 'Not Run',
+    type: 'metric',
+    uiState: {
+      vis: {
+        colors: checkResultColors,
+      },
+    },
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Greys',
+        metricColorMode: 'Labels',
+        colorsRange: [{ from: 0, to: 0 }],
+        labels: { show: true },
+        invertColors: false,
+        style: {
+          bgFill: '#000',
+          bgColor: false,
+          labelColor: false,
+          subText: '',
+          fontSize: 40,
+        },
+      },
+    },
+    data: {
+      searchSource: {
+        query: { language: 'kuery', query: '' },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          params: { customLabel: 'Checks Not Run' },
+          schema: 'metric',
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'filters',
+          params: {
+            filters: [
+              {
+                input: {
+                  query: 'check.result: "not run"',
+                  language: 'kuery',
+                },
+                label: 'Not Run',
+              },
+            ],
+          },
+          schema: 'group',
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateTotalChecks = (indexPatternId: string) => {
+  return {
+    id: 'total_checks_metric',
+    title: 'Total Checks',
+    type: 'metric',
+    uiState: {
+      vis: {
+        colors: checkResultColors,
+      },
+    },
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: false,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        labels: {
+          show: true,
+        },
+        style: {
+          fontSize: 48,
+        },
+      },
+    },
+    data: {
+      searchSource: {
+        query: { language: 'kuery', query: '' },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: { customLabel: 'Total Checks' },
+        },
+      ],
+    },
+  };
+};
+
+const getVisStateCheckResultsDonut = (indexPatternId: string) => {
+  return {
+    id: 'check_result_donut',
+    title: 'Check Results Distribution',
+    type: 'pie',
+    uiState: {
+      vis: {
+        colors: checkResultColors,
+      },
+    },
+    params: {
+      addLegend: true,
+      addTooltip: true,
+      isDonut: true, // ✅ Donut style
+      legendPosition: 'right',
+      labels: {
+        show: true,
+        position: 'default',
+        truncate: 100,
+        last_level: true,
+        values: true,
+      },
+    },
+    data: {
+      searchSource: {
+        query: { language: 'kuery', query: '' },
+        filter: [],
+        index: indexPatternId,
+      },
+      references: [
+        {
+          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+          type: 'index-pattern',
+          id: indexPatternId,
+        },
+      ],
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'count',
+          schema: 'metric',
+          params: { customLabel: 'Total Checks' },
+        },
+        {
+          id: '2',
+          enabled: true,
+          type: 'terms',
+          schema: 'segment',
+          params: {
+            field: 'check.result.keyword',
+            size: 5,
+            order: 'desc',
+            orderBy: '1',
+            customLabel: 'Check Result',
+          },
+        },
+      ],
+    },
+  };
+};
+
+export const getVisStateTopFailedPolicies = (indexPatternId: string) => ({
+  id: 'top_failed_policies',
+  title: 'Top 5 failed Policies',
+  type: 'table',
+  uiState: {
+    vis: {
+      colors: checkResultColors,
+    },
+  },
+  params: {
+    addTooltip: true,
+    addLegend: false,
+    orientation: 'horizontal',
+    truncateLegend: true,
+    categoryAxes: [{ position: 'left' }],
+    valueAxes: [{ position: 'bottom' }],
+  },
+  data: {
+    searchSource: {
+      query: {
+        language: 'kuery',
+        query: 'check.result.keyword: "failed"',
+      },
+      filter: [],
+      index: indexPatternId,
+    },
+    references: [
+      {
+        name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+        type: 'index-pattern',
+        id: indexPatternId,
+      },
+    ],
+    aggs: [
+      {
+        id: '1',
+        enabled: true,
+        type: 'count',
+        schema: 'metric',
+        params: { customLabel: 'failed Checks' },
+      },
+      {
+        id: '2',
+        enabled: true,
+        type: 'terms',
+        schema: 'segment',
+        params: {
+          field: 'policy.name.keyword',
+          size: 5,
+          order: 'desc',
+          orderBy: '1',
+          customLabel: 'Policy Name',
+        },
+      },
+    ],
+  },
+});
+
+export const getVisStateResultsByAgent = (indexPatternId: string) => ({
+  id: 'results_by_agent',
+  title: 'Check Results by Agent',
+  type: 'horizontal_bar',
+  params: {
+    addTooltip: true,
+    addLegend: true,
+    isStacked: true,
+    legendPosition: 'right',
+    categoryAxes: [{ position: 'left' }],
+    valueAxes: [{ position: 'bottom' }],
+  },
+  uiState: {
+    vis: {
+      colors: checkResultColors,
+    },
+  },
+  data: {
+    searchSource: {
+      query: { language: 'kuery', query: '' },
+      filter: [],
+      index: indexPatternId,
+    },
+    references: [
+      {
+        name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+        type: 'index-pattern',
+        id: indexPatternId,
+      },
+    ],
+    aggs: [
+      {
+        id: '1',
+        enabled: true,
+        type: 'terms',
+        schema: 'segment',
+        params: {
+          field: 'agent.name.keyword',
+          size: 10,
+          order: 'desc',
+          customLabel: 'Agent',
+        },
+      },
+      {
+        id: '2',
+        enabled: true,
+        type: 'terms',
+        schema: 'group',
+        params: {
+          field: 'check.result.keyword',
+          size: 5,
+          order: 'desc',
+          customLabel: 'Result',
+        },
+      },
+    ],
+  },
+});
+
+export const getVisStateCheckResultsByPolicy = (indexPatternId: string) => ({
+  id: 'sca-checks-by-policy',
+  title: 'Check Results by Policy',
+  type: 'horizontal_bar',
+  uiState: {
+    vis: {
+      colors: checkResultColors,
+    },
+  },
+  params: {
+    addLegend: true,
+    addTooltip: true,
+    legendPosition: 'right',
+    labels: {
+      show: true,
+      position: 'default',
+      truncate: 100,
+      last_level: true,
+      values: true,
+    },
+    categoryAxes: [
+      {
+        id: 'CategoryAxis-1',
+        type: 'category',
+        position: 'left',
+        show: true,
+        labels: {
+          show: true,
+        },
+      },
+    ],
+    valueAxes: [
+      {
+        id: 'ValueAxis-1',
+        name: 'LeftAxis-1',
+        type: 'value',
+        position: 'bottom',
+        show: true,
+        scale: {
+          type: 'linear',
+        },
+        labels: {
+          show: true,
+        },
+        title: {
+          text: 'Checks',
+        },
+      },
+    ],
+    seriesParams: [
+      {
+        data: {
+          id: '1',
+          label: 'Count',
+        },
+        drawLinesBetweenPoints: false,
+        mode: 'stacked',
+        show: true,
+        type: 'bar',
+        valueAxis: 'ValueAxis-1',
+      },
+    ],
+  },
+  data: {
+    searchSource: {
+      query: { language: 'kuery', query: '' },
+      filter: [],
+      index: indexPatternId,
+    },
+    references: [
+      {
+        name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+        type: 'index-pattern',
+        id: indexPatternId,
+      },
+    ],
+    aggs: [
+      {
+        id: '1',
+        enabled: true,
+        type: 'count',
+        schema: 'metric',
+        params: { customLabel: 'Checks' },
+      },
+      {
+        id: '2',
+        enabled: true,
+        type: 'terms',
+        schema: 'segment',
+        params: {
+          field: 'policy.name.keyword',
+          size: 10,
+          orderBy: '1',
+          order: 'desc',
+          customLabel: 'Policy',
+        },
+      },
+      {
+        id: '3',
+        enabled: true,
+        type: 'terms',
+        schema: 'group',
+        params: {
+          field: 'check.result.keyword',
+          size: 5,
+          orderBy: '1',
+          order: 'desc',
+          customLabel: 'Result',
+        },
+      },
+    ],
+  },
+});
+
+
+
+
+// ---------------------
+// AGREGAR AL PANEL
+// ---------------------
+export const getKPIsPanel = (
+  indexPatternId: string,
+): {
+  [panelId: string]: DashboardPanelState<
+    EmbeddableInput & { [k: string]: unknown }
+  >;
+} => {
+  return {
+    '1': {
+      gridData: { w: 12, h: 6, x: 0, y: 0, i: '1' },
+      type: 'visualization',
+      explicitInput: {
+        id: '1',
+        savedVis: getVisStateCheckResultFailed(indexPatternId),
+      },
+    },
+    '2': {
+      gridData: { w: 12, h: 6, x: 12, y: 0, i: '2' },
+      type: 'visualization',
+      explicitInput: {
+        id: '2',
+        savedVis: getVisStateCheckResultPassed(indexPatternId),
+      },
+    },
+    '3': {
+      gridData: { w: 12, h: 6, x: 24, y: 0, i: '3' },
+      type: 'visualization',
+      explicitInput: {
+        id: '3',
+        savedVis: getVisStateCheckResultNotRun(indexPatternId),
+      },
+    },
+    '4': {
+      gridData: { w: 12, h: 6, x: 36, y: 0, i: '4' },
+      type: 'visualization',
+      explicitInput: {
+        id: '4',
+        savedVis: getVisStateTotalChecks(indexPatternId),
+      },
+    },
+    '5': {
+      gridData: { w: 24, h: 10, x: 0, y: 18, i: '5' },
+      type: 'visualization',
+      explicitInput: {
+        id: '5',
+        savedVis: getVisStateResultsByAgent(indexPatternId),
+      },
+    },
+    '6': {
+      gridData: { w: 24, h: 10, x: 24, y: 6, i: '6' },
+      type: 'visualization',
+      explicitInput: {
+        id: '6',
+        savedVis: getVisStateCheckResultsDonut(indexPatternId),
+      },
+    },
+    '7': {
+      gridData: { w: 24, h: 10, x: 0, y: 28, i: '7' },
+      type: 'visualization',
+      explicitInput: {
+        id: '7',
+        savedVis: getVisStateCheckResultsByPolicy(indexPatternId),
+      },
+    },
+    '8': {
+      gridData: { w: 12, h: 10, x: 24, y: 28, i: '8' },
+      type: 'visualization',
+      explicitInput: {
+        id: '8',
+        savedVis: getVisStateTable(
+          indexPatternId,
+          'agent.name.keyword',
+          'Checks Not Run by Agent',
+          'sca-not-run-agents',
+          {
+            customLabel: 'Not Run',
+            filter: [
+              {
+                meta: {
+                  disabled: false,
+                  key: 'check.result.keyword',
+                  negate: false,
+                  type: 'phrase',
+                  value: 'Not run',
+                },
+                query: {
+                  match_phrase: {
+                    'check.result.keyword': 'Not run',
+                  },
+                },
+              },
+            ],
+          }
+        ),
+      },
+    },
+    '9': {
+      gridData: { w: 12, h: 10, x: 36, y: 18, i: '9' },
+      type: 'visualization',
+      explicitInput: {
+        id: '9',
+        savedVis: getVisStateTable(
+          indexPatternId,
+          'policy.name.keyword',
+          'Top 5 failed Policies',
+          'sca-top-failed-policies',
+          {
+            customLabel: 'failed Checks',
+            filter: [
+              {
+                meta: {
+                  disabled: false,
+                  key: 'check.result.keyword',
+                  negate: false,
+                  type: 'phrase',
+                  value: 'failed',
+                },
+                query: {
+                  match_phrase: {
+                    'check.result.keyword': 'failed',
+                  },
+                },
+              },
+            ],
+          }
+        ),
+      },
+    },
+  };
+};
