@@ -71,6 +71,7 @@ export class WazuhCorePlugin
         cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
         file: this.services.dataPathService.getConfigFilePath(),
       },
+      this.services.dataPathService
     );
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),

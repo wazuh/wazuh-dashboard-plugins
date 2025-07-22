@@ -30,7 +30,7 @@ import {
   AUTHORIZED_AGENTS,
   API_NAME_AGENT_STATUS,
 } from '../../common/constants';
-import { createDirectoryIfNotExists } from '../lib/filesystem';
+
 import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
 
 interface AgentsFilter {
@@ -322,15 +322,7 @@ export class WazuhReportingCtrl {
         );
 
         context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
-          'downloads/reports',
-        );
-        createDirectoryIfNotExists(
-          path.join(
-            context.wazuh_core.dataPathService.getDataDirectoryRelative(
-              'downloads/reports',
-            ),
-            context.wazuhEndpointParams.hashUsername,
-          ),
+          `downloads/reports/${context.wazuhEndpointParams.hashUsername}`,
         );
 
         await this.renderHeader(
@@ -419,15 +411,7 @@ export class WazuhReportingCtrl {
           context.wazuh_core.configuration,
         );
         context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
-          'downloads/reports',
-        );
-        createDirectoryIfNotExists(
-          path.join(
-            context.wazuh_core.dataPathService.getDataDirectoryRelative(
-              'downloads/reports',
-            ),
-            context.wazuhEndpointParams.hashUsername,
-          ),
+          `downloads/reports/${context.wazuhEndpointParams.hashUsername}`,
         );
 
         let tables = [];
@@ -716,15 +700,7 @@ export class WazuhReportingCtrl {
           );
 
           context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
-            'downloads/reports',
-          );
-          createDirectoryIfNotExists(
-            path.join(
-              context.wazuh_core.dataPathService.getDataDirectoryRelative(
-                'downloads/reports',
-              ),
-              context.wazuhEndpointParams.hashUsername,
-            ),
+            `downloads/reports/${context.wazuhEndpointParams.hashUsername}`,
           );
 
           let wmodulesResponse = {};
@@ -1050,8 +1026,9 @@ export class WazuhReportingCtrl {
         request,
         context,
       );
+
       context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
-        'downloads/reports',
+        `downloads/reports/${hashUsername}`,
       );
       const userReportsDirectoryPath = path.join(
         context.wazuh_core.dataPathService.getDataDirectoryRelative(
@@ -1059,7 +1036,7 @@ export class WazuhReportingCtrl {
         ),
         hashUsername,
       );
-      createDirectoryIfNotExists(userReportsDirectoryPath);
+
       context.wazuh.logger.debug(`Directory: ${userReportsDirectoryPath}`);
 
       const sortReportsByDate = (a, b) =>

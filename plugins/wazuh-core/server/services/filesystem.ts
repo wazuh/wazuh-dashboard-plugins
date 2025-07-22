@@ -1,13 +1,7 @@
 import fs from 'fs';
 import { IDataPathService } from './data-path';
 
-export const createDirectoryIfNotExists = (directory: string): void => {
-  if (!fs.existsSync(directory)) {
-    fs.mkdirSync(directory, { recursive: true });
-  }
-};
-
-// Compatibility function that delegates to DataPathService
+// Mantener solo las funciones relacionadas a DataPathService
 export const createDataDirectoryIfNotExists = (
   dataPathService: IDataPathService,
   directory?: string,
@@ -15,7 +9,6 @@ export const createDataDirectoryIfNotExists = (
   return dataPathService.createDataDirectoryIfNotExists(directory);
 };
 
-// Compatibility function that delegates to DataPathService
 export const getDataDirectoryRelative = (
   dataPathService: IDataPathService,
   directory?: string,
