@@ -3511,7 +3511,7 @@ export const KnownFields = [
     readFromDocValues: false,
   },
   {
-    name: 'data.ActivityDisplayName',
+    name: 'data.ms-graph.activity',
     type: 'string',
     esTypes: ['keyword'],
     searchable: true,
@@ -3519,7 +3519,7 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
-    name: 'data.Result',
+    name: 'data.ms-graph.activityResult',
     type: 'string',
     esTypes: ['keyword'],
     searchable: true,
@@ -3527,7 +3527,7 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
-    name: 'data.OperationName',
+    name: 'data.ms-graph.riskLevel',
     type: 'string',
     esTypes: ['keyword'],
     searchable: true,
@@ -3535,7 +3535,7 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
-    name: 'data.Category',
+    name: 'data.ms-graph.category',
     type: 'string',
     esTypes: ['keyword'],
     searchable: true,
@@ -3543,7 +3543,15 @@ export const KnownFields = [
     readFromDocValues: true,
   },
   {
-    name: 'data.InitiatedBy.user.displayName',
+    name: 'data.ms-graph.status',
+    type: 'string',
+    esTypes: ['keyword'],
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true,
+  },
+  {
+    name: 'data.ms-graph.activityOperationType',
     type: 'string',
     esTypes: ['keyword'],
     searchable: true,
