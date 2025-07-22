@@ -6,7 +6,7 @@ import {
 import { CacheTTL } from '../../common/services/cache';
 import fs from 'fs';
 import yml from 'js-yaml';
-import { createDataDirectoryIfNotExists } from './filesystem';
+
 import { IDataPathService } from './data-path';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { TPluginSettingWithKey } from '../../common/constants';
@@ -27,7 +27,11 @@ export class ConfigurationStore implements IConfigurationStore {
   private _cacheKey: string;
   private _fileEncoding: string = 'utf-8';
   file: string = '';
-  constructor(private logger: Logger, options: IConfigurationStoreOptions, private dataPathService: IDataPathService) {
+  constructor(
+    private logger: Logger,
+    options: IConfigurationStoreOptions,
+    private dataPathService: IDataPathService,
+  ) {
     this.file = options.file;
 
     if (!this.file) {
@@ -185,7 +189,7 @@ ${printSection('App configuration file', { prefix: '# ', fill: '=' })}
         `Ensuring the configuration file is created [${this.file}]`,
       );
       const dirname = path.resolve(path.dirname(this.file));
-      createDataDirectoryIfNotExists(this.dataPathService, dirname);
+      this.dataPathService.createDataDirectoryIfNotExists(dirname);
       if (!fs.existsSync(this.file)) {
         this.writeContentConfigurationFile(
           this.getDefaultConfigurationFileContent(),
