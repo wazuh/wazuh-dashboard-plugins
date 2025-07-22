@@ -20,149 +20,203 @@ const TenantId = [
   'abcdefab-cdef-abcd-efab-cdefabcdefab',
 ];
 
-const azureTags = ['azure-log-analytics', 'azure-ad-graph', 'azure-storage'];
+const riskEventTypes = [
+  'anomalousToken',
+  'anonymizedIPAddress',
+  'investigationsThreatIntelligence',
+  'maliciousIPAddress',
+  'unfamiliarFeatures',
+  'unlikelyTravel',
+];
+
+const riskLevels = ['low', 'medium', 'high'];
 
 const ruleDescriptions = [
-  'Azure: Log analytics',
-  'Azure: AD Consent to application',
-  'Azure: AD Remove delegated permission grant',
-  'Azure: AD Add delegated permission grant',
-  'Azure: AD Update application',
-  'Azure: AD Update service principal',
-  'Azure: AD Add app role assignment to service principal',
-  'Azure: AD Add service principal',
-  'Azure: AD Add application',
-  'Azure: AD Update user',
-  'Azure: AD Add app role assignment grant to user',
-  'Azure: AD Update application – Certificates and secrets management',
-  'Azure: Storage: Update user',
-  'Azure: Storage: Add service principal',
-  'Azure: Storage: Add application',
-  'Azure: Storage: Add delegated permission grant',
-  'Azure: Storage: Add app role assignment grant to user',
-  'Azure: Storage: Update service principal',
-  'Azure: Storage: Update application',
-  'Azure: Storage: Add app role assignment to service principal',
-  'Azure: Storage: Consent to application',
-  'Azure: Storage: Update application – Certificates and secrets management',
-  'Azure: Storage: Remove delegated permission grant',
+  'MS Graph message: Alert related events.',
+  'MS Graph message: Behaviors and indicators that are commonly associated with advanced persistent threats (APT) activity were detected. There is a high risk of severe damage to affected assets. Requires immediate action.',
+  'MS Graph message: Behaviors and indicators that might be a part of an advanced persistent threat (APT) were detected. This includes observed behaviors typical of attack stages, anomalous registry change, execution of suspicious files, and so forth.',
+  'MS Graph message: Indicators associated with prevalent malware and common threats were detected.',
+  'MS Graph message: MDM Intune audit event.',
+  'MS Graph message: No malicious activity has been detected. This alert indicates a false positive.',
+  'MS Graph message: Risk detection event.',
+  'MS Graph message: This indicates that the alert has been resolved.',
 ];
 
-const operationNames = [
-  'Update user',
-  'Add application',
-  'Add service principal',
-  'Consent to application',
-  'Add app role assignment grant to user',
-  'Update service principal',
-  'Update application',
-  'Add app role assignment to service principal',
-  'Add delegated permission grant',
-  'Update application – Certificates and secrets management',
-  'Remove delegated permission grant',
-];
-
-const operationTypes = ['Update', 'Add', 'Assign', 'Unassign'];
+const activityOperationType = ['Create', 'Action', 'Patch', 'Delete'];
 
 const results = ['success', 'failure', 'timeout', 'unknownFutureValue'];
 
-const category = [
-  'ApplicationManagement',
-  'UserManagement',
-  'GroupManagement',
-  'DirectoryManagement',
+const category = ['Application', 'DeviceConfiguration', 'Enrollment', 'Device'];
+
+const riskState = ['atRisk', 'dismissed', 'remediated'];
+
+const riskDetail = [
+  'aiConfirmedSigninSafe',
+  'none',
+  'userPassedMFADrivenByRiskBasedPolicy',
 ];
 
+const detectionTimingType = ['offline', 'realTime'];
+
+const activity = ['signin', 'user'];
+
 const auditLogs = {
-  timestamp: '2025-06-17T19:03:03.534+0000',
+  timestamp: '2025-07-22T13:22:10.213+0000',
   rule: {
     level: 3,
-    description: 'Azure: Log analytics',
-    id: '87801',
-    firedtimes: 2,
+    description: 'MS Graph message: Alert related events.',
+    id: '99501',
+    firedtimes: 11,
     mail: false,
-    groups: ['azure'],
+    groups: ['ms-graph'],
   },
-  agent: { id: '000', name: 'ip-10-0-0-1.ec2.internal' },
-  manager: { name: 'wazuh' },
-  id: '1750186983.334052',
-  cluster: { name: 'wazuh', node: 'worker-node' },
-  decoder: { name: 'json' },
+  agent: {
+    id: '000',
+    name: 'wazuh-test',
+  },
+  manager: {
+    name: 'wazuh',
+  },
+  id: '1753190530.87338',
+  decoder: {
+    name: 'json-msgraph',
+  },
   data: {
-    TenantId: '204deb58-7681-4702-8b46-487615384c11',
-    SourceSystem: 'Azure AD',
-    TimeGenerated: '2025-06-17T18:50:17.3801142Z',
-    ResourceId:
-      '/tenants/0fea4e03-8146-453b-b889-54b4bd11565b/providers/Microsoft.aadiam',
-    OperationName: 'Update application',
-    OperationVersion: '1.0',
-    Category: 'ApplicationManagement',
-    ResultSignature: 'None',
-    DurationMs: '0',
-    CorrelationId: 'bb5d958c-8294-4285-9e37-6af32860a365',
-    Resource: 'Microsoft.aadiam',
-    ResourceGroup: 'Microsoft.aadiam',
-    Level: '4',
-    AdditionalDetails: [
-      {
-        key: 'User-Agent',
-        value:
-          'Mozilla/5.0 (X11; Linux x86_64; rv:139.0) Gecko/20100101 Firefox/139.0',
-      },
-      { key: 'AppId', value: '2e1fd2bc-fe39-4af5-9d5a-0593c94134bf' },
-    ],
-    Id: 'Directory_bb5d958c-8294-4285-9e37-6af32860a365_D4K5I_33258260',
-    InitiatedBy: {
-      user: {
-        id: '5c2774bf-204e-4554-8779-4817d6a46fe3',
-        displayName: null,
-        userPrincipalName: 'test@wazuh.com',
-        ipAddress: '10.0.0.1',
-        roles: [],
-      },
+    integration: 'ms-graph',
+    'ms-graph': {
+      id: 'adfc42fdba71ff63845eb980ef79cf005919d5e338',
+      providerAlertId:
+        'afeaa0a6f464bc518db47d8890d176d34eec14a4893c3c14e659ea008916d48f',
+      incidentId: '14',
+      status: 'new',
+      severity: 'low',
+      serviceSource: 'azureAdIdentityProtection',
+      detectionSource: 'azureAdIdentityProtection',
+      productName: 'AAD Identity Protection',
+      detectorId: 'UnfamiliarLocation',
+      tenantId: '0fea4e03-8146-453b-b889-54b4bd11565b',
+      title: 'Unfamiliar sign-in properties',
+      description:
+        'The following properties of this sign-in are unfamiliar for the given user: ASN, Browser, Device, IP, Location, EASId, TenantIPsubnet',
+      category: 'InitialAccess',
+      alertWebUrl:
+        'https://security.microsoft.com/alerts/adfc42fdba71ff63845eb980ef79cf005919d5e338?tid=0fea4e03-8146-453b-b889-54b4bd11565b',
+      incidentWebUrl:
+        'https://security.microsoft.com/incident2/14/overview?tid=0fea4e03-8146-453b-b889-54b4bd11565b',
+      mitreTechniques: ['T1078', 'T1078.004'],
+      createdDateTime: '2025-07-18T19:54:06.1933333Z',
+      lastUpdateDateTime: '2025-07-18T19:54:07.08Z',
+      firstActivityDateTime: '2025-07-18T19:49:46.7576227Z',
+      lastActivityDateTime: '2025-07-18T19:49:46.7576227Z',
+      systemTags: ['Critical asset'],
+      comments: [],
+      evidence: [
+        {
+          '@odata.type': '#microsoft.graph.security.userEvidence',
+          createdDateTime: '2025-07-18T19:54:06.2633333Z',
+          verdict: 'suspicious',
+          remediationStatus: 'none',
+          remediationStatusDetails: null,
+          roles: [],
+          detailedRoles: [],
+          tags: ['Critical asset'],
+          stream: null,
+          userAccount: {
+            accountName: 'sample.data',
+            domainName: null,
+            userSid: 'S-1-12-1-2433668554-1095519951-903200417-2783035153',
+            azureAdUserId: '910ed5ca-4ecf-414c-a1be-d53511bfe1a5',
+            userPrincipalName: 'sample.data@wazuh.com',
+            displayName: 'Sample',
+          },
+        },
+        {
+          '@odata.type': '#microsoft.graph.security.cloudLogonSessionEvidence',
+          createdDateTime: '2025-07-18T19:54:06.2633333Z',
+          verdict: 'suspicious',
+          remediationStatus: 'none',
+          remediationStatusDetails: null,
+          roles: [],
+          detailedRoles: [],
+          tags: [],
+          sessionId: '006d96c9-c5d2-5a8d-886f-084357b15b41',
+          protocol: null,
+          deviceName: null,
+          operatingSystem: null,
+          browser: null,
+          userAgent:
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 OPR/114.0.0.0',
+          startUtcDateTime: '2025-07-18T19:49:46.7576227Z',
+          previousLogonDateTime: null,
+          account: {
+            createdDateTime: '0001-01-01T00:00:00Z',
+            verdict: 'unknown',
+            remediationStatus: 'none',
+            remediationStatusDetails: null,
+            roles: [],
+            detailedRoles: [],
+            tags: [],
+            stream: null,
+            userAccount: {
+              accountName: 'sample.data',
+              domainName: null,
+              userSid: 'S-1-12-1-2433668554-1095519951-903200417-2783035153',
+              azureAdUserId: '910ed5ca-4ecf-414c-a1be-d53511bfe1a5',
+              userPrincipalName: null,
+              displayName: 'Sample',
+            },
+          },
+        },
+        {
+          '@odata.type': '#microsoft.graph.security.ipEvidence',
+          createdDateTime: '2025-07-18T19:54:06.2633333Z',
+          verdict: 'suspicious',
+          remediationStatus: 'none',
+          remediationStatusDetails: null,
+          roles: [],
+          detailedRoles: [],
+          tags: [],
+          ipAddress: '179.49.126.14',
+          countryLetterCode: 'AR',
+          stream: null,
+          location: {
+            countryName: null,
+            state: 'Buenos Aires',
+            city: 'Bragado',
+            longitude: -60.48966,
+            latitude: -35.11912,
+          },
+        },
+        {
+          '@odata.type': '#microsoft.graph.security.cloudLogonRequestEvidence',
+          createdDateTime: '2025-07-18T19:54:06.2633333Z',
+          verdict: 'suspicious',
+          remediationStatus: 'none',
+          remediationStatusDetails: null,
+          roles: [],
+          detailedRoles: [],
+          tags: [],
+          requestId: 'c4105988-055b-429b-95f2-fac3dc690600',
+        },
+      ],
+      resource: 'security',
+      relationship: 'alerts_v2',
     },
-    LoggedByService: 'Core Directory',
-    Result: 'success',
-    TargetResources: [
-      {
-        id: '83b0be5b-f0c0-4c4c-b423-79a0e7678f5e',
-        displayName: 'wazuh-test',
-        type: 'Application',
-        modifiedProperties: [
-          {
-            displayName: 'RequiredResourceAccess',
-            oldValue:
-              '[{"ResourceAppId":"00000003-0000-0000-c000-000000000000","RequiredAppPermissions":[{"EntitlementId":"e4c9e354-4dc5-45b8-9e7c-e1393b0b1a20","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"4edf5f54-4666-44af-9de9-0144fb4b6e8c","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"314874da-47d6-4978-88dc-cf0d37f0bb82","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"bc257fb8-46b4-4b15-8713-01e91bfbe4ea","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"b9abcc4f-94fc-4457-9141-d20ce80ec952","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"e1fe6dd8-ba31-4d61-89e7-88639da4683d","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]}],"EncodingVersion":1}]',
-            newValue:
-              '[{"ResourceAppId":"00000003-0000-0000-c000-000000000000","RequiredAppPermissions":[{"EntitlementId":"e4c9e354-4dc5-45b8-9e7c-e1393b0b1a20","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"4edf5f54-4666-44af-9de9-0144fb4b6e8c","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"314874da-47d6-4978-88dc-cf0d37f0bb82","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"bc257fb8-46b4-4b15-8713-01e91bfbe4ea","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"b9abcc4f-94fc-4457-9141-d20ce80ec952","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"e1fe6dd8-ba31-4d61-89e7-88639da4683d","DirectAccessGrant":false,"ImpersonationAccessGrants":[20]},{"EntitlementId":"b0afded3-3588-46d8-8b3d-9842eff778da","DirectAccessGrant":true,"ImpersonationAccessGrants":[]}],"EncodingVersion":1}]',
-          },
-          {
-            displayName: 'Included Updated Properties',
-            oldValue: null,
-            newValue: '"RequiredResourceAccess"',
-          },
-        ],
-        administrativeUnits: [],
-      },
-    ],
-    AADTenantId: '0fea4e03-8146-453b-b889-54b4bd11565b',
-    ActivityDisplayName: 'Update application',
-    ActivityDateTime: '2025-06-17T18:50:17.3801142Z',
-    AADOperationType: 'Update',
-    Type: 'AuditLogs',
-    azure_tag: 'azure-log-analytics',
-    log_analytics_tag: 'azure-auditlogs',
   },
-  location: 'Azure',
+  location: 'ms-graph',
 };
 
 module.exports = {
   TenantId,
   auditLogs,
-  operationNames,
   category,
   ruleDescriptions,
-  operationTypes,
+  activityOperationType,
+  riskEventTypes,
+  riskState,
+  riskLevels,
+  riskDetail,
+  detectionTimingType,
+  activity,
   results,
-  azureTags,
 };

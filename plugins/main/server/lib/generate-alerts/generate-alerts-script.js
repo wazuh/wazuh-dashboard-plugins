@@ -367,32 +367,48 @@ function generateAlert(params) {
       new Date(alert.timestamp).getTime() - 3 * 24 * 60 * 60 * 1000,
     );
     const typeAlert = Azure.auditLogs;
-
-    alert.data = { ...typeAlert.data };
-    alert.data.TenantId = Random.arrayItem(Azure.TenantId);
-    alert.data.TimeGenerated = DateFormatter.format(
-      beforeDate,
-      DateFormatter.DATE_FORMAT.ISO_FULL,
-    );
-    alert.data.ResourceId = `tenants/${alert.data.TenantId}/providers/Microsoft.aadiam`;
-    alert.data.AADOperationType = Random.arrayItem(Azure.operationTypes);
-    alert.data.OperationType = Random.arrayItem(Azure.operationTypes);
-    alert.data.OperationName = Random.arrayItem(Azure.operationNames);
-    alert.data.Category = Random.arrayItem(Azure.category);
-    alert.data.Result = Random.arrayItem(Azure.results);
-    alert.data.Level = Random.number(1, RULE_MAX_LEVEL);
-    alert.data.Id = `Directory_${alert.data.TenantId}`;
-    alert.data.InitiatedBy.user.id = Random.createHash(32);
-    alert.data.InitiatedBy.user.displayName = Random.arrayItem(USERS);
-    alert.data.InitiatedBy.user.userPrincipalName = `${Random.arrayItem(
-      USERS,
-    )}@test.com`;
-    alert.data.ActivityDisplayName = Random.arrayItem(Azure.operationNames);
+    alert.agent = Random.arrayItem(AGENTS);
+    delete alert.agent.ip; // IP is not used in Azure alerts
     alert.rule = { ...typeAlert.rule };
     alert.rule.description = Random.arrayItem(Azure.ruleDescriptions);
     alert.rule.id = `${Random.number(1, ALERT_ID_MAX)}`;
     alert.rule.level = Random.number(1, RULE_MAX_LEVEL);
-    alert.azure_tag = Random.arrayItem(Azure.azureTags);
+
+    alert.data = { ...typeAlert.data };
+    alert.data.TenantId = Random.arrayItem(Azure.TenantId);
+    alert.data['ms-graph'].activityOperationType = Random.arrayItem(
+      Azure.activityOperationType,
+    );
+    alert.data['ms-graph'].category = Random.arrayItem(Azure.category);
+
+    alert.data['ms-graph'].activityResult = Random.arrayItem(Azure.results);
+    alert.data['ms-graph'].id = Random.createHash(32);
+    alert.data['ms-graph'].requestId = Random.createHash(32);
+    alert.data['ms-graph'].correlationId = Random.createHash(32);
+    alert.data['ms-graph'].riskEventType = Random.arrayItem(
+      Azure.riskEventTypes,
+    );
+    alert.data['ms-graph'].riskState = Random.arrayItem(Azure.riskState);
+    alert.data['ms-graph'].riskLevel = Random.arrayItem(Azure.riskLevels);
+    alert.data['ms-graph'].riskDetail = Random.arrayItem(Azure.riskDetail);
+    alert.data['ms-graph'].detectionTimingType = Random.arrayItem(
+      Azure.detectionTimingType,
+    );
+    alert.data['ms-graph'].activity = Random.arrayItem(Azure.activity);
+    alert.data['ms-graph'].ipAddress = Random.arrayItem(IPs);
+    alert.data['ms-graph'].activityDateTime = DateFormatter.format(
+      beforeDate,
+      DateFormatter.DATE_FORMAT.ISO_FULL,
+    );
+    alert.data['ms-graph'].detectedDateTime = DateFormatter.format(
+      beforeDate,
+      DateFormatter.DATE_FORMAT.ISO_FULL,
+    );
+    alert.data['ms-graph'].lastUpdatedDateTime = DateFormatter.format(
+      beforeDate,
+      DateFormatter.DATE_FORMAT.ISO_FULL,
+    );
+    alert.data['ms-graph'].userId = Random.createHash(32);
 
     alert.input = { type: 'log' };
     alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
