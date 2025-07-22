@@ -21,14 +21,14 @@ import {
   withAgentSupportModule,
 } from '../../common/hocs';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
-import Dashboard from './dashboard/dashboard';
+import { DashboardSCA } from './dashboard/sca-dashboard';
 
 const mapStateToProps = state => ({
   currentAgentData: state.appStateReducers.currentAgentData,
 });
 
 export const MainSca = compose(
-  withAgentSupportModule,
+  // withAgentSupportModule,
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
@@ -40,19 +40,19 @@ export const MainSca = compose(
     ],
   ]),
   connect(mapStateToProps),
-  withGuard(
-    ({ currentAgentData, agent }) => {
-      const agentData =
-        currentAgentData && currentAgentData.id ? currentAgentData : agent;
-      return agentData.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED;
-    },
-    () => (
-      <PromptSelectAgent
-        title='Agent has never connected'
-        body='The agent has never been connected please select another'
-      />
-    ),
-  ),
+  // withGuard(
+  //   ({ currentAgentData, agent }) => {
+  //     const agentData =
+  //       currentAgentData && currentAgentData.id ? currentAgentData : agent;
+  //     return agentData.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED;
+  //   },
+  //   () => (
+  //     <PromptSelectAgent
+  //       title='Agent has never connected'
+  //       body='The agent has never been connected please select another'
+  //     />
+  //   ),
+  // ),
   withUserAuthorizationPrompt(props => {
     const agentData =
       props.currentAgentData && props.currentAgentData.id
@@ -77,14 +77,14 @@ export const MainSca = compose(
   }),
 )(function MainSca({ selectView, currentAgentData, agent, ...rest }) {
   const agentData =
-    currentAgentData && currentAgentData.id ? currentAgentData : agent;
+    currentAgentData && currentAgentData?.id ? currentAgentData : agent;
 
   return (
     <>
       {selectView === 'inventory' ? (
         <SCAInventory {...rest} agent={agentData} />
       ) : (
-        <Dashboard {...rest} agent={agentData} />
+        <DashboardSCA {...rest} agent={agentData} />
       )}
     </>
   );
