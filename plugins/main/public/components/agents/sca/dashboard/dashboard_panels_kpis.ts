@@ -220,7 +220,7 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
             filters: [
               {
                 input: {
-                  query: 'check.result: "not run"',
+                  query: 'check.result: "Not run"',
                   language: 'kuery',
                 },
                 label: 'Not Run',
@@ -337,7 +337,7 @@ const getVisStateCheckResultsDonut = (indexPatternId: string) => {
           type: 'terms',
           schema: 'segment',
           params: {
-            field: 'check.result.keyword',
+            field: 'check.result',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -370,7 +370,7 @@ export const getVisStateTopFailedPolicies = (indexPatternId: string) => ({
     searchSource: {
       query: {
         language: 'kuery',
-        query: 'check.result.keyword: "failed"',
+        query: 'check.result: "failed"',
       },
       filter: [],
       index: indexPatternId,
@@ -396,7 +396,7 @@ export const getVisStateTopFailedPolicies = (indexPatternId: string) => ({
         type: 'terms',
         schema: 'segment',
         params: {
-          field: 'policy.name.keyword',
+          field: 'policy.name',
           size: 5,
           order: 'desc',
           orderBy: '1',
@@ -444,7 +444,7 @@ export const getVisStateResultsByAgent = (indexPatternId: string) => ({
         type: 'terms',
         schema: 'segment',
         params: {
-          field: 'agent.name.keyword',
+          field: 'agent.name',
           size: 10,
           order: 'desc',
           customLabel: 'Agent',
@@ -456,7 +456,7 @@ export const getVisStateResultsByAgent = (indexPatternId: string) => ({
         type: 'terms',
         schema: 'group',
         params: {
-          field: 'check.result.keyword',
+          field: 'check.result',
           size: 5,
           order: 'desc',
           customLabel: 'Result',
@@ -556,7 +556,7 @@ export const getVisStateCheckResultsByPolicy = (indexPatternId: string) => ({
         type: 'terms',
         schema: 'segment',
         params: {
-          field: 'policy.name.keyword',
+          field: 'policy.name',
           size: 10,
           orderBy: '1',
           order: 'desc',
@@ -569,7 +569,7 @@ export const getVisStateCheckResultsByPolicy = (indexPatternId: string) => ({
         type: 'terms',
         schema: 'group',
         params: {
-          field: 'check.result.keyword',
+          field: 'check.result',
           size: 5,
           orderBy: '1',
           order: 'desc',
@@ -657,7 +657,7 @@ export const getKPIsPanel = (
         id: '8',
         savedVis: getVisStateTable(
           indexPatternId,
-          'agent.name.keyword',
+          'agent.name',
           'Checks Not Run by Agent',
           'sca-not-run-agents',
           {
@@ -666,14 +666,14 @@ export const getKPIsPanel = (
               {
                 meta: {
                   disabled: false,
-                  key: 'check.result.keyword',
+                  key: 'check.result',
                   negate: false,
                   type: 'phrase',
                   value: 'Not run',
                 },
                 query: {
                   match_phrase: {
-                    'check.result.keyword': 'Not run',
+                    'check.result': 'Not run',
                   },
                 },
               },
@@ -689,7 +689,7 @@ export const getKPIsPanel = (
         id: '9',
         savedVis: getVisStateTable(
           indexPatternId,
-          'policy.name.keyword',
+          'policy.name',
           'Top 5 failed Policies',
           'sca-top-failed-policies',
           {
@@ -698,14 +698,14 @@ export const getKPIsPanel = (
               {
                 meta: {
                   disabled: false,
-                  key: 'check.result.keyword',
+                  key: 'check.result',
                   negate: false,
                   type: 'phrase',
                   value: 'failed',
                 },
                 query: {
                   match_phrase: {
-                    'check.result.keyword': 'failed',
+                    'check.result': 'failed',
                   },
                 },
               },
