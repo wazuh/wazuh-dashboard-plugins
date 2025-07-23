@@ -1027,15 +1027,10 @@ export class WazuhReportingCtrl {
         context,
       );
 
-      context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
-        `downloads/reports/${hashUsername}`,
-      );
-      const userReportsDirectoryPath = path.join(
-        context.wazuh_core.dataPathService.getDataDirectoryRelative(
-          'downloads/reports',
-        ),
-        hashUsername,
-      );
+      const userReportsDirectoryPath =
+        context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
+          `downloads/reports/${hashUsername}`,
+        );
 
       context.wazuh.logger.debug(`Directory: ${userReportsDirectoryPath}`);
 

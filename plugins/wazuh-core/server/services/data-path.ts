@@ -114,7 +114,7 @@ export class DataPathService implements IDataPathService {
   }
 
   /**
-   * Create data directory if not exists (compatibility method)
+   * Create data directory if not exists (compatibility method) and return the absolute path
    */
   createDataDirectoryIfNotExists(directory?: string): void {
     const absoluteRoute = directory
@@ -122,6 +122,7 @@ export class DataPathService implements IDataPathService {
       : this.getWazuhPath();
 
     this.ensureDirectoryExists(absoluteRoute);
+    return absoluteRoute;
   }
 
   /**
