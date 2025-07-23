@@ -58,8 +58,6 @@ export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
 
 // SCA
 export const WAZUH_SCA_PATTERN = 'wazuh-states-sca-*';
-// export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
-// export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
 
 // System inventory
 export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory-*';
@@ -94,8 +92,8 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING =
 export const WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION = 'threat-detection';
 export const WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING =
   'file-integrity-monitoring';
-export const WAZUH_SAMPLE_SCA =
-  'states-sca';
+export const WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT =
+  'security-configuration-assessment';
 export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 3000;
@@ -104,6 +102,10 @@ export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   dataSet: 'wazuh-alerts',
 };
 
+export const WAZUH_SETTING_SCA_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_SCA_PATTERN.replace('*', ''),
+  dataSet: 'states-sca',
+};
 export const WAZUH_SETTING_FIM_FILES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_FIM_FILES_PATTERN.replace('*', ''),
   dataSet: 'states-fim-files',
@@ -293,6 +295,14 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       indexPatternPrefix:
         WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX.dataSet,
+    },
+  ],
+  [WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT]: [
+    {
+      sca: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_SCA_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_SCA_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_INVENTORY_AGENT]: [
