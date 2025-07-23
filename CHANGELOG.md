@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data[#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
+- Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.2 - Revision 00
 
