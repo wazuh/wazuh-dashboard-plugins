@@ -14,9 +14,8 @@ See /docker/url-checks/docker-compose.yml for available environment variables.
 */
 
 const childProcess = require('child_process');
-const path = require('path');
 
-const COMPOSE_DIR = '../../docker/url-checks';
+const COMPOSE_DIR = './docker/url-checks';
 
 /**
  * Gets the project repository path.
@@ -27,7 +26,7 @@ const COMPOSE_DIR = '../../docker/url-checks';
  */
 function getProjectInfo() {
   return {
-    repo: path.resolve(__dirname, '../../../'),
+    repo: process.cwd(),
     nodeVersion: process.env.NODE_VERSION || '20',
   };
 }
@@ -91,10 +90,10 @@ function main() {
 
   // Check the required environment variables are set
   for (const [key, value] of Object.entries(envVars)) {
+    console.log(`${key}:`, value);
     if (!process.env[key]) {
       process.env[key] = value;
     }
-    console.log(`${key}: ${process.env[key]}`);
   }
 
   setupAbortController();
