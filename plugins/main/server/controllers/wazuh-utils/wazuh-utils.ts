@@ -19,6 +19,7 @@ import {
 } from 'src/core/server';
 import fs from 'fs';
 import path from 'path';
+import { createDirectoryIfNotExists } from '../../lib/filesystem';
 import glob from 'glob';
 import { getFileExtensionFromBuffer } from '../../../common/services/file-extension';
 import {
@@ -160,9 +161,7 @@ export class WazuhUtilsCtrl {
         pluginSetting.options.file.store.relativePathFileSystem,
       );
       context.wazuh.logger.debug(`Directory: ${targetDirectory}`);
-      context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
-        targetDirectory,
-      );
+      createDirectoryIfNotExists(targetDirectory);
       // Get the files related to the setting and remove them
       const files = glob.sync(path.join(targetDirectory, `${key}.*`));
       context.wazuh.logger.debug(
