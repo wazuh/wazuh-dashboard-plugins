@@ -8,13 +8,13 @@ version: '3'
 services:
   extracted-urls:
     image: node:${NODE_VERSION:-20}-alpine
-    working_dir: /app/plugins/main
+    working_dir: /app
     volumes:
       - ${REPO}:/app
     command: |
       /bin/sh -c '
         npm install -g tsx typescript --no-package-lock &&
-        tsx scripts/url-checks-extractor.ts
+        tsx scripts/url-checks/extractor.ts
         '
 
   url-checks:
@@ -22,8 +22,8 @@ services:
     depends_on:
       extracted-urls:
         condition: service_completed_successfully
-    working_dir: /app/plugins/main
+    working_dir: /app
     volumes:
       - ${REPO}:/app
     tty: true
-    command: --max-redirects 0 --format detailed --no-progress scripts/extracted-urls.md
+    command: --max-redirects 0 --format detailed --no-progress scripts/url-checks/extracted-urls.md

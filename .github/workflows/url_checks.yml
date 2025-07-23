@@ -29,9 +29,9 @@ jobs:
 
       - name: Validate URLs and extract them
         run: |
-          tsx plugins/main/scripts/url-checks-extractor.ts
+          tsx scripts/url-checks/extractor.ts
 
       - name: Check URLs with Lychee
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --max-redirects 0 --format detailed --no-progress plugins/main/scripts/extracted-urls.md
+          args: --max-redirects 0 --format detailed --no-progress scripts/url-checks/extracted-urls.md
