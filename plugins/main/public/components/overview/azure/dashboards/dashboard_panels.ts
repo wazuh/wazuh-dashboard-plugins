@@ -68,23 +68,19 @@ const getVisStateResults = (indexPatternId: string) => {
   };
 };
 
-const getVisStateRiskLevel = (indexPatternId: string) => {
+const getVisStateDisplayName = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_risk_levels',
-    title: 'Risk Levels',
-    type: 'pie',
+    id: 'azure_overview_display_name',
+    title: 'Top 5 Security Alerts by Display Name',
+    type: 'table',
     params: {
-      type: 'pie',
-      addTooltip: true,
-      addLegend: true,
-      legendPosition: 'right',
-      isDonut: true,
-      labels: {
-        show: false,
-        values: true,
-        last_level: true,
-        truncate: 100,
-      },
+      perPage: 5,
+      showPartialRows: false,
+      showMetricsAtAllLevels: false,
+      sort: { columnIndex: 3, direction: 'desc' },
+      showTotal: false,
+      showToolbar: true,
+      totalFunc: 'sum',
     },
     data: {
       searchSource: {
@@ -114,9 +110,9 @@ const getVisStateRiskLevel = (indexPatternId: string) => {
           id: '2',
           enabled: true,
           type: 'terms',
-          schema: 'segment',
+          schema: 'bucket',
           params: {
-            field: 'data.ms-graph.riskLevel',
+            field: 'data.ms-graph.displayName',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -131,23 +127,19 @@ const getVisStateRiskLevel = (indexPatternId: string) => {
   };
 };
 
-const getVisStateStatus = (indexPatternId: string) => {
+const getVisStateCategory = (indexPatternId: string) => {
   return {
-    id: 'azure_overview_status',
-    title: 'Status',
-    type: 'pie',
+    id: 'azure_overview_category',
+    title: 'Top 5 Categories',
+    type: 'table',
     params: {
-      type: 'pie',
-      addTooltip: true,
-      addLegend: true,
-      legendPosition: 'right',
-      isDonut: true,
-      labels: {
-        show: false,
-        values: true,
-        last_level: true,
-        truncate: 100,
-      },
+      perPage: 5,
+      showPartialRows: false,
+      showMetricsAtAllLevels: false,
+      sort: { columnIndex: 3, direction: 'desc' },
+      showTotal: false,
+      showToolbar: true,
+      totalFunc: 'sum',
     },
     data: {
       searchSource: {
@@ -177,9 +169,9 @@ const getVisStateStatus = (indexPatternId: string) => {
           id: '2',
           enabled: true,
           type: 'terms',
-          schema: 'segment',
+          schema: 'bucket',
           params: {
-            field: 'data.ms-graph.status',
+            field: 'data.ms-graph.category',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -187,6 +179,7 @@ const getVisStateStatus = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
+            customLabel: 'Top categories',
           },
         },
       ],
@@ -308,7 +301,7 @@ const getVisStateEventsByCategory = (indexPatternId: string) => {
       ],
       addTooltip: true,
       addLegend: true,
-      legendPosition: 'right',
+      legendPosition: 'left',
       times: [],
       addTimeMarker: false,
     },
@@ -607,23 +600,19 @@ const getVisStateAgentResults = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentRiskLevel = (indexPatternId: string) => {
+const getVisStateAgentDisplayName = (indexPatternId: string) => {
   return {
-    id: 'azure_agent_risk_level',
-    title: 'Risk Level',
-    type: 'pie',
+    id: 'azure_agent_display_name',
+    title: 'Top 5 Security Alerts by Display Name',
+    type: 'table',
     params: {
-      type: 'pie',
-      addTooltip: true,
-      addLegend: true,
-      legendPosition: 'right',
-      isDonut: true,
-      labels: {
-        show: false,
-        values: true,
-        last_level: true,
-        truncate: 100,
-      },
+      perPage: 5,
+      showPartialRows: false,
+      showMetricsAtAllLevels: false,
+      sort: { columnIndex: 3, direction: 'desc' },
+      showTotal: false,
+      showToolbar: true,
+      totalFunc: 'sum',
     },
     data: {
       searchSource: {
@@ -653,9 +642,9 @@ const getVisStateAgentRiskLevel = (indexPatternId: string) => {
           id: '2',
           enabled: true,
           type: 'terms',
-          schema: 'segment',
+          schema: 'bucket',
           params: {
-            field: 'data.ms-graph.riskLevel',
+            field: 'data.ms-graph.displayName',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -670,23 +659,19 @@ const getVisStateAgentRiskLevel = (indexPatternId: string) => {
   };
 };
 
-const getVisStateAgentStatus = (indexPatternId: string) => {
+const getVisStateAgentCategories = (indexPatternId: string) => {
   return {
-    id: 'azure_agent_status',
-    title: 'Status',
-    type: 'pie',
+    id: 'azure_agent_categories',
+    title: 'Top 5 Categories',
+    type: 'table',
     params: {
-      type: 'pie',
-      addTooltip: true,
-      addLegend: true,
-      legendPosition: 'right',
-      isDonut: true,
-      labels: {
-        show: false,
-        values: true,
-        last_level: true,
-        truncate: 100,
-      },
+      perPage: 5,
+      showPartialRows: false,
+      showMetricsAtAllLevels: false,
+      sort: { columnIndex: 3, direction: 'desc' },
+      showTotal: false,
+      showToolbar: true,
+      totalFunc: 'sum',
     },
     data: {
       searchSource: {
@@ -716,9 +701,9 @@ const getVisStateAgentStatus = (indexPatternId: string) => {
           id: '2',
           enabled: true,
           type: 'terms',
-          schema: 'segment',
+          schema: 'bucket',
           params: {
-            field: 'data.ms-graph.status',
+            field: 'data.ms-graph.category',
             size: 5,
             order: 'desc',
             orderBy: '1',
@@ -1129,7 +1114,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g2',
-        savedVis: getVisStateRiskLevel(indexPatternId),
+        savedVis: getVisStateDisplayName(indexPatternId),
       },
     },
     g3: {
@@ -1143,7 +1128,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g3',
-        savedVis: getVisStateStatus(indexPatternId),
+        savedVis: getVisStateCategory(indexPatternId),
       },
     },
     g4: {
@@ -1230,7 +1215,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a2',
-        savedVis: getVisStateAgentRiskLevel(indexPatternId),
+        savedVis: getVisStateAgentDisplayName(indexPatternId),
       },
     },
     a3: {
@@ -1244,7 +1229,7 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a3',
-        savedVis: getVisStateAgentStatus(indexPatternId),
+        savedVis: getVisStateAgentCategories(indexPatternId),
       },
     },
     a4: {

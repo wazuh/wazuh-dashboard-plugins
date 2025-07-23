@@ -6,7 +6,7 @@ import { commonColumns } from '../../common/data-grid-columns';
 export const azureColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   {
-    id: 'data.ms-graph.activity',
+    id: 'data.ms-graph.displayName',
     initialWidth: 200,
   },
   {

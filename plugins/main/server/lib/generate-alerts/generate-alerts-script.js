@@ -398,16 +398,17 @@ function generateAlert(params) {
     );
     alert.data['ms-graph'].activity = Random.arrayItem(Azure.activity);
     alert.data['ms-graph'].ipAddress = Random.arrayItem(IPs);
+    alert.data['ms-graph'].displayName = Random.arrayItem(Azure.displayName);
     alert.data['ms-graph'].activityDateTime = DateFormatter.format(
-      beforeDate,
+      new Date(Random.date()),
       DateFormatter.DATE_FORMAT.ISO_FULL,
     );
     alert.data['ms-graph'].detectedDateTime = DateFormatter.format(
-      beforeDate,
+      Random.date(),
       DateFormatter.DATE_FORMAT.ISO_FULL,
     );
     alert.data['ms-graph'].lastUpdatedDateTime = DateFormatter.format(
-      beforeDate,
+      Random.date(),
       DateFormatter.DATE_FORMAT.ISO_FULL,
     );
     alert.data['ms-graph'].userId = Random.createHash(32);
