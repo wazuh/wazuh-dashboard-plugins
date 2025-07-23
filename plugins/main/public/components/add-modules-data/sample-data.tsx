@@ -33,6 +33,7 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
   WAZUH_SAMPLE_INVENTORY_AGENT,
+  WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
   WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
@@ -69,6 +70,12 @@ const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 
 const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
 
+const sampleSecurityConfigurationAssessment = [
+  'states of SCA',
+  'checks',
+  'policies',
+].join(', ');
+
 const sampleInventory = [
   'hardware',
   'hotfixes',
@@ -101,7 +108,7 @@ export default class WzSampleData extends Component {
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
     this.categories = [
       {
-        title: 'Sample security information',
+        title: 'Sample Security Information',
         description: `Sample data, visualizations and dashboards for security information (${sampleSecurityInformationApplication}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
@@ -114,25 +121,31 @@ export default class WzSampleData extends Component {
           WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       },
       {
-        title: 'Sample threat detection and response',
+        title: 'Sample Threat Detection and Response',
         description: `Sample data, visualizations and dashboards for threat events of detection and response (${sampleThreatDetectionApplication}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
       },
       {
-        title: 'Sample file integrity monitoring inventory',
+        title: 'Sample File Integrity Monitoring Inventory',
         description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       },
       {
-        title: 'Sample system inventory',
+        title: 'Sample Security Configuration Assessment',
+        description: `Sample data, visualizations and dashboards for security configuration assessment (${sampleSecurityConfigurationAssessment}).`,
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
+      },
+      {
+        title: 'Sample System Inventory',
         description: `Sample data, visualizations and dashboards for system inventory (${sampleInventory}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
       },
       {
-        title: 'Sample vulnerability detection inventory',
+        title: 'Sample Vulnerability Detection Inventory',
         description: `Sample data, visualizations and dashboards for vulnerabilities inventory.`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_VULNERABILITIES,
