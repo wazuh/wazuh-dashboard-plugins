@@ -1,0 +1,25 @@
+# Multi-stage Dockerfile for URL checks
+# Stage 1: Extract URLs using Node.js
+FROM node:20-alpine AS url-extractor
+
+WORKDIR /app
+
+# Install global dependencies
+RUN npm install -g tsx typescript --no-package-lock
+
+# Copy the entire repository
+COPY . .
+
+# Extract URLs
+RUN tsx scripts/url-checks/extractor.ts
+
+# Stage 2: Check URLs using Lychee
+FROM lycheeverse/lychee:latest AS url-checker
+
+WORKDIR /app
+
+# Copy extracted URLs from previous stage
+COPY --from=url-extractor /app/scripts/url-checks/extracted-urls.md scripts/url-checks/extracted-urls.md
+
+# Default command to check URLs
+CMD ["--max-redirects", "0", "--format", "detailed", "--no-progress", "scripts/url-checks/extracted-urls.md"]
