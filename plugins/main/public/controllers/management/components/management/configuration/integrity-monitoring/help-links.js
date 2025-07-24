@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from "../../../../../../../common/services/web_documentation";
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 export default [
   {
     text: 'Integrity monitoring documentation',
-    href: webDocumentationLink('user-manual/capabilities/file-integrity/index.html')
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.FILE_INTEGRITY.INDEX,
   },
   {
     text: 'Syscheck reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/syscheck.html')
-  }
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.SYSCHECK,
+  },
 ];

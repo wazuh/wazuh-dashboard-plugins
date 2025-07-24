@@ -30,7 +30,6 @@ import {
   UI_LOGGER_LEVELS,
 } from '../../../../../../../../common/constants';
 import { TPluginSettingWithKey } from '../../../../../../../../../wazuh-core/common/constants';
-import { webDocumentationLink } from '../../../../../../../../common/services/web_documentation';
 import classNames from 'classnames';
 import { InputForm } from '../../../../../../common/form';
 import { useDispatch } from 'react-redux';
@@ -81,7 +80,7 @@ export const Category: React.FunctionComponent<ICategoryProps> = ({
                         aria-label='Help'
                         target='_blank'
                         rel='noopener noreferrer'
-                        href={webDocumentationLink(documentationLink)}
+                        href={documentationLink}
                       ></EuiButtonIcon>
                     </>
                   </EuiToolTip>

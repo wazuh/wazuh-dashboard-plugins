@@ -10,26 +10,19 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 export default [
   {
     text: 'Malware detection',
-    href: webDocumentationLink(
-      'user-manual/capabilities/malware-detection/index.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.MALWARE_DETECTION.INDEX,
   },
   {
     text: 'Monitoring security policies',
-    href: webDocumentationLink(
-      'user-manual/capabilities/policy-monitoring/index.html',
-      '4.8',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.POLICY_MONITORING.INDEX,
   },
   {
     text: 'Rootcheck reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/rootcheck.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.ROOTCHECK,
   },
 ];

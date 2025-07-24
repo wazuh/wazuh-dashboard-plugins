@@ -28,7 +28,7 @@ import { connect } from 'react-redux';
 import { isString, isFunction } from './utils/utils';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../common/doc-links';
 
 const columns = [
   {
@@ -44,15 +44,15 @@ const columns = [
 const helpLinks = [
   {
     text: 'Server administration',
-    href: webDocumentationLink('user-manual/manager/index.html'),
+    href: DOC_LINKS.USER_MANUAL.MANAGER.INDEX,
   },
   {
     text: 'Capabilities',
-    href: webDocumentationLink('user-manual/capabilities/index.html'),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.INDEX,
   },
   {
     text: 'Local configuration reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/index.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.INDEX,
   },
 ];
 
