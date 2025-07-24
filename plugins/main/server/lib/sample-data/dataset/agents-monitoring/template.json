@@ -1,0 +1,45 @@
+{
+  "index_patterns": ["wazuh-agent-monitoring*"],
+  "priority": 1,
+  "template": {
+    "settings": {
+      "index": {
+        "number_of_replicas": "0",
+        "number_of_shards": "1",
+        "query.default_field": ["cluster.name", "id", "host", "name", "status"],
+        "refresh_interval": "5s"
+      }
+    },
+    "mappings": {
+      "date_detection": false,
+      "properties": {
+        "timestamp": {
+          "type": "date",
+          "format": "dateOptionalTime"
+        },
+        "status": {
+          "type": "keyword"
+        },
+        "ip": {
+          "type": "keyword"
+        },
+        "host": {
+          "type": "keyword"
+        },
+        "name": {
+          "type": "keyword"
+        },
+        "id": {
+          "type": "keyword"
+        },
+        "cluster": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}

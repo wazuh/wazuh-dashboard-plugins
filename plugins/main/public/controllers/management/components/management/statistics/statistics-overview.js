@@ -27,16 +27,14 @@ import {
 import { clusterReq, clusterNodes } from '../configuration/utils/wz-fetch';
 import { compose } from 'redux';
 import {
-  withGuard,
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
-import { PromptStatisticsDisabled } from './prompt-statistics-disabled';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import {
-  HTTP_STATUS_CODES,
   UI_LOGGER_LEVELS,
+  WAZUH_STATISTICS_PATTERN,
 } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { getCore } from '../../../../../kibana-services';
@@ -227,10 +225,9 @@ export class WzStatisticsOverview extends Component {
 }
 
 const mapStateToProps = state => ({
-  statisticsEnabled: state.appConfig.data?.['cron.statistics.status'],
   configurationUIEditable:
     state.appConfig.data?.['configuration.ui_api_editable'],
-  statisticsIndexPatternID: `${state.appConfig.data['cron.prefix']}-${state.appConfig.data['cron.statistics.index.name']}*`,
+  statisticsIndexPatternID: WAZUH_STATISTICS_PATTERN, // TODO: this could be removed
 });
 
 export default compose(
@@ -240,9 +237,6 @@ export default compose(
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
   connect(mapStateToProps),
-  withGuard(props => {
-    return !props.statisticsEnabled;
-  }, PromptStatisticsDisabled),
 )(props => {
   const [loading, setLoading] = useState(true);
   const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
@@ -297,7 +291,7 @@ export default compose(
   return existStatisticsIndices && existStatisticsIndexPattern ? (
     <WzStatisticsOverview {...props} />
   ) : (
-    <PromptStatisticsNoIndices
+    <PromptStatisticsNoIndices // TODO: this should use the prompt as Vulnerabilities detection > Inventory instead
       indexPatternID={indexPatternID}
       existIndex={existStatisticsIndices}
     />
