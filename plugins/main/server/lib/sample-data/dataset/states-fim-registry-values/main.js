@@ -1,10 +1,16 @@
 const random = require('../../lib/random');
 const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
 
-function generateRandomEvent() {
+function generateRandomChecksum() {
   return {
-    category: random.choice(['registry_value', 'registry_key', 'file']),
-    action: random.choice(['added', 'modified', 'deleted']),
+    hash: {
+      sha1: random.choice([
+        '6853b29eef33ff39d8b63911673cf7b078f95485',
+        'c3499c2729730a7f807efb8676a92dcb6f8a3f8f',
+        'a80ed2ef79e22f1d8af817cea1dbbf01bef516cc',
+        '272ae13f02a9c805923917a42d2f27bd02654dec',
+      ]),
+    },
   };
 }
 
@@ -19,24 +25,20 @@ function generateRandomRegistry() {
       },
       type: random.choice(['REG_SZ', 'REG_DWORD']),
     },
-    gid: `gid${random.int(0, 1000)}`,
-    group: `group${random.int(0, 1000)}`,
     hive: 'HKLM',
-    key: 'SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\winword.exe',
-    mtime: random.date(),
-    owner: `owner${random.int(0, 1000)}`,
-    path: `/path/to/file_${random.int(0, 20)}`,
+    key: 'HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\winword.exe',
+    path: 'HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\winword.exe',
     size: random.int(1000, 1000000),
-    uid: `uid${random.int(0, 1000)}`,
     value: `registry_value${random.int(0, 1000)}`,
   };
 }
 
 function generateDocument(params) {
   // https://github.com/wazuh/wazuh-indexer/pull/744
+  // https://github.com/wazuh/wazuh-indexer-plugins/issues/506
   return {
     agent: generateRandomAgent(),
-    event: generateRandomEvent(),
+    checksum: generateRandomChecksum(),
     registry: generateRandomRegistry(),
     wazuh: generateRandomWazuh(params),
   };

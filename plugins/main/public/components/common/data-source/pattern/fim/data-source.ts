@@ -33,11 +33,7 @@ export class FIMRegistryKeysStatesDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-      ...this.getClusterManagerFilters(),
-      ...super.getFixedFilters(),
-      this.getRegistryTypeFilter(),
-    ];
+    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
   }
 
   getClusterManagerFilters() {
@@ -45,15 +41,6 @@ export class FIMRegistryKeysStatesDataSource extends PatternDataSource {
       this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
       VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
-    );
-  }
-
-  getRegistryTypeFilter() {
-    return PatternDataSourceFilterManager.createFilter(
-      FILTER_OPERATOR.IS,
-      'event.category',
-      'registry_key',
-      this.id,
     );
   }
 }
@@ -64,11 +51,7 @@ export class FIMRegistryValuesStatesDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [
-      ...this.getClusterManagerFilters(),
-      ...super.getFixedFilters(),
-      this.getRegistryTypeFilter(),
-    ];
+    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
   }
 
   getClusterManagerFilters() {
@@ -76,15 +59,6 @@ export class FIMRegistryValuesStatesDataSource extends PatternDataSource {
       this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
       VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
-    );
-  }
-
-  getRegistryTypeFilter() {
-    return PatternDataSourceFilterManager.createFilter(
-      FILTER_OPERATOR.IS,
-      'event.category',
-      'registry_value',
-      this.id,
     );
   }
 }
