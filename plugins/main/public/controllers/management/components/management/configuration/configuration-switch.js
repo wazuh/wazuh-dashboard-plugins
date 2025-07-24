@@ -25,7 +25,6 @@ import WzConfigurationAlerts from './alerts/alerts';
 import WzConfigurationClient from './client/client';
 import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
-import WzConfigurationIntegrations from './integrations/integrations';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
 import WzConfigurationOpenSCAP from './open-scap/open-scap';
 import WzConfigurationCisCat from './cis-cat/cis-cat';
@@ -38,7 +37,6 @@ import WzConfigurationCommands from './commands/commands';
 import WzConfigurationDockerListener from './docker-listener/docker-listener';
 import WzConfigurationLogCollection from './log-collection/log-collection';
 import WzConfigurationIntegrityMonitoring from './integrity-monitoring/integrity-monitoring';
-import WzConfigurationIntegrityAgentless from './agentless/agentless';
 import WzConfigurationIntegrityAmazonS3 from './aws-s3/aws-s3';
 import WzConfigurationAzureLogs from './azure-logs/azure-logs';
 import WzConfigurationGoogleCloudPubSub from './google-cloud-pub-sub/google-cloud-pub-sub';
@@ -335,13 +333,6 @@ class WzConfigurationSwitch extends Component {
                 </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='alerts-agent'>
                   <WzConfigurationAlertsLabelsAgent
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='integrations'>
-                  <WzConfigurationIntegrations
                     clusterNodeSelected={this.props.clusterNodeSelected}
                     agent={agent}
                     updateConfigurationSection={this.updateConfigurationSection}
