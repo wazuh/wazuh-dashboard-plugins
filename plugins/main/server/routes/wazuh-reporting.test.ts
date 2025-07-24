@@ -21,9 +21,11 @@ const mockDataPathService = {
   getDataDirectoryRelative: (directory?: string) =>
     `/tmp/wazuh/${directory || ''}`,
   createDataDirectoryIfNotExists: jest.fn(path => {
-    if (!fs.existsSync(path)) {
-      fs.mkdirSync(path, { recursive: true });
+    const absolutePath = `/tmp/wazuh/${path || ''}`;
+    if (!fs.existsSync(absolutePath)) {
+      fs.mkdirSync(absolutePath, { recursive: true });
     }
+    return absolutePath;
   }),
 };
 
@@ -36,7 +38,7 @@ const logger = loggingService.get();
 const context = {
   wazuh: {
     security: {
-      getCurrentUser: request => {
+      getCurrentUser: async request => {
         // x-test-username header doesn't exist when the platform or plugin are running.
         // It is used to generate the output of this method so we can simulate the user
         // that does the request to the endpoint and is expected by the endpoint handlers
@@ -172,26 +174,18 @@ describe('[endpoint] GET /reports', () => {
     // Create directories and file/s within directory.
     directories.forEach(({ username, files }) => {
       const hashUsername = md5(username);
+      // Create user directory using relative path
       mockDataPathService.createDataDirectoryIfNotExists(
-        path.join(
-          mockDataPathService.getDataDirectoryRelative('downloads/reports'),
-          hashUsername,
-        ),
+        `downloads/reports/${hashUsername}`,
       );
       if (files) {
         Array.from(Array(files).keys()).forEach(indexFile => {
-          fs.closeSync(
-            fs.openSync(
-              path.join(
-                mockDataPathService.getDataDirectoryRelative(
-                  'downloads/reports',
-                ),
-                hashUsername,
-                `report_${indexFile}.pdf`,
-              ),
-              'w',
-            ),
+          const filePath = path.join(
+            mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+            hashUsername,
+            `report_${indexFile}.pdf`,
           );
+          fs.closeSync(fs.openSync(filePath, 'w'));
         });
       }
     });

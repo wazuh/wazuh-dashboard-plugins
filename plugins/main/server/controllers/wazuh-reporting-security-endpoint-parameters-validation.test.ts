@@ -18,9 +18,11 @@ const mockDataPathService = {
   getDataDirectoryRelative: (directory?: string) =>
     `/tmp/wazuh/${directory || ''}`,
   createDataDirectoryIfNotExists: jest.fn(path => {
-    if (!fs.existsSync(path)) {
-      fs.mkdirSync(path, { recursive: true });
+    const absolutePath = `/tmp/wazuh/${path || ''}`;
+    if (!fs.existsSync(absolutePath)) {
+      fs.mkdirSync(absolutePath, { recursive: true });
     }
+    return absolutePath;
   }),
 };
 
@@ -29,7 +31,7 @@ const logger = loggingService.get();
 const context = {
   wazuh: {
     security: {
-      getCurrentUser: request => {
+      getCurrentUser: async request => {
         // x-test-username header doesn't exist when the platform or plugin are running.
         // It is used to generate the output of this method so we can simulate the user
         // that does the request to the endpoint and is expected by the endpoint handlers
@@ -74,26 +76,20 @@ beforeAll(async () => {
       files: ['wazuh-module-overview-general-1234.pdf'],
     },
   ].forEach(({ name, files }) => {
+    // Create user directory using relative path
     mockDataPathService.createDataDirectoryIfNotExists(
-      path.join(
-        mockDataPathService.getDataDirectoryRelative('downloads/reports'),
-        name,
-      ),
+      `downloads/reports/${name}`,
     );
 
     if (files) {
-      files.forEach(filename =>
-        fs.closeSync(
-          fs.openSync(
-            path.join(
-              mockDataPathService.getDataDirectoryRelative('downloads/reports'),
-              name,
-              filename,
-            ),
-            'w',
-          ),
-        ),
-      );
+      files.forEach(filename => {
+        const filePath = path.join(
+          mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+          name,
+          filename,
+        );
+        fs.closeSync(fs.openSync(filePath, 'w'));
+      });
     }
   });
 
@@ -130,11 +126,16 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  // Stop server
+  if (server) {
+    await server.stop();
+  }
+
+  // Clear all mocks
+  jest.clearAllMocks();
+
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
   execSync(`rm -rf ${mockDataPathService.getWazuhPath()}`);
-
-  // Stop server
-  await server.stop();
 });
 
 describe('[endpoint] GET /reports', () => {
