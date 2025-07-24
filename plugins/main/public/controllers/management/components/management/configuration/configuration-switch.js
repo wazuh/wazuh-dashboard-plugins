@@ -430,13 +430,6 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='agentless'>
-                  <WzConfigurationIntegrityAgentless
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='aws-s3'>
                   <WzConfigurationIntegrityAmazonS3
                     clusterNodeSelected={this.props.clusterNodeSelected}
