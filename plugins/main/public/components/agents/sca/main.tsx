@@ -56,6 +56,7 @@ export const MainSca = compose(
   return (
     <>
       {selectView === 'inventory' ? (
+        // @ts-ignore
         <SCAInventory {...rest} />
       ) : (
         <DashboardSCA {...rest} />

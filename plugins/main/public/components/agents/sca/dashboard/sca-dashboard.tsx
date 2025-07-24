@@ -17,13 +17,11 @@ import { useDataSource } from '../../../common/data-source/hooks';
 import { IndexPattern } from '../../../../../../../src/plugins/data/public';
 import { WzSearchBar } from '../../../common/search-bar';
 import { SampleDataWarning } from '../../../visualize/components';
-import { WAZUH_SAMPLE_SCA } from '../../../../../common/constants';
+import { WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT } from '../../../../../common/constants';
 import {
-  HideOnErrorInitializatingDataSource,
   PromptErrorInitializatingDataSource,
   withErrorBoundary,
 } from '../../../common/hocs';
-import { withSCADataSource } from '../hocs/validate-sca-states-index-pattern';
 import {
   SCAStatesDataSource,
   SCAStatesDataSourceRepository,
@@ -33,16 +31,10 @@ import {
   tParsedIndexPattern,
 } from '../../../common/data-source';
 import { DiscoverNoResults } from '../../../common/no-results/no-results';
-import { InventoryDashboardTable } from '../../../common/dashboards';
-import { withAgent } from '../../../overview/fim/inventory/inventories/hocs';
-import { CheckDetails } from './check-details-sca';
+import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
-
-/* The SCA dashboard is made up of 3 dashboards because the filters need
-a wrapper for visual adjustments, while the Kpi and the rest of the visualizations
-have different configurations at the dashboard level. */
 
 interface DashboardSCAProps {
   indexPattern: IndexPattern;
@@ -72,13 +64,12 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
     filters,
     setFilters,
   });
-  const { query } = searchBarProps;
 
   useEffect(() => {
     if (isDataSourceLoading) {
       return;
     }
-    fetchData({ query })
+    fetchData({ query: searchBarProps.query })
       .then(results => {
         setResults(results);
       })
@@ -91,46 +82,22 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
       });
   }, [
     JSON.stringify(fetchFilters),
-    JSON.stringify(query),
+    JSON.stringify(searchBarProps.query),
     isDataSourceLoading,
   ]);
 
-  // console.log('graphsss---->', {
-  //   viewMode: ViewMode.VIEW,
-  //   // Try to use the index pattern that the dataSource has
-  //   // but if it is undefined use the index pattern of the hoc
-  //   // because the first executions of the dataSource are undefined
-  //   // and embeddables need index pattern.
-  //   panels: getKPIsPanel(dataSource?.id || indexPattern?.id),
-  //   isFullScreenMode: false,
-  //   filters: fetchFilters ?? [],
-  //   useMargins: true,
-  //   id: 'kpis-sca-dashboard-tab',
-  //   timeRange: {
-  //     from: searchBarProps.dateRangeFrom,
-  //     to: searchBarProps.dateRangeTo,
-  //   },
-  //   title: 'KPIs Security Configuration Assessment dashboard',
-  //   description: 'KPIs Dashboard of the Security Configuration Assessment',
-  //   query: searchBarProps.query,
-  //   refreshConfig: {
-  //     pause: false,
-  //     value: 15,
-  //   },
-  //   hidePanelTitles: true,
-  //   lastReloadRequestTime: fingerprint,
-  // });
+  if (error) {
+    return <PromptErrorInitializatingDataSource error={error} />;
+  }
 
   return (
     <>
       <I18nProvider>
         <>
-          {/* <ModuleEnabledCheck />
           {isDataSourceLoading && !dataSource ? (
             <LoadingSearchbarProgress />
-          ) : ( */}
-          <>
-            <HideOnErrorInitializatingDataSource error={error}>
+          ) : (
+            <>
               <WzSearchBar
                 appName='sca-dashboard-searchbar'
                 {...searchBarProps}
@@ -141,79 +108,49 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
                 showQueryBar={true}
                 showSaveQuery={true}
               />
-            </HideOnErrorInitializatingDataSource>
-            {dataSource && results?.hits?.total === 0 ? (
-              <DiscoverNoResults />
-            ) : null}
-            <div
-              className={`sca-dashboard-responsive sca-dashboard-metrics ${
-                dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-              }`}
-            >
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  // Try to use the index pattern that the dataSource has
-                  // but if it is undefined use the index pattern of the hoc
-                  // because the first executions of the dataSource are undefined
-                  // and embeddables need index pattern.
-                  panels: getKPIsPanel(indexPattern?.id),
-                  isFullScreenMode: false,
-                  filters: fetchFilters ?? [],
-                  useMargins: true,
-                  id: 'it-hygiene-dashboard-kpis',
-                  timeRange: {
-                    from: searchBarProps.dateRangeFrom,
-                    to: searchBarProps.dateRangeTo,
-                  },
-                  title: 'IT Hygiene dashboard KPIs',
-                  description: 'Dashboard of the IT Hygiene KPIs',
-                  query: searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles: false,
-                  lastReloadRequestTime: fingerprint,
-                }}
-              />
-              <SampleDataWarning categoriesSampleData={[WAZUH_SAMPLE_SCA]} />
-              {/* <InventoryDashboardTable
-                DataSource={SCAStatesDataSource}
-                DataSourceRepositoryCreator={SCAStatesDataSourceRepository}
-                showAvancedFilters={true}
-                tableDefaultColumns={[]}
-                managedFilters={[]}
-                getDashboardPanels={() =>
-                  getKPIsPanel(dataSource?.id || indexPattern?.id)
-                }
-                tableId='sca-policies-inventory'
-                indexPattern={dataSource?.indexPattern}
-                categoriesSampleData={[WAZUH_SAMPLE_SCA]}
-                additionalDocumentDetailsTabs={[
-                  {
-                    id: 'sca-dashboard-tab',
-                    title: 'Security Configuration Assessment dashboard',
-                    description:
-                      'Dashboard of the Security Configuration Assessment',
-                    className: 'sca-dashboard-tab',
-                    name: 'Check Details',
-                    content: props => <CheckDetails {...props} />,
-                  },
+              <SampleDataWarning
+                categoriesSampleData={[
+                  WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
                 ]}
-              /> */}
-            </div>
-            {error && <PromptErrorInitializatingDataSource error={error} />}
-          </>
-          {/* )} */}
+              />
+              {dataSource && results?.hits?.total === 0 ? (
+                <DiscoverNoResults />
+              ) : null}
+              <div
+                className={`sca-dashboard-responsive sca-dashboard-metrics ${
+                  dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+                }`}
+              >
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getKPIsPanel(indexPattern?.id),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'security-configuration-assessment-kpis',
+                    timeRange: {
+                      from: searchBarProps.dateRangeFrom,
+                      to: searchBarProps.dateRangeTo,
+                    },
+                    title: 'Security Configuration Assessment dashboard KPIs',
+                    description: 'Dashboard of the SCA KPIs',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: false,
+                    lastReloadRequestTime: fingerprint,
+                  }}
+                />
+              </div>
+            </>
+          )}
         </>
       </I18nProvider>
     </>
   );
 };
 
-export const DashboardSCA = compose(
-  withErrorBoundary,
-  withAgent,
-  withSCADataSource,
-)(DashboardSCAComponent);
+export const DashboardSCA = compose(withErrorBoundary)(DashboardSCAComponent);

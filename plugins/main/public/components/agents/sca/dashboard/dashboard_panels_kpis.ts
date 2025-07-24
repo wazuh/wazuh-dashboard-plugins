@@ -8,11 +8,6 @@ const checkResultColors = {
   'Not run': '#6092c0',
 };
 
-
-// ---------------------
-// MÉTRICAS DE CHECK.RESULT
-// ---------------------
-
 const getVisStateCheckResultPassed = (indexPatternId: string) => {
   return {
     id: 'check_result_passed',
@@ -580,12 +575,6 @@ export const getVisStateCheckResultsByPolicy = (indexPatternId: string) => ({
   },
 });
 
-
-
-
-// ---------------------
-// AGREGAR AL PANEL
-// ---------------------
 export const getKPIsPanel = (
   indexPatternId: string,
 ): {
@@ -661,8 +650,8 @@ export const getKPIsPanel = (
           'Checks Not Run by Agent',
           'sca-not-run-agents',
           {
-            customLabel: 'Not Run',
-            filter: [
+            fieldCustomLabel: 'Not Run',
+            filters: [
               {
                 meta: {
                   disabled: false,
@@ -693,8 +682,8 @@ export const getKPIsPanel = (
           'Top 5 failed Policies',
           'sca-top-failed-policies',
           {
-            customLabel: 'failed Checks',
-            filter: [
+            fieldCustomLabel: 'Failed Policies',
+            filters: [
               {
                 meta: {
                   disabled: false,

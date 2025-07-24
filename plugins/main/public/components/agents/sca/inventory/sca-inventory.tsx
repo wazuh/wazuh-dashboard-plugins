@@ -30,7 +30,7 @@ import { managedFilters, tableColumns } from './utils/index';
  * security teams ensure systems are properly configured according to security
  * best practices and compliance requirements.
  */
-export const SCAInventory = (props: SCAInventoryProps) => {
+export const SCAInventory: React.FC<SCAInventoryProps> = ({ indexPattern }) => {
   return (
     <div style={{ margin: '0 12px' }}>
       <InventoryDashboardTable
@@ -38,9 +38,9 @@ export const SCAInventory = (props: SCAInventoryProps) => {
         DataSourceRepositoryCreator={SCAStatesDataSourceRepository}
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
-        getDashboardPanels={() => getKPIsPanel(props.indexPattern.id)}
+        getDashboardPanels={() => getKPIsPanel(indexPattern.id)}
         tableId='sca-policies-inventory'
-        indexPattern={props.indexPattern}
+        indexPattern={indexPattern}
         categoriesSampleData={[WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT]}
         additionalDocumentDetailsTabs={[
           {

@@ -536,6 +536,7 @@ export const getVisStateTable = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    filters?: any[];
   } = {},
 ) => {
   const {
@@ -547,6 +548,7 @@ export const getVisStateTable = (
     otherBucket,
     missingBucket,
     metricCustomLabel = 'Count',
+    filters = [],
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -572,7 +574,7 @@ export const getVisStateTable = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, filters),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {
