@@ -3,7 +3,7 @@ import { EuiDescriptionList, EuiHealth } from '@elastic/eui';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../common/constants';
 import { TableWzAPI } from '../../../common/tables';
 import { ComplianceText, RuleText } from '../components';
-import { getFilterValues } from './lib';
+import { getFilterValues } from './utils';
 import { withErrorBoundary } from '../../../common/hocs';
 
 type Props = {
