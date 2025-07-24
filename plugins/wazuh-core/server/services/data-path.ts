@@ -63,7 +63,7 @@ export class DataPathService implements IDataPathService {
   }
 
   /**
-   * Get the base data path from OpenSearch Dashboards configuration
+   * Get the base data path
    */
   getDataPath(): string {
     return this.dataPath;
