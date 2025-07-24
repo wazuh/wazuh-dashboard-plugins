@@ -14,12 +14,12 @@ COPY . .
 RUN tsx scripts/url-checks/extractor.ts
 
 # Stage 2: Check URLs using Lychee
-FROM lycheeverse/lychee:latest AS url-checker
+FROM lycheeverse/lychee:latest AS url-doc-checker
 
 WORKDIR /app
 
 # Copy extracted URLs from previous stage
-COPY --from=url-extractor /app/scripts/url-checks/extracted-urls.md scripts/url-checks/extracted-urls.md
+COPY --from=url-extractor /app/scripts/url-checks/extracted-urls.md /app/extracted-urls.md
 
 # Default command to check URLs
-CMD ["--max-redirects", "0", "--format", "detailed", "--no-progress", "scripts/url-checks/extracted-urls.md"]
+CMD ["--verbose", "--max-redirects", "0", "--format", "detailed", "--no-progress", "extracted-urls.md"]
