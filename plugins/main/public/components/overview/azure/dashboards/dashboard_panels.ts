@@ -54,7 +54,7 @@ const getVisStateResults = (indexPatternId: string) => {
           schema: 'segment',
           params: {
             field: 'data.ms-graph.activityResult',
-            size: 5,
+            size: 10,
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
@@ -71,7 +71,7 @@ const getVisStateResults = (indexPatternId: string) => {
 const getVisStateDisplayName = (indexPatternId: string) => {
   return {
     id: 'azure_overview_display_name',
-    title: 'Top 5 security alerts by display name',
+    title: '',
     type: 'table',
     params: {
       perPage: 5,
@@ -81,6 +81,16 @@ const getVisStateDisplayName = (indexPatternId: string) => {
       showTotal: false,
       showToolbar: true,
       totalFunc: 'sum',
+    },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 100,
+          },
+        ],
+      },
     },
     data: {
       searchSource: {
@@ -120,66 +130,7 @@ const getVisStateDisplayName = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-          },
-        },
-      ],
-    },
-  };
-};
-
-const getVisStateCategory = (indexPatternId: string) => {
-  return {
-    id: 'azure_overview_category',
-    title: 'Top 5 categories',
-    type: 'table',
-    params: {
-      perPage: 5,
-      showPartialRows: false,
-      showMetricsAtAllLevels: false,
-      sort: { columnIndex: 3, direction: 'desc' },
-      showTotal: false,
-      showToolbar: true,
-      totalFunc: 'sum',
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          schema: 'metric',
-          params: {},
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'terms',
-          schema: 'bucket',
-          params: {
-            field: 'data.ms-graph.category',
-            size: 5,
-            order: 'desc',
-            orderBy: '1',
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Top categories',
+            customLabel: 'Top 5 security alerts by display name',
           },
         },
       ],
@@ -586,7 +537,7 @@ const getVisStateAgentResults = (indexPatternId: string) => {
           schema: 'segment',
           params: {
             field: 'data.ms-graph.activityResult',
-            size: 5,
+            size: 10,
             order: 'desc',
             orderBy: '1',
             otherBucket: false,
@@ -603,7 +554,6 @@ const getVisStateAgentResults = (indexPatternId: string) => {
 const getVisStateAgentDisplayName = (indexPatternId: string) => {
   return {
     id: 'azure_agent_display_name',
-    title: 'Top 5 security alerts by display name',
     type: 'table',
     params: {
       perPage: 5,
@@ -613,6 +563,16 @@ const getVisStateAgentDisplayName = (indexPatternId: string) => {
       showTotal: false,
       showToolbar: true,
       totalFunc: 'sum',
+    },
+    uiState: {
+      vis: {
+        columnsWidth: [
+          {
+            colIndex: 1,
+            width: 100,
+          },
+        ],
+      },
     },
     data: {
       searchSource: {
@@ -652,65 +612,7 @@ const getVisStateAgentDisplayName = (indexPatternId: string) => {
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-          },
-        },
-      ],
-    },
-  };
-};
-
-const getVisStateAgentCategories = (indexPatternId: string) => {
-  return {
-    id: 'azure_agent_categories',
-    title: 'Top 5 categories',
-    type: 'table',
-    params: {
-      perPage: 5,
-      showPartialRows: false,
-      showMetricsAtAllLevels: false,
-      sort: { columnIndex: 3, direction: 'desc' },
-      showTotal: false,
-      showToolbar: true,
-      totalFunc: 'sum',
-    },
-    data: {
-      searchSource: {
-        query: {
-          language: 'kuery',
-          query: '',
-        },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          schema: 'metric',
-          params: {},
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'terms',
-          schema: 'bucket',
-          params: {
-            field: 'data.ms-graph.category',
-            size: 5,
-            order: 'desc',
-            orderBy: '1',
-            otherBucket: false,
-            otherBucketLabel: 'Other',
-            missingBucket: false,
-            missingBucketLabel: 'Missing',
+            customLabel: 'Top 5 security alerts by display name',
           },
         },
       ],
@@ -1114,12 +1016,12 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g2',
-        savedVis: getVisStateDisplayName(indexPatternId),
+        savedVis: getVisStateRegions(indexPatternId),
       },
     },
     g3: {
       gridData: {
-        w: 12,
+        w: 24,
         h: 9,
         x: 24,
         y: 0,
@@ -1128,62 +1030,48 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'g3',
-        savedVis: getVisStateCategory(indexPatternId),
+        savedVis: getVisStateDisplayName(indexPatternId),
       },
     },
     g4: {
       gridData: {
-        w: 12,
-        h: 9,
-        x: 36,
-        y: 0,
+        w: 24,
+        h: 12,
+        x: 0,
+        y: 9,
         i: 'g4',
       },
       type: 'visualization',
       explicitInput: {
         id: 'g4',
-        savedVis: getVisStateRegions(indexPatternId),
+        savedVis: getVisStateEventsByCategory(indexPatternId),
       },
     },
     g5: {
       gridData: {
         w: 24,
         h: 12,
-        x: 0,
+        x: 24,
         y: 9,
         i: 'g5',
       },
       type: 'visualization',
       explicitInput: {
         id: 'g5',
-        savedVis: getVisStateEventsByCategory(indexPatternId),
-      },
-    },
-    g6: {
-      gridData: {
-        w: 24,
-        h: 12,
-        x: 24,
-        y: 9,
-        i: 'g6',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'g6',
         savedVis: getVisStateOperationsTypes(indexPatternId),
       },
     },
-    g7: {
+    g6: {
       gridData: {
         w: 48,
         h: 20,
         x: 0,
         y: 21,
-        i: 'g7',
+        i: 'g6',
       },
       type: 'visualization',
       explicitInput: {
-        id: 'g7',
+        id: 'g6',
         savedVis: getVisStateGeolocationMap(indexPatternId),
       },
     },
@@ -1215,12 +1103,12 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a2',
-        savedVis: getVisStateAgentDisplayName(indexPatternId),
+        savedVis: getVisStateAgentRegions(indexPatternId),
       },
     },
     a3: {
       gridData: {
-        w: 12,
+        w: 24,
         h: 9,
         x: 24,
         y: 0,
@@ -1229,62 +1117,48 @@ export const getDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: 'a3',
-        savedVis: getVisStateAgentCategories(indexPatternId),
+        savedVis: getVisStateAgentDisplayName(indexPatternId),
       },
     },
     a4: {
       gridData: {
-        w: 12,
-        h: 9,
-        x: 36,
-        y: 0,
+        w: 24,
+        h: 12,
+        x: 0,
+        y: 9,
         i: 'a4',
       },
       type: 'visualization',
       explicitInput: {
         id: 'a4',
-        savedVis: getVisStateAgentRegions(indexPatternId),
+        savedVis: getVisStateAgentEventsByCategory(indexPatternId),
       },
     },
     a5: {
       gridData: {
         w: 24,
         h: 12,
-        x: 0,
+        x: 24,
         y: 9,
         i: 'a5',
       },
       type: 'visualization',
       explicitInput: {
         id: 'a5',
-        savedVis: getVisStateAgentEventsByCategory(indexPatternId),
-      },
-    },
-    a6: {
-      gridData: {
-        w: 24,
-        h: 12,
-        x: 24,
-        y: 9,
-        i: 'a6',
-      },
-      type: 'visualization',
-      explicitInput: {
-        id: 'a6',
         savedVis: getVisStateAgentOperationsTypes(indexPatternId),
       },
     },
-    a7: {
+    a6: {
       gridData: {
         w: 48,
         h: 20,
         x: 0,
         y: 21,
-        i: 'a7',
+        i: 'a6',
       },
       type: 'visualization',
       explicitInput: {
-        id: 'a7',
+        id: 'a6',
         savedVis: getVisStateAgentGeolocationMap(indexPatternId),
       },
     },

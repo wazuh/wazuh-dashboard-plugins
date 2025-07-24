@@ -7,11 +7,11 @@ export const azureColumns: tDataGridColumn[] = [
   commonColumns.timestamp,
   {
     id: 'data.ms-graph.displayName',
-    initialWidth: 200,
+    initialWidth: 250,
   },
   {
     id: 'data.ms-graph.activityResult',
-    initialWidth: 130,
+    initialWidth: 250,
   },
   commonColumns['rule.description'],
   commonColumns['rule.level'],
