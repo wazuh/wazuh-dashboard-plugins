@@ -1,41 +1,7 @@
 {
-  "index_patterns": ["wazuh-states-fim-registries*"],
+  "index_patterns": ["wazuh-states-fim-registry-keys*"],
   "priority": 1,
   "template": {
-    "settings": {
-      "index": {
-        "number_of_replicas": "0",
-        "number_of_shards": "1",
-        "query.default_field": [
-          "agent.host.architecture",
-          "agent.host.ip",
-          "agent.id",
-          "agent.name",
-          "agent.version",
-          "event.action",
-          "event.category",
-          "registry.architecture",
-          "registry.data.hash.md5",
-          "registry.data.hash.sha1",
-          "registry.data.hash.sha256",
-          "registry.data.type",
-          "registry.gid",
-          "registry.group",
-          "registry.hive",
-          "registry.key",
-          "registry.mtime",
-          "registry.owner",
-          "registry.path",
-          "registry.size",
-          "registry.uid",
-          "registry.value",
-          "wazuh.cluster.name",
-          "wazuh.cluster.node",
-          "wazuh.schema.version"
-        ],
-        "refresh_interval": "5s"
-      }
-    },
     "mappings": {
       "date_detection": false,
       "dynamic": "strict",
@@ -67,15 +33,15 @@
             }
           }
         },
-        "event": {
+        "checksum": {
           "properties": {
-            "action": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "category": {
-              "ignore_above": 1024,
-              "type": "keyword"
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -84,30 +50,6 @@
             "architecture": {
               "ignore_above": 1024,
               "type": "keyword"
-            },
-            "data": {
-              "properties": {
-                "hash": {
-                  "properties": {
-                    "md5": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "sha1": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "sha256": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
-                  }
-                },
-                "type": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                }
-              }
             },
             "gid": {
               "ignore_above": 1024,
@@ -136,14 +78,11 @@
               "ignore_above": 1024,
               "type": "keyword"
             },
-            "size": {
-              "type": "long"
-            },
-            "uid": {
+            "permissions": {
               "ignore_above": 1024,
               "type": "keyword"
             },
-            "value": {
+            "uid": {
               "ignore_above": 1024,
               "type": "keyword"
             }
@@ -173,6 +112,35 @@
             }
           }
         }
+      }
+    },
+    "settings": {
+      "index": {
+        "auto_expand_replicas": "0-1",
+        "number_of_replicas": "0",
+        "number_of_shards": "1",
+        "query.default_field": [
+          "agent.host.architecture",
+          "agent.host.ip",
+          "agent.id",
+          "agent.name",
+          "agent.version",
+          "checksum.hash.sha1",
+          "registry.architecture",
+          "registry.gid",
+          "registry.group",
+          "registry.hive",
+          "registry.key",
+          "registry.mtime",
+          "registry.owner",
+          "registry.path",
+          "registry.permissions",
+          "registry.uid",
+          "wazuh.cluster.name",
+          "wazuh.cluster.node",
+          "wazuh.schema.version"
+        ],
+        "refresh_interval": "5s"
       }
     }
   }
