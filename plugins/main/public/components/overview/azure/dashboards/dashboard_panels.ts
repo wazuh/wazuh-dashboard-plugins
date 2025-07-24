@@ -71,7 +71,7 @@ const getVisStateResults = (indexPatternId: string) => {
 const getVisStateDisplayName = (indexPatternId: string) => {
   return {
     id: 'azure_overview_display_name',
-    title: 'Top 5 Security Alerts by Display Name',
+    title: 'Top 5 security alerts by display name',
     type: 'table',
     params: {
       perPage: 5,
@@ -130,7 +130,7 @@ const getVisStateDisplayName = (indexPatternId: string) => {
 const getVisStateCategory = (indexPatternId: string) => {
   return {
     id: 'azure_overview_category',
-    title: 'Top 5 Categories',
+    title: 'Top 5 categories',
     type: 'table',
     params: {
       perPage: 5,
@@ -253,7 +253,7 @@ const getVisStateRegions = (indexPatternId: string) => {
 const getVisStateEventsByCategory = (indexPatternId: string) => {
   return {
     id: 'azure_overview_events_by_category',
-    title: 'Events by Category over Time',
+    title: 'Events by category over time',
     type: 'area',
     params: {
       type: 'area',
@@ -370,7 +370,7 @@ const getVisStateEventsByCategory = (indexPatternId: string) => {
 const getVisStateOperationsTypes = (indexPatternId: string) => {
   return {
     id: 'azure_overview_activity_operations_types',
-    title: 'Activity Operations Types',
+    title: 'Activity operations types',
     type: 'horizontal_bar',
     params: {
       grid: {
@@ -603,7 +603,7 @@ const getVisStateAgentResults = (indexPatternId: string) => {
 const getVisStateAgentDisplayName = (indexPatternId: string) => {
   return {
     id: 'azure_agent_display_name',
-    title: 'Top 5 Security Alerts by Display Name',
+    title: 'Top 5 security alerts by display name',
     type: 'table',
     params: {
       perPage: 5,
@@ -662,7 +662,7 @@ const getVisStateAgentDisplayName = (indexPatternId: string) => {
 const getVisStateAgentCategories = (indexPatternId: string) => {
   return {
     id: 'azure_agent_categories',
-    title: 'Top 5 Categories',
+    title: 'Top 5 categories',
     type: 'table',
     params: {
       perPage: 5,
@@ -784,7 +784,7 @@ const getVisStateAgentRegions = (indexPatternId: string) => {
 const getVisStateAgentEventsByCategory = (indexPatternId: string) => {
   return {
     id: 'azure_agent_events_by_Category',
-    title: 'Events by Category over Time',
+    title: 'Events by category over time',
     type: 'area',
     params: {
       type: 'area',
@@ -901,7 +901,7 @@ const getVisStateAgentEventsByCategory = (indexPatternId: string) => {
 const getVisStateAgentOperationsTypes = (indexPatternId: string) => {
   return {
     id: 'azure_agent_operations_types',
-    title: 'Top Operations by Type',
+    title: 'Top operations by type',
     type: 'horizontal_bar',
     params: {
       grid: {
