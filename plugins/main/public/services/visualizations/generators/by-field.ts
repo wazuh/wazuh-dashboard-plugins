@@ -310,11 +310,22 @@ export const getVisStateHorizontalBarSplitSeries = (
     categoryAxesShow?: boolean;
     seriesLabel?: string;
     seriesMode?: 'stacked' | 'normal';
-    // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;
-    // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
-  } = {},
+    uiState: {
+      vis: {
+        colors: {
+          [key: string]: string;
+        };
+      };
+    };
+  } = {
+      uiState: {
+        vis: {
+          colors: {}
+        }
+      }
+    }
 ) => {
   const {
     orderAggregation = 'desc',
@@ -328,11 +339,13 @@ export const getVisStateHorizontalBarSplitSeries = (
     seriesMode = 'stacked',
     otherBucket,
     missingBucket,
+    uiState
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
     type: 'horizontal_bar',
+    uiState,
     params: {
       addLegend: true,
       addTimeMarker: false,
