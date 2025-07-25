@@ -183,7 +183,7 @@ const InventoryVulsComponent = () => {
     /* FIX: If changing any filter and the results total is the same, the page is not reset to the
      initial page but it causes a request. This has a different behavior compared with the table
      used for Events. We should use the common logic for all the tables instead of creating new ones
-     avoinding the differences in the stuff that should be common for all the tables.
+     avoiding the differences in the stuff that should be common for all the tables.
      See the generic table plugins/main/public/components/common/wazuh-discover/table.tsx */
     JSON.stringify(fetchFilters),
     JSON.stringify(query),
