@@ -1,0 +1,36 @@
+/* WORKAROUND: Overwrite the color of the SCA status metric color on
+  Security Configuration Assessment dashboard.
+
+  The metric visualization do not allow to define the specific color.
+
+  */
+.wz-app div:nth-child(1)>div>div {
+
+    /* SCA status metric: Failed */
+    &>div:nth-child(1)>div>div>div.embPanel__content>div>div>div>div.mtrVis__value {
+        /* ATTENTION: any change on this color needs to historic visualization related to
+    SCA status should be changed too to match the colors on the dashboard */
+        color: #cc5642 !important;
+    }
+
+    /* SCA status metric: Passed */
+    &>div:nth-child(2)>div>div>div.embPanel__content>div>div>div>div.mtrVis__value {
+        /* ATTENTION: any change on this color needs to historic visualization related to
+    SCA status should be changed too to match the colors on the dashboard */
+        color: #209280 !important;
+    }
+
+    /* SCA status metric: Not applicable */
+    &>div:nth-child(3)>div>div>div.embPanel__content>div>div>div>div.mtrVis__value {
+        /* ATTENTION: any change on this color needs to historic visualization related to
+    SCA status should be changed too to match the colors on the dashboard */
+        color: #6092c0 !important;
+    }
+
+    /* SCA status metric: Unknown */
+    &>div:nth-child(4)>div>div>div.embPanel__content>div>div>div>div.mtrVis__value {
+        /* ATTENTION: any change on this color needs to historic visualization related to
+    SCA status should be changed too to match the colors on the dashboard */
+        color: #f5a700 !important;
+    }
+}

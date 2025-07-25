@@ -1,9 +1,9 @@
-import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
+import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
+import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
 import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
-} from '../../../../../services/visualizations';
+} from '../../../../../../services/visualizations';
 
 const checkResultColors = {
   passed: '#54b399',

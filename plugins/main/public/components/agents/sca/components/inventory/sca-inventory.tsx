@@ -1,13 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
-import { WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT } from '../../../../../common/constants';
+import { WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT } from '../../../../../../common/constants';
 import {
   SCAStatesDataSource,
   SCAStatesDataSourceRepository,
-} from '../../../common/data-source/pattern/sca';
-import { InventoryDashboardTable } from '../../../common/dashboards';
-import { SCAInventoryProps } from '../interfaces/interface-sca';
-import { CheckDetails } from '../components/sca-check-details';
+} from '../../../../common/data-source/pattern/sca';
+import { InventoryDashboardTable } from '../../../../common/dashboards';
+import { SCAInventoryProps } from '../../interfaces/interface-sca';
+import { CheckDetails } from '../sca-check-details';
 import { getKPIsPanel } from './utils/get-vis-sca-inventory';
 import { managedFilters, tableColumns } from './utils/index';
 

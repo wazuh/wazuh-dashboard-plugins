@@ -1,2 +1,2 @@
 export { MainSca } from './main';
-export { SCAInventory } from './inventory/sca-inventory';
+export { SCAInventory } from './components/inventory/sca-inventory';

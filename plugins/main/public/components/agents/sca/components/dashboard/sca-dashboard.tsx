@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
-import { SearchResponse } from '../../../../../../../src/core/server';
+import { SearchResponse } from '../../../../../../../../src/core/server';
 import { getPlugins } from '../../../../../kibana-services';
-import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
+import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
+import './sca-dashboard.scss';
 
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getKPIsPanel } from './utils/dashboard_panels_kpis';
@@ -13,7 +14,7 @@ import {
 } from '../../../../../react-services/error-management';
 import { compose } from 'redux';
 import { useDataSource } from '../../../../common/data-source/hooks';
-import { IndexPattern } from '../../../../../../../src/plugins/data/public';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { WzSearchBar } from '../../../../common/search-bar';
 import { SampleDataWarning } from '../../../../visualize/components';
 import { WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT } from '../../../../../../common/constants';
@@ -116,9 +117,8 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
                 <DiscoverNoResults />
               ) : null}
               <div
-                className={`sca-dashboard-responsive sca-dashboard-metrics ${
-                  dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-                }`}
+                className={`sca-dashboard-responsive sca-dashboard-metrics ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+                  }`}
               >
                 <DashboardByRenderer
                   input={{
