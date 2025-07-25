@@ -14,7 +14,7 @@ import React from 'react';
 import { SCAInventory } from './index';
 import { compose } from 'redux';
 import { withAgent, withUserAuthorizationPrompt } from '../../common/hocs';
-import { DashboardSCA } from './dashboard/sca-dashboard';
+import { DashboardSCA } from './components/dashboard/sca-dashboard';
 import { withSCADataSource } from './hocs/validate-sca-states-index-pattern';
 
 export const MainSca = compose(
