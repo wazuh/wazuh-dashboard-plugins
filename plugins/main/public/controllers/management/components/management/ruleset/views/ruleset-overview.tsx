@@ -1,13 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 // Eui components
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-  EuiPage,
-  EuiSpacer,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiPage } from '@elastic/eui';
 
 // Wazuh components
 import {
@@ -19,38 +13,15 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_RULES_KEY } from '../../common/constants';
 import RulesetTable from '../components/ruleset-table';
 import '../../common/layout-overview.scss';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
 import { rules } from '../../../../../../utils/applications';
 
 function WzRulesetOverview(props) {
-  const [showWarningRestart, setShowWarningRestart] = useState(false);
-
-  const updateRestartManagers = showWarningRestart => {
-    setShowWarningRestart(showWarningRestart);
-  };
-
   return (
     <EuiPage style={{ background: 'transparent' }}>
       <EuiPanel>
-        {showWarningRestart && (
-          <>
-            <EuiSpacer size='s' />
-            <WzRestartClusterManagerCallout
-              onRestarted={() => updateRestartManagers(false)}
-              onRestartedError={() => updateRestartManagers(true)}
-            />
-            <EuiSpacer size='s' />
-          </>
-        )}
-
         <EuiFlexGroup>
           <EuiFlexItem>
-            <RulesetTable
-              {...props}
-              updateRestartClusterManager={showWarningRestart =>
-                updateRestartManagers(showWarningRestart)
-              }
-            />
+            <RulesetTable {...props} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>

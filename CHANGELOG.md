@@ -18,6 +18,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed a problem in the expanded table row that allowed to see not updated inforamtion if using the Refresh button [#7544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7544)
 - Fixed a bug that caused a format issue in csv reports [#7550](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7550)
 
+### Remove
+
+- Removed the cluster restart warning on rules, decoders and CDB lists [#7620](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7620)
+
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 04
 
 ### Added
