@@ -19,6 +19,8 @@ import {
   WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
   WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
   WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+  WAZUH_IT_HYGIENE_USERS_PATTERN,
+  WAZUH_IT_HYGIENE_GROUPS_PATTERN,
 } from '../../../../../../common/constants';
 
 const errorPromptTypes = {
@@ -114,7 +116,19 @@ export const withSystemInventoryProcessesDataSource = withIndexPatternFromValue(
   },
 );
 
-export const withSystemInventoryTrafficDataSource = withIndexPatternFromValue({
+export const withSystemInventoryUsersDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_USERS_PATTERN,
+  validate: ensureIndexPatternIsCreated(),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
+
+export const withSystemInventoryGroupsDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
+  validate: ensureIndexPatternIsCreated(),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
+
+export const withSystemInventoryPortsDataSource = withIndexPatternFromValue({
   indexPattern: WAZUH_IT_HYGIENE_PORTS_PATTERN,
   validate: ensureIndexPatternIsCreated(
     mapFieldsFormat({

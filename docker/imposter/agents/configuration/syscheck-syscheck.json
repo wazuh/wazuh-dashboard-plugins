@@ -838,7 +838,9 @@
       "database": "disk",
       "whodata": {
         "restart_audit": "yes",
-        "startup_healthcheck": "yes"
+        "startup_healthcheck": "yes",
+        "queue_size": 16384,
+        "provider": "audit"
       },
       "nodiff": ["/etc/ssl/private.key"]
     }

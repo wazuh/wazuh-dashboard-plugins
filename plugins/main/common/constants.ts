@@ -75,6 +75,9 @@ export const WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN =
   'wazuh-states-inventory-protocols-*';
 export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN =
   'wazuh-states-inventory-system-*';
+export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users-*';
+export const WAZUH_IT_HYGIENE_GROUPS_PATTERN =
+  'wazuh-states-inventory-groups-*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -140,6 +143,14 @@ export const WAZUH_SETTING_INVENTORY_PROTOCOLS_SAMPLE_PREFIX = {
 export const WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_IT_HYGIENE_SYSTEM_PATTERN.replace('*', ''),
   dataSet: 'states-inventory-system',
+};
+export const WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_GROUPS_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-groups',
+};
+export const WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_USERS_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-users',
 };
 export const WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_VULNERABILITIES_PATTERN.replace('*', ''),
@@ -343,6 +354,18 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
         WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.dataSet,
     },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.dataSet,
+    },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
     {
@@ -523,7 +546,7 @@ export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
 export const HEALTH_CHECK = 'health-check';
 
 // Health check
-export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
+export const HEALTH_CHECK_REDIRECTION_TIME = 300; // ms
 
 // Plugin platform settings
 // Default timeFilter set by the app
