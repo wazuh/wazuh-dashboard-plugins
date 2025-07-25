@@ -1,3 +1,4 @@
+import { Filter } from 'src/plugins/data/common';
 import { STYLE } from '../../../components/overview/it-hygiene/common/saved-vis/constants';
 import {
   createIndexPatternReferences,
@@ -91,6 +92,12 @@ export const getVisStateDonutByField = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    // Define the filter
+    searchFilter?: Filter[];
+    // showLegend
+    showLegend?: boolean;
+    // showLabels
+    showLabels?: boolean;
   } = {},
 ) => {
   const {
@@ -98,6 +105,9 @@ export const getVisStateDonutByField = (
     size = 10,
     otherBucket,
     missingBucket,
+    searchFilter = [],
+    showLegend = false,
+    showLabels = true,
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -106,18 +116,20 @@ export const getVisStateDonutByField = (
     params: {
       type: 'pie',
       addTooltip: true,
-      addLegend: false,
+      addLegend: showLegend,
       legendPosition: 'right',
       isDonut: true,
       labels: {
-        show: true,
+        show: showLabels,
         values: true,
         last_level: true,
         truncate: 100,
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, {
+        filter: searchFilter,
+      }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {
@@ -163,6 +175,8 @@ export const getVisStateHorizontalBarByField = (
     orderAggregation?: 'asc' | 'desc';
     size?: number;
     fieldCustomLabel?: string;
+    metricType?: string;
+    metricField?: string;
     addLegend?: boolean;
     // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;
@@ -174,6 +188,8 @@ export const getVisStateHorizontalBarByField = (
     orderAggregation = 'desc',
     size = 10,
     fieldCustomLabel,
+    metricType = 'count',
+    metricField = undefined,
     addLegend = false,
     otherBucket,
     missingBucket,
@@ -265,8 +281,8 @@ export const getVisStateHorizontalBarByField = (
         {
           id: '1',
           enabled: true,
-          type: 'count',
-          params: {},
+          type: metricType,
+          params: { field: metricField },
           schema: 'metric',
         },
         {
@@ -306,6 +322,8 @@ export const getVisStateHorizontalBarSplitSeries = (
     size?: number;
     fieldCustomLabel?: string;
     metricCustomLabel?: string;
+    metricType?: string;
+    metricField?: string;
     valueAxesTitleText?: string;
     categoryAxesShow?: boolean;
     seriesLabel?: string;
@@ -314,6 +332,8 @@ export const getVisStateHorizontalBarSplitSeries = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    // Define the filter
+    searchFilter?: Filter[];
   } = {},
 ) => {
   const {
@@ -322,12 +342,15 @@ export const getVisStateHorizontalBarSplitSeries = (
     size = 10,
     fieldCustomLabel,
     metricCustomLabel,
+    metricType = 'count',
+    metricField = undefined,
     valueAxesTitleText = '',
     categoryAxesShow = false,
     seriesLabel = '',
     seriesMode = 'stacked',
     otherBucket,
     missingBucket,
+    searchFilter = [],
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -413,15 +436,18 @@ export const getVisStateHorizontalBarSplitSeries = (
       ],
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, {
+        filter: searchFilter,
+      }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {
           id: '1',
           enabled: true,
-          type: 'count',
+          type: metricType,
           params: {
-            customLabel: metricCustomLabel, //'File owner count',
+            customLabel: metricCustomLabel,
+            field: metricField,
           },
           schema: 'metric',
         },
