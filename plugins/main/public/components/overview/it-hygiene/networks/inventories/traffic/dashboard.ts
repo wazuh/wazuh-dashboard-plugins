@@ -158,21 +158,6 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
-      'interface.state',
-      'Interface states',
-      'it-hygiene-ports',
-      {
-        fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Interface state count',
-        valueAxesTitleText: ' ',
-        seriesLabel: 'Interface state',
-        seriesMode: 'stacked',
-        fieldCustomLabel: 'Interface state',
-      },
-    ),
-    getVisStateHorizontalBarSplitSeries(
-      indexPatternId,
       'network.transport',
       'Transport protocols',
       'it-hygiene-ports',
