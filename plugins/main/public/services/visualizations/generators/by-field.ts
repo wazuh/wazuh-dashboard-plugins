@@ -1,3 +1,4 @@
+import { Filter } from 'src/plugins/data/common';
 import { STYLE } from '../../../components/overview/it-hygiene/common/saved-vis/constants';
 import {
   createIndexPatternReferences,
@@ -91,6 +92,12 @@ export const getVisStateDonutByField = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    // Define the filter
+    searchFilter?: Filter[];
+    // showLegend
+    showLegend?: boolean;
+    // showLabels
+    showLabels?: boolean;
   } = {},
 ) => {
   const {
@@ -98,6 +105,9 @@ export const getVisStateDonutByField = (
     size = 10,
     otherBucket,
     missingBucket,
+    searchFilter = [],
+    showLegend = false,
+    showLabels = true,
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -106,18 +116,20 @@ export const getVisStateDonutByField = (
     params: {
       type: 'pie',
       addTooltip: true,
-      addLegend: false,
+      addLegend: showLegend,
       legendPosition: 'right',
       isDonut: true,
       labels: {
-        show: true,
+        show: showLabels,
         values: true,
         last_level: true,
         truncate: 100,
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, {
+        filter: searchFilter,
+      }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {
@@ -314,6 +326,8 @@ export const getVisStateHorizontalBarSplitSeries = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    // Define the filter
+    searchFilter?: Filter[];
   } = {},
 ) => {
   const {
@@ -328,6 +342,7 @@ export const getVisStateHorizontalBarSplitSeries = (
     seriesMode = 'stacked',
     otherBucket,
     missingBucket,
+    searchFilter = [],
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -413,7 +428,9 @@ export const getVisStateHorizontalBarSplitSeries = (
       ],
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, {
+        filter: searchFilter,
+      }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {

@@ -6,6 +6,8 @@ import {
   SearchBarProps,
   Filter,
 } from '../../../../../../src/plugins/data/public';
+import { opensearchFilters } from '../../../../../../src/plugins/data/public';
+import classNames from 'classnames';
 import '../../../../public/styles/media-queries.scss';
 
 export interface WzSearchBarProps extends SearchBarProps {
@@ -79,13 +81,7 @@ export const WzSearchBar = ({
               >
                 {fixedFilters?.map((filter, idx) => (
                   <EuiFlexItem grow={false} key={idx}>
-                    <EuiBadge className='globalFilterItem' color='hollow'>
-                      {`${filter.meta.key}: ${
-                        typeof filter.meta.value === 'function'
-                          ? filter.meta.value()
-                          : filter.meta.value
-                      }`}
-                    </EuiBadge>
+                    <FixedFilterLabel filter={filter} />
                   </EuiFlexItem>
                 ))}
                 {postFixedFilters
@@ -120,5 +116,32 @@ export const WzSearchBar = ({
         </EuiFlexGroup>
       ) : null}
     </EuiPanel>
+  );
+};
+
+function getClasses(negate: boolean) {
+  return classNames('globalFilterItem', {
+    'globalFilterItem-isExcluded': negate,
+  });
+}
+
+const { FilterLabel } = opensearchFilters;
+
+const FixedFilterLabel = ({ filter }) => {
+  const className = getClasses(filter.meta.negate);
+
+  /* TODO: to cover other rendering cases, this should follow the same approach as the defined in
+  the platform. See https://github.com/wazuh/wazuh-dashboard/blob/v4.12.0/src/plugins/data/public/ui/filter_bar/filter_view/index.tsx#L75-L104 */
+  return (
+    <EuiBadge className={className} color='hollow'>
+      <FilterLabel
+        filter={filter}
+        valueLabel={
+          typeof filter.meta.value === 'function'
+            ? filter.meta.value()
+            : filter.meta.value
+        }
+      />
+    </EuiBadge>
   );
 };
