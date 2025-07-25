@@ -29,7 +29,6 @@ import { ReportPrinter } from '../lib/reporting/printer';
 import {
   WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
   WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-  AUTHORIZED_AGENTS,
   API_NAME_AGENT_STATUS,
 } from '../../common/constants';
 import {
@@ -37,11 +36,6 @@ import {
   createDataDirectoryIfNotExists,
 } from '../lib/filesystem';
 import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
-
-interface AgentsFilter {
-  query: any;
-  agentsText: string;
-}
 
 export class WazuhReportingCtrl {
   constructor() {}
@@ -54,24 +48,11 @@ export class WazuhReportingCtrl {
     context: any,
     filters: any,
     searchBar?: string,
-  ): [string, AgentsFilter] {
+  ): [string] {
     context.wazuh.logger.debug(
       `Started to sanitize filters. filters: ${filters.length}, searchBar: ${searchBar}`,
     );
     let str = '';
-
-    const agentsFilter: AgentsFilter = { query: {}, agentsText: '' };
-    const agentsList: string[] = [];
-
-    //separate agents filter
-    filters = filters.filter(filter => {
-      if (filter.meta.controlledBy === AUTHORIZED_AGENTS) {
-        agentsFilter.query = filter.query;
-        agentsList.push(filter);
-        return false;
-      }
-      return filter;
-    });
 
     const len = filters.length;
 
@@ -97,15 +78,9 @@ export class WazuhReportingCtrl {
       str += ` AND (${searchBar})`;
     }
 
-    agentsFilter.agentsText = agentsList
-      .map(filter => filter.meta.value)
-      .join(',');
+    context.wazuh.logger.debug(`str: ${str}`);
 
-    context.wazuh.logger.debug(
-      `str: ${str}, agentsFilterStr: ${agentsFilter.agentsText}`,
-    );
-
-    return [str, agentsFilter];
+    return [str];
   }
 
   /**
@@ -345,9 +320,9 @@ export class WazuhReportingCtrl {
           apiId,
         );
 
-        const [sanitizedFilters, agentsFilter] = filters
+        const [sanitizedFilters] = filters
           ? this.sanitizeKibanaFilters(context, filters, searchBar)
-          : [false, null];
+          : [false];
 
         if (time && sanitizedFilters) {
           printer.addTimeRangeAndFilters(

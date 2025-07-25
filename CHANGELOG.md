@@ -2,6 +2,23 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v5.0.0 - OpenSearch Dashboards 3.1.0 - Revision 00
+
+### Added
+
+- Support for Wazuh 5.0.0
+- Added sample data generators for agents monitoring and server statistics [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
+
+### Removed
+
+- Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
+- Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
+- Removed prompt related to statistic job is disabled in Statistics app [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
+
+### Changed
+
+- Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
+
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.2 - Revision 00
 
 ### Added

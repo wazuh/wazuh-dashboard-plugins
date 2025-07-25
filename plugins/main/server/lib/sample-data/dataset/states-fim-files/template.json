@@ -4,6 +4,7 @@
   "template": {
     "settings": {
       "index": {
+        "auto_expand_replicas": "0-1",
         "number_of_replicas": "0",
         "number_of_shards": "1",
         "query.default_field": [
@@ -12,6 +13,9 @@
           "agent.id",
           "agent.name",
           "agent.version",
+          "checksum.hash.sha1",
+          "file.attributes",
+          "file.device",
           "file.gid",
           "file.group",
           "file.hash.md5",
@@ -22,6 +26,7 @@
           "file.owner",
           "file.path",
           "file.path.fields.text",
+          "file.permissions",
           "file.size",
           "file.uid",
           "wazuh.cluster.name",
@@ -62,8 +67,28 @@
             }
           }
         },
+        "checksum": {
+          "properties": {
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "file": {
           "properties": {
+            "attributes": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "device": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "gid": {
               "ignore_above": 1024,
               "type": "keyword"
@@ -100,6 +125,10 @@
               "type": "keyword"
             },
             "path": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "permissions": {
               "ignore_above": 1024,
               "type": "keyword"
             },
