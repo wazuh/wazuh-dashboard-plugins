@@ -787,6 +787,14 @@ export enum HTTP_STATUS_CODES {
   NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
 
+export const MODULE_SCA_CHECK_RESULT_LABEL = {
+  passed: 'Passed',
+  failed: 'Failed',
+  'not run': 'Not run',
+};
+
+
+
 // Search bar
 
 // This limits the results in the API request

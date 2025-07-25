@@ -18,29 +18,21 @@ import {
   EuiPanel,
   EuiTitle,
   EuiText,
-  EuiLink,
-  EuiBadge,
-  EuiSpacer,
   EuiLoadingChart,
   EuiButtonIcon,
   EuiToolTip,
   EuiEmptyPrompt,
+  EuiBasicTable,
 } from '@elastic/eui';
-import moment from 'moment-timezone';
-import { WzRequest } from '../../../../../react-services';
-import { formatUIDate } from '../../../../../react-services/time-service';
-import { getCore } from '../../../../../kibana-services';
+import { getCore, getPlugins } from '../../../../../kibana-services';
 import { withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
-import SCAPoliciesTable from '../../../../agents/sca/inventory/agent-policies-table';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
-import {
-  configurationAssessment,
-  endpointSummary,
-} from '../../../../../utils/applications';
+import { configurationAssessment } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { search } from '../../../search-bar';
 
 type Props = {
   agent: { [key in string]: any };
@@ -61,12 +53,10 @@ export const ScaScan = compose(
   class ScaScan extends Component<Props> {
     _isMount = false;
     state: {
-      lastScan: {
-        [key: string]: any;
-      };
       isLoading: Boolean;
-      firstTable: Boolean;
       policies: any[];
+      pageIndex: 0;
+      pageSize: 5;
     };
 
     pinnedAgentManager: PinnedAgentManager;
@@ -75,51 +65,107 @@ export const ScaScan = compose(
       super(props);
       this.pinnedAgentManager = new PinnedAgentManager();
       this.state = {
-        lastScan: {},
         isLoading: true,
-        firstTable: true,
         policies: [],
+        pageIndex: 0,
+        pageSize: 5,
       };
     }
 
     async componentDidMount() {
-      const storedPolicies = localStorage.getItem('scaPolicies');
-      if (storedPolicies) {
-        this.setState({ policies: JSON.parse(storedPolicies) });
-      }
       this._isMount = true;
-      this.getLastScan(this.props.agent.id);
+      this.getLastPolicies(this.props.agent.id);
     }
 
     async componentDidUpdate(prevProps: Readonly<Props>) {
       if (prevProps.agent.id !== this.props.agent.id) {
-        this.getLastScan(this.props.agent.id);
+        this.getLastPolicies(this.props.agent.id);
       }
     }
 
-    async getLastScan(agentId: Number) {
-      const scans = await WzRequest.apiReq(
-        'GET',
-        `/sca/${agentId}?sort=-end_scan`,
-        { params: { limit: 1 } },
-      );
-      this._isMount &&
-        this.setState({
-          lastScan: (((scans.data || {}).data || {}).affected_items || {})[0],
-          isLoading: false,
+    async getLastPolicies(agentId: string) {
+      try {
+        const indexPattern = await getPlugins().data.indexPatterns.get(
+          'wazuh-states-sca-*',
+        );
+
+        const response = await search({
+          indexPattern,
+          filters: [
+            {
+              meta: {
+                key: 'agent.id',
+                type: 'phrase',
+                value: agentId,
+                disabled: false,
+                negate: false,
+                alias: null,
+              },
+              query: {
+                match_phrase: {
+                  'agent.id': agentId,
+                },
+              },
+            },
+          ],
+          fields: ['policy.name', 'check.result', 'policy.id'],
+          pagination: {
+            pageIndex: 0,
+            pageSize: 1000,
+          },
         });
+
+        const hits = response?.hits?.hits || [];
+
+        const grouped = hits.reduce((acc, hit) => {
+          const { policy, check } = hit._source;
+
+          if (!policy?.name) return acc;
+
+          const key = policy.name;
+          acc[key] = acc[key] || {
+            name: policy.name,
+            policy_id: policy.id,
+            pass: 0,
+            fail: 0,
+            not_run: 0,
+            total: 0,
+          };
+
+          const result = (check?.result || '').toLowerCase();
+
+          if (['passed', 'failed', 'not run'].includes(result)) {
+            if (result === 'passed') acc[key].pass++;
+            if (result === 'failed') acc[key].fail++;
+            if (result === 'not run') acc[key].not_run++;
+          }
+
+          acc[key].total++;
+
+          return acc;
+        }, {});
+
+        const policies = Object.values(grouped);
+
+        if (this._isMount) {
+          this.setState({ policies, isLoading: false });
+        }
+      } catch (error) {
+        console.error('Failed to get policies:', error);
+        if (this._isMount) {
+          this.setState({
+            isLoading: false,
+          });
+        }
+      }
     }
 
-    durationScan() {
-      const { lastScan } = this.state;
-      const start_scan = moment(lastScan.start_scan);
-      const end_scan = moment(lastScan.end_scan);
-      let diff = start_scan.diff(end_scan);
-      let duration = moment.duration(diff);
-      let auxDuration =
-        Math.floor(duration.asHours()) + moment.utc(diff).format(':mm:ss');
-      return auxDuration === '0:00:00' ? '< 1s' : auxDuration;
-    }
+    onTableChange = ({ page }: any) => {
+      this.setState({
+        pageIndex: page.index,
+        pageSize: page.size,
+      });
+    };
 
     renderLoadingStatus() {
       const { isLoading } = this.state;
@@ -144,35 +190,20 @@ export const ScaScan = compose(
       }
     }
 
-    onClickRow = policy => {
-      const updatedPolicies = [...this.state.policies, policy];
-      this.setState({ policies: updatedPolicies }, () => {
-        localStorage.setItem(
-          'scaPolicies',
-          JSON.stringify(this.state.policies),
-        );
-        NavigationService.getInstance().navigateToApp(endpointSummary.id, {
-          path: `#/overview?tab=sca&redirectPolicy=${policy.policy_id}&agentId=${this.props.agent.id}`,
-        });
-      });
-    };
-
     renderScanDetails() {
-      const { isLoading, lastScan } = this.state;
-      if (isLoading || lastScan === undefined) return;
+      const { isLoading, policies, pageIndex, pageSize } = this.state;
+      if (isLoading || !policies.length) return;
+
+      const pageOfItems = policies.slice(
+        pageIndex * pageSize,
+        pageIndex * pageSize + pageSize,
+      );
 
       const columnsPolicies = [
         {
           field: 'name',
           name: 'Policy',
           width: '40%',
-        },
-        {
-          field: 'end_scan',
-          name: 'End scan',
-          dataType: 'date',
-          render: formatUIDate,
-          width: '20%',
         },
         {
           field: 'pass',
@@ -185,58 +216,43 @@ export const ScaScan = compose(
           width: '10%',
         },
         {
-          field: 'invalid',
-          name: MODULE_SCA_CHECK_RESULT_LABEL['not applicable'],
+          field: 'not_run',
+          name: MODULE_SCA_CHECK_RESULT_LABEL['not run'],
           width: '10%',
         },
         {
-          field: 'score',
-          name: 'Score',
+          field: 'total',
+          name: 'Total Checks',
           width: '10%',
-          render: score => {
-            return `${score}%`;
-          },
         },
       ];
-
-      const tableProps = {
-        tablePageSizeOptions: [4],
-        hidePerPageOptions: true,
-      };
 
       return (
         <Fragment>
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <RedirectAppLinks application={getCore().application}>
-                <EuiTitle size='xs'>
-                  <EuiLink
-                    onClick={() => {
-                      this.pinnedAgentManager.pinAgent(this.props.agent);
-                    }}
-                    href={NavigationService.getInstance().getUrlForApp(
-                      configurationAssessment.id,
-                      {
-                        path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
-                      },
-                    )}
-                  >
-                    <h4>{lastScan.name}</h4>
-                    <EuiSpacer size='m' />
-                  </EuiLink>
-                </EuiTitle>
-              </RedirectAppLinks>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ marginTop: 12 }}>
-              <EuiBadge color='secondary'>{lastScan?.policy_id}</EuiBadge>
+              <EuiTitle size='xs'>
+                <h4>Checks by policies</h4>
+              </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <EuiPanel>
-            <SCAPoliciesTable
-              agent={this.props.agent}
+
+          <EuiPanel style={{ marginTop: 16 }}>
+            <EuiBasicTable
+              items={pageOfItems}
               columns={columnsPolicies}
-              rowProps={this.onClickRow}
-              tableProps={tableProps}
+              pagination={{
+                showPerPageOptions: false,
+                pageIndex,
+                pageSize,
+                totalItemCount: policies.length,
+                hidePerPageOptions: true,
+              }}
+              onChange={this.onTableChange}
+              rowProps={(item, idx) => ({
+                'data-test-subj': `sca-row-${idx}`,
+                className: 'customRowClass',
+              })}
             />
           </EuiPanel>
         </Fragment>
@@ -262,7 +278,7 @@ export const ScaScan = compose(
     }
 
     render() {
-      const { lastScan } = this.state;
+      const { policies } = this.state;
       const loading = this.renderLoadingStatus();
       const scaScan = this.renderScanDetails();
       const emptyPrompt = this.renderEmptyPrompt();
@@ -273,7 +289,7 @@ export const ScaScan = compose(
           </EuiFlexItem>
         );
       }
-      if (!lastScan) {
+      if (!policies.length) {
         return (
           <EuiFlexItem>
             <EuiPanel paddingSize='m'>{emptyPrompt}</EuiPanel>
@@ -288,20 +304,7 @@ export const ScaScan = compose(
                 <EuiFlexItem grow={false}>
                   <RedirectAppLinks application={getCore().application}>
                     <EuiTitle size='xs'>
-                      <EuiLink
-                        className='agents-link-item'
-                        onClick={() => {
-                          this.pinnedAgentManager.pinAgent(this.props.agent);
-                        }}
-                        href={NavigationService.getInstance().getUrlForApp(
-                          configurationAssessment.id,
-                          {
-                            path: `#/overview?tab=sca&redirectPolicy=${lastScan?.policy_id}&agentId=${this.props.agent.id}`,
-                          },
-                        )}
-                      >
-                        <h2>SCA: Lastest scans</h2>
-                      </EuiLink>
+                      <h2>SCA: Scans summary</h2>
                     </EuiTitle>
                   </RedirectAppLinks>
                 </EuiFlexItem>
