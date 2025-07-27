@@ -30,8 +30,6 @@ import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
 import {
   jobInitializeRun,
-  jobMonitoringRun,
-  jobSchedulerRun,
   jobQueueRun,
   jobMigrationTasksRun,
   jobSanitizeUploadedFilesTasksRun,
@@ -149,28 +147,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       core,
       wazuh: {
         logger: this.logger.get('migration-task'),
-        api: plugins.wazuhCore.api,
-      },
-      wazuh_core: plugins.wazuhCore,
-      server: contextServer,
-    });
-
-    // Monitoring
-    jobMonitoringRun({
-      core,
-      wazuh: {
-        logger: this.logger.get('monitoring'),
-        api: plugins.wazuhCore.api,
-      },
-      wazuh_core: plugins.wazuhCore,
-      server: contextServer,
-    });
-
-    // Scheduler
-    jobSchedulerRun({
-      core,
-      wazuh: {
-        logger: this.logger.get('cron-scheduler'),
         api: plugins.wazuhCore.api,
       },
       wazuh_core: plugins.wazuhCore,

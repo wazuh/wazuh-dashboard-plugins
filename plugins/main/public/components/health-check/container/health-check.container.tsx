@@ -38,13 +38,17 @@ import {
   HEALTH_CHECK_REDIRECTION_TIME,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_MONITORING_PATTERN,
+  WAZUH_STATISTICS_PATTERN,
 } from '../../../../common/constants';
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 import { serverApis } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { ip, wzConfig } from '../../../services/resolves';
 import { compose } from 'redux';
-import NavigationService from '../../../react-services/navigation-service';
+import NavigationService, {
+  NavigationURLSearchParams,
+} from '../../../react-services/navigation-service';
 
 const checks = {
   api: {
@@ -73,7 +77,7 @@ const checks = {
     label: 'Monitoring index pattern',
     validator: appConfig =>
       checkPatternSupportService(
-        appConfig.data['wazuh.monitoring.pattern'],
+        WAZUH_MONITORING_PATTERN,
         WAZUH_INDEX_TYPE_MONITORING,
       ),
     awaitFor: [],
@@ -85,7 +89,7 @@ const checks = {
     label: 'Statistics index pattern',
     validator: appConfig =>
       checkPatternSupportService(
-        `${appConfig.data['cron.prefix']}-${appConfig.data['cron.statistics.index.name']}-*`,
+        WAZUH_STATISTICS_PATTERN,
         WAZUH_INDEX_TYPE_STATISTICS,
       ),
     awaitFor: [],
@@ -109,16 +113,14 @@ function HealthCheckComponent() {
     // This uses the previous location that is passed in as an state
     if (NavigationService.getInstance().getLocation()?.state?.prevLocation) {
       const searchParams = NavigationService.getInstance().buildSearch(
-        new URLSearchParams(
+        new NavigationURLSearchParams(
           NavigationService.getInstance().getLocation()?.state?.prevLocation?.search,
         ),
       );
       // update browser url
       const relativePath =
         NavigationService.getInstance().getLocation().state.prevLocation
-          .pathname +
-        '?' +
-        searchParams;
+          .pathname + searchParams;
       NavigationService.getInstance().navigate(relativePath);
     } else {
       NavigationService.getInstance().navigate('/');

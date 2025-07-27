@@ -2,7 +2,7 @@ import { SavedVis } from '../types';
 
 export function createSearchSource(
   indexPatternId: string,
-  filter: any[],
+  { filter = [] } = {},
 ): SavedVis['data']['searchSource'] {
   return {
     query: {

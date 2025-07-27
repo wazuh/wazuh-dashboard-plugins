@@ -35,6 +35,7 @@ import validateConfigAfterSent from './valid-configuration';
 
 import { getToasts } from '../../../../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
+import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';
@@ -73,6 +74,7 @@ class WzFileEditor extends Component {
       error: false,
       inputValue: '',
       initialInputValue: '',
+      showWarningRestart: false,
       isModalVisible: false,
       initContent: content,
       content,
@@ -151,11 +153,11 @@ class WzFileEditor extends Component {
         let toastMessage;
 
         if (this.props.addingFile != false) {
-          // remove current invalid file if the file is new.
+          //remove current invalid file if the file is new.
           await this.resourcesHandler.deleteFile(name, relativeDirname);
           toastMessage = 'The new file was deleted.';
         } else {
-          // restore file to previous version
+          //restore file to previous version
           await this.resourcesHandler.updateFile(
             name,
             this.state.initContent,
@@ -171,15 +173,10 @@ class WzFileEditor extends Component {
       this.setState({ isSaving: false });
       this.goToEdit(name);
       this.setState({
+        showWarningRestart: true,
         initialInputValue: this.state.inputValue,
         initContent: content,
       });
-      this.showToast(
-        'success',
-        'Success',
-        `The ${this.props.section} ${name} has been saved successfully.`,
-        3000,
-      );
     } catch (error) {
       let errorMessage;
       if (error instanceof Error) {
@@ -227,7 +224,7 @@ class WzFileEditor extends Component {
   render() {
     const { section, addingFile, fileContent } = this.props;
     const { wazuhNotReadyYet } = this.props;
-    const { name, content, path } = this.state;
+    const { name, content, path, showWarningRestart } = this.state;
     const isRules = path.includes('rules') ? 'Ruleset Test' : 'Decoders Test';
 
     const isEditable = addingFile
@@ -250,7 +247,7 @@ class WzFileEditor extends Component {
           )}
           buttonProps={{
             buttonType: 'empty',
-            permissions: [{ action: 'logtest:run', resource: '*:*:*' }],
+            permissions: [{ action: 'logtest:run', resource: `*:*:*` }],
             color: 'primary',
             iconType: 'documentEdit',
             style: { margin: '0px 8px', cursor: 'pointer' },
@@ -397,6 +394,19 @@ class WzFileEditor extends Component {
                   )}
                 </EuiFlexGroup>
                 <EuiSpacer size='m' />
+                {this.state.showWarningRestart && (
+                  <Fragment>
+                    <WzRestartClusterManagerCallout
+                      onRestarted={() =>
+                        this.setState({ showWarningRestart: false })
+                      }
+                      onRestartedError={() =>
+                        this.setState({ showWarningRestart: true })
+                      }
+                    />
+                    <EuiSpacer size='s' />
+                  </Fragment>
+                )}
                 {xmlError && (
                   <Fragment>
                     <span style={{ color: 'red' }}> {xmlError}</span>
@@ -411,10 +421,13 @@ class WzFileEditor extends Component {
                           theme='textmate'
                           width='100%'
                           height={`calc(100vh - ${
-                            !xmlError || wazuhNotReadyYet
+                            (showWarningRestart && !xmlError) ||
+                            wazuhNotReadyYet
                               ? 300
                               : xmlError
-                              ? 245
+                              ? !showWarningRestart
+                                ? 245
+                                : 350
                               : 230
                           }px)`}
                           value={content}

@@ -23,28 +23,11 @@ export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
 
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
-export const WAZUH_MONITORING_PREFIX = 'wazuh-monitoring-';
 export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring-*';
-export const WAZUH_MONITORING_TEMPLATE_NAME = 'wazuh-agent';
-export const WAZUH_MONITORING_DEFAULT_INDICES_SHARDS = 1;
-export const WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS = 0;
-export const WAZUH_MONITORING_DEFAULT_CREATION = 'w';
-export const WAZUH_MONITORING_DEFAULT_ENABLED = true;
-export const WAZUH_MONITORING_DEFAULT_FREQUENCY = 900;
-export const WAZUH_MONITORING_DEFAULT_CRON_FREQ = '0 * * * * *';
 
 // Job - Wazuh statistics
 export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
-export const WAZUH_STATISTICS_DEFAULT_PREFIX = 'wazuh';
-export const WAZUH_STATISTICS_DEFAULT_NAME = 'statistics';
-export const WAZUH_STATISTICS_PATTERN = `${WAZUH_STATISTICS_DEFAULT_PREFIX}-${WAZUH_STATISTICS_DEFAULT_NAME}-*`;
-export const WAZUH_STATISTICS_TEMPLATE_NAME = `${WAZUH_STATISTICS_DEFAULT_PREFIX}-${WAZUH_STATISTICS_DEFAULT_NAME}`;
-export const WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS = 1;
-export const WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS = 0;
-export const WAZUH_STATISTICS_DEFAULT_CREATION = 'w';
-export const WAZUH_STATISTICS_DEFAULT_STATUS = true;
-export const WAZUH_STATISTICS_DEFAULT_FREQUENCY = 900;
-export const WAZUH_STATISTICS_DEFAULT_CRON_FREQ = '0 */5 * * * *';
+export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics-*';
 
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities-*';
@@ -54,7 +37,10 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim-*';
 export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
-export const WAZUH_FIM_REGISTRIES_PATTERN = 'wazuh-states-fim-registries-*';
+export const WAZUH_FIM_REGISTRY_KEYS_PATTERN =
+  'wazuh-states-fim-registry-keys-*';
+export const WAZUH_FIM_REGISTRY_VALUES_PATTERN =
+  'wazuh-states-fim-registry-values-*';
 
 // SCA
 export const WAZUH_SCA_PATTERN = 'wazuh-states-sca-*';
@@ -78,6 +64,9 @@ export const WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN =
   'wazuh-states-inventory-protocols-*';
 export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN =
   'wazuh-states-inventory-system-*';
+export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users-*';
+export const WAZUH_IT_HYGIENE_GROUPS_PATTERN =
+  'wazuh-states-inventory-groups-*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -96,6 +85,8 @@ export const WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT =
   'security-configuration-assessment';
 export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
+export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
+export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 3000;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   settingIndexPattern: 'alerts.sample.prefix',
@@ -110,9 +101,13 @@ export const WAZUH_SETTING_FIM_FILES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_FIM_FILES_PATTERN.replace('*', ''),
   dataSet: 'states-fim-files',
 };
-export const WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX = {
-  indexPatternPrefix: WAZUH_FIM_REGISTRIES_PATTERN.replace('*', ''),
-  dataSet: 'states-fim-registries',
+export const WAZUH_SETTING_FIM_REGISTRY_KEYS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_FIM_REGISTRY_KEYS_PATTERN.replace('*', ''),
+  dataSet: 'states-fim-registry-keys',
+};
+export const WAZUH_SETTING_FIM_REGISTRY_VALUES_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_FIM_REGISTRY_VALUES_PATTERN.replace('*', ''),
+  dataSet: 'states-fim-registry-values',
 };
 export const WAZUH_SETTING_INVENTORY_HARDWARE_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_IT_HYGIENE_HARDWARE_PATTERN.replace('*', ''),
@@ -150,11 +145,34 @@ export const WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_IT_HYGIENE_SYSTEM_PATTERN.replace('*', ''),
   dataSet: 'states-inventory-system',
 };
+export const WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_GROUPS_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-groups',
+};
+export const WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_USERS_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-users',
+};
 export const WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_VULNERABILITIES_PATTERN.replace('*', ''),
   dataSet: 'states-vulnerabilities',
 };
+export const WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_MONITORING_PATTERN.replace('*', ''),
+  dataSet: 'agents-monitoring',
+};
+export const WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_STATISTICS_PATTERN.replace('*', ''),
+  dataSet: 'server-statistics',
+};
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
+  [WAZUH_SAMPLE_AGENT_MONITORING]: [
+    {
+      indexPatternPrefix:
+        WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_AGENTS_MONITORING_SAMPLE_PREFIX.dataSet,
+    },
+  ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     {
       syscheck: true,
@@ -291,10 +309,14 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       dataSet: WAZUH_SETTING_FIM_FILES_SAMPLE_PREFIX.dataSet,
     },
     {
-      registries: true,
       indexPatternPrefix:
-        WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX.indexPatternPrefix,
-      dataSet: WAZUH_SETTING_FIM_REGISTRIES_SAMPLE_PREFIX.dataSet,
+        WAZUH_SETTING_FIM_REGISTRY_KEYS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_FIM_REGISTRY_KEYS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      indexPatternPrefix:
+        WAZUH_SETTING_FIM_REGISTRY_VALUES_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_FIM_REGISTRY_VALUES_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT]: [
@@ -359,6 +381,25 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       indexPatternPrefix:
         WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.dataSet,
+    },
+  ],
+  [WAZUH_SAMPLE_SERVER_STATISTICS]: [
+    {
+      indexPatternPrefix:
+        WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_SERVER_STATISTICS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
@@ -497,7 +538,6 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   ABOUT = 'about',
 }
 
-export const AUTHORIZED_AGENTS = 'hidden-authorized-agents';
 export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER =
   'hidden-exclude-server';
 export const DATA_SOURCE_FILTER_CONTROLLED_PINNED_AGENT = 'pinned-agent';
@@ -540,7 +580,7 @@ export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
 export const HEALTH_CHECK = 'health-check';
 
 // Health check
-export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
+export const HEALTH_CHECK_REDIRECTION_TIME = 300; // ms
 
 // Plugin platform settings
 // Default timeFilter set by the app

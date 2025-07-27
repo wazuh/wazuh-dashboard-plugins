@@ -48,6 +48,22 @@ function choice(array) {
 }
 
 /**
+ * Choose a sample elements from an array
+ * @param {Array} array - Array to choose from
+ * @param {number} elements - Array to choose from
+ * @returns {*} Random sample from the array
+ */
+function sample(array, elements) {
+  const shuffled = array.slice(); // make a copy
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]; // swap
+  }
+
+  return shuffled.slice(0, elements);
+}
+
+/**
  * Generate a random boolean value
  * @returns {boolean} Random boolean
  */
@@ -129,4 +145,5 @@ module.exports = {
   ip,
   macAddress,
   float,
+  sample,
 };
