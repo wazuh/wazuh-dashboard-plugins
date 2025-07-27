@@ -112,38 +112,38 @@ export default class WzSampleData extends Component {
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
     this.categories = [
       {
-        title: 'Sample Security Information',
+        title: 'Sample security information',
         description: `Sample data, visualizations and dashboards for security information (${sampleSecurityInformationApplication}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       },
       {
-        title: `Sample ${malwareDetection.title}`,
+        title: `Sample ${malwareDetection.title.toLowerCase()}`,
         description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
         image: '',
         categorySampleDataIndex:
           WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       },
       {
-        title: 'Sample Threat Detection and Response',
+        title: 'Sample threat detection and response',
         description: `Sample data, visualizations and dashboards for threat events of detection and response (${sampleThreatDetectionApplication}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
       },
       {
-        title: 'Sample File Integrity Monitoring Inventory',
+        title: 'Sample file integrity monitoring inventory',
         description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       },
       {
-        title: 'Sample Security Configuration Assessment',
+        title: 'Sample security configuration assessment',
         description: `Sample data, visualizations and dashboards for security configuration assessment (${sampleSecurityConfigurationAssessment}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
       },
       {
-        title: 'Sample System Inventory',
+        title: 'Sample system inventory',
         description: `Sample data, visualizations and dashboards for system inventory (${sampleInventory}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
