@@ -98,7 +98,7 @@ export class WzRequest {
                 .getPathname()
                 .startsWith('/settings')
             ) {
-              NavigationService.getInstance().navigate('/health-check');
+              // TODO: manage the API is inaccessible
             }
             throw new Error(error);
           }
