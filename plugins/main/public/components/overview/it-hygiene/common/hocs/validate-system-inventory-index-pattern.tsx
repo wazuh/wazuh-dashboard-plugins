@@ -128,7 +128,7 @@ export const withSystemInventoryGroupsDataSource = withIndexPatternFromValue({
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
 });
 
-export const withSystemInventoryPortsDataSource = withIndexPatternFromValue({
+export const withSystemInventoryTrafficDataSource = withIndexPatternFromValue({
   indexPattern: WAZUH_IT_HYGIENE_PORTS_PATTERN,
   validate: ensureIndexPatternIsCreated(
     mapFieldsFormat({
