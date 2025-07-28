@@ -14,9 +14,8 @@ export interface IDataPathService {
   getConfigPath(): string;
   getDownloadsPath(): string;
   getConfigFilePath(): string;
-  getRegistryFilePath(): string;
   createDirectories(): void;
-  createDataDirectoryIfNotExists(directory?: string): void;
+  createDataDirectoryIfNotExists(directory?: string): string;
   getDataDirectoryRelative(directory?: string): string;
   setup(): Promise<void>;
   start(): Promise<void>;
@@ -28,6 +27,9 @@ export class DataPathService implements IDataPathService {
 
   constructor(private logger: Logger, globalConfig: DataPathConfig) {
     this.dataPath = globalConfig.path.data;
+    this.logger.debug(
+      `Initialized DataPathService with base path: ${this.dataPath}`,
+    );
   }
 
   /**
@@ -73,7 +75,9 @@ export class DataPathService implements IDataPathService {
    * Get the Wazuh data directory path
    */
   getWazuhPath(): string {
-    return path.join(this.dataPath, 'wazuh');
+    const wazuhPath = path.join(this.dataPath, 'wazuh');
+    this.logger.debug(`Wazuh path: ${wazuhPath}`);
+    return wazuhPath;
   }
 
   /**
@@ -116,11 +120,18 @@ export class DataPathService implements IDataPathService {
   /**
    * Create data directory if not exists (compatibility method) and return the absolute path
    */
-  createDataDirectoryIfNotExists(directory?: string): void {
-    const absoluteRoute = directory
-      ? path.join(this.getWazuhPath(), directory)
-      : this.getWazuhPath();
+  createDataDirectoryIfNotExists(directory?: string): string {
+    let absoluteRoute: string;
 
+    if (!directory) {
+      absoluteRoute = this.getWazuhPath();
+    } else if (path.isAbsolute(directory)) {
+      absoluteRoute = directory;
+    } else {
+      absoluteRoute = path.join(this.getWazuhPath(), directory);
+    }
+
+    this.logger.debug(`Creating directory if not exists: ${absoluteRoute}`);
     this.ensureDirectoryExists(absoluteRoute);
     return absoluteRoute;
   }
