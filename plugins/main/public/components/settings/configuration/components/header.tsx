@@ -22,10 +22,9 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { EuiFormErrorText } from '@elastic/eui';
-import { PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION } from '../../../../../common/constants';
-import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 import { getWazuhCorePlugin } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
+import { DOC_LINKS } from '../../../../../common/doc-links';
 
 export const Header = ({ query, setQuery, searchBarFilters }) => {
   return (
@@ -62,9 +61,7 @@ const Title = () => {
               aria-label='Help'
               target='_blank'
               rel='noopener noreferrer'
-              href={webDocumentationLink(
-                PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION,
-              )}
+              href={DOC_LINKS.USER_MANUAL.WAZUH_DASHBOARD.SETTINGS}
             ></EuiButtonIcon>
           </EuiToolTip>
         </h2>

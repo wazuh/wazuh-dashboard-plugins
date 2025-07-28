@@ -1,0 +1,12 @@
+version: '3'
+
+# Parameters:
+# -------------
+#   - REPO:         Path to the Wazuh app local repository
+
+services:
+  url-checks:
+    build:
+      context: ${REPO}
+      dockerfile: docker/url-checks/Dockerfile
+    tty: true

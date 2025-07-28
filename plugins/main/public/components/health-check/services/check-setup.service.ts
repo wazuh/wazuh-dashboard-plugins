@@ -14,11 +14,8 @@
 
 import { AppState, GenericRequest, WzRequest } from '../../../react-services';
 import { CheckLogger } from '../types/check_logger';
-import {
-  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
-  PLUGIN_APP_NAME,
-} from '../../../../common/constants';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { PLUGIN_APP_NAME } from '../../../../common/constants';
+import { DOC_LINKS } from '../../../../common/doc-links';
 
 export const checkSetupService =
   appInfo => async (checkLogger: CheckLogger) => {
@@ -53,11 +50,7 @@ export const checkSetupService =
           api.groups.minor !== appSplit[1]
         ) {
           checkLogger.error(
-            `API and ${PLUGIN_APP_NAME} version mismatch. API version: ${apiVersion}. App version: ${
-              setupData.data.data['app-version']
-            }. Read more about this error in our troubleshooting guide: ${webDocumentationLink(
-              PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
-            )}.`,
+            `API and ${PLUGIN_APP_NAME} version mismatch. API version: ${apiVersion}. App version: ${setupData.data.data['app-version']}. Read more about this error in our troubleshooting guide: ${DOC_LINKS.USER_MANUAL.WAZUH_DASHBOARD.TROUBLESHOOTING}.`,
           );
         }
       }

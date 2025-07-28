@@ -17,7 +17,7 @@ import WzConfigurationSettingsGroup from '../util-components/configuration-setti
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzNoConfig from '../util-components/no-config';
 import { isString, renderValueOrNo } from '../utils/utils';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const mainSettings = [
   {
@@ -37,11 +37,11 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'Use cases about alerts generation',
-    href: webDocumentationLink('getting-started/use-cases/index.html'),
+    href: DOC_LINKS.GETTING_STARTED.USE_CASES.INDEX,
   },
   {
     text: 'Alerts reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/alerts.html'),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.ALERTS,
   },
 ];
 
