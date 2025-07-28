@@ -12,9 +12,7 @@
 
 export * from './enable-menu';
 export * from './get-config';
-export * from './get-saved-search';
 export * from './health-check';
 export * from './nested-resolve';
-export * from './saved-search';
 export * from './settings-wizard';
 export * from './wz-config';

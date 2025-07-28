@@ -5,13 +5,9 @@ import {
 } from '../../../../components/common/hocs';
 // Redux
 import WzManagementMain from '../management/management-main';
-import {
-  enableMenu,
-  nestedResolve,
-  savedSearch,
-} from '../../../../services/resolves';
+import { enableMenu, nestedResolve } from '../../../../services/resolves';
 
 export default compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, nestedResolve, savedSearch }),
+  withRouteResolvers({ enableMenu, nestedResolve }),
 )(WzManagementMain);
