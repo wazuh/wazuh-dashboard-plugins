@@ -37,7 +37,7 @@ export const SystemInventoryUsersStatesDataSourceRepository =
 export const SystemInventoryGroupsStatesDataSourceRepository =
   createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_GROUPS_PATTERN);
 
-export const SystemInventoryPortsStatesDataSourceRepository =
+export const SystemInventoryTrafficStatesDataSourceRepository =
   createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_PORTS_PATTERN);
 
 export const SystemInventoryPackagesStatesDataSourceRepository =
