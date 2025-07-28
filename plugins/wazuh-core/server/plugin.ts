@@ -16,7 +16,6 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  UpdateRegistry,
   ConfigurationStore,
 } from './services';
 import { Configuration } from '../common/services/configuration';
@@ -27,6 +26,11 @@ import {
   WAZUH_DATA_CONFIG_APP_PATH,
 } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
+import { initializationTaskCreatorIndexPattern } from './health-check';
+import indexPatternFieldsAlerts from './health-check/index-patterns-fields/alerts-fields.json';
+import indexPatternFieldsMonitoring from './health-check/index-patterns-fields/monitoring-fields.json';
+import indexPatternFieldsStatistics from './health-check/index-patterns-fields/statistics-fields.json';
+import { initializationTaskCreatorServerAPIConnectionCompatibility } from './health-check/server-api';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -122,6 +126,54 @@ export class WazuhCorePlugin
         },
       };
     });
+
+    // Register health check tasks
+    // server API connection-compatibility
+    core.healthcheck.register(
+      initializationTaskCreatorServerAPIConnectionCompatibility({
+        taskName: 'check-server-api-connection-compatibility',
+        services: this.services,
+      }),
+    );
+
+    // index patterns
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: this.services,
+        taskName: 'index-pattern:alerts',
+        options: {
+          savedObjectOverwrite: {
+            timeFieldName: '@timestamp',
+          },
+          fieldsNoIndices: indexPatternFieldsAlerts,
+        },
+        configurationSettingKey: 'pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: this.services,
+        taskName: 'index-pattern:monitoring',
+        options: {
+          fieldsNoIndices: indexPatternFieldsMonitoring,
+        },
+        indexPatternID: 'wazuh-monitoring-*',
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: this.services,
+        taskName: 'index-pattern:statistics',
+        options: {
+          fieldsNoIndices: indexPatternFieldsStatistics,
+        },
+        indexPatternID: 'wazuh-statistics-*',
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
 
     return {
       ...this.services,
