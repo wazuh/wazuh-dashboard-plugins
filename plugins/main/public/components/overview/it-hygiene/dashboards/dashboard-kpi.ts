@@ -1,8 +1,7 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateHistogramBy } from '../common/saved-vis/generators';
+import { getVisStateTable } from '../common/saved-vis/generators';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
-import { HEIGHT, STYLE } from '../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
@@ -122,19 +121,13 @@ export const getDashboardKPIs = (
       type: 'visualization',
       explicitInput: {
         id: 's1',
-        savedVis: getVisStateHorizontalBarSplitSeries(
+        savedVis: getVisStateTable(
           indexPatternId,
           'host.os.platform',
-          'Operating system families',
+          '',
           'it-hygiene-top-operating-system-names',
           {
-            fieldSize: 9,
-            otherBucket: 'Others',
-            metricCustomLabel: 'OS families',
-            valueAxesTitleText: ' ',
-            seriesLabel: 'OS families',
-            seriesMode: 'normal',
-            fieldCustomLabel: 'OS families',
+            customLabel: 'Operating system families',
           },
         ),
       },

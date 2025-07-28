@@ -26,15 +26,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed some filter values could change on navigation or pin/unpin causing different searches with unexpected results [#7552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7552)
 - Fixed a problem in the expanded table row that allowed to see not updated inforamtion if using the Refresh button [#7544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7544)
 - Fixed a bug that caused a format issue in csv reports [#7550](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7550)
 
-## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 01
+## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 04
 
 ### Added
 
 - Support for Wazuh 4.13.0
-- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
+- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513) [#7582](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7582) [#7588](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7588)
 - Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
 - Added the ability to manage the sample data from FIM, IT Hygiene and vulnerabilities inventories prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
@@ -59,7 +60,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
-- Removed the cluster restart warning on rules, decoders and CDB lists [#7489](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7489)
 - Removed `Inventory data` view from agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed `GET /api/syscollector` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
