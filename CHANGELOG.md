@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed missing provider and queue_size fields in whodata configuration [#7596](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7596)
+- Fixed PDF report columns overflowing the page width [#7630](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7630)
 
 ## Wazuh v4.13.1 - OpenSearch Dashboards 2.19.2 - Revision 00
 
