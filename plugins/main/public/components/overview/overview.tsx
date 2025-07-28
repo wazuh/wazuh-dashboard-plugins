@@ -24,7 +24,6 @@ import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-servi
 import { withRouteResolvers } from '../common/hocs';
 import {
   enableMenu,
-  ip,
   nestedResolve,
   savedSearch,
 } from '../../services/resolves';
@@ -35,7 +34,6 @@ import { migrateLegacyQuery } from '../../utils/migrate_legacy_query';
 
 export const Overview: React.FC = withRouteResolvers({
   enableMenu,
-  ip,
   nestedResolve,
   savedSearch,
 })(() => {

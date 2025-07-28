@@ -20,7 +20,6 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 import { useGetTotalAgents } from './hooks';
 import {
   enableMenu,
-  ip,
   nestedResolve,
   savedSearch,
 } from '../../services/resolves';
@@ -28,7 +27,7 @@ import NavigationService from '../../react-services/navigation-service';
 
 export const MainEndpointsSummary = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ enableMenu, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
 )(() => {
   const { isLoading, totalAgents, error } = useGetTotalAgents('id!=000');

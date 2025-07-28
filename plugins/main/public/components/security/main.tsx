@@ -31,7 +31,6 @@ import { security } from '../../utils/applications';
 import { getWazuhCorePlugin } from '../../kibana-services';
 import {
   enableMenu,
-  ip,
   nestedResolve,
   savedSearch,
 } from '../../services/resolves';
@@ -64,7 +63,7 @@ const tabs = [
 
 export const WzSecurity = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ enableMenu, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([{ text: security.breadcrumbLabel }]),
 )(() => {
   const navigationService = NavigationService.getInstance();

@@ -42,7 +42,7 @@ import {
 import { getThemeAssetURL, getAssetURL } from '../../../utils/assets';
 import { serverApis } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { ip, wzConfig } from '../../../services/resolves';
+import { wzConfig } from '../../../services/resolves';
 import { compose } from 'redux';
 import NavigationService from '../../../react-services/navigation-service';
 
@@ -368,7 +368,7 @@ function HealthCheckComponent() {
 
 export const HealthCheck = compose(
   withErrorBoundary,
-  withRouteResolvers({ ip, wzConfig }),
+  withRouteResolvers({ wzConfig }),
 )(HealthCheckComponent);
 
 export const HealthCheckTest = HealthCheckComponent;

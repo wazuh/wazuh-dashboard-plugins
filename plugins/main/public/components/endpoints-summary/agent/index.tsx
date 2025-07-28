@@ -14,7 +14,6 @@ import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-se
 import { MainModuleAgent } from '../../common/modules/main-agent';
 import {
   enableMenu,
-  ip,
   nestedResolve,
   savedSearch,
 } from '../../../services/resolves';
@@ -37,7 +36,7 @@ const mapStateToProps = state => ({
 
 export const AgentView = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ enableMenu, nestedResolve, savedSearch }),
   connect(mapStateToProps),
   withAgentSync,
   withGlobalBreadcrumb(() => {

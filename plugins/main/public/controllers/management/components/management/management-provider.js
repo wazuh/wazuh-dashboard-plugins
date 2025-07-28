@@ -7,12 +7,11 @@ import {
 import WzManagementMain from '../management/management-main';
 import {
   enableMenu,
-  ip,
   nestedResolve,
   savedSearch,
 } from '../../../../services/resolves';
 
 export default compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ enableMenu, nestedResolve, savedSearch }),
 )(WzManagementMain);

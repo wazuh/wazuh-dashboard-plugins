@@ -5,14 +5,13 @@ import { withRouteResolvers } from '../common/hocs';
 import { compose } from 'redux';
 import {
   enableMenu,
-  ip,
   nestedResolve,
   savedSearch,
 } from '../../services/resolves';
 import { Redirect, Route, Switch } from '../router-search';
 
 export const ToolsRouter = compose(
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ enableMenu, nestedResolve, savedSearch }),
 )(() => (
   <Switch>
     <Route path='?tab=devTools'>

@@ -40,7 +40,6 @@ import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import {
   enableMenu,
-  ip,
   nestedResolve,
   savedSearch,
 } from '../../../../../services/resolves';
@@ -49,7 +48,7 @@ import { SECTIONS } from '../../../../../sections';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ enableMenu, nestedResolve, savedSearch }),
   withGlobalBreadcrumb([
     {
       text: endpointSummary.breadcrumbLabel,
