@@ -12,7 +12,6 @@
 
 const initialState = {
   currentAPI: '',
-  showMenu: false,
   wazuhNotReadyYet: '',
   currentTab: '',
   currentPlatform: false,
@@ -35,13 +34,6 @@ const appStateReducers = (state = initialState, action) => {
     return {
       ...state,
       currentAPI: action.currentAPI,
-    };
-  }
-
-  if (action.type === 'SHOW_MENU') {
-    return {
-      ...state,
-      showMenu: action.showMenu,
     };
   }
 

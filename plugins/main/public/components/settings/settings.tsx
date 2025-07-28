@@ -36,7 +36,7 @@ import {
 import { compose } from 'redux';
 import { withErrorBoundary, withRouteResolvers } from '../common/hocs';
 import { connect } from 'react-redux';
-import { enableMenu, nestedResolve } from '../../services/resolves';
+import { nestedResolve } from '../../services/resolves';
 import { Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
@@ -57,7 +57,7 @@ const mapDispatchToProps = dispatch => ({
 
 export const Settings = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, nestedResolve }),
+  withRouteResolvers({ nestedResolve }),
   connect(mapStateToProps, mapDispatchToProps),
 )(props => {
   const { tab } = useRouterSearch();

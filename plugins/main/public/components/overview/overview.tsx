@@ -22,14 +22,13 @@ import {
 } from '../../../../../src/plugins/opensearch_dashboards_utils/public';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import { withRouteResolvers } from '../common/hocs';
-import { enableMenu, nestedResolve } from '../../services/resolves';
+import { nestedResolve } from '../../services/resolves';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
 import { cloneDeep } from 'lodash';
 import { migrateLegacyQuery } from '../../utils/migrate_legacy_query';
 
 export const Overview: React.FC = withRouteResolvers({
-  enableMenu,
   nestedResolve,
 })(() => {
   const [agentsCounts, setAgentsCounts] = useState<object>({});

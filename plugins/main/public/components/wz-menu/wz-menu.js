@@ -48,7 +48,6 @@ export const WzMenu = withWindowSize(
     constructor(props) {
       super(props);
       this.state = {
-        showMenu: false,
         menuOpened: false,
         currentAPI: '',
         APIlist: [],
@@ -125,18 +124,6 @@ export const WzMenu = withWindowSize(
         this.showSelectorsInPopover = this.props.windowSize.width < 1100;
       }
 
-      if (
-        !this.isLoading &&
-        (prevProps.state.showMenu !== this.props.state.showMenu ||
-          (this.props.state.showMenu === true && this.state.showMenu === false))
-      ) {
-        this.isLoading = true;
-        newState = {
-          ...newState,
-          ...(await this.loadIndexPatternsList()),
-          isSelectorsPopoverOpen: false,
-        };
-      }
       if ((!currentAPI && apiId) || apiId !== currentAPI) {
         newState = { ...newState, currentAPI: apiId };
       } else {
@@ -239,7 +226,7 @@ export const WzMenu = withWindowSize(
 
     updatePatternAndApi = async () => {
       this.setState({
-        menuOpened: false,
+        menuOpened: false, // TODO: this seems that is unused
         ...{ APIlist: await this.loadApiList() },
         ...(await this.loadIndexPatternsList()),
       });

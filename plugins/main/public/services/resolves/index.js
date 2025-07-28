@@ -9,8 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-export * from './enable-menu';
 export * from './get-config';
 export * from './health-check';
 export * from './nested-resolve';

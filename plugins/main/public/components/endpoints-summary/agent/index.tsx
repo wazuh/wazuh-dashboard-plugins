@@ -12,7 +12,7 @@ import {
 import { compose } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 import { MainModuleAgent } from '../../common/modules/main-agent';
-import { enableMenu, nestedResolve } from '../../../services/resolves';
+import { nestedResolve } from '../../../services/resolves';
 import { useRouterSearch } from '../../common/hooks/use-router-search';
 import { Redirect, Route, Switch } from '../../router-search';
 import NavigationService from '../../../react-services/navigation-service';
@@ -32,7 +32,7 @@ const mapStateToProps = state => ({
 
 export const AgentView = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, nestedResolve }),
+  withRouteResolvers({ nestedResolve }),
   connect(mapStateToProps),
   withAgentSync,
   withGlobalBreadcrumb(() => {
