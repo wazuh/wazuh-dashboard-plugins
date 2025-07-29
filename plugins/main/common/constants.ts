@@ -399,38 +399,6 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
-// Wazuh data path
-const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
-export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = path.join(
-  __dirname,
-  '../../../',
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH,
-);
-export const WAZUH_DATA_ABSOLUTE_PATH = path.join(
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
-  'wazuh',
-);
-
-// Wazuh data path - config
-export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'config',
-);
-export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh-registry.json',
-);
-
-// Wazuh data path - downloads
-export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'downloads',
-);
-export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  'reports',
-);
-
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
 
