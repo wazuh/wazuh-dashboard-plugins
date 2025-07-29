@@ -43,13 +43,7 @@ classDiagram
         +delete(url: string): Promise~T~
     }
     
-    class ILogger {
-        <<interface>>
-        +info(message: string): void
-        +error(message: string, error?: Error): void
-        +warn(message: string): void
-        +debug(message: string): void
-    }
+
 
     %% Domain Entities
     class ClusterSettings {
@@ -244,12 +238,7 @@ interface IHttpClient {
   delete<T = any>(url: string, config?: any): Promise<T>;
 }
 
-interface ILogger {
-  info(message: string, ...args: any[]): void;
-  error(message: string, error?: Error): void;
-  warn(message: string, ...args: any[]): void;
-  debug(message: string, ...args: any[]): void;
-}
+
 ```
 
 ### Domain Entity Signatures

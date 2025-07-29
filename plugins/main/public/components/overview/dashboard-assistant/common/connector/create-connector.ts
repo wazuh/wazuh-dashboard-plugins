@@ -1,16 +1,13 @@
-import { IConnectorRepository, CreateConnectorRequest } from './domain/types';
+import type { IConnectorRepository } from './domain/types';
+import type { CreateConnectorRequest } from '../assistant-manager/domain/types';
 import { Connector } from './domain/connector';
-import { ILogger } from '../installation-manager/domain/types';
 
 export class CreateConnectorUseCase {
   constructor(
-    private readonly connectorRepository: IConnectorRepository,
-    private readonly logger: ILogger
+    private readonly connectorRepository: IConnectorRepository
   ) {}
 
   public async execute(request: CreateConnectorRequest): Promise<string> {
-    this.logger.info(`Creating connector: ${request.name}`);
-    
     const connector = Connector.create({
       name: request.name,
       description: request.description,
@@ -21,7 +18,6 @@ export class CreateConnectorUseCase {
     
     const connectorId = await this.connectorRepository.create(connector);
     
-    this.logger.info(`Connector created with ID: ${connectorId}`);
     return connectorId;
   }
 }

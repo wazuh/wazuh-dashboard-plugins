@@ -28,16 +28,16 @@ export function useAssistantInstallation() {
   // Create installation use case with mock repositories
   const installUseCase = useMemo(() => {
     const mockRepos = createMockRepositories();
-    const { httpClient, logger, clusterSettingsRepository, modelGroupRepository, connectorRepository, modelRepository, agentRepository } = mockRepos;
+    const { httpClient, clusterSettingsRepository, modelGroupRepository, connectorRepository, modelRepository, agentRepository } = mockRepos;
 
     // Create use cases
-    const updateClusterSettingsUseCase = new UpdateClusterSettingsUseCase(clusterSettingsRepository, logger);
-    const createModelGroupUseCase = new CreateModelGroupUseCase(modelGroupRepository, logger);
-    const createConnectorUseCase = new CreateConnectorUseCase(connectorRepository, logger);
-    const createModelUseCase = new CreateModelUseCase(modelRepository, logger);
-    const testModelConnectionUseCase = new TestModelConnectionUseCase(modelRepository, logger);
-    const createAgentUseCase = new CreateAgentUseCase(agentRepository, logger);
-    const registerAgentUseCase = new RegisterAgentUseCase(agentRepository, logger);
+    const updateClusterSettingsUseCase = new UpdateClusterSettingsUseCase(clusterSettingsRepository);
+    const createModelGroupUseCase = new CreateModelGroupUseCase(modelGroupRepository);
+    const createConnectorUseCase = new CreateConnectorUseCase(connectorRepository);
+    const createModelUseCase = new CreateModelUseCase(modelRepository);
+    const testModelConnectionUseCase = new TestModelConnectionUseCase(modelRepository);
+    const createAgentUseCase = new CreateAgentUseCase(agentRepository);
+    const registerAgentUseCase = new RegisterAgentUseCase(agentRepository);
 
     // Create installation manager
     const installationManager = new InstallationManager(
@@ -47,11 +47,10 @@ export function useAssistantInstallation() {
       createModelUseCase,
       testModelConnectionUseCase,
       createAgentUseCase,
-      registerAgentUseCase,
-      logger
+      registerAgentUseCase
     );
 
-    return new InstallDashboardAssistantUseCase(installationManager, logger);
+    return new InstallDashboardAssistantUseCase(installationManager);
   }, []);
 
   const setModel = useCallback((data: ModelFormData) => {

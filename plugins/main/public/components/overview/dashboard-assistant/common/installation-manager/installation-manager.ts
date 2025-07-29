@@ -1,5 +1,6 @@
-import { IInstallationManager, IInstallationStep } from './types';
-import { InstallDashboardAssistantRequest, InstallationResult, ILogger } from './domain/types';
+import { IInstallationManager } from './types';
+import { InstallDashboardAssistantRequest, InstallationResult } from './domain/types';
+import { IInstallationStep } from '../assistant-manager/domain/types';
 import { InstallationContext } from './domain/installation-context';
 import { UpdateClusterSettingsUseCase } from '../cluster/update-cluster-settings';
 import { CreateModelGroupUseCase } from '../model-group/create-model-group';
@@ -27,8 +28,7 @@ export class InstallationManager implements IInstallationManager {
     createModelUseCase: CreateModelUseCase,
     testModelConnectionUseCase: TestModelConnectionUseCase,
     createAgentUseCase: CreateAgentUseCase,
-    registerAgentUseCase: RegisterAgentUseCase,
-    private readonly logger: ILogger
+    registerAgentUseCase: RegisterAgentUseCase
   ) {
     this.steps = [
       new UpdateClusterSettingsStep(updateClusterSettingsUseCase),
@@ -46,12 +46,9 @@ export class InstallationManager implements IInstallationManager {
     
     for (const step of this.steps) {
       try {
-        this.logger.info(`Executing step: ${step.getName()}`);
         await step.execute(request, context);
-        this.logger.info(`Step completed: ${step.getName()}`);
       } catch (error) {
-        this.logger.error(`Step failed: ${step.getName()}`, error as Error);
-        throw new Error(`Installation failed at step: ${step.getName()}: ${(error as Error).message}`);
+        throw new Error(`Installation failed at step: ${step.getName()}`);
       }
     }
 

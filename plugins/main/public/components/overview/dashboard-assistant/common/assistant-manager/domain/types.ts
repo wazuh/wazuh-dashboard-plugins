@@ -6,12 +6,7 @@ export interface IHttpClient {
   delete<T = any>(url: string, config?: any): Promise<T>;
 }
 
-export interface ILogger {
-  info(message: string, ...args: any[]): void;
-  error(message: string, error?: Error): void;
-  warn(message: string, ...args: any[]): void;
-  debug(message: string, ...args: any[]): void;
-}
+
 
 export interface IInstallationManager {
   execute(request: InstallDashboardAssistantRequest): Promise<InstallationResult>;
@@ -22,7 +17,6 @@ export interface IInstallationStep {
   execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void>;
 }
 
-// Request/Response DTOs
 export interface InstallDashboardAssistantRequest {
   modelName: string;
   modelVersion: string;
@@ -90,6 +84,5 @@ export class InstallDashboardAssistantResponse {
   }
 }
 
-// Import InstallationContext from installation-manager domain
 import type { InstallationContext } from '../../installation-manager/domain/installation-context';
 export type { InstallationContext };

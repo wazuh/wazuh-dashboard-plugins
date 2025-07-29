@@ -1,19 +1,16 @@
-import { IModelRepository, CreateModelRequest } from './domain/types';
+import type { IModelRepository } from './domain/types';
+import type { CreateModelRequest } from '../assistant-manager/domain/types';
 import { Model } from './domain/model';
-import { ILogger } from '../installation-manager/domain/types';
 
 export class CreateModelUseCase {
   constructor(
-    private readonly modelRepository: IModelRepository,
-    private readonly logger: ILogger
+    private readonly modelRepository: IModelRepository
   ) {}
 
   public async execute(request: CreateModelRequest): Promise<string> {
-    this.logger.info(`Creating model: ${request.name}`);
-    
     const model = Model.create({
       name: request.name,
-      version: request.version,
+      version: '1.0',
       modelGroupId: request.modelGroupId,
       connectorId: request.connectorId,
       description: request.description
@@ -21,7 +18,6 @@ export class CreateModelUseCase {
     
     const modelId = await this.modelRepository.create(model);
     
-    this.logger.info(`Model created with ID: ${modelId}`);
     return modelId;
   }
 }

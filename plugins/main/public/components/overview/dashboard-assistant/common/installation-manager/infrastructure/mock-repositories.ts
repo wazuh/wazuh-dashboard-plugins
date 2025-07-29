@@ -1,4 +1,4 @@
-import type { IHttpClient, ILogger } from '../domain/types';
+import type { IHttpClient } from '../domain/types';
 import { ClusterSettingsRepository } from '../../cluster/cluster-settings-repository';
 import { ModelGroupRepository } from '../../model-group/model-group-repository';
 import { ConnectorRepository } from '../../connector/connector-repository';
@@ -50,33 +50,14 @@ class MockHttpClient implements IHttpClient {
   }
 }
 
-// Mock Logger
-class MockLogger implements ILogger {
-  info(message: string, ...args: any[]): void {
-    console.log(`[INFO] ${message}`, ...args);
-  }
 
-  error(message: string, error?: Error): void {
-    console.error(`[ERROR] ${message}`, error);
-  }
-
-  warn(message: string, ...args: any[]): void {
-    console.warn(`[WARN] ${message}`, ...args);
-  }
-
-  debug(message: string, ...args: any[]): void {
-    console.debug(`[DEBUG] ${message}`, ...args);
-  }
-}
 
 // Factory function to create mock repositories
 export function createMockRepositories() {
   const httpClient = new MockHttpClient();
-  const logger = new MockLogger();
 
   return {
     httpClient,
-    logger,
     clusterSettingsRepository: new ClusterSettingsRepository(httpClient),
     modelGroupRepository: new ModelGroupRepository(httpClient),
     connectorRepository: new ConnectorRepository(httpClient),

@@ -2,26 +2,6 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { GetModelsUseCase } from '../get-models';
 import { ModelRepositoryMock } from '../model-repository-mock';
 import { Model } from '../domain/model';
-import type { ILogger } from '../../installation-manager/domain/types';
-
-// Simple logger implementation for the hook
-class SimpleLogger implements ILogger {
-  info(message: string): void {
-    console.log(`[INFO] ${message}`);
-  }
-  
-  error(message: string): void {
-    console.error(`[ERROR] ${message}`);
-  }
-  
-  warn(message: string): void {
-    console.warn(`[WARN] ${message}`);
-  }
-  
-  debug(message: string): void {
-    console.debug(`[DEBUG] ${message}`);
-  }
-}
 
 interface UseModelsReturn {
   models: Model[];
@@ -45,9 +25,8 @@ export function useModels(): UseModelsReturn {
 
   // Create use case instance
   const getModelsUseCase = useMemo(() => {
-    const logger = new SimpleLogger();
     const modelRepository = new ModelRepositoryMock();
-    return new GetModelsUseCase(modelRepository, logger);
+    return new GetModelsUseCase(modelRepository);
   }, []);
 
   const fetchModels = useCallback(async () => {

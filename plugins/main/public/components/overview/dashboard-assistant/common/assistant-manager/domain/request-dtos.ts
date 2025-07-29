@@ -1,4 +1,3 @@
-// Request DTOs
 export interface CreateModelGroupRequest {
   name: string;
   description: string;
