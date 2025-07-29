@@ -39,21 +39,27 @@ interface ModelFormProps {
   modelConfig?: ModelConfig[];
 }
 
-
-
 const getVersionOptions = (selectedName: string, models: ModelConfig[]) => {
   const model = models.find(m => m.name === selectedName);
-  return model ? model.versions.map(version => ({ value: version, text: version })) : [];
+  return model
+    ? model.versions.map(version => ({ value: version, text: version }))
+    : [];
 };
 
 const getNameOptions = (models: ModelConfig[]) => {
   return models.map(model => ({
     value: model.name,
-    text: model.name
+    text: model.name,
   }));
 };
 
-export const ModelForm = ({ config = {}, onChange, onValidationChange, disabled = false, modelConfig = [] }: ModelFormProps) => {
+export const ModelForm = ({
+  config = {},
+  onChange,
+  onValidationChange,
+  disabled = false,
+  modelConfig = [],
+}: ModelFormProps) => {
   const [formData, setFormData] = useState<ModelFormData>({
     name: config.name?.value || '',
     version: config.version?.value || '',
@@ -61,7 +67,9 @@ export const ModelForm = ({ config = {}, onChange, onValidationChange, disabled 
     apiKey: config.apiKey?.value || '',
   });
 
-  const [versionOptions, setVersionOptions] = useState(getVersionOptions(config.name?.value || '', modelConfig));
+  const [versionOptions, setVersionOptions] = useState(
+    getVersionOptions(config.name?.value || '', modelConfig),
+  );
 
   useEffect(() => {
     if (onChange) {
@@ -70,7 +78,8 @@ export const ModelForm = ({ config = {}, onChange, onValidationChange, disabled 
   }, [formData, onChange]);
 
   useEffect(() => {
-    const isValid = formData.name && formData.version && formData.apiUrl && formData.apiKey;
+    const isValid =
+      formData.name && formData.version && formData.apiUrl && formData.apiKey;
     if (onValidationChange) {
       onValidationChange(!!isValid);
     }
@@ -80,11 +89,11 @@ export const ModelForm = ({ config = {}, onChange, onValidationChange, disabled 
     const newName = e.target.value;
     const newVersionOptions = getVersionOptions(newName, modelConfig);
     setVersionOptions(newVersionOptions);
-    
+
     setFormData(prev => ({
       ...prev,
       name: newName,
-      version: '' // Reset version when name changes
+      version: '', // Reset version when name changes
     }));
   };
 
@@ -102,7 +111,7 @@ export const ModelForm = ({ config = {}, onChange, onValidationChange, disabled 
 
   return (
     <EuiForm>
-      <EuiFormRow label="Name" fullWidth>
+      <EuiFormRow label='Name' fullWidth>
         <EuiSelect
           fullWidth
           options={getNameOptions(modelConfig)}
@@ -112,10 +121,10 @@ export const ModelForm = ({ config = {}, onChange, onValidationChange, disabled 
           disabled={config.name?.disabled || disabled}
         />
       </EuiFormRow>
-      
-      <EuiSpacer size="m" />
-      
-      <EuiFormRow label="Version" fullWidth>
+
+      <EuiSpacer size='m' />
+
+      <EuiFormRow label='Version' fullWidth>
         <EuiSelect
           fullWidth
           options={versionOptions}
@@ -125,28 +134,28 @@ export const ModelForm = ({ config = {}, onChange, onValidationChange, disabled 
           disabled={!formData.name || config.version?.disabled || disabled}
         />
       </EuiFormRow>
-      
-      <EuiSpacer size="m" />
-      
-      <EuiFormRow label="API URL" fullWidth>
+
+      <EuiSpacer size='m' />
+
+      <EuiFormRow label='API URL' fullWidth>
         <EuiFieldText
           fullWidth
           value={formData.apiUrl}
           onChange={handleApiUrlChange}
-          placeholder="Enter API URL"
+          placeholder='Enter API URL'
           disabled={config.apiUrl?.disabled || disabled}
         />
       </EuiFormRow>
-      
-      <EuiSpacer size="m" />
-      
-      <EuiFormRow label="API key" fullWidth>
+
+      <EuiSpacer size='m' />
+
+      <EuiFormRow label='API key' fullWidth>
         <EuiFieldText
           fullWidth
-          type="password"
+          type='password'
           value={formData.apiKey}
           onChange={handleApiKeyChange}
-          placeholder="Enter API key"
+          placeholder='Enter API key'
           disabled={config.apiKey?.disabled || disabled}
         />
       </EuiFormRow>

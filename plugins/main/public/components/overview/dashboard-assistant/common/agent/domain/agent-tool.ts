@@ -2,7 +2,7 @@ export class AgentTool {
   constructor(
     private readonly type: string,
     private readonly name?: string,
-    private readonly parameters?: Record<string, any>
+    private readonly parameters?: Record<string, any>,
   ) {}
 
   public toObject(): object {

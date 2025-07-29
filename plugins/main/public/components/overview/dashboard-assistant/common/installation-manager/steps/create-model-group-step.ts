@@ -11,13 +11,16 @@ export class CreateModelGroupStep implements IInstallationStep {
     return 'Create Model Group';
   }
 
-  public async execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void> {
+  public async execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void> {
     const createModelGroup = createModelGroupUseCase(this.modelGroupRepository);
     const modelGroupId = await createModelGroup({
       name: request.modelGroup.name,
-      description: request.modelGroup.description
+      description: request.modelGroup.description,
     });
-    
+
     context.set('modelGroupId', modelGroupId);
   }
 }

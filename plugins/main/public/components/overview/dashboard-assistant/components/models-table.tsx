@@ -17,7 +17,6 @@ import NavigationService from '../../../../react-services/navigation-service';
 import { dashboardAssistant } from '../../../../utils/applications';
 import { useModels } from '../common/model';
 
-
 interface Model {
   id: string;
   name: string;
@@ -31,9 +30,7 @@ interface ModelsTableProps {
   onAddModel?: boolean;
 }
 
-export const ModelsTable = ({
-  onAddModel
-}: ModelsTableProps) => {
+export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
   const { models, isLoading, error, refresh, getTableData } = useModels();
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
@@ -42,15 +39,15 @@ export const ModelsTable = ({
 
   if (error) {
     return (
-      <EuiFlexGroup direction="column" gutterSize="m" alignItems="center">
+      <EuiFlexGroup direction='column' gutterSize='m' alignItems='center'>
         <EuiFlexItem>
-          <EuiText color="danger">
+          <EuiText color='danger'>
             <h3>Error loading models</h3>
             <p>{error}</p>
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem>
-          <EuiButtonEmpty iconType="refresh" onClick={refresh}>
+          <EuiButtonEmpty iconType='refresh' onClick={refresh}>
             Retry
           </EuiButtonEmpty>
         </EuiFlexItem>
@@ -61,13 +58,13 @@ export const ModelsTable = ({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'active':
-        return <EuiIcon type="dot" color="success" />;
+        return <EuiIcon type='dot' color='success' />;
       case 'inactive':
-        return <EuiIcon type="dot" color="subdued" />;
+        return <EuiIcon type='dot' color='subdued' />;
       case 'error':
-        return <EuiIcon type="dot" color="danger" />;
+        return <EuiIcon type='dot' color='danger' />;
       default:
-        return <EuiIcon type="dot" color="subdued" />;
+        return <EuiIcon type='dot' color='subdued' />;
     }
   };
 
@@ -99,12 +96,10 @@ export const ModelsTable = ({
       name: 'Status',
       sortable: true,
       render: (status: string) => (
-        <EuiFlexGroup alignItems="center" gutterSize="s" responsive={false}>
+        <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
+          <EuiFlexItem grow={false}>{getStatusIcon(status)}</EuiFlexItem>
           <EuiFlexItem grow={false}>
-            {getStatusIcon(status)}
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiText size="s">{status}</EuiText>
+            <EuiText size='s'>{status}</EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
       ),
@@ -131,10 +126,10 @@ export const ModelsTable = ({
 
   const renderActionButtons = () => {
     const buttons = [];
-    
+
     if (onAddModel) {
       buttons.push(
-        <EuiFlexItem key="add-model" grow={false}>
+        <EuiFlexItem key='add-model' grow={false}>
           <EuiButtonEmpty
             color='primary'
             iconType='plusInCircle'
@@ -147,31 +142,31 @@ export const ModelsTable = ({
           >
             Add model
           </EuiButtonEmpty>
-        </EuiFlexItem>
+        </EuiFlexItem>,
       );
     }
-    
+
     buttons.push(
-      <EuiFlexItem key="refresh" grow={false}>
-        <EuiButtonEmpty iconType="refresh" onClick={refresh}>
+      <EuiFlexItem key='refresh' grow={false}>
+        <EuiButtonEmpty iconType='refresh' onClick={refresh}>
           Refresh
         </EuiButtonEmpty>
-      </EuiFlexItem>
+      </EuiFlexItem>,
     );
-    
+
     return buttons;
   };
 
   const header = (
-    <EuiFlexGroup wrap alignItems="center" responsive={false}>
+    <EuiFlexGroup wrap alignItems='center' responsive={false}>
       <EuiFlexItem>
-        <EuiFlexGroup wrap alignItems="center" responsive={false}>
-          <EuiFlexItem className="wz-flex-basis-auto" grow={false}>
-            <EuiTitle data-test-subj="models-table-title" size="s">
+        <EuiFlexGroup wrap alignItems='center' responsive={false}>
+          <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
+            <EuiTitle data-test-subj='models-table-title' size='s'>
               <h1>
                 Models{' '}
                 {isLoading ? (
-                  <EuiLoadingSpinner size="s" />
+                  <EuiLoadingSpinner size='s' />
                 ) : (
                   <span>({formatUINumber(tableModels.length)})</span>
                 )}
@@ -181,7 +176,7 @@ export const ModelsTable = ({
         </EuiFlexGroup>
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
-        <EuiFlexGroup wrap alignItems="center" responsive={false}>
+        <EuiFlexGroup wrap alignItems='center' responsive={false}>
           {renderActionButtons()}
         </EuiFlexGroup>
       </EuiFlexItem>
@@ -189,32 +184,32 @@ export const ModelsTable = ({
   );
 
   const table = (
-      <EuiBasicTable
-        items={tableModels}
-        columns={columns}
-        loading={isLoading}
-        hasActions
-        tableLayout="auto"
-        noItemsMessage={isLoading ? 'Loading models...' : 'No models found'}
-      />
+    <EuiBasicTable
+      items={tableModels}
+      columns={columns}
+      loading={isLoading}
+      hasActions
+      tableLayout='auto'
+      noItemsMessage={isLoading ? 'Loading models...' : 'No models found'}
+    />
   );
 
   return (
     <>
-      <EuiFlexGroup direction="column" gutterSize="s" responsive={false}>
+      <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
         <EuiFlexItem>{header}</EuiFlexItem>
         <EuiFlexItem>{table}</EuiFlexItem>
       </EuiFlexGroup>
 
       {isFlyoutVisible && selectedModel && (
-        <EuiFlyout onClose={closeFlyout} size="m">
+        <EuiFlyout onClose={closeFlyout} size='m'>
           <EuiFlyoutHeader hasBorder>
-            <EuiTitle size="m">
+            <EuiTitle size='m'>
               <h2>Model Details</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
-            <EuiFlexGroup direction="column" gutterSize="m">
+            <EuiFlexGroup direction='column' gutterSize='m'>
               <EuiFlexItem>
                 <EuiText>
                   <strong>Name:</strong> {selectedModel.name}
@@ -231,7 +226,11 @@ export const ModelsTable = ({
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiFlexGroup alignItems="center" gutterSize="s" responsive={false}>
+                <EuiFlexGroup
+                  alignItems='center'
+                  gutterSize='s'
+                  responsive={false}
+                >
                   <EuiFlexItem grow={false}>
                     <EuiText>
                       <strong>Status:</strong>
@@ -247,7 +246,8 @@ export const ModelsTable = ({
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiText>
-                  <strong>Created:</strong> {new Date(selectedModel.createdAt).toLocaleString()}
+                  <strong>Created:</strong>{' '}
+                  {new Date(selectedModel.createdAt).toLocaleString()}
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>

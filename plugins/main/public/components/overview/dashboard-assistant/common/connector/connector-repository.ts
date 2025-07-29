@@ -6,16 +6,18 @@ export class ConnectorRepository implements IConnectorRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(connector: Connector): Promise<string> {
-    const response = await this.httpClient.post(
+    const response = (await this.httpClient.post(
       '/_plugins/_ml/connectors/_create',
-      connector.toApiPayload()
-    ) as { connector_id: string };
+      connector.toApiPayload(),
+    )) as { connector_id: string };
     return response.connector_id;
   }
 
   public async findById(id: string): Promise<Connector | null> {
     try {
-      const response = await this.httpClient.get(`/_plugins/_ml/connectors/${id}`);
+      const response = await this.httpClient.get(
+        `/_plugins/_ml/connectors/${id}`,
+      );
       // TODO: Implement Connector.fromResponse method
       throw new Error('Method not implemented');
     } catch (error: any) {
@@ -27,7 +29,7 @@ export class ConnectorRepository implements IConnectorRepository {
   public async update(id: string, connector: Connector): Promise<void> {
     await this.httpClient.put(
       `/_plugins/_ml/connectors/${id}`,
-      connector.toApiPayload()
+      connector.toApiPayload(),
     );
   }
 

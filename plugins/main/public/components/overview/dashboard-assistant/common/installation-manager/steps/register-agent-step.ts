@@ -11,10 +11,13 @@ export class RegisterAgentStep implements IInstallationStep {
     return 'Register Agent';
   }
 
-  public async execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void> {
+  public async execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void> {
     const registerAgent = registerAgentUseCase(this.agentRepository);
     await registerAgent({
-      agentId: context.get<string>('agentId')!
+      agentId: context.get<string>('agentId')!,
     });
   }
 }

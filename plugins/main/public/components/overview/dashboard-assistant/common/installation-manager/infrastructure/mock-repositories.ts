@@ -15,7 +15,7 @@ class MockHttpClient implements IHttpClient {
   async post<T = any>(url: string, data?: any, config?: any): Promise<T> {
     console.log(`Mock POST request to: ${url}`, data);
     await new Promise(resolve => setTimeout(resolve, 800));
-    
+
     // Mock responses based on URL patterns
     if (url.includes('_cluster/settings')) {
       return { acknowledged: true } as T;
@@ -32,7 +32,7 @@ class MockHttpClient implements IHttpClient {
     if (url.includes('_plugins/_ml/agents/_register')) {
       return { agent_id: `agent_${Date.now()}` } as T;
     }
-    
+
     return {} as T;
   }
 
@@ -49,8 +49,6 @@ class MockHttpClient implements IHttpClient {
   }
 }
 
-
-
 // Factory function to create mock repositories
 export function createMockRepositories() {
   const httpClient = new MockHttpClient();
@@ -61,6 +59,6 @@ export function createMockRepositories() {
     modelGroupRepository: new ModelGroupRepository(httpClient),
     connectorRepository: new ConnectorRepository(httpClient),
     modelRepository: new ModelRepository(httpClient),
-    agentRepository: new AgentRepository(httpClient)
+    agentRepository: new AgentRepository(httpClient),
   };
 }

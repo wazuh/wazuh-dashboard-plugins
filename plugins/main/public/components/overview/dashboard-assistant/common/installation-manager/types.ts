@@ -1,21 +1,29 @@
 import type { InstallationContext } from './domain/installation-context';
-import type { InstallDashboardAssistantRequest, InstallationResult } from './domain/types';
+import type {
+  InstallDashboardAssistantRequest,
+  InstallationResult,
+} from './domain/types';
 
 // Define local interfaces for installation manager
 export interface IInstallationStep {
   getName(): string;
-  execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void>;
+  execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void>;
 }
 
 export interface IInstallationManager {
-  execute(request: InstallDashboardAssistantRequest): Promise<InstallationResult>;
+  execute(
+    request: InstallDashboardAssistantRequest,
+  ): Promise<InstallationResult>;
 }
 
 // Re-export domain types
-export type { 
-  InstallDashboardAssistantRequest, 
+export type {
+  InstallDashboardAssistantRequest,
   InstallationResult,
-  InstallationContext
+  InstallationContext,
 };
 
 // For compatibility with assistant-manager

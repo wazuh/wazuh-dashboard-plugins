@@ -6,10 +6,10 @@ export class ModelRepository implements IModelRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(model: Model): Promise<string> {
-    const response = await this.httpClient.post(
+    const response = (await this.httpClient.post(
       '/_plugins/_ml/models/_register',
-      model.toApiPayload()
-    ) as { model_id: string };
+      model.toApiPayload(),
+    )) as { model_id: string };
     return response.model_id;
   }
 
@@ -35,7 +35,7 @@ export class ModelRepository implements IModelRepository {
         description: 'Advanced AI model for complex reasoning and analysis',
         status: 'active',
         created_at: '2024-01-15T10:30:00Z',
-        api_url: 'https://api.anthropic.com/v1/messages'
+        api_url: 'https://api.anthropic.com/v1/messages',
       },
       {
         model_id: 'amazon-titan-2',
@@ -46,7 +46,7 @@ export class ModelRepository implements IModelRepository {
         description: 'High-performance text generation model',
         status: 'active',
         created_at: '2024-01-10T14:20:00Z',
-        api_url: 'https://bedrock-runtime.us-east-1.amazonaws.com'
+        api_url: 'https://bedrock-runtime.us-east-1.amazonaws.com',
       },
       {
         model_id: 'deepseek-3',
@@ -57,7 +57,7 @@ export class ModelRepository implements IModelRepository {
         description: 'Efficient model for chat and conversation',
         status: 'inactive',
         created_at: '2024-01-08T09:15:00Z',
-        api_url: 'https://api.deepseek.com/v1/chat/completions'
+        api_url: 'https://api.deepseek.com/v1/chat/completions',
       },
       {
         model_id: 'openai-gpt-4',
@@ -68,8 +68,8 @@ export class ModelRepository implements IModelRepository {
         description: 'Latest GPT model with enhanced capabilities',
         status: 'error',
         created_at: '2024-01-01T16:45:00Z',
-        api_url: 'https://api.openai.com/v1/chat/completions'
-      }
+        api_url: 'https://api.openai.com/v1/chat/completions',
+      },
     ];
 
     // Simulate API delay
@@ -81,7 +81,7 @@ export class ModelRepository implements IModelRepository {
   public async update(id: string, model: Model): Promise<void> {
     await this.httpClient.put(
       `/_plugins/_ml/models/${id}`,
-      model.toApiPayload()
+      model.toApiPayload(),
     );
   }
 
@@ -91,15 +91,12 @@ export class ModelRepository implements IModelRepository {
 
   public async testConnection(modelId: string): Promise<boolean> {
     try {
-      await this.httpClient.post(
-        `/_plugins/_ml/models/${modelId}/_predict`,
-        {
-          messages: [
-            { role: 'system', content: 'You are a helpful assistant.' },
-            { role: 'user', content: 'Hello!' }
-          ]
-        }
-      );
+      await this.httpClient.post(`/_plugins/_ml/models/${modelId}/_predict`, {
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant.' },
+          { role: 'user', content: 'Hello!' },
+        ],
+      });
       return true;
     } catch (error) {
       return false;

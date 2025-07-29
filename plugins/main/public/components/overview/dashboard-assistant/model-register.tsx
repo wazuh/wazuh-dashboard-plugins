@@ -44,72 +44,154 @@ interface ModelRegisterProps {
   formConfig?: FormConfig;
 }
 
-export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: ModelRegisterProps) => {
+export const ModelRegister = ({
+  onClickDeploy,
+  disabled = false,
+  formConfig,
+}: ModelRegisterProps) => {
   // Use the assistant installation hook
-  const { install, setModel, isLoading: isInstalling, error: installError, result, modelData, isSuccess } = useAssistantInstallation();
+  const {
+    install,
+    setModel,
+    isLoading: isInstalling,
+    error: installError,
+    result,
+    modelData,
+    isSuccess,
+  } = useAssistantInstallation();
 
   // Default form configuration
   const defaultFormConfig: FormConfig = {
     title: 'Register your preferred AI model',
-    description: 'Select and configure the AI model that will power your dashboard assistant\'s conversational capabilities and data insights',
+    description:
+      "Select and configure the AI model that will power your dashboard assistant's conversational capabilities and data insights",
     learnMoreText: 'Learn more',
     buttons: {
       cancel: 'Cancel',
-      deploy: 'Deploy'
+      deploy: 'Deploy',
     },
     maxWidth: '600px',
-    padding: '24px'
+    padding: '24px',
   };
   // Model configuration data
   const modelConfig = [
     {
       name: 'OpenAI GPT',
-      versions: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo', 'gpt-3.5-turbo-16k']
+      versions: [
+        'gpt-4o',
+        'gpt-4o-mini',
+        'gpt-4-turbo',
+        'gpt-4',
+        'gpt-3.5-turbo',
+        'gpt-3.5-turbo-16k',
+      ],
     },
     {
       name: 'Anthropic Claude',
-      versions: ['claude-3-5-sonnet-20241022', 'claude-3-5-haiku-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307', 'claude-2.1', 'claude-2.0', 'claude-instant-1.2']
+      versions: [
+        'claude-3-5-sonnet-20241022',
+        'claude-3-5-haiku-20241022',
+        'claude-3-opus-20240229',
+        'claude-3-sonnet-20240229',
+        'claude-3-haiku-20240307',
+        'claude-2.1',
+        'claude-2.0',
+        'claude-instant-1.2',
+      ],
     },
     {
       name: 'Google Gemini',
-      versions: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-1.0-pro', 'gemini-1.0-pro-vision']
+      versions: [
+        'gemini-1.5-pro',
+        'gemini-1.5-flash',
+        'gemini-1.0-pro',
+        'gemini-1.0-pro-vision',
+      ],
     },
     {
       name: 'Amazon Bedrock - Titan',
-      versions: ['amazon.titan-text-express-v1', 'amazon.titan-text-lite-v1', 'amazon.titan-embed-text-v1', 'amazon.titan-embed-text-v2']
+      versions: [
+        'amazon.titan-text-express-v1',
+        'amazon.titan-text-lite-v1',
+        'amazon.titan-embed-text-v1',
+        'amazon.titan-embed-text-v2',
+      ],
     },
     {
       name: 'Amazon Bedrock - Claude',
-      versions: ['anthropic.claude-3-5-sonnet-20241022-v2:0', 'anthropic.claude-3-5-haiku-20241022-v1:0', 'anthropic.claude-3-opus-20240229-v1:0', 'anthropic.claude-3-sonnet-20240229-v1:0']
+      versions: [
+        'anthropic.claude-3-5-sonnet-20241022-v2:0',
+        'anthropic.claude-3-5-haiku-20241022-v1:0',
+        'anthropic.claude-3-opus-20240229-v1:0',
+        'anthropic.claude-3-sonnet-20240229-v1:0',
+      ],
     },
     {
       name: 'Amazon Bedrock - Llama',
-      versions: ['meta.llama3-2-90b-instruct-v1:0', 'meta.llama3-2-11b-instruct-v1:0', 'meta.llama3-2-3b-instruct-v1:0', 'meta.llama3-2-1b-instruct-v1:0']
+      versions: [
+        'meta.llama3-2-90b-instruct-v1:0',
+        'meta.llama3-2-11b-instruct-v1:0',
+        'meta.llama3-2-3b-instruct-v1:0',
+        'meta.llama3-2-1b-instruct-v1:0',
+      ],
     },
     {
       name: 'Microsoft Azure OpenAI',
-      versions: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4', 'gpt-35-turbo', 'gpt-35-turbo-16k']
+      versions: [
+        'gpt-4o',
+        'gpt-4o-mini',
+        'gpt-4-turbo',
+        'gpt-4',
+        'gpt-35-turbo',
+        'gpt-35-turbo-16k',
+      ],
     },
     {
       name: 'Cohere',
-      versions: ['command-r-plus', 'command-r', 'command', 'command-nightly', 'command-light', 'command-light-nightly']
+      versions: [
+        'command-r-plus',
+        'command-r',
+        'command',
+        'command-nightly',
+        'command-light',
+        'command-light-nightly',
+      ],
     },
     {
       name: 'Mistral AI',
-      versions: ['mistral-large-latest', 'mistral-medium-latest', 'mistral-small-latest', 'open-mistral-7b', 'open-mixtral-8x7b', 'open-mixtral-8x22b']
+      versions: [
+        'mistral-large-latest',
+        'mistral-medium-latest',
+        'mistral-small-latest',
+        'open-mistral-7b',
+        'open-mixtral-8x7b',
+        'open-mixtral-8x22b',
+      ],
     },
     {
       name: 'Deepseek',
-      versions: ['deepseek-chat', 'deepseek-coder', 'deepseek-math']
+      versions: ['deepseek-chat', 'deepseek-coder', 'deepseek-math'],
     },
     {
       name: 'Hugging Face',
-      versions: ['microsoft/DialoGPT-large', 'facebook/blenderbot-400M-distill', 'microsoft/DialoGPT-medium', 'facebook/blenderbot-1B-distill']
+      versions: [
+        'microsoft/DialoGPT-large',
+        'facebook/blenderbot-400M-distill',
+        'microsoft/DialoGPT-medium',
+        'facebook/blenderbot-1B-distill',
+      ],
     },
     {
       name: 'Ollama',
-      versions: ['llama3.2:latest', 'llama3.1:latest', 'llama3:latest', 'mistral:latest', 'codellama:latest', 'phi3:latest']
-    }
+      versions: [
+        'llama3.2:latest',
+        'llama3.1:latest',
+        'llama3:latest',
+        'mistral:latest',
+        'codellama:latest',
+        'phi3:latest',
+      ],
+    },
   ];
 
   const config = formConfig || defaultFormConfig;
@@ -117,22 +199,25 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
     name: '',
     version: '',
     apiUrl: '',
-    apiKey: ''
+    apiKey: '',
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
   const [isDeploymentVisible, setIsDeploymentVisible] = useState(false);
 
-  const handleFormChange = useCallback((data: any) => {
-    setFormData(data);
-    setModel({
-      name: data.name,
-      version: data.version,
-      apiUrl: data.apiUrl,
-      apiKey: data.apiKey,
-      description: `${data.name} ${data.version} model`
-    });
-  }, [setModel]);
+  const handleFormChange = useCallback(
+    (data: any) => {
+      setFormData(data);
+      setModel({
+        name: data.name,
+        version: data.version,
+        apiUrl: data.apiUrl,
+        apiKey: data.apiKey,
+        description: `${data.name} ${data.version} model`,
+      });
+    },
+    [setModel],
+  );
 
   const handleValidationChange = useCallback((isValid: boolean) => {
     setIsFormValid(isValid);
@@ -143,17 +228,17 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
       name: '',
       version: '',
       apiUrl: '',
-      apiKey: ''
+      apiKey: '',
     });
   };
 
   const handleDeploy = async () => {
     console.log('Deploying model with data:', formData);
     setIsDeploymentVisible(true);
-    
+
     // Execute the installation using the hook
     await install();
-    
+
     if (onClickDeploy) {
       onClickDeploy();
     }
@@ -164,12 +249,15 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
       name: '',
       version: '',
       apiUrl: '',
-      apiKey: ''
+      apiKey: '',
     });
     setIsDeploymentVisible(false);
   };
 
-  const handleStepComplete = (stepId: string, status: 'pending' | 'loading' | 'success' | 'error') => {
+  const handleStepComplete = (
+    stepId: string,
+    status: 'pending' | 'loading' | 'success' | 'error',
+  ) => {
     console.log(`Step ${stepId} completed with status: ${status}`);
   };
 
@@ -197,86 +285,87 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
 
   const handleOnClickCheckStatus = () => {
     if (getWzCurrentAppID() === dashboardAssistant.id) {
-      NavigationService.getInstance().navigate(
-        `${dashboardAssistant.id}`,
-      );
+      NavigationService.getInstance().navigate(`${dashboardAssistant.id}`);
     }
-  }
+  };
 
   const deploymentSteps = [
-    { 
-      id: 'cluster', 
-      label: 'Enabling cluster settings', 
-      error: 'Failed to enable cluster settings. Check your permissions.' 
+    {
+      id: 'cluster',
+      label: 'Enabling cluster settings',
+      error: 'Failed to enable cluster settings. Check your permissions.',
     },
-    { 
-      id: 'connector', 
-      label: 'Creating connector', 
-      error: 'Unable to create connector. Verify network connectivity.' 
+    {
+      id: 'connector',
+      label: 'Creating connector',
+      error: 'Unable to create connector. Verify network connectivity.',
     },
-    { 
-      id: 'model', 
-      label: 'Registering model group', 
-      error: 'Model group registration failed. Check model configuration.' 
+    {
+      id: 'model',
+      label: 'Registering model group',
+      error: 'Model group registration failed. Check model configuration.',
     },
-    { 
-      id: 'register', 
-      label: 'Registering model', 
-      error: 'Model registration failed. Verify model parameters.' 
+    {
+      id: 'register',
+      label: 'Registering model',
+      error: 'Model registration failed. Verify model parameters.',
     },
-    { 
-      id: 'deploy', 
-      label: 'Checking deployment status', 
-      error: 'Deployment check failed. Review deployment logs.' 
+    {
+      id: 'deploy',
+      label: 'Checking deployment status',
+      error: 'Deployment check failed. Review deployment logs.',
     },
   ];
 
   return (
     <>
       <div style={{ minHeight: '100vh', display: 'flex' }}>
-        <EuiFlexGroup 
-          direction="column" 
-          justifyContent="center" 
-          alignItems="center" 
+        <EuiFlexGroup
+          direction='column'
+          justifyContent='center'
+          alignItems='center'
           style={{ minHeight: '100vh', width: '100%' }}
         >
-          <EuiFlexItem grow={false} style={{ maxWidth: config.maxWidth || '600px', width: '100%' }}>
-            <EuiPanel paddingSize="l">
-              <EuiTitle size="l">
+          <EuiFlexItem
+            grow={false}
+            style={{ maxWidth: config.maxWidth || '600px', width: '100%' }}
+          >
+            <EuiPanel paddingSize='l'>
+              <EuiTitle size='l'>
                 <h2>{config.title}</h2>
               </EuiTitle>
-              
-              <EuiSpacer size="s" />
-              
-              <EuiText color="subdued">
+
+              <EuiSpacer size='s' />
+
+              <EuiText color='subdued'>
                 <p>
                   {config.description}{' '}
-                  <EuiLink href="#" target="_blank">
+                  <EuiLink href='#' target='_blank'>
                     {config.learnMoreText}
                   </EuiLink>
                 </p>
               </EuiText>
-              
-              <EuiSpacer size="l" />
-              
+
+              <EuiSpacer size='l' />
+
               <ModelForm
-                  onChange={handleFormChange}
-                  onValidationChange={handleValidationChange}
-                  disabled={disabled}
-                  modelConfig={modelConfig}
-                />
-              
-              <EuiSpacer size="xl" />
-                
-              <EuiFlexGroup justifyContent="flexEnd" gutterSize="m">
+                onChange={handleFormChange}
+                onValidationChange={handleValidationChange}
+                disabled={disabled}
+                modelConfig={modelConfig}
+              />
+
+              <EuiSpacer size='xl' />
+
+              <EuiFlexGroup justifyContent='flexEnd' gutterSize='m'>
                 <EuiFlexItem grow={false}>
                   <EuiButtonEmpty onClick={handleCancel}>
                     {config.buttons.cancel}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  <EuiButton 
-                    fill 
+                  <EuiButton
+                    fill
                     onClick={handleDeploy}
                     disabled={!isFormValid || isInstalling}
                     isLoading={isInstalling}
@@ -291,21 +380,17 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
       </div>
 
       {isDeploymentVisible && (
-        <EuiFlyout 
-          onClose={handleCloseDeployment} 
-          size="m" 
-          type="push"
-        >
+        <EuiFlyout onClose={handleCloseDeployment} size='m' type='push'>
           <EuiFlyoutHeader hasBorder>
-            <EuiTitle size="m">
+            <EuiTitle size='m'>
               <h2>Model Deployment</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
-          
+
           <EuiFlyoutBody>
             <DeploymentStatus
               steps={deploymentSteps}
-              title="Model Deployment"
+              title='Model Deployment'
               autoStart={true}
               stepDelay={2000}
               onStepComplete={handleStepComplete}
@@ -317,5 +402,5 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
         </EuiFlyout>
       )}
     </>
-  )
-}
+  );
+};

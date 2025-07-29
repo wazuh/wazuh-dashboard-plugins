@@ -5,14 +5,21 @@ import { updateClusterSettingsUseCase } from '../../cluster/update-cluster-setti
 import type { IClusterSettingsRepository } from '../../cluster/domain/types';
 
 export class UpdateClusterSettingsStep implements IInstallationStep {
-  constructor(private readonly clusterSettingsRepository: IClusterSettingsRepository) {}
+  constructor(
+    private readonly clusterSettingsRepository: IClusterSettingsRepository,
+  ) {}
 
   public getName(): string {
     return 'Update Cluster Settings';
   }
 
-  public async execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void> {
-    const updateClusterSettings = updateClusterSettingsUseCase(this.clusterSettingsRepository);
+  public async execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void> {
+    const updateClusterSettings = updateClusterSettingsUseCase(
+      this.clusterSettingsRepository,
+    );
     await updateClusterSettings();
   }
 }

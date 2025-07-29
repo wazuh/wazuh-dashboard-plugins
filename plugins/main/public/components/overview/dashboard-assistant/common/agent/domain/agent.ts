@@ -10,7 +10,7 @@ export class Agent {
     private readonly description: string,
     private readonly llm: AgentLLM,
     private readonly memory: AgentMemory,
-    private readonly tools: AgentTool[]
+    private readonly tools: AgentTool[],
   ) {}
 
   public static create(config: {
@@ -20,7 +20,7 @@ export class Agent {
   }): Agent {
     const llm = new AgentLLM(config.modelId, {
       max_iteration: 5,
-      stop_when_no_tool_found: true
+      stop_when_no_tool_found: true,
     });
 
     const memory = new AgentMemory('conversation_summary', 10);
@@ -28,11 +28,11 @@ export class Agent {
     const tools = [
       new AgentTool('MLModelTool', 'MLModelTool', {
         model_id: config.modelId,
-        prompt: 'Answer the question: ${parameters.question}'
+        prompt: 'Answer the question: ${parameters.question}',
       }),
       new AgentTool('WazuhAlertSearchTool', 'WazuhAlertSearchTool', {
-        input: '${parameters.question}'
-      })
+        input: '${parameters.question}',
+      }),
     ];
 
     return new Agent(
@@ -42,7 +42,7 @@ export class Agent {
       config.description,
       llm,
       memory,
-      tools
+      tools,
     );
   }
 
@@ -57,7 +57,7 @@ export class Agent {
       description: this.description,
       llm: this.llm.toObject(),
       memory: this.memory.toObject(),
-      tools: this.tools.map(tool => tool.toObject())
+      tools: this.tools.map(tool => tool.toObject()),
     };
   }
 }

@@ -11,7 +11,7 @@ export class Connector {
     private readonly protocol: string,
     private readonly parameters: ConnectorParameters,
     private readonly credential: ConnectorCredential,
-    private readonly actions: ConnectorAction[]
+    private readonly actions: ConnectorAction[],
   ) {}
 
   public static create(config: {
@@ -21,25 +21,21 @@ export class Connector {
     model: string;
     apiKey: string;
   }): Connector {
-    const parameters = new ConnectorParameters(
-      config.endpoint,
-      config.model,
-      [
-        { role: 'developer', content: 'You are a helpful assistant.' },
-        { role: 'user', content: '${parameters.prompt}' }
-      ]
-    );
+    const parameters = new ConnectorParameters(config.endpoint, config.model, [
+      { role: 'developer', content: 'You are a helpful assistant.' },
+      { role: 'user', content: '${parameters.prompt}' },
+    ]);
 
     const credential = new ConnectorCredential(config.apiKey);
-    
+
     const actions = [
       new ConnectorAction(
         'predict',
         'POST',
         `https://${config.endpoint}/v1/chat/completions`,
-        { 'Authorization': `Bearer ${credential.openAIKey}` },
-        '{ "model": "${parameters.model}", "messages": ${parameters.messages} }'
-      )
+        { Authorization: `Bearer ${credential.openAIKey}` },
+        '{ "model": "${parameters.model}", "messages": ${parameters.messages} }',
+      ),
     ];
 
     return new Connector(
@@ -50,7 +46,7 @@ export class Connector {
       'http',
       parameters,
       credential,
-      actions
+      actions,
     );
   }
 
@@ -66,7 +62,7 @@ export class Connector {
       protocol: this.protocol,
       parameters: this.parameters.toObject(),
       credential: this.credential.toObject(),
-      actions: this.actions.map(action => action.toObject())
+      actions: this.actions.map(action => action.toObject()),
     };
   }
 }

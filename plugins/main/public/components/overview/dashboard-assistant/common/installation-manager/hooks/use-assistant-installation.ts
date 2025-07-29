@@ -2,7 +2,10 @@ import { useState, useCallback, useMemo } from 'react';
 import { installDashboardAssistantUseCase } from '../install-dashboard-assistant';
 import { InstallationManager } from '../installation-manager';
 import { createMockRepositories } from '../infrastructure/mock-repositories';
-import type { InstallDashboardAssistantRequest, InstallDashboardAssistantResponse } from '../domain/types';
+import type {
+  InstallDashboardAssistantRequest,
+  InstallDashboardAssistantResponse,
+} from '../domain/types';
 
 interface ModelFormData {
   name: string;
@@ -15,7 +18,8 @@ interface ModelFormData {
 export function useAssistantInstallation() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<InstallDashboardAssistantResponse | null>(null);
+  const [result, setResult] =
+    useState<InstallDashboardAssistantResponse | null>(null);
   const [modelData, setModelData] = useState<ModelFormData | null>(null);
 
   // Create installation use case with mock repositories
@@ -38,7 +42,7 @@ export function useAssistantInstallation() {
 
     setIsLoading(true);
     setError(null);
-    
+
     try {
       // Create installation request from model data
       const request: InstallDashboardAssistantRequest = {
@@ -46,28 +50,28 @@ export function useAssistantInstallation() {
           mlCommonsAgentFrameworkEnabled: true,
           onlyRunOnMlNode: false,
           ragPipelineFeatureEnabled: true,
-          trustedConnectorEndpointsRegex: ['.*']
+          trustedConnectorEndpointsRegex: ['.*'],
         },
         modelGroup: {
           name: `${modelData.name}_group`,
-          description: `Model group for ${modelData.name}`
+          description: `Model group for ${modelData.name}`,
         },
         connector: {
           name: `${modelData.name}_connector`,
           description: `Connector for ${modelData.name}`,
           endpoint: modelData.apiUrl,
           model: modelData.version,
-          apiKey: modelData.apiKey
+          apiKey: modelData.apiKey,
         },
         model: {
           name: modelData.name,
           version: modelData.version,
-          description: modelData.description || `${modelData.name} model`
+          description: modelData.description || `${modelData.name} model`,
         },
         agent: {
           name: `${modelData.name}_agent`,
-          description: `Agent for ${modelData.name}`
-        }
+          description: `Agent for ${modelData.name}`,
+        },
       };
 
       const response = await installUseCase(request);
@@ -77,11 +81,12 @@ export function useAssistantInstallation() {
         setError(response.message);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
       setResult({
         success: false,
-        message: errorMessage
+        message: errorMessage,
       });
     } finally {
       setIsLoading(false);
@@ -95,6 +100,6 @@ export function useAssistantInstallation() {
     error,
     result,
     modelData,
-    isSuccess: result?.success || false
+    isSuccess: result?.success || false,
   };
 }

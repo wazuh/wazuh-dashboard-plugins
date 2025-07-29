@@ -8,7 +8,7 @@ export class Model {
     private readonly description: string,
     private readonly status: 'active' | 'inactive' | 'error' = 'active',
     private readonly createdAt: string = new Date().toISOString(),
-    private readonly apiUrl: string = ''
+    private readonly apiUrl: string = '',
   ) {}
 
   public static create(config: {
@@ -24,7 +24,7 @@ export class Model {
       config.version,
       config.modelGroupId,
       config.connectorId,
-      config.description
+      config.description,
     );
   }
 
@@ -66,7 +66,7 @@ export class Model {
       data.description,
       data.status || 'active',
       data.created_at || data.createdAt || new Date().toISOString(),
-      data.api_url || data.apiUrl || ''
+      data.api_url || data.apiUrl || '',
     );
   }
 
@@ -76,7 +76,7 @@ export class Model {
       version: this.version,
       model_group_id: this.modelGroupId,
       connector_id: this.connectorId,
-      description: this.description
+      description: this.description,
     };
   }
 
@@ -94,7 +94,7 @@ export class Model {
       version: this.version,
       status: this.status,
       createdAt: this.createdAt,
-      apiUrl: this.apiUrl
+      apiUrl: this.apiUrl,
     };
   }
 }

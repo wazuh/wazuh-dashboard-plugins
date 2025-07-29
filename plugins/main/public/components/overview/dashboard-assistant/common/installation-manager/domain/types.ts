@@ -7,10 +7,10 @@ export interface IHttpClient {
   delete<T = any>(url: string, config?: any): Promise<T>;
 }
 
-
-
 export interface IInstallationManager {
-  execute(request: InstallDashboardAssistantRequest): Promise<InstallationResult>;
+  execute(
+    request: InstallDashboardAssistantRequest,
+  ): Promise<InstallationResult>;
 }
 
 export interface IInstallationStep {

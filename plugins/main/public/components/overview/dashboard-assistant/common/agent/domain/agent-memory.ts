@@ -1,7 +1,7 @@
 export class AgentMemory {
   constructor(
     private readonly type: string,
-    private readonly windowSize?: number
+    private readonly windowSize?: number,
   ) {}
 
   public toObject(): object {

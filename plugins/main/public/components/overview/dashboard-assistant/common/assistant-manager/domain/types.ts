@@ -6,15 +6,18 @@ export interface IHttpClient {
   delete<T = any>(url: string, config?: any): Promise<T>;
 }
 
-
-
 export interface IInstallationManager {
-  execute(request: InstallDashboardAssistantRequest): Promise<InstallationResult>;
+  execute(
+    request: InstallDashboardAssistantRequest,
+  ): Promise<InstallationResult>;
 }
 
 export interface IInstallationStep {
   getName(): string;
-  execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void>;
+  execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void>;
 }
 
 export interface InstallDashboardAssistantRequest {
@@ -72,7 +75,7 @@ export class InstallDashboardAssistantResponse {
   private constructor(
     public readonly success: boolean,
     public readonly agentId?: string,
-    public readonly error?: string
+    public readonly error?: string,
   ) {}
 
   public static success(agentId: string): InstallDashboardAssistantResponse {

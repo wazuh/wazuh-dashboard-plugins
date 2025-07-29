@@ -3,7 +3,7 @@ export class ClusterSettings {
     private readonly mlCommonsAgentFrameworkEnabled: boolean,
     private readonly onlyRunOnMlNode: boolean,
     private readonly ragPipelineFeatureEnabled: boolean,
-    private readonly trustedConnectorEndpointsRegex: string[]
+    private readonly trustedConnectorEndpointsRegex: string[],
   ) {}
 
   public static create(config: {
@@ -16,18 +16,22 @@ export class ClusterSettings {
       config.mlCommonsAgentFrameworkEnabled,
       config.onlyRunOnMlNode,
       config.ragPipelineFeatureEnabled,
-      config.trustedConnectorEndpointsRegex
+      config.trustedConnectorEndpointsRegex,
     );
   }
 
   public toApiPayload(): object {
     return {
       persistent: {
-        'plugins.ml_commons.agent_framework_enabled': this.mlCommonsAgentFrameworkEnabled,
-        'plugins.ml_commons.only_run_on_ml_node': this.onlyRunOnMlNode.toString(),
-        'plugins.ml_commons.rag_pipeline_feature_enabled': this.ragPipelineFeatureEnabled,
-        'plugins.ml_commons.trusted_connector_endpoints_regex': this.trustedConnectorEndpointsRegex
-      }
+        'plugins.ml_commons.agent_framework_enabled':
+          this.mlCommonsAgentFrameworkEnabled,
+        'plugins.ml_commons.only_run_on_ml_node':
+          this.onlyRunOnMlNode.toString(),
+        'plugins.ml_commons.rag_pipeline_feature_enabled':
+          this.ragPipelineFeatureEnabled,
+        'plugins.ml_commons.trusted_connector_endpoints_regex':
+          this.trustedConnectorEndpointsRegex,
+      },
     };
   }
 }

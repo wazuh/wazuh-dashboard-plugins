@@ -42,7 +42,7 @@ classDiagram
         +put(url: string, data: any): Promise~T~
         +delete(url: string): Promise~T~
     }
-    
+
 
 
     %% Domain Entities
@@ -220,7 +220,7 @@ classDiagram
     Agent --> AgentLLM
     Agent --> AgentMemory
     Agent --> AgentTool
-    
+
     IInstallationManager --> IInstallationStep
     IInstallationStep --> InstallationContext
 ```
@@ -237,8 +237,6 @@ interface IHttpClient {
   put<T = any>(url: string, data?: any, config?: any): Promise<T>;
   delete<T = any>(url: string, config?: any): Promise<T>;
 }
-
-
 ```
 
 ### Domain Entity Signatures
@@ -326,12 +324,17 @@ interface IAgentRepository {
 ```typescript
 // Installation management interfaces
 interface IInstallationManager {
-  execute(request: InstallDashboardAssistantRequest): Promise<InstallationResult>;
+  execute(
+    request: InstallDashboardAssistantRequest,
+  ): Promise<InstallationResult>;
 }
 
 interface IInstallationStep {
   getName(): string;
-  execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void>;
+  execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void>;
 }
 ```
 
@@ -340,6 +343,7 @@ interface IInstallationStep {
 The following use cases have been implemented in the `/common` directory:
 
 ### 🔧 **Core Installation Use Cases**
+
 1. **InstallDashboardAssistantUseCase** - Main orchestrator for the complete installation process
 2. **UpdateClusterSettingsUseCase** - Updates OpenSearch cluster settings for ML Commons
 3. **CreateModelGroupUseCase** - Creates model groups for organizing models
@@ -358,41 +362,41 @@ These are the steps you should follow:
 <details><summary>Step 1: Settings</summary>
 <p>
 
->  ```http
+> ```http
 > PUT /_cluster/settings
 > {
->    "persistent": {
->      "plugins.ml_commons.agent_framework_enabled": true,
->      "plugins.ml_commons.only_run_on_ml_node":"false",
->      "plugins.ml_commons.rag_pipeline_feature_enabled": true,
->      "plugins.ml_commons.trusted_connector_endpoints_regex": [
->        "^https://runtime\\.sagemaker\\..*[a-z0-9-]\\.amazonaws\\.com/.*$",
->        "^https://api\\.openai\\.com/.*$",
->        "^https://api\\.cohere\\.ai/.*$",
->        "^https://bedrock-runtime\\..*[a-z0-9-]\\.amazonaws\\.com/.*$"
->      ]
->    }
+>   "persistent": {
+>     "plugins.ml_commons.agent_framework_enabled": true,
+>     "plugins.ml_commons.only_run_on_ml_node":"false",
+>     "plugins.ml_commons.rag_pipeline_feature_enabled": true,
+>     "plugins.ml_commons.trusted_connector_endpoints_regex": [
+>       "^https://runtime\\.sagemaker\\..*[a-z0-9-]\\.amazonaws\\.com/.*$",
+>       "^https://api\\.openai\\.com/.*$",
+>       "^https://api\\.cohere\\.ai/.*$",
+>       "^https://bedrock-runtime\\..*[a-z0-9-]\\.amazonaws\\.com/.*$"
+>     ]
+>   }
 > }
 > ```
 
 </p>
-</details> 
+</details>
 
 <details><summary>Step 2: Create a model group</summary>
 <p>
 
 > Create a model group with an example below ([reference doc](https://opensearch.org/docs/2.19/ml-commons-plugin/remote-models/index/)) and note the model group id.
 >
->   ```http
+> ```http
 > POST /_plugins/_ml/model_groups/_register
 > {
->   "name": "test_model_group",
->   "description": "A model group for external models"
+> "name": "test_model_group",
+> "description": "A model group for external models"
 > }
->   ```
+> ```
 
 </p>
-</details> 
+</details>
 
 <details><summary>Step 3: Create a connector</summary>
 <p>
@@ -438,32 +442,32 @@ These are the steps you should follow:
 > ```
 
 </p>
-</details>  
+</details>
 
 <details><summary>Step 4: Create a model</summary>
 <p>
 
 > Create a model and note the model id
 >
->  ```http
->  POST /_plugins/_ml/models/_register?deploy=true
->   {
->     "name": "openAI-gpt-4o-mini",
->     "function_name": "remote",
->     "model_group_id": "<model group id from previous API call>",
->     "description": "test model",
->     "connector_id": "<connector id from previous API call>"
->   }
->  ```
+> ```http
+> POST /_plugins/_ml/models/_register?deploy=true
+>  {
+>    "name": "openAI-gpt-4o-mini",
+>    "function_name": "remote",
+>    "model_group_id": "<model group id from previous API call>",
+>    "description": "test model",
+>    "connector_id": "<connector id from previous API call>"
+>  }
+> ```
 
 </p>
-</details> 
+</details>
 
 <details><summary>Step 5: Test connection with calling the Predict API</summary>
 <p>
 
 > Test connection with calling the Predict API
-> 
+>
 > ```http
 > POST /_plugins/_ml/models/<llm_model_id>/_predict
 > {
@@ -483,7 +487,7 @@ These are the steps you should follow:
 > ```
 
 </p>
-</details> 
+</details>
 
 <details><summary>Step 6: Craete an Agent</summary>
 <p>
@@ -530,7 +534,7 @@ These are the steps you should follow:
 > ```
 
 </p>
-</details> 
+</details>
 
 <details><summary>Step 7: Execute a query</summary>
 <p>
@@ -546,7 +550,7 @@ These are the steps you should follow:
 > ```
 
 </p>
-</details> 
+</details>
 
 <details><summary>Register the agent in the indexer manager</summary>
 <p>

@@ -4,7 +4,7 @@ export class ConnectorAction {
     private readonly method: string,
     private readonly url: string,
     private readonly headers: Record<string, string>,
-    private readonly requestBody: string
+    private readonly requestBody: string,
   ) {}
 
   public toObject(): object {
@@ -13,7 +13,7 @@ export class ConnectorAction {
       method: this.method,
       url: this.url,
       headers: this.headers,
-      request_body: this.requestBody
+      request_body: this.requestBody,
     };
   }
 }

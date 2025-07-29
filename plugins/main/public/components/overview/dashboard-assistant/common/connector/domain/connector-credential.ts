@@ -7,7 +7,7 @@ export class ConnectorCredential {
 
   public toObject(): object {
     return {
-      openAI_key: this.openAI_key
+      openAI_key: this.openAI_key,
     };
   }
 }

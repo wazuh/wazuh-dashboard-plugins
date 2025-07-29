@@ -11,14 +11,17 @@ export class CreateAgentStep implements IInstallationStep {
     return 'Create Agent';
   }
 
-  public async execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void> {
+  public async execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void> {
     const createAgent = createAgentUseCase(this.agentRepository);
     const agentId = await createAgent({
       name: request.agent.name,
       description: request.agent.description,
-      modelId: context.get<string>('modelId')!
+      modelId: context.get<string>('modelId')!,
     });
-    
+
     context.set('agentId', agentId);
   }
 }

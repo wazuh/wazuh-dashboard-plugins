@@ -11,16 +11,19 @@ export class CreateConnectorStep implements IInstallationStep {
     return 'Create Connector';
   }
 
-  public async execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void> {
+  public async execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void> {
     const createConnector = createConnectorUseCase(this.connectorRepository);
     const connectorId = await createConnector({
       name: request.connector.name,
       description: request.connector.description,
       endpoint: request.connector.endpoint,
       model: request.connector.model,
-      apiKey: request.connector.apiKey
+      apiKey: request.connector.apiKey,
     });
-    
+
     context.set('connectorId', connectorId);
   }
 }

@@ -11,10 +11,15 @@ export class TestModelConnectionStep implements IInstallationStep {
     return 'Test Model Connection';
   }
 
-  public async execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void> {
-    const testModelConnection = testModelConnectionUseCase(this.modelRepository);
+  public async execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void> {
+    const testModelConnection = testModelConnectionUseCase(
+      this.modelRepository,
+    );
     await testModelConnection({
-      modelId: context.get<string>('modelId')!
+      modelId: context.get<string>('modelId')!,
     });
   }
 }

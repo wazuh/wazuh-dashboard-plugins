@@ -37,7 +37,8 @@ export function useModels(): UseModelsReturn {
       const fetchedModels = await getModelsUseCase.execute();
       setModels(fetchedModels);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch models';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to fetch models';
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -58,6 +59,6 @@ export function useModels(): UseModelsReturn {
     isLoading,
     error,
     refresh: fetchModels,
-    getTableData
+    getTableData,
   };
 }
