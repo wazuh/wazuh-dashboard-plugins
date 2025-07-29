@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -12,13 +12,13 @@ import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
-  EuiFlyoutFooter,
 } from '@elastic/eui';
 import { ModelForm } from './components/model-form';
 import { DeploymentStatus } from './components/deployment-status';
 import { getWzCurrentAppID } from '../../../kibana-services';
 import { dashboardAssistant } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
+import { useAssistantInstallation } from './common/installation-manager/hooks/use-assistant-installation';
 
 interface ModelConfig {
   name: string;
@@ -45,6 +45,9 @@ interface ModelRegisterProps {
 }
 
 export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: ModelRegisterProps) => {
+  // Use the assistant installation hook
+  const { install, setModel, isLoading: isInstalling, error: installError, result, modelData, isSuccess } = useAssistantInstallation();
+
   // Default form configuration
   const defaultFormConfig: FormConfig = {
     title: 'Register your preferred AI model',
@@ -120,13 +123,20 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
   const [isFormValid, setIsFormValid] = useState(false);
   const [isDeploymentVisible, setIsDeploymentVisible] = useState(false);
 
-  const handleFormChange = (data: any) => {
+  const handleFormChange = useCallback((data: any) => {
     setFormData(data);
-  };
+    setModel({
+      name: data.name,
+      version: data.version,
+      apiUrl: data.apiUrl,
+      apiKey: data.apiKey,
+      description: `${data.name} ${data.version} model`
+    });
+  }, [setModel]);
 
-  const handleValidationChange = (isValid: boolean) => {
+  const handleValidationChange = useCallback((isValid: boolean) => {
     setIsFormValid(isValid);
-  };
+  }, []);
 
   const handleCancel = () => {
     setFormData({
@@ -137,9 +147,13 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
     });
   };
 
-  const handleDeploy = () => {
+  const handleDeploy = async () => {
     console.log('Deploying model with data:', formData);
     setIsDeploymentVisible(true);
+    
+    // Execute the installation using the hook
+    await install();
+    
     if (onClickDeploy) {
       onClickDeploy();
     }
@@ -161,9 +175,25 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
 
   const handleAllComplete = (allSuccess: boolean) => {
     if (allSuccess) {
-      
+      console.log('All deployment steps completed successfully');
+    } else {
+      console.log('Some deployment steps failed');
     }
   };
+
+  // Effect to handle installation errors
+  useEffect(() => {
+    if (installError) {
+      console.error('Installation error:', installError);
+    }
+  }, [installError]);
+
+  // Effect to handle successful installation
+  useEffect(() => {
+    if (isSuccess && result) {
+      console.log('Installation completed successfully:', result);
+    }
+  }, [isSuccess, result]);
 
   const handleOnClickCheckStatus = () => {
     if (getWzCurrentAppID() === dashboardAssistant.id) {
@@ -248,9 +278,10 @@ export const ModelRegister = ({ onClickDeploy, disabled = false, formConfig }: M
                   <EuiButton 
                     fill 
                     onClick={handleDeploy}
-                    disabled={!isFormValid}
+                    disabled={!isFormValid || isInstalling}
+                    isLoading={isInstalling}
                   >
-                    {config.buttons.deploy}
+                    {isInstalling ? 'Deploying...' : config.buttons.deploy}
                   </EuiButton>
                 </EuiFlexItem>
               </EuiFlexGroup>

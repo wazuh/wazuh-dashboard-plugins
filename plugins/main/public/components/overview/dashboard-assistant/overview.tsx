@@ -189,24 +189,10 @@ export const AssistantOverview = () => {
           </EuiFlexItem>
         ) : (
           <ModelsTable
-            models={models}
-            isLoading={isLoadingModels}
-            onRefresh={handleRefreshModels}
-            onAddModel={handleAddModel}
+            onAddModel
           />
         )}
       </EuiPanel>
-        {isFlyoutVisible && (
-          <DeploymentStatus
-            steps={deploymentSteps}
-            title={deploymentConfig.title}
-            autoStart={deploymentConfig.autoStart}
-            stepDelay={deploymentConfig.stepDelay}
-            onStepComplete={handleStepComplete}
-            onAllComplete={handleAllComplete}
-            onClose={handleCloseFlyout}
-          />
-        )}
       <EuiGlobalToastList
         toasts={toasts}
         dismissToast={removeToast}

@@ -15,6 +15,7 @@ import {
 import { formatUINumber } from '../../../../react-services/format-number';
 import NavigationService from '../../../../react-services/navigation-service';
 import { dashboardAssistant } from '../../../../utils/applications';
+import { useModels } from '../common/model';
 
 
 interface Model {
@@ -27,20 +28,35 @@ interface Model {
 }
 
 interface ModelsTableProps {
-  models?: Model[];
-  isLoading?: boolean;
-  onRefresh?: () => void;
-  onAddModel?: () => void;
+  onAddModel?: boolean;
 }
 
 export const ModelsTable = ({
-  models = [],
-  isLoading = false,
-  onRefresh,
   onAddModel
 }: ModelsTableProps) => {
+  const { models, isLoading, error, refresh, getTableData } = useModels();
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
+
+  const tableModels = getTableData();
+
+  if (error) {
+    return (
+      <EuiFlexGroup direction="column" gutterSize="m" alignItems="center">
+        <EuiFlexItem>
+          <EuiText color="danger">
+            <h3>Error loading models</h3>
+            <p>{error}</p>
+          </EuiText>
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiButtonEmpty iconType="refresh" onClick={refresh}>
+            Retry
+          </EuiButtonEmpty>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    );
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -135,15 +151,13 @@ export const ModelsTable = ({
       );
     }
     
-    if (onRefresh) {
-      buttons.push(
-        <EuiFlexItem key="refresh" grow={false}>
-          <EuiButtonEmpty iconType="refresh" onClick={onRefresh}>
-            Refresh
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-      );
-    }
+    buttons.push(
+      <EuiFlexItem key="refresh" grow={false}>
+        <EuiButtonEmpty iconType="refresh" onClick={refresh}>
+          Refresh
+        </EuiButtonEmpty>
+      </EuiFlexItem>
+    );
     
     return buttons;
   };
@@ -159,7 +173,7 @@ export const ModelsTable = ({
                 {isLoading ? (
                   <EuiLoadingSpinner size="s" />
                 ) : (
-                  <span>({formatUINumber(models.length)})</span>
+                  <span>({formatUINumber(tableModels.length)})</span>
                 )}
               </h1>
             </EuiTitle>
@@ -176,7 +190,7 @@ export const ModelsTable = ({
 
   const table = (
       <EuiBasicTable
-        items={models}
+        items={tableModels}
         columns={columns}
         loading={isLoading}
         hasActions
