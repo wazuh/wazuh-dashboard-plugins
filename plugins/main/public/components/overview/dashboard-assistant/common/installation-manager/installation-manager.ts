@@ -1,63 +1,85 @@
 import { IInstallationManager } from './types';
 import { InstallDashboardAssistantRequest, InstallationResult } from './domain/types';
-import { IInstallationStep } from '../assistant-manager/domain/types';
 import { InstallationContext } from './domain/installation-context';
-import { UpdateClusterSettingsUseCase } from '../cluster/update-cluster-settings';
-import { CreateModelGroupUseCase } from '../model-group/create-model-group';
-import { CreateConnectorUseCase } from '../connector/create-connector';
-import { CreateModelUseCase } from '../model/create-model';
-import { TestModelConnectionUseCase } from '../model/test-model-connection';
-import { CreateAgentUseCase } from '../agent/create-agent';
-import { RegisterAgentUseCase } from '../agent/register-agent';
-import { UpdateClusterSettingsStep } from './steps/update-cluster-settings-step';
-import { CreateModelGroupStep } from './steps/create-model-group-step';
-import { CreateConnectorStep } from './steps/create-connector-step';
-import { CreateModelStep } from './steps/create-model-step';
-import { TestModelConnectionStep } from './steps/test-model-connection-step';
-import { CreateAgentStep } from './steps/create-agent-step';
-import { RegisterAgentStep } from './steps/register-agent-step';
+import { updateClusterSettingsUseCase } from '../cluster/update-cluster-settings';
+import { createModelGroupUseCase } from '../model-group/create-model-group';
+import { createConnectorUseCase } from '../connector/create-connector';
+import { createModelUseCase } from '../model/create-model';
+import { testModelConnectionUseCase } from '../model/test-model-connection';
+import { createAgentUseCase } from '../agent/create-agent';
+import { registerAgentUseCase } from '../agent/register-agent';
+import { createMockRepositories } from './infrastructure/mock-repositories';
+import type { IClusterSettingsRepository } from '../cluster/domain/types';
+import type { IModelGroupRepository, CreateModelGroupRequest } from '../model-group/domain/types';
+import type { IConnectorRepository, CreateConnectorRequest } from '../connector/domain/types';
+import type { IModelRepository, CreateModelRequest, TestModelConnectionRequest } from '../model/domain/types';
+import type { IAgentRepository, CreateAgentRequest, RegisterAgentRequest } from '../agent/domain/types';
+import { ClusterSettings } from '../cluster/domain/cluster-settings';
+import { ModelGroup } from '../model-group/domain/model-group';
+import { Connector } from '../connector/domain/connector';
+import { Model } from '../model/domain/model';
+import { Agent } from '../agent/domain/agent';
 
-// Installation Manager
 export class InstallationManager implements IInstallationManager {
-  private readonly steps: IInstallationStep[];
-
-  constructor(
-    updateClusterSettingsUseCase: UpdateClusterSettingsUseCase,
-    createModelGroupUseCase: CreateModelGroupUseCase,
-    createConnectorUseCase: CreateConnectorUseCase,
-    createModelUseCase: CreateModelUseCase,
-    testModelConnectionUseCase: TestModelConnectionUseCase,
-    createAgentUseCase: CreateAgentUseCase,
-    registerAgentUseCase: RegisterAgentUseCase
-  ) {
-    this.steps = [
-      new UpdateClusterSettingsStep(updateClusterSettingsUseCase),
-      new CreateModelGroupStep(createModelGroupUseCase),
-      new CreateConnectorStep(createConnectorUseCase),
-      new CreateModelStep(createModelUseCase),
-      new TestModelConnectionStep(testModelConnectionUseCase),
-      new CreateAgentStep(createAgentUseCase),
-      new RegisterAgentStep(registerAgentUseCase)
-    ];
-  }
+  private readonly mockRepos = createMockRepositories();
 
   public async execute(request: InstallDashboardAssistantRequest): Promise<InstallationResult> {
     const context = new InstallationContext();
     
-    for (const step of this.steps) {
-      try {
-        await step.execute(request, context);
-      } catch (error) {
-        throw new Error(`Installation failed at step: ${step.getName()}`);
-      }
+    try {
+      // Step 1: Update cluster settings
+      const updateClusterSettings = updateClusterSettingsUseCase(this.mockRepos.clusterSettingsRepository);
+      await updateClusterSettings();
+      
+      // Step 2: Create model group
+      const createModelGroup = createModelGroupUseCase(this.mockRepos.modelGroupRepository);
+      const modelGroupId = await createModelGroup(request.modelGroup);
+      context.set('modelGroupId', modelGroupId);
+      
+      // Step 3: Create connector
+      const createConnector = createConnectorUseCase(this.mockRepos.connectorRepository);
+      const connectorId = await createConnector(request.connector);
+      context.set('connectorId', connectorId);
+      
+      // Step 4: Create model
+      const createModel = createModelUseCase(this.mockRepos.modelRepository);
+      const modelRequest: CreateModelRequest = {
+        name: request.model.name,
+        modelGroupId: modelGroupId,
+        connectorId: connectorId,
+        description: request.model.description,
+        version: request.model.version || '1.0.0'
+      };
+      const modelId = await createModel(modelRequest);
+      context.set('modelId', modelId);
+      
+      // Step 5: Test model connection
+      const testModelConnection = testModelConnectionUseCase(this.mockRepos.modelRepository);
+      await testModelConnection({ modelId });
+      
+      // Step 6: Create agent
+      const createAgent = createAgentUseCase(this.mockRepos.agentRepository);
+      const agentRequest: CreateAgentRequest = {
+        name: request.agent.name,
+        description: request.agent.description,
+        modelId: modelId
+      };
+      const agentId = await createAgent(agentRequest);
+      context.set('agentId', agentId);
+      
+      // Step 7: Register agent
+      const registerAgent = registerAgentUseCase(this.mockRepos.agentRepository);
+      await registerAgent({ agentId });
+      
+      return {
+        success: true,
+        message: 'Installation completed successfully',
+        data: {
+          agentId: context.get<string>('agentId')
+        }
+      };
+    } catch (error) {
+      throw new Error(`Installation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-
-    return {
-      success: true,
-      message: 'Installation completed successfully',
-      data: {
-        agentId: context.get<string>('agentId')
-      }
-    };
   }
 }

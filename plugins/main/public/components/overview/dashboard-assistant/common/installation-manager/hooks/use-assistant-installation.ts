@@ -1,14 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
-import { InstallDashboardAssistantUseCase } from '../install-dashboard-assistant';
+import { installDashboardAssistantUseCase } from '../install-dashboard-assistant';
 import { InstallationManager } from '../installation-manager';
 import { createMockRepositories } from '../infrastructure/mock-repositories';
-import { UpdateClusterSettingsUseCase } from '../../cluster/update-cluster-settings';
-import { CreateModelGroupUseCase } from '../../model-group/create-model-group';
-import { CreateConnectorUseCase } from '../../connector/create-connector';
-import { CreateModelUseCase } from '../../model/create-model';
-import { TestModelConnectionUseCase } from '../../model/test-model-connection';
-import { CreateAgentUseCase } from '../../agent/create-agent';
-import { RegisterAgentUseCase } from '../../agent/register-agent';
 import type { InstallDashboardAssistantRequest, InstallDashboardAssistantResponse } from '../domain/types';
 
 interface ModelFormData {
@@ -27,30 +20,10 @@ export function useAssistantInstallation() {
 
   // Create installation use case with mock repositories
   const installUseCase = useMemo(() => {
-    const mockRepos = createMockRepositories();
-    const { httpClient, clusterSettingsRepository, modelGroupRepository, connectorRepository, modelRepository, agentRepository } = mockRepos;
+    // Create installation manager (now handles repositories internally)
+    const installationManager = new InstallationManager();
 
-    // Create use cases
-    const updateClusterSettingsUseCase = new UpdateClusterSettingsUseCase(clusterSettingsRepository);
-    const createModelGroupUseCase = new CreateModelGroupUseCase(modelGroupRepository);
-    const createConnectorUseCase = new CreateConnectorUseCase(connectorRepository);
-    const createModelUseCase = new CreateModelUseCase(modelRepository);
-    const testModelConnectionUseCase = new TestModelConnectionUseCase(modelRepository);
-    const createAgentUseCase = new CreateAgentUseCase(agentRepository);
-    const registerAgentUseCase = new RegisterAgentUseCase(agentRepository);
-
-    // Create installation manager
-    const installationManager = new InstallationManager(
-      updateClusterSettingsUseCase,
-      createModelGroupUseCase,
-      createConnectorUseCase,
-      createModelUseCase,
-      testModelConnectionUseCase,
-      createAgentUseCase,
-      registerAgentUseCase
-    );
-
-    return new InstallDashboardAssistantUseCase(installationManager);
+    return installDashboardAssistantUseCase(installationManager);
   }, []);
 
   const setModel = useCallback((data: ModelFormData) => {
@@ -97,7 +70,7 @@ export function useAssistantInstallation() {
         }
       };
 
-      const response = await installUseCase.execute(request);
+      const response = await installUseCase(request);
       setResult(response);
 
       if (!response.success) {

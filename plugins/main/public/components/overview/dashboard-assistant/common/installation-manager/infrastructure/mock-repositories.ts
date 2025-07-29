@@ -5,7 +5,6 @@ import { ConnectorRepository } from '../../connector/connector-repository';
 import { ModelRepository } from '../../model/model-repository';
 import { AgentRepository } from '../../agent/agent-repository';
 
-// Mock HTTP Client
 class MockHttpClient implements IHttpClient {
   async get<T = any>(url: string, config?: any): Promise<T> {
     console.log(`Mock GET request to: ${url}`);

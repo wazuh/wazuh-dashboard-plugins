@@ -1,17 +1,19 @@
 import { IInstallationStep } from '../types';
 import { InstallDashboardAssistantRequest } from '../domain/types';
 import { InstallationContext } from '../domain/installation-context';
-import { CreateModelGroupUseCase } from '../../model-group/create-model-group';
+import { createModelGroupUseCase } from '../../model-group/create-model-group';
+import type { IModelGroupRepository } from '../../model-group/domain/types';
 
 export class CreateModelGroupStep implements IInstallationStep {
-  constructor(private readonly createModelGroupUseCase: CreateModelGroupUseCase) {}
+  constructor(private readonly modelGroupRepository: IModelGroupRepository) {}
 
   public getName(): string {
     return 'Create Model Group';
   }
 
   public async execute(request: InstallDashboardAssistantRequest, context: InstallationContext): Promise<void> {
-    const modelGroupId = await this.createModelGroupUseCase.execute({
+    const createModelGroup = createModelGroupUseCase(this.modelGroupRepository);
+    const modelGroupId = await createModelGroup({
       name: request.modelGroup.name,
       description: request.modelGroup.description
     });
