@@ -32,6 +32,7 @@ const {
 const Audit = require('./sample-data/audit');
 const Authentication = require('./sample-data/authentication');
 const AWS = require('./sample-data/aws');
+const Azure = require('./sample-data/azure');
 const IntegrityMonitoring = require('./sample-data/integrity-monitoring');
 const CISCAT = require('./sample-data/ciscat');
 const GCP = require('./sample-data/gcp');
@@ -358,6 +359,60 @@ function generateAlert(params) {
       }
     }
     alert.input = { type: 'log' };
+    alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
+  }
+
+  if (params.azure) {
+    const beforeDate = new Date(
+      new Date(alert.timestamp).getTime() - 3 * 24 * 60 * 60 * 1000,
+    );
+    const typeAlert = Azure.auditLogs;
+    alert.rule = { ...typeAlert.rule };
+    alert.rule.description = Random.arrayItem(Azure.ruleDescriptions);
+    alert.rule.id = `${Random.number(1, ALERT_ID_MAX)}`;
+    alert.rule.level = Random.number(1, RULE_MAX_LEVEL);
+
+    alert.data = {
+      ...typeAlert.data,
+      'ms-graph': { ...typeAlert.data['ms-graph'] },
+    };
+    alert.data['ms-graph'].tenantId = Random.arrayItem(Azure.TenantId);
+    alert.data['ms-graph'].activityOperationType = Random.arrayItem(
+      Azure.activityOperationType,
+    );
+    alert.data['ms-graph'].category = Random.arrayItem(Azure.category);
+    alert.data['ms-graph'].title = Random.arrayItem(Azure.title);
+    alert.data['ms-graph'].status = Random.arrayItem(Azure.status);
+    alert.data['ms-graph'].activityResult = Random.arrayItem(Azure.results);
+    alert.data['ms-graph'].id = Random.createHash(32);
+    alert.data['ms-graph'].requestId = Random.createHash(32);
+    alert.data['ms-graph'].correlationId = Random.createHash(32);
+    alert.data['ms-graph'].riskEventType = Random.arrayItem(
+      Azure.riskEventTypes,
+    );
+    alert.data['ms-graph'].riskState = Random.arrayItem(Azure.riskState);
+    alert.data['ms-graph'].riskLevel = Random.arrayItem(Azure.riskLevels);
+    alert.data['ms-graph'].riskDetail = Random.arrayItem(Azure.riskDetail);
+    alert.data['ms-graph'].detectionTimingType = Random.arrayItem(
+      Azure.detectionTimingType,
+    );
+    alert.data['ms-graph'].activity = Random.arrayItem(Azure.activity);
+    alert.data['ms-graph'].ipAddress = Random.arrayItem(IPs);
+    alert.data['ms-graph'].displayName = Random.arrayItem(Azure.displayName);
+    alert.data['ms-graph'].activityDateTime = DateFormatter.format(
+      new Date(Random.date()),
+      DateFormatter.DATE_FORMAT.ISO_FULL,
+    );
+    alert.data['ms-graph'].detectedDateTime = DateFormatter.format(
+      Random.date(),
+      DateFormatter.DATE_FORMAT.ISO_FULL,
+    );
+    alert.data['ms-graph'].lastUpdatedDateTime = DateFormatter.format(
+      Random.date(),
+      DateFormatter.DATE_FORMAT.ISO_FULL,
+    );
+    alert.data['ms-graph'].userId = Random.createHash(32);
+
     alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
   }
 
