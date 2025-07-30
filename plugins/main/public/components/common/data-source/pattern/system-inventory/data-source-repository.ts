@@ -9,6 +9,8 @@ import {
   WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
   WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
   WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+  WAZUH_IT_HYGIENE_USERS_PATTERN,
+  WAZUH_IT_HYGIENE_GROUPS_PATTERN,
 } from '../../../../../../common/constants';
 import { createPatternDataSourceRepositoryUseValue } from '../pattern-data-source-repository-use-setting-value';
 
@@ -29,7 +31,13 @@ export const SystemInventoryProtocolsStatesDataSourceRepository =
 export const SystemInventoryProcessesStatesDataSourceRepository =
   createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_PROCESSES_PATTERN);
 
-export const SystemInventoryPortsStatesDataSourceRepository =
+export const SystemInventoryUsersStatesDataSourceRepository =
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_USERS_PATTERN);
+
+export const SystemInventoryGroupsStatesDataSourceRepository =
+  createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_GROUPS_PATTERN);
+
+export const SystemInventoryTrafficStatesDataSourceRepository =
   createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_PORTS_PATTERN);
 
 export const SystemInventoryPackagesStatesDataSourceRepository =

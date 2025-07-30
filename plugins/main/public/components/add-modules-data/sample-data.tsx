@@ -28,11 +28,13 @@ import { AppState } from '../../react-services/app-state';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import {
   UI_LOGGER_LEVELS,
+  WAZUH_SAMPLE_AGENT_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
   WAZUH_SAMPLE_INVENTORY_AGENT,
+  WAZUH_SAMPLE_SERVER_STATISTICS,
   WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
@@ -70,6 +72,7 @@ const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
 
 const sampleInventory = [
+  'groups',
   'hardware',
   'hotfixes',
   'interfaces',
@@ -79,6 +82,7 @@ const sampleInventory = [
   'processes',
   'protocols',
   'system',
+  'users',
 ].join(', ');
 
 export default class WzSampleData extends Component {
@@ -133,9 +137,22 @@ export default class WzSampleData extends Component {
       },
       {
         title: 'Sample vulnerability detection inventory',
-        description: `Sample data, visualizations and dashboards for vulnerabilities inventory.`,
+        description:
+          'Sample data, visualizations and dashboards for vulnerabilities inventory.',
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_VULNERABILITIES,
+      },
+      {
+        title: 'Sample agents monitoring',
+        description: `Sample data for agents monitoring.`,
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_AGENT_MONITORING,
+      },
+      {
+        title: 'Sample server statistics',
+        description: `Sample data for server statistics.`,
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_SERVER_STATISTICS,
       },
     ];
     this.state = {};
@@ -182,6 +199,11 @@ export default class WzSampleData extends Component {
       try {
         const clusterName = AppState.getClusterInfo().cluster;
         const managerName = AppState.getClusterInfo().manager;
+        try {
+          this.generateAlertsParams.api_id = JSON.parse(
+            AppState.getCurrentAPI(),
+          )?.id;
+        } catch {}
         this.generateAlertsParams.manager = {
           name: managerName,
         };
@@ -255,7 +277,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error trying to add sample data`,
+          title: 'Error trying to add sample data',
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -321,7 +343,7 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error trying to delete sample data`,
+          title: 'Error trying to delete sample data',
         },
       };
       getErrorOrchestrator().handleError(options);

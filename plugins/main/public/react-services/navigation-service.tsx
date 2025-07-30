@@ -5,6 +5,108 @@ import { getIndexPattern } from './elastic_helpers';
 import { buildPhraseFilter } from '../../../../src/plugins/data/common';
 import rison from 'rison-node';
 
+/**
+ * Custom implementation URLSearchParams-like to parse and serialize the URL query string.
+ * This does not encode the URL avoid the _a and _g query parameters filters can be modified in
+ * unexpected way breaking the filtering
+ */
+export class NavigationURLSearchParams {
+  _params: Map<string, string[]>;
+  constructor(queryString = '') {
+    // strip leading “?” if present
+    const qs =
+      queryString.charAt(0) === '?' ? queryString.slice(1) : queryString;
+    this._params = new Map();
+
+    if (!qs) return;
+
+    // parse “a=1&b=2&a=3”
+    qs.split('&').forEach(pair => {
+      const [rawKey, rawVal = null] = pair.split('=');
+      const key = rawKey; // No decode the key
+      const val = rawVal; // No decode the value
+
+      if (!this._params.has(key)) {
+        this._params.set(key, []);
+      }
+      this._params.get(key).push(val);
+    });
+  }
+
+  // get first value for key
+  get(key: string) {
+    const vals = this._params.get(key);
+    return vals ? vals[0] : null;
+  }
+
+  // get all values for key
+  getAll(key: string) {
+    return this._params.get(key) || [];
+  }
+
+  // check if it has a key
+  has(key: string) {
+    return this._params.has(key);
+  }
+
+  // replace all values for key
+  set(key: string, value: any) {
+    this._params.set(key, [String(value)]);
+  }
+
+  // append one more value under key
+  append(key: string, value: any) {
+    if (!this._params.has(key)) {
+      this._params.set(key, []);
+    }
+    this._params.get(key).push(String(value));
+  }
+
+  // remove key entirely
+  delete(key: string) {
+    this._params.delete(key);
+  }
+
+  // iterate [key, value] for every single entry
+  *entries() {
+    for (const [key, values] of this._params) {
+      for (const val of values) {
+        yield [key, val];
+      }
+    }
+  }
+
+  // iterate value for every single entry
+  *keys() {
+    for (const key of this._params.keys()) {
+      yield key;
+    }
+  }
+
+  // iterate value for every single entry
+  *values() {
+    for (const value of this._params.values()) {
+      yield value;
+    }
+  }
+
+  // alias for entries(), so for..of works
+  [Symbol.iterator]() {
+    return this.entries();
+  }
+
+  // rebuild a query string
+  toString() {
+    const parts = [];
+    for (const [rawKey, rawValue] of this._params) {
+      const key = rawKey;
+      const value = rawValue == null ? '' : rawValue; // assume already encoded if non-empty
+      parts.push(value === '' ? key : `${key}=${value}`);
+    }
+    return parts.length ? '?' + parts.join('&') : '';
+  }
+}
+
 class NavigationService {
   private static instance: NavigationService;
   private history: History;
@@ -46,18 +148,18 @@ class NavigationService {
     return this.history.location.state;
   }
 
-  public getParams(): URLSearchParams {
-    return new URLSearchParams(this.history.location.search);
+  public getParams(): NavigationURLSearchParams {
+    return new NavigationURLSearchParams(this.history.location.search);
   }
 
-  public renewURL(params?: URLSearchParams): void {
+  public renewURL(params?: NavigationURLSearchParams): void {
     const newPath = this.getPathname();
     const queryParams = params
       ? this.buildSearch(params)
       : this.buildSearch(this.getParams());
     const locationHash = this.getHash();
     this.navigate(
-      `${newPath}${queryParams ? `?${queryParams}` : ''}${locationHash}`,
+      `${newPath}${queryParams ? `${queryParams}` : ''}${locationHash}`,
     );
   }
 
@@ -124,10 +226,8 @@ class NavigationService {
     return getCore().application.getUrlForApp(appId, options);
   }
 
-  public buildSearch(search: URLSearchParams) {
-    return Array.from(search.entries())
-      .map(([key, value]) => `${key}=${value}`)
-      .join('&');
+  public buildSearch(search: NavigationURLSearchParams) {
+    return search.toString();
   }
 
   public updateAndNavigateSearchParams(params: {
@@ -145,7 +245,7 @@ class NavigationService {
     });
 
     const queryString = this.buildSearch(urlParams);
-    this.navigate(`${this.getPathname()}?${queryString}`);
+    this.navigate(`${this.getPathname()}${queryString}`);
   }
 
   public switchTab(newTab: string): void {
