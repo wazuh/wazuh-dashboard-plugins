@@ -31,7 +31,6 @@ export default async function sanitizeUploadedSVG(context) {
     const logosSettingKeys = [
       'customization.logo.sidebar',
       'customization.logo.app',
-      'customization.logo.healthcheck',
     ];
 
     logger.debug('Check configuration for custom branding uploaded SVG files');

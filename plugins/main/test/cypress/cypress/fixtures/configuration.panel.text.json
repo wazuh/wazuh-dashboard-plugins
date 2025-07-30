@@ -206,11 +206,6 @@
           "label": "customization.logo.app"
         },
         {
-          "title": "Logo Health Check",
-          "subTitle": "Set the name of the health-check logo stored at /plugins/wazuh/public/assets/",
-          "label": "customization.logo.healthcheck"
-        },
-        {
           "title": "Logo Reports",
           "subTitle": "Set the name of the reports logo (.png) stored at /plugins/wazuh/public/assets/",
           "label": "customization.logo.reports"
