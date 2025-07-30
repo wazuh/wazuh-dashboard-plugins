@@ -628,7 +628,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.text,
     defaultValue: WAZUH_SAMPLE_ALERT_PREFIX,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
     validateUIForm: function (value) {
       return this.validate(value);
     },
@@ -1041,7 +1040,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     },
     defaultValue: WAZUH_STATISTICS_DEFAULT_CREATION,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
     validateUIForm: function (value) {
       return this.validate(value);
     },
@@ -1101,7 +1099,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.number,
     defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_REPLICAS,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
     options: {
       number: {
         min: 0,
@@ -1140,7 +1137,6 @@ export const PLUGIN_SETTINGS: { [key: string]: TPluginSetting } = {
     type: EpluginSettingType.number,
     defaultValue: WAZUH_STATISTICS_DEFAULT_INDICES_SHARDS,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
     options: {
       number: {
         min: 1,
@@ -1924,7 +1920,6 @@ hosts:
     },
     defaultValue: WAZUH_MONITORING_DEFAULT_CREATION,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
     validateUIForm: function (value) {
       return this.validate(value);
     },
@@ -2051,7 +2046,6 @@ hosts:
     type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_REPLICAS,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
     options: {
       number: {
         min: 0,
@@ -2088,7 +2082,6 @@ hosts:
     type: EpluginSettingType.number,
     defaultValue: WAZUH_MONITORING_DEFAULT_INDICES_SHARDS,
     isConfigurableFromSettings: true,
-    requiresRunningHealthCheck: true,
     options: {
       number: {
         min: 1,
