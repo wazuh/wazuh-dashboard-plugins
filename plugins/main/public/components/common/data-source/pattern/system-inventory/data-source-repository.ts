@@ -11,6 +11,7 @@ import {
   WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
   WAZUH_IT_HYGIENE_USERS_PATTERN,
   WAZUH_IT_HYGIENE_GROUPS_PATTERN,
+  WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
 } from '../../../../../../common/constants';
 import { createPatternDataSourceRepositoryUseValue } from '../pattern-data-source-repository-use-setting-value';
 
@@ -51,3 +52,8 @@ export const SystemInventorySystemStatesDataSourceRepository =
 
 export const SystemInventoryHardwareStatesDataSourceRepository =
   createPatternDataSourceRepositoryUseValue(WAZUH_IT_HYGIENE_HARDWARE_PATTERN);
+
+export const SystemInventoryBrowserExtensionsStatesDataSourceRepository =
+  createPatternDataSourceRepositoryUseValue(
+    WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
+  );
