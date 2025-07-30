@@ -161,7 +161,7 @@ export class WazuhCorePlugin
     core.healthcheck.register(
       initializationTaskCreatorIndexPattern({
         services: this.services,
-        taskName: 'index-pattern:vulnerabilities',
+        taskName: 'index-pattern:vulnerabilities-states',
         options: {
           fieldsNoIndices: indexPatternFieldsStatesVulnerabilities,
         },
