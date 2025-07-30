@@ -35,6 +35,14 @@ import {
   jobSanitizeUploadedFilesTasksRun,
 } from './start';
 import { first } from 'rxjs/operators';
+import {
+  initializationTaskCreatorIndexPattern,
+  initializationTaskCreatorServerAPIConnectionCompatibility,
+} from './health-check';
+import indexPatternFieldsAlerts from './health-check/index-patterns-fields/alerts-fields.json';
+import indexPatternFieldsMonitoring from './health-check/index-patterns-fields/monitoring-fields.json';
+import indexPatternFieldsStatistics from './health-check/index-patterns-fields/statistics-fields.json';
+import indexPatternFieldsStatesVulnerabilities from './health-check/index-patterns-fields/vulnerability-states-fields.json';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -106,6 +114,66 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // Routes
     const router = core.http.createRouter();
     setupRoutes(router, plugins.wazuhCore);
+
+    // Register health check tasks
+    // server API connection-compatibility
+    core.healthcheck.register(
+      initializationTaskCreatorServerAPIConnectionCompatibility({
+        taskName: 'server-api:connection-compatibility',
+        services: plugins.wazuhCore,
+      }),
+    );
+
+    // index patterns
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: 'index-pattern:alerts',
+        options: {
+          savedObjectOverwrite: {
+            timeFieldName: '@timestamp',
+          },
+          fieldsNoIndices: indexPatternFieldsAlerts,
+        },
+        configurationSettingKey: 'pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: 'index-pattern:monitoring',
+        options: {
+          fieldsNoIndices: indexPatternFieldsMonitoring,
+        },
+        indexPatternID: 'wazuh-monitoring-*',
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: 'index-pattern:statistics',
+        options: {
+          fieldsNoIndices: indexPatternFieldsStatistics,
+        },
+        indexPatternID: 'wazuh-statistics-*',
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: 'index-pattern:vulnerabilities-states',
+        options: {
+          fieldsNoIndices: indexPatternFieldsStatesVulnerabilities,
+        },
+        indexPatternID: 'wazuh-states-vulnerabilities-*',
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
 
     return {};
   }
