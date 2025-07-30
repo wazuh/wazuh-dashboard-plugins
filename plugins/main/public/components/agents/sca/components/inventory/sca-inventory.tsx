@@ -32,7 +32,7 @@ import { managedFilters, tableColumns } from './utils/index';
  */
 export const SCAInventory: React.FC<SCAInventoryProps> = ({ indexPattern }) => {
   return (
-    <div style={{ margin: '0 12px' }}>
+    <div>
       <InventoryDashboardTable
         DataSource={SCAStatesDataSource}
         DataSourceRepositoryCreator={SCAStatesDataSourceRepository}

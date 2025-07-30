@@ -31,7 +31,7 @@ export const getKPIsPanel = (
           'sca-top-policies',
           {
             size: 5,
-            fieldCustomLabel: 'Top Policies',
+            fieldCustomLabel: 'Top 5 policies',
           },
         ),
       },
@@ -44,7 +44,7 @@ export const getKPIsPanel = (
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'check.result',
-          'Check results by Check',
+          'Checks by result',
           'sca-checks-by-result-inventory',
           {
             fieldSize: 4,
