@@ -1,0 +1,515 @@
+[
+  {
+    "count": 0,
+    "name": "_index",
+    "type": "string",
+    "esTypes": ["_index"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
+    "count": 0,
+    "name": "_source",
+    "type": "_source",
+    "esTypes": ["_source"],
+    "scripted": false,
+    "searchable": false,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "count": 0,
+    "name": "agent.build.original",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "agent.ephemeral_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "agent.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "agent.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "agent.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "agent.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "host.os.family",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "host.os.full",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "host.os.full.text",
+    "type": "string",
+    "esTypes": ["text"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false,
+    "subType": { "multi": { "parent": "host.os.full" } }
+  },
+  {
+    "count": 0,
+    "name": "host.os.kernel",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "host.os.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "host.os.name.text",
+    "type": "string",
+    "esTypes": ["text"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false,
+    "subType": { "multi": { "parent": "host.os.name" } }
+  },
+  {
+    "count": 0,
+    "name": "host.os.platform",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "host.os.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "host.os.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "message",
+    "type": "string",
+    "esTypes": ["text"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "count": 0,
+    "name": "package.architecture",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.build_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.checksum",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.install_scope",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.installed",
+    "type": "date",
+    "esTypes": ["date"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.license",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.reference",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.size",
+    "type": "number",
+    "esTypes": ["long"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "package.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "tags",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.classification",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.description.text",
+    "type": "string",
+    "esTypes": ["text"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false,
+    "subType": { "multi": { "parent": "vulnerability.description" } }
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.detected_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.enumeration",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.published_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.reference",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.report_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.scanner.vendor",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.score.base",
+    "type": "number",
+    "esTypes": ["float"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.score.environmental",
+    "type": "number",
+    "esTypes": ["float"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.score.temporal",
+    "type": "number",
+    "esTypes": ["float"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.score.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "vulnerability.severity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "wazuh.cluster.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "wazuh.cluster.node",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "count": 0,
+    "name": "wazuh.schema.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "scripted": false,
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  }
+]
