@@ -1,0 +1,195 @@
+{
+  "index_patterns": ["wazuh-states-inventory-browser-extensions*"],
+  "priority": 1,
+  "template": {
+    "settings": {
+      "index": {
+        "number_of_replicas": "0",
+        "number_of_shards": "1",
+        "query.default_field": [
+          "agent.host.architecture",
+          "agent.host.ip",
+          "agent.id",
+          "agent.name",
+          "agent.version",
+          "browser.name",
+          "wazuh.cluster.name",
+          "wazuh.cluster.node",
+          "wazuh.schema.version"
+        ],
+        "refresh_interval": "5s"
+      }
+    },
+    "mappings": {
+      "date_detection": false,
+      "dynamic": "strict",
+      "properties": {
+        "agent": {
+          "properties": {
+            "host": {
+              "properties": {
+                "architecture": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "ip": {
+                  "type": "ip"
+                }
+              }
+            },
+            "id": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "version": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "browser": {
+          "properties": {
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "user": {
+          "properties": {
+            "id": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "extension": {
+          "properties": {
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "id": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "version": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "description": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "author": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "sdk": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "path": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "profile": {
+              "properties": {
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "path": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "update_address": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "attributes": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "source": {
+              "properties": {
+                "address": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "type": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "enabled": {
+              "type": "boolean"
+            },
+            "autoupdate": {
+              "type": "boolean"
+            },
+            "persistent": {
+              "type": "boolean"
+            },
+            "from_webstore": {
+              "type": "boolean"
+            },
+            "referenced": {
+              "type": "boolean"
+            },
+            "installed": {
+              "type": "date"
+            },
+            "manifest": {
+              "properties": {
+                "hash": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "json": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "key": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "wazuh": {
+          "properties": {
+            "cluster": {
+              "properties": {
+                "name": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
+                "node": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            },
+            "schema": {
+              "properties": {
+                "version": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
