@@ -10,7 +10,6 @@ import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 import { ToastNotificationsModal } from './components/notifications/modal';
 import { WzUpdatesNotification } from './components/wz-updates-notification';
-import { HealthCheck } from './components/health-check';
 import { WzBlankScreen } from './components/wz-blank-screen/wz-blank-screen';
 import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
@@ -67,11 +66,6 @@ export function Application(props) {
       <WzAgentSelectorWrapper />
       <WzUpdatesNotification />
       <Switch>
-        <Route
-          path={`/${SECTIONS.HEALTH_CHECK}`}
-          exact
-          render={HealthCheck}
-        ></Route>
         <Route
           path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}
           exact

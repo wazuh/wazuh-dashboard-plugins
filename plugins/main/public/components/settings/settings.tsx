@@ -360,11 +360,6 @@ class SettingsComponent extends React.Component {
             <WzConfigurationSettings />
           </div>
         </Route>
-        <Route path='?tab=miscellaneous'>
-          <div>
-            <SettingsMiscellaneous />
-          </div>
-        </Route>
         <Route path='?tab=about'>
           <div>
             <SettingsAbout appInfo={this.appInfo} />

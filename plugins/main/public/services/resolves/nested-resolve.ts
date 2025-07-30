@@ -8,11 +8,5 @@ export function nestedResolve(params) {
   const healthCheckStatus = sessionStorage.getItem('healthCheck');
   if (!healthCheckStatus) return;
   const wazuhConfig = new WazuhConfig();
-  return getWzConfig(wazuhConfig).then(() =>
-    settingsWizard(
-      params,
-      wzMisc,
-      params.location && params.location.pathname.includes('/health-check'),
-    ),
-  );
+  return getWzConfig(wazuhConfig).then(() => settingsWizard(params, wzMisc));
 }

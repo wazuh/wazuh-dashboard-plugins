@@ -36,10 +36,7 @@ export const toastRequiresRunningHealthcheck = () => {
           <EuiButton
             onClick={() => {
               getToasts().remove(toast);
-              navigationService.navigate({
-                pathname: '/health-check',
-                state: { prevLocation: location },
-              });
+              // TODO: replace the management of API setup
             }}
             size='s'
           >
