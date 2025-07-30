@@ -13,13 +13,9 @@ export class SCAStatesDataSource extends PatternDataSource {
     super(id, title);
   }
 
-  // getStateSCA(): tFilter[] {
-  //   return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
-  // }
-
-  // getPoliciesSCA(): tFilter[] {
-  //   return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
-  // }
+  getFixedFilters(): tFilter[] {
+    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
+  }
 
   getClusterManagerFilters() {
     return PatternDataSourceFilterManager.getClusterManagerFilters(
