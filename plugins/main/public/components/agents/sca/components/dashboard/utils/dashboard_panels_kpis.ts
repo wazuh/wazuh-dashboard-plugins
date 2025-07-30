@@ -3,7 +3,7 @@ import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddab
 import { getVisStateTable } from '../../../../../../services/visualizations';
 
 const checkResultColors = {
-  passed: '#54b399',
+  passed: '#209280',
   failed: '#cc5642',
   'Not run': '#6092c0',
 };
@@ -11,7 +11,7 @@ const checkResultColors = {
 const getVisStateCheckResultPassed = (indexPatternId: string) => {
   return {
     id: 'check_result_passed',
-    title: 'Passed',
+    title: 'Checks passed',
     type: 'metric',
     uiState: {
       vis: {
@@ -24,10 +24,19 @@ const getVisStateCheckResultPassed = (indexPatternId: string) => {
       type: 'metric',
       metric: {
         percentageMode: false,
-        useRanges: false,
+        useRanges: true,
         colorSchema: 'Greens',
         metricColorMode: 'Labels',
-        colorsRange: [{ from: 0, to: 0 }],
+        colorsRange: [
+          {
+            from: -1,
+            to: 0,
+          },
+          {
+            from: 1,
+            to: 200000000,
+          },
+        ],
         labels: { show: true },
         invertColors: false,
         style: {
@@ -56,7 +65,7 @@ const getVisStateCheckResultPassed = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: { customLabel: 'Checks Passed' },
+          params: { customLabel: 'Passed' },
           schema: 'metric',
         },
         {
@@ -70,7 +79,7 @@ const getVisStateCheckResultPassed = (indexPatternId: string) => {
                   query: 'check.result: "passed"',
                   language: 'kuery',
                 },
-                label: 'Passed',
+                label: 'Checks',
               },
             ],
           },
@@ -84,7 +93,7 @@ const getVisStateCheckResultPassed = (indexPatternId: string) => {
 const getVisStateCheckResultFailed = (indexPatternId: string) => {
   return {
     id: 'check_result_failed',
-    title: 'failed',
+    title: 'Checks failed',
     type: 'metric',
     uiState: {
       vis: {
@@ -100,7 +109,16 @@ const getVisStateCheckResultFailed = (indexPatternId: string) => {
         useRanges: false,
         colorSchema: 'Reds',
         metricColorMode: 'Labels',
-        colorsRange: [{ from: 0, to: 0 }],
+        colorsRange: [
+          {
+            from: -1,
+            to: 0,
+          },
+          {
+            from: 1,
+            to: 200000000,
+          },
+        ],
         labels: { show: true },
         invertColors: false,
         style: {
@@ -130,7 +148,7 @@ const getVisStateCheckResultFailed = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: { customLabel: 'Checks failed' },
+          params: { customLabel: 'failed' },
           schema: 'metric',
         },
         {
@@ -144,7 +162,7 @@ const getVisStateCheckResultFailed = (indexPatternId: string) => {
                   query: 'check.result: "failed"',
                   language: 'kuery',
                 },
-                label: 'failed',
+                label: 'Checks',
               },
             ],
           },
@@ -158,7 +176,7 @@ const getVisStateCheckResultFailed = (indexPatternId: string) => {
 const getVisStateCheckResultNotRun = (indexPatternId: string) => {
   return {
     id: 'check_result_not_run',
-    title: 'Not Run',
+    title: 'Checks not Run',
     type: 'metric',
     uiState: {
       vis: {
@@ -172,9 +190,18 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Greys',
+        colorSchema: 'Blues',
         metricColorMode: 'Labels',
-        colorsRange: [{ from: 0, to: 0 }],
+        colorsRange: [
+          {
+            from: -1,
+            to: 0,
+          },
+          {
+            from: 1,
+            to: 200000000,
+          },
+        ],
         labels: { show: true },
         invertColors: false,
         style: {
@@ -204,7 +231,7 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: { customLabel: 'Checks Not Run' },
+          params: { customLabel: 'Not run' },
           schema: 'metric',
         },
         {
@@ -218,7 +245,7 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
                   query: 'check.result: "Not run"',
                   language: 'kuery',
                 },
-                label: 'Not Run',
+                label: 'Checks',
               },
             ],
           },
@@ -246,8 +273,18 @@ const getVisStateTotalChecks = (indexPatternId: string) => {
       metric: {
         percentageMode: false,
         useRanges: false,
-        colorSchema: 'Green to Red',
+        colorSchema: 'Greys',
         metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: -1,
+            to: 0,
+          },
+          {
+            from: 1,
+            to: 200000000,
+          },
+        ],
         labels: {
           show: true,
         },
@@ -404,7 +441,7 @@ export const getVisStateTopFailedPolicies = (indexPatternId: string) => ({
 
 export const getVisStateResultsByAgent = (indexPatternId: string) => ({
   id: 'results_by_agent',
-  title: 'Check Results by Agent',
+  title: 'Check results by agent',
   type: 'horizontal_bar',
   params: {
     addTooltip: true,
@@ -442,7 +479,7 @@ export const getVisStateResultsByAgent = (indexPatternId: string) => ({
           field: 'agent.name',
           size: 10,
           order: 'desc',
-          customLabel: 'Agent',
+          customLabel: 'Agents',
         },
       },
       {
@@ -667,7 +704,7 @@ export const getKPIsPanel = (
                 },
               },
             ],
-          }
+          },
         ),
       },
     },
@@ -699,7 +736,7 @@ export const getKPIsPanel = (
                 },
               },
             ],
-          }
+          },
         ),
       },
     },
