@@ -895,6 +895,14 @@
     "readFromDocValues": true
   },
   {
+    "name": "data.docker.from",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "data.docker.Type",
     "type": "string",
     "esTypes": ["keyword"],
@@ -1568,6 +1576,14 @@
   },
   {
     "name": "data.oscap.scan.content",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.YARA.scanned_file",
     "type": "string",
     "esTypes": ["keyword"],
     "searchable": true,
@@ -2799,7 +2815,23 @@
     "readFromDocValues": true
   },
   {
+    "name": "data.vulnerability.reference",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "data.vulnerability.severity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.vulnerability.status",
     "type": "string",
     "esTypes": ["keyword"],
     "searchable": true,
@@ -2818,6 +2850,14 @@
     "name": "data.vulnerability.updated",
     "type": "date",
     "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "data.vulnerability.scanner.reference",
+    "type": "string",
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
