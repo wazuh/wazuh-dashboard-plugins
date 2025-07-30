@@ -3,7 +3,6 @@ import { I18nProvider } from '@osd/i18n/react';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
-import './sca-dashboard.scss';
 
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getKPIsPanel } from './utils/dashboard_panels_kpis';
@@ -117,8 +116,9 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
                 <DiscoverNoResults />
               ) : null}
               <div
-                className={`sca-dashboard-responsive sca-dashboard-metrics ${dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
-                  }`}
+                className={`sca-dashboard-responsive sca-dashboard-metrics ${
+                  dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
+                }`}
               >
                 <DashboardByRenderer
                   input={{

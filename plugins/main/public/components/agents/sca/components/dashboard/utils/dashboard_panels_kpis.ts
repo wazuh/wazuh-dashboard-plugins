@@ -625,7 +625,7 @@ export const getKPIsPanel = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateCheckResultFailed(indexPatternId),
+        savedVis: getVisStateCheckResultPassed(indexPatternId),
       },
     },
     '2': {
@@ -633,7 +633,7 @@ export const getKPIsPanel = (
       type: 'visualization',
       explicitInput: {
         id: '2',
-        savedVis: getVisStateCheckResultPassed(indexPatternId),
+        savedVis: getVisStateCheckResultFailed(indexPatternId),
       },
     },
     '3': {
