@@ -15,13 +15,61 @@ import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
-import { getHttp } from '../kibana-services';
+import { getCore, getHttp, getToasts } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
+import { first } from 'rxjs/operators';
 
 export class WzRequest {
   static wazuhConfig: any;
+
+  static async ensureAPIisSelected() {
+    const currentApiDataCookie = AppState.getCurrentAPI();
+    let currentApiID;
+
+    if (currentApiDataCookie) {
+      try {
+        currentApiID = JSON.parse(currentApiDataCookie);
+      } catch {}
+    }
+
+    if (currentApiID) {
+      return;
+    }
+
+    // Get API available from health check task
+    const { checks } = await getCore()
+      .healthCheck.status$.pipe(first())
+      .toPromise();
+    const check = checks.find(
+      ({ name }) => name === 'server-api:connection-compatibility',
+    );
+
+    let apiWasSet = false;
+    if (check) {
+      const availableApiID = check?.data?.find(
+        ({ connection, compatibility }) => connection && compatibility,
+      )?.id;
+
+      if (availableApiID) {
+        AppState.setCurrentAPI(
+          JSON.stringify({
+            // TODO: fix name
+            name: 'TODO_FIX_NAME',
+            id: availableApiID,
+          }),
+        );
+        apiWasSet = true;
+      }
+    }
+
+    if (!apiWasSet) {
+      throw new Error(
+        'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status.',
+      );
+    }
+  }
 
   /**
    * Permorn a generic request
@@ -56,6 +104,7 @@ export class WzRequest {
         ? extraOptions.overwriteHeaders
         : {};
     try {
+      await this.ensureAPIisSelected();
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
@@ -98,7 +147,11 @@ export class WzRequest {
                 .getPathname()
                 .startsWith('/settings')
             ) {
-              // TODO: manage the API is inaccessible
+              getToasts().add({
+                color: 'warning',
+                title: `API with ID [${currentApi.id}] is not available.`,
+                text: 'This could indicate a problem in the network of the server API, review or change of API host in the API host selector if configurated other hosts.',
+              });
             }
             throw new Error(error);
           }
