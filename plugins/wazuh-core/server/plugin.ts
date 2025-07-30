@@ -132,7 +132,7 @@ export class WazuhCorePlugin
     // server API connection-compatibility
     core.healthcheck.register(
       initializationTaskCreatorServerAPIConnectionCompatibility({
-        taskName: 'check-server-api-connection-compatibility',
+        taskName: 'server-api:connection-compatibility',
         services: this.services,
       }),
     );
