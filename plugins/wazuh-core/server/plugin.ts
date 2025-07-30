@@ -30,6 +30,7 @@ import { initializationTaskCreatorIndexPattern } from './health-check';
 import indexPatternFieldsAlerts from './health-check/index-patterns-fields/alerts-fields.json';
 import indexPatternFieldsMonitoring from './health-check/index-patterns-fields/monitoring-fields.json';
 import indexPatternFieldsStatistics from './health-check/index-patterns-fields/statistics-fields.json';
+import indexPatternFieldsStatesVulnerabilities from './health-check/index-patterns-fields/vulnerabibility-states-fields.json';
 import { initializationTaskCreatorServerAPIConnectionCompatibility } from './health-check/server-api';
 
 export class WazuhCorePlugin
@@ -171,6 +172,18 @@ export class WazuhCorePlugin
           fieldsNoIndices: indexPatternFieldsStatistics,
         },
         indexPatternID: 'wazuh-statistics-*',
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: this.services,
+        taskName: 'index-pattern:vulnerabilities',
+        options: {
+          fieldsNoIndices: indexPatternFieldsStatesVulnerabilities,
+        },
+        indexPatternID: 'wazuh-states-vulnerabilities-*',
         configurationSettingKey: 'checks.pattern',
       }),
     );
