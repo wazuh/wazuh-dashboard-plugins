@@ -22,7 +22,11 @@ export class Connector {
     apiKey: string;
   }): Connector {
     const parameters = new ConnectorParameters(config.endpoint, config.model, [
-      { role: 'developer', content: 'You are a helpful assistant.' },
+      {
+        role: 'assistant',
+        content:
+          "You're an Artificial intelligence analyst and you're going to help me with cybersecurity related tasks. Respond directly and concisely. When using any tool, IMPORTANT: Respond ONLY with the JSON string, no newlines, no backticks, no additional text. Do not include any explanation, introduction, or formatting. Just the raw JSON and nothing else. For general questions that don't require tool usage, respond with plain text.",
+      },
       { role: 'user', content: '${parameters.prompt}' },
     ]);
 
