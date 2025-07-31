@@ -1,11 +1,40 @@
 import { InstallationContext } from './installation-context';
 
-// Infrastructure Interfaces
 export interface IHttpClient {
-  get<T = any>(url: string, config?: any): Promise<T>;
-  post<T = any>(url: string, data?: any, config?: any): Promise<T>;
-  put<T = any>(url: string, data?: any, config?: any): Promise<T>;
-  delete<T = any>(url: string, config?: any): Promise<T>;
+  get<T = any>(url: string, config?: Record<string, any>): Promise<T>;
+  post<T = any>(
+    url: string,
+    data?: any,
+    config?: Record<string, any>,
+  ): Promise<T>;
+  put<T = any>(
+    url: string,
+    data?: any,
+    config?: Record<string, any>,
+  ): Promise<T>;
+  delete<T = any>(url: string, config?: Record<string, any>): Promise<T>;
+  proxyRequest: {
+    get: (url: string, config?: Record<string, any>) => Promise<any>;
+    post: {
+      post: (
+        url: string,
+        data?: any,
+        config?: Record<string, any>,
+      ) => Promise<any>;
+      put: (
+        url: string,
+        data?: any,
+        config?: Record<string, any>,
+      ) => Promise<any>;
+      delete: (url: string, config?: Record<string, any>) => Promise<any>;
+    };
+    put: (
+      url: string,
+      data?: any,
+      config?: Record<string, any>,
+    ) => Promise<any>;
+    delete: (url: string, config?: Record<string, any>) => Promise<any>;
+  };
 }
 
 export interface IInstallationManager {
@@ -29,7 +58,8 @@ export interface InstallDashboardAssistantRequest {
     ragPipelineFeatureEnabled: boolean;
     trustedConnectorEndpointsRegex: string[];
   };
-  modelGroup?: { // ModelGroup is created automatically if is not defined
+  modelGroup?: {
+    // ModelGroup is created automatically if is not defined
     name: string;
     description: string;
   };
@@ -55,14 +85,14 @@ export interface InstallDashboardAssistantRequest {
 export enum StepExecutionState {
   WAITING = 'waiting',
   PROCESSING = 'processing',
-  FINISHED = 'finished'
+  FINISHED = 'finished',
 }
 
 // Step result states
 export enum StepResultState {
   SUCCESS = 'success',
   FAIL = 'fail',
-  WARNING = 'warning'
+  WARNING = 'warning',
 }
 
 export interface StepStatus {
@@ -147,15 +177,38 @@ export class InstallDashboardAssistantResponse {
     public readonly error?: string,
   ) {}
 
-  public static success(agentId: string, progress: InstallationProgress): InstallDashboardAssistantResponse {
-    return new InstallDashboardAssistantResponse(true, 'Installation completed successfully', progress, agentId);
+  public static success(
+    agentId: string,
+    progress: InstallationProgress,
+  ): InstallDashboardAssistantResponse {
+    return new InstallDashboardAssistantResponse(
+      true,
+      'Installation completed successfully',
+      progress,
+      agentId,
+    );
   }
 
-  public static failure(error: string, progress: InstallationProgress): InstallDashboardAssistantResponse {
-    return new InstallDashboardAssistantResponse(false, error, progress, undefined, error);
+  public static failure(
+    error: string,
+    progress: InstallationProgress,
+  ): InstallDashboardAssistantResponse {
+    return new InstallDashboardAssistantResponse(
+      false,
+      error,
+      progress,
+      undefined,
+      error,
+    );
   }
 
-  public static inProgress(progress: InstallationProgress): InstallDashboardAssistantResponse {
-    return new InstallDashboardAssistantResponse(false, 'Installation in progress', progress);
+  public static inProgress(
+    progress: InstallationProgress,
+  ): InstallDashboardAssistantResponse {
+    return new InstallDashboardAssistantResponse(
+      false,
+      'Installation in progress',
+      progress,
+    );
   }
 }

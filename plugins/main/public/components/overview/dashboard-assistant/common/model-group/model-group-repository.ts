@@ -2,14 +2,12 @@ import { IModelGroupRepository } from './domain/types';
 import { ModelGroup } from './domain/model-group';
 import { IHttpClient } from '../installation-manager/domain/types';
 
-const getProxyPath = (path: string, method: string) => `/api/console/proxy?path=${path}&method=${method}&dataSourceId=`;
-
 export class ModelGroupRepository implements IModelGroupRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(modelGroup: ModelGroup): Promise<string> {
-    const response = (await this.httpClient.post(
-      getProxyPath('/_plugins/_ml/model_groups/_register', 'POST'),
+    const response = (await this.httpClient.proxyRequest.post.post(
+      '/_plugins/_ml/model_groups/_register',
       modelGroup.toApiPayload(),
     )) as { model_group_id: string };
     return response.model_group_id;
@@ -17,8 +15,8 @@ export class ModelGroupRepository implements IModelGroupRepository {
 
   public async findById(id: string): Promise<ModelGroup | null> {
     try {
-      const response = (await this.httpClient.get(
-        getProxyPath(`/_plugins/_ml/model_groups/${id}`, 'GET'),
+      const response = (await this.httpClient.proxyRequest.get(
+        `/_plugins/_ml/model_groups/${id}`,
       )) as {
         model_group_id: string;
         name: string;
@@ -36,27 +34,29 @@ export class ModelGroupRepository implements IModelGroupRepository {
   }
 
   public async update(id: string, modelGroup: ModelGroup): Promise<void> {
-    await this.httpClient.put(
-      getProxyPath(`/_plugins/_ml/model_groups/${id}`, 'PUT'),
+    await this.httpClient.proxyRequest.put(
+      `/_plugins/_ml/model_groups/${id}`,
       modelGroup.toApiPayload(),
     );
   }
 
   public async delete(id: string): Promise<void> {
-    await this.httpClient.delete(getProxyPath(`/_plugins/_ml/model_groups/${id}`, 'DELETE'));
+    await this.httpClient.proxyRequest.delete(
+      `/_plugins/_ml/model_groups/${id}`,
+    );
   }
 
   public async getAll(): Promise<ModelGroup[]> {
     try {
       const searchPayload = {
         query: { match_all: {} },
-        size: 1000
+        size: 1000,
       };
 
-      const response = await this.httpClient.post(
-        getProxyPath('/_plugins/_ml/model_groups/_search', 'POST'),
-        searchPayload
-      ) as {
+      const response = (await this.httpClient.proxyRequest.post.post(
+        '/_plugins/_ml/model_groups/_search',
+        searchPayload,
+      )) as {
         hits: {
           hits: Array<{
             _source: any;
@@ -64,12 +64,12 @@ export class ModelGroupRepository implements IModelGroupRepository {
         };
       };
 
-      const modelGroups = response.hits.hits.map((hit: any) => 
+      const modelGroups = response.hits.hits.map((hit: any) =>
         ModelGroup.fromResponse(
           hit._source.model_group_id || hit._source.id,
           hit._source.name,
-          hit._source.description
-        )
+          hit._source.description,
+        ),
       );
       return modelGroups;
     } catch (error) {

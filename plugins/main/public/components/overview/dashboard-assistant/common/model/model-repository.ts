@@ -4,15 +4,12 @@ import { IHttpClient } from '../installation-manager/domain/types';
 import { validateModelPredictResponse } from './validate-model-predict';
 import { TEST_PROMPT } from '../../components/model-test-result';
 
-
-const getProxyPath = (path:string, method:string) => `/api/console/proxy?path=${path}&method=${method}&dataSourceId=`
-
 export class ModelRepository implements IModelRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(model: Model): Promise<string> {
-    const response = (await this.httpClient.post(
-      getProxyPath('/_plugins/_ml/models/_register', 'POST'),
+    const response = (await this.httpClient.proxyRequest.post.post(
+      '/_plugins/_ml/models/_register',
       model.toApiPayload(),
     )) as { model_id: string };
     return response.model_id;
@@ -20,7 +17,9 @@ export class ModelRepository implements IModelRepository {
 
   public async findById(id: string): Promise<Model | null> {
     try {
-      const response = await this.httpClient.get(getProxyPath(`/_plugins/_ml/models/${id}`, 'GET'));
+      const response = await this.httpClient.proxyRequest.get(
+        `/_plugins/_ml/models/${id}`,
+      );
       return Model.fromResponse(response);
     } catch (error: any) {
       if (error.status === 404) return null;
@@ -32,13 +31,16 @@ export class ModelRepository implements IModelRepository {
     try {
       const searchPayload = {
         query: {
-          match_all: {}
+          match_all: {},
         },
-        size: 1000
+        size: 1000,
       };
 
       /* ToDo: Change to call ml-commons-dashboards endpoints create on server */
-      const response = await this.httpClient.post(getProxyPath('/_plugins/_ml/models/_search', 'POST'), searchPayload) as {
+      const response = (await this.httpClient.proxyRequest.post.post(
+        '/_plugins/_ml/models/_search',
+        searchPayload,
+      )) as {
         hits: {
           hits: Array<{
             _source: any;
@@ -55,20 +57,22 @@ export class ModelRepository implements IModelRepository {
   }
 
   public async update(id: string, model: Model): Promise<void> {
-    await this.httpClient.put(
-      getProxyPath(`/_plugins/_ml/models/${id}`, 'PUT'),
+    await this.httpClient.proxyRequest.put(
+      `/_plugins/_ml/models/${id}`,
       model.toApiPayload(),
     );
   }
 
   public async delete(id: string): Promise<void> {
-    await this.httpClient.post(getProxyPath(`/_plugins/_ml/models/${id}`, 'DELETE'));
+    await this.httpClient.proxyRequest.post.delete(
+      `/_plugins/_ml/models/${id}`,
+    );
   }
 
   public async testConnection(modelId: string): Promise<ModelPredictResponse> {
     try {
-      const response = await this.httpClient.post(
-        getProxyPath(`/_plugins/_ml/models/${modelId}/_predict`, 'POST'),
+      const response = (await this.httpClient.proxyRequest.post.post(
+        `/_plugins/_ml/models/${modelId}/_predict`,
         {
           parameters: {
             prompt: TEST_PROMPT,
@@ -87,16 +91,15 @@ export class ModelRepository implements IModelRepository {
   }
 
   public async deploy(modelId: string, deploy: boolean): Promise<void> {
-    await this.httpClient.put(
-      getProxyPath(`/_plugins/_ml/models/${modelId}`, 'PUT'),
-      { deploy }
-    );
+    await this.httpClient.proxyRequest.put(`/_plugins/_ml/models/${modelId}`, {
+      deploy,
+    });
   }
 
   public async undeploy(modelId: string): Promise<void> {
-    await this.httpClient.post(
-      getProxyPath(`/_plugins/_ml/models/${modelId}/_undeploy`, 'POST'),
-      {}
+    await this.httpClient.proxyRequest.post.post(
+      `/_plugins/_ml/models/${modelId}/_undeploy`,
+      {},
     );
   }
 }
