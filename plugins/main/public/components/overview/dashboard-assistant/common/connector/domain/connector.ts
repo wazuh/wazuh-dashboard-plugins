@@ -76,21 +76,22 @@ export class Connector {
     const parameters = new ConnectorParameters(
       data.parameters?.endpoint || 'api.openai.com',
       data.parameters?.model || 'gpt-3.5-turbo',
-      data.parameters?.messages || []
+      data.parameters?.messages || [],
     );
     
     const credential = new ConnectorCredential(
-      data.credential?.api_key || data.credential?.openai_key || ''
+      data.credential?.api_key || data.credential?.openai_key || '',
     );
     
-    const actions = (data.actions || []).map((action: any) => 
+    const actions = (data.actions || []).map(
+      (action: any) =>
       new ConnectorAction(
         action.action_type || 'predict',
         action.method || 'POST',
         action.url || '',
         action.headers || {},
-        action.request_body || ''
-      )
+          action.request_body || '',
+        ),
     );
 
     return new Connector(
@@ -101,7 +102,7 @@ export class Connector {
       data.protocol || 'http',
       parameters,
       credential,
-      actions
+      actions,
     );
   }
 }
