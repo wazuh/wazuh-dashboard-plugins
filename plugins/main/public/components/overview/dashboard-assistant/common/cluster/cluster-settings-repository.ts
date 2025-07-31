@@ -14,7 +14,7 @@ export class ClusterSettingsRepository implements IClusterSettingsRepository {
 
   public async getSettings(): Promise<any> {
     try {
-      const response = await this.httpClient.proxyRequest.post.post(
+      const response = await this.httpClient.proxyRequest.post(
         '/_cluster/settings?include_defaults=true',
       );
       return response;

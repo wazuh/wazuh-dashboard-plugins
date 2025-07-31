@@ -16,14 +16,16 @@ export class HttpClient implements IHttpClient {
     return {
       get: (url: string, config?: Record<string, any>) =>
         this.post(buildProxyUrl(HttpMethod.GET, url), config),
-      post: {
-        post: (url: string, data?: any, config?: Record<string, any>) =>
+      post: Object.assign(
+        (url: string, data?: any, config?: Record<string, any>) =>
           this.post(buildProxyUrl(HttpMethod.POST, url), data, config),
-        put: (url: string, data?: any, config?: Record<string, any>) =>
-          this.post(buildProxyUrl(HttpMethod.PUT, url), data, config),
-        delete: (url: string, config?: Record<string, any>) =>
-          this.post(buildProxyUrl(HttpMethod.DELETE, url), config),
-      },
+        {
+          put: (url: string, data?: any, config?: Record<string, any>) =>
+            this.post(buildProxyUrl(HttpMethod.PUT, url), data, config),
+          delete: (url: string, config?: Record<string, any>) =>
+            this.post(buildProxyUrl(HttpMethod.DELETE, url), config),
+        },
+      ),
       put: (url: string, data?: any, config?: Record<string, any>) =>
         this.put(buildProxyUrl(HttpMethod.PUT, url), data, config),
       delete: (url: string, config?: Record<string, any>) =>

@@ -6,7 +6,7 @@ export class ConnectorRepository implements IConnectorRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(connector: Connector): Promise<string> {
-    const response = (await this.httpClient.proxyRequest.post.post(
+    const response = (await this.httpClient.proxyRequest.post(
       '/_plugins/_ml/connectors/_create',
       connector.toApiPayload(),
     )) as { connector_id: string };
@@ -44,7 +44,7 @@ export class ConnectorRepository implements IConnectorRepository {
         size: 1000,
       };
 
-      const response = (await this.httpClient.proxyRequest.post.post(
+      const response = (await this.httpClient.proxyRequest.post(
         '/_plugins/_ml/connectors/_search',
         searchPayload,
       )) as {

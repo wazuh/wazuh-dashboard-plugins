@@ -8,7 +8,7 @@ export class ModelRepository implements IModelRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(model: Model): Promise<string> {
-    const response = (await this.httpClient.proxyRequest.post.post(
+    const response = (await this.httpClient.proxyRequest.post(
       '/_plugins/_ml/models/_register',
       model.toApiPayload(),
     )) as { model_id: string };
@@ -37,7 +37,7 @@ export class ModelRepository implements IModelRepository {
       };
 
       /* ToDo: Change to call ml-commons-dashboards endpoints create on server */
-      const response = (await this.httpClient.proxyRequest.post.post(
+      const response = (await this.httpClient.proxyRequest.post(
         '/_plugins/_ml/models/_search',
         searchPayload,
       )) as {
@@ -71,7 +71,7 @@ export class ModelRepository implements IModelRepository {
 
   public async testConnection(modelId: string): Promise<ModelPredictResponse> {
     try {
-      const response = (await this.httpClient.proxyRequest.post.post(
+      const response = (await this.httpClient.proxyRequest.post(
         `/_plugins/_ml/models/${modelId}/_predict`,
         {
           parameters: {
@@ -97,7 +97,7 @@ export class ModelRepository implements IModelRepository {
   }
 
   public async undeploy(modelId: string): Promise<void> {
-    await this.httpClient.proxyRequest.post.post(
+    await this.httpClient.proxyRequest.post(
       `/_plugins/_ml/models/${modelId}/_undeploy`,
       {},
     );

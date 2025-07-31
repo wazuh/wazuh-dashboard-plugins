@@ -6,7 +6,7 @@ export class ModelGroupRepository implements IModelGroupRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(modelGroup: ModelGroup): Promise<string> {
-    const response = (await this.httpClient.proxyRequest.post.post(
+    const response = (await this.httpClient.proxyRequest.post(
       '/_plugins/_ml/model_groups/_register',
       modelGroup.toApiPayload(),
     )) as { model_group_id: string };
@@ -53,7 +53,7 @@ export class ModelGroupRepository implements IModelGroupRepository {
         size: 1000,
       };
 
-      const response = (await this.httpClient.proxyRequest.post.post(
+      const response = (await this.httpClient.proxyRequest.post(
         '/_plugins/_ml/model_groups/_search',
         searchPayload,
       )) as {

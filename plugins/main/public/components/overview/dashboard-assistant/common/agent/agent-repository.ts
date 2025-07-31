@@ -6,7 +6,7 @@ export class AgentRepository implements IAgentRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(agent: Agent): Promise<string> {
-    const response = (await this.httpClient.proxyRequest.post.post(
+    const response = (await this.httpClient.proxyRequest.post(
       '/_plugins/_ml/agents/_register',
       { ...agent.toApiPayload() },
     )) as { agent_id: string };
@@ -38,7 +38,7 @@ export class AgentRepository implements IAgentRepository {
   }
 
   public async execute(id: string, parameters: any): Promise<any> {
-    return await this.httpClient.proxyRequest.post.post(
+    return await this.httpClient.proxyRequest.post(
       `/_plugins/_ml/agents/${id}/_execute`,
       parameters,
     );
@@ -63,7 +63,7 @@ export class AgentRepository implements IAgentRepository {
         size: 1000,
       };
 
-      const response = (await this.httpClient.proxyRequest.post.post(
+      const response = (await this.httpClient.proxyRequest.post(
         '/_plugins/_ml/agents/_search',
         searchPayload,
       )) as {
