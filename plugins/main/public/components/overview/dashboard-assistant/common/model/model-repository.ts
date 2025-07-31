@@ -71,13 +71,10 @@ export class ModelRepository implements IModelRepository {
         getProxyPath(`/_plugins/_ml/models/${modelId}/_predict`, 'POST'),
         {
           parameters: {
-            messages: [
-              { role: 'assistant', content: 'You are a helpful assistant.' },
-              { role: 'user', content: TEST_PROMPT },
-            ],
-          }
-        }
-      ) as ModelPredictResponse;
+            prompt: TEST_PROMPT,
+          },
+        },
+      )) as ModelPredictResponse;
 
       // Validar que la respuesta tenga la estructura esperada usando la función de validación
       validateModelPredictResponse(response);
