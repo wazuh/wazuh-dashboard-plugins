@@ -2,15 +2,15 @@ import { IConnectorRepository } from './domain/types';
 import { Connector } from './domain/connector';
 import { IHttpClient } from '../installation-manager/domain/types';
 
-const getProxyPath = (method: string, path: string) =>
-  `/api/console/proxy?path=${path}&method=${method}&dataSourceId=`;
+const buildProxyUrl = (method: string, path: string) =>
+  `/api/console/proxy?method=${method}&path=${path}&dataSourceId=`;
 
 export class ConnectorRepository implements IConnectorRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(connector: Connector): Promise<string> {
     const response = (await this.httpClient.post(
-      getProxyPath('POST', '/_plugins/_ml/connectors/_create'),
+      buildProxyUrl('POST', '/_plugins/_ml/connectors/_create'),
       connector.toApiPayload(),
     )) as { connector_id: string };
     return response.connector_id;
@@ -19,7 +19,7 @@ export class ConnectorRepository implements IConnectorRepository {
   public async findById(id: string): Promise<Connector | null> {
     try {
       const response = await this.httpClient.get(
-        getProxyPath('GET', `/_plugins/_ml/connectors/${id}`),
+        buildProxyUrl('GET', `/_plugins/_ml/connectors/${id}`),
       );
       // TODO: Implement Connector.fromResponse method
       throw new Error('Method not implemented');
@@ -31,14 +31,14 @@ export class ConnectorRepository implements IConnectorRepository {
 
   public async update(id: string, connector: Connector): Promise<void> {
     await this.httpClient.put(
-      getProxyPath('PUT', `/_plugins/_ml/connectors/${id}`),
+      buildProxyUrl('PUT', `/_plugins/_ml/connectors/${id}`),
       connector.toApiPayload(),
     );
   }
 
   public async delete(id: string): Promise<void> {
     await this.httpClient.delete(
-      getProxyPath('DELETE', `/_plugins/_ml/connectors/${id}`),
+      buildProxyUrl('DELETE', `/_plugins/_ml/connectors/${id}`),
     );
   }
 
@@ -50,7 +50,7 @@ export class ConnectorRepository implements IConnectorRepository {
       };
 
       const response = (await this.httpClient.post(
-        getProxyPath('POST', '/_plugins/_ml/connectors/_search'),
+        buildProxyUrl('POST', '/_plugins/_ml/connectors/_search'),
         searchPayload,
       )) as {
         hits: {
