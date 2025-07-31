@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   EuiTitle,
   EuiText,
@@ -7,103 +7,61 @@ import {
   EuiLoadingSpinner,
   EuiLink,
   EuiListGroup,
-  EuiListGroupItem,
   EuiToolTip,
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
+import {
+  InstallationProgress,
+  StepExecutionState,
+  StepResultState,
+} from '../common/installation-manager/domain/types';
+import type { StepStatus } from '../common/installation-manager/domain/types';
 
-type StepStatus = 'pending' | 'loading' | 'success' | 'error';
-
-interface DeploymentStep {
-  id: string;
-  label: string;
-  error?: string;
-}
+type UIStepStatus = 'pending' | 'loading' | 'success' | 'error' | 'warning';
 
 interface DeploymentStatusProps {
-  steps: DeploymentStep[];
+  progress: InstallationProgress | null;
   title?: string;
-  autoStart?: boolean;
-  stepDelay?: number;
-  onStepComplete?: (stepId: string, status: StepStatus) => void;
-  onAllComplete?: (allSuccess: boolean) => void;
-  onClose?: () => void;
   onCheckButton?: () => void;
+  showCheckButton?: boolean;
+  isButtonDisabled?: boolean;
 }
 
 export const DeploymentStatus = ({
-  steps,
+  progress,
   title = 'Deploying dashboard assistant',
-  autoStart = true,
-  stepDelay = 2000,
-  onStepComplete,
-  onAllComplete,
   onCheckButton,
-  onClose,
+  showCheckButton = false,
+  isButtonDisabled = false,
 }: DeploymentStatusProps) => {
-  const [stepStatuses, setStepStatuses] = useState<Record<string, StepStatus>>(
-    () => {
-      const initialStatuses: Record<string, StepStatus> = {};
-      steps.forEach(step => {
-        initialStatuses[step.id] = 'pending';
-      });
-      return initialStatuses;
-    },
-  );
-
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const stepKeys = steps.map(step => step.id);
-
-  useEffect(() => {
-    if (!autoStart) return;
-
-    const processSteps = async () => {
-      for (let i = 0; i < stepKeys.length; i++) {
-        const stepKey = stepKeys[i];
-        if (stepStatuses[stepKey] !== 'pending') continue;
-
-        setCurrentStepIndex(i);
-
-        // Set step to loading
-        setStepStatuses(prev => ({
-          ...prev,
-          [stepKey]: 'loading',
-        }));
-
-        await new Promise(resolve =>
-          setTimeout(resolve, stepDelay + Math.random() * 1000),
-        );
-        const isSuccess = true;
-        const newStatus: StepStatus = isSuccess ? 'success' : 'error';
-
-        setStepStatuses(prev => ({
-          ...prev,
-          [stepKey]: newStatus,
-        }));
-
-        if (onStepComplete) {
-          onStepComplete(stepKey, newStatus);
-        }
-
-        if (!isSuccess) {
-          if (onAllComplete) {
-            onAllComplete(false);
-          }
-          break;
-        }
-
-        if (i === stepKeys.length - 1 && isSuccess && onAllComplete) {
-          onAllComplete(true);
-        }
+  // Helper function to map installation states to UI states
+  const mapToUIStatus = (
+    executionState: StepExecutionState,
+    resultState?: StepResultState,
+  ): UIStepStatus => {
+    if (executionState === StepExecutionState.WAITING) {
+      return 'pending';
+    }
+    if (executionState === StepExecutionState.PROCESSING) {
+      return 'loading';
+    }
+    if (executionState === StepExecutionState.FINISHED) {
+      if (resultState === StepResultState.SUCCESS) {
+        return 'success';
       }
-    };
+      if (resultState === StepResultState.FAIL) {
+        return 'error';
+      }
+      if (resultState === StepResultState.WARNING) {
+        return 'warning';
+      }
+    }
+    return 'pending';
+  };
 
-    processSteps();
-  }, [autoStart, stepDelay, onStepComplete, onAllComplete]);
-
-  const getStepIcon = (status: StepStatus) => {
+  const getStepIcon = (status: UIStepStatus) => {
     switch (status) {
       case 'loading':
         return <EuiLoadingSpinner size='m' />;
@@ -111,17 +69,28 @@ export const DeploymentStatus = ({
         return <EuiIcon type='check' color='success' />;
       case 'error':
         return <EuiIcon type='cross' color='danger' />;
+      case 'warning':
+        return <EuiIcon type='alert' color='warning' />;
       case 'pending':
       default:
         return <EuiIcon type='clock' color='subdued' />;
     }
   };
 
-  const allStepsCompleted = Object.values(stepStatuses).every(
-    status => status === 'success' || status === 'error',
-  );
-  const allStepsSuccess = Object.values(stepStatuses).every(
-    status => status === 'success',
+  // Default steps if no progress is provided
+  const defaultSteps = [
+    { name: 'Update Cluster Settings', label: 'Updating cluster settings' },
+    { name: 'Create Connector', label: 'Creating model connector' },
+    { name: 'Create Model', label: 'Creating AI model' },
+    { name: 'Test Model Connection', label: 'Testing model connection' },
+    { name: 'Create Agent', label: 'Creating assistant agent' },
+    { name: 'Register Agent', label: 'Registering agent' },
+  ];
+
+  const steps = progress?.steps || [];
+  const allStepsCompleted = progress?.overallState === StepExecutionState.FINISHED;
+  const allStepsSuccess = steps.every(
+    step => step.resultState === StepResultState.SUCCESS || step.resultState === StepResultState.WARNING,
   );
 
   return (
@@ -142,11 +111,15 @@ export const DeploymentStatus = ({
       <EuiSpacer size='l' />
 
       <EuiListGroup flush maxWidth={false}>
-        {steps.map(step => {
-          const stepStatus = stepStatuses[step.id];
+        {defaultSteps.map((defaultStep, index) => {
+          const step = steps.find(s => s.stepName === defaultStep.name);
+          const uiStatus = step
+            ? mapToUIStatus(step.executionState, step.resultState)
+            : 'pending';
+          
           return (
             <div
-              key={step.id}
+              key={defaultStep.name}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -154,16 +127,16 @@ export const DeploymentStatus = ({
                 padding: '8px 0',
               }}
             >
-              <EuiText size='s'>{step.label}</EuiText>
+              <EuiText size='s'>{defaultStep.label}</EuiText>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                {stepStatus === 'error' && step.error ? (
-                  <EuiToolTip content={step.error}>
+                {uiStatus === 'error' && step?.error ? (
+                  <EuiToolTip content={step.error.message}>
                     <div style={{ cursor: 'pointer' }}>
-                      {getStepIcon(stepStatus)}
+                      {getStepIcon(uiStatus)}
                     </div>
                   </EuiToolTip>
                 ) : (
-                  getStepIcon(stepStatus)
+                  getStepIcon(uiStatus)
                 )}
               </div>
             </div>
@@ -171,7 +144,7 @@ export const DeploymentStatus = ({
         })}
       </EuiListGroup>
 
-      {allStepsCompleted && allStepsSuccess && onClose && (
+      {(showCheckButton || (allStepsCompleted && allStepsSuccess)) && (
         <>
           <EuiSpacer size='l' />
           <EuiFlexGroup justifyContent='center'>
@@ -180,6 +153,7 @@ export const DeploymentStatus = ({
                 fill
                 onClick={() => onCheckButton?.()}
                 iconType='check'
+                disabled={isButtonDisabled}
               >
                 Check assistant status
               </EuiButton>

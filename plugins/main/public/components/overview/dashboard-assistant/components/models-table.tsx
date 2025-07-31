@@ -16,11 +16,16 @@ import { formatUINumber } from '../../../../react-services/format-number';
 import NavigationService from '../../../../react-services/navigation-service';
 import { dashboardAssistant } from '../../../../utils/applications';
 import { useModels } from '../common/model';
+import { ModelTestResult } from './model-test-result';
+import { useModelTest } from '../hooks/use-model-test';
+import { useDeleteModel } from '../hooks/use-delete-model';
+import { WzButtonModalConfirm } from '../../../common/buttons';
 
 interface Model {
   id: string;
   name: string;
   version: string;
+  description: string;
   apiUrl: string;
   status: 'active' | 'inactive' | 'error';
   createdAt: string;
@@ -34,6 +39,10 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
   const { models, isLoading, error, refresh, getTableData } = useModels();
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
+  const [isTestFlyoutVisible, setIsTestFlyoutVisible] = useState(false);
+  const [modelToTest, setModelToTest] = useState<Model | null>(null);
+  const { isLoading: isTestLoading, response: testResponse, error: testError, testModel, reset: resetTest } = useModelTest();
+  const { deleteModel, isDeleting, error: deleteError } = useDeleteModel();
 
   const tableModels = getTableData();
 
@@ -73,15 +82,39 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     setIsFlyoutVisible(true);
   };
 
+  const handleTestModel = async (model: Model) => {
+    setModelToTest(model);
+    setIsTestFlyoutVisible(true);
+    resetTest();
+    await testModel(model.id);
+  };
+
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
     setSelectedModel(null);
+  };
+
+  const closeTestFlyout = () => {
+    setIsTestFlyoutVisible(false);
+    setModelToTest(null);
+    resetTest();
+  };
+
+  const handleDeleteModel = async (modelId: string) => {
+    await deleteModel(modelId);
+    refresh();
   };
 
   const columns = [
     {
       field: 'name',
       name: 'Name',
+      sortable: true,
+      truncateText: true,
+    },
+    {
+      field: 'id',
+      name: 'ID',
       sortable: true,
       truncateText: true,
     },
@@ -120,6 +153,44 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           type: 'icon',
           onClick: (model: Model) => handleViewModel(model),
         },
+        {
+          name: 'Test',
+          description: 'Test model connection',
+          icon: 'play',
+          type: 'icon',
+          onClick: (model: Model) => handleTestModel(model),
+          enabled: (model: Model) => model.status === 'active',
+        },
+        /*{
+          name: 'Delete',
+          description: 'Delete model',
+          render: (model: Model) => (
+            <WzButtonModalConfirm
+              buttonType="empty"
+              tooltip={{ content: 'Delete model' }}
+              isDisabled={false}
+              modalTitle={`Delete model "${model.name}"?`}
+              onConfirm={() => handleDeleteModel(model.id)}
+              modalProps={{
+                buttonColor: 'danger',
+                defaultFocusedButton: 'cancel'
+              }}
+              modalConfirmText="Delete"
+              modalCancelText="Cancel"
+              iconType="trash"
+              color="danger"
+              aria-label="Delete model"
+            >
+              Are you sure you want to delete this model? This action cannot be undone.
+              The model will be undeployed first and then permanently removed.
+              {deleteError && (
+                <EuiText color="danger">
+                  <p>Error: {deleteError}</p>
+                </EuiText>
+              )}
+            </WzButtonModalConfirm>
+          ),
+        },*/
       ],
     },
   ];
@@ -221,11 +292,6 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiText>
-                  <strong>API URL:</strong> {selectedModel.apiUrl}
-                </EuiText>
-              </EuiFlexItem>
-              <EuiFlexItem>
                 <EuiFlexGroup
                   alignItems='center'
                   gutterSize='s'
@@ -254,6 +320,26 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           </EuiFlyoutBody>
         </EuiFlyout>
       )}
+
+      {isTestFlyoutVisible && modelToTest && (
+        <EuiFlyout onClose={closeTestFlyout} size='m'>
+          <EuiFlyoutHeader hasBorder>
+            <EuiTitle size='m'>
+              <h2>Test Model: {modelToTest.name}</h2>
+            </EuiTitle>
+          </EuiFlyoutHeader>
+          <EuiFlyoutBody>
+            <ModelTestResult
+              isLoading={isTestLoading}
+              response={testResponse}
+              error={testError}
+              modelName={modelToTest.name}
+            />
+          </EuiFlyoutBody>
+        </EuiFlyout>
+      )}
+
+
     </>
   );
 };

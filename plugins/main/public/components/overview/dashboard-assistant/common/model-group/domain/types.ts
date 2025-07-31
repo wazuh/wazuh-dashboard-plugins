@@ -6,6 +6,7 @@ import { ModelGroup } from './model-group';
 export interface IModelGroupRepository {
   create(modelGroup: ModelGroup): Promise<string>;
   findById(id: string): Promise<ModelGroup | null>;
+  getAll(): Promise<ModelGroup[]>;
   update(id: string, modelGroup: ModelGroup): Promise<void>;
   delete(id: string): Promise<void>;
 }

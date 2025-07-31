@@ -1,5 +1,6 @@
 import { InstallationContext } from './installation-context';
 
+// Infrastructure Interfaces
 export interface IHttpClient {
   get<T = any>(url: string, config?: any): Promise<T>;
   post<T = any>(url: string, data?: any, config?: any): Promise<T>;
@@ -14,9 +15,11 @@ export interface IInstallationManager {
 }
 
 export interface IInstallationStep {
-  execute(context: InstallationContext): Promise<void>;
-  rollback(context: InstallationContext): Promise<void>;
   getName(): string;
+  execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void>;
 }
 
 export interface InstallDashboardAssistantRequest {
@@ -26,7 +29,7 @@ export interface InstallDashboardAssistantRequest {
     ragPipelineFeatureEnabled: boolean;
     trustedConnectorEndpointsRegex: string[];
   };
-  modelGroup: {
+  modelGroup?: { // ModelGroup is created automatically if is not defined
     name: string;
     description: string;
   };
@@ -39,7 +42,7 @@ export interface InstallDashboardAssistantRequest {
   };
   model: {
     name: string;
-    version: string;
+    function_name: string;
     description: string;
   };
   agent: {
@@ -48,9 +51,42 @@ export interface InstallDashboardAssistantRequest {
   };
 }
 
+// Step execution states
+export enum StepExecutionState {
+  WAITING = 'waiting',
+  PROCESSING = 'processing',
+  FINISHED = 'finished'
+}
+
+// Step result states
+export enum StepResultState {
+  SUCCESS = 'success',
+  FAIL = 'fail',
+  WARNING = 'warning'
+}
+
+export interface StepStatus {
+  stepName: string;
+  executionState: StepExecutionState;
+  resultState?: StepResultState;
+  message?: string;
+  error?: Error;
+  startTime?: Date;
+  endTime?: Date;
+  data?: any;
+}
+
+export interface InstallationProgress {
+  currentStep: number;
+  totalSteps: number;
+  steps: StepStatus[];
+  overallState: StepExecutionState;
+}
+
 export interface InstallationResult {
   success: boolean;
   message: string;
+  progress: InstallationProgress;
   data?: {
     modelGroupId?: string;
     connectorId?: string;
@@ -60,19 +96,66 @@ export interface InstallationResult {
   errors?: InstallationError[];
 }
 
+// Request DTOs
+export interface CreateModelGroupRequest {
+  name: string;
+  description: string;
+}
+
+export interface CreateConnectorRequest {
+  name: string;
+  description: string;
+  endpoint: string;
+  model: string;
+  apiKey: string;
+}
+
+export interface CreateModelRequest {
+  name: string;
+  modelGroupId?: string;
+  description: string;
+  connectorId: string;
+  functionName: string;
+}
+
+export interface TestModelConnectionRequest {
+  modelId: string;
+}
+
+export interface CreateAgentRequest {
+  name: string;
+  description: string;
+  modelId: string;
+}
+
+export interface RegisterAgentRequest {
+  agentId: string;
+}
+
 export interface InstallationError {
   step: string;
   message: string;
   details?: any;
 }
 
-export interface InstallDashboardAssistantResponse {
-  success: boolean;
-  message: string;
-  data?: {
-    modelGroupId?: string;
-    connectorId?: string;
-    modelId?: string;
-    agentId?: string;
-  };
+export class InstallDashboardAssistantResponse {
+  private constructor(
+    public readonly success: boolean,
+    public readonly message: string,
+    public readonly progress: InstallationProgress,
+    public readonly agentId?: string,
+    public readonly error?: string,
+  ) {}
+
+  public static success(agentId: string, progress: InstallationProgress): InstallDashboardAssistantResponse {
+    return new InstallDashboardAssistantResponse(true, 'Installation completed successfully', progress, agentId);
+  }
+
+  public static failure(error: string, progress: InstallationProgress): InstallDashboardAssistantResponse {
+    return new InstallDashboardAssistantResponse(false, error, progress, undefined, error);
+  }
+
+  public static inProgress(progress: InstallationProgress): InstallDashboardAssistantResponse {
+    return new InstallDashboardAssistantResponse(false, 'Installation in progress', progress);
+  }
 }

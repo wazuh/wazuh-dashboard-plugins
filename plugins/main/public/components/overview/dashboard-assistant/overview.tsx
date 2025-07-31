@@ -11,8 +11,10 @@ import {
   EuiFlyoutBody,
   EuiTitle,
   EuiButtonEmpty,
+  EuiSpacer,
 } from '@elastic/eui';
 import { DeploymentStatus } from './components/deployment-status';
+import { DeploymentStatusContainer } from './components/deployment-status-container';
 import { ModelsTable } from './components/models-table';
 import { ModelRegister } from './model-register';
 import NavigationService from '../../../react-services/navigation-service';
@@ -162,6 +164,16 @@ export const AssistantOverview = () => {
 
   const removeToast = (removedToast: any) => {
     setToasts(toasts.filter(toast => toast.id !== removedToast.id));
+  };
+
+  const addToast = (toast: {
+    id: string;
+    title: string;
+    color: 'success' | 'danger';
+    text: string;
+    iconType: string;
+  }) => {
+    setToasts(currentToasts => [...currentToasts, toast]);
   };
 
   const handleCloseFlyout = () => {

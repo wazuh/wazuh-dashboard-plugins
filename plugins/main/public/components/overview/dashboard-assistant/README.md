@@ -182,7 +182,7 @@ classDiagram
         +getAll(): Promise~Model[]~
         +update(id: string, model: Model): Promise~void~
         +delete(id: string): Promise~void~
-        +testConnection(modelId: string): Promise~boolean~
+        +testConnection(modelId: string): Promise~ModelPredictResponse~
     }
 
     class IAgentRepository {

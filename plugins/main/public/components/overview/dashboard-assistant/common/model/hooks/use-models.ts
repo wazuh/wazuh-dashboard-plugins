@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { GetModelsUseCase } from '../get-models';
-import { ModelRepositoryMock } from '../model-repository-mock';
+import { getModelsUseCase } from '../get-models';
+import { ModelRepository } from '../model-repository';
+import { HttpClient } from '../../http-client';
 import { Model } from '../domain/model';
 
 interface UseModelsReturn {
@@ -12,6 +13,7 @@ interface UseModelsReturn {
     id: string;
     name: string;
     version: string;
+    description: string;
     status: 'active' | 'inactive' | 'error';
     createdAt: string;
     apiUrl: string;
@@ -24,9 +26,10 @@ export function useModels(): UseModelsReturn {
   const [error, setError] = useState<string | null>(null);
 
   // Create use case instance
-  const getModelsUseCase = useMemo(() => {
-    const modelRepository = new ModelRepositoryMock();
-    return new GetModelsUseCase(modelRepository);
+  const getModels = useMemo(() => {
+    const httpClient = new HttpClient();
+    const modelRepository = new ModelRepository(httpClient);
+    return getModelsUseCase(modelRepository);
   }, []);
 
   const fetchModels = useCallback(async () => {
@@ -34,7 +37,7 @@ export function useModels(): UseModelsReturn {
     setError(null);
 
     try {
-      const fetchedModels = await getModelsUseCase.execute();
+      const fetchedModels = await getModels();
       setModels(fetchedModels);
     } catch (err) {
       const errorMessage =
@@ -43,7 +46,7 @@ export function useModels(): UseModelsReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [getModelsUseCase]);
+  }, [getModels]);
 
   const getTableData = useCallback(() => {
     return models.map(model => model.toTableFormat());

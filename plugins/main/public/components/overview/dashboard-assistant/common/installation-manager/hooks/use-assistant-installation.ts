@@ -1,11 +1,11 @@
 import { useState, useCallback, useMemo } from 'react';
 import { installDashboardAssistantUseCase } from '../install-dashboard-assistant';
 import { InstallationManager } from '../installation-manager';
-import { createMockRepositories } from '../infrastructure/mock-repositories';
 import type {
   InstallDashboardAssistantRequest,
-  InstallDashboardAssistantResponse,
+  InstallationProgress,
 } from '../domain/types';
+import { InstallDashboardAssistantResponse } from '../domain/types';
 
 interface ModelFormData {
   name: string;
@@ -21,11 +21,14 @@ export function useAssistantInstallation() {
   const [result, setResult] =
     useState<InstallDashboardAssistantResponse | null>(null);
   const [modelData, setModelData] = useState<ModelFormData | null>(null);
+  const [progress, setProgress] = useState<InstallationProgress | null>(null);
 
-  // Create installation use case with mock repositories
+  // Create installation use case with real repositories
   const installUseCase = useMemo(() => {
-    // Create installation manager (now handles repositories internally)
-    const installationManager = new InstallationManager();
+    // Create installation manager with progress callback
+    const installationManager = new InstallationManager((progressUpdate) => {
+      setProgress(progressUpdate);
+    });
 
     return installDashboardAssistantUseCase(installationManager);
   }, []);
@@ -52,10 +55,11 @@ export function useAssistantInstallation() {
           ragPipelineFeatureEnabled: true,
           trustedConnectorEndpointsRegex: ['.*'],
         },
+        /*
         modelGroup: {
           name: `${modelData.name}_group`,
           description: `Model group for ${modelData.name}`,
-        },
+        },*/
         connector: {
           name: `${modelData.name}_connector`,
           description: `Connector for ${modelData.name}`,
@@ -65,7 +69,7 @@ export function useAssistantInstallation() {
         },
         model: {
           name: modelData.name,
-          version: modelData.version,
+          function_name: "remote",
           description: modelData.description || `${modelData.name} model`,
         },
         agent: {
@@ -84,22 +88,35 @@ export function useAssistantInstallation() {
       const errorMessage =
         err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
-      setResult({
-        success: false,
-        message: errorMessage,
-      });
+      // Create a failure response with current progress or empty progress
+      const currentProgress = progress || {
+        currentStep: 0,
+        totalSteps: 6,
+        steps: [],
+        overallState: 'waiting' as any
+      };
+      setResult(InstallDashboardAssistantResponse.failure(errorMessage, currentProgress));
     } finally {
       setIsLoading(false);
     }
   }, [modelData, installUseCase]);
 
+  const reset = useCallback(() => {
+    setIsLoading(false);
+    setError(null);
+    setResult(null);
+    setProgress(null);
+  }, []);
+
   return {
     install,
     setModel,
+    reset,
     isLoading,
     error,
     result,
     modelData,
+    progress,
     isSuccess: result?.success || false,
   };
 }

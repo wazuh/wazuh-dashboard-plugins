@@ -57,6 +57,7 @@ export const ModelRegister = ({
     error: installError,
     result,
     modelData,
+    progress,
     isSuccess,
   } = useAssistantInstallation();
 
@@ -237,7 +238,9 @@ export const ModelRegister = ({
     setIsDeploymentVisible(true);
 
     // Execute the installation using the hook
+    console.log('Starting installation...');
     await install();
+    console.log('Installation completed');
 
     if (onClickDeploy) {
       onClickDeploy();
@@ -282,6 +285,13 @@ export const ModelRegister = ({
       console.log('Installation completed successfully:', result);
     }
   }, [isSuccess, result]);
+
+  // Effect to monitor progress changes
+  useEffect(() => {
+    if (progress) {
+      console.log('Progress updated:', progress);
+    }
+  }, [progress]);
 
   const handleOnClickCheckStatus = () => {
     if (getWzCurrentAppID() === dashboardAssistant.id) {
@@ -389,14 +399,10 @@ export const ModelRegister = ({
 
           <EuiFlyoutBody>
             <DeploymentStatus
-              steps={deploymentSteps}
+              progress={progress}
               title='Model Deployment'
-              autoStart={true}
-              stepDelay={2000}
-              onStepComplete={handleStepComplete}
-              onAllComplete={handleAllComplete}
-              onClose={handleCloseDeployment}
               onCheckButton={handleOnClickCheckStatus}
+              showCheckButton={isSuccess}
             />
           </EuiFlyoutBody>
         </EuiFlyout>
