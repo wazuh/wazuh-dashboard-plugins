@@ -1,6 +1,6 @@
 // Register Agent Use Case
 import type { IAgentRepository } from './domain/types';
-import type { RegisterAgentRequest } from '../assistant-manager/domain/types';
+import type { RegisterAgentRequest } from '../installation-manager/domain/types';
 
 export const registerAgentUseCase =
   (agentRepository: IAgentRepository) =>

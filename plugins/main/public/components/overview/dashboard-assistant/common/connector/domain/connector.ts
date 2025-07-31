@@ -65,4 +65,39 @@ export class Connector {
       actions: this.actions.map(action => action.toObject()),
     };
   }
+
+  public static fromResponse(data: any): Connector {
+    // TODO: Implement proper parsing from API response
+    // For now, create a basic connector with available data
+    const parameters = new ConnectorParameters(
+      data.parameters?.endpoint || 'api.openai.com',
+      data.parameters?.model || 'gpt-3.5-turbo',
+      data.parameters?.messages || []
+    );
+    
+    const credential = new ConnectorCredential(
+      data.credential?.api_key || data.credential?.openai_key || ''
+    );
+    
+    const actions = (data.actions || []).map((action: any) => 
+      new ConnectorAction(
+        action.action_type || 'predict',
+        action.method || 'POST',
+        action.url || '',
+        action.headers || {},
+        action.request_body || ''
+      )
+    );
+
+    return new Connector(
+      data.connector_id || data.id || null,
+      data.name || 'Unknown Connector',
+      data.description || '',
+      data.version || 1,
+      data.protocol || 'http',
+      parameters,
+      credential,
+      actions
+    );
+  }
 }

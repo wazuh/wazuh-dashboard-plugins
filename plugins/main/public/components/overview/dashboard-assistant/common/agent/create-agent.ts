@@ -1,7 +1,7 @@
 // Create Agent Use Case
 
 import type { IAgentRepository } from './domain/types';
-import type { CreateAgentRequest } from '../assistant-manager/domain/types';
+import type { CreateAgentRequest } from '../installation-manager/domain/types';
 import { Agent } from './domain/agent';
 import { AgentLLM } from './domain/agent-llm';
 

@@ -60,4 +60,36 @@ export class Agent {
       tools: this.tools.map(tool => tool.toObject()),
     };
   }
+
+  public static fromResponse(data: any): Agent {
+    // TODO: Implement proper parsing from API response
+    // For now, create a basic agent with available data
+    const llm = new AgentLLM(
+      data.llm?.model_id || '',
+      data.llm?.parameters || { max_iteration: 5, stop_when_no_tool_found: true }
+    );
+    
+    const memory = new AgentMemory(
+      data.memory?.type || 'conversation_summary',
+      data.memory?.window_size || 10
+    );
+    
+    const tools = (data.tools || []).map((tool: any) => 
+      new AgentTool(
+        tool.type || 'MLModelTool',
+        tool.name || 'MLModelTool',
+        tool.parameters || {}
+      )
+    );
+
+    return new Agent(
+      data.agent_id || data.id || null,
+      data.name || 'Unknown Agent',
+      data.type || 'conversational',
+      data.description || '',
+      llm,
+      memory,
+      tools
+    );
+  }
 }

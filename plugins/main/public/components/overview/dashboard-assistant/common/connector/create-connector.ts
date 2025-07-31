@@ -1,5 +1,5 @@
 import type { IConnectorRepository } from './domain/types';
-import type { CreateConnectorRequest } from '../assistant-manager/domain/types';
+import type { CreateConnectorRequest } from '../installation-manager/domain/types';
 import { Connector } from './domain/connector';
 
 export const createConnectorUseCase =

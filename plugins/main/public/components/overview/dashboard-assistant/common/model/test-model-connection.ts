@@ -1,11 +1,12 @@
 import type {
   IModelRepository,
   TestModelConnectionRequest,
+  ModelPredictResponse,
 } from './domain/types';
 
 export const testModelConnectionUseCase =
   (modelRepository: IModelRepository) =>
-  async (request: TestModelConnectionRequest): Promise<void> => {
-    // Test the model connection
-    await modelRepository.testConnection(request.modelId);
+  async (request: TestModelConnectionRequest): Promise<ModelPredictResponse> => {
+    // Test the model connection and return the response
+    return await modelRepository.testConnection(request.modelId);
   };

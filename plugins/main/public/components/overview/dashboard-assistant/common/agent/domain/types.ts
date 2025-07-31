@@ -3,6 +3,7 @@ import { Agent } from './agent';
 export interface IAgentRepository {
   create(agent: Agent): Promise<string>;
   findById(id: string): Promise<Agent | null>;
+  getAll(): Promise<Agent[]>;
   update(id: string, agent: Agent): Promise<void>;
   delete(id: string): Promise<void>;
   execute(id: string, parameters: any): Promise<any>;

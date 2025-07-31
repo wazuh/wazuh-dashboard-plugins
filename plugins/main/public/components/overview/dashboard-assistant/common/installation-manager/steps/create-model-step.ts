@@ -21,7 +21,7 @@ export class CreateModelStep implements IInstallationStep {
     const createModel = createModelUseCase(this.modelRepository);
     const modelRequest: CreateModelRequest = {
       name: request.model.name,
-      version: request.model.version || '1.0.0',
+      functionName: request.model.function_name,
       modelGroupId: context.get<string>('modelGroupId')!,
       description: request.model.description,
       connectorId: context.get<string>('connectorId')!,

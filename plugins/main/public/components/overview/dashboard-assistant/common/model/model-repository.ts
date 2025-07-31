@@ -1,13 +1,18 @@
-import { IModelRepository } from './domain/types';
+import { IModelRepository, ModelPredictResponse } from './domain/types';
 import { Model } from './domain/model';
 import { IHttpClient } from '../installation-manager/domain/types';
+import { validateModelPredictResponse } from './validate-model-predict';
+import { TEST_PROMPT } from '../../components/model-test-result';
+
+
+const getProxyPath = (path:string, method:string) => `/api/console/proxy?path=${path}&method=${method}&dataSourceId=`
 
 export class ModelRepository implements IModelRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(model: Model): Promise<string> {
     const response = (await this.httpClient.post(
-      '/_plugins/_ml/models/_register',
+      getProxyPath('/_plugins/_ml/models/_register', 'POST'),
       model.toApiPayload(),
     )) as { model_id: string };
     return response.model_id;
@@ -15,7 +20,7 @@ export class ModelRepository implements IModelRepository {
 
   public async findById(id: string): Promise<Model | null> {
     try {
-      const response = await this.httpClient.get(`/_plugins/_ml/models/${id}`);
+      const response = await this.httpClient.get(getProxyPath(`/_plugins/_ml/models/${id}`, 'GET'));
       return Model.fromResponse(response);
     } catch (error: any) {
       if (error.status === 404) return null;
@@ -24,82 +29,76 @@ export class ModelRepository implements IModelRepository {
   }
 
   public async getAll(): Promise<Model[]> {
-    // Mock data for demonstration
-    const mockModels = [
-      {
-        model_id: 'anthropic-claude-1',
-        name: 'Anthropic Claude',
-        version: 'claude-3-5-sonnet-20241022',
-        model_group_id: 'group-1',
-        connector_id: 'connector-1',
-        description: 'Advanced AI model for complex reasoning and analysis',
-        status: 'active',
-        created_at: '2024-01-15T10:30:00Z',
-        api_url: 'https://api.anthropic.com/v1/messages',
-      },
-      {
-        model_id: 'amazon-titan-2',
-        name: 'Amazon Titan',
-        version: 'amazon.titan-text-express-v1',
-        model_group_id: 'group-2',
-        connector_id: 'connector-2',
-        description: 'High-performance text generation model',
-        status: 'active',
-        created_at: '2024-01-10T14:20:00Z',
-        api_url: 'https://bedrock-runtime.us-east-1.amazonaws.com',
-      },
-      {
-        model_id: 'deepseek-3',
-        name: 'Deepseek',
-        version: 'deepseek-chat',
-        model_group_id: 'group-3',
-        connector_id: 'connector-3',
-        description: 'Efficient model for chat and conversation',
-        status: 'inactive',
-        created_at: '2024-01-08T09:15:00Z',
-        api_url: 'https://api.deepseek.com/v1/chat/completions',
-      },
-      {
-        model_id: 'openai-gpt-4',
-        name: 'OpenAI GPT',
-        version: 'gpt-4-turbo',
-        model_group_id: 'group-4',
-        connector_id: 'connector-4',
-        description: 'Latest GPT model with enhanced capabilities',
-        status: 'error',
-        created_at: '2024-01-01T16:45:00Z',
-        api_url: 'https://api.openai.com/v1/chat/completions',
-      },
-    ];
+    try {
+      const searchPayload = {
+        query: {
+          match_all: {}
+        },
+        size: 1000
+      };
 
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+      /* ToDo: Change to call ml-commons-dashboards endpoints create on server */
+      const response = await this.httpClient.post(getProxyPath('/_plugins/_ml/models/_search', 'POST'), searchPayload) as {
+        hits: {
+          hits: Array<{
+            _source: any;
+          }>;
+        };
+      };
 
-    return mockModels.map(modelData => Model.fromResponse(modelData));
+      const models = response.hits.hits.map(hit => Model.fromResponse(hit));
+      return models;
+    } catch (error) {
+      console.error('Error fetching models:', error);
+      return [];
+    }
   }
 
   public async update(id: string, model: Model): Promise<void> {
     await this.httpClient.put(
-      `/_plugins/_ml/models/${id}`,
+      getProxyPath(`/_plugins/_ml/models/${id}`, 'PUT'),
       model.toApiPayload(),
     );
   }
 
   public async delete(id: string): Promise<void> {
-    await this.httpClient.delete(`/_plugins/_ml/models/${id}`);
+    await this.httpClient.delete(getProxyPath(`/_plugins/_ml/models/${id}`, 'DELETE'));
   }
 
-  public async testConnection(modelId: string): Promise<boolean> {
+  public async testConnection(modelId: string): Promise<ModelPredictResponse> {
     try {
-      await this.httpClient.post(`/_plugins/_ml/models/${modelId}/_predict`, {
-        messages: [
-          { role: 'system', content: 'You are a helpful assistant.' },
-          { role: 'user', content: 'Hello!' },
-        ],
-      });
-      return true;
+      const response = await this.httpClient.post(
+        getProxyPath(`/_plugins/_ml/models/${modelId}/_predict`, 'POST'),
+        {
+          parameters: {
+            messages: [
+              { role: 'assistant', content: 'You are a helpful assistant.' },
+              { role: 'user', content: TEST_PROMPT },
+            ],
+          }
+        }
+      ) as ModelPredictResponse;
+
+      // Validar que la respuesta tenga la estructura esperada usando la función de validación
+      validateModelPredictResponse(response);
+
+      return response;
     } catch (error) {
-      return false;
+      console.error('Error testing model connection:', error);
+      throw error;
     }
+  }
+
+  public async deploy(modelId: string, deploy: boolean): Promise<void> {
+    await this.httpClient.put(
+      getProxyPath(`/_plugins/_ml/models/${modelId}`, 'PUT'),
+      { deploy }
+    );
+  }
+
+  public async unregister(modelId: string): Promise<void> {
+    await this.httpClient.delete(
+      getProxyPath(`/_plugins/_ml/models/${modelId}`, 'DELETE')
+    );
   }
 }

@@ -1,5 +1,5 @@
 import type { IModelGroupRepository } from './domain/types';
-import type { CreateModelGroupRequest } from '../assistant-manager/domain/types';
+import type { CreateModelGroupRequest } from '../installation-manager/domain/types';
 import { ModelGroup } from './domain/model-group';
 
 export const createModelGroupUseCase =
