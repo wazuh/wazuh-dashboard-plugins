@@ -5,7 +5,8 @@ import { getPlugins } from '../../../../../kibana-services';
 import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
-import { getKPIsPanel } from './utils/dashboard_panels_kpis';
+import { getKPIsPanel } from './utils/dashboard-kpis';
+import { getDashboardPanels } from './utils/dashboard-panels';
 import {
   ErrorFactory,
   ErrorHandler,
@@ -116,7 +117,7 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
                 <DiscoverNoResults />
               ) : null}
               <div
-                className={`sca-dashboard-responsive sca-dashboard-metrics ${
+                className={`wz-dashboard-responsive wz-dashboard-metrics ${
                   dataSource && results?.hits?.total > 0 ? '' : 'wz-no-display'
                 }`}
               >
@@ -134,6 +135,31 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
                     },
                     title: 'Security Configuration Assessment dashboard KPIs',
                     description: 'Dashboard of the SCA KPIs',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: true,
+                    lastReloadRequestTime: fingerprint,
+                  }}
+                />
+              </div>
+              <div className='wz-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(indexPattern?.id),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: true,
+                    id: 'security-configuration-assessment-panels',
+                    timeRange: {
+                      from: searchBarProps.dateRangeFrom,
+                      to: searchBarProps.dateRangeTo,
+                    },
+                    title: 'Security Configuration Assessment dashboard panels',
+                    description: 'Dashboard of the SCA panels',
                     query: searchBarProps.query,
                     refreshConfig: {
                       pause: false,
