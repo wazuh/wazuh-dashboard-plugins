@@ -23,17 +23,17 @@ const mainSettings = [
   {
     field: 'enabled',
     label: 'File limit status',
-    render: renderValueYesThenEnabled
+    render: renderValueYesThenEnabled,
   },
   {
     field: 'entries',
-    label: 'Maximum number of files to monitor'
+    label: 'Maximum number of files to monitor',
   },
 ];
 
-const FILE_LIMIT_PROP = 'file_limit'
+const FILE_LIMIT_PROP = 'file_limit';
 
-class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
+class WzConfigurationIntegrityMonitoringFileLimit extends Component {
   constructor(props) {
     super(props);
   }
@@ -46,8 +46,8 @@ class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
         currentConfig['syscheck-syscheck'].syscheck &&
         currentConfig['syscheck-syscheck'].syscheck[FILE_LIMIT_PROP] ? (
           <WzConfigurationSettingsHeader
-            title="Registry limit"
-            description="Limit the maximum registries in the FIM database"
+            title='Files limit'
+            description='Limit the maximum files in the FIM database'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
@@ -58,11 +58,11 @@ class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
             />
           </WzConfigurationSettingsHeader>
         ) : (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         )}
       </Fragment>
     );
   }
 }
 
-export default WzConfigurationIntegrityMonitoringRegistryLimit;
+export default WzConfigurationIntegrityMonitoringFileLimit;
