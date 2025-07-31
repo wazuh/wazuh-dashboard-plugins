@@ -133,94 +133,32 @@ export const getVisStateTopFailedPolicies = (indexPatternId: string) => ({
   },
 });
 
-export const getVisStateResultsByAgent = (indexPatternId: string) => ({
-  id: 'results_by_agent',
-  title: 'Check results by agent',
+export const getVisStateChecksByResult = (indexPatternId: string) => ({
+  id: 'checks_by_result',
+  title: 'Checks by result',
   type: 'horizontal_bar',
   params: {
-    addTooltip: true,
-    addLegend: true,
-    isStacked: true,
-    legendPosition: 'right',
-    categoryAxes: [{ position: 'left' }],
-    valueAxes: [{ position: 'bottom' }],
-  },
-  uiState: {
-    vis: {
-      colors: checkResultColors,
-    },
-  },
-  data: {
-    searchSource: {
-      query: { language: 'kuery', query: '' },
-      filter: [],
-      index: indexPatternId,
-    },
-    references: [
-      {
-        name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-        type: 'index-pattern',
-        id: indexPatternId,
-      },
-    ],
-    aggs: [
-      {
-        id: '1',
-        enabled: true,
-        type: 'terms',
-        schema: 'segment',
-        params: {
-          field: 'agent.name',
-          size: 10,
-          order: 'desc',
-          customLabel: 'Agents',
-        },
-      },
-      {
-        id: '2',
-        enabled: true,
-        type: 'terms',
-        schema: 'group',
-        params: {
-          field: 'check.result',
-          size: 5,
-          order: 'desc',
-          customLabel: 'Result',
-        },
-      },
-    ],
-  },
-});
-
-export const getVisStateCheckResultsByPolicy = (indexPatternId: string) => ({
-  id: 'sca-checks-by-policy',
-  title: 'Check Results by Policy',
-  type: 'horizontal_bar',
-  uiState: {
-    vis: {
-      colors: checkResultColors,
-    },
-  },
-  params: {
-    addLegend: true,
-    addTooltip: true,
-    legendPosition: 'right',
-    labels: {
-      show: true,
-      position: 'default',
-      truncate: 100,
-      last_level: true,
-      values: true,
+    type: 'line',
+    grid: {
+      categoryLines: false,
     },
     categoryAxes: [
       {
         id: 'CategoryAxis-1',
         type: 'category',
-        position: 'left',
+        position: 'bottom',
         show: true,
+        style: {},
+        scale: {
+          type: 'linear',
+        },
         labels: {
           show: true,
+          filter: true,
+          truncate: 25,
+          rotate: 75,
         },
+        title: {},
       },
     ],
     valueAxes: [
@@ -228,32 +166,59 @@ export const getVisStateCheckResultsByPolicy = (indexPatternId: string) => ({
         id: 'ValueAxis-1',
         name: 'LeftAxis-1',
         type: 'value',
-        position: 'bottom',
+        position: 'left',
         show: true,
+        style: {},
         scale: {
           type: 'linear',
+          mode: 'normal',
         },
         labels: {
           show: true,
+          rotate: 0,
+          filter: false,
+          truncate: 100,
         },
         title: {
-          text: 'Checks',
+          text: ' ',
         },
       },
     ],
     seriesParams: [
       {
-        data: {
-          id: '1',
-          label: 'Count',
-        },
-        drawLinesBetweenPoints: false,
-        mode: 'stacked',
         show: true,
-        type: 'bar',
+        type: 'histogram',
+        mode: 'stacked',
+        data: {
+          label: ' ',
+          id: '1',
+        },
         valueAxis: 'ValueAxis-1',
+        drawLinesBetweenPoints: true,
+        lineWidth: 2,
+        interpolate: 'linear',
+        showCircles: true,
       },
     ],
+    addTooltip: true,
+    addLegend: true,
+    legendPosition: 'right',
+    times: [],
+    addTimeMarker: false,
+    labels: {},
+    thresholdLine: {
+      show: false,
+      value: 10,
+      width: 1,
+      style: 'full',
+      color: '#E7664C',
+    },
+    orderBucketsBySum: false,
+  },
+  uiState: {
+    vis: {
+      colors: checkResultColors,
+    },
   },
   data: {
     searchSource: {
@@ -273,34 +238,349 @@ export const getVisStateCheckResultsByPolicy = (indexPatternId: string) => ({
         id: '1',
         enabled: true,
         type: 'count',
+        params: {
+          customLabel: ' ',
+        },
         schema: 'metric',
-        params: { customLabel: 'Checks' },
       },
       {
         id: '2',
         enabled: true,
         type: 'terms',
-        schema: 'segment',
         params: {
-          field: 'policy.name',
-          size: 10,
+          field: 'check.name',
           orderBy: '1',
           order: 'desc',
-          customLabel: 'Policy',
+          size: 20,
+          otherBucket: false,
+          otherBucketLabel: 'Other',
+          missingBucket: false,
+          missingBucketLabel: 'Missing',
+          customLabel: 'Checks',
         },
+        schema: 'segment',
       },
       {
         id: '3',
         enabled: true,
         type: 'terms',
-        schema: 'group',
         params: {
           field: 'check.result',
-          size: 5,
           orderBy: '1',
           order: 'desc',
-          customLabel: 'Result',
+          size: 5,
+          otherBucket: false,
+          otherBucketLabel: 'Other',
+          missingBucket: false,
+          missingBucketLabel: 'Missing',
         },
+        schema: 'group',
+      },
+    ],
+  },
+});
+
+export const getVisStateResultsByAgent = (indexPatternId: string) => ({
+  id: 'results_by_agent',
+  title: 'Agents by check result',
+  type: 'horizontal_bar',
+  params: {
+    addLegend: true,
+    addTimeMarker: false,
+    addTooltip: true,
+    categoryAxes: [
+      {
+        id: 'CategoryAxis-1',
+        labels: {
+          filter: false,
+          rotate: 0,
+          show: true,
+          truncate: 200,
+        },
+        position: 'left',
+        scale: {
+          type: 'linear',
+        },
+        show: true,
+        style: {},
+        title: {},
+        type: 'category',
+      },
+    ],
+    grid: {
+      categoryLines: false,
+    },
+    labels: {},
+    legendPosition: 'right',
+    row: true,
+    seriesParams: [
+      {
+        data: {
+          id: '1',
+          label: ' ',
+        },
+        drawLinesBetweenPoints: true,
+        lineWidth: 2,
+        mode: 'stacked',
+        show: true,
+        showCircles: true,
+        type: 'histogram',
+        valueAxis: 'ValueAxis-1',
+      },
+    ],
+    thresholdLine: {
+      color: '#E7664C',
+      show: false,
+      style: 'full',
+      value: 10,
+      width: 1,
+    },
+    times: [],
+    type: 'histogram',
+    valueAxes: [
+      {
+        id: 'ValueAxis-1',
+        labels: {
+          filter: true,
+          rotate: 75,
+          show: true,
+          truncate: 100,
+        },
+        name: 'LeftAxis-1',
+        position: 'bottom',
+        scale: {
+          mode: 'normal',
+          type: 'linear',
+        },
+        show: true,
+        style: {},
+        title: {
+          text: ' ',
+        },
+        type: 'value',
+      },
+    ],
+  },
+  uiState: {
+    vis: {
+      colors: checkResultColors,
+    },
+  },
+  data: {
+    searchSource: {
+      query: { language: 'kuery', query: '' },
+      filter: [],
+      index: indexPatternId,
+    },
+    references: [
+      {
+        name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+        type: 'index-pattern',
+        id: indexPatternId,
+      },
+    ],
+    aggs: [
+      {
+        id: '1',
+        enabled: true,
+        type: 'count',
+        params: {
+          customLabel: ' ',
+        },
+        schema: 'metric',
+      },
+      {
+        id: '2',
+        enabled: true,
+        type: 'terms',
+        params: {
+          field: 'agent.name',
+          orderBy: '1',
+          order: 'desc',
+          size: 5,
+          otherBucket: false,
+          otherBucketLabel: 'Other',
+          missingBucket: false,
+          missingBucketLabel: 'Missing',
+          customLabel: 'Agents',
+        },
+        schema: 'segment',
+      },
+      {
+        id: '3',
+        enabled: true,
+        type: 'terms',
+        params: {
+          field: 'check.result',
+          orderBy: 'custom',
+          orderAgg: {
+            id: '3-orderAgg',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'orderAgg',
+          },
+          order: 'desc',
+          size: 5,
+          otherBucket: false,
+          otherBucketLabel: 'Other',
+          missingBucket: false,
+          missingBucketLabel: 'Missing',
+        },
+        schema: 'group',
+      },
+    ],
+  },
+});
+
+export const getVisStateCheckResultsByPolicy = (indexPatternId: string) => ({
+  id: 'policies_by_result',
+  title: 'Policies by check result',
+  type: 'horizontal_bar',
+  params: {
+    addLegend: true,
+    addTimeMarker: false,
+    addTooltip: true,
+    categoryAxes: [
+      {
+        id: 'CategoryAxis-1',
+        labels: {
+          filter: false,
+          rotate: 0,
+          show: true,
+          truncate: 200,
+        },
+        position: 'left',
+        scale: {
+          type: 'linear',
+        },
+        show: true,
+        style: {},
+        title: {},
+        type: 'category',
+      },
+    ],
+    grid: {
+      categoryLines: false,
+    },
+    labels: {},
+    legendPosition: 'right',
+    row: true,
+    seriesParams: [
+      {
+        data: {
+          id: '1',
+          label: ' ',
+        },
+        drawLinesBetweenPoints: true,
+        lineWidth: 2,
+        mode: 'stacked',
+        show: true,
+        showCircles: true,
+        type: 'histogram',
+        valueAxis: 'ValueAxis-1',
+      },
+    ],
+    thresholdLine: {
+      color: '#E7664C',
+      show: false,
+      style: 'full',
+      value: 10,
+      width: 1,
+    },
+    times: [],
+    type: 'histogram',
+    valueAxes: [
+      {
+        id: 'ValueAxis-1',
+        labels: {
+          filter: true,
+          rotate: 75,
+          show: true,
+          truncate: 100,
+        },
+        name: 'LeftAxis-1',
+        position: 'bottom',
+        scale: {
+          mode: 'normal',
+          type: 'linear',
+        },
+        show: true,
+        style: {},
+        title: {
+          text: ' ',
+        },
+        type: 'value',
+      },
+    ],
+  },
+  uiState: {
+    vis: {
+      colors: checkResultColors,
+    },
+  },
+  data: {
+    searchSource: {
+      query: { language: 'kuery', query: '' },
+      filter: [],
+      index: indexPatternId,
+    },
+    references: [
+      {
+        name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
+        type: 'index-pattern',
+        id: indexPatternId,
+      },
+    ],
+    aggs: [
+      {
+        id: '1',
+        enabled: true,
+        type: 'count',
+        params: {
+          customLabel: ' ',
+        },
+        schema: 'metric',
+      },
+      {
+        id: '2',
+        enabled: true,
+        type: 'terms',
+        params: {
+          field: 'policy.name',
+          orderBy: '1',
+          order: 'desc',
+          size: 5,
+          otherBucket: false,
+          otherBucketLabel: 'Other',
+          missingBucket: false,
+          missingBucketLabel: 'Missing',
+          customLabel: 'Policies',
+        },
+        schema: 'segment',
+      },
+      {
+        id: '3',
+        enabled: true,
+        type: 'terms',
+        params: {
+          field: 'check.result',
+          orderBy: 'custom',
+          orderAgg: {
+            id: '3-orderAgg',
+            enabled: true,
+            type: 'count',
+            params: {},
+            schema: 'orderAgg',
+          },
+          order: 'desc',
+          size: 5,
+          otherBucket: false,
+          otherBucketLabel: 'Other',
+          missingBucket: false,
+          missingBucketLabel: 'Missing',
+        },
+        schema: 'group',
       },
     ],
   },
@@ -319,20 +599,7 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateHorizontalBarSplitSeries(
-          indexPatternId,
-          'agent.name',
-          'Top 5 agents by check result',
-          'sca-dashboard-top-agents',
-          {
-            fieldSize: 5,
-            metricCustomLabel: 'Top ports count',
-            valueAxesTitleText: ' ',
-            seriesLabel: 'Top ports',
-            seriesMode: 'normal',
-            fieldCustomLabel: 'Top ports',
-          },
-        ),
+        savedVis: getVisStateResultsByAgent(indexPatternId),
       },
     },
     '2': {
@@ -340,7 +607,8 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '2',
-        savedVis: getVisStateCheckResultsDonut(indexPatternId),
+        // savedVis: getVisStateCheckResultsDonut(indexPatternId),
+        savedVis: getVisStateChecksByResult(indexPatternId),
       },
     },
     '3': {

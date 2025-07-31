@@ -64,7 +64,7 @@ const getVisStateCheckResultPassed = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: { customLabel: 'Passed' },
+          params: { customLabel: 'checks' },
           schema: 'metric',
         },
         {
@@ -78,7 +78,7 @@ const getVisStateCheckResultPassed = (indexPatternId: string) => {
                   query: 'check.result: "passed"',
                   language: 'kuery',
                 },
-                label: 'Checks',
+                label: 'Passed',
               },
             ],
           },
@@ -147,7 +147,7 @@ const getVisStateCheckResultFailed = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: { customLabel: 'failed' },
+          params: { customLabel: 'checks' },
           schema: 'metric',
         },
         {
@@ -161,7 +161,7 @@ const getVisStateCheckResultFailed = (indexPatternId: string) => {
                   query: 'check.result: "failed"',
                   language: 'kuery',
                 },
-                label: 'Checks',
+                label: 'Failed',
               },
             ],
           },
@@ -230,7 +230,7 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
           id: '1',
           enabled: true,
           type: 'count',
-          params: { customLabel: 'Not run' },
+          params: { customLabel: 'checks' },
           schema: 'metric',
         },
         {
@@ -244,7 +244,7 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
                   query: 'check.result: "Not run"',
                   language: 'kuery',
                 },
-                label: 'Checks',
+                label: 'Not run',
               },
             ],
           },
@@ -358,95 +358,5 @@ export const getKPIsPanel = (
         savedVis: getVisStateTotalChecks(indexPatternId),
       },
     },
-    ////////////////
-    // '5': {
-    //   gridData: { w: 24, h: 10, x: 0, y: 18, i: '5' },
-    //   type: 'visualization',
-    //   explicitInput: {
-    //     id: '5',
-    //     savedVis: getVisStateResultsByAgent(indexPatternId),
-    //   },
-    // },
-    // '6': {
-    //   gridData: { w: 24, h: 10, x: 24, y: 6, i: '6' },
-    //   type: 'visualization',
-    //   explicitInput: {
-    //     id: '6',
-    //     savedVis: getVisStateCheckResultsDonut(indexPatternId),
-    //   },
-    // },
-    // '7': {
-    //   gridData: { w: 24, h: 10, x: 0, y: 28, i: '7' },
-    //   type: 'visualization',
-    //   explicitInput: {
-    //     id: '7',
-    //     savedVis: getVisStateCheckResultsByPolicy(indexPatternId),
-    //   },
-    // },
-    // '8': {
-    //   gridData: { w: 12, h: 10, x: 24, y: 28, i: '8' },
-    //   type: 'visualization',
-    //   explicitInput: {
-    //     id: '8',
-    //     savedVis: getVisStateTable(
-    //       indexPatternId,
-    //       'agent.name',
-    //       'Checks Not Run by Agent',
-    //       'sca-not-run-agents',
-    //       {
-    //         fieldCustomLabel: 'Not Run',
-    //         filters: [
-    //           {
-    //             meta: {
-    //               disabled: false,
-    //               key: 'check.result',
-    //               negate: false,
-    //               type: 'phrase',
-    //               value: 'Not run',
-    //             },
-    //             query: {
-    //               match_phrase: {
-    //                 'check.result': 'Not run',
-    //               },
-    //             },
-    //           },
-    //         ],
-    //       },
-    //     ),
-    //   },
-    // },
-    // '9': {
-    //   gridData: { w: 12, h: 10, x: 36, y: 18, i: '9' },
-    //   type: 'visualization',
-    //   explicitInput: {
-    //     id: '9',
-    //     savedVis: getVisStateTable(
-    //       indexPatternId,
-    //       'policy.name',
-    //       'Top 5 failed Policies',
-    //       'sca-top-failed-policies',
-    //       {
-    //         fieldCustomLabel: 'Failed Policies',
-    //         filters: [
-    //           {
-    //             meta: {
-    //               disabled: false,
-    //               key: 'check.result',
-    //               negate: false,
-    //               type: 'phrase',
-    //               value: 'failed',
-    //             },
-    //             query: {
-    //               match_phrase: {
-    //                 'check.result': 'failed',
-    //               },
-    //             },
-    //           },
-    //         ],
-    //       },
-    //     ),
-    //   },
-    // },
-    ////////////////////////////////
   };
 };
