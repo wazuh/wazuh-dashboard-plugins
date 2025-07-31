@@ -17,9 +17,7 @@ import NavigationService from '../../../../react-services/navigation-service';
 import { dashboardAssistant } from '../../../../utils/applications';
 import { useModels } from '../common/model';
 import { ModelTestResult } from './model-test-result';
-import { useModelTest } from '../hooks/use-model-test';
-import { useDeleteModel } from '../hooks/use-delete-model';
-import { WzButtonModalConfirm } from '../../../common/buttons';
+import { useModelTest, useDeleteModel} from '../common/model/hooks';
 
 interface Model {
   id: string;
@@ -161,36 +159,13 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           onClick: (model: Model) => handleTestModel(model),
           enabled: (model: Model) => model.status === 'active',
         },
-        /*{
+        {
           name: 'Delete',
+          icon: 'trash',
+          type: 'icon',
           description: 'Delete model',
-          render: (model: Model) => (
-            <WzButtonModalConfirm
-              buttonType="empty"
-              tooltip={{ content: 'Delete model' }}
-              isDisabled={false}
-              modalTitle={`Delete model "${model.name}"?`}
-              onConfirm={() => handleDeleteModel(model.id)}
-              modalProps={{
-                buttonColor: 'danger',
-                defaultFocusedButton: 'cancel'
-              }}
-              modalConfirmText="Delete"
-              modalCancelText="Cancel"
-              iconType="trash"
-              color="danger"
-              aria-label="Delete model"
-            >
-              Are you sure you want to delete this model? This action cannot be undone.
-              The model will be undeployed first and then permanently removed.
-              {deleteError && (
-                <EuiText color="danger">
-                  <p>Error: {deleteError}</p>
-                </EuiText>
-              )}
-            </WzButtonModalConfirm>
-          ),
-        },*/
+          onClick: async (model: Model) => handleDeleteModel(model.id)
+        },
       ],
     },
   ];

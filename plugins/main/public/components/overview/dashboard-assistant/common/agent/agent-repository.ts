@@ -45,7 +45,7 @@ export class AgentRepository implements IAgentRepository {
   }
 
   public async register(agentId: string): Promise<void> {
-    await this.httpClient.put(getProxyPath('/.plugins-ml-config/_doc/os_chat', 'PUT'), {
+    await this.httpClient.post(getProxyPath('/.plugins-ml-config/_doc/os_chat', 'PUT'), {
       type: 'os_chat_root_agent',
       configuration: {
         agent_id: agentId,

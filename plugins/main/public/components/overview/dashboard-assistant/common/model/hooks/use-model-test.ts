@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
-import { testModelConnectionUseCase } from '../common/model/test-model-connection';
-import { ModelRepository } from '../common/model/model-repository';
-import { HttpClient } from '../common/http-client';
-import { ModelPredictResponse } from '../common/model/domain/types';
+import { testModelConnectionUseCase } from '../test-model-connection';
+import { ModelRepository } from '../model-repository';
+import { HttpClient } from '../../http-client';
+import { ModelPredictResponse } from '../domain/types';
 
 interface UseModelTestReturn {
   isLoading: boolean;

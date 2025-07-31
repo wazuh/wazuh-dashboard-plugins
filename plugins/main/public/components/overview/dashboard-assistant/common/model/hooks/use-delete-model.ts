@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
-import { deleteModelUseCase } from '../common/model/delete-model';
-import { ModelRepository } from '../common/model/model-repository';
-import { HttpClient } from '../common/http-client';
+import { deleteModelUseCase } from '../delete-model';
+import { ModelRepository } from '../model-repository';
+import { HttpClient } from '../../http-client';
 
 export interface UseDeleteModelReturn {
   isDeleting: boolean;

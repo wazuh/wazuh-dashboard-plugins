@@ -15,7 +15,7 @@ import { createModelUseCase } from '../model/create-model';
 import { testModelConnectionUseCase } from '../model/test-model-connection';
 import { createAgentUseCase } from '../agent/create-agent';
 import { registerAgentUseCase } from '../agent/register-agent';
-import { createRealRepositories } from './infrastructure/real-repositories';
+import { createRealRepositories } from './real-repositories';
 import type { IClusterSettingsRepository } from '../cluster/domain/types';
 import type {
   IModelGroupRepository,

@@ -62,7 +62,7 @@ export class ModelRepository implements IModelRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    await this.httpClient.delete(getProxyPath(`/_plugins/_ml/models/${id}`, 'DELETE'));
+    await this.httpClient.post(getProxyPath(`/_plugins/_ml/models/${id}`, 'DELETE'));
   }
 
   public async testConnection(modelId: string): Promise<ModelPredictResponse> {
@@ -96,9 +96,10 @@ export class ModelRepository implements IModelRepository {
     );
   }
 
-  public async unregister(modelId: string): Promise<void> {
-    await this.httpClient.delete(
-      getProxyPath(`/_plugins/_ml/models/${modelId}`, 'DELETE')
+  public async undeploy(modelId: string): Promise<void> {
+    await this.httpClient.post(
+      getProxyPath(`/_plugins/_ml/models/${modelId}/_undeploy`, 'POST'),
+      {}
     );
   }
 }

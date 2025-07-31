@@ -8,7 +8,7 @@ export interface IModelRepository {
   delete(id: string): Promise<void>;
   testConnection(modelId: string): Promise<ModelPredictResponse>;
   deploy(modelId: string, deploy: boolean): Promise<void>;
-  unregister(modelId: string): Promise<void>;
+  undeploy(modelId: string): Promise<void>;
 }
 
 export interface CreateModelRequest {

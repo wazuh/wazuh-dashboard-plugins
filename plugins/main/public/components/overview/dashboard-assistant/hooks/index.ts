@@ -1,1 +1,0 @@
-export { useModelTest } from './use-model-test';
