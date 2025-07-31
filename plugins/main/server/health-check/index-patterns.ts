@@ -68,10 +68,10 @@ async function createIndexPattern(
   } = {},
 ) {
   try {
-    let fields;
+    let fieldsObj;
 
     try {
-      fields = await getFieldMappings(
+      fieldsObj = await getFieldMappings(
         { logger, indexPatternsClient },
         indexPatternID,
       );
@@ -80,17 +80,34 @@ async function createIndexPattern(
         const message = `Fields for index pattern with ID [${indexPatternID}] could not be obtained. This could indicate there are not matching indices because they were not generated or there is some error in the process that generates and indexes that data. The index pattern will be created with a set of pre-defined fields.`;
 
         logger.warn(message);
-        fields = options.fieldsNoIndices;
+        fieldsObj = options.fieldsNoIndices;
       } else {
         throw error;
       }
     }
 
-    const savedObjectData = {
-      title: indexPatternID,
-      fields: JSON.stringify(fields),
-      ...options?.savedObjectOverwrite,
+    const title = indexPatternID;
+    const fields = JSON.stringify(fieldsObj);
+
+    let savedObjectData = {
+      title,
+      fields,
     };
+
+    if (typeof options?.savedObjectOverwrite === 'function') {
+      const overwriteProps = options?.savedObjectOverwrite(savedObjectData);
+      savedObjectData = {
+        ...savedObjectData,
+        ...overwriteProps,
+      };
+    }
+
+    if (typeof options?.savedObjectOverwrite === 'object') {
+      savedObjectData = {
+        ...savedObjectData,
+        ...options?.savedObjectOverwrite,
+      };
+    }
 
     logger.debug(
       `Creating index pattern with ID [${indexPatternID}] title [${savedObjectData.title}]`,
@@ -112,7 +129,7 @@ async function createIndexPattern(
     return response;
   } catch (error) {
     throw new Error(
-      `index pattern with ID [${indexPatternID}] could not be created due to: ${error.message}`,
+      `index pattern with ID [${indexPatternID}] could not be created due to: ${error.message}. This could indicate the collection is disabled or there is a problem in the collection and ingestion.`,
     );
   }
 }
@@ -228,6 +245,7 @@ export const initializationTaskCreatorIndexPattern = ({
   configurationSettingKey,
   indexPatternID,
   services,
+  taskMeta = {},
   ...rest
 }: {
   taskName: string;
@@ -235,7 +253,7 @@ export const initializationTaskCreatorIndexPattern = ({
   configurationSettingKey: string;
   indexPatternID?: string;
 }) => ({
-  isCritical: true,
+  isCritical: taskMeta?.isCritical || false,
   name: taskName,
   async run({ context: ctx, logger }: InitializationTaskRunContext) {
     let indexPatternIDResolved;
@@ -269,3 +287,46 @@ export const initializationTaskCreatorIndexPattern = ({
     }
   },
 });
+
+const fieldMappers = {
+  bytes: ({ type }) => (type === 'number' ? { id: 'bytes' } : undefined),
+  // integer, remove thousand and decimal separators through the params.pattern
+  integer: ({ type }) =>
+    type === 'number' ? { id: 'number', params: { pattern: '0' } } : undefined,
+  percent: ({ type }) => {
+    return type === 'number'
+      ? { id: 'percent', params: { pattern: '0,0.[00]%' } }
+      : undefined;
+  },
+};
+
+export function mapFieldsFormat(expectedFields: {
+  [key: keyof typeof fieldMappers]: (field: any) => any;
+}) {
+  return ({ fields }) => {
+    const fieldsToMap = Object.keys(expectedFields);
+    const mappedFields = fields
+      ?.filter(({ name }) => fieldsToMap.includes(name))
+      .map(field => {
+        const { name } = field;
+        const mapper = fieldMappers[expectedFields[name]] || undefined;
+
+        if (!mapper) {
+          return undefined;
+        }
+        const result = mapper(field);
+        if (!result) {
+          return undefined;
+        }
+        return [name, result];
+      })
+      .filter(Boolean);
+
+    if (mappedFields.length) {
+      return {
+        fieldFormatMap: JSON.stringify(Object.fromEntries(mappedFields)),
+      }; // Add format map for expected fields
+    }
+    return {};
+  };
+}

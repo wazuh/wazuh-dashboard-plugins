@@ -38,11 +38,49 @@ import { first } from 'rxjs/operators';
 import {
   initializationTaskCreatorIndexPattern,
   initializationTaskCreatorServerAPIConnectionCompatibility,
+  mapFieldsFormat,
 } from './health-check';
 import indexPatternFieldsAlerts from './health-check/index-patterns-fields/alerts-fields.json';
 import indexPatternFieldsMonitoring from './health-check/index-patterns-fields/monitoring-fields.json';
 import indexPatternFieldsStatistics from './health-check/index-patterns-fields/statistics-fields.json';
 import indexPatternFieldsStatesVulnerabilities from './health-check/index-patterns-fields/vulnerability-states-fields.json';
+import {
+  HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
+  WAZUH_FIM_FILES_PATTERN,
+  WAZUH_FIM_REGISTRY_KEYS_PATTERN,
+  WAZUH_FIM_REGISTRY_VALUES_PATTERN,
+  WAZUH_IT_HYGIENE_GROUPS_PATTERN,
+  WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
+  WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
+  WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
+  WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
+  WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
+  WAZUH_IT_HYGIENE_PATTERN,
+  WAZUH_IT_HYGIENE_PORTS_PATTERN,
+  WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
+  WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
+  WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+  WAZUH_IT_HYGIENE_USERS_PATTERN,
+  WAZUH_VULNERABILITIES_PATTERN,
+} from '../common/constants';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -128,7 +166,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthcheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: 'index-pattern:alerts',
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
         options: {
           savedObjectOverwrite: {
             timeFieldName: '@timestamp',
@@ -136,13 +174,16 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           fieldsNoIndices: indexPatternFieldsAlerts,
         },
         configurationSettingKey: 'pattern',
+        taskMeta: {
+          isCritical: true,
+        },
       }),
     );
 
     core.healthcheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: 'index-pattern:monitoring',
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
         options: {
           fieldsNoIndices: indexPatternFieldsMonitoring,
         },
@@ -154,7 +195,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthcheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: 'index-pattern:statistics',
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
         options: {
           fieldsNoIndices: indexPatternFieldsStatistics,
         },
@@ -166,11 +207,192 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     core.healthcheck.register(
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
-        taskName: 'index-pattern:vulnerabilities-states',
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
+        indexPatternID: WAZUH_VULNERABILITIES_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES,
         options: {
-          fieldsNoIndices: indexPatternFieldsStatesVulnerabilities,
+          savedObjectOverwrite: mapFieldsFormat({
+            'destination.port': 'integer',
+            'host.memory.free': 'bytes',
+            'host.memory.total': 'bytes',
+            'host.memory.used': 'bytes',
+            'host.memory.usage': 'percent',
+            'host.network.egress.bytes': 'bytes',
+            'host.network.ingress.bytes': 'bytes',
+            'package.size': 'bytes',
+            'process.parent.pid': 'integer',
+            'process.pid': 'integer',
+            'source.port': 'integer',
+          }),
         },
-        indexPatternID: 'wazuh-states-vulnerabilities-*',
+        indexPatternID: WAZUH_IT_HYGIENE_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
+        indexPatternID: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
+        indexPatternID: WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
+        indexPatternID: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'host.network.egress.bytes': 'bytes',
+            'host.network.ingress.bytes': 'bytes',
+          }),
+        },
+        indexPatternID: WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
+        indexPatternID: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'package.size': 'bytes',
+          }),
+        },
+        indexPatternID: WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'destination.port': 'integer',
+            'process.pid': 'integer',
+            'source.port': 'integer',
+          }),
+        },
+        indexPatternID: WAZUH_IT_HYGIENE_PORTS_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'process.parent.pid': 'integer',
+            'process.pid': 'integer',
+          }),
+        },
+        indexPatternID: WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
+        indexPatternID: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
+        indexPatternID: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
+        indexPatternID: WAZUH_IT_HYGIENE_USERS_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'file.size': 'bytes',
+          }),
+        },
+        indexPatternID: WAZUH_FIM_FILES_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
+        indexPatternID: WAZUH_FIM_REGISTRY_KEYS_PATTERN,
+        configurationSettingKey: 'checks.pattern',
+      }),
+    );
+
+    core.healthcheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'registry.size': 'bytes',
+          }),
+        },
+        indexPatternID: WAZUH_FIM_REGISTRY_VALUES_PATTERN,
         configurationSettingKey: 'checks.pattern',
       }),
     );

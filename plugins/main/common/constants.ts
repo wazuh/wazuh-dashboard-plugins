@@ -844,3 +844,61 @@ export const SUPPORTED_LANGUAGES = {
 } as const;
 
 export const SUPPORTED_LANGUAGES_ARRAY = Object.values(SUPPORTED_LANGUAGES);
+
+// Health check
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS = 'index-pattern:alerts';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES =
+  'index-pattern:vulnerabilities-states';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING =
+  'index-pattern:monitoring';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS =
+  'index-pattern:statistitcs';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
+  'index-pattern:inventory-states';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES =
+  'index-pattern:inventory-states-groups';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES =
+  'index-pattern:inventory-states-hardware';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES =
+  'index-pattern:inventory-states-hotfixes';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES =
+  'index-pattern:inventory-states-interfaces';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES =
+  'index-pattern:inventory-states-networks';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES =
+  'index-pattern:inventory-states-packages';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES =
+  'index-pattern:inventory-states-ports';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES =
+  'index-pattern:inventory-states-processes';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES =
+  'index-pattern:inventory-states-protocols';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES =
+  'index-pattern:inventory-states-system';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES =
+  'index-pattern:inventory-states-users';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES =
+  'index-pattern:fim-states';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES =
+  'index-pattern:fim-files-states';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES =
+  'index-pattern:fim-registry-keys-states';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
+  'index-pattern:fim-registry-values-states';

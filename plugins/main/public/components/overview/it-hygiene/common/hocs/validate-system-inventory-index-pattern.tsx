@@ -1,42 +1,35 @@
 import React from 'react';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { EuiLink } from '@elastic/eui';
+import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
+import { withHealthCheckChecks } from '../../../../common/hocs';
 import {
-  ensureIndexPatternIsCreated,
-  ERROR_NO_INDICES_FOUND,
-  mapFieldsFormat,
-  withIndexPatternFromValue,
-  withMapErrorPromptErrorEnsureIndexPattern,
-} from '../../../../common/hocs';
-import {
-  WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
-  WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
-  WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
-  WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
-  WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
-  WAZUH_IT_HYGIENE_PATTERN,
-  WAZUH_IT_HYGIENE_PORTS_PATTERN,
-  WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
-  WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
-  WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
-  WAZUH_IT_HYGIENE_USERS_PATTERN,
-  WAZUH_IT_HYGIENE_GROUPS_PATTERN,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
 } from '../../../../../../common/constants';
+import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 
-const errorPromptTypes = {
-  [ERROR_NO_INDICES_FOUND]: {
-    title: () => 'System inventory could be disabled or has a problem',
-    body: ({ message }: { message: React.ReactNode }) => (
+export const PromptFIMIndexPatternMissing = ({ refresh }) => (
+  <EuiEmptyPrompt
+    iconType='alert'
+    title={<h2>System inventory could be disabled or has a problem</h2>}
+    body={
       <>
-        <p>{message}</p>
         <p>
-          If the system inventory is enabled, then this could be caused by an
-          error in: server side, server-indexer connection, indexer side, index
-          creation, index data, index pattern name misconfiguration or user
-          permissions related to read the inventory indices.
+          If this is enabled, then this could be caused by an error in: server
+          side, server-indexer connection or indexer side. Review the server and
+          indexer logs.
         </p>
         <p>
-          Please, review the server and indexer logs. Also, you can check the{' '}
+          Also, you can check the{' '}
           <EuiLink
             href={webDocumentationLink(
               'user-manual/capabilities/system-inventory/index.html',
@@ -49,128 +42,71 @@ const errorPromptTypes = {
           </EuiLink>
         </p>
       </>
-    ),
-  },
-  default: {
-    title: ({ title }: { title: string }) => title,
-    body: ({ message }: { message: string }) => <p>{message}</p>,
-  },
-};
-
-export const withSystemInventoryDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_PATTERN,
-  validate: ensureIndexPatternIsCreated(
-    mapFieldsFormat({
-      'destination.port': 'integer',
-      'host.memory.free': 'bytes',
-      'host.memory.total': 'bytes',
-      'host.memory.used': 'bytes',
-      'host.memory.usage': 'percent',
-      'host.network.egress.bytes': 'bytes',
-      'host.network.ingress.bytes': 'bytes',
-      'package.size': 'bytes',
-      'process.parent.pid': 'integer',
-      'process.pid': 'integer',
-      'source.port': 'integer',
-    }),
-  ),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
-
-export const withSystemInventoryNetworksDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
-  validate: ensureIndexPatternIsCreated(),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
-
-export const withSystemInventoryInterfacesDataSource =
-  withIndexPatternFromValue({
-    indexPattern: WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
-    validate: ensureIndexPatternIsCreated(
-      mapFieldsFormat({
-        'host.network.egress.bytes': 'bytes',
-        'host.network.ingress.bytes': 'bytes',
-      }),
-    ),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  });
-
-export const withSystemInventoryProtocolsDataSource = withIndexPatternFromValue(
-  {
-    indexPattern: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
-    validate: ensureIndexPatternIsCreated(),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  },
+    }
+    actions={
+      <EuiButton color='primary' fill onClick={refresh}>
+        Refresh
+      </EuiButton>
+    }
+  />
 );
 
-export const withSystemInventoryProcessesDataSource = withIndexPatternFromValue(
-  {
-    indexPattern: WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
-    validate: ensureIndexPatternIsCreated(
-      mapFieldsFormat({
-        'process.parent.pid': 'integer',
-        'process.pid': 'integer',
-      }),
-    ),
-    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  },
+export const withSystemInventoryDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES],
+  PromptFIMIndexPatternMissing,
 );
 
-export const withSystemInventoryUsersDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_USERS_PATTERN,
-  validate: ensureIndexPatternIsCreated(),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
+export const withSystemInventoryNetworksDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES],
+  PromptFIMIndexPatternMissing,
+);
 
-export const withSystemInventoryGroupsDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
-  validate: ensureIndexPatternIsCreated(),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
+export const withSystemInventoryInterfacesDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES],
+  PromptFIMIndexPatternMissing,
+);
 
-export const withSystemInventoryTrafficDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_PORTS_PATTERN,
-  validate: ensureIndexPatternIsCreated(
-    mapFieldsFormat({
-      'destination.port': 'integer',
-      'process.pid': 'integer',
-      'source.port': 'integer',
-    }),
-  ),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
+export const withSystemInventoryProtocolsDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES],
+  PromptFIMIndexPatternMissing,
+);
 
-export const withSystemInventoryPackagesDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
-  validate: ensureIndexPatternIsCreated(
-    mapFieldsFormat({
-      'package.size': 'bytes',
-    }),
-  ),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
+export const withSystemInventoryProcessesDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES],
+  PromptFIMIndexPatternMissing,
+);
 
-export const withSystemInventoryHotfixesDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
-  validate: ensureIndexPatternIsCreated(),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
+export const withSystemInventoryUsersDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES],
+  PromptFIMIndexPatternMissing,
+);
 
-export const withSystemInventorySystemDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
-  validate: ensureIndexPatternIsCreated(),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
+export const withSystemInventoryGroupsDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES],
+  PromptFIMIndexPatternMissing,
+);
 
-export const withSystemInventoryHardwareDataSource = withIndexPatternFromValue({
-  indexPattern: WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
-  validate: ensureIndexPatternIsCreated(
-    mapFieldsFormat({
-      'host.memory.free': 'bytes',
-      'host.memory.total': 'bytes',
-      'host.memory.used': 'bytes',
-      'host.memory.usage': 'percent',
-    }),
-  ),
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-});
+export const withSystemInventoryTrafficDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES],
+  PromptFIMIndexPatternMissing,
+);
+
+export const withSystemInventoryPackagesDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES],
+  PromptFIMIndexPatternMissing,
+);
+
+export const withSystemInventoryHotfixesDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES],
+  PromptFIMIndexPatternMissing,
+);
+
+export const withSystemInventorySystemDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES],
+  PromptFIMIndexPatternMissing,
+);
+
+export const withSystemInventoryHardwareDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES],
+  PromptFIMIndexPatternMissing,
+);
