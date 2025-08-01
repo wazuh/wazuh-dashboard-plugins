@@ -2,7 +2,7 @@ import { IModelGroupRepository } from './domain/types';
 import { ModelGroup } from './domain/model-group';
 import { IHttpClient } from '../installation-manager/domain/types';
 
-export class ModelGroupRepository implements IModelGroupRepository {
+export class ModelGroupHttpClientRepository implements IModelGroupRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(modelGroup: ModelGroup): Promise<string> {
