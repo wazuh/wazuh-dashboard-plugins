@@ -78,9 +78,12 @@ export const DeploymentStatus = ({
   };
 
   const steps = progress?.steps || [];
-  const allStepsCompleted = progress?.overallState === StepExecutionState.FINISHED;
+  const allStepsCompleted =
+    progress?.overallState === StepExecutionState.FINISHED;
   const allStepsSuccess = steps.every(
-    step => step.resultState === StepResultState.SUCCESS || step.resultState === StepResultState.WARNING,
+    step =>
+      step.resultState === StepResultState.SUCCESS ||
+      step.resultState === StepResultState.WARNING,
   );
 
   return (
@@ -102,14 +105,14 @@ export const DeploymentStatus = ({
 
       <EuiListGroup flush maxWidth={false}>
         {steps.map((step: StepStatus, index) => {
-          
           const uiStatus = step
             ? mapToUIStatus(step.executionState, step.resultState)
             : 'pending';
-          
+          const key = `${step.stepName}-${index}`;
+
           return (
             <div
-              key={step.stepName}
+              key={key}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
