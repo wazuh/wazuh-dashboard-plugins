@@ -1,11 +1,7 @@
+import { Repository } from '../../domain/repository';
 import { Model } from './model';
 
-export interface IModelRepository {
-  create(model: Model): Promise<string>;
-  findById(id: string): Promise<Model | null>;
-  getAll(): Promise<Model[]>;
-  update(id: string, model: Model): Promise<void>;
-  delete(id: string): Promise<void>;
+export interface IModelRepository extends Repository<Model> {
   testConnection(modelId: string): Promise<ModelPredictResponse>;
   deploy(modelId: string, deploy: boolean): Promise<void>;
   undeploy(modelId: string): Promise<void>;
