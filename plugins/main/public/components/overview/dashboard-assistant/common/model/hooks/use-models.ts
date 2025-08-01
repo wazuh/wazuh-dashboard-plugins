@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getModelsUseCase } from '../get-models';
 import { ModelHttpClientRepository } from '../model-repository';
 import { HttpWithProxyClient } from '../../http-client';
-import { Model } from '../domain/model';
+import { Model, ModelStatus } from '../domain/model';
 
 interface UseModelsReturn {
   models: Model[];
@@ -14,7 +14,7 @@ interface UseModelsReturn {
     name: string;
     version: string;
     description: string;
-    status: 'active' | 'inactive' | 'error';
+    status: ModelStatus;
     createdAt: string;
     apiUrl: string;
   }>;

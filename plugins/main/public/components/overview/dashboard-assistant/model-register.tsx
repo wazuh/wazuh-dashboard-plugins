@@ -19,7 +19,7 @@ import { getWzCurrentAppID } from '../../../kibana-services';
 import { dashboardAssistant } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
 import { useAssistantInstallation } from './common/installation-manager/hooks/use-assistant-installation';
-import { ModelConfig, modelConfig } from "./model-config";
+import { ModelConfig, modelConfig } from './model-config';
 
 interface FormConfig {
   title: string;
@@ -133,21 +133,6 @@ export const ModelRegister = ({
     setIsDeploymentVisible(false);
   };
 
-  const handleStepComplete = (
-    stepId: string,
-    status: 'pending' | 'loading' | 'success' | 'error',
-  ) => {
-    console.log(`Step ${stepId} completed with status: ${status}`);
-  };
-
-  const handleAllComplete = (allSuccess: boolean) => {
-    if (allSuccess) {
-      console.log('All deployment steps completed successfully');
-    } else {
-      console.log('Some deployment steps failed');
-    }
-  };
-
   // Effect to handle installation errors
   useEffect(() => {
     if (installError) {
@@ -174,34 +159,6 @@ export const ModelRegister = ({
       NavigationService.getInstance().navigate(`${dashboardAssistant.id}`);
     }
   };
-
-  const deploymentSteps = [
-    {
-      id: 'cluster',
-      label: 'Enabling cluster settings',
-      error: 'Failed to enable cluster settings. Check your permissions.',
-    },
-    {
-      id: 'connector',
-      label: 'Creating connector',
-      error: 'Unable to create connector. Verify network connectivity.',
-    },
-    {
-      id: 'model',
-      label: 'Registering model group',
-      error: 'Model group registration failed. Check model configuration.',
-    },
-    {
-      id: 'register',
-      label: 'Registering model',
-      error: 'Model registration failed. Verify model parameters.',
-    },
-    {
-      id: 'deploy',
-      label: 'Checking deployment status',
-      error: 'Deployment check failed. Review deployment logs.',
-    },
-  ];
 
   return (
     <>
