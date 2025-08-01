@@ -41,8 +41,6 @@ jest.mock('./alerts/alerts-labels', () => ({
   __esModule: true,
 }));
 
-jest.mock('./integrations/integrations', () => () => <></>);
-
 jest.mock('./policy-monitoring/policy-monitoring', () => () => <></>);
 
 jest.mock('./open-scap/open-scap', () => () => <></>);
@@ -66,8 +64,6 @@ jest.mock('./docker-listener/docker-listener', () => () => <></>);
 jest.mock('./log-collection/log-collection', () => () => <></>);
 
 jest.mock('./integrity-monitoring/integrity-monitoring', () => () => <></>);
-
-jest.mock('./agentless/agentless', () => () => <></>);
 
 jest.mock('./aws-s3/aws-s3', () => () => <></>);
 
