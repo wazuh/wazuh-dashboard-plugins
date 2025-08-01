@@ -83,6 +83,7 @@ const sampleInventory = [
   'protocols',
   'system',
   'users',
+  'browser extensions',
 ].join(', ');
 
 export default class WzSampleData extends Component {
