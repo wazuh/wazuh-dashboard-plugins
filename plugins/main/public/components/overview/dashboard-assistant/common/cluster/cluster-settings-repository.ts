@@ -6,7 +6,7 @@ export class ClusterSettingsRepository implements IClusterSettingsRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async updateSettings(settings: ClusterSettings): Promise<void> {
-    await this.httpClient.proxyRequest.post.put(
+    await this.httpClient.proxyRequest.post.WithPut(
       '/_cluster/settings',
       settings.toApiPayload(),
     );

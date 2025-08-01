@@ -64,7 +64,7 @@ export class ModelRepository implements IModelRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    await this.httpClient.proxyRequest.post.delete(
+    await this.httpClient.proxyRequest.post.WithDelete(
       `/_plugins/_ml/models/${id}`,
     );
   }
