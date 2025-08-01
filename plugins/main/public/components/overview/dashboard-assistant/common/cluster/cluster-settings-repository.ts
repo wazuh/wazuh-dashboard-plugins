@@ -2,7 +2,9 @@ import { IClusterSettingsRepository } from './domain/types';
 import { ClusterSettings } from './domain/cluster-settings';
 import { IHttpClient } from '../installation-manager/domain/types';
 
-export class ClusterSettingsRepository implements IClusterSettingsRepository {
+export class ClusterSettingsHttpClientRepository
+  implements IClusterSettingsRepository
+{
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async updateSettings(settings: ClusterSettings): Promise<void> {
