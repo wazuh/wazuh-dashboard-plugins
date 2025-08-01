@@ -49,7 +49,7 @@ export class Model {
     return this.functionName;
   }
 
-  public getStatus(): 'active' | 'inactive' | 'error' {
+  public getStatus(): ModelStatus {
     return this.status;
   }
 
@@ -158,7 +158,7 @@ export class Model {
     function_name: string;
     version: string;
     description: string;
-    status: 'active' | 'inactive' | 'error';
+    status: ModelStatus;
     createdAt: string;
     apiUrl: string;
   } {
