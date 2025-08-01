@@ -36,12 +36,7 @@ import {
 import { compose } from 'redux';
 import { withErrorBoundary, withRouteResolvers } from '../common/hocs';
 import { connect } from 'react-redux';
-import {
-  enableMenu,
-  ip,
-  nestedResolve,
-  savedSearch,
-} from '../../services/resolves';
+import { nestedResolve } from '../../services/resolves';
 import { Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
@@ -62,7 +57,7 @@ const mapDispatchToProps = dispatch => ({
 
 export const Settings = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ nestedResolve }),
   connect(mapStateToProps, mapDispatchToProps),
 )(props => {
   const { tab } = useRouterSearch();
@@ -363,11 +358,6 @@ class SettingsComponent extends React.Component {
         <Route path='?tab=configuration'>
           <div>
             <WzConfigurationSettings />
-          </div>
-        </Route>
-        <Route path='?tab=miscellaneous'>
-          <div>
-            <SettingsMiscellaneous />
           </div>
         </Route>
         <Route path='?tab=about'>

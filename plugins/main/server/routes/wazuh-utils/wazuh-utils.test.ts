@@ -428,20 +428,16 @@ describe.skip('[endpoint] PUT /utils/configuration/files/{key} - Upload file', (
   afterAll(() => {});
 
   it.each`
-    setting                             | filename                     | responseStatusCode | responseBodyMessage
-    ${'customization.logo.unknown'}     | ${'fixture_image_small.jpg'} | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.healthcheck]\n- [request params.key.2]: expected value to equal [customization.logo.reports]'}
-    ${'customization.logo.app'}         | ${'fixture_image_small.jpg'} | ${200}             | ${null}
-    ${'customization.logo.app'}         | ${'fixture_image_small.png'} | ${200}             | ${null}
-    ${'customization.logo.app'}         | ${'fixture_image_small.svg'} | ${200}             | ${null}
-    ${'customization.logo.app'}         | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
-    ${'customization.logo.healthcheck'} | ${'fixture_image_small.jpg'} | ${200}             | ${null}
-    ${'customization.logo.healthcheck'} | ${'fixture_image_small.png'} | ${200}             | ${null}
-    ${'customization.logo.healthcheck'} | ${'fixture_image_small.svg'} | ${200}             | ${null}
-    ${'customization.logo.healthcheck'} | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
-    ${'customization.logo.reports'}     | ${'fixture_image_small.jpg'} | ${200}             | ${null}
-    ${'customization.logo.reports'}     | ${'fixture_image_small.png'} | ${200}             | ${null}
-    ${'customization.logo.reports'}     | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
-    ${'customization.logo.reports'}     | ${'fixture_image_small.svg'} | ${400}             | ${'File extension is not valid for setting [customization.logo.reports] setting. Allowed file extensions: .jpeg, .jpg, .png'}
+    setting                         | filename                     | responseStatusCode | responseBodyMessage
+    ${'customization.logo.unknown'} | ${'fixture_image_small.jpg'} | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.reports]'}
+    ${'customization.logo.app'}     | ${'fixture_image_small.jpg'} | ${200}             | ${null}
+    ${'customization.logo.app'}     | ${'fixture_image_small.png'} | ${200}             | ${null}
+    ${'customization.logo.app'}     | ${'fixture_image_small.svg'} | ${200}             | ${null}
+    ${'customization.logo.app'}     | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
+    ${'customization.logo.reports'} | ${'fixture_image_small.jpg'} | ${200}             | ${null}
+    ${'customization.logo.reports'} | ${'fixture_image_small.png'} | ${200}             | ${null}
+    ${'customization.logo.reports'} | ${'fixture_image_big.png'}   | ${413}             | ${'Payload content length greater than maximum allowed: 1048576'}
+    ${'customization.logo.reports'} | ${'fixture_image_small.svg'} | ${400}             | ${'File extension is not valid for setting [customization.logo.reports] setting. Allowed file extensions: .jpeg, .jpg, .png'}
   `(
     `$setting: $filename - PUT /utils/configuration/files/{key} - $responseStatusCode`,
     async ({ responseBodyMessage, responseStatusCode, setting, filename }) => {
@@ -502,11 +498,10 @@ describe.skip('[endpoint] DELETE /utils/configuration/files/{key} - Delete file'
   afterAll(() => {});
 
   it.each`
-    setting                             | expectedValue | responseStatusCode | responseBodyMessage
-    ${'customization.logo.unknown'}     | ${''}         | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.healthcheck]\n- [request params.key.2]: expected value to equal [customization.logo.reports]'}
-    ${'customization.logo.app'}         | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
-    ${'customization.logo.healthcheck'} | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
-    ${'customization.logo.reports'}     | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
+    setting                         | expectedValue | responseStatusCode | responseBodyMessage
+    ${'customization.logo.unknown'} | ${''}         | ${400}             | ${'[request params.key]: types that failed validation:\n- [request params.key.0]: expected value to equal [customization.logo.app]\n- [request params.key.1]: expected value to equal [customization.logo.reports]'}
+    ${'customization.logo.app'}     | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
+    ${'customization.logo.reports'} | ${''}         | ${200}             | ${'All files were removed and the configuration file was updated.'}
   `(
     `$setting - PUT /utils/configuration - $responseStatusCode`,
     async ({
