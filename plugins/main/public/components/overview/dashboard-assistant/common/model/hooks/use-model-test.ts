@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { testModelConnectionUseCase } from '../test-model-connection';
-import { ModelRepository } from '../model-repository';
+import { ModelHttpClientRepository } from '../model-repository';
 import { HttpWithProxyClient } from '../../http-client';
 import { ModelPredictResponse } from '../domain/types';
 
@@ -24,7 +24,7 @@ export function useModelTest(): UseModelTestReturn {
 
     try {
       const httpClient = new HttpWithProxyClient();
-      const modelRepository = new ModelRepository(httpClient);
+      const modelRepository = new ModelHttpClientRepository(httpClient);
       const testModelConnection = testModelConnectionUseCase(modelRepository);
 
       const result = await testModelConnection({ modelId });

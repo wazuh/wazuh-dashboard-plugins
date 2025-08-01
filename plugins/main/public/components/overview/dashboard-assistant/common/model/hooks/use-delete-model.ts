@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { deleteModelUseCase } from '../delete-model';
-import { ModelRepository } from '../model-repository';
+import { ModelHttpClientRepository } from '../model-repository';
 import { HttpWithProxyClient } from '../../http-client';
 
 export interface UseDeleteModelReturn {
@@ -17,7 +17,7 @@ export function useDeleteModel(): UseDeleteModelReturn {
   // Create repository instance
   const repository = useMemo(() => {
     const httpClient = new HttpWithProxyClient();
-    return new ModelRepository(httpClient);
+    return new ModelHttpClientRepository(httpClient);
   }, []);
 
   const deleteModel = useCallback(

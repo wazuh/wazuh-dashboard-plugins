@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getModelsUseCase } from '../get-models';
-import { ModelRepository } from '../model-repository';
+import { ModelHttpClientRepository } from '../model-repository';
 import { HttpWithProxyClient } from '../../http-client';
 import { Model } from '../domain/model';
 
@@ -28,7 +28,7 @@ export function useModels(): UseModelsReturn {
   // Create use case instance
   const getModels = useMemo(() => {
     const httpClient = new HttpWithProxyClient();
-    const modelRepository = new ModelRepository(httpClient);
+    const modelRepository = new ModelHttpClientRepository(httpClient);
     return getModelsUseCase(modelRepository);
   }, []);
 

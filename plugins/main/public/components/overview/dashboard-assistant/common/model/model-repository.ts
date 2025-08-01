@@ -4,7 +4,7 @@ import { IHttpClient } from '../installation-manager/domain/types';
 import { validateModelPredictResponse } from './validate-model-predict';
 import { TEST_PROMPT } from '../../components/model-test-result';
 
-export class ModelRepository implements IModelRepository {
+export class ModelHttpClientRepository implements IModelRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(model: Model): Promise<string> {
