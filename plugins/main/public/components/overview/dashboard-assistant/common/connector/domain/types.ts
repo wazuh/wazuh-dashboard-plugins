@@ -1,12 +1,7 @@
+import { Repository } from '../../domain/repository';
 import { Connector } from './connector';
 
-export interface IConnectorRepository {
-  create(connector: Connector): Promise<string>;
-  findById(id: string): Promise<Connector | null>;
-  getAll(): Promise<Connector[]>;
-  update(id: string, connector: Connector): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+export interface IConnectorRepository extends Repository<Connector> {}
 
 export interface CreateConnectorRequest {
   name: string;

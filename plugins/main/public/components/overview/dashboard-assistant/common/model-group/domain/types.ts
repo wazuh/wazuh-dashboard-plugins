@@ -1,15 +1,10 @@
 // Model Group Domain Types
 
+import { Repository } from '../../domain/repository';
 import { ModelGroup } from './model-group';
 
 // Repository Interface
-export interface IModelGroupRepository {
-  create(modelGroup: ModelGroup): Promise<string>;
-  findById(id: string): Promise<ModelGroup | null>;
-  getAll(): Promise<ModelGroup[]>;
-  update(id: string, modelGroup: ModelGroup): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+export interface IModelGroupRepository extends Repository<ModelGroup> {}
 
 // DTOs
 export interface CreateModelGroupRequest {
