@@ -8,28 +8,28 @@ export enum HttpMethod {
   DELETE = 'DELETE',
 }
 
-const buildProxyUrl = (method: HttpMethod, path: string) =>
-  `/api/console/proxy?method=${method}&path=${path}&dataSourceId=`;
-
 export class HttpClient implements IHttpClient {
+  private buildProxyUrl = (method: HttpMethod, path: string) =>
+    `/api/console/proxy?method=${method}&path=${path}&dataSourceId=`;
+
   get proxyRequest() {
     return {
       get: (url: string, config?: Record<string, any>) =>
-        this.post(buildProxyUrl(HttpMethod.GET, url), config),
+        this.post(this.buildProxyUrl(HttpMethod.GET, url), config),
       post: Object.assign(
         (url: string, data?: any, config?: Record<string, any>) =>
-          this.post(buildProxyUrl(HttpMethod.POST, url), data, config),
+          this.post(this.buildProxyUrl(HttpMethod.POST, url), data, config),
         {
           put: (url: string, data?: any, config?: Record<string, any>) =>
-            this.post(buildProxyUrl(HttpMethod.PUT, url), data, config),
+            this.post(this.buildProxyUrl(HttpMethod.PUT, url), data, config),
           delete: (url: string, config?: Record<string, any>) =>
-            this.post(buildProxyUrl(HttpMethod.DELETE, url), config),
+            this.post(this.buildProxyUrl(HttpMethod.DELETE, url), config),
         },
       ),
       put: (url: string, data?: any, config?: Record<string, any>) =>
-        this.put(buildProxyUrl(HttpMethod.PUT, url), data, config),
+        this.put(this.buildProxyUrl(HttpMethod.PUT, url), data, config),
       delete: (url: string, config?: Record<string, any>) =>
-        this.delete(buildProxyUrl(HttpMethod.DELETE, url), config),
+        this.delete(this.buildProxyUrl(HttpMethod.DELETE, url), config),
     };
   }
 
@@ -37,7 +37,7 @@ export class HttpClient implements IHttpClient {
     try {
       const response = (await GenericRequest.request(
         HttpMethod.GET,
-        config?.proxy ? buildProxyUrl(HttpMethod.GET, url) : url,
+        url,
         null,
         true,
       )) as { data: T };
