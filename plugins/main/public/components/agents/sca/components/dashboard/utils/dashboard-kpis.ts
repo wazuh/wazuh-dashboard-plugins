@@ -1,10 +1,75 @@
 import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
+import {
+  createIndexPatternReferences,
+  createSearchSource,
+} from '../../../../../overview/it-hygiene/common/saved-vis/create-saved-vis-data';
 
 const checkResultColors = {
   passed: '#209280',
   failed: '#cc5642',
   'Not run': '#6092c0',
+};
+
+const getVisStateGlobalPacketLossMetric = (
+  indexPatternId: string,
+): SavedVis => {
+  return {
+    id: 'it-hygiene-network-interfaces-global-packet-loss-rate',
+    title: 'Average packet loss rate',
+    type: 'metric',
+    params: {
+      addTooltip: true,
+      addLegend: false,
+      type: 'metric',
+      metric: {
+        percentageMode: true,
+        useRanges: false,
+        colorSchema: 'Green to Red',
+        metricColorMode: 'None',
+        colorsRange: [
+          {
+            from: 0,
+            to: 10000,
+          },
+        ],
+        labels: {
+          show: true,
+        },
+        invertColors: false,
+        // style: STYLE,
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          type: 'unique count',
+          params: {
+            field: 'check.result',
+            json: '\
+              {\
+                "script": {\
+                  "source": " \
+                    float passed=(doc[\'check.result\'].size() != 0 ? doc[\'check.result\'].value : 0); \
+                    float failed=(doc[\'check.result\'].size() != 0 ? doc[\'check.result\'].value : 0); \
+                    float total=(passed + failed); \
+                    float score=(passed / total); \
+                    return 5", \
+                  "lang": "painless" \
+                }\
+              }',
+
+            customLabel: 'Average packet loss rate',
+          },
+          schema: 'metric',
+        },
+      ],
+    },
+  };
 };
 
 const getVisStateCheckResultPassed = (indexPatternId: string) => {
@@ -355,7 +420,7 @@ export const getKPIsPanel = (
       type: 'visualization',
       explicitInput: {
         id: '4',
-        savedVis: getVisStateTotalChecks(indexPatternId),
+        savedVis: getVisStateGlobalPacketLossMetric(indexPatternId),
       },
     },
   };

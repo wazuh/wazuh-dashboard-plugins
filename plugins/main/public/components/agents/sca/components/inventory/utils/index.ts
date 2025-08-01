@@ -3,9 +3,9 @@ export const tableColumns = [
   { id: 'policy.name' },
   { id: 'policy.description' },
   { id: 'policy.file' },
-  { id: 'check.result' },
   { id: 'check.name' },
-]
+  { id: 'check.result' },
+];
 
 export const managedFilters = [
   {

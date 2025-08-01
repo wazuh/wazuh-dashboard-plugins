@@ -133,87 +133,41 @@ export const getVisStateTopFailedPolicies = (indexPatternId: string) => ({
   },
 });
 
-export const getVisStateChecksByResult = (indexPatternId: string) => ({
-  id: 'checks_by_result',
-  title: 'Checks by result',
-  type: 'horizontal_bar',
+export const getVisStatePolicyByCheckHeatmap = (indexPatternId: string) => ({
+  id: 'policies_by_agent',
+  title: 'Policies by agent ID',
+  type: 'heatmap',
   params: {
-    type: 'line',
-    grid: {
-      categoryLines: false,
-    },
-    categoryAxes: [
-      {
-        id: 'CategoryAxis-1',
-        type: 'category',
-        position: 'bottom',
-        show: true,
-        style: {},
-        scale: {
-          type: 'linear',
-        },
-        labels: {
-          show: true,
-          filter: true,
-          truncate: 25,
-          rotate: 75,
-        },
-        title: {},
-      },
-    ],
-    valueAxes: [
-      {
-        id: 'ValueAxis-1',
-        name: 'LeftAxis-1',
-        type: 'value',
-        position: 'left',
-        show: true,
-        style: {},
-        scale: {
-          type: 'linear',
-          mode: 'normal',
-        },
-        labels: {
-          show: true,
-          rotate: 0,
-          filter: false,
-          truncate: 100,
-        },
-        title: {
-          text: ' ',
-        },
-      },
-    ],
-    seriesParams: [
-      {
-        show: true,
-        type: 'histogram',
-        mode: 'stacked',
-        data: {
-          label: ' ',
-          id: '1',
-        },
-        valueAxis: 'ValueAxis-1',
-        drawLinesBetweenPoints: true,
-        lineWidth: 2,
-        interpolate: 'linear',
-        showCircles: true,
-      },
-    ],
+    type: 'heatmap',
     addTooltip: true,
     addLegend: true,
+    enableHover: false,
     legendPosition: 'right',
     times: [],
-    addTimeMarker: false,
-    labels: {},
-    thresholdLine: {
-      show: false,
-      value: 10,
-      width: 1,
-      style: 'full',
-      color: '#E7664C',
-    },
-    orderBucketsBySum: false,
+    colorsNumber: 4,
+    colorSchema: 'Reds',
+    setColorRange: false,
+    colorsRange: [],
+    invertColors: false,
+    percentageMode: false,
+    valueAxes: [
+      {
+        show: false,
+        id: 'ValueAxis-1',
+        type: 'value',
+        scale: {
+          type: 'linear',
+          defaultYExtents: false,
+        },
+        labels: {
+          show: false,
+          rotate: 75,
+          overwriteColor: false,
+          color: 'black',
+          truncate: 20,
+        },
+      },
+    ],
   },
   uiState: {
     vis: {
@@ -248,7 +202,7 @@ export const getVisStateChecksByResult = (indexPatternId: string) => ({
         enabled: true,
         type: 'terms',
         params: {
-          field: 'check.name',
+          field: 'agent.id',
           orderBy: '1',
           order: 'desc',
           size: 20,
@@ -265,7 +219,7 @@ export const getVisStateChecksByResult = (indexPatternId: string) => ({
         enabled: true,
         type: 'terms',
         params: {
-          field: 'check.result',
+          field: 'policy.name',
           orderBy: '1',
           order: 'desc',
           size: 5,
@@ -273,6 +227,7 @@ export const getVisStateChecksByResult = (indexPatternId: string) => ({
           otherBucketLabel: 'Other',
           missingBucket: false,
           missingBucketLabel: 'Missing',
+          customLabel: 'Policies',
         },
         schema: 'group',
       },
@@ -608,81 +563,25 @@ const getOverviewDashboardPanels = (
       explicitInput: {
         id: '2',
         // savedVis: getVisStateCheckResultsDonut(indexPatternId),
-        savedVis: getVisStateChecksByResult(indexPatternId),
-      },
-    },
-    '3': {
-      gridData: { w: 24, h: 10, x: 0, y: 10, i: '3' },
-      type: 'visualization',
-      explicitInput: {
-        id: '3',
         savedVis: getVisStateCheckResultsByPolicy(indexPatternId),
       },
     },
-    '4': {
-      gridData: { w: 12, h: 10, x: 24, y: 10, i: '4' },
+    '3': {
+      gridData: { w: 48, h: 12, x: 0, y: 10, i: '3' },
       type: 'visualization',
       explicitInput: {
-        id: '4',
-        savedVis: getVisStateTable(
-          indexPatternId,
-          'agent.name',
-          '',
-          'sca-not-run-agents',
-          {
-            fieldCustomLabel: 'Not Run',
-            filters: [
-              {
-                meta: {
-                  disabled: false,
-                  key: 'check.result',
-                  negate: false,
-                  type: 'phrase',
-                  value: 'Not run',
-                },
-                query: {
-                  match_phrase: {
-                    'check.result': 'Not run',
-                  },
-                },
-              },
-            ],
-          },
-        ),
+        id: '3',
+        savedVis: getVisStatePolicyByCheckHeatmap(indexPatternId),
       },
     },
-    '5': {
-      gridData: { w: 12, h: 10, x: 36, y: 10, i: '5' },
-      type: 'visualization',
-      explicitInput: {
-        id: '5',
-        savedVis: getVisStateTable(
-          indexPatternId,
-          'policy.name',
-          '',
-          'sca-top-failed-policies',
-          {
-            fieldCustomLabel: 'Failed Policies',
-            filters: [
-              {
-                meta: {
-                  disabled: false,
-                  key: 'check.result',
-                  negate: false,
-                  type: 'phrase',
-                  value: 'failed',
-                },
-                query: {
-                  match_phrase: {
-                    'check.result': 'failed',
-                  },
-                },
-              },
-            ],
-          },
-        ),
-      },
-    },
+    // '4': {
+    //   gridData: { w: 24, h: 10, x: 24, y: 10, i: '4' },
+    //   type: 'visualization',
+    //   explicitInput: {
+    //     id: '4',
+    //     savedVis: getVisStatePolicyByCheckHeatmap(indexPatternId),
+    //   },
+    // },
   };
 };
 

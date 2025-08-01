@@ -6,6 +6,7 @@ import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public'
 
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import { getKPIsPanel } from './utils/dashboard-kpis';
+import { getDashboardTables } from './utils/dashboard-tables';
 import { getDashboardPanels } from './utils/dashboard-panels';
 import {
   ErrorFactory,
@@ -135,6 +136,37 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
                     },
                     title: 'Security Configuration Assessment dashboard KPIs',
                     description: 'Dashboard of the SCA KPIs',
+                    query: searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles: true,
+                    lastReloadRequestTime: fingerprint,
+                  }}
+                />
+              </div>
+              <div className='wz-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls'>
+                <DashboardByRenderer
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    // Try to use the index pattern that the dataSource has
+                    // but if it is undefined use the index pattern of the hoc
+                    // because the first executions of the dataSource are undefined
+                    // and embeddables need index pattern.
+                    panels: getDashboardTables(
+                      dataSource?.id || indexPattern?.id,
+                    ),
+                    isFullScreenMode: false,
+                    filters: fetchFilters ?? [],
+                    useMargins: false,
+                    id: 'security-configuration-assessment-filters',
+                    timeRange: {
+                      from: searchBarProps.dateRangeFrom,
+                      to: searchBarProps.dateRangeTo,
+                    },
+                    title: 'IT Hygiene dashboard filters',
+                    description: 'Dashboard of the IT Hygiene filters',
                     query: searchBarProps.query,
                     refreshConfig: {
                       pause: false,
