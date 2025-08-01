@@ -6,11 +6,10 @@ import { ModelHttpClientRepository } from '../model/model-repository';
 import { AgentHttpClientRepository } from '../agent/agent-repository';
 
 // Factory function to create real repositories with HttpClient
-export function createRealRepositories() {
+export function initializeRepositories() {
   const httpClient = new HttpWithProxyClient();
 
   return {
-    httpClient,
     clusterSettingsRepository: new ClusterSettingsHttpClientRepository(
       httpClient,
     ),
