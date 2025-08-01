@@ -12,7 +12,7 @@ import { withFIMRegistryKeysDataSource } from '../../../common/hocs/validate-fim
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
 import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../../../common/constants';
 import { compose } from 'redux';
-import { withAgent } from '../hocs';
+import { withAgent } from '../../../../../common/hocs/with-agent';
 
 export const InventoryFIMRegistryKeys = compose(
   withAgent,

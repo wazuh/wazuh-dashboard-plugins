@@ -17,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.2 - Revision 00

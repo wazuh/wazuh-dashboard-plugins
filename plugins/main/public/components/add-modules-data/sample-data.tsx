@@ -34,6 +34,7 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
   WAZUH_SAMPLE_INVENTORY_AGENT,
+  WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
   WAZUH_SAMPLE_SERVER_STATISTICS,
   WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../../common/constants';
@@ -70,6 +71,12 @@ const sampleThreatDetectionApplication = [
 const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
 
 const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
+
+const sampleSecurityConfigurationAssessment = [
+  'states of SCA',
+  'checks',
+  'policies',
+].join(', ');
 
 const sampleInventory = [
   'groups',
@@ -111,7 +118,7 @@ export default class WzSampleData extends Component {
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       },
       {
-        title: `Sample ${malwareDetection.title}`,
+        title: `Sample ${malwareDetection.title.toLowerCase()}`,
         description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
         image: '',
         categorySampleDataIndex:
@@ -128,6 +135,12 @@ export default class WzSampleData extends Component {
         description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
+      },
+      {
+        title: 'Sample security configuration assessment',
+        description: `Sample data, visualizations and dashboards for security configuration assessment (${sampleSecurityConfigurationAssessment}).`,
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
       },
       {
         title: 'Sample system inventory',
