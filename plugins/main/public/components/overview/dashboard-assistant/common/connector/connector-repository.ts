@@ -2,7 +2,7 @@ import { IConnectorRepository } from './domain/types';
 import { Connector } from './domain/connector';
 import { IHttpClient } from '../installation-manager/domain/types';
 
-export class ConnectorRepository implements IConnectorRepository {
+export class ConnectorHttpClientRepository implements IConnectorRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(connector: Connector): Promise<string> {

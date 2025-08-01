@@ -1,7 +1,7 @@
 import { HttpWithProxyClient } from '../http-client';
 import { ClusterSettingsHttpClientRepository } from '../cluster/cluster-settings-repository';
 import { ModelGroupHttpClientRepository } from '../model-group/model-group-repository';
-import { ConnectorRepository } from '../connector/connector-repository';
+import { ConnectorHttpClientRepository } from '../connector/connector-repository';
 import { ModelHttpClientRepository } from '../model/model-repository';
 import { AgentHttpClientRepository } from '../agent/agent-repository';
 
@@ -15,7 +15,7 @@ export function createRealRepositories() {
       httpClient,
     ),
     modelGroupRepository: new ModelGroupHttpClientRepository(httpClient),
-    connectorRepository: new ConnectorRepository(httpClient),
+    connectorRepository: new ConnectorHttpClientRepository(httpClient),
     modelRepository: new ModelHttpClientRepository(httpClient),
     agentRepository: new AgentHttpClientRepository(httpClient),
   };
