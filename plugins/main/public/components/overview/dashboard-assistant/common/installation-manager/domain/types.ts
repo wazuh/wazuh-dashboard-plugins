@@ -1,7 +1,14 @@
 import { InstallationContext } from './installation-context';
 
-interface HttpPostProxy {
+interface HttpProxyPostRequest {
   (url: string, data?: any, config?: Record<string, any>): Promise<any>; // Default return type
+  put: (url: string, data?: any, config?: Record<string, any>) => Promise<any>;
+  delete: (url: string, config?: Record<string, any>) => Promise<any>;
+}
+
+interface HttpProxyRequest {
+  post: HttpProxyPostRequest;
+  get: (url: string, config?: Record<string, any>) => Promise<any>;
   put: (url: string, data?: any, config?: Record<string, any>) => Promise<any>;
   delete: (url: string, config?: Record<string, any>) => Promise<any>;
 }
@@ -19,16 +26,7 @@ export interface IHttpClient {
     config?: Record<string, any>,
   ): Promise<T>;
   delete<T = any>(url: string, config?: Record<string, any>): Promise<T>;
-  proxyRequest: {
-    get: (url: string, config?: Record<string, any>) => Promise<any>;
-    post: HttpPostProxy;
-    put: (
-      url: string,
-      data?: any,
-      config?: Record<string, any>,
-    ) => Promise<any>;
-    delete: (url: string, config?: Record<string, any>) => Promise<any>;
-  };
+  proxyRequest: HttpProxyRequest;
 }
 
 export interface IInstallationManager {

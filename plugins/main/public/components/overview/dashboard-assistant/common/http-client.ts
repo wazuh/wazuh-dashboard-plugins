@@ -14,8 +14,6 @@ export class HttpClient implements IHttpClient {
 
   get proxyRequest() {
     return {
-      get: (url: string, config?: Record<string, any>) =>
-        this.get(this.buildProxyUrl(HttpMethod.GET, url), config),
       post: Object.assign(
         (url: string, data?: any, config?: Record<string, any>) =>
           this.post(this.buildProxyUrl(HttpMethod.POST, url), data, config),
@@ -26,6 +24,8 @@ export class HttpClient implements IHttpClient {
             this.post(this.buildProxyUrl(HttpMethod.DELETE, url), config),
         },
       ),
+      get: (url: string, config?: Record<string, any>) =>
+        this.get(this.buildProxyUrl(HttpMethod.GET, url), config),
       put: (url: string, data?: any, config?: Record<string, any>) =>
         this.put(this.buildProxyUrl(HttpMethod.PUT, url), data, config),
       delete: (url: string, config?: Record<string, any>) =>
