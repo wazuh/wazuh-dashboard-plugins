@@ -1,3 +1,9 @@
+export enum ModelStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  ERROR = 'error',
+}
+
 export class Model {
   constructor(
     private readonly id: string | null,
@@ -7,7 +13,7 @@ export class Model {
     private readonly connectorId: string,
     private readonly description: string,
     private readonly version: string = '1',
-    private readonly status: 'active' | 'inactive' | 'error' = 'active',
+    private readonly status: ModelStatus = ModelStatus.ACTIVE,
     private readonly createdAt: string = new Date().toISOString(),
     private readonly apiUrl: string = '',
   ) {}
@@ -99,24 +105,24 @@ export class Model {
     // Handle OpenSearch response structure with _id and _source
     const source = data._source || data;
     const id = data._id || data.model_id || data.id;
-    
+
     // Map model_state to our status format
-    const mapModelState = (state: string): 'active' | 'inactive' | 'error' => {
+    const mapModelState = (state: string): ModelStatus => {
       switch (state?.toUpperCase()) {
         case 'DEPLOYED':
         case 'LOADED':
-          return 'active';
+          return ModelStatus.ACTIVE;
         case 'UNDEPLOYED':
         case 'NOT_DEPLOYED':
-          return 'inactive';
+          return ModelStatus.INACTIVE;
         case 'DEPLOY_FAILED':
         case 'LOAD_FAILED':
-          return 'error';
+          return ModelStatus.ERROR;
         default:
-          return data.status || 'active';
+          return data.status || ModelStatus.ACTIVE;
       }
     };
-    
+
     return new Model(
       id,
       source.name,
@@ -126,7 +132,12 @@ export class Model {
       source.description || '',
       source.model_version || source.version || '1',
       mapModelState(source.model_state),
-      new Date(source.created_time || source.created_at || source.createdAt || Date.now()).toISOString(),
+      new Date(
+        source.created_time ||
+          source.created_at ||
+          source.createdAt ||
+          Date.now(),
+      ).toISOString(),
       source.api_url || source.apiUrl || '',
     );
   }
