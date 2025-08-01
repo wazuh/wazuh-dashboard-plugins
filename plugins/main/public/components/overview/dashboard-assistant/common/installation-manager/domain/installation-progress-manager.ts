@@ -7,10 +7,11 @@ import {
 
 export class InstallationProgressManager {
   private progress: InstallationProgress;
-  private progressCallback?: (progress: InstallationProgress) => void;
 
-  constructor(stepNames: string[], progressCallback?: (progress: InstallationProgress) => void) {
-    this.progressCallback = progressCallback;
+  constructor(
+    stepNames: string[],
+    private progressCallback?: (progress: InstallationProgress) => void,
+  ) {
     this.progress = {
       currentStep: 0,
       totalSteps: stepNames.length,
@@ -44,7 +45,7 @@ export class InstallationProgressManager {
     resultState: StepResultState,
     message?: string,
     data?: any,
-    error?: Error
+    error?: Error,
   ): void {
     if (stepIndex >= 0 && stepIndex < this.progress.steps.length) {
       this.progress.steps[stepIndex] = {
@@ -71,19 +72,19 @@ export class InstallationProgressManager {
 
   public hasFailedSteps(): boolean {
     return this.progress.steps.some(
-      step => step.resultState === StepResultState.FAIL
+      step => step.resultState === StepResultState.FAIL,
     );
   }
 
   public isCompleted(): boolean {
     return this.progress.steps.every(
-      step => step.executionState === StepExecutionState.FINISHED
+      step => step.executionState === StepExecutionState.FINISHED,
     );
   }
 
   public getFailedSteps(): StepStatus[] {
     return this.progress.steps.filter(
-      step => step.resultState === StepResultState.FAIL
+      step => step.resultState === StepResultState.FAIL,
     );
   }
 
