@@ -6,6 +6,7 @@ import {
   EuiFieldText,
   EuiSpacer,
 } from '@elastic/eui';
+import { ModelConfig } from '../model-config';
 
 interface FieldConfig {
   value?: string;
@@ -26,11 +27,6 @@ interface ModelFormData {
   apiKey: string;
 }
 
-interface ModelConfig {
-  name: string;
-  versions: string[];
-}
-
 interface ModelFormProps {
   config?: ModelFormConfig;
   onChange?: (data: ModelFormData) => void;
@@ -42,7 +38,7 @@ interface ModelFormProps {
 const getVersionOptions = (selectedName: string, models: ModelConfig[]) => {
   const model = models.find(m => m.name === selectedName);
   return model
-    ? model.versions.map(version => ({ value: version, text: version }))
+    ? model.models.map(version => ({ value: version, text: version }))
     : [];
 };
 

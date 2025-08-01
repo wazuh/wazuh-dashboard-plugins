@@ -1,6 +1,6 @@
 export interface ModelConfig {
   name: string;
-  versions: string[];
+  models: string[];
   response_filter?: string;
   url_path: string;
   headers: Record<string, string>;
@@ -10,8 +10,8 @@ export interface ModelConfig {
 
 export const modelConfig: ModelConfig[] = [
   {
-    name: 'OpenAI GPT',
-    versions: [
+    name: 'GPT (OpenAI)',
+    models: [
       'gpt-4o',
       'gpt-4o-mini',
       'gpt-4-turbo',
@@ -28,8 +28,8 @@ export const modelConfig: ModelConfig[] = [
       '{ "model": "${parameters.model}", "messages": ${parameters.messages} }',
   },
   {
-    name: 'Anthropic Claude',
-    versions: [
+    name: 'Claude (Anthropic)',
+    models: [
       'claude-3-5-sonnet-20241022',
       'claude-3-5-haiku-20241022',
       'claude-3-opus-20240229',
