@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { testModelConnectionUseCase } from '../test-model-connection';
 import { ModelRepository } from '../model-repository';
-import { HttpClient } from '../../http-client';
+import { HttpWithProxyClient } from '../../http-client';
 import { ModelPredictResponse } from '../domain/types';
 
 interface UseModelTestReturn {
@@ -23,14 +23,15 @@ export function useModelTest(): UseModelTestReturn {
     setResponse(null);
 
     try {
-      const httpClient = new HttpClient();
+      const httpClient = new HttpWithProxyClient();
       const modelRepository = new ModelRepository(httpClient);
       const testModelConnection = testModelConnectionUseCase(modelRepository);
-      
+
       const result = await testModelConnection({ modelId });
       setResponse(result);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
     } finally {
       setIsLoading(false);

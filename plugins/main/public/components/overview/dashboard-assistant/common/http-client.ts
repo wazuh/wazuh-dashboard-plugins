@@ -8,7 +8,7 @@ export enum HttpMethod {
   DELETE = 'DELETE',
 }
 
-export class HttpClient implements IHttpClient {
+export class HttpWithProxyClient implements IHttpClient {
   private buildProxyUrl = (method: HttpMethod, path: string) =>
     `/api/console/proxy?method=${method}&path=${path}&dataSourceId=`;
 
