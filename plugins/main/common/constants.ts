@@ -856,49 +856,46 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS =
   'index-pattern:statistitcs';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
-  'index-pattern:inventory-states';
+  'index-pattern:states-inventory';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES =
-  'index-pattern:inventory-states-groups';
+  'index-pattern:states-inventory-groups';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES =
-  'index-pattern:inventory-states-hardware';
+  'index-pattern:states-inventory-hardware';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES =
-  'index-pattern:inventory-states-hotfixes';
+  'index-pattern:states-inventory-hotfixes';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES =
-  'index-pattern:inventory-states-interfaces';
+  'index-pattern:states-inventory-interfaces';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES =
-  'index-pattern:inventory-states-networks';
+  'index-pattern:states-inventory-networks';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES =
-  'index-pattern:inventory-states-packages';
+  'index-pattern:states-inventory-packages';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES =
-  'index-pattern:inventory-states-ports';
+  'index-pattern:states-inventory-ports';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES =
-  'index-pattern:inventory-states-processes';
+  'index-pattern:states-inventory-processes';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES =
-  'index-pattern:inventory-states-protocols';
+  'index-pattern:states-inventory-protocols';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES =
-  'index-pattern:inventory-states-system';
+  'index-pattern:states-inventory-system';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES =
-  'index-pattern:inventory-states-users';
-
-export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES =
-  'index-pattern:fim-states';
+  'index-pattern:states-inventory-users';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES =
-  'index-pattern:fim-files-states';
+  'index-pattern:states-fim-files';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES =
-  'index-pattern:fim-registry-keys-states';
+  'index-pattern:states-fim-registry-keys';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
-  'index-pattern:fim-registry-values-states';
+  'index-pattern:states-fim-registry-values';
