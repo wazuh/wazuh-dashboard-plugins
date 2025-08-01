@@ -7,11 +7,17 @@ import {
 
 export class InstallationProgressManager {
   private progress: InstallationProgress;
+  private steps: string[];
 
   constructor(
     stepNames: string[],
     private progressCallback?: (progress: InstallationProgress) => void,
   ) {
+
+    if (stepNames.length === 0) {
+      throw new Error('At least one step name must be provided');
+    }
+
     this.progress = {
       currentStep: 0,
       totalSteps: stepNames.length,
@@ -21,6 +27,7 @@ export class InstallationProgressManager {
       })),
       overallState: StepExecutionState.WAITING,
     };
+    this.steps = stepNames;
   }
 
   public getProgress(): InstallationProgress {

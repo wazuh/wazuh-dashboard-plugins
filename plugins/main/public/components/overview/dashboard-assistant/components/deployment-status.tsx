@@ -77,16 +77,6 @@ export const DeploymentStatus = ({
     }
   };
 
-  // Default steps if no progress is provided
-  const defaultSteps = [
-    { name: 'Update Cluster Settings', label: 'Updating cluster settings' },
-    { name: 'Create Connector', label: 'Creating model connector' },
-    { name: 'Create Model', label: 'Creating AI model' },
-    { name: 'Test Model Connection', label: 'Testing model connection' },
-    { name: 'Create Agent', label: 'Creating assistant agent' },
-    { name: 'Register Agent', label: 'Registering agent' },
-  ];
-
   const steps = progress?.steps || [];
   const allStepsCompleted = progress?.overallState === StepExecutionState.FINISHED;
   const allStepsSuccess = steps.every(
@@ -111,15 +101,15 @@ export const DeploymentStatus = ({
       <EuiSpacer size='l' />
 
       <EuiListGroup flush maxWidth={false}>
-        {defaultSteps.map((defaultStep, index) => {
-          const step = steps.find(s => s.stepName === defaultStep.name);
+        {steps.map((step: StepStatus, index) => {
+          
           const uiStatus = step
             ? mapToUIStatus(step.executionState, step.resultState)
             : 'pending';
           
           return (
             <div
-              key={defaultStep.name}
+              key={step.stepName}
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -127,7 +117,7 @@ export const DeploymentStatus = ({
                 padding: '8px 0',
               }}
             >
-              <EuiText size='s'>{defaultStep.label}</EuiText>
+              <EuiText size='s'>{step.stepName}</EuiText>
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {uiStatus === 'error' && step?.error ? (
                   <EuiToolTip content={step.error.message}>
