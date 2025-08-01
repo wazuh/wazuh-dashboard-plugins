@@ -2,7 +2,7 @@ import { IAgentRepository } from './domain/types';
 import { Agent } from './domain/agent';
 import { IHttpClient } from '../installation-manager/domain/types';
 
-export class AgentRepository implements IAgentRepository {
+export class AgentHttpClientRepository implements IAgentRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(agent: Agent): Promise<string> {
