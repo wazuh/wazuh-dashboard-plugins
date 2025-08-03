@@ -12,6 +12,7 @@ import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
+  // @ts-ignore
 } from '@elastic/eui';
 import { ModelForm } from './components/model-form';
 import { DeploymentStatus } from './components/deployment-status';
@@ -19,7 +20,10 @@ import { getWzCurrentAppID } from '../../../kibana-services';
 import { dashboardAssistant } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
 import { useAssistantInstallation } from './common/installation-manager/hooks/use-assistant-installation';
-import { ModelConfig, modelConfig } from './model-config';
+import {
+  ProviderModelConfig,
+  modelProviderConfigs,
+} from './provider-model-config';
 
 interface FormConfig {
   title: string;
@@ -36,7 +40,7 @@ interface FormConfig {
 interface ModelRegisterProps {
   onClickDeploy?: () => void;
   disabled?: boolean;
-  modelConfig?: ModelConfig[];
+  modelConfig?: ProviderModelConfig[];
   formConfig?: FormConfig;
 }
 
@@ -86,10 +90,10 @@ export const ModelRegister = ({
     (data: any) => {
       setFormData(data);
       setModel({
-        name: data.name,
-        version: data.version,
-        apiUrl: data.apiUrl,
-        apiKey: data.apiKey,
+        model_provider: data.name,
+        model_id: data.version,
+        api_url: data.apiUrl,
+        api_key: data.apiKey,
         description: `${data.name} ${data.version} model`,
       });
     },
@@ -195,7 +199,7 @@ export const ModelRegister = ({
                 onChange={handleFormChange}
                 onValidationChange={handleValidationChange}
                 disabled={disabled}
-                modelConfig={modelConfig}
+                modelConfig={modelProviderConfigs}
               />
 
               <EuiSpacer size='xl' />
