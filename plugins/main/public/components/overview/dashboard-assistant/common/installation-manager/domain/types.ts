@@ -1,37 +1,7 @@
+import { ProviderModelConfig } from '../../../provider-model-config';
+import { CreateConnectorDto } from '../../connector/application/dtos/create-connector-dto';
+import { Connector } from '../../connector/domain/entities/connector';
 import { InstallationContext } from './installation-context';
-
-interface HttpProxyPostRequest {
-  (url: string, data?: any, config?: Record<string, any>): Promise<any>; // Default return type
-  WithPut: (
-    url: string,
-    data?: any,
-    config?: Record<string, any>,
-  ) => Promise<any>;
-  WithDelete: (url: string, config?: Record<string, any>) => Promise<any>;
-}
-
-interface HttpProxyRequest {
-  post: HttpProxyPostRequest;
-  get: (url: string, config?: Record<string, any>) => Promise<any>;
-  put: (url: string, data?: any, config?: Record<string, any>) => Promise<any>;
-  delete: (url: string, config?: Record<string, any>) => Promise<any>;
-}
-
-export interface IHttpClient {
-  get<T = any>(url: string, config?: Record<string, any>): Promise<T>;
-  post<T = any>(
-    url: string,
-    data?: any,
-    config?: Record<string, any>,
-  ): Promise<T>;
-  put<T = any>(
-    url: string,
-    data?: any,
-    config?: Record<string, any>,
-  ): Promise<T>;
-  delete<T = any>(url: string, config?: Record<string, any>): Promise<T>;
-  proxyRequest: HttpProxyRequest;
-}
 
 export interface IInstallationManager {
   execute(
@@ -59,13 +29,7 @@ export interface InstallDashboardAssistantRequest {
     name: string;
     description: string;
   };
-  connector: {
-    name: string;
-    description: string;
-    endpoint: string;
-    model: string;
-    apiKey: string;
-  };
+  connector: CreateConnectorDto;
   model: {
     name: string;
     function_name: string;
@@ -91,7 +55,7 @@ export enum StepResultState {
   WARNING = 'warning',
 }
 
-export interface StepStatus {
+export interface StepState {
   stepName: string;
   executionState: StepExecutionState;
   resultState?: StepResultState;
@@ -105,7 +69,7 @@ export interface StepStatus {
 export interface InstallationProgress {
   currentStep: number;
   totalSteps: number;
-  steps: StepStatus[];
+  steps: StepState[];
   overallState: StepExecutionState;
 }
 
@@ -132,20 +96,9 @@ export interface CreateConnectorRequest {
   name: string;
   description: string;
   endpoint: string;
-  model: string;
-  apiKey: string;
-}
-
-export interface CreateModelRequest {
-  name: string;
-  modelGroupId?: string;
-  description: string;
-  connectorId: string;
-  functionName: string;
-}
-
-export interface TestModelConnectionRequest {
   modelId: string;
+  model: ProviderModelConfig;
+  apiKey: string;
 }
 
 export interface CreateAgentRequest {
@@ -164,13 +117,36 @@ export interface InstallationError {
   details?: any;
 }
 
-export class InstallDashboardAssistantResponse {
+// Define local interfaces for installation manager
+export interface IInstallationStep {
+  getName(): string;
+  execute(
+    request: InstallDashboardAssistantRequest,
+    context: InstallationContext,
+  ): Promise<void>;
+}
+
+// For compatibility with assistant-manager
+export interface IInstallDashboardAssistantResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    modelGroupId?: string;
+    connectorId?: string;
+    modelId?: string;
+    agentId?: string;
+  };
+}
+
+export class InstallDashboardAssistantResponse
+  implements IInstallDashboardAssistantResponse
+{
   private constructor(
-    public readonly success: boolean,
-    public readonly message: string,
-    public readonly progress: InstallationProgress,
-    public readonly agentId?: string,
-    public readonly error?: string,
+    readonly success: boolean,
+    readonly message: string,
+    readonly progress?: InstallationProgress,
+    readonly agentId?: string,
+    readonly error?: string,
   ) {}
 
   public static success(

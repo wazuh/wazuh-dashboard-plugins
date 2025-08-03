@@ -1,19 +1,17 @@
 import {
   StepExecutionState,
   StepResultState,
-  StepStatus,
+  StepState,
   InstallationProgress,
 } from './types';
 
 export class InstallationProgressManager {
   private progress: InstallationProgress;
-  private steps: string[];
 
   constructor(
     stepNames: string[],
     private progressCallback?: (progress: InstallationProgress) => void,
   ) {
-
     if (stepNames.length === 0) {
       throw new Error('At least one step name must be provided');
     }
@@ -27,7 +25,6 @@ export class InstallationProgressManager {
       })),
       overallState: StepExecutionState.WAITING,
     };
-    this.steps = stepNames;
   }
 
   public getProgress(): InstallationProgress {
@@ -89,7 +86,7 @@ export class InstallationProgressManager {
     );
   }
 
-  public getFailedSteps(): StepStatus[] {
+  public getFailedSteps(): StepState[] {
     return this.progress.steps.filter(
       step => step.resultState === StepResultState.FAIL,
     );

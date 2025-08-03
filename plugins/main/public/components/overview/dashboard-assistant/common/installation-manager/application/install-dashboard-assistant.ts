@@ -1,14 +1,14 @@
 import {
   IInstallationManager,
   InstallDashboardAssistantRequest,
-  InstallDashboardAssistantResponse,
-} from './domain/types';
+  IInstallDashboardAssistantResponse,
+} from '../domain/types';
 
 export const installDashboardAssistantUseCase =
   (installationOrchestrator: IInstallationManager) =>
   async (
     request: InstallDashboardAssistantRequest,
-  ): Promise<InstallDashboardAssistantResponse> => {
+  ): Promise<IInstallDashboardAssistantResponse> => {
     try {
       const result = await installationOrchestrator.execute(request);
 

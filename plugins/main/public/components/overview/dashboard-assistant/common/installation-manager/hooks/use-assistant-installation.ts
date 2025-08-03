@@ -1,17 +1,19 @@
 import { useState, useCallback, useMemo } from 'react';
-import { installDashboardAssistantUseCase } from '../install-dashboard-assistant';
-import { InstallationManager } from '../installation-manager';
+import { installDashboardAssistantUseCase } from '../application/install-dashboard-assistant';
+import { InstallationManager } from '../infrastructure/installation-manager';
 import type {
   InstallDashboardAssistantRequest,
   InstallationProgress,
 } from '../domain/types';
 import { InstallDashboardAssistantResponse } from '../domain/types';
+import { ConnectorFactory } from '../../connector/application/factories/connector-factory';
+import { modelProviderConfigs } from '../../../provider-model-config';
 
 interface ModelFormData {
-  name: string;
-  version: string;
-  apiUrl: string;
-  apiKey: string;
+  model_provider: string;
+  model_id: string;
+  api_url: string;
+  api_key: string;
   description?: string;
 }
 
@@ -26,7 +28,7 @@ export function useAssistantInstallation() {
   // Create installation use case with real repositories
   const installUseCase = useMemo(() => {
     // Create installation manager with progress callback
-    const installationManager = new InstallationManager((progressUpdate) => {
+    const installationManager = new InstallationManager(progressUpdate => {
       setProgress(progressUpdate);
     });
 
@@ -55,26 +57,25 @@ export function useAssistantInstallation() {
           ragPipelineFeatureEnabled: true,
           trustedConnectorEndpointsRegex: ['.*'],
         },
-        /*
-        modelGroup: {
-          name: `${modelData.name}_group`,
-          description: `Model group for ${modelData.name}`,
-        },*/
         connector: {
-          name: `${modelData.name}_connector`,
-          description: `Connector for ${modelData.name}`,
-          endpoint: modelData.apiUrl,
-          model: modelData.version,
-          apiKey: modelData.apiKey,
+          name: `${modelData.model_provider} Chat Connector`,
+          description: `The connector to public ${modelData.model_provider} model service for ${modelData.model_id}`,
+          endpoint: modelData.api_url,
+          model_id: modelData.model_id,
+          api_key: modelData.api_key,
+          model_config: modelProviderConfigs.find(
+            config => config.model_provider === modelData.model_provider,
+          )!,
         },
         model: {
-          name: modelData.name,
-          function_name: "remote",
-          description: modelData.description || `${modelData.name} model`,
+          name: modelData.model_provider,
+          function_name: 'remote',
+          description:
+            modelData.description || `${modelData.model_provider} model`,
         },
         agent: {
-          name: `${modelData.name}_agent`,
-          description: `Agent for ${modelData.name}`,
+          name: `${modelData.model_provider}_agent`,
+          description: `Agent for ${modelData.model_provider}`,
         },
       };
 
@@ -93,9 +94,14 @@ export function useAssistantInstallation() {
         currentStep: 0,
         totalSteps: 6,
         steps: [],
-        overallState: 'waiting' as any
+        overallState: 'waiting' as any,
       };
-      setResult(InstallDashboardAssistantResponse.failure(errorMessage, currentProgress));
+      setResult(
+        InstallDashboardAssistantResponse.failure(
+          errorMessage,
+          currentProgress,
+        ),
+      );
     } finally {
       setIsLoading(false);
     }

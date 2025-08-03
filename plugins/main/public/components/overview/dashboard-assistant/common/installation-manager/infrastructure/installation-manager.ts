@@ -1,34 +1,30 @@
-import { createAgentUseCase } from '../agent/create-agent';
-import type { CreateAgentRequest } from '../agent/domain/types';
-import { registerAgentUseCase } from '../agent/register-agent';
-import { updateClusterSettingsUseCase } from '../cluster/update-cluster-settings';
-import { createConnectorUseCase } from '../connector/create-connector';
-import { createModelUseCase } from '../model/create-model';
-import type { CreateModelRequest } from '../model/domain/types';
-import { testModelConnectionUseCase } from '../model/test-model-connection';
-import { InstallationContext } from './domain/installation-context';
-import { InstallationProgressManager } from './domain/installation-progress-manager';
+import { useCases } from '../../../setup';
+import { InstallationContext } from '../domain/installation-context';
+import { InstallationProgressManager } from '../domain/installation-progress-manager';
 import {
+  IInstallationManager,
   InstallDashboardAssistantRequest,
   InstallationProgress,
   InstallationResult,
   StepResultState,
-} from './domain/types';
-import { initializeRepositories } from './real-repositories';
-import { IInstallationManager } from './types';
+} from '../domain/types';
+import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
+import { AgentType } from '../../agent/domain/enums/agent-type';
+import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
+import { modelProviderConfigs } from '../../../provider-model-config';
 
 export class InstallationManager implements IInstallationManager {
-  private repos: ReturnType<typeof initializeRepositories>;
-  private progressCallback?: (progress: InstallationProgress) => void;
-
-  constructor(progressCallback?: (progress: InstallationProgress) => void) {
-    this.repos = initializeRepositories();
-    this.progressCallback = progressCallback;
-  }
+  constructor(
+    private progressCallback?: (progress: InstallationProgress) => void,
+  ) {}
 
   public async execute(
     request: InstallDashboardAssistantRequest,
   ): Promise<InstallationResult> {
+    const modelProviderConfig = modelProviderConfigs.find(
+      config => config.model_family === request.model.name,
+    );
+
     const stepNames = [
       'Update Cluster Settings',
       'Create Connector',
@@ -49,10 +45,7 @@ export class InstallationManager implements IInstallationManager {
       // Step 1: Update cluster settings
       progressManager.startStep(currentStepIndex);
       try {
-        const updateClusterSettings = updateClusterSettingsUseCase(
-          this.repos.clusterSettingsRepository,
-        );
-        await updateClusterSettings();
+        await useCases().updateClusterSettings(['.*']);
         progressManager.completeStep(
           currentStepIndex,
           StepResultState.SUCCESS,
@@ -74,10 +67,8 @@ export class InstallationManager implements IInstallationManager {
       progressManager.startStep(currentStepIndex);
       let connectorId: string;
       try {
-        const createConnector = createConnectorUseCase(
-          this.repos.connectorRepository,
-        );
-        connectorId = await createConnector(request.connector);
+        connectorId =
+          (await useCases().createConnector(request.connector)).id || '';
         context.set('connectorId', connectorId);
         progressManager.completeStep(
           currentStepIndex,
@@ -101,14 +92,13 @@ export class InstallationManager implements IInstallationManager {
       progressManager.startStep(currentStepIndex);
       let modelId: string;
       try {
-        const createModel = createModelUseCase(this.repos.modelRepository);
-        const modelRequest: CreateModelRequest = {
+        const modelRequest: CreateModelDto = {
           name: request.model.name,
-          connectorId: connectorId,
+          connector_id: connectorId,
           description: request.model.description,
-          functionName: request.model.function_name,
+          function_name: request.model.function_name,
         };
-        modelId = await createModel(modelRequest);
+        modelId = (await useCases().createModel(modelRequest)).id || '';
         context.set('modelId', modelId);
         progressManager.completeStep(
           currentStepIndex,
@@ -131,10 +121,7 @@ export class InstallationManager implements IInstallationManager {
       // Step 4: Test model connection
       progressManager.startStep(currentStepIndex);
       try {
-        const testModelConnection = testModelConnectionUseCase(
-          this.repos.modelRepository,
-        );
-        await testModelConnection({ modelId });
+        await useCases().testModelConnection(modelId);
         progressManager.completeStep(
           currentStepIndex,
           StepResultState.SUCCESS,
@@ -156,13 +143,47 @@ export class InstallationManager implements IInstallationManager {
       progressManager.startStep(currentStepIndex);
       let agentId: string;
       try {
-        const createAgent = createAgentUseCase(this.repos.agentRepository);
-        const agentRequest: CreateAgentRequest = {
+        const agentRequest: CreateAgentDto = {
           name: request.agent.name,
+          type: AgentType.CONVERSATIONAL,
           description: request.agent.description,
-          modelId: modelId,
+          llm: {
+            model_id: modelId,
+            parameters: {
+              max_iterations: 5,
+              stop_when_no_tool_found: true,
+              response_filter: modelProviderConfigs.find(
+                config => config.model_family === request.model.name,
+              )?.response_filter!,
+            },
+          },
+          tools: [
+            {
+              type: 'MLModelTool',
+              name: `${modelProviderConfig?.model_provider}_${request.model.name}_llm_model`,
+              description: `A general-purpose language model tool capable of answering broad questions, summarizing information, and providing analysis that doesn't require searching specific data. Use this when no other specialized tool is applicable.`,
+              parameters: {
+                model_id: modelId,
+                prompt: `Human: You're an Artificial intelligence analyst and you're going to help me with cybersecurity related tasks. Respond directly and concisely.
+
+                  \${parameters.chat_history:-}
+
+                  Human: \${parameters.question}
+
+                  Assistant:`,
+              },
+            },
+            {
+              type: 'SearchIndexTool',
+              name: 'WazuhAlertSearchTool',
+              description: `Use this tool ONLY when asked to search for specific Wazuh alert data or summarize trends (e.g., 'most frequent', 'top types'). This tool queries the 'wazuh-alerts-*' daily indices. Provide a JSON string for the 'input' parameter. This JSON string MUST always include 'index' and a 'query' field. The 'query' field's value must be a JSON object that itself contains the OpenSearch 'query' DSL. Parameters like 'size', 'sort', and 'aggs' (aggregations) must be at the top level, alongside 'index' and 'query'. Remember: for Wazuh, the timestamp field is 'timestamp' and severity is 'rule.level'. Examples: \`{"index": "wazuh-alerts-*", "query": {"query": {"match_all": {}}}} \` --- For high-severity alerts (level 10 or higher) in the last 24 hours: \`{"index": "wazuh-alerts-*", "query": {"query": {"bool": {"filter": [{"range": {"timestamp": {"gte": "now-24h/h"}}}, {"range": {"rule.level": {"gte": 10}}}]}}}, "size": 10, "sort": [{"rule.level": {"order": "desc"}}, {"timestamp": {"order": "desc"}}] }\` --- To find the most frequent alert types in the last 24 hours, use this structure: \`{"index": "wazuh-alerts-*", "query": {"query": {"range": {"timestamp": {"gte": "now-24h/h"}}}}, "size": 0, "aggs": {"alert_types": {"terms": {"field": "rule.description.keyword", "size": 10}}}}} \` If specific agent names or rule IDs are requested, use a 'match' or 'term' query within the 'bool' filter alongside other conditions.`,
+              parameters: {
+                input: '${parameters.input}',
+              },
+            },
+          ],
         };
-        agentId = await createAgent(agentRequest);
+        agentId = (await useCases().createAgent(agentRequest)).id || '';
         context.set('agentId', agentId);
         progressManager.completeStep(
           currentStepIndex,
@@ -185,8 +206,7 @@ export class InstallationManager implements IInstallationManager {
       // Step 6: Register agent
       progressManager.startStep(currentStepIndex);
       try {
-        const registerAgent = registerAgentUseCase(this.repos.agentRepository);
-        await registerAgent({ agentId });
+        await useCases().registerAgent(agentId);
         progressManager.completeStep(
           currentStepIndex,
           StepResultState.SUCCESS,
