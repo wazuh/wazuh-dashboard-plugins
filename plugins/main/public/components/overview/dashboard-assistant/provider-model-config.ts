@@ -1,5 +1,6 @@
-export interface ModelConfig {
-  name: string;
+export interface ProviderModelConfig {
+  model_family: string;
+  model_provider: string;
   models: string[];
   response_filter?: string;
   url_path: string;
@@ -8,9 +9,10 @@ export interface ModelConfig {
   extra_parameters?: Record<string, any>;
 }
 
-export const modelConfig: ModelConfig[] = [
+export const modelProviderConfigs: ProviderModelConfig[] = [
   {
-    name: 'GPT (OpenAI)',
+    model_family: 'GPT',
+    model_provider: 'OpenAI',
     models: [
       'gpt-4o',
       'gpt-4o-mini',
@@ -22,13 +24,14 @@ export const modelConfig: ModelConfig[] = [
     response_filter: '$.choices[0].message.content',
     url_path: '/v1/chat/completions',
     headers: {
-      Authorization: 'Bearer ${parameters.apiKey}',
+      Authorization: 'Bearer ${credential.api_key}',
     },
     request_body:
       '{ "model": "${parameters.model}", "messages": ${parameters.messages} }',
   },
   {
-    name: 'Claude (Anthropic)',
+    model_family: 'Claude',
+    model_provider: 'Anthropic',
     models: [
       'claude-3-5-sonnet-20241022',
       'claude-3-5-haiku-20241022',
@@ -42,7 +45,7 @@ export const modelConfig: ModelConfig[] = [
     response_filter: '$.content[0].text',
     url_path: '/v1/messages',
     headers: {
-      'x-api-key': '${credential.apiKey}',
+      'x-api-key': '${credential.api_key}',
       'anthropic-version': '2023-06-01',
       'content-type': 'application/json',
     },
