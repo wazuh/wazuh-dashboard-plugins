@@ -1,7 +1,0 @@
-import { CreateRepository, DeleteRepository } from '../../../domain/repository';
-import { Connector } from '../../domain/entities/connector';
-import { CreateConnectorDto } from '../dtos/create-connector-dto';
-
-export interface IConnectorRepository
-  extends CreateRepository<Connector, CreateConnectorDto>,
-    DeleteRepository {}

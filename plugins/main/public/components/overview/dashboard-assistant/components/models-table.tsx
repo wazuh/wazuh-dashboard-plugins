@@ -16,7 +16,11 @@ import { formatUINumber } from '../../../../react-services/format-number';
 import NavigationService from '../../../../react-services/navigation-service';
 import { dashboardAssistant } from '../../../../utils/applications';
 import { ModelTestResult } from './model-test-result';
-import { useModelTest, useDeleteModel, useModels } from '../common/model/hooks';
+import {
+  useModelTest,
+  useDeleteModel,
+  useModels,
+} from '../modules/model/hooks';
 
 interface Model {
   id: string;

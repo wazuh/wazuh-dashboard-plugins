@@ -117,12 +117,12 @@ classDiagram
         -endpoint: string
         -model: string
         -messages: Array~object~
-        +toObject(): object
+        +toPrimitives(): object
     }
 
     class ConnectorCredential {
-        -openAIKey: string
-        +toObject(): object
+        -apiKey: string
+        +toPrimitives(): object
     }
 
     class ConnectorAction {
@@ -131,26 +131,26 @@ classDiagram
         -url: string
         -headers: Record~string, string~
         -requestBody: string
-        +toObject(): object
+        +toPrimitives(): object
     }
 
     class AgentLLM {
         -modelId: string
         -parameters: object
-        +toObject(): object
+        +toPrimitives(): object
     }
 
     class AgentMemory {
         -type: string
         -windowSize: number
-        +toObject(): object
+        +toPrimitives(): object
     }
 
     class AgentTool {
         -type: string
         -name: string
         -parameters: object
-        +toObject(): object
+        +toPrimitives(): object
     }
 
     %% Repository Interfaces
@@ -400,9 +400,9 @@ These are the steps you should follow:
 
 <details><summary>Step 3: Create a connector</summary>
 <p>
-  
+
 > Create a connector ([reference doc](https://docs.opensearch.org/docs/2.19/ml-commons-plugin/remote-models/index/)). Keep note of the connector id from the API response. (Ensure the credentials passed should have access to call the LLM model)
-> 
+>
 > ```http
 > POST /_plugins/_ml/connectors/_create
 > {

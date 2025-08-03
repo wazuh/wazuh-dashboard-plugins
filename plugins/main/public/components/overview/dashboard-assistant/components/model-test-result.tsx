@@ -9,7 +9,7 @@ import {
   EuiLoadingSpinner,
   // @ts-ignore
 } from '@elastic/eui';
-import { ModelPredictResponse } from '../common/model/domain/types';
+import { ModelPredictResponse } from '../modules/model/domain/types';
 
 interface ModelTestResultProps {
   isLoading: boolean;

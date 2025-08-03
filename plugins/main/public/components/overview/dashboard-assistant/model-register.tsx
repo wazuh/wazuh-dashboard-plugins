@@ -19,11 +19,11 @@ import { DeploymentStatus } from './components/deployment-status';
 import { getWzCurrentAppID } from '../../../kibana-services';
 import { dashboardAssistant } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
-import { useAssistantInstallation } from './common/installation-manager/hooks/use-assistant-installation';
 import {
   ProviderModelConfig,
   modelProviderConfigs,
 } from './provider-model-config';
+import { useAssistantInstallation } from './modules/installation-manager/hooks/use-assistant-installation';
 
 interface FormConfig {
   title: string;
