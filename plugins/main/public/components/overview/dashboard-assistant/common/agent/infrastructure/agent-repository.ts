@@ -1,36 +1,22 @@
-import { IAgentRepository } from './domain/types';
-import { Agent } from './domain/agent';
-import { IHttpClient } from '../installation-manager/domain/types';
+import { IHttpClient } from '../../http/domain/entities/http-client';
+import { CreateAgentDto } from '../application/dtos/create-agent-dto';
+import { AgentFactory } from '../application/factories/agent-factory';
+import { IAgentRepository } from '../application/ports/agent-repository';
+import { Agent } from '../domain/entities/agent';
 
 export class AgentHttpClientRepository implements IAgentRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
-  public async create(agent: Agent): Promise<string> {
+  public async create(agentDto: CreateAgentDto) {
+    const agent = AgentFactory.create(agentDto);
     const response = (await this.httpClient.proxyRequest.post(
       '/_plugins/_ml/agents/_register',
-      { ...agent.toApiPayload() },
+      agent,
     )) as { agent_id: string };
-    return response.agent_id;
-  }
-
-  public async findById(id: string): Promise<Agent | null> {
-    try {
-      const response = await this.httpClient.proxyRequest.get(
-        `/_plugins/_ml/agents/${id}`,
-      );
-      // TODO: Implement Agent.fromResponse method
-      throw new Error('Method not implemented');
-    } catch (error: any) {
-      if (error.status === 404) return null;
-      throw error;
-    }
-  }
-
-  public async update(id: string, agent: Agent): Promise<void> {
-    await this.httpClient.proxyRequest.put(
-      `/_plugins/_ml/agents/${id}`,
-      agent.toApiPayload(),
-    );
+    return AgentFactory.fromResponse({
+      ...agent,
+      agent_id: response.agent_id,
+    });
   }
 
   public async delete(id: string): Promise<void> {
@@ -63,19 +49,16 @@ export class AgentHttpClientRepository implements IAgentRepository {
         size: 1000,
       };
 
-      const response = (await this.httpClient.proxyRequest.post(
-        '/_plugins/_ml/agents/_search',
-        searchPayload,
-      )) as {
+      const response = await this.httpClient.proxyRequest.post<{
         hits: {
           hits: Array<{
             _source: any;
           }>;
         };
-      };
+      }>('/_plugins/_ml/agents/_search', searchPayload);
 
       const agents = response.hits.hits.map((hit: any) =>
-        Agent.fromResponse(hit._source),
+        AgentFactory.fromResponse(hit._source),
       );
       return agents;
     } catch (error) {
