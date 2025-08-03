@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   EuiTitle,
   EuiLoadingSpinner,
@@ -15,9 +15,8 @@ import {
 import { formatUINumber } from '../../../../react-services/format-number';
 import NavigationService from '../../../../react-services/navigation-service';
 import { dashboardAssistant } from '../../../../utils/applications';
-import { useModels } from '../common/model';
 import { ModelTestResult } from './model-test-result';
-import { useModelTest, useDeleteModel} from '../common/model/hooks';
+import { useModelTest, useDeleteModel, useModels } from '../common/model/hooks';
 
 interface Model {
   id: string;
@@ -34,13 +33,19 @@ interface ModelsTableProps {
 }
 
 export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
-  const { models, isLoading, error, refresh, getTableData } = useModels();
+  const { isLoading, error, refresh, getTableData } = useModels();
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isTestFlyoutVisible, setIsTestFlyoutVisible] = useState(false);
   const [modelToTest, setModelToTest] = useState<Model | null>(null);
-  const { isLoading: isTestLoading, response: testResponse, error: testError, testModel, reset: resetTest } = useModelTest();
-  const { deleteModel, isDeleting, error: deleteError } = useDeleteModel();
+  const {
+    isLoading: isTestLoading,
+    response: testResponse,
+    error: testError,
+    testModel,
+    reset: resetTest,
+  } = useModelTest();
+  const { deleteModel } = useDeleteModel();
 
   const tableModels = getTableData();
 
@@ -164,7 +169,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           icon: 'trash',
           type: 'icon',
           description: 'Delete model',
-          onClick: async (model: Model) => handleDeleteModel(model.id)
+          onClick: async (model: Model) => handleDeleteModel(model.id),
         },
       ],
     },
@@ -313,8 +318,6 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           </EuiFlyoutBody>
         </EuiFlyout>
       )}
-
-
     </>
   );
 };

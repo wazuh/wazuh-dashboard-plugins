@@ -17,9 +17,17 @@ import {
   StepExecutionState,
   StepResultState,
 } from '../common/installation-manager/domain/types';
-import type { StepStatus } from '../common/installation-manager/domain/types';
+import type { StepState } from '../common/installation-manager/domain/types';
 
-type UIStepStatus = 'pending' | 'loading' | 'success' | 'error' | 'warning';
+const StepStatus = {
+  PENDING: 'pending',
+  LOADING: 'loading',
+  SUCCESS: 'success',
+  ERROR: 'error',
+  WARNING: 'warning',
+} as const;
+
+type StepStatus = (typeof StepStatus)[keyof typeof StepStatus];
 
 interface DeploymentStatusProps {
   progress: InstallationProgress | null;
@@ -31,7 +39,6 @@ interface DeploymentStatusProps {
 
 export const DeploymentStatus = ({
   progress,
-  title = 'Deploying dashboard assistant',
   onCheckButton,
   showCheckButton = false,
   isButtonDisabled = false,
@@ -40,38 +47,38 @@ export const DeploymentStatus = ({
   const mapToUIStatus = (
     executionState: StepExecutionState,
     resultState?: StepResultState,
-  ): UIStepStatus => {
+  ): StepStatus => {
     if (executionState === StepExecutionState.WAITING) {
-      return 'pending';
+      return StepStatus.PENDING;
     }
     if (executionState === StepExecutionState.PROCESSING) {
-      return 'loading';
+      return StepStatus.LOADING;
     }
     if (executionState === StepExecutionState.FINISHED) {
       if (resultState === StepResultState.SUCCESS) {
-        return 'success';
+        return StepStatus.SUCCESS;
       }
       if (resultState === StepResultState.FAIL) {
-        return 'error';
+        return StepStatus.ERROR;
       }
       if (resultState === StepResultState.WARNING) {
-        return 'warning';
+        return StepStatus.WARNING;
       }
     }
-    return 'pending';
+    return StepStatus.PENDING;
   };
 
-  const getStepIcon = (status: UIStepStatus) => {
+  const getStepIcon = (status: StepStatus) => {
     switch (status) {
-      case 'loading':
+      case StepStatus.LOADING:
         return <EuiLoadingSpinner size='m' />;
-      case 'success':
+      case StepStatus.SUCCESS:
         return <EuiIcon type='check' color='success' />;
-      case 'error':
+      case StepStatus.ERROR:
         return <EuiIcon type='cross' color='danger' />;
-      case 'warning':
+      case StepStatus.WARNING:
         return <EuiIcon type='alert' color='warning' />;
-      case 'pending':
+      case StepStatus.PENDING:
       default:
         return <EuiIcon type='clock' color='subdued' />;
     }
@@ -104,10 +111,10 @@ export const DeploymentStatus = ({
       <EuiSpacer size='l' />
 
       <EuiListGroup flush maxWidth={false}>
-        {steps.map((step: StepStatus, index) => {
+        {steps.map((step: StepState, index) => {
           const uiStatus = step
             ? mapToUIStatus(step.executionState, step.resultState)
-            : 'pending';
+            : StepStatus.PENDING;
           const key = `${step.stepName}-${index}`;
 
           return (
@@ -122,7 +129,7 @@ export const DeploymentStatus = ({
             >
               <EuiText size='s'>{step.stepName}</EuiText>
               <div style={{ display: 'flex', alignItems: 'center' }}>
-                {uiStatus === 'error' && step?.error ? (
+                {uiStatus === StepStatus.ERROR && step?.error ? (
                   <EuiToolTip content={step.error.message}>
                     <div style={{ cursor: 'pointer' }}>
                       {getStepIcon(uiStatus)}

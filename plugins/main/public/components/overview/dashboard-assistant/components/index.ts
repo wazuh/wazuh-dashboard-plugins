@@ -12,5 +12,5 @@ export type {
   InstallationProgress,
   StepExecutionState,
   StepResultState,
-  StepStatus,
+  StepState,
 } from '../common/installation-manager/domain/types';

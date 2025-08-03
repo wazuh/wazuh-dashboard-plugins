@@ -1,7 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { DeploymentStatus } from './deployment-status';
 import { useAssistantInstallation } from '../common/installation-manager/hooks/use-assistant-installation';
-import { StepExecutionState, StepResultState } from '../common/installation-manager/domain/types';
+import {
+  StepExecutionState,
+  StepResultState,
+} from '../common/installation-manager/domain/types';
 
 interface DeploymentStatusContainerProps {
   onCheckButton?: () => void;
@@ -50,17 +53,17 @@ export const DeploymentStatusContainer = ({
   // Determine if button should be disabled
   const isButtonDisabled = () => {
     if (!progress) return false;
-    
+
     // If installation is still in progress, don't disable
     if (progress.overallState !== StepExecutionState.FINISHED) {
       return false;
     }
-    
+
     // If installation finished, check if any step failed
     const hasFailedSteps = progress.steps.some(
-      step => step.resultState === StepResultState.FAIL
+      step => step.resultState === StepResultState.FAIL,
     );
-    
+
     return hasFailedSteps;
   };
 

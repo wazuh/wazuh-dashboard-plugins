@@ -6,19 +6,7 @@ import {
   EuiFieldText,
   EuiSpacer,
 } from '@elastic/eui';
-import { ModelConfig } from '../model-config';
-
-interface FieldConfig {
-  value?: string;
-  disabled?: boolean;
-}
-
-interface ModelFormConfig {
-  name?: FieldConfig;
-  version?: FieldConfig;
-  apiUrl?: FieldConfig;
-  apiKey?: FieldConfig;
-}
+import { ProviderModelConfig } from '../provider-model-config';
 
 interface ModelFormData {
   name: string;
@@ -28,43 +16,44 @@ interface ModelFormData {
 }
 
 interface ModelFormProps {
-  config?: ModelFormConfig;
   onChange?: (data: ModelFormData) => void;
   onValidationChange?: (isValid: boolean) => void;
   disabled?: boolean;
-  modelConfig?: ModelConfig[];
+  modelConfig?: ProviderModelConfig[];
 }
 
-const getVersionOptions = (selectedName: string, models: ModelConfig[]) => {
-  const model = models.find(m => m.name === selectedName);
+const retrieveModelsFromProvider = (
+  selected_model_provider: string,
+  models: ProviderModelConfig[],
+) => {
+  const model = models.find(m => m.model_provider === selected_model_provider);
   return model
-    ? model.models.map(version => ({ value: version, text: version }))
+    ? model.models.map(model => ({ value: model, text: model }))
     : [];
 };
 
-const getNameOptions = (models: ModelConfig[]) => {
+const mapModelProvidersToOptions = (models: ProviderModelConfig[]) => {
   return models.map(model => ({
-    value: model.name,
-    text: model.name,
+    value: model.model_provider,
+    text: model.model_provider,
   }));
 };
 
 export const ModelForm = ({
-  config = {},
   onChange,
   onValidationChange,
   disabled = false,
   modelConfig = [],
 }: ModelFormProps) => {
   const [formData, setFormData] = useState<ModelFormData>({
-    name: config.name?.value || '',
-    version: config.version?.value || '',
-    apiUrl: config.apiUrl?.value || '',
-    apiKey: config.apiKey?.value || '',
+    name: '',
+    version: '',
+    apiUrl: '',
+    apiKey: '',
   });
 
-  const [versionOptions, setVersionOptions] = useState(
-    getVersionOptions(config.name?.value || '', modelConfig),
+  const [modelsOptions, setModelsOptions] = useState(
+    retrieveModelsFromProvider('', modelConfig),
   );
 
   useEffect(() => {
@@ -81,10 +70,12 @@ export const ModelForm = ({
     }
   }, [formData, onValidationChange]);
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleModelProviderChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     const newName = e.target.value;
-    const newVersionOptions = getVersionOptions(newName, modelConfig);
-    setVersionOptions(newVersionOptions);
+    const newModelOptions = retrieveModelsFromProvider(newName, modelConfig);
+    setModelsOptions(newModelOptions);
 
     setFormData(prev => ({
       ...prev,
@@ -93,7 +84,7 @@ export const ModelForm = ({
     }));
   };
 
-  const handleVersionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData(prev => ({ ...prev, version: e.target.value }));
   };
 
@@ -110,11 +101,11 @@ export const ModelForm = ({
       <EuiFormRow label='Name' fullWidth>
         <EuiSelect
           fullWidth
-          options={getNameOptions(modelConfig)}
+          options={mapModelProvidersToOptions(modelConfig)}
           value={formData.name}
-          onChange={handleNameChange}
+          onChange={handleModelProviderChange}
           hasNoInitialSelection
-          disabled={config.name?.disabled || disabled}
+          disabled={disabled}
         />
       </EuiFormRow>
 
@@ -123,11 +114,11 @@ export const ModelForm = ({
       <EuiFormRow label='Version' fullWidth>
         <EuiSelect
           fullWidth
-          options={versionOptions}
+          options={modelsOptions}
           value={formData.version}
-          onChange={handleVersionChange}
+          onChange={handleModelChange}
           hasNoInitialSelection
-          disabled={!formData.name || config.version?.disabled || disabled}
+          disabled={!formData.name || disabled}
         />
       </EuiFormRow>
 
@@ -139,7 +130,7 @@ export const ModelForm = ({
           value={formData.apiUrl}
           onChange={handleApiUrlChange}
           placeholder='Enter API URL'
-          disabled={config.apiUrl?.disabled || disabled}
+          disabled={disabled}
         />
       </EuiFormRow>
 
@@ -152,7 +143,7 @@ export const ModelForm = ({
           value={formData.apiKey}
           onChange={handleApiKeyChange}
           placeholder='Enter API key'
-          disabled={config.apiKey?.disabled || disabled}
+          disabled={disabled}
         />
       </EuiFormRow>
     </EuiForm>
