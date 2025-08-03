@@ -16,8 +16,8 @@ import {
   InstallationProgress,
   StepExecutionState,
   StepResultState,
-} from '../common/installation-manager/domain/types';
-import type { StepState } from '../common/installation-manager/domain/types';
+  StepState,
+} from '../modules/installation-manager/domain/types';
 
 const StepStatus = {
   PENDING: 'pending',

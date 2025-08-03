@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { DeploymentStatus } from './deployment-status';
-import { useAssistantInstallation } from '../common/installation-manager/hooks/use-assistant-installation';
+import { useAssistantInstallation } from '../modules/installation-manager/hooks/use-assistant-installation';
 import {
-  StepExecutionState,
   StepResultState,
-} from '../common/installation-manager/domain/types';
+  StepExecutionState,
+} from '../modules/installation-manager/domain/types';
 
 interface DeploymentStatusContainerProps {
   onCheckButton?: () => void;
