@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { getModelsUseCase } from '../get-models';
-import { ModelHttpClientRepository } from '../model-repository';
-import { HttpWithProxyClient } from '../../http-client';
-import { Model, ModelStatus } from '../domain/model';
+import { useCallback, useEffect, useState } from 'react';
+import { Model } from '../domain/model';
+import { ModelStatus } from '../domain/model-status';
+import { useCases } from '../../../setup';
 
 interface UseModelsReturn {
   models: Model[];
@@ -25,19 +24,12 @@ export function useModels(): UseModelsReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Create use case instance
-  const getModels = useMemo(() => {
-    const httpClient = new HttpWithProxyClient();
-    const modelRepository = new ModelHttpClientRepository(httpClient);
-    return getModelsUseCase(modelRepository);
-  }, []);
-
   const fetchModels = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const fetchedModels = await getModels();
+      const fetchedModels = await useCases().getModels();
       setModels(fetchedModels);
     } catch (err) {
       const errorMessage =
@@ -46,7 +38,7 @@ export function useModels(): UseModelsReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [getModels]);
+  }, []);
 
   const getTableData = useCallback(() => {
     return models.map(model => model.toTableFormat());

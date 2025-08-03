@@ -1,7 +1,5 @@
-import { useState, useCallback, useMemo } from 'react';
-import { deleteModelUseCase } from '../delete-model';
-import { ModelHttpClientRepository } from '../model-repository';
-import { HttpWithProxyClient } from '../../http-client';
+import { useState, useCallback } from 'react';
+import { useCases } from '../../../setup';
 
 export interface UseDeleteModelReturn {
   isDeleting: boolean;
@@ -14,31 +12,21 @@ export function useDeleteModel(): UseDeleteModelReturn {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Create repository instance
-  const repository = useMemo(() => {
-    const httpClient = new HttpWithProxyClient();
-    return new ModelHttpClientRepository(httpClient);
+  const deleteModel = useCallback(async (modelId: string) => {
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      await useCases().deleteModel(modelId);
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setIsDeleting(false);
+    }
   }, []);
-
-  const deleteModel = useCallback(
-    async (modelId: string) => {
-      setIsDeleting(true);
-      setError(null);
-
-      try {
-        const deleteUseCase = deleteModelUseCase(repository);
-        await deleteUseCase(modelId);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : 'Unknown error occurred';
-        setError(errorMessage);
-        throw err;
-      } finally {
-        setIsDeleting(false);
-      }
-    },
-    [repository],
-  );
 
   const reset = useCallback(() => {
     setIsDeleting(false);

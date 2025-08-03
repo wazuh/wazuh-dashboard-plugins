@@ -1,74 +1,6 @@
-export enum ModelStatus {
-  ACTIVE = 'active',
-  INACTIVE = 'inactive',
-  ERROR = 'error',
-}
+import { ModelStatus } from './model-status';
 
 export class Model {
-  constructor(
-    private readonly id: string | null,
-    private readonly name: string,
-    private readonly functionName: string,
-    private readonly modelGroupId: string,
-    private readonly connectorId: string,
-    private readonly description: string,
-    private readonly version: string = '1',
-    private readonly status: ModelStatus = ModelStatus.ACTIVE,
-    private readonly createdAt: string = new Date().toISOString(),
-    private readonly apiUrl: string = '',
-  ) {}
-
-  public static create(config: {
-    name: string;
-    functionName: string;
-    modelGroupId?: string;
-    connectorId: string;
-    description: string;
-    version?: string;
-  }): Model {
-    return new Model(
-      null,
-      config.name,
-      config.functionName,
-      config.modelGroupId || '',
-      config.connectorId,
-      config.description,
-      config.version || '1',
-    );
-  }
-
-  public getId(): string | null {
-    return this.id;
-  }
-
-  public getName(): string {
-    return this.name;
-  }
-
-  public getFunctionName(): string {
-    return this.functionName;
-  }
-
-  public getStatus(): ModelStatus {
-    return this.status;
-  }
-
-  public getCreatedAt(): string {
-    return this.createdAt;
-  }
-
-  public getApiUrl(): string {
-    return this.apiUrl;
-  }
-
-  public getDescription(): string {
-    return this.description;
-  }
-
-  public getVersion(): string {
-    return this.version;
-  }
-
   /*
     Example from model index response
     {
@@ -101,48 +33,20 @@ export class Model {
       }
   */
 
-  public static fromResponse(data: any): Model {
-    // Handle OpenSearch response structure with _id and _source
-    const source = data._source || data;
-    const id = data._id || data.model_id || data.id;
+  constructor(
+    public readonly id: string | null,
+    public readonly name: string,
+    public readonly functionName: string,
+    public readonly modelGroupId: string,
+    public readonly connectorId: string,
+    public readonly description: string,
+    public readonly version: string = '1',
+    public readonly status: ModelStatus = ModelStatus.ACTIVE,
+    public readonly createdAt: string = new Date().toISOString(),
+    public readonly apiUrl: string = '',
+  ) {}
 
-    // Map model_state to our status format
-    const mapModelState = (state: string): ModelStatus => {
-      switch (state?.toUpperCase()) {
-        case 'DEPLOYED':
-        case 'LOADED':
-          return ModelStatus.ACTIVE;
-        case 'UNDEPLOYED':
-        case 'NOT_DEPLOYED':
-          return ModelStatus.INACTIVE;
-        case 'DEPLOY_FAILED':
-        case 'LOAD_FAILED':
-          return ModelStatus.ERROR;
-        default:
-          return data.status || ModelStatus.ACTIVE;
-      }
-    };
-
-    return new Model(
-      id,
-      source.name,
-      source.function_name || source.functionName || '',
-      source.model_group_id || source.modelGroupId || '',
-      source.connector_id || source.connectorId || '',
-      source.description || '',
-      source.model_version || source.version || '1',
-      mapModelState(source.model_state),
-      new Date(
-        source.created_time ||
-          source.created_at ||
-          source.createdAt ||
-          Date.now(),
-      ).toISOString(),
-      source.api_url || source.apiUrl || '',
-    );
-  }
-
-  public toApiPayload(): object {
+  public toPlainObject(): object {
     return {
       name: this.name,
       function_name: this.functionName,

@@ -1,8 +1,6 @@
 import { useState, useCallback } from 'react';
-import { testModelConnectionUseCase } from '../test-model-connection';
-import { ModelHttpClientRepository } from '../model-repository';
-import { HttpWithProxyClient } from '../../http-client';
 import { ModelPredictResponse } from '../domain/types';
+import { useCases } from '../../../setup';
 
 interface UseModelTestReturn {
   isLoading: boolean;
@@ -17,17 +15,13 @@ export function useModelTest(): UseModelTestReturn {
   const [response, setResponse] = useState<ModelPredictResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const testModel = useCallback(async (modelId: string) => {
+  const testModel = useCallback(async (model_id: string) => {
     setIsLoading(true);
     setError(null);
     setResponse(null);
 
     try {
-      const httpClient = new HttpWithProxyClient();
-      const modelRepository = new ModelHttpClientRepository(httpClient);
-      const testModelConnection = testModelConnectionUseCase(modelRepository);
-
-      const result = await testModelConnection({ modelId });
+      const result = await useCases().testModelConnection(model_id);
       setResponse(result);
     } catch (err) {
       const errorMessage =

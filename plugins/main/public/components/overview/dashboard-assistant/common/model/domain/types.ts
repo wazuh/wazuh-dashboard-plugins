@@ -1,25 +1,3 @@
-import { Repository } from '../../domain/repository';
-import { Model } from './model';
-
-export interface IModelRepository extends Repository<Model> {
-  testConnection(modelId: string): Promise<ModelPredictResponse>;
-  deploy(modelId: string, deploy: boolean): Promise<void>;
-  undeploy(modelId: string): Promise<void>;
-}
-
-export interface CreateModelRequest {
-  name: string;
-  functionName: string;
-  modelGroupId?: string; // is optional
-  connectorId: string;
-  description: string;
-}
-
-export interface TestModelConnectionRequest {
-  modelId: string;
-}
-
-// Tipos para la respuesta del modelo
 export interface ModelPredictChoice {
   finish_reason: string;
   index: number;
@@ -48,6 +26,8 @@ export interface ModelPredictContent {
 
 export interface ModelPredictDataAsMap {
   id: string;
+  model: string;
+  usage: ModelPredictUsage;
   // OpenAI-style format
   choices?: ModelPredictChoice[];
   created?: number;
@@ -58,9 +38,6 @@ export interface ModelPredictDataAsMap {
   content?: ModelPredictContent[];
   stop_reason?: string;
   stop_sequence?: string | null;
-  // Common fields
-  model: string;
-  usage: ModelPredictUsage;
 }
 
 export interface ModelPredictOutput {
