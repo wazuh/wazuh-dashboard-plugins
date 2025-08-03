@@ -1,12 +1,6 @@
-import { GenericRequest } from '../../../../react-services/generic-request';
-import { IHttpClient } from './installation-manager/domain/types';
-
-export enum HttpMethod {
-  GET = 'GET',
-  POST = 'POST',
-  PUT = 'PUT',
-  DELETE = 'DELETE',
-}
+import { GenericRequest } from '../../../../../../react-services/generic-request';
+import { IHttpClient } from '../domain/entities/http-client';
+import { HttpMethod } from '../domain/http-method';
 
 export class HttpWithProxyClient implements IHttpClient {
   private buildProxyUrl = (method: HttpMethod, path: string) =>
