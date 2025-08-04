@@ -5,6 +5,6 @@ import { ModelRepository } from '../ports/model-repository';
  * @param modelRepository - The model repository instance
  */
 export const deleteModelUseCase =
-  (modelRepository: ModelRepository) => (modelId: string) => {
-    modelRepository.delete(modelId);
+  (modelRepository: ModelRepository) => async (modelId: string) => {
+    await modelRepository.delete(modelId);
   };

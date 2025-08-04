@@ -51,9 +51,7 @@ export class ModelHttpClientRepository implements ModelRepository {
         };
       }>('/_plugins/_ml/models/_search', searchPayload);
 
-      return response.hits.hits.map(hit =>
-        ModelFactory.fromResponse(hit),
-      );
+      return response.hits.hits.map(hit => ModelFactory.fromResponse(hit));
     } catch (error) {
       console.error('Error fetching models:', error);
       return [];
@@ -68,7 +66,7 @@ export class ModelHttpClientRepository implements ModelRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    this.undeploy(id);
+    await this.undeploy(id);
 
     await this.httpClient.proxyRequest.post.WithDelete(
       `/_plugins/_ml/models/${id}`,
