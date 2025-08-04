@@ -27,7 +27,7 @@ export const DeploymentStatusContainer = ({
   const previousResultRef = useRef(result);
 
   useEffect(() => {
-    // Only show toast when installation completes (not loading and has result)
+    // Only show toast when the installation completes (not loading and has a result)
     if (!isLoading && result && result !== previousResultRef.current) {
       if (result.success) {
         onShowToast?.({
@@ -50,7 +50,7 @@ export const DeploymentStatusContainer = ({
     previousResultRef.current = result;
   }, [result, isLoading, onShowToast]);
 
-  // Determine if button should be disabled
+  // Determine if the button should be disabled
   const isButtonDisabled = () => {
     if (!progress) return false;
 

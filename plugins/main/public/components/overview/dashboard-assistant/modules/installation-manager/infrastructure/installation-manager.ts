@@ -63,7 +63,7 @@ export class InstallationManager implements IInstallationManager {
       }
       currentStepIndex++;
 
-      // Step 2: Create connector
+      // Step 2: Create a connector
       progressManager.startStep(currentStepIndex);
       let connectorId: string;
       try {
@@ -88,7 +88,7 @@ export class InstallationManager implements IInstallationManager {
       }
       currentStepIndex++;
 
-      // Step 3: Create model
+      // Step 3: Create a model
       progressManager.startStep(currentStepIndex);
       let modelId: string;
       try {
@@ -135,11 +135,11 @@ export class InstallationManager implements IInstallationManager {
           undefined,
           error as Error,
         );
-        // Continue with installation even if test fails
+        // Continue with installation even if the test fails
       }
       currentStepIndex++;
 
-      // Step 5: Create agent
+      // Step 5: Create an agent
       progressManager.startStep(currentStepIndex);
       let agentId: string;
       try {
@@ -203,7 +203,7 @@ export class InstallationManager implements IInstallationManager {
       }
       currentStepIndex++;
 
-      // Step 6: Register agent
+      // Step 6: Register an agent
       progressManager.startStep(currentStepIndex);
       try {
         await useCases().registerAgent(agentId);
