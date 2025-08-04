@@ -162,6 +162,10 @@ class SettingsComponent extends React.Component {
       tabs:
         getWzCurrentAppID() === appSettings.id
           ? // WORKAROUND: This avoids the configuration tab is displayed
+            /* TODO: The other view was removed, so this will leave a blank page. Migrating the app settings
+              to the opensearch_dashboards.yml that cause the settings are not managed by the Wazuh plugin,
+              should cause the App settings app should be removed.
+            */
             this.tabsConfiguration.filter(({ id }) =>
               !isConfigurationUIEditable ? id !== configurationTabID : true,
             )
