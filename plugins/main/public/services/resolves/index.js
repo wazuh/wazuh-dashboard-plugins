@@ -13,4 +13,3 @@ export * from './get-config';
 export * from './health-check';
 export * from './nested-resolve';
 export * from './settings-wizard';
-export * from './wz-config';
