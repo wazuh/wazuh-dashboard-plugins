@@ -6,7 +6,7 @@ import {
 } from './types';
 
 export class InstallationProgressManager {
-  private progress: InstallationProgress;
+  private readonly progress: InstallationProgress;
 
   constructor(
     stepNames: string[],
