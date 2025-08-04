@@ -17,11 +17,13 @@
  * under the License.
  */
 
+import type { WazuhCorePluginStart } from '../../wazuh-core/server';
+
 export interface WazuhPluginSetup {}
 
 export interface WazuhPluginStart {}
 
 export type PluginSetup = {
   securityDashboards?: {}; // TODO: Add OpenSearch Dashboards Security interface
-  wazuhCore: {};
+  wazuhCore: WazuhCorePluginStart;
 };

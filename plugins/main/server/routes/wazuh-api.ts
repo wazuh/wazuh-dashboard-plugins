@@ -1,8 +1,12 @@
 import { IRouter } from 'opensearch_dashboards/server';
 import { WazuhApiCtrl } from '../controllers';
 import { schema } from '@osd/config-schema';
+import { WazuhCorePluginStart } from '../../../wazuh-core/server';
 
-export function WazuhApiRoutes(router: IRouter) {
+export function WazuhApiRoutes(
+  router: IRouter,
+  services: WazuhCorePluginStart,
+) {
   const ctrl = new WazuhApiCtrl();
 
   // Returns if the wazuh-api configuration is working

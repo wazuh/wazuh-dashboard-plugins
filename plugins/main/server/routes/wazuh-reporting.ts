@@ -12,8 +12,12 @@
 import { WazuhReportingCtrl } from '../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
+import { WazuhCorePluginStart } from '../../../wazuh-core/server';
 
-export function WazuhReportingRoutes(router: IRouter) {
+export function WazuhReportingRoutes(
+  router: IRouter,
+  services: WazuhCorePluginStart,
+) {
   const ctrl = new WazuhReportingCtrl();
 
   const agentIDValidation = schema.string({

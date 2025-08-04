@@ -12,8 +12,12 @@
 import { UiLogsCtrl } from '../../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
+import { WazuhCorePluginStart } from '../../../../wazuh-core/server';
 
-export const UiLogsRoutes = (router: IRouter) => {
+export const UiLogsRoutes = (
+  router: IRouter,
+  services: WazuhCorePluginStart,
+) => {
   const ctrl = new UiLogsCtrl();
 
   router.post(
