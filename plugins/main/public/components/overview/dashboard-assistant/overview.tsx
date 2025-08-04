@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { EuiPanel, EuiGlobalToastList } from '@elastic/eui';
-import { ModelsTable } from './components/models-table';
+import { ModelsTable } from './components';
 
 const toastConfig = {
   lifeTimeMs: 6000,

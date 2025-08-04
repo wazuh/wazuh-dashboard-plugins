@@ -8,9 +8,9 @@ import {
   InstallationResult,
   StepResultState,
 } from '../domain/types';
-import { CreateModelDto } from '../../../modules/model/application/dtos/create-model-dto';
-import { AgentType } from '../../../modules/agent/domain/enums/agent-type';
-import { CreateAgentDto } from '../../../modules/agent/application/dtos/create-agent-dto';
+import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
+import { AgentType } from '../../agent/domain/enums/agent-type';
+import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
 import { modelProviderConfigs } from '../../../provider-model-config';
 
 export class InstallationManager implements IInstallationManager {

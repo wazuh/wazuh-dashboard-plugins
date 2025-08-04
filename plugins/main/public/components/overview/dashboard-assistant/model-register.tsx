@@ -14,8 +14,8 @@ import {
   EuiFlyoutBody,
   // @ts-ignore
 } from '@elastic/eui';
-import { ModelForm } from './components/model-form';
-import { DeploymentStatus } from './components/deployment-status';
+import { ModelForm } from './components';
+import { DeploymentStatus } from './components';
 import { getWzCurrentAppID } from '../../../kibana-services';
 import { dashboardAssistant } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
