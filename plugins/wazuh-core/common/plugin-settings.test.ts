@@ -20,18 +20,6 @@ describe('[settings] Input validation', () => {
     ${'alerts.sample.prefix'}          | ${'test,'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
     ${'alerts.sample.prefix'}          | ${'test#'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
     ${'alerts.sample.prefix'}          | ${'test*'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'checks.api'}                    | ${true}                                                                | ${undefined}
-    ${'checks.api'}                    | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'checks.fields'}                 | ${true}                                                                | ${undefined}
-    ${'checks.fields'}                 | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'checks.maxBuckets'}             | ${true}                                                                | ${undefined}
-    ${'checks.maxBuckets'}             | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'checks.pattern'}                | ${true}                                                                | ${undefined}
-    ${'checks.pattern'}                | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'checks.setup'}                  | ${true}                                                                | ${undefined}
-    ${'checks.setup'}                  | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'checks.template'}               | ${true}                                                                | ${undefined}
-    ${'checks.template'}               | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'configuration.ui_api_editable'} | ${true}                                                                | ${undefined}
     ${'configuration.ui_api_editable'} | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'checks.timeFilter'}             | ${true}                                                                | ${undefined}

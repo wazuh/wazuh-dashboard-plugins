@@ -309,20 +309,6 @@ describe.skip('[endpoint] PUT /utils/configuration', () => {
     ${'alerts.sample.prefix'}          | ${'test,'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
     ${'alerts.sample.prefix'}          | ${'test#'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
     ${'alerts.sample.prefix'}          | ${'test*'}                                                       | ${400}             | ${'[request body.alerts.sample.prefix]: It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
-    ${'checks.api'}                    | ${true}                                                          | ${200}             | ${null}
-    ${'checks.api'}                    | ${0}                                                             | ${400}             | ${'[request body.checks.api]: expected value of type [boolean] but got [number]'}
-    ${'checks.fields'}                 | ${true}                                                          | ${200}             | ${null}
-    ${'checks.fields'}                 | ${0}                                                             | ${400}             | ${'[request body.checks.fields]: expected value of type [boolean] but got [number]'}
-    ${'checks.maxBuckets'}             | ${true}                                                          | ${200}             | ${null}
-    ${'checks.maxBuckets'}             | ${0}                                                             | ${400}             | ${'[request body.checks.maxBuckets]: expected value of type [boolean] but got [number]'}
-    ${'checks.pattern'}                | ${true}                                                          | ${200}             | ${null}
-    ${'checks.pattern'}                | ${0}                                                             | ${400}             | ${'[request body.checks.pattern]: expected value of type [boolean] but got [number]'}
-    ${'checks.setup'}                  | ${true}                                                          | ${200}             | ${null}
-    ${'checks.setup'}                  | ${0}                                                             | ${400}             | ${'[request body.checks.setup]: expected value of type [boolean] but got [number]'}
-    ${'checks.template'}               | ${true}                                                          | ${200}             | ${null}
-    ${'checks.template'}               | ${0}                                                             | ${400}             | ${'[request body.checks.template]: expected value of type [boolean] but got [number]'}
-    ${'checks.timeFilter'}             | ${true}                                                          | ${200}             | ${null}
-    ${'checks.timeFilter'}             | ${0}                                                             | ${400}             | ${'[request body.checks.timeFilter]: expected value of type [boolean] but got [number]'}
     ${'configuration.ui_api_editable'} | ${true}                                                          | ${200}             | ${null}
     ${'configuration.ui_api_editable'} | ${true}                                                          | ${400}             | ${'[request body.configuration.ui_api_editable]: expected value of type [boolean] but got [number]'}
     ${'customization.enabled'}         | ${true}                                                          | ${200}             | ${null}
