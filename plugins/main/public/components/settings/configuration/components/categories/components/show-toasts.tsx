@@ -36,7 +36,7 @@ export const toastRequiresRunningHealthcheck = () => {
           <EuiButton
             onClick={() => {
               getToasts().remove(toast);
-              // TODO: replace the management of API setup
+              // TODO: This should be removed when the app settings are migrated to the opensearch_dashboards.yml file
             }}
             size='s'
           >
