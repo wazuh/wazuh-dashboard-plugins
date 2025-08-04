@@ -27,7 +27,9 @@ import { WzRequest } from './react-services/wz-request';
 export const Application = withGuardAsync(
   async (_props: any) => {
     // Setup the selected API
-    await WzRequest.setupAPI();
+    try {
+      await WzRequest.setupAPI();
+    } catch {}
 
     return {
       ok: false,
