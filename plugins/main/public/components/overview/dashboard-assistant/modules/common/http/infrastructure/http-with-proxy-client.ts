@@ -29,12 +29,12 @@ export class HttpWithProxyClient implements IHttpClient {
 
   async get<T = any>(url: string, config?: Record<string, any>): Promise<T> {
     try {
-      const response = (await GenericRequest.request(
+      const response = await GenericRequest.request<{ data: T }>(
         HttpMethod.GET,
         url,
         null,
         true,
-      )) as { data: T };
+      );
       return response.data;
     } catch (error) {
       throw new Error(`${HttpMethod.GET} request failed: ${error}`);
@@ -47,12 +47,12 @@ export class HttpWithProxyClient implements IHttpClient {
     config?: Record<string, any>,
   ): Promise<T> {
     try {
-      const response = (await GenericRequest.request(
+      const response = await GenericRequest.request<{ data: T }>(
         HttpMethod.POST,
         url,
         data,
         true,
-      )) as { data: T };
+      );
       return response.data;
     } catch (error) {
       throw new Error(`${HttpMethod.POST} request failed: ${error}`);
@@ -65,12 +65,12 @@ export class HttpWithProxyClient implements IHttpClient {
     config?: Record<string, any>,
   ): Promise<T> {
     try {
-      const response = (await GenericRequest.request(
+      const response = await GenericRequest.request<{ data: T }>(
         HttpMethod.PUT,
         url,
         data,
         true,
-      )) as { data: T };
+      );
       return response.data;
     } catch (error) {
       throw new Error(`${HttpMethod.PUT} request failed: ${error}`);
@@ -79,12 +79,12 @@ export class HttpWithProxyClient implements IHttpClient {
 
   async delete<T = any>(url: string, config?: Record<string, any>): Promise<T> {
     try {
-      const response = (await GenericRequest.request(
+      const response = await GenericRequest.request<{ data: T }>(
         HttpMethod.DELETE,
         url,
         null,
         true,
-      )) as { data: T };
+      );
       return response.data;
     } catch (error) {
       throw new Error(`${HttpMethod.DELETE} request failed: ${error}`);
