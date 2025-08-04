@@ -16,29 +16,29 @@ import { ModelHttpClientRepository } from './modules/model/infrastructure/reposi
 export const httpClient = new HttpWithProxyClient();
 
 // Factory function to create real repositories with HttpClient
-export const repositories = {
-  clusterSettingsRepository: new MLCommonsSettingsHttpClientRepository(
+export class Repositories {
+  static clusterSettingsRepository = new MLCommonsSettingsHttpClientRepository(
     httpClient,
-  ),
-  modelGroupRepository: new ModelGroupHttpClientRepository(httpClient),
-  connectorRepository: new ConnectorHttpClientRepository(httpClient),
-  modelRepository: new ModelHttpClientRepository(httpClient),
-  agentRepository: new AgentHttpClientRepository(httpClient),
-};
+  );
+  static modelGroupRepository = new ModelGroupHttpClientRepository(httpClient);
+  static connectorRepository = new ConnectorHttpClientRepository(httpClient);
+  static modelRepository = new ModelHttpClientRepository(httpClient);
+  static agentRepository = new AgentHttpClientRepository(httpClient);
+}
 
-export function useCases() {
-  return {
-    updateClusterSettings: updateClusterSettingsUseCase(
-      repositories.clusterSettingsRepository,
-    ),
-    createConnector: createConnectorUseCase(repositories.connectorRepository),
-    createModel: createModelUseCase(repositories.modelRepository),
-    createAgent: createAgentUseCase(repositories.agentRepository),
-    registerAgent: registerAgentUseCase(repositories.agentRepository),
-    getModels: getModelsUseCase(repositories.modelRepository),
-    deleteModel: deleteModelUseCase(repositories.modelRepository),
-    testModelConnection: testModelConnectionUseCase(
-      repositories.modelRepository,
-    ),
-  };
+export class UseCases {
+  static updateClusterSettings = updateClusterSettingsUseCase(
+    Repositories.clusterSettingsRepository,
+  );
+  static createConnector = createConnectorUseCase(
+    Repositories.connectorRepository,
+  );
+  static createModel = createModelUseCase(Repositories.modelRepository);
+  static createAgent = createAgentUseCase(Repositories.agentRepository);
+  static registerAgent = registerAgentUseCase(Repositories.agentRepository);
+  static getModels = getModelsUseCase(Repositories.modelRepository);
+  static deleteModel = deleteModelUseCase(Repositories.modelRepository);
+  static testModelConnection = testModelConnectionUseCase(
+    Repositories.modelRepository,
+  );
 }

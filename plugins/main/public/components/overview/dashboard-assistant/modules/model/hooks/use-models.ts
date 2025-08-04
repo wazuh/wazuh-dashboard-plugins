@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Model } from '../domain/model';
 import { ModelStatus } from '../domain/model-status';
-import { useCases } from '../../../setup';
+import { UseCases } from '../../../setup';
 
 interface UseModelsReturn {
   models: Model[];
@@ -29,7 +29,7 @@ export function useModels(): UseModelsReturn {
     setError(null);
 
     try {
-      const fetchedModels = await useCases().getModels();
+      const fetchedModels = await UseCases.getModels();
       setModels(fetchedModels);
     } catch (err) {
       const errorMessage =

@@ -10,7 +10,7 @@ import { ProviderModelConfig } from '../provider-model-config';
 
 interface ModelFormData {
   name: string;
-  version: string;
+  model: string;
   apiUrl: string;
   apiKey: string;
 }
@@ -47,7 +47,7 @@ export const ModelForm = ({
 }: ModelFormProps) => {
   const [formData, setFormData] = useState<ModelFormData>({
     name: '',
-    version: '',
+    model: '',
     apiUrl: '',
     apiKey: '',
   });
@@ -64,7 +64,7 @@ export const ModelForm = ({
 
   useEffect(() => {
     const isValid =
-      formData.name && formData.version && formData.apiUrl && formData.apiKey;
+      formData.name && formData.model && formData.apiUrl && formData.apiKey;
     if (onValidationChange) {
       onValidationChange(!!isValid);
     }
@@ -80,12 +80,12 @@ export const ModelForm = ({
     setFormData(prev => ({
       ...prev,
       name: newName,
-      version: '', // Reset version when name changes
+      model: '', // Reset a model when the name changes
     }));
   };
 
   const handleModelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, version: e.target.value }));
+    setFormData(prev => ({ ...prev, model: e.target.value }));
   };
 
   const handleApiUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +98,7 @@ export const ModelForm = ({
 
   return (
     <EuiForm>
-      <EuiFormRow label='Name' fullWidth>
+      <EuiFormRow label='Provider' fullWidth>
         <EuiSelect
           fullWidth
           options={mapModelProvidersToOptions(modelConfig)}
@@ -111,11 +111,11 @@ export const ModelForm = ({
 
       <EuiSpacer size='m' />
 
-      <EuiFormRow label='Version' fullWidth>
+      <EuiFormRow label='Model' fullWidth>
         <EuiSelect
           fullWidth
           options={modelsOptions}
-          value={formData.version}
+          value={formData.model}
           onChange={handleModelChange}
           hasNoInitialSelection
           disabled={!formData.name || disabled}

@@ -109,7 +109,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
 
   const handleDeleteModel = async (modelId: string) => {
     await deleteModel(modelId);
-    refresh();
+    await refresh();
   };
 
   const columns = [

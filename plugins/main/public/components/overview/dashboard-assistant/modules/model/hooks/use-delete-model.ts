@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useCases } from '../../../setup';
+import { UseCases } from '../../../setup';
 
 export interface UseDeleteModelReturn {
   isDeleting: boolean;
@@ -17,7 +17,7 @@ export function useDeleteModel(): UseDeleteModelReturn {
     setError(null);
 
     try {
-      await useCases().deleteModel(modelId);
+      await UseCases.deleteModel(modelId);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Unknown error occurred';

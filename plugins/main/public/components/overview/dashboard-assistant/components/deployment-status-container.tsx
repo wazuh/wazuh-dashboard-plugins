@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { DeploymentStatus } from './deployment-status';
 import { useAssistantInstallation } from '../modules/installation-manager/hooks/use-assistant-installation';
 import {
-  StepResultState,
   StepExecutionState,
+  StepResultState,
 } from '../modules/installation-manager/domain/types';
 
 interface DeploymentStatusContainerProps {

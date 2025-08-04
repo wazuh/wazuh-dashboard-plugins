@@ -1,4 +1,4 @@
-import { useCases } from '../../../setup';
+import { UseCases } from '../../../setup';
 import { InstallationContext } from '../domain/installation-context';
 import { InstallationProgressManager } from '../domain/installation-progress-manager';
 import {
@@ -12,6 +12,7 @@ import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
 import { AgentType } from '../../agent/domain/enums/agent-type';
 import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
 import { modelProviderConfigs } from '../../../provider-model-config';
+import { Tool } from '../../agent/domain/enums/tool';
 
 export class InstallationManager implements IInstallationManager {
   constructor(
@@ -45,7 +46,7 @@ export class InstallationManager implements IInstallationManager {
       // Step 1: Update cluster settings
       progressManager.startStep(currentStepIndex);
       try {
-        await useCases().updateClusterSettings(['.*']);
+        await UseCases.updateClusterSettings(['.*']);
         progressManager.completeStep(
           currentStepIndex,
           StepResultState.SUCCESS,
@@ -68,7 +69,7 @@ export class InstallationManager implements IInstallationManager {
       let connectorId: string;
       try {
         connectorId =
-          (await useCases().createConnector(request.connector)).id || '';
+          (await UseCases.createConnector(request.connector)).id || '';
         context.set('connectorId', connectorId);
         progressManager.completeStep(
           currentStepIndex,
@@ -98,7 +99,7 @@ export class InstallationManager implements IInstallationManager {
           description: request.model.description,
           function_name: request.model.function_name,
         };
-        modelId = (await useCases().createModel(modelRequest)).id || '';
+        modelId = (await UseCases.createModel(modelRequest)).id || '';
         context.set('modelId', modelId);
         progressManager.completeStep(
           currentStepIndex,
@@ -121,7 +122,7 @@ export class InstallationManager implements IInstallationManager {
       // Step 4: Test model connection
       progressManager.startStep(currentStepIndex);
       try {
-        await useCases().testModelConnection(modelId);
+        await UseCases.testModelConnection(modelId);
         progressManager.completeStep(
           currentStepIndex,
           StepResultState.SUCCESS,
@@ -159,7 +160,7 @@ export class InstallationManager implements IInstallationManager {
           },
           tools: [
             {
-              type: 'MLModelTool',
+              type: Tool.ML_MODEL_TOOL,
               name: `${modelProviderConfig?.model_provider}_${request.model.name}_llm_model`,
               description: `A general-purpose language model tool capable of answering broad questions, summarizing information, and providing analysis that doesn't require searching specific data. Use this when no other specialized tool is applicable.`,
               parameters: {
@@ -174,7 +175,7 @@ export class InstallationManager implements IInstallationManager {
               },
             },
             {
-              type: 'SearchIndexTool',
+              type: Tool.SEARCH_INDEX_TOOL,
               name: 'WazuhAlertSearchTool',
               description: `Use this tool ONLY when asked to search for specific Wazuh alert data or summarize trends (e.g., 'most frequent', 'top types'). This tool queries the 'wazuh-alerts-*' daily indices. Provide a JSON string for the 'input' parameter. This JSON string MUST always include 'index' and a 'query' field. The 'query' field's value must be a JSON object that itself contains the OpenSearch 'query' DSL. Parameters like 'size', 'sort', and 'aggs' (aggregations) must be at the top level, alongside 'index' and 'query'. Remember: for Wazuh, the timestamp field is 'timestamp' and severity is 'rule.level'. Examples: \`{"index": "wazuh-alerts-*", "query": {"query": {"match_all": {}}}} \` --- For high-severity alerts (level 10 or higher) in the last 24 hours: \`{"index": "wazuh-alerts-*", "query": {"query": {"bool": {"filter": [{"range": {"timestamp": {"gte": "now-24h/h"}}}, {"range": {"rule.level": {"gte": 10}}}]}}}, "size": 10, "sort": [{"rule.level": {"order": "desc"}}, {"timestamp": {"order": "desc"}}] }\` --- To find the most frequent alert types in the last 24 hours, use this structure: \`{"index": "wazuh-alerts-*", "query": {"query": {"range": {"timestamp": {"gte": "now-24h/h"}}}}, "size": 0, "aggs": {"alert_types": {"terms": {"field": "rule.description.keyword", "size": 10}}}}} \` If specific agent names or rule IDs are requested, use a 'match' or 'term' query within the 'bool' filter alongside other conditions.`,
               parameters: {
@@ -183,7 +184,7 @@ export class InstallationManager implements IInstallationManager {
             },
           ],
         };
-        agentId = (await useCases().createAgent(agentRequest)).id || '';
+        agentId = (await UseCases.createAgent(agentRequest)).id || '';
         context.set('agentId', agentId);
         progressManager.completeStep(
           currentStepIndex,
@@ -206,7 +207,7 @@ export class InstallationManager implements IInstallationManager {
       // Step 6: Register an agent
       progressManager.startStep(currentStepIndex);
       try {
-        await useCases().registerAgent(agentId);
+        await UseCases.registerAgent(agentId);
         progressManager.completeStep(
           currentStepIndex,
           StepResultState.SUCCESS,

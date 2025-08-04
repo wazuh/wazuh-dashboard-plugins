@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { ModelPredictResponse } from '../domain/types';
-import { useCases } from '../../../setup';
+import { UseCases } from '../../../setup';
 
 interface UseModelTestReturn {
   isLoading: boolean;
@@ -21,7 +21,7 @@ export function useModelTest(): UseModelTestReturn {
     setResponse(null);
 
     try {
-      const result = await useCases().testModelConnection(model_id);
+      const result = await UseCases.testModelConnection(model_id);
       setResponse(result);
     } catch (err) {
       const errorMessage =
