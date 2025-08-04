@@ -26,9 +26,15 @@ import { WzRequest } from './react-services/wz-request';
 
 export const Application = withGuardAsync(
   async (_props: any) => {
-    // Setup the selected API
     try {
       await WzRequest.setupAPI();
+      // TUn in parallel
+      await Promise.allSettled([
+        // Setup the selected API
+        WzRequest.setupAPI(),
+        // Load the app state
+        loadAppConfig(),
+      ]);
     } catch {}
 
     return {
@@ -56,9 +62,6 @@ export const Application = withGuardAsync(
     checkPluginVersion().finally(() => {
       WzAuthentication.refresh();
     });
-
-    // Load the app state
-    loadAppConfig();
 
     // TODO: Replace this with document insteat
     // Bind deleteExistentToken on Log out component.
