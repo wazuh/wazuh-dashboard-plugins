@@ -68,14 +68,13 @@ export class ModelGroupHttpClientRepository implements IModelGroupRepository {
         };
       }>('/_plugins/_ml/model_groups/_search', searchPayload);
 
-      const modelGroups = response.hits.hits.map((hit: any) =>
+      return response.hits.hits.map((hit: any) =>
         ModelGroupFactory.fromResponse({
           id: hit._source.model_group_id,
           name: hit._source.name,
           description: hit._source.description,
         }),
       );
-      return modelGroups;
     } catch (error) {
       console.error('Error fetching model groups:', error);
       throw error;

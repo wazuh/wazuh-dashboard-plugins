@@ -60,11 +60,9 @@ export const DeploymentStatusContainer = ({
     }
 
     // If installation finished, check if any step failed
-    const hasFailedSteps = progress.steps.some(
+    return progress.steps.some(
       step => step.resultState === StepResultState.FAIL,
     );
-
-    return hasFailedSteps;
   };
 
   return (

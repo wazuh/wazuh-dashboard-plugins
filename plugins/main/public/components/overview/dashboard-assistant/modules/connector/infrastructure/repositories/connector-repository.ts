@@ -38,10 +38,9 @@ export class ConnectorHttpClientRepository implements IConnectorRepository {
         };
       }>('/_plugins/_ml/connectors/_search', searchPayload);
 
-      const connectors = response.hits.hits.map((hit: any) =>
+      return response.hits.hits.map((hit: any) =>
         ConnectorFactory.fromResponse(hit._source),
       );
-      return connectors;
     } catch (error) {
       console.error('Error fetching connectors:', error);
       throw error;

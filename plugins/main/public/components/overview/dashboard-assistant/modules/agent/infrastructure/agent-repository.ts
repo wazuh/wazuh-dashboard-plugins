@@ -57,10 +57,9 @@ export class AgentHttpClientRepository implements IAgentRepository {
         };
       }>('/_plugins/_ml/agents/_search', searchPayload);
 
-      const agents = response.hits.hits.map((hit: any) =>
+      return response.hits.hits.map((hit: any) =>
         AgentFactory.fromResponse(hit._source),
       );
-      return agents;
     } catch (error) {
       console.error('Error fetching agents:', error);
       throw error;

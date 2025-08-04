@@ -51,10 +51,9 @@ export class ModelHttpClientRepository implements ModelRepository {
         };
       }>('/_plugins/_ml/models/_search', searchPayload);
 
-      const models = response.hits.hits.map(hit =>
+      return response.hits.hits.map(hit =>
         ModelFactory.fromResponse(hit),
       );
-      return models;
     } catch (error) {
       console.error('Error fetching models:', error);
       return [];

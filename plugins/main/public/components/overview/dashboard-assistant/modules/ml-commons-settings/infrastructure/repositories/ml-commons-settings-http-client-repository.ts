@@ -22,10 +22,9 @@ export class MLCommonsSettingsHttpClientRepository
 
   public async getSettings(): Promise<any> {
     try {
-      const response = await this.httpClient.proxyRequest.post(
+      return await this.httpClient.proxyRequest.post(
         '/_cluster/settings?include_defaults=true',
       );
-      return response;
     } catch (error) {
       console.error('Error fetching cluster settings:', error);
       throw error;
