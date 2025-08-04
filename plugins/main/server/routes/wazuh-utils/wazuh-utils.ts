@@ -62,7 +62,7 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
               );
             const validation = schema.object(validationSchema).validate(value);
             return response.ok(validation);
-          } catch (error) {
+          } catch (error: any) {
             return response.badRequest(error.message);
           }
         },
@@ -93,7 +93,7 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
               .object({ key: schema.oneOf(validationSchema) })
               .validate(value);
             return response.ok(validation);
-          } catch (error) {
+          } catch (error: any) {
             return response.badRequest(error.message);
           }
         },
@@ -134,7 +134,7 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
               .object({ key: schema.oneOf(validationSchema) })
               .validate(value);
             return response.ok(validation);
-          } catch (error) {
+          } catch (error: any) {
             return response.badRequest(error.message);
           }
         },

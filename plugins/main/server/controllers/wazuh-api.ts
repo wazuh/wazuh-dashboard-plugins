@@ -68,7 +68,7 @@ export class WazuhApiCtrl {
                 body: { token: wzToken },
               });
             }
-          } catch (error) {
+          } catch (error: any) {
             context.wazuh.logger.error(
               `Error decoding the API host entry token: ${error.message}`,
             );
@@ -94,7 +94,7 @@ export class WazuhApiCtrl {
         },
         body: { token },
       });
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage = `Error getting the authorization token: ${extractErrorMessage(
         error,
       )}`;
@@ -174,14 +174,14 @@ export class WazuhApiCtrl {
             idChanged: request.body.idChanged || null,
           },
         });
-      } catch (error) {
+      } catch (error: any) {
         // If we have an invalid response from the Wazuh API
         throw new Error(
           responseManagerInfo.data.detail ||
             `${api.url}:${api.port} is unreachable`,
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'EPROTO') {
         return response.ok({
           body: {
@@ -226,9 +226,9 @@ export class WazuhApiCtrl {
                 request.body.idChanged = id;
                 return await this.checkStoredAPI(context, request, response);
               }
-            } catch (error) {} // eslint-disable-line
+            } catch (error: any) {} // eslint-disable-line
           }
-        } catch (error) {
+        } catch (error: any) {
           context.wazuh.logger.error(error.message || error);
           return ErrorResponse(
             error.message || error,
@@ -322,7 +322,7 @@ export class WazuhApiCtrl {
             {},
             options,
           );
-      } catch (error) {
+      } catch (error: any) {
         return ErrorResponse(
           `ERROR3099 - ${
             error.response?.data?.detail || 'Server not ready yet'
@@ -358,7 +358,7 @@ export class WazuhApiCtrl {
           );
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.warn(error.message || error);
 
       if (
@@ -462,7 +462,7 @@ export class WazuhApiCtrl {
       if (!isValid) {
         throw new Error('Server not ready yet');
       }
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.error(error.message || error);
       return Promise.reject(error);
     }
@@ -492,7 +492,7 @@ export class WazuhApiCtrl {
         api = await context.wazuh_core.manageHosts.get(id, {
           excludePassword: true,
         });
-      } catch (error) {
+      } catch (error: any) {
         context.wazuh.logger.error('Could not get host credentials');
         //Can not get credentials from wazuh-hosts
         return ErrorResponse(
@@ -560,7 +560,7 @@ export class WazuhApiCtrl {
                 data,
                 options,
               );
-            } catch (error) {
+            } catch (error: any) {
               contextJob.wazuh.logger.error(
                 `An error ocurred in the delayed request: "${method} ${path}": ${
                   error.message || error
@@ -578,7 +578,7 @@ export class WazuhApiCtrl {
         try {
           const check = await this.checkDaemons(context, api, path);
           return check;
-        } catch (error) {
+        } catch (error: any) {
           const isDown = (error || {}).code === 'ECONNREFUSED';
           if (!isDown) {
             context.wazuh.logger.error(
@@ -639,7 +639,7 @@ export class WazuhApiCtrl {
       throw responseError && responseBody.detail
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the API');
-    } catch (error) {
+    } catch (error: any) {
       if (error?.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
         return ErrorResponse(
           error.message || error,
@@ -905,7 +905,7 @@ export class WazuhApiCtrl {
           }`,
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(
         error.message || error,
@@ -951,7 +951,7 @@ export class WazuhApiCtrl {
           },
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${
@@ -993,7 +993,7 @@ export class WazuhApiCtrl {
       return response.ok({
         body: { logos },
       });
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(
         error.message || error,
