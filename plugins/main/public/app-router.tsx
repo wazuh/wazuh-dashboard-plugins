@@ -21,8 +21,22 @@ import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
+import { withGuardAsync } from './components/common/hocs';
+import { WzRequest } from './react-services/wz-request';
 
-export function Application(props) {
+export const Application = withGuardAsync(
+  async (_props: any) => {
+    // Setup the selected API
+    await WzRequest.setupAPI();
+
+    return {
+      ok: false,
+      data: {},
+    };
+  },
+  null,
+  null,
+)((_props: any) => {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
   const history = navigationService.getHistory();
@@ -103,4 +117,4 @@ export function Application(props) {
       </Switch>
     </Router>
   );
-}
+});
