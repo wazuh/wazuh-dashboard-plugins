@@ -7,13 +7,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import { ProviderModelConfig } from '../provider-model-config';
-
-interface ModelFormData {
-  name: string;
-  model: string;
-  apiUrl: string;
-  apiKey: string;
-}
+import { ModelFormData } from './types';
 
 interface ModelFormProps {
   onChange?: (data: ModelFormData) => void;

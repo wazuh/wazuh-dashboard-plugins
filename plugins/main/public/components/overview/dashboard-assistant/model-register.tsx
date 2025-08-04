@@ -24,6 +24,7 @@ import {
   modelProviderConfigs,
 } from './provider-model-config';
 import { useAssistantInstallation } from './modules/installation-manager/hooks/use-assistant-installation';
+import { ModelFormData } from './components/types';
 
 interface FormConfig {
   title: string;
@@ -56,7 +57,6 @@ export const ModelRegister = ({
     isLoading: isInstalling,
     error: installError,
     result,
-    modelData,
     progress,
     isSuccess,
   } = useAssistantInstallation();
@@ -78,7 +78,7 @@ export const ModelRegister = ({
   const config = formConfig || defaultFormConfig;
   const [formData, setFormData] = useState({
     name: '',
-    version: '',
+    model: '',
     apiUrl: '',
     apiKey: '',
   });
@@ -87,14 +87,14 @@ export const ModelRegister = ({
   const [isDeploymentVisible, setIsDeploymentVisible] = useState(false);
 
   const handleFormChange = useCallback(
-    (data: any) => {
+    (data: ModelFormData) => {
       setFormData(data);
       setModel({
         model_provider: data.name,
-        model_id: data.version,
+        model_id: data.model,
         api_url: data.apiUrl,
         api_key: data.apiKey,
-        description: `${data.name} ${data.version} model`,
+        description: `${data.name} ${data.model} model`,
       });
     },
     [setModel],
@@ -107,7 +107,7 @@ export const ModelRegister = ({
   const handleCancel = () => {
     setFormData({
       name: '',
-      version: '',
+      model: '',
       apiUrl: '',
       apiKey: '',
     });
@@ -130,7 +130,7 @@ export const ModelRegister = ({
   const handleCloseDeployment = () => {
     setFormData({
       name: '',
-      version: '',
+      model: '',
       apiUrl: '',
       apiKey: '',
     });
