@@ -25,7 +25,6 @@ import { getAssetURL } from '../../utils/assets';
 import { getHttp, getWzCurrentAppID } from '../../kibana-services';
 import { ApiTable } from '../settings/api/api-table';
 import { WzConfigurationSettings } from '../settings/configuration';
-import { SettingsMiscellaneous } from '../settings/miscellaneous/miscellaneous';
 import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
 import { SettingsAbout } from '../settings/about/index';
 import {
@@ -102,7 +101,6 @@ class SettingsComponent extends React.Component {
     );
     this.tabsConfiguration = [
       { id: configurationTabID, name: 'Configuration' },
-      { id: 'miscellaneous', name: 'Miscellaneous' },
     ];
   }
 

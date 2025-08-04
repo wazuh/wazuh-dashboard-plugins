@@ -5,8 +5,6 @@ import { settingsWizard } from './settings-wizard';
 
 export function nestedResolve(params) {
   const wzMisc = new WzMisc();
-  const healthCheckStatus = sessionStorage.getItem('healthCheck');
-  if (!healthCheckStatus) return;
   const wazuhConfig = new WazuhConfig();
   return getWzConfig(wazuhConfig).then(() => settingsWizard(params, wzMisc));
 }
