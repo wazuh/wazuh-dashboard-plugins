@@ -56,7 +56,7 @@ export class WazuhElasticCtrl {
    */
   async buildSampleIndexByCategory(
     context: RequestHandlerContext,
-    category: string,
+    category: keyof typeof WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
   ): Promise<{ indexName: string; dataSet: string }[]> {
     const indexNames = await Promise.all(
       WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA[category].map(async item => ({
@@ -102,16 +102,18 @@ export class WazuhElasticCtrl {
       // Split into separate patterns
       const tmpdata = templates.match(/\[.*\]/g);
       const tmparray = [];
-      for (let item of tmpdata) {
-        // A template might use more than one pattern
-        if (item.includes(',')) {
-          item = item.substr(1).slice(0, -1);
-          const subItems = item.split(',');
-          for (const subitem of subItems) {
-            tmparray.push(`[${subitem.trim()}]`);
+      if (tmpdata !== null) {
+        for (let item of tmpdata) {
+          // A template might use more than one pattern
+          if (item.includes(',')) {
+            item = item.substring(1).slice(0, -1);
+            const subItems = item.split(',');
+            for (const subitem of subItems) {
+              tmparray.push(`[${subitem.trim()}]`);
+            }
+          } else {
+            tmparray.push(item);
           }
-        } else {
-          tmparray.push(item);
         }
       }
 
