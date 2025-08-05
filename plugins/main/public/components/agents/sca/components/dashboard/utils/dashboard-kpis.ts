@@ -11,6 +11,8 @@ const checkResultColors = {
   'Not run': '#6092c0',
 };
 
+const checkScoreColor = "#DD0A73"
+
 const getVisStateGlobalPacketLossMetric = (
   indexPatternId: string,
 ): SavedVis => {
@@ -45,28 +47,23 @@ const getVisStateGlobalPacketLossMetric = (
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {
-          id: '1',
+          id: 'score-checks',
           enabled: true,
-          type: 'unique count',
-          params: {
-            field: 'check.result',
-            json: '\
-              {\
-                "script": {\
-                  "source": " \
-                    float passed=(doc[\'check.result\'].size() != 0 ? doc[\'check.result\'].value : 0); \
-                    float failed=(doc[\'check.result\'].size() != 0 ? doc[\'check.result\'].value : 0); \
-                    float total=(passed + failed); \
-                    float score=(passed / total); \
-                    return 5", \
-                  "lang": "painless" \
-                }\
-              }',
-
-            customLabel: 'Average packet loss rate',
-          },
+          type: 'avg',
           schema: 'metric',
-        },
+          // params: {
+          //   field: 'check.result',
+          //   json: JSON.stringify({
+          //     script: {
+          //       source: `
+          //       return 42;
+          //     `,
+          //       lang: 'painless',
+          //     },
+          //   }),
+          //   customLabel: 'Checks Score (%)',
+          // },
+        }
       ],
     },
   };
@@ -309,7 +306,7 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
                   query: 'check.result: "Not run"',
                   language: 'kuery',
                 },
-                label: 'Not run',
+                label: 'Not runasd',
               },
             ],
           },
@@ -383,6 +380,78 @@ const getVisStateTotalChecks = (indexPatternId: string) => {
   };
 };
 
+const checkScore = {
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "data": [
+    {
+      "name": "scoredata",
+      "url": {
+        "%context%": true,
+        "index": "wazuh-states-sca-*",
+        "body": {
+          "size": 0,
+          "aggs": {
+            "passed": {
+              "filter": {
+                "term": {
+                  "check.result": "passed"
+                }
+              }
+            },
+            "total": {
+              "value_count": {
+                "field": "check.result"
+              }
+            }
+          }
+        }
+      },
+      "format": {
+        "property": "aggregations"
+      },
+      "transform": [
+        {
+          "type": "formula",
+          "as": "score",
+          "expr": "(datum.passed.doc_count / datum.total.value) * 100"
+        }
+      ]
+    }
+  ],
+  "marks": [
+    {
+      "type": "text",
+      "from": { "data": "scoredata" },
+      "encode": {
+        "enter": {
+          "x": { "signal": "width / 2" },
+          "y": { "signal": "height / 1.5" },
+          "align": { "value": "center" },
+          "baseline": { "value": "bottom" },
+          "text": { "signal": "format(datum.score, '.1f') + '%'" },
+          "fontSize": { "value": 40 },
+          "fill": { "value": checkScoreColor }
+        }
+      }
+    },
+    {
+      "type": "text",
+      "from": { "data": "scoredata" },
+      "encode": {
+        "enter": {
+          "x": { "signal": "width / 2" },
+          "y": { "signal": "height / 2 + 30" },
+          "align": { "value": "center" },
+          "baseline": { "value": "top" },
+          "text": { "value": "Score - checks" },
+          "fontSize": { "value": 16 },
+          "fill": { "value": "#333" }
+        }
+      }
+    }
+  ]
+}
+
 export const getKPIsPanel = (
   indexPatternId: string,
 ): {
@@ -420,8 +489,15 @@ export const getKPIsPanel = (
       type: 'visualization',
       explicitInput: {
         id: '4',
-        savedVis: getVisStateGlobalPacketLossMetric(indexPatternId),
+        savedVis: {
+          id: '4',
+          type: 'vega',
+          params: {
+            spec: JSON.stringify(checkScore),
+          },
+        },
       },
     },
+
   };
 };
