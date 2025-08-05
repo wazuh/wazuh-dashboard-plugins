@@ -39,7 +39,7 @@ const GCP = require('./sample-data/gcp');
 const Docker = require('./sample-data/docker');
 const Mitre = require('./sample-data/mitre');
 const Osquery = require('./sample-data/osquery');
-const OpenSCAP = require('./sample-data/openscap');
+
 const PolicyMonitoring = require('./sample-data/policy-monitoring');
 const Virustotal = require('./sample-data/virustotal');
 const Vulnerability = require('./sample-data/vulnerabilities');
@@ -568,23 +568,6 @@ function generateAlert(params) {
   if (params.mitre) {
     alert.rule = Random.arrayItem(Mitre.arrayMitreRules);
     alert.location = Random.arrayItem(Mitre.arrayLocation);
-  }
-
-  if (params.openscap) {
-    alert.data = {};
-    alert.data.oscap = {};
-    const typeAlert = { ...Random.arrayItem(OpenSCAP.data) };
-    alert.data = { ...typeAlert.data };
-    alert.rule = { ...typeAlert.rule };
-    alert.rule.firedtimes = Random.number(2, 10);
-    alert.input = {
-      type: 'log',
-    };
-    alert.decoder = { ...OpenSCAP.decoder };
-    alert.location = OpenSCAP.location;
-    if (typeAlert.full_log) {
-      alert.full_log = interpolateAlertProps(typeAlert.full_log, alert);
-    }
   }
 
   if (params.rootcheck) {

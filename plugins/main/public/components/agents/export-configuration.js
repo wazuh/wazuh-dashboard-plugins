@@ -39,7 +39,7 @@ export const ExportConfiguration = withErrorBoundary(
         'Anti-flooding settings',
         'Labels',
         'Policy monitoring',
-        { name: 'oscap', desc: 'OpenSCAP' },
+
         'CIS-CAT',
         'Osquery',
         'Inventory data',
