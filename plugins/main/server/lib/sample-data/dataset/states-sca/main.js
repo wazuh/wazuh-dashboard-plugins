@@ -27,30 +27,27 @@ function generateDocument(params) {
       condition: random.choice(['all', 'any']),
       description: sentence(6),
       id: `CUST${random.int(100, 999)}`,
-      name: `Ensure ${random.word()} is ${random.choice([
-        'enabled',
-        'disabled',
-      ])}.`,
+      name: `Ensure ${word()} is ${random.choice(['enabled', 'disabled'])}.`,
       rationale: `${sentence(6)}`,
       reason: null,
-      references: [`https://internal.docs/policies/${random.word()}`],
-      remediation: `Set registry key ${random.word()} to ${random.choice([
+      references: [`https://internal.docs/policies/${word()}`],
+      remediation: `Set registry key ${word()} to ${random.choice([
         '0',
         '1',
       ])}.`,
       result: random.choice(scaResults),
       rules: [
-        `r:HKLM\\SYSTEM\\${random.word()}\\Parameters -> n:${random.word()} compare == ${random.choice(
+        `r:HKLM\\SYSTEM\\${word()}\\Parameters -> n:${word()} compare == ${random.choice(
           ['0', '1'],
         )}`,
       ],
     },
     policy: {
       description: `${sentence(8)}`,
-      file: `${random.word()}_policy.yml`,
-      id: `custom_policy_${random.word()}`,
-      name: `Custom ${random.word()} Hardening Policy`,
-      references: [`https://internal.docs/policies/${random.word()}`],
+      file: `${word()}_policy.yml`,
+      id: `custom_policy_${word()}`,
+      name: `Custom ${word()} Hardening Policy`,
+      references: [`https://internal.docs/policies/${word()}`],
     },
     wazuh: generateRandomWazuh(params),
   };
