@@ -3,7 +3,7 @@ import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddab
 import {
   createIndexPatternReferences,
   createSearchSource,
-} from '../../../../../overview/it-hygiene/common/saved-vis/create-saved-vis-data';
+} from '../../../../it-hygiene/common/saved-vis/create-saved-vis-data';
 
 const checkResultColors = {
   passed: '#209280',

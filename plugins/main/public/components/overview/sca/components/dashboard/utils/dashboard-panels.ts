@@ -1,78 +1,10 @@
-import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
-import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
-import { getVisStateHistogramBy } from '../common/saved-vis/generators';
-import { getVisStateTable } from '../../../../../../services/visualizations';
-import {
-  getVisStateDonutByField,
-  getVisStateHorizontalBarSplitSeries,
-} from '../../../../../../services/visualizations';
+import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
+import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
 
 const checkResultColors = {
   passed: '#209280',
   failed: '#cc5642',
   'Not run': '#6092c0',
-};
-
-const getVisStateCheckResultsDonut = (indexPatternId: string) => {
-  return {
-    id: 'check_result_donut',
-    title: 'Check Results Distribution',
-    type: 'pie',
-    uiState: {
-      vis: {
-        colors: checkResultColors,
-      },
-    },
-    params: {
-      addLegend: true,
-      addTooltip: true,
-      isDonut: true,
-      legendPosition: 'right',
-      labels: {
-        show: true,
-        position: 'default',
-        truncate: 100,
-        last_level: true,
-        values: true,
-      },
-    },
-    data: {
-      searchSource: {
-        query: { language: 'kuery', query: '' },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          schema: 'metric',
-          params: { customLabel: 'Total Checks' },
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'terms',
-          schema: 'segment',
-          params: {
-            field: 'check.result',
-            size: 5,
-            order: 'desc',
-            orderBy: '1',
-            customLabel: 'Check Result',
-          },
-        },
-      ],
-    },
-  };
 };
 
 export const getVisStateTopFailedPolicies = (indexPatternId: string) => ({
@@ -562,7 +494,6 @@ const getOverviewDashboardPanels = (
       type: 'visualization',
       explicitInput: {
         id: '2',
-        // savedVis: getVisStateCheckResultsDonut(indexPatternId),
         savedVis: getVisStateCheckResultsByPolicy(indexPatternId),
       },
     },
@@ -574,14 +505,6 @@ const getOverviewDashboardPanels = (
         savedVis: getVisStatePolicyByCheckHeatmap(indexPatternId),
       },
     },
-    // '4': {
-    //   gridData: { w: 24, h: 10, x: 24, y: 10, i: '4' },
-    //   type: 'visualization',
-    //   explicitInput: {
-    //     id: '4',
-    //     savedVis: getVisStatePolicyByCheckHeatmap(indexPatternId),
-    //   },
-    // },
   };
 };
 
