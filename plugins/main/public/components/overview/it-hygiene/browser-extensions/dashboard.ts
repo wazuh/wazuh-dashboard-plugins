@@ -8,14 +8,14 @@ export const getOverviewBrowserExtensionsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateHorizontalBarByField(
       indexPatternId,
-      'extension.name',
+      'package.name',
       'Top 5 extensions',
       'it-hygiene-extensions-name',
       { customLabel: 'Extensions' },
     ),
     getVisStateHistogramBy(
       indexPatternId,
-      'extension.installed',
+      'package.installed',
       'Extensions installed',
       'it-hygiene-extensions-installed',
       'h',

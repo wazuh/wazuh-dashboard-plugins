@@ -60,13 +60,7 @@ const attributesPool = [
   'accessibility',
   'writing',
 ];
-const sdkTypes = ['webextensions', 'legacy', 'manifest_v3'];
 const profiles = ['Default', 'Security', 'Shopping', 'Profile 1', 'Work'];
-const webstoreSources = [
-  'https://chrome.google.com/webstore',
-  'https://addons.mozilla.org',
-  'https://webstore.fakeextensions.net',
-];
 
 function generateRandomBrowser() {
   return {
@@ -77,8 +71,8 @@ function generateRandomBrowser() {
         .choice(profiles)
         .toLowerCase()
         .replace(/\s+/g, '')}`,
+      referenced: random.boolean(),
     },
-    referenced: random.boolean(),
   };
 }
 
@@ -103,9 +97,7 @@ function generateRandomPackage() {
     ),
     name: packageBase.name,
     path: `/Extensions/${packageBase.name.toLowerCase().replace(/\s+/g, '')}`,
-    permissions: random
-      .sample(attributesPool, random.integer(1, attributesPool.length))
-      .join(','),
+    permissions: random.choice(attributesPool),
     persistent: random.boolean(),
     reference: packageBase.id,
     type: 'extension',
@@ -128,8 +120,8 @@ function generateDocument(params) {
     agent: generateRandomAgent(),
     browser: generateRandomBrowser(),
     file: generateRandomFile(),
-    user: generateRandomUser(),
     package: generateRandomPackage(),
+    user: generateRandomUser(),
     wazuh: generateRandomWazuh(params),
   };
 }

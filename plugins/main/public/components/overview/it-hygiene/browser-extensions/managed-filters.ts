@@ -6,12 +6,12 @@ export default [
   },
   {
     type: 'multiSelect',
-    key: 'extension.name',
+    key: 'package.name',
     placeholder: 'Extension name',
   },
   {
     type: 'multiSelect',
-    key: 'extension.enabled',
+    key: 'package.enabled',
     placeholder: 'Extension enabled',
   },
 ];

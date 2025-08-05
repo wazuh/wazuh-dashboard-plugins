@@ -1,8 +1,8 @@
 export default [
   { id: 'agent.name' },
   { id: 'browser.name' },
-  { id: 'extension.name' },
-  { id: 'extension.description' },
-  { id: 'extension.version' },
-  { id: 'extension.enabled' },
+  { id: 'package.name' },
+  { id: 'package.description' },
+  { id: 'package.version' },
+  { id: 'package.enabled' },
 ];
