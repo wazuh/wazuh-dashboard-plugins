@@ -1,6 +1,6 @@
 import { ClusterSettings } from '../../domain/entities/cluster-settings';
 
 export interface MLCommonsSettingsRepository {
-  updateSettings(settings: ClusterSettings): Promise<boolean>;
-  getSettings(): Promise<any>;
+  persist(settings: ClusterSettings): Promise<boolean>;
+  retrieve(): Promise<any>;
 }

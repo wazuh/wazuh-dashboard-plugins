@@ -1,8 +1,8 @@
 import type { MLCommonsSettingsRepository } from '../ports/ml-commons-settings-repository';
 import { MLCommonsSettingsFactory } from '../factories/ml-commons-settings-factory';
 
-export const updateClusterSettingsUseCase =
-  (clusterSettingsRepository: MLCommonsSettingsRepository) =>
+export const persistMLCommonsSettingsUseCase =
+  (MlCommonsSettingsRepository: MLCommonsSettingsRepository) =>
   async (endpoints_regex: string[]): Promise<void> => {
     const settings = MLCommonsSettingsFactory.create({
       agent_framework_enabled: true,
@@ -11,5 +11,5 @@ export const updateClusterSettingsUseCase =
       trusted_connector_endpoints_regex: endpoints_regex,
     });
 
-    await clusterSettingsRepository.updateSettings(settings);
+    await MlCommonsSettingsRepository.persist(settings);
   };

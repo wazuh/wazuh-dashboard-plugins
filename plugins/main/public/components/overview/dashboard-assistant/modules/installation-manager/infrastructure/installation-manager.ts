@@ -42,7 +42,7 @@ export class InstallationManager implements IInstallationManager {
       // Step 1: Update cluster settings
       progressManager.startStep(currentStepIndex);
       try {
-        await UseCases.updateClusterSettings(
+        await UseCases.persistMlCommonsSettings(
           request.ml_common_settings.trusted_connector_endpoints_regex,
         );
         progressManager.completeStep(

@@ -7,7 +7,7 @@ export class MLCommonsSettingsHttpClientRepository
 {
   constructor(private readonly httpClient: IHttpClient) {}
 
-  public async updateSettings(settings: ClusterSettings): Promise<boolean> {
+  public async persist(settings: ClusterSettings): Promise<boolean> {
     const response = await this.httpClient.proxyRequest.post.WithPut(
       '/_cluster/settings',
       settings,
@@ -20,7 +20,7 @@ export class MLCommonsSettingsHttpClientRepository
     }
   }
 
-  public async getSettings(): Promise<any> {
+  public async retrieve(): Promise<any> {
     try {
       return await this.httpClient.proxyRequest.post(
         '/_cluster/settings?include_defaults=true',

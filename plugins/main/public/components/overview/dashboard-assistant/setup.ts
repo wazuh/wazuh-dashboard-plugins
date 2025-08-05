@@ -4,7 +4,7 @@ import { AgentHttpClientRepository } from './modules/agent/infrastructure/agent-
 import { HttpWithProxyClient } from './modules/common/http/infrastructure/http-with-proxy-client';
 import { createConnectorUseCase } from './modules/connector/application/use-cases/create-connector';
 import { ConnectorHttpClientRepository } from './modules/connector/infrastructure/repositories/connector-repository';
-import { updateClusterSettingsUseCase } from './modules/ml-commons-settings/application/use-cases/update-ml-commons-settings';
+import { persistMLCommonsSettingsUseCase } from './modules/ml-commons-settings/application/use-cases/update-ml-commons-settings';
 import { MLCommonsSettingsHttpClientRepository } from './modules/ml-commons-settings/infrastructure/repositories/ml-commons-settings-http-client-repository';
 import { ModelGroupHttpClientRepository } from './modules/model-group/infrastructure/repositories/model-group-http-client-repository';
 import { createModelUseCase } from './modules/model/application/use-cases/create-model';
@@ -17,9 +17,8 @@ export const httpClient = new HttpWithProxyClient();
 
 // Factory function to create real repositories with HttpClient
 export class Repositories {
-  static clusterSettingsRepository = new MLCommonsSettingsHttpClientRepository(
-    httpClient,
-  );
+  static mlCommonsSettingsRepository =
+    new MLCommonsSettingsHttpClientRepository(httpClient);
   static modelGroupRepository = new ModelGroupHttpClientRepository(httpClient);
   static connectorRepository = new ConnectorHttpClientRepository(httpClient);
   static modelRepository = new ModelHttpClientRepository(httpClient);
@@ -27,8 +26,8 @@ export class Repositories {
 }
 
 export class UseCases {
-  static updateClusterSettings = updateClusterSettingsUseCase(
-    Repositories.clusterSettingsRepository,
+  static persistMlCommonsSettings = persistMLCommonsSettingsUseCase(
+    Repositories.mlCommonsSettingsRepository,
   );
   static createConnector = createConnectorUseCase(
     Repositories.connectorRepository,
