@@ -413,7 +413,7 @@ export class WazuhReportingCtrl {
           osquery: 'Osquery',
           command: 'Command',
           syscheck: 'Syscheck',
-          'open-scap': 'OpenSCAP',
+
           'cis-cat': 'CIS-CAT',
           syscollector: 'Syscollector',
           rootcheck: 'Rootcheck',

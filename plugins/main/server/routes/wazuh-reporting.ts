@@ -52,7 +52,7 @@ export function WazuhReportingRoutes(router: IRouter) {
     schema.literal('mitre'),
     schema.literal('docker'),
     schema.literal('osquery'),
-    schema.literal('oscap'),
+
     schema.literal('pci'),
     schema.literal('hipaa'),
     schema.literal('nist'),

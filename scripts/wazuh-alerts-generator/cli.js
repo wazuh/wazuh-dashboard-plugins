@@ -83,7 +83,7 @@
     office: { office: true },
     rootcheck: { rootcheck: true },
     audit: { audit: true },
-    openscap: { openscap: true },
+
     ciscat: { ciscat: true },
     vulnerabilities: { vulnerabilities: true },
     virustotal: { virustotal: true },
@@ -110,7 +110,7 @@
     'auditing-policy-monitoring': [
       'audit',
       'ciscat',
-      'openscap',
+
       'rootcheck',
       'virustotal',
       'yara',

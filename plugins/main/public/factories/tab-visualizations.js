@@ -26,7 +26,7 @@ export class TabVisualizations {
       gcp: 7,
       pm: 4,
       vuls: 10,
-      oscap: 13,
+
       ciscat: 3,
       audit: 9,
       gdpr: 6,
@@ -39,7 +39,7 @@ export class TabVisualizations {
       configuration: 0,
       osquery: 5,
       docker: 5,
-      mitre: 6
+      mitre: 6,
     };
 
     this.overview = {
@@ -48,7 +48,7 @@ export class TabVisualizations {
       fim: 7,
       pm: 5,
       vuls: 7,
-      oscap: 8,
+
       ciscat: 3,
       audit: 6,
       pci: 6,
@@ -62,7 +62,7 @@ export class TabVisualizations {
       sca: 0,
       docker: 5,
       mitre: 6,
-      tsc: 6
+      tsc: 6,
     };
 
     this.tabVisualizations = {};
