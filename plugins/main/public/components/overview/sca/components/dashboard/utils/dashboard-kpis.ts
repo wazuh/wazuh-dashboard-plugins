@@ -9,64 +9,7 @@ const checkResultColors = {
   passed: '#209280',
   failed: '#cc5642',
   'Not run': '#6092c0',
-};
-
-const checkScoreColor = "#DD0A73"
-
-const getVisStateGlobalPacketLossMetric = (
-  indexPatternId: string,
-): SavedVis => {
-  return {
-    id: 'it-hygiene-network-interfaces-global-packet-loss-rate',
-    title: 'Average packet loss rate',
-    type: 'metric',
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: true,
-        useRanges: false,
-        colorSchema: 'Green to Red',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        invertColors: false,
-        // style: STYLE,
-      },
-    },
-    data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
-      aggs: [
-        {
-          id: 'score-checks',
-          enabled: true,
-          type: 'avg',
-          schema: 'metric',
-          // params: {
-          //   field: 'check.result',
-          //   json: JSON.stringify({
-          //     script: {
-          //       source: `
-          //       return 42;
-          //     `,
-          //       lang: 'painless',
-          //     },
-          //   }),
-          //   customLabel: 'Checks Score (%)',
-          // },
-        }
-      ],
-    },
-  };
+  checkScoreColor: '#333333',
 };
 
 const getVisStateCheckResultPassed = (indexPatternId: string) => {
@@ -317,141 +260,84 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
   };
 };
 
-const getVisStateTotalChecks = (indexPatternId: string) => {
-  return {
-    id: 'total_checks_metric',
-    title: 'Total Checks',
-    type: 'metric',
-    uiState: {
-      vis: {
-        colors: checkResultColors,
-      },
-    },
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Greys',
-        metricColorMode: 'None',
-        colorsRange: [
-          {
-            from: -1,
-            to: 0,
-          },
-          {
-            from: 1,
-            to: 200000000,
-          },
-        ],
-        labels: {
-          show: true,
-        },
-        style: {
-          fontSize: 48,
-        },
-      },
-    },
-    data: {
-      searchSource: {
-        query: { language: 'kuery', query: '' },
-        filter: [],
+const checkScore = (indexPatternId: string) => ({
+  $schema: 'https://vega.github.io/schema/vega/v5.json',
+  data: [
+    {
+      name: 'scoredata',
+      url: {
+        '%context%': true,
         index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          schema: 'metric',
-          params: { customLabel: 'Total Checks' },
-        },
-      ],
-    },
-  };
-};
-
-const checkScore = {
-  "$schema": "https://vega.github.io/schema/vega/v5.json",
-  "data": [
-    {
-      "name": "scoredata",
-      "url": {
-        "%context%": true,
-        "index": "wazuh-states-sca-*",
-        "body": {
-          "size": 0,
-          "aggs": {
-            "passed": {
-              "filter": {
-                "term": {
-                  "check.result": "passed"
-                }
-              }
+        body: {
+          size: 0,
+          aggs: {
+            passed: {
+              filter: {
+                term: {
+                  'check.result': 'passed',
+                },
+              },
             },
-            "total": {
-              "value_count": {
-                "field": "check.result"
-              }
-            }
-          }
-        }
+            failed: {
+              filter: {
+                term: {
+                  'check.result': 'failed',
+                },
+              },
+            },
+          },
+        },
       },
-      "format": {
-        "property": "aggregations"
+      format: {
+        property: 'aggregations',
       },
-      "transform": [
+      transform: [
         {
-          "type": "formula",
-          "as": "score",
-          "expr": "(datum.passed.doc_count / datum.total.value) * 100"
-        }
-      ]
-    }
+          type: 'formula',
+          as: 'score',
+          expr: '(datum.passed.doc_count / (datum.passed.doc_count + datum.failed.doc_count)) * 100',
+        },
+      ],
+    },
   ],
-  "marks": [
+  marks: [
     {
-      "type": "text",
-      "from": { "data": "scoredata" },
-      "encode": {
-        "enter": {
-          "x": { "signal": "width / 2" },
-          "y": { "signal": "height / 1.5" },
-          "align": { "value": "center" },
-          "baseline": { "value": "bottom" },
-          "text": { "signal": "format(datum.score, '.1f') + '%'" },
-          "fontSize": { "value": 50 },
-          "fontWeight": { "value": 700 },
-          "fill": { "value": checkScoreColor }
-        }
-      }
+      type: 'text',
+      from: { data: 'scoredata' },
+      encode: {
+        enter: {
+          x: { signal: 'width / 2' },
+          y: { signal: 'height / 1.5' },
+          align: { value: 'center' },
+          baseline: { value: 'bottom' },
+          text: { signal: "format(datum.score, '.2f') + '%'" },
+          fontSize: { value: 53.333 },
+          fontWeight: { value: 700 },
+          font: {
+            value:
+              '"Inter UI", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
+          },
+          fill: { value: checkResultColors.checkScoreColor },
+        },
+      },
     },
     {
-      "type": "text",
-      "from": { "data": "scoredata" },
-      "encode": {
-        "enter": {
-          "x": { "signal": "width / 2" },
-          "y": { "signal": "height / 2 + 30" },
-          "align": { "value": "center" },
-          "baseline": { "value": "top" },
-          "text": { "value": "Score - checks" },
-          "fontSize": { "value": 16 },
-          "fill": { "value": "#333" }
-        }
-      }
-    }
-  ]
-}
+      type: 'text',
+      from: { data: 'scoredata' },
+      encode: {
+        enter: {
+          x: { signal: 'width / 2' },
+          y: { signal: 'height / 2 + 30' },
+          align: { value: 'center' },
+          baseline: { value: 'top' },
+          text: { value: 'Score' },
+          fontSize: { value: 16 },
+          fill: { value: '#333' },
+        },
+      },
+    },
+  ],
+});
 
 export const getKPIsPanel = (
   indexPatternId: string,
@@ -494,11 +380,10 @@ export const getKPIsPanel = (
           id: '4',
           type: 'vega',
           params: {
-            spec: JSON.stringify(checkScore),
+            spec: JSON.stringify(checkScore(indexPatternId)),
           },
         },
       },
     },
-
   };
 };
