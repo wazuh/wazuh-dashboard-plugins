@@ -29,7 +29,7 @@
         "interval": 86400,
         "content": {
           "type": "xccdf",
-          "path": "wodles/oscap/content/ssg-ubuntu2004-ds.xml"
+          "path": "wodles/content/ssg-ubuntu2004-ds.xml"
         }
       },
       {

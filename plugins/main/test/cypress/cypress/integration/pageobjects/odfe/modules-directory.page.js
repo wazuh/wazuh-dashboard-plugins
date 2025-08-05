@@ -1,7 +1,7 @@
 export const MODULES_DIRECTORY_PAGE = {
   amazonAWSCard: '[data-test-subj="overviewWelcomeAws"]',
   gCPCard: '[data-test-subj="overviewWelcomeGcp"]',
-  openSCAPCard: '[data-test-subj="overviewWelcomeOscap"]',
+
   cisCatCard: '[data-test-subj="overviewWelcomeCiscat"]',
   virusTotalCard: '[data-test-subj="overviewWelcomeVirustotal"]',
   osqueryCard: '[data-test-subj="overviewWelcomeOsquery"]',
