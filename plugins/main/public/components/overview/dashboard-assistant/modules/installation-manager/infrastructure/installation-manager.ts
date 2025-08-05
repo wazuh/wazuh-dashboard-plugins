@@ -152,7 +152,7 @@ export class InstallationManager implements IInstallationManager {
               max_iterations: 5,
               stop_when_no_tool_found: true,
               response_filter: modelProviderConfigs.find(
-                config => config.model_family === request.model.name,
+                config => config.model_provider === request.model.name,
               )?.response_filter!,
             },
           },
