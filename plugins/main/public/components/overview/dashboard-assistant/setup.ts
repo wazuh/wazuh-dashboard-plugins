@@ -3,9 +3,9 @@ import { createAgentUseCase } from './modules/agent/application/use-cases/create
 import { registerAgentUseCase } from './modules/agent/application/use-cases/register-agent';
 import { AgentHttpClientRepository } from './modules/agent/infrastructure/agent-repository';
 import { HttpWithProxyClient } from './modules/common/http/infrastructure/http-with-proxy-client';
-import { IConnectorRepository } from './modules/connector/application/ports/connector-repository';
+import { ConnectorRepository } from './modules/connector/application/ports/connector-repository';
 import { createConnectorUseCase } from './modules/connector/application/use-cases/create-connector';
-import { ConnectorHttpClientRepository } from './modules/connector/infrastructure/repositories/connector-repository';
+import { ConnectorOpenSearchRepository } from './modules/connector/infrastructure/opensearch/repositories/connector-opensearch-repository';
 import { MLCommonsSettingsRepository } from './modules/ml-commons-settings/application/ports/ml-commons-settings-repository';
 import { persistMLCommonsSettingsUseCase } from './modules/ml-commons-settings/application/use-cases/update-ml-commons-settings';
 import { MLCommonsSettingsHttpClientRepository } from './modules/ml-commons-settings/infrastructure/repositories/ml-commons-settings-http-client-repository';
@@ -26,8 +26,8 @@ export class Repositories {
     new MLCommonsSettingsHttpClientRepository(httpClient);
   static modelGroupRepository: ModelGroupRepository =
     new ModelGroupOpenSearchRepository(httpClient);
-  static connectorRepository: IConnectorRepository =
-    new ConnectorHttpClientRepository(httpClient);
+  static connectorRepository: ConnectorRepository =
+    new ConnectorOpenSearchRepository(httpClient);
   static modelRepository: ModelRepository = new ModelOpenSearchRepository(
     httpClient,
   );

@@ -5,6 +5,6 @@ import {
 import { Connector } from '../../domain/entities/connector';
 import { CreateConnectorDto } from '../dtos/create-connector-dto';
 
-export interface IConnectorRepository
+export interface ConnectorRepository
   extends CreateRepository<Connector, CreateConnectorDto>,
     DeleteRepository {}

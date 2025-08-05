@@ -1,7 +1,4 @@
 import { Model } from '../../domain/entities/model';
-import { ModelStatus } from '../../domain/enums/model-status';
-import { ModelOpenSearchResponse } from '../../infrastructure/opensearch/dtos/model-opensearch-response';
-import { ModelStateMapper } from '../mapper/model-state-mapper';
 
 export class ModelFactory {
   static create(props: {

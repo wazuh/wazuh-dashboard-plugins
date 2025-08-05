@@ -1,18 +1,20 @@
-import { IHttpClient } from '../../../common/http/domain/entities/http-client';
-import { CreateConnectorDto } from '../../application/dtos/create-connector-dto';
-import { ConnectorFactory } from '../../application/factories/connector-factory';
-import { IConnectorRepository } from '../../application/ports/connector-repository';
-import { Connector } from '../../domain/entities/connector';
+import { IHttpClient } from '../../../../common/http/domain/entities/http-client';
+import { CreateConnectorDto } from '../../../application/dtos/create-connector-dto';
+import { ConnectorFactory } from '../../../application/factories/connector-factory';
+import { ConnectorRepository } from '../../../application/ports/connector-repository';
+import { Connector } from '../../../domain/entities/connector';
+import { ConnectorResponseDto } from '../dtos/connector-opensearch-response-dto';
 
-export class ConnectorHttpClientRepository implements IConnectorRepository {
+export class ConnectorOpenSearchRepository implements ConnectorRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(connectorDto: CreateConnectorDto): Promise<Connector> {
     const connector = ConnectorFactory.create(connectorDto);
-    const response = (await this.httpClient.proxyRequest.post(
-      '/_plugins/_ml/connectors/_create',
-      connector,
-    )) as { connector_id: string };
+    const response =
+      await this.httpClient.proxyRequest.post<ConnectorResponseDto>(
+        '/_plugins/_ml/connectors/_create',
+        connector,
+      );
     return ConnectorFactory.fromResponse({
       ...connector,
       connector_id: response.connector_id,
