@@ -4,6 +4,7 @@ import { InstallationContext } from './installation-context';
 import { MLCommonsSettings } from '../../ml-commons-settings/domain/entities/ml-commons-settings';
 import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
 import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
+import { CreateMLCommonsDto } from '../../ml-commons-settings/application/dtos/create-ml-commons-dto';
 
 export interface IInstallationManager {
   execute(
@@ -21,10 +22,7 @@ export interface IInstallationStep {
 
 export interface InstallDashboardAssistantRequest {
   selected_provider: string;
-  ml_common_settings: Pick<
-    MLCommonsSettings,
-    'trusted_connector_endpoints_regex'
-  >;
+  ml_common_settings: CreateMLCommonsDto;
   connector: CreateConnectorDto;
   model: Pick<CreateModelDto, 'name' | 'description'>;
   agent: Pick<CreateAgentDto, 'name' | 'description'>;
