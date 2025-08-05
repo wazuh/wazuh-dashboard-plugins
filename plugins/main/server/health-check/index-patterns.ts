@@ -170,6 +170,68 @@ export const ensureIndexPatternExistence = async (
   }
 };
 
+export const matchesPatternList = (listString, indexPatternTitle) => {
+  const [, cleanIndexPatterns] = listString.match(/\[(.+)]/) || [null, null];
+
+  if (!cleanIndexPatterns) {
+    return false;
+  }
+
+  const indexPatterns = cleanIndexPatterns.match(/([^\s,]+)/g);
+
+  if (!indexPatterns) {
+    return false;
+  }
+
+  const lastChar = indexPatternTitle.at(-1);
+  const indexPatternTitleCleaned =
+    lastChar === '*' ? indexPatternTitle.slice(0, -1) : indexPatternTitle;
+
+  return indexPatterns.some(indexPattern => {
+    const lastChar = indexPattern.at(-1);
+    const indexPatternCleaned =
+      lastChar === '*' ? indexPattern.slice(0, -1) : indexPattern;
+
+    return (
+      indexPatternCleaned.startsWith(indexPatternTitleCleaned) ||
+      indexPatternTitleCleaned.startsWith(indexPatternCleaned)
+    );
+  });
+};
+
+export const ensureIndexPatternHasTemplate = async (
+  ctx,
+  indexPatternTitle: string,
+) => {
+  ctx.logger.debug('Getting templates');
+  const data =
+    await ctx.services.core.opensearch.client.asInternalUser.cat.templates({
+      format: 'json',
+    });
+
+  const templates = data.body;
+
+  ctx.logger.debug(`Templates: [${templates}]`);
+
+  const templatesFound = templates.filter(template => {
+    if (!template?.index_patterns) {
+      return false;
+    }
+
+    return matchesPatternList(template?.index_patterns, indexPatternTitle);
+  });
+
+  if (templatesFound.length === 0) {
+    throw new Error(`Template was not found for [${indexPatternTitle}]`);
+  }
+
+  ctx.logger.info(
+    `Templates found [${templatesFound.map(({ name }) => name).join(', ')}]`,
+  );
+
+  return templatesFound;
+};
+
 function getSavedObjectsClient(
   ctx: InitializationTaskRunContext,
   scope: InitializationTaskContext,
@@ -271,7 +333,7 @@ export const initializationTaskCreatorIndexPattern = ({
       const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
       const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
 
-      return await ensureIndexPatternExistence(
+      const indexPattern = await ensureIndexPatternExistence(
         { ...ctx, indexPatternsClient, savedObjectsClient, logger },
         {
           indexPatternID: indexPatternIDResolved,
@@ -279,8 +341,17 @@ export const initializationTaskCreatorIndexPattern = ({
           configurationSettingKey,
         },
       );
+
+      if (options.hasTemplate) {
+        await ensureIndexPatternHasTemplate(
+          { ...ctx, logger },
+          indexPattern?.attributes?.title,
+        );
+      }
+
+      return indexPattern;
     } catch (error) {
-      const message = `Error initilizating index pattern with ID [${indexPatternID}]: ${error.message}`;
+      const message = `Error initilizating index pattern with ID [${indexPatternIDResolved}]: ${error.message}`;
 
       logger.error(message);
       throw new Error(message);

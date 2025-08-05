@@ -172,6 +172,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             timeFieldName: '@timestamp',
           },
           fieldsNoIndices: indexPatternFieldsAlerts,
+          hasTemplate: true,
         },
         configurationSettingKey: 'pattern',
         taskMeta: {
