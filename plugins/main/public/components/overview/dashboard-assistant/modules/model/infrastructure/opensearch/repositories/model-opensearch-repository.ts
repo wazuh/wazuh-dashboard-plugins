@@ -6,10 +6,10 @@ import { ModelRepository } from '../../../application/ports/model-repository';
 import { CreateModelDto } from '../../../application/dtos/create-model-dto';
 import { ModelFactory } from '../../../application/factories/model-factory';
 import { IHttpClient } from '../../../../common/http/domain/entities/http-client';
-import { ModelIndexerResponse } from '../dtos/model-indexer-response';
-import { ModelIndexerMapper } from '../mappers/model-indexer-mapper';
+import { ModelOpenSearchResponse } from '../dtos/model-opensearch-response';
+import { ModelOpenSearchMapper } from '../mappers/model-opensearch-mapper';
 
-export class ModelIndexerRepository implements ModelRepository {
+export class ModelOpenSearchRepository implements ModelRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(createModelDto: CreateModelDto): Promise<Model> {
@@ -36,13 +36,13 @@ export class ModelIndexerRepository implements ModelRepository {
         hits: {
           hits: Array<{
             _id: string;
-            _source: ModelIndexerResponse;
+            _source: ModelOpenSearchResponse;
           }>;
         };
       }>('/_plugins/_ml/models/_search', searchPayload);
 
       return response.hits.hits.map(hit =>
-        ModelIndexerMapper.toModel({
+        ModelOpenSearchMapper.toModel({
           ...hit._source,
           id: hit._id,
         }),

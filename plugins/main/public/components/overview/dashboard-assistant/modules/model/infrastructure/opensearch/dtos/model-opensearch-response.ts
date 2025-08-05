@@ -1,4 +1,4 @@
-export interface ModelIndexerResponse {
+export interface ModelOpenSearchResponse {
   name: string;
   algorithm: string; // e.g., 'REMOTE'
   model_group_id: string;

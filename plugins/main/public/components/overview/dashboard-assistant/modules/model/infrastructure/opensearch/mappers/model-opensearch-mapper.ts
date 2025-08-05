@@ -1,9 +1,11 @@
 import { ModelStateMapper } from '../../../application/mapper/model-state-mapper';
 import { Model } from '../../../domain/entities/model';
-import { ModelIndexerResponse } from '../dtos/model-indexer-response';
+import { ModelOpenSearchResponse } from '../dtos/model-opensearch-response';
 
-export class ModelIndexerMapper {
-  public static toModel(source: ModelIndexerResponse & { id: string }): Model {
+export class ModelOpenSearchMapper {
+  public static toModel(
+    source: ModelOpenSearchResponse & { id: string },
+  ): Model {
     return new Model({
       id: source.id,
       name: source.name,

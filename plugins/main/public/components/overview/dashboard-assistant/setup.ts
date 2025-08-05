@@ -16,7 +16,7 @@ import { createModelUseCase } from './modules/model/application/use-cases/create
 import { deleteModelUseCase } from './modules/model/application/use-cases/delete-model';
 import { getModelsUseCase } from './modules/model/application/use-cases/get-models';
 import { testModelConnectionUseCase } from './modules/model/application/use-cases/test-model-connection';
-import { ModelIndexerRepository } from './modules/model/infrastructure/indexer-request/repositories/model-repository';
+import { ModelOpenSearchRepository } from './modules/model/infrastructure/opensearch/repositories/model-opensearch-repository';
 
 export const httpClient = new HttpWithProxyClient();
 
@@ -28,7 +28,7 @@ export class Repositories {
     new ModelGroupHttpClientRepository(httpClient);
   static connectorRepository: IConnectorRepository =
     new ConnectorHttpClientRepository(httpClient);
-  static modelRepository: ModelRepository = new ModelIndexerRepository(
+  static modelRepository: ModelRepository = new ModelOpenSearchRepository(
     httpClient,
   );
   static agentRepository: IAgentRepository = new AgentHttpClientRepository(
