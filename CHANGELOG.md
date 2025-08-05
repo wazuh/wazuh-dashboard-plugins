@@ -9,6 +9,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.14.0
 - Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587)
 - Added ability to set the Wazuh data path (wazuh directory) within the directory defined through `path.data` setting [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
+- Added Azure module with ms-graph integration [#7516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7516) [#7643](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7643)
 
 ### Fixed
 
