@@ -71,6 +71,14 @@ const webstoreSources = [
 function generateRandomBrowser() {
   return {
     name: random.choice(browsers),
+    profile: {
+      name: random.choice(profiles),
+      path: `/Profiles/${random
+        .choice(profiles)
+        .toLowerCase()
+        .replace(/\s+/g, '')}`,
+    },
+    referenced: random.boolean(),
   };
 }
 
@@ -80,41 +88,37 @@ function generateRandomUser() {
   };
 }
 
-function generateRandomExtension() {
-  const extensionBase = random.choice(extensions);
+function generateRandomPackage() {
+  const packageBase = random.choice(extensions);
   return {
-    name: extensionBase.name,
-    id: extensionBase.id,
-    description: extensionBase.description,
-    author: extensionBase.author,
-    version: random.randomVersion(),
-    sdk: random.choice(sdkTypes),
-    path: `/Extensions/${extensionBase.name.toLowerCase().replace(/\s+/g, '')}`,
-    profile: {
-      name: random.choice(profiles),
-      path: `/Profiles/${extensionBase.name.toLowerCase()}`,
-    },
-    update_address: `${random.choice(webstoreSources)}/update`,
-    attributes:
-      random.choice(attributesPool) + ',' + random.choice(attributesPool),
-    source: {
-      address: random.choice(webstoreSources),
-    },
-    type: 'extension',
-    enabled: random.boolean(),
     autoupdate: random.boolean(),
-    persistent: random.boolean(),
+    build_version: random.randomVersion(),
+    description: packageBase.description,
+    enabled: random.boolean(),
     from_webstore: random.boolean(),
-    referenced: random.boolean(),
+    id: packageBase.id,
     installed: DateFormatter.format(
       Random.date(),
       DateFormatter.DATE_FORMAT.ISO_TIMESTAMP,
     ),
-    manifest: {
-      hash: Random.createHash(10),
-      json: '{}',
+    name: packageBase.name,
+    path: `/Extensions/${packageBase.name.toLowerCase().replace(/\s+/g, '')}`,
+    permissions: random
+      .sample(attributesPool, random.integer(1, attributesPool.length))
+      .join(','),
+    persistent: random.boolean(),
+    reference: packageBase.id,
+    type: 'extension',
+    vendor: packageBase.author,
+    version: random.randomVersion(),
+  };
+}
+
+function generateRandomFile() {
+  return {
+    hash: {
+      sha256: Random.createHash(10) + '.sha256',
     },
-    key: Random.createHash(10),
   };
 }
 
@@ -123,8 +127,9 @@ function generateDocument(params) {
   return {
     agent: generateRandomAgent(),
     browser: generateRandomBrowser(),
+    file: generateRandomFile(),
     user: generateRandomUser(),
-    extension: generateRandomExtension(),
+    package: generateRandomPackage(),
     wazuh: generateRandomWazuh(params),
   };
 }

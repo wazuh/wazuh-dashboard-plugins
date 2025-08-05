@@ -4,6 +4,7 @@
   "template": {
     "settings": {
       "index": {
+        "auto_expand_replicas": "0-1",
         "number_of_replicas": "0",
         "number_of_shards": "1",
         "query.default_field": [
@@ -13,6 +14,12 @@
           "agent.name",
           "agent.version",
           "browser.name",
+          "user.id",
+          "package.name",
+          "package.id",
+          "package.version",
+          "package.vendor",
+          "package.type",
           "wazuh.cluster.name",
           "wazuh.cluster.node",
           "wazuh.schema.version"
@@ -56,46 +63,6 @@
             "name": {
               "ignore_above": 1024,
               "type": "keyword"
-            }
-          }
-        },
-        "user": {
-          "properties": {
-            "id": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            }
-          }
-        },
-        "extension": {
-          "properties": {
-            "name": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "id": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "version": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "description": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "author": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "sdk": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "path": {
-              "ignore_above": 1024,
-              "type": "keyword"
             },
             "profile": {
               "properties": {
@@ -106,60 +73,88 @@
                 "path": {
                   "ignore_above": 1024,
                   "type": "keyword"
+                },
+                "referenced": {
+                  "type": "boolean"
                 }
               }
-            },
-            "update_address": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "attributes": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "source": {
+            }
+          }
+        },
+        "file": {
+          "properties": {
+            "hash": {
               "properties": {
-                "address": {
+                "sha256": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 }
               }
+            }
+          }
+        },
+        "package": {
+          "properties": {
+            "autoupdate": {
+              "type": "boolean"
             },
-            "type": {
+            "build_version": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "description": {
               "ignore_above": 1024,
               "type": "keyword"
             },
             "enabled": {
               "type": "boolean"
             },
-            "autoupdate": {
-              "type": "boolean"
-            },
-            "persistent": {
-              "type": "boolean"
-            },
             "from_webstore": {
               "type": "boolean"
             },
-            "referenced": {
-              "type": "boolean"
+            "id": {
+              "ignore_above": 1024,
+              "type": "keyword"
             },
             "installed": {
               "type": "date"
             },
-            "manifest": {
-              "properties": {
-                "hash": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "json": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                }
-              }
+            "name": {
+              "ignore_above": 1024,
+              "type": "keyword"
             },
-            "key": {
+            "path": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "permissions": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "persistent": {
+              "type": "boolean"
+            },
+            "reference": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "type": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "vendor": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
+            "version": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            }
+          }
+        },
+        "user": {
+          "properties": {
+            "id": {
               "ignore_above": 1024,
               "type": "keyword"
             }
