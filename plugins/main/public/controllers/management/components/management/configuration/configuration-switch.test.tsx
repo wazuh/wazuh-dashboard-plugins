@@ -45,8 +45,6 @@ jest.mock('./integrations/integrations', () => () => <></>);
 
 jest.mock('./policy-monitoring/policy-monitoring', () => () => <></>);
 
-jest.mock('./cis-cat/cis-cat', () => () => <></>);
-
 jest.mock('./vulnerabilities/vulnerabilities', () => () => <></>);
 
 jest.mock('./osquery/osquery', () => () => <></>);

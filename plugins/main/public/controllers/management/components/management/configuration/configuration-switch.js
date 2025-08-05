@@ -28,7 +28,6 @@ import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationIntegrations from './integrations/integrations';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
 
-import WzConfigurationCisCat from './cis-cat/cis-cat';
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
 import WzConfigurationOsquery from './osquery/osquery';
 import WzConfigurationInventory from './inventory/inventory';
@@ -356,14 +355,6 @@ class WzConfigurationSwitch extends Component {
                   />
                 </WzViewSelectorSwitch>
 
-                <WzViewSelectorSwitch view='cis-cat'>
-                  <WzConfigurationCisCat
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
                 <WzViewSelectorSwitch view='vulnerabilities'>
                   <WzConfigurationVulnerabilities
                     clusterNodeSelected={this.props.clusterNodeSelected}
