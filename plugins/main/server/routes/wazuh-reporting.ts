@@ -47,7 +47,7 @@ export function WazuhReportingRoutes(router: IRouter) {
     schema.literal('sca'),
     schema.literal('office'),
     schema.literal('github'),
-    schema.literal('ciscat'),
+
     schema.literal('vuls'),
     schema.literal('mitre'),
     schema.literal('docker'),

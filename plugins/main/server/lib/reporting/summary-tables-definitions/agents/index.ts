@@ -68,15 +68,6 @@ const mitreAlertsSummary = {
   ],
 };
 
-const ciscatAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['data.cis.rule_title'],
-    AggregationFields['data.cis.group'],
-    AggregationFields['data.cis.result'],
-  ],
-};
-
 const pmAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -169,7 +160,7 @@ export default {
   tsc: [tscAlertsSummary],
   osquery: [osqueryAlertsSummary],
   mitre: [mitreAlertsSummary],
-  ciscat: [ciscatAlertsSummary],
+
   pm: [pmAlertsSummary],
   audit: [auditLastAlerts],
 

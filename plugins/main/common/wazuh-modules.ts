@@ -71,18 +71,6 @@ export const WAZUH_MODULES = {
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
   },
-  ciscat: {
-    title: 'CIS-CAT',
-    appId: 'ciscat',
-    description:
-      'Configuration assessment using Center of Internet Security scanner and SCAP checks.',
-  },
-  azure: {
-    title: 'Azure',
-    appId: 'azure',
-    description:
-      'Security events related to your Azure MS Graph services, collected directly via Azure API.',
-  },
   aws: {
     title: 'AWS',
     appId: 'amazon-web-services',

@@ -140,30 +140,7 @@ export const AggregationFields = {
     customLabel: 'Date',
     missing: '-',
   },
-  'data.cis.rule_title': {
-    field: 'data.cis.rule_title',
-    size: 50,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Rule title',
-    missing: '-',
-  },
-  'data.cis.group': {
-    field: 'data.cis.group',
-    size: 50,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Group',
-    missing: '-',
-  },
-  'data.cis.result': {
-    field: 'data.cis.result',
-    size: 10,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Result',
-    missing: '-',
-  },
+
   'data.title': {
     field: 'data.title',
     size: 10,

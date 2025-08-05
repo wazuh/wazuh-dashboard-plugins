@@ -117,14 +117,7 @@ const mitreAlertsSummary = {
     AggregationFields['rule.level'],
   ],
 };
-const ciscatAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['data.cis.rule_title'],
-    AggregationFields['data.cis.group'],
-    AggregationFields['data.cis.result'],
-  ],
-};
+
 const pmAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -163,8 +156,6 @@ const auditLastAlerts = {
 
 export default {
   aws: [awsAlertsSummary],
-  azure: [azureAlertsSummary],
-  ciscat: [ciscatAlertsSummary],
   docker: [dockerAlertsSummary],
   fim: [fimAlertsSummary],
   gcp: [gcpAlertsSummary],

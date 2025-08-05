@@ -148,8 +148,7 @@
       "data.aws.userIdentity.userName",
       "data.aws.vpcEndpointId",
       "data.command",
-      "data.cis.group",
-      "data.cis.rule_title",
+
       "data.data",
       "data.docker.Actor.Attributes.container",
       "data.docker.Actor.Attributes.image",

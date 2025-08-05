@@ -421,7 +421,6 @@ export class WazuhReportingCtrl {
           command: 'Command',
           syscheck: 'Syscheck',
 
-          'cis-cat': 'CIS-CAT',
           syscollector: 'Syscollector',
           rootcheck: 'Rootcheck',
           labels: 'Labels',
