@@ -11,24 +11,6 @@ function hash() {
 }
 
 /**
- * Pick a random word from a predefined list
- * @returns {string} Random word
- */
-function word() {
-  const words = ['network', 'smb', 'auth', 'firewall', 'admin', 'crypto'];
-  return choice(words);
-}
-
-/**
- * Generate a sentence with a given number of random words
- * @param {number} [wordsCount=5] - Number of words in the sentence
- * @returns {string} Random sentence
- */
-function sentence(wordsCount = 5) {
-  return Array.from({ length: wordsCount }, () => word()).join(' ') + '.';
-}
-
-/**
  * Generate a random integer between min and max (inclusive)
  * @param {number} min - Minimum value
  * @param {number} max - Maximum value
@@ -135,8 +117,6 @@ function float(min = 0, max = 1, decimals = 2) {
 
 module.exports = {
   hash,
-  word,
-  sentence,
   int,
   choice,
   boolean,
