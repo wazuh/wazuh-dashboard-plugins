@@ -15,17 +15,7 @@
               "enabled": "yes"
             }
           },
-          {
-            "cis-cat": {
-              "disabled": "yes",
-              "scan-on-start": "yes",
-              "interval": 86400,
-              "java_path": "wodles/java",
-              "ciscat_path": "wodles/ciscat",
-              "ciscat_binary": "CIS-CAT.sh",
-              "timeout": 1800
-            }
-          },
+
           {
             "osquery": {
               "disabled": "yes",

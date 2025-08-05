@@ -151,14 +151,6 @@ resources:
     path: /agents/summary/status
 
   # ===================================================== #
-  #   CISCAT
-  # ===================================================== #
-
-  # Get results
-  - method: GET
-    path: /ciscat/{agent_id}/results
-
-  # ===================================================== #
   #   CLUSTER
   # ===================================================== #
 
@@ -317,10 +309,6 @@ resources:
   # Clearagents FIM results
   - method: DELETE
     path: /experimental/syscheck
-
-  # Get agents CIS-CAT results
-  - method: GET
-    path: /experimental/ciscat/results
 
   # Get agents hardware
   - method: GET

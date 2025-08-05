@@ -25,7 +25,6 @@ export const WAZUH_MENU_PAGE = {
   policyMonitoringLink: '[data-test-subj=menuModulesPolicyMonitoringLink]',
   systemAuditingLink: '[data-test-subj=menuModulesAuditLink]',
 
-  cisCatLink: '[data-test-subj=menuModulesCiscatLink]',
   securityConfigurationAssessmentLink: '[data-test-subj=menuModulesScaLink]',
   vulnerabilitiesLink: '[data-test-subj=menuModulesVulsLink]',
   virusTotalLink: '[data-test-subj=menuModulesVirustotalLink]',
