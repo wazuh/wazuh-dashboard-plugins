@@ -21,6 +21,7 @@ import {
   useDeleteModel,
   useModels,
 } from '../modules/model/hooks';
+import { ModelFieldDefinition } from './types';
 
 interface Model {
   id: string;
@@ -31,6 +32,26 @@ interface Model {
   status: 'active' | 'inactive' | 'error';
   createdAt: string;
 }
+
+type ModelTableColumns =
+  | {
+      field: keyof ModelFieldDefinition;
+      name: string;
+      sortable?: boolean;
+      truncateText?: boolean;
+      render?: (value: any) => React.ReactNode;
+    }
+  | {
+      name: string;
+      actions: Array<{
+        name: string;
+        description: string;
+        icon: string;
+        type: 'icon';
+        onClick: (model: Model) => void;
+        enabled?: (model: Model) => boolean;
+      }>;
+    };
 
 interface ModelsTableProps {
   onAddModel?: boolean;
@@ -112,7 +133,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     await refresh();
   };
 
-  const columns = [
+  const columns: ModelTableColumns[] = [
     {
       field: 'name',
       name: 'Name',
