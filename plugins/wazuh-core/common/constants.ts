@@ -52,7 +52,6 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
     { rootcheck: true },
     { audit: true },
 
-    { ciscat: true },
     { virustotal: true },
     { yara: true },
   ],
@@ -149,7 +148,7 @@ export enum WAZUH_MODULES_ID {
   HIPAA = 'hipaa',
   NIST_800_53 = 'nist',
   TSC = 'tsc',
-  CIS_CAT = 'ciscat',
+
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',

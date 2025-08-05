@@ -71,12 +71,7 @@ export const WAZUH_MODULES = {
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
   },
-  ciscat: {
-    title: 'CIS-CAT',
-    appId: 'ciscat',
-    description:
-      'Configuration assessment using Center of Internet Security scanner and SCAP checks.',
-  },
+
   aws: {
     title: 'AWS',
     appId: 'amazon-web-services',

@@ -27,7 +27,6 @@ export class TabVisualizations {
       pm: 4,
       vuls: 10,
 
-      ciscat: 3,
       audit: 9,
       gdpr: 6,
       pci: 6,
@@ -49,7 +48,6 @@ export class TabVisualizations {
       pm: 5,
       vuls: 7,
 
-      ciscat: 3,
       audit: 6,
       pci: 6,
       gdpr: 5,

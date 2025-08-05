@@ -984,7 +984,7 @@
                 "agent-key-polling",
                 "aws-s3",
                 "azure-logs",
-                "cis-cat",
+
                 "docker-listener",
 
                 "osquery",
@@ -1243,7 +1243,7 @@
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
                 "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
+
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
                 "wazuh-modulesd:database",
@@ -4320,7 +4320,7 @@
                 "agent-key-polling",
                 "aws-s3",
                 "azure-logs",
-                "cis-cat",
+
                 "docker-listener",
 
                 "osquery",
@@ -4573,7 +4573,7 @@
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
                 "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
+
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
                 "wazuh-modulesd:database",

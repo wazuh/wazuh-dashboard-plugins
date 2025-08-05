@@ -1178,7 +1178,7 @@
                 "indexer",
                 "aws-s3",
                 "azure-logs",
-                "cis-cat",
+
                 "docker-listener",
 
                 "osquery",
@@ -4672,7 +4672,7 @@
                 "indexer",
                 "aws-s3",
                 "azure-logs",
-                "cis-cat",
+
                 "docker-listener",
 
                 "osquery",
