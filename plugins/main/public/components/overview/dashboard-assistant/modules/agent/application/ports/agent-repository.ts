@@ -1,4 +1,4 @@
-import { CreateRepository } from '../../../common/domain/repository';
+import { CreateRepository } from '../../../common/domain/entities/repository';
 import { Agent } from '../../domain/entities/agent';
 import { CreateAgentDto } from '../dtos/create-agent-dto';
 
