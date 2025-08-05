@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587)
 - Added ability to set the Wazuh data path (wazuh directory) within the directory defined through `path.data` setting [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
 - Added Azure module with ms-graph integration [#7516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7516) [#7644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7644)
+- Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646)
 
 ### Fixed
 
