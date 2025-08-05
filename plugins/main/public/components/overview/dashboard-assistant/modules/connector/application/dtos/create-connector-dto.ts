@@ -7,4 +7,5 @@ export interface CreateConnectorDto {
   model_id: string;
   model_config: ProviderModelConfig;
   api_key: string;
+  extra_parameters?: Record<string, any>;
 }

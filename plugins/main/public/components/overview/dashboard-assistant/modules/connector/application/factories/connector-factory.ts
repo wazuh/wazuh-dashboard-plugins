@@ -14,6 +14,7 @@ export class ConnectorFactory {
         },
         { role: 'user', content: '${parameters.prompt}' },
       ],
+      ...config.extra_parameters,
     };
 
     const credential = {

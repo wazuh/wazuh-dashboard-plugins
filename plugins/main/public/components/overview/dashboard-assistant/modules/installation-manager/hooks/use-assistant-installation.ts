@@ -49,6 +49,9 @@ export function useAssistantInstallation() {
     setIsLoading(true);
     setError(null);
 
+    const model_config = modelProviderConfigs.find(
+      config => config.model_provider === assistantModelInfo.model_provider,
+    )!;
     try {
       // Create installation request from model data
       const request: InstallDashboardAssistantRequest = {
@@ -62,10 +65,8 @@ export function useAssistantInstallation() {
           endpoint: assistantModelInfo.api_url,
           model_id: assistantModelInfo.model_id,
           api_key: assistantModelInfo.api_key,
-          model_config: modelProviderConfigs.find(
-            config =>
-              config.model_provider === assistantModelInfo.model_provider,
-          )!,
+          model_config,
+          extra_parameters: model_config.extra_parameters || {},
         },
         model: {
           name: assistantModelInfo.model_provider,
