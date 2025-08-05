@@ -24,7 +24,7 @@ export const WAZUH_MENU_PAGE = {
   googleCloudPlatformLink: '[data-test-subj=menuModulesGcpLink]',
   policyMonitoringLink: '[data-test-subj=menuModulesPolicyMonitoringLink]',
   systemAuditingLink: '[data-test-subj=menuModulesAuditLink]',
-  openScapLink: '[data-test-subj=menuModulesOpenScapLink]',
+
   cisCatLink: '[data-test-subj=menuModulesCiscatLink]',
   securityConfigurationAssessmentLink: '[data-test-subj=menuModulesScaLink]',
   vulnerabilitiesLink: '[data-test-subj=menuModulesVulsLink]',
