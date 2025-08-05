@@ -3,12 +3,10 @@ import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/
 
 // Overview
 
-// TODO: Replace field or visualizations to match Azure data structure when available
-
 const getVisStateResults = (indexPatternId: string) => {
   return {
     id: 'azure_overview_results',
-    title: 'Activity results',
+    title: 'Top 5 activity results',
     type: 'pie',
     params: {
       type: 'pie',
@@ -54,10 +52,10 @@ const getVisStateResults = (indexPatternId: string) => {
           schema: 'segment',
           params: {
             field: 'data.ms-graph.activityResult',
-            size: 10,
+            size: 5,
             order: 'desc',
             orderBy: '1',
-            otherBucket: false,
+            otherBucket: true,
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
@@ -141,7 +139,7 @@ const getVisStateDisplayName = (indexPatternId: string) => {
 const getVisStateRegions = (indexPatternId: string) => {
   return {
     id: 'azure_overview_regions',
-    title: 'Regions',
+    title: 'Top 5 regions',
     type: 'pie',
     params: {
       type: 'pie',
@@ -190,7 +188,7 @@ const getVisStateRegions = (indexPatternId: string) => {
             size: 5,
             order: 'desc',
             orderBy: '1',
-            otherBucket: false,
+            otherBucket: true,
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
@@ -321,7 +319,7 @@ const getVisStateEventsByCategory = (indexPatternId: string) => {
 const getVisStateOperationsTypes = (indexPatternId: string) => {
   return {
     id: 'azure_overview_activity_operations_types',
-    title: 'Activity operations types',
+    title: 'Top 5 activity operations types',
     type: 'horizontal_bar',
     params: {
       grid: {
@@ -362,7 +360,7 @@ const getVisStateOperationsTypes = (indexPatternId: string) => {
         },
       ],
       addTooltip: true,
-      addLegend: true,
+      addLegend: false,
       legendPosition: 'right',
     },
     data: {
@@ -396,6 +394,9 @@ const getVisStateOperationsTypes = (indexPatternId: string) => {
             size: 5,
             order: 'desc',
             orderBy: '1',
+            otherBucket: true,
+            otherBucketLabel: 'Other',
+            customLabel: 'Activity operation type',
           },
         },
       ],
@@ -491,7 +492,7 @@ const getVisStateGeolocationMap = (indexPatternId: string) => {
 const getVisStateAgentResults = (indexPatternId: string) => {
   return {
     id: 'azure_agent_activity_results',
-    title: 'Activities Results',
+    title: 'Top 5 activity results',
     type: 'pie',
     params: {
       type: 'pie',
@@ -537,10 +538,10 @@ const getVisStateAgentResults = (indexPatternId: string) => {
           schema: 'segment',
           params: {
             field: 'data.ms-graph.activityResult',
-            size: 10,
+            size: 5,
             order: 'desc',
             orderBy: '1',
-            otherBucket: false,
+            otherBucket: true,
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
@@ -623,7 +624,7 @@ const getVisStateAgentDisplayName = (indexPatternId: string) => {
 const getVisStateAgentRegions = (indexPatternId: string) => {
   return {
     id: 'azure_agent_regions',
-    title: 'Regions',
+    title: 'Top 5 regions',
     type: 'pie',
     params: {
       type: 'pie',
@@ -769,10 +770,10 @@ const getVisStateAgentEventsByCategory = (indexPatternId: string) => {
           schema: 'group',
           params: {
             field: 'data.ms-graph.category',
-            size: 5,
+            size: 10,
             order: 'desc',
             orderBy: '1',
-            otherBucket: false,
+            otherBucket: true,
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
@@ -803,7 +804,7 @@ const getVisStateAgentEventsByCategory = (indexPatternId: string) => {
 const getVisStateAgentOperationsTypes = (indexPatternId: string) => {
   return {
     id: 'azure_agent_operations_types',
-    title: 'Top operations by type',
+    title: 'Top 5 activity operations types',
     type: 'horizontal_bar',
     params: {
       grid: {
@@ -888,10 +889,11 @@ const getVisStateAgentOperationsTypes = (indexPatternId: string) => {
             size: 5,
             order: 'desc',
             orderBy: '1',
-            otherBucket: false,
+            otherBucket: true,
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
+            customLabel: 'Activity operation type',
           },
         },
       ],
