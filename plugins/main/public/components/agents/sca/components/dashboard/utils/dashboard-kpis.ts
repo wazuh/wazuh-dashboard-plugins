@@ -429,7 +429,8 @@ const checkScore = {
           "align": { "value": "center" },
           "baseline": { "value": "bottom" },
           "text": { "signal": "format(datum.score, '.1f') + '%'" },
-          "fontSize": { "value": 40 },
+          "fontSize": { "value": 50 },
+          "fontWeight": { "value": 700 },
           "fill": { "value": checkScoreColor }
         }
       }
