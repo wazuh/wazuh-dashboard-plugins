@@ -24,15 +24,6 @@
         }
       },
       {
-        "disabled": "no",
-        "scan-on-start": "yes",
-        "interval": 86400,
-        "content": {
-          "type": "xccdf",
-          "path": "wodles/content/ssg-ubuntu2004-ds.xml"
-        }
-      },
-      {
         "osquery": {
           "disabled": "no",
           "run_daemon": "yes",
