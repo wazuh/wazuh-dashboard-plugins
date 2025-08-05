@@ -241,12 +241,7 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
         WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
-    {
-      openscap: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
-    },
+
     {
       ciscat: true,
       settingIndexPattern:
@@ -423,7 +418,7 @@ export enum WAZUH_MODULES_ID {
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
   AUDITING = 'audit',
-  OPEN_SCAP = 'oscap',
+
   VULNERABILITIES = 'vuls',
   OSQUERY = 'osquery',
   DOCKER = 'docker',

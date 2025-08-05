@@ -102,7 +102,6 @@ type DataKeys =
   | 'office365'
   | 'gcp'
   | 'audit'
-  | 'oscap'
   | 'title'
   | 'file'
   | 'virustotal'
@@ -179,8 +178,7 @@ export type Params = {
   docker: boolean;
   /* if true, set Mitre att&ck fields */
   mitre: boolean;
-  /* if true, set OpenSCAP fields */
-  openscap: boolean;
+
   /* if true, set Policy monitoring fields */
   rootcheck: boolean;
   /* if true, set integrity monitoring fields (IMF) */

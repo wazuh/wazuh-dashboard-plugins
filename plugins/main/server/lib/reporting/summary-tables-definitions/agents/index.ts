@@ -138,15 +138,6 @@ const hipaaLastAlerts = {
   ],
 };
 
-// 'Wazuh-App-Agents-OSCAP-Last-alerts'
-const oscapLastAlerts = {
-  title: 'Last alerts',
-  aggs: [
-    AggregationFields['data.oscap.check.title'],
-    AggregationFields['data.oscap.scan.profile.title'],
-  ],
-};
-
 // 'Wazuh-App-Agents-Audit-Last-alerts'
 const auditLastAlerts = {
   title: 'Last alerts',
@@ -181,7 +172,7 @@ export default {
   ciscat: [ciscatAlertsSummary],
   pm: [pmAlertsSummary],
   audit: [auditLastAlerts],
-  oscap: [oscapLastAlerts],
+
   gdpr: [gdprLastAlerts],
   pci: [pciLastAlerts],
   docker: [dockerAlertsSummary],

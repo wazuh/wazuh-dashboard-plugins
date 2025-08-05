@@ -34,12 +34,7 @@ export const WAZUH_MODULES = {
     description:
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   },
-  oscap: {
-    title: 'OpenSCAP',
-    appId: 'openscap',
-    description:
-      'Configuration assessment and automation of compliance monitoring using SCAP checks.',
-  },
+
   audit: {
     title: 'System auditing',
     appId: 'system-auditing',

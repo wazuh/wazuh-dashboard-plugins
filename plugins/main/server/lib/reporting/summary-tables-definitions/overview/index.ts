@@ -17,15 +17,6 @@ const awsAlertsSummary = {
   ],
 };
 
-const azureAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['rule.id'],
-    AggregationFields['rule.description'],
-    AggregationFields['rule.level'],
-  ],
-};
-
 const fimAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -160,16 +151,6 @@ const githubAlertsSummary = {
   ],
 };
 
-// 'Wazuh-App-Overview-OSCAP-Last-alerts'
-const oscapLastAlerts = {
-  title: 'Last alerts',
-  aggs: [
-    AggregationFields['agent.name'],
-    AggregationFields['data.oscap.check.title'],
-    AggregationFields['data.oscap.scan.profile.title'],
-  ],
-};
-
 // 'Wazuh-App-Overview-Audit-Last-alerts'
 const auditLastAlerts = {
   title: 'Last alerts',
@@ -194,7 +175,7 @@ export default {
   mitre: [mitreAlertsSummary],
   nist: [nistAlertsSummary],
   office: [officeAlertsSummary],
-  oscap: [oscapLastAlerts],
+
   osquery: [osqueryAlertsSummary],
   pci: [pciAlertsSummary],
   pm: [pmAlertsSummary],

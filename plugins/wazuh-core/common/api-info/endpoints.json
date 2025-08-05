@@ -1133,7 +1133,7 @@
                 "azure-logs",
                 "cis-cat",
                 "docker-listener",
-                "open-scap",
+
                 "osquery",
                 "syscollector",
                 "vulnerability-detector"
@@ -4522,7 +4522,7 @@
                 "azure-logs",
                 "cis-cat",
                 "docker-listener",
-                "open-scap",
+
                 "osquery",
                 "syscollector",
                 "vulnerability-detector"

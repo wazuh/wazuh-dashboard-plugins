@@ -986,7 +986,7 @@
                 "azure-logs",
                 "cis-cat",
                 "docker-listener",
-                "open-scap",
+
                 "osquery",
                 "syscollector",
                 "vulnerability-detector"
@@ -1249,7 +1249,7 @@
                 "wazuh-modulesd:database",
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
+
                 "wazuh-modulesd:osquery",
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
@@ -4322,7 +4322,7 @@
                 "azure-logs",
                 "cis-cat",
                 "docker-listener",
-                "open-scap",
+
                 "osquery",
                 "syscollector",
                 "vulnerability-detector"
@@ -4579,7 +4579,7 @@
                 "wazuh-modulesd:database",
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
+
                 "wazuh-modulesd:osquery",
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"

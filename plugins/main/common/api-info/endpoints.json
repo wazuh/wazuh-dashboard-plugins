@@ -1180,7 +1180,7 @@
                 "azure-logs",
                 "cis-cat",
                 "docker-listener",
-                "open-scap",
+
                 "osquery",
                 "syscollector"
               ]
@@ -4674,7 +4674,7 @@
                 "azure-logs",
                 "cis-cat",
                 "docker-listener",
-                "open-scap",
+
                 "osquery",
                 "syscollector"
               ]

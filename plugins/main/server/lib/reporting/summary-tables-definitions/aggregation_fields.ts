@@ -188,7 +188,7 @@ export const AggregationFields = {
     customLabel: 'Action',
     missing: '-',
   },
-  'timestamp': {
+  timestamp: {
     field: 'timestamp',
     size: 5,
     order: 'desc',
@@ -201,22 +201,6 @@ export const AggregationFields = {
     order: 'desc',
     orderBy: '1',
     customLabel: 'Organization',
-    missing: '-',
-  },
-  'data.oscap.check.title': {
-    field: 'data.oscap.check.title',
-    size: 5,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Title',
-    missing: '-',
-  },
-  'data.oscap.scan.profile.title': {
-    field: 'data.oscap.scan.profile.title',
-    size: 5,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Profile',
     missing: '-',
   },
 };

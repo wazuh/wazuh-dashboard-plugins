@@ -113,24 +113,7 @@ export const AgentConfiguration = {
           ],
           tabs: ['General', 'Security configuration assessment'],
         },
-        {
-          subtitle: 'OpenSCAP',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-openscap.html',
-            '4.8',
-          ),
-          desc: 'Configuration assessment and automation of compliance monitoring using SCAP checks',
-          wodle: [{ name: 'open-scap' }],
-          labels: [
-            {
-              content: 'Evaluations',
-              disabled: 'OpenSCAP integration disabled',
-              'scan-on-start': 'Scan on start',
-              interval: 'Interval between scan executions',
-              timeout: 'Timeout (in seconds) for scan executions',
-            },
-          ],
-        },
+
         {
           subtitle: 'CIS-CAT',
           docuLink: webDocumentationLink(
