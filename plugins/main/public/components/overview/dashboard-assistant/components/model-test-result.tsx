@@ -77,7 +77,7 @@ export const ModelTestResult = ({
 
   const renderUserMessage = () => (
     <EuiPanel paddingSize='m' color='subdued' hasShadow={false}>
-      <EuiFlexGroup alignItems='flex-start' gutterSize='m' responsive={false}>
+      <EuiFlexGroup alignItems='flexStart' gutterSize='m' responsive={false}>
         <EuiFlexItem grow={false}>
           <EuiIcon type='user' size='l' color='#6DCCB1' />
         </EuiFlexItem>
