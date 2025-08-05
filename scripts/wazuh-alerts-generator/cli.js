@@ -85,7 +85,6 @@
     rootcheck: { rootcheck: true },
     audit: { audit: true },
 
-    ciscat: { ciscat: true },
     vulnerabilities: { vulnerabilities: true },
     virustotal: { virustotal: true },
     osquery: { osquery: true },
@@ -108,14 +107,7 @@
       'web',
       'windows',
     ],
-    'auditing-policy-monitoring': [
-      'audit',
-      'ciscat',
-
-      'rootcheck',
-      'virustotal',
-      'yara',
-    ],
+    'auditing-policy-monitoring': ['audit', 'rootcheck', 'virustotal', 'yara'],
     'thread-detection': ['docker', 'mitre', 'osquery', 'vulnerabilities'],
   };
 

@@ -34,7 +34,7 @@ const Authentication = require('./sample-data/authentication');
 const AWS = require('./sample-data/aws');
 const Azure = require('./sample-data/azure');
 const IntegrityMonitoring = require('./sample-data/integrity-monitoring');
-const CISCAT = require('./sample-data/ciscat');
+
 const GCP = require('./sample-data/gcp');
 const Docker = require('./sample-data/docker');
 const Mitre = require('./sample-data/mitre');
@@ -538,24 +538,6 @@ function generateAlert(params) {
         : null
       : null;
     alert.rule = dataAudit.rule;
-  }
-
-  if (params.ciscat) {
-    alert.rule.groups.push('ciscat');
-    alert.data.cis = {};
-
-    alert.data.cis.group = Random.arrayItem(CISCAT.group);
-    alert.data.cis.fail = Random.number(0, 100);
-    alert.data.cis.rule_title = Random.arrayItem(CISCAT.ruleTitle);
-    alert.data.cis.notchecked = Random.number(0, 100);
-    alert.data.cis.score = Random.number(0, 100);
-    alert.data.cis.pass = Random.number(0, 100);
-    alert.data.cis.timestamp = new Date(Random.date());
-    alert.data.cis.error = Random.number(0, 1);
-    alert.data.cis.benchmark = Random.arrayItem(CISCAT.benchmark);
-    alert.data.cis.unknown = Random.number(0, 100);
-    alert.data.cis.notchecked = Random.number(0, 5);
-    alert.data.cis.result = Random.arrayItem(CISCAT.result);
   }
 
   if (params.docker) {

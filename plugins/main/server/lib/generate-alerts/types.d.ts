@@ -172,8 +172,7 @@ export type Params = {
   gcp: boolean;
   /* if true, set System Auditing fields */
   audit: boolean;
-  /* if true, set CIS-CAT fields */
-  ciscat: boolean;
+
   /* if true, set Docker fields */
   docker: boolean;
   /* if true, set Mitre att&ck fields */

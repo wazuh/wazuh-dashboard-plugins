@@ -99,13 +99,6 @@ export default [
           'Configuration to ensure compliance with security policies, standards and hardening guides',
         goto: 'policy-monitoring',
       },
-
-      {
-        name: 'CIS-CAT',
-        description:
-          'Configuration assessment using CIS scanner and SCAP checks',
-        goto: 'cis-cat',
-      },
     ],
   },
   {
