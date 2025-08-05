@@ -1,5 +1,5 @@
 export interface ModelGroup {
-  id: string | null;
+  id: string;
   name: string;
   description: string;
 }

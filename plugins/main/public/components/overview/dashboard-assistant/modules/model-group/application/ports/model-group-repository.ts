@@ -1,6 +1,6 @@
 import { CreateRepository } from '../../../common/domain/repository';
-import { ModelGroup } from '../../domain/model-group';
+import { ModelGroup } from '../../domain/entities/model-group';
 import { CreateModelGroupDto } from '../dtos/create-model-group-dto';
 
-export interface IModelGroupRepository
+export interface ModelGroupRepository
   extends CreateRepository<ModelGroup, CreateModelGroupDto> {}
