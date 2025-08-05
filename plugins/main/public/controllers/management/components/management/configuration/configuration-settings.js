@@ -99,13 +99,7 @@ export default [
           'Configuration to ensure compliance with security policies, standards and hardening guides',
         goto: 'policy-monitoring',
       },
-      {
-        name: 'OpenSCAP',
-        description:
-          'Configuration assessment and automation of compliance monitoring using SCAP checks',
-        goto: 'open-scap',
-        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.OPEN_SCAP),
-      },
+
       {
         name: 'CIS-CAT',
         description:

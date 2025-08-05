@@ -27,7 +27,7 @@ import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationIntegrations from './integrations/integrations';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
-import WzConfigurationOpenSCAP from './open-scap/open-scap';
+
 import WzConfigurationCisCat from './cis-cat/cis-cat';
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
 import WzConfigurationOsquery from './osquery/osquery';
@@ -355,14 +355,7 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-                <WzViewSelectorSwitch view='open-scap'>
-                  <WzConfigurationOpenSCAP
-                    clusterNodeSelected={this.props.clusterNodeSelected}
-                    agent={agent}
-                    updateBadge={this.updateBadge}
-                    updateConfigurationSection={this.updateConfigurationSection}
-                  />
-                </WzViewSelectorSwitch>
+
                 <WzViewSelectorSwitch view='cis-cat'>
                   <WzConfigurationCisCat
                     clusterNodeSelected={this.props.clusterNodeSelected}
