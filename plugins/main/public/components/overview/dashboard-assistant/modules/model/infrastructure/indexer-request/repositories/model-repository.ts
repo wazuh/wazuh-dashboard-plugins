@@ -1,36 +1,25 @@
-import { ModelPredictResponse } from '../../domain/types';
-import { Model } from '../../domain/model';
-import { validateModelPredictResponse } from '../../validate-model-predict';
-import { TEST_PROMPT } from '../../../../components/model-test-result';
-import { ModelRepository } from '../../application/ports/model-repository';
-import { CreateModelDto } from '../../application/dtos/create-model-dto';
-import { ModelFactory } from '../../application/factories/model-factory';
-import { UpdateModelDto } from '../../application/dtos/update-model-dto';
-import { IHttpClient } from '../../../common/http/domain/entities/http-client';
+import { ModelPredictResponse } from '../../../domain/types';
+import { Model } from '../../../domain/entities/model';
+import { validateModelPredictResponse } from '../../../validate-model-predict';
+import { TEST_PROMPT } from '../../../../../components/model-test-result';
+import { ModelRepository } from '../../../application/ports/model-repository';
+import { CreateModelDto } from '../../../application/dtos/create-model-dto';
+import { ModelFactory } from '../../../application/factories/model-factory';
+import { IHttpClient } from '../../../../common/http/domain/entities/http-client';
+import { ModelIndexerResponse } from '../dtos/model-indexer-response';
+import { ModelIndexerMapper } from '../mappers/model-indexer-mapper';
 
-export class ModelHttpClientRepository implements ModelRepository {
+export class ModelIndexerRepository implements ModelRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(createModelDto: CreateModelDto): Promise<Model> {
     const response = await this.httpClient.proxyRequest.post<{
       model_id: string;
     }>('/_plugins/_ml/models/_register', createModelDto);
-    return ModelFactory.fromResponse({
+    return ModelFactory.create({
       ...createModelDto,
       id: response.model_id,
     });
-  }
-
-  public async findById(id: string): Promise<Model | null> {
-    try {
-      const response = await this.httpClient.proxyRequest.get(
-        `/_plugins/_ml/models/${id}`,
-      );
-      return ModelFactory.fromResponse(response);
-    } catch (error: any) {
-      if (error.status === 404) return null;
-      throw error;
-    }
   }
 
   public async getAll(): Promise<Model[]> {
@@ -46,23 +35,22 @@ export class ModelHttpClientRepository implements ModelRepository {
       const response = await this.httpClient.proxyRequest.post<{
         hits: {
           hits: Array<{
-            _source: any;
+            _id: string;
+            _source: ModelIndexerResponse;
           }>;
         };
       }>('/_plugins/_ml/models/_search', searchPayload);
 
-      return response.hits.hits.map(hit => ModelFactory.fromResponse(hit));
+      return response.hits.hits.map(hit =>
+        ModelIndexerMapper.toModel({
+          ...hit._source,
+          id: hit._id,
+        }),
+      );
     } catch (error) {
       console.error('Error fetching models:', error);
       return [];
     }
-  }
-
-  public async update(id: string, UpdateModelDto: UpdateModelDto) {
-    await this.httpClient.proxyRequest.put(
-      `/_plugins/_ml/models/${id}`,
-      UpdateModelDto,
-    );
   }
 
   public async delete(id: string): Promise<void> {

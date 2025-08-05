@@ -1,8 +1,9 @@
 import { ProviderModelConfig } from '../../../provider-model-config';
 import { CreateConnectorDto } from '../../../modules/connector/application/dtos/create-connector-dto';
-import { Connector } from '../../../modules/connector/domain/entities/connector';
 import { InstallationContext } from './installation-context';
 import { MLCommonsSettings } from '../../ml-commons-settings/domain/entities/ml-commons-settings';
+import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
+import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
 
 export interface IInstallationManager {
   execute(
@@ -25,15 +26,8 @@ export interface InstallDashboardAssistantRequest {
     'trusted_connector_endpoints_regex'
   >;
   connector: CreateConnectorDto;
-  model: {
-    name: string;
-    function_name: string;
-    description: string;
-  };
-  agent: {
-    name: string;
-    description: string;
-  };
+  model: Pick<CreateModelDto, 'name' | 'description'>;
+  agent: Pick<CreateAgentDto, 'name' | 'description'>;
 }
 
 // Step execution states

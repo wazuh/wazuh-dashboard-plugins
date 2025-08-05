@@ -1,4 +1,4 @@
-import type { Model } from '../../domain/model';
+import type { Model } from '../../domain/entities/model';
 import { ModelRepository } from '../ports/model-repository';
 
 export const getModelsUseCase =

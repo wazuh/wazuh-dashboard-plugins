@@ -1,22 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Model } from '../domain/model';
-import { ModelStatus } from '../domain/model-status';
+import { Model } from '../domain/entities/model';
 import { UseCases } from '../../../setup';
+import { ModelFieldDefinition } from '../../../components/types';
 
 interface UseModelsReturn {
   models: Model[];
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  getTableData: () => Array<{
-    id: string;
-    name: string;
-    version: string;
-    description: string;
-    status: ModelStatus;
-    createdAt: string;
-    apiUrl: string;
-  }>;
+  getTableData: () => Array<ModelFieldDefinition>;
 }
 
 export function useModels(): UseModelsReturn {

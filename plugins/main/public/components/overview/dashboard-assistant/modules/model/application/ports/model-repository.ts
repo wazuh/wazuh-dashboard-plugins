@@ -3,7 +3,7 @@ import {
   DeleteRepository,
   GetAllRepository,
 } from '../../../common/domain/repository';
-import { Model } from '../../domain/model';
+import { Model } from '../../domain/entities/model';
 import { ModelPredictResponse } from '../../domain/types';
 import { CreateModelDto } from '../dtos/create-model-dto';
 

@@ -70,7 +70,6 @@ export function useAssistantInstallation() {
         },
         model: {
           name: assistantModelInfo.model_provider,
-          function_name: 'remote',
           description:
             assistantModelInfo.description ||
             `${assistantModelInfo.model_provider} language model`,

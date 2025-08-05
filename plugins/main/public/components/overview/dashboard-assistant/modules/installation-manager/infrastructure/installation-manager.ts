@@ -8,7 +8,10 @@ import {
   InstallationResult,
   StepResultState,
 } from '../domain/types';
-import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
+import {
+  buildCreateModelDto,
+  CreateModelDto,
+} from '../../model/application/dtos/create-model-dto';
 import { AgentType } from '../../agent/domain/enums/agent-type';
 import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
 import { modelProviderConfigs } from '../../../provider-model-config';
@@ -91,13 +94,11 @@ export class InstallationManager implements IInstallationManager {
       progressManager.startStep(currentStepIndex);
       let modelId: string;
       try {
-        const modelRequest: CreateModelDto = {
-          name: request.model.name,
-          connector_id: connectorId,
-          description: request.model.description,
-          function_name: request.model.function_name,
-        };
-        modelId = (await UseCases.createModel(modelRequest)).id || '';
+        const createModelDto = buildCreateModelDto({
+          ...request.model,
+          connectorId,
+        });
+        modelId = (await UseCases.createModel(createModelDto)).id as string;
         context.set('modelId', modelId);
         progressManager.completeStep(
           currentStepIndex,
