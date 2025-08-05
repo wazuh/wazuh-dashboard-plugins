@@ -11,7 +11,6 @@ export class AgentFactory {
     );
 
     return {
-      id: null,
       name: config.name,
       type: config.type,
       description: config.description,

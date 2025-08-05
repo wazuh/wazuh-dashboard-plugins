@@ -2,7 +2,7 @@ import { AgentLLM } from './agent-llm';
 import { AgentTool } from './agent-tool';
 
 export interface Agent {
-  id: string | null;
+  id?: string;
   type: string;
   name: string;
   description: string;
