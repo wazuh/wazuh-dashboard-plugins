@@ -22,10 +22,6 @@ export class InstallationManager implements IInstallationManager {
   public async execute(
     request: InstallDashboardAssistantRequest,
   ): Promise<InstallationResult> {
-    const modelProviderConfig = modelProviderConfigs.find(
-      config => config.model_family === request.model.name,
-    );
-
     const stepNames = [
       'Update Cluster Settings',
       'Create Connector',
@@ -46,7 +42,9 @@ export class InstallationManager implements IInstallationManager {
       // Step 1: Update cluster settings
       progressManager.startStep(currentStepIndex);
       try {
-        await UseCases.updateClusterSettings(['.*']);
+        await UseCases.updateClusterSettings(
+          request.ml_common_settings.trusted_connector_endpoints_regex,
+        );
         progressManager.completeStep(
           currentStepIndex,
           StepResultState.SUCCESS,
@@ -161,7 +159,7 @@ export class InstallationManager implements IInstallationManager {
           tools: [
             {
               type: Tool.ML_MODEL_TOOL,
-              name: `${modelProviderConfig?.model_provider}_${request.model.name}_llm_model`,
+              name: `${request.connector.model_config.model_provider}_${request.connector.model_id}_llm_model`,
               description: `A general-purpose language model tool capable of answering broad questions, summarizing information, and providing analysis that doesn't require searching specific data. Use this when no other specialized tool is applicable.`,
               parameters: {
                 model_id: modelId,

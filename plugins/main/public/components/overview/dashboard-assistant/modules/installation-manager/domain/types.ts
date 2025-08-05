@@ -2,6 +2,7 @@ import { ProviderModelConfig } from '../../../provider-model-config';
 import { CreateConnectorDto } from '../../../modules/connector/application/dtos/create-connector-dto';
 import { Connector } from '../../../modules/connector/domain/entities/connector';
 import { InstallationContext } from './installation-context';
+import { MLCommonsSettings } from '../../ml-commons-settings/domain/entities/ml-commons-settings';
 
 export interface IInstallationManager {
   execute(
@@ -18,17 +19,11 @@ export interface IInstallationStep {
 }
 
 export interface InstallDashboardAssistantRequest {
-  clusterSettings: {
-    mlCommonsAgentFrameworkEnabled: boolean;
-    onlyRunOnMlNode: boolean;
-    ragPipelineFeatureEnabled: boolean;
-    trustedConnectorEndpointsRegex: string[];
-  };
-  modelGroup?: {
-    // ModelGroup is created automatically if is not defined
-    name: string;
-    description: string;
-  };
+  selected_provider: string;
+  ml_common_settings: Pick<
+    MLCommonsSettings,
+    'trusted_connector_endpoints_regex'
+  >;
   connector: CreateConnectorDto;
   model: {
     name: string;

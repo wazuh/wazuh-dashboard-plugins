@@ -9,7 +9,7 @@ import { InstallDashboardAssistantResponse } from '../domain/types';
 import { ConnectorFactory } from '../../../modules/connector/application/factories/connector-factory';
 import { modelProviderConfigs } from '../../../provider-model-config';
 
-interface ModelFormData {
+interface ModelConfiguration {
   model_provider: string;
   model_id: string;
   api_url: string;
@@ -22,7 +22,8 @@ export function useAssistantInstallation() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] =
     useState<InstallDashboardAssistantResponse | null>(null);
-  const [modelData, setModelData] = useState<ModelFormData | null>(null);
+  const [assistantModelInfo, setAssistantModelInfo] =
+    useState<ModelConfiguration | null>(null);
   const [progress, setProgress] = useState<InstallationProgress | null>(null);
 
   // Create installation use case with real repositories
@@ -35,12 +36,12 @@ export function useAssistantInstallation() {
     return installDashboardAssistantUseCase(installationManager);
   }, []);
 
-  const setModel = useCallback((data: ModelFormData) => {
-    setModelData(data);
+  const setModel = useCallback((data: ModelConfiguration) => {
+    setAssistantModelInfo(data);
   }, []);
 
   const install = useCallback(async () => {
-    if (!modelData) {
+    if (!assistantModelInfo) {
       setError('No model data provided');
       return;
     }
@@ -51,31 +52,31 @@ export function useAssistantInstallation() {
     try {
       // Create installation request from model data
       const request: InstallDashboardAssistantRequest = {
-        clusterSettings: {
-          mlCommonsAgentFrameworkEnabled: true,
-          onlyRunOnMlNode: false,
-          ragPipelineFeatureEnabled: true,
-          trustedConnectorEndpointsRegex: ['.*'],
+        selected_provider: assistantModelInfo.model_provider,
+        ml_common_settings: {
+          trusted_connector_endpoints_regex: ['.*'],
         },
         connector: {
-          name: `${modelData.model_provider} Chat Connector`,
-          description: `The connector to public ${modelData.model_provider} model service for ${modelData.model_id}`,
-          endpoint: modelData.api_url,
-          model_id: modelData.model_id,
-          api_key: modelData.api_key,
+          name: `${assistantModelInfo.model_provider} Chat Connector`,
+          description: `Connector to ${assistantModelInfo.model_provider} model service for ${assistantModelInfo.model_id}`,
+          endpoint: assistantModelInfo.api_url,
+          model_id: assistantModelInfo.model_id,
+          api_key: assistantModelInfo.api_key,
           model_config: modelProviderConfigs.find(
-            config => config.model_provider === modelData.model_provider,
+            config =>
+              config.model_provider === assistantModelInfo.model_provider,
           )!,
         },
         model: {
-          name: modelData.model_provider,
+          name: assistantModelInfo.model_provider,
           function_name: 'remote',
           description:
-            modelData.description || `${modelData.model_provider} model`,
+            assistantModelInfo.description ||
+            `${assistantModelInfo.model_provider} language model`,
         },
         agent: {
-          name: `${modelData.model_provider}_agent`,
-          description: `Agent for ${modelData.model_provider}`,
+          name: `${assistantModelInfo.model_provider}_agent`,
+          description: `AI agent powered by ${assistantModelInfo.model_provider}`,
         },
       };
 
@@ -105,7 +106,7 @@ export function useAssistantInstallation() {
     } finally {
       setIsLoading(false);
     }
-  }, [modelData, installUseCase]);
+  }, [assistantModelInfo, installUseCase]);
 
   const reset = useCallback(() => {
     setIsLoading(false);
@@ -121,7 +122,7 @@ export function useAssistantInstallation() {
     isLoading,
     error,
     result,
-    modelData,
+    modelData: assistantModelInfo,
     progress,
     isSuccess: result?.success || false,
   };
