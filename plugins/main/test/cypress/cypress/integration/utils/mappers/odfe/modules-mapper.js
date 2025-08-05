@@ -6,7 +6,6 @@ export const MODULES_CARDS = {
   'Google Cloud Platform': MODULES_PAGE['gCPToggleButton'],
   GitHub: MODULES_PAGE['gitHubCardToggleButton'],
 
-  'CIS-CAT': MODULES_PAGE['cisCatToggleButton'],
   VirusTotal: MODULES_PAGE['virusTotalToggleButton'],
   Osquery: MODULES_PAGE['osqueryToggleButton'],
   'Docker listener': MODULES_PAGE['dockerListenerToggleButton'],
@@ -20,7 +19,6 @@ export const MODULES_SETTINGS = {
   'Google Cloud Platform': MODULES_DIRECTORY_PAGE['gCPCard'],
   GitHub: MODULES_DIRECTORY_PAGE['gitHubCard'],
 
-  'CIS-CAT': MODULES_DIRECTORY_PAGE['cisCatCard'],
   VirusTotal: MODULES_DIRECTORY_PAGE['virusTotalCard'],
   Osquery: MODULES_DIRECTORY_PAGE['osqueryCard'],
   'Docker listener': MODULES_DIRECTORY_PAGE['dockerListenerCard'],

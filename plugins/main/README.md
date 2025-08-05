@@ -24,8 +24,6 @@ the Wazuh Indexer. The plugin provides the following capabilities:
     - Security configuration assessment: Scan your assets as part of a configuration assessment audit.
     - System auditing: Audit users behavior, monitoring command execution and alerting on access to critical files.
 
-    - CIS-CAT: Configuration assessment using Center of Internet Security scanner and SCAP checks.
-
   - Threat Detection and Response
     - Vulnerabilities: Discover what applications in your environment are affected by well-known vulnerabilities.
     - MITRE ATT&CK: Explore security alerts mapped to adversary tactics and techniques for better threat understanding.
