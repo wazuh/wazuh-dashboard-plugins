@@ -306,7 +306,7 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
                   query: 'check.result: "Not run"',
                   language: 'kuery',
                 },
-                label: 'Not runasd',
+                label: 'Not run',
               },
             ],
           },
