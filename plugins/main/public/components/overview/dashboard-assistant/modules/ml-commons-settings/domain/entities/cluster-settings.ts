@@ -1,7 +1,7 @@
-import { PluginSettings } from './plugin-settings';
+import { MlCommonsPluginSettings } from './plugin-settings';
 
 export interface ClusterSettings {
   persistent: {
-    plugins: PluginSettings;
+    plugins: MlCommonsPluginSettings;
   };
 }

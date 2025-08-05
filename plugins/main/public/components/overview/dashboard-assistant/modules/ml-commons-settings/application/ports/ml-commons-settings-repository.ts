@@ -1,6 +1,6 @@
-import { ClusterSettings } from '../../domain/entities/cluster-settings';
+import { MlCommonsPluginSettings } from '../../domain/entities/plugin-settings';
 
 export interface MLCommonsSettingsRepository {
-  persist(settings: ClusterSettings): Promise<boolean>;
+  persist(pluginSettings: MlCommonsPluginSettings): Promise<boolean>;
   retrieve(): Promise<any>;
 }

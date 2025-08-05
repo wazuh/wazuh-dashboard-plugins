@@ -1,5 +1,5 @@
 import { MLCommonsSettings } from './ml-commons-settings';
 
-export interface PluginSettings {
+export interface MlCommonsPluginSettings {
   ml_commons: MLCommonsSettings;
 }
