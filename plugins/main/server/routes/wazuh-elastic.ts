@@ -37,7 +37,7 @@ export function WazuhElasticRoutes(router: IRouter) {
       WAZUH_SAMPLE_SERVER_STATISTICS,
       WAZUH_SAMPLE_VULNERABILITIES,
       WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
-    ].map((category) => schema.literal(category))
+    ].map(category => schema.literal(category)),
   );
 
   // Endpoints
@@ -46,7 +46,8 @@ export function WazuhElasticRoutes(router: IRouter) {
       path: '/elastic/security/current-platform',
       validate: false,
     },
-    async (context, request, response) => ctrl.getCurrentPlatform(context, request, response)
+    async (context, request, response) =>
+      ctrl.getCurrentPlatform(context, request, response),
   );
 
   router.get(
@@ -58,7 +59,8 @@ export function WazuhElasticRoutes(router: IRouter) {
         }),
       },
     },
-    async (context, request, response) => ctrl.getTemplate(context, request, response)
+    async (context, request, response) =>
+      ctrl.getTemplate(context, request, response),
   );
 
   // TODO: this seems to be deprecated in 4.9 so it could be removed
@@ -77,7 +79,8 @@ export function WazuhElasticRoutes(router: IRouter) {
         }),
       },
     },
-    async (context, request, response) => ctrl.getFieldTop(context, request, response)
+    async (context, request, response) =>
+      ctrl.getFieldTop(context, request, response),
   );
 
   router.get(
@@ -89,7 +92,8 @@ export function WazuhElasticRoutes(router: IRouter) {
         }),
       },
     },
-    async (context, request, response) => ctrl.haveSampleDataOfCategory(context, request, response)
+    async (context, request, response) =>
+      ctrl.haveSampleDataOfCategory(context, request, response),
   );
 
   router.post(
@@ -102,7 +106,8 @@ export function WazuhElasticRoutes(router: IRouter) {
         body: schema.any(),
       },
     },
-    async (context, request, response) => ctrl.createSampleData(context, request, response)
+    async (context, request, response) =>
+      ctrl.createSampleData(context, request, response),
   );
 
   router.delete(
@@ -114,7 +119,8 @@ export function WazuhElasticRoutes(router: IRouter) {
         }),
       },
     },
-    async (context, request, response) => ctrl.deleteSampleData(context, request, response)
+    async (context, request, response) =>
+      ctrl.deleteSampleData(context, request, response),
   );
 
   router.post(
@@ -124,6 +130,7 @@ export function WazuhElasticRoutes(router: IRouter) {
         body: schema.any(),
       },
     },
-    async (context, request, response) => ctrl.alerts(context, request, response)
+    async (context, request, response) =>
+      ctrl.alerts(context, request, response),
   );
 }

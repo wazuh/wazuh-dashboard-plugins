@@ -1,6 +1,9 @@
 import { Filter } from 'src/plugins/data/common';
 import { STYLE } from '../../../components/overview/it-hygiene/common/saved-vis/constants';
-import { createIndexPatternReferences, createSearchSource } from '../lib/create-saved-vis-data';
+import {
+  createIndexPatternReferences,
+  createSearchSource,
+} from '../lib/create-saved-vis-data';
 
 export const getVisStatePieByField = (
   indexPatternId: string,
@@ -14,9 +17,14 @@ export const getVisStatePieByField = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
-  } = {}
+  } = {},
 ) => {
-  const { orderAggregation = 'desc', size = 10, otherBucket, missingBucket } = options;
+  const {
+    orderAggregation = 'desc',
+    size = 10,
+    otherBucket,
+    missingBucket,
+  } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
@@ -56,10 +64,14 @@ export const getVisStatePieByField = (
             size: size,
             otherBucket: Boolean(otherBucket),
             otherBucketLabel:
-              otherBucket && typeof otherBucket === 'boolean' ? 'Other' : otherBucket,
+              otherBucket && typeof otherBucket === 'boolean'
+                ? 'Other'
+                : otherBucket,
             missingBucket: Boolean(missingBucket),
             missingBucketLabel:
-              missingBucket && typeof missingBucket === 'boolean' ? 'Missing' : missingBucket,
+              missingBucket && typeof missingBucket === 'boolean'
+                ? 'Missing'
+                : missingBucket,
           },
           schema: 'segment',
         },
@@ -86,7 +98,7 @@ export const getVisStateDonutByField = (
     showLegend?: boolean;
     // showLabels
     showLabels?: boolean;
-  } = {}
+  } = {},
 ) => {
   const {
     orderAggregation = 'desc',
@@ -138,10 +150,14 @@ export const getVisStateDonutByField = (
             size: size,
             otherBucket: Boolean(otherBucket),
             otherBucketLabel:
-              otherBucket && typeof otherBucket === 'boolean' ? 'Other' : otherBucket,
+              otherBucket && typeof otherBucket === 'boolean'
+                ? 'Other'
+                : otherBucket,
             missingBucket: Boolean(missingBucket),
             missingBucketLabel:
-              missingBucket && typeof missingBucket === 'boolean' ? 'Missing' : missingBucket,
+              missingBucket && typeof missingBucket === 'boolean'
+                ? 'Missing'
+                : missingBucket,
           },
           schema: 'segment',
         },
@@ -166,7 +182,7 @@ export const getVisStateHorizontalBarByField = (
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
-  } = {}
+  } = {},
 ) => {
   const {
     orderAggregation = 'desc',
@@ -279,10 +295,14 @@ export const getVisStateHorizontalBarByField = (
             order: orderAggregation,
             size: 5,
             otherBucketLabel:
-              otherBucket && typeof otherBucket === 'boolean' ? 'Other' : otherBucket,
+              otherBucket && typeof otherBucket === 'boolean'
+                ? 'Other'
+                : otherBucket,
             missingBucket: Boolean(missingBucket),
             missingBucketLabel:
-              missingBucket && typeof missingBucket === 'boolean' ? 'Missing' : missingBucket,
+              missingBucket && typeof missingBucket === 'boolean'
+                ? 'Missing'
+                : missingBucket,
             customLabel: fieldCustomLabel,
           },
           schema: 'segment',
@@ -325,7 +345,7 @@ export const getVisStateHorizontalBarSplitSeries = (
         colors: {},
       },
     },
-  }
+  },
 ) => {
   const {
     orderAggregation = 'desc',
@@ -455,10 +475,14 @@ export const getVisStateHorizontalBarSplitSeries = (
             size: fieldSize,
             otherBucket: Boolean(otherBucket),
             otherBucketLabel:
-              otherBucket && typeof otherBucket === 'boolean' ? 'Other' : otherBucket,
+              otherBucket && typeof otherBucket === 'boolean'
+                ? 'Other'
+                : otherBucket,
             missingBucket: Boolean(missingBucket),
             missingBucketLabel:
-              missingBucket && typeof missingBucket === 'boolean' ? 'Missing' : missingBucket,
+              missingBucket && typeof missingBucket === 'boolean'
+                ? 'Missing'
+                : missingBucket,
             customLabel: fieldCustomLabel,
           },
           schema: 'group',
@@ -473,7 +497,7 @@ export const getVisStateMetricUniqueCountByField = (
   field: string,
   title: string,
   visIDPrefix: string,
-  aggLabel: string = ''
+  aggLabel: string = '',
 ) => {
   return {
     id: `${visIDPrefix}-${field}`,
@@ -539,7 +563,7 @@ export const getVisStateTable = (
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
     filters?: any[];
-  } = {}
+  } = {},
 ) => {
   const {
     orderAggregation = 'desc',
@@ -599,10 +623,14 @@ export const getVisStateTable = (
             size: size,
             otherBucket: Boolean(otherBucket),
             otherBucketLabel:
-              otherBucket && typeof otherBucket === 'boolean' ? 'Other' : otherBucket,
+              otherBucket && typeof otherBucket === 'boolean'
+                ? 'Other'
+                : otherBucket,
             missingBucket: Boolean(missingBucket),
             missingBucketLabel:
-              missingBucket && typeof missingBucket === 'boolean' ? 'Missing' : missingBucket,
+              missingBucket && typeof missingBucket === 'boolean'
+                ? 'Missing'
+                : missingBucket,
             customLabel: fieldCustomLabel,
             ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
           },
