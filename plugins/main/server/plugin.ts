@@ -40,10 +40,6 @@ import {
   initializationTaskCreatorServerAPIConnectionCompatibility,
   mapFieldsFormat,
 } from './health-check';
-import indexPatternFieldsAlerts from './health-check/index-patterns-fields/alerts-fields.json';
-import indexPatternFieldsMonitoring from './health-check/index-patterns-fields/monitoring-fields.json';
-import indexPatternFieldsStatistics from './health-check/index-patterns-fields/statistics-fields.json';
-import indexPatternFieldsStatesVulnerabilities from './health-check/index-patterns-fields/vulnerability-states-fields.json';
 import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
@@ -171,13 +167,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: {
             timeFieldName: '@timestamp',
           },
-          fieldsNoIndices: indexPatternFieldsAlerts,
           hasTemplate: true,
         },
         configurationSettingKey: 'pattern',
-        taskMeta: {
-          isCritical: true,
-        },
       }),
     );
 
@@ -185,9 +177,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
-        options: {
-          fieldsNoIndices: indexPatternFieldsMonitoring,
-        },
         indexPatternID: 'wazuh-monitoring-*',
       }),
     );
@@ -196,9 +185,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
-        options: {
-          fieldsNoIndices: indexPatternFieldsStatistics,
-        },
         indexPatternID: 'wazuh-statistics-*',
       }),
     );
