@@ -1,10 +1,10 @@
 import { GenericRequest } from '../../../../../../../react-services';
 import { IHttpClient } from '../domain/entities/http-client';
-import { HttpMethod } from '../domain/http-method';
+import { HttpMethod } from '../domain/enums/http-method';
 
 export class HttpWithProxyClient implements IHttpClient {
   private buildProxyUrl = (method: HttpMethod, path: string) =>
-    `/api/console/proxy?method=${method}&path=${path}&dataSourceId=`;
+    `/api/console/proxy?method=${method}&path=${path}`;
 
   get proxyRequest() {
     return {
