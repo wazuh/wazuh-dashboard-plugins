@@ -43,8 +43,6 @@ function generateRandomService() {
     : random.choice(['RUNNING', 'STOPPED']);
 
   return {
-    architecture: random.choice(['x86_64', 'arm64']),
-    hostname: `host${random.int(0, 1000)}`,
     service: {
       id: processName,
       name: processName.charAt(0).toUpperCase() + processName.slice(1),
@@ -97,12 +95,12 @@ function generateRandomService() {
     },
   };
 }
+
 function generateDocument(params) {
-  return {
-    agent: generateRandomAgent(),
-    host: generateRandomService(),
-    wazuh: generateRandomWazuh(params),
-  };
+  let document = generateRandomService();
+  document.agent = generateRandomAgent();
+  document.wazuh = generateRandomWazuh(params);
+  return document;
 }
 
 module.exports = {
