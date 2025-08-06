@@ -1,7 +1,8 @@
 import { Agent } from '../../domain/entities/agent';
-import { AgentLLM } from '../../domain/entities/agent-llm';
 
-export type CreateAgentDto = Omit<Agent, 'id' | 'llm'> &
-  Pick<AgentLLM, 'model_id' | 'response_filter'> & {
-    extra_parameters?: Record<string, any>;
-  };
+export interface CreateAgentDto
+  extends Pick<Agent, 'name' | 'description' | 'type' | 'tools'> {
+  model_id: string;
+  response_filter: string;
+  extra_parameters?: Record<string, any>;
+}

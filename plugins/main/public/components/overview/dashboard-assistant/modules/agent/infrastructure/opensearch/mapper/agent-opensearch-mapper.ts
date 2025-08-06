@@ -12,7 +12,7 @@ export class AgentOpenSearchMapper {
       name: dto.name,
       type: dto.type,
       description: dto.description,
-      llm: dto.llm,
+      model_id: dto.llm.model_id,
       tools: dto.tools || [],
     };
   }
@@ -26,7 +26,7 @@ export class AgentOpenSearchMapper {
       name: dto.name,
       type: dto.type,
       description: dto.description,
-      llm: dto.llm,
+      model_id: dto.llm.model_id,
       tools: dto.tools || [],
     };
   }

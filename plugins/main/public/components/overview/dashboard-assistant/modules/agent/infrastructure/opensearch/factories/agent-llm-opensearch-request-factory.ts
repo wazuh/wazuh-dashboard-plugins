@@ -9,12 +9,12 @@ export class AgentLLMOpenSearchRequestFactory {
   }
 
   public static create(params: {
-    modelId: string;
+    model_id: string;
     response_filter: string;
     extra_parameters?: Record<string, any>;
   }): AgentLLMOpenSearchRequestDto {
     return {
-      model_id: params.modelId,
+      model_id: params.model_id,
       parameters: {
         response_filter: params.response_filter,
         ...this.defaultParameters,

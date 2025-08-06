@@ -6,7 +6,7 @@ import { AgentOpenSearchRequestDto } from '../dtos/agent-opensearch-request-dto'
 export class AgentOpenSearchRequestFactory {
   public static create(config: CreateAgentDto): AgentOpenSearchRequestDto {
     const llm = AgentLLMOpenSearchRequestFactory.create({
-      modelId: config.model_id,
+      model_id: config.model_id,
       response_filter: config.response_filter ?? '',
       extra_parameters: config.extra_parameters,
     });
