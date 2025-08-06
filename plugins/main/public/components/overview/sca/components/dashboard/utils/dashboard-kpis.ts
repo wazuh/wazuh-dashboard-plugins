@@ -4,12 +4,26 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../../it-hygiene/common/saved-vis/create-saved-vis-data';
+import { getCore } from '../../../../../../kibana-services';
 
-const checkResultColors = {
-  passed: '#209280',
-  failed: '#cc5642',
-  'Not run': '#6092c0',
-  checkScoreColor: '#333333',
+const core = getCore();
+const decimalFormat = () => {
+  const pattern = core.uiSettings.get('format:percent:defaultPattern');
+  // TODO: parse decimal format in settings
+  return decimalFormat;
+};
+
+const checkResultColors = () => {
+  const colors = {
+    passed: '#209280',
+    failed: '#cc5642',
+    'Not run': '#6092c0',
+    checkScoreColor: core.uiSettings.get('theme:darkMode')
+      ? '#dfe5ef'
+      : '#333333',
+  };
+
+  return colors;
 };
 
 const getVisStateCheckResultPassed = (indexPatternId: string) => {
@@ -19,7 +33,7 @@ const getVisStateCheckResultPassed = (indexPatternId: string) => {
     type: 'metric',
     uiState: {
       vis: {
-        colors: checkResultColors,
+        colors: checkResultColors(),
       },
     },
     params: {
@@ -101,7 +115,7 @@ const getVisStateCheckResultFailed = (indexPatternId: string) => {
     type: 'metric',
     uiState: {
       vis: {
-        colors: checkResultColors,
+        colors: checkResultColors(),
       },
     },
     params: {
@@ -184,7 +198,7 @@ const getVisStateCheckResultNotRun = (indexPatternId: string) => {
     type: 'metric',
     uiState: {
       vis: {
-        colors: checkResultColors,
+        colors: checkResultColors(),
       },
     },
     params: {
@@ -317,7 +331,7 @@ const checkScore = (indexPatternId: string) => ({
             value:
               '"Inter UI", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
           },
-          fill: { value: checkResultColors.checkScoreColor },
+          fill: { value: checkResultColors().checkScoreColor },
         },
       },
     },
@@ -332,7 +346,7 @@ const checkScore = (indexPatternId: string) => ({
           baseline: { value: 'top' },
           text: { value: 'Score' },
           fontSize: { value: 16 },
-          fill: { value: '#333' },
+          fill: { value: checkResultColors().checkScoreColor },
         },
       },
     },
