@@ -150,9 +150,9 @@ export class InstallationManager implements IInstallationManager {
             parameters: {
               max_iterations: 5,
               stop_when_no_tool_found: true,
-              response_filter: modelProviderConfigs.find(
-                config => config.model_provider === request.model.name,
-              )?.response_filter!,
+              response_filter:
+                modelProviderConfigs[request.selected_provider]
+                  ?.response_filter!,
             },
           },
           tools: [

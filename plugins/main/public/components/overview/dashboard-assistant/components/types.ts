@@ -1,5 +1,5 @@
 export interface ModelFormData {
-  name: string;
+  modelProvider: string;
   model: string;
   apiUrl: string;
   apiKey: string;

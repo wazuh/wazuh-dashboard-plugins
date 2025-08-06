@@ -6,14 +6,17 @@ import {
   EuiFieldText,
   EuiSpacer,
 } from '@elastic/eui';
-import { ProviderModelConfig } from '../provider-model-config';
+import {
+  modelProviderConfigs,
+  ProviderModelConfig,
+} from '../provider-model-config';
 import { ModelFormData } from './types';
+import { mapToOptions } from './utils/map-to-options';
 
 interface ModelFormProps {
   onChange?: (data: ModelFormData) => void;
   onValidationChange?: (isValid: boolean) => void;
   disabled?: boolean;
-  modelConfig?: ProviderModelConfig[];
 }
 
 const retrieveModelsFromProvider = (
@@ -26,29 +29,25 @@ const retrieveModelsFromProvider = (
     : [];
 };
 
-const mapModelProvidersToOptions = (models: ProviderModelConfig[]) => {
-  return models.map(model => ({
-    value: model.model_provider,
-    text: model.model_provider,
-  }));
+const mapModelProvidersToOptions = () => {
+  return mapToOptions(Object.keys(modelProviderConfigs), model => model);
 };
 
 export const ModelForm = ({
   onChange,
   onValidationChange,
   disabled = false,
-  modelConfig = [],
 }: ModelFormProps) => {
   const [formData, setFormData] = useState<ModelFormData>({
-    name: '',
+    modelProvider: '',
     model: '',
     apiUrl: '',
     apiKey: '',
   });
 
-  const [modelsOptions, setModelsOptions] = useState(
-    retrieveModelsFromProvider('', modelConfig),
-  );
+  const [modelsOptions, setModelsOptions] = useState<
+    ReturnType<typeof mapToOptions>
+  >([]);
 
   useEffect(() => {
     if (onChange) {
@@ -58,7 +57,10 @@ export const ModelForm = ({
 
   useEffect(() => {
     const isValid =
-      formData.name && formData.model && formData.apiUrl && formData.apiKey;
+      formData.modelProvider &&
+      formData.model &&
+      formData.apiUrl &&
+      formData.apiKey;
     if (onValidationChange) {
       onValidationChange(!!isValid);
     }
@@ -67,14 +69,19 @@ export const ModelForm = ({
   const handleModelProviderChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
   ) => {
-    const newName = e.target.value;
-    const newModelOptions = retrieveModelsFromProvider(newName, modelConfig);
-    setModelsOptions(newModelOptions);
+    const newModelProvider = e.target.value;
+    setModelsOptions(
+      mapToOptions(
+        modelProviderConfigs[newModelProvider]?.models || [],
+        model => model,
+      ),
+    );
 
     setFormData(prev => ({
       ...prev,
-      name: newName,
-      model: '', // Reset a model when the name changes
+      modelProvider: newModelProvider,
+      model: modelProviderConfigs[newModelProvider].default_model || '',
+      apiUrl: modelProviderConfigs[newModelProvider].default_endpoint || '',
     }));
   };
 
@@ -95,8 +102,8 @@ export const ModelForm = ({
       <EuiFormRow label='Provider' fullWidth>
         <EuiSelect
           fullWidth
-          options={mapModelProvidersToOptions(modelConfig)}
-          value={formData.name}
+          options={mapModelProvidersToOptions()}
+          value={formData.modelProvider}
           onChange={handleModelProviderChange}
           hasNoInitialSelection
           disabled={disabled}
@@ -112,7 +119,7 @@ export const ModelForm = ({
           value={formData.model}
           onChange={handleModelChange}
           hasNoInitialSelection
-          disabled={!formData.name || disabled}
+          disabled={!formData.modelProvider || disabled}
         />
       </EuiFormRow>
 

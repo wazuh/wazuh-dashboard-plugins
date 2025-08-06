@@ -76,8 +76,8 @@ export const ModelRegister = ({
   };
 
   const config = formConfig || defaultFormConfig;
-  const [formData, setFormData] = useState({
-    name: '',
+  const [formData, setFormData] = useState<ModelFormData>({
+    modelProvider: '',
     model: '',
     apiUrl: '',
     apiKey: '',
@@ -90,11 +90,11 @@ export const ModelRegister = ({
     (data: ModelFormData) => {
       setFormData(data);
       setModel({
-        model_provider: data.name,
+        model_provider: data.modelProvider,
         model_id: data.model,
         api_url: data.apiUrl,
         api_key: data.apiKey,
-        description: `${data.name} ${data.model} model`,
+        description: `${data.modelProvider} ${data.model} model`,
       });
     },
     [setModel],
@@ -106,7 +106,7 @@ export const ModelRegister = ({
 
   const handleCancel = () => {
     setFormData({
-      name: '',
+      modelProvider: '',
       model: '',
       apiUrl: '',
       apiKey: '',
@@ -129,7 +129,7 @@ export const ModelRegister = ({
 
   const handleCloseDeployment = () => {
     setFormData({
-      name: '',
+      modelProvider: '',
       model: '',
       apiUrl: '',
       apiKey: '',
@@ -199,7 +199,6 @@ export const ModelRegister = ({
                 onChange={handleFormChange}
                 onValidationChange={handleValidationChange}
                 disabled={disabled}
-                modelConfig={modelProviderConfigs}
               />
 
               <EuiSpacer size='xl' />

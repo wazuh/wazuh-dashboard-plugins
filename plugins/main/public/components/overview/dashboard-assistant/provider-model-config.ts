@@ -7,13 +7,19 @@ export interface ProviderModelConfig {
   headers: Record<string, string>;
   request_body: string;
   extra_parameters?: Record<string, any>;
+  default_model?: string;
+  default_endpoint?: string;
+  default_endpoint_regex?: string;
 }
 
-export const modelProviderConfigs: ProviderModelConfig[] = [
-  {
+export const modelProviderConfigs: Record<string, ProviderModelConfig> = {
+  OpenAI: {
     model_family: 'GPT',
     model_provider: 'OpenAI',
     models: ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo', 'gpt-4'],
+    default_model: 'gpt-4o',
+    default_endpoint: 'api.openai.com',
+    default_endpoint_regex: String.raw`^https://api\.openai\.com/.*$`,
     response_filter: '$.choices[0].message.content',
     url_path: '/v1/chat/completions',
     headers: {
@@ -22,7 +28,7 @@ export const modelProviderConfigs: ProviderModelConfig[] = [
     request_body:
       '{ "model": "${parameters.model}", "messages": ${parameters.messages} }',
   },
-  {
+  Anthropic: {
     model_family: 'Claude',
     model_provider: 'Anthropic',
     models: [
@@ -33,6 +39,9 @@ export const modelProviderConfigs: ProviderModelConfig[] = [
       'claude-3-5-sonnet-latest',
       'claude-3-5-haiku-latest',
     ],
+    default_model: 'claude-3-7-sonnet-latest',
+    default_endpoint: 'api.anthropic.com',
+    default_endpoint_regex: String.raw`^https://api\.anthropic\.com/.*$`,
     response_filter: '$.content[0].text',
     url_path: '/v1/messages',
     headers: {
@@ -46,4 +55,4 @@ export const modelProviderConfigs: ProviderModelConfig[] = [
     request_body:
       '{ "model": "${parameters.model}", "max_tokens": ${parameters.max_tokens}, "messages": ${parameters.messages} }',
   },
-];
+};
