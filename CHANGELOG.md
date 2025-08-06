@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.10.3
 
+### Fixed
+
+- Fixed a bug that caused a format issue in csv reports [#7648](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7648)
+
 ## Wazuh v4.10.2 - OpenSearch Dashboards 2.16.0 - Revision 01
 
 ### Added
