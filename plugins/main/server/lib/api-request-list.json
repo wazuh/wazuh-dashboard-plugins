@@ -986,7 +986,6 @@
 
                 "docker-listener",
 
-                "osquery",
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -1248,7 +1247,6 @@
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
 
-                "wazuh-modulesd:osquery",
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
               ]
@@ -4320,7 +4318,6 @@
 
                 "docker-listener",
 
-                "osquery",
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -4576,7 +4573,6 @@
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
 
-                "wazuh-modulesd:osquery",
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
               ]

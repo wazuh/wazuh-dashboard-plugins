@@ -1133,7 +1133,6 @@
 
                 "docker-listener",
 
-                "osquery",
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -4521,7 +4520,6 @@
 
                 "docker-listener",
 
-                "osquery",
                 "syscollector",
                 "vulnerability-detector"
               ]
