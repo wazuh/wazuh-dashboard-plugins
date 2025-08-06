@@ -1,6 +1,6 @@
 import { ModelPredictResponse } from '../../../domain/types';
 import { Model } from '../../../domain/entities/model';
-import { ModelPredictValidator } from '../../../validate-model-predict';
+import { ModelPredictValidator } from '../../../model-predict-validator';
 import { TEST_PROMPT } from '../../../../../components/model-test-result';
 import { ModelRepository } from '../../../application/ports/model-repository';
 import { CreateModelDto } from '../../../application/dtos/create-model-dto';
