@@ -1,6 +1,6 @@
-import { AgentLLM } from '../../domain/entities/agent-llm';
+import { AgentLLMOpenSearchRequestDto } from '../dtos/agent-llm-opensearch-request-dto';
 
-export class AgentLLMFactory {
+export class AgentLLMOpenSearchRequestFactory {
   private static get defaultParameters(): Record<string, any> {
     return {
       max_iteration: 3,
@@ -12,7 +12,7 @@ export class AgentLLMFactory {
     modelId: string,
     response_filter: string,
     extra_parameters?: Record<string, any>,
-  ): AgentLLM {
+  ): AgentLLMOpenSearchRequestDto {
     return {
       model_id: modelId,
       parameters: {
@@ -20,6 +20,6 @@ export class AgentLLMFactory {
         ...this.defaultParameters,
         ...extra_parameters,
       },
-    } as AgentLLM;
+    };
   }
 }

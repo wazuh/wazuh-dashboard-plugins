@@ -1,12 +1,11 @@
-import { Agent } from '../../../domain/entities/agent';
 import { AppType } from '../../../domain/enums/app-type';
 import { CreateAgentDto } from '../../../application/dtos/create-agent-dto';
-import { AgentLLMFactory } from '../../../application/factories/agent-llm-factory';
+import { AgentLLMOpenSearchRequestFactory } from './agent-llm-opensearch-request-factory';
 import { AgentOpenSearchRequestDto } from '../dtos/agent-opensearch-request-dto';
 
 export class AgentOpenSearchRequestFactory {
   public static create(config: CreateAgentDto): AgentOpenSearchRequestDto {
-    const llm = AgentLLMFactory.create(
+    const llm = AgentLLMOpenSearchRequestFactory.create(
       config.llm.model_id,
       config.llm.parameters.response_filter ?? '',
     );
