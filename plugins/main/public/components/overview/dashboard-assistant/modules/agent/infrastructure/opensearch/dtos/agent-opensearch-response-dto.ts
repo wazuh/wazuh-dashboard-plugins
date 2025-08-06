@@ -1,3 +1,5 @@
+import { AgentType } from '../../../domain/enums/agent-type';
+
 export interface AgentOpenSearchResponseDto {
   created_time?: number;
   memory?: Memory;
@@ -6,7 +8,7 @@ export interface AgentOpenSearchResponseDto {
   is_hidden?: boolean;
   name: string;
   description: string;
-  type: string;
+  type: AgentType;
   llm: Llm;
   tools: Tool[];
 }
