@@ -6,7 +6,6 @@ import type {
   InstallationProgress,
 } from '../domain/types';
 import { InstallDashboardAssistantResponse } from '../domain/types';
-import { ConnectorFactory } from '../../../modules/connector/application/factories/connector-factory';
 import { modelProviderConfigs } from '../../../provider-model-config';
 
 interface ModelConfiguration {
@@ -64,7 +63,9 @@ export function useAssistantInstallation() {
           endpoint: assistantModelInfo.api_url,
           model_id: assistantModelInfo.model_id,
           api_key: assistantModelInfo.api_key,
-          model_config,
+          url_path: model_config.url_path,
+          headers: model_config.headers,
+          request_body: model_config.request_body,
           extra_parameters: model_config.extra_parameters || {},
         },
         model: {

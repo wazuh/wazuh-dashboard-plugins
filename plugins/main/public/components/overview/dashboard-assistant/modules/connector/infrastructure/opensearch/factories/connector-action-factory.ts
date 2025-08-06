@@ -1,4 +1,4 @@
-import { ConnectorAction } from '../../domain/entities/connector-action';
+import { ConnectorAction } from '../../../domain/entities/connector-action';
 
 export class ConnectorActionFactory {
   static create(action: {

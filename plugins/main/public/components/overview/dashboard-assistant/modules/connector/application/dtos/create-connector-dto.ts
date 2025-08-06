@@ -1,11 +1,11 @@
-import { ProviderModelConfig } from '../../../../provider-model-config';
-
 export interface CreateConnectorDto {
   name: string;
   description: string;
   endpoint: string;
   model_id: string;
-  model_config: ProviderModelConfig;
+  headers: Record<string, string>;
+  request_body: string;
+  url_path: string;
   api_key: string;
   extra_parameters?: Record<string, any>;
 }
