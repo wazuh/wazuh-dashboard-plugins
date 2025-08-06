@@ -67,7 +67,7 @@ jest.mock('./agentless/agentless', () => () => <></>);
 
 jest.mock('./aws-s3/aws-s3', () => () => <></>);
 
-jest.mock('./azure-logs/azure-logs', () => () => <></>);
+
 
 jest.mock('./google-cloud-pub-sub/google-cloud-pub-sub', () => () => <></>);
 
