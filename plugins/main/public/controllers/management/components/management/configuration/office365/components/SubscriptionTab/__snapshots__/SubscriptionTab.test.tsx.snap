@@ -21,8 +21,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
         "enabled": "yes",
         "interval": 600,
         "only_future_events": "yes",
-        "subscriptions": Array [
-  
+                "subscriptions": Array [
           "Audit.Exchange",
           "Audit.SharePoint",
           "Audit.General",
@@ -229,10 +228,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
         ]
       }
       items={
-        Array [
-          Object {
-  
-          },
+                Array [
           Object {
             "subscription": "Audit.Exchange",
           },
@@ -394,11 +390,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                           <div
                             className="euiTableCellContent"
                           >
-                            <span
-                              className="euiTableCellContent__text"
-                            >
-                      
-                            </span>
+
                           </div>
                         </td>
                       </EuiTableRowCell>

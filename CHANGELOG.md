@@ -11,10 +11,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
-- Removed deprecated agent modules (OpenSCAP, CIS-CAT, Azure Logs, OSQuery) as part of Wazuh 5.0 agent clean-up [#7632](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7632)
 - Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed prompt related to statistic job is disabled in Statistics app [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
+- Removed deprecated agent modules (OpenSCAP, CIS-CAT, Azure Logs, OSQuery) as part of Wazuh 5.0 agent clean-up [#7632](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7632)
 
 ### Changed
 
