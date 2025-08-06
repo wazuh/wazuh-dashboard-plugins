@@ -1,6 +1,6 @@
 import { ModelPredictResponse } from '../../../domain/types';
 import { Model } from '../../../domain/entities/model';
-import { validateModelPredictResponse } from '../../../validate-model-predict';
+import { ModelPredictValidator } from '../../../validate-model-predict';
 import { TEST_PROMPT } from '../../../../../components/model-test-result';
 import { ModelRepository } from '../../../application/ports/model-repository';
 import { CreateModelDto } from '../../../application/dtos/create-model-dto';
@@ -74,7 +74,7 @@ export class ModelOpenSearchRepository implements ModelRepository {
         );
 
       // Validate that the response has the expected structure using the validation function
-      validateModelPredictResponse(response);
+      ModelPredictValidator.validate(response);
 
       return response;
     } catch (error) {
