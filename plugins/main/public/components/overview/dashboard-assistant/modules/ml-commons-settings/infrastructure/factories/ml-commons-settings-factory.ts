@@ -1,7 +1,7 @@
 import { MlCommonsPluginSettings } from '../../domain/entities/plugin-settings';
-import { CreateMLCommonsDto } from '../dtos/create-ml-commons-dto';
+import { CreateMLCommonsDto } from '../../application/dtos/create-ml-commons-dto';
 
-export class MLCommonsSettingsFactory {
+export class MLCommonsSettingsCreateFactory {
   public static create(config: CreateMLCommonsDto): MlCommonsPluginSettings {
     return {
       ml_commons: {
