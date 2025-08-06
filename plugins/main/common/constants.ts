@@ -263,7 +263,6 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
-      osquery: true,
       settingIndexPattern:
         WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
@@ -414,7 +413,7 @@ export enum WAZUH_MODULES_ID {
   AUDITING = 'audit',
 
   VULNERABILITIES = 'vuls',
-  OSQUERY = 'osquery',
+
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
   PCI_DSS = 'pci',

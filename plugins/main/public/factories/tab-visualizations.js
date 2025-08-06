@@ -36,7 +36,7 @@ export class TabVisualizations {
       nist: 5,
       virustotal: 6,
       configuration: 0,
-      osquery: 5,
+
       docker: 5,
       mitre: 6,
     };
@@ -56,7 +56,7 @@ export class TabVisualizations {
       aws: 8,
       gcp: 5,
       virustotal: 5,
-      osquery: 6,
+
       sca: 0,
       docker: 5,
       mitre: 6,

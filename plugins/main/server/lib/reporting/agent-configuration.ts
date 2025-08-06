@@ -140,23 +140,6 @@ export const AgentConfiguration = {
       title: 'System threats and incident response',
       sections: [
         {
-          subtitle: 'Osquery',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-osquery.html',
-          ),
-          desc: 'Expose an operating system as a high-performance relational database',
-          wodle: [{ name: 'osquery' }],
-          labels: [
-            {
-              disabled: 'Osquery integration disabled',
-              run_daemon: 'Auto-run the Osquery daemon',
-              add_labels: 'Use defined labels as decorators',
-              log_path: 'Path to the Osquery results log file',
-              config_path: 'Path to the Osquery configuration file',
-            },
-          ],
-        },
-        {
           subtitle: 'Inventory data',
           docuLink: webDocumentationLink(
             'user-manual/reference/ossec-conf/wodle-syscollector.html',

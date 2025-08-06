@@ -83,7 +83,7 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
     { vulnerabilities: true },
-    { osquery: true },
+
     { docker: true },
     { mitre: true },
   ],
@@ -130,7 +130,7 @@ export enum WAZUH_MODULES_ID {
   AUDITING = 'audit',
 
   VULNERABILITIES = 'vuls',
-  OSQUERY = 'osquery',
+
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
   PCI_DSS = 'pci',

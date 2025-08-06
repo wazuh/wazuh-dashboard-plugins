@@ -108,38 +108,6 @@ export const AggregationFields = {
     customLabel: 'Type',
     missing: '-',
   },
-  'data.osquery.name': {
-    field: 'data.osquery.name',
-    size: 20,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Name',
-    missing: '-',
-  },
-  'data.osquery.action': {
-    field: 'data.osquery.action',
-    size: 5,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Action',
-    missing: '-',
-  },
-  'data.osquery.pack': {
-    field: 'data.osquery.pack',
-    size: 5,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Pack',
-    missing: '-',
-  },
-  'data.osquery.calendarTime': {
-    field: 'data.osquery.calendarTime',
-    size: 2,
-    order: 'desc',
-    orderBy: '1',
-    customLabel: 'Date',
-    missing: '-',
-  },
 
   'data.title': {
     field: 'data.title',

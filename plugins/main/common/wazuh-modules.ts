@@ -114,12 +114,7 @@ export const WAZUH_MODULES = {
     description:
       'Check the current agent configuration remotely applied by its group.',
   },
-  osquery: {
-    title: 'Osquery',
-    appId: 'osquery',
-    description:
-      'Osquery can be used to expose an operating system as a high-performance relational database.',
-  },
+
   sca: {
     title: 'Configuration assessment',
     appId: 'configuration-assessment',

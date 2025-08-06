@@ -48,17 +48,6 @@ const gcpAlertsSummary = {
   ],
 };
 
-const osqueryAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['data.osquery.name'],
-    AggregationFields['data.osquery.action'],
-    AggregationFields['agent.name'],
-    AggregationFields['data.osquery.pack'],
-    AggregationFields['data.osquery.calendarTime'],
-  ],
-};
-
 const mitreAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -158,7 +147,7 @@ export default {
   nist: [nistLastAlerts],
   gcp: [gcpAlertsSummary],
   tsc: [tscAlertsSummary],
-  osquery: [osqueryAlertsSummary],
+
   mitre: [mitreAlertsSummary],
 
   pm: [pmAlertsSummary],
