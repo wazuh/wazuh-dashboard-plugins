@@ -22,7 +22,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
         "interval": 600,
         "only_future_events": "yes",
         "subscriptions": Array [
-          "Audit.AzureActiveDirectory",
+  
           "Audit.Exchange",
           "Audit.SharePoint",
           "Audit.General",
@@ -231,7 +231,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
       items={
         Array [
           Object {
-            "subscription": "Audit.AzureActiveDirectory",
+  
           },
           Object {
             "subscription": "Audit.Exchange",
@@ -397,7 +397,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                             <span
                               className="euiTableCellContent__text"
                             >
-                              Audit.AzureActiveDirectory
+                      
                             </span>
                           </div>
                         </td>

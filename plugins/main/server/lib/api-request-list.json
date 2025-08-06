@@ -983,7 +983,6 @@
                 "syslog_output",
                 "agent-key-polling",
                 "aws-s3",
-                "azure-logs",
 
                 "docker-listener",
 
@@ -1242,7 +1241,6 @@
                 "wazuh-modulesd",
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
-                "wazuh-modulesd:azure-logs",
 
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
@@ -4319,7 +4317,6 @@
                 "syslog_output",
                 "agent-key-polling",
                 "aws-s3",
-                "azure-logs",
 
                 "docker-listener",
 
@@ -4572,7 +4569,6 @@
                 "wazuh-modulesd",
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
-                "wazuh-modulesd:azure-logs",
 
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",

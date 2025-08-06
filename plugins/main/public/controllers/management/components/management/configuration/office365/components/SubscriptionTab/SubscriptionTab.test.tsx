@@ -18,7 +18,7 @@ jest.mock(
   '../../../../../../../../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
   () => ({
     htmlIdGenerator: () => () => 'htmlId',
-  })
+  }),
 );
 
 describe('SubscriptionTab component', () => {
@@ -37,7 +37,6 @@ describe('SubscriptionTab component', () => {
           },
         ],
         subscriptions: [
-          'Audit.AzureActiveDirectory',
           'Audit.Exchange',
           'Audit.SharePoint',
           'Audit.General',
@@ -48,7 +47,7 @@ describe('SubscriptionTab component', () => {
     const agent = { id: '000' };
 
     const wrapper = mount(
-      <SubscriptionTab wodleConfiguration={wodleConfiguration} agent={agent} />
+      <SubscriptionTab wodleConfiguration={wodleConfiguration} agent={agent} />,
     );
 
     expect(wrapper).toMatchSnapshot();
