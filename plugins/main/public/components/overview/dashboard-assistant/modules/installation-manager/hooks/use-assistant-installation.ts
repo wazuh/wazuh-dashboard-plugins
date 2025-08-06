@@ -56,7 +56,7 @@ export function useAssistantInstallation() {
       const request: InstallDashboardAssistantRequest = {
         selected_provider: assistantModelInfo.model_provider,
         ml_common_settings: {
-          endpoints_regex: ['.*'],
+          endpoints_regex: [model_config.default_endpoint_regex || '.*'],
         },
         connector: {
           name: `${assistantModelInfo.model_provider} Chat Connector`,
