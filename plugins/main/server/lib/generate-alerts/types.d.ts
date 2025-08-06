@@ -106,7 +106,7 @@ type DataKeys =
   | 'file'
   | 'virustotal'
   | 'vulnerability'
-  | 'osquery'
+
   | 'srcip'
   | 'srcuser'
   | 'srcport'
@@ -186,8 +186,7 @@ export type Params = {
   virustotal: boolean;
   /* if true, set vulnerabilities fields */
   vulnerabilities: boolean;
-  /* if true, set Osquery fields */
-  osquery: boolean;
+
   /* if true, set pci_dss fields */
   pci_dss: boolean;
   /* if true, set gdpr fields */

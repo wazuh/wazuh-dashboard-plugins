@@ -38,7 +38,7 @@ const IntegrityMonitoring = require('./sample-data/integrity-monitoring');
 const GCP = require('./sample-data/gcp');
 const Docker = require('./sample-data/docker');
 const Mitre = require('./sample-data/mitre');
-const Osquery = require('./sample-data/osquery');
+
 
 const PolicyMonitoring = require('./sample-data/policy-monitoring');
 const Virustotal = require('./sample-data/virustotal');
@@ -724,21 +724,7 @@ function generateAlert(params) {
     };
   }
 
-  if (params.osquery) {
-    alert.rule.groups.push('osquery');
-    alert.data.osquery = {};
-    if (Random.number(0, 5) === 0) {
-      alert.rule.description = 'osquery error message';
-    } else {
-      const dataOsquery = Random.arrayItem(Osquery.dataOsquery);
-      alert.data.osquery = dataOsquery.osquery;
-      alert.data.osquery.calendarTime = alert.timestamp;
-      alert.rule.description = dataOsquery.rule.description;
-      Random.number(0, 99) === 0
-        ? (alert.data.osquery.action = 'removed')
-        : null;
-    }
-  }
+
 
   // Regulatory compliance
   if (

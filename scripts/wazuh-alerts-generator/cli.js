@@ -87,7 +87,7 @@
 
     vulnerabilities: { vulnerabilities: true },
     virustotal: { virustotal: true },
-    osquery: { osquery: true },
+
     docker: { docker: true },
     mitre: { mitre: true },
     yara: { yara: true },
@@ -108,7 +108,7 @@
       'windows',
     ],
     'auditing-policy-monitoring': ['audit', 'rootcheck', 'virustotal', 'yara'],
-    'thread-detection': ['docker', 'mitre', 'osquery', 'vulnerabilities'],
+    'thread-detection': ['docker', 'mitre', 'vulnerabilities'],
   };
 
   function displayHelp() {
