@@ -106,7 +106,6 @@ type DataKeys =
   | 'file'
   | 'virustotal'
   | 'vulnerability'
-
   | 'srcip'
   | 'srcuser'
   | 'srcport'
