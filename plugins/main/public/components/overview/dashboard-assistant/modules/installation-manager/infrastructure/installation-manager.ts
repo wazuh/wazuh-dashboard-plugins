@@ -152,7 +152,7 @@ export class InstallationManager implements IInstallationManager {
           tools: [
             AgentToolFactory.create({
               type: Tool.ML_MODEL_TOOL,
-              name: `${request.connector.model_config.model_provider}_${request.connector.model_id}_llm_model`,
+              name: `${request.selected_provider}_${request.connector.model_id}_llm_model`,
               description: `A general-purpose language model tool capable of answering broad questions, summarizing information, and providing analysis that doesn't require searching specific data. Use this when no other specialized tool is applicable.`,
               parameters: {
                 model_id: modelId,
