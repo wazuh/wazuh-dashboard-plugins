@@ -5,6 +5,8 @@ import { AgentRepository } from '../../../application/ports/agent-repository';
 import { Agent } from '../../../domain/entities/agent';
 import { AgentOpenSearchMapper } from '../mapper/agent-opensearch-mapper';
 import { AgentOpenSearchResponseDto } from '../dtos/agent-opensearch-response-dto';
+import { AgentOpenSearchResponseCreateDto } from '../dtos/agent-opensearch-response-create-dto';
+import { OpenSearchResponseDto } from '../../../../common/infrastructure/opensearch/dtos/opensearch-response-dto';
 
 export class AgentOpenSearchRepository implements AgentRepository {
   constructor(private readonly httpClient: IHttpClient) {}
@@ -12,9 +14,11 @@ export class AgentOpenSearchRepository implements AgentRepository {
   public async create(agentDto: CreateAgentDto) {
     const agentOpenSearchRequest =
       AgentOpenSearchRequestFactory.create(agentDto);
-    const response = await this.httpClient.proxyRequest.post<{
-      agent_id: string;
-    }>('/_plugins/_ml/agents/_register', agentOpenSearchRequest);
+    const response =
+      await this.httpClient.proxyRequest.post<AgentOpenSearchResponseCreateDto>(
+        '/_plugins/_ml/agents/_register',
+        agentOpenSearchRequest,
+      );
     return AgentOpenSearchMapper.fromRequest(
       response.agent_id,
       agentOpenSearchRequest,
@@ -40,11 +44,9 @@ export class AgentOpenSearchRepository implements AgentRepository {
 
     const {
       hits: { hits },
-    } = await this.httpClient.proxyRequest.post<{
-      hits: {
-        hits: Array<{ _id: string; _source: AgentOpenSearchResponseDto }>;
-      };
-    }>('/_plugins/_ml/agents/_search', searchPayload);
+    } = await this.httpClient.proxyRequest.post<
+      OpenSearchResponseDto<AgentOpenSearchResponseDto>
+    >('/_plugins/_ml/agents/_search', searchPayload);
 
     if (hits.length > 0) {
       return hits.map(hit =>
@@ -80,14 +82,9 @@ export class AgentOpenSearchRepository implements AgentRepository {
         size: 1000,
       };
 
-      const response = await this.httpClient.proxyRequest.post<{
-        hits: {
-          hits: Array<{
-            _id: string;
-            _source: AgentOpenSearchResponseDto;
-          }>;
-        };
-      }>('/_plugins/_ml/agents/_search', searchPayload);
+      const response = await this.httpClient.proxyRequest.post<
+        OpenSearchResponseDto<AgentOpenSearchResponseDto>
+      >('/_plugins/_ml/agents/_search', searchPayload);
 
       return response.hits.hits.map(hit =>
         AgentOpenSearchMapper.fromResponse(hit._id, hit._source),
