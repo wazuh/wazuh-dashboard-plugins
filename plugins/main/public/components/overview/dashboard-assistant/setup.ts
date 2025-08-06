@@ -2,7 +2,7 @@ import { AgentRepository } from './modules/agent/application/ports/agent-reposit
 import { createAgentUseCase } from './modules/agent/application/use-cases/create-agent';
 import { useAgentByModelIdUseCase } from './modules/agent/application/use-cases/use-agent-by-model-id';
 import { registerAgentUseCase } from './modules/agent/application/use-cases/register-agent';
-import { AgentOpenSearchRepository } from './modules/agent/infrastructure/opensearch/repositories/agent-repository';
+import { AgentOpenSearchRepository } from './modules/agent/infrastructure/opensearch/repositories/agent-opensearch-repository';
 import { HttpWithProxyClient } from './modules/common/http/infrastructure/http-with-proxy-client';
 import { ConnectorRepository } from './modules/connector/application/ports/connector-repository';
 import { createConnectorUseCase } from './modules/connector/application/use-cases/create-connector';

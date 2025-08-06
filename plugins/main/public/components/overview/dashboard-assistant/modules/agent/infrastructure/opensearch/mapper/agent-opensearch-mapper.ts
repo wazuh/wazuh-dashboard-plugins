@@ -2,7 +2,7 @@ import { Agent } from '../../../domain/entities/agent';
 import { AgentOpenSearchRequestDto } from '../dtos/agent-opensearch-request-dto';
 import { AgentOpenSearchResponseDto } from '../dtos/agent-opensearch-response-dto';
 
-export class AgentMapper {
+export class AgentOpenSearchMapper {
   public static fromRequest(
     agentId: string,
     dto: AgentOpenSearchRequestDto,

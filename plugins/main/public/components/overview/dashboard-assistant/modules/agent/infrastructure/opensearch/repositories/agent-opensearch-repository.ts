@@ -1,20 +1,24 @@
 import { IHttpClient } from '../../../../common/http/domain/entities/http-client';
 import { CreateAgentDto } from '../../../application/dtos/create-agent-dto';
-import { AgentRequestFactory } from '../factories/agent-request-factory';
+import { AgentOpenSearchRequestFactory } from '../factories/agent-opensearch-request-factory';
 import { AgentRepository } from '../../../application/ports/agent-repository';
 import { Agent } from '../../../domain/entities/agent';
-import { AgentMapper } from '../mapper/agent-mapper';
+import { AgentOpenSearchMapper } from '../mapper/agent-opensearch-mapper';
+import { AgentOpenSearchResponseDto } from '../dtos/agent-opensearch-response-dto';
 
 export class AgentOpenSearchRepository implements AgentRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async create(agentDto: CreateAgentDto) {
-    const agentRequest = AgentRequestFactory.create(agentDto);
-    const response = (await this.httpClient.proxyRequest.post(
-      '/_plugins/_ml/agents/_register',
-      agentRequest,
-    )) as { agent_id: string };
-    return AgentMapper.fromRequest(response.agent_id, agentRequest);
+    const agentOpenSearchRequest =
+      AgentOpenSearchRequestFactory.create(agentDto);
+    const response = await this.httpClient.proxyRequest.post<{
+      agent_id: string;
+    }>('/_plugins/_ml/agents/_register', agentOpenSearchRequest);
+    return AgentOpenSearchMapper.fromRequest(
+      response.agent_id,
+      agentOpenSearchRequest,
+    );
   }
 
   private findManyByModelId = async (
@@ -38,12 +42,14 @@ export class AgentOpenSearchRepository implements AgentRepository {
       hits: { hits },
     } = await this.httpClient.proxyRequest.post<{
       hits: {
-        hits: Array<{ _id: string; _source: any }>;
+        hits: Array<{ _id: string; _source: AgentOpenSearchResponseDto }>;
       };
     }>('/_plugins/_ml/agents/_search', searchPayload);
 
     if (hits.length > 0) {
-      return hits.map(hit => AgentMapper.fromResponse(hit._id, hit._source));
+      return hits.map(hit =>
+        AgentOpenSearchMapper.fromResponse(hit._id, hit._source),
+      );
     }
     return [];
   };
@@ -78,13 +84,13 @@ export class AgentOpenSearchRepository implements AgentRepository {
         hits: {
           hits: Array<{
             _id: string;
-            _source: any;
+            _source: AgentOpenSearchResponseDto;
           }>;
         };
       }>('/_plugins/_ml/agents/_search', searchPayload);
 
       return response.hits.hits.map(hit =>
-        AgentMapper.fromResponse(hit._id, hit._source),
+        AgentOpenSearchMapper.fromResponse(hit._id, hit._source),
       );
     } catch (error) {
       console.error('Error fetching agents:', error);

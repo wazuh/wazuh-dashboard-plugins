@@ -4,7 +4,7 @@ import { CreateAgentDto } from '../../../application/dtos/create-agent-dto';
 import { AgentLLMFactory } from '../../../application/factories/agent-llm-factory';
 import { AgentOpenSearchRequestDto } from '../dtos/agent-opensearch-request-dto';
 
-export class AgentRequestFactory {
+export class AgentOpenSearchRequestFactory {
   public static create(config: CreateAgentDto): AgentOpenSearchRequestDto {
     const llm = AgentLLMFactory.create(
       config.llm.model_id,
