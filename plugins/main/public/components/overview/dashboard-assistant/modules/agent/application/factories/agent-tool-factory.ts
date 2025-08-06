@@ -1,21 +1,21 @@
 import { AgentTool } from '../../domain/entities/agent-tool';
 
 export class AgentToolFactory {
-  public static create(
-    type: string,
-    name?: string,
-    description?: string,
-    parameters?: Record<string, any>,
-  ): AgentTool {
-    const tool: AgentTool = { type };
-    if (name) {
-      tool.name = name;
+  public static create(params: {
+    type: string;
+    name?: string;
+    description?: string;
+    parameters?: Record<string, any>;
+  }): AgentTool {
+    const tool: AgentTool = { type: params.type };
+    if (params.name) {
+      tool.name = params.name;
     }
-    if (description) {
-      tool.description = description;
+    if (params.description) {
+      tool.description = params.description;
     }
-    if (parameters) {
-      tool.parameters = parameters;
+    if (params.parameters) {
+      tool.parameters = params.parameters;
     }
     return tool as AgentTool;
   }

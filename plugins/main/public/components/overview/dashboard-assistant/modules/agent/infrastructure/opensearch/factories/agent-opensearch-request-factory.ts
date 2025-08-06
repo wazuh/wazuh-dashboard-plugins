@@ -5,10 +5,11 @@ import { AgentOpenSearchRequestDto } from '../dtos/agent-opensearch-request-dto'
 
 export class AgentOpenSearchRequestFactory {
   public static create(config: CreateAgentDto): AgentOpenSearchRequestDto {
-    const llm = AgentLLMOpenSearchRequestFactory.create(
-      config.llm.model_id,
-      config.llm.parameters.response_filter ?? '',
-    );
+    const llm = AgentLLMOpenSearchRequestFactory.create({
+      modelId: config.llm.model_id,
+      response_filter: config.llm.parameters.response_filter ?? '',
+      extra_parameters: config.llm.parameters.extra_parameters,
+    });
 
     return {
       name: config.name,

@@ -8,17 +8,17 @@ export class AgentLLMOpenSearchRequestFactory {
     };
   }
 
-  public static create(
-    modelId: string,
-    response_filter: string,
-    extra_parameters?: Record<string, any>,
-  ): AgentLLMOpenSearchRequestDto {
+  public static create(params: {
+    modelId: string;
+    response_filter: string;
+    extra_parameters?: Record<string, any>;
+  }): AgentLLMOpenSearchRequestDto {
     return {
-      model_id: modelId,
+      model_id: params.modelId,
       parameters: {
-        response_filter,
+        response_filter: params.response_filter,
         ...this.defaultParameters,
-        ...extra_parameters,
+        ...params.extra_parameters,
       },
     };
   }

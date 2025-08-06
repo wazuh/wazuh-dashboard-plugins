@@ -33,7 +33,15 @@ export function useModels(): UseModelsReturn {
   }, []);
 
   const getTableData = useCallback(() => {
-    return models.map(model => model.toTableFormat());
+    return models.map(model => {
+      return {
+        name: model.name,
+        id: model.id,
+        version: model.version,
+        status: model.status,
+        createdAt: model.created_at,
+      };
+    });
   }, [models]);
 
   // Load models on mount

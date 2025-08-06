@@ -6,7 +6,7 @@ export class ModelOpenSearchMapper {
   public static toModel(
     source: ModelOpenSearchResponse & { id: string },
   ): Model {
-    return new Model({
+    return {
       id: source.id,
       name: source.name,
       function_name: source.algorithm.toLowerCase(),
@@ -16,6 +16,6 @@ export class ModelOpenSearchMapper {
       version: source.model_version,
       status: ModelStateMapper.toStatus(source.model_state),
       created_at: new Date(source.created_time).toISOString(),
-    });
+    };
   }
 }
