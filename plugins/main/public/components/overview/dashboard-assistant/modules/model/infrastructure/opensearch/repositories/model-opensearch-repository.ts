@@ -28,7 +28,7 @@ export class ModelOpenSearchRepository implements ModelRepository {
         query: {
           match_all: {},
         },
-        size: 1000,
+        size: 25,
       };
 
       /* ToDo: Change to call ml-commons-dashboards endpoints create on server */
