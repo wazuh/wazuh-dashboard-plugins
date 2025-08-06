@@ -38,7 +38,6 @@ const GCP = require('./sample-data/gcp');
 const Docker = require('./sample-data/docker');
 const Mitre = require('./sample-data/mitre');
 
-
 const PolicyMonitoring = require('./sample-data/policy-monitoring');
 const Virustotal = require('./sample-data/virustotal');
 const Vulnerability = require('./sample-data/vulnerabilities');
@@ -668,8 +667,6 @@ function generateAlert(params) {
       ...dataVulnerability.data,
     };
   }
-
-
 
   // Regulatory compliance
   if (
