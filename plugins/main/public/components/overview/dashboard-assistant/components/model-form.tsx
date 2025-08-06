@@ -9,12 +9,10 @@ import {
 import { modelProviderConfigs } from '../provider-model-config';
 import { ModelFormData } from './types';
 import { mapToOptions } from './utils/map-to-options';
-import { validateModelForm, ValidationResult } from './model-form-schema';
 
 interface ModelFormProps {
   onChange?: (data: ModelFormData) => void;
   onValidationChange?: (isValid: boolean) => void;
-  onValidationErrors?: (validationResult: ValidationResult) => void;
   disabled?: boolean;
 }
 
@@ -25,7 +23,6 @@ const mapModelProvidersToOptions = () => {
 export const ModelForm = ({
   onChange,
   onValidationChange,
-  onValidationErrors,
   disabled = false,
 }: ModelFormProps) => {
   const [formData, setFormData] = useState<ModelFormData>({
@@ -39,12 +36,6 @@ export const ModelForm = ({
     ReturnType<typeof mapToOptions>
   >([]);
 
-  const [validationResult, setValidationResult] = useState<ValidationResult>({
-    isValid: false,
-    errors: [],
-    value: null,
-  });
-
   useEffect(() => {
     if (onChange) {
       onChange(formData);
@@ -52,18 +43,15 @@ export const ModelForm = ({
   }, [formData, onChange]);
 
   useEffect(() => {
-    // Use Joi schema validation instead of simple boolean checks
-    const validation = validateModelForm(formData);
-    setValidationResult(validation);
-
+    const isValid =
+      formData.modelProvider &&
+      formData.model &&
+      formData.apiUrl &&
+      formData.apiKey;
     if (onValidationChange) {
-      onValidationChange(validation.isValid);
+      onValidationChange(!!isValid);
     }
-
-    if (onValidationErrors) {
-      onValidationErrors(validation);
-    }
-  }, [formData, onValidationChange, onValidationErrors]);
+  }, [formData, onValidationChange]);
 
   const handleModelProviderChange = (
     e: React.ChangeEvent<HTMLSelectElement>,
@@ -96,27 +84,9 @@ export const ModelForm = ({
     setFormData(prev => ({ ...prev, apiKey: e.target.value }));
   };
 
-  // Helper function to get error message for a specific field
-  const getFieldError = (
-    fieldName: keyof ModelFormData,
-  ): string | undefined => {
-    const error = validationResult.errors.find(err => err.field === fieldName);
-    return error?.message;
-  };
-
-  // Helper function to check if a field has an error
-  const hasFieldError = (fieldName: keyof ModelFormData): boolean => {
-    return validationResult.errors.some(err => err.field === fieldName);
-  };
-
   return (
     <EuiForm>
-      <EuiFormRow
-        label='Provider'
-        fullWidth
-        error={getFieldError('modelProvider')}
-        isInvalid={hasFieldError('modelProvider')}
-      >
+      <EuiFormRow label='Provider' fullWidth>
         <EuiSelect
           fullWidth
           options={mapModelProvidersToOptions()}
@@ -124,18 +94,12 @@ export const ModelForm = ({
           onChange={handleModelProviderChange}
           hasNoInitialSelection
           disabled={disabled}
-          isInvalid={hasFieldError('modelProvider')}
         />
       </EuiFormRow>
 
       <EuiSpacer size='m' />
 
-      <EuiFormRow
-        label='Model'
-        fullWidth
-        error={getFieldError('model')}
-        isInvalid={hasFieldError('model')}
-      >
+      <EuiFormRow label='Model' fullWidth>
         <EuiSelect
           fullWidth
           options={modelsOptions}
@@ -143,36 +107,24 @@ export const ModelForm = ({
           onChange={handleModelChange}
           hasNoInitialSelection
           disabled={!formData.modelProvider || disabled}
-          isInvalid={hasFieldError('model')}
         />
       </EuiFormRow>
 
       <EuiSpacer size='m' />
 
-      <EuiFormRow
-        label='API URL'
-        fullWidth
-        error={getFieldError('apiUrl')}
-        isInvalid={hasFieldError('apiUrl')}
-      >
+      <EuiFormRow label='API URL' fullWidth>
         <EuiFieldText
           fullWidth
           value={formData.apiUrl}
           onChange={handleApiUrlChange}
           placeholder='Enter API URL'
           disabled={disabled}
-          isInvalid={hasFieldError('apiUrl')}
         />
       </EuiFormRow>
 
       <EuiSpacer size='m' />
 
-      <EuiFormRow
-        label='API key'
-        fullWidth
-        error={getFieldError('apiKey')}
-        isInvalid={hasFieldError('apiKey')}
-      >
+      <EuiFormRow label='API key' fullWidth>
         <EuiFieldText
           fullWidth
           type='password'
@@ -180,7 +132,6 @@ export const ModelForm = ({
           onChange={handleApiKeyChange}
           placeholder='Enter API key'
           disabled={disabled}
-          isInvalid={hasFieldError('apiKey')}
         />
       </EuiFormRow>
     </EuiForm>
