@@ -7,7 +7,7 @@ export const MODULES_CARDS = {
   GitHub: MODULES_PAGE['gitHubCardToggleButton'],
 
   VirusTotal: MODULES_PAGE['virusTotalToggleButton'],
-  Osquery: MODULES_PAGE['osqueryToggleButton'],
+
   'Docker listener': MODULES_PAGE['dockerListenerToggleButton'],
   GDPR: MODULES_PAGE['gDPRToggleButton'],
   HIPAA: MODULES_PAGE['hIPAAToggleButton'],
@@ -20,7 +20,7 @@ export const MODULES_SETTINGS = {
   GitHub: MODULES_DIRECTORY_PAGE['gitHubCard'],
 
   VirusTotal: MODULES_DIRECTORY_PAGE['virusTotalCard'],
-  Osquery: MODULES_DIRECTORY_PAGE['osqueryCard'],
+
   'Docker listener': MODULES_DIRECTORY_PAGE['dockerListenerCard'],
   GDPR: MODULES_DIRECTORY_PAGE['gDPRCard'],
   HIPAA: MODULES_DIRECTORY_PAGE['hIPAACard'],
