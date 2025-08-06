@@ -79,7 +79,7 @@ export class AgentOpenSearchRepository implements AgentRepository {
     try {
       const searchPayload = {
         query: { match_all: {} },
-        size: 1000,
+        size: 25,
       };
 
       const response = await this.httpClient.proxyRequest.post<
