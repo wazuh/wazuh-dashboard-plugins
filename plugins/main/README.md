@@ -25,11 +25,13 @@ the Wazuh Indexer. The plugin provides the following capabilities:
     - System auditing: Audit users behavior, monitoring command execution and alerting on access to critical files.
 
   - Threat Detection and Response
+
     - Vulnerabilities: Discover what applications in your environment are affected by well-known vulnerabilities.
     - MITRE ATT&CK: Explore security alerts mapped to adversary tactics and techniques for better threat understanding.
     - VirusTotal: Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.
-    
+
     - Docker listener: Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.
+
   - Regulatory Compliance
     - PCI DSS: Global security standard for entities that process, store or transmit payment cardholder data.
     - NIST 800-53: National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.
