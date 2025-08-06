@@ -148,8 +148,8 @@ export class InstallationManager implements IInstallationManager {
           llm: {
             model_id: modelId,
             parameters: {
-              max_iterations: 5,
-              stop_when_no_tool_found: true,
+              max_iterations: '5',
+              stop_when_no_tool_found: 'true',
               response_filter:
                 modelProviderConfigs[request.selected_provider]
                   ?.response_filter!,
