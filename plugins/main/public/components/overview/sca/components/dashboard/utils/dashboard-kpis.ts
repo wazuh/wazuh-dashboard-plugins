@@ -1,17 +1,49 @@
 import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
-import {
-  createIndexPatternReferences,
-  createSearchSource,
-} from '../../../../it-hygiene/common/saved-vis/create-saved-vis-data';
 import { getCore } from '../../../../../../kibana-services';
 
 const core = getCore();
 const decimalFormat = () => {
-  const pattern = core.uiSettings.get('format:percent:defaultPattern');
-  // TODO: parse decimal format in settings
-  return decimalFormat;
+  let decimalFormat;
+  try {
+    const pattern = core.uiSettings.get('format:percent:defaultPattern');
+
+    decimalFormat = convertNumeralToD3Format(pattern);
+  } catch {
+    decimalFormat = '.2f';
+  }
+
+  return decimalFormat ?? '.2f';
 };
+
+function convertNumeralToD3Format(numeralFormat: string): string {
+  const useThousands: boolean = numeralFormat.includes(',');
+  const isPercent: boolean = numeralFormat.includes('%');
+  const decimalMatch: RegExpMatchArray | null =
+    numeralFormat.match(/\.(0+)?(\[0+\])?/);
+
+  let minDecimals: number = 0;
+  let maxDecimals: number = 0;
+  let useTrim: boolean = false;
+
+  if (decimalMatch) {
+    const fixed: string = decimalMatch[1] || '';
+    const optional: string = decimalMatch[2] || '';
+    minDecimals = fixed.length;
+    maxDecimals = fixed.length + (optional.match(/0/g) || []).length;
+    useTrim = optional.length > 0;
+  }
+
+  const precision: number = maxDecimals || minDecimals;
+
+  let format: string = '';
+  if (useThousands) format += ',';
+  format += '.' + precision;
+
+  format += '~f';
+
+  return format;
+}
 
 const checkResultColors = () => {
   const colors = {
@@ -309,7 +341,7 @@ const checkScore = (indexPatternId: string) => ({
         {
           type: 'formula',
           as: 'score',
-          expr: '(datum.passed.doc_count / (datum.passed.doc_count + datum.failed.doc_count)) * 100',
+          expr: '(datum.passed.doc_count + datum.failed.doc_count)? (datum.passed.doc_count / (datum.passed.doc_count + datum.failed.doc_count)) * 100 : 0',
         },
       ],
     },
@@ -324,7 +356,7 @@ const checkScore = (indexPatternId: string) => ({
           y: { signal: 'height / 1.5' },
           align: { value: 'center' },
           baseline: { value: 'bottom' },
-          text: { signal: "format(datum.score, '.2f') + '%'" },
+          text: { signal: `format(datum.score, '${decimalFormat()}') + '%'` },
           fontSize: { value: 53.333 },
           fontWeight: { value: 700 },
           font: {
