@@ -3,7 +3,7 @@ export const MODULES_DIRECTORY_PAGE = {
   gCPCard: '[data-test-subj="overviewWelcomeGcp"]',
 
   virusTotalCard: '[data-test-subj="overviewWelcomeVirustotal"]',
-  osqueryCard: '[data-test-subj="overviewWelcomeOsquery"]',
+
   dockerListenerCard: '[data-test-subj="overviewWelcomeDocker"]',
   gDPRCard: '[data-test-subj="overviewWelcomeGdpr"]',
   hIPAACard: '[data-test-subj="overviewWelcomeHipaa"]',

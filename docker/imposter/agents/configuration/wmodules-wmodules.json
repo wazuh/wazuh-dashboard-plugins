@@ -15,15 +15,6 @@
       },
 
       {
-        "osquery": {
-          "disabled": "no",
-          "run_daemon": "yes",
-          "add_labels": "yes",
-          "log_path": "/var/log/osquery/osqueryd.results.log",
-          "config_path": "/etc/osquery/osquery.conf"
-        }
-      },
-      {
         "syscollector": {
           "disabled": "no",
           "scan-on-start": "yes",
