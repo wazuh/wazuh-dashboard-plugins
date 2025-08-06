@@ -22,6 +22,7 @@ import {
   useModels,
 } from '../modules/model/hooks';
 import { ModelFieldDefinition } from './types';
+import { UseCases } from '../setup';
 
 interface Model {
   id: string;
@@ -105,6 +106,10 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     }
   };
 
+  const handleUseModel = async (agentId: string) => {
+    await UseCases.useAgentByModelId(agentId);
+  };
+
   const handleViewModel = (model: Model) => {
     setSelectedModel(model);
     setIsFlyoutVisible(true);
@@ -174,6 +179,13 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     {
       name: 'Actions',
       actions: [
+        {
+          name: 'Use',
+          description: 'Use model in dashboard assistant',
+          icon: 'plusInCircle',
+          type: 'icon',
+          onClick: (model: Model) => handleUseModel(model.id),
+        },
         {
           name: 'View',
           description: 'View model details',

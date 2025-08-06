@@ -1,7 +1,7 @@
 import { CreateAgentDto } from '../dtos/create-agent-dto';
-import type { IAgentRepository } from '../ports/agent-repository';
+import type { AgentRepository } from '../ports/agent-repository';
 
 export const createAgentUseCase =
-  (agentRepository: IAgentRepository) => async (agentDto: CreateAgentDto) => {
+  (agentRepository: AgentRepository) => async (agentDto: CreateAgentDto) => {
     return await agentRepository.create(agentDto);
   };

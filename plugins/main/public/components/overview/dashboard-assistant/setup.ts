@@ -1,7 +1,8 @@
-import { IAgentRepository } from './modules/agent/application/ports/agent-repository';
+import { AgentRepository } from './modules/agent/application/ports/agent-repository';
 import { createAgentUseCase } from './modules/agent/application/use-cases/create-agent';
+import { useAgentByModelIdUseCase } from './modules/agent/application/use-cases/use-agent-by-model-id';
 import { registerAgentUseCase } from './modules/agent/application/use-cases/register-agent';
-import { AgentHttpClientRepository } from './modules/agent/infrastructure/agent-repository';
+import { AgentOpenSearchRepository } from './modules/agent/infrastructure/opensearch/repositories/agent-repository';
 import { HttpWithProxyClient } from './modules/common/http/infrastructure/http-with-proxy-client';
 import { ConnectorRepository } from './modules/connector/application/ports/connector-repository';
 import { createConnectorUseCase } from './modules/connector/application/use-cases/create-connector';
@@ -31,7 +32,7 @@ export class Repositories {
   static modelRepository: ModelRepository = new ModelOpenSearchRepository(
     httpClient,
   );
-  static agentRepository: IAgentRepository = new AgentHttpClientRepository(
+  static agentRepository: AgentRepository = new AgentOpenSearchRepository(
     httpClient,
   );
 }
@@ -50,5 +51,8 @@ export class UseCases {
   static deleteModel = deleteModelUseCase(Repositories.modelRepository);
   static testModelConnection = testModelConnectionUseCase(
     Repositories.modelRepository,
+  );
+  static useAgentByModelId = useAgentByModelIdUseCase(
+    Repositories.agentRepository,
   );
 }

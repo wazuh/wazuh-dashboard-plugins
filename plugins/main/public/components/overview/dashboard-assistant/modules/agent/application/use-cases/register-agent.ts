@@ -1,4 +1,4 @@
-import type { IAgentRepository as AgentRepository } from '../ports/agent-repository';
+import type { AgentRepository as AgentRepository } from '../ports/agent-repository';
 
 export const registerAgentUseCase =
   (agentRepository: AgentRepository) =>

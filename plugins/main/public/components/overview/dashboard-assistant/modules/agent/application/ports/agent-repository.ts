@@ -2,8 +2,9 @@ import { CreateRepository } from '../../../common/domain/entities/repository';
 import { Agent } from '../../domain/entities/agent';
 import { CreateAgentDto } from '../dtos/create-agent-dto';
 
-export interface IAgentRepository
+export interface AgentRepository
   extends CreateRepository<Agent, CreateAgentDto> {
   execute(id: string, parameters: any): Promise<any>;
   register(agentId: string): Promise<void>;
+  findByModelId(modelId: string): Promise<Agent | null>;
 }
