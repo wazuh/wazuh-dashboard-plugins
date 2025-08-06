@@ -189,7 +189,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           fieldsNoIndices: indexPatternFieldsMonitoring,
         },
         indexPatternID: 'wazuh-monitoring-*',
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -201,7 +200,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           fieldsNoIndices: indexPatternFieldsStatistics,
         },
         indexPatternID: 'wazuh-statistics-*',
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -210,7 +208,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
         indexPatternID: WAZUH_VULNERABILITIES_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -234,7 +231,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }),
         },
         indexPatternID: WAZUH_IT_HYGIENE_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -243,7 +239,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -252,7 +247,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -261,7 +255,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -276,7 +269,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }),
         },
         indexPatternID: WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -285,7 +277,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -299,7 +290,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }),
         },
         indexPatternID: WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -315,7 +305,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }),
         },
         indexPatternID: WAZUH_IT_HYGIENE_PORTS_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -330,7 +319,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }),
         },
         indexPatternID: WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -339,7 +327,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -348,7 +335,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -357,7 +343,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_USERS_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -371,7 +356,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }),
         },
         indexPatternID: WAZUH_FIM_FILES_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -380,7 +364,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
         indexPatternID: WAZUH_FIM_REGISTRY_KEYS_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
@@ -394,7 +377,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }),
         },
         indexPatternID: WAZUH_FIM_REGISTRY_VALUES_PATTERN,
-        configurationSettingKey: 'checks.pattern',
       }),
     );
 
