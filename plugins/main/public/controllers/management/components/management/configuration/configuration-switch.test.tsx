@@ -47,7 +47,7 @@ jest.mock('./policy-monitoring/policy-monitoring', () => () => <></>);
 
 jest.mock('./vulnerabilities/vulnerabilities', () => () => <></>);
 
-jest.mock('./osquery/osquery', () => () => <></>);
+
 
 jest.mock('./inventory/inventory', () => () => <></>);
 

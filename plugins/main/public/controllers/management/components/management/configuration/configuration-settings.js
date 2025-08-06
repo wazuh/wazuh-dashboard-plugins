@@ -112,12 +112,7 @@ export default [
         goto: 'vulnerabilities',
         when: 'manager',
       },
-      {
-        name: 'Osquery',
-        description:
-          'Expose an operating system as a high-performance relational database',
-        goto: 'osquery',
-      },
+
       {
         name: 'Inventory data',
         description:

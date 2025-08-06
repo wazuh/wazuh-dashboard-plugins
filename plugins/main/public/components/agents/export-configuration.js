@@ -40,7 +40,7 @@ export const ExportConfiguration = withErrorBoundary(
         'Labels',
         'Policy monitoring',
 
-        'Osquery',
+    
         'Inventory data',
         'Active response',
         'Commands',
