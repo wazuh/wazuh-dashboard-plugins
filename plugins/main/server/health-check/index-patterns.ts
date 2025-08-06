@@ -129,7 +129,7 @@ async function createIndexPattern(
     return response;
   } catch (error) {
     throw new Error(
-      `index pattern with ID [${indexPatternID}] could not be created due to: ${error.message}. This could indicate the collection is disabled or there is a problem in the collection and ingestion.`,
+      `index pattern with ID [${indexPatternID}] could not be created due to: ${error.message}. This could indicate the collection is disabled or there is a problem in the data collection or ingestion.`,
     );
   }
 }
