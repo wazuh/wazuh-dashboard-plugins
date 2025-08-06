@@ -2,10 +2,7 @@ import {
   DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
   VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
 } from '../../../../../../common/constants';
-import {
-  tFilter,
-  PatternDataSourceFilterManager,
-} from '../../index';
+import { tFilter, PatternDataSourceFilterManager } from '../../index';
 import { PatternDataSource } from '../pattern-data-source';
 
 export class SCAStatesDataSource extends PatternDataSource {
@@ -21,7 +18,7 @@ export class SCAStatesDataSource extends PatternDataSource {
     return PatternDataSourceFilterManager.getClusterManagerFilters(
       this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
-      VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,
+      VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER
     );
   }
 }

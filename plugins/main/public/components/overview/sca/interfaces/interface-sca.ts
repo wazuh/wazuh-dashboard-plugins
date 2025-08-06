@@ -1,4 +1,4 @@
-import { IndexPattern } from "src/plugins/data/common";
+import { IndexPattern } from 'src/plugins/data/common';
 
 interface TabButton {
   compare: null;
