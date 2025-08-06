@@ -1,4 +1,4 @@
-export interface CreateModelGroupDto {
-  name: string;
-  description: string;
-}
+import { ModelGroup } from '../../domain/entities/model-group';
+
+export interface CreateModelGroupDto
+  extends Pick<ModelGroup, 'name' | 'description'> {}
