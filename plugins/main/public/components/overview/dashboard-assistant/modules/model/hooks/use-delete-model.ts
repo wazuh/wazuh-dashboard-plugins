@@ -17,7 +17,7 @@ export function useDeleteModel(): UseDeleteModelReturn {
     setError(null);
 
     try {
-      await UseCases.deleteModel(modelId);
+      await UseCases.deleteModelWithRelatedEntities(modelId);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Unknown error occurred';

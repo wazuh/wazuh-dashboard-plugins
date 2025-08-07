@@ -17,6 +17,7 @@ import { ModelGroupRepository } from './modules/model-group/application/ports/mo
 import { ModelGroupOpenSearchRepository } from './modules/model-group/infrastructure/opensearch/repositories/model-group-opensearch-repository';
 import { ModelRepository } from './modules/model/application/ports/model-repository';
 import { createModelUseCase } from './modules/model/application/use-cases/create-model';
+import { deleteModelWithRelatedEntitiesUseCase } from './modules/model/application/use-cases/delete-model-with-related-entities';
 import { deleteModelUseCase } from './modules/model/application/use-cases/delete-model';
 import { getModelsUseCase } from './modules/model/application/use-cases/get-models';
 import { testModelConnectionUseCase } from './modules/model/application/use-cases/test-model-connection';
@@ -52,6 +53,12 @@ export class UseCases {
   static registerAgent = registerAgentUseCase(Repositories.agentRepository);
   static getModels = getModelsUseCase(Repositories.modelRepository);
   static deleteModel = deleteModelUseCase(Repositories.modelRepository);
+  static deleteModelWithRelatedEntities = deleteModelWithRelatedEntitiesUseCase(
+    Repositories.modelRepository,
+    Repositories.connectorRepository,
+    Repositories.modelGroupRepository,
+    Repositories.agentRepository,
+  );
   static testModelConnection = testModelConnectionUseCase(
     Repositories.modelRepository,
   );

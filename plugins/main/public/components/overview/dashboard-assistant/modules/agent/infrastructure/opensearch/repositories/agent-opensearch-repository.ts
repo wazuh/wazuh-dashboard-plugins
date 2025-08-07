@@ -56,12 +56,25 @@ export class AgentOpenSearchRepository implements AgentRepository {
     return [];
   };
 
+  public async findAllByModelId(modelId: string): Promise<Agent[]> {
+    return await this.findManyByModelId(modelId);
+  }
+
   public async findByModelId(modelId: string): Promise<Agent | null> {
     return (await this.findManyByModelId(modelId, { size: 1 }))[0] || null;
   }
 
   public async delete(id: string): Promise<void> {
-    await this.httpClient.proxyRequest.delete(`/_plugins/_ml/agents/${id}`);
+    await this.httpClient.proxyRequest.post.WithDelete(
+      `/_plugins/_ml/agents/${id}`,
+    );
+  }
+
+  public async deleteByModelId(modelId: string): Promise<void> {
+    const agents = await this.findManyByModelId(modelId);
+    for (const agent of agents) {
+      await this.delete(agent.id);
+    }
   }
 
   public async execute(id: string, parameters: any): Promise<any> {

@@ -28,6 +28,33 @@ export class ModelOpenSearchRepository implements ModelRepository {
     );
   }
 
+  public async findById(id: string): Promise<Model | null> {
+    try {
+      const response = await this.httpClient.proxyRequest.post<
+        OpenSearchResponseDto<ModelOpenSearchResponseDto>
+      >(`/_plugins/_ml/models/_search`, {
+        query: {
+          term: {
+            _id: {
+              value: id,
+            },
+          },
+        },
+        size: 1,
+      });
+
+      const hits = response.hits.hits;
+      if (hits.length === 0) {
+        return null;
+      }
+
+      return ModelOpenSearchMapper.fromResponse(id, hits[0]._source);
+    } catch (error) {
+      console.error('Error fetching model by ID:', error);
+      return null;
+    }
+  }
+
   public async getAll(): Promise<Model[]> {
     try {
       const searchPayload = {

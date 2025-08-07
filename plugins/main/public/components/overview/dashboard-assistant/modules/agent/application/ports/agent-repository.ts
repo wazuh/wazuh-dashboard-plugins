@@ -7,4 +7,5 @@ export interface AgentRepository
   execute(id: string, parameters: any): Promise<any>;
   register(agentId: string): Promise<void>;
   findByModelId(modelId: string): Promise<Agent | null>;
+  deleteByModelId(modelId: string): Promise<void>;
 }

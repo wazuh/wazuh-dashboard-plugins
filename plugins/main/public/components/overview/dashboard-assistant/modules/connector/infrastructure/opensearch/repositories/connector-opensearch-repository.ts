@@ -26,7 +26,9 @@ export class ConnectorOpenSearchRepository implements ConnectorRepository {
   }
 
   public async delete(id: string): Promise<void> {
-    await this.httpClient.proxyRequest.delete(`/_plugins/_ml/connectors/${id}`);
+    await this.httpClient.proxyRequest.post.WithDelete(
+      `/_plugins/_ml/connectors/${id}`,
+    );
   }
 
   public async getAll(): Promise<Connector[]> {
