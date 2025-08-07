@@ -17,7 +17,7 @@ import { InstallationProgressManager } from '../domain/entities/installation-pro
 
 export class InstallationManager implements IInstallationManager {
   constructor(
-    private progressCallback?: (progress: InstallationProgress) => void,
+    private onInstallationProgress?: (progress: InstallationProgress) => void,
   ) {}
 
   public async execute(
@@ -34,7 +34,7 @@ export class InstallationManager implements IInstallationManager {
 
     const progressManager = new InstallationProgressManager(
       stepNames,
-      this.progressCallback,
+      this.onInstallationProgress,
     );
     const context = new InstallationContext();
     let currentStepIndex = 0;

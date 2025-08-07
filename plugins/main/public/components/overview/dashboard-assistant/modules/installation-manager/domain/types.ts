@@ -12,14 +12,6 @@ export interface IInstallationManager {
   ): Promise<InstallationResult>;
 }
 
-export interface IInstallationStep {
-  getName(): string;
-  execute(
-    request: InstallDashboardAssistantRequest,
-    context: InstallationContext,
-  ): Promise<void>;
-}
-
 export interface InstallDashboardAssistantRequest {
   selected_provider: string;
   ml_common_settings: CreateMLCommonsDto;
