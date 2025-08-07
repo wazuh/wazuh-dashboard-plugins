@@ -1,23 +1,23 @@
 import React from 'react';
 import {
-  EuiTitle,
-  EuiText,
-  EuiSpacer,
-  EuiIcon,
-  EuiLoadingSpinner,
-  EuiLink,
-  EuiListGroup,
-  EuiToolTip,
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiIcon,
+  EuiLink,
+  EuiListGroup,
+  EuiLoadingSpinner,
+  EuiSpacer,
+  EuiText,
+  EuiTitle,
+  EuiToolTip,
 } from '@elastic/eui';
 import {
   InstallationProgress,
   StepExecutionState,
   StepResultState,
   StepState,
-} from '../modules/installation-manager/domain/types';
+} from '../modules/installation-manager/domain';
 
 const StepStatus = {
   PENDING: 'pending',

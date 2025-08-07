@@ -1,12 +1,15 @@
+import { InstallationProgress } from './components';
 import { AgentRepository } from './modules/agent/application/ports/agent-repository';
 import { createAgentUseCase } from './modules/agent/application/use-cases/create-agent';
-import { useAgentByModelIdUseCase } from './modules/agent/application/use-cases/use-agent-by-model-id';
 import { registerAgentUseCase } from './modules/agent/application/use-cases/register-agent';
+import { useAgentByModelIdUseCase } from './modules/agent/application/use-cases/use-agent-by-model-id';
 import { AgentOpenSearchRepository } from './modules/agent/infrastructure/opensearch/repositories/agent-opensearch-repository';
 import { HttpWithProxyClient } from './modules/common/http/infrastructure/http-with-proxy-client';
 import { ConnectorRepository } from './modules/connector/application/ports/connector-repository';
 import { createConnectorUseCase } from './modules/connector/application/use-cases/create-connector';
 import { ConnectorOpenSearchRepository } from './modules/connector/infrastructure/opensearch/repositories/connector-opensearch-repository';
+import { installDashboardAssistantUseCase } from './modules/installation-manager/application/use-cases';
+import { InstallationManager } from './modules/installation-manager/infrastructure/installation-manager';
 import { MLCommonsSettingsRepository } from './modules/ml-commons-settings/application/ports/ml-commons-settings-repository';
 import { persistMLCommonsSettingsUseCase } from './modules/ml-commons-settings/application/use-cases/update-ml-commons-settings';
 import { MLCommonsSettingsHttpClientRepository } from './modules/ml-commons-settings/infrastructure/repositories/ml-commons-settings-http-client-repository';
@@ -55,4 +58,12 @@ export class UseCases {
   static useAgentByModelId = useAgentByModelIdUseCase(
     Repositories.agentRepository,
   );
+  static installDashboardAssistant = (
+    callback: (progress: InstallationProgress) => void,
+  ) =>
+    installDashboardAssistantUseCase(
+      new InstallationManager(progressUpdate => {
+        callback(progressUpdate);
+      }),
+    );
 }

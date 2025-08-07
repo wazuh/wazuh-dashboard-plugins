@@ -13,4 +13,4 @@ export type {
   StepExecutionState,
   StepResultState,
   StepState,
-} from '../modules/installation-manager/domain/types';
+} from '../modules/installation-manager/domain';

@@ -1,19 +1,19 @@
+import { modelProviderConfigs } from '../../../provider-model-config';
 import { UseCases } from '../../../setup';
-import { InstallationContext } from '../domain/installation-context';
-import { InstallationProgressManager } from '../domain/installation-progress-manager';
+import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
+import { AgentToolFactory } from '../../agent/application/factories/agent-tool-factory';
+import { AgentType } from '../../agent/domain/enums/agent-type';
+import { Tool } from '../../agent/domain/enums/tool';
+import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
 import {
   IInstallationManager,
   InstallDashboardAssistantRequest,
   InstallationProgress,
   InstallationResult,
   StepResultState,
-} from '../domain/types';
-import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
-import { AgentType } from '../../agent/domain/enums/agent-type';
-import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
-import { modelProviderConfigs } from '../../../provider-model-config';
-import { Tool } from '../../agent/domain/enums/tool';
-import { AgentToolFactory } from '../../agent/application/factories/agent-tool-factory';
+} from '../domain';
+import { InstallationContext } from '../domain';
+import { InstallationProgressManager } from '../domain/entities/installation-progress-manager';
 
 export class InstallationManager implements IInstallationManager {
   constructor(

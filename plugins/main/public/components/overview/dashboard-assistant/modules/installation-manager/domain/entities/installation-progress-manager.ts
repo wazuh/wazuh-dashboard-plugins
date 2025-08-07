@@ -1,16 +1,12 @@
-import {
-  StepExecutionState,
-  StepResultState,
-  StepState,
-  InstallationProgress,
-} from './types';
+import { StepExecutionState, StepResultState } from '../enums';
+import { StepState, InstallationProgress } from '../types';
 
 export class InstallationProgressManager {
   private readonly progress: InstallationProgress;
 
   constructor(
     stepNames: string[],
-    private progressCallback?: (progress: InstallationProgress) => void,
+    private onProgressChange?: (progress: InstallationProgress) => void,
   ) {
     if (stepNames.length === 0) {
       throw new Error('At least one step name must be provided');
@@ -103,8 +99,8 @@ export class InstallationProgressManager {
   }
 
   private notifyProgress(): void {
-    if (this.progressCallback) {
-      this.progressCallback(this.getProgress());
+    if (this.onProgressChange) {
+      this.onProgressChange(this.getProgress());
     }
   }
 }

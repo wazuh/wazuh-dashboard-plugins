@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo } from 'react';
-import { installDashboardAssistantUseCase } from '../application/install-dashboard-assistant';
+import { installDashboardAssistantUseCase } from '../application/use-cases/install-dashboard-assistant';
 import { InstallationManager } from '../infrastructure/installation-manager';
 import type {
   InstallDashboardAssistantRequest,
@@ -7,6 +7,7 @@ import type {
 } from '../domain/types';
 import { InstallDashboardAssistantResponse } from '../domain/types';
 import { modelProviderConfigs } from '../../../provider-model-config';
+import { UseCases } from '../../../setup';
 
 interface ModelConfiguration {
   model_provider: string;
@@ -24,16 +25,6 @@ export function useAssistantInstallation() {
   const [assistantModelInfo, setAssistantModelInfo] =
     useState<ModelConfiguration | null>(null);
   const [progress, setProgress] = useState<InstallationProgress | null>(null);
-
-  // Create installation use case with real repositories
-  const installUseCase = useMemo(() => {
-    // Create installation manager with progress callback
-    const installationManager = new InstallationManager(progressUpdate => {
-      setProgress(progressUpdate);
-    });
-
-    return installDashboardAssistantUseCase(installationManager);
-  }, []);
 
   const setModel = useCallback((data: ModelConfiguration) => {
     setAssistantModelInfo(data);
@@ -80,7 +71,9 @@ export function useAssistantInstallation() {
         },
       };
 
-      const response = await installUseCase(request);
+      const response = await UseCases.installDashboardAssistant(
+        installationProgress => setProgress(installationProgress),
+      )(request);
       setResult(response);
 
       if (!response.success) {
@@ -106,7 +99,7 @@ export function useAssistantInstallation() {
     } finally {
       setIsLoading(false);
     }
-  }, [assistantModelInfo, installUseCase]);
+  }, [assistantModelInfo]);
 
   const reset = useCallback(() => {
     setIsLoading(false);

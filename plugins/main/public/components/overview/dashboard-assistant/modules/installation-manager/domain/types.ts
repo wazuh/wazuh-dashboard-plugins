@@ -1,10 +1,10 @@
-import { ProviderModelConfig } from '../../../provider-model-config';
 import { CreateConnectorDto } from '../../../modules/connector/application/dtos/create-connector-dto';
-import { InstallationContext } from './installation-context';
-import { MLCommonsSettings } from '../../ml-commons-settings/domain/entities/ml-commons-settings';
-import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
+import { ProviderModelConfig } from '../../../provider-model-config';
 import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
 import { CreateMLCommonsDto } from '../../ml-commons-settings/application/dtos/create-ml-commons-dto';
+import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
+import { InstallationContext } from './entities';
+import { StepExecutionState, StepResultState } from './enums';
 
 export interface IInstallationManager {
   execute(
@@ -26,20 +26,6 @@ export interface InstallDashboardAssistantRequest {
   connector: CreateConnectorDto;
   model: Pick<CreateModelDto, 'name' | 'description'>;
   agent: Pick<CreateAgentDto, 'name' | 'description'>;
-}
-
-// Step execution states
-export enum StepExecutionState {
-  WAITING = 'waiting',
-  PROCESSING = 'processing',
-  FINISHED = 'finished',
-}
-
-// Step result states
-export enum StepResultState {
-  SUCCESS = 'success',
-  FAIL = 'fail',
-  WARNING = 'warning',
 }
 
 export interface StepState {
