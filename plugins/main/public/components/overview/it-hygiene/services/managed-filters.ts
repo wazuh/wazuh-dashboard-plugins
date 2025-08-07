@@ -4,4 +4,9 @@ export default [
     key: 'service.name',
     placeholder: 'Service Name',
   },
+  {
+    type: 'multiSelect',
+    key: 'service.state',
+    placeholder: 'Service State',
+  },
 ];
