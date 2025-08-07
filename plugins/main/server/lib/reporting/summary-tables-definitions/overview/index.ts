@@ -5,8 +5,8 @@ const generalAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ]
-}
+  ],
+};
 
 const awsAlertsSummary = {
   title: 'Alerts summary',
@@ -14,8 +14,17 @@ const awsAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ]
-}
+  ],
+};
+
+const azureAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ],
+};
 
 const fimAlertsSummary = {
   title: 'Alerts summary',
@@ -23,8 +32,8 @@ const fimAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['syscheck.path'],
     AggregationFields['syscheck.event'],
-  ]
-}
+  ],
+};
 
 const gcpAlertsSummary = {
   title: 'Alerts summary',
@@ -32,8 +41,8 @@ const gcpAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ]
-}
+  ],
+};
 
 const officeAlertsSummary = {
   title: 'Alerts summary',
@@ -41,8 +50,8 @@ const officeAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ]
-}
+  ],
+};
 
 const pciAlertsSummary = {
   title: 'Alerts summary',
@@ -50,8 +59,8 @@ const pciAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['rule.pci_dss'],
     AggregationFields['rule.description'],
-  ]
-}
+  ],
+};
 
 const gdprAlertsSummary = {
   title: 'Alerts summary',
@@ -59,8 +68,8 @@ const gdprAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['rule.gdpr'],
     AggregationFields['rule.description'],
-  ]
-}
+  ],
+};
 
 const nistAlertsSummary = {
   title: 'Alerts summary',
@@ -68,8 +77,8 @@ const nistAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['rule.nist_800_53'],
     AggregationFields['rule.level'],
-  ]
-}
+  ],
+};
 
 const hipaaAlertsSummary = {
   title: 'Alerts summary',
@@ -77,8 +86,8 @@ const hipaaAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['rule.hipaa'],
     AggregationFields['rule.level'],
-  ]
-}
+  ],
+};
 
 const tscAlertsSummary = {
   title: 'Alerts summary',
@@ -86,8 +95,8 @@ const tscAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['rule.tsc'],
     AggregationFields['rule.description'],
-  ]
-}
+  ],
+};
 
 const virustotalAlertsSummary = {
   title: 'Alerts summary',
@@ -95,8 +104,8 @@ const virustotalAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ]
-}
+  ],
+};
 
 const osqueryAlertsSummary = {
   title: 'Alerts summary',
@@ -106,8 +115,8 @@ const osqueryAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['data.osquery.pack'],
     AggregationFields['data.osquery.calendarTime'],
-  ]
-}
+  ],
+};
 
 const mitreAlertsSummary = {
   title: 'Alerts summary',
@@ -115,23 +124,23 @@ const mitreAlertsSummary = {
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ]
-}
+  ],
+};
 const ciscatAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['data.cis.rule_title'],
     AggregationFields['data.cis.group'],
     AggregationFields['data.cis.result'],
-  ]
-}
+  ],
+};
 const pmAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.description'],
     AggregationFields['data.title'],
-  ]
-}
+  ],
+};
 
 const dockerAlertsSummary = {
   title: 'Events summary',
@@ -139,8 +148,8 @@ const dockerAlertsSummary = {
     AggregationFields['data.docker.Actor.Attributes.name'],
     AggregationFields['data.docker.Action'],
     AggregationFields['timestamp'],
-  ]
-}
+  ],
+};
 
 const githubAlertsSummary = {
   title: 'Alerts summary',
@@ -148,8 +157,8 @@ const githubAlertsSummary = {
     AggregationFields['agent.name'],
     AggregationFields['data.github.org'],
     AggregationFields['rule.description'],
-  ]
-}
+  ],
+};
 
 // 'Wazuh-App-Overview-OSCAP-Last-alerts'
 const oscapLastAlerts = {
@@ -158,8 +167,8 @@ const oscapLastAlerts = {
     AggregationFields['agent.name'],
     AggregationFields['data.oscap.check.title'],
     AggregationFields['data.oscap.scan.profile.title'],
-  ]
-}
+  ],
+};
 
 // 'Wazuh-App-Overview-Audit-Last-alerts'
 const auditLastAlerts = {
@@ -168,11 +177,12 @@ const auditLastAlerts = {
     AggregationFields['agent.name'],
     AggregationFields['rule.description'],
     AggregationFields['data.audit.exe'],
-  ]
-}
+  ],
+};
 
 export default {
   aws: [awsAlertsSummary],
+  azure: [azureAlertsSummary],
   ciscat: [ciscatAlertsSummary],
   docker: [dockerAlertsSummary],
   fim: [fimAlertsSummary],
@@ -191,4 +201,4 @@ export default {
   tsc: [tscAlertsSummary],
   virustotal: [virustotalAlertsSummary],
   audit: [auditLastAlerts],
-}
+};
