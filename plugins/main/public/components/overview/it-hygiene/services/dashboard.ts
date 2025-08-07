@@ -3,6 +3,8 @@ import {
   getVisStateHorizontalBarByField,
   getVisStatePieByField,
 } from '../common/saved-vis/generators';
+import { getVisStateHorizontalBarSplitSeries } from '../../../../services/visualizations';
+
 import { SavedVis } from '../common/types';
 
 export const getOverviewServicesTab = (indexPatternId: string) => {
@@ -21,12 +23,52 @@ export const getOverviewServicesTab = (indexPatternId: string) => {
                 filter: [
                   {
                     bool: {
-                      must_not: [
+                      must: [
                         {
-                          term: {
-                            'service.exit_code': 0,
+                          bool: {
+                            should: [
+                              {
+                                bool: {
+                                  must: [
+                                    { exists: { field: 'service.exit_code' } },
+                                    {
+                                      bool: {
+                                        must_not: [
+                                          { term: { 'service.exit_code': 0 } },
+                                        ],
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
+                              {
+                                bool: {
+                                  must: [
+                                    {
+                                      exists: {
+                                        field: 'service.win32_exit_code',
+                                      },
+                                    },
+                                    {
+                                      bool: {
+                                        must_not: [
+                                          {
+                                            term: {
+                                              'service.win32_exit_code': 0,
+                                            },
+                                          },
+                                        ],
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
+                            ],
+                            minimum_should_match: 1,
                           },
                         },
+                      ],
+                      must_not: [
                         {
                           terms: {
                             'service.state.keyword': ['RUNNING', 'active'],
@@ -42,11 +84,20 @@ export const getOverviewServicesTab = (indexPatternId: string) => {
         ],
       },
     ),
-    getVisStatePieByField(
+    getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'service.state',
       'Services by state',
       'it-hygiene-services-state',
+      {
+        fieldSize: 4,
+        otherBucket: 'Others',
+        metricCustomLabel: 'Service by state count',
+        valueAxesTitleText: ' ',
+        seriesLabel: 'Type',
+        seriesMode: 'stacked',
+        fieldCustomLabel: 'Type',
+      },
     ),
   ]);
 };
