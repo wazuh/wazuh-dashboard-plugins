@@ -1,6 +1,12 @@
 # Dashboard Assistant
 
-## Domain Model Architecture
+A comprehensive AI-powered assistant integration for Wazuh Dashboard that enables conversational AI capabilities for cybersecurity analysis and data querying through OpenSearch ML Commons.
+
+## 📋 Overview
+
+The Dashboard Assistant module provides a complete solution for integrating AI language models with Wazuh's security data, enabling users to interact with their security information through natural language queries and receive intelligent insights. It follows Clean Architecture principles with SOLID design patterns for maintainability and extensibility.
+
+## 🏗️ Domain Model Architecture
 
 ### Clean Architecture Implementation
 
@@ -10,164 +16,61 @@ This implementation follows Clean Architecture, SOLID principles, and design pat
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Presentation Layer                       │
-│  (React Components, UI State Management)                   │
+│                    Presentation Layer                 │
+│  (React Components, Hooks, UI State Management)       │
+│  - ModelRegister, ModelsTable, ModelForm              │
+│  - DeploymentStatus, ModelTestResult                  │
+│  - useAssistantInstallation, useModels, useModelTest  │
 └─────────────────────────────────────────────────────────────┘
                               │
 ┌─────────────────────────────────────────────────────────────┐
-│                   Application Layer                         │
-│  (Use Cases, Installation Manager)                         │
+│                   Application Layer                   │
+│  (Use Cases, Installation Manager, Business Logic)    │
+│  - installDashboardAssistantUseCase                   │
+│  - createModelUseCase, createConnectorUseCase         │
+│  - InstallationManager, Installation Steps            │
 └─────────────────────────────────────────────────────────────┘
                               │
 ┌─────────────────────────────────────────────────────────────┐
-│                    Domain Layer                             │
-│  (Entities, Value Objects, Domain Services)                │
+│                    Domain Layer                       │
+│  (Entities, Value Objects, Domain Services)           │
+│  - Model, Connector, Agent, ModelGroup                │
+│  - Installation Types, Prediction Types               │
 └─────────────────────────────────────────────────────────────┘
                               │
-┌─────────────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────────────────────┐
 │                 Infrastructure Layer                        │
-│  (Repositories, HTTP Clients, External APIs)               │
-└─────────────────────────────────────────────────────────────┘
+│  (Repositories, HTTP Clients, External APIs)                │
+│  - ModelOpenSearchRepository, ConnectorOpenSearchRepository │
+│  - HttpWithProxyClient, AgentOpenSearchRepository           │
+│  - MLCommonsSettingsHttpClientRepository                    │
+└───────────────────────────────────────────────────────────────────┘
 ```
 
-## Domain Model Diagram
+## 📊 Domain Model Diagram
 
 ```mermaid
 classDiagram
-    %% Core Infrastructure Interfaces
-    class IHttpClient {
-        <<interface>>
+    %% Core Infrastructure
+    class HttpWithProxyClient {
         +get(url: string): Promise~T~
         +post(url: string, data: any): Promise~T~
         +put(url: string, data: any): Promise~T~
         +delete(url: string): Promise~T~
     }
 
-
-
-    %% Domain Entities
-    class ClusterSettings {
-        -mlCommonsAgentFrameworkEnabled: boolean
-        -onlyRunOnMlNode: boolean
-        -ragPipelineFeatureEnabled: boolean
-        -trustedConnectorEndpointsRegex: string[]
-        +create(config): ClusterSettings
-        +toApiPayload(): object
-    }
-
-    class ModelGroup {
-        -id: string | null
-        -name: string
-        -description: string
-        +create(name: string, description: string): ModelGroup
-        +fromResponse(data): ModelGroup
-        +getId(): string | null
-        +toApiPayload(): object
-    }
-
-    class Connector {
-        -id: string | null
-        -name: string
-        -description: string
-        -version: number
-        -protocol: string
-        -parameters: ConnectorParameters
-        -credential: ConnectorCredential
-        -actions: ConnectorAction[]
-        +create(config): Connector
-        +getId(): string | null
-        +toApiPayload(): object
-    }
-
-    class Model {
-        -id: string | null
-        -name: string
-        -version: string
-        -modelGroupId: string
-        -connectorId: string
-        -description: string
-        -status: string
-        -createdAt: string
-        -apiUrl: string
-        +create(config): Model
-        +fromResponse(data): Model
-        +getId(): string | null
-        +getName(): string
-        +getVersion(): string
-        +getStatus(): string
-        +toApiPayload(): object
-        +toTableFormat(): object
-    }
-
-    class Agent {
-        -id: string | null
-        -name: string
-        -type: string
-        -description: string
-        -llm: AgentLLM
-        -memory: AgentMemory
-        -tools: AgentTool[]
-        +create(config): Agent
-        +getId(): string | null
-        +toApiPayload(): object
-    }
-
-    %% Value Objects
-    class ConnectorParameters {
-        -endpoint: string
-        -model: string
-        -messages: Array~object~
-        +toPrimitives(): object
-    }
-
-    class ConnectorCredential {
-        -apiKey: string
-        +toPrimitives(): object
-    }
-
-    class ConnectorAction {
-        -actionType: string
-        -method: string
-        -url: string
-        -headers: Record~string, string~
-        -requestBody: string
-        +toPrimitives(): object
-    }
-
-    class AgentLLM {
-        -modelId: string
-        -parameters: object
-        +toPrimitives(): object
-    }
-
-    class AgentMemory {
-        -type: string
-        -windowSize: number
-        +toPrimitives(): object
-    }
-
-    class AgentTool {
-        -type: string
-        -name: string
-        -parameters: object
-        +toPrimitives(): object
-    }
-
     %% Repository Interfaces
-    class IClusterSettingsRepository {
+    class ModelRepository {
         <<interface>>
-        +updateSettings(settings: ClusterSettings): Promise~void~
-    }
-
-    class IModelGroupRepository {
-        <<interface>>
-        +create(modelGroup: ModelGroup): Promise~string~
-        +findById(id: string): Promise~ModelGroup | null~
-        +update(id: string, modelGroup: ModelGroup): Promise~void~
+        +create(dto: CreateModelDto): Promise~string~
+        +findById(id: string): Promise~Model | null~
+        +getAll(): Promise~Model[]~
         +delete(id: string): Promise~void~
+        +testConnection(modelId: string): Promise~ModelPredictResponse~
+        +deploy(modelId: string, deploy: boolean): Promise~void~
     }
 
-    class IConnectorRepository {
+    class ConnectorRepository {
         <<interface>>
         +create(connector: Connector): Promise~string~
         +findById(id: string): Promise~Connector | null~
@@ -175,17 +78,7 @@ classDiagram
         +delete(id: string): Promise~void~
     }
 
-    class IModelRepository {
-        <<interface>>
-        +create(model: Model): Promise~string~
-        +findById(id: string): Promise~Model | null~
-        +getAll(): Promise~Model[]~
-        +update(id: string, model: Model): Promise~void~
-        +delete(id: string): Promise~void~
-        +testConnection(modelId: string): Promise~ModelPredictResponse~
-    }
-
-    class IAgentRepository {
+    class AgentRepository {
         <<interface>>
         +create(agent: Agent): Promise~string~
         +findById(id: string): Promise~Agent | null~
@@ -194,16 +87,32 @@ classDiagram
         +register(agentId: string): Promise~void~
     }
 
+    class ModelGroupRepository {
+        <<interface>>
+        +create(modelGroup: ModelGroup): Promise~string~
+        +findById(id: string): Promise~ModelGroup | null~
+        +update(id: string, modelGroup: ModelGroup): Promise~void~
+        +delete(id: string): Promise~void~
+    }
+
+    class MLCommonsSettingsRepository {
+        <<interface>>
+        +updateSettings(settings): Promise~void~
+    }
+
     %% Installation Management
     class IInstallationManager {
         <<interface>>
-        +execute(request: InstallDashboardAssistantRequest): Promise~InstallationResult~
+        +execute(request: InstallAIDashboardAssistantDto): Promise~InstallationResult~
     }
 
-    class IInstallationStep {
-        <<interface>>
+    class InstallationAIAssistantStep {
+        <<abstract>>
+        #name: string
         +getName(): string
         +execute(request, context): Promise~void~
+        +getSuccessMessage(): string
+        +getFailureMessage(): string
     }
 
     class InstallationContext {
@@ -211,356 +120,561 @@ classDiagram
         +set(key: string, value: any): void
         +get(key: string): T | undefined
         +has(key: string): boolean
+        +toObject(): object
+    }
+
+    %% Installation Steps
+    class UpdateMlCommonsSettingsStep {
+        +execute(request, context): Promise~void~
+    }
+
+    class CreateConnectorStep {
+        +execute(request, context): Promise~void~
+    }
+
+    class CreateModelStep {
+        +execute(request, context): Promise~void~
+    }
+
+    class TestModelConnectionStep {
+        +execute(request, context): Promise~void~
+    }
+
+    class CreateAgentStep {
+        +execute(request, context): Promise~void~
+    }
+
+    class RegisterAgentStep {
+        +execute(request, context): Promise~void~
+    }
+
+    %% Model State Management
+    class ModelStateMapper {
+        +toStatus(state: string, defaultStatus): ModelStatus
     }
 
     %% Relationships
-    Connector --> ConnectorParameters
-    Connector --> ConnectorCredential
-    Connector --> ConnectorAction
-    Agent --> AgentLLM
-    Agent --> AgentMemory
-    Agent --> AgentTool
-
-    IInstallationManager --> IInstallationStep
-    IInstallationStep --> InstallationContext
+    IInstallationManager --> InstallationAIAssistantStep
+    InstallationAIAssistantStep --> InstallationContext
+    InstallationAIAssistantStep <|-- UpdateMlCommonsSettingsStep
+    InstallationAIAssistantStep <|-- CreateConnectorStep
+    InstallationAIAssistantStep <|-- CreateModelStep
+    InstallationAIAssistantStep <|-- TestModelConnectionStep
+    InstallationAIAssistantStep <|-- CreateAgentStep
+    InstallationAIAssistantStep <|-- RegisterAgentStep
 ```
 
-## Domain Interfaces and Signatures
+## 🔧 Current Implementation
 
-### Core Infrastructure
+### Setup Configuration (`setup.ts`)
+
+The main setup file configures dependency injection with repositories and use cases:
 
 ```typescript
-// Infrastructure interfaces
-interface IHttpClient {
-  get<T = any>(url: string, config?: any): Promise<T>;
-  post<T = any>(url: string, data?: any, config?: any): Promise<T>;
-  put<T = any>(url: string, data?: any, config?: any): Promise<T>;
-  delete<T = any>(url: string, config?: any): Promise<T>;
+// HTTP Client
+export const httpClient = new HttpWithProxyClient();
+
+// Repositories (Dependency Injection)
+export class Repositories {
+  static mlCommonsSettingsRepository: MLCommonsSettingsRepository;
+  static modelGroupRepository: ModelGroupRepository;
+  static connectorRepository: ConnectorRepository;
+  static modelRepository: ModelRepository;
+  static agentRepository: AgentRepository;
+}
+
+// Use Cases (Business Logic Layer)
+export class UseCases {
+  static persistMlCommonsSettings;
+  static createConnector;
+  static createModel;
+  static createAgent;
+  static registerAgent;
+  static getModels;
+  static deleteModel;
+  static deleteModelWithRelatedEntities;
+  static testModelConnection;
+  static useAgentByModelId;
+  static installDashboardAssistant;
 }
 ```
 
-### Domain Entity Signatures
+### 🎯 Key Components
 
-```typescript
-// Domain entities interface signatures
-class ClusterSettings {
-  static create(config: ClusterSettingsConfig): ClusterSettings;
-  toApiPayload(): object;
-}
+#### 1. **ModelRegister Component** (`model-register.tsx`)
 
-class ModelGroup {
-  static create(name: string, description: string): ModelGroup;
-  static fromResponse(data: any): ModelGroup;
-  getId(): string | null;
-  toApiPayload(): object;
-}
+- **Purpose**: Main registration interface for AI models
+- **Features**:
+  - Model provider selection (OpenAI, Cohere, etc.)
+  - Configuration form with real-time validation
+  - Deployment progress tracking via flyout
+  - Integration with installation manager
+  - Form state management and validation
 
-class Connector {
-  static create(config: ConnectorConfig): Connector;
-  getId(): string | null;
-  toApiPayload(): object;
-}
-
-class Model {
-  static create(config: ModelConfig): Model;
-  static fromResponse(data: any): Model;
-  getId(): string | null;
-  getName(): string;
-  getVersion(): string;
-  getStatus(): 'active' | 'inactive' | 'error';
-  toApiPayload(): object;
-  toTableFormat(): ModelTableFormat;
-}
-
-class Agent {
-  static create(config: AgentConfig): Agent;
-  getId(): string | null;
-  toApiPayload(): object;
-}
+```tsx
+// Key functionality
+const {
+  install,
+  setModel,
+  isLoading: isInstalling,
+  error: installError,
+  result,
+  progress,
+  isSuccess,
+} = useAssistantInstallation();
 ```
 
-### Repository Interfaces
+#### 2. **ModelsTable Component** (`models-table.tsx`)
 
-```typescript
-// Repository interfaces
-interface IClusterSettingsRepository {
-  updateSettings(settings: ClusterSettings): Promise<void>;
-}
+- **Purpose**: Display and manage registered models
+- **Features**:
+  - Model listing with status indicators (active/inactive/error)
+  - Actions: View, Test, Use, Delete
+  - Real-time status updates
+  - Model details flyout
+  - Test results display in separate flyout
+  - Integrated with model hooks for data management
 
-interface IModelGroupRepository {
-  create(modelGroup: ModelGroup): Promise<string>;
-  findById(id: string): Promise<ModelGroup | null>;
-  update(id: string, modelGroup: ModelGroup): Promise<void>;
-  delete(id: string): Promise<void>;
-}
+```tsx
+// Model management actions
+const handleUseModel = async (agentId: string) => {
+  await UseCases.useAgentByModelId(agentId);
+};
 
-interface IConnectorRepository {
-  create(connector: Connector): Promise<string>;
-  findById(id: string): Promise<Connector | null>;
-  update(id: string, connector: Connector): Promise<void>;
-  delete(id: string): Promise<void>;
-}
-
-interface IModelRepository {
-  create(model: Model): Promise<string>;
-  findById(id: string): Promise<Model | null>;
-  getAll(): Promise<Model[]>;
-  update(id: string, model: Model): Promise<void>;
-  delete(id: string): Promise<void>;
-  testConnection(modelId: string): Promise<boolean>;
-}
-
-interface IAgentRepository {
-  create(agent: Agent): Promise<string>;
-  findById(id: string): Promise<Agent | null>;
-  update(id: string, agent: Agent): Promise<void>;
-  delete(id: string): Promise<void>;
-  register(agentId: string): Promise<void>;
-}
+const handleTestModel = async (model: Model) => {
+  await testModel(model.id);
+};
 ```
 
-### Installation Management
+#### 3. **ModelForm Component** (`model-form.tsx`)
 
-```typescript
-// Installation management interfaces
-interface IInstallationManager {
-  execute(
-    request: InstallDashboardAssistantRequest,
-  ): Promise<InstallationResult>;
-}
+- **Purpose**: Form for model configuration
+- **Features**:
+  - Provider selection with dynamic model options
+  - Model selection based on provider configuration
+  - API URL and key configuration with validation
+  - Real-time form validation using schema
+  - Integration with `modelProviderConfigs`
 
-interface IInstallationStep {
-  getName(): string;
-  execute(
-    request: InstallDashboardAssistantRequest,
-    context: InstallationContext,
-  ): Promise<void>;
-}
-```
+#### 4. **DeploymentStatus Component**
 
-## Implemented Use Cases
+- **Purpose**: Real-time installation progress display
+- **Features**:
+  - Step-by-step progress tracking
+  - Success/failure indicators
+  - Detailed error reporting
+  - Progress state management
 
-The following use cases have been implemented in the `/common` directory:
+#### 5. **ModelTestResult Component**
+
+- **Purpose**: Display model connectivity test results
+- **Features**:
+  - Loading states
+  - Response formatting
+  - Error handling and display
+
+## 🎯 Domain Interfaces and Signatures
+
+## 🔄 Implemented Use Cases
+
+The following use cases have been implemented:
 
 ### 🔧 **Core Installation Use Cases**
 
-1. **InstallDashboardAssistantUseCase** - Main orchestrator for the complete installation process
-2. **UpdateClusterSettingsUseCase** - Updates OpenSearch cluster settings for ML Commons
-3. **CreateModelGroupUseCase** - Creates model groups for organizing models
-4. **CreateConnectorUseCase** - Creates connectors for external AI services
-5. **CreateModelUseCase** - Creates and registers AI models
-6. **TestModelConnectionUseCase** - Tests connectivity and functionality of models
-7. **CreateAgentUseCase** - Creates conversational agents
-8. **RegisterAgentUseCase** - Registers agents in the indexer manager
+1. **installDashboardAssistantUseCase** - Main orchestrator for the complete installation process
+2. **persistMLCommonsSettingsUseCase** - Updates OpenSearch cluster settings for ML Commons
+3. **createModelGroupUseCase** - Creates model groups for organizing models
+4. **createConnectorUseCase** - Creates connectors for external AI services
+5. **createModelUseCase** - Creates and registers AI models
+6. **testModelConnectionUseCase** - Tests connectivity and functionality of models
+7. **createAgentUseCase** - Creates conversational agents with specialized tools
+8. **registerAgentUseCase** - Registers agents in the indexer manager
 
-## Installation Process via OSD API
+### 📊 **Model Management Use Cases**
+
+9. **getModelsUseCase** - Retrieves all registered models
+10. **deleteModelUseCase** - Removes individual models
+11. **deleteModelWithRelatedEntitiesUseCase** - Removes models and associated entities
+12. **useAgentByModelIdUseCase** - Activates agent for dashboard use
+
+## 🚀 Installation Manager
+
+The `InstallationManager` orchestrates the complete installation process through sequential steps:
+
+```typescript
+const steps: InstallationAIAssistantStep[] = [
+  new UpdateMlCommonsSettingsStep(), // Configure cluster settings
+  new CreateConnectorStep(), // Create AI service connector
+  new CreateModelStep(), // Register and deploy model
+  new TestModelConnectionStep(), // Verify model functionality
+  new CreateAgentStep(), // Create conversational agent
+  new RegisterAgentStep(), // Register agent in indexer
+];
+```
+
+### Installation Steps Details
+
+#### 1. **UpdateMlCommonsSettingsStep**
+
+- Configures OpenSearch cluster for ML Commons
+- Enables agent framework and RAG pipeline features
+- Sets trusted connector endpoints
+
+#### 2. **CreateConnectorStep**
+
+- Creates connector to external AI service
+- Configures authentication and endpoints
+- Sets up request/response formatting
+
+#### 3. **CreateModelStep**
+
+- Registers model with OpenSearch ML Commons
+- Links model to connector
+- Enables automatic deployment
+
+#### 4. **TestModelConnectionStep**
+
+- Executes test prediction request
+- Validates model response format
+- Ensures connectivity and functionality
+
+#### 5. **CreateAgentStep**
+
+- Creates conversational agent with specialized tools
+- Configures ML Model Tool for general queries
+- Sets up Wazuh Alert Search Tool for security data
+
+#### 6. **RegisterAgentStep**
+
+- Registers agent in indexer manager
+- Makes agent available for dashboard use
+
+## 🚀 Installation Process via OpenSearch API
 
 ### [ML Commons](https://github.com/opensearch-project/ml-commons/tree/2.19.2.0)
 
-These are the steps you should follow:
+The Dashboard Assistant follows this step-by-step installation process:
 
-<details><summary>Step 1: Settings</summary>
+<details><summary>Step 1: Cluster Settings Configuration</summary>
 <p>
 
-> ```http
-> PUT /_cluster/settings
-> {
->   "persistent": {
->     "plugins.ml_commons.agent_framework_enabled": true,
->     "plugins.ml_commons.only_run_on_ml_node":"false",
->     "plugins.ml_commons.rag_pipeline_feature_enabled": true,
->     "plugins.ml_commons.trusted_connector_endpoints_regex": [
->       "^https://runtime\\.sagemaker\\..*[a-z0-9-]\\.amazonaws\\.com/.*$",
->       "^https://api\\.openai\\.com/.*$",
->       "^https://api\\.cohere\\.ai/.*$",
->       "^https://bedrock-runtime\\..*[a-z0-9-]\\.amazonaws\\.com/.*$"
->     ]
->   }
-> }
-> ```
+Configure OpenSearch cluster for ML Commons:
+
+```http
+PUT /_cluster/settings
+{
+  "persistent": {
+    "plugins.ml_commons.agent_framework_enabled": true,
+    "plugins.ml_commons.only_run_on_ml_node":"false",
+    "plugins.ml_commons.rag_pipeline_feature_enabled": true,
+    "plugins.ml_commons.trusted_connector_endpoints_regex": [
+      "^https://runtime\\.sagemaker\\..*[a-z0-9-]\\.amazonaws\\.com/.*$",
+      "^https://api\\.openai\\.com/.*$",
+      "^https://api\\.cohere\\.ai/.*$",
+      "^https://bedrock-runtime\\..*[a-z0-9-]\\.amazonaws\\.com/.*$"
+    ]
+  }
+}
+```
 
 </p>
 </details>
 
-<details><summary>Step 2: Create a model group</summary>
+<details><summary>Step 2: Create Model Group</summary>
 <p>
 
-> Create a model group with an example below ([reference doc](https://opensearch.org/docs/2.19/ml-commons-plugin/remote-models/index/)) and note the model group id.
->
-> ```http
-> POST /_plugins/_ml/model_groups/_register
-> {
-> "name": "test_model_group",
-> "description": "A model group for external models"
-> }
-> ```
+Create a model group for organization:
+
+```http
+POST /_plugins/_ml/model_groups/_register
+{
+"name": "test_model_group",
+"description": "A model group for external models"
+}
+```
 
 </p>
 </details>
 
-<details><summary>Step 3: Create a connector</summary>
+<details><summary>Step 3: Create Connector</summary>
 <p>
 
-> Create a connector ([reference doc](https://docs.opensearch.org/docs/2.19/ml-commons-plugin/remote-models/index/)). Keep note of the connector id from the API response. (Ensure the credentials passed should have access to call the LLM model)
->
-> ```http
-> POST /_plugins/_ml/connectors/_create
-> {
->     "name": "OpenAI Chat Connector",
->     "description": "The connector to public OpenAI model service for GPT 4o mini",
->     "version": 1,
->     "protocol": "http",
->     "parameters": {
->         "endpoint": "api.openai.com",
->         "model": "gpt-4o-mini",
->         "messages": [
->           {
->             "role": "developer",
->             "content": "You are a helpful assistant."
->           },
->           {
->             "role": "user",
->             "content": "${parameters.prompt}"
->           }
->         ]
->     },
->     "credential": {
->         "openAI_key": "..."
->     },
->     "actions": [
->         {
->             "action_type": "predict",
->             "method": "POST",
->             "url": "https://${parameters.endpoint}/v1/chat/completions",
->             "headers": {
->                 "Authorization": "Bearer ${credential.openAI_key}"
->             },
->             "request_body": "{ \"model\": \"${parameters.model}\", \"messages\": ${parameters.messages} }"
->         }
->     ]
-> }
-> ```
+Create a connector for external AI service:
+
+```http
+POST /_plugins/_ml/connectors/_create
+{
+    "name": "OpenAI Chat Connector",
+    "description": "The connector to public OpenAI model service for GPT 4o mini",
+    "version": 1,
+    "protocol": "http",
+    "parameters": {
+        "endpoint": "api.openai.com",
+        "model": "gpt-4o-mini",
+        "messages": [
+          {
+            "role": "developer",
+            "content": "You are a helpful assistant."
+          },
+          {
+            "role": "user",
+            "content": "${parameters.prompt}"
+          }
+        ]
+    },
+    "credential": {
+        "openAI_key": "..."
+    },
+    "actions": [
+        {
+            "action_type": "predict",
+            "method": "POST",
+            "url": "https://${parameters.endpoint}/v1/chat/completions",
+            "headers": {
+                "Authorization": "Bearer ${credential.openAI_key}"
+            },
+            "request_body": "{ \"model\": \"${parameters.model}\", \"messages\": ${parameters.messages} }"
+        }
+    ]
+}
+```
 
 </p>
 </details>
 
-<details><summary>Step 4: Create a model</summary>
+<details><summary>Step 4: Register Model</summary>
 <p>
 
-> Create a model and note the model id
->
-> ```http
-> POST /_plugins/_ml/models/_register?deploy=true
->  {
->    "name": "openAI-gpt-4o-mini",
->    "function_name": "remote",
->    "model_group_id": "<model group id from previous API call>",
->    "description": "test model",
->    "connector_id": "<connector id from previous API call>"
->  }
-> ```
+Register and deploy the model:
+
+```http
+POST /_plugins/_ml/models/_register?deploy=true
+ {
+   "name": "openAI-gpt-4o-mini",
+   "function_name": "remote",
+   "model_group_id": "<model group id from previous API call>",
+   "description": "test model",
+   "connector_id": "<connector id from previous API call>"
+ }
+```
 
 </p>
 </details>
 
-<details><summary>Step 5: Test connection with calling the Predict API</summary>
+<details><summary>Step 5: Test Model Connection</summary>
 <p>
 
-> Test connection with calling the Predict API
->
-> ```http
-> POST /_plugins/_ml/models/<llm_model_id>/_predict
-> {
->   "parameters": {
->     "messages": [
->       {
->         "role": "system",
->         "content": "You are a helpful assistant."
->       },
->       {
->         "role": "user",
->         "content": "Hello!"
->       }
->     ]
->   }
-> }
-> ```
+Verify model functionality:
+
+```http
+POST /_plugins/_ml/models/<llm_model_id>/_predict
+{
+  "parameters": {
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "content": "Hello!"
+      }
+    ]
+  }
+}
+```
 
 </p>
 </details>
 
-<details><summary>Step 6: Craete an Agent</summary>
+<details><summary>Step 6: Create Agent</summary>
 <p>
 
-> ```http
-> POST /_plugins/_ml/agents/_register
-> {
->   "name": "OpenAI_wazuh_agent_test",
->   "type": "conversational",
->   "description": "This is a GPT-4o-mini agent that acts as an AI cybersecurity analyst, capable of answering general security questions and retrieving specific Wazuh alert data from daily indices.",
->   "llm": {
->     "model_id": "mnEFM5gBiNWPInKRyWun",
->     "parameters": {
->       "max_iteration": 3,
->       "stop_when_no_tool_found": true,
->       "disable_trace": false,
->       "response_filter": "$.choices[0].message.content"
->     }
->   },
->   "memory": {
->     "type": "conversation_index"
->   },
->   "app_type": "chat_with_rag",
->   "tools": [
->     {
->       "type": "MLModelTool",
->       "name": "OpenAI_GPT_4o_mini_llm_model",
->       "description": "A general-purpose language model tool capable of answering broad questions, summarizing information, and providing analysis that doesn't require searching specific data. Use this when no other specialized tool is applicable.",
->       "parameters": {
->         "model_id": "mnEFM5gBiNWPInKRyWun",
->         "prompt": "Human: You're an Artificial intelligence analyst and you're going to help me with cybersecurity related tasks. Respond directly and concisely.\\n\\n${parameters.chat_history:-}\\n\\nHuman: ${parameters.question}\\n\\nAssistant:"
->       }
->     },
->     {
->       "type": "SearchIndexTool",
->       "name": "WazuhAlertSearchTool",
->       "description": "Use this tool ONLY when asked to search for specific Wazuh alert data or summarize trends (e.g., 'most frequent', 'top types'). This tool queries the 'wazuh-alerts-*' daily indices. Provide a JSON string for the 'input' parameter. This JSON string MUST always include 'index' and a 'query' field. The 'query' field's value must be a JSON object that itself contains the OpenSearch 'query' DSL. Parameters like 'size', 'sort', and 'aggs' (aggregations) must be at the top level, alongside 'index' and 'query'. Remember: for Wazuh, the timestamp field is 'timestamp' and severity is 'rule.level'. Examples: \\\"{\\\"index\\\": \\\"wazuh-alerts-*\\\", \\\"query\\\": {\\\"query\\\": {\\\"match_all\\\": {}}}} }\\\" --- For high-severity alerts (level 10 or higher) in the last 24 hours: \\\"{\\\"index\\\": \\\"wazuh-alerts-*\\\", \\\"query\\\": {\\\"query\\\": {\\\"bool\\\": {\\\"filter\\\": [{\\\"range\\\": {\\\"timestamp\\\": {\\\"gte\\\": \\\"now-24h/h\\\"}}}, {\\\"range\\\": {\\\"rule.level\\\": {\\\"gte\\\": 10}}}]}}}, \\\"size\\\": 10, \\\"sort\\\": [{\\\"rule.level\\\": {\\\"order\\\": \\\"desc\\\"}}, {\\\"timestamp\\\": {\\\"order\\\": \\\"desc\\\"}}] }\\\" --- To find the most frequent alert types in the last 24 hours, use this structure: \\\"{\\\"index\\\": \\\"wazuh-alerts-*\\\", \\\"query\\\": {\\\"query\\\": {\\\"range\\\": {\\\"timestamp\\\": {\\\"gte\\\": \\\"now-24h/h\\\"}}}}, \\\"size\\\": 0, \\\"aggs\\\": {\\\"alert_types\\\": {\\\"terms\\\": {\\\"field\\\": \\\"rule.description.keyword\\\", \\\"size\\\": 10}}}}} }\\\" If specific agent names or rule IDs are requested, use a 'match' or 'term' query within the 'bool' filter alongside other conditions.",
->       "parameters": {
->         "input": "${parameters.open_search_query}"
->       }
->     }
->   ]
-> }
-> ```
+Create conversational agent with specialized tools:
+
+```http
+POST /_plugins/_ml/agents/_register
+{
+  "name": "OpenAI_wazuh_agent_test",
+  "type": "conversational",
+  "description": "This is a GPT-4o-mini agent that acts as an AI cybersecurity analyst, capable of answering general security questions and retrieving specific Wazuh alert data from daily indices.",
+  "llm": {
+    "model_id": "mnEFM5gBiNWPInKRyWun",
+    "parameters": {
+      "max_iteration": 3,
+      "stop_when_no_tool_found": true,
+      "disable_trace": false,
+      "response_filter": "$.choices[0].message.content"
+    }
+  },
+  "memory": {
+    "type": "conversation_index"
+  },
+  "app_type": "chat_with_rag",
+  "tools": [
+    {
+      "type": "MLModelTool",
+      "name": "OpenAI_GPT_4o_mini_llm_model",
+      "description": "A general-purpose language model tool capable of answering broad questions, summarizing information, and providing analysis that doesn't require searching specific data. Use this when no other specialized tool is applicable.",
+      "parameters": {
+        "model_id": "mnEFM5gBiNWPInKRyWun",
+        "prompt": "Human: You're an Artificial intelligence analyst and you're going to help me with cybersecurity related tasks. Respond directly and concisely.\\n\\n${parameters.chat_history:-}\\n\\nHuman: ${parameters.question}\\n\\nAssistant:"
+      }
+    },
+    {
+      "type": "SearchIndexTool",
+      "name": "WazuhAlertSearchTool",
+      "description": "Use this tool ONLY when asked to search for specific Wazuh alert data or summarize trends (e.g., 'most frequent', 'top types'). This tool queries the 'wazuh-alerts-*' daily indices. Provide a JSON string for the 'input' parameter. This JSON string MUST always include 'index' and a 'query' field. The 'query' field's value must be a JSON object that itself contains the OpenSearch 'query' DSL. Parameters like 'size', 'sort', and 'aggs' (aggregations) must be at the top level, alongside 'index' and 'query'. Remember: for Wazuh, the timestamp field is 'timestamp' and severity is 'rule.level'. Examples: \\\"{\\\"index\\\": \\\"wazuh-alerts-*\\\", \\\"query\\\": {\\\"query\\\": {\\\"match_all\\\": {}}}} }\\\" --- For high-severity alerts (level 10 or higher) in the last 24 hours: \\\"{\\\"index\\\": \\\"wazuh-alerts-*\\\", \\\"query\\\": {\\\"query\\\": {\\\"bool\\\": {\\\"filter\\\": [{\\\"range\\\": {\\\"timestamp\\\": {\\\"gte\\\": \\\"now-24h/h\\\"}}}, {\\\"range\\\": {\\\"rule.level\\\": {\\\"gte\\\": 10}}}]}}}, \\\"size\\\": 10, \\\"sort\\\": [{\\\"rule.level\\\": {\\\"order\\\": \\\"desc\\\"}}, {\\\"timestamp\\\": {\\\"order\\\": \\\"desc\\\"}}] }\\\" --- To find the most frequent alert types in the last 24 hours, use this structure: \\\"{\\\"index\\\": \\\"wazuh-alerts-*\\\", \\\"query\\\": {\\\"query\\\": {\\\"range\\\": {\\\"timestamp\\\": {\\\"gte\\\": \\\"now-24h/h\\\"}}}}, \\\"size\\\": 0, \\\"aggs\\\": {\\\"alert_types\\\": {\\\"terms\\\": {\\\"field\\\": \\\"rule.description.keyword\\\", \\\"size\\\": 10}}}}} }\\\" If specific agent names or rule IDs are requested, use a 'match' or 'term' query within the 'bool' filter alongside other conditions.",
+      "parameters": {
+        "input": "${parameters.input}"
+      }
+    }
+  ]
+}
+```
 
 </p>
 </details>
 
-<details><summary>Step 7: Execute a query</summary>
+<details><summary>Step 7: Test Agent</summary>
 <p>
 
-> ```http
-> POST /_plugins/_ml/agents/<agent id>/_execute
-> {
->   "parameters": {
->     "question": "What were the most frequent alert types in the last 24 hours?",
->     "verbose": true
->   }
-> }
-> ```
+Execute test query:
+
+```http
+POST /_plugins/_ml/agents/<agent id>/_execute
+{
+  "parameters": {
+    "question": "What were the most frequent alert types in the last 24 hours?",
+    "verbose": true
+  }
+}
+```
 
 </p>
 </details>
 
-<details><summary>Register the agent in the indexer manager</summary>
+<details><summary>Step 8: Register Agent in Indexer Manager</summary>
 <p>
 
-> ```bash
-> DIR="/etc/wazuh-indexer/certs"; curl --cacert $DIR/root-ca.pem --cert $DIR/admin.pem --key $DIR/admin-key.pem \
-> -X PUT https://127.0.0.1:9200/.plugins-ml-config/_doc/os_chat \
-> -H 'Content-Type: application/json' \
-> -d '{"type":"os_chat_root_agent","configuration":{"agent_id":"<agent id>"}}'
-> ```
+Final registration step:
+
+```bash
+DIR="/etc/wazuh-indexer/certs"; curl --cacert $DIR/root-ca.pem --cert $DIR/admin.pem --key $DIR/admin-key.pem \
+-X PUT https://127.0.0.1:9200/.plugins-ml-config/_doc/os_chat \
+-H 'Content-Type: application/json' \
+-d '{"type":"os_chat_root_agent","configuration":{"agent_id":"<agent id>"}}'
+```
 
 </p>
 </details>
+
+## 🔀 Module Structure
+
+```
+dashboard-assistant/
+├── components/                 # React components
+│   ├── model-form.tsx         # Model configuration form
+│   ├── models-table.tsx       # Models management table
+│   ├── deployment-status.tsx  # Installation progress
+│   ├── model-test-result.tsx  # Test results display
+│   ├── model-form-schema.ts   # Form validation schema
+│   ├── types/                 # Component type definitions
+│   └── utils/                 # Utility functions
+├── modules/                   # Domain modules
+│   ├── agent/                 # Agent management
+│   │   ├── application/       # Use cases and ports
+│   │   ├── domain/           # Entities and enums
+│   │   └── infrastructure/   # Repositories
+│   ├── connector/            # Connector management
+│   ├── model/                # Model management
+│   │   ├── application/      # Use cases, DTOs, mappers
+│   │   ├── domain/          # Entities, enums, types
+│   │   ├── hooks/           # React hooks
+│   │   └── infrastructure/ # OpenSearch repositories
+│   ├── model-group/         # Model group management
+│   ├── ml-commons-settings/ # ML Commons configuration
+│   ├── installation-manager/ # Installation orchestration
+│   │   ├── application/     # Use cases
+│   │   ├── domain/         # Types and entities
+│   │   ├── hooks/          # Installation hooks
+│   │   └── infrastructure/ # Installation steps
+│   └── common/             # Shared infrastructure
+├── hooks/                  # Custom React hooks
+├── provider-model-config.ts # AI provider configurations
+├── setup.ts               # Dependency injection setup
+├── model-register.tsx     # Main registration component
+└── README.md             # This documentation
+```
+
+## 🚀 Getting Started
+
+### 1. **Import the main component**:
+
+```tsx
+import { ModelRegister } from './dashboard-assistant/model-register';
+```
+
+### 2. **Use the registration component**:
+
+```tsx
+<ModelRegister
+  onClickDeploy={() => console.log('Deployment started')}
+  disabled={false}
+  formConfig={{
+    title: 'Custom title',
+    description: 'Custom description',
+    // ... other config
+  }}
+/>
+```
+
+### 3. **Manage models with table**:
+
+```tsx
+import { ModelsTable } from './dashboard-assistant/components/models-table';
+
+<ModelsTable onAddModel={true} />;
+```
+
+### 4. **Use installation hook directly**:
+
+```tsx
+import { useAssistantInstallation } from './dashboard-assistant/modules/installation-manager/hooks/use-assistant-installation';
+
+const MyComponent = () => {
+  const { install, setModel, isLoading, progress } = useAssistantInstallation();
+
+  const handleInstall = async () => {
+    setModel({
+      model_provider: 'openai',
+      model_id: 'gpt-4o-mini',
+      api_url: 'https://api.openai.com',
+      api_key: 'your-api-key',
+    });
+    await install();
+  };
+
+  return (
+    <button onClick={handleInstall} disabled={isLoading}>
+      {isLoading ? 'Installing...' : 'Install Assistant'}
+    </button>
+  );
+};
+```
+
+## 🛠️ Development and Contribution
+
+### Adding New AI Providers
+
+1. Update `provider-model-config.ts` with new provider configuration
+2. Add provider-specific validation in `model-form-schema.ts`
+3. Test integration with the installation process
+4. Update documentation
+
+### Adding New Installation Steps
+
+1. Extend `InstallationAIAssistantStep` abstract class
+2. Implement required methods (`execute`, `getSuccessMessage`, `getFailureMessage`)
+3. Add step to `InstallationManager` steps array
+4. Update progress tracking
