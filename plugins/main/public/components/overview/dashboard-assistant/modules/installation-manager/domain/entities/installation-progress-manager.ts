@@ -1,25 +1,29 @@
 import { StepExecutionState, StepResultState } from '../enums';
-import { StepState, InstallationProgress } from '../types';
+import {
+  StepState,
+  InstallationProgress,
+  InstallationAIAssistantStep,
+} from '../types';
 
 export class InstallationProgressManager {
   private readonly progress: InstallationProgress;
 
   constructor(
-    stepNames: string[],
+    steps: InstallationAIAssistantStep[],
     private onProgressChange?: (progress: InstallationProgress) => void,
   ) {
-    if (stepNames.length === 0) {
+    if (steps.length === 0) {
       throw new Error('At least one step name must be provided');
     }
 
     this.progress = {
       currentStep: 0,
-      totalSteps: stepNames.length,
-      steps: stepNames.map(name => ({
-        stepName: name,
-        executionState: StepExecutionState.WAITING,
+      totalSteps: steps.length,
+      steps: steps.map(step => ({
+        stepName: step.getName(),
+        executionState: StepExecutionState.PENDING,
       })),
-      overallState: StepExecutionState.WAITING,
+      progressGlobalState: StepExecutionState.PENDING,
     };
   }
 
@@ -32,19 +36,41 @@ export class InstallationProgressManager {
       this.progress.currentStep = stepIndex;
       this.progress.steps[stepIndex] = {
         ...this.progress.steps[stepIndex],
-        executionState: StepExecutionState.PROCESSING,
-        startTime: new Date(),
+        executionState: StepExecutionState.RUNNING,
       };
-      this.progress.overallState = StepExecutionState.PROCESSING;
+      this.progress.progressGlobalState = StepExecutionState.RUNNING;
       this.notifyProgress();
     }
   }
 
-  public completeStep(
+  public succeedStep(
+    stepIndex: number,
+    step: InstallationAIAssistantStep,
+  ): void {
+    this.completeStep(
+      stepIndex,
+      StepResultState.SUCCESS,
+      step.getSuccessMessage(),
+    );
+  }
+
+  public failStep(
+    stepIndex: number,
+    step: InstallationAIAssistantStep,
+    error: Error,
+  ): void {
+    this.completeStep(
+      stepIndex,
+      StepResultState.FAIL,
+      step.getFailureMessage(),
+      error,
+    );
+  }
+
+  private completeStep(
     stepIndex: number,
     resultState: StepResultState,
     message?: string,
-    data?: any,
     error?: Error,
   ): void {
     if (stepIndex >= 0 && stepIndex < this.progress.steps.length) {
@@ -53,17 +79,15 @@ export class InstallationProgressManager {
         executionState: StepExecutionState.FINISHED,
         resultState,
         message,
-        data,
         error,
-        endTime: new Date(),
       };
 
       // Update overall state
       if (resultState === StepResultState.FAIL) {
-        this.progress.overallState = StepExecutionState.FINISHED;
+        this.progress.progressGlobalState = StepExecutionState.FINISHED;
       } else if (stepIndex === this.progress.steps.length - 1) {
         // Last step completed
-        this.progress.overallState = StepExecutionState.FINISHED;
+        this.progress.progressGlobalState = StepExecutionState.FINISHED;
       }
 
       this.notifyProgress();
@@ -86,16 +110,6 @@ export class InstallationProgressManager {
     return this.progress.steps.filter(
       step => step.resultState === StepResultState.FAIL,
     );
-  }
-
-  public getCompletedStepsData(): Record<string, any> {
-    const data: Record<string, any> = {};
-    this.progress.steps.forEach(step => {
-      if (step.data && step.resultState === StepResultState.SUCCESS) {
-        data[step.stepName] = step.data;
-      }
-    });
-    return data;
   }
 
   private notifyProgress(): void {

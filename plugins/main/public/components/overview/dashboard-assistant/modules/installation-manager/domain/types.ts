@@ -7,12 +7,10 @@ import { InstallationContext } from './entities';
 import { StepExecutionState, StepResultState } from './enums';
 
 export interface IInstallationManager {
-  execute(
-    request: InstallDashboardAssistantRequest,
-  ): Promise<InstallationResult>;
+  execute(request: InstallAIDashboardAssistantDto): Promise<InstallationResult>;
 }
 
-export interface InstallDashboardAssistantRequest {
+export interface InstallAIDashboardAssistantDto {
   selected_provider: string;
   ml_common_settings: CreateMLCommonsDto;
   connector: CreateConnectorDto;
@@ -26,16 +24,13 @@ export interface StepState {
   resultState?: StepResultState;
   message?: string;
   error?: Error;
-  startTime?: Date;
-  endTime?: Date;
-  data?: any;
 }
 
 export interface InstallationProgress {
   currentStep: number;
   totalSteps: number;
   steps: StepState[];
-  overallState: StepExecutionState;
+  progressGlobalState: StepExecutionState;
 }
 
 export interface InstallationResult {
@@ -83,12 +78,22 @@ export interface InstallationError {
 }
 
 // Define local interfaces for installation manager
-export interface IInstallationStep {
-  getName(): string;
-  execute(
-    request: InstallDashboardAssistantRequest,
+export abstract class InstallationAIAssistantStep {
+  protected name: string;
+
+  constructor(params: { name: string }) {
+    this.name = params.name;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+  abstract execute(
+    request: InstallAIDashboardAssistantDto,
     context: InstallationContext,
   ): Promise<void>;
+  abstract getSuccessMessage(): string;
+  abstract getFailureMessage(): string;
 }
 
 // For compatibility with assistant-manager

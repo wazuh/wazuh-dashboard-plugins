@@ -1,5 +1,5 @@
 export enum StepExecutionState {
-  WAITING = 'waiting',
-  PROCESSING = 'processing',
+  PENDING = 'pending',
+  RUNNING = 'running',
   FINISHED = 'finished',
 }

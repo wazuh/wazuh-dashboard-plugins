@@ -55,7 +55,7 @@ export const DeploymentStatusContainer = ({
     if (!progress) return false;
 
     // If installation is still in progress, don't disable
-    if (progress.overallState !== StepExecutionState.FINISHED) {
+    if (progress.progressGlobalState !== StepExecutionState.FINISHED) {
       return false;
     }
 

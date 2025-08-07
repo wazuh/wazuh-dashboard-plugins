@@ -48,10 +48,10 @@ export const DeploymentStatus = ({
     executionState: StepExecutionState,
     resultState?: StepResultState,
   ): StepStatus => {
-    if (executionState === StepExecutionState.WAITING) {
+    if (executionState === StepExecutionState.PENDING) {
       return StepStatus.PENDING;
     }
-    if (executionState === StepExecutionState.PROCESSING) {
+    if (executionState === StepExecutionState.RUNNING) {
       return StepStatus.LOADING;
     }
     if (executionState === StepExecutionState.FINISHED) {
@@ -86,7 +86,7 @@ export const DeploymentStatus = ({
 
   const steps = progress?.steps || [];
   const allStepsCompleted =
-    progress?.overallState === StepExecutionState.FINISHED;
+    progress?.progressGlobalState === StepExecutionState.FINISHED;
   const allStepsSuccess = steps.every(
     step =>
       step.resultState === StepResultState.SUCCESS ||

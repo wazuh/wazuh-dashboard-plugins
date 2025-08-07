@@ -5,7 +5,10 @@ export class InstallationContext {
     this.context.set(key, value);
   }
 
-  public get<T>(key: string): T | undefined {
+  public get<T>(key: string): T {
+    if (!this.context.has(key)) {
+      throw new Error(`Key "${key}" not found in installation context`);
+    }
     return this.context.get(key);
   }
 
@@ -17,7 +20,7 @@ export class InstallationContext {
     this.context.clear();
   }
 
-  public getAll(): Record<string, any> {
+  public toObject(): Record<string, any> {
     return Object.fromEntries(this.context);
   }
 }

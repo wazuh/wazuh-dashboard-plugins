@@ -1,8 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
-import { installDashboardAssistantUseCase } from '../application/use-cases/install-dashboard-assistant';
-import { InstallationManager } from '../infrastructure/installation-manager';
+import { useState, useCallback } from 'react';
 import type {
-  InstallDashboardAssistantRequest,
+  InstallAIDashboardAssistantDto,
   InstallationProgress,
 } from '../domain/types';
 import { InstallDashboardAssistantResponse } from '../domain/types';
@@ -43,7 +41,7 @@ export function useAssistantInstallation() {
       modelProviderConfigs[assistantModelInfo.model_provider];
     try {
       // Create installation request from model data
-      const request: InstallDashboardAssistantRequest = {
+      const request: InstallAIDashboardAssistantDto = {
         selected_provider: assistantModelInfo.model_provider,
         ml_common_settings: {
           endpoints_regex: [model_config.default_endpoint_regex || '.*'],
@@ -88,7 +86,7 @@ export function useAssistantInstallation() {
         currentStep: 0,
         totalSteps: 6,
         steps: [],
-        overallState: 'waiting' as any,
+        progressGlobalState: 'waiting' as any,
       };
       setResult(
         InstallDashboardAssistantResponse.failure(
