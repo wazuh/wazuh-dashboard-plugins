@@ -55,7 +55,10 @@ export const withHealthCheckChecks =
     );
 
     const missingSuccessChecks = checkRequirements.filter(key =>
-      checks.some(({ name, result }) => name === key && result !== 'success'),
+      checks.some(
+        ({ name, result, _meta }) =>
+          name === key && _meta?.isEnabled && result && result !== 'success',
+      ),
     );
 
     if (missingSuccessChecks.length) {
