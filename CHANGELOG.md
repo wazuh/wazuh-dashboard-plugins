@@ -2,27 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v4.13.1 - OpenSearch Dashboards 2.19.2 - Revision 00
-
-### Added
-
-- Support for Wazuh 4.13.1
-
-### Changed
-
-- Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
-
-### Fixed
-
-- Fixed some filter values could change on navigation or pin/unpin causing different searches with unexpected results [#7552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7552)
-- Fixed a problem in the expanded table row that allowed to see not updated inforamtion if using the Refresh button [#7544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7544)
-- Fixed a bug that caused a format issue in csv reports [#7550](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7550)
-
-### Remove
-
-- Removed the cluster restart warning on rules, decoders and CDB lists [#7620](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7620)
-
-## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 04
+## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 05
 
 ### Added
 
@@ -39,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
 - Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482) [#7538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7538)
 - Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
+- Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
 
 ### Fixed
 
@@ -47,6 +28,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed X-axis label in "Vulnerabilities by year of publication" visualization [#7422](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7422)
 - Fixed a bug in Rule details flyout, where it didn't map all the compliances [#7501](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7501)
 - Fixed the Windows service name in Deploy new agent [#7540](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7540)
+- Fixed some filter values could change on navigation or pin/unpin causing different searches with unexpected results [#7552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7552)
+- Fixed a problem in the expanded table row that allowed to see not updated inforamtion if using the Refresh button [#7544](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7544)
+- Fixed a bug that caused a format issue in csv reports [#7550](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7550)
 
 ### Removed
 
@@ -55,6 +39,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed the `enrollment.password` field from the `/utils/configuration` endpoint response to prevent unauthorized agent registration by users with read-only API roles. [#7483](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7483)
 - Removed `vulnerability.pattern` setting [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
+- Removed the cluster restart warning on rules, decoders and CDB lists [#7620](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7620)
 
 ## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 03
 
