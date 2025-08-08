@@ -163,6 +163,7 @@ export const WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX = {
 export const WAZUH_SETTING_INVENTORY_SERVICES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_IT_HYGIENE_SERVICES_PATTERN.replace('*', ''),
   dataSet: 'states-inventory-services',
+};
 export const WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN.replace(
     '*',
