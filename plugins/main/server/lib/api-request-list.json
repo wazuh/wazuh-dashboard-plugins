@@ -983,11 +983,9 @@
                 "syslog_output",
                 "agent-key-polling",
                 "aws-s3",
-                "azure-logs",
-                "cis-cat",
+
                 "docker-listener",
-                "open-scap",
-                "osquery",
+
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -1242,15 +1240,13 @@
                 "wazuh-modulesd",
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
-                "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
+
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
                 "wazuh-modulesd:database",
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
-                "wazuh-modulesd:osquery",
+
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
               ]
@@ -4319,11 +4315,9 @@
                 "syslog_output",
                 "agent-key-polling",
                 "aws-s3",
-                "azure-logs",
-                "cis-cat",
+
                 "docker-listener",
-                "open-scap",
-                "osquery",
+
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -4572,15 +4566,13 @@
                 "wazuh-modulesd",
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
-                "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
+
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
                 "wazuh-modulesd:database",
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
-                "wazuh-modulesd:osquery",
+
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
               ]

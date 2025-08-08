@@ -99,19 +99,6 @@ export default [
           'Configuration to ensure compliance with security policies, standards and hardening guides',
         goto: 'policy-monitoring',
       },
-      {
-        name: 'OpenSCAP',
-        description:
-          'Configuration assessment and automation of compliance monitoring using SCAP checks',
-        goto: 'open-scap',
-        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.OPEN_SCAP),
-      },
-      {
-        name: 'CIS-CAT',
-        description:
-          'Configuration assessment using CIS scanner and SCAP checks',
-        goto: 'cis-cat',
-      },
     ],
   },
   {
@@ -125,12 +112,7 @@ export default [
         goto: 'vulnerabilities',
         when: 'manager',
       },
-      {
-        name: 'Osquery',
-        description:
-          'Expose an operating system as a high-performance relational database',
-        goto: 'osquery',
-      },
+
       {
         name: 'Inventory data',
         description:
@@ -198,12 +180,7 @@ export default [
           'Security events related to Amazon AWS services, collected directly via AWS API',
         goto: 'aws-s3',
       },
-      {
-        name: 'Azure Logs',
-        description: 'Configuration options of the Azure Logs wodle',
-        goto: 'azure-logs',
-        when: 'manager',
-      },
+
       {
         name: 'Google Cloud Pub/Sub',
         description: 'Configuration options of the Google Cloud Pub/Sub module',

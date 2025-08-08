@@ -30,7 +30,6 @@ describe('GeneralTab component', () => {
           },
         ],
         subscriptions: [
-          'Audit.AzureActiveDirectory',
           'Audit.Exchange',
           'Audit.SharePoint',
           'Audit.General',

@@ -113,24 +113,7 @@ export const AgentConfiguration = {
           ],
           tabs: ['General', 'Security configuration assessment'],
         },
-        {
-          subtitle: 'OpenSCAP',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-openscap.html',
-            '4.8',
-          ),
-          desc: 'Configuration assessment and automation of compliance monitoring using SCAP checks',
-          wodle: [{ name: 'open-scap' }],
-          labels: [
-            {
-              content: 'Evaluations',
-              disabled: 'OpenSCAP integration disabled',
-              'scan-on-start': 'Scan on start',
-              interval: 'Interval between scan executions',
-              timeout: 'Timeout (in seconds) for scan executions',
-            },
-          ],
-        },
+
         {
           subtitle: 'CIS-CAT',
           docuLink: webDocumentationLink(
@@ -156,23 +139,6 @@ export const AgentConfiguration = {
     {
       title: 'System threats and incident response',
       sections: [
-        {
-          subtitle: 'Osquery',
-          docuLink: webDocumentationLink(
-            'user-manual/reference/ossec-conf/wodle-osquery.html',
-          ),
-          desc: 'Expose an operating system as a high-performance relational database',
-          wodle: [{ name: 'osquery' }],
-          labels: [
-            {
-              disabled: 'Osquery integration disabled',
-              run_daemon: 'Auto-run the Osquery daemon',
-              add_labels: 'Use defined labels as decorators',
-              log_path: 'Path to the Osquery results log file',
-              config_path: 'Path to the Osquery configuration file',
-            },
-          ],
-        },
         {
           subtitle: 'Inventory data',
           docuLink: webDocumentationLink(

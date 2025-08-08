@@ -1130,11 +1130,9 @@
                 "syscheck",
                 "syslog_output",
                 "aws-s3",
-                "azure-logs",
-                "cis-cat",
+
                 "docker-listener",
-                "open-scap",
-                "osquery",
+
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -4519,11 +4517,9 @@
                 "syscheck",
                 "syslog_output",
                 "aws-s3",
-                "azure-logs",
-                "cis-cat",
+
                 "docker-listener",
-                "open-scap",
-                "osquery",
+
                 "syscollector",
                 "vulnerability-detector"
               ]

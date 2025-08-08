@@ -241,18 +241,7 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
         WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
-    {
-      openscap: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
-    },
-    {
-      ciscat: true,
-      settingIndexPattern:
-        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
-      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
-    },
+
     {
       virustotal: true,
       settingIndexPattern:
@@ -274,7 +263,6 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
     {
-      osquery: true,
       settingIndexPattern:
         WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
@@ -466,16 +454,16 @@ export enum WAZUH_MODULES_ID {
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
   AUDITING = 'audit',
-  OPEN_SCAP = 'oscap',
+
   VULNERABILITIES = 'vuls',
-  OSQUERY = 'osquery',
+
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
   PCI_DSS = 'pci',
   HIPAA = 'hipaa',
   NIST_800_53 = 'nist',
   TSC = 'tsc',
-  CIS_CAT = 'ciscat',
+
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',
