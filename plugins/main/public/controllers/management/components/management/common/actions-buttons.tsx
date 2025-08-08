@@ -29,9 +29,9 @@ import { SECTION_CDBLIST_SECTION } from './constants';
 async function uploadFiles(files, resource, overwrite) {
   try {
     let errors = false;
-    const results: any[] = [];
+    let results: any[] = [];
     const resourcesHandler = new ResourcesHandler(resource);
-    for (const idx in files) {
+    for (let idx in files) {
       const { file, content } = files[idx];
       try {
         await resourcesHandler.updateFile(
@@ -56,9 +56,7 @@ async function uploadFiles(files, resource, overwrite) {
         });
       }
     }
-    if (errors) {
-      throw results;
-    }
+    if (errors) throw results;
     return results;
   } catch (error) {
     throw error;
@@ -101,7 +99,7 @@ export const AddNewFileButton = ({ section, updateAddingFile }) => (
   </>
 );
 
-// Add new CDB list button
+//Add new CDB list button
 export const AddNewCdbListButton = ({ section, updateListContent }) => {
   return (
     <>
@@ -174,7 +172,7 @@ const uploadFile = async (files, resource, overwrite) => {
 export const UploadFilesButton = ({
   section,
   showingFiles,
-  onSuccess = (param: any) => {},
+  onSuccess,
   ...props
 }) => {
   return (
