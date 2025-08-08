@@ -15,6 +15,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.14.0
 - Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587)
 
+### Changed
+
+- Improved Integrity monitoring settings terminology by clarifying file/registry labels and updating component names for better user understanding [#7639](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7639)
+
 ### Fixed
 
 - Fixed missing provider and queue_size fields in whodata configuration [#7596](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7596)
