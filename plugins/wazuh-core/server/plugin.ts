@@ -16,7 +16,6 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  UpdateRegistry,
   ConfigurationStore,
 } from './services';
 import { Configuration } from '../common/services/configuration';

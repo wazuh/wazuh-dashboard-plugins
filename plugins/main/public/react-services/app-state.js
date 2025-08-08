@@ -326,11 +326,6 @@ export class AppState {
     return getCookies().remove('navigate');
   }
 
-  static setWzMenu(isVisible = true) {
-    const showMenu = updateShowMenu(isVisible);
-    store.dispatch(showMenu);
-  }
-
   static async downloadCsv(path, fileName, filters = []) {
     try {
       const csvReq = new CSVRequest();

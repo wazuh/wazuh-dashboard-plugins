@@ -24,7 +24,7 @@ export const withGuard =
 
 export const withGuardAsync =
   (
-    condition: (props: any) => { ok: boolean; data: any },
+    condition: (props: any) => Promise<{ ok: boolean; data: any }>,
     ComponentFulfillsCondition: React.JSX.Element,
     ComponentLoadingResolution: null | React.JSX.Element = null,
   ) =>

@@ -36,10 +36,7 @@ export const toastRequiresRunningHealthcheck = () => {
           <EuiButton
             onClick={() => {
               getToasts().remove(toast);
-              navigationService.navigate({
-                pathname: '/health-check',
-                state: { prevLocation: location },
-              });
+              // TODO: This should be removed when the app settings are migrated to the opensearch_dashboards.yml file
             }}
             size='s'
           >
