@@ -21,7 +21,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
         "enabled": "yes",
         "interval": 600,
         "only_future_events": "yes",
-                "subscriptions": Array [
+        "subscriptions": Array [
           "Audit.Exchange",
           "Audit.SharePoint",
           "Audit.General",
@@ -228,7 +228,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
         ]
       }
       items={
-                Array [
+        Array [
           Object {
             "subscription": "Audit.Exchange",
           },
@@ -390,46 +390,6 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                           <div
                             className="euiTableCellContent"
                           >
-
-                          </div>
-                        </td>
-                      </EuiTableRowCell>
-                    </tr>
-                  </EuiTableRow>
-                  <EuiTableRow
-                    isSelected={false}
-                  >
-                    <tr
-                      className="euiTableRow"
-                    >
-                      <EuiTableRowCell
-                        align="left"
-                        key="_data_column_subscription_1_0"
-                        mobileOptions={
-                          Object {
-                            "header": "Name",
-                            "render": undefined,
-                          }
-                        }
-                        setScopeRow={false}
-                        textOnly={true}
-                      >
-                        <td
-                          className="euiTableRowCell"
-                          style={
-                            Object {
-                              "width": undefined,
-                            }
-                          }
-                        >
-                          <div
-                            className="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
-                          >
-                            Name
-                          </div>
-                          <div
-                            className="euiTableCellContent"
-                          >
                             <span
                               className="euiTableCellContent__text"
                             >
@@ -448,7 +408,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                     >
                       <EuiTableRowCell
                         align="left"
-                        key="_data_column_subscription_2_0"
+                        key="_data_column_subscription_1_0"
                         mobileOptions={
                           Object {
                             "header": "Name",
@@ -492,7 +452,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                     >
                       <EuiTableRowCell
                         align="left"
-                        key="_data_column_subscription_3_0"
+                        key="_data_column_subscription_2_0"
                         mobileOptions={
                           Object {
                             "header": "Name",
@@ -536,7 +496,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                     >
                       <EuiTableRowCell
                         align="left"
-                        key="_data_column_subscription_4_0"
+                        key="_data_column_subscription_3_0"
                         mobileOptions={
                           Object {
                             "header": "Name",
