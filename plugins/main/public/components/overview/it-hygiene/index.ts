@@ -5,3 +5,4 @@ export * from './processes';
 export * from './system';
 export * from './users';
 export * from './services';
+export * from './browser-extensions';
