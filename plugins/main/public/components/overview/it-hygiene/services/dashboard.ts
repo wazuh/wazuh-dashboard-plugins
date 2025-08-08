@@ -90,7 +90,7 @@ export const getOverviewServicesTab = (indexPatternId: string) => {
       'Services by state',
       'it-hygiene-services-state',
       {
-        fieldSize: 4,
+        fieldSize: 5,
         otherBucket: 'Others',
         metricCustomLabel: 'Service by state count',
         valueAxesTitleText: ' ',
