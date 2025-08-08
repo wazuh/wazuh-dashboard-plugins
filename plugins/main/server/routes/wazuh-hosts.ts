@@ -9,10 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { WazuhCorePluginStart } from '../../../wazuh-core/server';
 import { WazuhHostsCtrl } from '../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 
-export function WazuhHostsRoutes(router: IRouter, services) {
+export function WazuhHostsRoutes(
+  router: IRouter,
+  services: WazuhCorePluginStart,
+) {
   const ctrl = new WazuhHostsCtrl();
 
   // Get Wazuh-API entries list (Multimanager) from elasticsearch index

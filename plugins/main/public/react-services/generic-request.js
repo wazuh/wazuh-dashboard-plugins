@@ -23,7 +23,7 @@ export class GenericRequest {
   /**
    * Generic request
    * @template T
-   * @param {string} method
+   * @param {'POST' | 'GET' | 'PUT' | 'DELETE'} method
    * @param {string} path
    * @param {any} payload
    * @param {boolean} returnError
@@ -53,45 +53,21 @@ export class GenericRequest {
       } catch (error) {
         // Intended
       }
-      var options = {};
+      let options = Object.assign(
+        {},
+        {
+          method: method,
+          headers: requestHeaders,
+          url: tmpUrl,
+          timeout: timeout || 20000,
+        },
+      );
+
+      if (['PUT', 'POST', 'DELETE'].includes(method)) {
+        options.data = payload;
+      }
 
       const data = {};
-      if (method === 'GET') {
-        options = {
-          method: method,
-          headers: requestHeaders,
-          url: tmpUrl,
-          timeout: timeout || 20000,
-        };
-      }
-      if (method === 'PUT') {
-        options = {
-          method: method,
-          headers: requestHeaders,
-          data: payload,
-          url: tmpUrl,
-          timeout: timeout || 20000,
-        };
-      }
-      if (method === 'POST') {
-        options = {
-          method: method,
-          headers: requestHeaders,
-          data: payload,
-          url: tmpUrl,
-          timeout: timeout || 20000,
-        };
-      }
-      if (method === 'DELETE') {
-        options = {
-          method: method,
-          headers: requestHeaders,
-          data: payload,
-          url: tmpUrl,
-          timeout: timeout || 20000,
-        };
-      }
-
       Object.assign(data, await request(options));
       if (!data) {
         throw new Error(
