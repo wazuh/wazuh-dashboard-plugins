@@ -535,3 +535,143 @@ export const clusterNodes = async () => {
     throw error;
   }
 };
+
+/**
+ * Reload ruleset on all nodes using the new API endpoint.
+ * @param {array} nodes List of nodes ID
+ * @returns {Promise<object>}
+ */
+export const reloadRuleset = async nodes => {
+  try {
+    nodesString = nodes.split(',');
+    const nodes_param = nodesString ? `?nodes_list=${nodesString}` : '';
+
+    const result = await WzRequest.apiReq(
+      'PUT',
+      `/cluster/analysisd/reload${nodes_param}`,
+      {},
+    );
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Restart cluster or Manager NEW
+ */
+export const restartClusterOrManager = async updateWazuhNotReadyYet => {
+  try {
+    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
+    const isCluster =
+      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+
+    getToasts().add({
+      color: 'success',
+      title:
+        'Reloading ruleset across the cluster. This may take a few seconds.',
+      toastLifeTimeMs: 3000,
+    });
+
+    // Call the new reload ruleset endpoint
+    const reloadResponse = await mockReloadRulesetWithError();
+    // const reloadResponse = await reloadRuleset();
+
+    // // Optional: Mostrar resultado en consola
+    console.debug('Ruleset reload response:', reloadResponse);
+
+    updateWazuhNotReadyYet('Reloading ruleset. Please wait...');
+
+    // // No es necesario hacer ping porque no reiniciamos nada,
+    // await makePing(updateWazuhNotReadyYet, isCluster);
+
+    return reloadResponse;
+  } catch (error) {
+    const message = extractMessage(error);
+    getToasts().addDanger(`Failed to reload ruleset: ${message}`);
+    throw error;
+  }
+};
+
+// /**
+//  * Restart cluster or Manager OLD
+//  */
+// export const restartClusterOrManager = async updateWazuhNotReadyYet => {
+//   try {
+//     const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
+//     const isCluster =
+//       clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+//     getToasts().add({
+//       color: 'success',
+//       title: isCluster
+//         ? 'Restarting cluster, it will take up to 30 seconds.'
+//         : 'The manager is being restarted',
+//       toastLifeTimeMs: 3000,
+//     });
+
+//     // isCluster ? await restartCluster() : await restartManager();
+//     // Dispatch a Redux action
+//     updateWazuhNotReadyYet(
+//       `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`,
+//     );
+//     await makePing(updateWazuhNotReadyYet, isCluster);
+//     return { restarted: isCluster ? 'Cluster' : 'Manager' };
+//   } catch (error) {
+//     throw error;
+//   }
+// };
+
+/**
+ * Mock: Simula un reload con un nodo fallando.
+ * @param {string[]} nodes Lista de IDs de nodos
+ * @returns {Promise<object>}
+ */
+export const mockReloadRulesetWithError = async (
+  nodes = ['master-node', 'worker1', 'worker2'],
+) => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const failedNode = nodes[nodes.length - 1]; // el último nodo falla
+      const successfulNodes = nodes.slice(0, -1);
+      resolve({
+        data: {
+          affected_items: successfulNodes,
+          total_affected_items: successfulNodes.length,
+          total_failed_items: 1,
+          failed_items: [
+            {
+              id: failedNode,
+              error: 'Timeout while reloading analysisd',
+            },
+          ],
+        },
+        message: 'Reload request completed with some errors',
+        error: 1,
+      });
+    }, 500);
+  });
+};
+
+/**
+ * Mock: Simula un reload exitoso en todos los nodos.
+ * @param {string[]} nodes Lista de IDs de nodos
+ * @returns {Promise<object>}
+ */
+export const mockReloadRuleset = async (
+  nodes = ['master-node', 'worker1', 'worker2'],
+) => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve({
+        data: {
+          affected_items: nodes,
+          total_affected_items: nodes.length,
+          total_failed_items: 0,
+          failed_items: [],
+        },
+        message: 'Reload request sent to all specified nodes',
+        error: 0,
+      });
+    }, 500); // Simula un pequeño delay de red
+  });
+};
