@@ -91,6 +91,7 @@ import {
   ITHygieneProcessesInventory,
   ITHygieneSystemInventory,
   ITHygieneUsersInventory,
+  ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
 
@@ -557,6 +558,12 @@ export const ModulesDefaults = {
         name: 'Identity',
         buttons: [ButtonExploreAgent],
         component: ITHygieneUsersInventory,
+      },
+      {
+        id: 'services',
+        name: 'Services',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneServicesInventory,
       },
       {
         id: 'browser-extensions',

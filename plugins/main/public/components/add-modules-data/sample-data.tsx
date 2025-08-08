@@ -83,6 +83,7 @@ const sampleInventory = [
   'protocols',
   'system',
   'users',
+  'services',
   'browser extensions',
 ].join(', ');
 
