@@ -4,3 +4,4 @@ export * from './packages';
 export * from './processes';
 export * from './system';
 export * from './users';
+export * from './browser-extensions';
