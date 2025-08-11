@@ -22,4 +22,17 @@ export function WazuhAssistantRoutes(
     async (context, request, response) =>
       ctrl.registerAgent(context, request, response),
   );
+
+  router.get(
+    {
+      path: '/assistant/agent/register-command/{agentId}',
+      validate: {
+        params: schema.object({
+          agentId: schema.string(),
+        }),
+      },
+    },
+    async (context, request, response) =>
+      ctrl.getRegisterAgentCommand(context, request, response),
+  );
 }

@@ -28,7 +28,6 @@ export class InstallationManager implements IInstallationManager {
       new CreateModelStep(),
       new TestModelConnectionStep(),
       new CreateAgentStep(),
-      new RegisterAgentStep(),
     ];
 
     const progressManager = new InstallationProgressManager(

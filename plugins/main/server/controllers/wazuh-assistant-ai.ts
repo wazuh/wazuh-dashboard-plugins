@@ -10,6 +10,41 @@ import fs from 'fs/promises';
 import { first } from 'rxjs/operators';
 
 export class WazuhAssistantCtrl {
+  async getRegisterAgentCommand(
+    context: RequestHandlerContext & { wazuh_core: WazuhCorePluginStart },
+    request: OpenSearchDashboardsRequest<{ agentId: string }>,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {
+    const certsDir = '/usr/share/opensearch/config/certs';
+    const indexerUrl =
+      context.core.opensearch.opensearchStart.client.config.hosts[0];
+    const data = {
+      type: 'os_chat_root_agent',
+      configuration: {
+        agent_id: request.params.agentId,
+      },
+    };
+    const certs = {
+      cacert: `root-ca.pem`,
+      cert: `admin.pem`,
+      key: `admin-key.pem`,
+    };
+
+    return response.ok({
+      body: {
+        command: `INDEXER_URL="${indexerUrl}"; \\
+DIR="${certsDir}"; \\
+CACERT="$DIR/${certs.cacert}"; \\
+CERT="$DIR/${certs.cert}"; \\
+KEY="$DIR/${certs.key}"; \\
+curl --cacert $CACERT --cert $CERT --key $KEY \\
+-X PUT $INDEXER_URL/.plugins-ml-config/_doc/os_chat \\
+-H 'Content-Type: application/json' \\
+-d '${JSON.stringify(data)}'`,
+      },
+    });
+  }
+
   async registerAgent(
     context: RequestHandlerContext & { wazuh_core: WazuhCorePluginStart },
     request: OpenSearchDashboardsRequest<{ agentId: string }>,

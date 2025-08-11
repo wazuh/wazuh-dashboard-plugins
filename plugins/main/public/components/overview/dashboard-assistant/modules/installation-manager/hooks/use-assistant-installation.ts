@@ -17,12 +17,16 @@ interface ModelConfiguration {
 
 export function useAssistantInstallation() {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] =
-    useState<InstallDashboardAssistantResponse | null>(null);
-  const [assistantModelInfo, setAssistantModelInfo] =
-    useState<ModelConfiguration | null>(null);
-  const [progress, setProgress] = useState<InstallationProgress | null>(null);
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [result, setResult] = useState<
+    InstallDashboardAssistantResponse | undefined
+  >(undefined);
+  const [assistantModelInfo, setAssistantModelInfo] = useState<
+    ModelConfiguration | undefined
+  >(undefined);
+  const [progress, setProgress] = useState<InstallationProgress | undefined>(
+    undefined,
+  );
 
   const setModel = useCallback((data: ModelConfiguration) => {
     setAssistantModelInfo(data);
@@ -72,7 +76,14 @@ export function useAssistantInstallation() {
       const response = await UseCases.installDashboardAssistant(
         installationProgress => setProgress(installationProgress),
       )(request);
-      setResult(response);
+      if (response.data?.agentId) {
+        setResult(
+          InstallDashboardAssistantResponse.success(
+            response.data?.agentId,
+            progress,
+          ),
+        );
+      }
 
       if (!response.success) {
         setError(response.message);
@@ -101,9 +112,9 @@ export function useAssistantInstallation() {
 
   const reset = useCallback(() => {
     setIsLoading(false);
-    setError(null);
-    setResult(null);
-    setProgress(null);
+    setError(undefined);
+    setResult(undefined);
+    setProgress(undefined);
   }, []);
 
   return {

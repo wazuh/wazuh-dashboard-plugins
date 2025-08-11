@@ -236,6 +236,7 @@ export const ModelRegister = ({
           <EuiFlyoutBody>
             <DeploymentStatus
               progress={progress}
+              agentId={result?.agentId}
               title='Model Deployment'
               onCheckButton={handleOnClickCheckStatus}
               showCheckButton={isSuccess}

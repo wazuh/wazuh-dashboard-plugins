@@ -18,6 +18,7 @@ import {
   StepResultState,
   StepState,
 } from '../modules/installation-manager/domain';
+import RegisterAgentCommand from './register-agent-command';
 
 const StepStatus = {
   PENDING: 'pending',
@@ -30,7 +31,8 @@ const StepStatus = {
 type StepStatus = (typeof StepStatus)[keyof typeof StepStatus];
 
 interface DeploymentStatusProps {
-  progress: InstallationProgress | null;
+  progress?: InstallationProgress;
+  agentId?: string;
   title?: string;
   onCheckButton?: () => void;
   showCheckButton?: boolean;
@@ -39,6 +41,7 @@ interface DeploymentStatusProps {
 
 export const DeploymentStatus = ({
   progress,
+  agentId,
   onCheckButton,
   showCheckButton = false,
   isButtonDisabled = false,
@@ -96,7 +99,7 @@ export const DeploymentStatus = ({
   return (
     <>
       <EuiTitle size='s'>
-        <h3>Assistant Setup in Progress</h3>
+        <h3>Assistant setup in progress</h3>
       </EuiTitle>
 
       <EuiSpacer size='s' />
@@ -143,6 +146,12 @@ export const DeploymentStatus = ({
           );
         })}
       </EuiListGroup>
+
+      <EuiSpacer size='l' />
+
+      {allStepsCompleted && allStepsSuccess && agentId && (
+        <RegisterAgentCommand agentId={agentId} />
+      )}
 
       {(showCheckButton || (allStepsCompleted && allStepsSuccess)) && (
         <>

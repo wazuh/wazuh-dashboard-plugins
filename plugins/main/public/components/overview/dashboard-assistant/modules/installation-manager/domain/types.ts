@@ -121,7 +121,7 @@ export class InstallDashboardAssistantResponse
 
   public static success(
     agentId: string,
-    progress: InstallationProgress,
+    progress?: InstallationProgress,
   ): InstallDashboardAssistantResponse {
     return new InstallDashboardAssistantResponse(
       true,
