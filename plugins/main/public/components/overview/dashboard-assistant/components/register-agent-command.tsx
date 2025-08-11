@@ -3,22 +3,31 @@ import { EuiCodeBlock } from '@elastic/eui';
 import { UseCases } from '../setup';
 
 interface RegisterAgentClipboardProps {
-  agentId: string;
+  entityId: string;
+  targetEntity: 'agent' | 'model';
 }
 
-const RegisterAgentCommand = ({ agentId }: RegisterAgentClipboardProps) => {
+const RegisterAgentCommand = ({
+  entityId,
+  targetEntity,
+}: RegisterAgentClipboardProps) => {
   const [command, setCommand] = useState<string | null>(null);
 
-  const fetchRegisterAgentCommand = async (agentId: string) => {
-    const command = await UseCases.getRegisterAgentCommand(agentId);
+  const fetchRegisterAgentCommand = async () => {
+    let command = '';
+    if (targetEntity === 'agent') {
+      command = await UseCases.getRegisterAgentCommand(entityId);
+    } else {
+      command = await UseCases.getRegisterAgentCommandByModelId(entityId);
+    }
     setCommand(command);
   };
 
   useEffect(() => {
-    if (agentId) {
-      fetchRegisterAgentCommand(agentId);
+    if (entityId) {
+      fetchRegisterAgentCommand();
     }
-  }, [agentId]);
+  }, [entityId]);
 
   return (
     <EuiCodeBlock language='shell' isCopyable>

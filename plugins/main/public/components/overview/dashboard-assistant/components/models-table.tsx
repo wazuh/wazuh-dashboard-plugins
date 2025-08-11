@@ -22,7 +22,8 @@ import {
   useModels,
 } from '../modules/model/hooks';
 import { ModelFieldDefinition } from './types';
-import { UseCases } from '../setup';
+import RegisterAgentCommand from './register-agent-command';
+import { useFlyout } from '../hooks/use-flyout';
 
 interface Model {
   id: string;
@@ -63,7 +64,14 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
   const [isTestFlyoutVisible, setIsTestFlyoutVisible] = useState(false);
-  const [modelToTest, setModelToTest] = useState<Model | null>(null);
+  const flyoutUse = useFlyout({
+    onOpenHandler(model: Model) {
+      setSelectedModel(model);
+    },
+    onCloseHandler() {
+      setSelectedModel(null);
+    },
+  });
   const {
     isLoading: isTestLoading,
     response: testResponse,
@@ -106,17 +114,13 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     }
   };
 
-  const handleUseModel = async (agentId: string) => {
-    await UseCases.useAgentByModelId(agentId);
-  };
-
   const handleViewModel = (model: Model) => {
     setSelectedModel(model);
     setIsFlyoutVisible(true);
   };
 
   const handleTestModel = async (model: Model) => {
-    setModelToTest(model);
+    setSelectedModel(model);
     setIsTestFlyoutVisible(true);
     resetTest();
     await testModel(model.id);
@@ -129,7 +133,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
 
   const closeTestFlyout = () => {
     setIsTestFlyoutVisible(false);
-    setModelToTest(null);
+    setSelectedModel(null);
     resetTest();
   };
 
@@ -184,7 +188,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           description: 'Use model in dashboard assistant',
           icon: 'plusInCircle',
           type: 'icon',
-          onClick: (model: Model) => handleUseModel(model.id),
+          onClick: (model: Model) => flyoutUse.open(model),
         },
         {
           name: 'View',
@@ -338,11 +342,11 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
         </EuiFlyout>
       )}
 
-      {isTestFlyoutVisible && modelToTest && (
+      {isTestFlyoutVisible && selectedModel && (
         <EuiFlyout onClose={closeTestFlyout} size='m'>
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size='m'>
-              <h2>Test Model: {modelToTest.name}</h2>
+              <h2>Test Model: {selectedModel.name}</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
@@ -350,7 +354,23 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
               isLoading={isTestLoading}
               response={testResponse}
               error={testError}
-              modelName={modelToTest.name}
+              modelName={selectedModel.name}
+            />
+          </EuiFlyoutBody>
+        </EuiFlyout>
+      )}
+
+      {flyoutUse.isOpen && selectedModel && (
+        <EuiFlyout onClose={flyoutUse.close} size='m'>
+          <EuiFlyoutHeader hasBorder>
+            <EuiTitle size='m'>
+              <h2>Register agent command</h2>
+            </EuiTitle>
+          </EuiFlyoutHeader>
+          <EuiFlyoutBody>
+            <RegisterAgentCommand
+              entityId={selectedModel.id}
+              targetEntity='model'
             />
           </EuiFlyoutBody>
         </EuiFlyout>

@@ -55,6 +55,9 @@ export class UseCases {
   static getRegisterAgentCommand = getRegisterAgentCommandUseCase(
     Repositories.agentRepository,
   );
+  static getRegisterAgentCommandByModelId = getRegisterAgentCommandUseCase(
+    Repositories.agentRepository,
+  );
   static getModels = getModelsUseCase(Repositories.modelRepository);
   static deleteModel = deleteModelUseCase(Repositories.modelRepository);
   static deleteModelWithRelatedEntities = deleteModelWithRelatedEntitiesUseCase(

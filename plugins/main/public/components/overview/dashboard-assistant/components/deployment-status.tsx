@@ -150,7 +150,7 @@ export const DeploymentStatus = ({
       <EuiSpacer size='l' />
 
       {allStepsCompleted && allStepsSuccess && agentId && (
-        <RegisterAgentCommand agentId={agentId} />
+        <RegisterAgentCommand entityId={agentId} targetEntity='agent' />
       )}
 
       {(showCheckButton || (allStepsCompleted && allStepsSuccess)) && (
