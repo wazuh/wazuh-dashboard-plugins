@@ -78,6 +78,10 @@ export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN =
 export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users-*';
 export const WAZUH_IT_HYGIENE_GROUPS_PATTERN =
   'wazuh-states-inventory-groups-*';
+export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
+  'wazuh-states-inventory-services-*';
+export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
+  'wazuh-states-inventory-browser-extensions-*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -156,6 +160,18 @@ export const WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_VULNERABILITIES_PATTERN.replace('*', ''),
   dataSet: 'states-vulnerabilities',
 };
+export const WAZUH_SETTING_INVENTORY_SERVICES_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_SERVICES_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-services',
+};
+export const WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN.replace(
+    '*',
+    '',
+  ),
+  dataSet: 'states-inventory-browser-extensions',
+};
+
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     {
@@ -372,6 +388,18 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       indexPatternPrefix:
         WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_SERVICES_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_SERVICES_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
