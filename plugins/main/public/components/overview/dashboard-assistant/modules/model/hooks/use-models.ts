@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Model } from '../domain/entities/model';
 import { UseCases } from '../../../setup';
 import { ModelFieldDefinition } from '../../../components/types';
-import { useFetchData } from '../../../hooks/use-fetch-data';
+import { useQuery } from '../../../hooks/use-query';
 
 interface UseModelsReturn {
   models: Model[];
@@ -17,13 +17,18 @@ export function useModels(): UseModelsReturn {
     data: models,
     error,
     isLoading,
-    refreshData,
-  } = useFetchData<Model[]>({
-    fetch() {
+    fetch,
+  } = useQuery<Model[]>({
+    query() {
       return UseCases.getModels();
     },
     initialData: [],
+    defaultErrorMessage: 'Failed to fetch models',
   });
+
+  useEffect(() => {
+    fetch();
+  }, []);
 
   const mapModelsToTableData = useCallback(() => {
     return models.map(model => {
@@ -41,7 +46,7 @@ export function useModels(): UseModelsReturn {
     models,
     isLoading,
     error,
-    refresh: refreshData,
+    refresh: fetch,
     mapModelsToTableData,
   };
 }

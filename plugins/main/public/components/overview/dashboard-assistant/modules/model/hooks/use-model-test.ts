@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { ModelPredictResponse } from '../domain/types';
 import { UseCases } from '../../../setup';
+import { useQuery } from '../../../hooks/use-query';
 
 interface UseModelTestReturn {
   isLoading: boolean;
@@ -11,38 +12,25 @@ interface UseModelTestReturn {
 }
 
 export function useModelTest(): UseModelTestReturn {
-  const [isLoading, setIsLoading] = useState(false);
-  const [response, setResponse] = useState<ModelPredictResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const testModel = useCallback(async (model_id: string) => {
-    setIsLoading(true);
-    setError(null);
-    setResponse(null);
-
-    try {
-      const result = await UseCases.testModelConnection(model_id);
-      setResponse(result);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const reset = useCallback(() => {
-    setIsLoading(false);
-    setResponse(null);
-    setError(null);
-  }, []);
+  const {
+    data: response,
+    error,
+    isLoading,
+    fetch,
+    reset,
+  } = useQuery<ModelPredictResponse | null>({
+    query(model_id: string) {
+      return UseCases.testModelConnection(model_id);
+    },
+    initialData: null,
+    defaultErrorMessage: 'Failed to test model connection',
+  });
 
   return {
     isLoading,
     response,
     error,
-    testModel,
+    testModel: fetch,
     reset,
   };
 }
