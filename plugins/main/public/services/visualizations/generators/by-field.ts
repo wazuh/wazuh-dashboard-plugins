@@ -340,12 +340,12 @@ export const getVisStateHorizontalBarSplitSeries = (
       };
     };
   } = {
-    uiState: {
-      vis: {
-        colors: {},
+      uiState: {
+        vis: {
+          colors: {},
+        },
       },
     },
-  },
 ) => {
   const {
     orderAggregation = 'desc',
@@ -556,7 +556,7 @@ export const getVisStateTable = (
     perPage?: number;
     customLabel?: string;
     fieldCustomLabel?: string;
-    metricCustomLabel;
+    metricCustomLabel?: string;
     addLegend?: boolean;
     // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;

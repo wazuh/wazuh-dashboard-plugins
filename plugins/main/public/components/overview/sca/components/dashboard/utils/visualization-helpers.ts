@@ -33,13 +33,8 @@ function convertNumeralToD3Format(numeralFormat: string): string {
 
 export const decimalFormat = () => {
   let decimalFormat;
-  try {
-    const pattern = core.uiSettings.get('format:percent:defaultPattern');
-
-    decimalFormat = convertNumeralToD3Format(pattern);
-  } catch {
-    decimalFormat = '.2f';
-  }
+  const pattern = core.uiSettings.get('format:percent:defaultPattern');
+  decimalFormat = convertNumeralToD3Format(pattern);
 
   return decimalFormat ?? '.2f';
 };

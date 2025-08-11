@@ -5,8 +5,8 @@ import {
   SCAStatesDataSource,
   SCAStatesDataSourceRepository,
 } from '../../../../common/data-source/pattern/sca';
+import { IndexPattern } from '../../../../../../../../src/plugins/data/public';
 import { InventoryDashboardTable } from '../../../../common/dashboards';
-import { SCAInventoryProps } from '../../interfaces/interface-sca';
 import { CheckDetails } from '../sca-check-details';
 import { getKPIsPanel } from './utils/get-vis-sca-inventory';
 import { managedFilters, tableColumns } from './utils/index';
@@ -30,30 +30,30 @@ import { managedFilters, tableColumns } from './utils/index';
  * security teams ensure systems are properly configured according to security
  * best practices and compliance requirements.
  */
-export const SCAInventory: React.FC<SCAInventoryProps> = ({ indexPattern }) => {
+export const SCAInventory: React.FC<{ indexPattern: IndexPattern }> = ({
+  indexPattern,
+}) => {
   return (
-    <div>
-      <InventoryDashboardTable
-        DataSource={SCAStatesDataSource}
-        DataSourceRepositoryCreator={SCAStatesDataSourceRepository}
-        tableDefaultColumns={tableColumns}
-        managedFilters={managedFilters}
-        getDashboardPanels={() => getKPIsPanel(indexPattern.id)}
-        tableId='sca-policies-inventory'
-        indexPattern={indexPattern}
-        categoriesSampleData={[WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT]}
-        additionalDocumentDetailsTabs={[
-          {
-            id: 'sca-dashboard-tab',
-            title: 'Security Configuration Assessment dashboard',
-            description: 'Dashboard of the Security Configuration Assessment',
-            name: 'Check Details',
-            // This is rendered in the document details view
-            // It is a custom component that shows the details of the check of a policy
-            content: props => <CheckDetails {...props} />,
-          },
-        ]}
-      />
-    </div>
+    <InventoryDashboardTable
+      DataSource={SCAStatesDataSource}
+      DataSourceRepositoryCreator={SCAStatesDataSourceRepository}
+      tableDefaultColumns={tableColumns}
+      managedFilters={managedFilters}
+      getDashboardPanels={() => getKPIsPanel(indexPattern.id)}
+      tableId='sca-policies-inventory'
+      indexPattern={indexPattern}
+      categoriesSampleData={[WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT]}
+      additionalDocumentDetailsTabs={[
+        {
+          id: 'sca-dashboard-tab',
+          title: 'Security Configuration Assessment dashboard',
+          description: 'Dashboard of the Security Configuration Assessment',
+          name: 'Check Details',
+          // This is rendered in the document details view
+          // It is a custom component that shows the details of the check of a policy
+          content: props => <CheckDetails {...props} />,
+        },
+      ]}
+    />
   );
 };

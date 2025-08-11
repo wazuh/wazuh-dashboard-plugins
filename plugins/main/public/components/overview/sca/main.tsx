@@ -14,7 +14,7 @@ import React from 'react';
 import { SCAInventory } from './index';
 import { compose } from 'redux';
 import { withAgent, withUserAuthorizationPrompt } from '../../common/hocs';
-import { DashboardSCA } from './components/dashboard/sca-dashboard';
+import { SCADashboard } from './components/dashboard/sca-dashboard';
 import { withSCADataSource } from './hocs/validate-sca-states-index-pattern';
 
 export const MainSca = compose(
@@ -52,14 +52,14 @@ export const MainSca = compose(
     ];
   }),
   withSCADataSource,
-)(function MainSca({ selectView, ...rest }) {
+)(function MainSca({ selectView, indexPattern }) {
   return (
     <>
       {selectView === 'inventory' ? (
         // @ts-ignore
-        <SCAInventory {...rest} />
+        <SCAInventory indexPattern={indexPattern} />
       ) : (
-        <DashboardSCA {...rest} />
+        <SCADashboard indexPattern={indexPattern} />
       )}
     </>
   );

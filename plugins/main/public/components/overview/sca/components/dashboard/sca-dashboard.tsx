@@ -37,11 +37,11 @@ import { LoadingSearchbarProgress } from '../../../../common/loading-searchbar-p
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-interface DashboardSCAProps {
+interface SCADashboardProps {
   indexPattern: IndexPattern;
 }
 
-const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
+const SCADashboardComponent: React.FC<SCADashboardProps> = ({
   indexPattern,
 }) => {
   const {
@@ -150,13 +150,7 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,
-                    // Try to use the index pattern that the dataSource has
-                    // but if it is undefined use the index pattern of the hoc
-                    // because the first executions of the dataSource are undefined
-                    // and embeddables need index pattern.
-                    panels: getDashboardTables(
-                      dataSource?.id || indexPattern?.id,
-                    ),
+                    panels: getDashboardTables(indexPattern?.id),
                     isFullScreenMode: false,
                     filters: fetchFilters ?? [],
                     useMargins: false,
@@ -210,4 +204,4 @@ const DashboardSCAComponent: React.FC<DashboardSCAProps> = ({
   );
 };
 
-export const DashboardSCA = compose(withErrorBoundary)(DashboardSCAComponent);
+export const SCADashboard = compose(withErrorBoundary)(SCADashboardComponent);

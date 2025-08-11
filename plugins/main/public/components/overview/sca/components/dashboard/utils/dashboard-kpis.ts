@@ -1,6 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
-import { checkResultColors, decimalFormat } from './visualizationHelpers';
+import { checkResultColors, decimalFormat } from './visualization-helpers';
 
 const getVisStateCheckResultPassed = (indexPatternId: string) => {
   return {

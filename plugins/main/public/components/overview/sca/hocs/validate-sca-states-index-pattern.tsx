@@ -13,6 +13,7 @@ import {
   ERROR_NO_INDICES_FOUND,
   withIndexPatternFromValue,
   withMapErrorPromptErrorEnsureIndexPattern,
+  MapErrorTypes,
 } from '../../../common/hocs/with-index-pattern';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
 
@@ -27,7 +28,7 @@ import { webDocumentationLink } from '../../../../../common/services/web_documen
  * when problems occur with index patterns.
  * @type {Object.<string, ErrorPromptType>}
  */
-const errorPromptTypes = {
+const errorPromptTypes: MapErrorTypes = {
   [ERROR_NO_INDICES_FOUND]: {
     title: () => 'Configuration Assessment could be disabled or has a problem',
     body: ({ message }: { message: React.ReactNode }) => (
@@ -82,7 +83,9 @@ const errorPromptTypes = {
  * @param {React.ComponentType} Component - The component to wrap
  * @returns {React.ComponentType} Component wrapped with index pattern validation
  */
-export const withSCADataSource = withIndexPatternFromValue({
+export const withSCADataSource: (
+  Component: React.ComponentType,
+) => React.ComponentType = withIndexPatternFromValue({
   indexPattern: WAZUH_SCA_PATTERN,
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
   validate: ensureIndexPatternIsCreated(),

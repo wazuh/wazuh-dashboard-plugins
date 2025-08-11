@@ -61,8 +61,8 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ document }) => {
         <EuiSpacer size='s' />
         <EuiText>
           <ul>
-            {check.rules.map((rule, i) => (
-              <li key={i}>{rule}</li>
+            {check.rules.map((rule: string, index: number) => (
+              <li key={index}>{rule}</li>
             ))}
           </ul>
         </EuiText>
@@ -75,23 +75,22 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ document }) => {
         <EuiSpacer size='s' />
         <EuiText>
           <ul>
-            {check.compliance.map((c, i) => {
-              if (!c.includes(':')) {
+            {check.compliance.map((compliance: string, index: number) => {
+              if (!compliance.includes(':')) {
                 return (
-                  <li key={i}>
-                    <code>{c}</code>
+                  <li key={index}>
+                    <code>{compliance}</code>
                   </li>
                 );
               }
-              const compliantLabel = c.split(':')[0];
-              const compliantValue = c.split(':')[1];
+              const complianceSplitted = compliance.split(':');
+              const complianceLabel = complianceSplitted[0];
+              const complianceValue = complianceSplitted[1];
               return (
-                <>
-                  <li key={i}>
-                    <strong>{compliantLabel}: </strong>
-                    <code>{compliantValue}</code>
-                  </li>
-                </>
+                <li key={index}>
+                  <strong>{complianceLabel}: </strong>
+                  <code>{complianceValue}</code>
+                </li>
               );
             })}
           </ul>
