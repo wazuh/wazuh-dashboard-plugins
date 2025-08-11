@@ -1,9 +1,9 @@
 import { useState } from 'react';
 
 interface FlyoutHandlers {
-  onOpenHandler: (payload: any) => void;
-  onCloseHandler: () => void;
-  resetHandler?: () => void;
+  onOpenHandler: (payload: any) => Awaited<void>;
+  onCloseHandler: () => Awaited<void>;
+  resetHandler?: () => Awaited<void>;
 }
 
 interface UseFlyoutReturn {
@@ -27,18 +27,18 @@ export const useFlyout = ({
     setFlyoutIsOpen(false);
   };
 
-  const onFlyoutOpen = (payload: any) => {
+  const onFlyoutOpen = async (payload: any) => {
     // Handle flyout open
     openFlyout();
-    onOpenHandler(payload);
-    resetHandler?.();
+    await resetHandler?.();
+    await onOpenHandler(payload);
   };
 
-  const onFlyoutClose = () => {
+  const onFlyoutClose = async () => {
     // Handle flyout close
     closeFlyout();
-    onCloseHandler();
-    resetHandler?.();
+    await onCloseHandler();
+    await resetHandler?.();
   };
 
   return {

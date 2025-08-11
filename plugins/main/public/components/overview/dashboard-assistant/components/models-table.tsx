@@ -63,7 +63,18 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
   const { isLoading, error, refresh, getTableData } = useModels();
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
-  const [isTestFlyoutVisible, setIsTestFlyoutVisible] = useState(false);
+  const flyoutTest = useFlyout({
+    async onOpenHandler(model: Model) {
+      setSelectedModel(model);
+      await testModel(model.id);
+    },
+    onCloseHandler() {
+      setSelectedModel(null);
+    },
+    resetHandler() {
+      resetTest();
+    },
+  });
   const flyoutUse = useFlyout({
     onOpenHandler(model: Model) {
       setSelectedModel(model);
@@ -119,22 +130,9 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     setIsFlyoutVisible(true);
   };
 
-  const handleTestModel = async (model: Model) => {
-    setSelectedModel(model);
-    setIsTestFlyoutVisible(true);
-    resetTest();
-    await testModel(model.id);
-  };
-
   const closeFlyout = () => {
     setIsFlyoutVisible(false);
     setSelectedModel(null);
-  };
-
-  const closeTestFlyout = () => {
-    setIsTestFlyoutVisible(false);
-    setSelectedModel(null);
-    resetTest();
   };
 
   const handleDeleteModel = async (modelId: string) => {
@@ -202,7 +200,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           description: 'Test model connection',
           icon: 'play',
           type: 'icon',
-          onClick: (model: Model) => handleTestModel(model),
+          onClick: (model: Model) => flyoutTest.open(model),
           enabled: (model: Model) => model.status === 'active',
         },
         {
@@ -342,8 +340,8 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
         </EuiFlyout>
       )}
 
-      {isTestFlyoutVisible && selectedModel && (
-        <EuiFlyout onClose={closeTestFlyout} size='m'>
+      {flyoutTest.isOpen && selectedModel && (
+        <EuiFlyout onClose={flyoutTest.close} size='m'>
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size='m'>
               <h2>Test Model: {selectedModel.name}</h2>
