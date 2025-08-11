@@ -62,7 +62,14 @@ interface ModelsTableProps {
 export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
   const { isLoading, error, refresh, getTableData } = useModels();
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
-  const [isFlyoutVisible, setIsFlyoutVisible] = useState(false);
+  const flyoutModelDetails = useFlyout({
+    onOpenHandler(model: Model) {
+      setSelectedModel(model);
+    },
+    onCloseHandler() {
+      setSelectedModel(null);
+    },
+  });
   const flyoutTest = useFlyout({
     async onOpenHandler(model: Model) {
       setSelectedModel(model);
@@ -125,16 +132,6 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     }
   };
 
-  const handleViewModel = (model: Model) => {
-    setSelectedModel(model);
-    setIsFlyoutVisible(true);
-  };
-
-  const closeFlyout = () => {
-    setIsFlyoutVisible(false);
-    setSelectedModel(null);
-  };
-
   const handleDeleteModel = async (modelId: string) => {
     await deleteModel(modelId);
     await refresh();
@@ -193,7 +190,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           description: 'View model details',
           icon: 'eye',
           type: 'icon',
-          onClick: (model: Model) => handleViewModel(model),
+          onClick: (model: Model) => flyoutModelDetails.open(model),
         },
         {
           name: 'Test',
@@ -291,8 +288,8 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
         <EuiFlexItem>{table}</EuiFlexItem>
       </EuiFlexGroup>
 
-      {isFlyoutVisible && selectedModel && (
-        <EuiFlyout onClose={closeFlyout} size='m'>
+      {flyoutModelDetails.isOpen && selectedModel && (
+        <EuiFlyout onClose={flyoutModelDetails.close} size='m'>
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size='m'>
               <h2>Model Details</h2>
