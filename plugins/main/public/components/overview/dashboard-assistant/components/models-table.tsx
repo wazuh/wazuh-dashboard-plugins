@@ -60,7 +60,7 @@ interface ModelsTableProps {
 }
 
 export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
-  const { isLoading, error, refresh, getTableData } = useModels();
+  const { isLoading, error, refresh, mapModelsToTableData } = useModels();
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const flyoutModelDetails = useFlyout({
     onOpenHandler(model: Model) {
@@ -99,7 +99,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
   } = useModelTest();
   const { deleteModel } = useDeleteModel();
 
-  const tableModels = getTableData();
+  const tableModels = mapModelsToTableData();
 
   if (error) {
     return (

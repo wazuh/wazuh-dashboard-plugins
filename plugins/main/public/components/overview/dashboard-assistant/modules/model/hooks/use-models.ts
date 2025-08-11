@@ -8,7 +8,7 @@ interface UseModelsReturn {
   isLoading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  getTableData: () => Array<ModelFieldDefinition>;
+  mapModelsToTableData: () => Array<ModelFieldDefinition>;
 }
 
 export function useModels(): UseModelsReturn {
@@ -32,7 +32,7 @@ export function useModels(): UseModelsReturn {
     }
   }, []);
 
-  const getTableData = useCallback(() => {
+  const mapModelsToTableData = useCallback(() => {
     return models.map(model => {
       return {
         name: model.name,
@@ -54,6 +54,6 @@ export function useModels(): UseModelsReturn {
     isLoading,
     error,
     refresh: fetchModels,
-    getTableData,
+    mapModelsToTableData,
   };
 }
