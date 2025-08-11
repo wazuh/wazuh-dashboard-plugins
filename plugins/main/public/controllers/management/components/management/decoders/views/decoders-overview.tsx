@@ -20,7 +20,7 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_DECODERS_KEY } from '../../common/constants';
 import '../../common/layout-overview.scss';
 import DecodersTable from '../components/decoders-table';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
+import WzReloadClusterManagerCallout from '../../../../../../components/common/reload-cluster-manager-callout';
 import { decoders } from '../../../../../../utils/applications';
 
 function WzDecodersOverview(props) {
@@ -36,9 +36,9 @@ function WzDecodersOverview(props) {
         {showWarningRestart && (
           <>
             <EuiSpacer size='s' />
-            <WzRestartClusterManagerCallout
-              onRestarted={() => updateRestartManagers(false)}
-              onRestartedError={() => updateRestartManagers(true)}
+            <WzReloadClusterManagerCallout
+              onReloaded={() => updateRestartManagers(false)}
+              onReloadedError={() => updateRestartManagers(true)}
             />
             <EuiSpacer size='s' />
           </>

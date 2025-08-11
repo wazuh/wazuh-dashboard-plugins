@@ -28,37 +28,37 @@ import { getToasts } from '../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../redux/actions/appStateActions';
 import {
   clusterReq,
-  restartClusterOrManager,
+  reloadClusterRuleset,
 } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { connect } from 'react-redux';
 
-interface IWzRestartClusterManagerCalloutProps {
+interface IWzReloadClusterManagerCalloutProps {
   updateWazuhNotReadyYet: (wazuhNotReadyYet) => void;
-  onRestarted: () => void;
-  onRestartedError: () => void;
+  onReloaded: () => void;
+  onReloadedError: () => void;
 }
 
-interface IWzRestartClusterManagerCalloutState {
-  warningRestarting: boolean;
-  warningRestartModalVisible: boolean;
+interface IWzReloadClusterManagerCalloutState {
+  warningReloading: boolean;
+  warningReloadModalVisible: boolean;
   isCluster: boolean;
 }
 
-class WzRestartClusterManagerCallout extends Component<
-  IWzRestartClusterManagerCalloutProps,
-  IWzRestartClusterManagerCalloutState
+class WzReloadClusterManagerCallout extends Component<
+  IWzReloadClusterManagerCalloutProps,
+  IWzReloadClusterManagerCalloutState
 > {
   constructor(props) {
     super(props);
     this.state = {
-      warningRestarting: false,
-      warningRestartModalVisible: false,
+      warningReloading: false,
+      warningReloadModalVisible: false,
       isCluster: false,
     };
   }
-  toggleWarningRestartModalVisible() {
+  toggleWarningReloadModalVisible() {
     this.setState({
-      warningRestartModalVisible: !this.state.warningRestartModalVisible,
+      warningReloadModalVisible: !this.state.warningReloadModalVisible,
     });
   }
   showToast(color, title, text = '', time = 3000) {
@@ -69,38 +69,51 @@ class WzRestartClusterManagerCallout extends Component<
       toastLifeTimeMs: time,
     });
   }
-  restartClusterOrManager = async () => {
+  reloadCluster = async () => {
     try {
       this.setState({
-        warningRestarting: true,
-        warningRestartModalVisible: false,
+        warningReloading: true,
+        warningReloadModalVisible: false,
       });
-      const data = await restartClusterOrManager(
-        this.props.updateWazuhNotReadyYet,
+      getToasts().add({
+        color: 'success',
+        title:
+          'Reloading ruleset across the cluster. This may take a few seconds.',
+        toastLifeTimeMs: 5000,
+      });
+      const { data, message } = await reloadClusterRuleset();
+
+      const nodesReloaded = data.affected_items.filter(
+        node => !data.failed_items?.includes(node),
       );
 
-      let nodesReloaded = data.data.affected_items;
-      let nodesFailed: string[];
-      if (data.data.total_failed_items > 0) {
-        nodesReloaded = data.data.affected_items.filter(
-          node => !data.data.failed_items?.includes(node),
+      if (nodesReloaded.length) {
+        this.props.onReloaded();
+        this.showToast(
+          'success',
+          'Cluster reloaded:',
+          nodesReloaded.join(', '),
+          15000,
         );
-        nodesFailed = data.data.failed_items.map(node => node.id);
       }
-
-      const toastDescription = `Cluster reloaded: ${nodesReloaded.join(', ')} ${
-        data.data.total_failed_items
-          ? `Nodes failed: ${nodesFailed.join(', ')}`
-          : ''
-      }`;
-
-      this.props.onRestarted();
-      this.showToast('success', data.message, toastDescription);
+      if (data.total_failed_items > 0) {
+        const nodesFailed = data.failed_items.map(node => node.id);
+        this.showToast(
+          'danger',
+          'Nodes failed: ',
+          nodesFailed.join(', '),
+          15000,
+        );
+      }
+      if (data.total_failed_items === 0) {
+        this.props.onReloaded();
+        throw new Error(`Failed to reload ruleset: ${message}`);
+      }
     } catch (error) {
-      this.setState({ warningRestarting: false });
+      this.setState({ warningReloading: false });
       this.props.updateWazuhNotReadyYet(false);
-      this.props.onRestartedError();
-      this.showToast('danger', 'Error', error.message || error);
+      this.props.onReloadedError();
+      this.showToast('danger', 'Error', error?.data?.detail || error);
     }
   };
   async componentDidMount() {
@@ -114,10 +127,10 @@ class WzRestartClusterManagerCallout extends Component<
     } catch (error) {}
   }
   render() {
-    const { warningRestarting, warningRestartModalVisible } = this.state;
+    const { warningReloading, warningReloadModalVisible } = this.state;
     return (
       <Fragment>
-        {!warningRestarting && (
+        {!warningReloading && (
           <EuiCallOut>
             <EuiFlexGroup justifyContent='spaceBetween' alignItems='center'>
               <EuiFlexItem style={{ marginTop: '0', marginBottom: '0' }}>
@@ -138,22 +151,22 @@ class WzRestartClusterManagerCallout extends Component<
               >
                 <EuiButton
                   iconType='refresh'
-                  onClick={() => this.toggleWarningRestartModalVisible()}
+                  onClick={() => this.toggleWarningReloadModalVisible()}
                 >
-                  {'Restart'}
+                  {'Reload'}
                 </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiCallOut>
         )}
-        {warningRestartModalVisible && (
+        {warningReloadModalVisible && (
           <EuiOverlayMask>
             <EuiConfirmModal
               title={`${
                 this.state.isCluster ? 'Cluster' : 'Manager'
               } will be restarted`}
-              onCancel={() => this.toggleWarningRestartModalVisible()}
-              onConfirm={() => this.restartClusterOrManager()}
+              onCancel={() => this.toggleWarningReloadModalVisible()}
+              onConfirm={() => this.reloadCluster()}
               cancelButtonText='Cancel'
               confirmButtonText='Confirm'
               defaultFocusedButton='cancel'
@@ -172,7 +185,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(
-  null,
-  mapDispatchToProps,
-)(WzRestartClusterManagerCallout);
+export default connect(null, mapDispatchToProps)(WzReloadClusterManagerCallout);

@@ -35,7 +35,7 @@ import validateConfigAfterSent from './valid-configuration';
 
 import { getToasts } from '../../../../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
+import WzReloadClusterManagerCallout from '../../../../../components/common/reload-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';
@@ -385,19 +385,6 @@ class WzFileEditor extends Component {
                       </EuiTitle>
                     )}
                   </EuiFlexItem>
-                  {this.state.showWarningRestart && (
-                    <Fragment>
-                      <WzRestartClusterManagerCallout
-                        onRestarted={() =>
-                          this.setState({ showWarningRestart: false })
-                        }
-                        onRestartedError={() =>
-                          this.setState({ showWarningRestart: true })
-                        }
-                      />
-                      <EuiSpacer size='s' />
-                    </Fragment>
-                  )}
                   <EuiFlexItem />
                   {/* This flex item is for separating between title and save button */}
                   {isEditable && (
@@ -406,6 +393,20 @@ class WzFileEditor extends Component {
                     </EuiFlexItem>
                   )}
                 </EuiFlexGroup>
+                <EuiSpacer size='m' />
+                {this.state.showWarningRestart && (
+                  <Fragment>
+                    <WzReloadClusterManagerCallout
+                      onReloaded={() =>
+                        this.setState({ showWarningRestart: false })
+                      }
+                      onReloadedError={() =>
+                        this.setState({ showWarningRestart: true })
+                      }
+                    />
+                    <EuiSpacer size='s' />
+                  </Fragment>
+                )}
                 <EuiSpacer size='m' />
                 {xmlError && (
                   <Fragment>
