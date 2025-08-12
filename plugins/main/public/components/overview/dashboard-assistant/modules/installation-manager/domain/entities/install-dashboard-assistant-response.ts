@@ -1,4 +1,3 @@
-import { StepExecutionState } from '../enums';
 import { InstallationProgress } from './installation-progress';
 
 export interface IInstallDashboardAssistantResponse {
