@@ -19,13 +19,19 @@ export class CreateAgentStep extends InstallationAIAssistantStep {
     request: InstallAIDashboardAssistantDto,
     modelId: string,
   ): CreateAgentDto {
+    const response_filter =
+      modelProviderConfigs[request.selected_provider]?.response_filter;
+    if (!response_filter) {
+      throw new Error(
+        `Missing response_filter for provider ${request.selected_provider}`,
+      );
+    }
     return {
       name: `${request.selected_provider}_agent`,
       type: AgentType.CONVERSATIONAL,
       description: `AI agent powered by ${request.selected_provider}`,
       model_id: modelId,
-      response_filter:
-        modelProviderConfigs[request.selected_provider]?.response_filter!,
+      response_filter,
       tools: [
         AgentToolFactory.create({
           type: Tool.ML_MODEL_TOOL,

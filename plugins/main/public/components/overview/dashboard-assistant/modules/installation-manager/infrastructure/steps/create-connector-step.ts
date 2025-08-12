@@ -12,12 +12,16 @@ export class CreateConnectorStep extends InstallationAIAssistantStep {
     super({ name: 'Create Connector' });
   }
 
-  async execute(
+  private buildDto(
     request: InstallAIDashboardAssistantDto,
-    context: InstallationContext,
-  ): Promise<void> {
+  ): CreateConnectorDto {
     const provider = modelProviderConfigs[request.selected_provider];
-    const connectorDto: CreateConnectorDto = {
+    if (!provider) {
+      throw new Error(
+        `Unknown provider: ${request.selected_provider}. Please review configuration.`,
+      );
+    }
+    return {
       name: `${request.selected_provider} Chat Connector`,
       description: `Connector to ${request.selected_provider} model service for ${request.model_id}`,
       endpoint: request.api_url,
@@ -28,8 +32,13 @@ export class CreateConnectorStep extends InstallationAIAssistantStep {
       request_body: provider.request_body,
       extra_parameters: provider.extra_parameters || {},
     };
+  }
 
-    const connector = await UseCases.createConnector(connectorDto);
+  async execute(
+    request: InstallAIDashboardAssistantDto,
+    context: InstallationContext,
+  ): Promise<void> {
+    const connector = await UseCases.createConnector(this.buildDto(request));
     context.set('connectorId', connector.id);
   }
 

@@ -1,6 +1,6 @@
 import { UseCases } from '../../../../setup';
 import { modelProviderConfigs } from '../../../../provider-model-config';
-import { buildCreateMLCommonsDto } from '../../../ml-commons-settings/application/dtos/create-ml-commons-dto';
+import { CreateMLCommonsDto } from '../../../ml-commons-settings/application/dtos/create-ml-commons-dto';
 import {
   InstallationAIAssistantStep,
   InstallationContext,
@@ -12,13 +12,24 @@ export class UpdateMlCommonsSettingsStep extends InstallationAIAssistantStep {
     super({ name: 'Update ML Commons Settings' });
   }
 
+  private buildDto(
+    request: InstallAIDashboardAssistantDto,
+  ): CreateMLCommonsDto {
+    const provider = modelProviderConfigs[request.selected_provider];
+    if (!provider) {
+      throw new Error(
+        `Unknown provider: ${request.selected_provider}. Please review configuration.`,
+      );
+    }
+    const endpoints_regex = [provider.default_endpoint_regex || '.*'];
+    return { endpoints_regex };
+  }
+
   async execute(
     request: InstallAIDashboardAssistantDto,
     context: InstallationContext,
   ): Promise<void> {
-    const provider = modelProviderConfigs[request.selected_provider];
-    const endpoints_regex = [provider?.default_endpoint_regex || '.*'];
-    const dto = buildCreateMLCommonsDto(endpoints_regex);
+    const dto = this.buildDto(request);
     await UseCases.persistMlCommonsSettings(dto);
   }
 

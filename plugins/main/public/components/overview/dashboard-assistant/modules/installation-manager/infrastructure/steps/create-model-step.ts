@@ -11,18 +11,23 @@ export class CreateModelStep extends InstallationAIAssistantStep {
     super({ name: 'Create Model' });
   }
 
-  async execute(
+  private buildDto(
     request: InstallAIDashboardAssistantDto,
     context: InstallationContext,
-  ): Promise<void> {
-    const modelDto: CreateModelDto = {
+  ): CreateModelDto {
+    return {
       connector_id: context.get('connectorId'),
       name: request.selected_provider,
       description:
         request.description || `${request.selected_provider} language model`,
     };
+  }
 
-    const model = await UseCases.createModel(modelDto);
+  async execute(
+    request: InstallAIDashboardAssistantDto,
+    context: InstallationContext,
+  ): Promise<void> {
+    const model = await UseCases.createModel(this.buildDto(request, context));
     context.set('modelId', model.id);
   }
 
