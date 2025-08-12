@@ -22,6 +22,7 @@ import NavigationService from '../../../../react-services/navigation-service';
 import { ProviderModelConfig } from '../provider-model-config';
 import { useAssistantInstallation } from '../modules/installation-manager/hooks/use-assistant-installation';
 import { ModelFormData } from './types';
+import { DashboardAssistantNavigationService } from '../services/dashboard-assistant-navigation-service';
 
 interface FormConfig {
   title: string;
@@ -136,7 +137,7 @@ export const ModelRegister = ({
 
   const handleOnClickCheckStatus = () => {
     if (getWzCurrentAppID() === dashboardAssistant.id) {
-      NavigationService.getInstance().navigate(`${dashboardAssistant.id}`);
+      DashboardAssistantNavigationService.Home();
     }
   };
 

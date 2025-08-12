@@ -25,6 +25,7 @@ import RegisterAgentCommand from './register-agent-command';
 import { useFlyout } from '../hooks/use-flyout';
 import { ModelStatus } from '../modules/model/domain/enums/model-status';
 import StatusIcon from './status-icon';
+import { DashboardAssistantNavigationService } from '../services/dashboard-assistant-navigation-service';
 
 interface Model {
   id: string;
@@ -208,12 +209,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           <EuiButtonEmpty
             color='primary'
             iconType='plusInCircle'
-            href={NavigationService.getInstance().getUrlForApp(
-              dashboardAssistant.id,
-              {
-                path: `#${dashboardAssistant.redirectTo()}/register-model`,
-              },
-            )}
+            href={DashboardAssistantNavigationService.RegisterModel()}
           >
             Add model
           </EuiButtonEmpty>
