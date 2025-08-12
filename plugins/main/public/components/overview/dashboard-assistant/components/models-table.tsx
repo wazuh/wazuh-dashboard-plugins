@@ -120,11 +120,6 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     );
   }
 
-  const handleDeleteModel = async (modelId: string) => {
-    await deleteModel(modelId);
-    await refresh();
-  };
-
   const columns: ModelTableColumns[] = [
     {
       field: 'name',
@@ -195,7 +190,10 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           icon: 'trash',
           type: 'icon',
           description: 'Delete model',
-          onClick: async (model: Model) => handleDeleteModel(model.id),
+          onClick: async (model: Model) => {
+            await deleteModel(model.id);
+            await refresh();
+          },
         },
       ],
     },
@@ -309,7 +307,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
                     </EuiText>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
-                    {getStatusIcon(selectedModel.status)}
+                    <StatusIcon status={selectedModel.status} />
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiText>{selectedModel.status}</EuiText>
