@@ -1,9 +1,8 @@
-import type { StepExecutionState, StepResultState } from '../enums';
+import type { ExecutionState } from '../enums';
 
 export interface StepState {
   stepName: string;
-  executionState: StepExecutionState;
-  resultState?: StepResultState;
+  state: ExecutionState;
   message?: string;
   error?: Error;
 }

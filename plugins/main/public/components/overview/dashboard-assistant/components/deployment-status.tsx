@@ -12,8 +12,7 @@ import {
 } from '@elastic/eui';
 import {
   InstallationProgress,
-  StepExecutionState,
-  StepResultState,
+  ExecutionState,
   StepState,
 } from '../modules/installation-manager/domain';
 import RegisterAgentCommand from './register-agent-command';
@@ -37,31 +36,26 @@ export const DeploymentStatus = ({
   isButtonDisabled = false,
 }: DeploymentStatusProps) => {
   // Helper function to map installation states to UI states
-  const mapToUIStatus = (
-    executionState: StepExecutionState,
-    resultState?: StepResultState,
-  ): StepStatus => {
-    if (executionState === StepExecutionState.PENDING) {
+  const mapToUIStatus = (executionState: ExecutionState): StepStatus => {
+    if (executionState === ExecutionState.PENDING) {
       return StepStatus.PENDING;
     }
-    if (executionState === StepExecutionState.RUNNING) {
+    if (executionState === ExecutionState.RUNNING) {
       return StepStatus.LOADING;
     }
-    if (executionState === StepExecutionState.FINISHED) {
-      if (resultState === StepResultState.SUCCESS) {
-        return StepStatus.SUCCESS;
-      }
-      if (resultState === StepResultState.FAIL) {
-        return StepStatus.ERROR;
-      }
-      if (resultState === StepResultState.WARNING) {
-        return StepStatus.WARNING;
-      }
+    if (executionState === ExecutionState.FINISHED_SUCCESSFULLY) {
+      return StepStatus.SUCCESS;
+    }
+    if (executionState === ExecutionState.FINISHED_WITH_WARNINGS) {
+      return StepStatus.WARNING;
+    }
+    if (executionState === ExecutionState.FAILED) {
+      return StepStatus.ERROR;
     }
     return StepStatus.PENDING;
   };
 
-  const steps = progress?.steps || [];
+  const steps = progress?.getSteps() || [];
 
   return (
     <>
@@ -83,7 +77,7 @@ export const DeploymentStatus = ({
       <EuiListGroup flush maxWidth={false}>
         {steps.map((step: StepState, index) => {
           const uiStatus = step
-            ? mapToUIStatus(step.executionState, step.resultState)
+            ? mapToUIStatus(step.state)
             : StepStatus.PENDING;
           const key = `${step.stepName}-${index}`;
 
@@ -114,18 +108,14 @@ export const DeploymentStatus = ({
         })}
       </EuiListGroup>
 
-      {progress?.isGlobalStateFinished() &&
-        progress.areAllStepsSuccessful() &&
-        agentId && (
-          <>
-            <EuiSpacer size='l' />
-            <RegisterAgentCommand entityId={agentId} targetEntity='agent' />
-          </>
-        )}
+      {progress?.isFinished() && agentId && (
+        <>
+          <EuiSpacer size='l' />
+          <RegisterAgentCommand entityId={agentId} targetEntity='agent' />
+        </>
+      )}
 
-      {(showCheckButton ||
-        (progress?.isGlobalStateFinished() &&
-          progress.areAllStepsSuccessful())) && (
+      {(showCheckButton || progress?.isFinished()) && (
         <>
           <EuiSpacer size='l' />
           <EuiFlexGroup justifyContent='center'>

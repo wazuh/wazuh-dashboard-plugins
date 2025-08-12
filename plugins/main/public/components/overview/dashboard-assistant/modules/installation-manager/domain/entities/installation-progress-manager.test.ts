@@ -1,6 +1,6 @@
 import { InstallationProgressManager } from './installation-progress-manager';
 import { InstallationAIAssistantStep } from './installation-ai-assistant-step';
-import { StepExecutionState, StepResultState } from '../enums';
+import { ExecutionState, StepResultState } from '../enums';
 
 class TestStep extends InstallationAIAssistantStep {
   constructor(
@@ -28,11 +28,9 @@ describe('InstallationProgressManager', () => {
 
     const snapshot = mgr.getProgress();
     expect(snapshot.steps.map(s => s.stepName)).toEqual(['Step 1', 'Step 2']);
-    expect(
-      snapshot.steps.every(
-        s => s.executionState === StepExecutionState.PENDING,
-      ),
-    ).toBe(true);
+    expect(snapshot.steps.every(s => s.state === ExecutionState.PENDING)).toBe(
+      true,
+    );
     expect(snapshot.currentStep).toBe(0);
   });
 
@@ -46,7 +44,7 @@ describe('InstallationProgressManager', () => {
     });
 
     const p = mgr.getProgress();
-    expect(p.steps[0].executionState).toBe(StepExecutionState.FINISHED);
+    expect(p.steps[0].state).toBe(ExecutionState.FINISHED);
     expect(p.steps[0].resultState).toBe(StepResultState.SUCCESS);
     expect(p.steps[0].message).toBe('done');
     expect(mgr.isCompleted()).toBe(true);
@@ -64,7 +62,7 @@ describe('InstallationProgressManager', () => {
     ).rejects.toThrow('boom');
 
     const p = mgr.getProgress();
-    expect(p.steps[0].executionState).toBe(StepExecutionState.FINISHED);
+    expect(p.steps[0].state).toBe(ExecutionState.FINISHED);
     expect(p.steps[0].resultState).toBe(StepResultState.FAIL);
     expect(p.steps[0].message).toBe('boom-msg');
     expect(p.steps[0].error).toBeInstanceOf(Error);
@@ -120,9 +118,7 @@ describe('InstallationProgressManager', () => {
 
     const p = mgr.getProgress();
     expect(p.currentStep).toBe(0);
-    expect(
-      p.steps.every(s => s.executionState === StepExecutionState.PENDING),
-    ).toBe(true);
+    expect(p.steps.every(s => s.state === ExecutionState.PENDING)).toBe(true);
     expect(p.steps.every(s => s.resultState === undefined)).toBe(true);
     expect(p.steps.every(s => s.message === undefined)).toBe(true);
     expect(p.steps.every(s => s.error === undefined)).toBe(true);
@@ -137,9 +133,9 @@ describe('InstallationProgressManager', () => {
 
     const snap1 = mgr.getProgress();
     // Mutate snapshot
-    snap1.steps[0].executionState = StepExecutionState.FINISHED as any;
+    snap1.steps[0].state = ExecutionState.FINISHED as any;
 
     const snap2 = mgr.getProgress();
-    expect(snap2.steps[0].executionState).toBe(StepExecutionState.PENDING);
+    expect(snap2.steps[0].state).toBe(ExecutionState.PENDING);
   });
 });

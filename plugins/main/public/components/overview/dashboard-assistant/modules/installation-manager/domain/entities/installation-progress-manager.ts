@@ -1,4 +1,4 @@
-import { StepExecutionState, StepResultState } from '../enums';
+import { ExecutionState, StepResultState } from '../enums';
 import { InstallationAIAssistantStep } from './installation-ai-assistant-step';
 import { InstallationProgress } from './installation-progress';
 
@@ -18,7 +18,7 @@ export class InstallationProgressManager {
     this.progress = new InstallationProgress({
       steps: steps.map(step => ({
         stepName: step.getName(),
-        executionState: StepExecutionState.PENDING,
+        state: ExecutionState.PENDING,
       })),
     });
 
@@ -39,12 +39,8 @@ export class InstallationProgressManager {
     if (this.inProgress) {
       throw new Error('A step is already running');
     }
-    const i = this.progress.currentStep;
-    if (
-      i < 0 ||
-      i >= this.progress.steps.length ||
-      this.progress.isCompleted()
-    ) {
+    const i = this.progress.getCurrentStep();
+    if (!this.progress.isStepPositionValid(i) || this.progress.isFinished()) {
       throw new Error('All steps have been completed');
     }
 
@@ -52,27 +48,34 @@ export class InstallationProgressManager {
     this.progress.startStep(i);
     try {
       await executor();
-      this.succeedStep(step);
+      this.succeedStep(i, step);
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      this.failStep(step, error);
+      this.failStep(i, step, error);
       throw error;
     } finally {
-      // Advance the internal index to the next step
-      this.progress.currentStep = i + 1;
       this.inProgress = false;
     }
   }
 
-  private succeedStep(step: InstallationAIAssistantStep): void {
+  private succeedStep(
+    stepIndex: number,
+    step: InstallationAIAssistantStep,
+  ): void {
     this.progress.completeStep(
+      stepIndex,
       StepResultState.SUCCESS,
       step.getSuccessMessage(),
     );
   }
 
-  private failStep(step: InstallationAIAssistantStep, error: Error): void {
+  private failStep(
+    stepIndex: number,
+    step: InstallationAIAssistantStep,
+    error: Error,
+  ): void {
     this.progress.completeStep(
+      stepIndex,
       StepResultState.FAIL,
       step.getFailureMessage(),
       error,

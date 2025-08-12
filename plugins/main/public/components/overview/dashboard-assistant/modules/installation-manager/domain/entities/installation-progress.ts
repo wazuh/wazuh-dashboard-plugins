@@ -1,93 +1,112 @@
-import { StepExecutionState, StepResultState } from '../enums';
+import { ExecutionState, StepResultState } from '../enums';
 import { StepState } from '../types';
 import { Observer, Subject } from 'rxjs';
 
 export class InstallationProgress {
-  public currentStep: number;
-  public totalSteps: number;
-  public steps: StepState[];
-  public globalState: StepExecutionState;
+  private currentStep: number;
+  private totalSteps: number;
+  private steps: StepState[];
+  private globalState: ExecutionState;
   private subject$: Subject<void> = new Subject<void>();
 
   constructor(params?: {
     steps?: StepState[];
     currentStep?: number;
-    globalState?: StepExecutionState;
+    globalState?: ExecutionState;
   }) {
     this.currentStep = params?.currentStep || 0;
     this.totalSteps = params?.steps?.length || 0;
     this.steps = params?.steps?.map(step => ({ ...step })) || [];
-    this.globalState = params?.globalState || StepExecutionState.PENDING;
+    this.globalState = params?.globalState || ExecutionState.PENDING;
+  }
+
+  public getCurrentStep() {
+    return this.currentStep;
+  }
+
+  public getSteps() {
+    return [...this.steps];
   }
 
   public startStep(stepIndex: number) {
-    if (this.isStepAvailable(stepIndex)) {
-      this.currentStep = stepIndex;
-      this.updateStep(stepIndex, {
-        executionState: StepExecutionState.RUNNING,
-      });
-      this.globalState = StepExecutionState.RUNNING;
+    if (this.isStepPositionValid(stepIndex)) {
+      const i = this.currentStep;
+      if (i < 0 || i >= this.totalSteps || this.isFinished()) {
+        throw new Error('All steps have been completed');
+      }
+      this.updateExecutionStepState(stepIndex, ExecutionState.RUNNING);
+      this.globalState = ExecutionState.RUNNING;
       this.notify();
     }
   }
 
-  public succeedStep(message: string): void {
-    this.completeStep(StepResultState.SUCCESS, message);
+  public succeedStep(stepIndex: number, message: string): void {
+    this.completeStep(stepIndex, StepResultState.SUCCESS, message);
   }
 
-  public failStep(message: string, error: Error): void {
-    this.completeStep(StepResultState.FAIL, message, error);
+  public failStep(stepIndex: number, message: string, error: Error): void {
+    this.completeStep(stepIndex, StepResultState.FAIL, message, error);
   }
 
   public completeStep(
+    stepIndex: number,
     resultState: StepResultState,
     message?: string,
     error?: Error,
   ) {
-    if (this.isStepAvailable(this.currentStep)) {
-      this.updateStep(this.currentStep, {
-        executionState: StepExecutionState.FINISHED,
-        resultState,
+    if (this.isStepPositionValid(stepIndex)) {
+      this.updateStep(stepIndex, {
+        state:
+          resultState === StepResultState.SUCCESS
+            ? ExecutionState.FINISHED_SUCCESSFULLY
+            : resultState === StepResultState.WARNING
+            ? ExecutionState.FINISHED_WITH_WARNINGS
+            : ExecutionState.FAILED,
         message,
         error,
       });
 
       this.updateGlobalState(resultState);
+      this.currentStep++;
       this.notify();
     }
   }
 
   public updateGlobalState(resultState: StepResultState): void {
-    if (
-      resultState === StepResultState.FAIL ||
-      this.currentStep === this.steps.length - 1
-    ) {
-      this.globalState = StepExecutionState.FINISHED;
+    if (resultState === StepResultState.FAIL) {
+      this.globalState = ExecutionState.FAILED;
+    }
+    if (this.currentStep === this.totalSteps - 1) {
+      if (this.hasWarnings()) {
+        this.globalState = ExecutionState.FINISHED_WITH_WARNINGS;
+      } else {
+        this.globalState = ExecutionState.FINISHED_SUCCESSFULLY;
+      }
     }
   }
 
-  public isStepAvailable(stepIndex: number): boolean {
-    return stepIndex >= 0 && stepIndex < this.steps.length;
+  public hasWarnings(): boolean {
+    return this.steps.some(
+      step => step.state === ExecutionState.FINISHED_WITH_WARNINGS,
+    );
+  }
+
+  public isStepPositionValid(stepIndex: number): boolean {
+    return stepIndex >= 0 && stepIndex < this.totalSteps;
+  }
+
+  public updateExecutionStepState(
+    stepIndex: number,
+    state: ExecutionState,
+  ): void {
+    this.updateStep(stepIndex, { state: state });
   }
 
   public updateStep(stepIndex: number, update: Partial<StepState>): void {
-    this.currentStep = stepIndex;
     const step = this.steps[stepIndex];
     if (step) {
       this.steps[stepIndex] = { ...step, ...update };
     }
-  }
-
-  public isGlobalStateFinished(): boolean {
-    return this.globalState === StepExecutionState.FINISHED;
-  }
-
-  public areAllStepsSuccessful(): boolean {
-    return this.steps.every(
-      step =>
-        step.resultState === StepResultState.SUCCESS ||
-        step.resultState === StepResultState.WARNING,
-    );
   }
 
   public subscribe(
@@ -110,30 +129,34 @@ export class InstallationProgress {
     this.currentStep = 0;
     this.steps = this.steps.map(step => ({
       stepName: step.stepName,
-      executionState: StepExecutionState.PENDING,
+      state: ExecutionState.PENDING,
     }));
-    this.globalState = StepExecutionState.PENDING;
+    this.globalState = ExecutionState.PENDING;
     this.notify();
   }
 
   public hasFailedSteps(): boolean {
-    return this.steps.some(step => step.resultState === StepResultState.FAIL);
+    return this.getFailedSteps().length > 0;
   }
 
   public getFailedSteps(): StepState[] {
-    return this.steps.filter(step => step.resultState === StepResultState.FAIL);
+    return this.steps.filter(step => step.state === ExecutionState.FAILED);
   }
 
-  public isCompleted(): boolean {
-    return this.steps.every(
-      step => step.executionState === StepExecutionState.FINISHED,
-    );
+  public isFinishedSuccessfully(): boolean {
+    return this.globalState === ExecutionState.FINISHED_SUCCESSFULLY;
   }
 
-  public isInProgress(): boolean {
-    return this.steps.some(
-      step => step.executionState === StepExecutionState.RUNNING,
-    );
+  public isFinishedWithWarnings(): boolean {
+    return this.globalState === ExecutionState.FINISHED_WITH_WARNINGS;
+  }
+
+  public isFinished(): boolean {
+    return this.isFinishedSuccessfully() || this.isFinishedWithWarnings();
+  }
+
+  public isRunning(): boolean {
+    return this.globalState === ExecutionState.RUNNING;
   }
 
   public clone() {
