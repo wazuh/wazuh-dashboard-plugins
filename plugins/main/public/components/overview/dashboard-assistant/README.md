@@ -351,7 +351,7 @@ const steps: InstallationAIAssistantStep[] = [
 
 ## 🚀 Installation Process via OpenSearch API
 
-### [ML Commons](https://github.com/opensearch-project/ml-commons/tree/2.19.2.0)
+### [ML Commons](https://github.com/opensearch-project/ml-commons/tree/2.19.3.0)
 
 The Dashboard Assistant follows this step-by-step installation process:
 
