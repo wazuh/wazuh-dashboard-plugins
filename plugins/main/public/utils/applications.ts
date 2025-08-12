@@ -863,7 +863,7 @@ export const dashboardAssistant = {
   category: 'wz-category-dashboard-assistant',
   id: 'dashboard-assistant',
   title: i18n.translate('wz-category-dashboard-assistant-title', {
-    defaultMessage: 'Dashboard Assistant',
+    defaultMessage: 'Dashboard assistant',
   }),
   breadcrumbLabel: i18n.translate(
     'wwz-category-dashboard-assistant-breadcrumbLabel',
