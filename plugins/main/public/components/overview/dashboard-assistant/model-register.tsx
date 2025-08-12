@@ -19,10 +19,7 @@ import { DeploymentStatus } from './components';
 import { getWzCurrentAppID } from '../../../kibana-services';
 import { dashboardAssistant } from '../../../utils/applications';
 import NavigationService from '../../../react-services/navigation-service';
-import {
-  ProviderModelConfig,
-  modelProviderConfigs,
-} from './provider-model-config';
+import { ProviderModelConfig } from './provider-model-config';
 import { useAssistantInstallation } from './modules/installation-manager/hooks/use-assistant-installation';
 import { ModelFormData } from './components/types';
 
