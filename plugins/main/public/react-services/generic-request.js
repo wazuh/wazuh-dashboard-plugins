@@ -18,7 +18,7 @@ import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
-import { HttpMethod } from './common/http-method';
+import { HttpMethod } from '../../common/enums/http-method';
 
 export class GenericRequest {
   /**

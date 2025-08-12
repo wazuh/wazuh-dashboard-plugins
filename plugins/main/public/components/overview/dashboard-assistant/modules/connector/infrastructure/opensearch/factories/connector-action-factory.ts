@@ -1,3 +1,4 @@
+import { HttpMethod } from '../../../../../../../../../common/enums/http-method';
 import { ConnectorAction } from '../../../domain/entities/connector-action';
 
 export class ConnectorActionFactory {
@@ -8,7 +9,7 @@ export class ConnectorActionFactory {
   }): ConnectorAction {
     return {
       action_type: 'predict',
-      method: 'POST',
+      method: HttpMethod.POST,
       url: action.url,
       headers: action.headers,
       request_body: action.request_body,

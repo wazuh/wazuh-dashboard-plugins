@@ -1,5 +1,5 @@
 import { GenericRequest } from '../../../../../../../react-services';
-import { HttpMethod } from '../../../../../../../react-services/common/http-method';
+import { HttpMethod } from '../../../../../../../../common/enums/http-method';
 import { IHttpClient } from '../domain/entities/http-client';
 
 export class HttpWithProxyClient implements IHttpClient {
