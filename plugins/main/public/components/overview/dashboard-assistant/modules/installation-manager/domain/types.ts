@@ -113,7 +113,7 @@ export class InstallDashboardAssistantResponse
 {
   public success: boolean;
   public message: string;
-  public progress?: InstallationProgress;
+  public progress: InstallationProgress;
   public data?: {
     agentId?: string;
     modelGroupId?: string;
@@ -125,7 +125,7 @@ export class InstallDashboardAssistantResponse
   private constructor(params: {
     success: boolean;
     message: string;
-    progress?: InstallationProgress;
+    progress: InstallationProgress;
     agentId?: string;
     error?: string;
   }) {
@@ -140,7 +140,7 @@ export class InstallDashboardAssistantResponse
 
   public static success(
     agentId: string,
-    progress?: InstallationProgress,
+    progress: InstallationProgress,
   ): InstallDashboardAssistantResponse {
     return new InstallDashboardAssistantResponse({
       success: true,
@@ -169,6 +169,19 @@ export class InstallDashboardAssistantResponse
       success: false,
       message: 'Installation in progress',
       progress,
+    });
+  }
+
+  static start(): InstallDashboardAssistantResponse {
+    return new InstallDashboardAssistantResponse({
+      success: false,
+      message: 'Installation started',
+      progress: {
+        currentStep: 0,
+        totalSteps: 0,
+        steps: [],
+        progressGlobalState: StepExecutionState.PENDING,
+      },
     });
   }
 }

@@ -18,14 +18,14 @@ interface ModelConfiguration {
 export function useAssistantInstallation() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [result, setResult] = useState<
-    InstallDashboardAssistantResponse | undefined
-  >(undefined);
+  const [result, setResult] = useState<InstallDashboardAssistantResponse>(
+    InstallDashboardAssistantResponse.start(),
+  );
   const [assistantModelInfo, setAssistantModelInfo] = useState<
     ModelConfiguration | undefined
   >(undefined);
-  const [progress, setProgress] = useState<InstallationProgress | undefined>(
-    undefined,
+  const [progress, setProgress] = useState<InstallationProgress>(
+    InstallDashboardAssistantResponse.start().progress,
   );
 
   const setModel = useCallback((data: ModelConfiguration) => {
@@ -93,12 +93,8 @@ export function useAssistantInstallation() {
         err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
       // Create a failure response with current progress or empty progress
-      const currentProgress = progress || {
-        currentStep: 0,
-        totalSteps: 0,
-        steps: [],
-        progressGlobalState: 'waiting' as any,
-      };
+      const currentProgress =
+        progress || InstallDashboardAssistantResponse.start().progress;
       setResult(
         InstallDashboardAssistantResponse.failure(
           errorMessage,
@@ -113,8 +109,8 @@ export function useAssistantInstallation() {
   const reset = useCallback(() => {
     setIsLoading(false);
     setError(undefined);
-    setResult(undefined);
-    setProgress(undefined);
+    setResult(InstallDashboardAssistantResponse.start());
+    setProgress(InstallDashboardAssistantResponse.start().progress);
   }, []);
 
   return {
