@@ -133,6 +133,12 @@ export class InstallationProgressManager {
     );
   }
 
+  public getFailedSteps(): StepState[] {
+    return this.progress.steps.filter(
+      step => step.resultState === StepResultState.FAIL,
+    );
+  }
+
   public isCompleted(): boolean {
     return this.progress.steps.every(
       step => step.executionState === StepExecutionState.FINISHED,
