@@ -230,7 +230,8 @@
       "data.ms-graph.actor.userPrincipalName",
       "data.ms-graph.androidSecurityPatchLevel",
       "data.ms-graph.appliedConditionalAccessPolicies",
-
+      "data.ms-graph.azureADDeviceId",
+      "data.ms-graph.azureADRegistered",
       "data.ms-graph.complianceState",
       "data.ms-graph.componentName",
       "data.ms-graph.configurationManagerClientEnabledFeatures.@odata.type",
@@ -1134,7 +1135,19 @@
           "id": {
             "type": "keyword"
           },
-
+          "azureSignInStatus": {
+            "properties": {
+              "additionalDetails": {
+                "type": "keyword"
+              },
+              "errorCode": {
+                "type": "integer"
+              },
+              "failureReason": {
+                "type": "keyword"
+              }
+            }
+          },
           "status": {
             "type": "keyword"
           },
@@ -1367,7 +1380,12 @@
               "appliedConditionalAccessPolicies": {
                 "type": "keyword"
               },
-
+              "azureADDeviceId": {
+                "type": "keyword"
+              },
+              "azureADRegistered": {
+                "type": "keyword"
+              },
               "complianceGracePeriodExpirationDateTime": {
                 "type": "date"
               },
