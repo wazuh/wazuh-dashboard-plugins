@@ -1014,7 +1014,7 @@ export const Categories = [
   {
     id: 'wz-category-dashboard-assistant',
     label: i18n.translate('wz-category-dashboard-assistant', {
-      defaultMessage: 'Dashboard Assistant',
+      defaultMessage: 'Dashboard assistant',
     }),
     order: 7e3,
     euiIconType: 'appSearchApp',
