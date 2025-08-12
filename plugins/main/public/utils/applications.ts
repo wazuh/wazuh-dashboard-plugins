@@ -491,25 +491,28 @@ export const office365 = {
     }`,
 };
 
-export const azure = {
+export const microsoftGraphAPI = {
   category: 'wz-category-cloud-security',
-  id: 'azure',
-  title: i18n.translate('wz-app-azure-title', {
-    defaultMessage: 'Azure',
+  id: 'microsoft-graph-api',
+  title: i18n.translate('wz-app-microsoft-graph-api-title', {
+    defaultMessage: 'Microsoft Graph API',
   }),
-  breadcrumbLabel: i18n.translate('wz-app-azure-breadcrumbLabel', {
-    defaultMessage: 'Azure',
-  }),
-  description: i18n.translate('wz-app-azure-description', {
+  breadcrumbLabel: i18n.translate(
+    'wz-app-microsoft-graph-api-breadcrumbLabel',
+    {
+      defaultMessage: 'Microsoft Graph API',
+    },
+  ),
+  description: i18n.translate('wz-app-microsoft-graph-api-description', {
     defaultMessage:
-      'Security events related to your Azure MS Graph services, collected directly via Azure API.',
+      'Security events related to your Microsoft Graph services, collected directly via Microsoft Graph API.',
   }),
   euiIconType: 'logoAzureMono',
   order: 505,
   showInOverviewApp: true,
   showInAgentMenu: true,
   redirectTo: () =>
-    `/overview/?tab=azure&tabView=dashboard${
+    `/overview/?tab=microsoftGraphAPI&tabView=dashboard${
       store.getState()?.appStateReducers?.currentAgentData?.id
         ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
         : ''
@@ -897,7 +900,7 @@ export const Applications = [
   devTools,
   rulesetTest,
   security,
-  azure,
+  microsoftGraphAPI,
   amazonWebServices,
   googleCloud,
   github,
