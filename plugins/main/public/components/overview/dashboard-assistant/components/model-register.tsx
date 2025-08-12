@@ -36,23 +36,21 @@ interface FormConfig {
 }
 
 interface ModelRegisterProps {
-  onClickDeploy?: () => void;
   disabled?: boolean;
   modelConfig?: ProviderModelConfig[];
   formConfig?: FormConfig;
 }
 
 export const ModelRegister = ({
-  onClickDeploy,
   disabled = false,
   formConfig,
 }: ModelRegisterProps) => {
+  const [isDeployed, setIsDeployed] = useState(false);
   // Use the assistant installation hook
   const {
     install,
     setModel,
     isLoading: isInstalling,
-    error: installError,
     result,
     progress,
     isSuccess,
@@ -73,19 +71,12 @@ export const ModelRegister = ({
   };
 
   const config = formConfig || defaultFormConfig;
-  const [formData, setFormData] = useState<ModelFormData>({
-    modelProvider: '',
-    model: '',
-    apiUrl: '',
-    apiKey: '',
-  });
 
   const [isFormValid, setIsFormValid] = useState(false);
   const [isDeploymentVisible, setIsDeploymentVisible] = useState(false);
 
   const handleFormChange = useCallback(
     (data: ModelFormData) => {
-      setFormData(data);
       setModel({
         model_provider: data.modelProvider,
         model_id: data.model,
@@ -111,18 +102,10 @@ export const ModelRegister = ({
     // Execute the installation using the hook
     await install();
 
-    if (onClickDeploy) {
-      onClickDeploy();
-    }
+    setIsDeployed(true);
   };
 
   const handleCloseDeployment = () => {
-    setFormData({
-      modelProvider: '',
-      model: '',
-      apiUrl: '',
-      apiKey: '',
-    });
     setIsDeploymentVisible(false);
   };
 
@@ -173,7 +156,7 @@ export const ModelRegister = ({
 
               <EuiFlexGroup justifyContent='flexEnd' gutterSize='m'>
                 <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty onClick={handleCancel}>
+                  <EuiButtonEmpty onClick={handleCancel} disabled={isDeployed}>
                     {config.buttons.cancel}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
@@ -181,7 +164,7 @@ export const ModelRegister = ({
                   <EuiButton
                     fill
                     onClick={handleDeploy}
-                    disabled={!isFormValid || isInstalling}
+                    disabled={!isFormValid || isInstalling || isDeployed}
                     isLoading={isInstalling}
                   >
                     {isInstalling ? 'Deploying...' : config.buttons.deploy}

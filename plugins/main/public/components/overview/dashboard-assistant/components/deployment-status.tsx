@@ -126,7 +126,7 @@ export const DeploymentStatus = ({
                 iconType='check'
                 disabled={isButtonDisabled}
               >
-                Check assistant status
+                Go to model assistants
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>

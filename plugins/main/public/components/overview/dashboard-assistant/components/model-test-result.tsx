@@ -102,7 +102,7 @@ export const ModelTestResult = ({
       return (
         <EuiPanel paddingSize='m' color='plain' hasShadow={false}>
           <EuiFlexGroup
-            alignItems='flex-start'
+            alignItems='flexStart'
             gutterSize='m'
             responsive={false}
           >
@@ -161,7 +161,7 @@ export const ModelTestResult = ({
       return (
         <EuiPanel paddingSize='m' color='plain' hasShadow={false}>
           <EuiFlexGroup
-            alignItems='flex-start'
+            alignItems='flexStart'
             gutterSize='m'
             responsive={false}
           >
@@ -238,7 +238,7 @@ export const ModelTestResult = ({
         <EuiFlexItem>
           <EuiPanel paddingSize='m' color='danger' hasShadow={false}>
             <EuiFlexGroup
-              alignItems='flex-start'
+              alignItems='flexStart'
               gutterSize='s'
               responsive={false}
             >
