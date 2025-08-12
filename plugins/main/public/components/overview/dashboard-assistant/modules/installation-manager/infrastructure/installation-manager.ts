@@ -44,7 +44,7 @@ export class InstallationManager implements IInstallationManager {
 
       return {
         success: true,
-        message: 'Dashboard Assistant installed successfully',
+        message: 'Dashboard assistant installed successfully',
         progress: progressManager.getProgress(),
         data: context.toObject(),
       };
