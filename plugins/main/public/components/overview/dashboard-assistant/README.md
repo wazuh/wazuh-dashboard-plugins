@@ -10,7 +10,7 @@ The Dashboard Assistant module provides a complete solution for integrating AI l
 
 ### Clean Architecture Implementation
 
-This implementation follows Clean Architecture, SOLID principles, and design patterns to create a robust and maintainable solution for Dashboard Assistant installation.
+This implementation follows Clean Architecture, SOLID principles, and design patterns to create a robust and maintainable solution for the dashboard assistant installation.
 
 #### Architecture Layers
 
