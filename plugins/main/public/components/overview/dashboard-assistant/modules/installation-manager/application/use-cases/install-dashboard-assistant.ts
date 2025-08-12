@@ -14,7 +14,7 @@ export const installDashboardAssistantUseCase =
 
       return {
         success: true,
-        message: 'Dashboard Assistant installed successfully',
+        message: 'Dashboard assistant installed successfully',
         data: result.data,
       };
     } catch (error) {
