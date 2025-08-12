@@ -39,7 +39,6 @@ export const ExportConfiguration = withErrorBoundary(
         'Anti-flooding settings',
         'Labels',
         'Policy monitoring',
-
         'Inventory data',
         'Active response',
         'Commands',

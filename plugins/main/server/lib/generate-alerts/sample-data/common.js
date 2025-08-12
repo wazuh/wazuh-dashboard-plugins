@@ -215,7 +215,6 @@ module.exports.DECODER = {
   WEB_ACCESSLOG: {
     name: 'web-accesslog',
   },
-
   ROOTCHECK: {
     name: 'rootcheck',
   },

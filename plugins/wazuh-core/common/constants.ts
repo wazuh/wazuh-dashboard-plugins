@@ -77,13 +77,11 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING]: [
     { rootcheck: true },
     { audit: true },
-
     { virustotal: true },
     { yara: true },
   ],
   [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION]: [
     { vulnerabilities: true },
-
     { docker: true },
     { mitre: true },
   ],
@@ -128,9 +126,7 @@ export enum WAZUH_MODULES_ID {
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
   AUDITING = 'audit',
-
   VULNERABILITIES = 'vuls',
-
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
   PCI_DSS = 'pci',

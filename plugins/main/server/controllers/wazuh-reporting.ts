@@ -417,10 +417,8 @@ export class WazuhReportingCtrl {
         let tables = [];
         const equivalences = {
           localfile: 'Local files',
-
           command: 'Command',
           syscheck: 'Syscheck',
-
           syscollector: 'Syscollector',
           rootcheck: 'Rootcheck',
           labels: 'Labels',

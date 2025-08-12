@@ -112,7 +112,6 @@ export default [
         goto: 'vulnerabilities',
         when: 'manager',
       },
-
       {
         name: 'Inventory data',
         description:

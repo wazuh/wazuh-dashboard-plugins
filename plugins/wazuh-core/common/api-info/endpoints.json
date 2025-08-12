@@ -1131,9 +1131,7 @@
                 "syslog_output",
                 "aws-s3",
                 "azure-logs",
-
                 "docker-listener",
-
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -4519,9 +4517,7 @@
                 "syslog_output",
                 "aws-s3",
                 "azure-logs",
-
                 "docker-listener",
-
                 "syscollector",
                 "vulnerability-detector"
               ]

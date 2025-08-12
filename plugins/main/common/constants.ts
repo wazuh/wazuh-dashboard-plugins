@@ -241,7 +241,6 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
         WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
     },
-
     {
       virustotal: true,
       settingIndexPattern:
@@ -411,16 +410,13 @@ export enum WAZUH_MODULES_ID {
   POLICY_MONITORING = 'pm',
   SECURITY_CONFIGURATION_ASSESSMENT = 'sca',
   AUDITING = 'audit',
-
   VULNERABILITIES = 'vuls',
-
   DOCKER = 'docker',
   MITRE_ATTACK = 'mitre',
   PCI_DSS = 'pci',
   HIPAA = 'hipaa',
   NIST_800_53 = 'nist',
   TSC = 'tsc',
-
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',

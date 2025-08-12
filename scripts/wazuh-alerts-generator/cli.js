@@ -84,10 +84,8 @@
     office: { office: true },
     rootcheck: { rootcheck: true },
     audit: { audit: true },
-
     vulnerabilities: { vulnerabilities: true },
     virustotal: { virustotal: true },
-
     docker: { docker: true },
     mitre: { mitre: true },
     yara: { yara: true },

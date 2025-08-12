@@ -766,7 +766,6 @@ export const KnownFields = [
     aggregatable: true,
     readFromDocValues: true,
   },
-
   {
     name: 'data.command',
     type: 'string',
@@ -1407,7 +1406,6 @@ export const KnownFields = [
     aggregatable: true,
     readFromDocValues: true,
   },
-
   {
     name: 'data.YARA.scanned_file',
     type: 'string',
@@ -1416,7 +1414,6 @@ export const KnownFields = [
     aggregatable: true,
     readFromDocValues: true,
   },
-
   {
     name: 'data.port.inode',
     type: 'number',

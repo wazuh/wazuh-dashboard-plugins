@@ -13,7 +13,6 @@
           "enabled": "yes"
         }
       },
-
       {
         "syscollector": {
           "disabled": "no",

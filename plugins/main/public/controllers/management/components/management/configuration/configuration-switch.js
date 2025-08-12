@@ -27,9 +27,7 @@ import WzConfigurationClientBuffer from './client-buffer/client-buffer';
 import { WzConfigurationAlertsLabelsAgent } from './alerts/alerts-labels';
 import WzConfigurationIntegrations from './integrations/integrations';
 import WzConfigurationPolicyMonitoring from './policy-monitoring/policy-monitoring';
-
 import WzConfigurationVulnerabilities from './vulnerabilities/vulnerabilities';
-
 import WzConfigurationInventory from './inventory/inventory';
 import WzConfigurationActiveResponse from './active-response/active-response';
 import WzConfigurationActiveResponseAgent from './active-response/active-response-agent';
@@ -354,7 +352,6 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-
                 <WzViewSelectorSwitch view='vulnerabilities'>
                   <WzConfigurationVulnerabilities
                     clusterNodeSelected={this.props.clusterNodeSelected}
@@ -363,7 +360,6 @@ class WzConfigurationSwitch extends Component {
                     updateConfigurationSection={this.updateConfigurationSection}
                   />
                 </WzViewSelectorSwitch>
-
                 <WzViewSelectorSwitch view='inventory'>
                   <WzConfigurationInventory
                     clusterNodeSelected={this.props.clusterNodeSelected}

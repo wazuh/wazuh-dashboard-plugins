@@ -10,7 +10,6 @@ This plugin for Wazuh dashboard allows you to visualize and analyze Wazuh alerts
 the Wazuh Indexer. The plugin provides the following capabilities:
 
 - Search alerts classified by modules and filter them using the different views. You will be able to explore the alerts both at Wazuh cluster level, and in a particular agent. The modules, divided into the following use cases, are:
-
   - Security Information Management
     - Security events: Browse through your security alerts, identifying issues and threats in your environment.
     - Integrity monitoring: Alerts related to file changes, including permissions, content, ownership and attributes.
@@ -19,26 +18,20 @@ the Wazuh Indexer. The plugin provides the following capabilities:
     - GitHub: Security events related to your GitHub organizations, collected via GitHub audit logs API.
     - Google Cloud Platform: Security events related to your Google Cloud Platform services, collected directly via GCP API.
   - Auditing and Policy Monitoring
-
     - Policy monitoring: Verify that your systems are configured according to your security policies baseline.
     - Security configuration assessment: Scan your assets as part of a configuration assessment audit.
     - System auditing: Audit users behavior, monitoring command execution and alerting on access to critical files.
-
   - Threat Detection and Response
-
     - Vulnerabilities: Discover what applications in your environment are affected by well-known vulnerabilities.
     - MITRE ATT&CK: Explore security alerts mapped to adversary tactics and techniques for better threat understanding.
     - VirusTotal: Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API.
-
     - Docker listener: Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.
-
   - Regulatory Compliance
     - PCI DSS: Global security standard for entities that process, store or transmit payment cardholder data.
     - NIST 800-53: National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.
     - GDPR: General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.
     - HIPAA: Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.
     - TSC: Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy.
-
 - View and edit the Wazuh server configuration.
 - Manage your ruleset (rules, decoders and CDB lists).
 - Manage your groups of agents.

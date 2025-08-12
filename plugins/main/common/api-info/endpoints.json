@@ -1178,9 +1178,7 @@
                 "indexer",
                 "aws-s3",
                 "azure-logs",
-
                 "docker-listener",
-
                 "syscollector"
               ]
             }
@@ -4671,9 +4669,7 @@
                 "indexer",
                 "aws-s3",
                 "azure-logs",
-
                 "docker-listener",
-
                 "syscollector"
               ]
             }

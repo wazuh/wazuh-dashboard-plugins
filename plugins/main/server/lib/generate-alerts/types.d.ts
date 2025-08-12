@@ -171,12 +171,10 @@ export type Params = {
   gcp: boolean;
   /* if true, set System Auditing fields */
   audit: boolean;
-
   /* if true, set Docker fields */
   docker: boolean;
   /* if true, set Mitre att&ck fields */
   mitre: boolean;
-
   /* if true, set Policy monitoring fields */
   rootcheck: boolean;
   /* if true, set integrity monitoring fields (IMF) */
@@ -185,7 +183,6 @@ export type Params = {
   virustotal: boolean;
   /* if true, set vulnerabilities fields */
   vulnerabilities: boolean;
-
   /* if true, set pci_dss fields */
   pci_dss: boolean;
   /* if true, set gdpr fields */

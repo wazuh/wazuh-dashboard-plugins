@@ -26,7 +26,6 @@ export class TabVisualizations {
       gcp: 7,
       pm: 4,
       vuls: 10,
-
       audit: 9,
       gdpr: 6,
       pci: 6,
@@ -36,7 +35,6 @@ export class TabVisualizations {
       nist: 5,
       virustotal: 6,
       configuration: 0,
-
       docker: 5,
       mitre: 6,
     };
@@ -47,7 +45,6 @@ export class TabVisualizations {
       fim: 7,
       pm: 5,
       vuls: 7,
-
       audit: 6,
       pci: 6,
       gdpr: 5,
@@ -56,7 +53,6 @@ export class TabVisualizations {
       aws: 8,
       gcp: 5,
       virustotal: 5,
-
       sca: 0,
       docker: 5,
       mitre: 6,
