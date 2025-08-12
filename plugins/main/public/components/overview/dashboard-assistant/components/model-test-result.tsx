@@ -50,7 +50,7 @@ export const ModelTestResult = ({
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiText size='s' color='danger'>
-              <strong>Test Failed</strong>
+              <strong>Test failed</strong>
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -65,7 +65,7 @@ export const ModelTestResult = ({
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiText size='s' color='success'>
-              <strong>Test Successful</strong>
+              <strong>Test successful</strong>
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -217,7 +217,7 @@ export const ModelTestResult = ({
           <EuiFlexGroup direction='column' gutterSize='s'>
             <EuiFlexItem>
               <EuiText size='s'>
-                <strong>Model Connection Test</strong>
+                <strong>Model connection test</strong>
               </EuiText>
             </EuiFlexItem>
             <EuiFlexItem>{renderStatus()}</EuiFlexItem>
@@ -249,7 +249,7 @@ export const ModelTestResult = ({
                 <EuiFlexGroup direction='column' gutterSize='xs'>
                   <EuiFlexItem>
                     <EuiText size='s' color='danger'>
-                      <strong>Test Failed</strong>
+                      <strong>Test failed</strong>
                     </EuiText>
                   </EuiFlexItem>
                   <EuiFlexItem>
