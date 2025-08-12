@@ -5,12 +5,12 @@ import { dashboardAssistant } from '../../../../utils/applications';
 export class DashboardAssistantNavigationService {
   static getRedirectUrl(path: string) {
     return NavigationService.getInstance().getUrlForApp(dashboardAssistant.id, {
-      path: `#${dashboardAssistant.redirectTo()}/${path}`,
+      path: `#${dashboardAssistant.redirectTo(path)}`,
     });
   }
 
   static Home() {
-    NavigationService.getInstance().navigate(`${dashboardAssistant.id}`);
+    NavigationService.getInstance().navigate(dashboardAssistant.id);
   }
 
   static RegisterModel() {
