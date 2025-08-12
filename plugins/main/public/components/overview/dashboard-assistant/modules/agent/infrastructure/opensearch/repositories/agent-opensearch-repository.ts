@@ -19,7 +19,7 @@ export class AgentOpenSearchRepository implements AgentRepository {
         '/_plugins/_ml/agents/_register',
         agentOpenSearchRequest,
       );
-    return AgentOpenSearchMapper.fromRequest(
+    return AgentOpenSearchMapper.fromResponse(
       response.agent_id,
       agentOpenSearchRequest,
     );
