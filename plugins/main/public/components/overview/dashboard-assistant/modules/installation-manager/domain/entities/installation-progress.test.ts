@@ -10,59 +10,63 @@ describe('InstallationProgress', () => {
 
   it('initializes with defaults and clones input steps', () => {
     const progress = new InstallationProgress({ steps: baseSteps });
-    expect(progress.currentStep).toBe(0);
-    expect(progress.totalSteps).toBe(2);
-    expect(progress.globalState).toBe(ExecutionState.PENDING);
-    expect(progress.steps).not.toBe(baseSteps);
-    expect(progress.steps.map(s => s.stepName)).toEqual(['S1', 'S2']);
+    expect(progress.getCurrentStep()).toBe(0);
+    expect(progress.getSteps().length).toBe(2);
+    expect(progress.isRunning()).toBe(false);
+    expect(progress.getSteps()).not.toBe(baseSteps);
+    expect(progress.getSteps().map(s => s.stepName)).toEqual(['S1', 'S2']);
   });
 
-  it('startStep sets current step to RUNNING and global state to RUNNING', () => {
-    const progress = new InstallationProgress({ steps: baseSteps });
-    const changed = progress.startStep(0);
-    expect(changed).toBe(true);
-    expect(progress.currentStep).toBe(0);
-    expect(progress.steps[0].state).toBe(ExecutionState.RUNNING);
-    expect(progress.globalState).toBe(ExecutionState.RUNNING);
-  });
-
-  it('succeedStep completes current step with SUCCESS and keeps global RUNNING if not last', () => {
+  it('startStep sets step to RUNNING and global state to RUNNING', () => {
     const progress = new InstallationProgress({ steps: baseSteps });
     progress.startStep(0);
-    progress.succeedStep('ok');
-    expect(progress.steps[0].state).toBe(ExecutionState.FINISHED);
-    expect(progress.steps[0].resultState).toBe(StepResultState.SUCCESS);
-    expect(progress.steps[0].message).toBe('ok');
-    expect(progress.globalState).toBe(ExecutionState.RUNNING);
+    expect(progress.getCurrentStep()).toBe(0);
+    expect(progress.getSteps()[0].state).toBe(ExecutionState.RUNNING);
+    expect(progress.isRunning()).toBe(true);
   });
 
-  it('failStep completes current step with FAIL and sets global to FINISHED', () => {
+  it('succeedStep completes current step with FINISHED_SUCCESSFULLY and keeps global RUNNING if not last', () => {
+    const progress = new InstallationProgress({ steps: baseSteps });
+    progress.startStep(0);
+    progress.succeedStep(0, 'ok');
+    const s0 = progress.getSteps()[0];
+    expect(s0.state).toBe(ExecutionState.FINISHED_SUCCESSFULLY);
+    expect(s0.message).toBe('ok');
+    expect(progress.isRunning()).toBe(true);
+  });
+
+  it('failStep completes current step with FAILED and sets global to failed state', () => {
     const progress = new InstallationProgress({ steps: baseSteps });
     progress.startStep(1);
     const err = new Error('boom');
-    progress.failStep('bad', err);
-    expect(progress.steps[1].state).toBe(ExecutionState.FINISHED);
-    expect(progress.steps[1].resultState).toBe(StepResultState.FAIL);
-    expect(progress.steps[1].message).toBe('bad');
-    expect(progress.steps[1].error).toBe(err);
-    expect(progress.globalState).toBe(ExecutionState.FINISHED);
+    progress.failStep(1, 'bad', err);
+    const s1 = progress.getSteps()[1];
+    expect(s1.state).toBe(ExecutionState.FAILED);
+    expect(s1.message).toBe('bad');
+    expect(s1.error).toBe(err);
+    expect(progress.hasFailedSteps()).toBe(true);
+    expect(progress.isRunning()).toBe(false);
+    expect(progress.isFinished()).toBe(false);
   });
 
-  it('completeStep returns false when currentStep is invalid', () => {
+  it('completeStep does nothing when stepIndex is invalid', () => {
     const progress = new InstallationProgress({ steps: [] });
-    const changed = progress.completeStep(StepResultState.SUCCESS, 'noop');
-    expect(changed).toBe(false);
+    expect(() =>
+      progress.completeStep(0, StepResultState.SUCCESS, 'noop'),
+    ).not.toThrow();
+    expect(progress.getCurrentStep()).toBe(0);
+    expect(progress.getSteps().length).toBe(0);
   });
 
-  it('updates global state to FINISHED when last step succeeds', () => {
+  it('updates global state to FINISHED_SUCCESSFULLY when last step succeeds', () => {
     const onlyOne: StepState[] = [
       { stepName: 'Only', state: ExecutionState.PENDING },
     ];
     const progress = new InstallationProgress({ steps: onlyOne });
     progress.startStep(0);
-    progress.succeedStep('done');
-    expect(progress.globalState).toBe(ExecutionState.FINISHED);
-    expect(progress.isGlobalStateFinished()).toBe(true);
+    progress.succeedStep(0, 'done');
+    expect(progress.isFinishedSuccessfully()).toBe(true);
+    expect(progress.isFinished()).toBe(true);
   });
 
   it('isStepAvailable validates bounds', () => {
@@ -76,33 +80,35 @@ describe('InstallationProgress', () => {
   it('updateStep merges updates without dropping existing fields', () => {
     const progress = new InstallationProgress({ steps: baseSteps });
     progress.updateStep(0, { message: 'msg' });
-    expect(progress.steps[0].stepName).toBe('S1');
-    expect(progress.steps[0].message).toBe('msg');
+    expect(progress.getSteps()[0].stepName).toBe('S1');
+    expect(progress.getSteps()[0].message).toBe('msg');
   });
 
-  it('areAllStepsSuccessful returns true when all are SUCCESS or WARNING', () => {
+  it('hasFailedSteps is false when steps are SUCCESS or WARNING; hasWarnings reflects warnings', () => {
     const progress = new InstallationProgress({ steps: baseSteps });
     progress.startStep(0);
-    progress.completeStep(StepResultState.SUCCESS, 'ok');
+    progress.completeStep(0, StepResultState.SUCCESS, 'ok');
     progress.startStep(1);
-    progress.completeStep(StepResultState.WARNING, 'warn');
-    expect(progress.areAllStepsSuccessful()).toBe(true);
+    progress.completeStep(1, StepResultState.WARNING, 'warn');
+    expect(progress.hasFailedSteps()).toBe(false);
+    expect(progress.hasWarnings()).toBe(true);
   });
 
-  it('areAllStepsSuccessful returns false if any step failed', () => {
+  it('hasFailedSteps returns true if any step failed', () => {
     const progress = new InstallationProgress({ steps: baseSteps });
     progress.startStep(0);
-    progress.completeStep(StepResultState.SUCCESS, 'ok');
+    progress.completeStep(0, StepResultState.SUCCESS, 'ok');
     progress.startStep(1);
-    progress.completeStep(StepResultState.FAIL, 'bad', new Error('x'));
-    expect(progress.areAllStepsSuccessful()).toBe(false);
+    progress.completeStep(1, StepResultState.FAIL, 'bad', new Error('x'));
+    expect(progress.hasFailedSteps()).toBe(true);
   });
 
   it('clone returns a deep copy (mutations do not affect original)', () => {
     const progress = new InstallationProgress({ steps: baseSteps });
     const cloned = progress.clone();
-    cloned.steps[0].message = 'changed';
-    expect(progress.steps[0].message).toBeUndefined();
+    cloned.updateStep(0, { message: 'changed' });
+    expect(progress.getSteps()[0].message).toBeUndefined();
+    expect(cloned.getSteps()[0].message).toBe('changed');
     expect(cloned).not.toBe(progress);
   });
 });
