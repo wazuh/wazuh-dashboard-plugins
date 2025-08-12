@@ -23,6 +23,7 @@ import { getModelsUseCase } from './modules/model/application/use-cases/get-mode
 import { testModelConnectionUseCase } from './modules/model/application/use-cases/test-model-connection';
 import { ModelOpenSearchRepository } from './modules/model/infrastructure/opensearch/repositories/model-opensearch-repository';
 import { getRegisterAgentCommandUseCase } from './modules/agent/application/use-cases/get-register-agent-command';
+import { getRegisterAgentCommandByModelIdUseCase } from './modules/agent/application/use-cases/get-register-agent-command-by-model-id';
 
 export const httpClient = new HttpWithProxyClient();
 
@@ -55,9 +56,8 @@ export class UseCases {
   static getRegisterAgentCommand = getRegisterAgentCommandUseCase(
     Repositories.agentRepository,
   );
-  static getRegisterAgentCommandByModelId = getRegisterAgentCommandUseCase(
-    Repositories.agentRepository,
-  );
+  static getRegisterAgentCommandByModelId =
+    getRegisterAgentCommandByModelIdUseCase(Repositories.agentRepository);
   static getModels = getModelsUseCase(Repositories.modelRepository);
   static deleteModel = deleteModelUseCase(Repositories.modelRepository);
   static deleteModelWithRelatedEntities = deleteModelWithRelatedEntitiesUseCase(
