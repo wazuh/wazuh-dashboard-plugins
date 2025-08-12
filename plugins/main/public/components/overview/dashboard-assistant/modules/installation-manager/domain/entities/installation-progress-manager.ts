@@ -4,15 +4,15 @@ import { InstallationAIAssistantStep } from './installation-ai-assistant-step';
 
 export class InstallationProgressManager {
   private readonly progress: InstallationProgress;
-  // Internal index for the current step
-  private currentIndex = 0;
+  // Prevent concurrent executions
+  private inProgress = false;
 
   constructor(
     steps: InstallationAIAssistantStep[],
     private onProgressChange?: (progress: InstallationProgress) => void,
   ) {
     if (steps.length === 0) {
-      throw new Error('At least one step name must be provided');
+      throw new Error('At least one step must be provided');
     }
 
     this.progress = {
@@ -27,28 +27,40 @@ export class InstallationProgressManager {
   }
 
   public getProgress(): InstallationProgress {
-    return { ...this.progress };
+    // Return a cloned snapshot to avoid external mutations
+    return {
+      currentStep: this.progress.currentStep,
+      totalSteps: this.progress.totalSteps,
+      steps: this.progress.steps.map(step => ({ ...step })),
+      progressGlobalState: this.progress.progressGlobalState,
+    };
   }
 
   public async runStep(
     step: InstallationAIAssistantStep,
     executor: () => Promise<void>,
   ): Promise<void> {
-    const i = this.currentIndex;
-    if (i < 0 || i >= this.progress.steps.length) {
-      throw new Error('No more steps to run');
+    if (this.inProgress) {
+      throw new Error('A step is already running');
+    }
+    const i = this.progress.currentStep;
+    if (i < 0 || i >= this.progress.steps.length || this.isCompleted()) {
+      throw new Error('All steps have been completed');
     }
 
+    this.inProgress = true;
     this.startStep(i);
     try {
       await executor();
       this.succeedStep(i, step);
     } catch (err) {
-      this.failStep(i, step, err as Error);
-      throw err;
+      const error = err instanceof Error ? err : new Error(String(err));
+      this.failStep(i, step, error);
+      throw error;
     } finally {
       // Advance the internal index to the next step
-      this.currentIndex = i + 1;
+      this.progress.currentStep = i + 1;
+      this.inProgress = false;
     }
   }
 
@@ -127,10 +139,19 @@ export class InstallationProgressManager {
     );
   }
 
-  public getFailedSteps(): StepState[] {
-    return this.progress.steps.filter(
-      step => step.resultState === StepResultState.FAIL,
-    );
+  // Allow reusing the manager without reinstantiation
+  public reset(): void {
+    this.progress.currentStep = 0;
+    this.progress.steps = this.progress.steps.map(s => ({
+      stepName: s.stepName,
+      executionState: StepExecutionState.PENDING,
+      // reset optional fields
+      resultState: undefined,
+      message: undefined,
+      error: undefined,
+    }));
+    this.progress.progressGlobalState = StepExecutionState.PENDING;
+    this.notifyProgress();
   }
 
   private notifyProgress(): void {
