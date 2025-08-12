@@ -23,7 +23,7 @@ import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { AssistantOverview } from './components/overview/dashboard-assistant/overview';
-import { ModelRegister } from './components/overview/dashboard-assistant/model-register';
+import { ModelRegister } from './components/overview/dashboard-assistant/components/model-register';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -107,13 +107,13 @@ export function Application(props) {
           exact
           render={props => <WzBlankScreen {...props} />}
         ></Route>
-        <Route 
-          path={`/assistant`}
+        <Route
+          path={`/${SECTIONS.ASSISTANT}`}
           exact
           render={props => <AssistantOverview {...props} />}
         ></Route>
-        <Route 
-          path={`/assistant/register-model`}
+        <Route
+          path={`/${SECTIONS.MODEL_REGISTER}`}
           exact
           render={props => <ModelRegister {...props} />}
         ></Route>

@@ -14,14 +14,14 @@ import {
   EuiFlyoutBody,
   // @ts-ignore
 } from '@elastic/eui';
-import { ModelForm } from './components';
-import { DeploymentStatus } from './components';
-import { getWzCurrentAppID } from '../../../kibana-services';
-import { dashboardAssistant } from '../../../utils/applications';
-import NavigationService from '../../../react-services/navigation-service';
-import { ProviderModelConfig } from './provider-model-config';
-import { useAssistantInstallation } from './modules/installation-manager/hooks/use-assistant-installation';
-import { ModelFormData } from './components/types';
+import { ModelForm } from '.';
+import { DeploymentStatus } from '.';
+import { getWzCurrentAppID } from '../../../../kibana-services';
+import { dashboardAssistant } from '../../../../utils/applications';
+import NavigationService from '../../../../react-services/navigation-service';
+import { ProviderModelConfig } from '../provider-model-config';
+import { useAssistantInstallation } from '../modules/installation-manager/hooks/use-assistant-installation';
+import { ModelFormData } from './types';
 
 interface FormConfig {
   title: string;
@@ -133,27 +133,6 @@ export const ModelRegister = ({
     });
     setIsDeploymentVisible(false);
   };
-
-  // Effect to handle installation errors
-  useEffect(() => {
-    if (installError) {
-      console.error('Installation error:', installError);
-    }
-  }, [installError]);
-
-  // Effect to handle successful installation
-  useEffect(() => {
-    if (isSuccess && result) {
-      console.log('Installation completed successfully:', result);
-    }
-  }, [isSuccess, result]);
-
-  // Effect to monitor progress changes
-  useEffect(() => {
-    if (progress) {
-      console.log('Progress updated:', progress);
-    }
-  }, [progress]);
 
   const handleOnClickCheckStatus = () => {
     if (getWzCurrentAppID() === dashboardAssistant.id) {

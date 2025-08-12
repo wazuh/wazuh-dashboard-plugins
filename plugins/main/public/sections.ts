@@ -8,4 +8,6 @@ export enum SECTIONS {
   SETTINGS = 'settings',
   WAZUH_DEV = 'wazuh-dev',
   BLANK_SCREEN = 'blank-screen',
+  ASSISTANT = 'assistant',
+  MODEL_REGISTER = 'assistant/register-model',
 }
