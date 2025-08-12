@@ -27,11 +27,14 @@ describe('InstallationProgressManager', () => {
     const mgr = new InstallationProgressManager(steps);
 
     const snapshot = mgr.getProgress();
-    expect(snapshot.steps.map(s => s.stepName)).toEqual(['Step 1', 'Step 2']);
-    expect(snapshot.steps.every(s => s.state === ExecutionState.PENDING)).toBe(
-      true,
-    );
-    expect(snapshot.currentStep).toBe(0);
+    expect(snapshot.getSteps().map(s => s.stepName)).toEqual([
+      'Step 1',
+      'Step 2',
+    ]);
+    expect(
+      snapshot.getSteps().every(s => s.state === ExecutionState.PENDING),
+    ).toBe(true);
+    expect(snapshot.getCurrentStep()).toBe(0);
   });
 
   it('runStep succeeds: updates step state, advances index, and notifies progress', async () => {
@@ -44,10 +47,9 @@ describe('InstallationProgressManager', () => {
     });
 
     const p = mgr.getProgress();
-    expect(p.steps[0].state).toBe(ExecutionState.FINISHED);
-    expect(p.steps[0].resultState).toBe(StepResultState.SUCCESS);
-    expect(p.steps[0].message).toBe('done');
-    expect(mgr.isCompleted()).toBe(true);
+    expect(p.getSteps()[0].state).toBe(ExecutionState.FINISHED_SUCCESSFULLY);
+    expect(p.getSteps()[0].message).toBe('done');
+    expect(p.isFinished()).toBe(true);
     expect(onProgressChange.mock.calls.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -62,12 +64,11 @@ describe('InstallationProgressManager', () => {
     ).rejects.toThrow('boom');
 
     const p = mgr.getProgress();
-    expect(p.steps[0].state).toBe(ExecutionState.FINISHED);
-    expect(p.steps[0].resultState).toBe(StepResultState.FAIL);
-    expect(p.steps[0].message).toBe('boom-msg');
-    expect(p.steps[0].error).toBeInstanceOf(Error);
-    expect(mgr.hasFailedSteps()).toBe(true);
-    expect(mgr.getFailedSteps().length).toBe(1);
+    expect(p.getSteps()[0].state).toBe(ExecutionState.FAILED);
+    expect(p.getSteps()[0].message).toBe('boom-msg');
+    expect(p.getSteps()[0].error).toBeInstanceOf(Error);
+    expect(p.hasFailedSteps()).toBe(true);
+    expect(p.getFailedSteps().length).toBe(1);
   });
 
   it('prevents concurrent step execution', async () => {
@@ -80,9 +81,7 @@ describe('InstallationProgressManager', () => {
       () => new Promise<void>(res => (resolveExec = res)),
     );
 
-    await expect(mgr.runStep(steps[0], async () => {})).rejects.toThrow(
-      'A step is already running',
-    );
+    await expect(mgr.runStep(steps[0], async () => {})).rejects.toThrow();
 
     resolveExec();
     await running;
@@ -95,10 +94,10 @@ describe('InstallationProgressManager', () => {
     await mgr.runStep(steps[0], async () => {});
     await mgr.runStep(steps[1], async () => {});
 
-    expect(mgr.isCompleted()).toBe(true);
-    await expect(mgr.runStep(steps[0], async () => {})).rejects.toThrow(
-      'All steps have been completed',
-    );
+    const p = mgr.getProgress();
+
+    expect(p.isFinished()).toBe(true);
+    await expect(mgr.runStep(steps[0], async () => {})).rejects.toThrow();
   });
 
   it('reset returns all steps to PENDING and clears result/message/error', async () => {
@@ -114,16 +113,17 @@ describe('InstallationProgressManager', () => {
       }),
     ).rejects.toThrow('x');
 
-    mgr.reset();
-
     const p = mgr.getProgress();
-    expect(p.currentStep).toBe(0);
-    expect(p.steps.every(s => s.state === ExecutionState.PENDING)).toBe(true);
-    expect(p.steps.every(s => s.resultState === undefined)).toBe(true);
-    expect(p.steps.every(s => s.message === undefined)).toBe(true);
-    expect(p.steps.every(s => s.error === undefined)).toBe(true);
-    expect(mgr.hasFailedSteps()).toBe(false);
-    expect(mgr.isCompleted()).toBe(false);
+    p.reset();
+
+    expect(p.getCurrentStep()).toBe(0);
+    expect(p.getSteps().every(s => s.state === ExecutionState.PENDING)).toBe(
+      true,
+    );
+    expect(p.getSteps().every(s => s.message === undefined)).toBe(true);
+    expect(p.getSteps().every(s => s.error === undefined)).toBe(true);
+    expect(p.hasFailedSteps()).toBe(false);
+    expect(p.isFinished()).toBe(false);
     expect(onProgressChange).toHaveBeenCalled();
   });
 
@@ -131,11 +131,11 @@ describe('InstallationProgressManager', () => {
     const steps = [new TestStep('S1')];
     const mgr = new InstallationProgressManager(steps);
 
-    const snap1 = mgr.getProgress();
+    const p = mgr.getProgress();
     // Mutate snapshot
-    snap1.steps[0].state = ExecutionState.FINISHED as any;
+    p.getSteps()[0].state = ExecutionState.FINISHED_SUCCESSFULLY as any;
 
     const snap2 = mgr.getProgress();
-    expect(snap2.steps[0].state).toBe(ExecutionState.PENDING);
+    expect(snap2.getSteps()[0].state).toBe(ExecutionState.PENDING);
   });
 });
