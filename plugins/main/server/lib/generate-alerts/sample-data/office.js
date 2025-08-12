@@ -249,7 +249,7 @@ module.exports.officeRules = {
       firedtimes: 3,
       groups: [
         'office365',
-
+        'AzureActiveDirectoryStsLogon',
         'hipaa_164.312.a.2.I,hipaa_164.312.b',
         'hipaa_164.312.d',
         'hipaa_164.312.e.2.II',
@@ -869,10 +869,10 @@ module.exports.arrayLogs = [
     UserKey: '100320014080D3AD@wazuh.com',
     UserType: 0,
     Version: 1,
-    Workload: 'Exchange',
+    Workload: 'AzureActiveDirectory',
     ObjectId: 'fake@email.not',
     UserId: 'fake@email.not',
-
+    AzureActiveDirectoryEventType: 1,
     ExtendedProperties: [
       {
         Name: 'additionalDetails',
