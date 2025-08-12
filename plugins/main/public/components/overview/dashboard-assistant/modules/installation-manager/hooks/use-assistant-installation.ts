@@ -5,6 +5,7 @@ import type {
 } from '../domain/types';
 import { InstallDashboardAssistantResponse } from '../domain/types';
 import { UseCases } from '../../../setup';
+import { useQuery } from '../../../hooks/use-query';
 
 interface ModelConfiguration {
   model_provider: string;
@@ -15,11 +16,6 @@ interface ModelConfiguration {
 }
 
 export function useAssistantInstallation() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | undefined>(undefined);
-  const [result, setResult] = useState<InstallDashboardAssistantResponse>(
-    InstallDashboardAssistantResponse.start(),
-  );
   const [assistantModelInfo, setAssistantModelInfo] = useState<
     ModelConfiguration | undefined
   >(undefined);
@@ -31,14 +27,23 @@ export function useAssistantInstallation() {
     setAssistantModelInfo(data);
   }, []);
 
-  const install = useCallback(async () => {
+  // Query executor for installing the assistant; always returns a response
+  const installerQuery = useCallback(async () => {
+    let lastProgress = InstallDashboardAssistantResponse.start().progress;
+
+    const onProgress = (installationProgress: InstallationProgress) => {
+      lastProgress = installationProgress;
+      setProgress(installationProgress);
+    };
+
     if (!assistantModelInfo) {
-      setError('No model data provided');
-      return;
+      // No model info provided; return a failure response
+      return InstallDashboardAssistantResponse.failure(
+        'No model data provided',
+        lastProgress,
+      );
     }
 
-    setIsLoading(true);
-    setError(undefined);
     try {
       // Build minimal request; DTOs will be created JIT inside steps
       const request: InstallAIDashboardAssistantDto = {
@@ -49,52 +54,61 @@ export function useAssistantInstallation() {
         description: assistantModelInfo.description,
       };
 
-      const response = await UseCases.installDashboardAssistant(
-        installationProgress => setProgress(installationProgress),
-      )(request);
-      if (response.data?.agentId) {
-        setResult(
-          InstallDashboardAssistantResponse.success(
-            response.data?.agentId,
-            progress,
-          ),
+      const response = await UseCases.installDashboardAssistant(onProgress)(
+        request,
+      );
+
+      if (response.success && response.data?.agentId) {
+        return InstallDashboardAssistantResponse.success(
+          response.data.agentId,
+          lastProgress,
         );
       }
 
-      if (!response.success) {
-        setError(response.message);
-      }
+      return InstallDashboardAssistantResponse.failure(
+        response.message ?? 'Installation failed',
+        lastProgress,
+      );
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
-      // Create a failure response with current progress or empty progress
-      const currentProgress =
-        progress || InstallDashboardAssistantResponse.start().progress;
-      setResult(
-        InstallDashboardAssistantResponse.failure(
-          errorMessage,
-          currentProgress,
-        ),
+      return InstallDashboardAssistantResponse.failure(
+        errorMessage,
+        lastProgress,
       );
-    } finally {
-      setIsLoading(false);
     }
   }, [assistantModelInfo]);
 
-  const reset = useCallback(() => {
-    setIsLoading(false);
-    setError(undefined);
-    setResult(InstallDashboardAssistantResponse.start());
+  const {
+    data: result,
+    isLoading,
+    error: queryError,
+    fetch,
+    reset: resetQuery,
+  } = useQuery<InstallDashboardAssistantResponse>({
+    query: installerQuery,
+    initialData: InstallDashboardAssistantResponse.start(),
+    defaultErrorMessage: 'Unknown error occurred',
+  });
+
+  const install = useCallback(async () => {
+    // Reset progress at the start of an installation
     setProgress(InstallDashboardAssistantResponse.start().progress);
-  }, []);
+    await fetch();
+  }, [fetch]);
+
+  const reset = useCallback(() => {
+    setAssistantModelInfo(undefined);
+    setProgress(InstallDashboardAssistantResponse.start().progress);
+    resetQuery();
+  }, [resetQuery]);
 
   return {
     install,
     setModel,
     reset,
     isLoading,
-    error,
+    error: queryError ?? undefined,
     result,
     modelData: assistantModelInfo,
     progress,
