@@ -25,10 +25,6 @@ import WzReloadClusterManagerCallout from '../../../../../../components/common/r
 function WzRulesetOverview(props) {
   const [showWarningRestart, setShowWarningRestart] = useState(false);
 
-  const updateRestartManagers = showWarningRestart => {
-    setShowWarningRestart(showWarningRestart);
-  };
-
   return (
     <EuiPage style={{ background: 'transparent' }}>
       <EuiPanel>
@@ -36,8 +32,8 @@ function WzRulesetOverview(props) {
           <>
             <EuiSpacer size='s' />
             <WzReloadClusterManagerCallout
-              onReloaded={() => updateRestartManagers(false)}
-              onReloadedError={() => updateRestartManagers(true)}
+              onReloaded={() => setShowWarningRestart(false)}
+              onReloadedError={() => setShowWarningRestart(true)}
             />
             <EuiSpacer size='s' />
           </>
@@ -46,9 +42,7 @@ function WzRulesetOverview(props) {
           <EuiFlexItem>
             <RulesetTable
               {...props}
-              updateRestartClusterManager={showWarningRestart =>
-                updateRestartManagers(showWarningRestart)
-              }
+              updateReloadClusterManager={() => setShowWarningRestart(true)}
             />{' '}
           </EuiFlexItem>
         </EuiFlexGroup>

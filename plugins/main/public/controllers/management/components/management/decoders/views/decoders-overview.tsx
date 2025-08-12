@@ -25,11 +25,6 @@ import { decoders } from '../../../../../../utils/applications';
 
 function WzDecodersOverview(props) {
   const [showWarningRestart, setShowWarningRestart] = useState(false);
-
-  const updateRestartManagers = showWarningRestart => {
-    setShowWarningRestart(showWarningRestart);
-  };
-
   return (
     <EuiPage style={{ background: 'transparent' }}>
       <EuiPanel>
@@ -37,8 +32,8 @@ function WzDecodersOverview(props) {
           <>
             <EuiSpacer size='s' />
             <WzReloadClusterManagerCallout
-              onReloaded={() => updateRestartManagers(false)}
-              onReloadedError={() => updateRestartManagers(true)}
+              onReloaded={() => setShowWarningRestart(false)}
+              onReloadedError={() => setShowWarningRestart(true)}
             />
             <EuiSpacer size='s' />
           </>
@@ -48,9 +43,7 @@ function WzDecodersOverview(props) {
           <EuiFlexItem>
             <DecodersTable
               {...props}
-              updateRestartClusterManager={showWarningRestart =>
-                updateRestartManagers(showWarningRestart)
-              }
+              updateReloadClusterManager={() => setShowWarningRestart(true)}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

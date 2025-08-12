@@ -25,10 +25,6 @@ import { cdbLists } from '../../../../../../utils/applications';
 function WzCDBListsOverview(props) {
   const [showWarningRestart, setShowWarningRestart] = useState(false);
 
-  const updateRestartManagers = showWarningRestart => {
-    setShowWarningRestart(showWarningRestart);
-  };
-
   return (
     <EuiPage style={{ background: 'transparent' }}>
       <EuiPanel>
@@ -36,8 +32,8 @@ function WzCDBListsOverview(props) {
           <>
             <EuiSpacer size='s' />
             <WzReloadClusterManagerCallout
-              onReloaded={() => updateRestartManagers(false)}
-              onReloadedError={() => updateRestartManagers(true)}
+              onReloaded={() => setShowWarningRestart(false)}
+              onReloadedError={() => setShowWarningRestart(true)}
             />
             <EuiSpacer size='s' />
           </>
@@ -47,9 +43,7 @@ function WzCDBListsOverview(props) {
           <EuiFlexItem>
             <CDBListsTable
               {...props}
-              updateRestartClusterManager={showWarningRestart =>
-                updateRestartManagers(showWarningRestart)
-              }
+              updateReloadClusterManager={() => setShowWarningRestart(true)}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
