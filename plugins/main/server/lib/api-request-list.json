@@ -984,9 +984,7 @@
                 "agent-key-polling",
                 "aws-s3",
                 "azure-logs",
-
                 "docker-listener",
-
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -1242,7 +1240,6 @@
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
                 "wazuh-modulesd:azure-logs",
-
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
                 "wazuh-modulesd:database",
@@ -4318,9 +4315,7 @@
                 "agent-key-polling",
                 "aws-s3",
                 "azure-logs",
-
                 "docker-listener",
-
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -4570,7 +4565,6 @@
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
                 "wazuh-modulesd:azure-logs",
-
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
                 "wazuh-modulesd:database",

@@ -145,7 +145,6 @@ const auditLastAlerts = {
 
 export default {
   aws: [awsAlertsSummary],
-
   docker: [dockerAlertsSummary],
   fim: [fimAlertsSummary],
   gcp: [gcpAlertsSummary],
@@ -156,7 +155,6 @@ export default {
   mitre: [mitreAlertsSummary],
   nist: [nistAlertsSummary],
   office: [officeAlertsSummary],
-
   pci: [pciAlertsSummary],
   pm: [pmAlertsSummary],
   tsc: [tscAlertsSummary],

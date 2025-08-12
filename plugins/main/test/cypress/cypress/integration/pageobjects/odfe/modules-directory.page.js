@@ -1,9 +1,7 @@
 export const MODULES_DIRECTORY_PAGE = {
   amazonAWSCard: '[data-test-subj="overviewWelcomeAws"]',
   gCPCard: '[data-test-subj="overviewWelcomeGcp"]',
-
   virusTotalCard: '[data-test-subj="overviewWelcomeVirustotal"]',
-
   dockerListenerCard: '[data-test-subj="overviewWelcomeDocker"]',
   gDPRCard: '[data-test-subj="overviewWelcomeGdpr"]',
   hIPAACard: '[data-test-subj="overviewWelcomeHipaa"]',

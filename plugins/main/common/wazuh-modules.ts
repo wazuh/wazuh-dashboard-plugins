@@ -34,7 +34,6 @@ export const WAZUH_MODULES = {
     description:
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   },
-
   audit: {
     title: 'System auditing',
     appId: 'system-auditing',
@@ -71,7 +70,6 @@ export const WAZUH_MODULES = {
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
   },
-
   aws: {
     title: 'AWS',
     appId: 'amazon-web-services',
@@ -115,7 +113,6 @@ export const WAZUH_MODULES = {
     description:
       'Check the current agent configuration remotely applied by its group.',
   },
-
   sca: {
     title: 'Configuration assessment',
     appId: 'configuration-assessment',

@@ -108,7 +108,6 @@ export const AggregationFields = {
     customLabel: 'Type',
     missing: '-',
   },
-
   'data.title': {
     field: 'data.title',
     size: 10,

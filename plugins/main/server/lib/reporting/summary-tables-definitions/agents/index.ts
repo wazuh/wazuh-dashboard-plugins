@@ -137,12 +137,9 @@ export default {
   nist: [nistLastAlerts],
   gcp: [gcpAlertsSummary],
   tsc: [tscAlertsSummary],
-
   mitre: [mitreAlertsSummary],
-
   pm: [pmAlertsSummary],
   audit: [auditLastAlerts],
-
   gdpr: [gdprLastAlerts],
   pci: [pciLastAlerts],
   docker: [dockerAlertsSummary],

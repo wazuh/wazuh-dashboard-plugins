@@ -208,7 +208,6 @@
       },
       "related_endpoints": ["PUT /agents/reconnect"]
     },
-
     "cluster:status": {
       "description": "Check Wazuh's cluster general status",
       "resources": ["*:*"],

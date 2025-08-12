@@ -148,7 +148,6 @@
       "data.aws.userIdentity.userName",
       "data.aws.vpcEndpointId",
       "data.command",
-
       "data.data",
       "data.docker.Actor.Attributes.container",
       "data.docker.Actor.Attributes.image",
@@ -346,7 +345,6 @@
       "data.os.display_version",
       "data.os.sysname",
       "data.os.version",
-
       "data.port.process",
       "data.port.protocol",
       "data.port.state",
@@ -1163,7 +1161,6 @@
           "url": {
             "type": "keyword"
           },
-
           "office365": {
             "properties": {
               "Actor": {
@@ -2602,7 +2599,6 @@
               }
             }
           },
-
           "parameters": {
             "properties": {
               "extra_args": {

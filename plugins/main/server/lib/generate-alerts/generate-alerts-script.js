@@ -33,11 +33,9 @@ const Audit = require('./sample-data/audit');
 const Authentication = require('./sample-data/authentication');
 const AWS = require('./sample-data/aws');
 const IntegrityMonitoring = require('./sample-data/integrity-monitoring');
-
 const GCP = require('./sample-data/gcp');
 const Docker = require('./sample-data/docker');
 const Mitre = require('./sample-data/mitre');
-
 const PolicyMonitoring = require('./sample-data/policy-monitoring');
 const Virustotal = require('./sample-data/virustotal');
 const Vulnerability = require('./sample-data/vulnerabilities');
