@@ -22,6 +22,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
         "interval": 600,
         "only_future_events": "yes",
         "subscriptions": Array [
+          "Audit.AzureActiveDirectory",
           "Audit.Exchange",
           "Audit.SharePoint",
           "Audit.General",
@@ -252,6 +253,7 @@ exports[`GeneralTab component renders correctly to match the snapshot 1`] = `
           "interval": 600,
           "only_future_events": "yes",
           "subscriptions": Array [
+            "Audit.AzureActiveDirectory",
             "Audit.Exchange",
             "Audit.SharePoint",
             "Audit.General",

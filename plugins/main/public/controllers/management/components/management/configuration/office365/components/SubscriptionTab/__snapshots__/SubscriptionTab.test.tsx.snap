@@ -22,6 +22,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
         "interval": 600,
         "only_future_events": "yes",
         "subscriptions": Array [
+          "Audit.AzureActiveDirectory",
           "Audit.Exchange",
           "Audit.SharePoint",
           "Audit.General",
@@ -230,6 +231,9 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
       items={
         Array [
           Object {
+            "subscription": "Audit.AzureActiveDirectory",
+          },
+          Object {
             "subscription": "Audit.Exchange",
           },
           Object {
@@ -393,7 +397,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                             <span
                               className="euiTableCellContent__text"
                             >
-                              Audit.Exchange
+                              Audit.AzureActiveDirectory
                             </span>
                           </div>
                         </td>
@@ -437,7 +441,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                             <span
                               className="euiTableCellContent__text"
                             >
-                              Audit.SharePoint
+                              Audit.Exchange
                             </span>
                           </div>
                         </td>
@@ -481,7 +485,7 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                             <span
                               className="euiTableCellContent__text"
                             >
-                              Audit.General
+                              Audit.SharePoint
                             </span>
                           </div>
                         </td>
@@ -497,6 +501,50 @@ exports[`SubscriptionTab component renders correctly to match the snapshot 1`] =
                       <EuiTableRowCell
                         align="left"
                         key="_data_column_subscription_3_0"
+                        mobileOptions={
+                          Object {
+                            "header": "Name",
+                            "render": undefined,
+                          }
+                        }
+                        setScopeRow={false}
+                        textOnly={true}
+                      >
+                        <td
+                          className="euiTableRowCell"
+                          style={
+                            Object {
+                              "width": undefined,
+                            }
+                          }
+                        >
+                          <div
+                            className="euiTableRowCell__mobileHeader euiTableRowCell--hideForDesktop"
+                          >
+                            Name
+                          </div>
+                          <div
+                            className="euiTableCellContent"
+                          >
+                            <span
+                              className="euiTableCellContent__text"
+                            >
+                              Audit.General
+                            </span>
+                          </div>
+                        </td>
+                      </EuiTableRowCell>
+                    </tr>
+                  </EuiTableRow>
+                  <EuiTableRow
+                    isSelected={false}
+                  >
+                    <tr
+                      className="euiTableRow"
+                    >
+                      <EuiTableRowCell
+                        align="left"
+                        key="_data_column_subscription_4_0"
                         mobileOptions={
                           Object {
                             "header": "Name",
