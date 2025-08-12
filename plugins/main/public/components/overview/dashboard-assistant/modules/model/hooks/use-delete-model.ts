@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useQuery } from '../../../hooks/use-query';
 import { UseCases } from '../../../setup';
 
 export interface UseDeleteModelReturn {
@@ -9,34 +9,17 @@ export interface UseDeleteModelReturn {
 }
 
 export function useDeleteModel(): UseDeleteModelReturn {
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const deleteModel = useCallback(async (modelId: string) => {
-    setIsDeleting(true);
-    setError(null);
-
-    try {
-      await UseCases.deleteModelWithRelatedEntities(modelId);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsDeleting(false);
-    }
-  }, []);
-
-  const reset = useCallback(() => {
-    setIsDeleting(false);
-    setError(null);
-  }, []);
+  const { isLoading, error, fetch, reset } = useQuery<void>({
+    query: (modelId: string) =>
+      UseCases.deleteModelWithRelatedEntities(modelId),
+    initialData: undefined as void,
+    defaultErrorMessage: 'Failed to delete model',
+  });
 
   return {
-    isDeleting,
+    isDeleting: isLoading,
     error,
-    deleteModel,
+    deleteModel: (modelId: string) => fetch(modelId),
     reset,
   };
 }
