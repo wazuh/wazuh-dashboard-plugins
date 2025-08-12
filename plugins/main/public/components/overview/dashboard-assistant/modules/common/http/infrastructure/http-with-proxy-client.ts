@@ -1,6 +1,6 @@
 import { GenericRequest } from '../../../../../../../react-services';
+import { HttpMethod } from '../../../../../../../react-services/common/http-method';
 import { IHttpClient } from '../domain/entities/http-client';
-import { HttpMethod } from '../domain/enums/http-method';
 
 export class HttpWithProxyClient implements IHttpClient {
   private buildProxyUrl = (method: HttpMethod, path: string) =>

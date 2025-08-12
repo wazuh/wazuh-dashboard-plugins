@@ -18,6 +18,7 @@ import { getHttp, getDataPlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
+import { HttpMethod } from './common/http-method';
 
 export class GenericRequest {
   /**
@@ -63,7 +64,9 @@ export class GenericRequest {
         },
       );
 
-      if (['PUT', 'POST', 'DELETE'].includes(method)) {
+      if (
+        [HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE].includes(method)
+      ) {
         options.data = payload;
       }
 
