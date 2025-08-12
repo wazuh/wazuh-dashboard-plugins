@@ -794,10 +794,10 @@ module.exports.arrayLogs = [
     UserKey: '100320014080D3AD@wazuh.com',
     UserType: 0,
     Version: 1,
-    Workload: 'Exchange',
+    Workload: 'AzureActiveDirectory',
     ObjectId: 'fake@email.not',
     UserId: 'fake@email.not',
-
+    AzureActiveDirectoryEventType: 1,
     ExtendedProperties: [
       {
         Name: 'additionalDetails',
