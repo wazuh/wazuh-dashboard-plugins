@@ -1,6 +1,6 @@
 # Dashboard Assistant
 
-A comprehensive AI-powered assistant integration for Wazuh Dashboard that enables conversational AI capabilities for cybersecurity analysis and data querying through OpenSearch ML Commons.
+A comprehensive AI-powered assistant integration for Wazuh dashboard that enables conversational AI capabilities for cybersecurity analysis and data querying through OpenSearch ML Commons.
 
 ## 📋 Overview
 
