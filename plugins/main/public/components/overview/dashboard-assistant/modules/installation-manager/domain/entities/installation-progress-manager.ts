@@ -45,10 +45,10 @@ export class InstallationProgressManager {
     this.startStep(i);
     try {
       await executor();
-      this.succeedStep(i, step);
+      this.succeedStep(step);
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
-      this.failStep(i, step, error);
+      this.failStep(step, error);
       throw error;
     } finally {
       // Advance the internal index to the next step
@@ -58,64 +58,25 @@ export class InstallationProgressManager {
   }
 
   public startStep(stepIndex: number): void {
-    if (stepIndex >= 0 && stepIndex < this.progress.steps.length) {
-      this.progress.currentStep = stepIndex;
-      this.progress.steps[stepIndex] = {
-        ...this.progress.steps[stepIndex],
-        executionState: StepExecutionState.RUNNING,
-      };
-      this.progress.progressGlobalState = StepExecutionState.RUNNING;
+    if (this.progress.startStep(stepIndex)) {
       this.notifyProgress();
     }
   }
 
-  public succeedStep(
-    stepIndex: number,
-    step: InstallationAIAssistantStep,
-  ): void {
-    this.completeStep(
-      stepIndex,
-      StepResultState.SUCCESS,
-      step.getSuccessMessage(),
-    );
+  public succeedStep(step: InstallationAIAssistantStep): void {
+    this.completeStep(StepResultState.SUCCESS, step.getSuccessMessage());
   }
 
-  public failStep(
-    stepIndex: number,
-    step: InstallationAIAssistantStep,
-    error: Error,
-  ): void {
-    this.completeStep(
-      stepIndex,
-      StepResultState.FAIL,
-      step.getFailureMessage(),
-      error,
-    );
+  public failStep(step: InstallationAIAssistantStep, error: Error): void {
+    this.completeStep(StepResultState.FAIL, step.getFailureMessage(), error);
   }
 
   private completeStep(
-    stepIndex: number,
     resultState: StepResultState,
     message?: string,
     error?: Error,
   ): void {
-    if (stepIndex >= 0 && stepIndex < this.progress.steps.length) {
-      this.progress.steps[stepIndex] = {
-        ...this.progress.steps[stepIndex],
-        executionState: StepExecutionState.FINISHED,
-        resultState,
-        message,
-        error,
-      };
-
-      // Update overall state
-      if (resultState === StepResultState.FAIL) {
-        this.progress.progressGlobalState = StepExecutionState.FINISHED;
-      } else if (stepIndex === this.progress.steps.length - 1) {
-        // Last step completed
-        this.progress.progressGlobalState = StepExecutionState.FINISHED;
-      }
-
+    if (this.progress.completeStep(resultState, message, error)) {
       this.notifyProgress();
     }
   }
@@ -149,7 +110,7 @@ export class InstallationProgressManager {
       message: undefined,
       error: undefined,
     }));
-    this.progress.progressGlobalState = StepExecutionState.PENDING;
+    this.progress.globalState = StepExecutionState.PENDING;
     this.notifyProgress();
   }
 
