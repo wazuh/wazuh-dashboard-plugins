@@ -353,7 +353,7 @@ const steps: InstallationAIAssistantStep[] = [
 
 ### [ML Commons](https://github.com/opensearch-project/ml-commons/tree/2.19.3.0)
 
-The Dashboard Assistant follows this step-by-step installation process:
+The dashboard assistant follows this step-by-step installation process:
 
 <details><summary>Step 1: Cluster Settings Configuration</summary>
 <p>
