@@ -133,7 +133,6 @@ export enum WAZUH_MODULES_ID {
   HIPAA = 'hipaa',
   NIST_800_53 = 'nist',
   TSC = 'tsc',
-
   VIRUSTOTAL = 'virustotal',
   GDPR = 'gdpr',
   GITHUB = 'github',

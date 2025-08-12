@@ -1245,7 +1245,6 @@
                 "wazuh-modulesd:database",
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
-
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
               ]
@@ -4570,7 +4569,6 @@
                 "wazuh-modulesd:database",
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
-
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
               ]
