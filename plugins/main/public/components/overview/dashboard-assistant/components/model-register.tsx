@@ -205,7 +205,7 @@ export const ModelRegister = ({
             <DeploymentStatus
               progress={progress}
               agentId={result?.data?.agentId}
-              title='Model Deployment'
+              title='Model deployment'
               onCheckButton={navigateToHomeIfCurrentApp}
               showCheckButton={isSuccess}
             />
