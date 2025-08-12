@@ -20,16 +20,16 @@ export class CreateAgentStep extends InstallationAIAssistantStep {
     modelId: string,
   ): CreateAgentDto {
     return {
-      name: request.agent.name,
+      name: `${request.selected_provider}_agent`,
       type: AgentType.CONVERSATIONAL,
-      description: request.agent.description,
+      description: `AI agent powered by ${request.selected_provider}`,
       model_id: modelId,
       response_filter:
         modelProviderConfigs[request.selected_provider]?.response_filter!,
       tools: [
         AgentToolFactory.create({
           type: Tool.ML_MODEL_TOOL,
-          name: `${request.selected_provider}_${request.connector.model_id}_llm_model`,
+          name: `${request.selected_provider}_${request.model_id}_llm_model`,
           description: `A general-purpose language model tool capable of answering broad questions, summarizing information, and providing analysis that doesn't require searching specific data. Use this when no other specialized tool is applicable.`,
           parameters: {
             model_id: modelId,

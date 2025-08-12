@@ -1,8 +1,4 @@
-import { CreateConnectorDto } from '../../../modules/connector/application/dtos/create-connector-dto';
 import { ProviderModelConfig } from '../../../provider-model-config';
-import { CreateAgentDto } from '../../agent/application/dtos/create-agent-dto';
-import { CreateMLCommonsDto } from '../../ml-commons-settings/application/dtos/create-ml-commons-dto';
-import { CreateModelDto } from '../../model/application/dtos/create-model-dto';
 import { InstallationContext } from './entities';
 import { StepExecutionState, StepResultState } from './enums';
 
@@ -11,11 +7,12 @@ export interface IInstallationManager {
 }
 
 export interface InstallAIDashboardAssistantDto {
-  selected_provider: string;
-  ml_common_settings: CreateMLCommonsDto;
-  connector: CreateConnectorDto;
-  model: Pick<CreateModelDto, 'name' | 'description'>;
-  agent: Pick<CreateAgentDto, 'name' | 'description'>;
+  // Minimal requirements provided by the UI to derive DTOs within steps (JIT)
+  selected_provider: string; // key to locate provider config
+  model_id: string; // provider's model identifier (e.g., gpt-4o)
+  api_url: string; // base URL/endpoint for the connector
+  api_key: string; // credential for the provider
+  description?: string; // optional human-friendly description
 }
 
 export interface StepState {

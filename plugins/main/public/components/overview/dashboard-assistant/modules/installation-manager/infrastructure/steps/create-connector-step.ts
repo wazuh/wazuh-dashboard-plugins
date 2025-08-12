@@ -1,4 +1,6 @@
 import { UseCases } from '../../../../setup';
+import { modelProviderConfigs } from '../../../../provider-model-config';
+import { CreateConnectorDto } from '../../../connector/application/dtos/create-connector-dto';
 import {
   InstallationContext,
   InstallationAIAssistantStep,
@@ -14,7 +16,20 @@ export class CreateConnectorStep extends InstallationAIAssistantStep {
     request: InstallAIDashboardAssistantDto,
     context: InstallationContext,
   ): Promise<void> {
-    const connector = await UseCases.createConnector(request.connector);
+    const provider = modelProviderConfigs[request.selected_provider];
+    const connectorDto: CreateConnectorDto = {
+      name: `${request.selected_provider} Chat Connector`,
+      description: `Connector to ${request.selected_provider} model service for ${request.model_id}`,
+      endpoint: request.api_url,
+      model_id: request.model_id,
+      api_key: request.api_key,
+      url_path: provider.url_path,
+      headers: provider.headers,
+      request_body: provider.request_body,
+      extra_parameters: provider.extra_parameters || {},
+    };
+
+    const connector = await UseCases.createConnector(connectorDto);
     context.set('connectorId', connector.id);
   }
 

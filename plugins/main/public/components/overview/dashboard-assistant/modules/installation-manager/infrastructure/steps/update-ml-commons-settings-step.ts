@@ -1,4 +1,6 @@
 import { UseCases } from '../../../../setup';
+import { modelProviderConfigs } from '../../../../provider-model-config';
+import { buildCreateMLCommonsDto } from '../../../ml-commons-settings/application/dtos/create-ml-commons-dto';
 import {
   InstallationAIAssistantStep,
   InstallationContext,
@@ -14,7 +16,10 @@ export class UpdateMlCommonsSettingsStep extends InstallationAIAssistantStep {
     request: InstallAIDashboardAssistantDto,
     context: InstallationContext,
   ): Promise<void> {
-    await UseCases.persistMlCommonsSettings(request.ml_common_settings);
+    const provider = modelProviderConfigs[request.selected_provider];
+    const endpoints_regex = [provider?.default_endpoint_regex || '.*'];
+    const dto = buildCreateMLCommonsDto(endpoints_regex);
+    await UseCases.persistMlCommonsSettings(dto);
   }
 
   getSuccessMessage(): string {

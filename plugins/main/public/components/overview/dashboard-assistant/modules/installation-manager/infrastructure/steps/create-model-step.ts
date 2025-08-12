@@ -17,8 +17,9 @@ export class CreateModelStep extends InstallationAIAssistantStep {
   ): Promise<void> {
     const modelDto: CreateModelDto = {
       connector_id: context.get('connectorId'),
-      name: request.model.name,
-      description: request.model.description,
+      name: request.selected_provider,
+      description:
+        request.description || `${request.selected_provider} language model`,
     };
 
     const model = await UseCases.createModel(modelDto);

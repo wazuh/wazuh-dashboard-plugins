@@ -4,7 +4,6 @@ import type {
   InstallationProgress,
 } from '../domain/types';
 import { InstallDashboardAssistantResponse } from '../domain/types';
-import { modelProviderConfigs } from '../../../provider-model-config';
 import { UseCases } from '../../../setup';
 
 interface ModelConfiguration {
@@ -40,37 +39,14 @@ export function useAssistantInstallation() {
 
     setIsLoading(true);
     setError(undefined);
-
-    const model_config =
-      modelProviderConfigs[assistantModelInfo.model_provider];
     try {
-      // Create installation request from model data
+      // Build minimal request; DTOs will be created JIT inside steps
       const request: InstallAIDashboardAssistantDto = {
         selected_provider: assistantModelInfo.model_provider,
-        ml_common_settings: {
-          endpoints_regex: [model_config.default_endpoint_regex || '.*'],
-        },
-        connector: {
-          name: `${assistantModelInfo.model_provider} Chat Connector`,
-          description: `Connector to ${assistantModelInfo.model_provider} model service for ${assistantModelInfo.model_id}`,
-          endpoint: assistantModelInfo.api_url,
-          model_id: assistantModelInfo.model_id,
-          api_key: assistantModelInfo.api_key,
-          url_path: model_config.url_path,
-          headers: model_config.headers,
-          request_body: model_config.request_body,
-          extra_parameters: model_config.extra_parameters || {},
-        },
-        model: {
-          name: assistantModelInfo.model_provider,
-          description:
-            assistantModelInfo.description ||
-            `${assistantModelInfo.model_provider} language model`,
-        },
-        agent: {
-          name: `${assistantModelInfo.model_provider}_agent`,
-          description: `AI agent powered by ${assistantModelInfo.model_provider}`,
-        },
+        model_id: assistantModelInfo.model_id,
+        api_url: assistantModelInfo.api_url,
+        api_key: assistantModelInfo.api_key,
+        description: assistantModelInfo.description,
       };
 
       const response = await UseCases.installDashboardAssistant(
