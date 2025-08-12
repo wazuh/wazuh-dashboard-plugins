@@ -3,10 +3,8 @@ import {
   EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiIcon,
   EuiLink,
   EuiListGroup,
-  EuiLoadingSpinner,
   EuiSpacer,
   EuiText,
   EuiTitle,
@@ -19,16 +17,8 @@ import {
   StepState,
 } from '../modules/installation-manager/domain';
 import RegisterAgentCommand from './register-agent-command';
-
-const StepStatus = {
-  PENDING: 'pending',
-  LOADING: 'loading',
-  SUCCESS: 'success',
-  ERROR: 'error',
-  WARNING: 'warning',
-} as const;
-
-type StepStatus = (typeof StepStatus)[keyof typeof StepStatus];
+import StepIcon from './step-icon';
+import { StepStatus } from './types';
 
 interface DeploymentStatusProps {
   progress?: InstallationProgress;
@@ -69,22 +59,6 @@ export const DeploymentStatus = ({
       }
     }
     return StepStatus.PENDING;
-  };
-
-  const getStepIcon = (status: StepStatus) => {
-    switch (status) {
-      case StepStatus.LOADING:
-        return <EuiLoadingSpinner size='m' />;
-      case StepStatus.SUCCESS:
-        return <EuiIcon type='check' color='success' />;
-      case StepStatus.ERROR:
-        return <EuiIcon type='cross' color='danger' />;
-      case StepStatus.WARNING:
-        return <EuiIcon type='alert' color='warning' />;
-      case StepStatus.PENDING:
-      default:
-        return <EuiIcon type='clock' color='subdued' />;
-    }
   };
 
   const steps = progress?.steps || [];
@@ -135,11 +109,11 @@ export const DeploymentStatus = ({
                 {uiStatus === StepStatus.ERROR && step?.error ? (
                   <EuiToolTip content={step.error.message}>
                     <div style={{ cursor: 'pointer' }}>
-                      {getStepIcon(uiStatus)}
+                      <StepIcon status={uiStatus} />
                     </div>
                   </EuiToolTip>
                 ) : (
-                  getStepIcon(uiStatus)
+                  <StepIcon status={uiStatus} />
                 )}
               </div>
             </div>
