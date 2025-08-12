@@ -106,13 +106,10 @@ export const ModelRegister = ({
   };
 
   const handleDeploy = async () => {
-    console.log('Deploying model with data:', formData);
     setIsDeploymentVisible(true);
 
     // Execute the installation using the hook
-    console.log('Starting installation...');
     await install();
-    console.log('Installation completed');
 
     if (onClickDeploy) {
       onClickDeploy();
