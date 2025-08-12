@@ -113,7 +113,7 @@ export function Application(props) {
           render={props => <AssistantOverview {...props} />}
         ></Route>
         <Route
-          path={`/${SECTIONS.MODEL_REGISTER}`}
+          path={`/${SECTIONS.ASSISTANT}/${SECTIONS.REGISTER_MODEL}`}
           exact
           render={props => <ModelRegister {...props} />}
         ></Route>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -18,7 +18,6 @@ import { ModelForm } from '.';
 import { DeploymentStatus } from '.';
 import { getWzCurrentAppID } from '../../../../kibana-services';
 import { dashboardAssistant } from '../../../../utils/applications';
-import NavigationService from '../../../../react-services/navigation-service';
 import { ProviderModelConfig } from '../provider-model-config';
 import { useAssistantInstallation } from '../modules/installation-manager/hooks/use-assistant-installation';
 import { ModelFormData } from './types';
@@ -103,12 +102,7 @@ export const ModelRegister = ({
   }, []);
 
   const handleCancel = () => {
-    setFormData({
-      modelProvider: '',
-      model: '',
-      apiUrl: '',
-      apiKey: '',
-    });
+    navigateToHomeIfCurrentApp();
   };
 
   const handleDeploy = async () => {
@@ -135,7 +129,7 @@ export const ModelRegister = ({
     setIsDeploymentVisible(false);
   };
 
-  const handleOnClickCheckStatus = () => {
+  const navigateToHomeIfCurrentApp = () => {
     if (getWzCurrentAppID() === dashboardAssistant.id) {
       DashboardAssistantNavigationService.Home();
     }
@@ -215,7 +209,7 @@ export const ModelRegister = ({
               progress={progress}
               agentId={result?.data?.agentId}
               title='Model Deployment'
-              onCheckButton={handleOnClickCheckStatus}
+              onCheckButton={navigateToHomeIfCurrentApp}
               showCheckButton={isSuccess}
             />
           </EuiFlyoutBody>

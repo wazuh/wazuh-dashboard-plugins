@@ -1,9 +1,10 @@
 import NavigationService from '../../../../react-services/navigation-service';
+import { SECTIONS } from '../../../../sections';
 import { dashboardAssistant } from '../../../../utils/applications';
 
 export class DashboardAssistantNavigationService {
-  static redirectTo(path: string) {
-    NavigationService.getInstance().getUrlForApp(dashboardAssistant.id, {
+  static getRedirectUrl(path: string) {
+    return NavigationService.getInstance().getUrlForApp(dashboardAssistant.id, {
       path: `#${dashboardAssistant.redirectTo()}/${path}`,
     });
   }
@@ -13,6 +14,8 @@ export class DashboardAssistantNavigationService {
   }
 
   static RegisterModel() {
-    this.redirectTo('register-model');
+    return DashboardAssistantNavigationService.getRedirectUrl(
+      SECTIONS.REGISTER_MODEL,
+    );
   }
 }

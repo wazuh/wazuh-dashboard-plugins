@@ -9,5 +9,5 @@ export enum SECTIONS {
   WAZUH_DEV = 'wazuh-dev',
   BLANK_SCREEN = 'blank-screen',
   ASSISTANT = 'assistant',
-  MODEL_REGISTER = 'assistant/register-model',
+  REGISTER_MODEL = 'register-model',
 }
