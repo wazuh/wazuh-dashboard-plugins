@@ -156,7 +156,10 @@ export const ModelRegister = ({
 
               <EuiFlexGroup justifyContent='flexEnd' gutterSize='m'>
                 <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty onClick={handleCancel} disabled={isDeployed}>
+                  <EuiButtonEmpty
+                    onClick={handleCancel}
+                    disabled={isInstalling || isDeployed}
+                  >
                     {config.buttons.cancel}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
