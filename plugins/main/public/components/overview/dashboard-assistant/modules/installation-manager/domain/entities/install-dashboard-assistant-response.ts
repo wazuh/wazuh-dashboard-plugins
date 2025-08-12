@@ -1,5 +1,5 @@
 import { StepExecutionState } from '../enums';
-import type { InstallationProgress } from '../types/installation-progress';
+import { InstallationProgress } from './installation-progress';
 
 export interface IInstallDashboardAssistantResponse {
   success: boolean;
@@ -80,12 +80,7 @@ export class InstallDashboardAssistantResponse
     return new InstallDashboardAssistantResponse({
       success: false,
       message: 'Installation started',
-      progress: {
-        currentStep: 0,
-        totalSteps: 0,
-        steps: [],
-        progressGlobalState: StepExecutionState.PENDING,
-      },
+      progress: new InstallationProgress(),
     });
   }
 }

@@ -1,5 +1,5 @@
-import type { InstallationProgress } from './installation-progress';
 import type { InstallationError } from './installation-error';
+import { InstallationProgress } from '../entities';
 
 export interface InstallationResult {
   success: boolean;

@@ -62,13 +62,6 @@ export const DeploymentStatus = ({
   };
 
   const steps = progress?.steps || [];
-  const allStepsCompleted =
-    progress?.progressGlobalState === StepExecutionState.FINISHED;
-  const allStepsSuccess = steps.every(
-    step =>
-      step.resultState === StepResultState.SUCCESS ||
-      step.resultState === StepResultState.WARNING,
-  );
 
   return (
     <>
@@ -121,14 +114,18 @@ export const DeploymentStatus = ({
         })}
       </EuiListGroup>
 
-      {allStepsCompleted && allStepsSuccess && agentId && (
-        <>
-          <EuiSpacer size='l' />
-          <RegisterAgentCommand entityId={agentId} targetEntity='agent' />
-        </>
-      )}
+      {progress?.isGlobalStateFinished() &&
+        progress.areAllStepsSuccessful() &&
+        agentId && (
+          <>
+            <EuiSpacer size='l' />
+            <RegisterAgentCommand entityId={agentId} targetEntity='agent' />
+          </>
+        )}
 
-      {(showCheckButton || (allStepsCompleted && allStepsSuccess)) && (
+      {(showCheckButton ||
+        (progress?.isGlobalStateFinished() &&
+          progress.areAllStepsSuccessful())) && (
         <>
           <EuiSpacer size='l' />
           <EuiFlexGroup justifyContent='center'>

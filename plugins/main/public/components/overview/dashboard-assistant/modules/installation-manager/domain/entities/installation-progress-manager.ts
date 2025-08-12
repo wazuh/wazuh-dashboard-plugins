@@ -1,6 +1,7 @@
 import { StepExecutionState, StepResultState } from '../enums';
-import { StepState, InstallationProgress } from '../types';
+import { StepState } from '../types';
 import { InstallationAIAssistantStep } from './installation-ai-assistant-step';
+import { InstallationProgress } from './installation-progress';
 
 export class InstallationProgressManager {
   private readonly progress: InstallationProgress;
@@ -15,25 +16,17 @@ export class InstallationProgressManager {
       throw new Error('At least one step must be provided');
     }
 
-    this.progress = {
-      currentStep: 0,
-      totalSteps: steps.length,
+    this.progress = new InstallationProgress({
       steps: steps.map(step => ({
         stepName: step.getName(),
         executionState: StepExecutionState.PENDING,
       })),
-      progressGlobalState: StepExecutionState.PENDING,
-    };
+    });
   }
 
   public getProgress(): InstallationProgress {
     // Return a cloned snapshot to avoid external mutations
-    return {
-      currentStep: this.progress.currentStep,
-      totalSteps: this.progress.totalSteps,
-      steps: this.progress.steps.map(step => ({ ...step })),
-      progressGlobalState: this.progress.progressGlobalState,
-    };
+    return this.progress.clone();
   }
 
   public async runStep(
