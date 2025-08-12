@@ -1,5 +1,4 @@
 import { StepExecutionState, StepResultState } from '../enums';
-import { StepState } from '../types';
 import { InstallationAIAssistantStep } from './installation-ai-assistant-step';
 import { InstallationProgress } from './installation-progress';
 
@@ -22,6 +21,10 @@ export class InstallationProgressManager {
         executionState: StepExecutionState.PENDING,
       })),
     });
+
+    this.progress.subscribe(() => {
+      this.notifyProgress();
+    });
   }
 
   public getProgress(): InstallationProgress {
@@ -37,12 +40,16 @@ export class InstallationProgressManager {
       throw new Error('A step is already running');
     }
     const i = this.progress.currentStep;
-    if (i < 0 || i >= this.progress.steps.length || this.isCompleted()) {
+    if (
+      i < 0 ||
+      i >= this.progress.steps.length ||
+      this.progress.isCompleted()
+    ) {
       throw new Error('All steps have been completed');
     }
 
     this.inProgress = true;
-    this.startStep(i);
+    this.progress.startStep(i);
     try {
       await executor();
       this.succeedStep(step);
@@ -57,61 +64,19 @@ export class InstallationProgressManager {
     }
   }
 
-  public startStep(stepIndex: number): void {
-    if (this.progress.startStep(stepIndex)) {
-      this.notifyProgress();
-    }
-  }
-
-  public succeedStep(step: InstallationAIAssistantStep): void {
-    this.completeStep(StepResultState.SUCCESS, step.getSuccessMessage());
-  }
-
-  public failStep(step: InstallationAIAssistantStep, error: Error): void {
-    this.completeStep(StepResultState.FAIL, step.getFailureMessage(), error);
-  }
-
-  private completeStep(
-    resultState: StepResultState,
-    message?: string,
-    error?: Error,
-  ): void {
-    if (this.progress.completeStep(resultState, message, error)) {
-      this.notifyProgress();
-    }
-  }
-
-  public hasFailedSteps(): boolean {
-    return this.progress.steps.some(
-      step => step.resultState === StepResultState.FAIL,
+  private succeedStep(step: InstallationAIAssistantStep): void {
+    this.progress.completeStep(
+      StepResultState.SUCCESS,
+      step.getSuccessMessage(),
     );
   }
 
-  public getFailedSteps(): StepState[] {
-    return this.progress.steps.filter(
-      step => step.resultState === StepResultState.FAIL,
+  private failStep(step: InstallationAIAssistantStep, error: Error): void {
+    this.progress.completeStep(
+      StepResultState.FAIL,
+      step.getFailureMessage(),
+      error,
     );
-  }
-
-  public isCompleted(): boolean {
-    return this.progress.steps.every(
-      step => step.executionState === StepExecutionState.FINISHED,
-    );
-  }
-
-  // Allow reusing the manager without reinstantiation
-  public reset(): void {
-    this.progress.currentStep = 0;
-    this.progress.steps = this.progress.steps.map(s => ({
-      stepName: s.stepName,
-      executionState: StepExecutionState.PENDING,
-      // reset optional fields
-      resultState: undefined,
-      message: undefined,
-      error: undefined,
-    }));
-    this.progress.globalState = StepExecutionState.PENDING;
-    this.notifyProgress();
   }
 
   private notifyProgress(): void {
