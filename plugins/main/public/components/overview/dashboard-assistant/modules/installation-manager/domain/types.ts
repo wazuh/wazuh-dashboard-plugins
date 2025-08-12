@@ -111,46 +111,64 @@ export interface IInstallDashboardAssistantResponse {
 export class InstallDashboardAssistantResponse
   implements IInstallDashboardAssistantResponse
 {
-  private constructor(
-    readonly success: boolean,
-    readonly message: string,
-    readonly progress?: InstallationProgress,
-    readonly agentId?: string,
-    readonly error?: string,
-  ) {}
+  public success: boolean;
+  public message: string;
+  public progress?: InstallationProgress;
+  public data?: {
+    agentId?: string;
+    modelGroupId?: string;
+    connectorId?: string;
+    modelId?: string;
+  };
+  public error?: string;
+
+  private constructor(params: {
+    success: boolean;
+    message: string;
+    progress?: InstallationProgress;
+    agentId?: string;
+    error?: string;
+  }) {
+    this.success = params.success;
+    this.message = params.message;
+    this.progress = params.progress;
+    this.data = {
+      agentId: params.agentId,
+    };
+    this.error = params.error;
+  }
 
   public static success(
     agentId: string,
     progress?: InstallationProgress,
   ): InstallDashboardAssistantResponse {
-    return new InstallDashboardAssistantResponse(
-      true,
-      'Installation completed successfully',
+    return new InstallDashboardAssistantResponse({
+      success: true,
+      message: 'Installation completed successfully',
       progress,
       agentId,
-    );
+    });
   }
 
   public static failure(
     error: string,
     progress: InstallationProgress,
   ): InstallDashboardAssistantResponse {
-    return new InstallDashboardAssistantResponse(
-      false,
-      error,
+    return new InstallDashboardAssistantResponse({
+      success: false,
+      message: error,
       progress,
-      undefined,
       error,
-    );
+    });
   }
 
   public static inProgress(
     progress: InstallationProgress,
   ): InstallDashboardAssistantResponse {
-    return new InstallDashboardAssistantResponse(
-      false,
-      'Installation in progress',
+    return new InstallDashboardAssistantResponse({
+      success: false,
+      message: 'Installation in progress',
       progress,
-    );
+    });
   }
 }

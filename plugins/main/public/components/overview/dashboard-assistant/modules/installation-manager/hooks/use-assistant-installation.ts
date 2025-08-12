@@ -39,7 +39,7 @@ export function useAssistantInstallation() {
     }
 
     setIsLoading(true);
-    setError(null);
+    setError(undefined);
 
     const model_config =
       modelProviderConfigs[assistantModelInfo.model_provider];
@@ -95,7 +95,7 @@ export function useAssistantInstallation() {
       // Create a failure response with current progress or empty progress
       const currentProgress = progress || {
         currentStep: 0,
-        totalSteps: 6,
+        totalSteps: 0,
         steps: [],
         progressGlobalState: 'waiting' as any,
       };
