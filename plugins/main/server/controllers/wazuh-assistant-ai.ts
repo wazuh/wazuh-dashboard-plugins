@@ -15,7 +15,7 @@ export class WazuhAssistantCtrl {
     request: OpenSearchDashboardsRequest<{ agentId: string }>,
     response: OpenSearchDashboardsResponseFactory,
   ) {
-    const certsDir = '/usr/share/opensearch/config/certs';
+    const certsDir = '/etc/wazuh-indexer/certs';
     const indexerUrl =
       context.core.opensearch.opensearchStart.client.config.hosts[0];
     const data = {
