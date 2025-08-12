@@ -6,7 +6,6 @@ import {
   EuiFlexItem,
   EuiText,
   EuiButtonEmpty,
-  EuiIcon,
   EuiBasicTable,
   EuiFlyout,
   EuiFlyoutHeader,
@@ -24,6 +23,8 @@ import {
 import { ModelFieldDefinition } from './types';
 import RegisterAgentCommand from './register-agent-command';
 import { useFlyout } from '../hooks/use-flyout';
+import { ModelStatus } from '../modules/model/domain/enums/model-status';
+import StatusIcon from './status-icon';
 
 interface Model {
   id: string;
@@ -31,7 +32,7 @@ interface Model {
   version: string;
   description: string;
   apiUrl: string;
-  status: 'active' | 'inactive' | 'error';
+  status: ModelStatus;
   createdAt: string;
 }
 
@@ -119,19 +120,6 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     );
   }
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'active':
-        return <EuiIcon type='dot' color='success' />;
-      case 'inactive':
-        return <EuiIcon type='dot' color='subdued' />;
-      case 'error':
-        return <EuiIcon type='dot' color='danger' />;
-      default:
-        return <EuiIcon type='dot' color='subdued' />;
-    }
-  };
-
   const handleDeleteModel = async (modelId: string) => {
     await deleteModel(modelId);
     await refresh();
@@ -160,9 +148,11 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
       field: 'status',
       name: 'Status',
       sortable: true,
-      render: (status: string) => (
+      render: (status: ModelStatus) => (
         <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
-          <EuiFlexItem grow={false}>{getStatusIcon(status)}</EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <StatusIcon status={status} />
+          </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiText size='s'>{status}</EuiText>
           </EuiFlexItem>
