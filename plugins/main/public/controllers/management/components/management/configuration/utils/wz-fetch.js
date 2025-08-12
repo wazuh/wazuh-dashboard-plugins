@@ -543,7 +543,7 @@ export const clusterNodes = async () => {
  */
 export const reloadRuleset = async (nodes = []) => {
   try {
-    nodesString = nodes.split(',');
+    const nodesString = nodes.join(',');
     const nodes_param = nodesString ? `?nodes_list=${nodesString}` : '';
 
     const result = await WzRequest.apiReq(
@@ -553,21 +553,6 @@ export const reloadRuleset = async (nodes = []) => {
     );
     return result;
   } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Reload cluster ruleset
- * @param {string[]} nodes
- * @returns {Promise<object>}
- */
-export const reloadClusterRuleset = async nodes => {
-  try {
-    return await reloadRuleset(nodes);
-  } catch (error) {
-    const message = extractMessage(error);
-    getToasts().addDanger(`Failed to reload ruleset: ${message}`);
     throw error;
   }
 };

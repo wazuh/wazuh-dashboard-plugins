@@ -25,7 +25,7 @@ import {
 import { getToasts } from '../../kibana-services';
 import {
   clusterReq,
-  reloadClusterRuleset,
+  reloadRuleset,
 } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 interface IWzReloadClusterManagerCalloutProps {
@@ -70,9 +70,12 @@ class WzReloadClusterManagerCallout extends Component<
           'Reloading ruleset across the cluster. This may take a few seconds.',
         toastLifeTimeMs: 5000,
       });
-      const { data, message } = await reloadClusterRuleset();
 
-      const nodesReloaded = data.affected_items.filter(
+      const {
+        data: { data, message },
+      } = await reloadRuleset();
+
+      const nodesReloaded = data.affected_items?.filter(
         node => !data.failed_items?.includes(node),
       );
 
@@ -82,10 +85,8 @@ class WzReloadClusterManagerCallout extends Component<
           'success',
           `Cluster reloaded in ${nodesReloaded.length} node(s)`,
           <div>
-            <p>The following nodes were reloaded successfully:</p>
-            <p>
-              <strong>{nodesReloaded.join(', ')}</strong>
-            </p>
+            <p>{message}:</p>
+            <strong>{nodesReloaded.join(', ')}</strong>
           </div>,
           10000,
         );
@@ -107,7 +108,7 @@ class WzReloadClusterManagerCallout extends Component<
               <p>
                 Problems were encountered when reloading on the following nodes:{' '}
               </p>
-              <p>{errorDetails}</p>
+              {errorDetails}
             </div>
           ),
           stack: JSON.stringify(data.failed_items),
@@ -120,7 +121,7 @@ class WzReloadClusterManagerCallout extends Component<
 
         getToasts().addError(errorObj, toastOptions);
       }
-      if (data.total_failed_items === 0) {
+      if (data.total_affected_items === 0) {
         this.props.onReloaded();
         throw new Error(`Failed to reload ruleset: ${message}`);
       }
