@@ -1,9 +1,6 @@
 import { StepExecutionState, StepResultState } from '../enums';
-import {
-  StepState,
-  InstallationProgress,
-  InstallationAIAssistantStep,
-} from '../types';
+import { StepState, InstallationProgress } from '../types';
+import { InstallationAIAssistantStep } from './installation-ai-assistant-step';
 
 export class InstallationProgressManager {
   private readonly progress: InstallationProgress;

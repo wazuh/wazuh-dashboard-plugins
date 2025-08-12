@@ -2,8 +2,8 @@ import { useState, useCallback } from 'react';
 import type {
   InstallAIDashboardAssistantDto,
   InstallationProgress,
-} from '../domain/types';
-import { InstallDashboardAssistantResponse } from '../domain/types';
+} from '../domain';
+import { InstallDashboardAssistantResponse } from '../domain';
 import { UseCases } from '../../../setup';
 import { useQuery } from '../../../hooks/use-query';
 

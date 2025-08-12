@@ -2,7 +2,7 @@ import {
   IInstallationManager,
   InstallAIDashboardAssistantDto,
   IInstallDashboardAssistantResponse,
-} from '../../domain/types';
+} from '../../domain';
 
 export const installDashboardAssistantUseCase =
   (installationOrchestrator: IInstallationManager) =>
