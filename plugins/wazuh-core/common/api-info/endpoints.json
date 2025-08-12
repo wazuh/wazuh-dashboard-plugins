@@ -1130,6 +1130,7 @@
                 "syscheck",
                 "syslog_output",
                 "aws-s3",
+                "azure-logs",
 
                 "docker-listener",
 
@@ -4517,6 +4518,7 @@
                 "syscheck",
                 "syslog_output",
                 "aws-s3",
+                "azure-logs",
 
                 "docker-listener",
 

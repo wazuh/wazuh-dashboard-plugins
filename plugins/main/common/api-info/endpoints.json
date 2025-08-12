@@ -1177,6 +1177,7 @@
                 "vulnerability-detection",
                 "indexer",
                 "aws-s3",
+                "azure-logs",
 
                 "docker-listener",
 
@@ -4669,6 +4670,7 @@
                 "vulnerability-detection",
                 "indexer",
                 "aws-s3",
+                "azure-logs",
 
                 "docker-listener",
 

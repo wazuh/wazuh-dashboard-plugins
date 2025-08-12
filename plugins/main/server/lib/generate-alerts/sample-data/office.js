@@ -10,7 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 
-module.exports.arrayOfficeGroups = ['office365'];
+module.exports.arrayOfficeGroups = [
+  'office365',
+  'AzureActiveDirectoryStsLogon',
+];
 
 module.exports.arrayLocationOffice = 'office365';
 
@@ -197,7 +200,7 @@ module.exports.officeRules = {
     data: {
       office365: {
         RecordType: 8,
-        Subscription: 'Audit.Exchange',
+        Subscription: 'Audit.AzureActiveDirectory',
       },
     },
     rule: {
@@ -206,7 +209,12 @@ module.exports.officeRules = {
       id: '91539',
       mail: false,
       firedtimes: 3,
-      groups: ['office365', 'hipaa_164.312.b', 'pci_dss_10.6.2'],
+      groups: [
+        'office365',
+        'AzureActiveDirectory',
+        'hipaa_164.312.b',
+        'pci_dss_10.6.2',
+      ],
     },
   },
   14: {
@@ -229,7 +237,7 @@ module.exports.officeRules = {
     data: {
       office365: {
         RecordType: 15,
-        Subscription: 'Audit.Exchange',
+        Subscription: 'Audit.AzureActiveDirectory',
       },
     },
     rule: {
@@ -595,11 +603,11 @@ module.exports.arrayLogs = [
     UserKey: '910ed5ca-4ecf-414c-a1be-d53511bfe1a5',
     UserType: 0,
     Version: 1,
-    Workload: 'Exchange',
+    Workload: 'AzureActiveDirectory',
     ClientIP: '190.16.9.176',
     ObjectId: '5f09333a-842c-47da-a157-57da27fcbca5',
     UserId: 'fake@email.not',
-
+    AzureActiveDirectoryEventType: 1,
     ExtendedProperties: [
       {
         Name: 'ResultStatusDetail',
@@ -669,10 +677,10 @@ module.exports.arrayLogs = [
     UserKey: 'Not Available',
     UserType: 4,
     Version: 1,
-    Workload: 'Exchange',
+    Workload: 'AzureActiveDirectory',
     ObjectId: 'f738ef14-47dc-4564-b53b-45069484ccc7',
     UserId: 'ServicePrincipal_4bf80788-0ec4-481a-ae7b-b71647bf3b57',
-
+    AzureActiveDirectoryEventType: 1,
     ExtendedProperties: [
       {
         Name: 'additionalDetails',
