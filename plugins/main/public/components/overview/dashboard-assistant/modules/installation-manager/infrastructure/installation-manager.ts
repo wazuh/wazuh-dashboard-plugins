@@ -35,18 +35,11 @@ export class InstallationManager implements IInstallationManager {
       this.onInstallationProgress,
     );
     const context = new InstallationContext();
-    let currentStep = 0;
     try {
       for (const step of steps) {
-        try {
-          progressManager.startStep(currentStep);
-          await step.execute(request, context);
-          progressManager.succeedStep(currentStep, step);
-        } catch (error) {
-          progressManager.failStep(currentStep, step, error as Error);
-          throw error;
-        }
-        currentStep++;
+        await progressManager.runStep(step, () =>
+          step.execute(request, context),
+        );
       }
 
       return {

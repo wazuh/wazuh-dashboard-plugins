@@ -7,6 +7,8 @@ import {
 
 export class InstallationProgressManager {
   private readonly progress: InstallationProgress;
+  // Internal index for the current step
+  private currentIndex = 0;
 
   constructor(
     steps: InstallationAIAssistantStep[],
@@ -29,6 +31,28 @@ export class InstallationProgressManager {
 
   public getProgress(): InstallationProgress {
     return { ...this.progress };
+  }
+
+  public async runStep(
+    step: InstallationAIAssistantStep,
+    executor: () => Promise<void>,
+  ): Promise<void> {
+    const i = this.currentIndex;
+    if (i < 0 || i >= this.progress.steps.length) {
+      throw new Error('No more steps to run');
+    }
+
+    this.startStep(i);
+    try {
+      await executor();
+      this.succeedStep(i, step);
+    } catch (err) {
+      this.failStep(i, step, err as Error);
+      throw err;
+    } finally {
+      // Advance the internal index to the next step
+      this.currentIndex = i + 1;
+    }
   }
 
   public startStep(stepIndex: number): void {
