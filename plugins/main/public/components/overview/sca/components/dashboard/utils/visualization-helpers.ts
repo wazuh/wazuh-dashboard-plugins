@@ -4,7 +4,6 @@ const core = getCore();
 
 function convertNumeralToD3Format(numeralFormat: string): string {
   const useThousands: boolean = numeralFormat.includes(',');
-  const isPercent: boolean = numeralFormat.includes('%');
   const decimalMatch: RegExpMatchArray | null =
     numeralFormat.match(/\.(0+)?(\[0+\])?/);
 
