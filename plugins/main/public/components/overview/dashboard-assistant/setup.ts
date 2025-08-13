@@ -1,4 +1,4 @@
-import { InstallationProgress } from './components';
+import { InstallationProgress } from './modules/installation-manager/domain';
 import { AgentRepository } from './modules/agent/application/ports/agent-repository';
 import { createAgentUseCase } from './modules/agent/application/use-cases/create-agent';
 import { registerAgentUseCase } from './modules/agent/application/use-cases/register-agent';

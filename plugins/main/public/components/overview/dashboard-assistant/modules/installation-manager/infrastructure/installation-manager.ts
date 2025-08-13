@@ -6,7 +6,7 @@ import {
   InstallationAIAssistantStep,
 } from '../domain';
 import { InstallationContext } from '../domain';
-import { InstallationProgressManager } from '../domain/entities/installation-progress-manager';
+import { InstallationProgressManager } from '../domain';
 import { CreateAgentStep } from './steps/create-agent-step';
 import { CreateConnectorStep } from './steps/create-connector-step';
 import { CreateModelStep } from './steps/create-model-step';
@@ -28,6 +28,7 @@ export class InstallationManager implements IInstallationManager {
       new CreateModelStep(),
       new TestModelConnectionStep(),
       new CreateAgentStep(),
+      new RegisterAgentStep(),
     ];
 
     const progressManager = new InstallationProgressManager(
@@ -49,11 +50,12 @@ export class InstallationManager implements IInstallationManager {
         data: context.toObject(),
       };
     } catch (error) {
-      const failedSteps = progressManager.getFailedSteps();
+      const progress = progressManager.getProgress();
+      const failedSteps = progress.getFailedSteps();
       return {
         success: false,
         message: `Installation failed: ${error}`,
-        progress: progressManager.getProgress(),
+        progress,
         errors: failedSteps.map(step => ({
           step: step.stepName,
           message: step.message || 'Unknown error',

@@ -10,6 +10,7 @@ export interface InstallationResult {
     connectorId?: string;
     modelId?: string;
     agentId?: string;
+    [key: string]: any;
   };
   errors?: InstallationError[];
 }

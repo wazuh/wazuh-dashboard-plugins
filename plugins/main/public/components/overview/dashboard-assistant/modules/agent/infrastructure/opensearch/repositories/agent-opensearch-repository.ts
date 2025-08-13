@@ -85,7 +85,18 @@ export class AgentOpenSearchRepository implements AgentRepository {
   }
 
   public async register(agentId: string): Promise<void> {
-    await this.httpClient.post(`/assistant/agent/register/${agentId}`);
+    // Prepare the data to be sent
+    const data = {
+      type: 'os_chat_root_agent',
+      configuration: {
+        agent_id: agentId,
+      },
+    };
+
+    await this.httpClient.proxyRequest.post.WithPut(
+      '/.plugins-ml-config/_doc/os_chat',
+      data,
+    );
   }
 
   public async getRegisterCommand(agentId: string): Promise<string> {
