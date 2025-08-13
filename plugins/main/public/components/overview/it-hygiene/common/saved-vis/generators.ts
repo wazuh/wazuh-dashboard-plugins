@@ -324,75 +324,6 @@ export const getVisStateMetricUniqueCountByField = (
   };
 };
 
-export const getVisStateMetricFilterBy = (
-  indexPatternId: string,
-  filterField: string,
-  title: string,
-  visIDPrefix: string,
-  filterValue: string = '',
-  label: string = '',
-) => {
-  return {
-    id: `${visIDPrefix}-${filterField}`,
-    title: title,
-    type: 'metric',
-    params: {
-      addLegend: false,
-      addTooltip: true,
-      metric: {
-        colorSchema: 'Green to Red',
-        colorsRange: [
-          {
-            from: 0,
-            to: 10000,
-          },
-        ],
-        invertColors: false,
-        labels: {
-          show: true,
-        },
-        metricColorMode: 'None',
-        percentageMode: false,
-        style: STYLE,
-        useRanges: false,
-      },
-      type: 'metric',
-    },
-    data: {
-      searchSource: createSearchSource(indexPatternId),
-      references: createIndexPatternReferences(indexPatternId),
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: {
-            customLabel: label,
-          },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: filterValue,
-                  language: 'kuery',
-                },
-                label: label,
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
-
 export const getVisStateHistogramBy = (
   indexPatternId: string,
   field: string,
@@ -601,6 +532,96 @@ export const getVisStateTable = (
           },
           schema: 'bucket',
         },
+      ],
+    },
+  };
+};
+
+export interface MetricVisOptions {
+  id: string;
+  title: string;
+  colorSchema?: string;
+  useRanges?: boolean;
+  style?: typeof STYLE;
+  aggsQuery?: { input: { query: string; language: string }; label: string }[];
+  metricAgg?: { type: string; params?: any };
+  colors: Record<string, string>;
+}
+
+/**
+ * Generates a visualization state object for a "metric" type chart.
+ * @doc
+ * https://eui.elastic.co/v106.0.0/docs/dataviz/types/metric-chart/
+ */
+export const getVisStateMetric = (
+  indexPatternId: string,
+  options: MetricVisOptions
+) => {
+  const {
+    id,
+    title,
+    colorSchema = 'Green to Red',
+    useRanges = false,
+    style = STYLE,
+    aggsQuery = [],
+    metricAgg = { type: 'count', params: { customLabel: 'checks' } },
+    colors = {}
+  } = options;
+
+  return {
+    id,
+    title,
+    type: 'metric',
+    uiState: {
+      vis: {
+        colors
+      }
+    },
+    params: {
+      addLegend: false,
+      addTooltip: true,
+      type: 'metric',
+      metric: {
+        colorSchema,
+        colorsRange: [
+          {
+            from: -1,
+            to: 0,
+          },
+          {
+            from: 1,
+            to: 200000000,
+          },
+        ],
+        invertColors: false,
+        labels: { show: true },
+        metricColorMode: 'Labels',
+        percentageMode: false,
+        style,
+        useRanges,
+      },
+    },
+    data: {
+      searchSource: createSearchSource(indexPatternId),
+      references: createIndexPatternReferences(indexPatternId),
+      aggs: [
+        {
+          id: '1',
+          enabled: true,
+          ...metricAgg,
+          schema: 'metric',
+        },
+        ...(aggsQuery.length
+          ? [
+            {
+              id: '2',
+              enabled: true,
+              type: 'filters',
+              params: { filters: aggsQuery },
+              schema: 'group',
+            },
+          ]
+          : []),
       ],
     },
   };

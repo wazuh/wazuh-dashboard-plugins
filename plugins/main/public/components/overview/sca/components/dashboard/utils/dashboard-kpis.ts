@@ -1,254 +1,8 @@
 import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
+import { getVisStateMetric } from '../../../../it-hygiene/common/saved-vis/generators';
 import { checkResultColors, decimalFormat } from './visualization-helpers';
 
-const getVisStateCheckResultPassed = (indexPatternId: string) => {
-  return {
-    id: 'check_result_passed',
-    title: 'Checks passed',
-    type: 'metric',
-    uiState: {
-      vis: {
-        colors: checkResultColors(),
-      },
-    },
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: true,
-        colorSchema: 'Greens',
-        metricColorMode: 'Labels',
-        colorsRange: [
-          {
-            from: -1,
-            to: 0,
-          },
-          {
-            from: 1,
-            to: 200000000,
-          },
-        ],
-        labels: { show: true },
-        invertColors: false,
-        style: {
-          bgColor: false,
-          labelColor: false,
-          subText: '',
-          fontSize: 40,
-        },
-      },
-    },
-    data: {
-      searchSource: {
-        query: { language: 'kuery', query: '' },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: { customLabel: 'checks' },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'check.result: "passed"',
-                  language: 'kuery',
-                },
-                label: 'Passed',
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
-
-const getVisStateCheckResultFailed = (indexPatternId: string) => {
-  return {
-    id: 'check_result_failed',
-    title: 'Checks failed',
-    type: 'metric',
-    uiState: {
-      vis: {
-        colors: checkResultColors(),
-      },
-    },
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Reds',
-        metricColorMode: 'Labels',
-        colorsRange: [
-          {
-            from: -1,
-            to: 0,
-          },
-          {
-            from: 1,
-            to: 200000000,
-          },
-        ],
-        labels: { show: true },
-        invertColors: false,
-        style: {
-          bgFill: '#000',
-          bgColor: false,
-          labelColor: false,
-          subText: '',
-          fontSize: 40,
-        },
-      },
-    },
-    data: {
-      searchSource: {
-        query: { language: 'kuery', query: '' },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: { customLabel: 'checks' },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'check.result: "failed"',
-                  language: 'kuery',
-                },
-                label: 'Failed',
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
-
-const getVisStateCheckResultNotRun = (indexPatternId: string) => {
-  return {
-    id: 'check_result_not_run',
-    title: 'Checks not Run',
-    type: 'metric',
-    uiState: {
-      vis: {
-        colors: checkResultColors(),
-      },
-    },
-    params: {
-      addTooltip: true,
-      addLegend: false,
-      type: 'metric',
-      metric: {
-        percentageMode: false,
-        useRanges: false,
-        colorSchema: 'Blues',
-        metricColorMode: 'Labels',
-        colorsRange: [
-          {
-            from: -1,
-            to: 0,
-          },
-          {
-            from: 1,
-            to: 200000000,
-          },
-        ],
-        labels: { show: true },
-        invertColors: false,
-        style: {
-          bgFill: '#000',
-          bgColor: false,
-          labelColor: false,
-          subText: '',
-          fontSize: 40,
-        },
-      },
-    },
-    data: {
-      searchSource: {
-        query: { language: 'kuery', query: '' },
-        filter: [],
-        index: indexPatternId,
-      },
-      references: [
-        {
-          name: 'kibanaSavedObjectMeta.searchSourceJSON.index',
-          type: 'index-pattern',
-          id: indexPatternId,
-        },
-      ],
-      aggs: [
-        {
-          id: '1',
-          enabled: true,
-          type: 'count',
-          params: { customLabel: 'checks' },
-          schema: 'metric',
-        },
-        {
-          id: '2',
-          enabled: true,
-          type: 'filters',
-          params: {
-            filters: [
-              {
-                input: {
-                  query: 'check.result: "Not run"',
-                  language: 'kuery',
-                },
-                label: 'Not run',
-              },
-            ],
-          },
-          schema: 'group',
-        },
-      ],
-    },
-  };
-};
 
 // Here we are using vega visualization: https://vega.github.io/vega/
 const checkScore = (indexPatternId: string) => ({
@@ -343,7 +97,22 @@ export const getKPIsPanel = (
       type: 'visualization',
       explicitInput: {
         id: '1',
-        savedVis: getVisStateCheckResultPassed(indexPatternId),
+        savedVis: getVisStateMetric(indexPatternId, {
+          id: 'check_result_passed',
+          title: 'Checks passed',
+          colors: checkResultColors(),
+          colorSchema: 'Greens',
+          useRanges: true,
+          aggsQuery: [
+            {
+              input: {
+                query: 'check.result: "passed"',
+                language: 'kuery',
+              },
+              label: 'Passed',
+            },
+          ]
+        }),
       },
     },
     '2': {
@@ -351,7 +120,21 @@ export const getKPIsPanel = (
       type: 'visualization',
       explicitInput: {
         id: '2',
-        savedVis: getVisStateCheckResultFailed(indexPatternId),
+        savedVis: getVisStateMetric(indexPatternId, {
+          id: 'check_result_failed',
+          title: 'Checks failed',
+          colors: checkResultColors(),
+          colorSchema: 'Reds',
+          aggsQuery: [
+            {
+              input: {
+                query: 'check.result: "failed"',
+                language: 'kuery',
+              },
+              label: 'Failed',
+            },
+          ],
+        }),
       },
     },
     '3': {
@@ -359,7 +142,21 @@ export const getKPIsPanel = (
       type: 'visualization',
       explicitInput: {
         id: '3',
-        savedVis: getVisStateCheckResultNotRun(indexPatternId),
+        savedVis: getVisStateMetric(indexPatternId, {
+          id: 'check_result_not_run',
+          title: 'Checks not run',
+          colors: checkResultColors(),
+          colorSchema: 'Blues',
+          aggsQuery: [
+            {
+              input: {
+                query: 'check.result: "Not run"',
+                language: 'kuery',
+              },
+              label: 'Not run',
+            },
+          ],
+        }),
       },
     },
     '4': {
