@@ -49,7 +49,7 @@ export const WzMenu = withWindowSize(
       super(props);
       this.state = {
         menuOpened: false,
-        currentAPI: '',
+        currentAPI: this.props.state.currentAPI || '',
         APIlist: [],
         showSelector: false,
         theresPattern: false,
@@ -156,6 +156,7 @@ export const WzMenu = withWindowSize(
       }
       newState = { ...prevProps.state, ...newState };
       if (!_.isEqual(newState, prevProps.state)) {
+        // FIXME: this will not update the state if the prevProps.state is equal to the newState, this means the component state could not be updated despite this is different to the newState
         // and the state is different from the previous one
         this.setState(newState);
       }
