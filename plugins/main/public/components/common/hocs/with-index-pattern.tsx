@@ -25,74 +25,74 @@ export const ensureIndexPatternIsCreated =
       fields: any[];
     }) => any;
   } = {}) =>
-    async ({ indexPatternID }) => {
-      try {
-        // Check the existence of related index pattern
-        const existIndexPattern = await existsIndexPattern(indexPatternID);
-        const indexPattern = existIndexPattern;
+  async ({ indexPatternID }) => {
+    try {
+      // Check the existence of related index pattern
+      const existIndexPattern = await existsIndexPattern(indexPatternID);
+      const indexPattern = existIndexPattern;
 
-        // If the index pattern does not exist, then check the existence of index
-        if (
-          existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND
-        ) {
-          // Check the existence of indices
-          const { exist, fields } = await existsIndices(indexPatternID);
+      // If the index pattern does not exist, then check the existence of index
+      if (
+        existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND
+      ) {
+        // Check the existence of indices
+        const { exist, fields } = await existsIndices(indexPatternID);
 
-          if (!exist) {
-            return {
-              ok: true,
-              data: {
-                error: {
-                  title: 'No matching indices',
-                  message: `No matching indices were found for [${indexPatternID}] index pattern.`,
-                  type: ERROR_NO_INDICES_FOUND,
-                },
+        if (!exist) {
+          return {
+            ok: true,
+            data: {
+              error: {
+                title: 'No matching indices',
+                message: `No matching indices were found for [${indexPatternID}] index pattern.`,
+                type: ERROR_NO_INDICES_FOUND,
               },
-            };
-          }
-          // Define fieldFormatMap
-          const extraAttributes = mapSavedObjectAttributesCreation
-            ? mapSavedObjectAttributesCreation({ indexPatternID, fields })
-            : {};
-
-          // If some index matches the index pattern, then create the index pattern
-          const resultCreateIndexPattern = await createIndexPattern(
-            indexPatternID,
-            fields,
-            extraAttributes,
-          );
-          if (resultCreateIndexPattern?.error) {
-            return {
-              ok: true,
-              data: {
-                error: {
-                  title: `There was a problem creating the [${indexPatternID}] index pattern`,
-                  message: resultCreateIndexPattern?.error,
-                  type: ERROR_INDEX_PATTERN_CREATION,
-                },
-              },
-            };
-          }
-        }
-        return {
-          ok: false,
-          data: {
-            indexPattern,
-          },
-        };
-      } catch (error) {
-        return {
-          ok: true,
-          data: {
-            error: {
-              title: 'There was a problem validating the data source',
-              message: error.message,
-              type: ERROR_ENSURE_INDEX_PATTERN,
             },
-          },
-        };
+          };
+        }
+        // Define fieldFormatMap
+        const extraAttributes = mapSavedObjectAttributesCreation
+          ? mapSavedObjectAttributesCreation({ indexPatternID, fields })
+          : {};
+
+        // If some index matches the index pattern, then create the index pattern
+        const resultCreateIndexPattern = await createIndexPattern(
+          indexPatternID,
+          fields,
+          extraAttributes,
+        );
+        if (resultCreateIndexPattern?.error) {
+          return {
+            ok: true,
+            data: {
+              error: {
+                title: `There was a problem creating the [${indexPatternID}] index pattern`,
+                message: resultCreateIndexPattern?.error,
+                type: ERROR_INDEX_PATTERN_CREATION,
+              },
+            },
+          };
+        }
       }
-    };
+      return {
+        ok: false,
+        data: {
+          indexPattern,
+        },
+      };
+    } catch (error) {
+      return {
+        ok: true,
+        data: {
+          error: {
+            title: 'There was a problem validating the data source',
+            message: error.message,
+            type: ERROR_ENSURE_INDEX_PATTERN,
+          },
+        },
+      };
+    }
+  };
 
 interface WithIndexPatternFromSettingDataSourceError {
   title: string;

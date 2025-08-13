@@ -340,12 +340,12 @@ export const getVisStateHorizontalBarSplitSeries = (
       };
     };
   } = {
-      uiState: {
-        vis: {
-          colors: {},
-        },
+    uiState: {
+      vis: {
+        colors: {},
       },
     },
+  },
 ) => {
   const {
     orderAggregation = 'desc',

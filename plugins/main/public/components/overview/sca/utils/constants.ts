@@ -1,5 +1,5 @@
 enum CheckResult {
-  Passed = "passed",
-  Failed = "failed",
-  NotRun = "not run",
+  Passed = 'passed',
+  Failed = 'failed',
+  NotRun = 'not run',
 }

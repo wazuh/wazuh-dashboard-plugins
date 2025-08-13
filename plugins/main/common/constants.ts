@@ -826,7 +826,10 @@ export enum HTTP_STATUS_CODES {
   NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
 
-export const MODULE_SCA_CHECK_RESULT_LABEL: Record<Uppercase<string>, { key: string, value: string }> = {
+export const MODULE_SCA_CHECK_RESULT_LABEL: Record<
+  Uppercase<string>,
+  { key: string; value: string }
+> = {
   PASSED: {
     key: 'passed',
     value: 'Passed',
@@ -837,7 +840,7 @@ export const MODULE_SCA_CHECK_RESULT_LABEL: Record<Uppercase<string>, { key: str
   },
   NOT_RUN: {
     key: 'not run',
-    value: 'Not run'
+    value: 'Not run',
   },
 } as const;
 
