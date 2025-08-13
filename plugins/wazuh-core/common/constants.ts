@@ -471,12 +471,12 @@ export type TPluginSetting = {
   requiresRestartingPluginPlatform?: boolean;
   // Define options related to the `type`.
   options?:
-    | TPluginSettingOptionsEditor
-    | TPluginSettingOptionsFile
-    | TPluginSettingOptionsNumber
-    | TPluginSettingOptionsSelect
-    | TPluginSettingOptionsSwitch
-    | TPluginSettingOptionsTextArea;
+  | TPluginSettingOptionsEditor
+  | TPluginSettingOptionsFile
+  | TPluginSettingOptionsNumber
+  | TPluginSettingOptionsSelect
+  | TPluginSettingOptionsSwitch
+  | TPluginSettingOptionsTextArea;
   // Transform the input value. The result is saved in the form global state of Settings/Configuration
   uiFormTransformChangedInputValue?: (value: any) => any;
   // Transform the configuration value or default as initial value for the input in Settings/Configuration
@@ -1631,11 +1631,20 @@ export enum HTTP_STATUS_CODES {
 }
 
 // Module Security configuration assessment
-export const MODULE_SCA_CHECK_RESULT_LABEL = {
-  passed: 'Passed',
-  failed: 'Failed',
-  'not applicable': 'Not applicable',
-};
+export const MODULE_SCA_CHECK_RESULT_LABEL: Record<Uppercase<string>, { key: string, value: string }> = {
+  PASSED: {
+    key: 'passed',
+    value: 'Passed',
+  },
+  FAILED: {
+    key: 'failed',
+    value: 'Failed',
+  },
+  NOT_RUN: {
+    key: 'not run',
+    value: 'Not run'
+  },
+} as const;
 
 // Search bar
 

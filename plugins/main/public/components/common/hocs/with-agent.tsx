@@ -14,5 +14,6 @@ const mapStateToProps = state => ({
  * @param {React.ComponentType} WrappedComponent - El componente al que se le inyectarán los datos del agente.
  * @returns {React.ComponentType} - El componente conectado con la prop `agent`.
  */
-export const withAgent = WrappedComponent =>
-  connect(mapStateToProps)(WrappedComponent);
+export const withAgent = (
+  WrappedComponent: React.ComponentType,
+): React.ComponentType => connect(mapStateToProps)(WrappedComponent);

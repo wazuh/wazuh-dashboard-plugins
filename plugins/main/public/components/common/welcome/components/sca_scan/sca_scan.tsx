@@ -27,7 +27,11 @@ import {
 import { getCore, getPlugins } from '../../../../../kibana-services';
 import { withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
-import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
+import {
+  MODULE_SCA_CHECK_RESULT_LABEL,
+  WAZUH_SCA_PATTERN,
+} from '../../../../../../common/constants';
+import { CheckResult } from '../../../../overview/sca/utils/constants';
 import { configurationAssessment } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
@@ -55,8 +59,8 @@ export const ScaScan = compose(
     state: {
       isLoading: Boolean;
       policies: any[];
-      pageIndex: 0;
-      pageSize: 5;
+      pageIndex: number;
+      pageSize: number;
     };
 
     pinnedAgentManager: PinnedAgentManager;
@@ -86,7 +90,7 @@ export const ScaScan = compose(
     async getLastPolicies(agentId: string) {
       try {
         const indexPattern = await getPlugins().data.indexPatterns.get(
-          'wazuh-states-sca-*',
+          WAZUH_SCA_PATTERN,
         );
 
         const response = await search({
@@ -132,12 +136,12 @@ export const ScaScan = compose(
             total: 0,
           };
 
-          const result = (check?.result || '').toLowerCase();
+          const result = (check?.result || '').toLowerCase() as CheckResult;
 
-          if (['passed', 'failed', 'not run'].includes(result)) {
-            if (result === 'passed') acc[key].pass++;
-            if (result === 'failed') acc[key].fail++;
-            if (result === 'not run') acc[key].not_run++;
+          if ((Object.values(CheckResult) as string[]).includes(result)) {
+            if (result === CheckResult.Passed) acc[key].pass++;
+            if (result === CheckResult.Failed) acc[key].fail++;
+            if (result === CheckResult.NotRun) acc[key].not_run++;
           }
 
           acc[key].total++;
@@ -207,17 +211,17 @@ export const ScaScan = compose(
         },
         {
           field: 'pass',
-          name: MODULE_SCA_CHECK_RESULT_LABEL.passed,
+          name: MODULE_SCA_CHECK_RESULT_LABEL.PASSED.value,
           width: '10%',
         },
         {
           field: 'fail',
-          name: MODULE_SCA_CHECK_RESULT_LABEL.failed,
+          name: MODULE_SCA_CHECK_RESULT_LABEL.FAILED.value,
           width: '10%',
         },
         {
           field: 'not_run',
-          name: MODULE_SCA_CHECK_RESULT_LABEL['not run'],
+          name: MODULE_SCA_CHECK_RESULT_LABEL.NOT_RUN.value,
           width: '10%',
         },
         {
