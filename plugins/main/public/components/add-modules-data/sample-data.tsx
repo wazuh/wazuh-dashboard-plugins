@@ -39,79 +39,16 @@ import {
   WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { malwareDetection } from '../../utils/applications';
 import {
-  amazonWebServices,
-  docker,
-  fileIntegrityMonitoring,
-  github,
-  googleCloud,
-  malwareDetection,
-  mitreAttack,
-  office365,
-  vulnerabilityDetection,
-} from '../../utils/applications';
-
-const sampleSecurityInformationApplication = [
-  fileIntegrityMonitoring.title,
-  amazonWebServices.title,
-  office365.title,
-  googleCloud.title,
-  github.title,
-  'authorization',
-  'ssh',
-  'web',
-].join(', ');
-
-const sampleThreatDetectionApplication = [
-  vulnerabilityDetection.title,
-  docker.title,
-  mitreAttack.title,
-].join(', ');
-
-const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
-
-const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
-
-const sampleSecurityConfigurationAssessment = [
-  'states of SCA',
-  'checks',
-  'policies',
-].join(', ');
-
-const sampleInventory = [
-  'groups',
-  'hardware',
-  'hotfixes',
-  'interfaces',
-  'networks',
-  'packages',
-  'ports',
-  'processes',
-  'protocols',
-  'system',
-  'users',
-].join(', ');
-
-const zipObject = (keys = [], values = []) => {
-  return keys.reduce((accumulator, key, index) => {
-    accumulator[key] = values[index];
-    return accumulator;
-  }, {});
-};
-
-const PromiseAllRecursiveObject = function (obj) {
-  const keys = Object.keys(obj);
-  return Promise.all(
-    keys.map(key => {
-      const value = obj[key];
-      // Promise.resolve(value) !== value should work, but !value.then always works
-      if (typeof value === 'object' && !value.then) {
-        return PromiseAllRecursiveObject(value);
-      }
-      return value;
-    }),
-  ).then(result => zipObject(keys, result));
-};
+  PromiseAllRecursiveObject,
+  sampleFileIntegrityMonitoring,
+  sampleInventory,
+  sampleMalwareDetection,
+  sampleSecurityConfigurationAssessment,
+  sampleSecurityInformationApplication,
+  sampleThreatDetectionApplication,
+} from './helper';
 
 export default class WzSampleData extends Component {
   categories: {
