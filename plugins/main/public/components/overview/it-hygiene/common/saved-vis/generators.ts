@@ -1,8 +1,10 @@
+import { DashboardPanelState } from 'src/plugins/dashboard/public/application';
 import { STYLE } from './constants';
 import {
   createIndexPatternReferences,
   createSearchSource,
 } from './create-saved-vis-data';
+import { EmbeddableInput } from 'src/plugins/embeddable/public';
 
 export const getVisStatePieByField = (
   indexPatternId: string,
@@ -625,4 +627,62 @@ export const getVisStateMetric = (
       ],
     },
   };
+};
+
+
+
+
+/**
+ * Table panel configuration for the dashboard table generator.
+ */
+export interface TablePanelConfig {
+  /** Unique panel ID (e.g., 't1') */
+  panelId: string;
+  /** X coordinate in the dashboard grid layout */
+  x: number;
+  /** Field name to aggregate on */
+  field: string;
+  /** Visualization title */
+  title: string;
+  /** Visualization ID prefix */
+  visIDPrefix: string;
+  /** Optional custom field label */
+  fieldCustomLabel?: string;
+}
+
+/**
+ * Creates a visualization state object for a "data table" chart.
+ * It is used on sca dashboard
+ *
+ * @param {string} indexPatternId - The ID of the OpenSearch index pattern.
+ * @param {TablePanelConfig[]} panels - Array of table panel definitions.
+ * @returns {Record<string, DashboardPanelState<EmbeddableInput>>} A mapping of panel IDs to dashboard panel states.
+ *
+ * @example
+ * const dashboardTables = createDashboardTables('my-index', [
+ *   { panelId: 't1', x: 0, field: 'agent.name', title: 'Top 5 agents', visIDPrefix: 'it-hygiene-stat', fieldCustomLabel: 'Top 5 agents' },
+ *   { panelId: 't2', x: 12, field: 'policy.name', title: 'Top 5 policies', visIDPrefix: 'sca-top-policies', fieldCustomLabel: 'Top 5 policies' },
+ * ]);
+ */
+export const getVisStateDashboardTables = (
+  indexPatternId: string,
+  panels: TablePanelConfig[]
+) => {
+  return panels.reduce((acc, { panelId, x, field, title, visIDPrefix, fieldCustomLabel }) => {
+    acc[panelId] = {
+      gridData: { w: 12, h: 12, x, y: 0, i: panelId },
+      type: 'visualization',
+      explicitInput: {
+        id: panelId,
+        savedVis: getVisStateTable(
+          indexPatternId,
+          field,
+          title,
+          visIDPrefix,
+          fieldCustomLabel ? { fieldCustomLabel } : {}
+        ),
+      },
+    };
+    return acc;
+  }, {} as Record<string, DashboardPanelState<EmbeddableInput>>);
 };
