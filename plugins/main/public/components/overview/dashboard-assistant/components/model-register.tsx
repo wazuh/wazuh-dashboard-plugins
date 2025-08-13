@@ -107,6 +107,7 @@ export const ModelRegister = ({
 
   const handleCloseDeployment = () => {
     setIsDeploymentVisible(false);
+    navigateToHomeIfCurrentApp();
   };
 
   const navigateToHomeIfCurrentApp = () => {
