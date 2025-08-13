@@ -267,7 +267,7 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
     };
   };
 
-  const { updateFileContent } = props;
+  const { updateReloadClusterManager, updateFileContent } = props;
   const columns = getColumns();
 
   /**
@@ -291,6 +291,9 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
         <UploadFilesButton
           section={SECTION_RULES_SECTION}
           showingFiles={showingFiles}
+          onSuccess={() => {
+            updateReloadClusterManager && updateReloadClusterManager();
+          }}
         />,
       );
     return buttons;
