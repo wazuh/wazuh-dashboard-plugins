@@ -9,7 +9,6 @@ import {
   vulnerabilityDetection,
 } from '../../utils/applications';
 
-
 export const sampleSecurityInformationApplication = [
   fileIntegrityMonitoring.title,
   amazonWebServices.title,
@@ -27,7 +26,9 @@ export const sampleThreatDetectionApplication = [
   mitreAttack.title,
 ].join(', ');
 
-export const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
+export const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(
+  ', ',
+);
 
 export const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
 

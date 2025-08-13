@@ -3,7 +3,6 @@ import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddab
 import { getVisStateMetric } from '../../../../it-hygiene/common/saved-vis/generators';
 import { checkResultColors, decimalFormat } from './visualization-helpers';
 
-
 // Here we are using vega visualization: https://vega.github.io/vega/
 const checkScore = (indexPatternId: string) => ({
   $schema: 'https://vega.github.io/schema/vega/v5.json',
@@ -111,7 +110,7 @@ export const getKPIsPanel = (
               },
               label: 'Passed',
             },
-          ]
+          ],
         }),
       },
     },

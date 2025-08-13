@@ -57,7 +57,7 @@ export const createBaseVisState = (
   type: string,
   params: any,
   aggs: any[],
-  indexPatternId: string
+  indexPatternId: string,
 ) => ({
   id,
   title,
@@ -99,7 +99,7 @@ export const createHorizontalBarVis = (
   title: string,
   field: string,
   fieldLabel: string,
-  indexPatternId: string
+  indexPatternId: string,
 ) =>
   createBaseVisState(
     id,
@@ -202,5 +202,5 @@ export const createHorizontalBarVis = (
         schema: 'group',
       },
     ],
-    indexPatternId
+    indexPatternId,
   );

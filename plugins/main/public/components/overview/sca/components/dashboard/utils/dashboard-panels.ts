@@ -1,6 +1,9 @@
 import { DashboardPanelState } from '../../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
-import { createBaseVisState, createHorizontalBarVis } from './visualization-helpers';
+import {
+  createBaseVisState,
+  createHorizontalBarVis,
+} from './visualization-helpers';
 
 export const getVisStateResultsByAgent = (indexPatternId: string) =>
   createHorizontalBarVis(
@@ -8,7 +11,7 @@ export const getVisStateResultsByAgent = (indexPatternId: string) =>
     'Agents by check result',
     'agent.name',
     'Agents',
-    indexPatternId
+    indexPatternId,
   );
 
 export const getVisStateCheckResultsByPolicy = (indexPatternId: string) =>
@@ -17,7 +20,7 @@ export const getVisStateCheckResultsByPolicy = (indexPatternId: string) =>
     'Policies by check result',
     'policy.name',
     'Policies',
-    indexPatternId
+    indexPatternId,
   );
 
 /**
@@ -93,15 +96,14 @@ export const getVisStatePolicyByCheckHeatmap = (indexPatternId: string) =>
         schema: 'group',
       },
     ],
-    indexPatternId
+    indexPatternId,
   );
-
 
 /**
  * Overview Dashboard Panels
  */
 export const getDashboardPanels = (
-  indexPatternId: string
+  indexPatternId: string,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }

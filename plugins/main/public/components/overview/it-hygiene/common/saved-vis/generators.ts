@@ -557,7 +557,7 @@ export interface MetricVisOptions {
  */
 export const getVisStateMetric = (
   indexPatternId: string,
-  options: MetricVisOptions
+  options: MetricVisOptions,
 ) => {
   const {
     id,
@@ -567,7 +567,7 @@ export const getVisStateMetric = (
     style = STYLE,
     aggsQuery = [],
     metricAgg = { type: 'count', params: { customLabel: 'checks' } },
-    colors = {}
+    colors = {},
   } = options;
 
   return {
@@ -576,8 +576,8 @@ export const getVisStateMetric = (
     type: 'metric',
     uiState: {
       vis: {
-        colors
-      }
+        colors,
+      },
     },
     params: {
       addLegend: false,
@@ -615,22 +615,19 @@ export const getVisStateMetric = (
         },
         ...(aggsQuery.length
           ? [
-            {
-              id: '2',
-              enabled: true,
-              type: 'filters',
-              params: { filters: aggsQuery },
-              schema: 'group',
-            },
-          ]
+              {
+                id: '2',
+                enabled: true,
+                type: 'filters',
+                params: { filters: aggsQuery },
+                schema: 'group',
+              },
+            ]
           : []),
       ],
     },
   };
 };
-
-
-
 
 /**
  * Table panel configuration for the dashboard table generator.
@@ -666,23 +663,26 @@ export interface TablePanelConfig {
  */
 export const getVisStateDashboardTables = (
   indexPatternId: string,
-  panels: TablePanelConfig[]
+  panels: TablePanelConfig[],
 ) => {
-  return panels.reduce((acc, { panelId, x, field, title, visIDPrefix, fieldCustomLabel }) => {
-    acc[panelId] = {
-      gridData: { w: 12, h: 12, x, y: 0, i: panelId },
-      type: 'visualization',
-      explicitInput: {
-        id: panelId,
-        savedVis: getVisStateTable(
-          indexPatternId,
-          field,
-          title,
-          visIDPrefix,
-          fieldCustomLabel ? { fieldCustomLabel } : {}
-        ),
-      },
-    };
-    return acc;
-  }, {} as Record<string, DashboardPanelState<EmbeddableInput>>);
+  return panels.reduce(
+    (acc, { panelId, x, field, title, visIDPrefix, fieldCustomLabel }) => {
+      acc[panelId] = {
+        gridData: { w: 12, h: 12, x, y: 0, i: panelId },
+        type: 'visualization',
+        explicitInput: {
+          id: panelId,
+          savedVis: getVisStateTable(
+            indexPatternId,
+            field,
+            title,
+            visIDPrefix,
+            fieldCustomLabel ? { fieldCustomLabel } : {},
+          ),
+        },
+      };
+      return acc;
+    },
+    {} as Record<string, DashboardPanelState<EmbeddableInput>>,
+  );
 };
