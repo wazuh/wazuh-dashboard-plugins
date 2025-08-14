@@ -4,5 +4,6 @@
   "deleteUser": false,
   "deleteRole": false,
   "deletePolicies": false,
-  "deleteRolesMapping": false
+  "deleteRolesMapping": false,
+  "subscription": "inactive"
 }
