@@ -19,15 +19,11 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_RULES_KEY } from '../../common/constants';
 import RulesetTable from '../components/ruleset-table';
 import '../../common/layout-overview.scss';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
 import { rules } from '../../../../../../utils/applications';
+import WzReloadClusterManagerCallout from '../../../../../../components/common/reload-cluster-manager-callout';
 
 function WzRulesetOverview(props) {
   const [showWarningRestart, setShowWarningRestart] = useState(false);
-
-  const updateRestartManagers = showWarningRestart => {
-    setShowWarningRestart(showWarningRestart);
-  };
 
   return (
     <EuiPage style={{ background: 'transparent' }}>
@@ -35,22 +31,19 @@ function WzRulesetOverview(props) {
         {showWarningRestart && (
           <>
             <EuiSpacer size='s' />
-            <WzRestartClusterManagerCallout
-              onRestarted={() => updateRestartManagers(false)}
-              onRestartedError={() => updateRestartManagers(true)}
+            <WzReloadClusterManagerCallout
+              onReloaded={() => setShowWarningRestart(false)}
+              onReloadedError={() => setShowWarningRestart(true)}
             />
             <EuiSpacer size='s' />
           </>
         )}
-
         <EuiFlexGroup>
           <EuiFlexItem>
             <RulesetTable
               {...props}
-              updateRestartClusterManager={showWarningRestart =>
-                updateRestartManagers(showWarningRestart)
-              }
-            />
+              updateReloadClusterManager={() => setShowWarningRestart(true)}
+            />{' '}
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>

@@ -165,6 +165,8 @@ export type Params = {
   cluster: Cluster;
   /* if true, set aws fields */
   aws: boolean;
+  /* if true, set azure fields */
+  azure: boolean;
   /* if true, set office fields */
   office: boolean;
   /* if true, set GCP fields */
