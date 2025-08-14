@@ -3,7 +3,7 @@
   "version": "4.14.1",
   "revision": "00",
   "pluginPlatform": {
-    "version": "2.19.2"
+    "version": "2.19.3"
   },
   "description": "Wazuh Core",
   "private": true,

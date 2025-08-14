@@ -115,7 +115,7 @@ const DashboardAzureComponents: React.FC = ({}) => {
               <SampleDataWarning
                 categoriesSampleData={[WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]}
               />
-              <div className='azure-dashboard-responsive'>
+              <div className='azure-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls'>
                 <DashboardByRenderer
                   input={{
                     viewMode: ViewMode.VIEW,

@@ -85,11 +85,13 @@ import {
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
   DashboardITHygiene,
+  ITHygieneBrowserExtensionsInventory,
   ITHygieneNetworksInventory,
   ITHygienePackagesInventory,
   ITHygieneProcessesInventory,
   ITHygieneSystemInventory,
   ITHygieneUsersInventory,
+  ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
 
@@ -149,7 +151,7 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  azure: {
+  microsoftGraphAPI: {
     init: 'dashboard',
     tabs: [
       {
@@ -159,10 +161,10 @@ export const ModulesDefaults = {
         component: DashboardAzure,
       },
       renderDiscoverTab({
-        moduleId: 'azure',
+        moduleId: 'microsoftGraphAPI',
         tableColumns: azureColumns,
         DataSource: AzureDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY], // TODO: Change this when sample data is available for Azure
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -556,6 +558,18 @@ export const ModulesDefaults = {
         name: 'Identity',
         buttons: [ButtonExploreAgent],
         component: ITHygieneUsersInventory,
+      },
+      {
+        id: 'services',
+        name: 'Services',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneServicesInventory,
+      },
+      {
+        id: 'browser-extensions',
+        name: 'Browser extensions',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneBrowserExtensionsInventory,
       },
     ],
     availableFor: ['manager', 'agent'],

@@ -38,7 +38,7 @@ import {
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import {
   amazonWebServices,
-  azure,
+  microsoftGraphAPI,
   docker,
   fileIntegrityMonitoring,
   github,
@@ -55,7 +55,7 @@ const sampleSecurityInformationApplication = [
   office365.title,
   googleCloud.title,
   github.title,
-  azure.title,
+  microsoftGraphAPI.title,
   'authorization',
   'ssh',
   'web',
@@ -83,6 +83,8 @@ const sampleInventory = [
   'protocols',
   'system',
   'users',
+  'services',
+  'browser extensions',
 ].join(', ');
 
 export default class WzSampleData extends Component {
