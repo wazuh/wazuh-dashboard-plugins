@@ -10,7 +10,12 @@ import {
 } from '@elastic/eui';
 import _ from 'lodash';
 import { formatUIDate } from '../../../../react-services/time-service';
-import WzRibbon from '../../../common/ribbon/ribbon';
+import {
+  IWzRibbonBody,
+  WzRibbonBody,
+  WzRibbonPanel,
+  WzRibbonTitle,
+} from '../../../common/ribbon/ribbon';
 import {
   IRibbonItem,
   RibbonItemLabel,
@@ -33,6 +38,10 @@ import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
+import {
+  PromptErrorInitializatingDataSource,
+  withDataSourceInitiated,
+} from '../../../common/hocs';
 
 interface SyscollectorMetricsProps {
   agent: Agent;
@@ -83,6 +92,12 @@ const getPlatformIcon = (agent?: Agent): React.JSX.Element => {
   }
   return <></>;
 };
+
+const RibbonBodyProtected = withDataSourceInitiated({})(
+  ({ items, 'data-test-subj': dataTestSubj }: IWzRibbonBody) => (
+    <WzRibbonBody items={items} data-test-subj={dataTestSubj}></WzRibbonBody>
+  ),
+);
 
 export const InventoryMetrics = withSystemInventoryDataSource(
   ({ agent }: SyscollectorMetricsProps) => {
@@ -149,18 +164,6 @@ export const InventoryMetrics = withSystemInventoryDataSource(
       }
     }, [itHygieneDataSource.isLoading, agent.id]);
 
-    if (
-      !isLoading &&
-      (_.isEmpty(data?.hardware) || _.isEmpty(data?.software))
-    ) {
-      return (
-        <EuiPanel paddingSize='s' style={{ margin: 16, textAlign: 'center' }}>
-          <EuiIcon type='iInCircle' /> Not enough hardware or operating system
-          information
-        </EuiPanel>
-      );
-    }
-
     const items: IRibbonItem[] = [
       {
         key: 'cores',
@@ -206,35 +209,51 @@ export const InventoryMetrics = withSystemInventoryDataSource(
     ];
 
     return (
-      <WzRibbon
-        data-test-subj='syscollector-metrics'
-        items={items}
-        title={
-          <EuiFlexGroup justifyContent='spaceBetween'>
-            <EuiFlexItem grow={false}>
-              <EuiTitle>
-                <h2>System inventory</h2>
-              </EuiTitle>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <RedirectAppLinks application={getCore().application}>
-                <EuiToolTip position='top' content={`Open ${ITHygiene.title}`}>
-                  <EuiButtonIcon
-                    iconType='popout'
-                    color='primary'
-                    className='EuiButtonIcon'
-                    href={NavigationService.getInstance().getUrlForApp(
-                      ITHygiene.id,
-                    )}
-                    aria-label={`Open ${ITHygiene.title}`}
-                  />
-                </EuiToolTip>
-              </RedirectAppLinks>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        }
-        titleAction
-      />
+      <WzRibbonPanel>
+        <WzRibbonTitle
+          title={
+            <EuiFlexGroup justifyContent='spaceBetween'>
+              <EuiFlexItem grow={false}>
+                <EuiTitle>
+                  <h2>System inventory</h2>
+                </EuiTitle>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <RedirectAppLinks application={getCore().application}>
+                  <EuiToolTip
+                    position='top'
+                    content={`Open ${ITHygiene.title}`}
+                  >
+                    <EuiButtonIcon
+                      iconType='popout'
+                      color='primary'
+                      className='EuiButtonIcon'
+                      href={NavigationService.getInstance().getUrlForApp(
+                        ITHygiene.id,
+                      )}
+                      aria-label={`Open ${ITHygiene.title}`}
+                    />
+                  </EuiToolTip>
+                </RedirectAppLinks>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          }
+        ></WzRibbonTitle>
+        {!isLoading &&
+        !itHygieneDataSource.error &&
+        (_.isEmpty(data?.hardware) || _.isEmpty(data?.software)) ? (
+          <div style={{ textAlign: 'center' }}>
+            <EuiIcon type='iInCircle' /> Not enough hardware or operating system
+            information
+          </div>
+        ) : (
+          <RibbonBodyProtected
+            items={items}
+            dataTestSubj='syscollector-metrics'
+            dataSource={itHygieneDataSource}
+          />
+        )}
+      </WzRibbonPanel>
     );
   },
 );
