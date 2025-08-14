@@ -82,6 +82,12 @@ export const WAZUH_MODULES = {
     description:
       'Configuration assessment using Center of Internet Security scanner and SCAP checks.',
   },
+  microsoftGraphAPI: {
+    title: 'Microsoft Graph API',
+    appId: 'microsoft-graph-api',
+    description:
+      'Security events related to your Microsoft Graph services, collected directly via Microsoft Graph API.',
+  },
   aws: {
     title: 'AWS',
     appId: 'amazon-web-services',

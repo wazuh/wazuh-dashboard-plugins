@@ -41,7 +41,7 @@ import {
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { malwareDetection } from '../../utils/applications';
 import {
-  PromiseAllRecursiveObject,
+  DeepPromiseResolver,
   sampleFileIntegrityMonitoring,
   sampleInventory,
   sampleMalwareDetection,
@@ -146,7 +146,7 @@ export default class WzSampleData extends Component {
   async componentDidMount() {
     try {
       // Check if sample data for each category was added
-      const results = await PromiseAllRecursiveObject(
+      const results = await DeepPromiseResolver(
         this.categories.reduce((accum, cur) => {
           accum[cur.categorySampleDataIndex] = WzRequest.genericReq(
             'GET',
