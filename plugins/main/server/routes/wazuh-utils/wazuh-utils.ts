@@ -16,8 +16,12 @@ import {
   CUSTOMIZATION_ENDPOINT_PAYLOAD_UPLOAD_CUSTOM_FILE_MAXIMUM_BYTES,
   EpluginSettingType,
 } from '../../../common/constants';
+import { WazuhCorePluginStart } from '../../../../wazuh-core/server';
 
-export function WazuhUtilsRoutes(router: IRouter, services) {
+export function WazuhUtilsRoutes(
+  router: IRouter,
+  services: WazuhCorePluginStart,
+) {
   const ctrl = new WazuhUtilsCtrl();
 
   // Returns the plugins configuration
@@ -62,7 +66,7 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
               );
             const validation = schema.object(validationSchema).validate(value);
             return response.ok(validation);
-          } catch (error) {
+          } catch (error: any) {
             return response.badRequest(error.message);
           }
         },
@@ -93,7 +97,7 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
               .object({ key: schema.oneOf(validationSchema) })
               .validate(value);
             return response.ok(validation);
-          } catch (error) {
+          } catch (error: any) {
             return response.badRequest(error.message);
           }
         },
@@ -134,7 +138,7 @@ export function WazuhUtilsRoutes(router: IRouter, services) {
               .object({ key: schema.oneOf(validationSchema) })
               .validate(value);
             return response.ok(validation);
-          } catch (error) {
+          } catch (error: any) {
             return response.badRequest(error.message);
           }
         },

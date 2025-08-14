@@ -22,6 +22,8 @@ import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
+import { AssistantOverview } from './components/overview/dashboard-assistant/overview';
+import { ModelRegister } from './components/overview/dashboard-assistant/components/model-register';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -104,6 +106,16 @@ export function Application(props) {
           path={`/${SECTIONS.BLANK_SCREEN}`}
           exact
           render={props => <WzBlankScreen {...props} />}
+        ></Route>
+        <Route
+          path={`/${SECTIONS.ASSISTANT}`}
+          exact
+          render={props => <AssistantOverview {...props} />}
+        ></Route>
+        <Route
+          path={`/${SECTIONS.ASSISTANT}/${SECTIONS.REGISTER_MODEL}`}
+          exact
+          render={props => <ModelRegister {...props} />}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>

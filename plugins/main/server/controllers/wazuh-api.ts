@@ -18,7 +18,7 @@ import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
 import { HTTP_STATUS_CODES } from '../../common/constants';
 import { addJobToQueue } from '../start/queue';
-import jwtDecode from 'jwt-decode';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
 import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
@@ -30,6 +30,7 @@ import {
   revision as pluginRevision,
 } from '../../package.json';
 import { extractErrorMessage } from '../lib/extract-error-message';
+import { WazuhCorePluginStart } from '../../../wazuh-core/server';
 
 export class WazuhApiCtrl {
   constructor() {}
@@ -61,14 +62,14 @@ export class WazuhApiCtrl {
         if (wzToken) {
           try {
             // if the current token is not a valid jwt token we ask for a new one
-            const decodedToken = jwtDecode(wzToken);
-            const expirationTime = decodedToken.exp - Date.now() / 1000;
+            const decodedToken = jwtDecode<JwtPayload>(wzToken);
+            const expirationTime = decodedToken.exp! - Date.now() / 1000;
             if (wzToken && expirationTime > 0) {
               return response.ok({
                 body: { token: wzToken },
               });
             }
-          } catch (error) {
+          } catch (error: any) {
             context.wazuh.logger.error(
               `Error decoding the API host entry token: ${error.message}`,
             );
@@ -94,7 +95,7 @@ export class WazuhApiCtrl {
         },
         body: { token },
       });
-    } catch (error) {
+    } catch (error: any) {
       const errorMessage = `Error getting the authorization token: ${extractErrorMessage(
         error,
       )}`;
@@ -174,14 +175,14 @@ export class WazuhApiCtrl {
             idChanged: request.body.idChanged || null,
           },
         });
-      } catch (error) {
+      } catch (error: any) {
         // If we have an invalid response from the Wazuh API
         throw new Error(
           responseManagerInfo.data.detail ||
             `${api.url}:${api.port} is unreachable`,
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       if (error.code === 'EPROTO') {
         return response.ok({
           body: {
@@ -226,9 +227,9 @@ export class WazuhApiCtrl {
                 request.body.idChanged = id;
                 return await this.checkStoredAPI(context, request, response);
               }
-            } catch (error) {} // eslint-disable-line
+            } catch (error: any) {} // eslint-disable-line
           }
-        } catch (error) {
+        } catch (error: any) {
           context.wazuh.logger.error(error.message || error);
           return ErrorResponse(
             error.message || error,
@@ -252,7 +253,13 @@ export class WazuhApiCtrl {
    * This perfoms a validation of API params
    * @param {Object} body API params
    */
-  validateCheckApiParams(body) {
+  validateCheckApiParams(body: {
+    username: string;
+    password: string;
+    id: string;
+    url: string;
+    port: number;
+  }) {
     if (!('username' in body)) {
       return 'Missing param: API USERNAME';
     }
@@ -309,7 +316,7 @@ export class WazuhApiCtrl {
           response,
         );
       }
-      const options = { apiHostID: request.body.id };
+      const options: Record<string, any> = { apiHostID: request.body.id };
       if (request.body.forceRefresh) {
         options['forceRefresh'] = request.body.forceRefresh;
       }
@@ -322,7 +329,7 @@ export class WazuhApiCtrl {
             {},
             options,
           );
-      } catch (error) {
+      } catch (error: any) {
         return ErrorResponse(
           `ERROR3099 - ${
             error.response?.data?.detail || 'Server not ready yet'
@@ -358,7 +365,7 @@ export class WazuhApiCtrl {
           );
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.warn(error.message || error);
 
       if (
@@ -462,13 +469,13 @@ export class WazuhApiCtrl {
       if (!isValid) {
         throw new Error('Server not ready yet');
       }
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.error(error.message || error);
       return Promise.reject(error);
     }
   }
 
-  sleep(timeMs) {
+  sleep(timeMs: number): Promise<void> {
     // eslint-disable-next-line
     return new Promise((resolve, reject) => {
       setTimeout(resolve, timeMs);
@@ -484,7 +491,14 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(context, method, path, data, id, response) {
+  async makeRequest(
+    context: { wazuh_core: WazuhCorePluginStart },
+    method: 'GET' | 'PUT' | 'POST' | 'DELETE',
+    path: string,
+    data: Record<string, any> | null,
+    id: string,
+    response: Record<string, any>,
+  ) {
     const devTools = !!(data || {}).devTools;
     try {
       let api;
@@ -492,7 +506,7 @@ export class WazuhApiCtrl {
         api = await context.wazuh_core.manageHosts.get(id, {
           excludePassword: true,
         });
-      } catch (error) {
+      } catch (error: any) {
         context.wazuh.logger.error('Could not get host credentials');
         //Can not get credentials from wazuh-hosts
         return ErrorResponse(
@@ -560,7 +574,7 @@ export class WazuhApiCtrl {
                 data,
                 options,
               );
-            } catch (error) {
+            } catch (error: any) {
               contextJob.wazuh.logger.error(
                 `An error ocurred in the delayed request: "${method} ${path}": ${
                   error.message || error
@@ -578,7 +592,7 @@ export class WazuhApiCtrl {
         try {
           const check = await this.checkDaemons(context, api, path);
           return check;
-        } catch (error) {
+        } catch (error: any) {
           const isDown = (error || {}).code === 'ECONNREFUSED';
           if (!isDown) {
             context.wazuh.logger.error(
@@ -639,7 +653,7 @@ export class WazuhApiCtrl {
       throw responseError && responseBody.detail
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the API');
-    } catch (error) {
+    } catch (error: any) {
       if (error?.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
         return ErrorResponse(
           error.message || error,
@@ -768,7 +782,7 @@ export class WazuhApiCtrl {
 
       context.wazuh.logger.debug(`Report ${tmpPath}`);
       // Real limit, regardless the user query
-      const params = { limit: 500 };
+      const params: Record<string, any> = { limit: 500 };
 
       if (filters.length) {
         for (const filter of filters) {
@@ -790,7 +804,9 @@ export class WazuhApiCtrl {
         request.body.path.includes('/lists') &&
         request.body.filters &&
         request.body.filters.length &&
-        request.body.filters.find(filter => filter._isCDBList);
+        request.body.filters.find(
+          (filter: { _isCDBList: boolean }) => filter._isCDBList,
+        );
 
       const totalItems = (((output || {}).data || {}).data || {})
         .total_affected_items;
@@ -860,7 +876,7 @@ export class WazuhApiCtrl {
           for (const list of itemsArray) {
             const { relative_dirname, items } = list;
             flatLists.push(
-              ...items.map(item => ({
+              ...items.map((item: { key: string; value: string }) => ({
                 relative_dirname,
                 key: item.key,
                 value: item.value,
@@ -875,10 +891,13 @@ export class WazuhApiCtrl {
           fields = ['key', 'value'];
           itemsArray = output.data.data.affected_items[0].items;
         }
-        fields = fields.map(item => ({ value: item, default: '-' }));
+        const mapped_fields = fields.map(item => ({
+          value: item,
+          default: '-',
+        }));
         const options = {
           emptyFieldValue: '',
-          keys: fields.map(field => ({
+          keys: mapped_fields.map(field => ({
             field: field.value,
             title: KeyEquivalence[field.value] || field.value,
           })),
@@ -905,7 +924,7 @@ export class WazuhApiCtrl {
           }`,
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(
         error.message || error,
@@ -951,7 +970,7 @@ export class WazuhApiCtrl {
           },
         },
       });
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${
@@ -993,7 +1012,7 @@ export class WazuhApiCtrl {
       return response.ok({
         body: { logos },
       });
-    } catch (error) {
+    } catch (error: any) {
       context.wazuh.logger.error(error.message || error);
       return ErrorResponse(
         error.message || error,
