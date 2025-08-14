@@ -2,6 +2,23 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.0
+- Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587)
+- Added ability to set the Wazuh data path (wazuh directory) within the directory defined through `path.data` setting [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
+- Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641)
+- Added Microsoft Graph API module [#7516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7516) [#7644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7644) [#7661](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7661)
+- Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646)
+
+### Fixed
+
+- Fixed missing provider and queue_size fields in whodata configuration [#7596](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7596)
+- Fixed an error that caused PDF report tables to overflow the page width [#7630](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7630)
+- Fixed TypeError when changing API host ID in wazuh.yml configuration [#7611](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7611)
+
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 05
 
 ### Added
@@ -13,6 +30,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added the ability to manage the sample data from FIM, IT Hygiene and vulnerabilities inventories prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
 - Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 - Add UUID field to APIs table [#7412](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7412)
+- Added the ability to manage the sample data from FIM, IT Higiene and vulnerabilities inventories and new settings to define the index names prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449)
+- Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 
 ## Changed
 

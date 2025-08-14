@@ -29,9 +29,9 @@ import { SECTION_CDBLIST_SECTION } from './constants';
 async function uploadFiles(files, resource, overwrite) {
   try {
     let errors = false;
-    let results: any[] = [];
+    const results: any[] = [];
     const resourcesHandler = new ResourcesHandler(resource);
-    for (let idx in files) {
+    for (const idx in files) {
       const { file, content } = files[idx];
       try {
         await resourcesHandler.updateFile(

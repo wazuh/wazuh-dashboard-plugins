@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import React from 'react';
 import { MainSca } from '../../agents/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
@@ -16,14 +17,12 @@ import { ComplianceTable } from '../../overview/compliance-table';
 import { ButtonModuleGenerateReport } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
-import { withModuleNotForAgent } from '../hocs';
 import {
   WazuhDiscover,
   WazuhDiscoverProps,
 } from '../wazuh-discover/wz-discover';
 import { threatHuntingColumns } from '../wazuh-discover/config/data-grid-columns';
 import { vulnerabilitiesColumns } from '../../overview/vulnerabilities/events/vulnerabilities-columns';
-import React from 'react';
 import { dockerColumns } from '../../overview/docker/events/docker-columns';
 import { googleCloudColumns } from '../../overview/google-cloud/events/google-cloud-columns';
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
@@ -38,6 +37,7 @@ import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
+import { azureColumns } from '../../overview/azure/events/azure-columns';
 import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
@@ -61,6 +61,7 @@ import {
   DashboardGoogleCloud,
   DashboardVuls,
   InventoryVuls,
+  DashboardAzure,
 } from '../../overview';
 import {
   DockerDataSource,
@@ -79,14 +80,18 @@ import {
   PCIDSSDataSource,
   Office365DataSource,
   ThreatHuntingDataSource,
+  AzureDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
   DashboardITHygiene,
+  ITHygieneBrowserExtensionsInventory,
   ITHygieneNetworksInventory,
   ITHygienePackagesInventory,
   ITHygieneProcessesInventory,
   ITHygieneSystemInventory,
+  ITHygieneUsersInventory,
+  ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
 
@@ -141,6 +146,24 @@ export const ModulesDefaults = {
         moduleId: 'fim',
         tableColumns: fileIntegrityMonitoringColumns,
         DataSource: FIMDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+      }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  microsoftGraphAPI: {
+    init: 'dashboard',
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardAzure,
+      },
+      renderDiscoverTab({
+        moduleId: 'microsoftGraphAPI',
+        tableColumns: azureColumns,
+        DataSource: AzureDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
@@ -380,7 +403,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
         ),
       },
@@ -406,7 +429,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={HIPAADataSource} />
         ),
       },
@@ -432,7 +455,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={NIST80053DataSource} />
         ),
       },
@@ -458,7 +481,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={GDPRDataSource} />
         ),
       },
@@ -484,7 +507,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Controls',
         buttons: [ButtonExploreAgent],
-        component: props => (
+        component: (props: any) => (
           <ComplianceTable {...props} DataSource={TSCDataSource} />
         ),
       },
@@ -529,6 +552,24 @@ export const ModulesDefaults = {
         name: 'Network',
         buttons: [ButtonExploreAgent],
         component: ITHygieneNetworksInventory,
+      },
+      {
+        id: 'users',
+        name: 'Identity',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneUsersInventory,
+      },
+      {
+        id: 'services',
+        name: 'Services',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneServicesInventory,
+      },
+      {
+        id: 'browser-extensions',
+        name: 'Browser extensions',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneBrowserExtensionsInventory,
       },
     ],
     availableFor: ['manager', 'agent'],
