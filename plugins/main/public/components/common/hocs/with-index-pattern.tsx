@@ -111,7 +111,7 @@ export interface WithIndexPatternFromSettingDataSourceParams {
   }>;
 }
 
-interface MapErrorTypes {
+export interface MapErrorTypes {
   default: {
     title: (title: string) => string;
     body: () => React.Node;

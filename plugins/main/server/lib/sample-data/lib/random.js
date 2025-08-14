@@ -3,6 +3,14 @@
  */
 
 /**
+ * Generate a random hexadecimal hash string
+ * @returns {string} Random hash string
+ */
+function hash() {
+  return Math.random().toString(16).substring(2, 42);
+}
+
+/**
  * Generate a random integer between min and max (inclusive)
  * @param {number} min - Minimum value
  * @param {number} max - Maximum value
@@ -119,6 +127,7 @@ function randomVersion() {
 }
 
 module.exports = {
+  hash,
   int,
   choice,
   boolean,
