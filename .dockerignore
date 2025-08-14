@@ -44,7 +44,9 @@ Thumbs.db
 
 # Git
 .git/
-.gitignore
+# Do not ignore .gitignore: ripgrep needs this file inside the container (docker/url-checks/Dockerfile)
+# to exclude the configured patterns, just like on the host machine.
+# .gitignore
 
 # Docker
 Dockerfile*

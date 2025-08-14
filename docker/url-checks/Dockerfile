@@ -11,14 +11,19 @@ RUN npm install -g tsx typescript --no-package-lock
 COPY . .
 
 # This step aims to obtain all URLs throughout the entire repository, filtering out those that correspond to examples (such as `example.org`, `sampledata`, `cors-anywhere`, among others). These URLs are excluded because they often generate errors or are simply fictitious addresses used as references.
-# For now, this step is commented out, as I couldn't properly configure the **Lychee** tool, which is a link checker. The problem is that Lychee, instead of just verifying the validity of each URL, accesses them and recursively analyzes all the links it finds within, which is not the desired behavior in this case. I have not yet found a way to limit it so that it only verifies the URL directly without following internal links.
-
-# RUN apk add --no-cache ripgrep && rg -o 'https?://[^\s"'"'"'<>()]+' plugins/ --glob '!package-lock.json' --glob '!yarn.lock' --glob '!*.test.*' | grep -vE '(\$[{(]?|github.com|github.io|stackoverflow|foo\.org|env-[0-9]\.example|localhost|w3\.org|sample-data|kibana\:|[a-z]+\:[0-9]+|cors-anywhere\.herokuapp\.com)' > links.txt
+RUN apk add --no-cache git ripgrep && \
+  # ripgrep only uses .gitignore if it detects a Git repo.
+  # Running `git init` (and/or installing Git) allows rg to apply the .gitignore rules automatically.
+  git init && \
+  # https://stackoverflow.com/a/3809435
+  rg --pcre2 -o 'https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)[\$]?' \
+  plugins/ --glob '!package-lock.json' --glob '!package.json' --glob '!yarn.lock' --glob '!*.test.*' \
+  | grep -vE '(\$[{(]?|github.com|github.io|stackoverflow|foo\.org|env-[0-9]\.example|localhost|w3\.org|sample-data|kibana\:|[a-z]+\:[0-9]+|cors-anywhere\.herokuapp\.com)|endpoints.json' > links.txt
 
 # Extract URLs
 RUN tsx scripts/url-checks/extractor.ts
 
-# Stage 2: Check URLs using Lychee
+# Stage 2: Check Doc URLs using Lychee
 FROM lycheeverse/lychee:latest AS url-doc-checker
 
 WORKDIR /app
@@ -28,3 +33,14 @@ COPY --from=url-extractor /app/scripts/url-checks/extracted-urls.md /app/extract
 
 # Default command to check URLs
 CMD ["--verbose", "--max-redirects", "0", "--format", "detailed", "--no-progress", "extracted-urls.md"]
+
+# Stage 3: Check URLs using Lychee
+FROM lycheeverse/lychee:latest AS url-checker
+
+WORKDIR /app
+
+# Copy extracted URLs from previous stage
+COPY --from=url-extractor /app/links.txt /app/links.txt
+
+# Default command to check URLs
+CMD ["--verbose", "--format", "detailed", "--no-progress", "links.txt"]
