@@ -15,15 +15,54 @@ import {
 } from '@elastic/eui';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
+import { withDataSourceInitiated, withDataSourceLoading } from '../../hocs';
+import { compose } from 'redux';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
+
+const EventsDashboard = compose(
+  withDataSourceLoading({
+    isLoadingNameProp: 'isDataSourceLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    dataSourceNameProp: 'dataSource',
+    isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceErrorNameProp: 'error',
+  }),
+)(({ dataSource, fetchFilters, timeFilter }) => {
+  return (
+    <DashboardByRenderer
+      input={{
+        viewMode: ViewMode.VIEW,
+        panels: getDashboardPanels(dataSource?.id),
+        isFullScreenMode: false,
+        filters: fetchFilters ?? [],
+        useMargins: true,
+        id: 'agent-events-count-evolution',
+        timeRange: {
+          from: timeFilter.from,
+          to: timeFilter.to,
+        },
+        title: 'Events count evolution',
+        description: 'Dashboard of Events count evolution',
+        refreshConfig: {
+          pause: false,
+          value: 15,
+        },
+        hidePanelTitles: true,
+      }}
+    />
+  );
+});
 
 export const EventsCount = () => {
   const {
     dataSource,
     fetchFilters,
     isLoading: isDataSourceLoading,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: AlertsDataSource,
     repository: new AlertsDataSourceRepository(),
@@ -44,31 +83,13 @@ export const EventsCount = () => {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='s' />
-        {!isDataSourceLoading && dataSource ? (
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getDashboardPanels(dataSource?.id),
-              isFullScreenMode: false,
-              filters: fetchFilters ?? [],
-              useMargins: true,
-              id: 'agent-events-count-evolution',
-              timeRange: {
-                from: timeFilter.from,
-                to: timeFilter.to,
-              },
-              title: 'Events count evolution',
-              description: 'Dashboard of Events count evolution',
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: true,
-            }}
-          />
-        ) : (
-          <LoadingSearchbarProgress />
-        )}
+        <EventsDashboard
+          isDataSourceLoading={isDataSourceLoading}
+          dataSource={dataSource}
+          fetchFilters={fetchFilters}
+          timeFilter={timeFilter}
+          error={error}
+        ></EventsDashboard>
       </EuiFlexItem>
     </EuiPanel>
   );
