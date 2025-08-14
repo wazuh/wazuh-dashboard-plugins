@@ -37,6 +37,7 @@
       "GET /agents/no_group",
       "GET /agents/outdated",
       "GET /agents/stats/distinct",
+      "GET /agents/summary",
       "GET /agents/summary/os",
       "GET /agents/summary/status",
       "GET /groups/{group_id}/agents",
@@ -51,11 +52,7 @@
       "resources": ["*:*:*"],
       "effect": "allow"
     },
-    "related_endpoints": [
-      "POST /agents",
-      "POST /agents/insert",
-      "POST /agents/insert/quick"
-    ]
+    "related_endpoints": ["POST /agents", "POST /agents/insert", "POST /agents/insert/quick"]
   },
   "agent:modify_group": {
     "description": "Change the group of agents",
@@ -224,10 +221,7 @@
       "resources": ["agent:id:001", "agent:id:003", "agent:group:default"],
       "effect": "deny"
     },
-    "related_endpoints": [
-      "GET /ciscat/{agent_id}/results",
-      "GET /experimental/ciscat/results"
-    ]
+    "related_endpoints": ["GET /ciscat/{agent_id}/results", "GET /experimental/ciscat/results"]
   },
   "cluster:status": {
     "description": "Check Wazuh's cluster general status",
@@ -277,11 +271,7 @@
       "resources": ["list:file:audit-keys"],
       "effect": "deny"
     },
-    "related_endpoints": [
-      "GET /lists",
-      "GET /lists/files/{filename}",
-      "GET /lists/files"
-    ]
+    "related_endpoints": ["GET /lists", "GET /lists/files/{filename}", "GET /lists/files"]
   },
   "lists:update": {
     "description": "Update or upload CDB lists files",
@@ -301,10 +291,7 @@
       "resources": ["list:file:audit-keys"],
       "effect": "deny"
     },
-    "related_endpoints": [
-      "PUT /lists/files/{filename}",
-      "DELETE /lists/files/{filename}"
-    ]
+    "related_endpoints": ["PUT /lists/files/{filename}", "DELETE /lists/files/{filename}"]
   },
   "logtest:run": {
     "description": "Run logtest tool or end a logtest session",
@@ -407,10 +394,7 @@
       "resources": ["agent:id:011"],
       "effect": "allow"
     },
-    "related_endpoints": [
-      "GET /rootcheck/{agent_id}",
-      "GET /rootcheck/{agent_id}/last_scan"
-    ]
+    "related_endpoints": ["GET /rootcheck/{agent_id}", "GET /rootcheck/{agent_id}/last_scan"]
   },
   "rootcheck:clear": {
     "description": "Clear the agents rootcheck database",
@@ -420,10 +404,7 @@
       "resources": ["agent:id:*"],
       "effect": "deny"
     },
-    "related_endpoints": [
-      "DELETE /rootcheck/{agent_id}",
-      "DELETE /experimental/rootcheck"
-    ]
+    "related_endpoints": ["DELETE /rootcheck/{agent_id}", "DELETE /experimental/rootcheck"]
   },
   "rules:read": {
     "description": "Read rules files",
@@ -459,10 +440,7 @@
       "resources": ["rule:file:0610-win-ms_logs_rules.xml"],
       "effect": "allow"
     },
-    "related_endpoints": [
-      "PUT /rules/files/{filename}",
-      "DELETE /rules/files/{filename}"
-    ]
+    "related_endpoints": ["PUT /rules/files/{filename}", "DELETE /rules/files/{filename}"]
   },
   "sca:read": {
     "description": "Access agents security configuration assessment",
@@ -472,10 +450,7 @@
       "resources": ["agent:id:*"],
       "effect": "allow"
     },
-    "related_endpoints": [
-      "GET /sca/{agent_id}",
-      "GET /sca/{agent_id}/checks/{policy_id}"
-    ]
+    "related_endpoints": ["GET /sca/{agent_id}", "GET /sca/{agent_id}/checks/{policy_id}"]
   },
   "syscheck:run": {
     "description": "Run agents syscheck scan",
@@ -495,10 +470,7 @@
       "resources": ["agent:id:011", "agent:group:us-west"],
       "effect": "allow"
     },
-    "related_endpoints": [
-      "GET /syscheck/{agent_id}",
-      "GET /syscheck/{agent_id}/last_scan"
-    ]
+    "related_endpoints": ["GET /syscheck/{agent_id}", "GET /syscheck/{agent_id}/last_scan"]
   },
   "syscheck:clear": {
     "description": "Clear the agents syscheck database",
@@ -508,10 +480,7 @@
       "resources": ["agent:id:*"],
       "effect": "deny"
     },
-    "related_endpoints": [
-      "DELETE /syscheck/{agent_id}",
-      "DELETE /experimental/syscheck"
-    ]
+    "related_endpoints": ["DELETE /syscheck/{agent_id}", "DELETE /experimental/syscheck"]
   },
   "decoders:read": {
     "description": "Read decoders files",
@@ -546,10 +515,7 @@
       "resources": ["decoder:file:local_decoder.xml"],
       "effect": "allow"
     },
-    "related_endpoints": [
-      "PUT /decoders/files/{filename}",
-      "DELETE /decoders/files/{filename}"
-    ]
+    "related_endpoints": ["PUT /decoders/files/{filename}", "DELETE /decoders/files/{filename}"]
   },
   "event:ingest": {
     "description": "Ingest events",
@@ -587,7 +553,9 @@
       "GET /syscollector/{agent_id}/os",
       "GET /syscollector/{agent_id}/packages",
       "GET /syscollector/{agent_id}/ports",
-      "GET /syscollector/{agent_id}/processes"
+      "GET /syscollector/{agent_id}/processes",
+      "GET /syscollector/{agent_id}/users",
+      "GET /syscollector/{agent_id}/groups"
     ]
   },
   "security:revoke": {
@@ -679,11 +647,7 @@
       "resources": ["*:*:*"],
       "effect": "deny"
     },
-    "related_endpoints": [
-      "POST /security/roles",
-      "POST /security/rules",
-      "POST /security/policies"
-    ]
+    "related_endpoints": ["POST /security/roles", "POST /security/rules", "POST /security/policies"]
   },
   "security:read_config": {
     "description": "Read current system security configuration",
