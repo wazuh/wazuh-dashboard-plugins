@@ -80,13 +80,6 @@ export default [
         goto: 'alerts',
         when: 'manager',
       },
-      {
-        name: 'Integrations',
-        description:
-          'Slack, VirusTotal and PagerDuty integrations with external APIs',
-        goto: 'integrations',
-        when: 'manager',
-      },
     ],
   },
   {
@@ -159,13 +152,6 @@ export default [
         description:
           'Identify changes in content, permissions, ownership, and attributes of files',
         goto: 'integrity-monitoring',
-      },
-      {
-        name: 'Agentless',
-        description:
-          'Run integrity checks on devices such as routers, firewalls and switches',
-        goto: 'agentless',
-        when: 'manager',
       },
     ],
   },

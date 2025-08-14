@@ -15,6 +15,7 @@ on:
       - 2.*
       - 3.*
       - 4.*
+      - main
     types: [opened, synchronize, reopened, ready_for_review]
 jobs:
   linter:
