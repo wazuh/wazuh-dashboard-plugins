@@ -2,6 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.2 - Revision 00
+
+### Added
+
+- Support for Wazuh 4.14.1
+
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 00
 
 ### Added
@@ -12,6 +18,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641)
 - Added Microsoft Graph API module [#7516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7516) [#7644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7644) [#7661](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7661)
 - Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646)
+
+### Changed
+
+- Improved Integrity monitoring settings terminology by clarifying file/registry labels and updating component names for better user understanding [#7639](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7639)
 
 ### Fixed
 
