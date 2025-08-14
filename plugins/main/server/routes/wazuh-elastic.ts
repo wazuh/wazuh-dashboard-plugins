@@ -13,11 +13,13 @@ import { WazuhElasticCtrl } from '../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
 import {
+  WAZUH_SAMPLE_AGENT_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
   WAZUH_SAMPLE_INVENTORY_AGENT,
+  WAZUH_SAMPLE_SERVER_STATISTICS,
   WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../common/constants';
 
@@ -25,11 +27,13 @@ export function WazuhElasticRoutes(router: IRouter) {
   const ctrl = new WazuhElasticCtrl();
   const schemaSampleAlertsCategories = schema.oneOf(
     [
+      WAZUH_SAMPLE_AGENT_MONITORING,
       WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
       WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       WAZUH_SAMPLE_INVENTORY_AGENT,
+      WAZUH_SAMPLE_SERVER_STATISTICS,
       WAZUH_SAMPLE_VULNERABILITIES,
     ].map(category => schema.literal(category)),
   );

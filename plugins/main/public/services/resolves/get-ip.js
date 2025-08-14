@@ -13,9 +13,10 @@
 import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { getDataPlugin, getSavedObjects } from '../../kibana-services';
-import { WazuhConfig } from '../../react-services/wazuh-config';
-import { getWzConfig } from './get-config';
-import { UI_LOGGER_LEVELS } from '../../../common/constants';
+import {
+  UI_LOGGER_LEVELS,
+  WAZUH_MONITORING_PATTERN,
+} from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { StatisticsDataSource } from '../../components/common/data-source/pattern/statistics';
@@ -23,11 +24,10 @@ import NavigationService from '../../react-services/navigation-service';
 
 export async function getIp() {
   const checkWazuhPatterns = async indexPatterns => {
-    const configuration = await getWzConfig(new WazuhConfig());
     const STATISTICS_PATTERN_IDENTIFIER =
       StatisticsDataSource.getIdentifierDataSourcePattern();
     const wazuhPatterns = [
-      `${configuration['wazuh.monitoring.pattern']}`,
+      WAZUH_MONITORING_PATTERN,
       STATISTICS_PATTERN_IDENTIFIER,
     ];
     return wazuhPatterns.every(pattern => {
