@@ -155,6 +155,41 @@ if [[ "$3" =~ "server-local" ]]; then
   export IMAGE_TAG="${4}"
 fi
 
+# Use dashboard from sources
+if [[ "$3" =~ "dashboard-src" ]]; then
+  profile="$3"
+
+  if [[ -z "$SRC_DASHBOARD" ]]; then
+    echo 'Define the SRC_DASHBOARD env variable pointing to the root directory of the dashboard.';
+    exit 1;
+  fi
+
+  if [[ ! -d "$SRC_DASHBOARD" ]]; then
+    echo 'The SRC_DASHBOARD env variable is not poiting to a directory.';
+    exit 1;
+  fi
+
+  if [[ -z "$SRC_SECURITY_PLUGIN" ]]; then
+    echo 'Define the SRC_SECURITY_PLUGIN env variable pointing to the root directory of the security plugin.';
+    exit 1;
+  fi
+
+  if [[ ! -d "$SRC_SECURITY_PLUGIN" ]]; then
+    echo 'The SRC_SECURITY_PLUGIN env variable is not poiting to a directory.';
+    exit 1;
+  fi
+
+  node_version_path="$SRC_DASHBOARD/.nvmrc"
+
+  if [[ ! -f "$node_version_path" ]]; then
+    echo ".nvmrc not found in $node_version_path. Did you define correctly the path to the dashboard?";
+    exit 1;
+  fi
+  echo "Loading NODE_VERSION from $node_version_path.";
+  export NODE_VERSION=$(cat $node_version_path);
+  echo "NODE_VERSION env var set as: $NODE_VERSION.";
+fi
+
 export SEC_CONFIG_PATH=/usr/share/opensearch/plugins/opensearch-security/securityconfig
 if [[ "$OSD_MAJOR" == "2.x" ]]; then
   export SEC_CONFIG_PATH=/usr/share/opensearch/config/opensearch-security

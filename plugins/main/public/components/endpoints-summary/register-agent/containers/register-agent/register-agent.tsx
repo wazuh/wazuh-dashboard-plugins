@@ -38,18 +38,13 @@ import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import {
-  enableMenu,
-  ip,
-  nestedResolve,
-  savedSearch,
-} from '../../../../../services/resolves';
+import { nestedResolve } from '../../../../../services/resolves';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { SECTIONS } from '../../../../../sections';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ nestedResolve }),
   withGlobalBreadcrumb([
     {
       text: endpointSummary.breadcrumbLabel,

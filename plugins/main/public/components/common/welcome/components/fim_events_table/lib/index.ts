@@ -11,4 +11,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export { getFimAlerts, getWazuhFilter } from './get_fim_alerts';
+export { getWazuhFilter } from './get_fim_alerts';

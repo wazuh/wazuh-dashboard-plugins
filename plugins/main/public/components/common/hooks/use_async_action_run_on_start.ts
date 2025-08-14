@@ -1,13 +1,13 @@
 import { useCallback, useState, useEffect } from 'react';
 
-type useAsyncActionRunOnStartAction<T> = (...any) => T
-type useAsyncActionRunOnStartDependencies = any[]
+type useAsyncActionRunOnStartAction<T> = (...any) => T;
+type useAsyncActionRunOnStartDependencies = any[];
 type useAsyncActionRunOnStartDependenciesReturns<T> = {
-  data: T
-  error: any
-  running: boolean
-  run: Promise<T>
-}
+  data: T | null;
+  error: any;
+  running: boolean;
+  run: Promise<T>;
+};
 
 /**
  * Get data from an asynchronous process. Manage data, error and running states while running the process. It starts with running status activated, so this is
@@ -17,29 +17,31 @@ type useAsyncActionRunOnStartDependenciesReturns<T> = {
  * @param dependencies Define the dependencies to rerun the process
  * @returns It returns data, error, run, running
  */
-export function useAsyncActionRunOnStart<T>(action: useAsyncActionRunOnStartAction<T>, dependencies: useAsyncActionRunOnStartDependencies = []): useAsyncActionRunOnStartDependenciesReturns<T>{
+export function useAsyncActionRunOnStart<T>(
+  action: useAsyncActionRunOnStartAction<T>,
+  dependencies: useAsyncActionRunOnStartDependencies = [],
+): useAsyncActionRunOnStartDependenciesReturns<T> {
   const [running, setRunning] = useState(true);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
 
   const run: Promise<T> = useCallback(async () => {
-    try{
+    try {
       setRunning(true);
       setError(null);
       setData(null);
       const data = await action(...dependencies);
       setData(data);
-    }catch(error){
+    } catch (error) {
       setError(error);
-    }finally{
+    } finally {
       setRunning(false);
-    };
-  }, [action,...dependencies]);
+    }
+  }, [action, ...dependencies]);
 
   useEffect(() => {
     run();
-  }, [action,...dependencies]);
+  }, [action, ...dependencies]);
 
-
-  return { data, error, run, running};
+  return { data, error, run, running };
 }

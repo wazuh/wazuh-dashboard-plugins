@@ -15,13 +15,194 @@ import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
-import { getHttp } from '../kibana-services';
+import { getCore, getHttp, getToasts } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
+import { first } from 'rxjs/operators';
 
 export class WzRequest {
   static wazuhConfig: any;
+
+  static async setupAPIInCookie() {
+    const currentApiDataCookie = AppState.getCurrentAPI();
+    let currentApiID;
+
+    if (currentApiDataCookie) {
+      try {
+        currentApiID = JSON.parse(currentApiDataCookie).id;
+      } catch {}
+    }
+
+    if (currentApiID) {
+      return true;
+    }
+  }
+
+  static async setupAPIHealthCheck() {
+    const { checks } = await getCore()
+      .healthCheck.status$.pipe(first())
+      .toPromise();
+    const check = checks.find(
+      ({ name, status }) =>
+        name === 'server-api:connection-compatibility' && status === 'finished',
+    );
+    if (check) {
+      const availableApiID = check?.data?.find(
+        ({ connection, compatibility }) => connection && compatibility,
+      )?.id;
+
+      if (availableApiID) {
+        // WARNING: the checkStored API can return information about another API host that is available
+        const response = await ApiCheck.checkStored(availableApiID);
+        if (response?.data?.data?.cluster_info) {
+          // WORKAROUND: this sets the API according to the return taking into account the warning
+          const apiID = response?.data?.idChanged || availableApiID;
+          AppState.setClusterInfo(response?.data?.data?.cluster_info);
+          AppState.setCurrentAPI(
+            JSON.stringify({
+              name: response?.data?.data?.cluster_info?.manager,
+              id: apiID,
+            }),
+          );
+          return true;
+        }
+      }
+    }
+  }
+
+  static async setupAPITryHosts() {
+    try {
+      const hosts = await getCore().http.get('/hosts/apis');
+
+      for (var i = 0; i < hosts.length; i++) {
+        try {
+          // WARNING: the checkStored API can return information about another API host that is available
+          const response = await ApiCheck.checkStored(hosts[i].id);
+          if (response?.data?.data?.cluster_info) {
+            // WORKAROUND: this sets the API according to the return taking into account the warning
+            const apiID = response?.data?.idChanged || hosts[i].id;
+            AppState.setClusterInfo(response?.data?.data?.cluster_info);
+            AppState.setCurrentAPI(
+              JSON.stringify({
+                name: response?.data?.data?.cluster_info?.manager,
+                id: apiID,
+              }),
+            );
+            return true;
+          }
+        } catch (err) {}
+      }
+
+      // if (hosts.length) {
+      //   for (var i = 0; i < hosts.length; i++) {
+      //     try {
+      //       checkLogger.info(`Checking API host id [${hosts[i].id}]...`);
+      //       const API = await ApiCheck.checkApi(hosts[i], true);
+      //       if (API && API.data) {
+      //         return hosts[i].id;
+      //       }
+      //     } catch (err) {
+      //       checkLogger.info(
+      //         `Could not connect to API id [${hosts[i].id}]: ${
+      //           err.message || err
+      //         }`,
+      //       );
+      //       errors.push(
+      //         `Could not connect to API id [${hosts[i].id}]: ${
+      //           err.message || err
+      //         }`,
+      //       );
+      //     }
+      //   }
+      //   if (errors.length) {
+      //     for (var j = 0; j < errors.length; j++) {
+      //       if (errors[j].includes('ERROR3099 - 405: Method Not Allowed')) {
+      //         return Promise.reject(
+      //           `No API available to connect. This may be related to a version mismatch between server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${webDocumentationLink(
+      //             PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
+      //           )}#wazuh-api-and-wazuh-app-version-mismatch-error-is-displayed.`,
+      //         );
+      //       }
+      //     }
+      //     return Promise.reject(new Error('No API available to connect'));
+      //   }
+      // }
+      // return Promise.reject(new Error('No API configuration found'));
+    } catch (error) {
+      // return Promise.reject(new Error(`Error connecting to API: ${error}`));
+    }
+  }
+
+  static async setupAPI() {
+    const methods = [
+      // this.setupAPIInCookie,
+      // this.setupAPIHealthCheck,
+      this.setupAPITryHosts,
+    ];
+
+    for (const fn of methods) {
+      const isSet = await fn.call(this);
+
+      if (isSet) {
+        return;
+      }
+    }
+
+    getToasts.add({
+      color: 'danger',
+      text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and update the page.',
+    });
+  }
+
+  static async ensureAPIisSelected() {
+    const currentApiDataCookie = AppState.getCurrentAPI();
+    let currentApiID;
+
+    if (currentApiDataCookie) {
+      try {
+        currentApiID = JSON.parse(currentApiDataCookie).id;
+      } catch {}
+    }
+
+    if (currentApiID) {
+      return;
+    }
+
+    // Get API available from health check task
+    const { checks } = await getCore()
+      .healthCheck.status$.pipe(first())
+      .toPromise();
+    const check = checks.find(
+      ({ name }) => name === 'server-api:connection-compatibility',
+    );
+
+    let apiWasSet = false;
+    if (check) {
+      const availableApiID = check?.data?.find(
+        ({ connection, compatibility }) => connection && compatibility,
+      )?.id;
+
+      if (availableApiID) {
+        const response = await ApiCheck.checkStored(availableApiID);
+        AppState.setClusterInfo(response?.data?.data?.clusterInfo);
+        AppState.setCurrentAPI(
+          JSON.stringify({
+            // TODO: fix name
+            name: 'TODO_FIX_NAME',
+            id: availableApiID,
+          }),
+        );
+        apiWasSet = true;
+      }
+    }
+
+    if (!apiWasSet) {
+      throw new Error(
+        'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status.',
+      );
+    }
+  }
 
   /**
    * Permorn a generic request
@@ -56,6 +237,7 @@ export class WzRequest {
         ? extraOptions.overwriteHeaders
         : {};
     try {
+      // await this.ensureAPIisSelected();
       if (!method || !path) {
         throw new Error('Missing parameters');
       }
@@ -98,7 +280,11 @@ export class WzRequest {
                 .getPathname()
                 .startsWith('/settings')
             ) {
-              NavigationService.getInstance().navigate('/health-check');
+              getToasts().add({
+                color: 'warning',
+                title: `API with ID [${currentApi.id}] is not available.`,
+                text: 'This could indicate a problem in the network of the server API, review or change of API host in the API host selector if configurated other hosts.',
+              });
             }
             throw new Error(error);
           }
