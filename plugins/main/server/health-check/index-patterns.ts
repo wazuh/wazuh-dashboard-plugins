@@ -376,7 +376,7 @@ export function mapFieldsFormat(expectedFields: {
 }) {
   return ({ fields }) => {
     const fieldsToMap = Object.keys(expectedFields);
-    const mappedFields = fields
+    const mappedFields = JSON.parse(fields)
       ?.filter(({ name }) => fieldsToMap.includes(name))
       .map(field => {
         const { name } = field;
