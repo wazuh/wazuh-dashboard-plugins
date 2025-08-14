@@ -5,28 +5,26 @@ import { CtiStatus, StatusCtiSubscriptionProps } from '../types';
 
 export const StatusCtiSubscription: React.FC<StatusCtiSubscriptionProps> = ({
   isActive,
-  setIsActive,
+  checkCtiStatus,
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleCheckStatus = () => {
+  const handleCheckStatus = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsActive(Math.random() > 0.5 ? CtiStatus.SUCCESS : CtiStatus.PENDING);
-    }, 2000);
+    await checkCtiStatus();
+    setIsLoading(false);
   };
 
   const statusBadge = (
     <div className='wz-margin-h'>
       <EuiHealth
         onClickAriaLabel={
-          isActive === CtiStatus.SUCCESS
+          isActive === CtiStatus.ACTIVE
             ? 'View active CTI subscription status'
             : 'View pending CTI subscription status'
         }
-        color={isActive === CtiStatus.SUCCESS ? 'success' : 'warning'}
+        color={isActive === CtiStatus.ACTIVE ? 'success' : 'warning'}
       />
     </div>
   );
@@ -39,7 +37,7 @@ export const StatusCtiSubscription: React.FC<StatusCtiSubscriptionProps> = ({
       onClick={() => setIsPopoverOpen(prevState => !prevState)}
     >
       <EuiText style={{ width: 300 }}>
-        {isActive === CtiStatus.SUCCESS ? (
+        {isActive === CtiStatus.ACTIVE ? (
           <FormattedMessage
             id='wazuhCheckUpdates.ctiSubscription.statusPopoverActive'
             defaultMessage='Your CTI subscription is active.'

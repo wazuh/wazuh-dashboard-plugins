@@ -21,17 +21,17 @@ import { CtiStatus, StatusCtiModalProps } from '../types';
 
 export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
   handleStatusModalToggle,
-  setIsActive,
+  checkCtiStatus,
   isActive,
 }) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  const handleCheckStatus = () => {
+  const handleCheckStatus = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsActive(CtiStatus.SUCCESS);
-    }, 2000);
+
+    await checkCtiStatus();
+
+    setIsLoading(false);
   };
 
   return (
@@ -84,21 +84,15 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
           </EuiDescriptionListTitle>
           <EuiDescriptionListDescription>
             {!isLoading ? (
-              isActive !== CtiStatus.INACTIVE ? (
-                <EuiBadge color='success'>
-                  <FormattedMessage
-                    id='wazuhCheckUpdates.ctiSubscription.statusActive'
-                    defaultMessage='Active'
-                  />
-                </EuiBadge>
-              ) : (
-                <EuiBadge color='warning'>
-                  <FormattedMessage
-                    id='wazuhCheckUpdates.ctiSubscription.statusInactive'
-                    defaultMessage='Pending'
-                  />
-                </EuiBadge>
-              )
+              <EuiBadge
+                color={isActive === CtiStatus.ACTIVE ? 'success' : 'warning'}
+              >
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiSubscription.statusActive'
+                  defaultMessage='{status}'
+                  values={{ status: isActive }}
+                />
+              </EuiBadge>
             ) : (
               <EuiLoadingSpinner size='m' />
             )}

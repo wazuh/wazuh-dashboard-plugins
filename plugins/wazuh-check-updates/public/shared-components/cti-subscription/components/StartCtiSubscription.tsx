@@ -2,11 +2,13 @@ import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import { EuiButtonEmpty, EuiIcon } from '@elastic/eui';
 import { LinkCtiProps } from '../types';
+import { getCore } from '../../../plugin-services';
 
 export const StartCtiSubscription: React.FC<LinkCtiProps> = ({
   handleModalToggle,
-  isNewHomePageEnable,
 }) => {
+  const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
+
   const navButtonTopRight = (
     <EuiButtonEmpty iconType='rocket' onClick={() => handleModalToggle()}>
       <FormattedMessage

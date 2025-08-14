@@ -3,26 +3,21 @@ import { Dispatch, SetStateAction } from 'react';
 export interface LinkCtiProps {
   handleModalToggle: () => void;
   handleStatusModalToggle?: () => void;
-  isNewHomePageEnable?: boolean;
 }
 
 export enum CtiStatus {
-  SUCCESS = 'success',
+  ACTIVE = 'active',
   PENDING = 'pending',
   INACTIVE = 'inactive',
 }
 
 export interface StatusCtiSubscriptionProps {
   isActive: CtiStatus;
-  setIsActive: Dispatch<SetStateAction<CtiStatus>>;
-}
-
-export interface CtiSubscriptionProps {
-  isNewHomePageEnable?: boolean;
+  checkCtiStatus: () => Promise<void>;
 }
 
 export interface StatusCtiModalProps {
   handleStatusModalToggle: () => void;
-  setIsActive: Dispatch<SetStateAction<CtiStatus>>;
+  checkCtiStatus: () => Promise<void>;
   isActive: CtiStatus;
 }
