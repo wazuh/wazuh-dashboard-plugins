@@ -27,14 +27,10 @@ import {
 } from '../lib/reporting/extended-information';
 import { ReportPrinter } from '../lib/reporting/printer';
 import {
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+  AUTHORIZED_AGENTS,
   API_NAME_AGENT_STATUS,
 } from '../../common/constants';
-import {
-  createDirectoryIfNotExists,
-  createDataDirectoryIfNotExists,
-} from '../lib/filesystem';
+
 import { agentStatusLabelByAgentStatus } from '../../common/services/wz_agent_status';
 
 export class WazuhReportingCtrl {
@@ -301,14 +297,8 @@ export class WazuhReportingCtrl {
           context.wazuh_core.configuration,
         );
 
-        createDataDirectoryIfNotExists();
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(
-          path.join(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-            context.wazuhEndpointParams.hashUsername,
-          ),
+        context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
+          `downloads/reports/${context.wazuhEndpointParams.hashUsername}`,
         );
 
         await this.renderHeader(
@@ -396,15 +386,8 @@ export class WazuhReportingCtrl {
           context.wazuh.logger.get('report-printer'),
           context.wazuh_core.configuration,
         );
-
-        createDataDirectoryIfNotExists();
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-        createDirectoryIfNotExists(
-          path.join(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-            context.wazuhEndpointParams.hashUsername,
-          ),
+        context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
+          `downloads/reports/${context.wazuhEndpointParams.hashUsername}`,
         );
 
         let tables = [];
@@ -691,16 +674,9 @@ export class WazuhReportingCtrl {
             context.wazuh.logger.get('report-printer'),
             context.wazuh_core.configuration,
           );
-          createDataDirectoryIfNotExists();
-          createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-          createDirectoryIfNotExists(
-            WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-          );
-          createDirectoryIfNotExists(
-            path.join(
-              WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-              context.wazuhEndpointParams.hashUsername,
-            ),
+
+          context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
+            `downloads/reports/${context.wazuhEndpointParams.hashUsername}`,
           );
 
           let wmodulesResponse = {};
@@ -1026,14 +1002,12 @@ export class WazuhReportingCtrl {
         request,
         context,
       );
-      createDataDirectoryIfNotExists();
-      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
-      createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
-      const userReportsDirectoryPath = path.join(
-        WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-        hashUsername,
-      );
-      createDirectoryIfNotExists(userReportsDirectoryPath);
+
+      const userReportsDirectoryPath =
+        context.wazuh_core.dataPathService.createDataDirectoryIfNotExists(
+          `downloads/reports/${hashUsername}`,
+        );
+
       context.wazuh.logger.debug(`Directory: ${userReportsDirectoryPath}`);
 
       const sortReportsByDate = (a, b) =>
@@ -1143,7 +1117,9 @@ export class WazuhReportingCtrl {
         const { username, hashUsername } =
           await context.wazuh.security.getCurrentUser(request, context);
         const userReportsDirectoryPath = path.join(
-          WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+          context.wazuh_core.dataPathService.getDataDirectoryRelative(
+            'downloads/reports',
+          ),
           hashUsername,
         );
         const filename = reportFileNameAccessor(request);

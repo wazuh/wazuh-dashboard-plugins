@@ -1,5 +1,6 @@
 import { ConfigurationStore } from './configuration-store';
 import fs from 'fs';
+import { DataPathService } from './data-path';
 
 function createMockLogger() {
   return {
@@ -9,6 +10,17 @@ function createMockLogger() {
     error: jest.fn(),
     get: () => createMockLogger(),
   };
+}
+
+function createMockDataPathService() {
+  return {
+    getConfigFilePath: jest.fn(() => '/tmp/test-config.yml'),
+    createDataDirectoryIfNotExists: jest.fn(path => {
+      if (!fs.existsSync(path)) {
+        fs.mkdirSync(path, { recursive: true });
+      }
+    }),
+  } as any;
 }
 
 beforeEach(() => {
@@ -27,21 +39,31 @@ describe(`[service] ConfigurationStore`, () => {
     ${'Give an error due to missing parameter of file'} | ${''}           | ${true}
     ${'Create instance successful'}                     | ${'config.yml'} | ${false}
   `('$title', ({ file, shouldThrowError }) => {
+    const mockDataPathService = createMockDataPathService();
+
     if (shouldThrowError) {
       expect(
         () =>
-          new ConfigurationStore(createMockLogger(), {
-            file,
-            cache_seconds: 10,
-          }),
+          new ConfigurationStore(
+            createMockLogger(),
+            {
+              file,
+              cache_seconds: 10,
+            },
+            mockDataPathService,
+          ),
       ).toThrow('File is not defined');
     } else {
       expect(
         () =>
-          new ConfigurationStore(createMockLogger(), {
-            file,
-            cache_seconds: 10,
-          }),
+          new ConfigurationStore(
+            createMockLogger(),
+            {
+              file,
+              cache_seconds: 10,
+            },
+            mockDataPathService,
+          ),
       ).not.toThrow();
     }
   });
@@ -53,10 +75,15 @@ describe(`[service] ConfigurationStore`, () => {
       ${'Ensure the file is created'}                | ${'config.yml'} | ${false}
       ${'Ensure the file is created. Already exist'} | ${'config.yml'} | ${true}
     `('$title', ({ file, createFile }) => {
-      const configurationStore = new ConfigurationStore(createMockLogger(), {
-        file,
-        cache_seconds: 10,
-      });
+      const mockDataPathService = createMockDataPathService();
+      const configurationStore = new ConfigurationStore(
+        createMockLogger(),
+        {
+          file,
+          cache_seconds: 10,
+        },
+        mockDataPathService,
+      );
 
       // Mock configuration
       configurationStore.setConfiguration({
@@ -92,10 +119,15 @@ describe(`[service] ConfigurationStore`, () => {
       ${'Update the configuration'} | ${{ key1: ['value'] }}              | ${'key1: ["default"]\nkey2: 1'}    | ${'key1: ["value"]\nkey2: 1'}
       ${'Update the configuration'} | ${{ key1: ['value'], key2: false }} | ${'key1: ["default"]\nkey2: true'} | ${'key1: ["value"]\nkey2: false'}
     `('$title', async ({ prevContent, postContent, updateSettings }) => {
-      const configurationStore = new ConfigurationStore(createMockLogger(), {
-        file: 'config.yml',
-        cache_seconds: 10,
-      });
+      const mockDataPathService = createMockDataPathService();
+      const configurationStore = new ConfigurationStore(
+        createMockLogger(),
+        {
+          file: 'config.yml',
+          cache_seconds: 10,
+        },
+        mockDataPathService,
+      );
 
       // Mock configuration
       configurationStore.setConfiguration({

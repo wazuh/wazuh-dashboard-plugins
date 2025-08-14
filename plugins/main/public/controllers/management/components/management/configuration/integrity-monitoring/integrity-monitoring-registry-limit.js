@@ -21,18 +21,18 @@ import { renderValueYesThenEnabled } from '../utils/utils';
 const mainSettings = [
   {
     field: 'enabled',
-    label: 'File limit status',
-    render: renderValueYesThenEnabled
+    label: 'Registry limit status',
+    render: renderValueYesThenEnabled,
   },
   {
     field: 'entries',
-    label: 'Maximum number of registries values to monitor'
-  }
+    label: 'Maximum number of registries values to monitor',
+  },
 ];
 
-const FILE_LIMIT_PROP = 'registry_limit'
+const REGISTRY_LIMIT_PROP = 'registry_limit';
 
-class WzConfigurationIntegrityMonitoringFileLimit extends Component {
+class WzConfigurationIntegrityMonitoringRegistryLimit extends Component {
   constructor(props) {
     super(props);
   }
@@ -43,25 +43,25 @@ class WzConfigurationIntegrityMonitoringFileLimit extends Component {
         {currentConfig &&
         currentConfig['syscheck-syscheck'] &&
         currentConfig['syscheck-syscheck'].syscheck &&
-        currentConfig['syscheck-syscheck'].syscheck[FILE_LIMIT_PROP] ? (
+        currentConfig['syscheck-syscheck'].syscheck[REGISTRY_LIMIT_PROP] ? (
           <WzConfigurationSettingsHeader
-            title="Entries limit"
-            description="Limit the maximum entries in the FIM database"
+            title='Registries limit'
+            description='Limit the maximum registries in the FIM database'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup
               config={
-                currentConfig['syscheck-syscheck'].syscheck[FILE_LIMIT_PROP]
+                currentConfig['syscheck-syscheck'].syscheck[REGISTRY_LIMIT_PROP]
               }
               items={mainSettings}
             />
           </WzConfigurationSettingsHeader>
         ) : (
-          <WzNoConfig error="not-present" help={helpLinks} />
+          <WzNoConfig error='not-present' help={helpLinks} />
         )}
       </Fragment>
     );
   }
 }
 
-export default WzConfigurationIntegrityMonitoringFileLimit;
+export default WzConfigurationIntegrityMonitoringRegistryLimit;

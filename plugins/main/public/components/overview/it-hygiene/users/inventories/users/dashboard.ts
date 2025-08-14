@@ -66,7 +66,7 @@ export const getOverviewUsersUsersTab = (indexPatternId: string) => {
       {
         metricType: 'max',
         metricField: 'user.auth_failures.count',
-        fieldCustomLabel: 'Auth failures count',
+        fieldCustomLabel: 'User name',
       },
     ),
     getVisStateHorizontalBarByField(
