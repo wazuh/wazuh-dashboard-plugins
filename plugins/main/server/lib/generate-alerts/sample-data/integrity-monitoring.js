@@ -24,7 +24,6 @@ module.exports.pathsLinux = [
   '/etc/resolv.conf',
   '/var/wazuh/queue/fim/db/fim.db-journal',
   '/var/wazuh/queue/fim/db/fim.db',
-  '/var/osquery/osquery.db/CURRENT',
   '/etc/sysconfig/network-scripts/ifcfg-eth1',
   '/etc/filebeat/fields.yml',
   '/var/log/lastlog',
@@ -36,7 +35,6 @@ module.exports.pathsLinux = [
   '/run/utmp',
   '/etc/resolv.conf',
   '/var/wazuh/queue/fim/db/fim.db',
-  '/var/osquery/osquery.db/CURRENT',
   '/run/utmp',
 ];
 module.exports.pathsWindows = [

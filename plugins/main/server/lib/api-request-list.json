@@ -749,168 +749,6 @@
         ]
       },
       {
-        "name": "/ciscat/:agent_id/results",
-        "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.ciscat_controller.get_agents_ciscat_results",
-        "description": "Return the agent's ciscat results info",
-        "summary": "Get results",
-        "tags": ["Ciscat"],
-        "args": [
-          {
-            "name": ":agent_id",
-            "description": "Agent ID. All possible values from 000 onwards",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "minLength": 3,
-              "description": "Agent ID",
-              "format": "numbers"
-            }
-          }
-        ],
-        "query": [
-          {
-            "name": "benchmark",
-            "description": "Filter by benchmark type",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "error",
-            "description": "Filter by encountered errors",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "fail",
-            "description": "Filter by failed checks",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "limit",
-            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 500,
-              "minimum": 1,
-              "maximum": 100000
-            }
-          },
-          {
-            "name": "notchecked",
-            "description": "Filter by not checked",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "offset",
-            "description": "First element to return in the collection",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 0,
-              "minimum": 0
-            }
-          },
-          {
-            "name": "pass",
-            "description": "Filter by passed checks",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "pretty",
-            "description": "Show results in human-readable format",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          },
-          {
-            "name": "profile",
-            "description": "Filter by evaluated profile",
-            "schema": {
-              "type": "string",
-              "format": "alphanumeric"
-            }
-          },
-          {
-            "name": "q",
-            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "score",
-            "description": "Filter by final score",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 0
-            }
-          },
-          {
-            "name": "search",
-            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
-            "schema": {
-              "type": "string",
-              "format": "search"
-            }
-          },
-          {
-            "name": "select",
-            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "names"
-              }
-            }
-          },
-          {
-            "name": "sort",
-            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
-            "schema": {
-              "type": "string",
-              "format": "sort"
-            }
-          },
-          {
-            "name": "unknown",
-            "description": "Filter by unknown results",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "wait_for_complete",
-            "description": "Disable timeout response",
-            "schema": {
-              "type": "boolean",
-              "default": false
-            }
-          }
-        ]
-      },
-      {
         "name": "/cluster/:node_id/configuration",
         "documentation": "https://documentation.wazuh.com/current/user-manual/api/reference.html#operation/api.controllers.cluster_controller.get_configuration_node",
         "description": "Return wazuh configuration used in node {node_id}. The 'section' and 'field' parameters will be ignored if 'raw' parameter is provided.",
@@ -984,10 +822,7 @@
                 "agent-key-polling",
                 "aws-s3",
                 "azure-logs",
-                "cis-cat",
                 "docker-listener",
-                "open-scap",
-                "osquery",
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -1243,14 +1078,11 @@
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
                 "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
                 "wazuh-modulesd:database",
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
-                "wazuh-modulesd:osquery",
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
               ]
@@ -4320,10 +4152,7 @@
                 "agent-key-polling",
                 "aws-s3",
                 "azure-logs",
-                "cis-cat",
                 "docker-listener",
-                "open-scap",
-                "osquery",
                 "syscollector",
                 "vulnerability-detector"
               ]
@@ -4573,14 +4402,11 @@
                 "wazuh-modulesd:agent-key-polling",
                 "wazuh-modulesd:aws-s3",
                 "wazuh-modulesd:azure-logs",
-                "wazuh-modulesd:ciscat",
                 "wazuh-modulesd:control",
                 "wazuh-modulesd:command",
                 "wazuh-modulesd:database",
                 "wazuh-modulesd:docker-listener",
                 "wazuh-modulesd:download",
-                "wazuh-modulesd:oscap",
-                "wazuh-modulesd:osquery",
                 "wazuh-modulesd:syscollector",
                 "wazuh-modulesd:vulnerability-detector"
               ]

@@ -16,26 +16,6 @@
             }
           },
           {
-            "cis-cat": {
-              "disabled": "yes",
-              "scan-on-start": "yes",
-              "interval": 86400,
-              "java_path": "wodles/java",
-              "ciscat_path": "wodles/ciscat",
-              "ciscat_binary": "CIS-CAT.sh",
-              "timeout": 1800
-            }
-          },
-          {
-            "osquery": {
-              "disabled": "yes",
-              "run_daemon": "yes",
-              "add_labels": "yes",
-              "log_path": "/var/log/osquery/test.log",
-              "config_path": "/etc/osquery/test.conf"
-            }
-          },
-          {
             "syscollector": {
               "disabled": "no",
               "scan-on-start": "yes",

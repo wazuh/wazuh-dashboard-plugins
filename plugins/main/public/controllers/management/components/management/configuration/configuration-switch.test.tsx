@@ -43,13 +43,7 @@ jest.mock('./alerts/alerts-labels', () => ({
 
 jest.mock('./policy-monitoring/policy-monitoring', () => () => <></>);
 
-jest.mock('./open-scap/open-scap', () => () => <></>);
-
-jest.mock('./cis-cat/cis-cat', () => () => <></>);
-
 jest.mock('./vulnerabilities/vulnerabilities', () => () => <></>);
-
-jest.mock('./osquery/osquery', () => () => <></>);
 
 jest.mock('./inventory/inventory', () => () => <></>);
 
@@ -66,8 +60,6 @@ jest.mock('./log-collection/log-collection', () => () => <></>);
 jest.mock('./integrity-monitoring/integrity-monitoring', () => () => <></>);
 
 jest.mock('./aws-s3/aws-s3', () => () => <></>);
-
-jest.mock('./azure-logs/azure-logs', () => () => <></>);
 
 jest.mock('./google-cloud-pub-sub/google-cloud-pub-sub', () => () => <></>);
 

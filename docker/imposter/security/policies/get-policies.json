@@ -135,16 +135,6 @@
         "roles": []
       },
       {
-        "id": 12,
-        "name": "ciscat_read_ciscat",
-        "policy": {
-          "actions": ["ciscat:read"],
-          "resources": ["agent:id:*"],
-          "effect": "allow"
-        },
-        "roles": [1, 2, 100]
-      },
-      {
         "id": 13,
         "name": "decoders_read_decoders",
         "policy": {

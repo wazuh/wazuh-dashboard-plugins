@@ -37,6 +37,7 @@
       "GET /agents/no_group",
       "GET /agents/outdated",
       "GET /agents/stats/distinct",
+      "GET /agents/summary",
       "GET /agents/summary/os",
       "GET /agents/summary/status",
       "GET /groups/{group_id}/agents",
@@ -587,7 +588,9 @@
       "GET /syscollector/{agent_id}/os",
       "GET /syscollector/{agent_id}/packages",
       "GET /syscollector/{agent_id}/ports",
-      "GET /syscollector/{agent_id}/processes"
+      "GET /syscollector/{agent_id}/processes",
+      "GET /syscollector/{agent_id}/users",
+      "GET /syscollector/{agent_id}/groups"
     ]
   },
   "security:revoke": {
