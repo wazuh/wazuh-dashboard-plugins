@@ -6,6 +6,7 @@ import { get } from 'lodash';
 import {
   PatternDataSource,
   tParsedIndexPattern,
+  tSearchParams,
   useDataSource,
 } from '../data-source';
 import { useAsyncActionRunOnStart } from '../hooks';
@@ -62,6 +63,25 @@ export const withDataSource =
     return <WrappedCompoment {...props} {...{ [nameProp]: dataSource }} />;
   };
 
+interface WithDataSourceFetchOnStartProps {
+  nameProp: string;
+  mapRequestParams?: (props: {
+    dataSource: any;
+    [key: string]: any;
+  }) => tSearchParams;
+  mapResponse?: (response: any, props: any) => any;
+  LoadingComponent?: React.ComponentType<{ action: any }>;
+  ErrorComponent?: React.ComponentType<{
+    action: any;
+    error: any;
+    refresh: () => void;
+  }>;
+  mapFetchActionDependencies?: (props: {
+    dataSource: any;
+    [key: string]: any;
+  }) => any[] | any[];
+}
+
 export const withDataSourceFetchOnStart =
   ({
     nameProp,
@@ -69,19 +89,31 @@ export const withDataSourceFetchOnStart =
     mapResponse,
     LoadingComponent = null,
     ErrorComponent = null,
-  }) =>
+    mapFetchActionDependencies = [],
+  }: WithDataSourceFetchOnStartProps) =>
   WrappedComponent =>
   props => {
     const dataSource = props[nameProp];
-    const fetch = useCallback(async () => {
+    const fetch = useCallback(async (...dependencies: any[]) => {
       const response = await dataSource.fetchData(
-        mapRequestParams ? mapRequestParams({ ...props, dataSource }) : {},
+        mapRequestParams
+          ? mapRequestParams({ ...props, dataSource, dependencies })
+          : {},
       );
       return mapResponse
-        ? mapResponse(response, { ...props, dataSource })
+        ? mapResponse(response, { ...props, dataSource, dependencies })
         : response;
-    }, [dataSource.isLoading]);
-    const action = useAsyncActionRunOnStart(fetch, [dataSource.isLoading]);
+    }, []);
+
+    const actionActionRunDependencies =
+      typeof mapFetchActionDependencies === 'function'
+        ? mapFetchActionDependencies({ ...props, dataSource })
+        : mapFetchActionDependencies || [];
+
+    const action = useAsyncActionRunOnStart(fetch, [
+      dataSource.isLoading,
+      ...actionActionRunDependencies,
+    ]);
 
     if (LoadingComponent && action.running) {
       return <LoadingComponent action={action} />;
@@ -108,6 +140,7 @@ export const withDataSourceFetch = ({
   nameProp = 'dataSource',
   mapRequestParams,
   mapResponse,
+  mapFetchActionDependencies,
   LoadingDataSourceComponent,
   FetchingDataComponent,
   ErrorFetchDataComponent,
@@ -115,11 +148,12 @@ export const withDataSourceFetch = ({
   DataSource: any;
   DataSourceRepositoryCreator: any;
   nameProp?: string;
-  mapRequestParams?: () => any;
-  mapResponse?: () => any;
-  LoadingDataSourceComponent: any;
-  FetchingDataComponent: any;
-  ErrorFetchDataComponent: any;
+  mapRequestParams?: WithDataSourceFetchOnStartProps['mapRequestParams'];
+  mapResponse?: WithDataSourceFetchOnStartProps['mapResponse'];
+  mapFetchActionDependencies?: WithDataSourceFetchOnStartProps['mapFetchActionDependencies'];
+  LoadingDataSourceComponent?: any;
+  FetchingDataComponent?: any;
+  ErrorFetchDataComponent?: any;
 }) =>
   compose(
     withDataSource({
@@ -142,5 +176,6 @@ export const withDataSourceFetch = ({
       mapResponse,
       LoadingComponent: FetchingDataComponent,
       ErrorComponent: ErrorFetchDataComponent,
+      mapFetchActionDependencies: mapFetchActionDependencies,
     }),
   );
