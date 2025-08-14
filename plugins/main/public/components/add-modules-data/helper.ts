@@ -1,5 +1,6 @@
 import {
   amazonWebServices,
+  microsoftGraphAPI,
   docker,
   fileIntegrityMonitoring,
   github,
@@ -15,6 +16,7 @@ export const sampleSecurityInformationApplication = [
   office365.title,
   googleCloud.title,
   github.title,
+  microsoftGraphAPI.title,
   'authorization',
   'ssh',
   'web',
@@ -50,6 +52,8 @@ export const sampleInventory = [
   'protocols',
   'system',
   'users',
+  'services',
+  'browser extensions',
 ].join(', ');
 
 /**
