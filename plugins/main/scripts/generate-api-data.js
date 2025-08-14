@@ -354,7 +354,7 @@ node ${cliFilePath} --spec https://raw.githubusercontent.com/wazuh/wazuh/main/ap
           Object.keys(endpointData).forEach(httpMethod => {
             const httpMethodUppercase = httpMethod.toUpperCase();
             const endpointMethodData = endpointData[httpMethod];
-            // description is not always present
+            // description is not always present in the endpoint data
             const { description = '', summary, tags } = endpointMethodData;
 
             const endpointMethodParameters =
