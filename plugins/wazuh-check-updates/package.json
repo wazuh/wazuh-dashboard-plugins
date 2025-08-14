@@ -36,6 +36,8 @@
     "@types/": "testing-library/user-event",
     "@types/md5": "^2.3.2",
     "@types/node-cron": "^3.0.8",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
     "@typescript-eslint/parser": "^6.2.1",
     "eslint": "^8.46.0",
