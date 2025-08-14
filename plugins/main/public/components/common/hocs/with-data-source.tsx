@@ -36,6 +36,12 @@ export const withDataSourceLoading = ({
   LoadingComponent = () => null,
 }) => withGuard(props => get(props, isLoadingNameProp), LoadingComponent);
 
+/**
+ * This has to be used in combination with withDataSourceLoading else the guard condition could cause
+ * the wrapped component is rendered
+ * @param param0
+ * @returns
+ */
 export const withDataSourceInitiated = ({
   dataSourceNameProp = 'dataSource.dataSource',
   isLoadingNameProp = 'dataSource.isLoading',
