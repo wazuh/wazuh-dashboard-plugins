@@ -23,6 +23,15 @@ const awsAlertsSummary = {
   ],
 };
 
+const azureAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ],
+};
+
 const fimAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -131,6 +140,7 @@ const dockerAlertsSummary = {
 export default {
   general: [generalAlertsSummary, generalGroupsSummary],
   aws: [awsAlertsSummary],
+  azure: [azureAlertsSummary],
   fim: [fimAlertsSummary],
   github: [githubAlertsSummary],
   hipaa: [hipaaLastAlerts],

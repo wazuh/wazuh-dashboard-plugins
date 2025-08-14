@@ -35,7 +35,7 @@ import validateConfigAfterSent from './valid-configuration';
 
 import { getToasts } from '../../../../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzRestartClusterManagerCallout from '../../../../../components/common/restart-cluster-manager-callout';
+import WzReloadClusterManagerCallout from '../../../../../components/common/reload-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';
@@ -74,8 +74,8 @@ class WzFileEditor extends Component {
       error: false,
       inputValue: '',
       initialInputValue: '',
-      showWarningRestart: false,
       isModalVisible: false,
+      showWarningRestart: false,
       initContent: content,
       content,
       name,
@@ -153,11 +153,11 @@ class WzFileEditor extends Component {
         let toastMessage;
 
         if (this.props.addingFile != false) {
-          //remove current invalid file if the file is new.
+          // remove current invalid file if the file is new.
           await this.resourcesHandler.deleteFile(name, relativeDirname);
           toastMessage = 'The new file was deleted.';
         } else {
-          //restore file to previous version
+          // restore file to previous version
           await this.resourcesHandler.updateFile(
             name,
             this.state.initContent,
@@ -173,8 +173,8 @@ class WzFileEditor extends Component {
       this.setState({ isSaving: false });
       this.goToEdit(name);
       this.setState({
-        showWarningRestart: true,
         initialInputValue: this.state.inputValue,
+        showWarningRestart: true,
         initContent: content,
       });
     } catch (error) {
@@ -396,17 +396,18 @@ class WzFileEditor extends Component {
                 <EuiSpacer size='m' />
                 {this.state.showWarningRestart && (
                   <Fragment>
-                    <WzRestartClusterManagerCallout
-                      onRestarted={() =>
+                    <WzReloadClusterManagerCallout
+                      onReloaded={() =>
                         this.setState({ showWarningRestart: false })
                       }
-                      onRestartedError={() =>
+                      onReloadedError={() =>
                         this.setState({ showWarningRestart: true })
                       }
                     />
                     <EuiSpacer size='s' />
                   </Fragment>
                 )}
+                <EuiSpacer size='m' />
                 {xmlError && (
                   <Fragment>
                     <span style={{ color: 'red' }}> {xmlError}</span>

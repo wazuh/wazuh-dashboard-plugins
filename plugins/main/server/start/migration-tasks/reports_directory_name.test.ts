@@ -1,17 +1,22 @@
 import fs from 'fs';
 import md5 from 'md5';
-import { execSync } from 'child_process';
 import path from 'path';
-import {
-  WAZUH_DATA_ABSOLUTE_PATH,
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-} from '../../../common/constants';
-import {
-  createDataDirectoryIfNotExists,
-  createDirectoryIfNotExists,
-} from '../../lib/filesystem';
+import { execSync } from 'child_process';
 import migrateReportsDirectoryName, { isMD5 } from './reports_directory_name';
+
+// Mock the DataPathService for tests
+const mockDataPathService = {
+  getWazuhPath: () => '/tmp/wazuh',
+  getConfigPath: () => '/tmp/wazuh/config',
+  getDownloadsPath: () => '/tmp/wazuh/downloads',
+  getDataDirectoryRelative: (directory?: string) =>
+    `/tmp/wazuh/${directory || ''}`,
+  createDataDirectoryIfNotExists: jest.fn(path => {
+    if (!fs.existsSync(path)) {
+      fs.mkdirSync(path, { recursive: true });
+    }
+  }),
+};
 
 function mockContextCreator(loggerLevel: string) {
   const logs = [];
@@ -37,6 +42,9 @@ function mockContextCreator(loggerLevel: string) {
         debug: createLogger('debug'),
       },
     },
+    wazuh_core: {
+      dataPathService: mockDataPathService,
+    },
     /* Mocked logs getter. It is only for testing purpose.*/
     _getLogs(logLevel: string) {
       return logLevel ? logs.filter(({ level }) => level === logLevel) : logs;
@@ -47,27 +55,45 @@ function mockContextCreator(loggerLevel: string) {
 
 beforeAll(() => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists();
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getWazuhPath(),
+  );
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-  createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getDownloadsPath(),
+  );
+  // Note: We don't create the reports directory here because the first test
+  // expects it to not exist
 });
 
 afterAll(() => {
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
+  execSync(`rm -rf ${mockDataPathService.getWazuhPath()}`);
+  // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
 });
 
 describe("[migration] `reports` directory doesn't exist", () => {
   let mockContext = mockContextCreator('debug');
 
+  beforeEach(() => {
+    // Ensure the reports directory doesn't exist for this test
+    const reportsPath =
+      mockDataPathService.getDataDirectoryRelative('downloads/reports');
+    if (fs.existsSync(reportsPath)) {
+      execSync(`rm -rf ${reportsPath}`);
+    }
+  });
+
   it("Debug mode - Task started and skipped because of the `reports` directory doesn't exit", () => {
     // Migrate the directories
     migrateReportsDirectoryName(mockContext);
-    // Logs that the task started and skipped.
+
     expect(
       mockContext
         ._getLogs('debug')
-        .filter(({ message }) => message.includes('Task started')),
+        .filter(({ message }) =>
+          message.includes('Task started: Migrate reports directory name'),
+        ),
     ).toHaveLength(1);
     expect(
       mockContext
@@ -87,12 +113,18 @@ describe('[migration] Rename the subdirectories of `reports` directory', () => {
   beforeEach(() => {
     mockContext = mockContextCreator('info');
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+    mockDataPathService.createDataDirectoryIfNotExists(
+      mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+    );
   });
 
   afterEach(() => {
     mockContext = null;
-    execSync(`rm -rf ${WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH}`);
+    execSync(
+      `rm -rf ${mockDataPathService.getDataDirectoryRelative(
+        'downloads/reports',
+      )}`,
+    );
   });
 
   const userNameDirectory1 = { name: 'user1', files: 0 };
@@ -164,15 +196,20 @@ describe('[migration] Rename the subdirectories of `reports` directory', () => {
         foundRequireRenamingDirectories - renamedDirectories;
       // Create directories and file/s within directory.
       directories.forEach(({ name, files }) => {
-        createDirectoryIfNotExists(
-          path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, name),
+        mockDataPathService.createDataDirectoryIfNotExists(
+          path.join(
+            mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+            name,
+          ),
         );
         if (files) {
           Array.from(Array(files).keys()).forEach(indexFile => {
             fs.closeSync(
               fs.openSync(
                 path.join(
-                  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+                  mockDataPathService.getDataDirectoryRelative(
+                    'downloads/reports',
+                  ),
                   name,
                   `report_${indexFile}.pdf`,
                 ),
@@ -214,7 +251,12 @@ describe('[migration] Rename the subdirectories of `reports` directory', () => {
             // If directory name is a valid MD5, the directory should exist.
             expect(
               fs.existsSync(
-                path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, name),
+                path.join(
+                  mockDataPathService.getDataDirectoryRelative(
+                    'downloads/reports',
+                  ),
+                  name,
+                ),
               ),
             ).toBe(true);
           } else {
@@ -238,14 +280,21 @@ describe('[migration] Rename the subdirectories of `reports` directory', () => {
             expect(
               fs.existsSync(
                 path.join(
-                  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
+                  mockDataPathService.getDataDirectoryRelative(
+                    'downloads/reports',
+                  ),
                   md5(name),
                 ),
               ),
             ).toBe(true);
             expect(
               !fs.existsSync(
-                path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, name),
+                path.join(
+                  mockDataPathService.getDataDirectoryRelative(
+                    'downloads/reports',
+                  ),
+                  name,
+                ),
               ),
             ).toBe(true);
           }
@@ -269,12 +318,22 @@ describe('[migration] Rename the subdirectories of `reports` directory', () => {
           ).toBe(true);
           expect(
             fs.existsSync(
-              path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, name),
+              path.join(
+                mockDataPathService.getDataDirectoryRelative(
+                  'downloads/reports',
+                ),
+                name,
+              ),
             ),
           ).toBe(true);
           expect(
             fs.existsSync(
-              path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, md5(name)),
+              path.join(
+                mockDataPathService.getDataDirectoryRelative(
+                  'downloads/reports',
+                ),
+                md5(name),
+              ),
             ),
           ).toBe(true);
         }

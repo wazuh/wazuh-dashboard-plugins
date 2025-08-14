@@ -144,6 +144,57 @@ export class ReportPrinter {
     this._printer = new PdfPrinter(fonts);
     this._content = [];
   }
+
+  private processLongText(text: string, maxLength: number = 60): string {
+    if (!text || typeof text !== 'string') {
+      return text || '-';
+    }
+
+    if (text.length <= maxLength) {
+      return text;
+    }
+
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+
+    for (const word of words) {
+      if (
+        currentLine.length + (currentLine.length > 0 ? 1 : 0) + word.length >
+        maxLength
+      ) {
+        if (currentLine.length > 0) {
+          lines.push(currentLine);
+          currentLine = '';
+        }
+
+        if (word.length > maxLength) {
+          const chunks = [];
+          for (let i = 0; i < word.length; i += maxLength) {
+            chunks.push(word.slice(i, i + maxLength));
+          }
+          for (let i = 0; i < chunks.length - 1; i++) {
+            lines.push(chunks[i]);
+          }
+          currentLine = chunks[chunks.length - 1];
+        } else {
+          currentLine = word;
+        }
+      } else {
+        if (currentLine.length > 0) {
+          currentLine += ' ' + word;
+        } else {
+          currentLine = word;
+        }
+      }
+    }
+
+    if (currentLine.length > 0) {
+      lines.push(currentLine);
+    }
+
+    return lines.join('\n');
+  }
   addContent(...content: any) {
     this._content.push(...content);
     return this;
@@ -174,7 +225,10 @@ export class ReportPrinter {
         const full_body = [];
 
         const modifiedRows = rows.map(row =>
-          row.map(cell => ({ text: cell || '-', style: 'standard' })),
+          row.map(cell => ({
+            text: this.processLongText(cell || '-'),
+            style: 'standard',
+          })),
         );
         // for (const row of rows) {
         //   modifiedRows.push(
@@ -267,7 +321,10 @@ export class ReportPrinter {
         TimSort.sort(rows, sortTableRows);
 
         const modifiedRows = rows.map(row =>
-          row.map(cell => ({ text: cell || '-', style: 'standard' })),
+          row.map(cell => ({
+            text: this.processLongText(cell || '-'),
+            style: 'standard',
+          })),
         );
 
         // the width of the columns is assigned
@@ -506,7 +563,9 @@ export class ReportPrinter {
       return columns.map(column => {
         const cellValue = item[column.id];
         return {
-          text: typeof cellValue !== 'undefined' ? cellValue : '-',
+          text: this.processLongText(
+            typeof cellValue !== 'undefined' ? String(cellValue) : '-',
+          ),
           style: 'standard',
         };
       });

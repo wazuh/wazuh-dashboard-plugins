@@ -267,7 +267,7 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
     };
   };
 
-  const { updateRestartClusterManager, updateFileContent } = props;
+  const { updateReloadClusterManager, updateFileContent } = props;
   const columns = getColumns();
 
   /**
@@ -292,7 +292,7 @@ function RulesetTable({ setShowingFiles, showingFiles, ...props }) {
           section={SECTION_RULES_SECTION}
           showingFiles={showingFiles}
           onSuccess={() => {
-            updateRestartClusterManager && updateRestartClusterManager();
+            updateReloadClusterManager && updateReloadClusterManager();
           }}
         />,
       );

@@ -145,7 +145,7 @@ function CDBListsTable(props) {
     }
   };
 
-  const { updateRestartClusterManager, updateListContent } = props;
+  const { updateReloadClusterManager, updateListContent } = props;
   const columns = getColumns();
 
   /**
@@ -171,7 +171,7 @@ function CDBListsTable(props) {
       section={SECTION_CDBLIST_SECTION}
       showingFiles={showingFiles}
       onSuccess={() => {
-        updateRestartClusterManager && updateRestartClusterManager();
+        updateReloadClusterManager && updateReloadClusterManager();
       }}
     />,
   ];

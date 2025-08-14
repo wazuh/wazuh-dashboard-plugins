@@ -10,18 +10,24 @@ import { WazuhReportingRoutes } from './wazuh-reporting';
 import { WazuhUtilsCtrl } from '../controllers/wazuh-utils/wazuh-utils';
 import md5 from 'md5';
 import path from 'path';
-import {
-  createDataDirectoryIfNotExists,
-  createDirectoryIfNotExists,
-} from '../lib/filesystem';
-import {
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-  WAZUH_DATA_ABSOLUTE_PATH,
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-} from '../../common/constants';
-import { execSync } from 'child_process';
 import fs from 'fs';
+import { execSync } from 'child_process';
+
+// Mock the DataPathService for tests
+const mockDataPathService = {
+  getWazuhPath: () => '/tmp/wazuh',
+  getConfigPath: () => '/tmp/wazuh/config',
+  getDownloadsPath: () => '/tmp/wazuh/downloads',
+  getDataDirectoryRelative: (directory?: string) =>
+    `/tmp/wazuh/${directory || ''}`,
+  createDataDirectoryIfNotExists: jest.fn(path => {
+    const absolutePath = `/tmp/wazuh/${path || ''}`;
+    if (!fs.existsSync(absolutePath)) {
+      fs.mkdirSync(absolutePath, { recursive: true });
+    }
+    return absolutePath;
+  }),
+};
 
 jest.mock('../lib/reporting/extended-information', () => ({
   extendedInformation: jest.fn(),
@@ -32,7 +38,7 @@ const logger = loggingService.get();
 const context = {
   wazuh: {
     security: {
-      getCurrentUser: request => {
+      getCurrentUser: async request => {
         // x-test-username header doesn't exist when the platform or plugin are running.
         // It is used to generate the output of this method so we can simulate the user
         // that does the request to the endpoint and is expected by the endpoint handlers
@@ -57,6 +63,7 @@ const context = {
     },
   },
   wazuh_core: {
+    dataPathService: mockDataPathService,
     configuration: {
       _settings: new Map(),
       logger: {
@@ -82,10 +89,14 @@ let server, innerServer;
 // BEFORE ALL
 beforeAll(async () => {
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  createDataDirectoryIfNotExists();
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getWazuhPath(),
+  );
 
   // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/config directory.
-  createDirectoryIfNotExists(WAZUH_DATA_CONFIG_DIRECTORY_PATH);
+  mockDataPathService.createDataDirectoryIfNotExists(
+    mockDataPathService.getConfigPath(),
+  );
 
   // Create server
   const config = {
@@ -136,7 +147,7 @@ afterAll(async () => {
   jest.clearAllMocks();
 
   // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-  execSync(`rm -rf ${WAZUH_DATA_ABSOLUTE_PATH}`);
+  execSync(`rm -rf ${mockDataPathService.getWazuhPath()}`);
 });
 
 describe('[endpoint] GET /reports', () => {
@@ -146,32 +157,35 @@ describe('[endpoint] GET /reports', () => {
   ];
   beforeAll(() => {
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh directory.
-    createDataDirectoryIfNotExists();
+    mockDataPathService.createDataDirectoryIfNotExists(
+      mockDataPathService.getWazuhPath(),
+    );
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH);
+    mockDataPathService.createDataDirectoryIfNotExists(
+      mockDataPathService.getDownloadsPath(),
+    );
 
     // Create <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads/reports directory.
-    createDirectoryIfNotExists(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH);
+    mockDataPathService.createDataDirectoryIfNotExists(
+      mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+    );
 
     // Create directories and file/s within directory.
     directories.forEach(({ username, files }) => {
       const hashUsername = md5(username);
-      createDirectoryIfNotExists(
-        path.join(WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH, hashUsername),
+      // Create user directory using relative path
+      mockDataPathService.createDataDirectoryIfNotExists(
+        `downloads/reports/${hashUsername}`,
       );
       if (files) {
         Array.from(Array(files).keys()).forEach(indexFile => {
-          fs.closeSync(
-            fs.openSync(
-              path.join(
-                WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH,
-                hashUsername,
-                `report_${indexFile}.pdf`,
-              ),
-              'w',
-            ),
+          const filePath = path.join(
+            mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+            hashUsername,
+            `report_${indexFile}.pdf`,
           );
+          fs.closeSync(fs.openSync(filePath, 'w'));
         });
       }
     });
@@ -179,7 +193,7 @@ describe('[endpoint] GET /reports', () => {
 
   afterAll(async () => {
     // Remove <PLUGIN_PLATFORM_PATH>/data/wazuh/downloads directory.
-    execSync(`rm -rf ${WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH}`);
+    execSync(`rm -rf ${mockDataPathService.getDownloadsPath()}`);
   });
 
   it.each(directories)(
@@ -320,6 +334,15 @@ describe('[endpoint] PUT /utils/configuration', () => {
         );
       }
 
+      // Create user directory for PDF generation
+      const userDirPath = md5(USER_NAME);
+      mockDataPathService.createDataDirectoryIfNotExists(
+        path.join(
+          mockDataPathService.getDataDirectoryRelative('downloads/reports'),
+          userDirPath,
+        ),
+      );
+
       // Generate PDF report
       const responseReport = await supertest(innerServer.listener)
         .post(`/reports/modules/${tab}`)
@@ -330,7 +353,9 @@ describe('[endpoint] PUT /utils/configuration', () => {
       const fileName =
         responseReport.body?.message.match(/([A-Z-0-9]*\.pdf)/gi)[0];
       const userPath = md5(USER_NAME);
-      const reportPath = `${WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH}/${userPath}/${fileName}`;
+      const reportPath = `${mockDataPathService.getDataDirectoryRelative(
+        'downloads/reports',
+      )}/${userPath}/${fileName}`;
       const PDFbuffer = fs.readFileSync(reportPath);
       const PDFcontent = PDFbuffer.toString('utf8');
       const content = PDFcontent.replace(

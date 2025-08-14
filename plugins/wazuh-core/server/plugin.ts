@@ -16,7 +16,6 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  UpdateRegistry,
   ConfigurationStore,
 } from './services';
 import { Configuration } from '../common/services/configuration';
@@ -24,9 +23,11 @@ import {
   PLUGIN_SETTINGS,
   PLUGIN_SETTINGS_CATEGORIES,
   WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-  WAZUH_DATA_CONFIG_APP_PATH,
 } from '../common/constants';
 import { enhanceConfiguration } from './services/enhance-configuration';
+import { DataPathService, IDataPathService } from './services/data-path';
+import path from 'path';
+import { first } from 'rxjs/operators';
 
 export class WazuhCorePlugin
   implements Plugin<WazuhCorePluginSetup, WazuhCorePluginStart>
@@ -47,14 +48,30 @@ export class WazuhCorePlugin
   ): Promise<WazuhCorePluginSetup> {
     this.logger.debug('wazuh_core: Setup');
 
+    // Get global configuration
+    const globalConfig =
+      await this.initializerContext.config.legacy.globalConfig$
+        .pipe(first())
+        .toPromise();
+
+    // Initialize DataPathService with logger and global configuration
+    this.services.dataPathService = new DataPathService(
+      this.logger.get('data-path'),
+      globalConfig,
+    );
+    // Setup and start DataPathService
+    await this.services.dataPathService.setup();
+    await this.services.dataPathService.start();
+
     this.services.dashboardSecurity = createDashboardSecurity(plugins);
 
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-store'),
       {
         cache_seconds: WAZUH_CORE_CONFIGURATION_CACHE_SECONDS,
-        file: WAZUH_DATA_CONFIG_APP_PATH,
+        file: this.services.dataPathService.getConfigFilePath(),
       },
+      this.services.dataPathService,
     );
     this.services.configuration = new Configuration(
       this.logger.get('configuration'),

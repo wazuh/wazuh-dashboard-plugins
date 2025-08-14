@@ -73,6 +73,7 @@
   const alertModules = {
     syscheck: { syscheck: true },
     aws: { aws: true },
+    azure: { azure: true },
     gcp: { gcp: true },
     authentication: { authentication: true },
     ssh: { ssh: true },

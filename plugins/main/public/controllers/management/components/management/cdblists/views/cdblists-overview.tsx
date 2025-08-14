@@ -19,15 +19,11 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_CDBLIST_KEY } from '../../common/constants';
 import CDBListsTable from '../components/cdblists-table';
 import '../../common/layout-overview.scss';
-import WzRestartClusterManagerCallout from '../../../../../../components/common/restart-cluster-manager-callout';
+import WzReloadClusterManagerCallout from '../../../../../../components/common/reload-cluster-manager-callout';
 import { cdbLists } from '../../../../../../utils/applications';
 
 function WzCDBListsOverview(props) {
   const [showWarningRestart, setShowWarningRestart] = useState(false);
-
-  const updateRestartManagers = showWarningRestart => {
-    setShowWarningRestart(showWarningRestart);
-  };
 
   return (
     <EuiPage style={{ background: 'transparent' }}>
@@ -35,9 +31,9 @@ function WzCDBListsOverview(props) {
         {showWarningRestart && (
           <>
             <EuiSpacer size='s' />
-            <WzRestartClusterManagerCallout
-              onRestarted={() => updateRestartManagers(false)}
-              onRestartedError={() => updateRestartManagers(true)}
+            <WzReloadClusterManagerCallout
+              onReloaded={() => setShowWarningRestart(false)}
+              onReloadedError={() => setShowWarningRestart(true)}
             />
             <EuiSpacer size='s' />
           </>
@@ -47,9 +43,7 @@ function WzCDBListsOverview(props) {
           <EuiFlexItem>
             <CDBListsTable
               {...props}
-              updateRestartClusterManager={showWarningRestart =>
-                updateRestartManagers(showWarningRestart)
-              }
+              updateReloadClusterManager={() => setShowWarningRestart(true)}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

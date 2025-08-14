@@ -37,6 +37,7 @@ import { tscColumns } from '../../overview/tsc/events/tsc-columns';
 import { githubColumns } from '../../overview/github/events/github-columns';
 import { mitreAttackColumns } from '../../overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../../overview/malware-detection/events/malware-detection-columns';
+import { azureColumns } from '../../overview/azure/events/azure-columns';
 import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
@@ -60,6 +61,7 @@ import {
   DashboardGoogleCloud,
   DashboardVuls,
   InventoryVuls,
+  DashboardAzure,
 } from '../../overview';
 import {
   DockerDataSource,
@@ -78,15 +80,18 @@ import {
   PCIDSSDataSource,
   Office365DataSource,
   ThreatHuntingDataSource,
+  AzureDataSource,
 } from '../data-source';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
   DashboardITHygiene,
+  ITHygieneBrowserExtensionsInventory,
   ITHygieneNetworksInventory,
   ITHygienePackagesInventory,
   ITHygieneProcessesInventory,
   ITHygieneSystemInventory,
   ITHygieneUsersInventory,
+  ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
 
@@ -141,6 +146,24 @@ export const ModulesDefaults = {
         moduleId: 'fim',
         tableColumns: fileIntegrityMonitoringColumns,
         DataSource: FIMDataSource,
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+      }),
+    ],
+    availableFor: ['manager', 'agent'],
+  },
+  microsoftGraphAPI: {
+    init: 'dashboard',
+    tabs: [
+      {
+        id: 'dashboard',
+        name: 'Dashboard',
+        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        component: DashboardAzure,
+      },
+      renderDiscoverTab({
+        moduleId: 'microsoftGraphAPI',
+        tableColumns: azureColumns,
+        DataSource: AzureDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
@@ -535,6 +558,18 @@ export const ModulesDefaults = {
         name: 'Identity',
         buttons: [ButtonExploreAgent],
         component: ITHygieneUsersInventory,
+      },
+      {
+        id: 'services',
+        name: 'Services',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneServicesInventory,
+      },
+      {
+        id: 'browser-extensions',
+        name: 'Browser extensions',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneBrowserExtensionsInventory,
       },
     ],
     availableFor: ['manager', 'agent'],

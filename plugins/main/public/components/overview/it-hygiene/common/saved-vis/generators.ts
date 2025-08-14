@@ -130,6 +130,7 @@ export const getVisStateHorizontalBarByField = (
     addLegend?: boolean;
     orderAggregation?: 'asc' | 'desc';
     customLabel?: string;
+    filter?: any[];
   } = {},
 ) => {
   const {
@@ -137,6 +138,7 @@ export const getVisStateHorizontalBarByField = (
     addLegend = false,
     orderAggregation = 'desc',
     customLabel,
+    filter: searchFilter = [],
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -219,7 +221,9 @@ export const getVisStateHorizontalBarByField = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, {
+        filter: searchFilter,
+      }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {

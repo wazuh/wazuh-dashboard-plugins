@@ -491,6 +491,34 @@ export const office365 = {
     }`,
 };
 
+export const microsoftGraphAPI = {
+  category: 'wz-category-cloud-security',
+  id: 'microsoft-graph-api',
+  title: i18n.translate('wz-app-microsoft-graph-api-title', {
+    defaultMessage: 'Microsoft Graph API',
+  }),
+  breadcrumbLabel: i18n.translate(
+    'wz-app-microsoft-graph-api-breadcrumbLabel',
+    {
+      defaultMessage: 'Microsoft Graph API',
+    },
+  ),
+  description: i18n.translate('wz-app-microsoft-graph-api-description', {
+    defaultMessage:
+      'Security events related to your Microsoft Graph services, collected directly via Microsoft Graph API.',
+  }),
+  euiIconType: 'logoAzureMono',
+  order: 505,
+  showInOverviewApp: true,
+  showInAgentMenu: true,
+  redirectTo: () =>
+    `/overview/?tab=microsoftGraphAPI&tabView=dashboard${
+      store.getState()?.appStateReducers?.currentAgentData?.id
+        ? `&agentId=${store.getState()?.appStateReducers?.currentAgentData?.id}`
+        : ''
+    }`,
+};
+
 export const endpointSummary = {
   category: 'wz-category-agents-management',
   id: 'endpoints-summary',
@@ -850,6 +878,7 @@ export const Applications = [
   devTools,
   rulesetTest,
   security,
+  microsoftGraphAPI,
   amazonWebServices,
   googleCloud,
   github,

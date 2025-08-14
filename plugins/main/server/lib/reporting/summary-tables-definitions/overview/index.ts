@@ -17,6 +17,15 @@ const awsAlertsSummary = {
   ],
 };
 
+const azureAlertsSummary = {
+  title: 'Alerts summary',
+  aggs: [
+    AggregationFields['rule.id'],
+    AggregationFields['rule.description'],
+    AggregationFields['rule.level'],
+  ],
+};
+
 const fimAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -106,7 +115,6 @@ const mitreAlertsSummary = {
     AggregationFields['rule.level'],
   ],
 };
-
 const pmAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -145,6 +153,7 @@ const auditLastAlerts = {
 
 export default {
   aws: [awsAlertsSummary],
+  azure: [azureAlertsSummary],
   docker: [dockerAlertsSummary],
   fim: [fimAlertsSummary],
   gcp: [gcpAlertsSummary],
