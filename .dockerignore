@@ -126,4 +126,5 @@ docker/
 !docker/url-checks/
 
 # Keep only the url-checks related files for the build context
+# Ignore if generated locally on the host machine
 scripts/url-checks/extracted-urls.md
