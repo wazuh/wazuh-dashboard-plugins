@@ -50,10 +50,12 @@ const buildEnvVars = ({ repo, nodeVersion }) => {
  */
 function setupAbortController() {
   process.on('SIGINT', () => {
-    console.log('SIGINT received. Stopping and removing containers...');
+    console.log(
+      'SIGINT received. Stopping and removing containers and images...',
+    );
     childProcess.spawnSync(
       'docker',
-      ['compose', '--project-directory', COMPOSE_DIR, 'down'],
+      ['compose', '--project-directory', COMPOSE_DIR, 'down', '--rmi', 'all'],
       { stdio: 'inherit' },
     );
     process.exit();
@@ -64,6 +66,13 @@ function setupAbortController() {
  * Start the container and remove it once the 'up' process finishes.
  */
 function startUrlChecks() {
+  // Clean any previous containers/images for this compose project before starting
+  childProcess.spawnSync(
+    'docker',
+    ['compose', '--project-directory', COMPOSE_DIR, 'down', '--rmi', 'all'],
+    { stdio: 'inherit' },
+  );
+
   const urlChecks = childProcess.spawn('docker', [
     'compose',
     '--project-directory',
@@ -88,11 +97,11 @@ function startUrlChecks() {
 
   urlChecks.on('close', code => {
     console.log(
-      `docker compose up exited with code ${code}. Removing containers...`,
+      `docker compose up exited with code ${code}. Removing containers and images...`,
     );
     childProcess.spawnSync(
       'docker',
-      ['compose', '--project-directory', COMPOSE_DIR, 'down'],
+      ['compose', '--project-directory', COMPOSE_DIR, 'down', '--rmi', 'all'],
       { stdio: 'inherit' },
     );
     process.exit(code);
