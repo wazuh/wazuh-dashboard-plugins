@@ -5,8 +5,14 @@ version: '3'
 #   - REPO:         Path to the Wazuh app local repository
 
 services:
-  url-checks:
+  docs-url-checks:
     build:
       context: ${REPO}
-      dockerfile: docker/url-checks/Dockerfile
+      dockerfile: docker/url-checks/Dockerfile.docs
+    tty: true
+
+  others-url-checks:
+    build:
+      context: ${REPO}
+      dockerfile: docker/url-checks/Dockerfile.others
     tty: true

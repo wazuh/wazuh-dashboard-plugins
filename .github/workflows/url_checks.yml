@@ -17,7 +17,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build and run URL checks
+      - name: Build and run Docs URL checks
         run: |
-          docker build -f docker/url-checks/Dockerfile -t url-checks .
-          docker run --rm url-checks
+          docker build -f docker/url-checks/Dockerfile.docs -t docs-url-checks .
+          docker run --rm docs-url-checks
+
+      - name: Build and run Others URL checks
+        run: |
+          docker build -f docker/url-checks/Dockerfile.others -t others-url-checks .
+          docker run --rm others-url-checks
