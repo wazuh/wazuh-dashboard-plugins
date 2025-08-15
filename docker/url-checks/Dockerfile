@@ -40,15 +40,15 @@ WORKDIR /app
 COPY --from=url-extractor /app/scripts/url-checks/extracted-urls.md /app/extracted-urls.md
 
 # Default command to check URLs
-CMD ["--verbose", "--max-redirects", "0", "--format", "detailed", "--no-progress", "extracted-urls.md"]
+CMD ["--verbose", "--max-redirects", "0", "--format", "detailed", "--no-progress", "--include-fragments", "extracted-urls.md"]
 
 # Stage 3: Check URLs using Lychee
-FROM lycheeverse/lychee:latest AS url-checker
+# FROM lycheeverse/lychee:latest AS url-checker
 
-WORKDIR /app
+# WORKDIR /app
 
-# Copy extracted URLs from previous stage
-COPY --from=url-extractor /app/links.txt /app/links.txt
+# # Copy extracted URLs from previous stage
+# COPY --from=url-extractor /app/links.txt /app/links.txt
 
-# Default command to check URLs
-CMD ["--verbose", "--format", "detailed", "--no-progress", "links.txt"]
+# # Default command to check URLs
+# CMD ["--verbose", "--format", "detailed", "--no-progress", "links.txt"]
