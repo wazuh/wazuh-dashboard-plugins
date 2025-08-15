@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for URL checks
 # Stage 1: Extract URLs using Node.js
-FROM node:20-alpine AS url-extractor
+FROM node:22-alpine AS url-extractor
 
 WORKDIR /app
 
