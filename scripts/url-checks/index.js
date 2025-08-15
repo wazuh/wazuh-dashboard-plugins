@@ -46,22 +46,22 @@ const buildEnvVars = ({ repo, nodeVersion }) => {
 };
 
 /**
- * Captures the SIGINT signal (Ctrl + C) to stop the container and exit.
+ * Captures the SIGINT signal (Ctrl + C) to stop and remove the container and exit.
  */
 function setupAbortController() {
   process.on('SIGINT', () => {
-    childProcess.spawnSync('docker', [
-      'compose',
-      '--project-directory',
-      COMPOSE_DIR,
-      'stop',
-    ]);
+    console.log('SIGINT received. Stopping and removing containers...');
+    childProcess.spawnSync(
+      'docker',
+      ['compose', '--project-directory', COMPOSE_DIR, 'down'],
+      { stdio: 'inherit' },
+    );
     process.exit();
   });
 }
 
 /**
- * Start the container.
+ * Start the container and remove it once the 'up' process finishes.
  */
 function startUrlChecks() {
   const urlChecks = childProcess.spawn('docker', [
@@ -70,6 +70,7 @@ function startUrlChecks() {
     COMPOSE_DIR,
     'up',
     '--no-log-prefix',
+    '--abort-on-container-exit',
   ]);
 
   urlChecks.stdout.on('data', data => {
@@ -78,6 +79,23 @@ function startUrlChecks() {
 
   urlChecks.stderr.on('data', data => {
     console.error(`${data}`);
+  });
+
+  urlChecks.on('error', err => {
+    console.error('Failed to start docker compose:', err);
+    process.exit(1);
+  });
+
+  urlChecks.on('close', code => {
+    console.log(
+      `docker compose up exited with code ${code}. Removing containers...`,
+    );
+    childProcess.spawnSync(
+      'docker',
+      ['compose', '--project-directory', COMPOSE_DIR, 'down'],
+      { stdio: 'inherit' },
+    );
+    process.exit(code);
   });
 }
 
