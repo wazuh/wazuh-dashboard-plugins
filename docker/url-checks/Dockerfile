@@ -20,6 +20,14 @@ RUN apk add --no-cache git ripgrep && \
   plugins/ --glob '!package-lock.json' --glob '!package.json' --glob '!yarn.lock' --glob '!*.test.*' \
   | grep -vE '(\$[{(]?|github.com|github.io|stackoverflow|foo\.org|env-[0-9]\.example|localhost|w3\.org|sample-data|kibana\:|[a-z]+\:[0-9]+|cors-anywhere\.herokuapp\.com)|endpoints.json' > links.txt
 
+# Retrieve the Wazuh Dashboard version and update package.json files
+RUN apk add --no-cache jq curl && \
+  echo $(curl -s https://api.github.com/repos/wazuh/wazuh-dashboard/releases/latest | jq '.tag_name' -r | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+') > VERSION && \
+  jq ".version=\"$(cat VERSION)\"" plugins/main/package.json > plugins/main/package.json.tmp && \
+  mv plugins/main/package.json.tmp plugins/main/package.json && \
+  jq ".version=\"$(cat VERSION)\"" plugins/wazuh-core/package.json > plugins/wazuh-core/package.json.tmp && \
+  mv plugins/wazuh-core/package.json.tmp plugins/wazuh-core/package.json
+
 # Extract URLs
 RUN tsx scripts/url-checks/extractor.ts
 
