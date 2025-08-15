@@ -26,20 +26,19 @@ import {
 
 import { connect } from 'react-redux';
 
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import {
+  DOC_LINKS,
+  DOC_LINKS_WITH_FRAGMENTS,
+} from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Configuring syslog output',
-    href: webDocumentationLink(
-      'user-manual/manager/alert-management.html#configuring-syslog-output',
-    ),
+    href: DOC_LINKS_WITH_FRAGMENTS.ALERT_MANAGEMENT_CONFIGURING_SYSLOG_OUTPUT,
   },
   {
     text: 'Syslog output reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/syslog-output.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.SYSLOG_OUTPUT,
   },
 ];
 
