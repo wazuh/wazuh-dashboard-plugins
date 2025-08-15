@@ -34,7 +34,7 @@ function extractUrlsFromObject(obj: any): string[] {
  * Extract URL paths from the documentation directory
  * @returns {string[]} Array of URL path objects
  */
-function retrieveUrlList(): string[] {
+function retrieveAllDocumentUrls(): string[] {
   return [
     ...extractUrlsFromObject(DOC_LINKS),
     ...extractUrlsFromObject(DOC_CORE_LINKS),
@@ -45,7 +45,7 @@ function retrieveUrlList(): string[] {
 async function main() {
   console.log('🔍 Starting URL validation process...');
 
-  const urlList: string[] = retrieveUrlList();
+  const urlList: string[] = retrieveAllDocumentUrls();
 
   if (urlList.length > 0) {
     console.info(`Found ${urlList.length} URLs to validate.`);
