@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 
 ### Removed
@@ -18,11 +19,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed prompt related to statistic job is disabled in Statistics app [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
-
-### Changed
-
-- Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
-- Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 - Removed the configuration for modules that relied on the following deprecated daemons: wazuh-agentlessd, wazuh-csyslogd, wazuh-dbd, wazuh-integratord, wazuh-maild, and wazuh-reportd. [#7612](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7612)
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 00
