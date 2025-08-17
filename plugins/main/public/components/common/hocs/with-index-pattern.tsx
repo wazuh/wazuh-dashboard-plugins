@@ -111,14 +111,16 @@ export interface WithIndexPatternFromSettingDataSourceParams {
   }>;
 }
 
-export interface MapErrorTypes {
+export interface MapErrorTypes<
+  Title extends string | { title: string } = string,
+> {
   default: {
-    title: (title: string) => string;
-    body: () => React.Node;
+    title: (title: Title) => string;
+    body: (props: { title: string; message: string }) => React.Node;
   };
   [key: string]: {
-    title: (title: string) => string;
-    body: () => React.Node;
+    title: (title: Title) => string;
+    body: (props: { title: string; message: string }) => React.Node;
   };
 }
 const mapErrorPromptComponents = (

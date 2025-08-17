@@ -2,12 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import { SearchResponse } from '../../../../../../../../src/core/server';
 import { getPlugins } from '../../../../../kibana-services';
-import { ViewMode } from '../../../../../../../../src/plugins/embeddable/public';
 
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
-import { getKPIsPanel } from './utils/dashboard-kpis';
-import { getDashboardTables } from './utils/dashboard-tables';
-import { getDashboardPanels } from './utils/dashboard-panels';
 import {
   ErrorFactory,
   ErrorHandler,
@@ -33,6 +29,11 @@ import {
 } from '../../../../common/data-source';
 import { DiscoverNoResults } from '../../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../../common/loading-searchbar-progress/loading-searchbar-progress';
+import {
+  getKPIsConfig,
+  getPanelsConfig,
+  getTablesConfig,
+} from './utils/dashboard-by-renderer-config';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -123,77 +124,38 @@ const SCADashboardComponent: React.FC<SCADashboardProps> = ({
                 }`}
               >
                 <DashboardByRenderer
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getKPIsPanel(indexPattern?.id),
-                    isFullScreenMode: false,
-                    filters: fetchFilters ?? [],
-                    useMargins: true,
-                    id: 'security-configuration-assessment-kpis',
-                    timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
-                    },
-                    title: 'Security Configuration Assessment dashboard KPIs',
-                    description: 'Dashboard of the SCA KPIs',
+                  input={getKPIsConfig({
+                    indexPatternId: indexPattern?.id,
+                    fetchFilters,
+                    dateRangeFrom: searchBarProps.dateRangeFrom,
+                    dateRangeTo: searchBarProps.dateRangeTo,
                     query: searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles: true,
-                    lastReloadRequestTime: fingerprint,
-                  }}
+                    fingerprint,
+                  })}
                 />
               </div>
               <div className='wz-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls'>
                 <DashboardByRenderer
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getDashboardTables(indexPattern?.id),
-                    isFullScreenMode: false,
-                    filters: fetchFilters ?? [],
-                    useMargins: false,
-                    id: 'security-configuration-assessment-filters',
-                    timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
-                    },
-                    title: 'IT Hygiene dashboard filters',
-                    description: 'Dashboard of the IT Hygiene filters',
+                  input={getTablesConfig({
+                    indexPatternId: indexPattern?.id,
+                    fetchFilters,
+                    dateRangeFrom: searchBarProps.dateRangeFrom,
+                    dateRangeTo: searchBarProps.dateRangeTo,
                     query: searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles: true,
-                    lastReloadRequestTime: fingerprint,
-                  }}
+                    fingerprint,
+                  })}
                 />
               </div>
               <div className='wz-dashboard-responsive wz-dashboard-hide-tables-pagination-export-csv-controls'>
                 <DashboardByRenderer
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    panels: getDashboardPanels(indexPattern?.id),
-                    isFullScreenMode: false,
-                    filters: fetchFilters ?? [],
-                    useMargins: true,
-                    id: 'security-configuration-assessment-panels',
-                    timeRange: {
-                      from: searchBarProps.dateRangeFrom,
-                      to: searchBarProps.dateRangeTo,
-                    },
-                    title: 'Security Configuration Assessment dashboard panels',
-                    description: 'Dashboard of the SCA panels',
+                  input={getPanelsConfig({
+                    indexPatternId: indexPattern?.id,
+                    fetchFilters,
+                    dateRangeFrom: searchBarProps.dateRangeFrom,
+                    dateRangeTo: searchBarProps.dateRangeTo,
                     query: searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles: false,
-                    lastReloadRequestTime: fingerprint,
-                  }}
+                    fingerprint,
+                  })}
                 />
               </div>
             </>

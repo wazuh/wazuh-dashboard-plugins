@@ -619,14 +619,14 @@ export const getVisStateMetric = (
         },
         ...(aggsQuery.length
           ? [
-              {
-                id: '2',
-                enabled: true,
-                type: 'filters',
-                params: { filters: aggsQuery },
-                schema: 'group',
-              },
-            ]
+            {
+              id: '2',
+              enabled: true,
+              type: 'filters',
+              params: { filters: aggsQuery },
+              schema: 'group',
+            },
+          ]
           : []),
       ],
     },
@@ -681,7 +681,7 @@ export const getVisStateDashboardTables = (
             field,
             title,
             visIDPrefix,
-            fieldCustomLabel ? { fieldCustomLabel } : {},
+            fieldCustomLabel ? { customLabel: fieldCustomLabel } : {},
           ),
         },
       };

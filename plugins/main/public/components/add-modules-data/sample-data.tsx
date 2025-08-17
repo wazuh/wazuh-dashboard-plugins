@@ -153,7 +153,7 @@ export default class WzSampleData extends Component {
             `/indexer/sampledata/${cur.categorySampleDataIndex}`,
           );
           return accum;
-        }, {}),
+        }, {} as Record<string, Promise<any>>),
       );
 
       this.setState(
@@ -175,7 +175,7 @@ export default class WzSampleData extends Component {
 
       // eslint-disable-next-line camelcase
       this.generateAlertsParams.api_id = JSON.parse(
-        AppState.getCurrentAPI(),
+        AppState.getCurrentAPI() || '{}',
       )?.id;
       this.generateAlertsParams.manager = {
         name: managerName,

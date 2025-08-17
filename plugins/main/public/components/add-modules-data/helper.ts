@@ -85,18 +85,20 @@ export const sampleInventory = [
  * Time complexity: O(n) where n = keys.length.
  * Does not mutate the input arrays.
  */
-export const zipObject = (keys = [], values = []) => {
+export const zipObject = (keys: any[] = [], values: any[] = []) => {
   return keys.reduce((accumulator, key, index) => {
     accumulator[key] = values[index];
     return accumulator;
   }, {});
 };
 
-export const DeepPromiseResolver = function (obj) {
+export const DeepPromiseResolver = async function (
+  obj: Record<string, any>,
+): Promise<Record<string, any>> {
   const keys = Object.keys(obj);
   return Promise.all(
     keys.map(key => {
-      const value = obj[key];
+      const value: Record<string, any> | Promise<any> = obj[key];
       // Promise.resolve(value) !== value should work, but !value.then always works
       if (typeof value === 'object' && !value.then) {
         return DeepPromiseResolver(value);

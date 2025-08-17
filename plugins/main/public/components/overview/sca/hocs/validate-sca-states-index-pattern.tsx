@@ -28,7 +28,7 @@ import { webDocumentationLink } from '../../../../../common/services/web_documen
  * when problems occur with index patterns.
  * @type {Object.<string, ErrorPromptType>}
  */
-const errorPromptTypes: MapErrorTypes = {
+const errorPromptTypes: MapErrorTypes<{ title: string }> = {
   [ERROR_NO_INDICES_FOUND]: {
     title: () => 'Configuration Assessment could be disabled or has a problem',
     body: ({ message }: { message: React.ReactNode }) => (
