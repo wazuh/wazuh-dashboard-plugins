@@ -10,6 +10,7 @@ import {
   useDataSource,
 } from '../data-source';
 import { useAsyncActionRunOnStart } from '../hooks';
+import { useDataSourceWithSearchBar } from '../hooks/use-data-source-search-context';
 
 export const PromptErrorInitializatingDataSource = (props: {
   error?: string;
@@ -69,6 +70,17 @@ export const withDataSource =
     return <WrappedCompoment {...props} {...{ [nameProp]: dataSource }} />;
   };
 
+export const withDataSourceSearchBar =
+  ({ DataSource, DataSourceRepositoryCreator, nameProp = 'dataSource' }) =>
+  WrappedCompoment =>
+  props => {
+    const dataSource = useDataSourceWithSearchBar({
+      DataSource: DataSource,
+      DataSourceRepositoryCreator: DataSourceRepositoryCreator,
+    });
+    return <WrappedCompoment {...props} {...{ [nameProp]: dataSource }} />;
+  };
+
 interface WithDataSourceFetchOnStartProps {
   nameProp: string;
   mapRequestParams?: (props: {
@@ -86,6 +98,9 @@ interface WithDataSourceFetchOnStartProps {
     dataSource: any;
     [key: string]: any;
   }) => any[] | any[];
+  fetchOptions?: {
+    refreshDataOnPreRun?: boolean;
+  };
 }
 
 export const withDataSourceFetchOnStart =
@@ -96,6 +111,7 @@ export const withDataSourceFetchOnStart =
     LoadingComponent = null,
     ErrorComponent = null,
     mapFetchActionDependencies = [],
+    fetchOptions = {},
   }: WithDataSourceFetchOnStartProps) =>
   WrappedComponent =>
   props => {
@@ -116,10 +132,11 @@ export const withDataSourceFetchOnStart =
         ? mapFetchActionDependencies({ ...props, dataSource })
         : mapFetchActionDependencies || [];
 
-    const action = useAsyncActionRunOnStart(fetch, [
-      dataSource.isLoading,
-      ...actionActionRunDependencies,
-    ]);
+    const action = useAsyncActionRunOnStart(
+      fetch,
+      [dataSource.isLoading, ...actionActionRunDependencies],
+      fetchOptions,
+    );
 
     if (LoadingComponent && action.running) {
       return <LoadingComponent action={action} />;
@@ -183,5 +200,56 @@ export const withDataSourceFetch = ({
       LoadingComponent: FetchingDataComponent,
       ErrorComponent: ErrorFetchDataComponent,
       mapFetchActionDependencies: mapFetchActionDependencies,
+    }),
+  );
+
+export const withDataSourceFetchSearchBar = ({
+  DataSource,
+  DataSourceRepositoryCreator,
+  nameProp = 'dataSource',
+  mapRequestParams,
+  mapResponse,
+  mapFetchActionDependencies,
+  fetchOptions = {
+    refreshDataOnPreRun: false,
+  },
+  LoadingDataSourceComponent,
+  FetchingDataComponent,
+  ErrorFetchDataComponent,
+}: {
+  DataSource: any;
+  DataSourceRepositoryCreator: any;
+  nameProp?: string;
+  mapRequestParams?: WithDataSourceFetchOnStartProps['mapRequestParams'];
+  mapResponse?: WithDataSourceFetchOnStartProps['mapResponse'];
+  mapFetchActionDependencies?: WithDataSourceFetchOnStartProps['mapFetchActionDependencies'];
+  LoadingDataSourceComponent?: any;
+  FetchingDataComponent?: any;
+  ErrorFetchDataComponent?: any;
+  fetchOptions: WithDataSourceFetchOnStartProps['fetchOptions'];
+}) =>
+  compose(
+    withDataSourceSearchBar({
+      DataSource,
+      DataSourceRepositoryCreator,
+      nameProp,
+    }),
+    withDataSourceLoading({
+      isLoadingNameProp: `${nameProp}.isLoading`,
+      LoadingComponent: LoadingDataSourceComponent,
+    }),
+    withDataSourceInitiated({
+      dataSourceNameProp: `${nameProp}.dataSource`,
+      isLoadingNameProp: `${nameProp}.isLoading`,
+      dataSourceErrorNameProp: `${nameProp}.error`,
+    }),
+    withDataSourceFetchOnStart({
+      nameProp,
+      mapRequestParams,
+      mapResponse,
+      LoadingComponent: FetchingDataComponent,
+      ErrorComponent: ErrorFetchDataComponent,
+      mapFetchActionDependencies: mapFetchActionDependencies,
+      fetchOptions,
     }),
   );

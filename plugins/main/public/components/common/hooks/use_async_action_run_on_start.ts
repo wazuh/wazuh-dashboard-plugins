@@ -20,6 +20,7 @@ type useAsyncActionRunOnStartDependenciesReturns<T> = {
 export function useAsyncActionRunOnStart<T>(
   action: useAsyncActionRunOnStartAction<T>,
   dependencies: useAsyncActionRunOnStartDependencies = [],
+  { refreshDataOnPreRun = true } = { refreshDataOnPreRun: true },
 ): useAsyncActionRunOnStartDependenciesReturns<T> {
   const [running, setRunning] = useState(true);
   const [data, setData] = useState(null);
@@ -29,7 +30,9 @@ export function useAsyncActionRunOnStart<T>(
     try {
       setRunning(true);
       setError(null);
-      setData(null);
+      if (refreshDataOnPreRun) {
+        setData(null);
+      }
       const data = await action(...dependencies);
       setData(data);
     } catch (error) {
