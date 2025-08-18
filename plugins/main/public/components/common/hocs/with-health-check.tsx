@@ -44,32 +44,38 @@ const DefaultMissingRequiredChecks = ({
  */
 export const withHealthCheckChecks =
   (
-    checkRequirements,
-    MissingRequirementsComponent = DefaultMissingRequiredChecks,
+    checkRequirements: string[],
+    MissingRequirementsComponent: React.ComponentType<{
+      missingSuccessChecks: any[];
+      checks: any[];
+      refresh: () => void;
+    }> = DefaultMissingRequiredChecks,
   ) =>
   WrappedComponent =>
   props => {
-    const { checks } = useObservable(
-      getCore().healthCheck.status$,
-      getCore().healthCheck.status$.getValue(),
-    );
+    // const { checks } = useObservable(
+    //   getCore().healthCheck.status$,
+    //   getCore().healthCheck.status$.getValue(),
+    // );
 
-    const missingSuccessChecks = checkRequirements.filter(key =>
-      checks.some(
-        ({ name, result, _meta }) =>
-          name === key && _meta?.isEnabled && result && result !== 'success',
-      ),
-    );
+    // const missingSuccessChecks = checkRequirements.filter(key =>
+    //   checks.some(
+    //     ({ name, result, _meta }) =>
+    //       name === key && _meta?.isEnabled && result && result !== 'success',
+    //   ),
+    // );
 
-    if (missingSuccessChecks.length) {
-      return (
-        <MissingRequirementsComponent
-          missingSuccessChecks={missingSuccessChecks}
-          checks={checks}
-          refresh={getCore().healthCheck.client.internal.run}
-        />
-      );
-    }
+    // // Disable
+    // if (missingSuccessChecks.length) {
+    //   return (
+    //     <MissingRequirementsComponent
+    //       missingSuccessChecks={missingSuccessChecks}
+    //       checks={checks}
+    //       refresh={getCore().healthCheck.client.internal.run}
+    //     />
+    //   );
+    // }
 
+    // TODO: decide if we want the usage of the implemented HOC or remove
     return <WrappedComponent {...props} />;
   };
