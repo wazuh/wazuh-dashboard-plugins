@@ -5,7 +5,6 @@ import { getDashboardPanels } from './dashboard-panels';
 import { Query } from '../../../../../../../../../src/plugins/data/public';
 
 interface DashboardConfigParams {
-  indexPatternId: string;
   fetchFilters: any[];
   dateRangeFrom: string;
   dateRangeTo: string;
@@ -27,7 +26,6 @@ interface ConfigOverrides {
  */
 const buildDashboardConfig = (
   {
-    indexPatternId,
     fetchFilters,
     dateRangeFrom,
     dateRangeTo,
