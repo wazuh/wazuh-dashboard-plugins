@@ -1,5 +1,9 @@
 import React from 'react';
-import { withDataSourceFetchSearchBar, withInjectProps } from '../hocs';
+import {
+  withDataSourceFetchSearchBar,
+  withErrorBoundary,
+  withInjectProps,
+} from '../hocs';
 import { getPlugins } from '../../../kibana-services';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
@@ -122,6 +126,7 @@ export const createDashboard = ({
   }>;
 }) =>
   compose(
+    withErrorBoundary,
     withInjectProps({
       sampleDataWarningCategories,
       getDashboardPanels,
