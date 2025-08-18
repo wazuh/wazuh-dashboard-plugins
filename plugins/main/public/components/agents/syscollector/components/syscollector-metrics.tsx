@@ -38,10 +38,7 @@ import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
-import {
-  PromptErrorInitializatingDataSource,
-  withDataSourceInitiated,
-} from '../../../common/hocs';
+import { withDataSourceInitiated } from '../../../common/hocs';
 
 interface SyscollectorMetricsProps {
   agent: Agent;
