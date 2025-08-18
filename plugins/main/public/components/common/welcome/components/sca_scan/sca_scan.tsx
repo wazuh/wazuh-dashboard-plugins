@@ -27,16 +27,12 @@ import {
 import { getCore, getPlugins } from '../../../../../kibana-services';
 import { withUserAuthorizationPrompt } from '../../../hocs';
 import { compose } from 'redux';
-import {
-  MODULE_SCA_CHECK_RESULT_LABEL,
-  WAZUH_SCA_PATTERN,
-} from '../../../../../../common/constants';
-import { CheckResult } from '../../../../overview/sca/utils/constants';
+import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
 import { configurationAssessment } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { search } from '../../../search-bar';
+import { fetchLastPolicies } from './service/sca_scan_service';
 
 type Props = {
   agent: { [key in string]: any };
@@ -89,81 +85,15 @@ export const ScaScan = compose(
 
     async getLastPolicies(agentId: string) {
       try {
-        const indexPattern = await getPlugins().data.indexPatterns.get(
-          WAZUH_SCA_PATTERN,
-        );
-
-        const response = await search({
-          indexPattern,
-          filters: [
-            {
-              meta: {
-                key: 'agent.id',
-                type: 'phrase',
-                value: agentId,
-                disabled: false,
-                negate: false,
-                alias: null,
-              },
-              query: {
-                match_phrase: {
-                  'agent.id': agentId,
-                },
-              },
-            },
-          ],
-          fields: ['policy.name', 'check.result', 'policy.id'],
-          pagination: {
-            pageIndex: 0,
-            pageSize: 1000,
-          },
-        });
-
-        const hits = response?.hits?.hits || [];
-
-        const grouped = hits.reduce((acc, hit) => {
-          const { policy, check } = hit._source;
-
-          if (!policy?.name) return acc;
-
-          const key = policy.name;
-          acc[key] = acc[key] || {
-            name: policy.name,
-            policy_id: policy.id,
-            pass: 0,
-            fail: 0,
-            not_run: 0,
-            total: 0,
-          };
-
-          const result = (check?.result || '').toLowerCase() as CheckResult;
-
-          if ((Object.values(CheckResult) as string[]).includes(result)) {
-            if (result === CheckResult.Passed) acc[key].pass++;
-            if (result === CheckResult.Failed) acc[key].fail++;
-            if (result === CheckResult.NotRun) acc[key].not_run++;
-          }
-
-          acc[key].total++;
-
-          return acc;
-        }, {});
-
-        const policies = Object.values(grouped);
-
+        const policies = await fetchLastPolicies(agentId);
         if (this._isMount) {
           this.setState({ policies, isLoading: false });
         }
-      } catch (error) {
-        console.error('Failed to get policies:', error);
-        if (this._isMount) {
-          this.setState({
-            isLoading: false,
-          });
-        }
+      } catch (err) {
+        console.error(err);
+        if (this._isMount) this.setState({ isLoading: false });
       }
     }
-
     onTableChange = ({ page }: any) => {
       this.setState({
         pageIndex: page.index,
