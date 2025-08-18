@@ -12,7 +12,14 @@ export async function fetchLastPolicies(agentId: string) {
     indexPattern,
     filters: [
       {
-        meta: { key: 'agent.id', type: 'phrase', value: agentId, disabled: false, negate: false, alias: null },
+        meta: {
+          key: 'agent.id',
+          type: 'phrase',
+          value: agentId,
+          disabled: false,
+          negate: false,
+          alias: null,
+        },
         query: { match_phrase: { 'agent.id': agentId } },
       },
     ],
