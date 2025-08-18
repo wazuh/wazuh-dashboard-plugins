@@ -97,15 +97,7 @@ export class PatternDataSourceRepository
     AppState.setCurrentPattern(dataSource.id);
     return;
   }
-  async getDefault(): Promise<tParsedIndexPattern | null> {
-    const currentPattern = this.getStoreIndexPatternId();
-    if (!currentPattern) {
-      return Promise.resolve(null);
-    }
-    return await this.get(currentPattern);
-  }
-
-  getStoreIndexPatternId(): string {
-    return AppState.getCurrentPattern();
+  async getDefault(dataSources): Promise<tParsedIndexPattern | null> {
+    // This method should be redefined by the subclasses
   }
 }

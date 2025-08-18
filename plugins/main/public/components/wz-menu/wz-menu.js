@@ -98,6 +98,11 @@ export const WzMenu = withWindowSize(
         };
         getErrorOrchestrator().handleError(options);
       }
+
+      try {
+        const additionalState = await this.loadIndexPatternsList();
+        this.setState(state => ({ ...state, ...additionalState }));
+      } catch (e) {}
     }
 
     showToast = (color, title, text, time) => {

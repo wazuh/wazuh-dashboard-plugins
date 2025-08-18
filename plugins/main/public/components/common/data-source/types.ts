@@ -68,7 +68,7 @@ export type tDataSourceRepository<T extends object> = {
   get(id: string): Promise<T>;
   getAll(): Promise<T[]>;
   setDefault(dataSourceData: T): void;
-  getDefault(): Promise<T | null>;
+  getDefault(dataSources: T[]): Promise<T | null>;
 };
 
 export type tDataSourceSelector<T extends tDataSource> = {
