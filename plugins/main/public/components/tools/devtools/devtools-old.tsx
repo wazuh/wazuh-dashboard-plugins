@@ -26,6 +26,7 @@ import { webDocumentationLink } from '../../../../common/services/web_documentat
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
 import { DEV_TOOLS_INITIAL_BUFFER } from './initial-buffer';
+import { Keys } from './types/keys';
 
 /**
  * Detect de groups of instructions
@@ -888,8 +889,8 @@ export const ToolDevTools = withGlobalBreadcrumb([
           setMultipleKeyPressed(state => [...state, e.which]);
         }
         if (
-          multipleKeyPressed.includes(13) &&
-          multipleKeyPressed.includes(16) &&
+          multipleKeyPressed.includes(Keys.ENTER) &&
+          multipleKeyPressed.includes(Keys.SHIFT) &&
           multipleKeyPressed.length === 2
         ) {
           e.preventDefault();
