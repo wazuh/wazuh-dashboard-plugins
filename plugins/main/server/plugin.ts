@@ -60,6 +60,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
   WAZUH_FIM_FILES_PATTERN,
@@ -79,6 +80,7 @@ import {
   WAZUH_IT_HYGIENE_SERVICES_PATTERN,
   WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
   WAZUH_IT_HYGIENE_USERS_PATTERN,
+  WAZUH_SCA_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../common/constants';
 
@@ -384,6 +386,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           }),
         },
         indexPatternID: WAZUH_FIM_REGISTRY_VALUES_PATTERN,
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
+        indexPatternID: WAZUH_SCA_PATTERN,
       }),
     );
 
