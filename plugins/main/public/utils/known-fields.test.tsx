@@ -6,7 +6,7 @@ import { googleCloudColumns } from '../components/overview/google-cloud/events/g
 import { amazonWebServicesColumns } from '../components/overview/amazon-web-services/events/amazon-web-services-columns';
 import { office365Columns } from '../components/overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../components/overview/fim/events/file-integrity-monitoring-columns';
-import { configurationAssessmentColumns } from '../components/agents/sca/events/configuration-assessment-columns';
+import { configurationAssessmentColumns } from '../components/overview/sca/events/configuration-assessment-columns';
 import { pciColumns } from '../components/overview/pci/events/pci-columns';
 import { hipaaColumns } from '../components/overview/hipaa/events/hipaa-columns';
 import { nistColumns } from '../components/overview/nist/events/nist-columns';

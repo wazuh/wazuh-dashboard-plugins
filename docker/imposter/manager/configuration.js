@@ -8,12 +8,6 @@ switch (pathConfiguration[0]) {
       .withFile('manager/configuration/agent_labels.json');
 
     break;
-  case 'reports':
-    respond()
-      .withStatusCode(200)
-      .withFile('manager/configuration/monitor_reports.json');
-
-    break;
   case 'wmodules':
     respond()
       .withStatusCode(200)

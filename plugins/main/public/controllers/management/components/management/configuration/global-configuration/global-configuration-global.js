@@ -164,27 +164,6 @@ class WzConfigurationGlobalConfigurationGlobal extends Component {
               config={mainSettingsConfig}
               items={mainSettings}
             />
-            {agent.id === '000' && (
-              <Fragment>
-                <WzConfigurationSettingsGroup
-                  title='Email settings'
-                  description='Basic email settings (needed for granular email settings)'
-                  config={globalSettingsConfig}
-                  items={emailSettings}
-                />
-                <WzConfigurationSettingsGroup
-                  title='Other settings'
-                  description='Settings not directly related to any specific component'
-                  config={globalSettingsConfig}
-                  items={otherSettings}
-                />
-                <WzConfigurationSettingsGroup
-                  title='Prelude and ZeroMQ output'
-                  config={globalSettingsConfig}
-                  items={preludeZeroMQOutputSettings}
-                />
-              </Fragment>
-            )}
           </WzConfigurationSettingsHeader>
         )}
       </Fragment>

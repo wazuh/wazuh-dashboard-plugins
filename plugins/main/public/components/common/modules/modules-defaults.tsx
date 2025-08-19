@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
-import { MainSca } from '../../agents/sca';
+import { MainSca } from '../../overview/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
@@ -28,7 +28,7 @@ import { googleCloudColumns } from '../../overview/google-cloud/events/google-cl
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
 import { office365Columns } from '../../overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
-import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
+import { configurationAssessmentColumns } from '../../overview/sca/events/configuration-assessment-columns';
 import { pciColumns } from '../../overview/pci/events/pci-columns';
 import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
 import { nistColumns } from '../../overview/nist/events/nist-columns';
@@ -85,11 +85,13 @@ import {
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
   DashboardITHygiene,
+  ITHygieneBrowserExtensionsInventory,
   ITHygieneNetworksInventory,
   ITHygienePackagesInventory,
   ITHygieneProcessesInventory,
   ITHygieneSystemInventory,
   ITHygieneUsersInventory,
+  ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
 
@@ -149,7 +151,7 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  azure: {
+  microsoftGraphAPI: {
     init: 'dashboard',
     tabs: [
       {
@@ -159,10 +161,10 @@ export const ModulesDefaults = {
         component: DashboardAzure,
       },
       renderDiscoverTab({
-        moduleId: 'azure',
+        moduleId: 'microsoftGraphAPI',
         tableColumns: azureColumns,
         DataSource: AzureDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY], // TODO: Change this when sample data is available for Azure
+        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -556,6 +558,18 @@ export const ModulesDefaults = {
         name: 'Identity',
         buttons: [ButtonExploreAgent],
         component: ITHygieneUsersInventory,
+      },
+      {
+        id: 'services',
+        name: 'Services',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneServicesInventory,
+      },
+      {
+        id: 'browser-extensions',
+        name: 'Browser extensions',
+        buttons: [ButtonExploreAgent],
+        component: ITHygieneBrowserExtensionsInventory,
       },
     ],
     availableFor: ['manager', 'agent'],

@@ -328,13 +328,24 @@ export const getVisStateHorizontalBarSplitSeries = (
     categoryAxesShow?: boolean;
     seriesLabel?: string;
     seriesMode?: 'stacked' | 'normal';
-    // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;
-    // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
     // Define the filter
     searchFilter?: Filter[];
-  } = {},
+    uiState: {
+      vis: {
+        colors: {
+          [key: string]: string;
+        };
+      };
+    };
+  } = {
+    uiState: {
+      vis: {
+        colors: {},
+      },
+    },
+  },
 ) => {
   const {
     orderAggregation = 'desc',
@@ -350,12 +361,14 @@ export const getVisStateHorizontalBarSplitSeries = (
     seriesMode = 'stacked',
     otherBucket,
     missingBucket,
-    searchFilter = [],
+    searchFilter,
+    uiState,
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
     title: title,
     type: 'horizontal_bar',
+    uiState,
     params: {
       addLegend: true,
       addTimeMarker: false,
@@ -543,12 +556,13 @@ export const getVisStateTable = (
     perPage?: number;
     customLabel?: string;
     fieldCustomLabel?: string;
-    metricCustomLabel;
+    metricCustomLabel?: string;
     addLegend?: boolean;
     // Define the label, and if this exists, enable the other bucket
     otherBucket?: boolean | string;
     // Define the label, and if this exists, enable the missing bucket
     missingBucket?: boolean | string;
+    filters?: any[];
   } = {},
 ) => {
   const {
@@ -560,6 +574,7 @@ export const getVisStateTable = (
     otherBucket,
     missingBucket,
     metricCustomLabel = 'Count',
+    filters = [],
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -585,7 +600,7 @@ export const getVisStateTable = (
       },
     },
     data: {
-      searchSource: createSearchSource(indexPatternId),
+      searchSource: createSearchSource(indexPatternId, { filter: filters }),
       references: createIndexPatternReferences(indexPatternId),
       aggs: [
         {

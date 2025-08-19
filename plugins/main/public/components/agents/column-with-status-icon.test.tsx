@@ -9,7 +9,7 @@ describe('ColumnWithStatusIcon component', () => {
     );
 
     expect(wrapper).toMatchSnapshot();
-    expect(wrapper.find('svg').prop('class')).toContain('euiIcon--success');
+    expect(wrapper.find('span').attr('color')).toContain('success');
     expect(wrapper[1].children[0].data).toEqual('Active');
   });
 });
