@@ -199,7 +199,7 @@ export const InventoryDashboardTable = ({
 
   const searchBarProps = {
     ...managedSearchBarProps,
-    showDatePicker: false,
+    showDatePicker: Boolean(dataSource?.indexPattern?.timeFieldName),
     showQueryInput: true,
     showQueryBar: true,
     showSaveQuery: true,
