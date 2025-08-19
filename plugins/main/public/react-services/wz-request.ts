@@ -31,11 +31,10 @@ export class WzRequest {
     if (currentApiDataCookie) {
       try {
         currentApiID = JSON.parse(currentApiDataCookie).id;
+        if (currentApiID) {
+          return true;
+        }
       } catch {}
-    }
-
-    if (currentApiID) {
-      return true;
     }
   }
 
@@ -91,53 +90,15 @@ export class WzRequest {
             );
             return true;
           }
-        } catch (err) {}
+        } catch {}
       }
-
-      // if (hosts.length) {
-      //   for (var i = 0; i < hosts.length; i++) {
-      //     try {
-      //       checkLogger.info(`Checking API host id [${hosts[i].id}]...`);
-      //       const API = await ApiCheck.checkApi(hosts[i], true);
-      //       if (API && API.data) {
-      //         return hosts[i].id;
-      //       }
-      //     } catch (err) {
-      //       checkLogger.info(
-      //         `Could not connect to API id [${hosts[i].id}]: ${
-      //           err.message || err
-      //         }`,
-      //       );
-      //       errors.push(
-      //         `Could not connect to API id [${hosts[i].id}]: ${
-      //           err.message || err
-      //         }`,
-      //       );
-      //     }
-      //   }
-      //   if (errors.length) {
-      //     for (var j = 0; j < errors.length; j++) {
-      //       if (errors[j].includes('ERROR3099 - 405: Method Not Allowed')) {
-      //         return Promise.reject(
-      //           `No API available to connect. This may be related to a version mismatch between server and ${PLUGIN_APP_NAME}. Please check the versions and try again. Read more about this in our troubleshooting guide: ${webDocumentationLink(
-      //             PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
-      //           )}#wazuh-api-and-wazuh-app-version-mismatch-error-is-displayed.`,
-      //         );
-      //       }
-      //     }
-      //     return Promise.reject(new Error('No API available to connect'));
-      //   }
-      // }
-      // return Promise.reject(new Error('No API configuration found'));
-    } catch (error) {
-      // return Promise.reject(new Error(`Error connecting to API: ${error}`));
-    }
+    } catch {}
   }
 
   static async setupAPI() {
     const methods = [
-      // this.setupAPIInCookie,
-      // this.setupAPIHealthCheck,
+      this.setupAPIInCookie,
+      this.setupAPIHealthCheck,
       this.setupAPITryHosts,
     ];
 
@@ -151,57 +112,9 @@ export class WzRequest {
 
     getToasts.add({
       color: 'danger',
-      text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and update the page.',
+      text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
+      toastLifeTimeMs: 120000,
     });
-  }
-
-  static async ensureAPIisSelected() {
-    const currentApiDataCookie = AppState.getCurrentAPI();
-    let currentApiID;
-
-    if (currentApiDataCookie) {
-      try {
-        currentApiID = JSON.parse(currentApiDataCookie).id;
-      } catch {}
-    }
-
-    if (currentApiID) {
-      return;
-    }
-
-    // Get API available from health check task
-    const { checks } = await getCore()
-      .healthCheck.status$.pipe(first())
-      .toPromise();
-    const check = checks.find(
-      ({ name }) => name === 'server-api:connection-compatibility',
-    );
-
-    let apiWasSet = false;
-    if (check) {
-      const availableApiID = check?.data?.find(
-        ({ connection, compatibility }) => connection && compatibility,
-      )?.id;
-
-      if (availableApiID) {
-        const response = await ApiCheck.checkStored(availableApiID);
-        AppState.setClusterInfo(response?.data?.data?.clusterInfo);
-        AppState.setCurrentAPI(
-          JSON.stringify({
-            // TODO: fix name
-            name: 'TODO_FIX_NAME',
-            id: availableApiID,
-          }),
-        );
-        apiWasSet = true;
-      }
-    }
-
-    if (!apiWasSet) {
-      throw new Error(
-        'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status.',
-      );
-    }
   }
 
   /**
@@ -237,7 +150,6 @@ export class WzRequest {
         ? extraOptions.overwriteHeaders
         : {};
     try {
-      // await this.ensureAPIisSelected();
       if (!method || !path) {
         throw new Error('Missing parameters');
       }

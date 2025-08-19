@@ -27,8 +27,7 @@ import { WzRequest } from './react-services/wz-request';
 export const Application = withGuardAsync(
   async (_props: any) => {
     try {
-      await WzRequest.setupAPI();
-      // TUn in parallel
+      // Run in parallel
       await Promise.allSettled([
         // Setup the selected API
         WzRequest.setupAPI(),

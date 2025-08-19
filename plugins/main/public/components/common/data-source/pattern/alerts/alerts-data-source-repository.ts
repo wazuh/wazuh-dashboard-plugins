@@ -46,6 +46,12 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
 
   async getDefault(dataSources): Promise<tParsedIndexPattern | null> {
     const storedIndexPatternId = this.getStoreIndexPatternId();
+
+    if (!storedIndexPatternId) {
+      throw new Error(
+        'There is no selected index pattern for alerts. Ensure there is a compatible index pattern and select it using the index pattern selector. The index pattern selector is only available when there are multiple compatibles index patterns. If there is only a compatible index pattern, the selector is not visible, and it could indicate the index pattern was not selected due to some error or you could need to select it.',
+      );
+    }
     const dataSource = dataSources.find(
       ({ id }) => id === storedIndexPatternId,
     );
