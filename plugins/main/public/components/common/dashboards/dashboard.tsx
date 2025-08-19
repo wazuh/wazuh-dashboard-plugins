@@ -67,8 +67,10 @@ export const Dashboard = props => {
               useMargins = true,
               className = '',
             }) => {
+              const idComponent = id;
               const dashboard = (
                 <DashboardByRenderer
+                  key={idComponent}
                   className='wz-search-me'
                   input={{
                     viewMode: ViewMode.VIEW,
@@ -104,7 +106,7 @@ export const Dashboard = props => {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
                 some styles using CSS selectors */
                 return (
-                  <div className={className} key={id}>
+                  <div className={className} key={idComponent}>
                     {dashboard}
                   </div>
                 );
