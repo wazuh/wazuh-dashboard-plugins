@@ -1,0 +1,1 @@
+export { AssistantOpenSearchRepository } from './assistant-opensearch-repository';

@@ -1,0 +1,1 @@
+export type { AssistantRepository } from './assistant-repository';
