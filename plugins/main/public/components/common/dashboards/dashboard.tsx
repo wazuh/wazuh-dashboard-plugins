@@ -38,7 +38,6 @@ export const Dashboard = props => {
         showDatePicker={true}
         showQueryInput={true}
         showQueryBar={true}
-        showSaveQuery={true}
       />
       {props.dataSourceAction?.data?.hits?.total === 0 ? (
         <DiscoverNoResults />
