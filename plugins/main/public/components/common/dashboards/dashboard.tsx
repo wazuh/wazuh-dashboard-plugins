@@ -118,7 +118,10 @@ export const createDashboard = ({
   DataSourceRepositoryCreator: any;
   sampleDataWarningCategories?: string[];
   getDashboardPanels: Array<{
-    getDashboardPanels: (indexPatternId: string, pinnedAgent?: boolean) => any;
+    getDashboardPanels: (
+      indexPatternId: string,
+      isPinnedAgent?: boolean,
+    ) => any;
     id: string;
     title: string;
     description: string;

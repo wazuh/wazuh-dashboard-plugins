@@ -888,7 +888,7 @@ const getVisStateTop5PCIDSSRequirementsAgents = (indexPatternId: string) => {
 
 export const getDashboardPanels = (
   indexPatternId: string,
-  pinnedAgent?: boolean,
+  isPinnedAgent?: boolean,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }
@@ -1027,5 +1027,5 @@ export const getDashboardPanels = (
     },
   };
 
-  return pinnedAgent ? pinnedAgentPanels : panels;
+  return isPinnedAgent ? pinnedAgentPanels : panels;
 };
