@@ -34,56 +34,21 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
   WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
   WAZUH_SAMPLE_INVENTORY_AGENT,
+  WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
   WAZUH_SAMPLE_SERVER_STATISTICS,
   WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
+import { malwareDetection } from '../../utils/applications';
 import {
-  amazonWebServices,
-  docker,
-  fileIntegrityMonitoring,
-  github,
-  googleCloud,
-  malwareDetection,
-  mitreAttack,
-  office365,
-  vulnerabilityDetection,
-} from '../../utils/applications';
-
-const sampleSecurityInformationApplication = [
-  fileIntegrityMonitoring.title,
-  amazonWebServices.title,
-  office365.title,
-  googleCloud.title,
-  github.title,
-  'authorization',
-  'ssh',
-  'web',
-].join(', ');
-
-const sampleThreatDetectionApplication = [
-  vulnerabilityDetection.title,
-  docker.title,
-  mitreAttack.title,
-].join(', ');
-
-const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(', ');
-
-const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
-
-const sampleInventory = [
-  'groups',
-  'hardware',
-  'hotfixes',
-  'interfaces',
-  'networks',
-  'packages',
-  'ports',
-  'processes',
-  'protocols',
-  'system',
-  'users',
-].join(', ');
+  DeepPromiseResolver,
+  sampleFileIntegrityMonitoring,
+  sampleInventory,
+  sampleMalwareDetection,
+  sampleSecurityConfigurationAssessment,
+  sampleSecurityInformationApplication,
+  sampleThreatDetectionApplication,
+} from './helper';
 
 export default class WzSampleData extends Component {
   categories: {
@@ -92,7 +57,7 @@ export default class WzSampleData extends Component {
     image: string;
     categorySampleDataIndex: string;
   }[];
-  generateAlertsParams: any;
+  generateAlertsParams: Record<string, unknown>;
   state: {
     [name: string]: {
       exists: boolean;
@@ -106,32 +71,44 @@ export default class WzSampleData extends Component {
     this.categories = [
       {
         title: 'Sample security information',
-        description: `Sample data, visualizations and dashboards for security information (${sampleSecurityInformationApplication}).`,
+        description: `Sample data, visualizations and dashboards for
+        security information (${sampleSecurityInformationApplication}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       },
       {
-        title: `Sample ${malwareDetection.title}`,
-        description: `Sample data, visualizations and dashboards for events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
+        title: `Sample ${malwareDetection.title.toLowerCase()}`,
+        description: `Sample data, visualizations and dashboards for
+        events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
         image: '',
         categorySampleDataIndex:
           WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       },
       {
         title: 'Sample threat detection and response',
-        description: `Sample data, visualizations and dashboards for threat events of detection and response (${sampleThreatDetectionApplication}).`,
+        description: `Sample data, visualizations and dashboards for
+        threat events of detection and response (${sampleThreatDetectionApplication}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
       },
       {
         title: 'Sample file integrity monitoring inventory',
-        description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
+        description: `Sample data, visualizations and dashboards for
+        file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       },
       {
+        title: 'Sample security configuration assessment',
+        description: `Sample data, visualizations and dashboards for
+        security configuration assessment (${sampleSecurityConfigurationAssessment}).`,
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
+      },
+      {
         title: 'Sample system inventory',
-        description: `Sample data, visualizations and dashboards for system inventory (${sampleInventory}).`,
+        description: `Sample data, visualizations and dashboards for
+        system inventory (${sampleInventory}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
       },
@@ -144,19 +121,20 @@ export default class WzSampleData extends Component {
       },
       {
         title: 'Sample agents monitoring',
-        description: `Sample data for agents monitoring.`,
+        description: 'Sample data for agents monitoring.',
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_AGENT_MONITORING,
       },
       {
         title: 'Sample server statistics',
-        description: `Sample data for server statistics.`,
+        description: 'Sample data for server statistics.',
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_SERVER_STATISTICS,
       },
     ];
     this.state = {};
     this.categories.forEach(category => {
+      // eslint-disable-next-line react/no-direct-mutation-state
       this.state[category.categorySampleDataIndex] = {
         exists: false,
         addDataLoading: false,
@@ -168,53 +146,45 @@ export default class WzSampleData extends Component {
   async componentDidMount() {
     try {
       // Check if sample data for each category was added
-      try {
-        const results = await PromiseAllRecursiveObject(
-          this.categories.reduce((accum, cur) => {
-            accum[cur.categorySampleDataIndex] = WzRequest.genericReq(
-              'GET',
-              `/indexer/sampledata/${cur.categorySampleDataIndex}`,
-            );
-            return accum;
-          }, {}),
-        );
+      const results = await DeepPromiseResolver(
+        this.categories.reduce((accum, cur) => {
+          accum[cur.categorySampleDataIndex] = WzRequest.genericReq(
+            'GET',
+            `/indexer/sampledata/${cur.categorySampleDataIndex}`,
+          );
+          return accum;
+        }, {} as Record<string, Promise<any>>),
+      );
 
-        this.setState(
-          Object.keys(results).reduce(
-            (accum, cur) => {
-              accum[cur] = {
-                ...this.state[cur],
-                exists: results[cur].data.exists,
-              };
-              return accum;
-            },
-            { ...this.state },
-          ),
-        );
-      } catch (error) {
-        throw error;
-      }
+      this.setState(
+        Object.keys(results).reduce(
+          (accum, cur) => {
+            accum[cur] = {
+              ...this.state[cur],
+              exists: results[cur].data.exists,
+            };
+            return accum;
+          },
+          { ...this.state },
+        ),
+      );
 
       // Get information about cluster/manager
-      try {
-        const clusterName = AppState.getClusterInfo().cluster;
-        const managerName = AppState.getClusterInfo().manager;
-        try {
-          this.generateAlertsParams.api_id = JSON.parse(
-            AppState.getCurrentAPI(),
-          )?.id;
-        } catch {}
-        this.generateAlertsParams.manager = {
-          name: managerName,
+      const clusterName = AppState.getClusterInfo().cluster;
+      const managerName = AppState.getClusterInfo().manager;
+
+      // eslint-disable-next-line camelcase
+      this.generateAlertsParams.api_id = JSON.parse(
+        AppState.getCurrentAPI() || '{}',
+      )?.id;
+      this.generateAlertsParams.manager = {
+        name: managerName,
+      };
+      if (clusterName && clusterName !== 'Disabled') {
+        this.generateAlertsParams.cluster = {
+          name: clusterName,
+          node: clusterName,
         };
-        if (clusterName && clusterName !== 'Disabled') {
-          this.generateAlertsParams.cluster = {
-            name: clusterName,
-            node: clusterName,
-          };
-        }
-      } catch (error) {
-        throw error;
       }
     } catch (error) {
       const options = {
@@ -408,24 +378,3 @@ export default class WzSampleData extends Component {
     );
   }
 }
-
-const zipObject = (keys = [], values = []) => {
-  return keys.reduce((accumulator, key, index) => {
-    accumulator[key] = values[index];
-    return accumulator;
-  }, {});
-};
-
-const PromiseAllRecursiveObject = function (obj) {
-  const keys = Object.keys(obj);
-  return Promise.all(
-    keys.map(key => {
-      const value = obj[key];
-      // Promise.resolve(value) !== value should work, but !value.then always works
-      if (typeof value === 'object' && !value.then) {
-        return PromiseAllRecursiveObject(value);
-      }
-      return value;
-    }),
-  ).then(result => zipObject(keys, result));
-};

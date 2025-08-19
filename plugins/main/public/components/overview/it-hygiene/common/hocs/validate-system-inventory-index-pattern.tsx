@@ -14,6 +14,8 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES,
 } from '../../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 
@@ -110,3 +112,14 @@ export const withSystemInventoryHardwareDataSource = withHealthCheckChecks(
   [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES],
   PromptFIMIndexPatternMissing,
 );
+
+export const withSystemInventoryServicesDataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES],
+  PromptFIMIndexPatternMissing,
+);
+
+export const withSystemInventoryBrowserExtensionsDataSource =
+  withHealthCheckChecks(
+    [HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES],
+    PromptFIMIndexPatternMissing,
+  );

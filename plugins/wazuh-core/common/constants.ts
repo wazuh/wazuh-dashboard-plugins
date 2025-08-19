@@ -39,6 +39,7 @@ export const WAZUH_SAMPLE_ALERTS_CATEGORIES_TYPE_ALERTS = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     { syscheck: true },
     { aws: true },
+    { azure: true },
     { office: true },
     { gcp: true },
     { authentication: true },
@@ -78,43 +79,6 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
-
-// Wazuh data path
-const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
-export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = path.join(
-  __dirname,
-  '../../../',
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH,
-);
-export const WAZUH_DATA_ABSOLUTE_PATH = path.join(
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
-  'wazuh',
-);
-
-// Wazuh data path - config
-export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'config',
-);
-export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh-registry.json',
-);
-
-export const WAZUH_DATA_CONFIG_APP_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh.yml',
-);
-
-// Wazuh data path - downloads
-export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'downloads',
-);
-export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  'reports',
-);
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
@@ -1333,13 +1297,6 @@ export enum HTTP_STATUS_CODES {
   INSUFFICIENT_STORAGE = 507,
   NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
-
-// Module Security configuration assessment
-export const MODULE_SCA_CHECK_RESULT_LABEL = {
-  passed: 'Passed',
-  failed: 'Failed',
-  'not applicable': 'Not applicable',
-};
 
 // Search bar
 

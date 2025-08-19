@@ -1,11 +1,12 @@
 import fs from 'fs';
 import { execSync } from 'child_process';
 import path from 'path';
-import { createDirectoryIfNotExists } from '../../lib/filesystem';
+
 import sanitizeUploadedSVG from './sanitize-svg';
 import { sanitizeSVG } from '../../lib/sanitizer';
 import maliciousMockSVG from './__mocks__/malicious.customization.logo.app.svg.ts';
 import sanitizedMockSVG from './__mocks__/sanitized.customization.logo.app.svg.ts';
+import { createDirectoryIfNotExists } from '../../lib/filesystem';
 
 const customImageDirectory = path.join(
   __dirname,

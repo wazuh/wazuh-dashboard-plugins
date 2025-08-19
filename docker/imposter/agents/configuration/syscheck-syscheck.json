@@ -13,6 +13,10 @@
         "enabled": "yes",
         "entries": 100000
       },
+      "registry_limit": {
+        "enabled": "yes",
+        "entries": 100000
+      },
       "diff": {
         "disk_quota": {
           "enabled": "yes",

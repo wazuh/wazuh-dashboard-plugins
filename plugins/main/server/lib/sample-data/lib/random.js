@@ -3,6 +3,14 @@
  */
 
 /**
+ * Generate a random hexadecimal hash string
+ * @returns {string} Random hash string
+ */
+function hash() {
+  return Math.random().toString(16).substring(2, 42);
+}
+
+/**
  * Generate a random integer between min and max (inclusive)
  * @param {number} min - Minimum value
  * @param {number} max - Maximum value
@@ -107,7 +115,19 @@ function float(min = 0, max = 1, decimals = 2) {
   return Math.round(randomFloat * factor) / factor;
 }
 
+/**
+ * Generate a random version string
+ * @returns {string} Random version string in the format x.y.z
+ */
+function randomVersion() {
+  const major = int(0, 5);
+  const minor = int(0, 10);
+  const patch = int(0, 20);
+  return `${major}.${minor}.${patch}`;
+}
+
 module.exports = {
+  hash,
   int,
   choice,
   boolean,
@@ -116,5 +136,6 @@ module.exports = {
   ip,
   macAddress,
   float,
+  randomVersion,
   sample,
 };
