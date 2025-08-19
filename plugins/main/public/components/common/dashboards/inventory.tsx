@@ -41,7 +41,6 @@ const InventoryDashboard = ({
   managedFilters,
   managedFiltersProps,
   tableId,
-  indexPattern,
   error,
   categoriesSampleData,
   classNameDashboardWrapper,
@@ -108,9 +107,7 @@ const InventoryDashboard = ({
               <DashboardByRenderer
                 input={{
                   viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    dataSource?.id || indexPattern?.id,
-                  ),
+                  panels: getDashboardPanels(dataSource?.id),
                   isFullScreenMode: false,
                   filters: fetchFilters ?? [],
                   useMargins: true,
@@ -182,7 +179,6 @@ export interface InventoryDashboardTableProps {
   managedFilters: CustomSearchBarProps['filterInputs'];
   managedFiltersProps?: CustomSearchBarProps['filterInputsProps'];
   tableId: TableDataGridWithSearchBarInspectedHitFetchDataTableId;
-  indexPattern: IndexPattern;
   categoriesSampleData?: string[];
   classNameDashboardWrapper?: string;
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
@@ -197,7 +193,6 @@ export const InventoryDashboardTable = ({
   managedFilters,
   managedFiltersProps,
   tableId,
-  indexPattern,
   additionalDocumentDetailsTabs,
   categoriesSampleData,
 }: InventoryDashboardTableProps) => {
@@ -244,7 +239,6 @@ export const InventoryDashboardTable = ({
       managedFiltersProps={managedFiltersProps}
       tableId={tableId}
       error={error}
-      indexPattern={indexPattern}
       classNameDashboardWrapper={classNameDashboardWrapper}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       categoriesSampleData={categoriesSampleData}

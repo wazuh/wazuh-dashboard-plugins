@@ -17,6 +17,7 @@ const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 export const Dashboard = props => {
+  // This is not used by the SCA dashboard.
   useReportingCommunicateSearchContext({
     isSearching: props.dataSource.dataSource.isLoading,
     totalResults: props.dataSourceAction?.data?.hits?.total ?? 0,
@@ -35,7 +36,9 @@ export const Dashboard = props => {
         appName='dashboard-searchbar'
         {...props.dataSource.searchBarProps}
         fixedFilters={props.dataSource.fixedFilters}
-        showDatePicker={true}
+        showDatePicker={Boolean(
+          props.dataSource.dataSource.indexPattern.timeFieldName,
+        )}
         showQueryInput={true}
         showQueryBar={true}
       />
@@ -61,37 +64,54 @@ export const Dashboard = props => {
               title,
               description,
               hidePanelTitles,
-            }) => (
-              <DashboardByRenderer
-                input={{
-                  viewMode: ViewMode.VIEW,
-                  panels: getDashboardPanels(
-                    props.dataSource.dataSource.id,
-                    Boolean(
-                      props.dataSource.dataSource?.getPinnedAgentFilter()
-                        ?.length,
+              useMargins = true,
+              className = '',
+            }) => {
+              const dashboard = (
+                <DashboardByRenderer
+                  className='wz-search-me'
+                  input={{
+                    viewMode: ViewMode.VIEW,
+                    panels: getDashboardPanels(
+                      props.dataSource.dataSource.id,
+                      Boolean(
+                        props.dataSource.dataSource?.getPinnedAgentFilter()
+                          ?.length,
+                      ),
                     ),
-                  ),
-                  isFullScreenMode: false,
-                  filters: props.dataSource.fetchFilters ?? [],
-                  useMargins: true,
-                  id: id,
-                  timeRange: {
-                    from: props.dataSource.searchBarProps.dateRangeFrom,
-                    to: props.dataSource.searchBarProps.dateRangeTo,
-                  },
-                  title: title,
-                  description: description,
-                  query: props.dataSource.searchBarProps.query,
-                  refreshConfig: {
-                    pause: false,
-                    value: 15,
-                  },
-                  hidePanelTitles,
-                  lastReloadRequestTime: props.dataSource.fingerprint,
-                }}
-              />
-            ),
+                    isFullScreenMode: false,
+                    filters: props.dataSource.fetchFilters ?? [],
+                    useMargins,
+                    id: id,
+                    timeRange: {
+                      from: props.dataSource.searchBarProps.dateRangeFrom,
+                      to: props.dataSource.searchBarProps.dateRangeTo,
+                    },
+                    title: title,
+                    description: description,
+                    query: props.dataSource.searchBarProps.query,
+                    refreshConfig: {
+                      pause: false,
+                      value: 15,
+                    },
+                    hidePanelTitles,
+                    lastReloadRequestTime: props.dataSource.fingerprint,
+                  }}
+                />
+              );
+
+              if (className) {
+                /* Add a wrapper div with the className to apply styles that allow to overwrite
+                some styles using CSS selectors */
+                return (
+                  <div className={className} key={id}>
+                    {dashboard}
+                  </div>
+                );
+              }
+
+              return dashboard;
+            },
           )}
         </div>
       </div>
@@ -125,6 +145,11 @@ export const createDashboard = ({
     title: string;
     description: string;
     hidePanelTitles: boolean;
+    useMargins?: boolean;
+    /**
+     * Class name to apply to the dashboard container
+     */
+    className?: string;
   }>;
 }) =>
   compose(
@@ -137,14 +162,19 @@ export const createDashboard = ({
       DataSource,
       DataSourceRepositoryCreator,
       nameProp: 'dataSource',
-      mapRequestParams: ({ dependencies }) => {
+      mapRequestParams: ({ dataSource, dependencies }) => {
         const [, , query, dateRangeFrom, dateRangeTo] = dependencies;
         return {
           query: JSON.parse(query),
-          dateRange: {
-            from: dateRangeFrom,
-            to: dateRangeTo,
-          },
+          // Add conditionally the date range if the index pattern has a time field
+          ...(dataSource.dataSource.indexPattern.timeFieldName
+            ? {
+                dateRange: {
+                  from: dateRangeFrom,
+                  to: dateRangeTo,
+                },
+              }
+            : {}),
         };
       },
       mapFetchActionDependencies: props => [

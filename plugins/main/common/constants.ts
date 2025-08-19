@@ -936,3 +936,6 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
   'index-pattern:states-fim-registry-values';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
+  'index-pattern:states-sca';

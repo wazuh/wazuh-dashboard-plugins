@@ -1,10 +1,10 @@
 # SCA Documentation
 
-## 🛡️ MainSca Component – Functionality and Context
+## 🛡️ SCADashboard and SCAInventory Component – Functionality and Context
 
 ## 📌 What is this component?
 
-`MainSca` is the main component of the **SCA (Security Configuration Assessment)** module within the Wazuh dashboard.  
+`SCADashboard` and `SCAInventory` are the main components of the **SCA (Security Configuration Assessment)** module.  
 It provides a visual summary of the compliance status of the security policies evaluated by Wazuh agents.
 
 It allows users to quickly see, for each policy associated with an agent, how many checks were:
