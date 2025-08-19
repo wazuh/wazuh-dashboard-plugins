@@ -25,20 +25,18 @@ import {
 } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { withAgentSupportModule } from '../../common/hocs';
 import {
-  AlertsDataSourceRepository,
-  PatternDataSource,
-  tFilter,
-  tParsedIndexPattern,
-  useDataSource,
-} from '../../common/data-source';
-import { IndexPattern } from '../../../../../../src/plugins/data/common';
-import useSearchBar from '../../common/search-bar/use-search-bar';
+  withAgentSupportModule,
+  withDataSourceInitiated,
+  withDataSourceLoading,
+  withDataSourceSearchBar,
+} from '../../common/hocs';
+import { AlertsDataSourceRepository, tFilter } from '../../common/data-source';
 import { LoadingSearchbarProgress } from '../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
 import { WzSearchBar } from '../../common/search-bar';
+import { compose } from 'redux';
 
 function buildComplianceObject({ section }) {
   try {
@@ -140,27 +138,25 @@ function buildComplianceObject({ section }) {
   }
 }
 
-export const ComplianceTable = withAgentSupportModule(props => {
-  const { DataSource, ...rest } = props;
+export const ComplianceTable = compose(
+  withAgentSupportModule,
+  withDataSourceSearchBar({
+    DataSourceFromNameProp: 'DataSource',
+    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  }),
+  withDataSourceLoading({
+    isLoadingNameProp: 'dataSource.isLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    dataSourceNameProp: 'dataSource.dataSource',
+    isLoadingNameProp: 'dataSource.isLoading',
+    dataSourceErrorNameProp: 'dataSource.error',
+  }),
+)(props => {
+  const { dataSource } = props;
 
-  const {
-    filters,
-    dataSource,
-    fetchFilters,
-    fixedFilters,
-    isLoading: isDataSourceLoading,
-    fetchData,
-    setFilters,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource,
-    repository: new AlertsDataSourceRepository(),
-  });
-
-  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
-    indexPattern: dataSource?.indexPattern as IndexPattern,
-    filters,
-    setFilters,
-  });
+  const { searchBarProps, fingerprint, autoRefreshFingerprint } = dataSource;
 
   const { dateRangeFrom, dateRangeTo } = searchBarProps;
   const [complianceData, setComplianceData] = useState({
@@ -177,7 +173,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
     return [
       {
         meta: {
-          index: dataSource?.indexPattern.id,
+          index: dataSource.dataSource?.indexPattern.id,
           negate: false,
           disabled: false,
           alias: null,
@@ -255,7 +251,7 @@ export const ComplianceTable = withAgentSupportModule(props => {
 
   const action = useAsyncAction(getRequirementsCount, [
     props.section,
-    dataSource,
+    dataSource.dataSource,
     searchBarProps.query,
     { from: dateRangeFrom, to: dateRangeTo },
   ]);
@@ -269,18 +265,15 @@ export const ComplianceTable = withAgentSupportModule(props => {
   }, []);
 
   useEffect(() => {
-    if (dataSource) {
-      action.run({
-        section: props.section,
-        fetchData,
-        query: searchBarProps.query,
-        dateRange: { from: dateRangeFrom, to: dateRangeTo },
-      });
-    }
+    action.run({
+      section: props.section,
+      fetchData: dataSource.fetchData,
+      query: searchBarProps.query,
+      dateRange: { from: dateRangeFrom, to: dateRangeTo },
+    });
   }, [
-    dataSource,
     JSON.stringify(searchBarProps.query),
-    JSON.stringify(fetchFilters),
+    JSON.stringify(dataSource.fetchFilters),
     dateRangeFrom,
     dateRangeTo,
     fingerprint,
@@ -289,84 +282,80 @@ export const ComplianceTable = withAgentSupportModule(props => {
 
   return (
     <I18nProvider>
-      {isDataSourceLoading && !dataSource ? (
-        <LoadingSearchbarProgress />
-      ) : (
-        <>
-          <EuiPanel
-            paddingSize='none'
-            hasShadow={false}
-            hasBorder={false}
-            color='transparent'
-          >
-            <WzSearchBar
-              appName='compliance-controls'
-              {...searchBarProps}
-              fixedFilters={fixedFilters}
-              showDatePicker={true}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
+      <>
+        <EuiPanel
+          paddingSize='none'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
+          <WzSearchBar
+            appName='compliance-controls'
+            {...searchBarProps}
+            fixedFilters={dataSource.fixedFilters}
+            showDatePicker={true}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
+        </EuiPanel>
+        <EuiPanel
+          paddingSize='s'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
+          <EuiPanel paddingSize='none'>
+            <EuiFlexGroup paddingSize='none'>
+              <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
+                {!!Object.keys(complianceData.complianceObject).length && (
+                  <EuiFlexGroup>
+                    <EuiFlexItem
+                      grow={false}
+                      style={{
+                        width: '15%',
+                        minWidth: 145,
+                        maxHeight: 'calc(100vh - 320px)',
+                        overflowX: 'hidden',
+                      }}
+                    >
+                      <ComplianceRequirements
+                        section={props.section}
+                        onChangeSelectedRequirements={selectedRequirements =>
+                          setComplianceData(state => ({
+                            ...state,
+                            selectedRequirements,
+                          }))
+                        }
+                        requirementsCount={action.data || []}
+                        loadingAlerts={action.running}
+                        {...complianceData}
+                      />
+                    </EuiFlexItem>
+                    <EuiFlexItem style={{ width: '15%' }}>
+                      <ComplianceSubrequirements
+                        section={props.section}
+                        onSelectedTabChanged={id =>
+                          props.onSelectedTabChanged(id)
+                        }
+                        requirementsCount={action.data || []}
+                        loadingAlerts={action.running}
+                        fetchFilters={dataSource.fetchFilters}
+                        getRegulatoryComplianceRequirementFilter={
+                          getRegulatoryComplianceRequirementFilter
+                        }
+                        {...complianceData}
+                        filters={dataSource.filters}
+                        setFilters={dataSource.setFilters}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                )}
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiPanel>
-          <EuiPanel
-            paddingSize='s'
-            hasShadow={false}
-            hasBorder={false}
-            color='transparent'
-          >
-            <EuiPanel paddingSize='none'>
-              <EuiFlexGroup paddingSize='none'>
-                <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
-                  {!!Object.keys(complianceData.complianceObject).length && (
-                    <EuiFlexGroup>
-                      <EuiFlexItem
-                        grow={false}
-                        style={{
-                          width: '15%',
-                          minWidth: 145,
-                          maxHeight: 'calc(100vh - 320px)',
-                          overflowX: 'hidden',
-                        }}
-                      >
-                        <ComplianceRequirements
-                          section={props.section}
-                          onChangeSelectedRequirements={selectedRequirements =>
-                            setComplianceData(state => ({
-                              ...state,
-                              selectedRequirements,
-                            }))
-                          }
-                          requirementsCount={action.data || []}
-                          loadingAlerts={action.running}
-                          {...complianceData}
-                        />
-                      </EuiFlexItem>
-                      <EuiFlexItem style={{ width: '15%' }}>
-                        <ComplianceSubrequirements
-                          section={props.section}
-                          onSelectedTabChanged={id =>
-                            props.onSelectedTabChanged(id)
-                          }
-                          requirementsCount={action.data || []}
-                          loadingAlerts={action.running}
-                          fetchFilters={fetchFilters}
-                          getRegulatoryComplianceRequirementFilter={
-                            getRegulatoryComplianceRequirementFilter
-                          }
-                          {...complianceData}
-                          filters={filters}
-                          setFilters={setFilters}
-                        />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  )}
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPanel>
-          </EuiPanel>
-        </>
-      )}
+        </EuiPanel>
+      </>
     </I18nProvider>
   );
 });

@@ -59,24 +59,63 @@ export const withDataSourceInitiated = ({
     ),
   );
 
+/**
+ * This HOC creates the dataSource instance. It allows to pass the DataSource and
+ * DataSourceRepositoryCreator as builders or as props.
+ * @param param0
+ * @returns
+ */
 export const withDataSource =
-  ({ DataSource, DataSourceRepositoryCreator, nameProp = 'dataSource' }) =>
+  ({
+    DataSource,
+    DataSourceRepositoryCreator,
+    nameProp = 'dataSource',
+    DataSourceFromNameProp,
+    DataSourceRepositoryCreatorFromNameProp,
+  }) =>
   WrappedCompoment =>
   props => {
+    const DataSourceBuilder = DataSourceFromNameProp
+      ? get(props, DataSourceFromNameProp)
+      : DataSource;
+    const DataSourceRepositoryCreatorBuilder =
+      DataSourceRepositoryCreatorFromNameProp
+        ? get(props, DataSourceRepositoryCreatorFromNameProp)
+        : DataSourceRepositoryCreator;
     const dataSource = useDataSource<tParsedIndexPattern, PatternDataSource>({
-      DataSource: DataSource,
-      repository: new DataSourceRepositoryCreator(),
+      DataSource: DataSourceBuilder,
+      repository: new DataSourceRepositoryCreatorBuilder(),
     });
     return <WrappedCompoment {...props} {...{ [nameProp]: dataSource }} />;
   };
 
+/**
+ * This HOC creates the dataSource instance and the search bar props. It allows to pass the
+ * DataSource and DataSourceRepositoryCreator as builders or as props.
+ * @param param0
+ * @returns
+ */
 export const withDataSourceSearchBar =
-  ({ DataSource, DataSourceRepositoryCreator, nameProp = 'dataSource' }) =>
+  ({
+    DataSource,
+    DataSourceRepositoryCreator,
+    nameProp = 'dataSource',
+    DataSourceFromNameProp,
+    DataSourceRepositoryCreatorFromNameProp,
+  }) =>
   WrappedCompoment =>
   props => {
+    const DataSourceBuilder = DataSourceFromNameProp
+      ? get(props, DataSourceFromNameProp)
+      : DataSource;
+    const DataSourceRepositoryCreatorBuilder =
+      DataSourceRepositoryCreatorFromNameProp
+        ? get(props, DataSourceRepositoryCreatorFromNameProp)
+        : DataSourceRepositoryCreator;
+
     const dataSource = useDataSourceWithSearchBar({
-      DataSource: DataSource,
-      DataSourceRepositoryCreator: DataSourceRepositoryCreator,
+      DataSource: DataSourceBuilder,
+      DataSourceRepositoryCreator: DataSourceRepositoryCreatorBuilder,
     });
     return <WrappedCompoment {...props} {...{ [nameProp]: dataSource }} />;
   };
@@ -159,7 +198,9 @@ export const withDataSourceFetchOnStart =
 
 export const withDataSourceFetch = ({
   DataSource,
+  DataSourceFromNameProp,
   DataSourceRepositoryCreator,
+  DataSourceRepositoryCreatorFromNameProp,
   nameProp = 'dataSource',
   mapRequestParams,
   mapResponse,
@@ -169,7 +210,9 @@ export const withDataSourceFetch = ({
   ErrorFetchDataComponent,
 }: {
   DataSource: any;
+  DataSourceFromNameProp?: string;
   DataSourceRepositoryCreator: any;
+  DataSourceRepositoryCreatorFromNameProp?: string;
   nameProp?: string;
   mapRequestParams?: WithDataSourceFetchOnStartProps['mapRequestParams'];
   mapResponse?: WithDataSourceFetchOnStartProps['mapResponse'];
@@ -181,7 +224,9 @@ export const withDataSourceFetch = ({
   compose(
     withDataSource({
       DataSource,
+      DataSourceFromNameProp,
       DataSourceRepositoryCreator,
+      DataSourceRepositoryCreatorFromNameProp,
       nameProp,
     }),
     withDataSourceLoading({
@@ -205,7 +250,9 @@ export const withDataSourceFetch = ({
 
 export const withDataSourceFetchSearchBar = ({
   DataSource,
+  DataSourceFromNameProp,
   DataSourceRepositoryCreator,
+  DataSourceRepositoryCreatorFromNameProp,
   nameProp = 'dataSource',
   mapRequestParams,
   mapResponse,
@@ -218,7 +265,9 @@ export const withDataSourceFetchSearchBar = ({
   ErrorFetchDataComponent,
 }: {
   DataSource: any;
+  DataSourceFromNameProp?: string;
   DataSourceRepositoryCreator: any;
+  DataSourceRepositoryCreatorFromNameProp?: string;
   nameProp?: string;
   mapRequestParams?: WithDataSourceFetchOnStartProps['mapRequestParams'];
   mapResponse?: WithDataSourceFetchOnStartProps['mapResponse'];
@@ -231,7 +280,9 @@ export const withDataSourceFetchSearchBar = ({
   compose(
     withDataSourceSearchBar({
       DataSource,
+      DataSourceFromNameProp,
       DataSourceRepositoryCreator,
+      DataSourceRepositoryCreatorFromNameProp,
       nameProp,
     }),
     withDataSourceLoading({
