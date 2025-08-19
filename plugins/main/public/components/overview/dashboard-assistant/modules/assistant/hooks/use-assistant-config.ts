@@ -13,7 +13,10 @@ export function useAssistantConfig() {
       const config = await UseCases.getConfig();
       return config;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch assistant configuration';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Failed to fetch assistant configuration';
       throw new Error(errorMessage);
     }
   }, []);

@@ -93,7 +93,7 @@ curl --cacert $CACERT --cert $CERT --key $KEY \\
     context: RequestHandlerContext & { wazuh_core: WazuhCorePluginStart },
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
-  ) {    
+  ) {
     const result = await axios.get(
       `${context.core.opensearch.opensearchStart.client.config.hosts[0]}/.plugins-ml-config/_doc/os_chat`,
       {

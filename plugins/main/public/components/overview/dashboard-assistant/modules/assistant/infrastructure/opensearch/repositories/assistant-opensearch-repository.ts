@@ -5,7 +5,9 @@ export class AssistantOpenSearchRepository implements AssistantRepository {
   constructor(private readonly httpClient: IHttpClient) {}
 
   public async getConfig(): Promise<any> {
-    const response = await this.httpClient.proxyRequest.post.WithGet('/.plugins-ml-config/_doc/os_chat');
+    const response = await this.httpClient.proxyRequest.post.WithGet(
+      '/.plugins-ml-config/_doc/os_chat',
+    );
     return response;
   }
 }

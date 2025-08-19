@@ -44,8 +44,6 @@ interface ModelRegisterProps {
   formConfig?: FormConfig;
 }
 
-
-
 const ModelRegisterComponent = ({
   disabled = false,
   formConfig,
@@ -58,7 +56,7 @@ const ModelRegisterComponent = ({
     isLoading: isInstalling,
     result,
     progress,
-    isSuccess
+    isSuccess,
   } = useAssistantInstallation();
 
   // Default form configuration
@@ -211,8 +209,8 @@ export const ModelRegister = withGlobalBreadcrumb(() => [
   {
     text: 'Dashboard Assistant',
     href: NavigationService.getInstance().getUrlForApp(dashboardAssistant.id, {
-        path: `#/${SECTIONS.ASSISTANT}`,
-      }),
+      path: `#/${SECTIONS.ASSISTANT}`,
+    }),
   },
   {
     text: 'Register model',

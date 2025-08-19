@@ -45,9 +45,8 @@ export class Repositories {
   static agentRepository: AgentRepository = new AgentOpenSearchRepository(
     httpClient,
   );
-  static assistantRepository: AssistantRepository = new AssistantOpenSearchRepository(
-    httpClient,
-  );
+  static assistantRepository: AssistantRepository =
+    new AssistantOpenSearchRepository(httpClient);
 }
 
 export class UseCases {

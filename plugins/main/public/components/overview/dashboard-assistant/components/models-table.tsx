@@ -197,22 +197,26 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           type: 'icon',
           enabled: (model: Model) => model.status === 'active' && !model.inUse,
           onClick: async (model: Model) => {
-            if(!model.agentId){
+            if (!model.agentId) {
               return;
             }
-            try{
+            try {
               await UseCases.registerAgent(model.agentId);
               // ToDo: Check why is needed to wait 500 ms
               await new Promise(resolve => setTimeout(resolve, 500));
               await refresh();
               addSuccessToast(
                 'Agent registered',
-                `The agent "${model.agentName}" with ID "${model.agentId}" has been successfully registered.`
+                `The agent "${model.agentName}" with ID "${model.agentId}" has been successfully registered.`,
               );
-            }catch(error){
+            } catch (error) {
               addErrorToast(
                 'Error registering agent',
-                `Could not register agent "${model.agentName}" with ID "${model.agentId}". ${error instanceof Error ? error.message : 'Unknown error'}`
+                `Could not register agent "${model.agentName}" with ID "${
+                  model.agentId
+                }". ${
+                  error instanceof Error ? error.message : 'Unknown error'
+                }`,
               );
             }
           },
@@ -246,12 +250,16 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
               await refresh();
               addSuccessToast(
                 'Model deleted',
-                `The model "${model.name}" with ID "${model.id}" has been successfully deleted.`
+                `The model "${model.name}" with ID "${model.id}" has been successfully deleted.`,
               );
             } catch (error) {
               addErrorToast(
                 'Error deleting model',
-                `Could not delete model "${model.name}" with ID "${model.id}". ${error instanceof Error ? error.message : 'Unknown error'}`
+                `Could not delete model "${model.name}" with ID "${
+                  model.id
+                }". ${
+                  error instanceof Error ? error.message : 'Unknown error'
+                }`,
               );
             }
           },

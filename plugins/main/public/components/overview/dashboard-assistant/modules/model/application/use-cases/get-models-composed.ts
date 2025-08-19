@@ -8,16 +8,16 @@ import { AssistantRepository } from '../../../assistant/application/ports/assist
 export const getModelsComposedUseCase = (
   modelRepository: ModelRepository,
   agentRepository: AgentRepository,
-  assistantRepository: AssistantRepository
+  assistantRepository: AssistantRepository,
 ) => {
   return async (): Promise<ModelsComposed[]> => {
     const models = await modelRepository.getAll();
-    
+
     const modelsWithAgents = await Promise.all(
-      models.map(async (model) => {
+      models.map(async model => {
         try {
           const agent = await agentRepository.findByModelId(model.id);
-          
+
           return {
             ...model,
             agentId: agent?.id,
@@ -30,12 +30,12 @@ export const getModelsComposedUseCase = (
             agentName: undefined,
           } as ModelWithAgent;
         }
-      })
+      }),
     );
-    
+
     const assistantConfig = await assistantRepository.getConfig();
     const activeAgentId = assistantConfig?._source?.configuration?.agent_id;
-    
+
     return ModelWithAgentMapper.toTableData(modelsWithAgents, activeAgentId);
   };
 };

@@ -1,4 +1,10 @@
-import React, { useContext, createContext, ReactNode, useState, useCallback } from 'react';
+import React, {
+  useContext,
+  createContext,
+  ReactNode,
+  useState,
+  useCallback,
+} from 'react';
 import { Toast } from '@elastic/eui';
 
 interface ToastContextType {
@@ -13,7 +19,9 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const ToastProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
@@ -25,44 +33,58 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }, []);
 
   const removeToast = useCallback((removedToast: Toast) => {
-    setToasts(prevToasts => prevToasts.filter(toast => toast.id !== removedToast.id));
+    setToasts(prevToasts =>
+      prevToasts.filter(toast => toast.id !== removedToast.id),
+    );
   }, []);
 
-  const addSuccessToast = useCallback((title: string, text?: string) => {
-    addToast({
-      title,
-      text,
-      color: 'success',
-      iconType: 'check',
-    });
-  }, [addToast]);
+  const addSuccessToast = useCallback(
+    (title: string, text?: string) => {
+      addToast({
+        title,
+        text,
+        color: 'success',
+        iconType: 'check',
+      });
+    },
+    [addToast],
+  );
 
-  const addErrorToast = useCallback((title: string, text?: string) => {
-    addToast({
-      title,
-      text,
-      color: 'danger',
-      iconType: 'alert',
-    });
-  }, [addToast]);
+  const addErrorToast = useCallback(
+    (title: string, text?: string) => {
+      addToast({
+        title,
+        text,
+        color: 'danger',
+        iconType: 'alert',
+      });
+    },
+    [addToast],
+  );
 
-  const addWarningToast = useCallback((title: string, text?: string) => {
-    addToast({
-      title,
-      text,
-      color: 'warning',
-      iconType: 'warning',
-    });
-  }, [addToast]);
+  const addWarningToast = useCallback(
+    (title: string, text?: string) => {
+      addToast({
+        title,
+        text,
+        color: 'warning',
+        iconType: 'warning',
+      });
+    },
+    [addToast],
+  );
 
-  const addInfoToast = useCallback((title: string, text?: string) => {
-    addToast({
-      title,
-      text,
-      color: 'primary',
-      iconType: 'iInCircle',
-    });
-  }, [addToast]);
+  const addInfoToast = useCallback(
+    (title: string, text?: string) => {
+      addToast({
+        title,
+        text,
+        color: 'primary',
+        iconType: 'iInCircle',
+      });
+    },
+    [addToast],
+  );
 
   const value: ToastContextType = {
     toasts,
@@ -74,11 +96,7 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     addInfoToast,
   };
 
-  return React.createElement(
-    ToastContext.Provider,
-    { value },
-    children
-  );
+  return React.createElement(ToastContext.Provider, { value }, children);
 };
 
 export const useToast = (): ToastContextType => {

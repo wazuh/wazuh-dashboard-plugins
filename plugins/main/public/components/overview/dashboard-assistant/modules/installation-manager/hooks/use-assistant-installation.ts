@@ -100,7 +100,6 @@ export function useAssistantInstallation() {
     resetQuery();
   }, [resetQuery]);
 
-
   return {
     install,
     setModel,
@@ -110,6 +109,6 @@ export function useAssistantInstallation() {
     result,
     modelData: assistantModelInfo,
     progress,
-    isSuccess: result?.success || false
+    isSuccess: result?.success || false,
   };
 }

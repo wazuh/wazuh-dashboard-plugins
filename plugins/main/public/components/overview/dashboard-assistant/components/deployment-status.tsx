@@ -106,19 +106,21 @@ export const DeploymentStatus = ({
           );
         })}
       </EuiListGroup>
-      {((progress && !progress?.isFinished() && progress?.getFailedSteps().length > 0) || showCheckButton || progress?.isFinished()) && (
+      {((progress &&
+        !progress?.isFinished() &&
+        progress?.getFailedSteps().length > 0) ||
+        showCheckButton ||
+        progress?.isFinished()) && (
         <>
           <EuiSpacer size='l' />
           <EuiFlexGroup justifyContent='center'>
             <EuiFlexItem grow={false}>
-              <EuiButton
-                fill
-                onClick={() => onCheckButton?.()}
-              >
-                {(progress && !progress?.isFinished() && progress?.getFailedSteps().length > 0) 
-                  ? 'Go back' 
-                  : 'Go to model assistants'
-                }
+              <EuiButton fill onClick={() => onCheckButton?.()}>
+                {progress &&
+                !progress?.isFinished() &&
+                progress?.getFailedSteps().length > 0
+                  ? 'Go back'
+                  : 'Go to model assistants'}
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>

@@ -32,18 +32,18 @@ export const ModelTestResult = ({
   useEffect(() => {
     if (response && !isLoading && !error) {
       addSuccessToast(
-      'Model test successful',
-      `The model "${modelName}" responded correctly.`
-    );
+        'Model test successful',
+        `The model "${modelName}" responded correctly.`,
+      );
     }
   }, [response, isLoading, error, modelName, addSuccessToast]);
 
   useEffect(() => {
     if (error && !isLoading) {
       addErrorToast(
-      'Model test error',
-      `The test for model "${modelName}" failed: ${error}`
-    );
+        'Model test error',
+        `The test for model "${modelName}" failed: ${error}`,
+      );
     }
   }, [error, isLoading, modelName, addErrorToast]);
   const renderStatus = () => {

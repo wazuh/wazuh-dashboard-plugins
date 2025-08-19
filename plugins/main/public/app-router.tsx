@@ -116,7 +116,11 @@ export function Application(props) {
         <Route
           path={`/${SECTIONS.ASSISTANT}/${SECTIONS.REGISTER_MODEL}`}
           exact
-          render={props => <ToastProvider><ModelRegister {...props} /></ToastProvider>}
+          render={props => (
+            <ToastProvider>
+              <ModelRegister {...props} />
+            </ToastProvider>
+          )}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>

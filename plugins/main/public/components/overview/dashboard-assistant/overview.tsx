@@ -36,4 +36,4 @@ export const AssistantOverview = withGlobalBreadcrumb([
       <AssistantOverviewContent />
     </ToastProvider>
   );
-})
+});

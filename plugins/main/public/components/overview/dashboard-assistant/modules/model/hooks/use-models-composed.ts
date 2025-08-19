@@ -11,12 +11,7 @@ interface UseModelsComposed {
 }
 
 export function useModelsComposed(): UseModelsComposed {
-  const {
-    data,
-    error,
-    isLoading,
-    fetch
-  } = useQuery<ModelsComposed[]>({
+  const { data, error, isLoading, fetch } = useQuery<ModelsComposed[]>({
     query() {
       return UseCases.getModelsComposed();
     },
