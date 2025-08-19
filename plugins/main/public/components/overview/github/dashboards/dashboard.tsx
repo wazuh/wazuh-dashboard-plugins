@@ -14,7 +14,7 @@ export const DashboardGitHub = createDashboard({
       id: 'github-dashboard-tab',
       title: 'GitHub dashboard',
       description: 'Dashboard of the GitHub',
-      hidePanelTitles: true,
+      hidePanelTitles: false,
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
