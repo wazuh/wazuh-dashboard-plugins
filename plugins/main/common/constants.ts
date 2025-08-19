@@ -922,6 +922,12 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES =
   'index-pattern:states-inventory-users';
 
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES =
+  'index-pattern:states-inventory-services';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES =
+  'index-pattern:states-inventory-browser-extensions';
+
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES =
   'index-pattern:states-fim-files';
 
