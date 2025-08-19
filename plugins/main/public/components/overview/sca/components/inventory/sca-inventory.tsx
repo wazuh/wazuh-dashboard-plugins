@@ -33,7 +33,7 @@ import { compose } from 'redux';
  * security teams ensure systems are properly configured according to security
  * best practices and compliance requirements.
  */
-export const SCAInventory: React.FC<{ indexPattern: IndexPattern }> = compose(
+export const SCAInventory: React.FC<{}> = compose(
   withErrorBoundary,
   withSCADataSource,
 )(() => {
