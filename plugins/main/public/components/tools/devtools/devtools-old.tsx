@@ -1048,14 +1048,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
                 aria-hidden='true'
               ></i>
             </a>
-            {/* <i
-              href={webDocumentationLink('user-manual/api/reference.html')}
-              // onClick={help}
-              className='fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw'
-              aria-hidden='true'
-            ></i> */}
             <i
-              // ng-click='ctrl.exportOutput()'
               onClick={() => exportOutput(editorOutputRef.current)}
               tooltip='Export as JSON'
               tooltip-placement='bottom'
@@ -1066,7 +1059,6 @@ export const ToolDevTools = withGlobalBreadcrumb([
           <textarea style={{ display: 'flex' }} id='api_output'></textarea>
         </div>
       </div>
-      {/* </md-content> */}
     </div>
   );
 });
