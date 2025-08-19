@@ -88,4 +88,21 @@ curl --cacert $CACERT --cert $CERT --key $KEY \\
 
     return response.ok({ body: { success: true } });
   }
+
+  async getAssistantConfig(
+    context: RequestHandlerContext & { wazuh_core: WazuhCorePluginStart },
+    request: OpenSearchDashboardsRequest,
+    response: OpenSearchDashboardsResponseFactory,
+  ) {    
+    const result = await axios.get(
+      `${context.core.opensearch.opensearchStart.client.config.hosts[0]}/.plugins-ml-config/_doc/os_chat`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    return response.ok({ body: result.data });
+  }
 }

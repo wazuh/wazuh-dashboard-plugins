@@ -24,6 +24,7 @@ import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { AssistantOverview } from './components/overview/dashboard-assistant/overview';
 import { ModelRegister } from './components/overview/dashboard-assistant/components/model-register';
+import { ToastProvider } from './components/overview/dashboard-assistant/hooks/use-toast';
 
 export function Application(props) {
   const dispatch = useDispatch();
@@ -115,7 +116,7 @@ export function Application(props) {
         <Route
           path={`/${SECTIONS.ASSISTANT}/${SECTIONS.REGISTER_MODEL}`}
           exact
-          render={props => <ModelRegister {...props} />}
+          render={props => <ToastProvider><ModelRegister {...props} /></ToastProvider>}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>

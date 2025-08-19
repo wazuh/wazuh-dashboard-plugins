@@ -4,4 +4,7 @@ export interface ModelFieldDefinition {
   version: string;
   status: string;
   createdAt: string;
+  agentId?: string;
+  agentName?: string;
+  inUse?: boolean;
 }

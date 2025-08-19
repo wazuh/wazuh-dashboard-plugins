@@ -20,10 +20,14 @@ import { createModelUseCase } from './modules/model/application/use-cases/create
 import { deleteModelWithRelatedEntitiesUseCase } from './modules/model/application/use-cases/delete-model-with-related-entities';
 import { deleteModelUseCase } from './modules/model/application/use-cases/delete-model';
 import { getModelsUseCase } from './modules/model/application/use-cases/get-models';
+import { getModelsComposedUseCase } from './modules/model/application/use-cases/get-models-composed';
 import { testModelConnectionUseCase } from './modules/model/application/use-cases/test-model-connection';
 import { ModelOpenSearchRepository } from './modules/model/infrastructure/opensearch/repositories/model-opensearch-repository';
 import { getRegisterAgentCommandUseCase } from './modules/agent/application/use-cases/get-register-agent-command';
 import { getRegisterAgentCommandByModelIdUseCase } from './modules/agent/application/use-cases/get-register-agent-command-by-model-id';
+import { AssistantRepository } from './modules/assistant/application/ports/assistant-repository';
+import { getConfigUseCase } from './modules/assistant/application/use-cases/get-config';
+import { AssistantOpenSearchRepository } from './modules/assistant/infrastructure/opensearch/repositories/assistant-opensearch-repository';
 
 export const httpClient = new HttpWithProxyClient();
 
@@ -39,6 +43,9 @@ export class Repositories {
     httpClient,
   );
   static agentRepository: AgentRepository = new AgentOpenSearchRepository(
+    httpClient,
+  );
+  static assistantRepository: AssistantRepository = new AssistantOpenSearchRepository(
     httpClient,
   );
 }
@@ -59,6 +66,11 @@ export class UseCases {
   static getRegisterAgentCommandByModelId =
     getRegisterAgentCommandByModelIdUseCase(Repositories.agentRepository);
   static getModels = getModelsUseCase(Repositories.modelRepository);
+  static getModelsComposed = getModelsComposedUseCase(
+    Repositories.modelRepository,
+    Repositories.agentRepository,
+    Repositories.assistantRepository,
+  );
   static deleteModel = deleteModelUseCase(Repositories.modelRepository);
   static deleteModelWithRelatedEntities = deleteModelWithRelatedEntitiesUseCase(
     Repositories.modelRepository,
@@ -72,6 +84,7 @@ export class UseCases {
   static useAgentByModelId = useAgentByModelIdUseCase(
     Repositories.agentRepository,
   );
+  static getConfig = getConfigUseCase(Repositories.assistantRepository);
   static installDashboardAssistant = (
     callback: (progress: InstallationProgress) => void,
   ) =>

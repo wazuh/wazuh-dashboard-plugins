@@ -16,6 +16,8 @@ export class HttpWithProxyClient implements IHttpClient {
             this.post(this.buildProxyUrl(HttpMethod.PUT, url), data, config),
           WithDelete: (url: string, config?: Record<string, any>) =>
             this.post(this.buildProxyUrl(HttpMethod.DELETE, url), config),
+          WithGet: (url: string, config?: Record<string, any>) =>
+            this.post(this.buildProxyUrl(HttpMethod.GET, url), config)
         },
       ),
       get: (url: string, config?: Record<string, any>) =>

@@ -9,6 +9,10 @@ interface HttpProxyPostRequest {
     url: string,
     config?: Record<string, any>,
   ) => Promise<T>;
+  WithGet: <T = any>(
+    url: string,
+    config?: Record<string, any>,
+  ) => Promise<T>;
 }
 
 interface HttpProxyRequest {

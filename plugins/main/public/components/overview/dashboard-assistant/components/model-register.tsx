@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   EuiButton,
   EuiButtonEmpty,
@@ -12,7 +12,6 @@ import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
-  // @ts-ignore
 } from '@elastic/eui';
 import { ModelForm } from '.';
 import { DeploymentStatus } from '.';
@@ -22,6 +21,10 @@ import { ProviderModelConfig } from '../provider-model-config';
 import { useAssistantInstallation } from '../modules/installation-manager/hooks/use-assistant-installation';
 import { ModelFormData } from './types';
 import { DashboardAssistantNavigationService } from '../services/dashboard-assistant-navigation-service';
+import { withGlobalBreadcrumb } from '../../../common/hocs';
+import NavigationService from '../../../../react-services/navigation-service';
+import { SECTIONS } from '../../../../sections';
+import { ToastProvider, useToast } from '../hooks/use-toast';
 
 interface FormConfig {
   title: string;
@@ -41,19 +44,21 @@ interface ModelRegisterProps {
   formConfig?: FormConfig;
 }
 
-export const ModelRegister = ({
+
+
+const ModelRegisterComponent = ({
   disabled = false,
   formConfig,
 }: ModelRegisterProps) => {
   const [isDeployed, setIsDeployed] = useState(false);
-  // Use the assistant installation hook
+  const { addSuccessToast, addErrorToast, addInfoToast } = useToast();
   const {
     install,
     setModel,
     isLoading: isInstalling,
     result,
     progress,
-    isSuccess,
+    isSuccess
   } = useAssistantInstallation();
 
   // Default form configuration
@@ -98,7 +103,6 @@ export const ModelRegister = ({
 
   const handleDeploy = async () => {
     setIsDeploymentVisible(true);
-
     // Execute the installation using the hook
     await install();
 
@@ -202,3 +206,15 @@ export const ModelRegister = ({
     </>
   );
 };
+
+export const ModelRegister = withGlobalBreadcrumb(() => [
+  {
+    text: 'Dashboard Assistant',
+    href: NavigationService.getInstance().getUrlForApp(dashboardAssistant.id, {
+        path: `#/${SECTIONS.ASSISTANT}`,
+      }),
+  },
+  {
+    text: 'Register model',
+  },
+])(ModelRegisterComponent);

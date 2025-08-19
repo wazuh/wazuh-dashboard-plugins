@@ -22,12 +22,10 @@ export function useAssistantInstallation() {
   const [progress, setProgress] = useState<InstallationProgress>(
     InstallDashboardAssistantResponse.start().progress,
   );
-
   const setModel = useCallback((data: ModelConfiguration) => {
     setAssistantModelInfo(data);
   }, []);
 
-  // Query executor for installing the assistant; always returns a response
   const installerQuery = useCallback(async () => {
     let lastProgress = InstallDashboardAssistantResponse.start().progress;
 
@@ -45,7 +43,6 @@ export function useAssistantInstallation() {
     }
 
     try {
-      // Build minimal request; DTOs will be created JIT inside steps
       const request: InstallAIDashboardAssistantDto = {
         selected_provider: assistantModelInfo.model_provider,
         model_id: assistantModelInfo.model_id,
@@ -92,7 +89,7 @@ export function useAssistantInstallation() {
   });
 
   const install = useCallback(async () => {
-    // Reset progress at the start of an installation
+    // Reset progress and reported failed steps at the start of an installation
     setProgress(InstallDashboardAssistantResponse.start().progress);
     await fetch();
   }, [fetch]);
@@ -103,6 +100,7 @@ export function useAssistantInstallation() {
     resetQuery();
   }, [resetQuery]);
 
+
   return {
     install,
     setModel,
@@ -112,6 +110,6 @@ export function useAssistantInstallation() {
     result,
     modelData: assistantModelInfo,
     progress,
-    isSuccess: result?.success || false,
+    isSuccess: result?.success || false
   };
 }

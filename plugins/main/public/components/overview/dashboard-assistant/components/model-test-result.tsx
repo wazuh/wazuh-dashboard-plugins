@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   EuiPanel,
   EuiFlexGroup,
@@ -10,6 +10,7 @@ import {
   // @ts-ignore
 } from '@elastic/eui';
 import { ModelPredictResponse } from '../modules/model/domain/types';
+import { useToast } from '../hooks/use-toast';
 
 interface ModelTestResultProps {
   isLoading: boolean;
@@ -26,6 +27,25 @@ export const ModelTestResult = ({
   error,
   modelName,
 }: ModelTestResultProps) => {
+  const { addSuccessToast, addErrorToast } = useToast();
+
+  useEffect(() => {
+    if (response && !isLoading && !error) {
+      addSuccessToast(
+      'Model test successful',
+      `The model "${modelName}" responded correctly.`
+    );
+    }
+  }, [response, isLoading, error, modelName, addSuccessToast]);
+
+  useEffect(() => {
+    if (error && !isLoading) {
+      addErrorToast(
+      'Model test error',
+      `The test for model "${modelName}" failed: ${error}`
+    );
+    }
+  }, [error, isLoading, modelName, addErrorToast]);
   const renderStatus = () => {
     if (isLoading) {
       return (

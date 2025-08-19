@@ -10,22 +10,23 @@ import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
+  EuiIcon,
 } from '@elastic/eui';
 import { formatUINumber } from '../../../../react-services/format-number';
-import NavigationService from '../../../../react-services/navigation-service';
-import { dashboardAssistant } from '../../../../utils/applications';
 import { ModelTestResult } from './model-test-result';
 import {
   useModelTest,
   useDeleteModel,
-  useModels,
+  useModelsComposed,
 } from '../modules/model/hooks';
+import { useToast } from '../hooks/use-toast';
 import { ModelFieldDefinition } from './types';
 import RegisterAgentCommand from './register-agent-command';
 import { useFlyout } from '../hooks/use-flyout';
 import { ModelStatus } from '../modules/model/domain/enums/model-status';
 import StatusIcon from './status-icon';
 import { DashboardAssistantNavigationService } from '../services/dashboard-assistant-navigation-service';
+import { UseCases } from '../setup';
 
 interface Model {
   id: string;
@@ -35,6 +36,9 @@ interface Model {
   apiUrl: string;
   status: ModelStatus;
   createdAt: string;
+  agentId?: string;
+  agentName?: string;
+  inUse?: boolean;
 }
 
 type ModelTableColumns =
@@ -62,7 +66,8 @@ interface ModelsTableProps {
 }
 
 export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
-  const { isLoading, error, refresh, mapModelsToTableData } = useModels();
+  const { addSuccessToast, addErrorToast, addInfoToast } = useToast();
+  const { isLoading, error, refresh, models } = useModelsComposed();
   const [selectedModel, setSelectedModel] = useState<Model | null>(null);
   const flyoutModelDetails = useFlyout({
     onOpenHandler(model: Model) {
@@ -100,8 +105,6 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     reset: resetTest,
   } = useModelTest();
   const { deleteModel } = useDeleteModel();
-
-  const tableModels = mapModelsToTableData();
 
   if (error) {
     return (
@@ -141,6 +144,13 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
       truncateText: true,
     },
     {
+      field: 'agentId',
+      name: 'Agent ID',
+      sortable: true,
+      truncateText: true,
+      render: (agentId: string) => agentId || '-',
+    },
+    {
       field: 'status',
       name: 'Status',
       sortable: true,
@@ -151,6 +161,22 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiText size='s'>{status}</EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      ),
+    },
+    {
+      field: 'inUse',
+      name: 'In Use',
+      sortable: true,
+      render: (inUse: boolean) => (
+        <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
+          <EuiFlexItem grow={false}>
+            <EuiIcon
+              type={inUse ? 'check' : 'cross'}
+              color={inUse ? 'success' : 'danger'}
+              size='m'
+            />
           </EuiFlexItem>
         </EuiFlexGroup>
       ),
@@ -169,14 +195,36 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           description: 'Use model in dashboard assistant',
           icon: 'plusInCircle',
           type: 'icon',
-          onClick: (model: Model) => flyoutUse.open(model),
+          enabled: (model: Model) => model.status === 'active' && !model.inUse,
+          onClick: async (model: Model) => {
+            if(!model.agentId){
+              return;
+            }
+            try{
+              await UseCases.registerAgent(model.agentId);
+              // ToDo: Check why is needed to wait 500 ms
+              await new Promise(resolve => setTimeout(resolve, 500));
+              await refresh();
+              addSuccessToast(
+                'Agent registered',
+                `The agent "${model.agentName}" with ID "${model.agentId}" has been successfully registered.`
+              );
+            }catch(error){
+              addErrorToast(
+                'Error registering agent',
+                `Could not register agent "${model.agentName}" with ID "${model.agentId}". ${error instanceof Error ? error.message : 'Unknown error'}`
+              );
+            }
+          },
         },
         {
           name: 'View',
           description: 'View model details',
           icon: 'eye',
           type: 'icon',
-          onClick: (model: Model) => flyoutModelDetails.open(model),
+          onClick: (model: Model) => {
+            flyoutModelDetails.open(model);
+          },
         },
         {
           name: 'Test',
@@ -191,9 +239,21 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
           icon: 'trash',
           type: 'icon',
           description: 'Delete model',
+          enabled: (model: Model) => !model.inUse,
           onClick: async (model: Model) => {
-            await deleteModel(model.id);
-            await refresh();
+            try {
+              await deleteModel(model.id);
+              await refresh();
+              addSuccessToast(
+                'Model deleted',
+                `The model "${model.name}" with ID "${model.id}" has been successfully deleted.`
+              );
+            } catch (error) {
+              addErrorToast(
+                'Error deleting model',
+                `Could not delete model "${model.name}" with ID "${model.id}". ${error instanceof Error ? error.message : 'Unknown error'}`
+              );
+            }
           },
         },
       ],
@@ -239,7 +299,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
                 {isLoading ? (
                   <EuiLoadingSpinner size='s' />
                 ) : (
-                  <span>({formatUINumber(tableModels.length)})</span>
+                  <span>({formatUINumber(models.length)})</span>
                 )}
               </h1>
             </EuiTitle>
@@ -256,7 +316,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
 
   const table = (
     <EuiBasicTable
-      items={tableModels}
+      items={models}
       columns={columns}
       loading={isLoading}
       hasActions

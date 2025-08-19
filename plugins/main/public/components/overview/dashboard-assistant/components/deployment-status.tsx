@@ -15,7 +15,6 @@ import {
   ExecutionState,
   StepState,
 } from '../modules/installation-manager/domain';
-import RegisterAgentCommand from './register-agent-command';
 import StepIcon from './step-icon';
 import { StepStatus } from './types';
 
@@ -107,15 +106,7 @@ export const DeploymentStatus = ({
           );
         })}
       </EuiListGroup>
-
-      {progress?.isFinished() && agentId && (
-        <>
-          <EuiSpacer size='l' />
-          <RegisterAgentCommand entityId={agentId} targetEntity='agent' />
-        </>
-      )}
-
-      {(showCheckButton || progress?.isFinished()) && (
+      {((progress && !progress?.isFinished() && progress?.getFailedSteps().length > 0) || showCheckButton || progress?.isFinished()) && (
         <>
           <EuiSpacer size='l' />
           <EuiFlexGroup justifyContent='center'>
@@ -123,10 +114,11 @@ export const DeploymentStatus = ({
               <EuiButton
                 fill
                 onClick={() => onCheckButton?.()}
-                iconType='check'
-                disabled={isButtonDisabled}
               >
-                Go to model assistants
+                {(progress && !progress?.isFinished() && progress?.getFailedSteps().length > 0) 
+                  ? 'Go back' 
+                  : 'Go to model assistants'
+                }
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
