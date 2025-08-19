@@ -4,7 +4,7 @@ import jsonLint from '../../../utils/codemirror/json-lint';
 import { ExcludedIntelliSenseTriggerKeys } from './excluded-devtools-autocomplete-keys';
 import queryString from 'querystring-browser';
 import $ from 'jquery';
-import { saveAs } from '@elastic/filesaver';
+import * as FileSaver from '../../../services/file-saver';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 import {
   GenericRequest,
@@ -851,7 +851,7 @@ function exportOutput(editor) {
     const blob = new Blob([editor.getValue()], {
       type: 'application/json',
     });
-    saveAs(blob, 'export.json');
+    FileSaver.saveAs?.(blob, 'export.json');
   } catch (error) {
     const options: UIErrorLog = {
       context: `exportOutput`,
