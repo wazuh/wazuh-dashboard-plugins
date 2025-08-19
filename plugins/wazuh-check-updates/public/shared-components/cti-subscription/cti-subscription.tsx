@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
 import './subscription.scss';
-import { StartCtiSubscription } from './components/StartCtiSubscription';
-import { StatusCtiSubscription } from './components/StatusCtiSubscription';
-import { ModalCti } from './components/ModalCti';
-import { StatusCtiModal } from './components/StatusCtiModal';
+import { StartCtiSubscription } from './components/start-cti-subscription';
+import { StatusCtiSubscription } from './components/status-cti-subscription';
+import { ModalCti } from './components/modal-cti';
+import { StatusCtiModal } from './components/status-cti-modal';
 import { CtiStatus } from './types';
 import { getApiInfo } from '../../services/get-api-info';
 

@@ -10,7 +10,7 @@ export const getApiInfoRoute = (router: IRouter) => {
     },
     async (context, request, response) => {
       try {
-        const apiInfo = await getApiInfo();
+        const apiInfo = await getApiInfo(request);
         return response.ok({
           body: apiInfo,
         });

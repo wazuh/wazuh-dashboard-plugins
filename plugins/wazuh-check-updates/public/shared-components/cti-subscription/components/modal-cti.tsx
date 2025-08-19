@@ -22,8 +22,20 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
 
   const handleButtonClick = () => {
     setLoading(true);
+
+    // TODO: Replace with actual API call to start CTI subscription
     setTimeout(() => {
+      const ctiResponse = {
+        device_code: 'test_device_code',
+        user_code: 'mock_user_code',
+        verification_uri: 'https://cti.wazuh.com',
+        verification_uri_complete: 'https://cti.wazuh.com',
+        expires_in: 1800,
+        interval: 5,
+      };
+
       setLoading(false);
+      window.open(ctiResponse.verification_uri_complete, '_blank');
       handleStatusModalToggle?.();
       handleModalToggle();
     }, 2000);
@@ -65,9 +77,17 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       </EuiModalBody>
 
       <EuiModalFooter>
-        <EuiButtonEmpty onClick={handleModalToggle}>Cancel</EuiButtonEmpty>
+        <EuiButtonEmpty onClick={handleModalToggle}>
+          <FormattedMessage
+            id='wazuhCheckUpdates.ctiSubscription.modalButtonCancel'
+            defaultMessage='Cancel'
+          />
+        </EuiButtonEmpty>
         <EuiButton isLoading={loading} onClick={handleButtonClick} fill>
-          Yes, I want to subscribe
+          <FormattedMessage
+            id='wazuhCheckUpdates.ctiSubscription.modalButtonSubscribe'
+            defaultMessage='Yes, I want to subscribe'
+          />
         </EuiButton>
       </EuiModalFooter>
     </EuiModal>

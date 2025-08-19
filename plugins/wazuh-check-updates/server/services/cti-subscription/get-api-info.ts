@@ -1,51 +1,50 @@
+import { OpenSearchDashboardsRequest } from 'src/core/server';
 import {
   getWazuhCheckUpdatesServices,
   getWazuhCore,
 } from '../../plugin-services';
 
 export const getApiInfo = async (
-  queryApi = false,
-  forceQuery = false,
+  request: OpenSearchDashboardsRequest,
 ): Promise<any> => {
   const { logger } = getWazuhCheckUpdatesServices();
   try {
-    const { api: wazuhApiClient } = getWazuhCore();
-    let path = '';
+    const { utils, api: wazuhApiClient } = getWazuhCore();
+
+    const apiHostID = utils.getAPIHostIDFromCookie(
+      request.headers.cookie,
+      'wz-api',
+    );
+
+    if (!apiHostID) {
+      throw new Error('API host ID not found');
+    }
 
     const { data } = await wazuhApiClient.client.asInternalUser.request(
       'GET',
-      '/cluster/status',
+      '/cluster/nodes',
       {},
-      { apiHostID: 'imposter' }, //TODO: Replace with actual API host ID
+      {
+        apiHostID,
+      },
     );
 
-    const { enabled, running } = data;
+    const {
+      data: { affected_items },
+    }: { data: { affected_items: any[] } } = data;
 
-    const isClusterMode = enabled == 'yes' && running == 'yes';
+    const masterNode = affected_items.find(
+      (node: any) => node.type === 'master',
+    );
 
-    if (!isClusterMode) {
-      path = '/manager/info';
-    }
-
-    if (isClusterMode) {
-      const nodes = await wazuhApiClient.client.asInternalUser.request(
-        'GET',
-        '/cluster/node',
-        {},
-        { apiHostID: 'imposter' }, //TODO: Replace with actual API host ID
-      );
-
-      const [masterNode] = nodes.find((node: any) => node.type === 'master');
-
-      path = `/cluster/${masterNode.name}/info`;
-    }
+    const path = `/cluster/${masterNode.name}/info`;
 
     try {
       const { data } = await wazuhApiClient.client.asInternalUser.request(
         'GET',
         path,
         {},
-        { apiHostID: 'imposter' }, //TODO: Replace with actual API host ID
+        { apiHostID },
       );
       logger.info('[INFO]: API info retrieved successfully', data);
       return data;

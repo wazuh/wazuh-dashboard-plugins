@@ -1,7 +1,14 @@
 import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
-import { EuiHealth, EuiButton, EuiPopover, EuiText } from '@elastic/eui';
+import {
+  EuiHealth,
+  EuiButton,
+  EuiPopover,
+  EuiText,
+  EuiButtonEmpty,
+} from '@elastic/eui';
 import { CtiStatus, StatusCtiSubscriptionProps } from '../types';
+import { getCore } from '../../../plugin-services';
 
 export const StatusCtiSubscription: React.FC<StatusCtiSubscriptionProps> = ({
   isActive,
@@ -16,38 +23,55 @@ export const StatusCtiSubscription: React.FC<StatusCtiSubscriptionProps> = ({
     setIsLoading(false);
   };
 
-  const statusBadge = (
-    <div className='wz-margin-h'>
+  const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
+
+  const colorHealth = isActive === CtiStatus.ACTIVE ? 'success' : 'warning';
+
+  const statusNavTop = (
+    <EuiButtonEmpty>
       <EuiHealth
         onClickAriaLabel={
           isActive === CtiStatus.ACTIVE
             ? 'View active CTI subscription status'
             : 'View pending CTI subscription status'
         }
-        color={isActive === CtiStatus.ACTIVE ? 'success' : 'warning'}
-      />
-    </div>
+        color={colorHealth}
+      >
+        <FormattedMessage
+          id='wazuhCheckUpdates.ctiSubscription.statusNavTop'
+          defaultMessage={`CTI Subscription: {status}`}
+          values={{
+            status: isActive,
+          }}
+        />
+      </EuiHealth>
+    </EuiButtonEmpty>
+  );
+
+  const statusBadge = (
+    // <div className='wz-margin-h'>
+    <EuiHealth
+      onClickAriaLabel={`View ${isActive} CTI subscription status`}
+      color={colorHealth}
+    />
+    // </div>
   );
 
   return (
     <EuiPopover
-      button={statusBadge}
+      button={isNewHomePageEnable ? statusBadge : statusNavTop}
       isOpen={isPopoverOpen}
       closePopover={() => setIsPopoverOpen(false)}
       onClick={() => setIsPopoverOpen(prevState => !prevState)}
     >
       <EuiText style={{ width: 300 }}>
-        {isActive === CtiStatus.ACTIVE ? (
-          <FormattedMessage
-            id='wazuhCheckUpdates.ctiSubscription.statusPopoverActive'
-            defaultMessage='Your CTI subscription is active.'
-          />
-        ) : (
-          <FormattedMessage
-            id='wazuhCheckUpdates.ctiSubscription.statusPopoverPending'
-            defaultMessage='Your CTI subscription is on process'
-          />
-        )}
+        <FormattedMessage
+          id='wazuhCheckUpdates.ctiSubscription.statusPopover'
+          defaultMessage='Your CTI subscription is {status}.'
+          values={{
+            status: isActive,
+          }}
+        />
         <FormattedMessage
           id='wazuhCheckUpdates.ctiSubscription.statusPopover'
           defaultMessage='Want to refresh the status of your subscription?'
