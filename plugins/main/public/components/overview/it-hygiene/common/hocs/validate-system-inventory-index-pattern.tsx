@@ -21,6 +21,8 @@ import {
   WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
   WAZUH_IT_HYGIENE_USERS_PATTERN,
   WAZUH_IT_HYGIENE_GROUPS_PATTERN,
+  WAZUH_IT_HYGIENE_SERVICES_PATTERN,
+  WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
 } from '../../../../../../common/constants';
 
 const errorPromptTypes = {
@@ -174,3 +176,16 @@ export const withSystemInventoryHardwareDataSource = withIndexPatternFromValue({
   ),
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
 });
+
+export const withSystemInventoryServicesDataSource = withIndexPatternFromValue({
+  indexPattern: WAZUH_IT_HYGIENE_SERVICES_PATTERN,
+  validate: ensureIndexPatternIsCreated(),
+  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+});
+
+export const withSystemInventoryBrowserExtensionsDataSource =
+  withIndexPatternFromValue({
+    indexPattern: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
+    validate: ensureIndexPatternIsCreated(),
+    ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
+  });

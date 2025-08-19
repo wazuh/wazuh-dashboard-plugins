@@ -1,0 +1,58 @@
+# 🎯 **Playground Workflow**
+#
+# ⚡ **Overview:**
+# This workflow deploys a development environment and executes any specified `npm` or `yarn` command for testing purposes.
+#
+# 🛠️ **Key Features:**
+# - 🔄 Supports any valid Git reference (branch, tag, or commit SHA).
+# - 💡 Allows execution of custom commands (e.g., `yarn test:jest`, `npm run lint`).
+# - 🐳 Supports additional Docker run parameters for flexible environment configurations.
+# - 📦 Enables artifact creation with customizable names and paths.
+# - ♻️ Reuses the `6_builderprecompiled_base-dev-environment` workflow for consistency.
+#
+# ⚠️ **Notes:**
+# - Ensure that commands specified are compatible with the project’s dependencies.
+# - Artifacts, if defined, will be archived automatically with a `.zip` suffix.
+
+name: Playground
+
+on:
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: main
+        description: Git reference (branch, tag, or commit SHA) to build from.
+      command:
+        required: true
+        type: string
+        default: 'yarn test:jest'
+        description: Command to run in the environment.
+      docker_run_extra_args:
+        type: string
+        default: ''
+        description: Additional parameters for the docker run command.
+        required: false
+      artifact_name:
+        type: string
+        default: ''
+        description: Artifact name (will be automatically suffixed with .zip).
+        required: false
+      artifact_path:
+        type: string
+        default: ''
+        description: Folder to include in the archive.
+        required: false
+
+jobs:
+  deploy_and_run_command:
+    name: Deploy and run command
+    uses: ./.github/workflows/6_builderprecompiled_base-dev-environment.yml
+    with:
+      reference: ${{ github.event.inputs.reference }}
+      command: ${{ github.event.inputs.command }}
+      docker_run_extra_args: ${{ github.event.inputs.docker_run_extra_args }}
+      artifact_name: ${{ github.event.inputs.artifact_name }}
+      artifact_path: ${{ github.event.inputs.artifact_path }}
+    secrets: inherit

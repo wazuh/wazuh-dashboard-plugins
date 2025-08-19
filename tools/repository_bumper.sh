@@ -2,13 +2,15 @@
 #
 # Wazuh Dashboard Plugins repository bumper (Pure Shell Version)
 # This script automates version and stage bumping across the repository using only shell commands.
+# Compatible with macOS and Linux systems.
 
 set -e
 
 # --- Global Variables ---
 SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_PATH=$(git rev-parse --show-toplevel 2>/dev/null)
-DATE_TIME=$(date "+%Y-%m-%d_%H-%M-%S-%3N")
+# Use a more compatible timestamp format (nanoseconds may not be available on all systems)
+DATE_TIME=$(date "+%Y-%m-%d_%H-%M-%S" 2>/dev/null || date "+%Y-%m-%d_%H-%M-%S")
 LOG_FILE="${SCRIPT_PATH}/repository_bumper_${DATE_TIME}.log"
 VERSION_FILE="${REPO_PATH}/VERSION.json"
 VERSION=""
@@ -25,6 +27,27 @@ OPENSEARCH_VERSION=""
 touch "$LOG_FILE"
 
 # --- Helper Functions ---
+
+# Function to run sed -i in a cross-platform way
+sed_inplace() {
+  # macOS requires an empty string after -i, Linux doesn't
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
+
+# Function to run sed with extended regex in a cross-platform way
+sed_extended() {
+  # macOS uses -E, some Linux systems use -r
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -E "$@"
+  else
+    # Try -E first, fall back to -r if it fails
+    sed -E "$@" 2>/dev/null || sed -r "$@"
+  fi
+}
 
 # Function to log messages
 log() {
@@ -60,9 +83,14 @@ update_json() {
   local key="$2"
   local value="$3"
 
-  # Get the current value of the key
+  # Get the current value of the key at the top level (line 3 for version in package.json)
   local current_value
-  current_value=$(grep -oE '"'$key'"\s*:\s*"[^"]*"' "$file" | sed -E 's/.*:\s*"([^"]*)"/\1/' | head -n1)
+  if [ "$key" = "version" ] && [[ "$file" == *"package.json" ]]; then
+    # For package.json, specifically get the version from line 3 to avoid nested version in pluginPlatform
+    current_value=$(sed -n '3p' "$file" | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+  else
+    current_value=$(grep -o "^[[:space:]]*\"$key\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" "$file" | sed "s/.*\"$key\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/")
+  fi
 
   if [ "$current_value" = "$value" ]; then
     # If the value is already correct, do nothing and don't report
@@ -73,8 +101,6 @@ update_json() {
 
   # Read the file, apply the filter, and write to a temporary file, then replace the original.
   # WARNING: Using sed for JSON manipulation is fragile and not recommended.
-  # This attempts to replace simple top-level "key": "value" pairs where the value is expected to be a string.
-  # It assumes the key-value pair exists on a single line.
   log "Attempting to update $key to $value in $file using sed (Note: This is fragile)"
 
   # Escape key and value for use in sed regex and replacement string
@@ -82,14 +108,14 @@ update_json() {
   local escaped_key=$(printf '%s\n' "$key" | sed -e 's/[&/\]/\\&/g')
   local escaped_value=$(printf '%s\n' "$value" | sed -e 's/[&/\]/\\&/g')
 
-  # The sed command tries to find a line matching:
-  # ^(\s*"escaped_key"\s*:\s*") - Capture group 1: Start of line, optional space, quoted key, optional space, colon, optional space, opening quote for the value
-  # [^"]*                       - Match the existing value (any characters except a quote)
-  # ("\s*,?)                    - Capture group 2: Closing quote, optional space, optional comma
-  # $                           - End of line
-  # It replaces the line with: \1 (captured group 1) + escaped_value + \2 (captured group 2)
-  # Use sed address range 0,/pattern/ to apply substitution only up to the first matching line
-  sed -E '0,/^\s*"'$escaped_key'"\s*:\s*"[^"]*"\s*,?$/{s/^(\s*"'$escaped_key'"\s*:\s*")[^"]*("\s*,?)$/\1'$escaped_value'\2/}' "$file" >"${file}.tmp"
+  # For package.json version updates, be more specific to avoid updating nested versions
+  if [ "$key" = "version" ] && [[ "$file" == *"package.json" ]]; then
+    # Update only the first occurrence of version (which should be the top-level one)
+    sed "1,/^[[:space:]]*\"version\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/{s/^\\([[:space:]]*\\)\"version\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/\\1\"version\": \"$escaped_value\"/;}" "$file" >"${file}.tmp"
+  else
+    # Use the general approach for other keys
+    sed "s/^\\([[:space:]]*\\)\"$escaped_key\"[[:space:]]*:[[:space:]]*\"[^\"]*\"/\\1\"$escaped_key\": \"$escaped_value\"/g" "$file" >"${file}.tmp"
+  fi
 
   # Check if sed actually made a change (simple check: compare files)
   if cmp -s "$file" "${file}.tmp"; then
@@ -129,7 +155,7 @@ update_endpoints_json() {
   local escaped_old_version=$(echo "$old_doc_version" | sed 's/\./\\./g')
   local escaped_new_version=$(echo "$new_doc_version" | sed 's/\./\\./g')
 
-  sed -i "s|documentation.wazuh.com/${escaped_old_version}|documentation.wazuh.com/${escaped_new_version}|g" "$endpoints_file" && log "Successfully updated documentation URLs in $endpoints_file" || {
+  sed_inplace "s|documentation.wazuh.com/${escaped_old_version}|documentation.wazuh.com/${escaped_new_version}|g" "$endpoints_file" && log "Successfully updated documentation URLs in $endpoints_file" || {
     log "ERROR: Failed to update documentation URLs in $endpoints_file using sed."
     # Consider adding error handling or attempting to restore a backup if needed
     exit 1
@@ -156,9 +182,9 @@ update_imposter_config() {
     replacement="${VERSION}"
   fi
 
-# Extract current reference from URL
+  # Extract current reference from URL
   local current_spec_ref
-  current_spec_ref=$(grep -oE 'specFile: https://raw.githubusercontent.com/wazuh/wazuh/[^/]+/' "$imposter_config_file" | sed -E 's|.*/wazuh/([^/]+)/.*|\1|' | head -n1)
+  current_spec_ref=$(grep -oE 'specFile: https://raw.githubusercontent.com/wazuh/wazuh/[^/]+/' "$imposter_config_file" | sed_extended 's|.*/wazuh/([^/]+)/.*|\1|' | head -n1)
 
   if [ "$current_spec_ref" = "$replacement" ]; then
     return
@@ -167,7 +193,8 @@ update_imposter_config() {
   log "Updating specFile URL in $imposter_config_file to version $new_version"
 
   # Use sed to replace the version string within the specFile URL
- sed -i -E "s|(specFile: https://raw.githubusercontent.com/wazuh/wazuh/)[^/]+|\1${replacement}|" "$imposter_config_file" && \
+  # Create a more compatible sed command for macOS
+  sed_inplace "s|specFile: https://raw.githubusercontent.com/wazuh/wazuh/[^/]*/|specFile: https://raw.githubusercontent.com/wazuh/wazuh/${replacement}/|" "$imposter_config_file" &&
     log "Successfully updated specFile URL in $imposter_config_file" || {
     log "ERROR: Failed to update specFile URL in $imposter_config_file using sed."
     exit 1
@@ -192,10 +219,10 @@ parse_arguments() {
       usage
       exit 0
       ;;
-      --tag)
+    --tag)
       TAG=true
       shift
-  ;;
+      ;;
     *)
       log "ERROR: Unknown option: $1" # Log error instead of just echo
       usage
@@ -207,7 +234,7 @@ parse_arguments() {
 
 # Function to validate input parameters
 validate_input() {
-   if [ -z "$VERSION" ] && [ "$TAG" != true ]; then
+  if [ -z "$VERSION" ] && [ "$TAG" != true ]; then
     log "ERROR: --version is required unless --tag is set"
     usage
     exit 1
@@ -239,7 +266,7 @@ pre_update_checks() {
 
   # Attempt to extract version from VERSION.json using sed
   log "Attempting to extract current version from $VERSION_FILE using sed..."
-  CURRENT_VERSION=$(sed -n 's/^\s*"version"\s*:\s*"\([^"]*\)".*$/\1/p' "$VERSION_FILE" | head -n 1) # head -n 1 ensures only the first match is taken
+  CURRENT_VERSION=$(grep -o '"version"[[:space:]]*:[[:space:]]*"[^"]*"' "$VERSION_FILE" | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
 
   # Check if sed successfully extracted a version
   if [ -z "$CURRENT_VERSION" ]; then
@@ -267,7 +294,7 @@ pre_update_checks() {
 
   # Attempt to extract stage from VERSION.json using sed
   log "Attempting to extract current stage from $VERSION_FILE using sed..."
-  CURRENT_STAGE=$(sed -n 's/^\s*"stage"\s*:\s*"\([^"]*\)".*$/\1/p' "$VERSION_FILE" | head -n 1) # head -n 1 ensures only the first match is taken
+  CURRENT_STAGE=$(grep -o '"stage"[[:space:]]*:[[:space:]]*"[^"]*"' "$VERSION_FILE" | sed 's/.*"stage"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
 
   # Check if sed successfully extracted a stage
   if [ -z "$CURRENT_STAGE" ]; then
@@ -325,8 +352,8 @@ compare_versions_and_set_revision() {
         log "New version ($VERSION) is identical to current version ($CURRENT_VERSION)"
         local main_package_json="${REPO_PATH}/plugins/main/package.json" # Need path again
         log "Attempting to extract current revision from $main_package_json using sed (Note: This is fragile)"
-        local current_revision_val=$(sed -n 's/^\s*"revision"\s*:\s*"\([^"]*\)".*$/\1/p' "$main_package_json" | head -n 1)
-          # Check if sed successfully extracted a revision
+        local current_revision_val=$(grep -o '"revision"[[:space:]]*:[[:space:]]*"[^"]*"' "$main_package_json" | sed 's/.*"revision"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
+        # Check if sed successfully extracted a revision
         if [ -z "$current_revision_val" ]; then
           log "ERROR: Failed to extract 'revision' from $main_package_json using sed. Check file format or key presence."
           exit 1 # Exit if sed fails
@@ -377,7 +404,6 @@ update_package_json_files() {
   git ls-files "$plugins_dir" | grep '/package.json$' | grep -v 'test/cypress/package.json' | while IFS= read -r pkg_file; do
     local full_pkg_path
     full_pkg_path=$(realpath "${pkg_file}")
-    log "Processing $full_pkg_path"
     update_json "$full_pkg_path" "version" "$VERSION"
     update_json "$full_pkg_path" "revision" "$REVISION"
   done
@@ -417,7 +443,8 @@ update_changelog() {
   # Within that block, it finds the line starting with "version": "..." and extracts the value.
   # This is significantly less reliable than using jq.
   log "Attempting to extract pluginPlatform.version from $package_json_file using sed (Note: This is fragile)"
-  OPENSEARCH_VERSION=$(sed -n '/"pluginPlatform":\s*{/,/}/ { /^\s*"version":\s*"\([^"]*\)"/ { s//\1/p; q; } }' "$package_json_file")
+  # Use a more targeted approach - look for the pluginPlatform block and extract version from it
+  OPENSEARCH_VERSION=$(grep -A 5 '"pluginPlatform"' "$package_json_file" | grep '"version"' | sed 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
   if [ -z "$OPENSEARCH_VERSION" ] || [ "$OPENSEARCH_VERSION" == "null" ]; then
     log "ERROR: Could not extract pluginPlatform.version from $package_json_file for changelog"
     exit 1
@@ -436,27 +463,30 @@ update_changelog() {
     if [ -n "$STAGE" ]; then
       log "Changelog entry for this version and OpenSearch Dashboards version exists. Updating revision only."
       # Use sed to update only the revision number in the header
-      sed -i -E "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file" &&
-      log "CHANGELOG.md revision updated successfully." || {
-      log "ERROR: Failed to update revision in $changelog_file"
-      exit 1
+      if [[ "$OSTYPE" == "darwin"* ]]; then
+        sed -i '' -E "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file"
+      else
+        # Try -E first, fall back to -r if it fails
+        sed -i -E "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file" 2>/dev/null ||
+          sed -i -r "s|(${changelog_header_regex})|## Wazuh v${VERSION} - OpenSearch Dashboards ${OPENSEARCH_VERSION} - Revision ${REVISION}|" "$changelog_file"
+      fi &&
+        log "CHANGELOG.md revision updated successfully." || {
+        log "ERROR: Failed to update revision in $changelog_file"
+        exit 1
       }
     fi
   else
     log "No existing changelog entry for this version and OpenSearch Dashboards version. Inserting new entry."
-    local new_entry
-    new_entry=$(printf "## Wazuh v%s - OpenSearch Dashboards %s - Revision %s\n\n### Added\n\n- Support for Wazuh %s\n" "$VERSION" "$OPENSEARCH_VERSION" "$REVISION" "$VERSION")
 
-    # Use awk to insert the new entry after the title and description (lines 1-4)
-    awk -v entry="$new_entry" '
-    NR == 1 { print; next } # Print line 1 (# Change Log)
-    NR == 2 { print; next } # Print line 2 (blank)
-    NR == 3 { print; next } # Print line 3 (description)
-    NR == 4 { print; printf "%s\n\n", entry; next } # Print line 4 (blank) and insert entry
-    { print } # Print the rest of the lines starting from line 5
-    ' "$changelog_file" >temp_changelog && mv temp_changelog "$changelog_file" || {
+    # Create the new entry directly in the changelog using sed
+    local temp_file=$(mktemp)
+    head -n 4 "$changelog_file" >"$temp_file"
+    printf "\n## Wazuh v%s - OpenSearch Dashboards %s - Revision %s\n\n### Added\n\n- Support for Wazuh %s\n\n" "$VERSION" "$OPENSEARCH_VERSION" "$REVISION" "$VERSION" >>"$temp_file"
+    tail -n +5 "$changelog_file" >>"$temp_file"
+
+    mv "$temp_file" "$changelog_file" || {
       log "ERROR: Failed to update $changelog_file"
-      rm -f temp_changelog # Clean up temp file on error
+      rm -f "$temp_file" # Clean up temp file on error
       exit 1
     }
     log "CHANGELOG.md updated successfully."
@@ -489,7 +519,6 @@ main() {
     VERSION=$CURRENT_VERSION # If no version provided, use current version
   fi
 
-
   # Compare versions and determine revision
   compare_versions_and_set_revision
 
@@ -511,7 +540,6 @@ main() {
   update_package_json_files
   update_osd_json_files
   update_changelog
-
 
   # Conditionally update endpoints.json
   if [[ -n "$VERSION" && "$CURRENT_MAJOR_MINOR" != "$NEW_MAJOR_MINOR" ]]; then

@@ -19,9 +19,6 @@ import WzTabSelector, {
 import withWzConfig from '../util-hocs/wz-config';
 import WzConfigurationAlertsGeneral from './alerts-general';
 import WzConfigurationAlertsLabels from './alerts-labels';
-import WzConfigurationAlertsEmailAlerts from './alerts-email-alerts';
-import WzConfigurationAlertsEmailReports from './alerts-reports';
-import WzConfigurationAlertsSyslogOutput from './alerts-syslog-output';
 
 import { connect } from 'react-redux';
 import { compose } from 'redux';
@@ -40,15 +37,6 @@ class WzConfigurationAlerts extends Component {
           <WzTabSelectorTab label='Labels'>
             <WzConfigurationAlertsLabels {...this.props} />
           </WzTabSelectorTab>
-          <WzTabSelectorTab label='Email alerts'>
-            <WzConfigurationAlertsEmailAlerts {...this.props} />
-          </WzTabSelectorTab>
-          <WzTabSelectorTab label='Reports'>
-            <WzConfigurationAlertsEmailReports {...this.props} />
-          </WzTabSelectorTab>
-          <WzTabSelectorTab label='Syslog output'>
-            <WzConfigurationAlertsSyslogOutput {...this.props} />
-          </WzTabSelectorTab>
         </WzTabSelector>
       </Fragment>
     );
@@ -58,9 +46,6 @@ class WzConfigurationAlerts extends Component {
 const sections = [
   { component: 'analysis', configuration: 'alerts' },
   { component: 'agent', configuration: 'labels' },
-  { component: 'mail', configuration: 'alerts' },
-  { component: 'monitor', configuration: 'reports' },
-  { component: 'csyslog', configuration: 'csyslog' },
 ];
 
 const mapStateToProps = state => ({

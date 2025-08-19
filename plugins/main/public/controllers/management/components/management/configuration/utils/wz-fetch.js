@@ -537,27 +537,21 @@ export const clusterNodes = async () => {
 };
 
 /**
- * Restart cluster or Manager
+ * Reload ruleset on all nodes using the new API endpoint.
+ * @param {array} nodes List of nodes ID
+ * @returns {Promise<object>}
  */
-export const restartClusterOrManager = async updateWazuhNotReadyYet => {
+export const reloadRuleset = async (nodes = []) => {
   try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    getToasts().add({
-      color: 'success',
-      title: isCluster
-        ? 'Restarting cluster, it will take up to 30 seconds.'
-        : 'The manager is being restarted',
-      toastLifeTimeMs: 3000,
-    });
-    isCluster ? await restartCluster() : await restartManager();
-    // Dispatch a Redux action
-    updateWazuhNotReadyYet(
-      `Restarting ${isCluster ? 'Cluster' : 'Manager'}, please wait.`,
+    const nodesString = nodes.join(',');
+    const nodes_param = nodesString ? `?nodes_list=${nodesString}` : '';
+
+    const result = await WzRequest.apiReq(
+      'PUT',
+      `/cluster/analysisd/reload${nodes_param}`,
+      {},
     );
-    await makePing(updateWazuhNotReadyYet, isCluster);
-    return { restarted: isCluster ? 'Cluster' : 'Manager' };
+    return result;
   } catch (error) {
     throw error;
   }
