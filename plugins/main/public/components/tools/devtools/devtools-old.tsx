@@ -25,6 +25,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
+import { DEV_TOOLS_INITIAL_BUFFER } from './initial-buffer';
 
 /**
  * Detect de groups of instructions
@@ -324,23 +325,8 @@ function init(editorInput, editorOutput) {
   editorOutput.setSize('auto', '100%');
   const currentState = AppState.getCurrentDevTools();
   if (!currentState) {
-    const demoStr =
-      'GET /agents?status=active\n\n# Example comment\n\n# You can use ? after the endpoint \n# in order to get suggestions \n# for your query params\n\nGET /manager/info\n\nPOST /agents\n' +
-      JSON.stringify({ name: 'NewAgent' }, null, 2) +
-      '\n\nPUT /logtest\n' +
-      JSON.stringify(
-        {
-          log_format: 'syslog',
-          location: 'logtest',
-          event:
-            'Jul 06 22:00:22 linux-agent sshd[29205]: Invalid user blimey from 1.3.1.3 port 48928',
-        },
-        null,
-        2,
-      );
-
-    AppState.setCurrentDevTools(demoStr);
-    editorInput.getDoc().setValue(demoStr);
+    AppState.setCurrentDevTools(DEV_TOOLS_INITIAL_BUFFER);
+    editorInput.getDoc().setValue(DEV_TOOLS_INITIAL_BUFFER);
   } else {
     editorInput.getDoc().setValue(currentState);
   }
