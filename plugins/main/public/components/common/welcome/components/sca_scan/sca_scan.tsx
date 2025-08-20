@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -22,250 +22,248 @@ import {
   EuiButtonIcon,
   EuiToolTip,
   EuiEmptyPrompt,
-  EuiBasicTable,
+  EuiInMemoryTable,
 } from '@elastic/eui';
-import { getCore, getPlugins } from '../../../../../kibana-services';
-import { withUserAuthorizationPrompt } from '../../../hocs';
+import { getCore } from '../../../../../kibana-services';
+import { withDataSourceFetch, withGuard, withPanel } from '../../../hocs';
 import { compose } from 'redux';
 import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
 import { configurationAssessment } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { fetchLastPolicies } from './service/sca_scan_service';
+import {
+  SCAStatesDataSource,
+  SCAStatesDataSourceRepository,
+} from '../../../data-source/pattern/sca';
+import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
+import { CheckResult } from '../../../../overview/sca/utils/constants';
+import { groupBy } from 'lodash';
 
-type Props = {
+type ScaScanProps = {
   agent: { [key in string]: any };
 };
 
-export const ScaScan = compose(
-  withUserAuthorizationPrompt([
-    [
-      { action: 'agent:read', resource: 'agent:id:*' },
-      { action: 'agent:read', resource: 'agent:group:*' },
-    ],
-    [
-      { action: 'sca:read', resource: 'agent:id:*' },
-      { action: 'sca:read', resource: 'agent:group:*' },
-    ],
-  ]),
-)(
-  class ScaScan extends Component<Props> {
-    _isMount = false;
-    state: {
-      isLoading: Boolean;
-      policies: any[];
-      pageIndex: number;
-      pageSize: number;
-    };
+const TOP_POLICIES_SIZE = 20;
 
-    pinnedAgentManager: PinnedAgentManager;
-
-    constructor(props) {
-      super(props);
-      this.pinnedAgentManager = new PinnedAgentManager();
-      this.state = {
-        isLoading: true,
-        policies: [],
-        pageIndex: 0,
-        pageSize: 5,
-      };
-    }
-
-    async componentDidMount() {
-      this._isMount = true;
-      this.getLastPolicies(this.props.agent.id);
-    }
-
-    async componentDidUpdate(prevProps: Readonly<Props>) {
-      if (prevProps.agent.id !== this.props.agent.id) {
-        this.getLastPolicies(this.props.agent.id);
-      }
-    }
-
-    async getLastPolicies(agentId: string) {
-      try {
-        const policies = await fetchLastPolicies(agentId);
-        if (this._isMount) {
-          this.setState({ policies, isLoading: false });
-        }
-      } catch (err) {
-        console.error(err);
-        if (this._isMount) this.setState({ isLoading: false });
-      }
-    }
-    onTableChange = ({ page }: any) => {
-      this.setState({
-        pageIndex: page.index,
-        pageSize: page.size,
-      });
-    };
-
-    renderLoadingStatus() {
-      const { isLoading } = this.state;
-      if (!isLoading) {
-        return;
-      } else {
-        return (
-          <EuiFlexGroup justifyContent='center' alignItems='center'>
-            <EuiFlexItem grow={false}>
-              <div
-                style={{
-                  display: 'block',
-                  textAlign: 'center',
-                  paddingTop: 100,
-                }}
-              >
-                <EuiLoadingChart size='xl' />
-              </div>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        );
-      }
-    }
-
-    renderScanDetails() {
-      const { isLoading, policies, pageIndex, pageSize } = this.state;
-      if (isLoading || !policies.length) return;
-
-      const pageOfItems = policies.slice(
-        pageIndex * pageSize,
-        pageIndex * pageSize + pageSize,
-      );
-
-      const columnsPolicies = [
-        {
-          field: 'name',
-          name: 'Policy',
-          width: '40%',
-        },
-        {
-          field: 'pass',
-          name: MODULE_SCA_CHECK_RESULT_LABEL.PASSED.value,
-          width: '10%',
-        },
-        {
-          field: 'fail',
-          name: MODULE_SCA_CHECK_RESULT_LABEL.FAILED.value,
-          width: '10%',
-        },
-        {
-          field: 'not_run',
-          name: MODULE_SCA_CHECK_RESULT_LABEL.NOT_RUN.value,
-          width: '10%',
-        },
-        {
-          field: 'total',
-          name: 'Total Checks',
-          width: '10%',
-        },
-      ];
-
-      return (
-        <Fragment>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiTitle size='xs'>
-                <h4>Checks by policies</h4>
-              </EuiTitle>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-
-          <EuiPanel style={{ marginTop: 16 }}>
-            <EuiBasicTable
-              items={pageOfItems}
-              columns={columnsPolicies}
-              pagination={{
-                showPerPageOptions: false,
-                pageIndex,
-                pageSize,
-                totalItemCount: policies.length,
-                hidePerPageOptions: true,
-              }}
-              onChange={this.onTableChange}
-              rowProps={(item, idx) => ({
-                'data-test-subj': `sca-row-${idx}`,
-                className: 'customRowClass',
-              })}
-            />
-          </EuiPanel>
-        </Fragment>
-      );
-    }
-
-    renderEmptyPrompt() {
-      const { isLoading } = this.state;
-      if (isLoading) return;
-      return (
-        <Fragment>
-          <EuiEmptyPrompt
-            iconType='visVega'
-            title={<h4>You don't have SCA scans in this agent.</h4>}
-            body={
-              <Fragment>
-                <p>Check your agent settings to generate scans.</p>
-              </Fragment>
-            }
-          />
-        </Fragment>
-      );
-    }
-
-    render() {
-      const { policies } = this.state;
-      const loading = this.renderLoadingStatus();
-      const scaScan = this.renderScanDetails();
-      const emptyPrompt = this.renderEmptyPrompt();
-      if (loading) {
-        return (
-          <EuiFlexItem>
-            <EuiPanel paddingSize='m'>{loading}</EuiPanel>
-          </EuiFlexItem>
-        );
-      }
-      if (!policies.length) {
-        return (
-          <EuiFlexItem>
-            <EuiPanel paddingSize='m'>{emptyPrompt}</EuiPanel>
-          </EuiFlexItem>
-        );
-      }
-      return (
-        <EuiFlexItem>
-          <EuiPanel paddingSize='m'>
-            <EuiText size='xs'>
-              <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
-                <EuiFlexItem grow={false}>
-                  <RedirectAppLinks application={getCore().application}>
-                    <EuiTitle size='xs'>
-                      <h2>SCA: Scans summary</h2>
-                    </EuiTitle>
-                  </RedirectAppLinks>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <RedirectAppLinks application={getCore().application}>
-                    <EuiToolTip position='top' content='Open SCA Scans'>
-                      <EuiButtonIcon
-                        iconType='popout'
-                        color='primary'
-                        className='EuiButtonIcon'
-                        onClick={() => {
-                          this.pinnedAgentManager.pinAgent(this.props.agent);
-                        }}
-                        href={NavigationService.getInstance().getUrlForApp(
-                          configurationAssessment.id,
-                        )}
-                        aria-label='Open SCA Scans'
-                      />
-                    </EuiToolTip>
-                  </RedirectAppLinks>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiText>
-            {scaScan}
-          </EuiPanel>
+const ScaScanHeader = ({ agent }) => {
+  return (
+    <EuiText size='xs'>
+      <EuiFlexGroup className='wz-section-sca-euiFlexGroup'>
+        <EuiFlexItem grow={false}>
+          <RedirectAppLinks application={getCore().application}>
+            <EuiTitle size='xs'>
+              <h2>SCA: Scans summary</h2>
+            </EuiTitle>
+          </RedirectAppLinks>
         </EuiFlexItem>
-      );
-    }
+        <EuiFlexItem grow={false}>
+          <RedirectAppLinks application={getCore().application}>
+            <EuiToolTip position='top' content='Open SCA Scans'>
+              <EuiButtonIcon
+                iconType='popout'
+                color='primary'
+                className='EuiButtonIcon'
+                onClick={() => {
+                  new PinnedAgentManager().pinAgent(agent);
+                }}
+                href={NavigationService.getInstance().getUrlForApp(
+                  configurationAssessment.id,
+                )}
+                aria-label='Open SCA Scans'
+              />
+            </EuiToolTip>
+          </RedirectAppLinks>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </EuiText>
+  );
+};
+
+const ScaScanFetchingData = () => (
+  <EuiFlexGroup justifyContent='center' alignItems='center'>
+    <EuiFlexItem grow={false}>
+      <div
+        style={{
+          display: 'block',
+          textAlign: 'center',
+          paddingTop: 100,
+        }}
+      >
+        <EuiLoadingChart size='xl' />
+      </div>
+    </EuiFlexItem>
+  </EuiFlexGroup>
+);
+
+const ScaScanTable = ({ dataSourceAction }) => {
+  const { hits: policies = [] } = dataSourceAction.data || {};
+
+  const columnsPolicies = [
+    {
+      field: 'name',
+      name: 'Policy',
+      width: '40%',
+      sortable: true,
+    },
+    {
+      field: 'pass',
+      name: MODULE_SCA_CHECK_RESULT_LABEL.PASSED.value,
+      width: '10%',
+      sortable: true,
+    },
+    {
+      field: 'fail',
+      name: MODULE_SCA_CHECK_RESULT_LABEL.FAILED.value,
+      width: '10%',
+      sortable: true,
+    },
+    {
+      field: 'not_run',
+      name: MODULE_SCA_CHECK_RESULT_LABEL.NOT_RUN.value,
+      width: '10%',
+      sortable: true,
+    },
+    {
+      field: 'total',
+      name: 'Total Checks',
+      width: '10%',
+      sortable: true,
+    },
+  ];
+
+  return (
+    <>
+      <EuiFlexGroup alignItems='center' gutterSize='s'>
+        <EuiFlexItem grow={false} responsive={false}>
+          <EuiTitle size='xs'>
+            <h4>Checks by policies</h4>
+          </EuiTitle>
+        </EuiFlexItem>
+        <EuiFlexItem grow={false} responsive={false}>
+          <EuiText size='xs'>
+            <span>(top {TOP_POLICIES_SIZE})</span>
+          </EuiText>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+
+      <EuiPanel style={{ marginTop: 16 }}>
+        <EuiInMemoryTable
+          columns={columnsPolicies}
+          items={policies}
+          loading={dataSourceAction.isLoading}
+          sorting={true}
+          pagination={{
+            hidePerPageOptions: true,
+            pageSize: 5,
+          }}
+          cellProps={(item, column) => {
+            if (column.field == 'name') {
+              return {
+                title: `${item.name} (${item.id})`,
+              };
+            }
+          }}
+        />
+      </EuiPanel>
+    </>
+  );
+};
+
+const ScaScanNoData = () => {
+  return (
+    <>
+      <EuiEmptyPrompt
+        iconType='visVega'
+        title={<h4>You don't have SCA scans in this agent.</h4>}
+        body={
+          <>
+            <p>Check your agent settings to generate scans.</p>
+          </>
+        }
+      />
+    </>
+  );
+};
+
+const ScaScanBody = compose(
+  withDataSourceFetch({
+    DataSource: SCAStatesDataSource,
+    DataSourceRepositoryCreator: SCAStatesDataSourceRepository,
+    LoadingDataSourceComponent: LoadingSearchbarProgress,
+    mapRequestParams() {
+      return {
+        aggs: {
+          policy_id: {
+            terms: {
+              field: 'policy.id',
+              size: TOP_POLICIES_SIZE,
+            },
+            aggs: {
+              policy_name: {
+                terms: {
+                  field: 'policy.name',
+                  size: 1,
+                },
+                aggs: {
+                  check_result: {
+                    terms: {
+                      field: 'check.result',
+                      size: 5,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    },
+    mapResponse(response) {
+      return {
+        hits: response.aggregations?.policy_id.buckets.map(
+          ({ key, policy_name: policyNameBuckets }) => {
+            const [{ key: policy_name, check_result }] =
+              policyNameBuckets.buckets;
+            console.log({ policyNameBuckets, policy_name, check_result });
+            const {
+              [CheckResult.Passed]: [{ doc_count: pass }] = [{ doc_count: 0 }],
+              [CheckResult.Failed]: [{ doc_count: fail }] = [{ doc_count: 0 }],
+              [CheckResult.NotRun]: [{ doc_count: not_run }] = [
+                { doc_count: 0 },
+              ],
+            } = groupBy(check_result.buckets, 'key');
+
+            const total = pass + fail + not_run;
+            return {
+              id: key,
+              name: policy_name,
+              pass,
+              fail,
+              not_run,
+              total,
+            };
+          },
+        ),
+      };
+    },
+    mapFetchActionDependencies(props) {
+      return [props.agent, props.pageIndex, props.pageSize];
+    },
+    FetchingDataComponent: ScaScanFetchingData,
+  }),
+  withGuard(({ dataSourceAction }) => {
+    return dataSourceAction.data?.hits?.length === 0;
+  }, ScaScanNoData),
+)(ScaScanTable);
+
+export const ScaScan: React.FC<Props> = withPanel({ paddingSize: 'm' })(
+  (props: Props) => {
+    return (
+      <>
+        <ScaScanHeader agent={props.agent} />
+        <ScaScanBody agent={props.agent}></ScaScanBody>
+      </>
+    );
   },
 );
