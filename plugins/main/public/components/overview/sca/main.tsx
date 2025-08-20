@@ -11,24 +11,13 @@
  */
 
 import React from 'react';
-import { Inventory } from './index';
-import { connect } from 'react-redux';
+import { SCAInventory } from './index';
 import { compose } from 'redux';
-import { PromptSelectAgent, PromptNoSelectedAgent } from '../prompts';
-import {
-  withGuard,
-  withUserAuthorizationPrompt,
-  withAgentSupportModule,
-} from '../../common/hocs';
-import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
-import Dashboard from './dashboard/dashboard';
-
-const mapStateToProps = state => ({
-  currentAgentData: state.appStateReducers.currentAgentData,
-});
+import { withAgent, withUserAuthorizationPrompt } from '../../common/hocs';
+import { SCADashboard } from './components/dashboard/sca-dashboard';
+import { withSCADataSource } from './hocs/validate-sca-states-index-pattern';
 
 export const MainSca = compose(
-  withAgentSupportModule,
   withUserAuthorizationPrompt([
     [
       { action: 'agent:read', resource: 'agent:id:*' },
@@ -39,27 +28,7 @@ export const MainSca = compose(
       { action: 'sca:read', resource: 'agent:group:*' },
     ],
   ]),
-  connect(mapStateToProps),
-  withGuard(
-    props =>
-      !(props.currentAgentData && props.currentAgentData.id && props.agent),
-    () => (
-      <PromptNoSelectedAgent body='You need to select an agent to see Security Configuration Assessment inventory.' />
-    ),
-  ),
-  withGuard(
-    ({ currentAgentData, agent }) => {
-      const agentData =
-        currentAgentData && currentAgentData.id ? currentAgentData : agent;
-      return agentData.status === API_NAME_AGENT_STATUS.NEVER_CONNECTED;
-    },
-    () => (
-      <PromptSelectAgent
-        title='Agent has never connected'
-        body='The agent has never been connected please select another'
-      />
-    ),
-  ),
+  withAgent,
   withUserAuthorizationPrompt(props => {
     const agentData =
       props.currentAgentData && props.currentAgentData.id
@@ -82,16 +51,14 @@ export const MainSca = compose(
       ],
     ];
   }),
-)(function MainSca({ selectView, currentAgentData, agent, ...rest }) {
-  const agentData =
-    currentAgentData && currentAgentData.id ? currentAgentData : agent;
-
+  withSCADataSource,
+)(function MainSca({ selectView, indexPattern }) {
   return (
     <>
       {selectView === 'inventory' ? (
-        <Inventory {...rest} agent={agentData} />
+        <SCAInventory indexPattern={indexPattern} />
       ) : (
-        <Dashboard {...rest} agent={agentData} />
+        <SCADashboard indexPattern={indexPattern} />
       )}
     </>
   );

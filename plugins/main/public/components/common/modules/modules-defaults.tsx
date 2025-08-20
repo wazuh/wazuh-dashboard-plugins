@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
-import { MainSca } from '../../agents/sca';
+import { MainSca } from '../../overview/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
@@ -28,7 +28,7 @@ import { googleCloudColumns } from '../../overview/google-cloud/events/google-cl
 import { amazonWebServicesColumns } from '../../overview/amazon-web-services/events/amazon-web-services-columns';
 import { office365Columns } from '../../overview/office/events/office-365-columns';
 import { fileIntegrityMonitoringColumns } from '../../overview/fim/events/file-integrity-monitoring-columns';
-import { configurationAssessmentColumns } from '../../agents/sca/events/configuration-assessment-columns';
+import { configurationAssessmentColumns } from '../../overview/sca/events/configuration-assessment-columns';
 import { pciColumns } from '../../overview/pci/events/pci-columns';
 import { hipaaColumns } from '../../overview/hipaa/events/hipaa-columns';
 import { nistColumns } from '../../overview/nist/events/nist-columns';
