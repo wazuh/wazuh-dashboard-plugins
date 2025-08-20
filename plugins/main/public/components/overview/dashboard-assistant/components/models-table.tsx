@@ -169,12 +169,12 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
       field: 'inUse',
       name: 'In Use',
       sortable: true,
-      render: (inUse: boolean) => (
+      render: (inUse: boolean) => inUse && (
         <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiIcon
-              type={inUse ? 'check' : 'cross'}
-              color={inUse ? 'success' : 'danger'}
+              type={'check'}
+              color={'success'}
               size='m'
             />
           </EuiFlexItem>
