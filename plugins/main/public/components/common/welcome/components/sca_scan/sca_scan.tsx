@@ -232,7 +232,6 @@ const ScaScanBody = compose(
           ({ key, policy_name: policyNameBuckets }) => {
             const [{ key: policy_name, check_result }] =
               policyNameBuckets.buckets;
-            console.log({ policyNameBuckets, policy_name, check_result });
             const {
               [CheckResult.Passed]: [{ doc_count: pass }] = [{ doc_count: 0 }],
               [CheckResult.Failed]: [{ doc_count: fail }] = [{ doc_count: 0 }],
