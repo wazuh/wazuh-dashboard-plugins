@@ -1,0 +1,94 @@
+# 📝 Based on: `4_builderprecompiled_base-dev-environment.yml`
+#
+# 📦 Manual Build Workflow for Wazuh Dashboard Plugins
+#
+# ⚡ Overview:
+# This workflow builds and tests production-ready packages for Wazuh Dashboard plugins,
+# either manually or triggered by other workflows.
+#
+# 🚀 Key Features:
+# - 🖇️ Manual or Automated Builds: Supports manual execution or invocation from other workflows,
+#   specifying any valid code reference (branch, tag, or commit SHA).
+# - 🏗️ Production-Ready Package Generation: Builds a production-ready package from the provided code reference.
+# - 🌐 Reusable Build Environment: Reuses a preconfigured build environment, ensuring consistency and easier maintenance.
+# - 🧪 Automated Testing: Automatically downloads and tests generated artifacts using a dynamically configured Docker environment.
+#
+
+name: (4.x) Build app package (on demand)
+
+on:
+  workflow_call:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: master
+        description: Source code reference (branch, tag or commit SHA)
+  workflow_dispatch:
+    inputs:
+      reference:
+        required: true
+        type: string
+        default: master
+        description: Source code reference (branch, tag or commit SHA)
+
+jobs:
+  # Build an app package from the given source code reference.
+  build:
+    name: Build app package
+    uses: ./.github/workflows/4_builderprecompiled_base-dev-environment.yml
+    permissions:
+      pull-requests: write
+    with:
+      reference: ${{ inputs.reference }}
+      command: 'yarn build'
+      artifact_name: 'wazuh-dashboard-plugins'
+    secrets: inherit
+
+  test-packages:
+    needs: build
+    name: Test packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Step 01 - Download the plugin's source code
+        uses: actions/checkout@v4
+        with:
+          repository: wazuh/wazuh-dashboard-plugins
+          ref: ${{ inputs.reference }}
+          path: wazuh
+
+      - name: Step 02 - Set variables
+        run: |
+          echo "githubReference=$(echo ${{ inputs.reference }} | sed 's/\//-/g')" >> $GITHUB_ENV
+          echo "currentDir=$(pwd -P)" >> $GITHUB_ENV
+          echo "version=$(jq -r '.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+          echo "revision=$(jq -r '.revision' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+          echo "versionPlatform=$(jq -r '.pluginPlatform.version' $(pwd)/wazuh/plugins/main/package.json)" >> $GITHUB_ENV
+
+      - name: Step 03 - Download the main plugin's artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          overwrite: true
+
+      - name: Step 04 - Download the core plugin's artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-core_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          overwrite: true
+
+      - name: Step 05 - Download the check-updates plugin's artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          path: ${{ env.currentDir }}/wazuh/scripts/test-packages/plugins/wazuh-dashboard-plugins_wazuh-check-updates_${{ env.version }}-${{ env.revision }}_${{ env.githubReference }}.zip
+          overwrite: true
+
+      - name: Step 06 - Build the Docker image
+        run: |
+          echo "current=${{ env.currentDir }}"
+          cd ./wazuh/scripts/test-packages
+          docker build --build-arg OSD_VERSION=${{ env.versionPlatform }} -f osd-test-packages.Dockerfile ./
