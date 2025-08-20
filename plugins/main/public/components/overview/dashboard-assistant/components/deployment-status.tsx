@@ -110,24 +110,29 @@ export const DeploymentStatus = ({
         })}
       </EuiListGroup>
       {(() => {
-        const hasErrors = progress && !progress.isFinished() && progress.getFailedSteps().length > 0;
+        const hasErrors =
+          progress &&
+          !progress.isFinished() &&
+          progress.getFailedSteps().length > 0;
         const isFinished = progress?.isFinished();
         const shouldShowButton = hasErrors || showCheckButton || isFinished;
-        
+
         if (!shouldShowButton) return null;
-        
+
         const handleClick = () => {
           if (hasErrors) {
             const failedSteps = progress?.getFailedSteps() || [];
-            const errorMessage = failedSteps.map(step => step.error || 'Unknown error').join(', ');
+            const errorMessage = failedSteps
+              .map(step => step.error || 'Unknown error')
+              .join(', ');
             onFinishedWithError?.(errorMessage);
           } else {
             onCheckButton?.();
           }
         };
-        
+
         const buttonText = hasErrors ? 'Try again' : 'Go to model assistants';
-        
+
         return (
           <>
             <EuiSpacer size='l' />
@@ -140,7 +145,7 @@ export const DeploymentStatus = ({
             </EuiFlexGroup>
           </>
         );
-       })()}
+      })()}
     </>
   );
 };

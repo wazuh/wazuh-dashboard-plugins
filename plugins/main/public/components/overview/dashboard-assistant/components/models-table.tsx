@@ -169,17 +169,14 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
       field: 'inUse',
       name: 'In use',
       sortable: true,
-      render: (inUse: boolean) => inUse && (
-        <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
-          <EuiFlexItem grow={false}>
-            <EuiIcon
-              type={'check'}
-              color={'success'}
-              size='m'
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      ),
+      render: (inUse: boolean) =>
+        inUse && (
+          <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
+            <EuiFlexItem grow={false}>
+              <EuiIcon type={'check'} color={'success'} size='m' />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        ),
     },
     {
       field: 'createdAt',

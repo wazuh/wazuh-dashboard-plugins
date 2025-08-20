@@ -50,7 +50,8 @@ const ModelRegisterComponent = ({
   formConfig,
 }: ModelRegisterProps) => {
   const [isDeployed, setIsDeployed] = useState(false);
-  const { addSuccessToast, addErrorToast, addInfoToast, toasts, removeToast } = useToast();
+  const { addSuccessToast, addErrorToast, addInfoToast, toasts, removeToast } =
+    useToast();
   const {
     install,
     setModel,
@@ -62,16 +63,19 @@ const ModelRegisterComponent = ({
   } = useAssistantInstallation();
 
   useEffect(() => {
-    if(error) {
-      addErrorToast(`Error deploying model`, `${error}. Rolling back current installation. Please, verify data provided and try again.`);
+    if (error) {
+      addErrorToast(
+        `Error deploying model`,
+        `${error}. Rolling back current installation. Please, verify data provided and try again.`,
+      );
     }
-  }, [error])
+  }, [error]);
 
   useEffect(() => {
-    if(isSuccess) {
+    if (isSuccess) {
       addSuccessToast('Model deployed successfully.');
     }
-  }, [isSuccess])
+  }, [isSuccess]);
 
   // Default form configuration
   const defaultFormConfig: FormConfig = {

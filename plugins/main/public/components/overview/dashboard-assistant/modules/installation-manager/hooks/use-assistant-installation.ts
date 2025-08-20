@@ -63,7 +63,7 @@ export function useAssistantInstallation() {
         );
       }
 
-      if(!response.success && response.data?.modelId) {
+      if (!response.success && response.data?.modelId) {
         UseCases.deleteModelWithRelatedEntities(response.data.modelId);
       }
 
@@ -106,12 +106,17 @@ export function useAssistantInstallation() {
   }, [resetQuery]);
 
   useEffect(() => {
-    if(progress.hasFailed()) {
-      setError(`Steps: "${progress.getFailedSteps().map(s => s.stepName).join('", "')}" has failed`);
-    }else{
+    if (progress.hasFailed()) {
+      setError(
+        `Steps: "${progress
+          .getFailedSteps()
+          .map(s => s.stepName)
+          .join('", "')}" has failed`,
+      );
+    } else {
       setError(undefined);
     }
-  }, [JSON.stringify(progress)])
+  }, [JSON.stringify(progress)]);
 
   return {
     install,

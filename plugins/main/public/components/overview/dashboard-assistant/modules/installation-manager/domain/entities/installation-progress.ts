@@ -166,8 +166,11 @@ export class InstallationProgress {
       globalState: this.globalState,
     });
   }
-  
+
   public hasFailed(): boolean {
-    return this.globalState === ExecutionState.FAILED && !!this.getFailedSteps().length
+    return (
+      this.globalState === ExecutionState.FAILED &&
+      !!this.getFailedSteps().length
+    );
   }
 }
