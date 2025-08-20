@@ -548,7 +548,7 @@ export const reloadRuleset = async (nodes = []) => {
 
     const result = await WzRequest.apiReq(
       'PUT',
-      `/cluster/analysisd/reload${nodes_param}`,
+      `/analysisd/reload${nodes_param}`,
       {},
     );
     return result;
