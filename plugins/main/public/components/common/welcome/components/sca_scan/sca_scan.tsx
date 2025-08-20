@@ -39,6 +39,8 @@ import {
 import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
 import { CheckResult } from '../../../../overview/sca/utils/constants';
 import { groupBy } from 'lodash';
+import { decimalFormat } from '../../../../overview/sca/components/dashboard/utils/visualization-helpers';
+import d3 from 'd3';
 
 type ScaScanProps = {
   agent: { [key in string]: any };
@@ -125,10 +127,14 @@ const ScaScanTable = ({ dataSourceAction }) => {
       sortable: true,
     },
     {
-      field: 'total',
-      name: 'Total Checks',
+      field: 'score',
+      name: 'Score',
       width: '10%',
       sortable: true,
+      render: score => {
+        const scoreFormat = decimalFormat();
+        return `${d3.format(scoreFormat)(score * 100)}%`;
+      },
     },
   ];
 
@@ -153,6 +159,7 @@ const ScaScanTable = ({ dataSourceAction }) => {
           items={policies}
           loading={dataSourceAction.isLoading}
           sorting={true}
+          error={dataSourceAction.error}
           pagination={{
             hidePerPageOptions: true,
             pageSize: 5,
@@ -234,14 +241,14 @@ const ScaScanBody = compose(
               ],
             } = groupBy(check_result.buckets, 'key');
 
-            const total = pass + fail + not_run;
+            const score = pass / Math.max(pass + fail, 1);
             return {
               id: key,
               name: policy_name,
               pass,
               fail,
               not_run,
-              total,
+              score,
             };
           },
         ),
@@ -257,8 +264,8 @@ const ScaScanBody = compose(
   }, ScaScanNoData),
 )(ScaScanTable);
 
-export const ScaScan: React.FC<Props> = withPanel({ paddingSize: 'm' })(
-  (props: Props) => {
+export const ScaScan: React.FC<ScaScanProps> = withPanel({ paddingSize: 'm' })(
+  (props: ScaScanProps) => {
     return (
       <>
         <ScaScanHeader agent={props.agent} />
