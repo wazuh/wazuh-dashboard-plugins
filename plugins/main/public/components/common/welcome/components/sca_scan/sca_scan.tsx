@@ -157,7 +157,7 @@ const ScaScanTable = ({ dataSourceAction }) => {
         <EuiInMemoryTable
           columns={columnsPolicies}
           items={policies}
-          loading={dataSourceAction.isLoading}
+          loading={dataSourceAction.running}
           sorting={true}
           error={dataSourceAction.error}
           pagination={{
