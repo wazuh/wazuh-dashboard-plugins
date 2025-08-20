@@ -22,7 +22,9 @@ interface DeploymentStatusProps {
   progress?: InstallationProgress;
   agentId?: string;
   title?: string;
+  error?: string;
   onCheckButton?: () => void;
+  onFinishedWithError?: (error: string) => void;
   showCheckButton?: boolean;
   isButtonDisabled?: boolean;
 }
@@ -31,6 +33,7 @@ export const DeploymentStatus = ({
   progress,
   agentId,
   onCheckButton,
+  onFinishedWithError,
   showCheckButton = false,
   isButtonDisabled = false,
 }: DeploymentStatusProps) => {
@@ -106,26 +109,38 @@ export const DeploymentStatus = ({
           );
         })}
       </EuiListGroup>
-      {((progress &&
-        !progress?.isFinished() &&
-        progress?.getFailedSteps().length > 0) ||
-        showCheckButton ||
-        progress?.isFinished()) && (
-        <>
-          <EuiSpacer size='l' />
-          <EuiFlexGroup justifyContent='center'>
-            <EuiFlexItem grow={false}>
-              <EuiButton fill onClick={() => onCheckButton?.()}>
-                {progress &&
-                !progress?.isFinished() &&
-                progress?.getFailedSteps().length > 0
-                  ? 'Go back'
-                  : 'Go to model assistants'}
-              </EuiButton>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </>
-      )}
+      {(() => {
+        const hasErrors = progress && !progress.isFinished() && progress.getFailedSteps().length > 0;
+        const isFinished = progress?.isFinished();
+        const shouldShowButton = hasErrors || showCheckButton || isFinished;
+        
+        if (!shouldShowButton) return null;
+        
+        const handleClick = () => {
+          if (hasErrors) {
+            const failedSteps = progress?.getFailedSteps() || [];
+            const errorMessage = failedSteps.map(step => step.error || 'Unknown error').join(', ');
+            onFinishedWithError?.(errorMessage);
+          } else {
+            onCheckButton?.();
+          }
+        };
+        
+        const buttonText = hasErrors ? 'Try again' : 'Go to model assistants';
+        
+        return (
+          <>
+            <EuiSpacer size='l' />
+            <EuiFlexGroup justifyContent='center'>
+              <EuiFlexItem grow={false}>
+                <EuiButton fill onClick={handleClick}>
+                  {buttonText}
+                </EuiButton>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </>
+        );
+       })()}
     </>
   );
 };

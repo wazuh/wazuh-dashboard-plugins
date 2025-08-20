@@ -167,7 +167,7 @@ export const ModelsTable = ({ onAddModel }: ModelsTableProps) => {
     },
     {
       field: 'inUse',
-      name: 'In Use',
+      name: 'In use',
       sortable: true,
       render: (inUse: boolean) => inUse && (
         <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>

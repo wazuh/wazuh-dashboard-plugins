@@ -12,6 +12,7 @@ import {
   EuiFlyout,
   EuiFlyoutHeader,
   EuiFlyoutBody,
+  EuiGlobalToastList,
 } from '@elastic/eui';
 import { ModelForm } from '.';
 import { DeploymentStatus } from '.';
@@ -49,15 +50,28 @@ const ModelRegisterComponent = ({
   formConfig,
 }: ModelRegisterProps) => {
   const [isDeployed, setIsDeployed] = useState(false);
-  const { addSuccessToast, addErrorToast, addInfoToast } = useToast();
+  const { addSuccessToast, addErrorToast, addInfoToast, toasts, removeToast } = useToast();
   const {
     install,
     setModel,
     isLoading: isInstalling,
     result,
+    error,
     progress,
     isSuccess,
   } = useAssistantInstallation();
+
+  useEffect(() => {
+    if(error) {
+      addErrorToast(`Error deploying model`, `${error}. Rolling back current installation. Please, verify data provided and try again.`);
+    }
+  }, [error])
+
+  useEffect(() => {
+    if(isSuccess) {
+      addSuccessToast('Model deployed successfully.');
+    }
+  }, [isSuccess])
 
   // Default form configuration
   const defaultFormConfig: FormConfig = {
@@ -186,21 +200,31 @@ const ModelRegisterComponent = ({
         <EuiFlyout onClose={handleCloseDeployment} size='m' type='push'>
           <EuiFlyoutHeader hasBorder>
             <EuiTitle size='m'>
-              <h2>Model Deployment</h2>
+              <h2>Model deployment</h2>
             </EuiTitle>
           </EuiFlyoutHeader>
 
           <EuiFlyoutBody>
             <DeploymentStatus
               progress={progress}
+              error={error}
               agentId={result?.data?.agentId}
               title='Model deployment'
               onCheckButton={navigateToHomeIfCurrentApp}
               showCheckButton={isSuccess}
+              onFinishedWithError={() => {
+                setIsDeployed(false);
+                setIsDeploymentVisible(false);
+              }}
             />
           </EuiFlyoutBody>
         </EuiFlyout>
       )}
+      <EuiGlobalToastList
+        toasts={toasts}
+        dismissToast={removeToast}
+        toastLifeTimeMs={6000}
+      />
     </>
   );
 };

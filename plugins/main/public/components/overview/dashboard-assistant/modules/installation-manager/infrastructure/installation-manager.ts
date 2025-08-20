@@ -56,6 +56,7 @@ export class InstallationManager implements IInstallationManager {
         success: false,
         message: `Installation failed: ${error}`,
         progress,
+        data: context.toObject(),
         errors: failedSteps.map(step => ({
           step: step.stepName,
           message: step.message || 'Unknown error',

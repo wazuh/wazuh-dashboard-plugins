@@ -13,7 +13,7 @@ export const installDashboardAssistantUseCase =
       const result = await installationOrchestrator.execute(request);
 
       return {
-        success: true,
+        success: result.success,
         message: 'Dashboard assistant installed successfully',
         data: result.data,
       };

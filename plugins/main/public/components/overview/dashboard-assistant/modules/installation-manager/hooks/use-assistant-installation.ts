@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type {
   InstallAIDashboardAssistantDto,
   InstallationProgress,
@@ -25,6 +25,7 @@ export function useAssistantInstallation() {
   const setModel = useCallback((data: ModelConfiguration) => {
     setAssistantModelInfo(data);
   }, []);
+  const [error, setError] = useState<string | undefined>(undefined);
 
   const installerQuery = useCallback(async () => {
     let lastProgress = InstallDashboardAssistantResponse.start().progress;
@@ -60,6 +61,10 @@ export function useAssistantInstallation() {
           response.data.agentId,
           lastProgress,
         );
+      }
+
+      if(!response.success && response.data?.modelId) {
+        UseCases.deleteModelWithRelatedEntities(response.data.modelId);
       }
 
       return InstallDashboardAssistantResponse.failure(
@@ -100,12 +105,20 @@ export function useAssistantInstallation() {
     resetQuery();
   }, [resetQuery]);
 
+  useEffect(() => {
+    if(progress.hasFailed()) {
+      setError(`Steps: "${progress.getFailedSteps().map(s => s.stepName).join('", "')}" has failed`);
+    }else{
+      setError(undefined);
+    }
+  }, [JSON.stringify(progress)])
+
   return {
     install,
     setModel,
     reset,
     isLoading,
-    error: queryError ?? undefined,
+    error,
     result,
     modelData: assistantModelInfo,
     progress,
