@@ -137,11 +137,101 @@ export const VisualizationBasicWidget = ({
   );
 };
 
+type VisualizationBasicWidgetSelectorOptions = { value: any; text: string }[];
 type VisualizationBasicWidgetSelectorProps = VisualizationBasicWidgetProps & {
-  selectorOptions: { value: any; text: string }[];
+  selectorOptions: VisualizationBasicWidgetSelectorOptions;
   title?: string;
   onFetchExtraDependencies?: any[];
 };
+interface VisualizationBasicWidgetSelectorHeaderProps {
+  title?: string | React.ReactNode;
+  selectorOptions: VisualizationBasicWidgetSelectorOptions;
+  selectedOption: string;
+  onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+}
+
+type VisualizationBasicWidgetSelectorBodyProps =
+  VisualizationBasicWidgetProps & {
+    selectorOptions: VisualizationBasicWidgetSelectorOptions;
+    selectedOption: string;
+    onFetchExtraDependencies?: any[];
+  };
+
+export const useVisualizationBasicWidgetSelector = (
+  selectorOptions: VisualizationBasicWidgetSelectorOptions,
+) => {
+  const [selectedOption, setSelectedOption] = useState(
+    selectorOptions[0].value,
+  );
+
+  const onChange = useCallback(
+    event => setSelectedOption(event.target.value),
+    [],
+  );
+
+  return { selectedOption, setSelectedOption, onChange };
+};
+
+export const VisualizationBasicWidgetSelectorHeader = ({
+  title,
+  selectorOptions,
+  selectedOption,
+  onChange,
+}: VisualizationBasicWidgetSelectorHeaderProps) => (
+  <>
+    <EuiFlexGroup
+      className='embPanel__header'
+      gutterSize='none'
+      alignItems='center'
+    >
+      <EuiFlexItem>
+        {title && (
+          <h2 className='embPanel__title wz-headline-title'>
+            <EuiText size='xs'>
+              <h2>{title}</h2>
+            </EuiText>
+          </h2>
+        )}
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiSelect
+          style={{ fontSize: '0.793rem' }}
+          compressed={true}
+          options={selectorOptions}
+          value={selectedOption}
+          onChange={onChange}
+          aria-label='Select options'
+        />
+      </EuiFlexItem>
+    </EuiFlexGroup>
+    <EuiSpacer size='s' />
+  </>
+);
+
+export const VisualizationBasicWidgetSelectorBody = ({
+  selectedOption,
+  selectorOptions,
+  onFetchExtraDependencies,
+  ...rest
+}: VisualizationBasicWidgetSelectorBodyProps) => (
+  <VisualizationBasicWidget
+    {...rest}
+    {...(rest.noDataMessage
+      ? {
+          noDataMessage:
+            typeof rest.noDataMessage === 'function'
+              ? rest.noDataMessage(
+                  selectedOption,
+                  selectorOptions.find(
+                    option => option.value === selectedOption,
+                  ),
+                )
+              : rest.noDataMessage,
+        }
+      : {})}
+    onFetchDependencies={[selectedOption, ...(onFetchExtraDependencies || [])]}
+  />
+);
 
 /**
  * Renders a visualization that has a selector to change the resource to fetch data and display it. Use the visualization basic.
@@ -152,59 +242,21 @@ export const VisualizationBasicWidgetSelector = ({
   onFetchExtraDependencies,
   ...rest
 }: VisualizationBasicWidgetSelectorProps) => {
-  const [selectedOption, setSelectedOption] = useState(
-    selectorOptions[0].value,
-  );
-
-  const onChange = useCallback(e => setSelectedOption(e.target.value));
+  const { selectedOption, onChange } =
+    useVisualizationBasicWidgetSelector(selectorOptions);
 
   return (
     <>
-      <EuiFlexGroup
-        className='embPanel__header'
-        gutterSize='none'
-        alignItems='center'
-      >
-        <EuiFlexItem>
-          {title && (
-            <h2 className='embPanel__title wz-headline-title'>
-              <EuiText size='xs'>
-                <h2>{title}</h2>
-              </EuiText>
-            </h2>
-          )}
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiSelect
-            style={{ fontSize: '0.793rem' }}
-            compressed={true}
-            options={selectorOptions}
-            value={selectedOption}
-            onChange={onChange}
-            aria-label='Select options'
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiSpacer size='s' />
-      <VisualizationBasicWidget
+      <VisualizationBasicWidgetSelectorHeader
+        title={title}
+        selectorOptions={selectorOptions}
+        selectedOption={selectedOption}
+        onChange={onChange}
+      />
+      <VisualizationBasicWidgetSelectorBody
         {...rest}
-        {...(rest.noDataMessage
-          ? {
-              noDataMessage:
-                typeof rest.noDataMessage === 'function'
-                  ? rest.noDataMessage(
-                      selectedOption,
-                      selectorOptions.find(
-                        option => option.value === selectedOption,
-                      ),
-                    )
-                  : rest.noDataMessage,
-            }
-          : {})}
-        onFetchDependencies={[
-          selectedOption,
-          ...(onFetchExtraDependencies || []),
-        ]}
+        selectorOptions={selectorOptions}
+        selectedOption={selectedOption}
       />
     </>
   );
