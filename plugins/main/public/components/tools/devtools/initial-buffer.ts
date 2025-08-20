@@ -1,16 +1,25 @@
-export const DEV_TOOLS_INITIAL_BUFFER = `GET /agents?status=active
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
-# Example comment
+export const DEV_TOOLS_INITIAL_BUFFER = `# Wazuh API Console
+#
+# This console allows you to interact with the Wazuh API directly
+#
+# API Reference: ${webDocumentationLink('user-manual/api/reference.html')}
+# TIP: You can use \`?\` after the endpoint to get suggestions for your query params
+#
+# Examples:
 
-# You can use ? after the endpoint
-# in order to get suggestions
-# for your query params
+# List agents: Return information about all available agents or a list of them
+GET /agents?status=active
 
+# Get information: Return basic information such as version, compilation date, installation path
 GET /manager/info
 
+# Add agent: Add a new agent
 POST /agents
 ${JSON.stringify({ name: 'NewAgent' }, null, 2)}
 
+# Run logtest: Run logtest tool to check if a specified log raises any alert among other information
 PUT /logtest
 ${JSON.stringify(
   {
@@ -21,5 +30,5 @@ ${JSON.stringify(
   },
   null,
   2,
-)};
+)}
 `;
