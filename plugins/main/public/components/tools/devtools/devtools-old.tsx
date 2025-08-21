@@ -30,6 +30,7 @@ import { Keys } from './types/keys';
 import { getTopNavConfig } from './application/components/top-nav/get-top-nav';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { TopNavMenu } from './application/components/top-nav/top-nav-menu';
+import DevToolsColumnSeparator from './application/components/separator/dev-tools-column-separator';
 
 /**
  * Detect de groups of instructions
@@ -994,87 +995,67 @@ export const ToolDevTools = withGlobalBreadcrumb([
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
         // @ts-ignore
         '--col-separator-width': '14px',
         '--col-left-width': '50%',
         '--col-right-width': 'calc(100% - var(--col-left-width))',
       }}
-      className='dev-tools-max-height'
+      className='wz-dev-tools'
     >
-      <div className='wz-dev-box'>
-        <div
-          id='wz-dev-left-column'
-          style={{ display: 'flex', flexDirection: 'column' }}
-        >
-          <EuiFlexGroup gutterSize='none'>
-            <EuiFlexItem>
-              <TopNavMenu
-                useUpdatedUX={useUpdatedUX}
-                items={getTopNavConfig({
-                  useUpdatedUX,
-                  onClickExport: () =>
-                    saveEditorContentAsJson(editorOutputRef.current),
-                })}
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <span>
+      <div
+        id='wz-dev-left-column'
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
+        <EuiFlexGroup gutterSize='none'>
+          <EuiFlexItem>
+            <TopNavMenu
+              useUpdatedUX={useUpdatedUX}
+              items={getTopNavConfig({
+                useUpdatedUX,
+                onClickExport: () =>
+                  saveEditorContentAsJson(editorOutputRef.current),
+              })}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <span>
+          <i
+            onClick={() =>
+              send(editorInputRef.current, editorOutputRef.current)
+            }
+            title='Click to send the request'
+            className='fa fa-play wz-play-dev-color cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background'
+            id='play_button'
+            aria-hidden='true'
+          ></i>
+          <a
+            href=''
+            target='__blank'
+            title='Open documentation'
+            className='fa fa-info-circle cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background'
+            id='wazuh_dev_tools_documentation'
+          ></a>
+        </span>
+        <textarea style={{ display: 'flex' }} id='api_input'></textarea>
+      </div>
+      <DevToolsColumnSeparator />
+      <div
+        id='wz-dev-right-column'
+        style={{ display: 'flex', flexDirection: 'column' }}
+      >
+        <span>
+          <a
+            href={webDocumentationLink('user-manual/api/reference.html')}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
             <i
-              onClick={() =>
-                send(editorInputRef.current, editorOutputRef.current)
-              }
-              title='Click to send the request'
-              className='fa fa-play wz-play-dev-color cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background'
-              id='play_button'
+              className='fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw'
               aria-hidden='true'
             ></i>
-            <a
-              href=''
-              target='__blank'
-              title='Open documentation'
-              className='fa fa-info-circle cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background'
-              id='wazuh_dev_tools_documentation'
-            ></a>
-          </span>
-          <textarea style={{ display: 'flex' }} id='api_input'></textarea>
-        </div>
-        <div className='wz-dev-column-separator layout-column'>
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            width='16'
-            height='16'
-            viewBox='0 0 16 16'
-            className='euiIcon euiIcon--medium euiIcon-isLoaded'
-            focusable='false'
-            role='img'
-            aria-hidden='true'
-          >
-            <path
-              fill-rule='evenodd'
-              d='M6 2.5c0-.276.232-.5.5-.5.276 0 .5.229.5.5v11c0 .276-.232.5-.5.5a.503.503 0 0 1-.5-.5v-11Zm3 0c0-.276.232-.5.5-.5.276 0 .5.229.5.5v11c0 .276-.232.5-.5.5a.503.503 0 0 1-.5-.5v-11Z'
-            ></path>
-          </svg>
-        </div>
-        <div
-          id='wz-dev-right-column'
-          style={{ display: 'flex', flexDirection: 'column' }}
-        >
-          <span>
-            <a
-              href={webDocumentationLink('user-manual/api/reference.html')}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              <i
-                className='fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw'
-                aria-hidden='true'
-              ></i>
-            </a>
-          </span>
-          <textarea style={{ display: 'flex' }} id='api_output'></textarea>
-        </div>
+          </a>
+        </span>
+        <textarea style={{ display: 'flex' }} id='api_output'></textarea>
       </div>
     </div>
   );

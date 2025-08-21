@@ -452,9 +452,14 @@ md-sidenav {
 
 /* Dev tools styles */
 
-.wz-dev-box {
+.wz-dev-tools {
+  display: flex;
   margin: 0px !important;
   font-size: 14.5px;
+}
+
+.wz-app:has(.wz-dev-tools) {
+  flex-grow: 1;
 }
 
 .wz-play-dev-color {
@@ -506,7 +511,7 @@ $sides: left, right;
   max-width: calc(#{100% - $w} - var(--col-separator-width) / 2);
 }
 
-.wz-dev-box .CodeMirror {
+.wz-dev-tools .CodeMirror {
   border: 1px solid #ddd !important;
 }
 
@@ -1600,16 +1605,6 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
 
 .ace_autocomplete {
   width: 390px !important;
-}
-
-.wz-devtools {
-  border: 1px solid red;
-  margin: 16px;
-}
-
-.wz-devtools-tab .euiButtonEmpty__text {
-  height: 24px;
-  text-decoration: none !important;
 }
 
 .history-list {
