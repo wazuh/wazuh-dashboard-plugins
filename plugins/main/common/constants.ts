@@ -75,6 +75,13 @@ export const WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN =
   'wazuh-states-inventory-protocols-*';
 export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN =
   'wazuh-states-inventory-system-*';
+export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users-*';
+export const WAZUH_IT_HYGIENE_GROUPS_PATTERN =
+  'wazuh-states-inventory-groups-*';
+export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
+  'wazuh-states-inventory-services-*';
+export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
+  'wazuh-states-inventory-browser-extensions-*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -141,10 +148,30 @@ export const WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_IT_HYGIENE_SYSTEM_PATTERN.replace('*', ''),
   dataSet: 'states-inventory-system',
 };
+export const WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_GROUPS_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-groups',
+};
+export const WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_USERS_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-users',
+};
 export const WAZUH_SETTING_VULNERABILITIES_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_VULNERABILITIES_PATTERN.replace('*', ''),
   dataSet: 'states-vulnerabilities',
 };
+export const WAZUH_SETTING_INVENTORY_SERVICES_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_SERVICES_PATTERN.replace('*', ''),
+  dataSet: 'states-inventory-services',
+};
+export const WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN.replace(
+    '*',
+    '',
+  ),
+  dataSet: 'states-inventory-browser-extensions',
+};
+
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
   [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]: [
     {
@@ -155,6 +182,13 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
     },
     {
       aws: true,
+      settingIndexPattern:
+        WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
+      dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      azure: true,
+      count: 1000,
       settingIndexPattern:
         WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.settingIndexPattern,
       dataSet: WAZUH_SETTING_ALERTS_SAMPLE_PREFIX.dataSet,
@@ -343,6 +377,30 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
         WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_INVENTORY_SYSTEM_SAMPLE_PREFIX.dataSet,
     },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_USERS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_GROUPS_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_SERVICES_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_SERVICES_SAMPLE_PREFIX.dataSet,
+    },
+    {
+      registries: true,
+      indexPatternPrefix:
+        WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_INVENTORY_BROWSER_EXTENSIONS_SAMPLE_PREFIX.dataSet,
+    },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
     {
@@ -368,38 +426,6 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
-
-// Wazuh data path
-const WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH = 'data';
-export const WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH = path.join(
-  __dirname,
-  '../../../',
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_PATH,
-);
-export const WAZUH_DATA_ABSOLUTE_PATH = path.join(
-  WAZUH_DATA_PLUGIN_PLATFORM_BASE_ABSOLUTE_PATH,
-  'wazuh',
-);
-
-// Wazuh data path - config
-export const WAZUH_DATA_CONFIG_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'config',
-);
-export const WAZUH_DATA_CONFIG_REGISTRY_PATH = path.join(
-  WAZUH_DATA_CONFIG_DIRECTORY_PATH,
-  'wazuh-registry.json',
-);
-
-// Wazuh data path - downloads
-export const WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_ABSOLUTE_PATH,
-  'downloads',
-);
-export const WAZUH_DATA_DOWNLOADS_REPORTS_DIRECTORY_PATH = path.join(
-  WAZUH_DATA_DOWNLOADS_DIRECTORY_PATH,
-  'reports',
-);
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
@@ -510,6 +536,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_GOOGLE_CLOUD_RULE_GROUP =
 export const DATA_SOURCE_FILTER_CONTROLLED_MALWARE_DETECTION_RULE_GROUP =
   'malware-detection-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_AWS_RULE_GROUP = 'aws-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
+  'azure-rule-group'; // TODO: change this to 'azure-rule-group' if needed when Azure data source is implemented
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
   'configuration-assessment-rule-group';
@@ -523,7 +551,7 @@ export const WAZUH_LINK_SLACK = 'https://wazuh.com/community/join-us-on-slack';
 export const HEALTH_CHECK = 'health-check';
 
 // Health check
-export const HEALTH_CHECK_REDIRECTION_TIME = 300; //ms
+export const HEALTH_CHECK_REDIRECTION_TIME = 300; // ms
 
 // Plugin platform settings
 // Default timeFilter set by the app

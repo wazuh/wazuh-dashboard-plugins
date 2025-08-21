@@ -128,9 +128,41 @@ export class ManageHosts {
       const hosts = (await this.get(undefined, options)) as IAPIHost[];
       this.logger.debug('Getting registry');
       const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
+
+      const hostsNeedingRegistry = hosts.filter(host => !registry[host.id]);
+      if (hostsNeedingRegistry.length > 0) {
+        this.logger.debug(
+          `Found ${hostsNeedingRegistry.length} hosts without registry data, updating cache`,
+        );
+
+        await Promise.allSettled(
+          hostsNeedingRegistry.map(async (host: IAPIHost) => {
+            try {
+              await this.getRegistryDataByHost(host, { throwError: false });
+              this.logger.debug(`Registry data updated for host [${host.id}]`);
+            } catch (error) {
+              const errorMessage =
+                error instanceof Error ? error.message : String(error);
+              this.logger.warn(
+                `Failed to get registry data for host [${host.id}]: ${errorMessage}`,
+              );
+            }
+          }),
+        );
+
+        const updatedRegistry = Object.fromEntries([
+          ...this.cacheRegistry.entries(),
+        ]);
+        return hosts.map(host => {
+          const { id } = host;
+          return { ...host, cluster_info: updatedRegistry[id] || {} };
+        });
+      }
+
       return hosts.map(host => {
         const { id } = host;
-        return { ...host, cluster_info: registry[id] };
+
+        return { ...host, cluster_info: registry[id] || {} };
       });
     } catch (error) {
       this.logger.error(error.message);
