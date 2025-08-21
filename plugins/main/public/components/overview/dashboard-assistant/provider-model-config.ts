@@ -28,6 +28,21 @@ export const modelProviderConfigs: Record<string, ProviderModelConfig> = {
     request_body:
       '{ "model": "${parameters.model}", "messages": ${parameters.messages} }',
   },
+  Deepseek: {
+    model_family: 'Deepseek',
+    model_provider: 'Deepseek',
+    models: ['deepseek-chat', 'deepseek-coder'],
+    default_model: 'deepseek-chat',
+    default_endpoint: 'api.deepseek.com',
+    default_endpoint_regex: String.raw`^https://api\.deepseek\.com/.*$`,
+    response_filter: '$.choices[0].message.content',
+    url_path: '/v1/chat/completions',
+    headers: {
+      Authorization: 'Bearer ${credential.api_key}',
+    },
+    request_body:
+      '{ "model": "${parameters.model}", "messages": ${parameters.messages} }',
+  },
   Anthropic: {
     model_family: 'Claude',
     model_provider: 'Anthropic',
