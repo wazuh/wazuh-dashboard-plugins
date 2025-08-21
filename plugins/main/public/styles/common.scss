@@ -471,13 +471,14 @@ md-sidenav {
 }
 
 .wz-dev-column-separator {
-  width: 12px;
+  width: 16px;
   margin-top: 15px;
   background: #dddddd;
   float: left;
   cursor: ew-resize;
   text-align: center;
-  display: block !important;
+  display: flex;
+  align-items: center;
 }
 
 .wz-dev-column-separator:hover {
@@ -488,11 +489,6 @@ md-sidenav {
 .wz-dev-column-separator.active {
   background-color: #0079a5;
   color: #fff;
-}
-
-.wz-dev-column-separator span {
-  display: table-cell;
-  vertical-align: middle;
 }
 
 #wz-dev-left-column {
