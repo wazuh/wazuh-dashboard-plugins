@@ -157,21 +157,19 @@ function calculateWhichGroup(editor, firstTime = false, groups = []) {
         ch: 0,
       });
     } catch {
-      $('#play_button').hide();
-      $('#wazuh_dev_tools_documentation').hide();
+      $('#wz-dev-tools-buttons--send-request').hide();
+      $('#wz-dev-tools-buttons--go-to-api-reference').hide();
       return null;
     }
 
-    if (!$('#play_button').is(':visible')) $('#play_button').show();
-    if (!$('#wazuh_dev_tools_documentation').is(':visible'))
-      $('#wazuh_dev_tools_documentation').show();
-    const currentPlayButton = $('#play_button').offset();
-    $('#play_button').offset({
-      top: cords.top /*+ 2*/,
-      left: currentPlayButton.left,
-    });
-    $('#wazuh_dev_tools_documentation').offset({
-      top: cords.top /*+ 2*/,
+    if (!$('#wz-dev-tools-buttons--send-request').is(':visible')) {
+      $('#wz-dev-tools-buttons--send-request').show();
+    }
+    if (!$('#wz-dev-tools-buttons--go-to-api-reference').is(':visible')) {
+      $('#wz-dev-tools-buttons--go-to-api-reference').show();
+    }
+    $('#wz-dev-tools-buttons').offset({
+      top: cords.top + 1,
     });
     if (firstTime) highlightGroup(editor, desiredGroup[0]);
     if (desiredGroup[0]) {
@@ -218,17 +216,17 @@ function calculateWhichGroup(editor, firstTime = false, groups = []) {
           ),
         );
       if (apiEndpoint && apiEndpoint.documentation) {
-        $('#wazuh_dev_tools_documentation')
+        $('#wz-dev-tools-buttons--go-to-api-reference')
           .attr('href', apiEndpoint.documentation)
           .show();
       } else {
-        $('#wazuh_dev_tools_documentation').attr('href', '').hide();
+        $('#wz-dev-tools-buttons--go-to-api-reference').attr('href', '').hide();
       }
     }
     return desiredGroup[0];
   } catch (error) {
-    $('#play_button').hide();
-    $('#wazuh_dev_tools_documentation').hide();
+    $('#wz-dev-tools-buttons--send-request').hide();
+    $('#wz-dev-tools-buttons--go-to-api-reference').hide();
     const options: UIErrorLog = {
       context: `calculateWhichGroup`,
       level: UI_LOGGER_LEVELS.WARNING as UILogLevel,
@@ -726,10 +724,8 @@ async function send(editorInput, editorOutput, firstTime = false) {
           line: desiredGroup.start,
           ch: 0,
         });
-        const currentPlayButton = $('#play_button').offset();
-        $('#play_button').offset({
-          top: cords.top /*+ 2*/,
-          left: currentPlayButton.left,
+        $('#wz-dev-tools-buttons').offset({
+          top: cords.top + 1,
         });
       }
 
@@ -1018,24 +1014,32 @@ export const ToolDevTools = withGlobalBreadcrumb([
             />
           </EuiFlexItem>
         </EuiFlexGroup>
-        <span>
+        <div
+          id='wz-dev-tools-buttons'
+          style={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            position: 'relative',
+            left: '-5px',
+          }}
+        >
           <i
             onClick={() =>
               send(editorInputRef.current, editorOutputRef.current)
             }
             title='Click to send the request'
-            className='fa fa-play wz-play-dev-color cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background'
-            id='play_button'
+            className='fa fa-play wz-play-dev-color cursor-pointer wz-always-top CodeMirror-styled-background'
+            id='wz-dev-tools-buttons--send-request'
             aria-hidden='true'
           ></i>
           <a
             href=''
             target='__blank'
             title='Open documentation'
-            className='fa fa-info-circle cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background'
-            id='wazuh_dev_tools_documentation'
+            className='fa fa-info-circle cursor-pointer wz-always-top CodeMirror-styled-background'
+            id='wz-dev-tools-buttons--go-to-api-reference'
           ></a>
-        </span>
+        </div>
         <textarea style={{ display: 'flex' }} id='api_input'></textarea>
       </div>
       <DevToolsColumnSeparator />
