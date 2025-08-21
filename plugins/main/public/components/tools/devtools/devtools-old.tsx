@@ -704,8 +704,12 @@ function init(editorInput, editorOutput) {
     $(evtDocument).unbind('mousemove');
   });
 
+  window.onresize = () => {
+    dynamicHeight();
+  };
+
   const dynamicHeight = () =>
-    DynamicHeight.dynamicHeightDevTools(editorInput, window);
+    DynamicHeight.dynamicHeightDevTools(window);
   dynamicHeight();
 }
 

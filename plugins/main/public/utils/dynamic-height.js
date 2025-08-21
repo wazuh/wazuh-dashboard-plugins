@@ -36,10 +36,10 @@ export class DynamicHeight {
           editorContainer.height(windows - (offsetTop + bottom));
           codeMirror.length
             ? $(`.${classElement} .CodeMirror`).height(
-                windows - (offsetTop + bottom + headerContainerHeight)
+                windows - (offsetTop + bottom + headerContainerHeight),
               )
             : $(`.${classElement}`).height(
-                windows - (offsetTop + bottom + headerContainerHeight)
+                windows - (offsetTop + bottom + headerContainerHeight),
               );
         }, 1);
       }
@@ -62,7 +62,7 @@ export class DynamicHeight {
           const offsetTop = DynamicHeight.getPosition(editorContainer[0]).y;
           editorContainer.height(windows - (offsetTop + 20));
           $('.wzXmlEditorBody .CodeMirror').css({
-            height: 'calc(100% - ' + (headerContainer.height() - 22) + 'px)'
+            height: 'calc(100% - ' + (headerContainer.height() - 22) + 'px)',
           });
         }, 1);
       }
@@ -82,7 +82,7 @@ export class DynamicHeight {
           const editorContainer = $(classElement);
           const offsetTop = DynamicHeight.getPosition(editorContainer[0]).y;
           $(classElement).css({
-            height: 'calc(100vh - ' + (offsetTop + staticHeight + 2) + 'px)'
+            height: 'calc(100vh - ' + (offsetTop + staticHeight + 2) + 'px)',
           });
         }, 1);
       }
@@ -91,10 +91,9 @@ export class DynamicHeight {
 
   /**
    * Calculates the dynamic height for the dev tools
-   * @param {Object} self
-   * @param {Object} window
+   * @param {Window} window
    */
-  static dynamicHeightDevTools(self, window) {
+  static dynamicHeightDevTools(window) {
     let devToolsElement;
     const interval = setInterval(() => {
       devToolsElement = $('#wz-dev-left-column');
@@ -103,23 +102,19 @@ export class DynamicHeight {
         setTimeout(() => {
           const windows = $(window).height();
           $('#wz-dev-left-column').height(
-            windows -
-              (DynamicHeight.getPosition($('#wz-dev-left-column')[0]).y + 20)
+            windows - DynamicHeight.getPosition($('#wz-dev-left-column')[0]).y,
           );
           $('.wz-dev-column-separator').height(
             windows -
-              (DynamicHeight.getPosition($('.wz-dev-column-separator')[0]).y +
-                20)
+              DynamicHeight.getPosition($('.wz-dev-column-separator')[0]).y,
           );
           $('#wz-dev-right-column').height(
-            windows -
-              (DynamicHeight.getPosition($('#wz-dev-right-column')[0]).y + 20)
+            windows - DynamicHeight.getPosition($('#wz-dev-right-column')[0]).y,
           );
           $('.wz-dev-column-separator span').height(
             windows -
-              (DynamicHeight.getPosition($('.wz-dev-column-separator span')[0])
-                .y +
-                20)
+              DynamicHeight.getPosition($('.wz-dev-column-separator span')[0])
+                .y,
           );
         }, 1);
       }
