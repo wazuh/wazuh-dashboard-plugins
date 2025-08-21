@@ -708,8 +708,7 @@ function init(editorInput, editorOutput) {
     dynamicHeight();
   };
 
-  const dynamicHeight = () =>
-    DynamicHeight.dynamicHeightDevTools(window);
+  const dynamicHeight = () => DynamicHeight.dynamicHeightDevTools(window);
   dynamicHeight();
 }
 
