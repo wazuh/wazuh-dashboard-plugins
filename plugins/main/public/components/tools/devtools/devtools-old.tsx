@@ -705,18 +705,6 @@ function init(editorInput, editorOutput) {
     $(evtDocument).unbind('mousemove');
   });
 
-  window.onresize = () => {
-    $('#wz-dev-left-column').attr(
-      'style',
-      'width: calc(var(--col-left-width) - var(--col-separator-width) / 2); !important',
-    );
-    $('#wz-dev-right-column').attr(
-      'style',
-      'width: calc(var(--col-right-width) - var(--col-separator-width) / 2); !important',
-    );
-    dynamicHeight();
-  };
-
   const dynamicHeight = () =>
     DynamicHeight.dynamicHeightDevTools(editorInput, window);
   dynamicHeight();
