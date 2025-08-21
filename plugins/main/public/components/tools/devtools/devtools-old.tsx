@@ -27,6 +27,9 @@ import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
 import { DEV_TOOLS_INITIAL_BUFFER } from './initial-buffer';
 import { Keys } from './types/keys';
+import { getTopNavConfig } from './application/components/top-nav/get-top-nav';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { TopNavMenu } from './application/components/top-nav/top-nav-menu';
 
 /**
  * Detect de groups of instructions
@@ -874,6 +877,8 @@ export const ToolDevTools = withGlobalBreadcrumb([
   const editorInputRef = useRef();
   const editorOutputRef = useRef();
 
+  const useUpdatedUX = getUiSettings().get('home:useNewHomePage');
+
   useEffect(() => {
     (async function () {
       const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
@@ -1008,6 +1013,18 @@ export const ToolDevTools = withGlobalBreadcrumb([
           id='wz-dev-left-column'
           style={{ display: 'flex', flexDirection: 'column' }}
         >
+          <EuiFlexGroup gutterSize='none'>
+            <EuiFlexItem>
+              <TopNavMenu
+                useUpdatedUX={useUpdatedUX}
+                items={getTopNavConfig({
+                  useUpdatedUX,
+                  onClickExport: () =>
+                    saveEditorContentAsJson(editorOutputRef.current),
+                })}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
           <span>
             <i
               onClick={() =>
@@ -1046,13 +1063,6 @@ export const ToolDevTools = withGlobalBreadcrumb([
                 aria-hidden='true'
               ></i>
             </a>
-            <i
-              onClick={() => exportOutput(editorOutputRef.current)}
-              tooltip='Export as JSON'
-              tooltip-placement='bottom'
-              className='fa fa-download wz-question-dev-color cursor-pointer pull-right fa-fw'
-              aria-hidden='true'
-            ></i>
           </span>
           <textarea style={{ display: 'flex' }} id='api_output'></textarea>
         </div>
