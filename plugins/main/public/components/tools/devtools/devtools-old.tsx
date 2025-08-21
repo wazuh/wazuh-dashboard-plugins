@@ -955,7 +955,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
         {
           lineNumbers: true,
           matchBrackets: true,
-          mode: { name: 'python', json: true },
+          mode: { name: 'javascript', json: true },
           readOnly: true,
           lineWrapping: true,
           styleActiveLine: true,
