@@ -870,7 +870,7 @@ function exportOutput(editor) {
 export const ToolDevTools = withGlobalBreadcrumb([
   { text: devTools.breadcrumbLabel },
 ])(() => {
-  const [multipleKeyPressed, setMultipleKeyPressed] = useState([]);
+  const [multipleKeyPressed, setMultipleKeyPressed] = useState<number[]>([]);
   const editorInputRef = useRef();
   const editorOutputRef = useRef();
 
