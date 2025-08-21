@@ -479,26 +479,17 @@ md-sidenav {
   text-align: center;
   display: flex;
   align-items: center;
+
+  &:hover {
+    background-color: #cce4ed;
+  }
+  &:focus,
+  &.active {
+    background-color: #0079a5;
+    color: #fff;
+  }
 }
 
-.wz-dev-column-separator:hover {
-  background-color: #cce4ed;
-}
-
-.wz-dev-column-separator:focus,
-.wz-dev-column-separator.active {
-  background-color: #0079a5;
-  color: #fff;
-}
-
-#wz-dev-left-column {
-  width: calc(var(--col-left-width) - var(--col-separator-width) / 2);
-  float: left;
-}
-
-#wz-dev-right-column {
-  width: calc(var(--col-right-width) - var(--col-separator-width) / 2);
-  float: right;
 }
 
 #wz-dev-left-column,
