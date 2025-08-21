@@ -22,15 +22,15 @@ import {
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
 import { DEV_TOOLS_INITIAL_BUFFER } from './initial-buffer';
 import { Keys } from './types/keys';
 import { getTopNavConfig } from './application/components/top-nav/get-top-nav';
-import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem, EuiTabs, EuiTab } from '@elastic/eui';
 import { TopNavMenu } from './application/components/top-nav/top-nav-menu';
 import DevToolsColumnSeparator from './application/components/separator/dev-tools-column-separator';
+import { CONSOLE_CONTAINER } from './constants';
 
 /**
  * Detect de groups of instructions
@@ -993,77 +993,87 @@ export const ToolDevTools = withGlobalBreadcrumb([
   }, []);
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        // @ts-ignore
-        '--col-separator-width': '14px',
-        '--col-left-width': '50%',
-        '--col-right-width': 'calc(100% - var(--col-left-width))',
-      }}
-      className='wz-dev-tools'
-    >
-      <EuiFlexGroup gutterSize='none'>
-        <EuiFlexItem>
-          <TopNavMenu
-            useUpdatedUX={useUpdatedUX}
-            items={getTopNavConfig({
-              useUpdatedUX,
-              onClickExport: () =>
-                saveEditorContentAsJson(editorOutputRef.current),
-            })}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-        }}
+    <div id='wz-dev-tools-container'>
+      <EuiTabs size='s'>
+        <EuiTab isSelected={true}>Console</EuiTab>
+      </EuiTabs>
+      <EuiFlexGroup
+        style={{ padding: `${CONSOLE_CONTAINER.padding}px`, margin: 0 }}
+        direction='column'
       >
         <div
-          id='wz-dev-left-column'
-          style={{ display: 'flex', flexDirection: 'column' }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            // @ts-ignore
+            '--col-separator-width': '14px',
+            '--col-left-width': '50%',
+            '--col-right-width': 'calc(100% - var(--col-left-width))',
+          }}
+          className='wz-dev-tools'
         >
+          <EuiFlexGroup gutterSize='none'>
+            <EuiFlexItem>
+              <TopNavMenu
+                useUpdatedUX={useUpdatedUX}
+                items={getTopNavConfig({
+                  useUpdatedUX,
+                  onClickExport: () =>
+                    saveEditorContentAsJson(editorOutputRef.current),
+                })}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
           <div
-            id='wz-dev-tools-buttons'
             style={{
               display: 'flex',
-              justifyContent: 'flex-end',
-              position: 'relative',
-              left: '-0.75rem',
-              gap: '0.5rem',
-              height: 0,
+              flexDirection: 'row',
             }}
           >
-            <i
-              onClick={() =>
-                send(editorInputRef.current, editorOutputRef.current)
-              }
-              title='Click to send the request'
-              className='fa fa-play wz-dev-tools-buttons--send-request cursor-pointer wz-always-top CodeMirror-styled-background'
-              id='wz-dev-tools-buttons--send-request'
-              aria-hidden='true'
-            ></i>
-            <a
-              href=''
-              target='__blank'
-              title='Open documentation'
-              className='fa fa-info-circle cursor-pointer wz-always-top CodeMirror-styled-background'
-              id='wz-dev-tools-buttons--go-to-api-reference'
-            ></a>
+            <div
+              id='wz-dev-left-column'
+              style={{ display: 'flex', flexDirection: 'column' }}
+            >
+              <div
+                id='wz-dev-tools-buttons'
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  position: 'relative',
+                  left: '-0.75rem',
+                  gap: '0.5rem',
+                  height: 0,
+                }}
+              >
+                <i
+                  onClick={() =>
+                    send(editorInputRef.current, editorOutputRef.current)
+                  }
+                  title='Click to send the request'
+                  className='fa fa-play wz-dev-tools-buttons--send-request cursor-pointer wz-always-top CodeMirror-styled-background'
+                  id='wz-dev-tools-buttons--send-request'
+                  aria-hidden='true'
+                ></i>
+                <a
+                  href=''
+                  target='__blank'
+                  title='Open documentation'
+                  className='fa fa-info-circle cursor-pointer wz-always-top CodeMirror-styled-background'
+                  id='wz-dev-tools-buttons--go-to-api-reference'
+                ></a>
+              </div>
+              <textarea style={{ display: 'flex' }} id='api_input'></textarea>
+            </div>
+            <DevToolsColumnSeparator />
+            <div
+              id='wz-dev-right-column'
+              style={{ display: 'flex', flexDirection: 'column' }}
+            >
+              <textarea style={{ display: 'flex' }} id='api_output'></textarea>
+            </div>
           </div>
-          <textarea style={{ display: 'flex' }} id='api_input'></textarea>
         </div>
-        <DevToolsColumnSeparator />
-        <div
-          id='wz-dev-right-column'
-          style={{ display: 'flex', flexDirection: 'column' }}
-        >
-          <textarea style={{ display: 'flex' }} id='api_output'></textarea>
-        </div>
-      </div>
+      </EuiFlexGroup>
     </div>
   );
 });

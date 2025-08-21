@@ -1,3 +1,5 @@
+import { CONSOLE_CONTAINER } from '../components/tools/devtools/constants';
+
 /*
  * Wazuh app - Helper class for div heights
  * Copyright (C) 2015-2022 Wazuh, Inc.
@@ -100,7 +102,7 @@ export class DynamicHeight {
       if (devToolsElement) {
         clearInterval(interval);
         setTimeout(() => {
-          const windows = $(window).height();
+          const windows = $(window).height() - CONSOLE_CONTAINER.padding;
           $('#wz-dev-left-column').height(
             windows - DynamicHeight.getPosition($('#wz-dev-left-column')[0]).y,
           );
