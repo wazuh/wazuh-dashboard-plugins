@@ -503,8 +503,9 @@ md-sidenav {
 
 #wz-dev-left-column,
 #wz-dev-right-column {
-  min-width: calc(20% - var(--col-separator-width) / 2);
-  max-width: calc(80% - var(--col-separator-width) / 2);
+  $w: 20%;
+  min-width: calc(#{$w} - var(--col-separator-width) / 2);
+  max-width: calc(#{100% - $w} - var(--col-separator-width) / 2);
 }
 
 .wz-dev-box .CodeMirror {
