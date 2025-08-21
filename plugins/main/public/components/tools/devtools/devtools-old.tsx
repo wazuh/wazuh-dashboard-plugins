@@ -1020,7 +1020,8 @@ export const ToolDevTools = withGlobalBreadcrumb([
             display: 'flex',
             justifyContent: 'flex-end',
             position: 'relative',
-            left: '-5px',
+            left: '-0.75rem',
+            gap: '0.5rem',
           }}
         >
           <i
@@ -1028,7 +1029,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
               send(editorInputRef.current, editorOutputRef.current)
             }
             title='Click to send the request'
-            className='fa fa-play wz-play-dev-color cursor-pointer wz-always-top CodeMirror-styled-background'
+            className='fa fa-play wz-dev-tools-buttons--send-request cursor-pointer wz-always-top CodeMirror-styled-background'
             id='wz-dev-tools-buttons--send-request'
             aria-hidden='true'
           ></i>
