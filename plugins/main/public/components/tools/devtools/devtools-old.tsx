@@ -991,6 +991,8 @@ export const ToolDevTools = withGlobalBreadcrumb([
   return (
     <div
       style={{
+        display: 'flex',
+        flexDirection: 'column',
         // @ts-ignore
         '--col-separator-width': '14px',
         '--col-left-width': '50%',
@@ -998,69 +1000,65 @@ export const ToolDevTools = withGlobalBreadcrumb([
       }}
       className='wz-dev-tools'
     >
+      <EuiFlexGroup gutterSize='none'>
+        <EuiFlexItem>
+          <TopNavMenu
+            useUpdatedUX={useUpdatedUX}
+            items={getTopNavConfig({
+              useUpdatedUX,
+              onClickExport: () =>
+                saveEditorContentAsJson(editorOutputRef.current),
+            })}
+          />
+        </EuiFlexItem>
+      </EuiFlexGroup>
       <div
-        id='wz-dev-left-column'
-        style={{ display: 'flex', flexDirection: 'column' }}
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+        }}
       >
-        <EuiFlexGroup gutterSize='none'>
-          <EuiFlexItem>
-            <TopNavMenu
-              useUpdatedUX={useUpdatedUX}
-              items={getTopNavConfig({
-                useUpdatedUX,
-                onClickExport: () =>
-                  saveEditorContentAsJson(editorOutputRef.current),
-              })}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
         <div
-          id='wz-dev-tools-buttons'
-          style={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            position: 'relative',
-            left: '-0.75rem',
-            gap: '0.5rem',
-          }}
+          id='wz-dev-left-column'
+          style={{ display: 'flex', flexDirection: 'column' }}
         >
-          <i
-            onClick={() =>
-              send(editorInputRef.current, editorOutputRef.current)
-            }
-            title='Click to send the request'
-            className='fa fa-play wz-dev-tools-buttons--send-request cursor-pointer wz-always-top CodeMirror-styled-background'
-            id='wz-dev-tools-buttons--send-request'
-            aria-hidden='true'
-          ></i>
-          <a
-            href=''
-            target='__blank'
-            title='Open documentation'
-            className='fa fa-info-circle cursor-pointer wz-always-top CodeMirror-styled-background'
-            id='wz-dev-tools-buttons--go-to-api-reference'
-          ></a>
-        </div>
-        <textarea style={{ display: 'flex' }} id='api_input'></textarea>
-      </div>
-      <DevToolsColumnSeparator />
-      <div
-        id='wz-dev-right-column'
-        style={{ display: 'flex', flexDirection: 'column' }}
-      >
-        <span>
-          <a
-            href={webDocumentationLink('user-manual/api/reference.html')}
-            target='_blank'
-            rel='noopener noreferrer'
+          <div
+            id='wz-dev-tools-buttons'
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              position: 'relative',
+              left: '-0.75rem',
+              gap: '0.5rem',
+              height: 0,
+            }}
           >
             <i
-              className='fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw'
+              onClick={() =>
+                send(editorInputRef.current, editorOutputRef.current)
+              }
+              title='Click to send the request'
+              className='fa fa-play wz-dev-tools-buttons--send-request cursor-pointer wz-always-top CodeMirror-styled-background'
+              id='wz-dev-tools-buttons--send-request'
               aria-hidden='true'
             ></i>
-          </a>
-        </span>
-        <textarea style={{ display: 'flex' }} id='api_output'></textarea>
+            <a
+              href=''
+              target='__blank'
+              title='Open documentation'
+              className='fa fa-info-circle cursor-pointer wz-always-top CodeMirror-styled-background'
+              id='wz-dev-tools-buttons--go-to-api-reference'
+            ></a>
+          </div>
+          <textarea style={{ display: 'flex' }} id='api_input'></textarea>
+        </div>
+        <DevToolsColumnSeparator />
+        <div
+          id='wz-dev-right-column'
+          style={{ display: 'flex', flexDirection: 'column' }}
+        >
+          <textarea style={{ display: 'flex' }} id='api_output'></textarea>
+        </div>
       </div>
     </div>
   );
