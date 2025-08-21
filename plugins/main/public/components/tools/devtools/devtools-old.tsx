@@ -848,7 +848,7 @@ function parseError(error) {
   }
 }
 
-function exportOutput(editor) {
+function saveEditorContentAsJson(editor) {
   try {
     // eslint-disable-next-line
     const blob = new Blob([editor.getValue()], {
