@@ -902,10 +902,11 @@ export const ToolDevTools = withGlobalBreadcrumb([
           lineNumbers: true,
           matchBrackets: true,
           mode: { name: 'javascript', json: true },
-          theme: isDarkThemeEnabled ? 'lesser-dark' : 'ttcn',
-          foldGutter: true,
+          lineWrapping: true,
           styleSelectedText: true,
+          foldGutter: true,
           gutters: ['CodeMirror-foldgutter'],
+          theme: isDarkThemeEnabled ? 'lesser-dark' : 'ttcn',
         },
       ));
 
@@ -955,13 +956,13 @@ export const ToolDevTools = withGlobalBreadcrumb([
         {
           lineNumbers: true,
           matchBrackets: true,
-          mode: { name: 'javascript', json: true },
+          mode: { name: 'python', json: true },
           readOnly: true,
           lineWrapping: true,
           styleActiveLine: true,
-          theme: isDarkThemeEnabled ? 'lesser-dark' : 'ttcn',
           foldGutter: true,
           gutters: ['CodeMirror-foldgutter'],
+          theme: isDarkThemeEnabled ? 'lesser-dark' : 'ttcn',
         },
       );
 
