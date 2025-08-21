@@ -708,11 +708,11 @@ function init(editorInput, editorOutput) {
   window.onresize = () => {
     $('#wz-dev-left-column').attr(
       'style',
-      'width: calc(45% - 7px); !important',
+      'width: calc(var(--col-left-width) - var(--col-separator-width) / 2); !important',
     );
     $('#wz-dev-right-column').attr(
       'style',
-      'width: calc(55% - 7px); !important',
+      'width: calc(var(--col-right-width) - var(--col-separator-width) / 2); !important',
     );
     dynamicHeight();
   };
@@ -1005,7 +1005,14 @@ export const ToolDevTools = withGlobalBreadcrumb([
 
   return (
     <div
-      style={{ display: 'flex', flexDirection: 'column' }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        // @ts-ignore
+        '--col-separator-width': '14px',
+        '--col-left-width': '50%',
+        '--col-right-width': 'calc(100% - var(--col-left-width))',
+      }}
       className='dev-tools-max-height'
     >
       <div className='wz-dev-box'>

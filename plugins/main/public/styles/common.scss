@@ -471,7 +471,7 @@ md-sidenav {
 }
 
 .wz-dev-column-separator {
-  width: 16px;
+  width: var(--col-separator-width);
   margin-top: 15px;
   background: #dddddd;
   float: left;
@@ -492,17 +492,19 @@ md-sidenav {
 }
 
 #wz-dev-left-column {
-  width: calc(45% - 7px);
-  min-width: calc(20% - 7px);
-  max-width: calc(80% - 7px);
+  width: calc(var(--col-left-width) - var(--col-separator-width) / 2);
   float: left;
 }
 
 #wz-dev-right-column {
-  width: calc(55% - 7px);
-  min-width: calc(20% - 7px);
-  max-width: calc(80% - 7px);
-  float: left;
+  width: calc(var(--col-right-width) - var(--col-separator-width) / 2);
+  float: right;
+}
+
+#wz-dev-left-column,
+#wz-dev-right-column {
+  min-width: calc(20% - var(--col-separator-width) / 2);
+  max-width: calc(80% - var(--col-separator-width) / 2);
 }
 
 .wz-dev-box .CodeMirror {
