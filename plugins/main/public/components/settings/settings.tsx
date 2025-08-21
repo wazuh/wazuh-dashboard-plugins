@@ -84,7 +84,6 @@ class SettingsComponent extends React.Component {
     this.wzMisc = new WzMisc();
 
     if (this.wzMisc.getWizard()) {
-      window.sessionStorage.removeItem('healthCheck');
       this.wzMisc.setWizard(false);
     }
     this.apiIsDown = this.wzMisc.getApiIsDown();

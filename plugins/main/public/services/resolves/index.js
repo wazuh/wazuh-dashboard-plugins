@@ -10,6 +10,5 @@
  * Find more information about this on the LICENSE file.
  */
 export * from './get-config';
-export * from './health-check';
 export * from './nested-resolve';
 export * from './settings-wizard';
