@@ -150,5 +150,4 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
       throw new Error(message);
     }
   },
-  isCritical: true,
 });
