@@ -980,9 +980,9 @@ export const ToolDevTools = withGlobalBreadcrumb([
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
           severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
           error: {
-            error: error,
-            message: error.message || error,
-            title: error.name,
+            error: error as Error,
+            message: (error as Error).message || (error as string),
+            title: (error as Error).name,
           },
         };
         getErrorOrchestrator().handleError(options);
