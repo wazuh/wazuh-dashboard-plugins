@@ -35,13 +35,4 @@ export function WazuhAssistantRoutes(
     async (context, request, response) =>
       ctrl.getRegisterAgentCommand(context, request, response),
   );
-
-  router.get(
-    {
-      path: '/assistant/config',
-      validate: {},
-    },
-    async (context, request, response) =>
-      ctrl.getAssistantConfig(context, request, response),
-  );
 }
