@@ -1008,8 +1008,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
           id='wz-dev-left-column'
           style={{ display: 'flex', flexDirection: 'column' }}
         >
-          <span className='wz-headline-title wz-dev-title'>
-            Console
+          <span>
             <i
               onClick={() =>
                 send(editorInputRef.current, editorOutputRef.current)
@@ -1027,7 +1026,6 @@ export const ToolDevTools = withGlobalBreadcrumb([
               id='wazuh_dev_tools_documentation'
             ></a>
           </span>
-
           <textarea style={{ display: 'flex' }} id='api_input'></textarea>
         </div>
         <div className='wz-dev-column-separator layout-column'>
@@ -1037,7 +1035,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
           id='wz-dev-right-column'
           style={{ display: 'flex', flexDirection: 'column' }}
         >
-          <span className='wz-headline-title wz-dev-title'>
+          <span>
             <a
               href={webDocumentationLink('user-manual/api/reference.html')}
               target='_blank'
