@@ -17,6 +17,7 @@ import {
   createDashboardSecurity,
   ServerAPIClient,
   ConfigurationStore,
+  getCookieValueByName,
 } from './services';
 import { Configuration } from '../common/services/configuration';
 import {
@@ -129,6 +130,10 @@ export class WazuhCorePlugin
           asInternalUser: this.services.serverAPIClient.asInternalUser,
           asScoped: this.services.serverAPIClient.asScoped,
         },
+      },
+      utils: {
+        getAPIHostIDFromCookie: (cookie: any, name: string) =>
+          getCookieValueByName(cookie, name),
       },
     };
   }
