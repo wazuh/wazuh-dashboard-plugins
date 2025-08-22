@@ -140,20 +140,28 @@ function analyzeGroups(editor) {
 function calculateWhichGroup(editor, firstTime = false, groups = []) {
   try {
     const selection = editor.getCursor();
+    const validGroups = groups.filter(item => {
+      return item.requestText;
+    });
     const desiredGroup = firstTime
-      ? groups.filter(item => item.requestText)
-      : groups.filter(
-          item =>
+      ? validGroups
+      : validGroups.filter(item => {
+          return (
             item.requestText &&
             item.end >= selection.line &&
-            item.start <= selection.line,
-        );
+            item.start <= selection.line
+          );
+        });
+
+    if (desiredGroup.length === 0) {
+      desiredGroup.push(validGroups[0]);
+    }
 
     // Place play button at first line from the selected group
     let cords;
     try {
       cords = editor.cursorCoords({
-        line: desiredGroup[0].start,
+        line: desiredGroup[0]?.start,
         ch: 0,
       });
     } catch {
@@ -168,7 +176,10 @@ function calculateWhichGroup(editor, firstTime = false, groups = []) {
     if (!$('#wz-dev-tools-buttons--go-to-api-reference').is(':visible')) {
       $('#wz-dev-tools-buttons--go-to-api-reference').show();
     }
-    $('#wz-dev-tools-buttons').offset({
+    $('#wz-dev-tools-buttons--send-request').offset({
+      top: cords.top + 1,
+    });
+    $('#wz-dev-tools-buttons--go-to-api-reference').offset({
       top: cords.top + 1,
     });
     if (firstTime) highlightGroup(editor, desiredGroup[0]);
@@ -727,7 +738,10 @@ async function send(editorInput, editorOutput, firstTime = false) {
           line: desiredGroup.start,
           ch: 0,
         });
-        $('#wz-dev-tools-buttons').offset({
+        $('#wz-dev-tools-buttons--send-request').offset({
+          top: cords.top + 1,
+        });
+        $('#wz-dev-tools-buttons--go-to-api-reference').offset({
           top: cords.top + 1,
         });
       }
