@@ -901,7 +901,6 @@ export const ToolDevTools = withGlobalBreadcrumb([
           lineNumbers: true,
           matchBrackets: true,
           mode: { name: 'javascript', json: true },
-          lineWrapping: true,
           styleSelectedText: true,
           foldGutter: true,
           gutters: ['CodeMirror-foldgutter'],
