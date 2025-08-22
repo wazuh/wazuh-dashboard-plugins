@@ -5,7 +5,7 @@
 #
 # Jest is a third-party software https://jestjs.io/
 
-name: Run unit test
+name: (4.x) Run unit test
 permissions:
   pull-requests: write
 on:
@@ -14,7 +14,7 @@ on:
       reference:
         required: true
         type: string
-        default: master
+        default: 4.10.4
         description: Source code reference (branch, tag or commit SHA)
       command:
         required: true
