@@ -39,7 +39,7 @@ export class HttpWithProxyClient implements IHttpClient {
       );
       return response.data;
     } catch (error) {
-      throw new Error(`${HttpMethod.GET} request failed: ${error}`);
+      throw error;
     }
   }
 
@@ -57,7 +57,7 @@ export class HttpWithProxyClient implements IHttpClient {
       );
       return response.data;
     } catch (error) {
-      throw new Error(`${HttpMethod.POST} request failed: ${error}`);
+      throw error;
     }
   }
 
@@ -75,7 +75,7 @@ export class HttpWithProxyClient implements IHttpClient {
       );
       return response.data;
     } catch (error) {
-      throw new Error(`${HttpMethod.PUT} request failed: ${error}`);
+      throw error;
     }
   }
 
@@ -89,7 +89,7 @@ export class HttpWithProxyClient implements IHttpClient {
       );
       return response.data;
     } catch (error) {
-      throw new Error(`${HttpMethod.DELETE} request failed: ${error}`);
+      throw error;
     }
   }
 }

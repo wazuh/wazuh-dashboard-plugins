@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ModelsComposed } from '../application/dtos/models-composed';
 import { UseCases } from '../../../setup';
 import { useQuery } from '../../../hooks/use-query';
@@ -19,23 +19,14 @@ export function useModelsComposed(): UseModelsComposed {
     defaultErrorMessage: 'Failed to fetch models data',
   });
 
-  const [models, setModels] = useState<ModelsComposed[]>([]);
-
-  useEffect(() => {
-    setModels(data);
-    console.log('models changes', data);
-  }, [data]);
-
   useEffect(() => {
     fetch();
   }, []);
 
   return {
-    models,
+    models: data,
     isLoading,
     error: error,
-    refresh: async () => {
-      await fetch();
-    },
+    refresh: fetch,
   };
 }
