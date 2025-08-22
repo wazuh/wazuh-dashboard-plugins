@@ -50,7 +50,11 @@ export const withDataSourceInitiated = ({
 }) =>
   withGuard(
     props => {
-      return !get(props, isLoadingNameProp) && !get(props, dataSourceNameProp);
+      return (
+        /* data source is not defined or there is an error related to the data source initialization */
+        (!get(props, isLoadingNameProp) && !get(props, dataSourceNameProp)) ||
+        get(props, dataSourceErrorNameProp)
+      );
     },
     props => (
       <PromptErrorInitializatingDataSource
@@ -154,7 +158,7 @@ export const withDataSourceFetchOnStart =
   }: WithDataSourceFetchOnStartProps) =>
   WrappedComponent =>
   props => {
-    const dataSource = props[nameProp];
+    const dataSource = get(props, nameProp);
     const fetch = useCallback(async (...dependencies: any[]) => {
       const response = await dataSource.fetchData(
         mapRequestParams
