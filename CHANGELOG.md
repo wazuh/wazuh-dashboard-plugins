@@ -21,6 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed prompt related to statistic job is disabled in Statistics app [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the configuration for modules that relied on the following deprecated daemons: wazuh-agentlessd, wazuh-csyslogd, wazuh-dbd, wazuh-integratord, wazuh-maild, and wazuh-reportd. [#7612](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7612)
+- Removed deprecated modules OpenSCAP, CIS-CAT, Osquery [#7645](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7645)
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 00
 

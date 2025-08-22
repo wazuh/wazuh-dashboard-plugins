@@ -215,10 +215,6 @@ module.exports.DECODER = {
   WEB_ACCESSLOG: {
     name: 'web-accesslog',
   },
-  OSCAP: {
-    parent: 'oscap',
-    name: 'oscap',
-  },
   ROOTCHECK: {
     name: 'rootcheck',
   },
