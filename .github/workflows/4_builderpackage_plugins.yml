@@ -22,14 +22,14 @@ on:
       reference:
         required: true
         type: string
-        default: main
+        default: 4.14.0
         description: Source code reference (branch, tag or commit SHA)
   workflow_dispatch:
     inputs:
       reference:
         required: true
         type: string
-        default: main
+        default: 4.14.0
         description: Source code reference (branch, tag or commit SHA)
 
 jobs:

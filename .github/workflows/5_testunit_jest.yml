@@ -5,7 +5,7 @@
 #
 # Jest is a third-party software https://jestjs.io/
 
-name: Run unit test
+name: (5.x) Run unit test
 permissions:
   pull-requests: write
 on:
