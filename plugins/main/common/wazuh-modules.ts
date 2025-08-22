@@ -34,12 +34,6 @@ export const WAZUH_MODULES = {
     description:
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   },
-  oscap: {
-    title: 'OpenSCAP',
-    appId: 'openscap',
-    description:
-      'Configuration assessment and automation of compliance monitoring using SCAP checks.',
-  },
   audit: {
     title: 'System auditing',
     appId: 'system-auditing',
@@ -75,12 +69,6 @@ export const WAZUH_MODULES = {
     appId: 'tsc',
     description:
       'Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy',
-  },
-  ciscat: {
-    title: 'CIS-CAT',
-    appId: 'ciscat',
-    description:
-      'Configuration assessment using Center of Internet Security scanner and SCAP checks.',
   },
   microsoftGraphAPI: {
     title: 'Microsoft Graph API',
@@ -130,12 +118,6 @@ export const WAZUH_MODULES = {
     appId: 'endpoint-summary',
     description:
       'Check the current agent configuration remotely applied by its group.',
-  },
-  osquery: {
-    title: 'Osquery',
-    appId: 'osquery',
-    description:
-      'Osquery can be used to expose an operating system as a high-performance relational database.',
   },
   sca: {
     title: 'Configuration assessment',

@@ -92,19 +92,6 @@ export default [
           'Configuration to ensure compliance with security policies, standards and hardening guides',
         goto: 'policy-monitoring',
       },
-      {
-        name: 'OpenSCAP',
-        description:
-          'Configuration assessment and automation of compliance monitoring using SCAP checks',
-        goto: 'open-scap',
-        when: agent => hasAgentSupportModule(agent, WAZUH_MODULES_ID.OPEN_SCAP),
-      },
-      {
-        name: 'CIS-CAT',
-        description:
-          'Configuration assessment using CIS scanner and SCAP checks',
-        goto: 'cis-cat',
-      },
     ],
   },
   {
@@ -117,12 +104,6 @@ export default [
           'Discover what applications are affected by well-known vulnerabilities',
         goto: 'vulnerabilities',
         when: 'manager',
-      },
-      {
-        name: 'Osquery',
-        description:
-          'Expose an operating system as a high-performance relational database',
-        goto: 'osquery',
       },
       {
         name: 'Inventory data',

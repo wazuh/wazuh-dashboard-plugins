@@ -107,17 +107,6 @@ const virustotalAlertsSummary = {
   ],
 };
 
-const osqueryAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['data.osquery.name'],
-    AggregationFields['data.osquery.action'],
-    AggregationFields['agent.name'],
-    AggregationFields['data.osquery.pack'],
-    AggregationFields['data.osquery.calendarTime'],
-  ],
-};
-
 const mitreAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -126,14 +115,7 @@ const mitreAlertsSummary = {
     AggregationFields['rule.level'],
   ],
 };
-const ciscatAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['data.cis.rule_title'],
-    AggregationFields['data.cis.group'],
-    AggregationFields['data.cis.result'],
-  ],
-};
+
 const pmAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
@@ -160,16 +142,6 @@ const githubAlertsSummary = {
   ],
 };
 
-// 'Wazuh-App-Overview-OSCAP-Last-alerts'
-const oscapLastAlerts = {
-  title: 'Last alerts',
-  aggs: [
-    AggregationFields['agent.name'],
-    AggregationFields['data.oscap.check.title'],
-    AggregationFields['data.oscap.scan.profile.title'],
-  ],
-};
-
 // 'Wazuh-App-Overview-Audit-Last-alerts'
 const auditLastAlerts = {
   title: 'Last alerts',
@@ -183,7 +155,6 @@ const auditLastAlerts = {
 export default {
   aws: [awsAlertsSummary],
   azure: [azureAlertsSummary],
-  ciscat: [ciscatAlertsSummary],
   docker: [dockerAlertsSummary],
   fim: [fimAlertsSummary],
   gcp: [gcpAlertsSummary],
@@ -194,8 +165,6 @@ export default {
   mitre: [mitreAlertsSummary],
   nist: [nistAlertsSummary],
   office: [officeAlertsSummary],
-  oscap: [oscapLastAlerts],
-  osquery: [osqueryAlertsSummary],
   pci: [pciAlertsSummary],
   pm: [pmAlertsSummary],
   tsc: [tscAlertsSummary],
