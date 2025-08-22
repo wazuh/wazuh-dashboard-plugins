@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   EuiPanel,
   EuiFlexGroup,
@@ -8,14 +9,10 @@ import {
   EuiSpacer,
   EuiTitle,
 } from '@elastic/eui';
-import React, { Fragment, useEffect, useState } from 'react';
 import { VulsTopPackageTable } from '../top_packages_table';
 import VulsSeverityStat from '../vuls_severity_stat/vuls_severity_stat';
 import {
   PatternDataSourceFilterManager,
-  PatternDataSource,
-  tParsedIndexPattern,
-  useDataSource,
   FILTER_OPERATOR,
   VulnerabilitiesDataSourceRepository,
   VulnerabilitiesDataSource,
@@ -27,26 +24,54 @@ import { vulnerabilityDetection } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { WzLink } from '../../../../../components/wz-link/wz-link';
 import {
-  withDataSourceInitiated,
-  withDataSourceLoading,
+  withDataSourceFetch,
   withErrorBoundary,
 } from '../../../../common/hocs';
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../../../../components/overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 import { formatUINumber } from '../../../../../react-services/format-number';
-import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
 
-const VulsPanelContent = compose(
-  withDataSourceLoading({
-    isLoadingNameProp: 'isDataSourceLoading',
-    LoadingComponent: LoadingSearchbarProgress,
+const VulsPanelContentInitiation = compose(
+  withDataSourceFetch({
+    DataSource: VulnerabilitiesDataSource,
+    DataSourceRepositoryCreator: VulnerabilitiesDataSourceRepository,
+    nameProp: 'dataSource',
+    mapFetchActionDependencies: ({ agent }) => [agent.id],
+    mapRequestParams() {
+      return {
+        aggs: {
+          severity: {
+            terms: {
+              field: 'vulnerability.severity',
+              size: 5,
+              order: {
+                _count: 'desc',
+              },
+            },
+          },
+          package: {
+            terms: {
+              field: 'package.name',
+              size: 5,
+              order: {
+                _count: 'desc',
+              },
+            },
+          },
+        },
+      };
+    },
+    mapResponse(response) {
+      return {
+        severity: response?.aggregations?.severity?.buckets || [],
+        package: response?.aggregations?.package?.buckets || [],
+      };
+    },
   }),
-  withDataSourceInitiated({
-    dataSourceNameProp: 'dataSource',
-    isLoadingNameProp: 'isDataSourceLoading',
-    dataSourceErrorNameProp: 'error',
-  }),
-)(({ agent, topPackagesData, dataSource, severities, severityStats }) => {
+)(({ agent, dataSourceAction, dataSource: dataSourceInitiation }) => {
+  const { dataSource } = dataSourceInitiation;
+  const { severity: severityStats = [], package: topPackagesData = [] } =
+    dataSourceAction?.data || {};
   const getSeverityValue = severity => {
     const value =
       severityStats?.find(v => v.key.toUpperCase() === severity.toUpperCase())
@@ -78,7 +103,7 @@ const VulsPanelContent = compose(
                 <VulsSeverityStat
                   value={`${getSeverityValue(severityLabel)}`}
                   color={severityColor}
-                  isLoading={isLoading || isDataSourceLoading}
+                  isLoading={dataSourceAction.running}
                   textAlign='left'
                 />
               </WzLink>
@@ -107,83 +132,6 @@ const VulsPanelContent = compose(
   );
 });
 
-const VulsPanelContentInitiation = ({ agent }) => {
-  const {
-    dataSource,
-    isLoading: isDataSourceLoading,
-    fetchData,
-    error,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: VulnerabilitiesDataSource,
-    repository: new VulnerabilitiesDataSourceRepository(),
-  });
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [severityStats, setSeverityStats] = useState(null);
-  const [topPackagesData, setTopPackagesData] = useState([]);
-
-  const fetchSeverityStatsData = async () => {
-    const data = await fetchData({
-      aggs: {
-        severity: {
-          terms: {
-            field: 'vulnerability.severity',
-            size: 5,
-            order: {
-              _count: 'desc',
-            },
-          },
-        },
-      },
-    });
-    setSeverityStats(data.aggregations.severity.buckets);
-  };
-
-  const fetchTopPackagesData = async () => {
-    fetchData({
-      aggs: {
-        package: {
-          terms: {
-            field: 'package.name',
-            size: 5,
-            order: {
-              _count: 'desc',
-            },
-          },
-        },
-      },
-    }).then(results => {
-      setTopPackagesData(results.aggregations.package.buckets);
-    });
-  };
-
-  useEffect(() => {
-    if (isDataSourceLoading) {
-      return;
-    }
-    setIsLoading(true);
-    Promise.all([fetchSeverityStatsData(), fetchTopPackagesData()])
-      .catch(error => {
-        console.error(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [isDataSourceLoading, agent.id]);
-
-  return (
-    <VulsPanelContent
-      agent={agent}
-      topPackagesData={topPackagesData}
-      dataSource={dataSource}
-      severities={severities}
-      severityStats={severityStats}
-      isLoading={isLoading}
-      error={error}
-    />
-  );
-};
-
 const PanelWithVulnerabilitiesState = compose(
   withErrorBoundary,
   withVulnerabilitiesStateDataSource,
@@ -191,42 +139,37 @@ const PanelWithVulnerabilitiesState = compose(
 
 const VulsPanel = ({ agent }) => {
   return (
-    <Fragment>
-      <EuiPanel paddingSize='m'>
-        <EuiText size='xs'>
-          <EuiFlexGroup
-            className='wz-section-sca-euiFlexGroup'
-            responsive={false}
-          >
-            <EuiFlexItem grow={false}>
-              <EuiTitle size='xs'>
-                <h2>Vulnerability Detection</h2>
-              </EuiTitle>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <RedirectAppLinks application={getCore().application}>
-                <EuiToolTip
-                  position='top'
-                  content='Open Vulnerability Detection'
-                >
-                  <EuiButtonIcon
-                    iconType='popout'
-                    color='primary'
-                    className='EuiButtonIcon'
-                    href={NavigationService.getInstance().getUrlForApp(
-                      vulnerabilityDetection.id,
-                    )}
-                    aria-label='Open Vulnerability Detection'
-                  />
-                </EuiToolTip>
-              </RedirectAppLinks>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiText>
-        <EuiSpacer size='s' />
-        <PanelWithVulnerabilitiesState agent={agent} />
-      </EuiPanel>
-    </Fragment>
+    <EuiPanel paddingSize='m'>
+      <EuiText size='xs'>
+        <EuiFlexGroup
+          className='wz-section-sca-euiFlexGroup'
+          responsive={false}
+        >
+          <EuiFlexItem grow={false}>
+            <EuiTitle size='xs'>
+              <h2>Vulnerability Detection</h2>
+            </EuiTitle>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <RedirectAppLinks application={getCore().application}>
+              <EuiToolTip position='top' content='Open Vulnerability Detection'>
+                <EuiButtonIcon
+                  iconType='popout'
+                  color='primary'
+                  className='EuiButtonIcon'
+                  href={NavigationService.getInstance().getUrlForApp(
+                    vulnerabilityDetection.id,
+                  )}
+                  aria-label='Open Vulnerability Detection'
+                />
+              </EuiToolTip>
+            </RedirectAppLinks>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiText>
+      <EuiSpacer size='s' />
+      <PanelWithVulnerabilitiesState agent={agent} />
+    </EuiPanel>
   );
 };
 
