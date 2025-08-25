@@ -78,22 +78,21 @@ describe('[Sanitize SVG cronjob] Sanitize different custom logos.', () => {
       mockContext.wazuh_core.configuration._settings.get.mockImplementation(
         key =>
           Object.fromEntries(
-            [
-              'customization.logo.sidebar',
-              'customization.logo.healthcheck',
-              'customization.logo.app',
-            ].map(key => [
-              key,
-              {
-                options: {
-                  file: {
-                    store: {
-                      resolveStaticURL: filename => `custom/images/${filename}`,
+            ['customization.logo.sidebar', 'customization.logo.app'].map(
+              key => [
+                key,
+                {
+                  options: {
+                    file: {
+                      store: {
+                        resolveStaticURL: filename =>
+                          `custom/images/${filename}`,
+                      },
                     },
                   },
                 },
-              },
-            ]),
+              ],
+            ),
           )[key],
       );
       await sanitizeUploadedSVG(mockContext);
@@ -103,15 +102,6 @@ describe('[Sanitize SVG cronjob] Sanitize different custom logos.', () => {
           .filter(({ message }) =>
             message.includes(
               `[customization.logo.sidebar] not customized. Skip.`,
-            ),
-          ),
-      ).toHaveLength(1);
-      expect(
-        mockContext
-          ._getLogs()
-          .filter(({ message }) =>
-            message.includes(
-              `[customization.logo.healthcheck] not customized. Skip.`,
             ),
           ),
       ).toHaveLength(1);
@@ -145,22 +135,21 @@ describe('[Sanitize SVG cronjob] Sanitize different custom logos.', () => {
       mockContext.wazuh_core.configuration._settings.get.mockImplementationOnce(
         () =>
           Object.fromEntries(
-            [
-              'customization.logo.sidebar',
-              'customization.logo.healthcheck',
-              'customization.logo.app',
-            ].map(key => [
-              key,
-              {
-                options: {
-                  file: {
-                    store: {
-                      resolveStaticURL: filename => `custom/images/${filename}`,
+            ['customization.logo.sidebar', 'customization.logo.app'].map(
+              key => [
+                key,
+                {
+                  options: {
+                    file: {
+                      store: {
+                        resolveStaticURL: filename =>
+                          `custom/images/${filename}`,
+                      },
                     },
                   },
                 },
-              },
-            ]),
+              ],
+            ),
           ),
       );
       await sanitizeUploadedSVG(mockContext);

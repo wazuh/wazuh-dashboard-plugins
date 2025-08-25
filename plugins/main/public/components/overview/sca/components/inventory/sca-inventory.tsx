@@ -10,6 +10,9 @@ import { InventoryDashboardTable } from '../../../../common/dashboards';
 import { CheckDetails } from '../sca-check-details';
 import { getKPIsPanel } from './utils/get-vis-sca-inventory';
 import { managedFilters, tableColumns } from './utils/index';
+import { withSCADataSource } from '../../hocs/validate-sca-states-index-pattern';
+import { withErrorBoundary } from '../../../../common/hocs';
+import { compose } from 'redux';
 
 /**
  * @fileoverview SCA Inventory component for Wazuh Dashboard
@@ -30,18 +33,18 @@ import { managedFilters, tableColumns } from './utils/index';
  * security teams ensure systems are properly configured according to security
  * best practices and compliance requirements.
  */
-export const SCAInventory: React.FC<{ indexPattern: IndexPattern }> = ({
-  indexPattern,
-}) => {
+export const SCAInventory: React.FC<{}> = compose(
+  withErrorBoundary,
+  withSCADataSource,
+)(() => {
   return (
     <InventoryDashboardTable
       DataSource={SCAStatesDataSource}
       DataSourceRepositoryCreator={SCAStatesDataSourceRepository}
       tableDefaultColumns={tableColumns}
       managedFilters={managedFilters}
-      getDashboardPanels={() => getKPIsPanel(indexPattern.id)}
+      getDashboardPanels={getKPIsPanel}
       tableId='sca-policies-inventory'
-      indexPattern={indexPattern}
       categoriesSampleData={[WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT]}
       additionalDocumentDetailsTabs={[
         {
@@ -56,4 +59,4 @@ export const SCAInventory: React.FC<{ indexPattern: IndexPattern }> = ({
       ]}
     />
   );
-};
+});

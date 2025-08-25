@@ -48,9 +48,8 @@ export const WzMenu = withWindowSize(
     constructor(props) {
       super(props);
       this.state = {
-        showMenu: false,
         menuOpened: false,
-        currentAPI: '',
+        currentAPI: this.props.state.currentAPI || '',
         APIlist: [],
         showSelector: false,
         theresPattern: false,
@@ -99,6 +98,11 @@ export const WzMenu = withWindowSize(
         };
         getErrorOrchestrator().handleError(options);
       }
+
+      try {
+        const additionalState = await this.loadIndexPatternsList();
+        this.setState(state => ({ ...state, ...additionalState }));
+      } catch (e) {}
     }
 
     showToast = (color, title, text, time) => {
@@ -125,18 +129,6 @@ export const WzMenu = withWindowSize(
         this.showSelectorsInPopover = this.props.windowSize.width < 1100;
       }
 
-      if (
-        !this.isLoading &&
-        (prevProps.state.showMenu !== this.props.state.showMenu ||
-          (this.props.state.showMenu === true && this.state.showMenu === false))
-      ) {
-        this.isLoading = true;
-        newState = {
-          ...newState,
-          ...(await this.loadIndexPatternsList()),
-          isSelectorsPopoverOpen: false,
-        };
-      }
       if ((!currentAPI && apiId) || apiId !== currentAPI) {
         newState = { ...newState, currentAPI: apiId };
       } else {
@@ -169,6 +161,7 @@ export const WzMenu = withWindowSize(
       }
       newState = { ...prevProps.state, ...newState };
       if (!_.isEqual(newState, prevProps.state)) {
+        // FIXME: this will not update the state if the prevProps.state is equal to the newState, this means the component state could not be updated despite this is different to the newState
         // and the state is different from the previous one
         this.setState(newState);
       }
@@ -239,7 +232,7 @@ export const WzMenu = withWindowSize(
 
     updatePatternAndApi = async () => {
       this.setState({
-        menuOpened: false,
+        menuOpened: false, // TODO: this seems that is unused
         ...{ APIlist: await this.loadApiList() },
         ...(await this.loadIndexPatternsList()),
       });

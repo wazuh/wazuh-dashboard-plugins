@@ -15,7 +15,7 @@ import { getOverviewUsersUsersTab } from './dashboard';
 export const ITHygieneUsersInventoryUsers = compose(
   withAgent,
   withSystemInventoryUsersDataSource,
-)((props: any) => {
+)(() => {
   return (
     <div style={{ margin: '0 12px' }}>
       <InventoryDashboardTable
@@ -27,7 +27,6 @@ export const ITHygieneUsersInventoryUsers = compose(
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewUsersUsersTab}
         tableId='it-hygiene-inventory-users'
-        indexPattern={props.indexPattern}
         categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     </div>

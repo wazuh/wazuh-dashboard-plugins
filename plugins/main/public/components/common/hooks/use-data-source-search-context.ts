@@ -154,7 +154,7 @@ export function useDataSourceWithSearchBar({
   const fetchDataWrapQueryDateRange = params =>
     fetchData({
       query: searchBarProps.query,
-      dateRange: dataSource?.indexPattern?.timeField
+      dateRange: dataSource?.indexPattern?.timeFieldName
         ? useAbsoluteDateRange
           ? absoluteDateRange
           : dateRange

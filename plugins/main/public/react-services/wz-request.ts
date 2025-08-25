@@ -15,13 +15,107 @@ import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
-import { getHttp } from '../kibana-services';
+import { getCore, getHttp, getToasts } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
+import { first } from 'rxjs/operators';
 
 export class WzRequest {
   static wazuhConfig: any;
+
+  static async setupAPIInCookie() {
+    const currentApiDataCookie = AppState.getCurrentAPI();
+    let currentApiID;
+
+    if (currentApiDataCookie) {
+      try {
+        currentApiID = JSON.parse(currentApiDataCookie).id;
+        if (currentApiID) {
+          return true;
+        }
+      } catch {}
+    }
+  }
+
+  static async setupAPIHealthCheck() {
+    const { checks } = await getCore()
+      .healthCheck.status$.pipe(first())
+      .toPromise();
+    const check = checks.find(
+      ({ name, status }) =>
+        name === 'server-api:connection-compatibility' && status === 'finished',
+    );
+    if (check) {
+      const availableApiID = check?.data?.find(
+        ({ connection, compatibility }) => connection && compatibility,
+      )?.id;
+
+      if (availableApiID) {
+        // WARNING: the checkStored API can return information about another API host that is available
+        const response = await ApiCheck.checkStored(availableApiID);
+        if (response?.data?.data?.cluster_info) {
+          // WORKAROUND: this sets the API according to the return taking into account the warning
+          const apiID = response?.data?.idChanged || availableApiID;
+          AppState.setClusterInfo(response?.data?.data?.cluster_info);
+          AppState.setCurrentAPI(
+            JSON.stringify({
+              name: response?.data?.data?.cluster_info?.manager,
+              id: apiID,
+            }),
+          );
+          return true;
+        }
+      }
+    }
+  }
+
+  static async setupAPITryHosts() {
+    try {
+      const hosts = await getCore().http.get('/hosts/apis');
+
+      for (var i = 0; i < hosts.length; i++) {
+        try {
+          // WARNING: the checkStored API can return information about another API host that is available
+          const response = await ApiCheck.checkStored(hosts[i].id);
+          if (response?.data?.data?.cluster_info) {
+            // WORKAROUND: this sets the API according to the return taking into account the warning
+            const apiID = response?.data?.idChanged || hosts[i].id;
+            AppState.setClusterInfo(response?.data?.data?.cluster_info);
+            AppState.setCurrentAPI(
+              JSON.stringify({
+                name: response?.data?.data?.cluster_info?.manager,
+                id: apiID,
+              }),
+            );
+            return true;
+          }
+        } catch {}
+      }
+    } catch {}
+  }
+
+  static async setupAPI() {
+    const methods = [
+      this.setupAPIInCookie,
+      this.setupAPIHealthCheck,
+      this.setupAPITryHosts,
+    ];
+
+    for (const fn of methods) {
+      const isSet = await fn.call(this);
+
+      if (isSet) {
+        return;
+      }
+    }
+
+    getToasts.add({
+      color: 'danger',
+      text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
+      toastLifeTimeMs: 120000,
+    });
+  }
 
   /**
    * Permorn a generic request
@@ -98,7 +192,11 @@ export class WzRequest {
                 .getPathname()
                 .startsWith('/settings')
             ) {
-              NavigationService.getInstance().navigate('/health-check');
+              getToasts().add({
+                color: 'warning',
+                title: `API with ID [${currentApi.id}] is not available.`,
+                text: 'This could indicate a problem in the network of the server API, review or change of API host in the API host selector if configurated other hosts.',
+              });
             }
             throw new Error(error);
           }

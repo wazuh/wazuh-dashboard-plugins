@@ -6,7 +6,7 @@ import {
   ITHygieneNetworksInventoryServices,
   ITHygieneNetworksInventoryTraffic,
 } from './inventories';
-import { ITHygieneInventoryTabLayout } from '../common/components/inventory';
+import { ModuleSubTabs } from '../../../common/tabs';
 
 const tabs = [
   {
@@ -37,5 +37,5 @@ const tabs = [
 ];
 
 export const ITHygieneNetworksInventory = () => {
-  return <ITHygieneInventoryTabLayout tabs={tabs} />;
+  return <ModuleSubTabs tabs={tabs} />;
 };

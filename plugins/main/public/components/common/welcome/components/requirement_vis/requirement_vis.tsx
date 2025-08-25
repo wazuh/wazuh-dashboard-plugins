@@ -13,9 +13,12 @@
  */
 
 import React, { useCallback } from 'react';
-import { EuiFlexItem, EuiPanel, euiPaletteColorBlind } from '@elastic/eui';
-import { VisualizationBasicWidgetSelector } from '../../../charts/visualizations/basic';
-import { getRequirementAlerts } from './lib';
+import { euiPaletteColorBlind } from '@elastic/eui';
+import {
+  useVisualizationBasicWidgetSelector,
+  VisualizationBasicWidgetSelectorBody,
+  VisualizationBasicWidgetSelectorHeader,
+} from '../../../charts/visualizations/basic';
 import { useTimeFilter } from '../../../hooks';
 import { AppState } from '../../../../../react-services';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
@@ -25,6 +28,18 @@ import {
   PatternDataSourceFilterManager,
 } from '../../../data-source/pattern/pattern-data-source-filter-manager';
 import NavigationService from '../../../../../react-services/navigation-service';
+import {
+  withDataSource,
+  withDataSourceInitiated,
+  withDataSourceLoading,
+  withPanel,
+} from '../../../hocs';
+import {
+  AlertsDataSourceRepository,
+  ThreatHuntingDataSource,
+} from '../../../data-source';
+import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
+import { compose } from 'redux';
 
 const selectionOptionsCompliance = [
   { value: 'pci_dss', text: 'PCI DSS' },
@@ -44,7 +59,43 @@ const requirementNameModuleID = {
   tsc: 'tsc',
 };
 
-export function RequirementVis(props) {
+export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
+  const { selectedOption, onChange } = useVisualizationBasicWidgetSelector(
+    selectionOptionsCompliance,
+  );
+
+  return (
+    <>
+      <VisualizationBasicWidgetSelectorHeader
+        title='Compliance'
+        selectorOptions={selectionOptionsCompliance}
+        selectedOption={selectedOption}
+        onChange={onChange}
+      ></VisualizationBasicWidgetSelectorHeader>
+      <RequirementVisBody
+        selectedOption={selectedOption}
+        selectorOptions={selectionOptionsCompliance}
+        agent={props.agent}
+      ></RequirementVisBody>
+    </>
+  );
+});
+
+const RequirementVisBody = compose(
+  withDataSource({
+    DataSource: ThreatHuntingDataSource,
+    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  }),
+  withDataSourceLoading({
+    isLoadingNameProp: 'dataSource.isLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    isLoadingNameProp: 'dataSource.isLoading',
+    dataSourceErrorNameProp: 'dataSource.error',
+    dataSourceNameProp: 'dataSource.dataSource',
+  }),
+)(props => {
   const colors = euiPaletteColorBlind();
   const { timeFilter } = useTimeFilter();
   const pinnedAgentManager = new PinnedAgentManager();
@@ -74,11 +125,34 @@ export function RequirementVis(props) {
 
   const fetchData = useCallback(
     async (selectedOptionValue, timeFilter, agent) => {
-      const buckets = await getRequirementAlerts(
-        agent.id,
-        timeFilter,
-        selectedOptionValue,
-      );
+      const response = await props.dataSource.fetchData({
+        dateRange: timeFilter,
+        filters: [
+          ...props.dataSource.fetchFilters,
+          PatternDataSourceFilterManager.createFilter(
+            FILTER_OPERATOR.EXISTS,
+            `rule.${selectedOptionValue}`,
+            null,
+            props.dataSource.dataSource.indexPattern.id,
+          ),
+        ],
+        pagination: {
+          pageIndex: 0,
+          pageSize: 1 /* WORKAROUND: the hits are not required, only the aggregations, but this uses a fallback value if this is falsy. See search function in
+          plugins/main/public/components/common/search-bar/search-bar-service.ts */,
+        },
+        aggs: {
+          top_alerts_compliance: {
+            terms: {
+              field: `rule.${selectedOptionValue}`,
+              size: 5,
+            },
+          },
+        },
+      });
+
+      const buckets = response?.aggregations?.top_alerts_compliance?.buckets;
+
       return buckets?.length
         ? buckets.map(({ key, doc_count }, index) => ({
             label: key,
@@ -96,22 +170,19 @@ export function RequirementVis(props) {
   );
 
   return (
-    <EuiFlexItem>
-      <EuiPanel paddingSize='m'>
-        <VisualizationBasicWidgetSelector
-          type='donut'
-          size={{ width: '100%', height: '200px' }}
-          showLegend
-          title='Compliance'
-          selectorOptions={selectionOptionsCompliance}
-          onFetch={fetchData}
-          onFetchExtraDependencies={[timeFilter, props.agent]}
-          noDataTitle='No results'
-          noDataMessage={(_, optionRequirement) =>
-            `No ${optionRequirement.text} results were found in the selected time range.`
-          }
-        />
-      </EuiPanel>
-    </EuiFlexItem>
+    <VisualizationBasicWidgetSelectorBody
+      type='donut'
+      size={{ width: '100%', height: '200px' }}
+      showLegend
+      selectorOptions={selectionOptionsCompliance}
+      onFetch={fetchData}
+      onFetchExtraDependencies={[timeFilter, props.agent]}
+      noDataTitle='No results'
+      noDataMessage={(_, optionRequirement) =>
+        `No ${optionRequirement.text} results were found in the selected time range.`
+      }
+      selectedOption={props.selectedOption}
+      selectorOptions={props.selectorOptions}
+    />
   );
-}
+});

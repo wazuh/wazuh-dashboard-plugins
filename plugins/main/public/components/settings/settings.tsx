@@ -25,7 +25,6 @@ import { getAssetURL } from '../../utils/assets';
 import { getHttp, getWzCurrentAppID } from '../../kibana-services';
 import { ApiTable } from '../settings/api/api-table';
 import { WzConfigurationSettings } from '../settings/configuration';
-import { SettingsMiscellaneous } from '../settings/miscellaneous/miscellaneous';
 import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
 import { SettingsAbout } from '../settings/about/index';
 import {
@@ -36,12 +35,7 @@ import {
 import { compose } from 'redux';
 import { withErrorBoundary, withRouteResolvers } from '../common/hocs';
 import { connect } from 'react-redux';
-import {
-  enableMenu,
-  ip,
-  nestedResolve,
-  savedSearch,
-} from '../../services/resolves';
+import { nestedResolve } from '../../services/resolves';
 import { Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
@@ -62,7 +56,7 @@ const mapDispatchToProps = dispatch => ({
 
 export const Settings = compose(
   withErrorBoundary,
-  withRouteResolvers({ enableMenu, ip, nestedResolve, savedSearch }),
+  withRouteResolvers({ nestedResolve }),
   connect(mapStateToProps, mapDispatchToProps),
 )(props => {
   const { tab } = useRouterSearch();
@@ -90,7 +84,6 @@ class SettingsComponent extends React.Component {
     this.wzMisc = new WzMisc();
 
     if (this.wzMisc.getWizard()) {
-      window.sessionStorage.removeItem('healthCheck');
       this.wzMisc.setWizard(false);
     }
     this.apiIsDown = this.wzMisc.getApiIsDown();
@@ -107,7 +100,6 @@ class SettingsComponent extends React.Component {
     );
     this.tabsConfiguration = [
       { id: configurationTabID, name: 'Configuration' },
-      { id: 'miscellaneous', name: 'Miscellaneous' },
     ];
   }
 
@@ -169,6 +161,10 @@ class SettingsComponent extends React.Component {
       tabs:
         getWzCurrentAppID() === appSettings.id
           ? // WORKAROUND: This avoids the configuration tab is displayed
+            /* TODO: The other view was removed, so this will leave a blank page. Migrating the app settings
+              to the opensearch_dashboards.yml that cause the settings are not managed by the Wazuh plugin,
+              should cause the App settings app should be removed.
+            */
             this.tabsConfiguration.filter(({ id }) =>
               !isConfigurationUIEditable ? id !== configurationTabID : true,
             )
@@ -363,11 +359,6 @@ class SettingsComponent extends React.Component {
         <Route path='?tab=configuration'>
           <div>
             <WzConfigurationSettings />
-          </div>
-        </Route>
-        <Route path='?tab=miscellaneous'>
-          <div>
-            <SettingsMiscellaneous />
           </div>
         </Route>
         <Route path='?tab=about'>

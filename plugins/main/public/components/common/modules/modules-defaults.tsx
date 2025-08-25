@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
-import { MainSca } from '../../overview/sca';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
@@ -94,6 +93,7 @@ import {
   ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
+import { SCAInventory, SCADashboard } from '../../overview/sca';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -233,13 +233,13 @@ export const ModulesDefaults = {
         id: 'dashboard',
         name: 'Dashboard',
         buttons: [ButtonExploreAgent],
-        component: MainSca,
+        component: SCADashboard,
       },
       {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonExploreAgent],
-        component: MainSca,
+        component: SCAInventory,
       },
       renderDiscoverTab({
         moduleId: 'sca',

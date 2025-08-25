@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { healthCheck } from './health-check';
 import { AppState } from '../../react-services/app-state';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { ErrorHandler } from '../../react-services/error-handler';
@@ -19,7 +18,7 @@ import NavigationService from '../../react-services/navigation-service';
 import { getWzCurrentAppID } from '../../kibana-services';
 import { serverApis } from '../../utils/applications';
 
-export function settingsWizard(_, wzMisc, disableErrors = false) {
+export function settingsWizard(_, wzMisc) {
   try {
     const callCheckStored = async () => {
       let currentApi = false;
@@ -87,7 +86,6 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
       }
     };
 
-    AppState.setWzMenu();
     const currentParams = new URLSearchParams(
       NavigationService.getInstance().getSearch(),
     );
@@ -98,11 +96,7 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
       currentParams &&
       currentParams.get('tab') === 'ruleset' &&
       currentParams.get('ruleid');
-    if (!targetedAgent && !targetedRule && !disableErrors && healthCheck()) {
-      NavigationService.getInstance().navigate({
-        pathname: '/health-check',
-        state: { prevLocation: NavigationService.getInstance().getLocation() },
-      });
+    if (!targetedAgent && !targetedRule) {
     } else {
       // There's no cookie for current API
       const currentApi = AppState.getCurrentAPI();
@@ -113,18 +107,13 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
               // Try to set some API entry as default
               const defaultApi = await tryToSetDefault(data.data);
               setUpCredentials('Default API has been updated.', defaultApi);
-              NavigationService.getInstance().navigate({
-                pathname: '/health-check',
-                state: {
-                  prevLocation: NavigationService.getInstance().getLocation(),
-                },
-              });
+              // TODO: replace the management of API setup
             } else {
               setUpCredentials('Please set up API credentials.');
             }
           })
           .catch(error => {
-            !disableErrors && ErrorHandler.handle(error);
+            ErrorHandler.handle(error);
             wzMisc.setWizard(true);
             if (
               !NavigationService.getInstance()
@@ -153,12 +142,7 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
                 // Try to set some as default
                 const defaultApi = await tryToSetDefault(data.data);
                 setUpCredentials('Default API has been updated.', defaultApi);
-                NavigationService.getInstance().navigate({
-                  pathname: '/health-check',
-                  state: {
-                    prevLocation: NavigationService.getInstance().getLocation(),
-                  },
-                });
+                // TODO: replace the management of API setup
               } else {
                 setUpCredentials('Please set up API credentials.', false);
               }
@@ -181,6 +165,6 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
         title: error.name || error,
       },
     };
-    !disableErrors && getErrorOrchestrator().handleError(options);
+    getErrorOrchestrator().handleError(options);
   }
 }

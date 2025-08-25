@@ -6,42 +6,24 @@
  */
 
 import React from 'react';
-import { EuiLink } from '@elastic/eui';
-import { WAZUH_SCA_PATTERN } from '../../../../../common/constants';
-import {
-  ensureIndexPatternIsCreated,
-  ERROR_NO_INDICES_FOUND,
-  withIndexPatternFromValue,
-  withMapErrorPromptErrorEnsureIndexPattern,
-  MapErrorTypes,
-} from '../../../common/hocs/with-index-pattern';
+import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
+import { HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES } from '../../../../../common/constants';
 import { webDocumentationLink } from '../../../../../common/services/web_documentation';
+import { withHealthCheckChecks } from '../../../common/hocs';
 
-/**
- * @typedef {Object} ErrorPromptType
- * @property {Function} title - Function that returns the error message title
- * @property {Function} body - Function that returns the error message body as a React component
- */
-
-/**
- * Definition of error message types that will be shown to the user
- * when problems occur with index patterns.
- * @type {Object.<string, ErrorPromptType>}
- */
-const errorPromptTypes: MapErrorTypes<{ title: string }> = {
-  [ERROR_NO_INDICES_FOUND]: {
-    title: () => 'Configuration Assessment could be disabled or has a problem',
-    body: ({ message }: { message: React.ReactNode }) => (
+export const PromptSCAIndexPatternMissing = ({ refresh }) => (
+  <EuiEmptyPrompt
+    iconType='alert'
+    title={<h2>Configuration Assessment could be disabled or has a problem</h2>}
+    body={
       <>
-        <p>{message}</p>
         <p>
-          If the Configuration Assessment is enabled, then this could be caused
-          by an error in: server side, server-indexer connection, indexer side,
-          index creation, index data, index pattern name misconfiguration or
-          user permissions related to read the inventory indices.
+          If this is enabled, then this could be caused by an error in: server
+          side, server-indexer connection or indexer side. Review the server and
+          indexer logs.
         </p>
         <p>
-          Please, review the server and indexer logs. Also, you can check the{' '}
+          Also, you can check the{' '}
           <EuiLink
             href={webDocumentationLink(
               'user-manual/capabilities/sec-config-assessment/index.html',
@@ -50,43 +32,20 @@ const errorPromptTypes: MapErrorTypes<{ title: string }> = {
             rel='noopener noreferrer'
             external
           >
-            Configuration assessment documentation.
+            configuration assessment documentation.
           </EuiLink>
         </p>
       </>
-    ),
-  },
-  default: {
-    title: ({ title }: { title: string }) => title,
-    body: ({ message }) => <p>{message}</p>,
-  },
-};
+    }
+    actions={
+      <EuiButton color='primary' fill onClick={refresh}>
+        Refresh
+      </EuiButton>
+    }
+  />
+);
 
-/**
- * HOC that provides validation for the SCA index pattern.
- * Ensures that the index pattern exists for SCA functionality
- * is properly configured before displaying related data.
- *
- * @example
- * // Component that displays SCA data
- * const SCAComponent = ({ data }) => {
- *   // Component rendering
- * };
- *
- * // Component wrapped with index pattern validation
- * const SCAComponentWithDataSource = withSCADataSource(SCAComponent);
- *
- * // Usage in application
- * <SCAComponentWithDataSource />
- *
- * @function
- * @param {React.ComponentType} Component - The component to wrap
- * @returns {React.ComponentType} Component wrapped with index pattern validation
- */
-export const withSCADataSource: (
-  Component: React.ComponentType,
-) => React.ComponentType = withIndexPatternFromValue({
-  indexPattern: WAZUH_SCA_PATTERN,
-  ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  validate: ensureIndexPatternIsCreated(),
-});
+export const withSCADataSource = withHealthCheckChecks(
+  [HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES],
+  PromptSCAIndexPatternMissing,
+);

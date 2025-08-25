@@ -25,7 +25,7 @@ const Application =  () => {
     <Router history={history}>
      {/* General components that could be always displayed in all views or conditionally */}
      <Switch>
-      <Route path={'/health-check'} exact render={HealthCheck}></Route>
+      <Route path={'/path'} exact render={Component}></Route>
       {/* Rest of routes */}
      <Switch>
     <Router>

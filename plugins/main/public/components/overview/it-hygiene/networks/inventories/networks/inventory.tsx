@@ -6,27 +6,23 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryNetworksDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import {
-  ITHygieneInventoryDashboardTable,
-  ITHygieneInventoryDashboardTableProps,
-} from '../../../common/components/inventory';
 import { getOverviewNetworksNetworksTab } from './dashboard';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
+import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../../../common/constants';
 
 export const ITHygieneNetworksInventoryNetworks =
-  withSystemInventoryNetworksDataSource(
-    (props: ITHygieneInventoryDashboardTableProps) => {
-      return (
-        <ITHygieneInventoryDashboardTable
-          DataSource={SystemInventoryStatesDataSource}
-          DataSourceRepositoryCreator={
-            SystemInventoryNetworksStatesDataSourceRepository
-          }
-          tableDefaultColumns={tableColumns}
-          managedFilters={managedFilters}
-          getDashboardPanels={getOverviewNetworksNetworksTab}
-          tableId='it-hygiene-inventory-networks'
-          indexPattern={props.indexPattern}
-        />
-      );
-    },
-  );
+  withSystemInventoryNetworksDataSource(() => {
+    return (
+      <InventoryDashboardTable
+        DataSource={SystemInventoryStatesDataSource}
+        DataSourceRepositoryCreator={
+          SystemInventoryNetworksStatesDataSourceRepository
+        }
+        tableDefaultColumns={tableColumns}
+        managedFilters={managedFilters}
+        getDashboardPanels={getOverviewNetworksNetworksTab}
+        tableId='it-hygiene-inventory-networks'
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
+      />
+    );
+  });

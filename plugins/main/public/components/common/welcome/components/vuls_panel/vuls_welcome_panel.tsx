@@ -26,16 +26,93 @@ import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { WzLink } from '../../../../../components/wz-link/wz-link';
-import { withErrorBoundary } from '../../../../common/hocs';
+import {
+  withDataSourceInitiated,
+  withDataSourceLoading,
+  withErrorBoundary,
+} from '../../../../common/hocs';
 import { compose } from 'redux';
 import { withVulnerabilitiesStateDataSource } from '../../../../../components/overview/vulnerabilities/common/hocs/validate-vulnerabilities-states-index-pattern';
 import { formatUINumber } from '../../../../../react-services/format-number';
+import { LoadingSearchbarProgress } from '../../../loading-searchbar-progress/loading-searchbar-progress';
 
-const VulsPanelContent = ({ agent }) => {
+const VulsPanelContent = compose(
+  withDataSourceLoading({
+    isLoadingNameProp: 'isDataSourceLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    dataSourceNameProp: 'dataSource',
+    isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceErrorNameProp: 'error',
+  }),
+)(({ agent, topPackagesData, dataSource, severities, severityStats }) => {
+  const getSeverityValue = severity => {
+    const value =
+      severityStats?.find(v => v.key.toUpperCase() === severity.toUpperCase())
+        ?.doc_count || '0';
+    return value ? `${formatUINumber(value)} ${severity}` : '0';
+  };
+  const renderSeverityStats = (severity, index) => {
+    const severityLabel = severities[severity].label;
+    const severityColor = severities[severity].color;
+    return (
+      <EuiFlexItem key={index}>
+        <EuiPanel paddingSize='m'>
+          <EuiFlexGroup className='h-100' gutterSize='none' alignItems='center'>
+            <EuiFlexItem>
+              <WzLink
+                appId={vulnerabilityDetection.id}
+                path={`/overview?tab=vuls&tabView=dashboard&agentId=${
+                  agent.id
+                }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
+                  PatternDataSourceFilterManager.createFilter(
+                    FILTER_OPERATOR.IS,
+                    `vulnerability.severity`,
+                    severityLabel,
+                    dataSource?.indexPattern?.id,
+                  ),
+                ])}`}
+                style={{ color: severityColor }}
+              >
+                <VulsSeverityStat
+                  value={`${getSeverityValue(severityLabel)}`}
+                  color={severityColor}
+                  isLoading={isLoading || isDataSourceLoading}
+                  textAlign='left'
+                />
+              </WzLink>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPanel>
+      </EuiFlexItem>
+    );
+  };
+
+  return (
+    <EuiFlexGroup paddingSize='none'>
+      <EuiFlexItem grow={2}>
+        <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
+          {Object.keys(severities).reverse().map(renderSeverityStats)}
+        </EuiFlexGroup>
+      </EuiFlexItem>
+      <EuiFlexItem grow={3}>
+        <VulsTopPackageTable
+          agentId={agent.id}
+          items={topPackagesData}
+          indexPatternId={dataSource?.indexPattern.id}
+        />
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  );
+});
+
+const VulsPanelContentInitiation = ({ agent }) => {
   const {
     dataSource,
     isLoading: isDataSourceLoading,
     fetchData,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: VulnerabilitiesDataSource,
     repository: new VulnerabilitiesDataSourceRepository(),
@@ -94,71 +171,23 @@ const VulsPanelContent = ({ agent }) => {
       });
   }, [isDataSourceLoading, agent.id]);
 
-  const getSeverityValue = severity => {
-    const value =
-      severityStats?.find(v => v.key.toUpperCase() === severity.toUpperCase())
-        ?.doc_count || '0';
-    return value ? `${formatUINumber(value)} ${severity}` : '0';
-  };
-
-  const renderSeverityStats = (severity, index) => {
-    const severityLabel = severities[severity].label;
-    const severityColor = severities[severity].color;
-    return (
-      <EuiFlexItem key={index}>
-        <EuiPanel paddingSize='m'>
-          <EuiFlexGroup className='h-100' gutterSize='none' alignItems='center'>
-            <EuiFlexItem>
-              <WzLink
-                appId={vulnerabilityDetection.id}
-                path={`/overview?tab=vuls&tabView=dashboard&agentId=${
-                  agent.id
-                }&_g=${PatternDataSourceFilterManager.filtersToURLFormat([
-                  PatternDataSourceFilterManager.createFilter(
-                    FILTER_OPERATOR.IS,
-                    `vulnerability.severity`,
-                    severityLabel,
-                    dataSource?.indexPattern?.id,
-                  ),
-                ])}`}
-                style={{ color: severityColor }}
-              >
-                <VulsSeverityStat
-                  value={`${getSeverityValue(severityLabel)}`}
-                  color={severityColor}
-                  isLoading={isLoading || isDataSourceLoading}
-                  textAlign='left'
-                />
-              </WzLink>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPanel>
-      </EuiFlexItem>
-    );
-  };
-
   return (
-    <EuiFlexGroup paddingSize='none'>
-      <EuiFlexItem grow={2}>
-        <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
-          {Object.keys(severities).reverse().map(renderSeverityStats)}
-        </EuiFlexGroup>
-      </EuiFlexItem>
-      <EuiFlexItem grow={3}>
-        <VulsTopPackageTable
-          agentId={agent.id}
-          items={topPackagesData}
-          indexPatternId={dataSource?.indexPattern.id}
-        />
-      </EuiFlexItem>
-    </EuiFlexGroup>
+    <VulsPanelContent
+      agent={agent}
+      topPackagesData={topPackagesData}
+      dataSource={dataSource}
+      severities={severities}
+      severityStats={severityStats}
+      isLoading={isLoading}
+      error={error}
+    />
   );
 };
 
 const PanelWithVulnerabilitiesState = compose(
   withErrorBoundary,
   withVulnerabilitiesStateDataSource,
-)(VulsPanelContent);
+)(VulsPanelContentInitiation);
 
 const VulsPanel = ({ agent }) => {
   return (

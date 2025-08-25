@@ -29,7 +29,6 @@ export const InventoryFIMRegistryValues = compose(
         managedFilters={managedFilters}
         getDashboardPanels={getDashboard}
         tableId='fim-registry-values-inventory'
-        indexPattern={props.indexPattern}
         categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
     </div>

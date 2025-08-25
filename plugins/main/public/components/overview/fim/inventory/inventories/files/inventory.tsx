@@ -27,7 +27,6 @@ export const InventoryFIMFiles = compose(
         managedFilters={managedFilters}
         getDashboardPanels={getDashboard}
         tableId='fim-files-inventory'
-        indexPattern={props.indexPattern}
         categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
     </div>
