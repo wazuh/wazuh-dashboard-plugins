@@ -107,7 +107,11 @@ const FimTableDataSource = withDataSourceFetch({
       },
     };
   },
-  mapFetchActionDependencies: ({ timeFilter, sort }) => [timeFilter, sort],
+  mapFetchActionDependencies: ({ timeFilter, sort, agent }) => [
+    timeFilter,
+    sort,
+    agent.id,
+  ],
   mapResponse: response => {
     return { total: response?.hits?.total, items: response?.hits?.hits };
   },
