@@ -862,6 +862,28 @@ const about = {
   redirectTo: () => '/settings?tab=about',
 };
 
+export const dashboardAssistant = {
+  category: 'wz-category-dashboard-assistant',
+  id: 'dashboard-assistant',
+  title: i18n.translate('wz-category-dashboard-assistant-title', {
+    defaultMessage: 'Dashboard assistant',
+  }),
+  breadcrumbLabel: i18n.translate(
+    'wwz-category-dashboard-assistant-breadcrumbLabel',
+    {
+      defaultMessage: 'Dashboard assistant',
+    },
+  ),
+  description: i18n.translate('wz-category-dashboard-assistant-description', {
+    defaultMessage: 'Show information about App Versions and community links.',
+  }),
+  euiIconType: 'indexRollupApp',
+  order: 10006,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: (path?: string) => '/assistant' + (path ? `/${path}` : ''),
+};
+
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
@@ -900,6 +922,7 @@ export const Applications = [
   appSettings,
   about,
   ITHygiene,
+  dashboardAssistant,
 ].sort((a, b) => {
   // Sort applications by order
   if (a.order < b.order) {
@@ -990,5 +1013,13 @@ export const Categories = [
     }),
     order: 6e3,
     euiIconType: 'dashboardApp',
+  },
+  {
+    id: 'wz-category-dashboard-assistant',
+    label: i18n.translate('wz-category-dashboard-assistant', {
+      defaultMessage: 'Dashboard assistant',
+    }),
+    order: 7e3,
+    euiIconType: 'appSearchApp',
   },
 ];

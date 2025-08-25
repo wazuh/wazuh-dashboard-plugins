@@ -1,0 +1,95 @@
+import { GenericRequest } from '../../../../../../../react-services';
+import { HttpMethod } from '../../../../../../../../common/enums/http-method';
+import { IHttpClient } from '../domain/entities/http-client';
+
+export class HttpWithProxyClient implements IHttpClient {
+  private buildProxyUrl = (method: HttpMethod, path: string) =>
+    `/api/console/proxy?method=${method}&path=${path}`;
+
+  get proxyRequest() {
+    return {
+      post: Object.assign(
+        (url: string, data?: any, config?: Record<string, any>) =>
+          this.post(this.buildProxyUrl(HttpMethod.POST, url), data, config),
+        {
+          WithPut: (url: string, data?: any, config?: Record<string, any>) =>
+            this.post(this.buildProxyUrl(HttpMethod.PUT, url), data, config),
+          WithDelete: (url: string, config?: Record<string, any>) =>
+            this.post(this.buildProxyUrl(HttpMethod.DELETE, url), config),
+          WithGet: (url: string, config?: Record<string, any>) =>
+            this.post(this.buildProxyUrl(HttpMethod.GET, url), config),
+        },
+      ),
+      get: (url: string, config?: Record<string, any>) =>
+        this.get(this.buildProxyUrl(HttpMethod.GET, url), config),
+      put: (url: string, data?: any, config?: Record<string, any>) =>
+        this.put(this.buildProxyUrl(HttpMethod.PUT, url), data, config),
+      delete: (url: string, config?: Record<string, any>) =>
+        this.delete(this.buildProxyUrl(HttpMethod.DELETE, url), config),
+    };
+  }
+
+  async get<T = any>(url: string, config?: Record<string, any>): Promise<T> {
+    try {
+      const response = await GenericRequest.request<{ data: T }>(
+        HttpMethod.GET,
+        url,
+        null,
+        true,
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async post<T = any>(
+    url: string,
+    data?: any,
+    config?: Record<string, any>,
+  ): Promise<T> {
+    try {
+      const response = await GenericRequest.request<{ data: T }>(
+        HttpMethod.POST,
+        url,
+        data,
+        true,
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async put<T = any>(
+    url: string,
+    data?: any,
+    config?: Record<string, any>,
+  ): Promise<T> {
+    try {
+      const response = await GenericRequest.request<{ data: T }>(
+        HttpMethod.PUT,
+        url,
+        data,
+        true,
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async delete<T = any>(url: string, config?: Record<string, any>): Promise<T> {
+    try {
+      const response = await GenericRequest.request<{ data: T }>(
+        HttpMethod.DELETE,
+        url,
+        null,
+        true,
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+}

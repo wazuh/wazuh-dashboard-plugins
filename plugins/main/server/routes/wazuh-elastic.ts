@@ -20,8 +20,12 @@ import {
   WAZUH_SAMPLE_INVENTORY_AGENT,
   WAZUH_SAMPLE_VULNERABILITIES,
 } from '../../common/constants';
+import { WazuhCorePluginStart } from '../../../wazuh-core/server';
 
-export function WazuhElasticRoutes(router: IRouter) {
+export function WazuhElasticRoutes(
+  router: IRouter,
+  services: WazuhCorePluginStart,
+) {
   const ctrl = new WazuhElasticCtrl();
   const schemaSampleAlertsCategories = schema.oneOf(
     [
