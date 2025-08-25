@@ -26,7 +26,7 @@ import {
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
 import { endpointSummary } from '../../../utils/applications';
-import { LastAlertsStat } from './last-alerts-stat';
+import { LastAlertsSummaryBySeverity } from './last-alerts-stat';
 import { VisualizationBasic } from '../../../components/common/charts/visualizations/basic';
 import NavigationService from '../../../react-services/navigation-service';
 import './stats.scss';
@@ -158,12 +158,9 @@ export const Stats = withErrorBoundary(
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
-              <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
-                <LastAlertsStat severity='critical' />
-                <LastAlertsStat severity='high' />
-                <LastAlertsStat severity='medium' />
-                <LastAlertsStat severity='low' />
-              </EuiFlexGroup>
+              <div className='vulnerabilites-summary-card'>
+                <LastAlertsSummaryBySeverity />
+              </div>
             </EuiCard>
           </EuiFlexItem>
         </EuiFlexGroup>
