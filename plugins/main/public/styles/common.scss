@@ -418,7 +418,7 @@ md-content {
   font-size: 14px !important;
 }
 
-.euiTab.euiTab-isSelected {
+:root:not(:has(#wz-dev-tools-container)) .euiTab.euiTab-isSelected {
   font-weight: 600 !important;
 }
 
@@ -452,14 +452,17 @@ md-sidenav {
 
 /* Dev tools styles */
 
-.wz-dev-box {
+.wz-dev-tools {
+  display: flex;
   margin: 0px !important;
-  font-size: 14.5px;
 }
 
-.wz-play-dev-color {
+.wz-app:has(.wz-dev-tools) {
+  flex-grow: 1;
+}
+
+.wz-dev-tools-buttons--send-request {
   color: #70ba56;
-  margin-right: 15px;
 }
 
 .wz-question-dev-color {
@@ -471,45 +474,39 @@ md-sidenav {
 }
 
 .wz-dev-column-separator {
-  width: 12px;
-  margin-top: 15px;
+  width: var(--col-separator-width);
   background: #dddddd;
-  float: left;
-  cursor: ew-resize;
-  text-align: center;
-  display: block !important;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background-color: #cce4ed;
+  }
+  &:focus,
+  &.active {
+    background-color: #0079a5;
+    color: #fff;
+  }
 }
 
-.wz-dev-column-separator:hover {
-  background-color: #cce4ed;
+$sides: left, right;
+
+@each $side in $sides {
+  #wz-dev-#{$side}-column {
+    width: calc(var(--col-#{$side}-width) - var(--col-separator-width) / 2);
+    float: #{$side};
+  }
 }
 
-.wz-dev-column-separator:focus,
-.wz-dev-column-separator.active {
-  background-color: #0079a5;
-  color: #fff;
-}
-
-.wz-dev-column-separator span {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-#wz-dev-left-column {
-  width: calc(45% - 7px);
-  min-width: calc(20% - 7px);
-  max-width: calc(80% - 7px);
-  float: left;
-}
-
+#wz-dev-left-column,
 #wz-dev-right-column {
-  width: calc(55% - 7px);
-  min-width: calc(20% - 7px);
-  max-width: calc(80% - 7px);
-  float: left;
+  $w: 20%;
+  min-width: calc(#{$w} - var(--col-separator-width) / 2);
+  max-width: calc(#{100% - $w} - var(--col-separator-width) / 2);
 }
 
-.wz-dev-box .CodeMirror {
+.wz-dev-tools .CodeMirror {
   border: 1px solid #ddd !important;
 }
 
@@ -1603,16 +1600,6 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
 
 .ace_autocomplete {
   width: 390px !important;
-}
-
-.wz-devtools {
-  border: 1px solid red;
-  margin: 16px;
-}
-
-.wz-devtools-tab .euiButtonEmpty__text {
-  height: 24px;
-  text-decoration: none !important;
 }
 
 .history-list {

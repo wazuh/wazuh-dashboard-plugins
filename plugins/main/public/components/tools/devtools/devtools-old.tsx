@@ -22,9 +22,15 @@ import {
   UILogLevel,
 } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
+import { DEV_TOOLS_INITIAL_BUFFER } from './initial-buffer';
+import { Keys } from './types/keys';
+import { getTopNavConfig } from './application/components/top-nav/get-top-nav';
+import { EuiFlexGroup, EuiFlexItem, EuiTabs, EuiTab } from '@elastic/eui';
+import { TopNavMenu } from './application/components/top-nav/top-nav-menu';
+import DevToolsColumnSeparator from './application/components/separator/dev-tools-column-separator';
+import { CONSOLE_CONTAINER } from './constants';
 
 /**
  * Detect de groups of instructions
@@ -134,38 +140,47 @@ function analyzeGroups(editor) {
 function calculateWhichGroup(editor, firstTime = false, groups = []) {
   try {
     const selection = editor.getCursor();
+    const validGroups = groups.filter(item => {
+      return item.requestText;
+    });
     const desiredGroup = firstTime
-      ? groups.filter(item => item.requestText)
-      : groups.filter(
-          item =>
+      ? validGroups
+      : validGroups.filter(item => {
+          return (
             item.requestText &&
             item.end >= selection.line &&
-            item.start <= selection.line,
-        );
+            item.start <= selection.line
+          );
+        });
+
+    if (desiredGroup.length === 0 && validGroups.length > 0) {
+      desiredGroup.push(validGroups[0]);
+    }
 
     // Place play button at first line from the selected group
     let cords;
     try {
       cords = editor.cursorCoords({
-        line: desiredGroup[0].start,
+        line: desiredGroup[0]?.start,
         ch: 0,
       });
     } catch {
-      $('#play_button').hide();
-      $('#wazuh_dev_tools_documentation').hide();
+      $('#wz-dev-tools-buttons--send-request').hide();
+      $('#wz-dev-tools-buttons--go-to-api-reference').hide();
       return null;
     }
 
-    if (!$('#play_button').is(':visible')) $('#play_button').show();
-    if (!$('#wazuh_dev_tools_documentation').is(':visible'))
-      $('#wazuh_dev_tools_documentation').show();
-    const currentPlayButton = $('#play_button').offset();
-    $('#play_button').offset({
-      top: cords.top /*+ 2*/,
-      left: currentPlayButton.left,
+    if (!$('#wz-dev-tools-buttons--send-request').is(':visible')) {
+      $('#wz-dev-tools-buttons--send-request').show();
+    }
+    if (!$('#wz-dev-tools-buttons--go-to-api-reference').is(':visible')) {
+      $('#wz-dev-tools-buttons--go-to-api-reference').show();
+    }
+    $('#wz-dev-tools-buttons--send-request').offset({
+      top: cords.top + 1,
     });
-    $('#wazuh_dev_tools_documentation').offset({
-      top: cords.top /*+ 2*/,
+    $('#wz-dev-tools-buttons--go-to-api-reference').offset({
+      top: cords.top + 1,
     });
     if (firstTime) highlightGroup(editor, desiredGroup[0]);
     if (desiredGroup[0]) {
@@ -212,17 +227,17 @@ function calculateWhichGroup(editor, firstTime = false, groups = []) {
           ),
         );
       if (apiEndpoint && apiEndpoint.documentation) {
-        $('#wazuh_dev_tools_documentation')
+        $('#wz-dev-tools-buttons--go-to-api-reference')
           .attr('href', apiEndpoint.documentation)
           .show();
       } else {
-        $('#wazuh_dev_tools_documentation').attr('href', '').hide();
+        $('#wz-dev-tools-buttons--go-to-api-reference').attr('href', '').hide();
       }
     }
     return desiredGroup[0];
   } catch (error) {
-    $('#play_button').hide();
-    $('#wazuh_dev_tools_documentation').hide();
+    $('#wz-dev-tools-buttons--send-request').hide();
+    $('#wz-dev-tools-buttons--go-to-api-reference').hide();
     const options: UIErrorLog = {
       context: `calculateWhichGroup`,
       level: UI_LOGGER_LEVELS.WARNING as UILogLevel,
@@ -324,23 +339,8 @@ function init(editorInput, editorOutput) {
   editorOutput.setSize('auto', '100%');
   const currentState = AppState.getCurrentDevTools();
   if (!currentState) {
-    const demoStr =
-      'GET /agents?status=active\n\n# Example comment\n\n# You can use ? after the endpoint \n# in order to get suggestions \n# for your query params\n\nGET /manager/info\n\nPOST /agents\n' +
-      JSON.stringify({ name: 'NewAgent' }, null, 2) +
-      '\n\nPUT /logtest\n' +
-      JSON.stringify(
-        {
-          log_format: 'syslog',
-          location: 'logtest',
-          event:
-            'Jul 06 22:00:22 linux-agent sshd[29205]: Invalid user blimey from 1.3.1.3 port 48928',
-        },
-        null,
-        2,
-      );
-
-    AppState.setCurrentDevTools(demoStr);
-    editorInput.getDoc().setValue(demoStr);
+    AppState.setCurrentDevTools(DEV_TOOLS_INITIAL_BUFFER);
+    editorInput.getDoc().setValue(DEV_TOOLS_INITIAL_BUFFER);
   } else {
     editorInput.getDoc().setValue(currentState);
   }
@@ -703,7 +703,7 @@ function init(editorInput, editorOutput) {
     const leftOrigWidth = $('#wz-dev-left-column').width();
     const rightOrigWidth = $('#wz-dev-right-column').width();
     $(evtDocument).mousemove(function (e) {
-      const leftWidth = e.pageX - 85 + 14;
+      const leftWidth = e.pageX;
       let rightWidth = leftOrigWidth - leftWidth;
       $('#wz-dev-left-column').css('width', leftWidth);
       $('#wz-dev-right-column').css('width', rightOrigWidth + rightWidth);
@@ -716,19 +716,10 @@ function init(editorInput, editorOutput) {
   });
 
   window.onresize = () => {
-    $('#wz-dev-left-column').attr(
-      'style',
-      'width: calc(45% - 7px); !important',
-    );
-    $('#wz-dev-right-column').attr(
-      'style',
-      'width: calc(55% - 7px); !important',
-    );
     dynamicHeight();
   };
 
-  const dynamicHeight = () =>
-    DynamicHeight.dynamicHeightDevTools(editorInput, window);
+  const dynamicHeight = () => DynamicHeight.dynamicHeightDevTools(window);
   dynamicHeight();
 }
 
@@ -747,10 +738,11 @@ async function send(editorInput, editorOutput, firstTime = false) {
           line: desiredGroup.start,
           ch: 0,
         });
-        const currentPlayButton = $('#play_button').offset();
-        $('#play_button').offset({
-          top: cords.top /*+ 2*/,
-          left: currentPlayButton.left,
+        $('#wz-dev-tools-buttons--send-request').offset({
+          top: cords.top + 1,
+        });
+        $('#wz-dev-tools-buttons--go-to-api-reference').offset({
+          top: cords.top + 1,
         });
       }
 
@@ -858,13 +850,13 @@ function parseError(error) {
   }
 }
 
-function exportOutput(editor) {
+function saveEditorContentAsJson(editor) {
   try {
     // eslint-disable-next-line
     const blob = new Blob([editor.getValue()], {
       type: 'application/json',
     });
-    FileSaver.saveAs(blob, 'export.json');
+    FileSaver.saveAs?.(blob, 'export.json');
   } catch (error) {
     const options: UIErrorLog = {
       context: `exportOutput`,
@@ -883,9 +875,11 @@ function exportOutput(editor) {
 export const ToolDevTools = withGlobalBreadcrumb([
   { text: devTools.breadcrumbLabel },
 ])(() => {
-  const [multipleKeyPressed, setMultipleKeyPressed] = useState([]);
+  const [multipleKeyPressed, setMultipleKeyPressed] = useState<number[]>([]);
   const editorInputRef = useRef();
   const editorOutputRef = useRef();
+
+  const useUpdatedUX = getUiSettings().get('home:useNewHomePage');
 
   useEffect(() => {
     (async function () {
@@ -902,8 +896,8 @@ export const ToolDevTools = withGlobalBreadcrumb([
           setMultipleKeyPressed(state => [...state, e.which]);
         }
         if (
-          multipleKeyPressed.includes(13) &&
-          multipleKeyPressed.includes(16) &&
+          multipleKeyPressed.includes(Keys.ENTER) &&
+          multipleKeyPressed.includes(Keys.SHIFT) &&
           multipleKeyPressed.length === 2
         ) {
           e.preventDefault();
@@ -921,10 +915,10 @@ export const ToolDevTools = withGlobalBreadcrumb([
           lineNumbers: true,
           matchBrackets: true,
           mode: { name: 'javascript', json: true },
-          theme: isDarkThemeEnabled ? 'lesser-dark' : 'ttcn',
-          foldGutter: true,
           styleSelectedText: true,
+          foldGutter: true,
           gutters: ['CodeMirror-foldgutter'],
+          theme: isDarkThemeEnabled ? 'lesser-dark' : 'ttcn',
         },
       ));
 
@@ -978,9 +972,9 @@ export const ToolDevTools = withGlobalBreadcrumb([
           readOnly: true,
           lineWrapping: true,
           styleActiveLine: true,
-          theme: isDarkThemeEnabled ? 'lesser-dark' : 'ttcn',
           foldGutter: true,
           gutters: ['CodeMirror-foldgutter'],
+          theme: isDarkThemeEnabled ? 'lesser-dark' : 'ttcn',
         },
       );
 
@@ -998,9 +992,9 @@ export const ToolDevTools = withGlobalBreadcrumb([
           level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
           severity: UI_ERROR_SEVERITIES.UI as UIErrorSeverity,
           error: {
-            error: error,
-            message: error.message || error,
-            title: error.name,
+            error: error as Error,
+            message: (error as Error).message || (error as string),
+            title: (error as Error).name,
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -1012,74 +1006,87 @@ export const ToolDevTools = withGlobalBreadcrumb([
   }, []);
 
   return (
-    <div
-      style={{ display: 'flex', flexDirection: 'column' }}
-      className='dev-tools-max-height'
-    >
-      <div className='wz-dev-box'>
+    <div id='wz-dev-tools-container'>
+      <EuiTabs size='s'>
+        <EuiTab isSelected={true}>Console</EuiTab>
+      </EuiTabs>
+      <EuiFlexGroup
+        style={{ padding: `${CONSOLE_CONTAINER.padding}px`, margin: 0 }}
+        direction='column'
+      >
         <div
-          id='wz-dev-left-column'
-          style={{ display: 'flex', flexDirection: 'column' }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            // @ts-ignore
+            '--col-separator-width': '14px',
+            '--col-left-width': '50%',
+            '--col-right-width': 'calc(100% - var(--col-left-width))',
+          }}
+          className='wz-dev-tools'
         >
-          <span className='wz-headline-title wz-dev-title'>
-            Console
-            <i
-              onClick={() =>
-                send(editorInputRef.current, editorOutputRef.current)
-              }
-              title='Click to send the request'
-              className='fa fa-play wz-play-dev-color cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background'
-              id='play_button'
-              aria-hidden='true'
-            ></i>
-            <a
-              href=''
-              target='__blank'
-              title='Open documentation'
-              className='fa fa-info-circle cursor-pointer pull-right fa-fw wz-always-top CodeMirror-styled-background'
-              id='wazuh_dev_tools_documentation'
-            ></a>
-          </span>
-
-          <textarea style={{ display: 'flex' }} id='api_input'></textarea>
-        </div>
-        <div className='wz-dev-column-separator layout-column'>
-          <span>︙</span>
-        </div>
-        <div
-          id='wz-dev-right-column'
-          style={{ display: 'flex', flexDirection: 'column' }}
-        >
-          <span className='wz-headline-title wz-dev-title'>
-            <a
-              href={webDocumentationLink('user-manual/api/reference.html')}
-              target='_blank'
-              rel='noopener noreferrer'
+          <EuiFlexGroup gutterSize='none'>
+            <EuiFlexItem>
+              <TopNavMenu
+                useUpdatedUX={useUpdatedUX}
+                items={getTopNavConfig({
+                  useUpdatedUX,
+                  onClickExport: () =>
+                    saveEditorContentAsJson(editorOutputRef.current),
+                })}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+            }}
+          >
+            <div
+              id='wz-dev-left-column'
+              style={{ display: 'flex', flexDirection: 'column' }}
             >
-              <i
-                className='fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw'
-                aria-hidden='true'
-              ></i>
-            </a>
-            {/* <i
-              href={webDocumentationLink('user-manual/api/reference.html')}
-              // onClick={help}
-              className='fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw'
-              aria-hidden='true'
-            ></i> */}
-            <i
-              // ng-click='ctrl.exportOutput()'
-              onClick={() => exportOutput(editorOutputRef.current)}
-              tooltip='Export as JSON'
-              tooltip-placement='bottom'
-              className='fa fa-download wz-question-dev-color cursor-pointer pull-right fa-fw'
-              aria-hidden='true'
-            ></i>
-          </span>
-          <textarea style={{ display: 'flex' }} id='api_output'></textarea>
+              <div
+                id='wz-dev-tools-buttons'
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  position: 'relative',
+                  left: '-0.75rem',
+                  gap: '0.5rem',
+                  height: 0,
+                }}
+              >
+                <i
+                  onClick={() =>
+                    send(editorInputRef.current, editorOutputRef.current)
+                  }
+                  title='Click to send the request'
+                  className='fa fa-play wz-dev-tools-buttons--send-request cursor-pointer wz-always-top CodeMirror-styled-background'
+                  id='wz-dev-tools-buttons--send-request'
+                  aria-hidden='true'
+                ></i>
+                <a
+                  href=''
+                  target='__blank'
+                  title='Open documentation'
+                  className='fa fa-info-circle cursor-pointer wz-always-top CodeMirror-styled-background'
+                  id='wz-dev-tools-buttons--go-to-api-reference'
+                ></a>
+              </div>
+              <textarea style={{ display: 'flex' }} id='api_input'></textarea>
+            </div>
+            <DevToolsColumnSeparator />
+            <div
+              id='wz-dev-right-column'
+              style={{ display: 'flex', flexDirection: 'column' }}
+            >
+              <textarea style={{ display: 'flex' }} id='api_output'></textarea>
+            </div>
+          </div>
         </div>
-      </div>
-      {/* </md-content> */}
+      </EuiFlexGroup>
     </div>
   );
 });
