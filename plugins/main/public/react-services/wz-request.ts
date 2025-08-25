@@ -189,15 +189,21 @@ export class WzRequest {
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
             if (
+              // TODO: review the condition for the /settings path to ignore the management
               !NavigationService.getInstance()
                 .getPathname()
                 .startsWith('/settings')
             ) {
+              const title = `API with ID [${currentApi.id}] is not available.`;
+              const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
+
               getToasts().add({
                 color: 'warning',
-                title: `API with ID [${currentApi.id}] is not available.`,
-                text: 'This could indicate a problem in the network of the server API, review or change of API host in the API host selector if configurated other hosts.',
+                title,
+                text,
               });
+
+              throw new Error(`${title} ${text}`);
             }
             throw new Error(error);
           }
