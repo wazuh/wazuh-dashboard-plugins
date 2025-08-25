@@ -10,19 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 export const OFFICE_365 = 'office365';
 export const WMODULES_WMODULES = 'wmodules-wmodules';
 export const HELP_LINKS = [
   {
     text: 'Monitoring Office 365',
-    href: webDocumentationLink('cloud-security/office365/index.html'),
+    href: DOC_LINKS.CLOUD_SECURITY.OFFICE365.INDEX,
   },
   {
     text: 'Configuration options for the module',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/office365-module.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.OFFICE365_MODULE,
   },
 ];

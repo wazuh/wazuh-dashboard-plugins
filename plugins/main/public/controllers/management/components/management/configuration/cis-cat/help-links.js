@@ -9,21 +9,15 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 export default [
   {
     text: 'CIS-CAT module documentation',
-    href: webDocumentationLink(
-      'user-manual/capabilities/policy-monitoring/ciscat/ciscat.html',
-      '4.8',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.POLICY_MONITORING.CISCAT,
   },
   {
     text: 'CIS-CAT module reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/wodle-ciscat.html',
-      '4.8',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_CISCAT,
   },
 ];

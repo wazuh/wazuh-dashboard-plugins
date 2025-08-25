@@ -18,18 +18,16 @@ import WzNoConfig from '../util-components/no-config';
 import withWzConfig from '../util-hocs/wz-config';
 import { isString, renderValueNoThenEnabled } from '../utils/utils';
 import { wodleBuilder } from '../utils/builders';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Using Wazuh to monitor Azure',
-    href: webDocumentationLink('cloud-security/azure/index.html'),
+    href: DOC_LINKS.CLOUD_SECURITY.AZURE.INDEX,
   },
   {
     text: 'Azure reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/wodle-azure-logs.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.WODLE_AZURE_LOGS,
   },
 ];
 
@@ -93,8 +91,8 @@ class WzConfigurationAzure extends Component {
           )}
         {currentConfig && this.wodleConfig['azure-logs'] && (
           <WzConfigurationSettingsHeader
-            title="Main settings"
-            description="Configuration for the Azure logs wodle"
+            title='Main settings'
+            description='Configuration for the Azure logs wodle'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup

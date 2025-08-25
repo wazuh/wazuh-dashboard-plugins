@@ -13,12 +13,8 @@
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiButton, EuiLink } from '@elastic/eui';
 import { useDispatch } from 'react-redux';
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import { showExploreAgentModalGlobal } from '../../../redux/actions/appStateActions';
-
-const documentationLink = webDocumentationLink(
-  'user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager',
-);
+import { DOC_LINKS_WITH_FRAGMENTS } from '../../../../common/doc-links';
 
 export const PromptAgentNeverConnected = () => {
   const dispatch = useDispatch();
@@ -35,7 +31,9 @@ export const PromptAgentNeverConnected = () => {
             manager.
           </p>
           <EuiLink
-            href={documentationLink}
+            href={
+              DOC_LINKS_WITH_FRAGMENTS.AGENT_CONNECTION_CHECKING_CONNECTION_WITH_THE_WAZUH_MANAGER
+            }
             target='_blank'
             rel='noopener noreferrer'
             external
