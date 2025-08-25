@@ -153,7 +153,7 @@ function calculateWhichGroup(editor, firstTime = false, groups = []) {
           );
         });
 
-    if (desiredGroup.length === 0) {
+    if (desiredGroup.length === 0 && validGroups.length > 0) {
       desiredGroup.push(validGroups[0]);
     }
 
