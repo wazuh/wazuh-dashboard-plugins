@@ -20,6 +20,7 @@ export default {
     `${kbnDir}/src/dev/jest/setup/enzyme.js`,
     '<rootDir>/test/__mocks__/localStorage.setup.ts',
   ],
+  setupFilesAfterEnv: [`${kbnDir}/src/dev/jest/setup/monaco_mock.js`],
   collectCoverage: true,
   coverageDirectory: './target/test-coverage',
   coverageReporters: ['html', 'text-summary', 'json-summary'],
