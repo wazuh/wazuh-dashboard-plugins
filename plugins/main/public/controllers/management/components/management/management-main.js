@@ -60,6 +60,7 @@ const WzManagementMain = props => (
     <Route path={`?tab=${SECTION_CDBLIST_SECTION}`}>
       <WzCDBLists />
     </Route>
+    {/* TODO: research about 2 routes with same render */}
     <Route path={`?tab=ruleset`}>
       <WzRuleset />
     </Route>

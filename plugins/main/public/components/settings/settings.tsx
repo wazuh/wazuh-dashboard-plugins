@@ -194,6 +194,7 @@ class SettingsComponent extends React.Component {
   async getSettings() {
     try {
       try {
+        // TODO: this seems that is not used
         this.setState({
           indexPatterns: await SavedObject.getListOfWazuhValidIndexPatterns(),
         });

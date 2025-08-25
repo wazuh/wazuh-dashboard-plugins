@@ -26,6 +26,7 @@ export class WzRequest {
 
   static async setupAPIInCookie() {
     const currentApiDataCookie = AppState.getCurrentAPI();
+    // TODO: review clustInfo cookie
     let currentApiID;
 
     if (currentApiDataCookie) {
