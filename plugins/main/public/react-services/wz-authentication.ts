@@ -42,9 +42,11 @@ export class WzAuthentication {
   private static async login(force = false) {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
-      while (!idHost) {
-        await new Promise(r => setTimeout(r, 500));
-        idHost = JSON.parse(AppState.getCurrentAPI()).id;
+
+      if (!idHost) {
+        throw new Error(
+          'It can not login into the server API due there no selected API. Ensure the server API is selected and this is available.',
+        );
       }
 
       const response = await WzRequest.genericReq('POST', '/api/login', {
