@@ -279,7 +279,6 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       tabView: 'intelligence',
       tabRedirect: 'techniques',
       idToRedirect: currentTechnique,
-      // _g: PatternDataSourceFilterManager.filtersToURLFormat(filters),
     });
   };
 
@@ -298,7 +297,6 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       tabView: 'intelligence',
       tabRedirect: 'tactics',
       idToRedirect: tactic.id,
-      // _g: PatternDataSourceFilterManager.filtersToURLFormat(filters),
     });
   };
 
