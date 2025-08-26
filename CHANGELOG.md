@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.1
 
+### Fixed
+
+- Fixed navigation problem in MITRE ATT&CK framework details flyout [#7689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7689)
+
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 00
 
 ### Added
