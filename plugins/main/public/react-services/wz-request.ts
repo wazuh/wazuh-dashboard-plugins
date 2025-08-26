@@ -273,6 +273,14 @@ export class WzRequest {
         : options;
 
       const id = JSON.parse(AppState.getCurrentAPI()).id;
+
+      if (!id) {
+        return Promise.reject(
+          new Error(
+            'There is no selected server API. Ensure the server API is selected and this is online.',
+          ),
+        );
+      }
       const requestData = { method, path, body, id };
       const response = await this.genericReq(
         'POST',
