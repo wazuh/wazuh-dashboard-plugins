@@ -8,7 +8,7 @@ import { UpdatesNotification } from './components/updates-notification';
 import { DismissNotificationCheck } from './components/dismiss-notification-check';
 import { setCore, setWazuhCore } from './plugin-services';
 import { getAvailableUpdates } from './services';
-import { CtiSubscription } from './shared-components/cti-subscription/cti-subscription';
+import { CtiRegistration } from './shared-components/cti-registration/cti-registration';
 
 export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart>
@@ -28,7 +28,7 @@ export class WazuhCheckUpdatesPlugin
       UpdatesNotification,
       getAvailableUpdates,
       DismissNotificationCheck,
-      CtiSubscription,
+      CtiRegistration,
     };
   }
 

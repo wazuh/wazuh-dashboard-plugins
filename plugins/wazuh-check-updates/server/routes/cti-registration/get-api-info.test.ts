@@ -4,7 +4,7 @@ import { loggingSystemMock } from '../../../../../src/core/server/logging/loggin
 import { ByteSizeValue } from '@osd/config-schema';
 import { routes } from '../../../common/constants';
 import { getApiInfoRoute } from './get-api-info';
-import { getApiInfo } from '../../services/cti-subscription/get-api-info';
+import { getApiInfo } from '../../services/cti-registration/get-api-info';
 import supertest from 'supertest';
 
 const serverAddress = '127.0.0.1';

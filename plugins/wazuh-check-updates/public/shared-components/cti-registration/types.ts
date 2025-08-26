@@ -1,5 +1,3 @@
-import { Dispatch, SetStateAction } from 'react';
-
 export interface LinkCtiProps {
   handleModalToggle: () => void;
   handleStatusModalToggle?: () => void;
@@ -11,7 +9,7 @@ export enum CtiStatus {
   INACTIVE = 'inactive',
 }
 
-export interface StatusCtiSubscriptionProps {
+export interface StatusCtiRegistrationProps {
   isActive: CtiStatus;
   checkCtiStatus: () => Promise<void>;
 }

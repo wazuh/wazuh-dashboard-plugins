@@ -1,6 +1,6 @@
 import { IRouter } from 'opensearch-dashboards/server';
 import { routes } from '../../../common/constants';
-import { getApiInfo } from '../../services/cti-subscription/get-api-info';
+import { getApiInfo } from '../../services/cti-registration/get-api-info';
 
 export const getApiInfoRoute = (router: IRouter) => {
   router.get(

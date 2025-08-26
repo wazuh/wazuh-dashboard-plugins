@@ -1,30 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { I18nProvider } from '@osd/i18n/react';
-import './subscription.scss';
-import { StartCtiSubscription } from './components/start-cti-subscription';
-import { StatusCtiSubscription } from './components/status-cti-subscription';
+import './registration.scss';
+import { StartCtiRegistration } from './components/start-cti-registration';
+import { StatusCtiRegistration } from './components/status-cti-registration';
 import { ModalCti } from './components/modal-cti';
 import { StatusCtiModal } from './components/status-cti-modal';
 import { CtiStatus } from './types';
-import { getApiInfo } from '../../services/get-api-info';
+import { useCtiStatus } from './hooks/useCtiStatus';
 
-export const CtiSubscription = () => {
+export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [isActive, setIsActive] = useState<CtiStatus>(CtiStatus.INACTIVE);
-
-  useEffect(() => {
-    checkCtiStatus();
-  }, []);
-
-  const checkCtiStatus = async () => {
-    const response = await getApiInfo();
-
-    const statusSubscription =
-      response.affected_items[0]?.subscription?.status || CtiStatus.INACTIVE;
-
-    setIsActive(statusSubscription);
-  };
+  const { isActive, checkCtiStatus } = useCtiStatus();
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
@@ -38,9 +25,9 @@ export const CtiSubscription = () => {
     <I18nProvider>
       <>
         {isActive === CtiStatus.INACTIVE ? (
-          <StartCtiSubscription handleModalToggle={handleModalToggle} />
+          <StartCtiRegistration handleModalToggle={handleModalToggle} />
         ) : (
-          <StatusCtiSubscription
+          <StatusCtiRegistration
             isActive={isActive}
             checkCtiStatus={checkCtiStatus}
           />

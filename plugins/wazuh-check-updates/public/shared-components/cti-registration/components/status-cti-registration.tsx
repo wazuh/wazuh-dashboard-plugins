@@ -7,10 +7,10 @@ import {
   EuiText,
   EuiButtonEmpty,
 } from '@elastic/eui';
-import { CtiStatus, StatusCtiSubscriptionProps } from '../types';
+import { CtiStatus, StatusCtiRegistrationProps } from '../types';
 import { getCore } from '../../../plugin-services';
 
-export const StatusCtiSubscription: React.FC<StatusCtiSubscriptionProps> = ({
+export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   isActive,
   checkCtiStatus,
 }) => {
@@ -32,14 +32,14 @@ export const StatusCtiSubscription: React.FC<StatusCtiSubscriptionProps> = ({
       <EuiHealth
         onClickAriaLabel={
           isActive === CtiStatus.ACTIVE
-            ? 'View active CTI subscription status'
-            : 'View pending CTI subscription status'
+            ? 'View active CTI registration status'
+            : 'View pending CTI registration status'
         }
         color={colorHealth}
       >
         <FormattedMessage
-          id='wazuhCheckUpdates.ctiSubscription.statusNavTop'
-          defaultMessage={`CTI Subscription: {status}`}
+          id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
+          defaultMessage={`CTI Registration: {status}`}
           values={{
             status: isActive,
           }}
@@ -51,7 +51,7 @@ export const StatusCtiSubscription: React.FC<StatusCtiSubscriptionProps> = ({
   const statusBadge = (
     // <div className='wz-margin-h'>
     <EuiHealth
-      onClickAriaLabel={`View ${isActive} CTI subscription status`}
+      onClickAriaLabel={`View ${isActive} CTI registration status`}
       color={colorHealth}
     />
     // </div>
@@ -66,20 +66,20 @@ export const StatusCtiSubscription: React.FC<StatusCtiSubscriptionProps> = ({
     >
       <EuiText style={{ width: 300 }}>
         <FormattedMessage
-          id='wazuhCheckUpdates.ctiSubscription.statusPopover'
-          defaultMessage='Your CTI subscription is {status}.'
+          id='wazuhCheckUpdates.ctiRegistration.statusPopover'
+          defaultMessage='Your CTI registration is {status}.'
           values={{
             status: isActive,
           }}
         />
         <FormattedMessage
-          id='wazuhCheckUpdates.ctiSubscription.statusPopover'
-          defaultMessage='Want to refresh the status of your subscription?'
+          id='wazuhCheckUpdates.ctiRegistration.statusPopover'
+          defaultMessage='Want to refresh the status of your registration?'
         />
       </EuiText>
       <EuiButton onClick={handleCheckStatus} isLoading={isLoading}>
         <FormattedMessage
-          id='wazuhCheckUpdates.ctiSubscription.checkStatus'
+          id='wazuhCheckUpdates.ctiRegistration.checkStatus'
           defaultMessage='Check Status'
         />
       </EuiButton>

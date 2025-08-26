@@ -9,8 +9,8 @@
       "tz_offset": 0,
       "tz_name": "UTC",
       "uuid": "c842f85c-c24b-4b39-9508-093ce53482e7",
-      "subscription": {
-        "status": "processing"
+      "registration": {
+        "status": "pending"
       }
     }
   ],

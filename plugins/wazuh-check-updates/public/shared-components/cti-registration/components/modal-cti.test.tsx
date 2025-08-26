@@ -43,9 +43,9 @@ describe('ModalCti component', () => {
       />,
     );
     expect(
-      getByText('Do you want to subscribe to CTI updates?'),
+      getByText('Do you want to register to CTI updates?'),
     ).toBeInTheDocument();
-    expect(getByText('Yes, I want to subscribe')).toBeInTheDocument();
+    expect(getByText('Yes, I want to register')).toBeInTheDocument();
   });
 
   it('should handle button click and open verification URI', async () => {
@@ -55,7 +55,7 @@ describe('ModalCti component', () => {
         handleStatusModalToggle={handleStatusModalToggleMock}
       />,
     );
-    const button = getByText('Yes, I want to subscribe');
+    const button = getByText('Yes, I want to register');
     act(() => {
       fireEvent.click(button);
       // TODO: remove this advanceTimersByTime when not using fake timers

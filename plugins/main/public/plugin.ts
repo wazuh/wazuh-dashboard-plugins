@@ -195,7 +195,7 @@ export class WazuhPlugin
     }
 
     // Registrar el control de navegación del header
-    registerHeaderNavControl(core, plugins.wazuhCheckUpdates.CtiSubscription);
+    registerHeaderNavControl(core, plugins.wazuhCheckUpdates.CtiRegistration);
 
     setCore(core);
     setPlugins(plugins);

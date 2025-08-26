@@ -1,8 +1,8 @@
-import { CtiStatus } from '../shared-components/cti-subscription/types';
+import { CtiStatus } from '../shared-components/cti-registration/types';
 
 export interface apiInfo {
   affected_items: Array<{
-    subscription: {
+    registration: {
       status: CtiStatus;
     };
   }>;

@@ -23,7 +23,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   const handleButtonClick = () => {
     setLoading(true);
 
-    // TODO: Replace with actual API call to start CTI subscription
+    // TODO: Replace with actual API call to start CTI registration
     setTimeout(() => {
       const ctiResponse = {
         device_code: 'test_device_code',
@@ -35,7 +35,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       };
 
       setLoading(false);
-      window.open(ctiResponse.verification_uri_complete, '_blank');
+      window.open(ctiResponse.verification_uri_complete, 'wazuh_cti');
       handleStatusModalToggle?.();
       handleModalToggle();
     }, 2000);
@@ -47,8 +47,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         <EuiModalHeaderTitle>
           <EuiTitle>
             <FormattedMessage
-              id='wazuhCheckUpdates.ctiSubscription.modalTitle'
-              defaultMessage='Do you want to subscribe to CTI updates?'
+              id='wazuhCheckUpdates.ctiRegistration.modalTitle'
+              defaultMessage='Do you want to register to CTI updates?'
             />
           </EuiTitle>
         </EuiModalHeaderTitle>
@@ -57,8 +57,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       <EuiModalBody>
         <EuiText>
           <FormattedMessage
-            id='wazuhCheckUpdates.ctiSubscription.modalBodyAdditional'
-            defaultMessage='If you subscribe, you will receive updates about CTI changes and improvements. For more information, visit our {documentationCTIWazuh}.'
+            id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
+            defaultMessage='If you register, you will receive updates about CTI changes and improvements. For more information, visit our {documentationCTIWazuh}.'
             values={{
               documentationCTIWazuh: (
                 <EuiLink
@@ -66,7 +66,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                   target='_blank'
                 >
                   <FormattedMessage
-                    id='wazuhCheckUpdates.ctiSubscription.modalBodyAdditionalLink'
+                    id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditionalLink'
                     defaultMessage='documentation'
                   />
                 </EuiLink>
@@ -79,14 +79,14 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       <EuiModalFooter>
         <EuiButtonEmpty onClick={handleModalToggle}>
           <FormattedMessage
-            id='wazuhCheckUpdates.ctiSubscription.modalButtonCancel'
+            id='wazuhCheckUpdates.ctiRegistration.modalButtonCancel'
             defaultMessage='Cancel'
           />
         </EuiButtonEmpty>
         <EuiButton isLoading={loading} onClick={handleButtonClick} fill>
           <FormattedMessage
-            id='wazuhCheckUpdates.ctiSubscription.modalButtonSubscribe'
-            defaultMessage='Yes, I want to subscribe'
+            id='wazuhCheckUpdates.ctiRegistration.modalButtonSubscribe'
+            defaultMessage='Yes, I want to register'
           />
         </EuiButton>
       </EuiModalFooter>

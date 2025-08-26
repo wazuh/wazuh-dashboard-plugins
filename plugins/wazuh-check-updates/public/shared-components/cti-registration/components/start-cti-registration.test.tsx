@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { StartCtiSubscription } from './start-cti-subscription';
+import { StartCtiRegistration } from './start-cti-registration';
 
 // Mock @osd/i18n to handle FormattedMessage components
 jest.mock('@osd/i18n', () => ({
@@ -32,7 +32,7 @@ jest.mock('../../../plugin-services.ts', () => ({
 
 const { getCore } = require('../../../plugin-services.ts');
 
-describe('StartCtiSubscription component', () => {
+describe('StartCtiRegistration component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getCore as jest.Mock).mockImplementation(mockGetCore);
@@ -42,20 +42,20 @@ describe('StartCtiSubscription component', () => {
   it('should render EuiButtonEmpty when newHomePage is disabled', () => {
     mockUiSettings.get.mockReturnValue(false);
     const { getByText, getByRole } = render(
-      <StartCtiSubscription handleModalToggle={handleModalToggleMock} />,
+      <StartCtiRegistration handleModalToggle={handleModalToggleMock} />,
     );
 
-    expect(getByText('Registry')).toBeInTheDocument();
+    expect(getByText('Register')).toBeInTheDocument();
     expect(getByRole('button')).toHaveClass('euiButtonEmpty');
   });
 
   it('should render EuiButtonIcon when newHomePage is enabled', async () => {
     mockUiSettings.get.mockReturnValue(true);
     const { getByRole, queryByText, findByText } = render(
-      <StartCtiSubscription handleModalToggle={handleModalToggleMock} />,
+      <StartCtiRegistration handleModalToggle={handleModalToggleMock} />,
     );
 
-    expect(queryByText('Registry')).not.toBeInTheDocument();
+    expect(queryByText('Register')).not.toBeInTheDocument();
 
     const buttonIcon = getByRole('button');
 
@@ -72,7 +72,7 @@ describe('StartCtiSubscription component', () => {
   it('should call handleModalToggle when EuiButtonEmpty is clicked', () => {
     mockUiSettings.get.mockReturnValue(false);
     const { getByRole } = render(
-      <StartCtiSubscription handleModalToggle={handleModalToggleMock} />,
+      <StartCtiRegistration handleModalToggle={handleModalToggleMock} />,
     );
 
     fireEvent.click(getByRole('button'));
@@ -82,7 +82,7 @@ describe('StartCtiSubscription component', () => {
   it('should call handleModalToggle when EuiButtonIcon is clicked', () => {
     mockUiSettings.get.mockReturnValue(true);
     const { getByRole } = render(
-      <StartCtiSubscription handleModalToggle={handleModalToggleMock} />,
+      <StartCtiRegistration handleModalToggle={handleModalToggleMock} />,
     );
 
     fireEvent.click(getByRole('button'));

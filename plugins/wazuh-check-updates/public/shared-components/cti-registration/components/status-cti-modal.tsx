@@ -26,13 +26,15 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
 }) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  const handleCheckStatus = async () => {
-    setIsLoading(true);
+  React.useEffect(() => {
+    const fetchStatus = async () => {
+      setIsLoading(true);
+      await checkCtiStatus();
+      setIsLoading(false);
+    };
 
-    await checkCtiStatus();
-
-    setIsLoading(false);
-  };
+    fetchStatus();
+  }, [checkCtiStatus]);
 
   return (
     <EuiModal onClose={handleStatusModalToggle}>
@@ -40,8 +42,8 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
         <EuiModalHeaderTitle>
           <EuiTitle>
             <FormattedMessage
-              id='wazuhCheckUpdates.ctiSubscription.statusModalTitle'
-              defaultMessage='CTI Subscription Status'
+              id='wazuhCheckUpdates.ctiRegistration.statusModalTitle'
+              defaultMessage='CTI Registration Status'
             />
           </EuiTitle>
         </EuiModalHeaderTitle>
@@ -50,14 +52,14 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
       <EuiModalBody>
         <EuiText>
           <FormattedMessage
-            id='wazuhCheckUpdates.ctiSubscription.statusModalBody'
+            id='wazuhCheckUpdates.ctiRegistration.statusModalBody'
             defaultMessage='To continue, please complete the form on the page that opened. There you can finish the process or check the status of your request.'
           />
         </EuiText>
         <EuiSpacer size='m' />
         <EuiText>
           <FormattedMessage
-            id='wazuhCheckUpdates.ctiSubscription.statusModalBodyLink'
+            id='wazuhCheckUpdates.ctiRegistration.statusModalBodyLink'
             defaultMessage='If no page was opened, you can access the form directly using the following link: {link}'
             values={{
               link: (
@@ -78,8 +80,8 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
         >
           <EuiDescriptionListTitle>
             <FormattedMessage
-              id='wazuhCheckUpdates.ctiSubscription.statusSubscription'
-              defaultMessage='Subscription status:'
+              id='wazuhCheckUpdates.ctiRegistration.statusRegistration'
+              defaultMessage='Registration status:'
             />
           </EuiDescriptionListTitle>
           <EuiDescriptionListDescription>
@@ -88,7 +90,7 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
                 color={isActive === CtiStatus.ACTIVE ? 'success' : 'warning'}
               >
                 <FormattedMessage
-                  id='wazuhCheckUpdates.ctiSubscription.statusActive'
+                  id='wazuhCheckUpdates.ctiRegistration.statusActive'
                   defaultMessage='{status}'
                   values={{ status: isActive }}
                 />
@@ -101,10 +103,9 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
       </EuiModalBody>
 
       <EuiModalFooter>
-        <EuiButton onClick={handleCheckStatus}>Check status</EuiButton>
         <EuiButton onClick={handleStatusModalToggle} fill>
           <FormattedMessage
-            id='wazuhCheckUpdates.ctiSubscription.statusModalDone'
+            id='wazuhCheckUpdates.ctiRegistration.statusModalDone'
             defaultMessage='Finish process'
           />
         </EuiButton>

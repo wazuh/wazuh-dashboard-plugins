@@ -4,7 +4,7 @@ import { CoreStart } from 'opensearch_dashboards/public';
 
 export const registerHeaderNavControl = (
   coreStart: CoreStart,
-  Components: React.ComponentType<{ isNewHomePageEnable: boolean }>,
+  Components: React.ComponentType,
   params?: {},
 ) => {
   const isNewHomePageEnable = coreStart.uiSettings.get('home:useNewHomePage');
@@ -14,10 +14,7 @@ export const registerHeaderNavControl = (
   ]({
     order: 100,
     mount: (el: HTMLElement) => {
-      ReactDOM.render(
-        <Components {...params} isNewHomePageEnable={isNewHomePageEnable} />,
-        el,
-      );
+      ReactDOM.render(<Components {...params} />, el);
 
       return () => {
         ReactDOM.unmountComponentAtNode(el);
