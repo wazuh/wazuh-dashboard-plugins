@@ -29,7 +29,13 @@
  */
 
 import React, { FunctionComponent } from 'react';
-import { EuiTabs, EuiTab, EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
+import {
+  EuiTabs,
+  EuiTab,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSpacer,
+} from '@elastic/eui';
 
 interface CommonProps {
   disabled: boolean;
@@ -66,8 +72,12 @@ export const TopNavMenu: FunctionComponent<Props> = ({
   rightContainerChildren,
 }) => {
   if (useUpdatedUX) {
-    const leftMenus = items.filter((item) => item.position === MenuItemPosition.LEFT);
-    const rightMenus = items.filter((item) => item.position === MenuItemPosition.RIGHT);
+    const leftMenus = items.filter(
+      item => item.position === MenuItemPosition.LEFT,
+    );
+    const rightMenus = items.filter(
+      item => item.position === MenuItemPosition.RIGHT,
+    );
     const renderMenus = (item: TopNavMenuItem, idx: number) => {
       const commonProps: CommonProps = {
         disabled: !!disabled,
@@ -83,15 +93,15 @@ export const TopNavMenu: FunctionComponent<Props> = ({
     };
     return (
       <>
-        <EuiSpacer size="s" />
-        <EuiFlexGroup justifyContent="spaceBetween">
+        <EuiSpacer size='s' />
+        <EuiFlexGroup justifyContent='spaceBetween'>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="m">
+            <EuiFlexGroup gutterSize='m'>
               {leftMenus.map((item, index) => renderMenus(item, index))}
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize="m">
+            <EuiFlexGroup gutterSize='m'>
               {rightContainerChildren}
               {rightMenus.map((item, index) => renderMenus(item, index))}
             </EuiFlexGroup>
@@ -103,7 +113,7 @@ export const TopNavMenu: FunctionComponent<Props> = ({
   }
 
   return (
-    <EuiTabs size="s">
+    <EuiTabs size='s'>
       {items.map((item, idx) => {
         return (
           <EuiTab
