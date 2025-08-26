@@ -10,7 +10,7 @@ export const StartCtiRegistration: React.FC<LinkCtiProps> = ({
   const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
 
   const navButtonTopRight = (
-    <EuiToolTip position='bottom' content='Subscribe to CTI updates'>
+    <EuiToolTip position='bottom' content='register to CTI updates'>
       <EuiButtonEmpty iconType='globe' onClick={() => handleModalToggle()}>
         <FormattedMessage
           id='wazuhCheckUpdates.ctiRegistration.openModalRegister'
@@ -21,9 +21,9 @@ export const StartCtiRegistration: React.FC<LinkCtiProps> = ({
   );
 
   const navButtonBottomLeft = (
-    <EuiToolTip position='top' content='Subscribe to CTI updates'>
+    <EuiToolTip position='top' content='register to CTI updates'>
       <EuiButtonIcon
-        aria-label='Subscribe to CTI updates'
+        aria-label='register to CTI updates'
         color='text'
         iconType='globe'
         onClick={() => handleModalToggle()}

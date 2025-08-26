@@ -13,21 +13,21 @@ switch (subscriptionStatus) {
       .withFile('cluster/node-info/node-info-active.json');
     break;
   case 'inactive':
-    storeWazuh.save('subscription', 'processing');
+    storeWazuh.save('subscription', 'pending');
     storeWazuh.save('attempt', attempt + 1);
     respond()
       .withStatusCode(200)
       .withFile('cluster/node-info/node-info-inactive.json');
     break;
-  case 'processing':
+  case 'pending':
     if (attempt === 5) {
       storeWazuh.save('subscription', 'active');
     } else {
-      storeWazuh.save('subscription', 'processing');
+      storeWazuh.save('subscription', 'pending');
       storeWazuh.save('attempt', attempt + 1);
     }
     respond()
       .withStatusCode(200)
-      .withFile('cluster/node-info/node-info-processing.json');
+      .withFile('cluster/node-info/node-info-pending.json');
     break;
 }

@@ -85,7 +85,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         </EuiButtonEmpty>
         <EuiButton isLoading={loading} onClick={handleButtonClick} fill>
           <FormattedMessage
-            id='wazuhCheckUpdates.ctiRegistration.modalButtonSubscribe'
+            id='wazuhCheckUpdates.ctiRegistration.modalButtonRegister'
             defaultMessage='Yes, I want to register'
           />
         </EuiButton>

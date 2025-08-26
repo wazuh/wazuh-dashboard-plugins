@@ -59,13 +59,10 @@ describe('StartCtiRegistration component', () => {
 
     const buttonIcon = getByRole('button');
 
-    expect(buttonIcon).toHaveAttribute(
-      'aria-label',
-      'Subscribe to CTI updates',
-    );
+    expect(buttonIcon).toHaveAttribute('aria-label', 'Register to CTI updates');
     fireEvent.mouseEnter(buttonIcon);
 
-    const tooltip = await findByText('Subscribe to CTI updates');
+    const tooltip = await findByText('Register to CTI updates');
     expect(tooltip).toBeInTheDocument();
   });
 

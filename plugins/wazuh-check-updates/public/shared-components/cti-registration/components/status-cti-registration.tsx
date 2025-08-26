@@ -49,12 +49,10 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   );
 
   const statusBadge = (
-    // <div className='wz-margin-h'>
     <EuiHealth
       onClickAriaLabel={`View ${isActive} CTI registration status`}
       color={colorHealth}
     />
-    // </div>
   );
 
   return (
@@ -72,17 +70,7 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
             status: isActive,
           }}
         />
-        <FormattedMessage
-          id='wazuhCheckUpdates.ctiRegistration.statusPopover'
-          defaultMessage='Want to refresh the status of your registration?'
-        />
       </EuiText>
-      <EuiButton onClick={handleCheckStatus} isLoading={isLoading}>
-        <FormattedMessage
-          id='wazuhCheckUpdates.ctiRegistration.checkStatus'
-          defaultMessage='Check Status'
-        />
-      </EuiButton>
     </EuiPopover>
   );
 };

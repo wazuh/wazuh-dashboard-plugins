@@ -1,13 +1,8 @@
 import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
-  EuiBadge,
   EuiButton,
-  EuiDescriptionList,
-  EuiDescriptionListDescription,
-  EuiDescriptionListTitle,
   EuiLink,
-  EuiLoadingSpinner,
   EuiModal,
   EuiModalBody,
   EuiModalFooter,
@@ -17,7 +12,7 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
-import { CtiStatus, StatusCtiModalProps } from '../types';
+import { StatusCtiModalProps } from '../types';
 
 export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
   handleStatusModalToggle,
@@ -43,7 +38,7 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
           <EuiTitle>
             <FormattedMessage
               id='wazuhCheckUpdates.ctiRegistration.statusModalTitle'
-              defaultMessage='CTI Registration Status'
+              defaultMessage='CTI registration status'
             />
           </EuiTitle>
         </EuiModalHeaderTitle>
@@ -70,43 +65,13 @@ export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
             }}
           />
         </EuiText>
-        <EuiSpacer size='m' />
-        <EuiDescriptionList
-          type='column'
-          align='center'
-          descriptionProps={{
-            style: { textAlign: 'right' },
-          }}
-        >
-          <EuiDescriptionListTitle>
-            <FormattedMessage
-              id='wazuhCheckUpdates.ctiRegistration.statusRegistration'
-              defaultMessage='Registration status:'
-            />
-          </EuiDescriptionListTitle>
-          <EuiDescriptionListDescription>
-            {!isLoading ? (
-              <EuiBadge
-                color={isActive === CtiStatus.ACTIVE ? 'success' : 'warning'}
-              >
-                <FormattedMessage
-                  id='wazuhCheckUpdates.ctiRegistration.statusActive'
-                  defaultMessage='{status}'
-                  values={{ status: isActive }}
-                />
-              </EuiBadge>
-            ) : (
-              <EuiLoadingSpinner size='m' />
-            )}
-          </EuiDescriptionListDescription>
-        </EuiDescriptionList>
       </EuiModalBody>
 
       <EuiModalFooter>
         <EuiButton onClick={handleStatusModalToggle} fill>
           <FormattedMessage
             id='wazuhCheckUpdates.ctiRegistration.statusModalDone'
-            defaultMessage='Finish process'
+            defaultMessage='Close'
           />
         </EuiButton>
       </EuiModalFooter>
