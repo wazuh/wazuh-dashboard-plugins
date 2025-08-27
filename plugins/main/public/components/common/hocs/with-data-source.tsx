@@ -18,7 +18,7 @@ export const PromptErrorInitializatingDataSource = (props: {
   return (
     <EuiEmptyPrompt
       iconType='alert'
-      title={<h2>Data source was not initialized</h2>}
+      title={<h2>Data source has an error</h2>}
       body={<>{typeof props.error === 'string' && <p>{props.error}</p>}</>}
     />
   );
@@ -90,7 +90,9 @@ export const withDataSource =
       DataSource: DataSourceBuilder,
       repository: new DataSourceRepositoryCreatorBuilder(),
     });
-    return <WrappedCompoment {...props} {...{ [nameProp]: dataSource }} />;
+    return (
+      <WrappedCompoment {...props} {...{ [nameProp]: { ...dataSource } }} />
+    );
   };
 
 /**
@@ -160,6 +162,7 @@ export const withDataSourceFetchOnStart =
   props => {
     const dataSource = get(props, nameProp);
     const fetch = useCallback(async (...dependencies: any[]) => {
+      // FIXME: there is a bug that caches the inital filters
       const response = await dataSource.fetchData(
         mapRequestParams
           ? mapRequestParams({ ...props, dataSource, dependencies })
