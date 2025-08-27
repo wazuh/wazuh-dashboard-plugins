@@ -1,7 +1,7 @@
 import React from 'react';
 import useObservable from 'react-use/lib/useObservable';
 import { EuiEmptyPrompt } from '@elastic/eui';
-import { WzRequest } from '../../../react-services';
+import { AppState, WzRequest } from '../../../react-services';
 
 const PromptServerAPIUnavailable = () => (
   <EuiEmptyPrompt
@@ -26,6 +26,34 @@ export const withServerAPIAvailable = WrappedComponent => props => {
 
   if (!available) {
     return <PromptServerAPIUnavailable />;
+  }
+
+  return <WrappedComponent {...props} />;
+};
+
+const PromptServerAPINotSelected = () => (
+  <EuiEmptyPrompt
+    iconType='alert'
+    title={<h2>Server API is not selected</h2>}
+    body={
+      <div>
+        <p>
+          The server API is not selected. Select it using the server API
+          selector.
+        </p>
+      </div>
+    }
+  />
+);
+
+export const withSelectedServerAPI = WrappedComponent => props => {
+  const available = useObservable(
+    AppState.selectedServerAPIChanged$,
+    AppState.selectedServerAPI$.getValue(),
+  );
+
+  if (!available) {
+    return <PromptServerAPINotSelected />;
   }
 
   return <WrappedComponent {...props} />;
