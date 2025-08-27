@@ -28,3 +28,4 @@ export * from './with-wrap-component';
 export * from './with-inject-props';
 export * from './with-health-check';
 export * from './with-agent';
+export * from './with-server-api-available';

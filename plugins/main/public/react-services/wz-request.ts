@@ -19,10 +19,15 @@ import { getCore, getHttp, getToasts } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
-import { first } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+import { first, distinctUntilChanged } from 'rxjs/operators';
 
 export class WzRequest {
   static wazuhConfig: any;
+  static serverAPIStatus$ = new BehaviorSubject(true);
+  static serverAPIAvailable$ = this.serverAPIStatus$.pipe(
+    distinctUntilChanged(),
+  );
 
   static async setupAPIInCookie() {
     const currentApiDataCookie = AppState.getCurrentAPI();
@@ -107,10 +112,12 @@ export class WzRequest {
       const isSet = await fn.call(this);
 
       if (isSet) {
+        this.serverAPIStatus$.next(true);
         return;
       }
     }
 
+    this.serverAPIStatus$.next(false);
     getToasts.add({
       color: 'danger',
       text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
@@ -172,6 +179,7 @@ export class WzRequest {
       };
 
       const data = await request(options);
+      this.serverAPIStatus$.next(true);
 
       if (data['error']) {
         throw new Error(data['error']);
@@ -194,6 +202,7 @@ export class WzRequest {
                 .getPathname()
                 .startsWith('/settings')
             ) {
+              this.serverAPIStatus$.next(false);
               const title = `API with ID [${currentApi.id}] is not available.`;
               const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
 
