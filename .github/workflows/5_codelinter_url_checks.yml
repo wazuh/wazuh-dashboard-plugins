@@ -1,4 +1,4 @@
-name: URL Checks
+name: (5.x) URL Checks
 
 on:
   pull_request:

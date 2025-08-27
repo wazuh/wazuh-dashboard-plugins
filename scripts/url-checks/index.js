@@ -10,7 +10,6 @@ See /docker/url-checks/docker-compose.yml for available environment variables.
 # Usage:
 # -------------
 #   - node scripts/url-checks.js
-#   - yarn url-checks
 */
 
 const childProcess = require('child_process');
