@@ -16,7 +16,10 @@ import { useUserPermissionsIsAdminRequirements } from '../hooks/use-user-is-admi
 import { WzEmptyPromptNoPermissions } from '../permissions/prompt';
 import { compose } from 'redux';
 import { withUserLogged } from './withUserLogged';
-import { withServerAPIAvailable } from './with-server-api-available';
+import {
+  withSelectedServerAPI,
+  withServerAPIAvailable,
+} from './with-server-api-available';
 //
 const withUserAuthorizationPromptChanged =
   (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
@@ -49,6 +52,7 @@ export const withUserAuthorizationPrompt =
   WrappedComponent =>
     compose(
       withUserLogged,
+      withSelectedServerAPI,
       withServerAPIAvailable,
       withUserAuthorizationPromptChanged(permissions, othersPermissions),
     )(WrappedComponent);
