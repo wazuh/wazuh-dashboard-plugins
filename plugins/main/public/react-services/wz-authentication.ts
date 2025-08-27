@@ -96,7 +96,7 @@ export class WzAuthentication {
       store.dispatch(updateWithUserLogged(true));
 
       // Set server API as available
-      WzRequest.serverAPIStatus$.next(true);
+      WzRequest.serverAPIAvailable$.next(true);
     } catch (error) {
       const options: UIErrorLog = {
         context: `${WzAuthentication.name}.refresh`,
@@ -118,7 +118,7 @@ export class WzAuthentication {
       );
       store.dispatch(updateWithUserLogged(true));
       // Set server API as unavailable
-      WzRequest.serverAPIStatus$.next(false);
+      WzRequest.serverAPIAvailable$.next(false);
       return Promise.reject(error);
     }
   }

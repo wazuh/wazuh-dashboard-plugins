@@ -20,8 +20,8 @@ const PromptServerAPIUnavailable = () => (
 
 export const withServerAPIAvailable = WrappedComponent => props => {
   const available = useObservable(
-    WzRequest.serverAPIAvailable$,
-    WzRequest.serverAPIStatus$.getValue(),
+    WzRequest.serverAPIAvailableChanged$,
+    WzRequest.serverAPIAvailable$.getValue(),
   );
 
   if (!available) {
