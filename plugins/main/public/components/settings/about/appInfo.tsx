@@ -1,14 +1,7 @@
-import { EuiCallOut, EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 import React from 'react';
-import { AppInfo } from '../types';
+import { EuiCallOut, EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 
-interface SettingsAboutAppInfoProps {
-  appInfo?: AppInfo;
-}
-
-export const SettingsAboutAppInfo = ({
-  appInfo,
-}: SettingsAboutAppInfoProps) => {
+export const SettingsAboutAppInfo = ({ appInfo }: { appInfo: string }) => {
   return (
     <EuiCallOut>
       <EuiFlexGroup
@@ -18,8 +11,7 @@ export const SettingsAboutAppInfo = ({
       >
         <EuiFlexItem>
           <EuiText>
-            App version:{' '}
-            <b>{appInfo?.['app-version'] ? appInfo['app-version'] : ''}</b>
+            App version: <b>{appInfo}</b>
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
