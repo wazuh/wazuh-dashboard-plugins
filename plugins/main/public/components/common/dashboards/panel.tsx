@@ -71,6 +71,7 @@ export const createPanel = ({
     withDataSourceInitiated({
       isLoadingNameProp: 'dataSource.isLoading',
       dataSourceNameProp: 'dataSource.dataSource',
+      dataSourceErrorNameProp: 'dataSource.error',
     }),
   )(
     ({
