@@ -3,7 +3,7 @@ import { installDashboardAssistantUseCase } from './install-dashboard-assistant'
 describe('installDashboardAssistantUseCase', () => {
   it('returns success with data when orchestrator resolves', async () => {
     const data = { agentId: 'agent-1', modelId: 'model-1' };
-    const execute = jest.fn().mockResolvedValue({ data });
+    const execute = jest.fn().mockResolvedValue({ success: true, data });
     const orchestrator = { execute } as any;
 
     const useCase = installDashboardAssistantUseCase(orchestrator);

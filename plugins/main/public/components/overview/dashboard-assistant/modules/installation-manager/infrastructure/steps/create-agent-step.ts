@@ -35,20 +35,22 @@ export class CreateAgentStep extends InstallationAIAssistantStep {
         {
           type: Tool.SEARCH_INDEX_TOOL,
           name: 'alerts',
-          description: "Search Wazuh alerts",
+          description: 'Search Wazuh alerts',
           include_output_in_agent_response: false,
           config: {
-            input: "{ \"index\": \"wazuh-alerts-*\", \"size\": 200, \"track_total_hits\": true, \"query\": { \"query\": { \"bool\": { \"must\": [ { \"query_string\": { \"query\": \"${parameters.llm_generated_input}\", \"lenient\": true, \"default_operator\": \"AND\", \"analyze_wildcard\": true, \"fields\": [ \"rule.description\", \"rule.id\", \"rule.level\", \"rule.groups\", \"agent.name\", \"agent.id\", \"agent.ip\", \"syscheck.event\", \"full_log\", \"decoder.name\", \"predecoder.program_name\", \"location\", \"input.type\", \"@timestamp\" ] } } ] } } } }"
-          }
+            input:
+              '{ "index": "wazuh-alerts-*", "size": 200, "track_total_hits": true, "query": { "query": { "bool": { "must": [ { "query_string": { "query": "${parameters.llm_generated_input}", "lenient": true, "default_operator": "AND", "analyze_wildcard": true, "fields": [ "rule.description", "rule.id", "rule.level", "rule.groups", "agent.name", "agent.id", "agent.ip", "syscheck.event", "full_log", "decoder.name", "predecoder.program_name", "location", "input.type", "@timestamp" ] } } ] } } } }',
+          },
         },
         {
           type: Tool.SEARCH_INDEX_TOOL,
           name: 'vuls',
-          description: "Search Wazuh vulnerabilities",
+          description: 'Search Wazuh vulnerabilities',
           include_output_in_agent_response: false,
           config: {
-            input: "{ \"index\": \"wazuh-states-vulnerabilities-*\", \"size\": 10000, \"track_total_hits\": true, \"query\": { \"query\": { \"bool\": { \"must\": [ { \"query_string\": { \"query\": \"${parameters.llm_generated_input}\", \"lenient\": true, \"default_operator\": \"AND\", \"analyze_wildcard\": true, \"fields\": [ \"vulnerability.id\", \"vulnerability.severity\", \"package.name\", \"package.version\", \"agent.name\" ] } } ] } } } }"
-          }
+            input:
+              '{ "index": "wazuh-states-vulnerabilities-*", "size": 10000, "track_total_hits": true, "query": { "query": { "bool": { "must": [ { "query_string": { "query": "${parameters.llm_generated_input}", "lenient": true, "default_operator": "AND", "analyze_wildcard": true, "fields": [ "vulnerability.id", "vulnerability.severity", "package.name", "package.version", "agent.name" ] } } ] } } } }',
+          },
         },
       ],
     };
