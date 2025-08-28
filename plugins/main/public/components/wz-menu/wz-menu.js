@@ -21,7 +21,6 @@ import {
   EuiToolTip,
   EuiLoadingSpinner,
   EuiSelect,
-  EuiIconTip,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
 
