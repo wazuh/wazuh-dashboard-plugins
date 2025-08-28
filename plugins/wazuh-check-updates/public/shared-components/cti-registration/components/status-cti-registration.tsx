@@ -15,31 +15,40 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   checkCtiStatus,
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
-
-  const handleCheckStatus = async () => {
-    setIsLoading(true);
-    await checkCtiStatus();
-    setIsLoading(false);
-  };
 
   const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
 
-  const colorHealth = isActive === CtiStatus.ACTIVE ? 'success' : 'warning';
+  const checkStatus = () => {
+    checkCtiStatus();
+  };
+
+  const statusData = {
+    [CtiStatus.ACTIVE]: {
+      color: 'success',
+      onClickAriaLabel: 'View active CTI registration status',
+      message: 'CTI Registration: {status}',
+    },
+    [CtiStatus.PENDING]: {
+      color: 'warning',
+      onClickAriaLabel: 'View pending CTI registration status',
+      message: 'CTI Registration: {status}',
+    },
+    [CtiStatus.ERROR]: {
+      color: 'danger',
+      onClickAriaLabel: 'View error CTI registration status',
+      message: 'CTI Registration: {status} trying to contact the API.',
+    },
+  };
 
   const statusNavTop = (
     <EuiButtonEmpty>
       <EuiHealth
-        onClickAriaLabel={
-          isActive === CtiStatus.ACTIVE
-            ? 'View active CTI registration status'
-            : 'View pending CTI registration status'
-        }
-        color={colorHealth}
+        onClickAriaLabel={statusData[isActive].onClickAriaLabel}
+        color={statusData[isActive].color}
       >
         <FormattedMessage
           id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
-          defaultMessage={`CTI Registration: {status}`}
+          defaultMessage={statusData[isActive].message}
           values={{
             status: isActive,
           }}
@@ -50,8 +59,8 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
 
   const statusBadge = (
     <EuiHealth
-      onClickAriaLabel={`View ${isActive} CTI registration status`}
-      color={colorHealth}
+      onClickAriaLabel={statusData[isActive].onClickAriaLabel}
+      color={statusData[isActive].color}
     />
   );
 
@@ -65,12 +74,13 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
       <EuiText style={{ width: 300 }}>
         <FormattedMessage
           id='wazuhCheckUpdates.ctiRegistration.statusPopover'
-          defaultMessage='Your CTI registration is {status}.'
+          defaultMessage={statusData[isActive].message}
           values={{
             status: isActive,
           }}
         />
       </EuiText>
+      <EuiButton onClick={checkStatus}>Try again</EuiButton>
     </EuiPopover>
   );
 };

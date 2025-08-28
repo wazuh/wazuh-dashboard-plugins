@@ -7,6 +7,7 @@ export enum CtiStatus {
   ACTIVE = 'active',
   PENDING = 'pending',
   INACTIVE = 'inactive',
+  ERROR = 'error',
 }
 
 export interface StatusCtiRegistrationProps {

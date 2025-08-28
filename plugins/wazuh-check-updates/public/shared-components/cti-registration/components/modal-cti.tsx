@@ -11,6 +11,7 @@ import {
   EuiModalHeaderTitle,
   EuiText,
   EuiTitle,
+  EuiCallOut,
 } from '@elastic/eui';
 import { LinkCtiProps } from '../types';
 
@@ -19,25 +20,40 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   handleStatusModalToggle,
 }) => {
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | null>(null);
 
   const handleButtonClick = () => {
     setLoading(true);
 
     // TODO: Replace with actual API call to start CTI registration
     setTimeout(() => {
-      const ctiResponse = {
-        device_code: 'test_device_code',
-        user_code: 'mock_user_code',
-        verification_uri: 'https://cti.wazuh.com',
-        verification_uri_complete: 'https://cti.wazuh.com',
-        expires_in: 1800,
-        interval: 5,
-      };
+      try {
+        // Simulate possible error - replace with actual API call
+        const shouldFail = Math.random() < 0.4; // 40% chance of error
 
-      setLoading(false);
-      window.open(ctiResponse.verification_uri_complete, 'wazuh_cti');
-      handleStatusModalToggle?.();
-      handleModalToggle();
+        if (shouldFail) {
+          throw new Error('Failed to connect to CTI service');
+        }
+
+        const ctiResponse = {
+          device_code: 'test_device_code',
+          user_code: 'mock_user_code',
+          verification_uri: 'https://cti.wazuh.com',
+          verification_uri_complete: 'https://cti.wazuh.com',
+          expires_in: 1800,
+          interval: 5,
+        };
+
+        setLoading(false);
+        window.open(ctiResponse.verification_uri_complete, 'wazuh_cti');
+        handleStatusModalToggle?.();
+        handleModalToggle();
+      } catch (err) {
+        setLoading(false);
+        setError(
+          'There was an error connecting to the CTI service. Please try again later.',
+        );
+      }
     }, 2000);
   };
 
@@ -74,6 +90,24 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             }}
           />
         </EuiText>
+        {error && (
+          <EuiCallOut
+            title={
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.errorTitle'
+                defaultMessage='Registration Error'
+              />
+            }
+            color='danger'
+            iconType='alert'
+            style={{ marginBottom: '16px' }}
+          >
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.errorMessage'
+              defaultMessage={error}
+            />
+          </EuiCallOut>
+        )}
       </EuiModalBody>
 
       <EuiModalFooter>

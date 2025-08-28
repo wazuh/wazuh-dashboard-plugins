@@ -39,6 +39,7 @@ export const useCtiStatus = () => {
         }
       } catch (error) {
         console.error('Error during polling:', error);
+        setIsActive(CtiStatus.ERROR);
         stopPolling();
       }
     }, 5000);
@@ -65,6 +66,7 @@ export const useCtiStatus = () => {
       }
     } catch (error) {
       console.error('Error checking CTI status:', error);
+      setIsActive(CtiStatus.ERROR);
       stopPolling();
     }
   }, [startPolling, stopPolling]);

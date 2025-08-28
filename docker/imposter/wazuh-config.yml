@@ -199,7 +199,6 @@ resources:
   - method: GET
     path: /cluster/{node_id}/info
     response:
-      statusCode: 200
       scriptFile: cluster/node-info/node-info.js
 
   # Get node config
