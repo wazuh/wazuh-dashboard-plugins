@@ -15,6 +15,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
 
   async getAll() {
     const indexPatterns = await super.getAll();
+    // FIXME: this should take into account the ip.ignore settig to filter the index patterns
     return indexPatterns.filter(this.checkIfAlertsIndexPattern);
   }
 
