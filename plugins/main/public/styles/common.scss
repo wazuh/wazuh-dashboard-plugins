@@ -418,7 +418,7 @@ md-content {
   font-size: 14px !important;
 }
 
-:root:not(:has(#wz-dev-tools-container)) .euiTab.euiTab-isSelected {
+.euiTab.euiTab-isSelected {
   font-weight: 600 !important;
 }
 
