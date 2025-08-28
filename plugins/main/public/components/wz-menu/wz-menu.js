@@ -251,8 +251,6 @@ export const WzMenu = withWindowSize(
       const showSelectorsInPopover =
         this.props.windowSize && this.props.windowSize.width < 1100;
 
-      console.log(this.props);
-
       return (
         <>
           <MountPointPortal setMountPoint={getHeaderActionMenuMounter()}>
