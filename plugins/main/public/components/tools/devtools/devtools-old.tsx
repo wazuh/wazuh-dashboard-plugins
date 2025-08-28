@@ -1080,7 +1080,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
             <DevToolsColumnSeparator />
             <div
               id='wz-dev-right-column'
-              style={{ display: 'flex', flexDirection: 'column' }}
+              style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
             >
               <textarea style={{ display: 'flex' }} id='api_output'></textarea>
             </div>
