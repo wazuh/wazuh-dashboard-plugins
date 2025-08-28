@@ -48,32 +48,12 @@ const gcpAlertsSummary = {
   ],
 };
 
-const osqueryAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['data.osquery.name'],
-    AggregationFields['data.osquery.action'],
-    AggregationFields['agent.name'],
-    AggregationFields['data.osquery.pack'],
-    AggregationFields['data.osquery.calendarTime'],
-  ],
-};
-
 const mitreAlertsSummary = {
   title: 'Alerts summary',
   aggs: [
     AggregationFields['rule.id'],
     AggregationFields['rule.description'],
     AggregationFields['rule.level'],
-  ],
-};
-
-const ciscatAlertsSummary = {
-  title: 'Alerts summary',
-  aggs: [
-    AggregationFields['data.cis.rule_title'],
-    AggregationFields['data.cis.group'],
-    AggregationFields['data.cis.result'],
   ],
 };
 
@@ -138,15 +118,6 @@ const hipaaLastAlerts = {
   ],
 };
 
-// 'Wazuh-App-Agents-OSCAP-Last-alerts'
-const oscapLastAlerts = {
-  title: 'Last alerts',
-  aggs: [
-    AggregationFields['data.oscap.check.title'],
-    AggregationFields['data.oscap.scan.profile.title'],
-  ],
-};
-
 // 'Wazuh-App-Agents-Audit-Last-alerts'
 const auditLastAlerts = {
   title: 'Last alerts',
@@ -176,12 +147,9 @@ export default {
   nist: [nistLastAlerts],
   gcp: [gcpAlertsSummary],
   tsc: [tscAlertsSummary],
-  osquery: [osqueryAlertsSummary],
   mitre: [mitreAlertsSummary],
-  ciscat: [ciscatAlertsSummary],
   pm: [pmAlertsSummary],
   audit: [auditLastAlerts],
-  oscap: [oscapLastAlerts],
   gdpr: [gdprLastAlerts],
   pci: [pciLastAlerts],
   docker: [dockerAlertsSummary],

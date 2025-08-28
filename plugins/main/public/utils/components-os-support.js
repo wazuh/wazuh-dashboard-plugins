@@ -14,21 +14,12 @@ import { vulnerabilityDetection, docker, office365 } from './applications';
 
 export const UnsupportedComponents = {
   [WAZUH_AGENTS_OS_TYPE.LINUX]: [],
-  [WAZUH_AGENTS_OS_TYPE.WINDOWS]: [
-    WAZUH_MODULES_ID.AUDITING,
-    docker.id,
-    WAZUH_MODULES_ID.OPEN_SCAP,
-  ],
-  [WAZUH_AGENTS_OS_TYPE.DARWIN]: [
-    WAZUH_MODULES_ID.AUDITING,
-    docker.id,
-    WAZUH_MODULES_ID.OPEN_SCAP,
-  ],
+  [WAZUH_AGENTS_OS_TYPE.WINDOWS]: [WAZUH_MODULES_ID.AUDITING, docker.id],
+  [WAZUH_AGENTS_OS_TYPE.DARWIN]: [WAZUH_MODULES_ID.AUDITING, docker.id],
   [WAZUH_AGENTS_OS_TYPE.SUNOS]: [vulnerabilityDetection.id, office365.id],
   [WAZUH_AGENTS_OS_TYPE.OTHERS]: [
     WAZUH_MODULES_ID.AUDITING,
     docker.id,
-    WAZUH_MODULES_ID.OPEN_SCAP,
     vulnerabilityDetection.id,
     office365.id,
   ],
