@@ -74,7 +74,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
           mode: { name: 'http-request', json: true },
           styleSelectedText: true,
           foldGutter: true,
-          gutters: ['CodeMirror-foldgutter'],
+          gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
           theme: isDarkThemeEnabled ? 'lesser-dark' : 'http-request',
         },
       );
@@ -89,7 +89,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
           lineWrapping: true,
           styleActiveLine: true,
           foldGutter: true,
-          gutters: ['CodeMirror-foldgutter'],
+          gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
           theme: isDarkThemeEnabled ? 'lesser-dark' : 'http-request',
         },
       );
