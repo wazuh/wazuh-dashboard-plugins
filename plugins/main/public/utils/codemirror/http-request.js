@@ -66,8 +66,17 @@
           // Map punctuation
           if (tok === ':') return 'punctuation colon';
           if (tok === ',') return 'punctuation comma';
-          if (tok === '{' || tok === '[' || tok === '(') return 'paren lparen';
-          if (tok === '}' || tok === ']' || tok === ')') return 'paren rparen';
+          // Use the same style for opening and closing brackets so
+          // CodeMirror's brace-fold can correctly detect ranges.
+          if (
+            tok === '{' ||
+            tok === '}' ||
+            tok === '[' ||
+            tok === ']' ||
+            tok === '(' ||
+            tok === ')'
+          )
+            return 'bracket';
 
           // Map primitives
           if (style === 'number') return 'constant numeric';
@@ -160,6 +169,9 @@
       },
 
       lineComment: '#',
+      // Enable folding for JSON bodies and bracketed regions
+      // by using the standard brace fold helper.
+      fold: 'brace',
       helperType: 'http-request',
     };
   });
