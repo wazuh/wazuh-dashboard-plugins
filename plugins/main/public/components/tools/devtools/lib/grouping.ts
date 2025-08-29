@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import jsonLint from '../../../../utils/codemirror/json-lint';
+import CodeMirror from '../../../../utils/codemirror/lib/codemirror';
 import { AppState } from '../../../../react-services';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import {
@@ -9,16 +10,17 @@ import {
   UILogLevel,
 } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { EditorLike, EditorGroup } from './types';
 
 /**
  * Split the current buffer into request groups (method + path + optional JSON body).
  */
-export function analyzeGroups(editor: EditorLike): EditorGroup[] {
+export function analyzeGroups(
+  editor: CodeMirror.EditorLike,
+): CodeMirror.EditorGroup[] {
   try {
     const currentState = editor.getValue().toString();
     AppState.setCurrentDevTools(currentState);
-    const tmpgroups: EditorGroup[] = [];
+    const tmpgroups: CodeMirror.EditorGroup[] = [];
     const splitted = currentState
       .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
       .filter(item => item.replace(/\s/g, '').length);
@@ -115,8 +117,8 @@ export function analyzeGroups(editor: EditorLike): EditorGroup[] {
 export function calculateWhichGroup(
   editor: any,
   firstTime = false,
-  groups: EditorGroup[] = [],
-): EditorGroup | null {
+  groups: CodeMirror.EditorGroup[] = [],
+): CodeMirror.EditorGroup | null {
   try {
     const selection = editor.getCursor();
     const validGroups = groups.filter(item => {
@@ -236,7 +238,7 @@ export function calculateWhichGroup(
 /**
  * Mark the given group as active by highlighting its lines.
  */
-export function highlightGroup(editor: any, group?: EditorGroup) {
+export function highlightGroup(editor: any, group?: CodeMirror.EditorGroup) {
   editor.eachLine((line: any) =>
     editor.removeLineClass(line, 'background', 'CodeMirror-styled-background'),
   );
@@ -261,7 +263,10 @@ export function highlightGroup(editor: any, group?: EditorGroup) {
 /**
  * Validate JSON structure for all groups and render error widgets.
  */
-export function checkJsonParseError(editor: any, groups: EditorGroup[] = []) {
+export function checkJsonParseError(
+  editor: any,
+  groups: CodeMirror.EditorGroup[] = [],
+) {
   const affectedGroups: string[] = [];
   for (const widget of editor.__widgets) {
     editor.removeLineWidget(widget.widget);

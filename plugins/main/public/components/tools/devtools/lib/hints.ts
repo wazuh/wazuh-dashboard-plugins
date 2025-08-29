@@ -226,6 +226,7 @@ export function registerDictionaryHint(editorInput: any) {
             end: { line: currentGroup.start, ch: 0 },
           };
           return [
+            // @ts-ignore
             ...Array(currentGroup.end + 1 - currentGroup.start).keys(),
           ].reduce((jsonBodyKeyCursor: any, lineNumberRange: number) => {
             const editorLineNumber = currentGroup.start + lineNumberRange;
