@@ -44,7 +44,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
       }
 
       // Send request on SHIFT + ENTER
-      $(window.document).keydown(e => {
+      $(window.document).on('keydown', e => {
         if (!multipleKeyPressed.includes(e.which)) {
           setMultipleKeyPressed(state => [...state, e.which]);
         }
@@ -57,7 +57,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
           return send(editorInputRef.current, editorOutputRef.current);
         }
       });
-      $(window.document).keyup(() => setMultipleKeyPressed([]));
+      $(window.document).on('keyup', () => setMultipleKeyPressed([]));
 
       // Create CodeMirror editors
       editorInputRef.current = CodeMirror.fromTextArea(

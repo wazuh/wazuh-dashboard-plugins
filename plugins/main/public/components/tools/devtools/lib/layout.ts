@@ -10,7 +10,7 @@ export function setupResizableColumns(doc: Document) {
     $('.wz-dev-column-separator').addClass('active');
     const leftOrigWidth = $('#wz-dev-left-column').width() as number;
     const rightOrigWidth = $('#wz-dev-right-column').width() as number;
-    $(doc).mousemove(function (e: any) {
+    $(doc).on('mousemove', function (e: any) {
       const leftWidth = e.pageX;
       const rightWidth = leftOrigWidth - leftWidth;
       $('#wz-dev-left-column').css('width', leftWidth);
@@ -18,9 +18,9 @@ export function setupResizableColumns(doc: Document) {
     });
   });
 
-  $(doc).mouseup(function () {
+  $(doc).on('mouseup', function () {
     $('.wz-dev-column-separator').removeClass('active');
-    $(doc).unbind('mousemove');
+    $(doc).off('mousemove');
   });
 }
 
@@ -32,4 +32,3 @@ export function setupDynamicHeight(win: Window) {
   win.onresize = dynamicHeight;
   dynamicHeight();
 }
-
