@@ -239,25 +239,41 @@ export function calculateWhichGroup(
  * Mark the given group as active by highlighting its lines.
  */
 export function highlightGroup(editor: any, group?: CodeMirror.EditorGroup) {
-  editor.eachLine((line: any) =>
-    editor.removeLineClass(line, 'background', 'CodeMirror-styled-background'),
-  );
-  if (group) {
-    if (
-      !group.requestTextJson ||
-      (group.requestText.includes('{') && group.requestText.includes('}'))
-    ) {
-      editor.addLineClass(
-        group.start,
-        'background',
-        'CodeMirror-styled-background',
-      );
-      return;
-    }
-    for (let i = group.start; i <= group.end; i++) {
-      editor.addLineClass(i, 'background', 'CodeMirror-styled-background');
-    }
+  // Keep track of which lines we highlighted last time and clear only those.
+  // This avoids scenarios where iterating all lines misses some and stale
+  // highlights remain when moving between endpoints.
+  if (!editor.__highlightedLines) {
+    editor.__highlightedLines = [] as number[];
   }
+
+  for (const lineNo of editor.__highlightedLines) {
+    editor.removeLineClass(
+      lineNo,
+      'background',
+      'CodeMirror-styled-background',
+    );
+  }
+  editor.__highlightedLines = [];
+
+  if (!group) return;
+
+  const add = (ln: number) => {
+    editor.addLineClass(ln, 'background', 'CodeMirror-styled-background');
+    editor.__highlightedLines.push(ln);
+  };
+
+  // If the request has no JSON body (or everything is inline in braces
+  // on the same line), highlight only the request line. Otherwise
+  // highlight the entire block.
+  if (
+    !group.requestTextJson ||
+    (group.requestText.includes('{') && group.requestText.includes('}'))
+  ) {
+    add(group.start);
+    return;
+  }
+
+  for (let i = group.start; i <= group.end; i++) add(i);
 }
 
 /**
