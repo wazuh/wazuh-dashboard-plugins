@@ -82,26 +82,8 @@
       } else {
         var pos = Pos(cur, 0);
         var range = func && func(cm, pos);
-        if (range && range.to.line - range.from.line >= minSize) {
+        if (range && range.to.line - range.from.line >= minSize)
           mark = marker(opts.indicatorOpen);
-        } else {
-          // Also show marker on lines that contain a closing
-          // bracket (} or ]) by scanning upwards to find a
-          // fold that ends on this line. This enables folding
-          // from closing-brace lines when combined with
-          // foldOptions.scanUp.
-          var text = cm.getLine(cur) || '';
-          if (/[\}\]]/.test(text)) {
-            var first = Math.max(cm.firstLine(), cur - 500); // limit scan for performance
-            for (var l = cur; l >= first; --l) {
-              var r = func && func(cm, Pos(l, 0));
-              if (r && r.to && r.to.line === cur && r.to.line - r.from.line >= minSize) {
-                mark = marker(opts.indicatorOpen);
-                break;
-              }
-            }
-          }
-        }
       }
       cm.setGutterMarker(line, opts.gutter, mark);
       ++cur;
