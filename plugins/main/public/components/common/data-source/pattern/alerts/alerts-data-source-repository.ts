@@ -1,5 +1,7 @@
 import { AppState } from '../../../../../react-services';
+import { PatternDataSourceFactory } from '../pattern-data-source-factory';
 import { PatternDataSourceRepository } from '../pattern-data-source-repository';
+import { AlertsDataSource } from './alerts-data-source';
 
 const ALERTS_REQUIRED_FIELDS = [
   'timestamp',
@@ -69,4 +71,33 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
   getStoreIndexPatternId(): string {
     return AppState.getCurrentPattern();
   }
+
+  async setupDefault(dataSources): Promise<void> {
+    // TODO: it should check the index pattern in the cookie exists and assign the default from the configuration
+    if (!this.getStoreIndexPatternId()) {
+      const [dataSource] = dataSources;
+
+      if (!dataSource) {
+        throw new Error('No compatible index patterns found.');
+      }
+
+      AppState.setCurrentPattern(dataSource.id);
+    }
+  }
+}
+
+// WORKAROUND: This is a workaround to ensure the default alerts index pattern is set when the app starts.
+export async function AlertsDataSourceSetup() {
+  if (AppState.getCurrentPattern()) {
+    return;
+  }
+
+  const factory = new PatternDataSourceFactory();
+  const repository = new AlertsDataSourceRepository();
+
+  const dataSources = await factory.createAll(
+    AlertsDataSource,
+    await repository.getAll(),
+  );
+  repository.setupDefault(dataSources);
 }
