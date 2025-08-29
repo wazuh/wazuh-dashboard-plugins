@@ -134,8 +134,12 @@ export function calculateWhichGroup(
           );
         });
 
-    if (desiredGroup.length === 0 && validGroups.length > 0) {
-      (desiredGroup as any).push(validGroups[0]);
+    // If the cursor isn't within a valid group (e.g. in a comment),
+    // no block is selected: hide controls and exit.
+    if (!firstTime && desiredGroup.length === 0) {
+      $('#wz-dev-tools-buttons--send-request').hide();
+      $('#wz-dev-tools-buttons--go-to-api-reference').hide();
+      return null;
     }
 
     // Place action buttons at the first line from the selected group
@@ -151,18 +155,21 @@ export function calculateWhichGroup(
       return null;
     }
 
-    if (!$('#wz-dev-tools-buttons--send-request').is(':visible')) {
-      $('#wz-dev-tools-buttons--send-request').show();
+    if (desiredGroup[0]) {
+      if (!$('#wz-dev-tools-buttons--send-request').is(':visible')) {
+        $('#wz-dev-tools-buttons--send-request').show();
+      }
+      if (!$('#wz-dev-tools-buttons--go-to-api-reference').is(':visible')) {
+        $('#wz-dev-tools-buttons--go-to-api-reference').show();
+      }
+      // Position buttons relative to the first line of the active block
+      $('#wz-dev-tools-buttons--send-request').offset({
+        top: cords.top + 1,
+      });
+      $('#wz-dev-tools-buttons--go-to-api-reference').offset({
+        top: cords.top + 1,
+      });
     }
-    if (!$('#wz-dev-tools-buttons--go-to-api-reference').is(':visible')) {
-      $('#wz-dev-tools-buttons--go-to-api-reference').show();
-    }
-    $('#wz-dev-tools-buttons--send-request').offset({
-      top: cords.top + 1,
-    });
-    $('#wz-dev-tools-buttons--go-to-api-reference').offset({
-      top: cords.top + 1,
-    });
 
     if (firstTime) highlightGroup(editor, desiredGroup[0]);
 
@@ -211,8 +218,12 @@ export function calculateWhichGroup(
         $('#wz-dev-tools-buttons--go-to-api-reference')
           .attr('href', apiEndpoint.documentation)
           .show();
+        // Keep send button visible only when there's a valid endpoint selected
+        $('#wz-dev-tools-buttons--send-request').show();
       } else {
         $('#wz-dev-tools-buttons--go-to-api-reference').attr('href', '').hide();
+        // Hide send button when there is no valid endpoint at cursor
+        $('#wz-dev-tools-buttons--send-request').hide();
       }
     }
     return desiredGroup[0] || null;

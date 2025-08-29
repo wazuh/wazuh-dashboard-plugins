@@ -52,10 +52,12 @@ export async function initEditors(editorInput: any, editorOutput: any) {
   // Widgets holder & model placeholder
   editorInput.__widgets = [];
   editorInput.model = [];
+  editorInput.__groupsCache = [];
 
   // Change & cursor events
   editorInput.on('change', () => {
     const groups = analyzeGroups(editorInput);
+    editorInput.__groupsCache = groups;
     const currentState = editorInput.getValue().toString();
     AppState.setCurrentDevTools(currentState);
     const currentGroup = calculateWhichGroup(editorInput, undefined, groups);
@@ -70,13 +72,23 @@ export async function initEditors(editorInput: any, editorOutput: any) {
 
   editorInput.on('cursorActivity', () => {
     const groups = analyzeGroups(editorInput);
+    editorInput.__groupsCache = groups;
     const currentGroup = calculateWhichGroup(editorInput, undefined, groups);
     highlightGroup(editorInput, currentGroup as any);
     checkJsonParseError(editorInput, groups);
   });
 
+  // Reposition action buttons while scrolling without changing the cursor
+  editorInput.on('scroll', () => {
+    const groups = editorInput.__groupsCache?.length
+      ? editorInput.__groupsCache
+      : analyzeGroups(editorInput);
+    calculateWhichGroup(editorInput, undefined, groups);
+  });
+
   // Place initial highlight
   const groups = analyzeGroups(editorInput);
+  editorInput.__groupsCache = groups;
   const currentGroup = calculateWhichGroup(editorInput, undefined, groups);
   highlightGroup(editorInput, currentGroup as any);
 
