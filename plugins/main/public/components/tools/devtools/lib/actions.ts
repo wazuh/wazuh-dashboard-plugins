@@ -1,4 +1,4 @@
-import queryString from 'querystring-browser';
+import queryString from 'query-string';
 import { WzRequest, ErrorHandler } from '../../../../react-services';
 import * as FileSaver from '../../../../services/file-saver';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
