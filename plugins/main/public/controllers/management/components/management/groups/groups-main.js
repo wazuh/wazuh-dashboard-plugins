@@ -136,5 +136,7 @@ export default compose(
         ]
       : [{ text: endpointGroups.breadcrumbLabel }];
   }),
+  /* TODO: this component is doing a request to the server API but it is not protected with the requirement permissions, so
+  the errors could be catched by a withErrorBounday if exist */
   withRouterSearch,
 )(WzGroups);
