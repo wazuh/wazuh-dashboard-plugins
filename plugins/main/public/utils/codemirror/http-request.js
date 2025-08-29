@@ -68,15 +68,9 @@
           if (tok === ',') return 'punctuation comma';
           // Use the same style for opening and closing brackets so
           // CodeMirror's brace-fold can correctly detect ranges.
-          if (
-            tok === '{' ||
-            tok === '}' ||
-            tok === '[' ||
-            tok === ']' ||
-            tok === '(' ||
-            tok === ')'
-          )
-            return 'bracket';
+          if (tok === '{' || tok === '}') return 'square-brackets';
+          if (tok === '(' || tok === ')') return 'parentheses';
+          if (tok === '[' || tok === ']') return 'curly-brackets';
 
           // Map primitives
           if (style === 'number') return 'constant numeric';
