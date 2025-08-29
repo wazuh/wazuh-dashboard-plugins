@@ -43,12 +43,6 @@ import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
 import { connect } from 'react-redux';
 import NavigationService from '../../../../../react-services/navigation-service';
-import {
-  existsIndices,
-  existsIndexPattern,
-  createIndexPattern,
-} from '../../../../../react-services';
-import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
