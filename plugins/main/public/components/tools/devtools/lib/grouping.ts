@@ -156,19 +156,42 @@ export function calculateWhichGroup(
     }
 
     if (desiredGroup[0]) {
-      if (!$('#wz-dev-tools-buttons--send-request').is(':visible')) {
-        $('#wz-dev-tools-buttons--send-request').show();
+      // Hide buttons when the target line is outside the editor viewport
+      try {
+        const wrapperEl =
+          editor.getWrapperElement?.() || editor.display?.wrapper || null;
+        const $wrapper = wrapperEl ? $(wrapperEl) : null;
+        const wrapperTop = $wrapper?.offset()?.top ?? 0;
+        const wrapperHeight = $wrapper?.outerHeight?.() ?? 0;
+        const wrapperBottom = wrapperTop + wrapperHeight;
+
+        const lineTop = cords.top + 1; // Page coords provided by CodeMirror
+
+        const isVisible = lineTop >= wrapperTop && lineTop <= wrapperBottom;
+
+        if (!isVisible) {
+          $('#wz-dev-tools-buttons--send-request').hide();
+          $('#wz-dev-tools-buttons--go-to-api-reference').hide();
+        } else {
+          if (!$('#wz-dev-tools-buttons--send-request').is(':visible')) {
+            $('#wz-dev-tools-buttons--send-request').show();
+          }
+          if (!$('#wz-dev-tools-buttons--go-to-api-reference').is(':visible')) {
+            $('#wz-dev-tools-buttons--go-to-api-reference').show();
+          }
+          // Position buttons relative to the first line of the active block
+          $('#wz-dev-tools-buttons--send-request').offset({
+            top: lineTop,
+          });
+          $('#wz-dev-tools-buttons--go-to-api-reference').offset({
+            top: lineTop,
+          });
+        }
+      } catch {
+        // In case of any positioning error, make sure buttons are hidden
+        $('#wz-dev-tools-buttons--send-request').hide();
+        $('#wz-dev-tools-buttons--go-to-api-reference').hide();
       }
-      if (!$('#wz-dev-tools-buttons--go-to-api-reference').is(':visible')) {
-        $('#wz-dev-tools-buttons--go-to-api-reference').show();
-      }
-      // Position buttons relative to the first line of the active block
-      $('#wz-dev-tools-buttons--send-request').offset({
-        top: cords.top + 1,
-      });
-      $('#wz-dev-tools-buttons--go-to-api-reference').offset({
-        top: cords.top + 1,
-      });
     }
 
     if (firstTime) highlightGroup(editor, desiredGroup[0]);
