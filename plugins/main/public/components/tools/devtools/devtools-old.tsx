@@ -116,7 +116,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
             flexDirection: 'column',
             // @ts-ignore
             '--col-separator-width': '14px',
-            '--col-left-width': '50%',
+            '--col-left-width': '46.5%',
             '--col-right-width': 'calc(100% - var(--col-left-width))',
           }}
           className='wz-dev-tools'

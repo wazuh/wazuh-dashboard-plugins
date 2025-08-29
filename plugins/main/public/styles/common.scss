@@ -518,7 +518,6 @@ $sides: left, right;
 @each $side in $sides {
   #wz-dev-#{$side}-column {
     width: calc(var(--col-#{$side}-width) - var(--col-separator-width) / 2);
-    float: #{$side};
   }
 }
 
