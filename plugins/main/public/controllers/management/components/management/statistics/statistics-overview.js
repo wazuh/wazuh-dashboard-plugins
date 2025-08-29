@@ -14,7 +14,6 @@ import React, { Component, useState, useEffect } from 'react';
 import {
   EuiFlexItem,
   EuiFlexGroup,
-  EuiButtonEmpty,
   EuiPanel,
   EuiTitle,
   EuiPage,
@@ -32,17 +31,10 @@ import {
 } from '../../../../../components/common/hocs';
 import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
-import {
-  UI_LOGGER_LEVELS,
-  WAZUH_STATISTICS_PATTERN,
-} from '../../../../../../common/constants';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { getCore } from '../../../../../kibana-services';
-import { appSettings, statistics } from '../../../../../utils/applications';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { statistics } from '../../../../../utils/applications';
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
-import { connect } from 'react-redux';
-import NavigationService from '../../../../../react-services/navigation-service';
 import {
   existsIndices,
   existsIndexPattern,
@@ -178,24 +170,6 @@ export class WzStatisticsOverview extends Component {
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
-            {this.props.configurationUIEditable && (
-              <EuiFlexItem grow={false}>
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiButtonEmpty
-                    href={NavigationService.getInstance().getUrlForApp(
-                      appSettings.id,
-                      {
-                        path: '#/settings?tab=configuration&category=Task:Statistics',
-                      },
-                    )}
-                    iconType='gear'
-                    iconSide='left'
-                  >
-                    Settings
-                  </EuiButtonEmpty>
-                </RedirectAppLinks>
-              </EuiFlexItem>
-            )}
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
@@ -224,19 +198,12 @@ export class WzStatisticsOverview extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  configurationUIEditable:
-    state.appConfig.data?.['configuration.ui_api_editable'],
-  statisticsIndexPatternID: WAZUH_STATISTICS_PATTERN, // TODO: this could be removed
-});
-
 export default compose(
   withGlobalBreadcrumb([{ text: statistics.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
-  connect(mapStateToProps),
 )(props => {
   const [loading, setLoading] = useState(true);
   const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
