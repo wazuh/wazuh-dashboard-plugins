@@ -455,6 +455,10 @@ md-sidenav {
 .wz-dev-tools {
   display: flex;
   margin: 0px !important;
+
+  #wz-dev-tools-buttons--send-request {
+    opacity: 1 !important;
+  }
 }
 
 .wz-app:has(.wz-dev-tools) {
