@@ -529,10 +529,6 @@ $sides: left, right;
   max-width: calc(#{100% - $w} - var(--col-separator-width) / 2);
 }
 
-.wz-dev-tools .CodeMirror {
-  border: 1px solid #ddd !important;
-}
-
 /* Card and select input shadow overriding */
 
 .wz-md-card:not(.wz-metric-color) {
