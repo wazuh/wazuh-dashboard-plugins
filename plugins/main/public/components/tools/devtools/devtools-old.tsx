@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiTab, EuiTabs } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTab,
+  EuiTabs,
+  EuiIcon,
+} from '@elastic/eui';
 import CodeMirror from '../../../utils/codemirror/lib/codemirror';
 import $ from 'jquery';
 import store from '../../../redux/store';
@@ -138,27 +144,30 @@ export const ToolDevTools = withGlobalBreadcrumb([
                   display: 'flex',
                   justifyContent: 'flex-end',
                   position: 'relative',
-                  left: '-0.75rem',
-                  gap: '0.5rem',
+                  left: '-1.25rem',
+                  gap: '0.25rem',
                   height: 0,
                 }}
               >
-                <i
+                <EuiIcon
+                  type='play'
                   onClick={() =>
                     send(editorInputRef.current, editorOutputRef.current)
                   }
-                  title='Click to send the request'
-                  className='fa fa-play wz-dev-tools-buttons--send-request cursor-pointer wz-always-top CodeMirror-styled-background'
+                  title='Send request'
+                  className='cursor-pointer wz-always-top'
                   id='wz-dev-tools-buttons--send-request'
-                  aria-hidden='true'
-                ></i>
+                  color='success'
+                />
                 <a
                   href=''
                   target='__blank'
                   title='Open documentation'
-                  className='fa fa-info-circle cursor-pointer wz-always-top CodeMirror-styled-background'
+                  className='cursor-pointer wz-always-top'
                   id='wz-dev-tools-buttons--go-to-api-reference'
-                ></a>
+                >
+                  <EuiIcon type='documentation' />
+                </a>
               </div>
               <textarea style={{ display: 'flex' }} id='api_input'></textarea>
             </div>
