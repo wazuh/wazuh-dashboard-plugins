@@ -14,7 +14,11 @@ export interface EditorLike {
   /** CodeMirror API: get document object */
   getDoc?: () => { setValue: (value: string) => void };
   /** CodeMirror API: search cursor factory */
-  getSearchCursor?: (query: string, pos?: any, options?: any) => {
+  getSearchCursor?: (
+    query: string,
+    pos?: any,
+    options?: any,
+  ) => {
     findNext: () => boolean;
     from: () => { line: number; ch: number };
   };
@@ -42,4 +46,3 @@ export interface EditorGroup {
 }
 
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
-

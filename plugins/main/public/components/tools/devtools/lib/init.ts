@@ -1,8 +1,12 @@
-import CodeMirror from '../../../../utils/codemirror/lib/codemirror';
 import { ExcludedIntelliSenseTriggerKeys } from '../excluded-devtools-autocomplete-keys';
 import { AppState, GenericRequest } from '../../../../react-services';
 import { DEV_TOOLS_INITIAL_BUFFER } from '../initial-buffer';
-import { analyzeGroups, calculateWhichGroup, checkJsonParseError, highlightGroup } from './grouping';
+import {
+  analyzeGroups,
+  calculateWhichGroup,
+  checkJsonParseError,
+  highlightGroup,
+} from './grouping';
 import { ensureAutocompleteCommand, registerDictionaryHint } from './hints';
 import { setupDynamicHeight, setupResizableColumns } from './layout';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -100,4 +104,3 @@ export async function initEditors(editorInput: any, editorOutput: any) {
     getErrorOrchestrator().handleError(options);
   }
 }
-

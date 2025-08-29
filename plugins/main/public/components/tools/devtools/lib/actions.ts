@@ -9,12 +9,20 @@ import {
   UILogLevel,
 } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { analyzeGroups, calculateWhichGroup, checkJsonParseError } from './grouping';
+import {
+  analyzeGroups,
+  calculateWhichGroup,
+  checkJsonParseError,
+} from './grouping';
 
 /**
  * Perform the request defined in the active group and render the response.
  */
-export async function send(editorInput: any, editorOutput: any, firstTime = false) {
+export async function send(
+  editorInput: any,
+  editorOutput: any,
+  firstTime = false,
+) {
   try {
     const groups = analyzeGroups(editorInput);
     const desiredGroup = calculateWhichGroup(editorInput, firstTime, groups);
@@ -78,20 +86,28 @@ export async function send(editorInput: any, editorOutput: any, firstTime = fals
 
       let JSONraw: any = {};
       try {
-        JSONraw = JSON.parse((paramsInline as string) || desiredGroup.requestTextJson);
+        JSONraw = JSON.parse(
+          (paramsInline as string) || desiredGroup.requestTextJson,
+        );
       } catch (error) {
         JSONraw = {};
       }
 
-      if (typeof (extra as any).pretty !== 'undefined') delete (extra as any).pretty;
+      if (typeof (extra as any).pretty !== 'undefined')
+        delete (extra as any).pretty;
       if (typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
 
       if (typeof JSONraw === 'object') JSONraw.devTools = true;
       if (!firstTime) {
         const response = await WzRequest.apiReq(method, req, JSONraw);
 
-        if (typeof response === 'string' && (response as string).includes('3029')) {
-          editorOutput.setValue('This method is not allowed without admin mode');
+        if (
+          typeof response === 'string' &&
+          (response as string).includes('3029')
+        ) {
+          editorOutput.setValue(
+            'This method is not allowed without admin mode',
+          );
         } else {
           editorOutput.setValue(
             JSON.stringify((response || {}).data || {}, null, 2),

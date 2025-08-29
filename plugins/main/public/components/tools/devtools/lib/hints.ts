@@ -34,7 +34,13 @@ export function registerDictionaryHint(editorInput: any) {
       const currentGroup = calculateWhichGroup(editor, undefined, groups);
       const editorCursor = editor.getCursor();
       // Get http method, path, query params from API request
-      const [inputRequest, inputHttpMethod, inputPath, inputQueryParamsStart, inputQueryParams] =
+      const [
+        inputRequest,
+        inputHttpMethod,
+        inputPath,
+        inputQueryParamsStart,
+        inputQueryParams,
+      ] =
         (currentGroup &&
           currentGroup.requestText &&
           currentGroup.requestText.match(
@@ -51,14 +57,17 @@ export function registerDictionaryHint(editorInput: any) {
         [];
       // Get all API endpoints with http method in the request
       const inputHttpMethodEndpoints =
-        (model.find((item: any) => item.method === inputHttpMethod) || {}).endpoints || [];
+        (model.find((item: any) => item.method === inputHttpMethod) || {})
+          .endpoints || [];
       // Find the API endpoint in the request
       const apiEndpoint = inputHttpMethodEndpoints
         .map((endpoint: any) => ({
           ...endpoint,
           splitURL: endpoint.name.split('/').filter((item: string) => item),
         }))
-        .filter((endpoint: any) => endpoint.splitURL.length === inputEndpoint.length)
+        .filter(
+          (endpoint: any) => endpoint.splitURL.length === inputEndpoint.length,
+        )
         .find((endpoint: any) =>
           endpoint.splitURL.reduce(
             (accum: boolean, str: string, index: number) =>
@@ -92,9 +101,11 @@ export function registerDictionaryHint(editorInput: any) {
           // It is defining query param value query_param=
           const definingQueryParamValue =
             inputQueryParams && inputQueryParams.includes('&')
-              ? (inputRequest as string).lastIndexOf('=') > (inputRequest as string).lastIndexOf('&')
+              ? (inputRequest as string).lastIndexOf('=') >
+                (inputRequest as string).lastIndexOf('&')
               : !!(inputQueryParams || '').includes('?') ||
-                (inputRequest as string).lastIndexOf('=') > (inputRequest as string).lastIndexOf('?');
+                (inputRequest as string).lastIndexOf('=') >
+                  (inputRequest as string).lastIndexOf('?');
 
           if (!definingQueryParamValue && apiEndpoint && apiEndpoint.query) {
             const inputQueryPreviousEntriesKeys = inputQuery
@@ -102,7 +113,8 @@ export function registerDictionaryHint(editorInput: any) {
               .map((query: any) => query.key);
             hints = apiEndpoint.query
               .filter(
-                (query: any) => !inputQueryPreviousEntriesKeys.includes(query.name),
+                (query: any) =>
+                  !inputQueryPreviousEntriesKeys.includes(query.name),
               )
               .map(
                 (item: any) =>
@@ -125,29 +137,36 @@ export function registerDictionaryHint(editorInput: any) {
         } else if (inputHttpMethod) {
           // Get hints for all http method endpoint
           if (!inputPath) {
-            hints = inputHttpMethodEndpoints.map((endpoint: any) => endpoint.name);
+            hints = inputHttpMethodEndpoints.map(
+              (endpoint: any) => endpoint.name,
+            );
           } else {
             // Get hints for requests as: http_method api_path
             hints = inputHttpMethodEndpoints
               .map((endpoint: any) => ({
                 ...endpoint,
-                splitURL: endpoint.name.split('/').filter((item: string) => item),
+                splitURL: endpoint.name
+                  .split('/')
+                  .filter((item: string) => item),
               }))
               .filter((endpoint: any) =>
-                endpoint.splitURL.reduce((accum: boolean, splitPath: string, index: number) => {
-                  if (!accum) {
-                    return accum;
-                  }
-                  if (
-                    splitPath.startsWith(':') ||
-                    !inputEndpoint[index] ||
-                    (inputEndpoint[index] &&
-                      splitPath.startsWith(inputEndpoint[index]))
-                  ) {
-                    return true;
-                  }
-                  return false;
-                }, true),
+                endpoint.splitURL.reduce(
+                  (accum: boolean, splitPath: string, index: number) => {
+                    if (!accum) {
+                      return accum;
+                    }
+                    if (
+                      splitPath.startsWith(':') ||
+                      !inputEndpoint[index] ||
+                      (inputEndpoint[index] &&
+                        splitPath.startsWith(inputEndpoint[index]))
+                    ) {
+                      return true;
+                    }
+                    return false;
+                  },
+                  true,
+                ),
               )
               .map((endpoint: any) =>
                 endpoint.splitURL.reduce(
@@ -180,7 +199,9 @@ export function registerDictionaryHint(editorInput: any) {
           } else if (parameter.type === 'array') {
             valueBodyParam = '[]';
           } else if (parameter.type === 'object') {
-            const paramPropertiesKeys = Object.keys(parameter.properties).sort();
+            const paramPropertiesKeys = Object.keys(
+              parameter.properties,
+            ).sort();
             const lastIndex = paramPropertiesKeys.length - 1;
             valueBodyParam = `{\n${paramPropertiesKeys
               .map(
@@ -237,7 +258,10 @@ export function registerDictionaryHint(editorInput: any) {
             return jsonBodyKeyCursor;
           }, false);
         };
-        const getInnerPropertyBodyParamObject = (object: any, keys: string[]) => {
+        const getInnerPropertyBodyParamObject = (
+          object: any,
+          keys: string[],
+        ) => {
           if (!keys || !keys.length) {
             return object;
           }
@@ -353,9 +377,13 @@ export function registerDictionaryHint(editorInput: any) {
     return {
       list: (!curWord
         ? []
-        : (getDictionary(curLine, curWord) as any[]).filter(function (item: any) {
+        : (getDictionary(curLine, curWord) as any[]).filter(function (
+            item: any,
+          ) {
             const text = (item.text || item) as string;
-            return text.toUpperCase().includes((curWord as string).toUpperCase());
+            return text
+              .toUpperCase()
+              .includes((curWord as string).toUpperCase());
           })
       ).sort(),
       from: CodeMirror.Pos(cur.line, start),
@@ -363,4 +391,3 @@ export function registerDictionaryHint(editorInput: any) {
     };
   });
 }
-

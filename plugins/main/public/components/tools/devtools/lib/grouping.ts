@@ -182,15 +182,19 @@ export function calculateWhichGroup(
         [];
       // Get all API endpoints with http method in the request
       const inputHttpMethodEndpoints =
-        (editor.model.find((item: any) => item.method === inputHttpMethod) || {})
-          .endpoints || [];
+        (
+          editor.model.find((item: any) => item.method === inputHttpMethod) ||
+          {}
+        ).endpoints || [];
       // Find the API endpoint in the request
       const apiEndpoint = inputHttpMethodEndpoints
         .map((endpoint: any) => ({
           ...endpoint,
           splitURL: endpoint.name.split('/').filter((item: string) => item),
         }))
-        .filter((endpoint: any) => endpoint.splitURL.length === inputEndpoint.length)
+        .filter(
+          (endpoint: any) => endpoint.splitURL.length === inputEndpoint.length,
+        )
         .find((endpoint: any) =>
           endpoint.splitURL.reduce(
             (accum: boolean, str: string, index: number) =>
@@ -298,4 +302,3 @@ export function checkJsonParseError(editor: any, groups: EditorGroup[] = []) {
   }
   return affectedGroups;
 }
-
