@@ -5,7 +5,7 @@ import { DynamicHeight } from '../../../../utils/dynamic-height';
  * Enable the draggable separator between editors to resize columns.
  */
 export function setupResizableColumns(doc: Document) {
-  $('.wz-dev-column-separator').mousedown(function (e) {
+  $('.wz-dev-column-separator').on('mousedown', function (e) {
     e.preventDefault();
     $('.wz-dev-column-separator').addClass('active');
     // Capture initial state to compute deltas instead of using absolute pageX
