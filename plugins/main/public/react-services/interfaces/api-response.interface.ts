@@ -14,4 +14,6 @@ interface IResponseData<T> {
 
 export default interface IApiResponse<T> {
   data: IResponseData<T>;
+  status: number;
+  statusText: string;
 }

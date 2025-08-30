@@ -22,6 +22,15 @@ export async function send(
   editorInput: any,
   editorOutput: any,
   firstTime = false,
+  hooks?: {
+    onStart?: () => void;
+    onEnd?: (meta: {
+      status?: number;
+      statusText?: string;
+      durationMs: number;
+      ok: boolean;
+    }) => void;
+  },
 ) {
   try {
     const groups = analyzeGroups(editorInput);
@@ -99,7 +108,12 @@ export async function send(
 
       if (typeof JSONraw === 'object') JSONraw.devTools = true;
       if (!firstTime) {
-        const response = await WzRequest.apiReq(method, req, JSONraw);
+        const start = Date.now();
+        hooks?.onStart?.();
+        const response = await WzRequest.apiReq(method, req, JSONraw, {
+          // Return the raw axios-like response so we can read status/statusText.
+          returnOriginalResponse: true,
+        } as any);
 
         if (
           typeof response === 'string' &&
@@ -108,10 +122,26 @@ export async function send(
           editorOutput.setValue(
             'This method is not allowed without admin mode',
           );
+          hooks?.onEnd?.({
+            status: undefined,
+            statusText: 'Forbidden without admin mode',
+            durationMs: Date.now() - start,
+            ok: false,
+          });
         } else {
-          editorOutput.setValue(
-            JSON.stringify((response || {}).data || {}, null, 2),
-          );
+          const body = (response || {}).data || {};
+          editorOutput.setValue(JSON.stringify(body, null, 2));
+          // Determine OK state: API returns 200 even for logical errors when devTools flag is set.
+          // If the payload includes an 'error' key, we consider it a failure.
+          const hasPayloadError = !!(body && body.error);
+          const status = (response || {}).status;
+          const statusText = (response || {}).statusText;
+          hooks?.onEnd?.({
+            status,
+            statusText,
+            durationMs: Date.now() - start,
+            ok: !hasPayloadError && status >= 200 && status < 300,
+          });
         }
       }
     }
@@ -130,7 +160,18 @@ export async function send(
     };
     getErrorOrchestrator().handleError(options);
 
-    return editorOutput.setValue(parseError(error));
+    try {
+      editorOutput.setValue(parseError(error));
+    } finally {
+      const status = (error || {}).response?.status;
+      const statusText = (error || {}).response?.statusText || error?.message;
+      hooks?.onEnd?.({
+        status,
+        statusText,
+        durationMs: 0,
+        ok: false,
+      });
+    }
   }
 }
 

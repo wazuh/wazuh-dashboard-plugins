@@ -5,6 +5,8 @@ import {
   EuiTab,
   EuiTabs,
   EuiIcon,
+  EuiBadge,
+  EuiLoadingSpinner,
 } from '@elastic/eui';
 import CodeMirror from '../../../utils/codemirror/lib/codemirror';
 import $ from 'jquery';
@@ -33,6 +35,13 @@ export const ToolDevTools = withGlobalBreadcrumb([
   const [multipleKeyPressed, setMultipleKeyPressed] = useState<number[]>([]);
   const editorInputRef = useRef<any>();
   const editorOutputRef = useRef<any>();
+  const [requestMeta, setRequestMeta] = useState<{
+    loading: boolean;
+    status?: number;
+    statusText?: string;
+    durationMs?: number;
+    ok?: boolean;
+  } | null>(null);
 
   const useUpdatedUX = getUiSettings().get('home:useNewHomePage');
 
@@ -60,7 +69,14 @@ export const ToolDevTools = withGlobalBreadcrumb([
           multipleKeyPressed.length === 2
         ) {
           e.preventDefault();
-          return send(editorInputRef.current, editorOutputRef.current);
+          return send(editorInputRef.current, editorOutputRef.current, false, {
+            onStart: () => setRequestMeta({ loading: true }),
+            onEnd: meta =>
+              setRequestMeta({
+                loading: false,
+                ...meta,
+              }),
+          });
         }
       });
       $(window.document).on('keyup', () => setMultipleKeyPressed([]));
@@ -132,6 +148,50 @@ export const ToolDevTools = withGlobalBreadcrumb([
                 })}
               />
             </EuiFlexItem>
+            <EuiFlexItem>
+              {/* Request status indicator */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  justifyContent: 'flex-end',
+                }}
+              >
+                {requestMeta?.loading ? (
+                  <EuiBadge color='hollow'>
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                      }}
+                    >
+                      <EuiLoadingSpinner size='s' />
+                      Request in progress
+                    </span>
+                  </EuiBadge>
+                ) : requestMeta ? (
+                  <>
+                    <EuiBadge color={requestMeta.ok ? 'success' : 'danger'}>
+                      {requestMeta.status
+                        ? `${requestMeta.status} - ${
+                            requestMeta.statusText ||
+                            (requestMeta.ok ? 'OK' : 'ERROR')
+                          }`
+                        : requestMeta.ok
+                        ? 'OK'
+                        : 'ERROR'}
+                    </EuiBadge>
+                    {typeof requestMeta.durationMs !== 'undefined' && (
+                      <EuiBadge color='hollow'>
+                        {Math.max(0, Math.round(requestMeta.durationMs))} ms
+                      </EuiBadge>
+                    )}
+                  </>
+                ) : null}
+              </div>
+            </EuiFlexItem>
           </EuiFlexGroup>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div
@@ -152,7 +212,19 @@ export const ToolDevTools = withGlobalBreadcrumb([
                 <EuiIcon
                   type='play'
                   onClick={() =>
-                    send(editorInputRef.current, editorOutputRef.current)
+                    send(
+                      editorInputRef.current,
+                      editorOutputRef.current,
+                      false,
+                      {
+                        onStart: () => setRequestMeta({ loading: true }),
+                        onEnd: meta =>
+                          setRequestMeta({
+                            loading: false,
+                            ...meta,
+                          }),
+                      },
+                    )
                   }
                   title='Send request'
                   className='cursor-pointer wz-always-top'
