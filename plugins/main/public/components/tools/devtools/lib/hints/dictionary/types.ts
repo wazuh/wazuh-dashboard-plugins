@@ -19,6 +19,12 @@ export interface EndpointDef {
   name: string;
   query?: QueryParamDef[];
   body?: BodyParamDef[];
+  // Optional fields present in /api/routes and used by other parts
+  documentation?: string;
+  description?: string;
+  summary?: string;
+  tags?: string[];
+  args?: any[];
   // Internal helper during matching
   splitURL?: string[];
 }
