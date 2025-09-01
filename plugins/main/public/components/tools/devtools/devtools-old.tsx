@@ -16,8 +16,8 @@ import { getTopNavConfig } from './application/components/top-nav/get-top-nav';
 import DevToolsColumnSeparator from './application/components/separator/dev-tools-column-separator';
 import { CONSOLE_CONTAINER } from './constants';
 import { send, saveEditorContentAsJson } from './lib/actions';
-import useHotkeyForDevTools from './application/hooks/useDevToolsHotkey';
-import useSetup from './application/hooks/useSetup';
+import useHotkeyForDevTools from './application/hooks/use-hotkey-for-dev-tools';
+import useSetup from './application/hooks/use-setup';
 
 /**
  * Wazuh DevTools Console.
