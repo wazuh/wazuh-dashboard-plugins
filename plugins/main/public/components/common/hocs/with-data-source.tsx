@@ -161,17 +161,19 @@ export const withDataSourceFetchOnStart =
   WrappedComponent =>
   props => {
     const dataSource = get(props, nameProp);
-    const fetch = useCallback(async (...dependencies: any[]) => {
-      // FIXME: there is a bug that caches the inital filters
-      const response = await dataSource.fetchData(
-        mapRequestParams
-          ? mapRequestParams({ ...props, dataSource, dependencies })
-          : {},
-      );
-      return mapResponse
-        ? mapResponse(response, { ...props, dataSource, dependencies })
-        : response;
-    }, []);
+    const fetch = useCallback(
+      async (...dependencies: any[]) => {
+        const response = await dataSource.fetchData(
+          mapRequestParams
+            ? mapRequestParams({ ...props, dataSource, dependencies })
+            : {},
+        );
+        return mapResponse
+          ? mapResponse(response, { ...props, dataSource, dependencies })
+          : response;
+      },
+      [dataSource.fetchFilters],
+    );
 
     const actionActionRunDependencies =
       typeof mapFetchActionDependencies === 'function'
