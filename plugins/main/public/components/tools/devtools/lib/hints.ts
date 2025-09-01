@@ -78,6 +78,31 @@ export function registerDictionaryHint(editorInput: any) {
             true,
           ),
         );
+      // Small renderer to show a right-aligned label (endpoint/param/flag)
+      const makeRender =
+        (label: string) => (elt: HTMLElement, _data: any, cur: any) => {
+          try {
+            const wrap = document.createElement('div');
+            wrap.className = 'wz-hint';
+            const left = document.createElement('span');
+            left.className = 'wz-hint__text';
+            left.textContent = cur.displayText || cur.text || '';
+            const right = document.createElement('span');
+            right.className = 'wz-hint__label';
+            right.textContent = label;
+            wrap.appendChild(left);
+            wrap.appendChild(right);
+            elt.appendChild(wrap);
+          } catch (e) {
+            // Fallback to plain text if something fails
+            elt.appendChild(
+              document.createTextNode(
+                (cur.displayText || cur.text || '') as string,
+              ),
+            );
+          }
+        };
+
       // Get API endpoint path hints
       if (
         exp[0] &&
@@ -116,33 +141,52 @@ export function registerDictionaryHint(editorInput: any) {
                 (query: any) =>
                   !inputQueryPreviousEntriesKeys.includes(query.name),
               )
-              .map(
-                (item: any) =>
-                  `${inputPath}${inputQuery
-                    .filter((query: any) => query.key && query.value)
-                    .reduce(
-                      (accum: string, query: any, index: number) =>
-                        `${accum}${index > 0 ? '&' : ''}${query.key}=${
-                          query.value
-                        }`,
-                      '?',
-                    )}${
-                    inputQuery.filter((query: any) => query.key && query.value)
-                      .length > 0
-                      ? '&'
-                      : ''
-                  }${item.name}=`,
-              );
+              .map((item: any) => {
+                const nextPath = `${inputPath}${inputQuery
+                  .filter((query: any) => query.key && query.value)
+                  .reduce(
+                    (accum: string, query: any, index: number) =>
+                      `${accum}${index > 0 ? '&' : ''}${query.key}=${
+                        query.value
+                      }`,
+                    '?',
+                  )}${
+                  inputQuery.filter((query: any) => query.key && query.value)
+                    .length > 0
+                    ? '&'
+                    : ''
+                }${item.name}=`;
+                const isFlag = (item.schema || {}).type === 'boolean';
+                return {
+                  text: nextPath,
+                  displayText: item.name,
+                  render: makeRender(isFlag ? 'flag' : 'param'),
+                };
+              });
           }
         } else if (inputHttpMethod) {
-          // Get hints for all http method endpoint
-          if (!inputPath) {
-            hints = inputHttpMethodEndpoints.map(
-              (endpoint: any) => endpoint.name,
-            );
+          // Get hints for all http method endpoints
+          if (!inputPath || inputPath === '/') {
+            hints = inputHttpMethodEndpoints.map((endpoint: any) => ({
+              text: endpoint.name,
+              displayText: endpoint.name,
+              render: makeRender('endpoint'),
+            }));
           } else {
-            // Get hints for requests as: http_method api_path
-            hints = inputHttpMethodEndpoints
+            // Prefer a simple prefix match to handle cases like '/manager' or '/manager/info'
+            const inputPathLc = String(inputPath).toLowerCase();
+            const prefixMatches = inputHttpMethodEndpoints
+              .filter((endpoint: any) =>
+                String(endpoint.name).toLowerCase().startsWith(inputPathLc),
+              )
+              .map((endpoint: any) => ({
+                text: endpoint.name,
+                displayText: endpoint.name,
+                render: makeRender('endpoint'),
+              }));
+
+            // Keep the previous segmented match logic for partial segments
+            const structuredMatches = inputHttpMethodEndpoints
               .map((endpoint: any) => ({
                 ...endpoint,
                 splitURL: endpoint.name
@@ -152,14 +196,14 @@ export function registerDictionaryHint(editorInput: any) {
               .filter((endpoint: any) =>
                 endpoint.splitURL.reduce(
                   (accum: boolean, splitPath: string, index: number) => {
-                    if (!accum) {
-                      return accum;
-                    }
+                    if (!accum) return accum;
                     if (
                       splitPath.startsWith(':') ||
                       !inputEndpoint[index] ||
                       (inputEndpoint[index] &&
-                        splitPath.startsWith(inputEndpoint[index]))
+                        splitPath
+                          .toLowerCase()
+                          .startsWith(inputEndpoint[index]))
                     ) {
                       return true;
                     }
@@ -168,16 +212,43 @@ export function registerDictionaryHint(editorInput: any) {
                   true,
                 ),
               )
-              .map((endpoint: any) =>
-                endpoint.splitURL.reduce(
+              .map((endpoint: any) => {
+                const suggestion = endpoint.splitURL.reduce(
                   (accum: string, splitPath: string, index: number) =>
                     `${accum}/${
                       (splitPath.startsWith(':') && inputEndpoint[index]) ||
                       splitPath
                     }`,
                   '',
-                ),
-              );
+                );
+                return {
+                  text: suggestion,
+                  displayText: suggestion,
+                  render: makeRender('endpoint'),
+                };
+              });
+
+            // Fallback: include all endpoints, let later filtering by curWord narrow down.
+            const allEndpoints = inputHttpMethodEndpoints.map(
+              (endpoint: any) => ({
+                text: endpoint.name,
+                displayText: endpoint.name,
+                render: makeRender('endpoint'),
+              }),
+            );
+
+            // Merge and de-duplicate by text
+            const seen: Record<string, boolean> = {};
+            hints = [
+              ...prefixMatches,
+              ...structuredMatches,
+              ...allEndpoints,
+            ].filter(item => {
+              const key = String((item as any).text || item);
+              if (seen[key]) return false;
+              seen[key] = true;
+              return true;
+            });
           }
         }
         // Get API endpoint body params hints
@@ -334,6 +405,7 @@ export function registerDictionaryHint(editorInput: any) {
               _moveCursor: ['string', 'array'].includes(bodyParam.type),
               displayText: bodyParam.name,
               bodyParam,
+              render: makeRender('param'),
               hint: (cm: any, self: any, data: any) => {
                 editor.replaceRange(
                   line.replace(/\S+/, '') + data.text,
@@ -375,18 +447,31 @@ export function registerDictionaryHint(editorInput: any) {
     while (end < curLine.length && !whiteSpace.test(curLine.charAt(end))) ++end;
     while (start && !whiteSpace.test(curLine.charAt(start - 1))) --start;
     const curWord = start !== end && curLine.slice(start, end);
+    // Build suggestions always; when there's no current word, don't filter.
+    const unfilteredList = getDictionary(
+      curLine,
+      (curWord as string) || '',
+    ) as any[];
+    const list = unfilteredList.filter(function (item: any) {
+      if (!curWord) return true;
+      const text = (item.text ?? item) as string;
+      return text.toUpperCase().includes((curWord as string).toUpperCase());
+    });
+    // Sort by displayText/text when objects are used
+    const sortedList = list.sort((a: any, b: any) => {
+      const A = ((a && (a.displayText || a.text)) || a || '')
+        .toString()
+        .toUpperCase();
+      const B = ((b && (b.displayText || b.text)) || b || '')
+        .toString()
+        .toUpperCase();
+      if (A < B) return -1;
+      if (A > B) return 1;
+      return 0;
+    });
+
     return {
-      list: (!curWord
-        ? []
-        : (getDictionary(curLine, curWord) as any[]).filter(function (
-            item: any,
-          ) {
-            const text = (item.text || item) as string;
-            return text
-              .toUpperCase()
-              .includes((curWord as string).toUpperCase());
-          })
-      ).sort(),
+      list: sortedList,
       from: CodeMirror.Pos(cur.line, start),
       to: CodeMirror.Pos(cur.line, end),
     };
