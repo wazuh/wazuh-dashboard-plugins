@@ -22,7 +22,7 @@ import { CONSOLE_CONTAINER } from './constants';
 import { AppState } from '../../../react-services';
 import { initEditors } from './lib/init';
 import { send, saveEditorContentAsJson } from './lib/actions';
-import useDevToolsHotkey from './application/hooks/useDevToolsHotkey';
+import useHotkeyForDevTools from './application/hooks/useDevToolsHotkey';
 
 /**
  * Wazuh DevTools Console.
@@ -44,7 +44,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
   } | null>(null);
 
   const useUpdatedUX = getUiSettings().get('home:useNewHomePage');
-  useDevToolsHotkey({
+  useHotkeyForDevTools({
     editorInputRef,
     editorOutputRef,
     onStart: () => setRequestMeta({ loading: true }),

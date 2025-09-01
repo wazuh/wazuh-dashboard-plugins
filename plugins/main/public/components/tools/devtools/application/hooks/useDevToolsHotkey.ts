@@ -9,7 +9,7 @@ interface Props {
   onEnd: (meta: any) => void;
 }
 
-const useDevToolsHotkey = ({
+const useHotkeyForDevTools = ({
   editorInputRef,
   editorOutputRef,
   onStart,
@@ -38,4 +38,4 @@ const useDevToolsHotkey = ({
   }, []);
 };
 
-export default useDevToolsHotkey;
+export default useHotkeyForDevTools;
