@@ -101,22 +101,31 @@ export class DynamicHeight {
   static dynamicHeightDevTools(window) {
     let devToolsElement;
     const interval = setInterval(() => {
-      devToolsElement = $('#wz-dev-left-column');
-      if (devToolsElement) {
+      // Use the canonical IDs from EDITOR_MIRRORS to locate columns
+      const leftColumnSelector = `#${EDITOR_MIRRORS.LEFT_COLUMN_ID}`;
+      const rightColumnSelector = `#${EDITOR_MIRRORS.RIGHT_COLUMN_ID}`;
+      devToolsElement = $(leftColumnSelector);
+      if (devToolsElement && devToolsElement.length) {
         clearInterval(interval);
         setTimeout(() => {
           const windows = $(window).height() - CONSOLE_CONTAINER.padding;
-          $('#wz-dev-left-column').height(
-            windows - DynamicHeight.getPosition($('#wz-dev-left-column')[0]).y,
+          // Left column
+          $(leftColumnSelector).height(
+            windows -
+              DynamicHeight.getPosition($(leftColumnSelector)[0]).y,
           );
+          // Separator
           $(`#${EDITOR_MIRRORS.SEPARATOR_ID}`).height(
             windows -
               DynamicHeight.getPosition($(`#${EDITOR_MIRRORS.SEPARATOR_ID}`)[0])
                 .y,
           );
-          $('#wz-dev-right-column').height(
-            windows - DynamicHeight.getPosition($('#wz-dev-right-column')[0]).y,
+          // Right column
+          $(rightColumnSelector).height(
+            windows -
+              DynamicHeight.getPosition($(rightColumnSelector)[0]).y,
           );
+          // Separator inner span (grip)
           $(`#${EDITOR_MIRRORS.SEPARATOR_ID} span`).height(
             windows -
               DynamicHeight.getPosition(

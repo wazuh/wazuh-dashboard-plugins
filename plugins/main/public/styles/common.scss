@@ -537,6 +537,9 @@ md-sidenav {
   $w: 20%;
   min-width: calc(#{$w} - var(--col-separator-width) / 2);
   max-width: calc(#{100% - $w} - var(--col-separator-width) / 2);
+  /* allow inner flex children to shrink and enable internal scrolling */
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Card and select input shadow overriding */
