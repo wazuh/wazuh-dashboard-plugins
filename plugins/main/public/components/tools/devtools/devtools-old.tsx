@@ -22,6 +22,7 @@ import { CONSOLE_CONTAINER } from './constants';
 import { AppState } from '../../../react-services';
 import { initEditors } from './lib/init';
 import { send, saveEditorContentAsJson } from './lib/actions';
+import useDevToolsHotkey from './application/hooks/useDevToolsHotkey';
 
 /**
  * Wazuh DevTools Console.
@@ -43,28 +44,18 @@ export const ToolDevTools = withGlobalBreadcrumb([
   } | null>(null);
 
   const useUpdatedUX = getUiSettings().get('home:useNewHomePage');
+  useDevToolsHotkey({
+    editorInputRef,
+    editorOutputRef,
+    onStart: () => setRequestMeta({ loading: true }),
+    onEnd: meta =>
+      setRequestMeta({
+        loading: false,
+        ...meta,
+      }),
+  });
 
   useEffect(() => {
-    // Key handler: CTRL/CMD + ENTER
-    const handleKeyDown = (e: any) => {
-      const isEnter =
-        e.key === 'Enter' || e.keyCode === Keys.ENTER || e.which === Keys.ENTER;
-      const hasCtrlOrCmd = !!(e.ctrlKey || e.metaKey);
-      if (isEnter && hasCtrlOrCmd) {
-        if (!editorInputRef.current || !editorOutputRef.current) return;
-        e.preventDefault();
-        return send(editorInputRef.current, editorOutputRef.current, false, {
-          onStart: () => setRequestMeta({ loading: true }),
-          onEnd: meta =>
-            setRequestMeta({
-              loading: false,
-              ...meta,
-            }),
-        });
-      }
-    };
-    $(window.document).on('keydown', handleKeyDown);
-
     (async function () {
       const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
 
@@ -113,9 +104,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
     })();
 
     // Cleanup listeners on unmount
-    return () => {
-      $(window.document).off('keydown', handleKeyDown);
-    };
+    return () => {};
   }, []);
 
   return (

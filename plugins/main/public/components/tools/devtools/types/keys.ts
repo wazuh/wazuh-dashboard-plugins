@@ -36,3 +36,17 @@ export const Keys = {
 } as const;
 
 export type Keys = (typeof Keys)[keyof typeof Keys];
+
+export const isEnter = (
+  keyDownEvent: JQuery.KeyDownEvent<Document, undefined, Document, Document>,
+) => {
+  return (
+    keyDownEvent.key === 'Enter' ||
+    keyDownEvent.keyCode === Keys.ENTER ||
+    keyDownEvent.which === Keys.ENTER
+  );
+};
+
+export const hasCtrlOrCmd = (
+  keyDownEvent: JQuery.KeyDownEvent<Document, undefined, Document, Document>,
+) => !!(keyDownEvent.ctrlKey || keyDownEvent.metaKey);
