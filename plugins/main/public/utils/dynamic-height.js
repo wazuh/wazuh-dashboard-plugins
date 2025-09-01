@@ -111,8 +111,7 @@ export class DynamicHeight {
           const windows = $(window).height() - CONSOLE_CONTAINER.padding;
           // Left column
           $(leftColumnSelector).height(
-            windows -
-              DynamicHeight.getPosition($(leftColumnSelector)[0]).y,
+            windows - DynamicHeight.getPosition($(leftColumnSelector)[0]).y,
           );
           // Separator
           $(`#${EDITOR_MIRRORS.SEPARATOR_ID}`).height(
@@ -122,8 +121,7 @@ export class DynamicHeight {
           );
           // Right column
           $(rightColumnSelector).height(
-            windows -
-              DynamicHeight.getPosition($(rightColumnSelector)[0]).y,
+            windows - DynamicHeight.getPosition($(rightColumnSelector)[0]).y,
           );
           // Separator inner span (grip)
           $(`#${EDITOR_MIRRORS.SEPARATOR_ID} span`).height(
