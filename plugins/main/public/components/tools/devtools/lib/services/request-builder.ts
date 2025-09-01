@@ -54,13 +54,32 @@ export class RequestBuilder {
       ? raw.split(method)[1].trim()
       : raw.trim();
 
-    // Inline body handling: e.g. POST /path { ... }
-    if (withoutMethod.includes('{') && withoutMethod.includes('}')) {
-      const inlineBody = `{${withoutMethod.split('{')[1]}`;
-      const path = withoutMethod.split('{')[0].trim();
-      return { path, inlineBody };
+    // Inline body handling robust to nested braces: e.g. POST /path { ... { ... } }
+    const startIdx = withoutMethod.indexOf('{');
+    if (startIdx === -1) {
+      return { path: withoutMethod };
     }
-    return { path: withoutMethod };
+    // Find matching closing brace using a simple brace counter
+    let depth = 0;
+    let endIdx = -1;
+    for (let i = startIdx; i < withoutMethod.length; i++) {
+      const ch = withoutMethod[i];
+      if (ch === '{') depth++;
+      else if (ch === '}') {
+        depth--;
+        if (depth === 0) {
+          endIdx = i;
+          break;
+        }
+      }
+    }
+    // If we couldn't find a matching closing brace, treat as no inline body
+    if (endIdx === -1) {
+      return { path: withoutMethod };
+    }
+
+    const path = withoutMethod.slice(0, startIdx).trim();
+    const inlineBody = withoutMethod.slice(startIdx, endIdx + 1);
+    return { path, inlineBody };
   }
 }
-

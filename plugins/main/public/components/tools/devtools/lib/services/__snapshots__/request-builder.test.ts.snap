@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RequestBuilder construye método, path y body desde inline JSON (happy path): inline-body 1`] = `
+Object {
+  "body": Object {
+    "devTools": true,
+    "foo": 1,
+  },
+  "method": "POST",
+  "path": "/alerts/_search",
+}
+`;
