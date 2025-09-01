@@ -22,6 +22,7 @@ import { getErrorOrchestrator } from './common-services';
 import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { Cookies } from 'react-cookie';
+import { isEqual } from 'lodash';
 
 /* WORKAROUND: this defines the cookies object in case it doesn't exist that is used by
 the selectedServerAPI$ observable */
@@ -38,7 +39,7 @@ export class AppState {
       : false,
   );
   static selectedServerAPIChanged$ = this.selectedServerAPI$.pipe(
-    distinctUntilChanged(),
+    distinctUntilChanged(isEqual),
   );
   /**
    * Cluster setters and getters
