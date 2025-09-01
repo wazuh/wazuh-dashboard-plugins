@@ -21,7 +21,16 @@ import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
 import { BehaviorSubject } from 'rxjs';
 import { first, distinctUntilChanged } from 'rxjs/operators';
+import { throttle } from 'lodash';
 
+// throttle to avoid multiple toasts
+const displayAPINotAvailableToast = throttle(({ title, text }) => {
+  getToasts().add({
+    color: 'warning',
+    title,
+    text,
+  });
+}, 500);
 export class WzRequest {
   static wazuhConfig: any;
   static serverAPIAvailable$ = new BehaviorSubject(true);
@@ -206,11 +215,7 @@ export class WzRequest {
               const title = `API with ID [${currentApi.id}] is not available.`;
               const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
 
-              getToasts().add({
-                color: 'warning',
-                title,
-                text,
-              });
+              displayAPINotAvailableToast({ title, text });
 
               throw new Error(`${title} ${text}`);
             }
