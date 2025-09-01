@@ -2,6 +2,7 @@ import type { EditorLike, EditorGroup } from '../../../types/editor';
 import type { BodyParamDef } from '../types';
 import { BODY_LINE_START_RE } from '../constants';
 
+/** Extract indentation and the partial key being typed on a JSON body line. */
 export function extractBodyLineContext(line: string) {
   const match = line.match(BODY_LINE_START_RE) || [] as any;
   const spaceLineStart = match[1] || '';
@@ -9,6 +10,7 @@ export function extractBodyLineContext(line: string) {
   return { spaceLineStart, inputKeyBodyParam };
 }
 
+/** Render a JSON body parameter line, recursively expanding objects. */
 export function renderBodyParamText(parameter: BodyParamDef, space: string): string {
   let valueBodyParam = '';
   if (parameter.type === 'string') {
@@ -28,6 +30,10 @@ export function renderBodyParamText(parameter: BodyParamDef, space: string): str
   return `\"${parameter.name}\": ${valueBodyParam}`;
 }
 
+/**
+ * Traverse the editor buffer in the active group to infer the nested object
+ * path at the current cursor position inside the JSON body.
+ */
 export function getCursorObjectPath(
   editor: EditorLike,
   group: EditorGroup,
@@ -69,6 +75,7 @@ export function getCursorObjectPath(
   );
 }
 
+/** Navigate a body schema down a path of keys, returning the nested object schema or []. */
 export function getInnerObjectFromSchema(
   object: BodyParamDef,
   keys: string[],
@@ -83,10 +90,12 @@ export function getInnerObjectFromSchema(
   return getInnerObjectFromSchema(object.properties[key], rest);
 }
 
+/** Remove trailing dangling keys to allow JSON.parse of incomplete bodies. */
 export function sanitizeJsonBody(json: string): string {
   return json.replace(/(,?\s*\"\S*\s*)\}/g, '}');
 }
 
+/** Get existing keys at the cursor path to avoid suggesting duplicates. */
 export function getExistingKeysAtCursor(
   jsonBody: string,
   pathKeys: string[] = [],
@@ -97,4 +106,3 @@ export function getExistingKeysAtCursor(
   const target = pathKeys.reduce((acc: any, key: string) => acc?.[key], obj);
   return Object.keys(target || {});
 }
-

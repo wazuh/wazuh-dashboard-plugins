@@ -1,6 +1,6 @@
 import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
 import { analyzeGroups, calculateWhichGroup } from '../grouping';
-import { DictionaryHintProvider } from './dictionary/hint-provider';
+import { createDictionaryHintProvider } from './dictionary/factory';
 import { logUiError } from './dictionary/utils/logging-adapter';
 import { limitToSingleQuestionMark, sortCaseInsensitive } from './dictionary/utils/hint-utils';
 
@@ -9,7 +9,7 @@ import { limitToSingleQuestionMark, sortCaseInsensitive } from './dictionary/uti
  * Requires that `editorInput.model` contains the available API description.
  */
 export function registerDictionaryHint(editorInput: any) {
-  const provider = new DictionaryHintProvider({
+  const provider = createDictionaryHintProvider({
     analyzeGroups,
     calculateWhichGroup,
     logError: logUiError,
