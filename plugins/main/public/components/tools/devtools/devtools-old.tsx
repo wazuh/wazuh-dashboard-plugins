@@ -8,21 +8,16 @@ import {
   EuiBadge,
   EuiLoadingSpinner,
 } from '@elastic/eui';
-import CodeMirror from '../../../utils/codemirror/lib/codemirror';
-import $ from 'jquery';
-import store from '../../../redux/store';
 import { getUiSettings } from '../../../kibana-services';
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
-import { Keys } from './types/keys';
 import { TopNavMenu } from './application/components/top-nav/top-nav-menu';
 import { getTopNavConfig } from './application/components/top-nav/get-top-nav';
 import DevToolsColumnSeparator from './application/components/separator/dev-tools-column-separator';
 import { CONSOLE_CONTAINER } from './constants';
-import { AppState } from '../../../react-services';
-import { initEditors } from './lib/init';
 import { send, saveEditorContentAsJson } from './lib/actions';
 import useHotkeyForDevTools from './application/hooks/useDevToolsHotkey';
+import useSetup from './application/hooks/useSetup';
 
 /**
  * Wazuh DevTools Console.
@@ -33,8 +28,7 @@ import useHotkeyForDevTools from './application/hooks/useDevToolsHotkey';
 export const ToolDevTools = withGlobalBreadcrumb([
   { text: devTools.breadcrumbLabel },
 ])(() => {
-  const editorInputRef = useRef<any>();
-  const editorOutputRef = useRef<any>();
+  const { editorInputRef, editorOutputRef } = useSetup();
   const [requestMeta, setRequestMeta] = useState<{
     loading: boolean;
     status?: number;
@@ -54,58 +48,6 @@ export const ToolDevTools = withGlobalBreadcrumb([
         ...meta,
       }),
   });
-
-  useEffect(() => {
-    (async function () {
-      const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
-
-      // Ensure menu is visible when loading the tool
-      if (
-        store.getState() &&
-        (store.getState() as any).appStateReducers &&
-        !(store.getState() as any).appStateReducers.showMenu
-      ) {
-        AppState.setWzMenu();
-      }
-
-      // Create CodeMirror editors
-      editorInputRef.current = CodeMirror.fromTextArea(
-        window.document.getElementById('api_input'),
-        {
-          lineNumbers: true,
-          matchBrackets: true,
-          mode: { name: 'http-request', json: true },
-          styleSelectedText: true,
-          foldGutter: true,
-          gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-          theme: isDarkThemeEnabled ? 'lesser-dark' : 'http-request',
-        },
-      );
-
-      editorOutputRef.current = CodeMirror.fromTextArea(
-        window.document.getElementById('api_output'),
-        {
-          lineNumbers: true,
-          matchBrackets: true,
-          mode: { name: 'http-request', json: true },
-          readOnly: true,
-          lineWrapping: true,
-          styleActiveLine: true,
-          foldGutter: true,
-          gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-          theme: isDarkThemeEnabled ? 'lesser-dark' : 'http-request',
-        },
-      );
-
-      // Configure behavior, routes and layout
-      await initEditors(editorInputRef.current, editorOutputRef.current);
-      // Render welcome message and position UI controls
-      send(editorInputRef.current, editorOutputRef.current, true);
-    })();
-
-    // Cleanup listeners on unmount
-    return () => {};
-  }, []);
 
   return (
     <div id='wz-dev-tools-container'>
