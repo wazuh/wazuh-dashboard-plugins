@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { TableWzAPI } from '../../common/tables';
 import { formatUIDate } from '../../../react-services/time-service';
 import {
@@ -28,13 +28,14 @@ interface AgentUpgradesTaskDetailsModalProps {
 export const AgentUpgradesTaskDetailsModal = ({
   onClose,
 }: AgentUpgradesTaskDetailsModalProps) => {
-  const datetime = new Date();
-  datetime.setMinutes(datetime.getMinutes() - 60);
-  const formattedDate = datetime.toISOString();
-
-  const defaultFilters = {
-    q: `last_update_time>${formattedDate}`,
-  };
+  const defaultFilters = useMemo(() => {
+    const datetime = new Date();
+    datetime.setMinutes(datetime.getMinutes() - 60);
+    const formattedDate = datetime.toISOString();
+    return {
+      q: `last_update_time>${formattedDate}`,
+    };
+  });
 
   const handleOnCloseModal = () => onClose();
 
