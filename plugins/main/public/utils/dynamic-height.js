@@ -1,4 +1,7 @@
-import { CONSOLE_CONTAINER } from '../components/tools/devtools/constants';
+import {
+  CONSOLE_CONTAINER,
+  EDITOR_MIRRORS,
+} from '../components/tools/devtools/constants';
 
 /*
  * Wazuh app - Helper class for div heights
@@ -106,17 +109,19 @@ export class DynamicHeight {
           $('#wz-dev-left-column').height(
             windows - DynamicHeight.getPosition($('#wz-dev-left-column')[0]).y,
           );
-          $('.wz-dev-column-separator').height(
+          $(`#${EDITOR_MIRRORS.SEPARATOR_ID}`).height(
             windows -
-              DynamicHeight.getPosition($('.wz-dev-column-separator')[0]).y,
+              DynamicHeight.getPosition($(`#${EDITOR_MIRRORS.SEPARATOR_ID}`)[0])
+                .y,
           );
           $('#wz-dev-right-column').height(
             windows - DynamicHeight.getPosition($('#wz-dev-right-column')[0]).y,
           );
-          $('.wz-dev-column-separator span').height(
+          $(`#${EDITOR_MIRRORS.SEPARATOR_ID} span`).height(
             windows -
-              DynamicHeight.getPosition($('.wz-dev-column-separator span')[0])
-                .y,
+              DynamicHeight.getPosition(
+                $(`#${EDITOR_MIRRORS.SEPARATOR_ID} span`)[0],
+              ).y,
           );
         }, 1);
       }

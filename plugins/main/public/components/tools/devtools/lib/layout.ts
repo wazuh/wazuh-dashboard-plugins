@@ -1,13 +1,14 @@
 import $ from 'jquery';
 import { DynamicHeight } from '../../../../utils/dynamic-height';
+import { EDITOR_MIRRORS } from '../constants';
 
 /**
  * Enable the draggable separator between editors to resize columns.
  */
 export function setupResizableColumns(doc: Document) {
-  $('.wz-dev-column-separator').on('mousedown', function (e) {
+  $(`#${EDITOR_MIRRORS.SEPARATOR_ID}`).on('mousedown', function (e) {
     e.preventDefault();
-    $('.wz-dev-column-separator').addClass('active');
+    $(`#${EDITOR_MIRRORS.SEPARATOR_ID}`).addClass('active');
     // Capture initial state to compute deltas instead of using absolute pageX
     const startX = e.pageX;
     const leftOrigWidth = ($('#wz-dev-left-column').width() as number) || 0;
@@ -25,7 +26,7 @@ export function setupResizableColumns(doc: Document) {
   });
 
   $(doc).on('mouseup', function () {
-    $('.wz-dev-column-separator').removeClass('active');
+    $(`#${EDITOR_MIRRORS.SEPARATOR_ID}`).removeClass('active');
     $(doc).off('mousemove');
   });
 }

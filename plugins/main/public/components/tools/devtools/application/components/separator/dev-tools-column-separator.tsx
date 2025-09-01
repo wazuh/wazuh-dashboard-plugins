@@ -1,9 +1,10 @@
 import React from 'react';
+import { EDITOR_MIRRORS } from '../../../constants';
 
 const DevToolsColumnSeparator = () => {
   return (
     <div
-      className='wz-dev-column-separator'
+      id={EDITOR_MIRRORS.SEPARATOR_ID}
       role='separator'
       aria-orientation='vertical'
     >

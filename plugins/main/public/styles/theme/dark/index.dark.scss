@@ -248,16 +248,16 @@ md-divider {
   border: 1px solid #343741 !important;
 }
 
-.wz-dev-column-separator {
+#wz-dev-tools-textarea-editor--separator {
   background: #1d1e24;
+
+  &:hover {
+    background-color: #0b4462;
+  }
 }
 
 .CodeMirror-styled-background {
   background-color: #343741;
-}
-
-.wz-dev-column-separator:hover {
-  background-color: #0b4462;
 }
 
 .CodeMirror-hints {

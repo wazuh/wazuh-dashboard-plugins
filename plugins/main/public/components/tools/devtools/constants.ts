@@ -10,6 +10,7 @@ export class DEV_TOOLS_BUTTONS {
 
 export class EDITOR_MIRRORS {
   static ID = 'wz-dev-tools-textarea-editor';
+  static SEPARATOR_ID = `${EDITOR_MIRRORS.ID}--separator`;
   static INPUT_ID = `${EDITOR_MIRRORS.ID}--input`;
   static OUTPUT_ID = `${EDITOR_MIRRORS.ID}--output`;
 }
