@@ -36,7 +36,6 @@ const VulsPanelContentInitiation = compose(
     DataSource: VulnerabilitiesDataSource,
     DataSourceRepositoryCreator: VulnerabilitiesDataSourceRepository,
     nameProp: 'dataSource',
-    mapFetchActionDependencies: ({ agent }) => [agent.id],
     mapRequestParams() {
       return {
         aggs: {

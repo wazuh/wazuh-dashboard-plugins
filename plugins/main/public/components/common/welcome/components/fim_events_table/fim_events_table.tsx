@@ -88,7 +88,7 @@ export function useTimeFilter() {
 const FimTableDataSource = withDataSourceFetch({
   DataSource: FIMDataSource,
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
-  mapRequestParams: ({ agent, dataSource, dependencies }) => {
+  mapRequestParams: ({ dataSource, dependencies }) => {
     const [_, timeFilter, sort] = dependencies;
 
     const sortSearch = [
@@ -107,10 +107,11 @@ const FimTableDataSource = withDataSourceFetch({
       },
     };
   },
-  mapFetchActionDependencies: ({ timeFilter, sort, agent }) => [
+  mapFetchActionDependencies: ({ timeFilter, sort }) => [
     timeFilter,
     sort,
-    agent.id,
+    /* Changing the agent causes the fetchFilters change, and the HOC manage this case so it is not
+    requried adding the agent to the dependencies */
   ],
   mapResponse: response => {
     return { total: response?.hits?.total, items: response?.hits?.hits };
