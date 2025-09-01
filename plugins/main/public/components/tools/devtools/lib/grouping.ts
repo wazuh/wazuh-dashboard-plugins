@@ -124,7 +124,7 @@ export function calculateWhichGroup(
     const validGroups = groups.filter(item => {
       return item.requestText;
     });
-    const desiredGroup = firstTime
+    let desiredGroup = firstTime
       ? (validGroups as any)
       : validGroups.filter(item => {
           return (
@@ -134,12 +134,41 @@ export function calculateWhichGroup(
           );
         });
 
-    // If the cursor isn't within a valid group (e.g. in a comment),
-    // no block is selected: hide controls and exit.
+    // If there is no active cursor within a valid group (e.g. first click without focusing the editor),
+    // fallback to the first visible group in the viewport. If none are visible, use the first group.
     if (!firstTime && desiredGroup.length === 0) {
-      $('#wz-dev-tools-buttons--send-request').hide();
-      $('#wz-dev-tools-buttons--go-to-api-reference').hide();
-      return null;
+      try {
+        const wrapperEl =
+          editor.getWrapperElement?.() || editor.display?.wrapper || null;
+        const $wrapper = wrapperEl ? $(wrapperEl) : null;
+        const wrapperTop = $wrapper?.offset()?.top ?? 0;
+        const wrapperHeight = $wrapper?.outerHeight?.() ?? 0;
+        const wrapperBottom = wrapperTop + wrapperHeight;
+
+        const firstVisible = validGroups.find(g => {
+          try {
+            const c = editor.cursorCoords({ line: g.start, ch: 0 });
+            const lineTop = c.top + 1; // Page coords
+            return lineTop >= wrapperTop && lineTop <= wrapperBottom;
+          } catch {
+            return false;
+          }
+        });
+
+        if (firstVisible) {
+          desiredGroup = [firstVisible] as any;
+        } else if (validGroups.length) {
+          desiredGroup = [validGroups[0]] as any;
+        }
+      } catch {
+        // ignore fallback calculation errors
+      }
+
+      if (!desiredGroup.length) {
+        $('#wz-dev-tools-buttons--send-request').hide();
+        $('#wz-dev-tools-buttons--go-to-api-reference').hide();
+        return null;
+      }
     }
 
     // Place action buttons at the first line from the selected group
