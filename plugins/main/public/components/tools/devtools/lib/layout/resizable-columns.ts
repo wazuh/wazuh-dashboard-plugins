@@ -9,15 +9,17 @@ export function setupResizableColumns(doc: Document) {
     e.preventDefault();
     $(`#${EDITOR_MIRRORS.SEPARATOR_ID}`).addClass('active');
     const startX = e.pageX;
-    const leftOrigWidth = ($('#wz-dev-left-column').width() as number) || 0;
-    const rightOrigWidth = ($('#wz-dev-right-column').width() as number) || 0;
+    const leftOrigWidth =
+      ($(`#${EDITOR_MIRRORS.LEFT_COLUMN_ID}`).width() as number) || 0;
+    const rightOrigWidth =
+      ($(`#${EDITOR_MIRRORS.RIGHT_COLUMN_ID}`).width() as number) || 0;
 
     $(doc).on('mousemove', function (ev: any) {
       const dx = ev.pageX - startX;
       const newLeftWidth = leftOrigWidth + dx;
       const newRightWidth = rightOrigWidth - dx;
-      $('#wz-dev-left-column').css('width', newLeftWidth);
-      $('#wz-dev-right-column').css('width', newRightWidth);
+      $(`#${EDITOR_MIRRORS.LEFT_COLUMN_ID}`).css('width', newLeftWidth);
+      $(`#${EDITOR_MIRRORS.RIGHT_COLUMN_ID}`).css('width', newRightWidth);
     });
   });
 
@@ -26,4 +28,3 @@ export function setupResizableColumns(doc: Document) {
     $(doc).off('mousemove');
   });
 }
-

@@ -481,7 +481,7 @@ md-sidenav {
   z-index: 2000;
 }
 
-#wz-dev-tools-textarea-editor--separator {
+#wz-dev-tools-editor--separator {
   width: var(--col-separator-width);
   min-width: var(--col-separator-width);
   cursor: col-resize;
@@ -525,16 +525,15 @@ md-sidenav {
   }
 }
 
-$sides: left, right;
-
-@each $side in $sides {
-  #wz-dev-#{$side}-column {
-    width: calc(var(--col-#{$side}-width) - var(--col-separator-width) / 2);
-  }
+#wz-dev-tools-editor--left-column {
+  width: calc(var(--col-left-width) - var(--col-separator-width) / 2);
+}
+#wz-dev-tools-editor--right-column {
+  width: calc(var(--col-right-width) - var(--col-separator-width) / 2);
 }
 
-#wz-dev-left-column,
-#wz-dev-right-column {
+#wz-dev-tools-editor--left-column,
+#wz-dev-tools-editor--right-column {
   $w: 20%;
   min-width: calc(#{$w} - var(--col-separator-width) / 2);
   max-width: calc(#{100% - $w} - var(--col-separator-width) / 2);
