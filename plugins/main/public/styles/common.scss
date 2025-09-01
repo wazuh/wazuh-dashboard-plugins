@@ -455,8 +455,17 @@ md-sidenav {
 .wz-dev-tools {
   margin: 0px !important;
 
-  #wz-dev-tools-buttons--send-request {
-    opacity: 1 !important;
+  #wz-dev-tools-buttons {
+    position: relative;
+    left: -1.25rem;
+    height: 0;
+    gap: 0.25rem;
+
+    > * {
+      cursor: pointer;
+      z-index: 10;
+      opacity: 1 !important;
+    }
   }
 }
 

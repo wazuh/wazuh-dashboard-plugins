@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiTab,
-  EuiTabs,
-  EuiIcon,
   EuiBadge,
   EuiLoadingSpinner,
 } from '@elastic/eui';
@@ -15,10 +12,11 @@ import { TopNavMenu } from './application/components/top-nav/top-nav-menu';
 import { getTopNavConfig } from './application/components/top-nav/get-top-nav';
 import DevToolsColumnSeparator from './application/components/separator/dev-tools-column-separator';
 import { CONSOLE_CONTAINER } from './constants';
-import { send, saveEditorContentAsJson } from './lib/actions';
+import { saveEditorContentAsJson, send } from './lib/actions';
 import useHotkeyForDevTools from './application/hooks/use-hotkey-for-dev-tools';
 import useSetup from './application/hooks/use-setup';
-import DevToolTabs from "./application/components/dev-tools-tabs";
+import DevToolTabs from './application/components/dev-tools-tabs';
+import DevToolsActionButtons from './application/components/dev-tools-action-buttons';
 
 /**
  * Wazuh DevTools Console.
@@ -133,49 +131,18 @@ export const ToolDevTools = withGlobalBreadcrumb([
               id='wz-dev-left-column'
               style={{ display: 'flex', flexDirection: 'column' }}
             >
-              <div
-                id='wz-dev-tools-buttons'
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-end',
-                  position: 'relative',
-                  left: '-1.25rem',
-                  gap: '0.25rem',
-                  height: 0,
+              <DevToolsActionButtons
+                onSendRequestButton={() => {
+                  send(editorInputRef.current, editorOutputRef.current, false, {
+                    onStart: () => setRequestMeta({ loading: true }),
+                    onEnd: meta =>
+                      setRequestMeta({
+                        loading: false,
+                        ...meta,
+                      }),
+                  });
                 }}
-              >
-                <EuiIcon
-                  type='play'
-                  onClick={() =>
-                    send(
-                      editorInputRef.current,
-                      editorOutputRef.current,
-                      false,
-                      {
-                        onStart: () => setRequestMeta({ loading: true }),
-                        onEnd: meta =>
-                          setRequestMeta({
-                            loading: false,
-                            ...meta,
-                          }),
-                      },
-                    )
-                  }
-                  title='Send request'
-                  className='cursor-pointer wz-always-top'
-                  id='wz-dev-tools-buttons--send-request'
-                  color='success'
-                />
-                <a
-                  href=''
-                  target='__blank'
-                  title='Open documentation'
-                  className='cursor-pointer wz-always-top'
-                  id='wz-dev-tools-buttons--go-to-api-reference'
-                >
-                  <EuiIcon type='documentation' />
-                </a>
-              </div>
+              />
               <textarea style={{ display: 'flex' }} id='api_input'></textarea>
             </div>
             <DevToolsColumnSeparator />

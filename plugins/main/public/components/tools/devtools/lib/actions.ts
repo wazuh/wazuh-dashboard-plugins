@@ -14,6 +14,7 @@ import {
   calculateWhichGroup,
   checkJsonParseError,
 } from './grouping';
+import { DEV_TOOLS_BUTTONS } from '../constants';
 
 /**
  * Perform the request defined in the active group and render the response.
@@ -43,14 +44,12 @@ export async function send(
           ch: 0,
         });
         // keep buttons aligned with selection on first render
-        (window as any).$('#wz-dev-tools-buttons--send-request')?.offset?.({
+        (window as any).$(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`)?.offset?.({
           top: cords.top + 1,
         });
-        (window as any)
-          .$('#wz-dev-tools-buttons--go-to-api-reference')
-          ?.offset?.({
-            top: cords.top + 1,
-          });
+        (window as any).$(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`)?.offset?.({
+          top: cords.top + 1,
+        });
       }
 
       const affectedGroups = checkJsonParseError(editorInput, groups);

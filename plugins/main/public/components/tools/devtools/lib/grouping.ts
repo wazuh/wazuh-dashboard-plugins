@@ -10,6 +10,7 @@ import {
   UILogLevel,
 } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { DEV_TOOLS_BUTTONS } from '../constants';
 
 /**
  * Split the current buffer into request groups (method + path + optional JSON body).
@@ -165,8 +166,8 @@ export function calculateWhichGroup(
       }
 
       if (!desiredGroup.length) {
-        $('#wz-dev-tools-buttons--send-request').hide();
-        $('#wz-dev-tools-buttons--go-to-api-reference').hide();
+        $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
+        $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).hide();
         return null;
       }
     }
@@ -179,8 +180,8 @@ export function calculateWhichGroup(
         ch: 0,
       });
     } catch {
-      $('#wz-dev-tools-buttons--send-request').hide();
-      $('#wz-dev-tools-buttons--go-to-api-reference').hide();
+      $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
+      $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).hide();
       return null;
     }
 
@@ -199,27 +200,27 @@ export function calculateWhichGroup(
         const isVisible = lineTop >= wrapperTop && lineTop <= wrapperBottom;
 
         if (!isVisible) {
-          $('#wz-dev-tools-buttons--send-request').hide();
-          $('#wz-dev-tools-buttons--go-to-api-reference').hide();
+          $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
+          $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).hide();
         } else {
-          if (!$('#wz-dev-tools-buttons--send-request').is(':visible')) {
-            $('#wz-dev-tools-buttons--send-request').show();
+          if (!$(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).is(':visible')) {
+            $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).show();
           }
-          if (!$('#wz-dev-tools-buttons--go-to-api-reference').is(':visible')) {
-            $('#wz-dev-tools-buttons--go-to-api-reference').show();
+          if (!$(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).is(':visible')) {
+            $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).show();
           }
           // Position buttons relative to the first line of the active block
-          $('#wz-dev-tools-buttons--send-request').offset({
+          $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).offset({
             top: lineTop,
           });
-          $('#wz-dev-tools-buttons--go-to-api-reference').offset({
+          $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).offset({
             top: lineTop,
           });
         }
       } catch {
         // In case of any positioning error, make sure buttons are hidden
-        $('#wz-dev-tools-buttons--send-request').hide();
-        $('#wz-dev-tools-buttons--go-to-api-reference').hide();
+        $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
+        $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).hide();
       }
     }
 
@@ -267,21 +268,21 @@ export function calculateWhichGroup(
           ),
         );
       if (apiEndpoint && apiEndpoint.documentation) {
-        $('#wz-dev-tools-buttons--go-to-api-reference')
+        $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`)
           .attr('href', apiEndpoint.documentation)
           .show();
         // Keep send button visible only when there's a valid endpoint selected
-        $('#wz-dev-tools-buttons--send-request').show();
+        $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).show();
       } else {
-        $('#wz-dev-tools-buttons--go-to-api-reference').attr('href', '').hide();
+        $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).attr('href', '').hide();
         // Hide send button when there is no valid endpoint at cursor
-        $('#wz-dev-tools-buttons--send-request').hide();
+        $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
       }
     }
     return desiredGroup[0] || null;
   } catch (error: any) {
-    $('#wz-dev-tools-buttons--send-request').hide();
-    $('#wz-dev-tools-buttons--go-to-api-reference').hide();
+    $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
+    $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).hide();
     const options: UIErrorLog = {
       context: `calculateWhichGroup`,
       level: UI_LOGGER_LEVELS.WARNING as UILogLevel,
