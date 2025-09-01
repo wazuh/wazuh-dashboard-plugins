@@ -1,7 +1,12 @@
 import { ExcludedIntelliSenseTriggerKeys } from '../excluded-devtools-autocomplete-keys';
 import { AppState } from '../../../../react-services';
 import { DEV_TOOLS_INITIAL_BUFFER } from '../initial-buffer';
-import { analyzeGroups, calculateWhichGroup, checkJsonParseError, highlightGroup } from './grouping';
+import {
+  analyzeGroups,
+  calculateWhichGroup,
+  checkJsonParseError,
+  highlightGroup,
+} from './grouping';
 import { ensureAutocompleteCommand } from './hints/autocomplete';
 import { registerDictionaryHint } from './hints/dictionary-hint';
 import { setupDynamicHeight, setupResizableColumns } from './layout';

@@ -4,14 +4,17 @@ import { BODY_LINE_START_RE } from '../constants';
 
 /** Extract indentation and the partial key being typed on a JSON body line. */
 export function extractBodyLineContext(line: string) {
-  const match = line.match(BODY_LINE_START_RE) || [] as any;
+  const match = line.match(BODY_LINE_START_RE) || ([] as any);
   const spaceLineStart = match[1] || '';
   const inputKeyBodyParam = match[2] || '';
   return { spaceLineStart, inputKeyBodyParam };
 }
 
 /** Render a JSON body parameter line, recursively expanding objects. */
-export function renderBodyParamText(parameter: BodyParamDef, space: string): string {
+export function renderBodyParamText(
+  parameter: BodyParamDef,
+  space: string,
+): string {
   let valueBodyParam = '';
   if (parameter.type === 'string') {
     valueBodyParam = '""';
@@ -21,8 +24,12 @@ export function renderBodyParamText(parameter: BodyParamDef, space: string): str
     const keys = Object.keys(parameter.properties || {}).sort();
     const lastIndex = keys.length - 1;
     const inner = keys
-      .map((keyProp, index) =>
-        `${space}\t${renderBodyParamText({ name: keyProp, ...(parameter.properties || {})[keyProp]! }, space + '\t')}${lastIndex !== index ? ',' : ''}`,
+      .map(
+        (keyProp, index) =>
+          `${space}\t${renderBodyParamText(
+            { name: keyProp, ...(parameter.properties || {})[keyProp]! },
+            space + '\t',
+          )}${lastIndex !== index ? ',' : ''}`,
       )
       .join('\n');
     valueBodyParam = `{\n${inner}\n${space}}`;
@@ -48,17 +55,27 @@ export function getCursorObjectPath(
   return [...Array(group.end + 1 - group.start).keys()].reduce(
     (jsonBodyKeyCursor: any, lineNumberRange: number) => {
       const editorLineNumber = group.start + lineNumberRange;
-      const editorLineContent = editor.getLine ? editor.getLine(editorLineNumber) : '';
+      const editorLineContent = editor.getLine
+        ? editor.getLine(editorLineNumber)
+        : '';
       const openBracket = editorLineContent.indexOf('{');
       const closeBracket = editorLineContent.indexOf('}');
-      const keyOpenBracket = (editorLineContent.match(/\s*\"(\S+)\"\s*:\s*\{/) || [])[1];
+      const keyOpenBracket = (editorLineContent.match(
+        /\s*\"(\S+)\"\s*:\s*\{/,
+      ) || [])[1];
 
       if (keyOpenBracket) {
         jsonBodyKeyCurrent.push(keyOpenBracket);
-        jsonBodyKeyCurrentPosition.start = { line: editorLineNumber, ch: openBracket };
+        jsonBodyKeyCurrentPosition.start = {
+          line: editorLineNumber,
+          ch: openBracket,
+        };
       }
       if (closeBracket !== -1) {
-        jsonBodyKeyCurrentPosition.end = { line: editorLineNumber, ch: closeBracket };
+        jsonBodyKeyCurrentPosition.end = {
+          line: editorLineNumber,
+          ch: closeBracket,
+        };
       }
       const cursor = editor.getCursor ? editor.getCursor() : { line: 0, ch: 0 };
       if (
@@ -84,7 +101,11 @@ export function getInnerObjectFromSchema(
     return object;
   }
   const [key, ...rest] = keys;
-  if (!object.properties || !object.properties[key] || object.properties[key].type !== 'object') {
+  if (
+    !object.properties ||
+    !object.properties[key] ||
+    object.properties[key].type !== 'object'
+  ) {
     return [];
   }
   return getInnerObjectFromSchema(object.properties[key], rest);

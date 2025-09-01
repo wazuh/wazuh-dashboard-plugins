@@ -35,7 +35,9 @@ describe('registerDictionaryHint', () => {
 
     const res = helper(editor);
     // Filters to include only items containing 'a' (case-insensitive)
-    const list = res.list.map((i: any) => (i.text ?? i)).map((t: any) => (typeof t === 'string' ? t : t.text));
+    const list = res.list
+      .map((i: any) => i.text ?? i)
+      .map((t: any) => (typeof t === 'string' ? t : t.text));
     expect(list).toContain('alpha');
     expect(list).not.toContain('Zed');
     // Ensure question marks limited in strings

@@ -23,7 +23,9 @@ describe('lib/grouping index wrappers', () => {
   it('delegates calculateWhichGroup to service.selectActiveGroup', async () => {
     const selectActiveGroup = jest.fn().mockReturnValue({ id: 1 });
     jest.doMock('./grouping-service', () => ({
-      GroupingService: jest.fn().mockImplementation(() => ({ selectActiveGroup })),
+      GroupingService: jest
+        .fn()
+        .mockImplementation(() => ({ selectActiveGroup })),
     }));
 
     const mod = await import('./index');
@@ -58,4 +60,3 @@ describe('lib/grouping index wrappers', () => {
     expect(res).toEqual(['bad']);
   });
 });
-

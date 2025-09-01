@@ -1,19 +1,36 @@
 import type { BodyParamDef } from '../types';
-import { extractBodyLineContext, renderBodyParamText, getInnerObjectFromSchema, sanitizeJsonBody, getExistingKeysAtCursor, getCursorObjectPath } from './body-utils';
+import {
+  extractBodyLineContext,
+  renderBodyParamText,
+  getInnerObjectFromSchema,
+  sanitizeJsonBody,
+  getExistingKeysAtCursor,
+  getCursorObjectPath,
+} from './body-utils';
 
 describe('body-utils', () => {
   describe('extractBodyLineContext', () => {
     it('extracts indentation and typed key', () => {
-      expect(extractBodyLineContext('  "us')).toEqual({ spaceLineStart: '  ', inputKeyBodyParam: 'us' });
+      expect(extractBodyLineContext('  "us')).toEqual({
+        spaceLineStart: '  ',
+        inputKeyBodyParam: 'us',
+      });
       // Note: current regex captures closing quote/colon when present
-      expect(extractBodyLineContext('"name":')).toEqual({ spaceLineStart: '', inputKeyBodyParam: 'name":' });
+      expect(extractBodyLineContext('"name":')).toEqual({
+        spaceLineStart: '',
+        inputKeyBodyParam: 'name":',
+      });
     });
   });
 
   describe('renderBodyParamText', () => {
     it('renders string and array types', () => {
-      expect(renderBodyParamText({ name: 'title', type: 'string' }, '  ')).toBe('\"title\": ""');
-      expect(renderBodyParamText({ name: 'tags', type: 'array' }, '')).toBe('\"tags\": []');
+      expect(renderBodyParamText({ name: 'title', type: 'string' }, '  ')).toBe(
+        '"title": ""',
+      );
+      expect(renderBodyParamText({ name: 'tags', type: 'array' }, '')).toBe(
+        '"tags": []',
+      );
     });
 
     it('renders nested object types preserving indentation', () => {
@@ -29,7 +46,7 @@ describe('body-utils', () => {
       // Must contain keys a and z with correct structure
       expect(out).toContain('"a"');
       expect(out).toContain('"z"');
-      expect(out.startsWith('\"obj\": {'));
+      expect(out.startsWith('"obj": {'));
     });
   });
 
@@ -38,7 +55,11 @@ describe('body-utils', () => {
       name: 'root',
       type: 'object',
       properties: {
-        a: { name: 'a', type: 'object', properties: { b: { name: 'b', type: 'string' } } },
+        a: {
+          name: 'a',
+          type: 'object',
+          properties: { b: { name: 'b', type: 'string' } },
+        },
       },
     };
 

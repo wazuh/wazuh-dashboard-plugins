@@ -12,8 +12,9 @@ describe('parseErrorForOutput (integration)', () => {
   });
 
   it('extracts nested message via ErrorHandler and returns it', () => {
-    const res = parseErrorForOutput({ response: { data: { message: 'Server says hi' } } });
+    const res = parseErrorForOutput({
+      response: { data: { message: 'Server says hi' } },
+    });
     expect(res).toBe('Server says hi');
   });
 });
-

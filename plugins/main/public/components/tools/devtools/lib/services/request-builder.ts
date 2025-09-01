@@ -1,5 +1,9 @@
 import queryString from 'query-string';
-import { HTTP_METHODS, DEFAULT_HTTP_METHOD, HttpMethod } from '../constants/http';
+import {
+  HTTP_METHODS,
+  DEFAULT_HTTP_METHOD,
+  HttpMethod,
+} from '../constants/http';
 import type { EditorGroup } from '../types/editor';
 import type { BuiltRequest } from '../types/http';
 import { safeJsonParse, stripReservedFlags } from '../utils/json';
@@ -18,7 +22,11 @@ export class RequestBuilder {
     const { path, inlineBody } = this.extractPathAndInlineBody(raw, method);
 
     // Ensure absolute-like path
-    const normalizedPath = path ? (path.startsWith('/') ? path : `/${path}`) : '/';
+    const normalizedPath = path
+      ? path.startsWith('/')
+        ? path
+        : `/${path}`
+      : '/';
 
     // Parse and sanitize query parameters
     const { url, query } = queryString.parseUrl(normalizedPath);
@@ -29,7 +37,10 @@ export class RequestBuilder {
     );
 
     // Body: inline has priority, fallback to multi-line JSON body
-    let body = safeJsonParse((inlineBody as string) || group.requestTextJson, {} as any);
+    let body = safeJsonParse(
+      (inlineBody as string) || group.requestTextJson,
+      {} as any,
+    );
     body = stripReservedFlags(body);
     if (typeof body === 'object') (body as any).devTools = true;
 
@@ -41,9 +52,7 @@ export class RequestBuilder {
   }
 
   private detectMethod(raw: string): HttpMethod {
-    return (
-      HTTP_METHODS.find(m => raw.startsWith(m)) || DEFAULT_HTTP_METHOD
-    );
+    return HTTP_METHODS.find(m => raw.startsWith(m)) || DEFAULT_HTTP_METHOD;
   }
 
   private extractPathAndInlineBody(

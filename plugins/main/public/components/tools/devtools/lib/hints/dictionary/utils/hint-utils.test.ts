@@ -1,4 +1,8 @@
-import { dedupeByText, sortCaseInsensitive, limitToSingleQuestionMark } from './hint-utils';
+import {
+  dedupeByText,
+  sortCaseInsensitive,
+  limitToSingleQuestionMark,
+} from './hint-utils';
 
 describe('hint-utils', () => {
   describe('dedupeByText', () => {
@@ -16,7 +20,11 @@ describe('hint-utils', () => {
         { text: 'c', displayText: 'C' },
       ];
       const out = dedupeByText(items as any);
-      expect(out).toEqual([{ text: 'a' }, { text: 'b' }, { text: 'c', displayText: 'C' }] as any);
+      expect(out).toEqual([
+        { text: 'a' },
+        { text: 'b' },
+        { text: 'c', displayText: 'C' },
+      ] as any);
     });
   });
 
@@ -30,7 +38,12 @@ describe('hint-utils', () => {
       ] as any;
       const out = sortCaseInsensitive(items);
       // A, b, m, z (case-insensitive)
-      expect(out.map((i: any) => i.displayText || i.text || i)).toEqual(['A', 'b', 'm', 'z']);
+      expect(out.map((i: any) => i.displayText || i.text || i)).toEqual([
+        'A',
+        'b',
+        'm',
+        'z',
+      ]);
     });
   });
 
@@ -45,4 +58,3 @@ describe('hint-utils', () => {
     });
   });
 });
-

@@ -19,11 +19,17 @@ export class ResponseHandler {
     const response = res || {};
     const status: number | undefined = response.status;
     const statusText: string | undefined = response.statusText;
-    const body = typeof response === 'object' && 'data' in response ? response.data : response;
+    const body =
+      typeof response === 'object' && 'data' in response
+        ? response.data
+        : response;
     const hasPayloadError = !!(body && (body as any).error);
-    const ok = !hasPayloadError && typeof status === 'number' && status >= 200 && status < 300;
+    const ok =
+      !hasPayloadError &&
+      typeof status === 'number' &&
+      status >= 200 &&
+      status < 300;
 
     return { body, status, statusText, ok };
   }
 }
-

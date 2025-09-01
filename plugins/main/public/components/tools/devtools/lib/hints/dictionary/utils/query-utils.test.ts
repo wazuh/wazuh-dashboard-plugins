@@ -1,4 +1,8 @@
-import { buildNextPathWithQuery, isDefiningQueryParamValue, parseQueryString } from './query-utils';
+import {
+  buildNextPathWithQuery,
+  isDefiningQueryParamValue,
+  parseQueryString,
+} from './query-utils';
 
 describe('query-utils', () => {
   describe('parseQueryString', () => {
@@ -43,11 +47,15 @@ describe('query-utils', () => {
 
   describe('buildNextPathWithQuery', () => {
     it('builds next path with existing valid entries', () => {
-      const out = buildNextPathWithQuery('/x', [
-        { key: 'a', value: '1' },
-        { key: 'b', value: '' as any }, // invalid value -> filtered
-        { key: 'c', value: '3' },
-      ], 'next');
+      const out = buildNextPathWithQuery(
+        '/x',
+        [
+          { key: 'a', value: '1' },
+          { key: 'b', value: '' as any }, // invalid value -> filtered
+          { key: 'c', value: '3' },
+        ],
+        'next',
+      );
       expect(out).toBe('/x?a=1&c=3&next=');
     });
 
@@ -56,4 +64,3 @@ describe('query-utils', () => {
     });
   });
 });
-

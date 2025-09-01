@@ -12,4 +12,3 @@ describe('DefaultCurrentStateStore', () => {
     expect(mod.AppState.setCurrentDevTools).toHaveBeenCalledWith('abc');
   });
 });
-

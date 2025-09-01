@@ -14,4 +14,3 @@ export class FallbackHintStrategy implements HintStrategy {
     return context.model.map((m: MethodDef) => m.method) as Array<string>;
   }
 }
-

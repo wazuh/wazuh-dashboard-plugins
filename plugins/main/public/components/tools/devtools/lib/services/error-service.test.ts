@@ -7,7 +7,9 @@ jest.mock('../../../../../react-services/common-services', () => ({
 }));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const { getErrorOrchestrator } = require('../../../../../react-services/common-services');
+const {
+  getErrorOrchestrator,
+} = require('../../../../../react-services/common-services');
 
 describe('ErrorService', () => {
   const service = new ErrorService();
@@ -52,4 +54,3 @@ describe('ErrorService', () => {
     expect(payload.severity).toBe(UI_ERROR_SEVERITIES.BUSINESS);
   });
 });
-

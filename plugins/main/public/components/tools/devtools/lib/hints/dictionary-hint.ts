@@ -2,7 +2,10 @@ import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
 import { analyzeGroups, calculateWhichGroup } from '../grouping';
 import { createDictionaryHintProvider } from './dictionary/factory';
 import { logUiError } from './dictionary/utils/logging-adapter';
-import { limitToSingleQuestionMark, sortCaseInsensitive } from './dictionary/utils/hint-utils';
+import {
+  limitToSingleQuestionMark,
+  sortCaseInsensitive,
+} from './dictionary/utils/hint-utils';
 
 /**
  * Register a CodeMirror hint helper that provides endpoint, query and body parameter hints.

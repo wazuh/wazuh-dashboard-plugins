@@ -42,4 +42,3 @@ export interface HintItem {
   _moveCursor?: boolean;
   bodyParam?: BodyParamDef;
 }
-

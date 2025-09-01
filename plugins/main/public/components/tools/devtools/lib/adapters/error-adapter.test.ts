@@ -21,7 +21,7 @@ jest.mock('../../../../../react-services', () => ({
 import { ErrorHandler } from '../../../../../react-services';
 
 describe('parseErrorForOutput (unit)', () => {
-  const handleMock = (ErrorHandler.handle as unknown) as jest.Mock;
+  const handleMock = ErrorHandler.handle as unknown as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -77,4 +77,3 @@ describe('parseErrorForOutput (unit)', () => {
     expect(handleMock).toHaveBeenCalledTimes(1);
   });
 });
-

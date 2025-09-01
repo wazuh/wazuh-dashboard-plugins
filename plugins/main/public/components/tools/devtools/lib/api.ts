@@ -5,7 +5,10 @@ import { DevToolsActions } from './actions/dev-tools-actions';
 import { FileService } from './services/file-service';
 
 // Singleton-ish default actions instance for UI usage
-const defaultActions = new DevToolsActions(new WzHttpClient(), new ErrorService());
+const defaultActions = new DevToolsActions(
+  new WzHttpClient(),
+  new ErrorService(),
+);
 
 export const send = (
   editorInput: any,
@@ -27,4 +30,3 @@ export function saveEditorContentAsJson(editor: any) {
     });
   }
 }
-

@@ -15,4 +15,3 @@ describe('FallbackHintStrategy', () => {
     expect(s.getHints(ctx)).toEqual(['GET', 'POST']);
   });
 });
-

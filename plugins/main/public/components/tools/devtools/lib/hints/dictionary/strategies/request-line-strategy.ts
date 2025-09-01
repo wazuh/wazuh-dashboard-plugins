@@ -1,8 +1,15 @@
 import type { HintStrategy } from './hint-strategy';
 import type { HintItem } from '../types';
 import type { HintContext } from '../context';
-import { parseQueryString, isDefiningQueryParamValue, buildNextPathWithQuery } from '../utils/query-utils';
-import { buildEndpointHintItem, buildQueryParamHintItem } from '../utils/hint-builders';
+import {
+  parseQueryString,
+  isDefiningQueryParamValue,
+  buildNextPathWithQuery,
+} from '../utils/query-utils';
+import {
+  buildEndpointHintItem,
+  buildQueryParamHintItem,
+} from '../utils/hint-builders';
 import { dedupeByText, limitToSingleQuestionMark } from '../utils/hint-utils';
 
 /**
@@ -16,7 +23,8 @@ export class RequestLineHintStrategy implements HintStrategy {
   }
 
   getHints(context: HintContext): Array<HintItem | string> {
-    const { parsed, word, methodEndpoints, inputEndpoint, apiEndpoint } = context;
+    const { parsed, word, methodEndpoints, inputEndpoint, apiEndpoint } =
+      context;
 
     // Query param suggestions
     if (parsed.method && parsed.path && parsed.queryMark) {
@@ -87,7 +95,9 @@ export class RequestLineHintStrategy implements HintStrategy {
           return buildEndpointHintItem(suggestion);
         });
 
-      const allEndpoints = methodEndpoints.map(e => buildEndpointHintItem(e.name));
+      const allEndpoints = methodEndpoints.map(e =>
+        buildEndpointHintItem(e.name),
+      );
 
       return dedupeByText([
         ...prefixMatches,
@@ -99,4 +109,3 @@ export class RequestLineHintStrategy implements HintStrategy {
     return [];
   }
 }
-

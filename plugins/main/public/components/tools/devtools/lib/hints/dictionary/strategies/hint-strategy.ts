@@ -9,4 +9,3 @@ export interface HintStrategy {
   canHandle(context: HintContext): boolean;
   getHints(context: HintContext): Array<HintItem | string>;
 }
-

@@ -22,7 +22,11 @@ describe('ApiRoutesService', () => {
     });
 
     const res = await service.getAvailableRoutes();
-    expect(GenericRequest.request).toHaveBeenCalledWith('GET', '/api/routes', {});
+    expect(GenericRequest.request).toHaveBeenCalledWith(
+      'GET',
+      '/api/routes',
+      {},
+    );
     expect(res).toEqual([{ path: '/a' }]);
   });
 
@@ -36,4 +40,3 @@ describe('ApiRoutesService', () => {
     expect(res).toEqual([]);
   });
 });
-

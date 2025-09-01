@@ -13,7 +13,10 @@ type JQueryStub = {
 };
 
 // Initialized in beforeEach to avoid hoisting issues
-const state: Record<string, { visible: boolean; attrs: Record<string, string> }> = {};
+const state: Record<
+  string,
+  { visible: boolean; attrs: Record<string, string> }
+> = {};
 
 jest.mock('jquery', () => {
   const $ = ((sel: string) => {

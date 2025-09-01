@@ -12,12 +12,14 @@ jest.mock('../adapters/error-adapter', () => ({
 
 describe('DevToolsActions.send', () => {
   // Minimal editor output stub
-  const createOutput = () => ({ setValue: jest.fn() }) as unknown as EditorOutputLike;
+  const createOutput = () =>
+    ({ setValue: jest.fn() } as unknown as EditorOutputLike);
 
   // Common default stubs
-  const createHttp = (impl?: any) => ({ request: jest.fn(impl) }) as unknown as HttpClient & {
-    request: jest.Mock;
-  };
+  const createHttp = (impl?: any) =>
+    ({ request: jest.fn(impl) } as unknown as HttpClient & {
+      request: jest.Mock;
+    });
 
   const createErrors = () => ({ log: jest.fn() });
 
@@ -43,7 +45,9 @@ describe('DevToolsActions.send', () => {
     validateJson: jest.fn(() => options?.jsonErrors ?? []),
   });
 
-  const group = (overrides?: Partial<{ requestText: string; requestTextJson: string }>) => ({
+  const group = (
+    overrides?: Partial<{ requestText: string; requestTextJson: string }>,
+  ) => ({
     requestText: 'GET /example',
     requestTextJson: '',
     start: 0,
@@ -60,16 +64,33 @@ describe('DevToolsActions.send', () => {
     const hooks: SendHooks = { onStart: jest.fn(), onEnd: jest.fn() };
 
     const desired = group({ requestText: 'GET /my/path' });
-    const httpResponse = { status: 200, statusText: 'OK', data: { result: 'ok' } };
+    const httpResponse = {
+      status: 200,
+      statusText: 'OK',
+      data: { result: 'ok' },
+    };
 
     const http = createHttp(() => Promise.resolve(httpResponse));
     const errors = createErrors();
-    const requests = createRequests({ method: 'GET', path: '/my/path', body: { a: 1 } });
+    const requests = createRequests({
+      method: 'GET',
+      path: '/my/path',
+      body: { a: 1 },
+    });
     const responses = createResponses({
       adminForbidden: false,
-      normalized: { body: httpResponse.data, status: 200, statusText: 'OK', ok: true },
+      normalized: {
+        body: httpResponse.data,
+        status: 200,
+        statusText: 'OK',
+        ok: true,
+      },
     });
-    const grouping = createGrouping({ desiredGroup: desired, groups: [desired], jsonErrors: [] });
+    const grouping = createGrouping({
+      desiredGroup: desired,
+      groups: [desired],
+      jsonErrors: [],
+    });
 
     // Freeze duration for deterministic assertions
     const nowSpy = jest
@@ -89,15 +110,24 @@ describe('DevToolsActions.send', () => {
 
     expect(grouping.parseGroups).toHaveBeenCalled();
     expect(grouping.selectActiveGroup).toHaveBeenCalled();
-    expect(grouping.validateJson).toHaveBeenCalledWith(expect.anything(), [desired]);
+    expect(grouping.validateJson).toHaveBeenCalledWith(expect.anything(), [
+      desired,
+    ]);
     expect(requests.build).toHaveBeenCalledWith(desired);
     expect(hooks.onStart).toHaveBeenCalledTimes(1);
-    expect(http.request).toHaveBeenCalledWith('GET', '/my/path', { a: 1 }, { returnOriginalResponse: true });
+    expect(http.request).toHaveBeenCalledWith(
+      'GET',
+      '/my/path',
+      { a: 1 },
+      { returnOriginalResponse: true },
+    );
     expect(responses.isAdminModeForbidden).toHaveBeenCalledWith(httpResponse);
     expect(responses.normalize).toHaveBeenCalledWith(httpResponse);
 
     // Output should be pretty JSON and stable (snapshot)
-    expect((editorOutput.setValue as any).mock.calls[0][0]).toMatchSnapshot('happy-path-output');
+    expect((editorOutput.setValue as any).mock.calls[0][0]).toMatchSnapshot(
+      'happy-path-output',
+    );
 
     expect(hooks.onEnd).toHaveBeenCalledWith({
       status: 200,
@@ -116,9 +146,17 @@ describe('DevToolsActions.send', () => {
     const desired = group({ requestText: 'POST /broken' });
     const http = createHttp(() => Promise.resolve({}));
     const errors = createErrors();
-    const requests = createRequests({ method: 'POST', path: '/broken', body: {} });
+    const requests = createRequests({
+      method: 'POST',
+      path: '/broken',
+      body: {},
+    });
     const responses = createResponses();
-    const grouping = createGrouping({ desiredGroup: desired, groups: [desired], jsonErrors: [desired.requestText] });
+    const grouping = createGrouping({
+      desiredGroup: desired,
+      groups: [desired],
+      jsonErrors: [desired.requestText],
+    });
 
     const actions = new DevToolsActions(
       http,
@@ -130,7 +168,9 @@ describe('DevToolsActions.send', () => {
 
     await actions.send({} as any, editorOutput, false, hooks);
 
-    expect(editorOutput.setValue).toHaveBeenCalledWith(MESSAGES.ERROR_PARSING_JSON);
+    expect(editorOutput.setValue).toHaveBeenCalledWith(
+      MESSAGES.ERROR_PARSING_JSON,
+    );
     expect(http.request).not.toHaveBeenCalled();
     expect(hooks.onStart).not.toHaveBeenCalled();
     expect(hooks.onEnd).not.toHaveBeenCalled();
@@ -145,9 +185,17 @@ describe('DevToolsActions.send', () => {
     const httpResponse = 'Forbidden: code 3029'; // ADMIN_MODE_FORBIDDEN_TOKEN present
     const http = createHttp(() => Promise.resolve(httpResponse));
     const errors = createErrors();
-    const requests = createRequests({ method: 'DELETE', path: '/secure', body: {} });
+    const requests = createRequests({
+      method: 'DELETE',
+      path: '/secure',
+      body: {},
+    });
     const responses = createResponses({ adminForbidden: true });
-    const grouping = createGrouping({ desiredGroup: desired, groups: [desired], jsonErrors: [] });
+    const grouping = createGrouping({
+      desiredGroup: desired,
+      groups: [desired],
+      jsonErrors: [],
+    });
 
     const nowSpy = jest
       .spyOn(Date, 'now')
@@ -164,7 +212,9 @@ describe('DevToolsActions.send', () => {
 
     await actions.send({} as any, editorOutput, false, hooks);
 
-    expect(editorOutput.setValue).toHaveBeenCalledWith(MESSAGES.ADMIN_MODE_REQUIRED);
+    expect(editorOutput.setValue).toHaveBeenCalledWith(
+      MESSAGES.ADMIN_MODE_REQUIRED,
+    );
     // normalize should not be called when admin forbidden
     expect(responses.normalize).not.toHaveBeenCalled();
     expect(hooks.onEnd).toHaveBeenCalledWith({
@@ -184,9 +234,17 @@ describe('DevToolsActions.send', () => {
     const desired = group({ requestText: 'GET /ignored' });
     const http = createHttp(() => Promise.resolve({}));
     const errors = createErrors();
-    const requests = createRequests({ method: 'GET', path: '/ignored', body: {} });
+    const requests = createRequests({
+      method: 'GET',
+      path: '/ignored',
+      body: {},
+    });
     const responses = createResponses();
-    const grouping = createGrouping({ desiredGroup: desired, groups: [desired], jsonErrors: [] });
+    const grouping = createGrouping({
+      desiredGroup: desired,
+      groups: [desired],
+      jsonErrors: [],
+    });
 
     const actions = new DevToolsActions(
       http,
@@ -217,7 +275,11 @@ describe('DevToolsActions.send', () => {
     const errors = createErrors();
     const requests = createRequests({ method: 'GET', path: '/boom', body: {} });
     const responses = createResponses();
-    const grouping = createGrouping({ desiredGroup: desired, groups: [desired], jsonErrors: [] });
+    const grouping = createGrouping({
+      desiredGroup: desired,
+      groups: [desired],
+      jsonErrors: [],
+    });
 
     const actions = new DevToolsActions(
       http,
@@ -244,18 +306,30 @@ describe('DevToolsActions.send', () => {
     const hooks: SendHooks = { onStart: jest.fn(), onEnd: jest.fn() };
 
     // Inline body + reserved flags in body/query => sanitized by RequestBuilder
-    const desired = group({ requestText: 'POST agents?pretty=true {"pretty": true, "x": 1}' });
+    const desired = group({
+      requestText: 'POST agents?pretty=true {"pretty": true, "x": 1}',
+    });
 
     let capturedArgs: any[] | null = null;
-    const http = createHttp((method: any, path: any, body: any, options: any) => {
-      capturedArgs = [method, path, body, options];
-      return Promise.resolve({ status: 201, statusText: 'Created', data: { id: 'abc' } });
-    });
+    const http = createHttp(
+      (method: any, path: any, body: any, options: any) => {
+        capturedArgs = [method, path, body, options];
+        return Promise.resolve({
+          status: 201,
+          statusText: 'Created',
+          data: { id: 'abc' },
+        });
+      },
+    );
 
     const errors = createErrors();
     const requests = new RequestBuilder();
     const responses = new ResponseHandler();
-    const grouping = createGrouping({ desiredGroup: desired, groups: [desired], jsonErrors: [] });
+    const grouping = createGrouping({
+      desiredGroup: desired,
+      groups: [desired],
+      jsonErrors: [],
+    });
 
     const nowSpy = jest
       .spyOn(Date, 'now')
@@ -281,7 +355,9 @@ describe('DevToolsActions.send', () => {
     ]);
 
     // ResponseHandler should pretty-print the response body
-    expect(editorOutput.setValue).toHaveBeenCalledWith(JSON.stringify({ id: 'abc' }, null, 2));
+    expect(editorOutput.setValue).toHaveBeenCalledWith(
+      JSON.stringify({ id: 'abc' }, null, 2),
+    );
     expect(hooks.onEnd).toHaveBeenCalledWith({
       status: 201,
       statusText: 'Created',
@@ -292,4 +368,3 @@ describe('DevToolsActions.send', () => {
     nowSpy.mockRestore();
   });
 });
-

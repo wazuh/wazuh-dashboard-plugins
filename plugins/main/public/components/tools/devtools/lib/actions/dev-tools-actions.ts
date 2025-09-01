@@ -35,7 +35,10 @@ export class DevToolsActions {
       );
 
       if (desiredGroup) {
-        const affectedGroups = this.grouping.validateJson(editorInput as any, groups);
+        const affectedGroups = this.grouping.validateJson(
+          editorInput as any,
+          groups,
+        );
         const hasJsonError = affectedGroups.some(
           item => item === desiredGroup.requestText,
         );
@@ -66,9 +69,8 @@ export class DevToolsActions {
             return;
           }
 
-          const { body, status, statusText, ok } = this.responses.normalize(
-            response,
-          );
+          const { body, status, statusText, ok } =
+            this.responses.normalize(response);
           editorOutput.setValue(JSON.stringify(body, null, 2));
           hooks?.onEnd?.({
             status,

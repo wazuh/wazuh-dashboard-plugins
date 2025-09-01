@@ -13,4 +13,3 @@ describe('DefaultJsonLinter', () => {
     expect(mod.default.parse).toHaveBeenCalledWith('{"a":1}');
   });
 });
-

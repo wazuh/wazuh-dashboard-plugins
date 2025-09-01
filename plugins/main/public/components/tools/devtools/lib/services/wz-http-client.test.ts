@@ -17,10 +17,22 @@ describe('WzHttpClient', () => {
   });
 
   it('delegates en WzRequest.apiReq (happy path)', async () => {
-    (WzRequest.apiReq as jest.Mock).mockResolvedValue({ status: 200, data: { ok: true } });
-    const res = await client.request('POST', '/path', { a: 1 }, { returnOriginalResponse: true });
-    expect(WzRequest.apiReq).toHaveBeenCalledWith('POST', '/path', { a: 1 }, { returnOriginalResponse: true });
+    (WzRequest.apiReq as jest.Mock).mockResolvedValue({
+      status: 200,
+      data: { ok: true },
+    });
+    const res = await client.request(
+      'POST',
+      '/path',
+      { a: 1 },
+      { returnOriginalResponse: true },
+    );
+    expect(WzRequest.apiReq).toHaveBeenCalledWith(
+      'POST',
+      '/path',
+      { a: 1 },
+      { returnOriginalResponse: true },
+    );
     expect(res).toEqual({ status: 200, data: { ok: true } });
   });
 });
-

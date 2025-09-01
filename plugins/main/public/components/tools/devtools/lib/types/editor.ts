@@ -25,7 +25,11 @@ export interface EditorLike {
   on(event: string, handler: (...args: any[]) => void): void;
   getCursor(): CursorPos;
   cursorCoords(pos: CursorPos): CursorCoords;
-  getSearchCursor?(query: string, pos?: any, options?: any): {
+  getSearchCursor?(
+    query: string,
+    pos?: any,
+    options?: any,
+  ): {
     findNext(): boolean;
     from(): CursorPos;
   };

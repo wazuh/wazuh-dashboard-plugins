@@ -70,8 +70,12 @@ describe('stripReservedFlags', () => {
     expect(originalTrue).toEqual({ a: 1, pretty: true, b: 2 });
     expect(originalFalse).toEqual({ a: 1, pretty: false, b: 2 });
 
-    expect(sanitizedTrue).toMatchSnapshot('stripReservedFlags-with-pretty-true');
-    expect(sanitizedFalse).toMatchSnapshot('stripReservedFlags-with-pretty-false');
+    expect(sanitizedTrue).toMatchSnapshot(
+      'stripReservedFlags-with-pretty-true',
+    );
+    expect(sanitizedFalse).toMatchSnapshot(
+      'stripReservedFlags-with-pretty-false',
+    );
   });
 
   it('does not remove nested "pretty" fields (only top-level)', () => {
@@ -87,7 +91,10 @@ describe('stripReservedFlags', () => {
   });
 
   it('keeps the key when "pretty" is explicitly undefined (by design of implementation)', () => {
-    const obj: { pretty?: boolean | undefined; x: number } = { pretty: undefined, x: 1 };
+    const obj: { pretty?: boolean | undefined; x: number } = {
+      pretty: undefined,
+      x: 1,
+    };
     const result = stripReservedFlags(obj);
     expect(result).toHaveProperty('pretty', undefined);
     expect(result).toHaveProperty('x', 1);
@@ -100,4 +107,3 @@ describe('stripReservedFlags', () => {
     expect(stripReservedFlags('str' as any)).toBe('str');
   });
 });
-

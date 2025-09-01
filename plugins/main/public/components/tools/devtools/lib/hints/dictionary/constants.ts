@@ -14,4 +14,3 @@ export const LABEL_FLAG = 'flag';
  * Captures indentation and typed key prefix.
  */
 export const BODY_LINE_START_RE = /^(\s*)(?:\"|')(\S*)(?::)?$/;
-

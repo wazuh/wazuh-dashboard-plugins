@@ -36,7 +36,9 @@ export function isCursorOnRequestLine(
 ): boolean {
   if (!current) return false;
   const firstToken = (line.split(/\s+/g)[0] || '').trim();
-  return Boolean(firstToken) && current.start === cursorLine && !word.includes('{');
+  return (
+    Boolean(firstToken) && current.start === cursorLine && !word.includes('{')
+  );
 }
 
 /** Determine if the cursor is currently inside a JSON body block. */
@@ -94,4 +96,3 @@ export function buildHintContext(
     isInsideBodyBlock: insideBody,
   };
 }
-

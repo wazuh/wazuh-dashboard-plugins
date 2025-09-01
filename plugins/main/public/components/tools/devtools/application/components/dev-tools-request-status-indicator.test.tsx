@@ -5,9 +5,7 @@ import DevToolsRequestStatusIndicator from './dev-tools-request-status-indicator
 
 describe('DevToolsRequestStatusIndicator', () => {
   it('shows spinner when loading', () => {
-    render(
-      <DevToolsRequestStatusIndicator loading show />,
-    );
+    render(<DevToolsRequestStatusIndicator loading show />);
     expect(screen.getByText(/Request in progress/i)).toBeInTheDocument();
   });
 
@@ -19,16 +17,12 @@ describe('DevToolsRequestStatusIndicator', () => {
   });
 
   it('renders OK when ok=true and no status code', () => {
-    render(
-      <DevToolsRequestStatusIndicator loading={false} show ok />,
-    );
+    render(<DevToolsRequestStatusIndicator loading={false} show ok />);
     expect(screen.getByText('OK')).toBeInTheDocument();
   });
 
   it('renders ERROR when ok=false and no status code', () => {
-    render(
-      <DevToolsRequestStatusIndicator loading={false} show ok={false} />,
-    );
+    render(<DevToolsRequestStatusIndicator loading={false} show ok={false} />);
     expect(screen.getByText('ERROR')).toBeInTheDocument();
   });
 
@@ -47,21 +41,37 @@ describe('DevToolsRequestStatusIndicator', () => {
 
   it('renders rounded non-negative duration in ms', () => {
     const { rerender } = render(
-      <DevToolsRequestStatusIndicator loading={false} show ok durationMs={12.5} />,
+      <DevToolsRequestStatusIndicator
+        loading={false}
+        show
+        ok
+        durationMs={12.5}
+      />,
     );
     expect(screen.getByText('13 ms')).toBeInTheDocument();
 
     rerender(
-      <DevToolsRequestStatusIndicator loading={false} show ok durationMs={-10} />,
+      <DevToolsRequestStatusIndicator
+        loading={false}
+        show
+        ok
+        durationMs={-10}
+      />,
     );
     expect(screen.getByText('0 ms')).toBeInTheDocument();
   });
 
   it('matches snapshot for basic success meta', () => {
     const { container } = render(
-      <DevToolsRequestStatusIndicator loading={false} show ok status={200} statusText='OK' durationMs={123} />,
+      <DevToolsRequestStatusIndicator
+        loading={false}
+        show
+        ok
+        status={200}
+        statusText='OK'
+        durationMs={123}
+      />,
     );
     expect(container).toMatchSnapshot();
   });
 });
-

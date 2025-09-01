@@ -37,4 +37,3 @@ describe('resolveDocsUrl', () => {
     expect(resolveDocsUrl(editor, 'INVALID')).toBeNull();
   });
 });
-

@@ -1,11 +1,21 @@
-import { findMatchingEndpoint, getMethodEndpoints, parseRequestLine, splitPathToSegments } from './endpoint-utils';
+import {
+  findMatchingEndpoint,
+  getMethodEndpoints,
+  parseRequestLine,
+  splitPathToSegments,
+} from './endpoint-utils';
 import type { DevToolsModel, EndpointDef, MethodDef } from '../types';
 
 describe('endpoint-utils', () => {
   describe('parseRequestLine', () => {
     it('parses method, path and query', () => {
       const out = parseRequestLine('GET /alpha/beta?x=1&y=2');
-      expect(out).toEqual({ method: 'GET', path: '/alpha/beta', queryMark: '?', queryString: 'x=1&y=2' });
+      expect(out).toEqual({
+        method: 'GET',
+        path: '/alpha/beta',
+        queryMark: '?',
+        queryString: 'x=1&y=2',
+      });
     });
 
     it('returns empty object on empty input', () => {
@@ -53,4 +63,3 @@ describe('endpoint-utils', () => {
     });
   });
 });
-

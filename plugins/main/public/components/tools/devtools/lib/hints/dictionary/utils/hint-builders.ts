@@ -23,4 +23,3 @@ export function buildQueryParamHintItem(
     render: createHintRenderer(isFlag ? LABEL_FLAG : LABEL_PARAM),
   };
 }
-

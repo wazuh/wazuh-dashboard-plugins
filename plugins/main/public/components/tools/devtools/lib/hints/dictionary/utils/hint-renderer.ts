@@ -1,4 +1,8 @@
-import { HINT_LABEL_CLASS, HINT_TEXT_CLASS, HINT_WRAPPER_CLASS } from '../constants';
+import {
+  HINT_LABEL_CLASS,
+  HINT_TEXT_CLASS,
+  HINT_WRAPPER_CLASS,
+} from '../constants';
 
 /**
  * Create a CodeMirror hint render function with a right-aligned label.
@@ -24,4 +28,3 @@ export function createHintRenderer(label: string) {
     }
   };
 }
-

@@ -7,4 +7,3 @@ export const MESSAGES = {
   ADMIN_MODE_REQUIRED: 'This method is not allowed without admin mode',
   ADMIN_MODE_REQUIRED_SHORT: 'Forbidden without admin mode',
 } as const;
-

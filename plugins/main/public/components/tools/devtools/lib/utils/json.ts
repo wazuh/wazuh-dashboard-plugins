@@ -1,7 +1,10 @@
 /**
  * Safely parse JSON. Returns `{}` on failure by default.
  */
-export function safeJsonParse<T = any>(raw: string | undefined | null, fallback: T = {} as T): T {
+export function safeJsonParse<T = any>(
+  raw: string | undefined | null,
+  fallback: T = {} as T,
+): T {
   if (!raw) return fallback;
   try {
     return JSON.parse(raw) as T;
@@ -19,4 +22,3 @@ export function stripReservedFlags<T extends Record<string, any>>(obj: T): T {
   if (typeof copy.pretty !== 'undefined') delete copy.pretty;
   return copy as T;
 }
-

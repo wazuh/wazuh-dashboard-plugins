@@ -7,7 +7,12 @@ const baseContext = (over: Partial<HintContext> = {}): HintContext => ({
   word: '',
   model: [],
   groups: [],
-  currentGroup: { requestText: 'GET /api?foo=1', requestTextJson: '', start: 0, end: 0 },
+  currentGroup: {
+    requestText: 'GET /api?foo=1',
+    requestTextJson: '',
+    start: 0,
+    end: 0,
+  },
   cursorLine: 0,
   parsed: { method: 'GET', path: '/api', queryMark: '?', queryString: 'foo=1' },
   inputEndpoint: ['api'],
@@ -23,24 +28,36 @@ describe('RequestLineHintStrategy', () => {
     const s = new RequestLineHintStrategy();
     expect(s.canHandle(baseContext())).toBe(true);
     expect(s.canHandle(baseContext({ isOnRequestLine: false }))).toBe(false);
-    expect(s.canHandle(baseContext({ parsed: { path: '/x' } as any }))).toBe(false);
+    expect(s.canHandle(baseContext({ parsed: { path: '/x' } as any }))).toBe(
+      false,
+    );
   });
 
   it('suggests query params when adding modifiers', () => {
     const s = new RequestLineHintStrategy();
-  const ctx = baseContext({
-    apiEndpoint: {
-      name: '/api',
-      query: [
-        { name: 'bar', schema: { type: 'boolean' } },
-        { name: 'baz' },
-        { name: 'foo' }, // already present in qs -> skipped
-      ],
-    },
-    methodEndpoints: [{ name: '/api' }],
-    parsed: { method: 'GET', path: '/api', queryMark: '?', queryString: 'foo=1&' } as any,
-    currentGroup: { requestText: 'GET /api?foo=1&', requestTextJson: '', start: 0, end: 0 },
-  });
+    const ctx = baseContext({
+      apiEndpoint: {
+        name: '/api',
+        query: [
+          { name: 'bar', schema: { type: 'boolean' } },
+          { name: 'baz' },
+          { name: 'foo' }, // already present in qs -> skipped
+        ],
+      },
+      methodEndpoints: [{ name: '/api' }],
+      parsed: {
+        method: 'GET',
+        path: '/api',
+        queryMark: '?',
+        queryString: 'foo=1&',
+      } as any,
+      currentGroup: {
+        requestText: 'GET /api?foo=1&',
+        requestTextJson: '',
+        start: 0,
+        end: 0,
+      },
+    });
     const out = s.getHints(ctx);
     const labels = (out as any[]).map(i => i.displayText);
     expect(labels).toContain('bar');

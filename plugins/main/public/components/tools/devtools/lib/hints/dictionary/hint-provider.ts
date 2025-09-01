@@ -2,7 +2,11 @@ import type { EditorLike, EditorGroup } from '../../types/editor';
 import type { DevToolsModel, HintItem } from './types';
 import { buildHintContext } from './context';
 import type { HintStrategy } from './strategies/hint-strategy';
-import { BodyHintStrategy, FallbackHintStrategy, RequestLineHintStrategy } from './strategies';
+import {
+  BodyHintStrategy,
+  FallbackHintStrategy,
+  RequestLineHintStrategy,
+} from './strategies';
 
 export interface HintProviderDeps {
   analyzeGroups: (editor: EditorLike) => EditorGroup[];

@@ -39,7 +39,9 @@ describe('useHotkeyForDevTools', () => {
 
   it('cleans up listener on unmount', () => {
     const cb = jest.fn();
-    const { unmount } = renderHook(() => useHotkeyForDevTools({ onSendRequestButton: cb }));
+    const { unmount } = renderHook(() =>
+      useHotkeyForDevTools({ onSendRequestButton: cb }),
+    );
     expect(on).toHaveBeenCalledTimes(1);
     act(() => unmount());
     expect(off).toHaveBeenCalledWith('keydown', expect.any(Function));
@@ -48,4 +50,3 @@ describe('useHotkeyForDevTools', () => {
     expect(cb).not.toHaveBeenCalled();
   });
 });
-

@@ -10,8 +10,14 @@ export interface ParsedRequestLine {
 
 export function parseRequestLine(text?: string): ParsedRequestLine {
   if (!text) return {};
-  const [, inputHttpMethod, inputPath, inputQueryParamsStart, inputQueryParams] =
-    (text.match(REQUEST_LINE_REGEX) as RegExpMatchArray | null) || [] as any;
+  const [
+    ,
+    inputHttpMethod,
+    inputPath,
+    inputQueryParamsStart,
+    inputQueryParams,
+  ] =
+    (text.match(REQUEST_LINE_REGEX) as RegExpMatchArray | null) || ([] as any);
   return {
     method: inputHttpMethod,
     path: inputPath,
@@ -28,9 +34,14 @@ export function splitPathToSegments(path?: string): string[] {
     .map((s: string) => s.toLowerCase());
 }
 
-export function getMethodEndpoints(model: DevToolsModel | undefined, method?: string): EndpointDef[] {
+export function getMethodEndpoints(
+  model: DevToolsModel | undefined,
+  method?: string,
+): EndpointDef[] {
   if (!model || !method) return [];
-  const entry: MethodDef | undefined = model.find((m: MethodDef) => m.method === method);
+  const entry: MethodDef | undefined = model.find(
+    (m: MethodDef) => m.method === method,
+  );
   return (entry && entry.endpoints) || [];
 }
 
@@ -43,11 +54,16 @@ export function findMatchingEndpoint(
       ...endpoint,
       splitURL: endpoint.name.split('/').filter(Boolean),
     }))
-    .filter((e: EndpointDef) => (e.splitURL || []).length === inputSegments.length);
+    .filter(
+      (e: EndpointDef) => (e.splitURL || []).length === inputSegments.length,
+    );
 
   return candidates.find((e: EndpointDef) =>
-    (e.splitURL || []).reduce((acc: boolean, seg: string, idx: number) =>
-      acc && (seg.startsWith(':') ? true : seg.toLowerCase() === inputSegments[idx]), true),
+    (e.splitURL || []).reduce(
+      (acc: boolean, seg: string, idx: number) =>
+        acc &&
+        (seg.startsWith(':') ? true : seg.toLowerCase() === inputSegments[idx]),
+      true,
+    ),
   );
 }
-

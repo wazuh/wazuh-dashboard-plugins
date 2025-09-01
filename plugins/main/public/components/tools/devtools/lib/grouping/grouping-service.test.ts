@@ -82,7 +82,13 @@ describe('GroupingService.parseGroups', () => {
     const mockJson = { parse: jest.fn() };
     const svc = new GroupingService(
       // ui
-      { showPlay: jest.fn(), hidePlay: jest.fn(), showDocs: jest.fn(), hideDocs: jest.fn(), setButtonsTop: jest.fn() } as any,
+      {
+        showPlay: jest.fn(),
+        hidePlay: jest.fn(),
+        showDocs: jest.fn(),
+        hideDocs: jest.fn(),
+        setButtonsTop: jest.fn(),
+      } as any,
       // errors
       { log: jest.fn() } as any,
       // state
@@ -134,7 +140,10 @@ describe('GroupingService.parseGroups', () => {
 
   it('returns empty array if search cursor cannot find a block', () => {
     const editor = buildEditor('GET /agents');
-    editor.getSearchCursor = () => ({ findNext: () => false, from: () => ({ line: 0, ch: 0 }) });
+    editor.getSearchCursor = () => ({
+      findNext: () => false,
+      from: () => ({ line: 0, ch: 0 }),
+    });
 
     const svc = new GroupingService();
     const groups = svc.parseGroups(editor);
@@ -148,14 +157,31 @@ describe('GroupingService.highlightGroup', () => {
     (editor as any).__highlightedLines = [10, 11];
 
     const svc = new GroupingService();
-    svc.highlightGroup(editor, { requestText: 'GET /agents', requestTextJson: '', start: 0, end: 0 });
+    svc.highlightGroup(editor, {
+      requestText: 'GET /agents',
+      requestTextJson: '',
+      start: 0,
+      end: 0,
+    });
 
     // Previous highlights removed
-    expect(editor.removeLineClass).toHaveBeenCalledWith(10, 'background', expect.any(String));
-    expect(editor.removeLineClass).toHaveBeenCalledWith(11, 'background', expect.any(String));
+    expect(editor.removeLineClass).toHaveBeenCalledWith(
+      10,
+      'background',
+      expect.any(String),
+    );
+    expect(editor.removeLineClass).toHaveBeenCalledWith(
+      11,
+      'background',
+      expect.any(String),
+    );
 
     // New highlight applied only to start line
-    expect(editor.addLineClass).toHaveBeenCalledWith(0, 'background', expect.any(String));
+    expect(editor.addLineClass).toHaveBeenCalledWith(
+      0,
+      'background',
+      expect.any(String),
+    );
   });
 
   it('highlights all lines in a multi-line JSON group', () => {
@@ -169,8 +195,16 @@ describe('GroupingService.highlightGroup', () => {
     });
 
     expect(editor.addLineClass).toHaveBeenCalledTimes(4); // 5,6,7,8
-    expect(editor.addLineClass).toHaveBeenCalledWith(5, 'background', expect.any(String));
-    expect(editor.addLineClass).toHaveBeenCalledWith(8, 'background', expect.any(String));
+    expect(editor.addLineClass).toHaveBeenCalledWith(
+      5,
+      'background',
+      expect.any(String),
+    );
+    expect(editor.addLineClass).toHaveBeenCalledWith(
+      8,
+      'background',
+      expect.any(String),
+    );
   });
 });
 
@@ -186,11 +220,7 @@ describe('GroupingService.selectActiveGroup', () => {
   }
 
   it('selects group by cursor position and shows buttons when visible', () => {
-    const content = [
-      'GET /agents',
-      '',
-      'GET /agents/docs',
-    ].join('\n');
+    const content = ['GET /agents', '', 'GET /agents/docs'].join('\n');
 
     const editor = buildEditor(content);
     const ui = makeUI();
@@ -198,7 +228,12 @@ describe('GroupingService.selectActiveGroup', () => {
 
     const groups: EditorGroup[] = [
       { requestText: 'GET /agents', requestTextJson: '', start: 0, end: 0 },
-      { requestText: 'GET /agents/docs', requestTextJson: '', start: 2, end: 2 },
+      {
+        requestText: 'GET /agents/docs',
+        requestTextJson: '',
+        start: 2,
+        end: 2,
+      },
     ];
 
     // Put cursor on line 2 (docs request), and ensure visible
@@ -300,15 +335,31 @@ describe('GroupingService.validateJson', () => {
     };
 
     const svc = new GroupingService(
-      { showPlay: jest.fn(), hidePlay: jest.fn(), showDocs: jest.fn(), hideDocs: jest.fn(), setButtonsTop: jest.fn() } as any,
+      {
+        showPlay: jest.fn(),
+        hidePlay: jest.fn(),
+        showDocs: jest.fn(),
+        hideDocs: jest.fn(),
+        setButtonsTop: jest.fn(),
+      } as any,
       { log: jest.fn() } as any,
       { setCurrentDevTools: jest.fn() } as any,
       json as any,
     );
 
     const groups: EditorGroup[] = [
-      { requestText: 'POST /ok', requestTextJson: '{"good": true}', start: 0, end: 3 },
-      { requestText: 'POST /fail', requestTextJson: '{bad json}', start: 4, end: 8 },
+      {
+        requestText: 'POST /ok',
+        requestTextJson: '{"good": true}',
+        start: 0,
+        end: 3,
+      },
+      {
+        requestText: 'POST /fail',
+        requestTextJson: '{bad json}',
+        start: 4,
+        end: 8,
+      },
       { requestText: 'GET /noop', requestTextJson: '', start: 9, end: 9 },
     ];
 

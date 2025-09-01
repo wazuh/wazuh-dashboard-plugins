@@ -2,14 +2,7 @@ import { BodyHintStrategy } from './body-strategy';
 import type { HintContext } from '../context';
 
 // Build a minimal editor buffer with a JSON body to exercise the strategy
-const lines = [
-  'GET /api',
-  '{',
-  '  "a": {',
-  '    "existing": 1',
-  '  }',
-  '}',
-];
+const lines = ['GET /api', '{', '  "a": {', '    "existing": 1', '  }', '}'];
 
 const editor = {
   getCursor: () => ({ line: 3, ch: 5 }),

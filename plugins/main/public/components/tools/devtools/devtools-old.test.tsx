@@ -6,7 +6,8 @@ import '@testing-library/jest-dom/extend-expect';
 // Mocks
 jest.mock('../../common/hocs', () => ({
   // Identity HOC so we render the wrapped component without referencing React
-  withGlobalBreadcrumb: () => (Component: any) => (props: any) => Component(props),
+  withGlobalBreadcrumb: () => (Component: any) => (props: any) =>
+    Component(props),
   __esModule: true,
 }));
 
@@ -31,7 +32,11 @@ jest.mock('../../../utils/applications', () => ({
 jest.mock('./application/hooks/use-setup', () => ({
   __esModule: true,
   default: () => ({
-    editorInputRef: { current: { /* minimal stub */ } },
+    editorInputRef: {
+      current: {
+        /* minimal stub */
+      },
+    },
     editorOutputRef: { current: { getValue: jest.fn(() => '{}') } },
   }),
 }));
@@ -78,14 +83,21 @@ describe('ToolDevTools (integration)', () => {
         hooks?: { onStart?: Function; onEnd?: Function },
       ) => {
         hooks?.onStart?.();
-        hooks?.onEnd?.({ ok: true, status: 200, statusText: 'OK', durationMs: 123.4 });
+        hooks?.onEnd?.({
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          durationMs: 123.4,
+        });
       },
     );
 
     const { container } = render(<ToolDevTools />);
 
     // Act: click Play
-    const play = container.querySelector(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`);
+    const play = container.querySelector(
+      `#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`,
+    );
     expect(play).toBeTruthy();
     await act(async () => {
       fireEvent.click(play!);
@@ -93,9 +105,7 @@ describe('ToolDevTools (integration)', () => {
 
     // Assert send called and UI reflects status
     expect(lib.send).toHaveBeenCalledTimes(1);
-    expect(
-      screen.getByText(/200\s-\sOK/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/200\s-\sOK/i)).toBeInTheDocument();
     expect(screen.getByText(/123\s?ms/i)).toBeInTheDocument();
   });
 
@@ -103,7 +113,9 @@ describe('ToolDevTools (integration)', () => {
     const { container } = render(<ToolDevTools />);
 
     // Export button provided by top nav config
-    const exportBtn = container.querySelector('[data-test-subj="consoleExportButton"]');
+    const exportBtn = container.querySelector(
+      '[data-test-subj="consoleExportButton"]',
+    );
     expect(exportBtn).toBeTruthy();
     fireEvent.click(exportBtn!);
 
@@ -119,7 +131,12 @@ describe('ToolDevTools (integration)', () => {
         hooks?: { onStart?: Function; onEnd?: Function },
       ) => {
         hooks?.onStart?.();
-        hooks?.onEnd?.({ ok: false, status: 500, statusText: 'Internal Error', durationMs: 45.2 });
+        hooks?.onEnd?.({
+          ok: false,
+          status: 500,
+          statusText: 'Internal Error',
+          durationMs: 45.2,
+        });
       },
     );
 

@@ -122,13 +122,17 @@ export class GroupingService {
       const validGroups = groups.filter(item => item.requestText);
       let desiredGroup: any = firstTime
         ? (validGroups as any)
-        : validGroups.filter(item =>
-            item.requestText && item.end >= selection.line && item.start <= selection.line,
+        : validGroups.filter(
+            item =>
+              item.requestText &&
+              item.end >= selection.line &&
+              item.start <= selection.line,
           );
 
       if (!firstTime && desiredGroup.length === 0) {
         try {
-          const wrapperEl = editor.getWrapperElement?.() || editor.display?.wrapper || null;
+          const wrapperEl =
+            editor.getWrapperElement?.() || editor.display?.wrapper || null;
           const $wrapper = wrapperEl ? $(wrapperEl) : null;
           const wrapperTop = $wrapper?.offset()?.top ?? 0;
           const wrapperHeight = $wrapper?.outerHeight?.() ?? 0;
@@ -169,7 +173,8 @@ export class GroupingService {
 
       if (desiredGroup[0]) {
         try {
-          const wrapperEl = editor.getWrapperElement?.() || editor.display?.wrapper || null;
+          const wrapperEl =
+            editor.getWrapperElement?.() || editor.display?.wrapper || null;
           const $wrapper = wrapperEl ? $(wrapperEl) : null;
           const wrapperTop = $wrapper?.offset()?.top ?? 0;
           const wrapperHeight = $wrapper?.outerHeight?.() ?? 0;
@@ -184,7 +189,9 @@ export class GroupingService {
             this.ui.hideDocs();
           } else {
             this.ui.showPlay();
-            this.ui.showDocs(resolveDocsUrl(editor as any, desiredGroup[0].requestText) || '');
+            this.ui.showDocs(
+              resolveDocsUrl(editor as any, desiredGroup[0].requestText) || '',
+            );
             this.ui.setButtonsTop(lineTop);
           }
         } catch {
@@ -211,7 +218,11 @@ export class GroupingService {
     } catch (error: any) {
       this.ui.hidePlay();
       this.ui.hideDocs();
-      this.errors.log({ context: 'selectActiveGroup', error, level: undefined });
+      this.errors.log({
+        context: 'selectActiveGroup',
+        error,
+        level: undefined,
+      });
       return null;
     }
   }
@@ -236,7 +247,10 @@ export class GroupingService {
       (editor as any).__highlightedLines.push(ln);
     };
 
-    if (!group.requestTextJson || (group.requestText.includes('{') && group.requestText.includes('}'))) {
+    if (
+      !group.requestTextJson ||
+      (group.requestText.includes('{') && group.requestText.includes('}'))
+    ) {
       add(group.start);
       return;
     }
@@ -267,9 +281,12 @@ export class GroupingService {
           icon.className = 'lint-error-icon';
           icon.id = String(new Date().getTime() / 1000);
           icon.onmouseover = () => {
-            const advice = msg.appendChild(window.document.createElement('span'));
+            const advice = msg.appendChild(
+              window.document.createElement('span'),
+            );
             advice.id = String(new Date().getTime() / 1000);
-            advice.innerText = (error?.message as string) || 'Error parsing query';
+            advice.innerText =
+              (error?.message as string) || 'Error parsing query';
             advice.className = 'lint-block-wz';
           };
 
@@ -290,4 +307,3 @@ export class GroupingService {
     return affectedGroups;
   }
 }
-

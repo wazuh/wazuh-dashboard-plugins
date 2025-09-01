@@ -22,7 +22,8 @@ describe('DevTools services (integración)', () => {
 
   it('flujo: build -> http -> normalize', async () => {
     const group = {
-      requestText: 'POST /index/_search?pretty=true { "query": {"match_all":{}} }',
+      requestText:
+        'POST /index/_search?pretty=true { "query": {"match_all":{}} }',
       requestTextJson: '',
       start: 0,
       end: 0,
@@ -37,14 +38,16 @@ describe('DevTools services (integración)', () => {
       data: { took: 1, hits: { total: 0 } },
     });
 
-    const raw = await client.request(built.method, built.path, built.body, { returnOriginalResponse: true });
+    const raw = await client.request(built.method, built.path, built.body, {
+      returnOriginalResponse: true,
+    });
     const normalized = handler.normalize(raw);
 
     expect(WzRequest.apiReq).toHaveBeenCalledWith(
       'POST',
       '/index/_search',
       expect.objectContaining({ devTools: true }),
-      { returnOriginalResponse: true }
+      { returnOriginalResponse: true },
     );
     expect(normalized).toEqual({
       body: { took: 1, hits: { total: 0 } },

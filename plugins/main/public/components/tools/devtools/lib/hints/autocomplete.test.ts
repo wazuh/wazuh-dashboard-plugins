@@ -13,7 +13,10 @@ describe('ensureAutocompleteCommand', () => {
     expect(typeof CM.commands.autocomplete).toBe('function');
     const cmInstance = {};
     CM.commands.autocomplete(cmInstance);
-    expect(CM.showHint).toHaveBeenCalledWith(cmInstance, CM.hint.dictionaryHint, { completeSingle: false });
+    expect(CM.showHint).toHaveBeenCalledWith(
+      cmInstance,
+      CM.hint.dictionaryHint,
+      { completeSingle: false },
+    );
   });
 });
-
