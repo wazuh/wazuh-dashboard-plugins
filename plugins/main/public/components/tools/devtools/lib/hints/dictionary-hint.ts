@@ -1,24 +1,14 @@
-import CodeMirror from '../../../../utils/codemirror/lib/codemirror';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
-import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
+import { analyzeGroups, calculateWhichGroup } from '../grouping';
+import { REQUEST_LINE_REGEX } from '../constants/regex';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
   UIErrorSeverity,
   UILogLevel,
-} from '../../../../react-services/error-orchestrator/types';
-import { analyzeGroups, calculateWhichGroup } from './grouping';
-
-/**
- * Ensure the autocomplete command is configured to use our dictionary hint provider.
- */
-export function ensureAutocompleteCommand() {
-  CodeMirror.commands.autocomplete = function (cm: any) {
-    CodeMirror.showHint(cm, (CodeMirror as any).hint.dictionaryHint, {
-      completeSingle: false,
-    });
-  };
-}
+} from '../../../../../react-services/error-orchestrator/types';
 
 /**
  * Register a CodeMirror hint helper that provides endpoint, query and body parameter hints.
@@ -33,7 +23,6 @@ export function registerDictionaryHint(editorInput: any) {
       const groups = analyzeGroups(editorInput);
       const currentGroup = calculateWhichGroup(editor, undefined, groups);
       const editorCursor = editor.getCursor();
-      // Get http method, path, query params from API request
       const [
         inputRequest,
         inputHttpMethod,
@@ -43,11 +32,8 @@ export function registerDictionaryHint(editorInput: any) {
       ] =
         (currentGroup &&
           currentGroup.requestText &&
-          currentGroup.requestText.match(
-            /^(GET|PUT|POST|DELETE) ([^\?]*)(\?)?(\S+)?/,
-          )) ||
+          currentGroup.requestText.match(REQUEST_LINE_REGEX)) ||
         [];
-      // Split the input request path as array and lowercase
       const inputEndpoint =
         (inputPath &&
           inputPath
@@ -55,11 +41,9 @@ export function registerDictionaryHint(editorInput: any) {
             .filter((item: string) => item)
             .map((item: string) => item.toLowerCase())) ||
         [];
-      // Get all API endpoints with http method in the request
       const inputHttpMethodEndpoints =
         (model.find((item: any) => item.method === inputHttpMethod) || {})
           .endpoints || [];
-      // Find the API endpoint in the request
       const apiEndpoint = inputHttpMethodEndpoints
         .map((endpoint: any) => ({
           ...endpoint,
@@ -78,7 +62,6 @@ export function registerDictionaryHint(editorInput: any) {
             true,
           ),
         );
-      // Small renderer to show a right-aligned label (endpoint/param/flag)
       const makeRender =
         (label: string) => (elt: HTMLElement, _data: any, cur: any) => {
           try {
@@ -94,7 +77,6 @@ export function registerDictionaryHint(editorInput: any) {
             wrap.appendChild(right);
             elt.appendChild(wrap);
           } catch (e) {
-            // Fallback to plain text if something fails
             elt.appendChild(
               document.createTextNode(
                 (cur.displayText || cur.text || '') as string,
@@ -103,16 +85,13 @@ export function registerDictionaryHint(editorInput: any) {
           }
         };
 
-      // Get API endpoint path hints
       if (
         exp[0] &&
         currentGroup &&
         currentGroup.start === editorCursor.line &&
         !word.includes('{')
       ) {
-        // Get hints for requests as: http_method api_path?query_params
         if (inputHttpMethod && inputPath && inputQueryParamsStart) {
-          // Split the query params as {key, value}[] where key=value in query param
           const inputQuery =
             (inputQueryParams &&
               inputQueryParams
@@ -123,7 +102,6 @@ export function registerDictionaryHint(editorInput: any) {
                   return { key, value };
                 })) ||
             [];
-          // It is defining query param value query_param=
           const definingQueryParamValue =
             inputQueryParams && inputQueryParams.includes('&')
               ? (inputRequest as string).lastIndexOf('=') >
@@ -165,7 +143,6 @@ export function registerDictionaryHint(editorInput: any) {
               });
           }
         } else if (inputHttpMethod) {
-          // Get hints for all http method endpoints
           if (!inputPath || inputPath === '/') {
             hints = inputHttpMethodEndpoints.map((endpoint: any) => ({
               text: endpoint.name,
@@ -173,7 +150,6 @@ export function registerDictionaryHint(editorInput: any) {
               render: makeRender('endpoint'),
             }));
           } else {
-            // Prefer a simple prefix match to handle cases like '/manager' or '/manager/info'
             const inputPathLc = String(inputPath).toLowerCase();
             const prefixMatches = inputHttpMethodEndpoints
               .filter((endpoint: any) =>
@@ -184,8 +160,6 @@ export function registerDictionaryHint(editorInput: any) {
                 displayText: endpoint.name,
                 render: makeRender('endpoint'),
               }));
-
-            // Keep the previous segmented match logic for partial segments
             const structuredMatches = inputHttpMethodEndpoints
               .map((endpoint: any) => ({
                 ...endpoint,
@@ -227,8 +201,6 @@ export function registerDictionaryHint(editorInput: any) {
                   render: makeRender('endpoint'),
                 };
               });
-
-            // Fallback: include all endpoints, let later filtering by curWord narrow down.
             const allEndpoints = inputHttpMethodEndpoints.map(
               (endpoint: any) => ({
                 text: endpoint.name,
@@ -236,8 +208,6 @@ export function registerDictionaryHint(editorInput: any) {
                 render: makeRender('endpoint'),
               }),
             );
-
-            // Merge and de-duplicate by text
             const seen: Record<string, boolean> = {};
             hints = [
               ...prefixMatches,
@@ -251,7 +221,6 @@ export function registerDictionaryHint(editorInput: any) {
             });
           }
         }
-        // Get API endpoint body params hints
       } else if (
         currentGroup &&
         currentGroup.requestText &&
@@ -259,7 +228,7 @@ export function registerDictionaryHint(editorInput: any) {
         currentGroup.start < editorCursor.line &&
         currentGroup.end > editorCursor.line
       ) {
-        const reLineStart = /^(\s*)(?:"|')(\S*)(?::)?$/; // Line starts with
+        const reLineStart = /^(\s*)(?:\"|')(\S*)(?::)?$/;
         const spaceLineStart = (line.match(reLineStart) || [])[1] || '';
         const inputKeyBodyParam = (line.match(reLineStart) || [])[2] || '';
 
@@ -287,7 +256,7 @@ export function registerDictionaryHint(editorInput: any) {
               )
               .join('\n')}\n${space}}`;
           }
-          return `"${parameter.name}": ${valueBodyParam}`;
+          return `\"${parameter.name}\": ${valueBodyParam}`;
         };
 
         const getInnerKeysBodyRequest = () => {
@@ -305,7 +274,7 @@ export function registerDictionaryHint(editorInput: any) {
             const openBracket = editorLineContent.indexOf('{');
             const closeBracket = editorLineContent.indexOf('}');
             const keyOpenBracket = (editorLineContent.match(
-              /\s*"(\S+)"\s*:\s*\{/,
+              /\s*\"(\S+)\"\s*:\s*\{/,
             ) || [])[1];
             keyOpenBracket &&
               jsonBodyKeyCurrent.push(keyOpenBracket) &&
@@ -367,7 +336,7 @@ export function registerDictionaryHint(editorInput: any) {
           }
           try {
             const bodySanitizedBodyParam = currentGroup.requestTextJson.replace(
-              /(,?\s*"\S*\s*)\}/g,
+              /(,?\s*\"\S*\s*)\}/g,
               '}',
             );
             inputBodyPreviousKeys = Object.keys(
@@ -426,7 +395,6 @@ export function registerDictionaryHint(editorInput: any) {
         hints = model.map((a: any) => a.method);
       }
       const final_hints = hints.map(chain => {
-        // Avoid errors when hint is not a string (e.g. request body parameters)
         if (typeof chain !== 'string') {
           return chain;
         }
@@ -447,7 +415,6 @@ export function registerDictionaryHint(editorInput: any) {
     while (end < curLine.length && !whiteSpace.test(curLine.charAt(end))) ++end;
     while (start && !whiteSpace.test(curLine.charAt(start - 1))) --start;
     const curWord = start !== end && curLine.slice(start, end);
-    // Build suggestions always; when there's no current word, don't filter.
     const unfilteredList = getDictionary(
       curLine,
       (curWord as string) || '',
@@ -457,7 +424,6 @@ export function registerDictionaryHint(editorInput: any) {
       const text = (item.text ?? item) as string;
       return text.toUpperCase().includes((curWord as string).toUpperCase());
     });
-    // Sort by displayText/text when objects are used
     const sortedList = list.sort((a: any, b: any) => {
       const A = ((a && (a.displayText || a.text)) || a || '')
         .toString()

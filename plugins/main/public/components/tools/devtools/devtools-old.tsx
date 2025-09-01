@@ -4,11 +4,10 @@ import { getUiSettings } from '../../../kibana-services';
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
 import { CONSOLE_CONTAINER } from './constants';
-import { saveEditorContentAsJson, send } from './lib/actions';
+import { saveEditorContentAsJson, send } from './lib';
 import useHotkeyForDevTools from './application/hooks/use-hotkey-for-dev-tools';
 import useSetup from './application/hooks/use-setup';
 import DevToolTabs from './application/components/dev-tools-tabs';
-import DevToolsActionButtons from './application/components/dev-tools-action-buttons';
 import DevToolsHeader from './application/components/dev-tools-header';
 import DevToolsMirrors from './application/components/dev-tools-mirrors';
 

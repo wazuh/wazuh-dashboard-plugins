@@ -1,13 +1,9 @@
 import { ExcludedIntelliSenseTriggerKeys } from '../excluded-devtools-autocomplete-keys';
-import { AppState, GenericRequest } from '../../../../react-services';
+import { AppState } from '../../../../react-services';
 import { DEV_TOOLS_INITIAL_BUFFER } from '../initial-buffer';
-import {
-  analyzeGroups,
-  calculateWhichGroup,
-  checkJsonParseError,
-  highlightGroup,
-} from './grouping';
-import { ensureAutocompleteCommand, registerDictionaryHint } from './hints';
+import { analyzeGroups, calculateWhichGroup, checkJsonParseError, highlightGroup } from './grouping';
+import { ensureAutocompleteCommand } from './hints/autocomplete';
+import { registerDictionaryHint } from './hints/dictionary-hint';
 import { setupDynamicHeight, setupResizableColumns } from './layout';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import {
@@ -17,6 +13,7 @@ import {
   UILogLevel,
 } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { ApiRoutesService } from './services/routes-service';
 
 /**
  * Configure input/output CodeMirror editors: behavior, content, events and layout.
@@ -98,8 +95,8 @@ export async function initEditors(editorInput: any, editorOutput: any) {
 
   // Load available routes for autocompletion
   try {
-    const response = await GenericRequest.request('GET', '/api/routes', {});
-    editorInput.model = !response.error ? response.data : [];
+    const routesService = new ApiRoutesService();
+    editorInput.model = await routesService.getAvailableRoutes();
   } catch (error: any) {
     editorInput.model = [];
 

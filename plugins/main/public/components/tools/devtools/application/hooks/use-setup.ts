@@ -3,8 +3,7 @@ import { AppState } from '../../../../../react-services';
 import store from '../../../../../redux/store';
 import { getUiSettings } from '../../../../../kibana-services';
 import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
-import { initEditors } from '../../lib/init';
-import { send } from '../../lib/actions';
+import { initEditors, send } from '../../lib';
 import { EDITOR_MIRRORS } from '../../constants';
 
 const useSetup = () => {

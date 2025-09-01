@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { send } from '../../lib/actions';
-import { hasCtrlOrCmd, isEnter, Keys } from '../../types/keys';
+import { hasCtrlOrCmd, isEnter } from '../../types/keys';
 
 interface Props {
   onSendRequestButton: () => void;

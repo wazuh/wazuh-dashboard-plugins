@@ -1,16 +1,17 @@
 import $ from 'jquery';
-import jsonLint from '../../../../utils/codemirror/json-lint';
-import CodeMirror from '../../../../utils/codemirror/lib/codemirror';
-import { AppState } from '../../../../react-services';
-import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
+import jsonLint from '../../../../../utils/codemirror/json-lint';
+import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
+import { AppState } from '../../../../../react-services';
+import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
   UIErrorSeverity,
   UILogLevel,
-} from '../../../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../../../react-services/common-services';
-import { DEV_TOOLS_BUTTONS } from '../constants';
+} from '../../../../../react-services/error-orchestrator/types';
+import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { DEV_TOOLS_BUTTONS } from '../../constants';
+import { REQUEST_LINE_REGEX, REQUEST_SPLIT_REGEX } from '../constants/regex';
 
 /**
  * Split the current buffer into request groups (method + path + optional JSON body).
@@ -23,7 +24,7 @@ export function analyzeGroups(
     AppState.setCurrentDevTools(currentState);
     const tmpgroups: CodeMirror.EditorGroup[] = [];
     const splitted = currentState
-      .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
+      .split(REQUEST_SPLIT_REGEX)
       .filter(item => item.replace(/\s/g, '').length);
 
     let start = 0;
@@ -40,16 +41,13 @@ export function analyzeGroups(
       if (cursor.findNext()) start = cursor.from().line;
       else return [];
 
-      // Prevent user frustration when there are duplicated queries.
       if (tmp.length) {
-        // It's a safe loop since findNext returns false if there is no next query.
         while (
           editor.getLine!(cursor.from().line) !== tmp[0] &&
           cursor.findNext()
         ) {
           start = cursor.from().line;
         }
-        // Avoid selecting already-started blocks
         while (starts.includes(start) && cursor.findNext()) {
           start = cursor.from().line;
         }
@@ -135,8 +133,6 @@ export function calculateWhichGroup(
           );
         });
 
-    // If there is no active cursor within a valid group (e.g. first click without focusing the editor),
-    // fallback to the first visible group in the viewport. If none are visible, use the first group.
     if (!firstTime && desiredGroup.length === 0) {
       try {
         const wrapperEl =
@@ -149,7 +145,7 @@ export function calculateWhichGroup(
         const firstVisible = validGroups.find(g => {
           try {
             const c = editor.cursorCoords({ line: g.start, ch: 0 });
-            const lineTop = c.top + 1; // Page coords
+            const lineTop = c.top + 1;
             return lineTop >= wrapperTop && lineTop <= wrapperBottom;
           } catch {
             return false;
@@ -161,9 +157,7 @@ export function calculateWhichGroup(
         } else if (validGroups.length) {
           desiredGroup = [validGroups[0]] as any;
         }
-      } catch {
-        // ignore fallback calculation errors
-      }
+      } catch {}
 
       if (!desiredGroup.length) {
         $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
@@ -172,7 +166,6 @@ export function calculateWhichGroup(
       }
     }
 
-    // Place action buttons at the first line from the selected group
     let cords;
     try {
       cords = editor.cursorCoords({
@@ -186,7 +179,6 @@ export function calculateWhichGroup(
     }
 
     if (desiredGroup[0]) {
-      // Hide buttons when the target line is outside the editor viewport
       try {
         const wrapperEl =
           editor.getWrapperElement?.() || editor.display?.wrapper || null;
@@ -195,7 +187,7 @@ export function calculateWhichGroup(
         const wrapperHeight = $wrapper?.outerHeight?.() ?? 0;
         const wrapperBottom = wrapperTop + wrapperHeight;
 
-        const lineTop = cords.top + 1; // Page coords provided by CodeMirror
+        const lineTop = cords.top + 1;
 
         const isVisible = lineTop >= wrapperTop && lineTop <= wrapperBottom;
 
@@ -209,16 +201,10 @@ export function calculateWhichGroup(
           if (!$(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).is(':visible')) {
             $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).show();
           }
-          // Position buttons relative to the first line of the active block
-          $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).offset({
-            top: lineTop,
-          });
-          $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).offset({
-            top: lineTop,
-          });
+          $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).offset({ top: lineTop });
+          $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).offset({ top: lineTop });
         }
       } catch {
-        // In case of any positioning error, make sure buttons are hidden
         $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
         $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).hide();
       }
@@ -230,11 +216,8 @@ export function calculateWhichGroup(
       const [inputRequest, inputHttpMethod, inputPath, inputQueryParamsStart] =
         (desiredGroup[0] &&
           desiredGroup[0].requestText &&
-          desiredGroup[0].requestText.match(
-            /^(GET|PUT|POST|DELETE) ([^\?]*)(\?)?(\S+)?/,
-          )) ||
+          desiredGroup[0].requestText.match(REQUEST_LINE_REGEX)) ||
         [];
-      // Split the input request path as array and lowercase
       const inputEndpoint =
         (inputPath &&
           inputPath
@@ -242,13 +225,11 @@ export function calculateWhichGroup(
             .filter((item: string) => item)
             .map((item: string) => item.toLowerCase())) ||
         [];
-      // Get all API endpoints with http method in the request
       const inputHttpMethodEndpoints =
         (
           editor.model.find((item: any) => item.method === inputHttpMethod) ||
           {}
         ).endpoints || [];
-      // Find the API endpoint in the request
       const apiEndpoint = inputHttpMethodEndpoints
         .map((endpoint: any) => ({
           ...endpoint,
@@ -271,11 +252,9 @@ export function calculateWhichGroup(
         $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`)
           .attr('href', apiEndpoint.documentation)
           .show();
-        // Keep send button visible only when there's a valid endpoint selected
         $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).show();
       } else {
         $(`#${DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}`).attr('href', '').hide();
-        // Hide send button when there is no valid endpoint at cursor
         $(`#${DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}`).hide();
       }
     }
@@ -303,9 +282,6 @@ export function calculateWhichGroup(
  * Mark the given group as active by highlighting its lines.
  */
 export function highlightGroup(editor: any, group?: CodeMirror.EditorGroup) {
-  // Keep track of which lines we highlighted last time and clear only those.
-  // This avoids scenarios where iterating all lines misses some and stale
-  // highlights remain when moving between endpoints.
   if (!editor.__highlightedLines) {
     editor.__highlightedLines = [] as number[];
   }
@@ -326,9 +302,6 @@ export function highlightGroup(editor: any, group?: CodeMirror.EditorGroup) {
     editor.__highlightedLines.push(ln);
   };
 
-  // If the request has no JSON body (or everything is inline in braces
-  // on the same line), highlight only the request line. Otherwise
-  // highlight the entire block.
   if (
     !group.requestTextJson ||
     (group.requestText.includes('{') && group.requestText.includes('}'))
