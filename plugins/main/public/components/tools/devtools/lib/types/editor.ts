@@ -64,3 +64,9 @@ export interface SendHooks {
   onEnd?: (meta: SendHooksMeta) => void;
 }
 
+/**
+ * Minimal output editor surface used by actions.
+ */
+export interface EditorOutputLike {
+  setValue(v: string): void;
+}

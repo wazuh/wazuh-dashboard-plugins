@@ -20,3 +20,9 @@ export interface HttpClient {
     options?: HttpRequestOptions,
   ): Promise<IApiResponse<T> | T>;
 }
+
+export interface BuiltRequest {
+  method: HttpMethod;
+  path: string;
+  body: any;
+}
