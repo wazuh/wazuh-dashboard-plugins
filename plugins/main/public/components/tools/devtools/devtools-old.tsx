@@ -47,7 +47,8 @@ export const ToolDevTools = withGlobalBreadcrumb([
   useEffect(() => {
     // Key handler: CTRL/CMD + ENTER
     const handleKeyDown = (e: any) => {
-      const isEnter = e.key === 'Enter' || e.keyCode === Keys.ENTER || e.which === Keys.ENTER;
+      const isEnter =
+        e.key === 'Enter' || e.keyCode === Keys.ENTER || e.which === Keys.ENTER;
       const hasCtrlOrCmd = !!(e.ctrlKey || e.metaKey);
       if (isEnter && hasCtrlOrCmd) {
         if (!editorInputRef.current || !editorOutputRef.current) return;
@@ -148,7 +149,11 @@ export const ToolDevTools = withGlobalBreadcrumb([
                 })}
               />
             </EuiFlexItem>
-            <EuiFlexItem>
+            <EuiFlexItem
+              style={{
+                justifyContent: 'center',
+              }}
+            >
               {/* Request status indicator */}
               <div
                 style={{
