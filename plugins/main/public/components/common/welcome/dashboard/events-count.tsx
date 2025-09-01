@@ -25,6 +25,7 @@ const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 const EventsDashboard = compose(
   withDataSource({
+    // FIXME: This data source has no the filter related to the server API context
     DataSource: AlertsDataSource,
     DataSourceRepositoryCreator: AlertsDataSourceRepository,
   }),
