@@ -1,7 +1,13 @@
 // Public API for DevTools lib
 export { DevToolsActions } from './actions/dev-tools-actions';
 export { send, saveEditorContentAsJson } from './api';
-export { analyzeGroups, calculateWhichGroup, highlightGroup, checkJsonParseError } from './grouping';
+export {
+  analyzeGroups,
+  calculateWhichGroup,
+  highlightGroup,
+  checkJsonParseError,
+  GroupingService,
+} from './grouping';
 export { ensureAutocompleteCommand } from './hints/autocomplete';
 export { registerDictionaryHint } from './hints/dictionary-hint';
 export { setupResizableColumns, setupDynamicHeight } from './layout';

@@ -2,7 +2,7 @@ import type { EditorLike, EditorOutputLike, SendHooks } from '../types/editor';
 import type { HttpClient } from '../types/http';
 import { ErrorService } from '../services/error-service';
 import { parseErrorForOutput } from '../adapters/error-adapter';
-import { analyzeGroups, calculateWhichGroup, checkJsonParseError } from '../grouping';
+import { GroupingService } from '../grouping';
 import { RequestBuilder } from '../services/request-builder';
 import { ResponseHandler } from '../services/response-handler';
 import { MESSAGES } from '../constants/messages';
@@ -17,6 +17,7 @@ export class DevToolsActions {
     private errors = new ErrorService(),
     private requests = new RequestBuilder(),
     private responses = new ResponseHandler(),
+    private grouping = new GroupingService(),
   ) {}
 
   async send(
@@ -26,15 +27,15 @@ export class DevToolsActions {
     hooks?: SendHooks,
   ) {
     try {
-      const groups = analyzeGroups(editorInput as any);
-      const desiredGroup = calculateWhichGroup(
+      const groups = this.grouping.parseGroups(editorInput as any);
+      const desiredGroup = this.grouping.selectActiveGroup(
         editorInput as any,
         firstTime,
         groups,
       );
 
       if (desiredGroup) {
-        const affectedGroups = checkJsonParseError(editorInput as any, groups);
+        const affectedGroups = this.grouping.validateJson(editorInput as any, groups);
         const hasJsonError = affectedGroups.some(
           item => item === desiredGroup.requestText,
         );
