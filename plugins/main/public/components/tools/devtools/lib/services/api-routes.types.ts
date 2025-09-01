@@ -233,4 +233,3 @@ export enum PurpleFormat {
 
 // Convenience alias for the full API routes response
 export type ApiRoutes = APIInfo[];
-
