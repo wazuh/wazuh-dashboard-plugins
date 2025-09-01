@@ -12,7 +12,7 @@ const DevToolsMirrors = ({ onSendRequestButton }: Props) => {
   return (
     <EuiFlexGroup gutterSize='none' direction='row'>
       <EuiFlexGroup
-        id='wz-dev-left-column'
+        id={EDITOR_MIRRORS.LEFT_COLUMN_ID}
         gutterSize='none'
         direction='column'
       >
@@ -21,7 +21,7 @@ const DevToolsMirrors = ({ onSendRequestButton }: Props) => {
       </EuiFlexGroup>
       <DevToolsColumnSeparator />
       <EuiFlexGroup
-        id='wz-dev-right-column'
+        id={EDITOR_MIRRORS.RIGHT_COLUMN_ID}
         direction='column'
         gutterSize='none'
         style={{ flexGrow: 1 }}
