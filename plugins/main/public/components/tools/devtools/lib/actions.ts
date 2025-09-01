@@ -146,7 +146,8 @@ export async function send(
       }
     }
 
-    (firstTime || !desiredGroup) && editorOutput.setValue('Welcome!');
+    // Show welcome message only on first render, not when there's no active endpoint.
+    if (firstTime) editorOutput.setValue('Welcome!');
   } catch (error: any) {
     const options: UIErrorLog = {
       context: `send`,
