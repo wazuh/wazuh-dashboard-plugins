@@ -148,6 +148,9 @@ export default class WzSampleData extends Component {
       // Check if sample data for each category was added
       const results = await DeepPromiseResolver(
         this.categories.reduce((accum, cur) => {
+          /* FIXME: this should not use this client to do the request because this manage the availability of the server API
+          and can change the prompt related to problem with the server API
+          */
           accum[cur.categorySampleDataIndex] = WzRequest.genericReq(
             'GET',
             `/indexer/sampledata/${cur.categorySampleDataIndex}`,
@@ -173,10 +176,22 @@ export default class WzSampleData extends Component {
       const clusterName = AppState.getClusterInfo().cluster;
       const managerName = AppState.getClusterInfo().manager;
 
+      if (!clusterName && !managerName) {
+        throw new Error(
+          'The data related to the server API context could not be obtained. This is required when adding sample data to match the server API context.',
+        );
+      }
+
       // eslint-disable-next-line camelcase
       this.generateAlertsParams.api_id = JSON.parse(
         AppState.getCurrentAPI() || '{}',
       )?.id;
+
+      if (!this.generateAlertsParams.api_id) {
+        throw new Error(
+          'The server API is not selected. Select it using the server API selector.',
+        );
+      }
       this.generateAlertsParams.manager = {
         name: managerName,
       };
@@ -221,6 +236,9 @@ export default class WzSampleData extends Component {
           addDataLoading: true,
         },
       });
+      /* FIXME: this should not use this client to do the request because this manage the availability of the server API
+          and can change the prompt related to problem with the server API
+      */
       await WzRequest.genericReq(
         'POST',
         `/indexer/sampledata/${category.categorySampleDataIndex}`,
@@ -267,6 +285,9 @@ export default class WzSampleData extends Component {
           removeDataLoading: true,
         },
       });
+      /* FIXME: this should not use this client to do the request because this manage the availability of the server API
+          and can change the prompt related to problem with the server API
+      */
       const { data: deleteResponse } = await WzRequest.genericReq(
         'DELETE',
         `/indexer/sampledata/${category.categorySampleDataIndex}`,
