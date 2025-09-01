@@ -18,6 +18,7 @@ import { CONSOLE_CONTAINER } from './constants';
 import { send, saveEditorContentAsJson } from './lib/actions';
 import useHotkeyForDevTools from './application/hooks/use-hotkey-for-dev-tools';
 import useSetup from './application/hooks/use-setup';
+import DevToolTabs from "./application/components/dev-tools-tabs";
 
 /**
  * Wazuh DevTools Console.
@@ -50,10 +51,8 @@ export const ToolDevTools = withGlobalBreadcrumb([
   });
 
   return (
-    <div id='wz-dev-tools-container'>
-      <EuiTabs size='s'>
-        <EuiTab isSelected={true}>Console</EuiTab>
-      </EuiTabs>
+    <>
+      <DevToolTabs />
       <EuiFlexGroup
         style={{ padding: `${CONSOLE_CONTAINER.padding}px`, margin: 0 }}
         direction='column'
@@ -189,6 +188,6 @@ export const ToolDevTools = withGlobalBreadcrumb([
           </div>
         </div>
       </EuiFlexGroup>
-    </div>
+    </>
   );
 });
