@@ -27,12 +27,11 @@ import { send, saveEditorContentAsJson } from './lib/actions';
  * Wazuh DevTools Console.
  *
  * Provides a split view with an editable API request buffer and a read-only
- * response viewer. SHIFT + ENTER runs the current request.
+ * response viewer. CTRL/CMD + ENTER runs the current request.
  */
 export const ToolDevTools = withGlobalBreadcrumb([
   { text: devTools.breadcrumbLabel },
 ])(() => {
-  const [multipleKeyPressed, setMultipleKeyPressed] = useState<number[]>([]);
   const editorInputRef = useRef<any>();
   const editorOutputRef = useRef<any>();
   const [requestMeta, setRequestMeta] = useState<{
@@ -46,6 +45,25 @@ export const ToolDevTools = withGlobalBreadcrumb([
   const useUpdatedUX = getUiSettings().get('home:useNewHomePage');
 
   useEffect(() => {
+    // Key handler: CTRL/CMD + ENTER
+    const handleKeyDown = (e: any) => {
+      const isEnter = e.key === 'Enter' || e.keyCode === Keys.ENTER || e.which === Keys.ENTER;
+      const hasCtrlOrCmd = !!(e.ctrlKey || e.metaKey);
+      if (isEnter && hasCtrlOrCmd) {
+        if (!editorInputRef.current || !editorOutputRef.current) return;
+        e.preventDefault();
+        return send(editorInputRef.current, editorOutputRef.current, false, {
+          onStart: () => setRequestMeta({ loading: true }),
+          onEnd: meta =>
+            setRequestMeta({
+              loading: false,
+              ...meta,
+            }),
+        });
+      }
+    };
+    $(window.document).on('keydown', handleKeyDown);
+
     (async function () {
       const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
 
@@ -57,29 +75,6 @@ export const ToolDevTools = withGlobalBreadcrumb([
       ) {
         AppState.setWzMenu();
       }
-
-      // Send request on SHIFT + ENTER
-      $(window.document).on('keydown', e => {
-        if (!multipleKeyPressed.includes(e.which)) {
-          setMultipleKeyPressed(state => [...state, e.which]);
-        }
-        if (
-          multipleKeyPressed.includes(Keys.ENTER) &&
-          multipleKeyPressed.includes(Keys.SHIFT) &&
-          multipleKeyPressed.length === 2
-        ) {
-          e.preventDefault();
-          return send(editorInputRef.current, editorOutputRef.current, false, {
-            onStart: () => setRequestMeta({ loading: true }),
-            onEnd: meta =>
-              setRequestMeta({
-                loading: false,
-                ...meta,
-              }),
-          });
-        }
-      });
-      $(window.document).on('keyup', () => setMultipleKeyPressed([]));
 
       // Create CodeMirror editors
       editorInputRef.current = CodeMirror.fromTextArea(
@@ -115,6 +110,11 @@ export const ToolDevTools = withGlobalBreadcrumb([
       // Render welcome message and position UI controls
       send(editorInputRef.current, editorOutputRef.current, true);
     })();
+
+    // Cleanup listeners on unmount
+    return () => {
+      $(window.document).off('keydown', handleKeyDown);
+    };
   }, []);
 
   return (
