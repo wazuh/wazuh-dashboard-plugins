@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiBadge,
-  EuiLoadingSpinner,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getUiSettings } from '../../../kibana-services';
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
-import { TopNavMenu } from './application/components/top-nav/top-nav-menu';
-import { getTopNavConfig } from './application/components/top-nav/get-top-nav';
 import DevToolsColumnSeparator from './application/components/separator/dev-tools-column-separator';
 import { CONSOLE_CONTAINER } from './constants';
 import { saveEditorContentAsJson, send } from './lib/actions';
@@ -54,20 +47,18 @@ export const ToolDevTools = withGlobalBreadcrumb([
     <>
       <DevToolTabs />
       <EuiFlexGroup
-        style={{ padding: `${CONSOLE_CONTAINER.padding}px`, margin: 0 }}
+        style={{
+          padding: `${CONSOLE_CONTAINER.padding}px`,
+          margin: 0,
+          '--col-separator-width': '14px',
+          '--col-left-width': '46.5%',
+          '--col-right-width': 'calc(100% - var(--col-left-width))',
+        }}
         direction='column'
+        gutterSize='none'
+        className='wz-dev-tools'
       >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            // @ts-ignore
-            '--col-separator-width': '14px',
-            '--col-left-width': '46.5%',
-            '--col-right-width': 'calc(100% - var(--col-left-width))',
-          }}
-          className='wz-dev-tools'
-        >
+        <EuiFlexItem>
           <DevToolsHeader
             useUpdatedUX={useUpdatedUX}
             {...requestMeta}
@@ -77,25 +68,28 @@ export const ToolDevTools = withGlobalBreadcrumb([
               saveEditorContentAsJson(editorOutputRef.current);
             }}
           />
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            <div
+          <EuiFlexGroup gutterSize='none' direction='row'>
+            <EuiFlexGroup
               id='wz-dev-left-column'
-              style={{ display: 'flex', flexDirection: 'column' }}
+              gutterSize='none'
+              direction='column'
             >
               <DevToolsActionButtons
                 onSendRequestButton={onSendRequestButton}
               />
-              <textarea style={{ display: 'flex' }} id='api_input'></textarea>
-            </div>
+              <textarea id='api_input' style={{ display: 'none' }} />
+            </EuiFlexGroup>
             <DevToolsColumnSeparator />
-            <div
+            <EuiFlexGroup
               id='wz-dev-right-column'
-              style={{ display: 'flex', flexDirection: 'column', flexGrow: 1 }}
+              direction='column'
+              gutterSize='none'
+              style={{ flexGrow: 1 }}
             >
-              <textarea style={{ display: 'flex' }} id='api_output'></textarea>
-            </div>
-          </div>
-        </div>
+              <textarea id='api_output' style={{ display: 'none' }} />
+            </EuiFlexGroup>
+          </EuiFlexGroup>
+        </EuiFlexItem>
       </EuiFlexGroup>
     </>
   );

@@ -13,7 +13,7 @@ const DevToolsActionButtons = ({
     <EuiFlexGroup
       id={DEV_TOOLS_BUTTONS.ID}
       justifyContent='flexEnd'
-      gutterSize='xs'
+      gutterSize='none'
     >
       <EuiIcon
         type='play'
