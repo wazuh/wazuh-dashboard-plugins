@@ -5,6 +5,7 @@ import { getUiSettings } from '../../../../../kibana-services';
 import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
 import { initEditors } from '../../lib/init';
 import { send } from '../../lib/actions';
+import { EDITOR_MIRRORS } from '../../constants';
 
 const useSetup = () => {
   const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
@@ -24,7 +25,7 @@ const useSetup = () => {
       }
 
       editorInputRef.current = CodeMirror.fromTextArea(
-        window.document.getElementById('api_input'),
+        window.document.getElementById(EDITOR_MIRRORS.INPUT_ID),
         {
           lineNumbers: true,
           matchBrackets: true,
@@ -36,7 +37,7 @@ const useSetup = () => {
         },
       );
       editorOutputRef.current = CodeMirror.fromTextArea(
-        window.document.getElementById('api_output'),
+        window.document.getElementById(EDITOR_MIRRORS.OUTPUT_ID),
         {
           lineNumbers: true,
           matchBrackets: true,

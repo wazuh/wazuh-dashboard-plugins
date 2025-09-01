@@ -3,7 +3,6 @@ import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { getUiSettings } from '../../../kibana-services';
 import { withGlobalBreadcrumb } from '../../common/hocs';
 import { devTools } from '../../../utils/applications';
-import DevToolsColumnSeparator from './application/components/separator/dev-tools-column-separator';
 import { CONSOLE_CONTAINER } from './constants';
 import { saveEditorContentAsJson, send } from './lib/actions';
 import useHotkeyForDevTools from './application/hooks/use-hotkey-for-dev-tools';
@@ -11,6 +10,7 @@ import useSetup from './application/hooks/use-setup';
 import DevToolTabs from './application/components/dev-tools-tabs';
 import DevToolsActionButtons from './application/components/dev-tools-action-buttons';
 import DevToolsHeader from './application/components/dev-tools-header';
+import DevToolsMirrors from './application/components/dev-tools-mirrors';
 
 /**
  * Wazuh DevTools Console.
@@ -68,27 +68,7 @@ export const ToolDevTools = withGlobalBreadcrumb([
               saveEditorContentAsJson(editorOutputRef.current);
             }}
           />
-          <EuiFlexGroup gutterSize='none' direction='row'>
-            <EuiFlexGroup
-              id='wz-dev-left-column'
-              gutterSize='none'
-              direction='column'
-            >
-              <DevToolsActionButtons
-                onSendRequestButton={onSendRequestButton}
-              />
-              <textarea id='api_input' style={{ display: 'none' }} />
-            </EuiFlexGroup>
-            <DevToolsColumnSeparator />
-            <EuiFlexGroup
-              id='wz-dev-right-column'
-              direction='column'
-              gutterSize='none'
-              style={{ flexGrow: 1 }}
-            >
-              <textarea id='api_output' style={{ display: 'none' }} />
-            </EuiFlexGroup>
-          </EuiFlexGroup>
+          <DevToolsMirrors onSendRequestButton={onSendRequestButton} />
         </EuiFlexItem>
       </EuiFlexGroup>
     </>
