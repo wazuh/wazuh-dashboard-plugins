@@ -97,12 +97,15 @@ function generateRandomPackage() {
     ),
     name: packageBase.name,
     path: `/Extensions/${packageBase.name.toLowerCase().replace(/\s+/g, '')}`,
-    permissions: random.choice(attributesPool),
+    permissions: Array.from({ length: random.int(1, 4) }, () =>
+      random.choice(attributesPool),
+    ).filter((value, index, self) => self.indexOf(value) === index),
     persistent: random.boolean(),
     reference: packageBase.id,
     type: 'extension',
     vendor: packageBase.author,
     version: random.randomVersion(),
+    visible: random.boolean(),
   };
 }
 
