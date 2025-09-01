@@ -11,6 +11,7 @@ import {
   withErrorBoundary,
   withGlobalBreadcrumb,
   withRouteResolvers,
+  withUserAuthorizationPrompt,
 } from '../common/hocs';
 import { compose } from 'redux';
 import { WzButtonPermissions } from '../common/permissions/button';
@@ -25,6 +26,12 @@ export const MainEndpointsSummary = compose(
   withErrorBoundary,
   withRouteResolvers({ nestedResolve }),
   withGlobalBreadcrumb([{ text: endpointSummary.breadcrumbLabel }]),
+  withUserAuthorizationPrompt([
+    [
+      { action: 'agent:read', resource: 'agent:id:*' },
+      { action: 'agent:read', resource: 'agent:group:*' },
+    ],
+  ]),
 )(() => {
   const { isLoading, totalAgents, error } = useGetTotalAgents('id!=000');
 
