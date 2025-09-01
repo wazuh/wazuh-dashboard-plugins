@@ -3,30 +3,18 @@ import { send } from '../../lib/actions';
 import { hasCtrlOrCmd, isEnter, Keys } from '../../types/keys';
 
 interface Props {
-  editorInputRef: React.RefObject<any>;
-  editorOutputRef: React.RefObject<any>;
-  onStart: () => void;
-  onEnd: (meta: any) => void;
+  onSendRequestButton: () => void;
 }
 
-const useHotkeyForDevTools = ({
-  editorInputRef,
-  editorOutputRef,
-  onStart,
-  onEnd,
-}: Props) => {
+const useHotkeyForDevTools = ({ onSendRequestButton }: Props) => {
   useEffect(() => {
     // Key handler: CTRL/CMD + ENTER
     const handleKeyDown = (
       event: JQuery.KeyDownEvent<Document, undefined, Document, Document>,
     ) => {
       if (isEnter(event) && hasCtrlOrCmd(event)) {
-        if (!editorInputRef.current || !editorOutputRef.current) return;
         event.preventDefault();
-        return send(editorInputRef.current, editorOutputRef.current, false, {
-          onStart,
-          onEnd,
-        });
+        onSendRequestButton();
       }
     };
     $(window.document).on('keydown', handleKeyDown);

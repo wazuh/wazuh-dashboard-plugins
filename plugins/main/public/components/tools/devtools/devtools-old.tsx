@@ -17,6 +17,7 @@ import useHotkeyForDevTools from './application/hooks/use-hotkey-for-dev-tools';
 import useSetup from './application/hooks/use-setup';
 import DevToolTabs from './application/components/dev-tools-tabs';
 import DevToolsActionButtons from './application/components/dev-tools-action-buttons';
+import DevToolsHeader from './application/components/dev-tools-header';
 
 /**
  * Wazuh DevTools Console.
@@ -36,17 +37,18 @@ export const ToolDevTools = withGlobalBreadcrumb([
     ok?: boolean;
   } | null>(null);
 
+  const onSendRequestButton = () =>
+    send(editorInputRef.current, editorOutputRef.current, false, {
+      onStart: () => setRequestMeta({ loading: true }),
+      onEnd: meta =>
+        setRequestMeta({
+          loading: false,
+          ...meta,
+        }),
+    });
+
   const useUpdatedUX = getUiSettings().get('home:useNewHomePage');
-  useHotkeyForDevTools({
-    editorInputRef,
-    editorOutputRef,
-    onStart: () => setRequestMeta({ loading: true }),
-    onEnd: meta =>
-      setRequestMeta({
-        loading: false,
-        ...meta,
-      }),
-  });
+  useHotkeyForDevTools({ onSendRequestButton });
 
   return (
     <>
@@ -66,82 +68,22 @@ export const ToolDevTools = withGlobalBreadcrumb([
           }}
           className='wz-dev-tools'
         >
-          <EuiFlexGroup gutterSize='none'>
-            <EuiFlexItem>
-              <TopNavMenu
-                useUpdatedUX={useUpdatedUX}
-                items={getTopNavConfig({
-                  useUpdatedUX,
-                  onClickExport: () =>
-                    saveEditorContentAsJson(editorOutputRef.current),
-                })}
-              />
-            </EuiFlexItem>
-            <EuiFlexItem
-              style={{
-                justifyContent: 'center',
-              }}
-            >
-              {/* Request status indicator */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  justifyContent: 'flex-end',
-                }}
-              >
-                {requestMeta?.loading ? (
-                  <EuiBadge color='hollow'>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 6,
-                      }}
-                    >
-                      <EuiLoadingSpinner size='s' />
-                      Request in progress
-                    </span>
-                  </EuiBadge>
-                ) : requestMeta ? (
-                  <>
-                    <EuiBadge color={requestMeta.ok ? 'success' : 'danger'}>
-                      {requestMeta.status
-                        ? `${requestMeta.status} - ${
-                            requestMeta.statusText ||
-                            (requestMeta.ok ? 'OK' : 'ERROR')
-                          }`
-                        : requestMeta.ok
-                        ? 'OK'
-                        : 'ERROR'}
-                    </EuiBadge>
-                    {typeof requestMeta.durationMs !== 'undefined' && (
-                      <EuiBadge color='hollow'>
-                        {Math.max(0, Math.round(requestMeta.durationMs))} ms
-                      </EuiBadge>
-                    )}
-                  </>
-                ) : null}
-              </div>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+          <DevToolsHeader
+            useUpdatedUX={useUpdatedUX}
+            {...requestMeta}
+            loading={!!requestMeta?.loading}
+            show={!!requestMeta}
+            onClickExport={() => {
+              saveEditorContentAsJson(editorOutputRef.current);
+            }}
+          />
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <div
               id='wz-dev-left-column'
               style={{ display: 'flex', flexDirection: 'column' }}
             >
               <DevToolsActionButtons
-                onSendRequestButton={() => {
-                  send(editorInputRef.current, editorOutputRef.current, false, {
-                    onStart: () => setRequestMeta({ loading: true }),
-                    onEnd: meta =>
-                      setRequestMeta({
-                        loading: false,
-                        ...meta,
-                      }),
-                  });
-                }}
+                onSendRequestButton={onSendRequestButton}
               />
               <textarea style={{ display: 'flex' }} id='api_input'></textarea>
             </div>
