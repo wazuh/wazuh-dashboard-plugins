@@ -51,7 +51,7 @@ export function WzSearchBar(props: IWzSearchBarProps) {
     inputValue,
     setInputValue,
     inputRef,
-    setIsOpen
+    setIsOpen,
   );
   return (
     <EuiFlexGroup>
@@ -60,11 +60,14 @@ export function WzSearchBar(props: IWzSearchBarProps) {
           status={status}
           inputRef={setInputRef}
           prepend={
-            <WzSearchBadges filters={props.filters} onFiltersChange={props.onFiltersChange} />
+            <WzSearchBadges
+              filters={props.filters}
+              onFiltersChange={props.onFiltersChange}
+            />
           }
           value={inputValue}
-          onKeyPress={(event) => handler && handler.onKeyPress(inputValue, event)}
-          onItemClick={(item) => handler && handler.onItemClick(item, inputValue)}
+          onKeyPress={event => handler && handler.onKeyPress(inputValue, event)}
+          onItemClick={item => handler && handler.onItemClick(item, inputValue)}
           isPopoverOpen={isOpen}
           onClosePopover={() => setIsOpen(false)}
           onPopoverFocus={() => setIsOpen(true)}
@@ -79,7 +82,7 @@ export function WzSearchBar(props: IWzSearchBarProps) {
           <WzSearchButtons
             filters={props.filters}
             options={props.buttonOptions}
-            onChange={(filters) => props.onFiltersChange(filters)}
+            onChange={filters => props.onFiltersChange(filters)}
           />
         </EuiFlexItem>
       )}
@@ -92,7 +95,7 @@ function useSuggestHandler(
   inputValue,
   setInputValue,
   inputRef,
-  setIsOpen
+  setIsOpen,
 ): [suggestItem[], SuggestHandler | undefined, string, boolean] {
   const [handler, setHandler] = useState<undefined | SuggestHandler>();
   const [suggestsItems, setSuggestItems] = useState<suggestItem[]>([]);
@@ -101,7 +104,11 @@ function useSuggestHandler(
 
   useEffect(() => {
     setHandler(
-      new SuggestHandler({ ...props, status, setStatus, setInvalid, setIsOpen }, setInputValue, inputRef)
+      new SuggestHandler(
+        { ...props, status, setStatus, setInvalid, setIsOpen },
+        setInputValue,
+        inputRef,
+      ),
     );
     !props.noDeleteFiltersOnUpdateSuggests && props.onFiltersChange([]);
   }, [props.suggestions]);
@@ -120,7 +127,7 @@ function useSuggestHandler(
             const options = {
               context: `${useSuggestHandler.name}.useEffect`,
               level: UI_LOGGER_LEVELS.ERROR,
-              severity: UI_ERROR_SEVERITIES.CRITICAL,
+              severity: UI_ERROR_SEVERITIES.BUSINESS,
               store: true,
               error: {
                 error: error,
