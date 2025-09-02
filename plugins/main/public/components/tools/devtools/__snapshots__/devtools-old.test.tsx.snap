@@ -88,7 +88,7 @@ exports[`ToolDevTools (integration) renders and matches snapshot (initial state)
           >
             <svg
               aria-hidden="true"
-              aria-labelledby="i6d87d460-877f-11f0-ae50-abe83158c00f"
+              aria-labelledby="i1f11de00-87f4-11f0-92ea-ed24b11584c8"
               class="euiIcon euiIcon--medium euiIcon--success euiIcon-isLoading"
               focusable="false"
               height="16"
@@ -99,7 +99,7 @@ exports[`ToolDevTools (integration) renders and matches snapshot (initial state)
               xmlns="http://www.w3.org/2000/svg"
             >
               <title
-                id="i6d87d460-877f-11f0-ae50-abe83158c00f"
+                id="i1f11de00-87f4-11f0-92ea-ed24b11584c8"
               >
                 Send request
               </title>
