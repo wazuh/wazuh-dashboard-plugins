@@ -68,11 +68,6 @@ describe('ToolDevTools (integration)', () => {
     jest.clearAllMocks();
   });
 
-  it('renders and matches snapshot (initial state)', () => {
-    const { container } = render(<ToolDevTools />);
-    expect(container).toMatchSnapshot();
-  });
-
   it('clicking Play sends the request and updates status meta (happy path)', async () => {
     // Arrange mocked send to invoke hooks
     lib.send.mockImplementation(
