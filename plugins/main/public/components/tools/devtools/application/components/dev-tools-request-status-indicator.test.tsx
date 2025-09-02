@@ -8,14 +8,14 @@ jest.mock('@elastic/eui', () => {
   const React = require('react');
   return {
     EuiBadge: ({ children, color }: any) => (
-      <span data-test-subj="euiBadge" data-color={color || 'default'}>{children}</span>
+      <span data-test-subj='euiBadge' data-color={color || 'default'}>
+        {children}
+      </span>
     ),
     EuiFlexGroup: ({ children }: any) => (
-      <div data-test-subj="euiFlexGroup">{children}</div>
+      <div data-test-subj='euiFlexGroup'>{children}</div>
     ),
-    EuiLoadingSpinner: () => (
-      <span data-test-subj="euiLoadingSpinner" />
-    ),
+    EuiLoadingSpinner: () => <span data-test-subj='euiLoadingSpinner' />,
   };
 });
 
