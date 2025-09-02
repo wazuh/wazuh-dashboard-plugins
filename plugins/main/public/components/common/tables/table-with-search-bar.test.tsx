@@ -16,13 +16,6 @@ import React from 'react';
 import { mount } from 'enzyme';
 import { TableWithSearchBar } from './table-with-search-bar';
 
-// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
-// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
-
-jest.mock('@osd/monaco', () => ({
-  monaco: {},
-}));
-
 jest.mock('../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
