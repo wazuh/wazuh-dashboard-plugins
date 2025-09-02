@@ -20,9 +20,9 @@ Developer console to interact with the Wazuh API from OpenSearch Dashboards. It 
 
 DevTools renders as a tool view and orchestrates:
 
-1) CodeMirror initialization (two editors): `application/hooks/use-setup.ts`.
-2) Behavior configuration: `lib/init.ts` (autocomplete, grouping, events, layout).
-3) Sending the active request: `lib/api.ts` → `DevToolsActions.send`.
+1. CodeMirror initialization (two editors): `application/hooks/use-setup.ts`.
+2. Behavior configuration: `lib/init.ts` (autocomplete, grouping, events, layout).
+3. Sending the active request: `lib/api.ts` → `DevToolsActions.send`.
 
 The `devtools-old.tsx` container wires everything together, exposing the Send button (Ctrl/Cmd + Enter) and JSON export.
 
@@ -70,4 +70,3 @@ send(editorInput, editorOutput, false, {
 - `editorInput.model` must be populated with API routes (`/api/routes`) for autocomplete to work.
 - Shortcut: Ctrl/Cmd + Enter triggers `send` on the active group.
 - See also `plugins/main/README.md` for overall plugin context.
-

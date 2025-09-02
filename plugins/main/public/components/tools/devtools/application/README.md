@@ -56,4 +56,3 @@ export function MyDevToolsContainer() {
 
 - Dark/light theme is taken from `uiSettings` when creating CodeMirror.
 - `use-setup` calls `lib/init.ts` (autocomplete, layout, API routes) and `send(..., true)` to render the welcome message.
-

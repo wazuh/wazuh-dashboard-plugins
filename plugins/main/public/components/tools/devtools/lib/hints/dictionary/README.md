@@ -25,7 +25,9 @@ import { createDictionaryHintProvider } from './dictionary/factory';
 const provider = createDictionaryHintProvider({
   analyzeGroups,
   calculateWhichGroup,
-  logError: (ctx, err) => {/* delegate to Error Orchestrator */},
+  logError: (ctx, err) => {
+    /* delegate to Error Orchestrator */
+  },
   getModel: () => editorInput.model,
 });
 
@@ -53,8 +55,12 @@ Add a custom strategy:
 import type { HintStrategy, HintContext } from './strategies/hint-strategy';
 
 class MyStrategy implements HintStrategy {
-  canHandle(ctx: HintContext) { return ctx.isInsideBodyBlock; }
-  getHints(ctx: HintContext) { return [{ text: 'my.custom.key' }]; }
+  canHandle(ctx: HintContext) {
+    return ctx.isInsideBodyBlock;
+  }
+  getHints(ctx: HintContext) {
+    return [{ text: 'my.custom.key' }];
+  }
 }
 
 const provider = new DictionaryHintProvider(deps, [
@@ -67,4 +73,3 @@ const provider = new DictionaryHintProvider(deps, [
 
 - The `DevToolsModel` is obtained from `/api/routes` and can include `documentation`, `description`, etc., in addition to `query` and `body`.
 - Strategy order determines suggestion priority.
-

@@ -56,14 +56,22 @@ import { DevToolsActions } from './actions/dev-tools-actions';
 
 class FakeHttp {
   async request(method: any, path: string, body: any) {
-    return { status: 200, statusText: 'OK', data: { ok: true, method, path, body } };
+    return {
+      status: 200,
+      statusText: 'OK',
+      data: { ok: true, method, path, body },
+    };
   }
 }
 
 const actions = new DevToolsActions(new FakeHttp() as any);
 await actions.send(editorInput, editorOutput, false, {
-  onStart: () => {/* ... */},
-  onEnd:  ({ status, durationMs }) => {/* ... */},
+  onStart: () => {
+    /* ... */
+  },
+  onEnd: ({ status, durationMs }) => {
+    /* ... */
+  },
 });
 ```
 
@@ -71,4 +79,3 @@ await actions.send(editorInput, editorOutput, false, {
 
 - `editorInput.model` must contain available routes (loaded by `ApiRoutesService`).
 - Inline and multi‑line JSON detection is handled in `RequestBuilder`.
-

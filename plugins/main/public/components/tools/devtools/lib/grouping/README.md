@@ -50,4 +50,3 @@ const current = grouping.selectActiveGroup(editor, false, groups);
 
 - Highlighting uses the `CodeMirror-styled-background` class (`constants/ui.ts`).
 - Error widgets are removed/recreated on each validation run.
-

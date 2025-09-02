@@ -20,4 +20,3 @@ const cleaned = stripReservedFlags({ pretty: true, x: 1 }); // => { x: 1 }
 
 - `safeJsonParse` returns the provided fallback when parsing fails.
 - Reserved flags are centralized to simplify future changes.
-

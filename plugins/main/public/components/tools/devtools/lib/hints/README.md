@@ -49,4 +49,3 @@ editorInput.on('keyup', (cm, e) => {
 
 - Excluded trigger keys are defined in `excluded-devtools-autocomplete-keys.ts`.
 - If `editorInput.model` is empty, the provider will return an empty list.
-

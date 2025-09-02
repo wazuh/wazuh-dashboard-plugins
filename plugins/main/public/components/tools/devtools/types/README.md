@@ -21,4 +21,3 @@ window.addEventListener('keydown', (ev: any) => {
 ## Notes
 
 - Used by `application/hooks/use-hotkey-for-dev-tools.ts` to trigger `send`.
-

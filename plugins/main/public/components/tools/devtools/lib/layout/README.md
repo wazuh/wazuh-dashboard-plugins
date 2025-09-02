@@ -29,4 +29,3 @@ setupDynamicHeight(window);
 ## Notes
 
 - Requires elements with the IDs declared in `constants.ts`.
-

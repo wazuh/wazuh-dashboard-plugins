@@ -30,11 +30,12 @@ Mock `HttpClient` to test `DevToolsActions` without network calls:
 import type { HttpClient } from './http';
 
 const http: HttpClient = {
-  async request() { return { status: 200, statusText: 'OK', data: {} } as any; },
+  async request() {
+    return { status: 200, statusText: 'OK', data: {} } as any;
+  },
 };
 ```
 
 ## Notes
 
 - Keep the surface minimal to lower coupling and improve testability.
-
