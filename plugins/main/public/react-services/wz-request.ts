@@ -18,7 +18,6 @@ import IApiResponse from './interfaces/api-response.interface';
 import { getCore, getHttp, getToasts } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
-import NavigationService from './navigation-service';
 import { BehaviorSubject } from 'rxjs';
 import { first, distinctUntilChanged } from 'rxjs/operators';
 import { throttle } from 'lodash';
@@ -205,21 +204,13 @@ export class WzRequest {
           } catch (error) {
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
-            if (
-              // TODO: review the condition for the /settings path to ignore the management
-              !NavigationService.getInstance()
-                .getPathname()
-                .startsWith('/settings')
-            ) {
-              this.serverAPIAvailable$.next(false);
-              const title = `API with ID [${currentApi.id}] is not available.`;
-              const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
+            this.serverAPIAvailable$.next(false);
+            const title = `API with ID [${currentApi.id}] is not available.`;
+            const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
 
-              displayAPINotAvailableToast({ title, text });
+            displayAPINotAvailableToast({ title, text });
 
-              throw new Error(`${title} ${text}`);
-            }
-            throw new Error(error);
+            throw new Error(`${title} ${text}`);
           }
         }
       }
