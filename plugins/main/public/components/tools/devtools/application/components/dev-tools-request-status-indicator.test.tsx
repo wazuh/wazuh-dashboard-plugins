@@ -3,6 +3,22 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import DevToolsRequestStatusIndicator from './dev-tools-request-status-indicator';
 
+// Mock EUI components to avoid EuiInnerText MutationObserver side-effects in tests
+jest.mock('@elastic/eui', () => {
+  const React = require('react');
+  return {
+    EuiBadge: ({ children, color }: any) => (
+      <span data-test-subj="euiBadge" data-color={color || 'default'}>{children}</span>
+    ),
+    EuiFlexGroup: ({ children }: any) => (
+      <div data-test-subj="euiFlexGroup">{children}</div>
+    ),
+    EuiLoadingSpinner: () => (
+      <span data-test-subj="euiLoadingSpinner" />
+    ),
+  };
+});
+
 describe('DevToolsRequestStatusIndicator', () => {
   it('shows spinner when loading', () => {
     render(<DevToolsRequestStatusIndicator loading show />);
@@ -61,8 +77,8 @@ describe('DevToolsRequestStatusIndicator', () => {
     expect(screen.getByText('0 ms')).toBeInTheDocument();
   });
 
-  it('matches snapshot for basic success meta', () => {
-    const { container } = render(
+  it('renders basic success meta as text', () => {
+    render(
       <DevToolsRequestStatusIndicator
         loading={false}
         show
@@ -72,6 +88,7 @@ describe('DevToolsRequestStatusIndicator', () => {
         durationMs={123}
       />,
     );
-    expect(container).toMatchSnapshot();
+    expect(screen.getByText('200 - OK')).toBeInTheDocument();
+    expect(screen.getByText('123 ms')).toBeInTheDocument();
   });
 });
