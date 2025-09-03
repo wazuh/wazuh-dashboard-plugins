@@ -22,8 +22,6 @@ describe('[settings] Input validation', () => {
     ${'alerts.sample.prefix'}          | ${'test*'}                                                             | ${'It can\'t contain invalid characters: \\, /, ?, ", <, >, |, ,, #, *.'}
     ${'configuration.ui_api_editable'} | ${true}                                                                | ${undefined}
     ${'configuration.ui_api_editable'} | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
-    ${'checks.timeFilter'}             | ${true}                                                                | ${undefined}
-    ${'checks.timeFilter'}             | ${0}                                                                   | ${'It should be a boolean. Allowed values: true or false.'}
     ${'customization.enabled'}         | ${true}                                                                | ${undefined}
     ${'customization.logo.app'}        | ${{ size: 124000, name: 'image.jpg' }}                                 | ${undefined}
     ${'customization.logo.app'}        | ${{ size: 124000, name: 'image.jpeg' }}                                | ${undefined}
