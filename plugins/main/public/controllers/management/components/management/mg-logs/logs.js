@@ -229,17 +229,12 @@ export default compose(
       try {
         let nodeList = '';
         let selectedNode = '';
-        const nodeListTmp = await WzRequest.apiReq(
-          'GET',
-          '/cluster/nodes',
-            {},
-          );
-          if (Array.isArray(nodeListTmp?.data?.data?.affected_items)) {
-            nodeList = nodeListTmp.data.data.affected_items;
-            selectedNode = nodeListTmp.data.data.affected_items.filter(
-              item => item.type === 'master',
-            )[0].name;
-          }
+        const nodeListTmp = await WzRequest.apiReq('GET', '/cluster/nodes', {});
+        if (Array.isArray(nodeListTmp?.data?.data?.affected_items)) {
+          nodeList = nodeListTmp.data.data.affected_items;
+          selectedNode = nodeListTmp.data.data.affected_items.filter(
+            item => item.type === 'master',
+          )[0].name;
           return {
             nodeList,
             logsPath: `/cluster/${selectedNode}/logs`,
@@ -247,7 +242,11 @@ export default compose(
           };
         }
 
-        return { nodeList: '', logsPath: '/cluster/local/logs', selectedNode: '' };
+        return {
+          nodeList: '',
+          logsPath: '/cluster/local/logs',
+          selectedNode: '',
+        };
       } catch (error) {
         throw new Error('Error building logs path: ' + error);
       }
