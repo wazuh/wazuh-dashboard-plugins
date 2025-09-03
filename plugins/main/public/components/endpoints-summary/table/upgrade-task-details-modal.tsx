@@ -35,7 +35,7 @@ export const AgentUpgradesTaskDetailsModal = ({
     return {
       q: `last_update_time>${formattedDate}`,
     };
-  });
+  }, []);
 
   const handleOnCloseModal = () => onClose();
 
