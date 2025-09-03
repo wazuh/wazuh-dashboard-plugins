@@ -10,8 +10,9 @@ const PromptServerAPIUnavailable = () => (
     body={
       <div>
         <p>
-          The server API is currently not available. Please check your network
-          connection or contact the system administrator.
+          The server API is currently not available. Review the connection with
+          the selected server API, the service is running and the API host
+          configuration is valid.
         </p>
       </div>
     }
