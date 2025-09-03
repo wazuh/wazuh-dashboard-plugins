@@ -97,18 +97,15 @@ export class FilterHandler {
     return result;
   }
   /**
-   * This function takes two parameters, the isCluster parameter is a boolean thats defines if it uses cluster.name key or manager.name
+   * This function creates a filter for cluster/manager queries. In v5.0+ always uses cluster.name (cluster by default)
    * @param {*} manager
-   * @param {*} isCluster
+   * @param {*} isCluster - Always true in v5.0+ (kept for compatibility)
    * @param {*} fixedKey
    * @returns
    */
-  managerQuery(manager, isCluster, fixedKey = undefined) {
-    const metaKey = fixedKey
-      ? fixedKey
-      : isCluster
-      ? 'cluster.name'
-      : 'manager.name';
+  managerQuery(manager, isCluster = true, fixedKey = undefined) {
+    // Always use cluster.name in v5.0+ (cluster mode by default)
+    const metaKey = fixedKey ? fixedKey : 'cluster.name';
     const result = this.base();
     result.meta.key = metaKey;
     result.meta.value = manager;

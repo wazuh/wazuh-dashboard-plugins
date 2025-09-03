@@ -256,7 +256,7 @@ export class PatternDataSourceFilterManager
   }
 
   /**
-   * Return the filter when the cluster or manager are enabled
+   * Return the filter when the cluster is enabled (always enabled in v5.0+)
    */
   static getClusterManagerFilters(
     indexPatternId: string,
@@ -264,12 +264,10 @@ export class PatternDataSourceFilterManager
     key?: string,
   ): tFilter[] {
     const filterHandler = new FilterHandler();
-    const isCluster = AppState.getClusterInfo().status == 'enabled';
+    // Cluster mode is always enabled in v5.0+
     const managerFilter = filterHandler.managerQuery(
-      isCluster
-        ? AppState.getClusterInfo().cluster
-        : AppState.getClusterInfo().manager,
-      isCluster,
+      AppState.getClusterInfo().cluster,
+      true,
       key,
     );
     managerFilter.meta = {

@@ -1,13 +1,13 @@
 export const getLastAlertsQuery = (
   currentIndexPattern: string,
-  isClusterEnabled: boolean,
   clusterValue: string,
   ruleLevelRange: {
     minRuleLevel: number;
     maxRuleLevel?: number;
   },
 ) => {
-  const clusterField = isClusterEnabled ? 'cluster.name' : 'manager.name';
+  // Always use cluster.name in v5.0+ (cluster mode by default)
+  const clusterField = 'cluster.name';
   return {
     indexPattern: currentIndexPattern,
     aggs: {
