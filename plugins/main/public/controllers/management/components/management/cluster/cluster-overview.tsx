@@ -22,15 +22,12 @@ interface ClusterOverviewState {
 const checkClusterIsEnabledAndRunning = async () => {
   try {
     const status: any = await WzRequest.apiReq('GET', '/cluster/status', {});
-    const clusterEnabled = status?.data?.data?.enabled;
-    const isClusterEnabled = clusterEnabled === 'yes';
     const statusRunning = status?.data?.data?.running;
-    const isClusterRunning = statusRunning === 'yes';
     return {
-      ok: !(isClusterEnabled && isClusterRunning),
+      ok: false,
       data: {
-        clusterEnabled,
-        isClusterRunning,
+        clusterEnabled: 'yes',
+        isClusterRunning: true,
         statusRunning,
       },
     };
@@ -52,13 +49,7 @@ export const ClusterOverview = compose(
   ]),
   withGuardAsync(
     checkClusterIsEnabledAndRunning,
-    ({ clusterEnabled, isClusterRunning, error }) => (
-      <ClusterDisabled
-        error={error}
-        enabled={clusterEnabled}
-        running={isClusterRunning}
-      />
-    ),
+    ({ clusterEnabled, isClusterRunning, error }) => null,
     () => (
       <LoadingSearchbarProgress
         message={
@@ -78,9 +69,7 @@ export const ClusterOverview = compose(
   }: ClusterOverviewState) => {
     return (
       <>
-        {clusterEnabled && isClusterRunning ? (
-          <ClusterDashboard statusRunning={statusRunning} />
-        ) : null}
+        <ClusterDashboard statusRunning={statusRunning} />
       </>
     );
   },

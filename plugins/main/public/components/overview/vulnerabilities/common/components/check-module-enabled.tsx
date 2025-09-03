@@ -59,16 +59,8 @@ export const ModuleEnabledCheck = () => {
 
   const checkVDIsEnabled = async () => {
     try {
-      // Check cluster status
       setData(null);
-      const clusterStatus = await clusterReq();
-
-      // Check if the module is enabled
-      const enabled =
-        clusterStatus.data.data.enabled === 'yes' &&
-        clusterStatus.data.data.running === 'yes'
-          ? await checkVDIsEnabledCluster()
-          : await checkVDIsEnabledManager();
+      const enabled = await checkVDIsEnabledCluster();
       setData({ enabled });
     } catch (error) {
       const options = {

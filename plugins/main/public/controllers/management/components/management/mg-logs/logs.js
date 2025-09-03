@@ -227,21 +227,11 @@ export default compose(
      */
     async getLogsPath() {
       try {
-        const clusterStatus = await WzRequest.apiReq(
+        let nodeList = '';
+        let selectedNode = '';
+        const nodeListTmp = await WzRequest.apiReq(
           'GET',
-          '/cluster/status',
-          {},
-        );
-        const clusterEnabled =
-          clusterStatus?.data?.data?.running === 'yes' &&
-          clusterStatus?.data?.data?.enabled === 'yes';
-
-        if (clusterEnabled) {
-          let nodeList = '';
-          let selectedNode = '';
-          const nodeListTmp = await WzRequest.apiReq(
-            'GET',
-            '/cluster/nodes',
+          '/cluster/nodes',
             {},
           );
           if (Array.isArray(nodeListTmp?.data?.data?.affected_items)) {
@@ -257,7 +247,7 @@ export default compose(
           };
         }
 
-        return { nodeList: '', logsPath: '/manager/logs', selectedNode: '' };
+        return { nodeList: '', logsPath: '/cluster/local/logs', selectedNode: '' };
       } catch (error) {
         throw new Error('Error building logs path: ' + error);
       }

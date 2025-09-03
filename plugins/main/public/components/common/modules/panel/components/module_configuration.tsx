@@ -56,23 +56,14 @@ export const PanelModuleConfiguration : FunctionalComponent<{h: string}> = conne
         const configuration = await getMapConfigurationToState('agent', configurationAPIPartialPath, mapResponseConfiguration, agent);
         return configuration ? [configuration] : null;
       }else{
-        const custerStatusResponse = await WzRequest.apiReq('GET', '/cluster/status', {});
-        if (custerStatusResponse.data.data.enabled === 'yes' && custerStatusResponse.data.data.running === 'yes') {
-          // Cluster mode
-          // Get the cluster nodes
-          const nodesResponse = await WzRequest.apiReq('GET', `/cluster/nodes`, {});
-          const nodesConfigurationResponses = await Promise.all(
-            nodesResponse.data.data.affected_items
-              .map(async node => await getMapConfigurationToState('cluster_node', configurationAPIPartialPath, mapResponseConfiguration, node)
-            )
-          );
-          const nodeConfigurations = nodesConfigurationResponses.filter(nodeConfiguration => nodeConfiguration);
-          return nodeConfigurations.length ? nodeConfigurations : null;
-        } else {
-          // Manager mode
-          const configuration = await getMapConfigurationToState('manager', configurationAPIPartialPath, mapResponseConfiguration);
-          return configuration ? [configuration] : null;
-        };
+        const nodesResponse = await WzRequest.apiReq('GET', `/cluster/nodes`, {});
+        const nodesConfigurationResponses = await Promise.all(
+          nodesResponse.data.data.affected_items
+            .map(async node => await getMapConfigurationToState('cluster_node', configurationAPIPartialPath, mapResponseConfiguration, node)
+          )
+        );
+        const nodeConfigurations = nodesConfigurationResponses.filter(nodeConfiguration => nodeConfiguration);
+        return nodeConfigurations.length ? nodeConfigurations : null;
       }
     }catch(error){
       const options: UIErrorLog = {

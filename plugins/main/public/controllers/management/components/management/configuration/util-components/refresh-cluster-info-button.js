@@ -19,7 +19,7 @@ import { connect } from 'react-redux';
 import {
   updateClusterNodes,
   updateClusterNodeSelected,
-  updateRefreshTime
+  updateRefreshTime,
 } from '../../../../../../redux/actions/configurationActions';
 import { clusterNodes, clusterReq } from '../utils/wz-fetch';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
@@ -30,33 +30,24 @@ class WzRefreshClusterInfoButton extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: false
-    }
+      isLoading: false,
+    };
   }
   async checkIfClusterOrManager() {
     try {
-      this.setState({isLoading: true});
-      // in case which enable/disable cluster configuration, update Redux Store
-      const cluster = await clusterReq();
-      if(cluster.data.data.enabled === 'yes' && cluster.data.data.running === 'yes'){
-        // try if it is a cluster
-        const nodes = await clusterNodes();
-        // set cluster nodes in Redux Store
-        this.props.updateClusterNodes(nodes.data.data.affected_items);
-        // set cluster node selected in Redux Store
-        const existsClusterCurrentNodeSelected = nodes.data.data.affected_items.find(
-          node => node.name === this.props.clusterNodeSelected
+      this.setState({ isLoading: true });
+      const nodes = await clusterNodes();
+      this.props.updateClusterNodes(nodes.data.data.affected_items);
+      const existsClusterCurrentNodeSelected =
+        nodes.data.data.affected_items.find(
+          node => node.name === this.props.clusterNodeSelected,
         );
-        this.props.updateClusterNodeSelected(
-          existsClusterCurrentNodeSelected
-            ? existsClusterCurrentNodeSelected.name
-            : nodes.data.data.affected_items.find(node => node.type === 'master').name
-        );
-      }else{
-        // do nothing if it isn't a cluster
-        this.props.updateClusterNodes(false);
-        this.props.updateClusterNodeSelected(false);
-      }
+      this.props.updateClusterNodeSelected(
+        existsClusterCurrentNodeSelected
+          ? existsClusterCurrentNodeSelected.name
+          : nodes.data.data.affected_items.find(node => node.type === 'master')
+              .name,
+      );
     } catch (error) {
       // do nothing if it isn't a cluster
       this.props.updateClusterNodes(false);
@@ -67,19 +58,19 @@ class WzRefreshClusterInfoButton extends Component {
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
           error: error,
-          message: error.message || error,
-          title: error.name || error
+          message: error.message || error,
+          title: error.name || error,
         },
       };
       getErrorOrchestrator().handleError(options);
     }
-    this.setState({isLoading: false});
+    this.setState({ isLoading: false });
     this.props.updateRefreshTime();
   }
   render() {
     return (
       <EuiButtonEmpty
-        iconType="refresh"
+        iconType='refresh'
         isLoading={this.state.isLoading}
         onClick={() => this.checkIfClusterOrManager()}
         isDisabled={this.state.isLoading}
@@ -91,7 +82,7 @@ class WzRefreshClusterInfoButton extends Component {
 }
 
 const mapStateToProps = state => ({
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
 const mapDispatchToProps = dispatch => ({
@@ -99,11 +90,10 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateClusterNodes(clusterNodes)),
   updateClusterNodeSelected: clusterNodeSelected =>
     dispatch(updateClusterNodeSelected(clusterNodeSelected)),
-  updateRefreshTime: () =>
-    dispatch(updateRefreshTime())
+  updateRefreshTime: () => dispatch(updateRefreshTime()),
 });
 
 export default connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 )(WzRefreshClusterInfoButton);
