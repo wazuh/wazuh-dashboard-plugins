@@ -28,30 +28,12 @@ export type ServerAddressOptions = {
   nodetype: string;
 };
 
-/**
- * Get the cluster status
- */
-export const clusterStatusResponse = async (): Promise<boolean> => {
-  const clusterStatus = await WzRequest.apiReq('GET', '/cluster/status', {});
-  if (
-    clusterStatus.data.data.enabled === 'yes' &&
-    clusterStatus.data.data.running === 'yes'
-  ) {
-    // Cluster mode
-    return true;
-  } else {
-    // Manager mode
-    return false;
-  }
-};
+// Removed clusterStatusResponse function - cluster mode is always enabled in v5.0+
 
 /**
  * Get the remote configuration from api
  */
-async function getRemoteConfiguration(
-  nodeName: string,
-  clusterStatus: boolean,
-): Promise<RemoteConfig> {
+async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
   let config: RemoteConfig = {
     name: nodeName,
     isUdp: false,
@@ -59,20 +41,12 @@ async function getRemoteConfiguration(
   };
 
   try {
-    let result;
-    if (clusterStatus) {
-      result = await WzRequest.apiReq(
-        'GET',
-        `/cluster/${nodeName}/configuration/request/remote`,
-        {},
-      );
-    } else {
-      result = await WzRequest.apiReq(
-        'GET',
-        '/manager/configuration/request/remote',
-        {},
-      );
-    }
+    // Always use cluster endpoints in v5.0+ (cluster mode by default)
+    const result = await WzRequest.apiReq(
+      'GET',
+      `/cluster/${nodeName}/configuration/request/remote`,
+      {},
+    );
     const items = result?.data?.data?.affected_items || [];
     const remote = items[0]?.remote;
     if (remote) {
@@ -105,10 +79,9 @@ async function getRemoteConfiguration(
  * @param node
  * @returns
  */
-async function getAuthConfiguration(node: string, clusterStatus: boolean) {
-  const authConfigUrl = clusterStatus
-    ? `/cluster/${node}/configuration/auth/auth`
-    : '/manager/configuration/auth/auth';
+async function getAuthConfiguration(node: string) {
+  // Always use cluster endpoints in v5.0+ (cluster mode by default)
+  const authConfigUrl = `/cluster/${node}/configuration/auth/auth`;
   const result = await WzRequest.apiReq('GET', authConfigUrl, {});
   const auth = result?.data?.data?.affected_items?.[0];
   return auth;
@@ -139,11 +112,8 @@ async function getConnectionConfig(
   const nodeIp = nodeSelected?.value;
   if (!defaultServerAddress) {
     if (nodeSelected.nodetype !== 'custom') {
-      const clusterStatus = await clusterStatusResponse();
-      const remoteConfig = await getRemoteConfiguration(
-        nodeName,
-        clusterStatus,
-      );
+      // Always use cluster mode in v5.0+ (cluster mode by default)
+      const remoteConfig = await getRemoteConfiguration(nodeName);
       return {
         serverAddress: nodeIp,
         udpProtocol: remoteConfig.isUdp,
@@ -220,17 +190,9 @@ export const parseNodesInOptions = (
 export const fetchClusterNodesOptions = async (): Promise<
   ServerAddressOptions[]
 > => {
-  const clusterStatus = await clusterStatusResponse();
-  if (clusterStatus) {
-    // Cluster mode
-    // Get the cluster nodes
-    const nodes = await getNodeIPs();
-    return parseNodesInOptions(nodes);
-  } else {
-    // Manager mode
-    // Get the manager node
-    return await getManagerNode();
-  }
+  // Always use cluster mode in v5.0+ (cluster mode by default)
+  const nodes = await getNodeIPs();
+  return parseNodesInOptions(nodes);
 };
 
 /**
@@ -250,12 +212,9 @@ export const getMasterNode = (
 export const getMasterConfiguration = async () => {
   const nodes = await fetchClusterNodesOptions();
   const masterNode = getMasterNode(nodes);
-  const clusterStatus = await clusterStatusResponse();
-  const remote = await getRemoteConfiguration(
-    masterNode[0].label,
-    clusterStatus,
-  );
-  const auth = await getAuthConfiguration(masterNode[0].label, clusterStatus);
+  // Always use cluster mode in v5.0+ (cluster mode by default)
+  const remote = await getRemoteConfiguration(masterNode[0].label);
+  const auth = await getAuthConfiguration(masterNode[0].label);
   return {
     remote,
     auth,

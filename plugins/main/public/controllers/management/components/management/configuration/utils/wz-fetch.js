@@ -54,8 +54,8 @@ export const getCurrentConfig = async (
       try {
         const url = node
           ? `/cluster/${node}/configuration/${component}/${configuration}`
-          : !node && agentId === '000'
-          ? `/manager/configuration/${component}/${configuration}`
+          : agentId === '000'
+          ? `/cluster/local/configuration/${component}/${configuration}`
           : `/agents/${agentId}/config/${component}/${configuration}`;
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
@@ -264,14 +264,10 @@ export const clusterReq = async () => {
  */
 export const fetchFile = async selectedNode => {
   try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {}; // TODO: Check, when FIX ISSUE /cluster/status
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+    // Always use cluster endpoints in v5.0+ (cluster mode by default)
     const data = await WzRequest.apiReq(
       'GET',
-      isCluster
-        ? `/cluster/${selectedNode}/configuration`
-        : `/manager/configuration`,
+      `/cluster/${selectedNode}/configuration`,
       {
         params: {
           raw: true,
@@ -302,15 +298,10 @@ export const restartNodeSelected = async (
   updateWazuhNotReadyYet,
 ) => {
   try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const isCluster =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    // Dispatch a Redux action
-    updateWazuhNotReadyYet(
-      `Restarting ${isCluster ? selectedNode : 'Manager'}, please wait.`,
-    ); //FIXME: if it enables/disables cluster, this will show Manager instead node name
-    isCluster ? await restartNode(selectedNode) : await restartManager();
-    return await makePing(updateWazuhNotReadyYet, isCluster);
+    // Always use cluster mode in v5.0+ (cluster mode by default)
+    updateWazuhNotReadyYet(`Restarting ${selectedNode}, please wait.`);
+    await restartNode(selectedNode);
+    return await makePing(updateWazuhNotReadyYet, true);
   } catch (error) {
     throw error;
   }
@@ -403,14 +394,8 @@ export const restartNode = async node => {
 
 export const saveConfiguration = async (selectedNode, xml) => {
   try {
-    const clusterStatus = (((await clusterReq()) || {}).data || {}).data || {};
-    const enabledAndRunning =
-      clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-    if (enabledAndRunning) {
-      await saveFileCluster(xml, selectedNode);
-    } else {
-      await saveFileManager(xml);
-    }
+    // Always use cluster mode in v5.0+ (cluster mode by default)
+    await saveFileCluster(xml, selectedNode);
   } catch (error) {
     throw error;
   }
@@ -479,28 +464,12 @@ export const saveFileManager = async text => {
  */
 export const validateAfterSent = async (node = false) => {
   try {
-    const clusterStatus = await WzRequest.apiReq('GET', `/cluster/status`, {});
-
-    const clusterData = ((clusterStatus || {}).data || {}).data || {};
-    const isCluster =
-      clusterData.enabled === 'yes' && clusterData.running === 'yes';
-
-    let validation = false;
-    if (node && isCluster) {
-      validation = await WzRequest.apiReq(
-        'GET',
-        `/cluster/configuration/validation`,
-        {},
-      );
-    } else {
-      validation = isCluster
-        ? await WzRequest.apiReq('GET', `/cluster/configuration/validation`, {})
-        : await WzRequest.apiReq(
-            'GET',
-            `/manager/configuration/validation`,
-            {},
-          );
-    }
+    // Always use cluster endpoints in v5.0+ (cluster mode by default)
+    const validation = await WzRequest.apiReq(
+      'GET',
+      `/cluster/configuration/validation`,
+      {},
+    );
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {

@@ -30,42 +30,43 @@ export const queryConfig = async (agentId, sections, node = false) => {
     }
 
     const result = {};
-    await Promise.all(sections.map(async(section)=> {
-      const { component, configuration } = section;
-      if (
-        !component ||
-        typeof component !== 'string' ||
-        !configuration ||
-        typeof configuration !== 'string'
-      ) {
-        throw new Error('Invalid section');
-      }
-      try {
-        const url = node
-          ? `/cluster/${node}/configuration/${component}/${configuration}`
-          : !node
-            && agentId === '000'
-            ? `/manager/configuration/${component}/${configuration}`
+    await Promise.all(
+      sections.map(async section => {
+        const { component, configuration } = section;
+        if (
+          !component ||
+          typeof component !== 'string' ||
+          !configuration ||
+          typeof configuration !== 'string'
+        ) {
+          throw new Error('Invalid section');
+        }
+        try {
+          const url = node
+            ? `/cluster/${node}/configuration/${component}/${configuration}`
+            : agentId === '000'
+            ? `/cluster/local/configuration/${component}/${configuration}`
             : `/agents/${agentId}/configuration/${component}/${configuration}`;
 
-        const partialResult = await WzRequest.apiReq('GET', url, {});
-        result[`${component}-${configuration}`] = partialResult.data.data;
-      } catch (error) {
-        const options = {
-          context: `${AppState.name}.queryConfig`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          display: false,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Fetch Configuration`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    }));
+          const partialResult = await WzRequest.apiReq('GET', url, {});
+          result[`${component}-${configuration}`] = partialResult.data.data;
+        } catch (error) {
+          const options = {
+            context: `${AppState.name}.queryConfig`,
+            level: UI_LOGGER_LEVELS.ERROR,
+            severity: UI_ERROR_SEVERITIES.BUSINESS,
+            store: true,
+            display: false,
+            error: {
+              error: error,
+              message: error.message || error,
+              title: `Fetch Configuration`,
+            },
+          };
+          getErrorOrchestrator().handleError(options);
+        }
+      }),
+    );
     return result;
   } catch (error) {
     const options = {
@@ -83,4 +84,4 @@ export const queryConfig = async (agentId, sections, node = false) => {
 
     getErrorOrchestrator().handleError(options);
   }
-}
+};

@@ -137,14 +137,10 @@ class WzReloadClusterManagerCallout extends Component<
     }
   };
   async componentDidMount() {
-    try {
-      const clusterStatus = await clusterReq();
-      this.setState({
-        isCluster:
-          clusterStatus.data.data.enabled === 'yes' &&
-          clusterStatus.data.data.running === 'yes',
-      });
-    } catch (error) {}
+    // Always use cluster mode in v5.0+ (cluster mode by default)
+    this.setState({
+      isCluster: true,
+    });
   }
   render() {
     const { warningReloading } = this.state;
