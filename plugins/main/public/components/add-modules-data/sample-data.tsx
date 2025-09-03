@@ -49,6 +49,7 @@ import {
   sampleSecurityInformationApplication,
   sampleThreatDetectionApplication,
 } from './helper';
+import { GenericRequest } from '../../react-services';
 
 export default class WzSampleData extends Component {
   categories: {
@@ -148,10 +149,7 @@ export default class WzSampleData extends Component {
       // Check if sample data for each category was added
       const results = await DeepPromiseResolver(
         this.categories.reduce((accum, cur) => {
-          /* FIXME: this should not use this client to do the request because this manage the availability of the server API
-          and can change the prompt related to problem with the server API
-          */
-          accum[cur.categorySampleDataIndex] = WzRequest.genericReq(
+          accum[cur.categorySampleDataIndex] = GenericRequest.request(
             'GET',
             `/indexer/sampledata/${cur.categorySampleDataIndex}`,
           );
@@ -236,9 +234,6 @@ export default class WzSampleData extends Component {
           addDataLoading: true,
         },
       });
-      /* FIXME: this should not use this client to do the request because this manage the availability of the server API
-          and can change the prompt related to problem with the server API
-      */
       await WzRequest.genericReq(
         'POST',
         `/indexer/sampledata/${category.categorySampleDataIndex}`,
@@ -285,9 +280,6 @@ export default class WzSampleData extends Component {
           removeDataLoading: true,
         },
       });
-      /* FIXME: this should not use this client to do the request because this manage the availability of the server API
-          and can change the prompt related to problem with the server API
-      */
       const { data: deleteResponse } = await WzRequest.genericReq(
         'DELETE',
         `/indexer/sampledata/${category.categorySampleDataIndex}`,
