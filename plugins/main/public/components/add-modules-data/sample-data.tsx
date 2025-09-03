@@ -169,23 +169,17 @@ export default class WzSampleData extends Component {
         ),
       );
 
-      // Get information about cluster/manager
+      // Get information about cluster
       const clusterName = AppState.getClusterInfo().cluster;
-      const managerName = AppState.getClusterInfo().manager;
 
       // eslint-disable-next-line camelcase
       this.generateAlertsParams.api_id = JSON.parse(
         AppState.getCurrentAPI() || '{}',
       )?.id;
-      this.generateAlertsParams.manager = {
-        name: managerName,
+      this.generateAlertsParams.cluster = {
+        name: clusterName,
+        node: clusterName,
       };
-      if (clusterName && clusterName !== 'Disabled') {
-        this.generateAlertsParams.cluster = {
-          name: clusterName,
-          node: clusterName,
-        };
-      }
     } catch (error) {
       const options = {
         context: `${WzSampleData.name}.componentDidMount`,

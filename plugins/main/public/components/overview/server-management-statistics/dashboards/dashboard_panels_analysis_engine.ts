@@ -2674,5 +2674,5 @@ export const getDashboardPanelsAnalysisEngine = (
     },
   };
 
-  return isClusterMode ? clusterModePanels : panels;
+  return clusterModePanels;
 };
