@@ -170,8 +170,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
         options: {
+          // TODO: this should ensure the field exist
           savedObjectOverwrite: {
-            timeFieldName: '@timestamp',
+            timeFieldName: 'timestamp',
           },
           hasTemplate: true,
         },
@@ -184,6 +185,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
         indexPatternID: 'wazuh-monitoring-*',
+        options: {
+          // TODO: this should ensure the field exist
+          savedObjectOverwrite: {
+            timeFieldName: 'timestamp',
+          },
+        },
       }),
     );
 
@@ -192,6 +199,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
         indexPatternID: 'wazuh-statistics-*',
+        options: {
+          // TODO: this should ensure the field exist
+          savedObjectOverwrite: {
+            timeFieldName: 'timestamp',
+          },
+        },
       }),
     );
 
@@ -396,6 +409,18 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_SCA_PATTERN,
       }),
     );
+
+    // let t = true;
+    // core.healthCheck.register({
+    //   name: 'test:fail',
+    //   run: ctx => {
+    //     // t = !t;
+    //     throw new Error('Placeholder error message here');
+    //     if (t) {
+    //     }
+    //   },
+    //   isCritical: true,
+    // });
 
     return {};
   }
