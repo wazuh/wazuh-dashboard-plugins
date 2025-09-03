@@ -439,17 +439,12 @@ export class WazuhApiCtrl {
         ((((response || {}).data || {}).data || {}).affected_items || [])[0] ||
         {};
 
-      const isCluster =
-        ((api || {}).cluster_info || {}).status === 'enabled' &&
-        typeof daemons['wazuh-clusterd'] !== 'undefined';
       const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
 
       const execd = daemons['wazuh-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-      const clusterd = isCluster
-        ? daemons['wazuh-clusterd'] === 'running'
-        : true;
+      const clusterd = daemons['wazuh-clusterd'] === 'running';
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
