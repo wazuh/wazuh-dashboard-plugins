@@ -19,10 +19,14 @@ const validateConfigAfterSent = async (node = false) => {
       validation = await WzRequest.apiReq(
         'GET',
         `/cluster/${node}/configuration/validation`,
-        {}
+        {},
       );
     } else {
-      validation = await WzRequest.apiReq('GET', `/cluster/configuration/validation`, {});
+      validation = await WzRequest.apiReq(
+        'GET',
+        `/cluster/configuration/validation`,
+        {},
+      );
     }
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
