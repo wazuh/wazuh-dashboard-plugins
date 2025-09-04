@@ -464,12 +464,10 @@ export const saveFileManager = async text => {
  */
 export const validateAfterSent = async (node = false) => {
   try {
-    // Always use cluster endpoints in v5.0+ (cluster mode by default)
-    const validation = await WzRequest.apiReq(
-      'GET',
-      `/cluster/configuration/validation`,
-      {},
-    );
+    const endpoint = node
+      ? `/cluster/${node}/configuration/validation`
+      : `/cluster/configuration/validation`;
+    const validation = await WzRequest.apiReq('GET', endpoint, {});
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {
