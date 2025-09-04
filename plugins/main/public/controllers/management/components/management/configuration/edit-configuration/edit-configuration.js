@@ -41,7 +41,6 @@ import {
   saveFileManager,
   saveFileCluster,
   clusterNodes,
-  clusterReq,
 } from '../utils/wz-fetch';
 import { validateXML } from '../utils/xml';
 import { getToasts } from '../../../../../..//kibana-services';

@@ -23,10 +23,7 @@ import {
 } from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
-import {
-  clusterReq,
-  reloadRuleset,
-} from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { reloadRuleset } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 interface IWzReloadClusterManagerCalloutProps {
   updateWazuhNotReadyYet: (wazuhNotReadyYet) => void;
@@ -36,7 +33,6 @@ interface IWzReloadClusterManagerCalloutProps {
 
 interface IWzReloadClusterManagerCalloutState {
   warningReloading: boolean;
-  isCluster: boolean;
 }
 
 class WzReloadClusterManagerCallout extends Component<
@@ -47,7 +43,6 @@ class WzReloadClusterManagerCallout extends Component<
     super(props);
     this.state = {
       warningReloading: false,
-      isCluster: false,
     };
   }
   showToast(color, title, text = '', time = 3000) {
@@ -136,12 +131,6 @@ class WzReloadClusterManagerCallout extends Component<
       );
     }
   };
-  async componentDidMount() {
-    // Always use cluster mode in v5.0+ (cluster mode by default)
-    this.setState({
-      isCluster: true,
-    });
-  }
   render() {
     const { warningReloading } = this.state;
     return (

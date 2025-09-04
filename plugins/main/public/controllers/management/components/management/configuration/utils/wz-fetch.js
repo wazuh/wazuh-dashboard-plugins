@@ -168,10 +168,9 @@ export const handleError = async (
 
 /**
  * Check daemons status
- * @param {boolean} isCluster
  * @returns {object|Promise}
  */
-export const checkDaemons = async isCluster => {
+export const checkDaemons = async () => {
   try {
     const response = await WzRequest.apiReq(
       'GET',
@@ -188,18 +187,10 @@ export const checkDaemons = async isCluster => {
     const modulesd = daemons['wazuh-modulesd'] === 'running';
     const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
 
-    let clusterd = true;
-    if (isCluster) {
-      const clusterStatus =
-        (((await clusterReq()) || {}).data || {}).data || {};
-      clusterd =
-        clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes'
-          ? daemons['wazuh-clusterd'] === 'running'
-          : false;
-    }
+    // Always check clusterd in v5.0+ (cluster by default)
+    const clusterd = daemons['wazuh-clusterd'] === 'running';
 
-    const isValid =
-      execd && modulesd && wazuhdb && (isCluster ? clusterd : true);
+    const isValid = execd && modulesd && wazuhdb && clusterd;
 
     if (isValid) {
       return { isValid };
@@ -228,7 +219,7 @@ export const makePing = async (
     while (tries--) {
       await delayAsPromise(2000);
       try {
-        isValid = await checkDaemons(isCluster);
+        isValid = await checkDaemons();
         if (isValid) {
           updateWazuhNotReadyYet('');
           break;
@@ -243,18 +234,6 @@ export const makePing = async (
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
     throw new Error('Server could not be recovered.');
-  }
-};
-
-/**
- * Get Cluster status from Wazuh API
- * @returns {Promise}
- */
-export const clusterReq = async () => {
-  try {
-    return WzRequest.apiReq('GET', '/cluster/status', {});
-  } catch (error) {
-    return Promise.reject(error);
   }
 };
 

@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  clusterReq,
-  clusterNodes,
-} from '../../../../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { clusterNodes } from '../../../../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { WzRequest } from '../../../../../react-services';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { EuiCallOut, EuiLink } from '@elastic/eui';
