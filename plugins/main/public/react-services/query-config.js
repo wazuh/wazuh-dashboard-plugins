@@ -45,7 +45,7 @@ export const queryConfig = async (agentId, sections, node = false) => {
           const url = node
             ? `/cluster/${node}/configuration/${component}/${configuration}`
             : agentId === '000'
-            ? `/cluster/local/configuration/${component}/${configuration}`
+            ? `/manager/configuration/${component}/${configuration}`
             : `/agents/${agentId}/configuration/${component}/${configuration}`;
 
           const partialResult = await WzRequest.apiReq('GET', url, {});

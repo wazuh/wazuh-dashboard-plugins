@@ -244,7 +244,7 @@ export default compose(
 
         return {
           nodeList: '',
-          logsPath: '/cluster/local/logs',
+          logsPath: '/manager/logs',
           selectedNode: '',
         };
       } catch (error) {
