@@ -19,7 +19,7 @@ interface ClusterOverviewState {
   statusRunning: string;
 }
 
-const checkClusterIsEnabledAndRunning = async () => {
+const getClusterStatus = async () => {
   try {
     const status: any = await WzRequest.apiReq('GET', '/cluster/status', {});
     const statusRunning = status?.data?.data?.running;
@@ -48,14 +48,14 @@ export const ClusterOverview = compose(
     { action: 'cluster:status', resource: '*:*:*' },
   ]),
   withGuardAsync(
-    checkClusterIsEnabledAndRunning,
+    getClusterStatus,
     ({ clusterEnabled, isClusterRunning, error }) => null,
     () => (
       <LoadingSearchbarProgress
         message={
           <FormattedMessage
-            id='module.cluster.checking'
-            defaultMessage='Checking if cluster is enabled and running...'
+            id='module.cluster.loading'
+            defaultMessage='Loading cluster information...'
           />
         }
       />

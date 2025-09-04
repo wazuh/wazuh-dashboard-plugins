@@ -18,7 +18,11 @@ export default class StatusHandler {
    */
   static async agentsSummary() {
     try {
-      const result = await WzRequest.apiReq('GET', `/agents/summary/status`, {});
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/agents/summary/status`,
+        {},
+      );
       return result;
     } catch (error) {
       throw error;
@@ -57,7 +61,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq(
         'GET',
         `/cluster/${nodeId}/status`,
-        {}
+        {},
       );
       return result;
     } catch (error) {
@@ -73,7 +77,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq(
         'GET',
         `/cluster/${nodeId}/info`,
-        {}
+        {},
       );
       return result;
     } catch (error) {
@@ -86,11 +90,7 @@ export default class StatusHandler {
    */
   static async clusterAgentsCount() {
     try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        `/overview/agents`,
-        {}
-      );
+      const result = await WzRequest.apiReq('GET', `/overview/agents`, {});
       return result;
     } catch (error) {
       throw error;
@@ -130,8 +130,8 @@ export default class StatusHandler {
         params: {
           limit: 1,
           sort: '-dateAdd',
-          q: 'id!=000'
-        }
+          q: 'id!=000',
+        },
       });
       return result;
     } catch (error) {
@@ -147,7 +147,7 @@ export default class StatusHandler {
       const validationError = await WzRequest.apiReq(
         'GET',
         `/cluster/configuration/validation`,
-        {}
+        {},
       );
 
       const data = ((validationError || {}).data || {}).data || {};
@@ -171,7 +171,7 @@ export default class StatusHandler {
       const validationError = await WzRequest.apiReq(
         'GET',
         `/manager/configuration/validation`,
-        {}
+        {},
       );
 
       const data = ((validationError || {}).data || {}).data || {};

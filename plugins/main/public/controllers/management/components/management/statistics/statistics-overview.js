@@ -24,7 +24,7 @@ import {
   EuiSpacer,
   EuiProgress,
 } from '@elastic/eui';
-import { clusterReq, clusterNodes } from '../configuration/utils/wz-fetch';
+import { clusterNodes } from '../configuration/utils/wz-fetch';
 import { compose } from 'redux';
 import {
   withGlobalBreadcrumb,
