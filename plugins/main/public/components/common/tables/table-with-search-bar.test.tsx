@@ -29,6 +29,11 @@ jest.mock('../../../kibana-services', () => ({
       prepend: str => str,
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 jest.mock('../../../react-services/common-services', () => ({

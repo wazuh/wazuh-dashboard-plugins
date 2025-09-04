@@ -24,6 +24,11 @@ jest.mock('../../../../../../kibana-services', () => ({
       }
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 const mockStore = configureMockStore();

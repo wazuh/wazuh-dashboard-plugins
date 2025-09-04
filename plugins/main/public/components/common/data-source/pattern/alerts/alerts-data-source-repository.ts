@@ -1,6 +1,9 @@
 import { AppState } from '../../../../../react-services';
 import { PatternDataSourceFactory } from '../pattern-data-source-factory';
-import { PatternDataSourceRepository } from '../pattern-data-source-repository';
+import {
+  PatternDataSourceRepository,
+  tParsedIndexPattern,
+} from '../pattern-data-source-repository';
 import { AlertsDataSource } from './alerts-data-source';
 
 const ALERTS_REQUIRED_FIELDS = [
@@ -17,7 +20,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
 
   async getAll() {
     const indexPatterns = await super.getAll();
-    // FIXME: this should take into account the ip.ignore settig to filter the index patterns
+    // FIXME: this should take into account the ip.ignore setting to filter the index patterns
     return indexPatterns.filter(this.checkIfAlertsIndexPattern);
   }
 
@@ -66,6 +69,13 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
     }
 
     return dataSource;
+  }
+
+  setDefault(dataSource: tParsedIndexPattern): void {
+    if (!dataSource) {
+      throw new Error('Index pattern is required');
+    }
+    AppState.setCurrentPattern(dataSource.id);
   }
 
   getStoreIndexPatternId(): string {

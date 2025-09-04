@@ -29,6 +29,11 @@ jest.mock('../../../../../kibana-services', () => ({
       }
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 // the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.

@@ -2,16 +2,77 @@ import React from 'react';
 import { EuiPage, EuiPageBody, EuiSpacer, EuiProgress } from '@elastic/eui';
 import { SettingsAboutAppInfo } from './appInfo';
 import { SettingsAboutGeneralInfo } from './generalInfo';
-import { PLUGIN_APP_NAME } from '../../../../common/constants';
-import { useAboutData } from './useAboutData';
+import {
+  PLUGIN_APP_NAME,
+  UI_LOGGER_LEVELS,
+} from '../../../../common/constants';
+import { useAsyncActionRunOnStart } from '../../common/hooks';
+import { GenericRequest } from '../../../react-services';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
+
+async function fetchAboutData() {
+  try {
+    const data = await GenericRequest.request('GET', '/api/setup');
+    const response = data.data.data;
+    return response['app-version'] as string;
+  } catch (error) {
+    const options = {
+      context: `${SettingsAbout.name}.getAppInfo`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      error: {
+        error: error,
+        message: error.message || error,
+        title: error.name || error,
+      },
+    };
+    getErrorOrchestrator().handleError(options);
+    throw error;
+  }
+}
+
+// export const useAboutData = () => {
+//   const [appInfo, setAppInfo] = useState<string>();
+//   const [loading, setLoading] = useState<boolean>(true);
+//   const [error, setError] = useState<boolean>(false);
+
+//   useEffect(() => {
+//     const fetchData = async () => {
+//       try {
+//         const data = await GenericRequest.request('GET', '/api/setup');
+//         const response = data.data.data;
+//         setAppInfo(response['app-version'] as string);
+//       } catch (error) {
+//         setError(true);
+//         const options = {
+//           context: `${Settings.name}.getAppInfo`,
+//           level: UI_LOGGER_LEVELS.ERROR,
+//           severity: UI_ERROR_SEVERITIES.BUSINESS,
+//           error: {
+//             error: error,
+//             message: error.message || error,
+//             title: error.name || error,
+//           },
+//         };
+//         getErrorOrchestrator().handleError(options);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+//     fetchData();
+//   }, []);
+
+//   return { appInfo, loading, error };
+// };
 
 export const SettingsAbout: React.FC = () => {
-  const { appInfo, loading, error } = useAboutData();
+  const { data, running, error } = useAsyncActionRunOnStart(fetchAboutData);
 
   let headerAbout;
   if (error) {
     headerAbout = null;
-  } else if (loading) {
+  } else if (running) {
     headerAbout = (
       <>
         <EuiProgress size='xs' color='primary' />
@@ -21,7 +82,7 @@ export const SettingsAbout: React.FC = () => {
   } else {
     headerAbout = (
       <>
-        <SettingsAboutAppInfo appInfo={appInfo} />
+        <SettingsAboutAppInfo appInfo={data} />
         <EuiSpacer size='l' />
       </>
     );

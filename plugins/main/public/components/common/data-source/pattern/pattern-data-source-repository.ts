@@ -91,11 +91,10 @@ export class PatternDataSourceRepository
   }
 
   setDefault(dataSource: tParsedIndexPattern): void {
+    // This method should be redefined by the subclasses
     if (!dataSource) {
       throw new Error('Index pattern is required');
     }
-    AppState.setCurrentPattern(dataSource.id);
-    return;
   }
   async getDefault(dataSources): Promise<tParsedIndexPattern | null> {
     // This method should be redefined by the subclasses

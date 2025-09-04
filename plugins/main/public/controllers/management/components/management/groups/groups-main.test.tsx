@@ -23,6 +23,11 @@ jest.mock('../../../../../kibana-services', () => ({
       prepend: str => str,
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 const mockProps = {
