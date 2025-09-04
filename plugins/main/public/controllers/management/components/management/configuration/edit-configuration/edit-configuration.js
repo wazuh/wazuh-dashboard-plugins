@@ -38,7 +38,6 @@ import {
 import {
   fetchFile,
   restartNodeSelected,
-  saveFileManager,
   saveFileCluster,
   clusterNodes,
 } from '../utils/wz-fetch';
@@ -74,12 +73,11 @@ class WzEditConfiguration extends Component {
   async editorSave() {
     try {
       this.setState({ saving: true });
-      this.props.clusterNodeSelected
-        ? await saveFileCluster(
-            this.state.editorValue,
-            this.props.clusterNodeSelected,
-          )
-        : await saveFileManager(this.state.editorValue);
+      // In cluster by default, clusterNodeSelected is always available
+      await saveFileCluster(
+        this.state.editorValue,
+        this.props.clusterNodeSelected,
+      );
       this.setState({
         saving: false,
         infoChangesAfterRestart: true,
@@ -91,8 +89,8 @@ class WzEditConfiguration extends Component {
             <EuiIcon type='check' />
             &nbsp;
             <span>
-              <b>{this.props.clusterNodeSelected || 'Manager'}</b> configuration
-              has been updated
+              <b>{this.props.clusterNodeSelected}</b> configuration has been
+              updated
             </span>
           </Fragment>
         ),
@@ -193,12 +191,6 @@ class WzEditConfiguration extends Component {
           color: 'success',
         });
       }
-      if (!this.props.clusterNodeSelected) {
-        this.addToast({
-          title: 'Manager was restarted',
-          color: 'success',
-        });
-      }
     } catch (error) {
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });
@@ -257,7 +249,7 @@ class WzEditConfiguration extends Component {
     return (
       <Fragment>
         <WzConfigurationPath
-          title={`${clusterNodeSelected ? 'Cluster' : 'Manager'} configuration`}
+          title='Cluster configuration'
           updateConfigurationSection={this.props.updateConfigurationSection}
           hasChanges={this.state.hasChanges}
         >
@@ -272,12 +264,10 @@ class WzEditConfiguration extends Component {
             ) : (
               <WzButtonPermissions
                 permissions={[
-                  this.props.clusterNodeSelected
-                    ? {
-                        action: 'cluster:update_config',
-                        resource: `node:id:${this.props.clusterNodeSelected}`,
-                      }
-                    : { action: 'manager:update_config', resource: '*:*:*' },
+                  {
+                    action: 'cluster:update_config',
+                    resource: `node:id:${this.props.clusterNodeSelected}`,
+                  },
                 ]}
                 isDisabled={saving || disableSaveRestartButtons}
                 iconType='save'
@@ -290,12 +280,10 @@ class WzEditConfiguration extends Component {
           <EuiFlexItem grow={false}>
             <WzButtonPermissions
               permissions={[
-                this.props.clusterNodeSelected
-                  ? {
-                      action: 'cluster:restart',
-                      resource: `node:id:${this.props.clusterNodeSelected}`,
-                    }
-                  : { action: 'manager:restart', resource: '*:*:*' },
+                {
+                  action: 'cluster:restart',
+                  resource: `node:id:${this.props.clusterNodeSelected}`,
+                },
               ]}
               fill
               iconType='refresh'
@@ -303,8 +291,7 @@ class WzEditConfiguration extends Component {
               isDisabled={disableSaveRestartButtons || restarting}
               isLoading={restarting}
             >
-              {restarting ? 'Restarting' : 'Restart'}{' '}
-              {clusterNodeSelected || 'Manager'}
+              {restarting ? 'Restarting' : 'Restart'} {clusterNodeSelected}
             </WzButtonPermissions>
           </EuiFlexItem>
         </WzConfigurationPath>
@@ -323,7 +310,7 @@ class WzEditConfiguration extends Component {
         {restart && !restarting && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={`${clusterNodeSelected || 'Manager'} will be restarted`}
+              title={`${clusterNodeSelected} will be restarted`}
               onCancel={() => this.toggleRestart()}
               onConfirm={() => this.confirmRestart()}
               cancelButtonText='Cancel'
@@ -420,11 +407,8 @@ const WzEditorConfiguration = compose(
               <EuiText>
                 Edit <span style={{ fontWeight: 'bold' }}>ossec.conf</span> of{' '}
                 <span style={{ fontWeight: 'bold' }}>
-                  {(existsClusterCurrentNodeSelected && clusterNodeSelected) ||
-                    'Manager'}
-                  {existsClusterCurrentNodeSelected &&
-                  clusterNodeSelected &&
-                  clusterNodes
+                  {clusterNodeSelected}
+                  {existsClusterCurrentNodeSelected && clusterNodes
                     ? ' (' +
                       clusterNodes.find(
                         node => node.name === clusterNodeSelected,

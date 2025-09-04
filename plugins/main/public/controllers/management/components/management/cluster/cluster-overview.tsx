@@ -8,7 +8,6 @@ import {
 } from '../../../../../components/common/hocs';
 import { cluster } from '../../../../../utils/applications';
 import { WzRequest } from '../../../../../react-services';
-import { ClusterDisabled } from '../../../../../components/management/cluster/cluster-disabled';
 import { ClusterDashboard } from '../../../../../components/management/cluster/dashboard/dashboard';
 import { LoadingSearchbarProgress } from '../../../../../components/common/loading-searchbar-progress/loading-searchbar-progress';
 import { FormattedMessage } from '@osd/i18n/react';
@@ -26,8 +25,8 @@ const getClusterStatus = async () => {
     return {
       ok: false,
       data: {
-        clusterEnabled: 'yes',
-        isClusterRunning: true,
+        clusterEnabled: 'yes', // Always enabled in v5.0+ (cluster by default)
+        isClusterRunning: true, // Always running in v5.0+ (cluster by default)
         statusRunning,
       },
     };

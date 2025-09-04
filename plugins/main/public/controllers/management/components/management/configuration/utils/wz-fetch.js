@@ -420,23 +420,6 @@ export const saveFileCluster = async (text, node) => {
 };
 
 /**
- * Save text to ossec.conf manager file
- * @param {string} text Text to save
- */
-export const saveFileManager = async text => {
-  const xml = replaceIllegalXML(text);
-  try {
-    await WzRequest.apiReq('PUT', `/manager/configuration`, {
-      body: xml.toString(),
-      origin: 'raw',
-    });
-    await validateAfterSent(false);
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
  * Validate after sent
  * @param {} node Node
  * @returns{boolean|Promise}
