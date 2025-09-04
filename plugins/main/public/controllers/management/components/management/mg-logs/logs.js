@@ -230,11 +230,16 @@ export default compose(
         let nodeList = '';
         let selectedNode = '';
         const nodeListTmp = await WzRequest.apiReq('GET', '/cluster/nodes', {});
-        if (Array.isArray(nodeListTmp?.data?.data?.affected_items)) {
+        if (
+          Array.isArray(nodeListTmp?.data?.data?.affected_items) &&
+          nodeListTmp.data.data.affected_items.length > 0
+        ) {
           nodeList = nodeListTmp.data.data.affected_items;
-          selectedNode = nodeListTmp.data.data.affected_items.filter(
+          const masterNode = nodeListTmp.data.data.affected_items.find(
             item => item.type === 'master',
-          )[0].name;
+          );
+          selectedNode =
+            masterNode?.name || nodeListTmp.data.data.affected_items[0].name;
           return {
             nodeList,
             logsPath: `/cluster/${selectedNode}/logs`,
@@ -242,10 +247,12 @@ export default compose(
           };
         }
 
+        // In cluster by default, no nodes available indicates an API or cluster issue
         return {
-          nodeList: '',
-          logsPath: '/manager/logs',
+          nodeList: [],
+          logsPath: '',
           selectedNode: '',
+          error: 'No cluster nodes available',
         };
       } catch (error) {
         throw new Error('Error building logs path: ' + error);
@@ -387,17 +394,24 @@ export default compose(
           3000,
         );
         const filters = this.buildFilters();
+
+        if (!this.state.selectedNode) {
+          this.showToast(
+            'warning',
+            'No cluster node selected',
+            'Please select a cluster node to export logs',
+            5000,
+          );
+          return;
+        }
+
         await exportCsv(
-          this.state.selectedNode
-            ? `/cluster/${this.state.selectedNode}/logs`
-            : '/manager/logs',
+          `/cluster/${this.state.selectedNode}/logs`,
           Object.keys(filters).map(filter => ({
             name: filter,
             value: filters[filter],
           })),
-          `wazuh-${
-            this.state.selectedNode ? `${this.state.selectedNode}-` : ''
-          }ossec-log`,
+          `wazuh-${this.state.selectedNode}-ossec-log`,
         );
       } catch (error) {
         const options = {
