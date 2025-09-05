@@ -22,7 +22,7 @@ const DevToolsActionButtons = ({
         id={DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}
         color='success'
       />
-      <a href='' target='__blank' id={DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID}>
+      <a href='' target='__blank' id={DEV_TOOLS_BUTTONS.DOCS_BUTTON_ID} rel='noopener noreferrer'>
         <EuiIcon type='documentation' />
       </a>
     </EuiFlexGroup>
