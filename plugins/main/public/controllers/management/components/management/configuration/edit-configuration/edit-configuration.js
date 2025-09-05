@@ -73,7 +73,13 @@ class WzEditConfiguration extends Component {
   async editorSave() {
     try {
       this.setState({ saving: true });
-      // In cluster by default, clusterNodeSelected is always available
+      // In cluster by default, clusterNodeSelected should always be available
+      if (!this.props.clusterNodeSelected) {
+        throw new Error(
+          'No cluster node selected. Unable to save configuration.',
+        );
+      }
+
       await saveFileCluster(
         this.state.editorValue,
         this.props.clusterNodeSelected,
@@ -216,11 +222,13 @@ class WzEditConfiguration extends Component {
         nodes.data.data.affected_items.find(
           node => node.name === this.props.clusterNodeSelected,
         );
+      const masterNode = nodes.data.data.affected_items.find(
+        node => node.type === 'master',
+      );
       this.props.updateClusterNodeSelected(
         existsClusterCurrentNodeSelected
           ? existsClusterCurrentNodeSelected.name
-          : nodes.data.data.affected_items.find(node => node.type === 'master')
-              .name,
+          : masterNode?.name || nodes.data.data.affected_items[0]?.name,
       );
       this.props.updateConfigurationSection(
         'edit-configuration',

@@ -246,14 +246,6 @@ export default compose(
             selectedNode: selectedNode,
           };
         }
-
-        // In cluster by default, no nodes available indicates an API or cluster issue
-        return {
-          nodeList: [],
-          logsPath: '',
-          selectedNode: '',
-          error: 'No cluster nodes available',
-        };
       } catch (error) {
         throw new Error('Error building logs path: ' + error);
       }
@@ -394,16 +386,6 @@ export default compose(
           3000,
         );
         const filters = this.buildFilters();
-
-        if (!this.state.selectedNode) {
-          this.showToast(
-            'warning',
-            'No cluster node selected',
-            'Please select a cluster node to export logs',
-            5000,
-          );
-          return;
-        }
 
         await exportCsv(
           `/cluster/${this.state.selectedNode}/logs`,
