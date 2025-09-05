@@ -274,11 +274,11 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         indexPatternId,
       ),
     ];
-    const params = `tab=mitre&tabView=intelligence&tabRedirect=techniques&idToRedirect=${currentTechnique}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
-      filters,
-    )}`;
-    NavigationService.getInstance().navigateToApp(mitreAttack.id, {
-      path: `#/overview?${params}`,
+    NavigationService.getInstance().updateAndNavigateSearchParams({
+      tab: 'mitre',
+      tabView: 'intelligence',
+      tabRedirect: 'techniques',
+      idToRedirect: currentTechnique,
     });
   };
 
@@ -292,11 +292,11 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         indexPatternId,
       ),
     ];
-    const params = `tab=mitre&tabView=intelligence&tabRedirect=tactics&idToRedirect=${
-      tactic.id
-    }&_g=${PatternDataSourceFilterManager.filtersToURLFormat(filters)}`;
-    NavigationService.getInstance().navigateToApp(mitreAttack.id, {
-      path: `#/overview?${params}`,
+    NavigationService.getInstance().updateAndNavigateSearchParams({
+      tab: 'mitre',
+      tabView: 'intelligence',
+      tabRedirect: 'tactics',
+      idToRedirect: tactic.id,
     });
   };
 
