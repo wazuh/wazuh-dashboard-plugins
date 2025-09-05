@@ -76,7 +76,7 @@ export const getVisStateHostsTotalFreeMemoryTable = (
             otherBucketLabel: 'Other',
             missingBucket: false,
             missingBucketLabel: 'Missing',
-            customLabel: 'Top 5 endpoints most used memory',
+            customLabel: 'Top 5 endpoints by memory usage',
           },
           schema: 'bucket',
         },

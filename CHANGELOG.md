@@ -29,6 +29,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.1
 
+### Fixed
+
+- Fixed navigation problem in MITRE ATT&CK framework details flyout [#7689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7689)
+
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 00
 
 ### Added
@@ -36,9 +40,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 4.14.0
 - Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587)
 - Added ability to set the Wazuh data path (wazuh directory) within the directory defined through `path.data` setting [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
-- Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641)
+- Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641) [#7696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7696)
 - Added Microsoft Graph API module [#7516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7516) [#7644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7644) [#7661](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7661)
-- Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646)
+- Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646) [#7695](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7695)
 
 ### Changed
 
@@ -50,12 +54,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error that caused PDF report tables to overflow the page width [#7630](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7630)
 - Fixed TypeError when changing API host ID in wazuh.yml configuration [#7611](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7611)
 
-## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 05
+## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 07
 
 ### Added
 
 - Support for Wazuh 4.13.0
-- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513) [#7582](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7582) [#7588](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7588)
+- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513) [#7582](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7582) [#7588](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7588) [#7692](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7692)
 - Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
 - Added the ability to manage the sample data from FIM, IT Hygiene and vulnerabilities inventories prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
@@ -66,7 +70,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ## Changed
 
-- Changed the manager reset button to reload in Rules, Decoders and CDB list [#7657](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7657)
+- Changed the manager reset button to reload in Rules, Decoders and CDB list [#7657](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7657) [#7677](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7677)
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
 - Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482) [#7538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7538)
 - Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
