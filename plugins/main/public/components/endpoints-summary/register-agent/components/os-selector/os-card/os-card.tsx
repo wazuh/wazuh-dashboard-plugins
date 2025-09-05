@@ -10,7 +10,7 @@ import {
 import { OPERATING_SYSTEMS_OPTIONS } from '../../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 interface Props {
   setStatusCheck: string;
@@ -57,9 +57,7 @@ export const OsCard = ({ onChange, value }: Props) => {
             For additional systems and architectures, please check our{' '}
             <EuiLink
               target='_blank'
-              href={webDocumentationLink(
-                'installation-guide/wazuh-agent/index.html',
-              )}
+              href={DOC_LINKS.INSTALLATION_GUIDE.WAZUH_AGENT.INDEX}
               rel='noopener noreferrer'
             >
               documentation

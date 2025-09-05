@@ -22,7 +22,7 @@ import { isString } from '../utils/utils';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const mainSettings = [
   { field: 'type', label: 'Agentless monitoring type' },
@@ -35,15 +35,11 @@ const mainSettings = [
 const helpLinks = [
   {
     text: 'How to monitor agentless devices',
-    href: webDocumentationLink(
-      'user-manual/capabilities/agentless-monitoring/index.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.AGENTLESS_MONITORING.INDEX,
   },
   {
     text: 'Agentless reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/agentless.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.AGENTLESS,
   },
 ];
 

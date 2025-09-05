@@ -15,26 +15,21 @@ import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsGroup from '../util-components/configuration-settings-group';
 import withWzConfig from '../util-hocs/wz-config';
 import { capitalize, isString } from '../utils/utils';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
+import { DOC_LINKS } from '../../../../../../../common/doc-links';
 
 const helpLinks = [
   {
     text: 'Integration with external APIs',
-    href: webDocumentationLink(
-      'user-manual/manager/integration-with-external-apis.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.MANAGER.INTEGRATION_WITH_EXTERNAL_APIS,
   },
   {
     text: 'VirusTotal integration',
-    href: webDocumentationLink(
-      'user-manual/capabilities/malware-detection/virus-total-integration.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.CAPABILITIES.MALWARE_DETECTION
+      .VIRUS_TOTAL_INTEGRATION,
   },
   {
     text: 'Integration reference',
-    href: webDocumentationLink(
-      'user-manual/reference/ossec-conf/integration.html',
-    ),
+    href: DOC_LINKS.USER_MANUAL.REFERENCE.OSSEC_CONF.INTEGRATION,
   },
 ];
 
