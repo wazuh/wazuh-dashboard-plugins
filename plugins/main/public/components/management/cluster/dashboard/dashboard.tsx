@@ -27,8 +27,6 @@ import {
 import { WzSearchBar } from '../../../common/search-bar';
 import NavigationService from '../../../../react-services/navigation-service';
 
-
-
 interface ClusterDashboardState {
   showConfig: boolean;
   showNodes: boolean;
@@ -39,7 +37,7 @@ interface ClusterDashboardState {
   agentsCount: number;
 }
 
-const DashboardCT: React.FC<DashboardCTProps> = () => {
+const DashboardCT: React.FC = () => {
   const {
     filters,
     dataSource,
