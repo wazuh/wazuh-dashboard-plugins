@@ -87,6 +87,7 @@ export function getTopNavConfig({
       window.open(
         webDocumentationLink('user-manual/api/reference.html'),
         '_blank',
+        'noopener,noreferrer'
       ),
     ),
   );
