@@ -93,12 +93,10 @@ export class WzStatusOverview extends Component {
     try {
       this.props.updateLoadingStatus(true);
 
-      const [clusterStatus, agentsCountByManagerNodes] = (
-        await Promise.all([
-          this.statusHandler.clusterStatus(),
-          this.statusHandler.clusterAgentsCount(),
-        ])
-      ).map(response => response?.data?.data);
+      // In v5.0+ cluster is always enabled and running (cluster by default)
+      const agentsCountByManagerNodes = (
+        await this.statusHandler.clusterAgentsCount()
+      )?.data?.data;
       const { connection: agentsCount, configuration } =
         agentsCountByManagerNodes?.agent_status;
 
@@ -118,15 +116,11 @@ export class WzStatusOverview extends Component {
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
 
-      this.props.updateClusterEnabled(
-        clusterStatus && clusterStatus.enabled === 'yes',
-      );
+      // Cluster is always enabled in v5.0+ (cluster by default)
+      this.props.updateClusterEnabled(true);
 
-      if (
-        clusterStatus &&
-        clusterStatus.enabled === 'yes' &&
-        clusterStatus.running === 'yes'
-      ) {
+      // Cluster is always enabled and running in v5.0+ (cluster by default)
+      {
         const nodes = await this.statusHandler.clusterNodes();
         const listNodes = nodes.data.data.affected_items;
         this.props.updateListNodes(listNodes);
@@ -143,28 +137,6 @@ export class WzStatusOverview extends Component {
           masterNode.name,
         );
         this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
-      } else {
-        if (
-          clusterStatus &&
-          clusterStatus.enabled === 'yes' &&
-          clusterStatus.running === 'no'
-        ) {
-          this.showToast(
-            'danger',
-            `Cluster is enabled but it's not running, please check your cluster health.`,
-            3000,
-          );
-        } else {
-          const managerInfo = await this.statusHandler.managerInfo();
-          const daemons = await this.statusHandler.managerStatus();
-          const listDaemons = this.objToArr(
-            daemons?.data?.data?.affected_items?.[0],
-          );
-          const managerInfoData = managerInfo?.data?.data?.affected_items?.[0];
-          this.props.updateListDaemons(listDaemons);
-          this.props.updateSelectedNode(false);
-          this.props.updateNodeInfo(managerInfoData);
-        }
       }
       const [lastAgent] = agentsCountByManagerNodes?.last_registered_agent;
 

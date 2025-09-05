@@ -22,7 +22,6 @@ interface OverviewCardsProps {
   goNodes: () => void;
   goConfiguration: () => void;
   configuration: any;
-  status: any;
   version: any;
   nodesCount: number;
   nodeList: any[];
@@ -99,7 +98,7 @@ export const OverviewCards = ({
                 },
                 {
                   title: 'Running',
-                  description: status ?? 'no',
+                  description: 'yes',
                 },
                 {
                   title: 'Version',

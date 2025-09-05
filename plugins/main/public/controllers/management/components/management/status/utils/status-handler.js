@@ -30,18 +30,6 @@ export default class StatusHandler {
   }
 
   /**
-   * Get cluster status
-   */
-  static async clusterStatus() {
-    try {
-      const result = await WzRequest.apiReq('GET', `/cluster/status`, {});
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
    * Get cluster nodes
    */
   static async clusterNodes() {

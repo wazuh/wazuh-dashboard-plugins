@@ -227,32 +227,20 @@ export class ManageHosts {
         }
       }
 
-      const responseClusterStatus =
+      // In v5.0+ cluster is always enabled (cluster by default)
+      status = 'enabled';
+
+      const responseClusterLocal =
         await this.serverAPIClient.asInternalUser.request(
           'GET',
-          `/cluster/status`,
+          `/cluster/local/info`,
           {},
           { apiHostID },
         );
 
-      if (
-        this.isServerAPIClientResponseOk(responseClusterStatus) &&
-        responseClusterStatus.data?.data?.enabled === 'yes'
-      ) {
-        status = 'enabled';
-
-        const responseClusterLocal =
-          await this.serverAPIClient.asInternalUser.request(
-            'GET',
-            `/cluster/local/info`,
-            {},
-            { apiHostID },
-          );
-
-        if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
-          node = responseClusterLocal.data.data.affected_items[0].node;
-          cluster = responseClusterLocal.data.data.affected_items[0].cluster;
-        }
+      if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
+        node = responseClusterLocal.data.data.affected_items[0].node;
+        cluster = responseClusterLocal.data.data.affected_items[0].cluster;
       }
     } catch (error) {
       if (options?.throwError) {

@@ -175,14 +175,6 @@ resources:
       statusCode: 200
       scriptFile: cluster/cluster_sync.js
       # staticFile: cluster/cluster_sync_no_sync.json
-
-  # Get cluster status
-  - method: GET
-    path: /cluster/status
-    response:
-      statusCode: 200
-      staticFile: cluster/cluster_status.json
-
   # Get local node config
   - method: GET
     path: /cluster/local/config
