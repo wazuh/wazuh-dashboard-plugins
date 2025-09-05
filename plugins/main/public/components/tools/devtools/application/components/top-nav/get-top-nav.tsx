@@ -35,62 +35,19 @@ import { topNavItems } from './top-nav-items';
 
 interface Props {
   onClickExport: () => void;
-  onClickHistory?: () => void;
-  onClickSettings?: () => void;
-  onClickHelp?: () => void;
-  onClickImport?: () => void;
-  useUpdatedUX?: boolean;
 }
 
-export function getTopNavConfig({
-  onClickHistory,
-  onClickSettings,
-  onClickHelp,
-  onClickExport,
-  onClickImport,
-  useUpdatedUX,
-}: Props): TopNavMenuItem[] {
-  const topNavItemsOut: TopNavMenuItem[] = [];
-
-  if (onClickHistory) {
-    topNavItemsOut.push(topNavItems.historyItem(onClickHistory));
-  }
-
-  const addHelpItem = () => {
-    if (onClickHelp) {
-      topNavItemsOut.push(topNavItems.helpItem(onClickHelp));
-    }
-  };
-
-  const addSettingsItem = () => {
-    if (onClickSettings) {
-      topNavItemsOut.push(topNavItems.settingsItem(onClickSettings));
-    }
-  };
-
-  if (useUpdatedUX) {
-    addHelpItem();
-    addSettingsItem();
-  } else {
-    addSettingsItem();
-    addHelpItem();
-  }
-
-  topNavItemsOut.push(topNavItems.exportItem(onClickExport));
-
-  if (onClickImport) {
-    topNavItemsOut.push(topNavItems.importItem(onClickImport));
-  }
-
-  topNavItemsOut.push(
+export function getTopNavConfig({ onClickExport }: Props): TopNavMenuItem[] {
+  const topNavItemsOut: TopNavMenuItem[] = [
+    topNavItems.exportItem(onClickExport),
     topNavItems.apiReferenceItem(() =>
       window.open(
         webDocumentationLink('user-manual/api/reference.html'),
         '_blank',
-        'noopener,noreferrer'
+        'noopener,noreferrer',
       ),
     ),
-  );
+  ];
 
   return topNavItemsOut;
 }

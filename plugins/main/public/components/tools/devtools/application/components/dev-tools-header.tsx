@@ -30,10 +30,7 @@ const DevToolsHeader = ({
       <EuiFlexItem>
         <TopNavMenu
           useUpdatedUX={useUpdatedUX}
-          items={getTopNavConfig({
-            useUpdatedUX,
-            onClickExport,
-          })}
+          items={getTopNavConfig({ onClickExport })}
         />
       </EuiFlexItem>
       <EuiFlexItem>
