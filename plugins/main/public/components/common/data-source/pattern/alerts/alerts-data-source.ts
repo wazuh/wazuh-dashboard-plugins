@@ -7,8 +7,8 @@ export class AlertsDataSource extends PatternDataSource {
     super(id, title);
   }
 
-  getFixedFiltersClusterManager(): tFilter[] {
-    return [...this.getClusterManagerFilters()];
+  getFixedFilters(): tFilter[] {
+    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
   }
 
   getRuleGroupsFilter(key: string, value: string, controlledByValue: string) {
