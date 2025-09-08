@@ -6,7 +6,7 @@ Low‑level services to build HTTP requests from editor groups, perform the call
 
 - `request-builder.ts`: Detects method/path, parses inline or multi‑line body JSON, strips reserved flags.
 - `wz-http-client.ts`: `HttpClient` implementation backed by `WzRequest`.
-- `response-handler.ts`: Normalizes responses (status, ok, body) and detects restrictions (admin mode).
+- `response-handler.ts`: Normalizes responses (status, ok, body) and detects authorization restrictions (insufficient permissions).
 - `routes-service.ts`: Loads `/api/routes` to populate `editorInput.model`.
 - `error-service.ts`: Thin wrapper around the Error Orchestrator (unified logging).
 - `api-routes.types.ts`: Types for API routes.
@@ -23,14 +23,14 @@ const built = builder.build(currentGroup);
 // built: { method, path, body }
 ```
 
-Normalize response and check for admin mode:
+Normalize response and check for insufficient permissions:
 
 ```ts
 import { ResponseHandler } from './response-handler';
 
 const rh = new ResponseHandler();
-if (rh.isAdminModeForbidden(res)) {
-  // handle admin‑mode restriction
+if (rh.isPermissionsForbidden(res)) {
+  // handle insufficient permissions restriction
 }
 const { body, status, statusText, ok } = rh.normalize(res);
 ```

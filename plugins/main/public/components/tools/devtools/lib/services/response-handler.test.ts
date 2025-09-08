@@ -1,14 +1,14 @@
 import { ResponseHandler } from './response-handler';
-import { ADMIN_MODE_FORBIDDEN_TOKEN } from '../constants/config';
+import { PERMISSIONS_FORBIDDEN_TOKEN } from '../constants/config';
 
 describe('ResponseHandler', () => {
   const handler = new ResponseHandler();
 
-  it('detects admin-mode forbidden token', () => {
+  it('detects insufficient-permissions forbidden token', () => {
     expect(
-      handler.isAdminModeForbidden(`...${ADMIN_MODE_FORBIDDEN_TOKEN}...`),
+      handler.isPermissionsForbidden(`...${PERMISSIONS_FORBIDDEN_TOKEN}...`),
     ).toBe(true);
-    expect(handler.isAdminModeForbidden('nope')).toBe(false);
+    expect(handler.isPermissionsForbidden('nope')).toBe(false);
   });
 
   it('normalizes axios-like response successfully (ok=true)', () => {

@@ -97,11 +97,11 @@ export class DevToolsActions {
             { returnOriginalResponse: true },
           );
 
-          if (this.responses.isAdminModeForbidden(response)) {
-            editorOutput.setValue(MESSAGES.ADMIN_MODE_REQUIRED);
+          if (this.responses.isPermissionsForbidden(response)) {
+            editorOutput.setValue(MESSAGES.INSUFFICIENT_PERMISSIONS);
             hooks?.onEnd?.({
               status: undefined,
-              statusText: MESSAGES.ADMIN_MODE_REQUIRED_SHORT,
+              statusText: MESSAGES.INSUFFICIENT_PERMISSIONS_SHORT,
               durationMs: Date.now() - start,
               ok: false,
             });

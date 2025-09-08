@@ -1,4 +1,4 @@
-import { ADMIN_MODE_FORBIDDEN_TOKEN } from '../constants/config';
+import { PERMISSIONS_FORBIDDEN_TOKEN } from '../constants/config';
 
 export interface NormalizedResponse {
   body: any;
@@ -11,8 +11,8 @@ export interface NormalizedResponse {
  * Interprets API responses and extracts consistent metadata.
  */
 export class ResponseHandler {
-  isAdminModeForbidden(res: any): boolean {
-    return typeof res === 'string' && res.includes(ADMIN_MODE_FORBIDDEN_TOKEN);
+  isPermissionsForbidden(res: any): boolean {
+    return typeof res === 'string' && res.includes(PERMISSIONS_FORBIDDEN_TOKEN);
   }
 
   normalize(res: any): NormalizedResponse {

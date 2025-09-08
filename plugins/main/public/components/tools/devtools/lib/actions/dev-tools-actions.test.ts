@@ -28,10 +28,10 @@ describe('DevToolsActions.send', () => {
   });
 
   const createResponses = (options?: {
-    adminForbidden?: boolean;
+    permissionsForbidden?: boolean;
     normalized?: any;
   }) => ({
-    isAdminModeForbidden: jest.fn(() => !!options?.adminForbidden),
+    isPermissionsForbidden: jest.fn(() => !!options?.permissionsForbidden),
     normalize: jest.fn(() => options?.normalized ?? {}),
   });
 
@@ -121,7 +121,7 @@ describe('DevToolsActions.send', () => {
       { a: 1 },
       { returnOriginalResponse: true },
     );
-    expect(responses.isAdminModeForbidden).toHaveBeenCalledWith(httpResponse);
+    expect(responses.isPermissionsForbidden).toHaveBeenCalledWith(httpResponse);
     expect(responses.normalize).toHaveBeenCalledWith(httpResponse);
 
     // Output should be pretty JSON and stable (snapshot)
@@ -177,12 +177,12 @@ describe('DevToolsActions.send', () => {
     expect(requests.build).not.toHaveBeenCalled();
   });
 
-  it('handles admin mode forbidden: shows message and calls onEnd with failure', async () => {
+  it('handles insufficient permissions: shows message and calls onEnd with failure', async () => {
     const editorOutput = createOutput();
     const hooks: SendHooks = { onStart: jest.fn(), onEnd: jest.fn() };
 
     const desired = group({ requestText: 'DELETE /secure' });
-    const httpResponse = 'Forbidden: code 3029'; // ADMIN_MODE_FORBIDDEN_TOKEN present
+    const httpResponse = 'Forbidden: code 3029'; // PERMISSIONS_FORBIDDEN_TOKEN present
     const http = createHttp(() => Promise.resolve(httpResponse));
     const errors = createErrors();
     const requests = createRequests({
@@ -190,7 +190,7 @@ describe('DevToolsActions.send', () => {
       path: '/secure',
       body: {},
     });
-    const responses = createResponses({ adminForbidden: true });
+    const responses = createResponses({ permissionsForbidden: true });
     const grouping = createGrouping({
       desiredGroup: desired,
       groups: [desired],
@@ -213,13 +213,13 @@ describe('DevToolsActions.send', () => {
     await actions.send({} as any, editorOutput, false, hooks);
 
     expect(editorOutput.setValue).toHaveBeenCalledWith(
-      MESSAGES.ADMIN_MODE_REQUIRED,
+      MESSAGES.INSUFFICIENT_PERMISSIONS,
     );
     // normalize should not be called when admin forbidden
     expect(responses.normalize).not.toHaveBeenCalled();
     expect(hooks.onEnd).toHaveBeenCalledWith({
       status: undefined,
-      statusText: MESSAGES.ADMIN_MODE_REQUIRED_SHORT,
+      statusText: MESSAGES.INSUFFICIENT_PERMISSIONS_SHORT,
       durationMs: 150,
       ok: false,
     });
