@@ -26,15 +26,7 @@ const requiredPermissionsCluster = [
 const requiredPermissionsManager = [
   {
     action: 'cluster:read',
-    resource: '*:*:*',
-  },
-  {
-    action: 'cluster:read',
     resource: 'file:path:/etc/lists',
-  },
-  {
-    action: 'cluster:read',
-    resource: '*:*:*',
   },
   {
     action: 'manager:upload_file',
@@ -107,10 +99,6 @@ const missingPermissionsForManagerUser = [
   {
     action: 'cluster:read',
     resource: 'file:path:/etc/lists',
-  },
-  {
-    action: 'cluster:read',
-    resource: '*:*:*',
   },
   {
     action: 'manager:upload_file',
