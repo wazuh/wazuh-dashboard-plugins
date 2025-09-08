@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { AppState } from '../../../../../react-services';
-import store from '../../../../../redux/store';
+import { showMenu } from "../../../../../redux/selectors/appStateReducers";
 import { getUiSettings } from '../../../../../kibana-services';
 import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
 import { initEditors, send } from '../../lib';
@@ -15,11 +15,7 @@ const useSetup = () => {
   useEffect(() => {
     (async function () {
       // Ensure menu is visible when loading the tool
-      if (
-        store.getState() &&
-        (store.getState() as any).appStateReducers &&
-        !(store.getState() as any).appStateReducers.showMenu
-      ) {
+      if (!showMenu) {
         AppState.setWzMenu();
       }
 
