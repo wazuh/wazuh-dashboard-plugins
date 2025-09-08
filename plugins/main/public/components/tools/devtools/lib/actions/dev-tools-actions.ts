@@ -30,7 +30,11 @@ export class DevToolsActions {
 
     // Build message strictly from HTTP status code and text when available
     let message: string | undefined;
-    if (typeof status === 'number' && typeof statusText === 'string' && statusText.length) {
+    if (
+      typeof status === 'number' &&
+      typeof statusText === 'string' &&
+      statusText.length
+    ) {
       message = `${status} - ${statusText}`;
     } else if (typeof status === 'number') {
       message = String(status);
@@ -44,7 +48,12 @@ export class DevToolsActions {
     // - If body is an object with `error`, use it as code
     // - Otherwise, fall back to HTTP status code or to fallback message
     let errorPayload: string | undefined;
-    if (body && typeof body === 'object' && (body as any).error !== undefined && (body as any).error !== null) {
+    if (
+      body &&
+      typeof body === 'object' &&
+      (body as any).error !== undefined &&
+      (body as any).error !== null
+    ) {
       const maybeCode = (body as any).error;
       errorPayload = String(maybeCode);
     } else if (typeof status === 'number') {
@@ -108,9 +117,8 @@ export class DevToolsActions {
             return;
           }
 
-          const { body, status, statusText, ok } = this.responses.normalize(
-            response,
-          );
+          const { body, status, statusText, ok } =
+            this.responses.normalize(response);
           if (ok) {
             editorOutput.setValue(JSON.stringify(body, null, 2));
           } else {

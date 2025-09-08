@@ -316,9 +316,18 @@ describe('DevToolsActions.send', () => {
 
     const http = createHttp(() => Promise.resolve(httpResponse));
     const errors = createErrors();
-    const requests = createRequests({ method: 'GET', path: '/notfound', body: {} });
+    const requests = createRequests({
+      method: 'GET',
+      path: '/notfound',
+      body: {},
+    });
     const responses = createResponses({
-      normalized: { body: httpResponse.data, status: 404, statusText: 'Not Found', ok: false },
+      normalized: {
+        body: httpResponse.data,
+        status: 404,
+        statusText: 'Not Found',
+        ok: false,
+      },
     });
     const grouping = createGrouping({
       desiredGroup: desired,
