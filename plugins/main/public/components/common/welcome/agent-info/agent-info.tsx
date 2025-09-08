@@ -117,10 +117,10 @@ export class AgentInfo extends Component<AgentInfoProps> {
           value: agent,
           label: 'Operating system',
           render: (value: Agent) => (
-            <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               {getPlatformIcon(value)}
               {getOsName(value)}
-            </>
+            </div>
           ),
         },
         {
