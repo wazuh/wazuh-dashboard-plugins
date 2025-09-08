@@ -20,7 +20,7 @@ describe('ErrorService', () => {
     (getErrorOrchestrator as jest.Mock).mockReturnValue({ handleError });
   });
 
-  it('compone payload por defecto (niveles y severidad) con message string', () => {
+  it('composes default payload (levels and severity) with message string', () => {
     service.log({ context: 'ctx', message: 'msg' });
 
     expect(handleError).toHaveBeenCalledTimes(1);
@@ -33,7 +33,7 @@ describe('ErrorService', () => {
     });
   });
 
-  it('usa title explícito y extrae message desde Error', () => {
+  it('uses explicit title and extracts message from Error', () => {
     const err = new Error('boom');
     service.log({ context: 'c', title: 'T', message: err, error: err });
 
@@ -42,7 +42,7 @@ describe('ErrorService', () => {
     expect(payload.error.message).toBe('boom');
   });
 
-  it('toma level y severity personalizados si se proveen', () => {
+  it('uses custom level and severity if provided', () => {
     service.log({
       context: 'c',
       message: 'm',

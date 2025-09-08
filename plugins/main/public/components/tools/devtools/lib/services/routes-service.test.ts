@@ -16,7 +16,7 @@ describe('ApiRoutesService', () => {
     (GenericRequest.request as jest.Mock).mockReset();
   });
 
-  it('retorna data cuando no hay error (happy path)', async () => {
+  it('returns data when no error (happy path)', async () => {
     (GenericRequest.request as jest.Mock).mockResolvedValue({
       data: [{ path: '/a' }],
     });
@@ -30,7 +30,7 @@ describe('ApiRoutesService', () => {
     expect(res).toEqual([{ path: '/a' }]);
   });
 
-  it('retorna [] cuando response.error está presente (error path)', async () => {
+  it('returns [] when response.error is present (error path)', async () => {
     (GenericRequest.request as jest.Mock).mockResolvedValue({
       error: 'boom',
       data: [{ path: '/a' }],

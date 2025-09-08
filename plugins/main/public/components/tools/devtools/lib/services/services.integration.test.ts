@@ -11,7 +11,7 @@ jest.mock('../../../../../react-services', () => ({
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { WzRequest } = require('../../../../../react-services');
 
-describe('DevTools services (integración)', () => {
+describe('DevTools services (integration)', () => {
   const builder = new RequestBuilder();
   const client = new WzHttpClient();
   const handler = new ResponseHandler();
@@ -20,7 +20,7 @@ describe('DevTools services (integración)', () => {
     (WzRequest.apiReq as jest.Mock).mockReset();
   });
 
-  it('flujo: build -> http -> normalize', async () => {
+  it('flow: build -> http -> normalize', async () => {
     const group = {
       requestText:
         'POST /index/_search?pretty=true { "query": {"match_all":{}} }',
@@ -31,7 +31,7 @@ describe('DevTools services (integración)', () => {
 
     const built = builder.build(group as any);
 
-    // Respuesta simulada del cliente HTTP
+    // Mocked HTTP client response
     (WzRequest.apiReq as jest.Mock).mockResolvedValue({
       status: 200,
       statusText: 'OK',
