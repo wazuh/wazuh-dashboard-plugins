@@ -4,7 +4,6 @@ export const DEV_TOOLS_INITIAL_BUFFER = `# API Console
 #
 # This console allows you to interact with the server API directly
 #
-# API Reference: ${webDocumentationLink('user-manual/api/reference.html')}
 # TIP: You can use \`?\` after the endpoint to get suggestions for your query params
 #
 # Examples:
