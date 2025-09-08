@@ -279,7 +279,10 @@ export const Steps = ({
           </EuiButton>
         </>
       ),
-      status: startCommandStepStatus,
+      status:
+        missingStepsName.length > 0 || invalidFieldsName.length > 0
+          ? 'disabled'
+          : 'current',
     },
   ];
 
