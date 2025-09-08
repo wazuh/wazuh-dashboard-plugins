@@ -262,7 +262,7 @@ describe('DevToolsActions.send', () => {
     expect(hooks.onEnd).not.toHaveBeenCalled();
   });
 
-  it('handles thrown HTTP errors: logs, renders parsed error, and calls onEnd with error metadata', async () => {
+  it('handles thrown HTTP errors: logs, renders error JSON {error, message}, and calls onEnd with error metadata', async () => {
     const editorOutput = createOutput();
     const hooks: SendHooks = { onStart: jest.fn(), onEnd: jest.fn() };
 
@@ -292,11 +292,57 @@ describe('DevToolsActions.send', () => {
     await actions.send({} as any, editorOutput, false, hooks);
 
     expect(errors.log).toHaveBeenCalledWith({ context: 'send', error: boom });
-    expect(editorOutput.setValue).toHaveBeenCalledWith('PARSED_ERROR');
+    expect(editorOutput.setValue).toHaveBeenCalledWith(
+      JSON.stringify({ error: '500', message: '500 - Internal' }, null, 2),
+    );
     expect(hooks.onEnd).toHaveBeenCalledWith({
       status: 500,
       statusText: 'Internal',
       durationMs: 0,
+      ok: false,
+    });
+  });
+
+  it('renders error output using payload error code and HTTP status text when response body has error', async () => {
+    const editorOutput = createOutput();
+    const hooks: SendHooks = { onStart: jest.fn(), onEnd: jest.fn() };
+
+    const desired = group({ requestText: 'GET /notfound' });
+    const httpResponse = {
+      status: 404,
+      statusText: 'Not Found',
+      data: { error: 3013, message: 'Some API message' },
+    };
+
+    const http = createHttp(() => Promise.resolve(httpResponse));
+    const errors = createErrors();
+    const requests = createRequests({ method: 'GET', path: '/notfound', body: {} });
+    const responses = createResponses({
+      normalized: { body: httpResponse.data, status: 404, statusText: 'Not Found', ok: false },
+    });
+    const grouping = createGrouping({
+      desiredGroup: desired,
+      groups: [desired],
+      jsonErrors: [],
+    });
+
+    const actions = new DevToolsActions(
+      http,
+      errors as any,
+      requests as any,
+      responses as any,
+      grouping as any,
+    );
+
+    await actions.send({} as any, editorOutput, false, hooks);
+
+    expect(editorOutput.setValue).toHaveBeenCalledWith(
+      JSON.stringify({ error: '3013', message: '404 - Not Found' }, null, 2),
+    );
+    expect(hooks.onEnd).toHaveBeenCalledWith({
+      status: 404,
+      statusText: 'Not Found',
+      durationMs: expect.any(Number),
       ok: false,
     });
   });

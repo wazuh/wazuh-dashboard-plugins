@@ -20,6 +20,45 @@ export class DevToolsActions {
     private grouping = new GroupingService(),
   ) {}
 
+  private buildErrorOutput(input: {
+    body?: any;
+    status?: number;
+    statusText?: string;
+    fallbackMessage?: string;
+  }): { error: string; message: string } {
+    const { body, status, statusText, fallbackMessage } = input || {};
+
+    // Build message strictly from HTTP status code and text when available
+    let message: string | undefined;
+    if (typeof status === 'number' && typeof statusText === 'string' && statusText.length) {
+      message = `${status} - ${statusText}`;
+    } else if (typeof status === 'number') {
+      message = String(status);
+    } else if (typeof statusText === 'string' && statusText.length) {
+      message = statusText;
+    } else if (fallbackMessage) {
+      message = fallbackMessage;
+    }
+
+    // Build error field using API error code when available
+    // - If body is an object with `error`, use it as code
+    // - Otherwise, fall back to HTTP status code or to fallback message
+    let errorPayload: string | undefined;
+    if (body && typeof body === 'object' && (body as any).error !== undefined && (body as any).error !== null) {
+      const maybeCode = (body as any).error;
+      errorPayload = String(maybeCode);
+    } else if (typeof status === 'number') {
+      errorPayload = String(status);
+    } else if (fallbackMessage) {
+      errorPayload = fallbackMessage;
+    }
+
+    return {
+      error: errorPayload || 'Unknown',
+      message: message || 'Unknown error',
+    };
+  }
+
   async send(
     editorInput: EditorLike,
     editorOutput: EditorOutputLike,
@@ -69,9 +108,15 @@ export class DevToolsActions {
             return;
           }
 
-          const { body, status, statusText, ok } =
-            this.responses.normalize(response);
-          editorOutput.setValue(JSON.stringify(body, null, 2));
+          const { body, status, statusText, ok } = this.responses.normalize(
+            response,
+          );
+          if (ok) {
+            editorOutput.setValue(JSON.stringify(body, null, 2));
+          } else {
+            const out = this.buildErrorOutput({ body, status, statusText });
+            editorOutput.setValue(JSON.stringify(out, null, 2));
+          }
           hooks?.onEnd?.({
             status,
             statusText,
@@ -84,13 +129,18 @@ export class DevToolsActions {
       if (firstTime) editorOutput.setValue(MESSAGES.WELCOME);
     } catch (error: any) {
       this.errors.log({ context: 'send', error });
-      try {
-        editorOutput.setValue(parseErrorForOutput(error));
-      } finally {
-        const status = (error || {}).response?.status;
-        const statusText = (error || {}).response?.statusText || error?.message;
-        hooks?.onEnd?.({ status, statusText, durationMs: 0, ok: false });
-      }
+      const resp = (error || {}).response;
+      const status = resp?.status;
+      const statusText = resp?.statusText || error?.message;
+      const body = resp?.data;
+      const out = this.buildErrorOutput({
+        body,
+        status,
+        statusText,
+        fallbackMessage: parseErrorForOutput(error),
+      });
+      editorOutput.setValue(JSON.stringify(out, null, 2));
+      hooks?.onEnd?.({ status, statusText, durationMs: 0, ok: false });
     }
   }
 }
