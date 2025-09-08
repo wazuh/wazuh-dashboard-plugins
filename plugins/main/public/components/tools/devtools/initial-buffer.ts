@@ -1,8 +1,8 @@
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
-export const DEV_TOOLS_INITIAL_BUFFER = `# Wazuh API Console
+export const DEV_TOOLS_INITIAL_BUFFER = `# API Console
 #
-# This console allows you to interact with the Wazuh API directly
+# This console allows you to interact with the server API directly
 #
 # API Reference: ${webDocumentationLink('user-manual/api/reference.html')}
 # TIP: You can use \`?\` after the endpoint to get suggestions for your query params
