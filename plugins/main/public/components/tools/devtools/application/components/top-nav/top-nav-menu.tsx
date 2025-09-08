@@ -55,6 +55,7 @@ export interface TopNavMenuItem {
   onClick: () => void;
   testId: string;
   render?: (commonProps: CommonProps) => React.JSX.Element;
+  renderClassic?: (commonProps: CommonProps) => React.JSX.Element;
   position: MenuItemPosition;
 }
 
@@ -121,9 +122,13 @@ export const TopNavMenu: FunctionComponent<Props> = ({
             disabled={disabled}
             onClick={item.onClick}
             title={item.label}
-            data-test-subj={item.testId}
+            data-test-subj={item.renderClassic ? undefined : item.testId}
           >
-            {item.label}
+            {item.renderClassic?.({
+              'data-test-subj': item.testId,
+              disabled: !!disabled,
+              onClick: item.onClick,
+            }) || item.label}
           </EuiTab>
         );
       })}

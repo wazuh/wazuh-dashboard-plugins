@@ -28,9 +28,7 @@
  * under the License.
  */
 
-import React from 'react';
 import { TopNavMenuItem } from '../../../../console/public/application/components';
-import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 import { topNavItems } from './top-nav-items';
 
 interface Props {
@@ -40,13 +38,7 @@ interface Props {
 export function getTopNavConfig({ onClickExport }: Props): TopNavMenuItem[] {
   const topNavItemsOut: TopNavMenuItem[] = [
     topNavItems.exportItem(onClickExport),
-    topNavItems.apiReferenceItem(() =>
-      window.open(
-        webDocumentationLink('user-manual/api/reference.html'),
-        '_blank',
-        'noopener,noreferrer',
-      ),
-    ),
+    topNavItems.apiReferenceItem(() => {}),
   ];
 
   return topNavItemsOut;
