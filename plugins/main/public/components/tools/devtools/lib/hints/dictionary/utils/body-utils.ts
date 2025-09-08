@@ -5,7 +5,8 @@ import { NOT_FOUND_INDEX } from '../../../constants/common';
 
 /** Extract indentation and the partial key being typed on a JSON body line. */
 export function extractBodyLineContext(line: string) {
-  const match = line.match(BODY_LINE_START_RE) || ([] as any);
+  const match =
+    (line.match(BODY_LINE_START_RE) as RegExpMatchArray | null) || [];
   const spaceLineStart = match[1] || '';
   const inputKeyBodyParam = match[2] || '';
   return { spaceLineStart, inputKeyBodyParam };
@@ -54,7 +55,7 @@ export function getCursorObjectPath(
 
   // @ts-ignore: we only need numeric range
   return [...Array(group.end + 1 - group.start).keys()].reduce(
-    (jsonBodyKeyCursor: any, lineNumberRange: number) => {
+    (jsonBodyKeyCursor: string[] | false, lineNumberRange: number) => {
       const editorLineNumber = group.start + lineNumberRange;
       const editorLineContent = editor.getLine
         ? editor.getLine(editorLineNumber)
@@ -124,7 +125,15 @@ export function getExistingKeysAtCursor(
 ): string[] {
   const sanitized = sanitizeJsonBody(jsonBody);
   // Walk into nested object to get keys of current object
-  const obj = JSON.parse(sanitized);
-  const target = pathKeys.reduce((acc: any, key: string) => acc?.[key], obj);
-  return Object.keys(target || {});
+  const obj: Record<string, unknown> = JSON.parse(sanitized);
+  const target = pathKeys.reduce<Record<string, unknown> | unknown>(
+    (acc, key: string) => {
+      if (acc && typeof acc === 'object' && key in acc) {
+        return (acc as Record<string, unknown>)[key];
+      }
+      return undefined;
+    },
+    obj,
+  );
+  return Object.keys((target as Record<string, unknown>) || {});
 }

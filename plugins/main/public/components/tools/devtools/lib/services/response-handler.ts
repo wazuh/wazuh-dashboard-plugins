@@ -15,15 +15,19 @@ export class ResponseHandler {
     return typeof res === 'string' && res.includes(PERMISSIONS_FORBIDDEN_TOKEN);
   }
 
-  normalize(res: any): NormalizedResponse {
+  normalize(res: string | Record<string, any>): NormalizedResponse {
     const response = res || {};
-    const status: number | undefined = response.status;
-    const statusText: string | undefined = response.statusText;
+    let status: number | undefined;
+    let statusText: string | undefined;
+    if (typeof response === 'object') {
+      status = response.status;
+      statusText = response.statusText;
+    }
     const body =
       typeof response === 'object' && 'data' in response
         ? response.data
         : response;
-    const hasPayloadError = !!(body && (body as any).error);
+    const hasPayloadError = !!body?.error;
     const ok =
       !hasPayloadError &&
       typeof status === 'number' &&

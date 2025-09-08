@@ -645,7 +645,8 @@ export class WazuhApiCtrl {
       // status code (e.g. 404 for unknown endpoints), instead of a 500.
       if (devTools && error?.response) {
         try {
-          const statusCode = error.response.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
+          const statusCode =
+            error.response.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
           const body = error.response.data || {
             message: error.message || 'Unexpected error',
           };

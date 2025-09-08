@@ -31,19 +31,19 @@ export class RequestBuilder {
 
     // Parse and sanitize query parameters
     const { url, query } = queryString.parseUrl(normalizedPath);
-    for (const key of RESERVED_QUERY_PARAMS) delete (query as any)[key];
+    for (const key of RESERVED_QUERY_PARAMS) delete query[key];
     const sanitizedPath = queryString.stringifyUrl(
       { url, query },
       { skipEmptyString: true, skipNull: true },
     );
 
     // Body: inline has priority, fallback to multi-line JSON body
-    let body = safeJsonParse(
+    let body = safeJsonParse<Record<string, boolean>>(
       (inlineBody as string) || group.requestTextJson,
-      {} as any,
+      {},
     );
     body = stripReservedFlags(body);
-    if (typeof body === 'object') (body as any).devTools = true;
+    if (typeof body === 'object') body.devTools = true;
 
     return {
       method,

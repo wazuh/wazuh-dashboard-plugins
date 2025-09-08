@@ -75,18 +75,15 @@ export class DevToolsActions {
     hooks?: SendHooks,
   ) {
     try {
-      const groups = this.grouping.parseGroups(editorInput as any);
+      const groups = this.grouping.parseGroups(editorInput);
       const desiredGroup = this.grouping.selectActiveGroup(
-        editorInput as any,
+        editorInput,
         firstTime,
         groups,
       );
 
       if (desiredGroup) {
-        const affectedGroups = this.grouping.validateJson(
-          editorInput as any,
-          groups,
-        );
+        const affectedGroups = this.grouping.validateJson(editorInput, groups);
         const hasJsonError = affectedGroups.some(
           item => item === desiredGroup.requestText,
         );
@@ -135,17 +132,17 @@ export class DevToolsActions {
       }
 
       if (firstTime) editorOutput.setValue(MESSAGES.WELCOME);
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.errors.log({ context: 'send', error });
-      const resp = (error || {}).response;
+      const resp = (error as any)?.response;
       const status = resp?.status;
-      const statusText = resp?.statusText || error?.message;
+      const statusText = resp?.statusText || (error as any)?.message;
       const body = resp?.data;
       const out = this.buildErrorOutput({
         body,
         status,
         statusText,
-        fallbackMessage: parseErrorForOutput(error),
+        fallbackMessage: parseErrorForOutput(error as any),
       });
       editorOutput.setValue(JSON.stringify(out, null, 2));
       hooks?.onEnd?.({ status, statusText, durationMs: 0, ok: false });

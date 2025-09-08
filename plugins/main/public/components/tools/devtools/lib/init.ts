@@ -24,15 +24,25 @@ import { ApiRoutesService } from './services/routes-service';
  * Configure input/output CodeMirror editors: behavior, content, events and layout.
  * Also loads the API routes for autocompletion into `editorInput.model`.
  */
-export async function initEditors(editorInput: any, editorOutput: any) {
+import type { EditorLike } from './types/editor';
+import type CodeMirror from '../../../../utils/codemirror/lib/codemirror';
+
+export async function initEditors(
+  editorInput: EditorLike,
+  editorOutput: CodeMirror.Editor,
+) {
   // Sizes
   editorInput.setSize('auto', '100%');
   editorOutput.setSize('auto', '100%');
 
   // Autocomplete on keyup (except excluded keys)
-  editorInput.on('keyup', function (cm: any, e: any) {
-    if (!ExcludedIntelliSenseTriggerKeys[(e.keyCode || e.which).toString()]) {
-      cm.execCommand('autocomplete', null, {
+  editorInput.on('keyup', function (cm, e?: KeyboardEvent) {
+    const keyCode = (e?.keyCode ?? e?.which) as number | undefined;
+    if (
+      keyCode !== undefined &&
+      !ExcludedIntelliSenseTriggerKeys[String(keyCode)]
+    ) {
+      cm.execCommand?.('autocomplete', null, {
         completeSingle: false,
       });
     }
@@ -64,10 +74,10 @@ export async function initEditors(editorInput: any, editorOutput: any) {
     AppState.setCurrentDevTools(currentState);
     const currentGroup = calculateWhichGroup(editorInput, undefined, groups);
     if (currentGroup) {
-      const hasWidget = editorInput.__widgets.filter(
-        (item: any) => item.start === currentGroup.start,
+      const hasWidget = editorInput.__widgets?.filter(
+        item => item.start === currentGroup.start,
       );
-      if (hasWidget.length) editorInput.removeLineWidget(hasWidget[0].widget);
+      if (hasWidget?.length) editorInput.removeLineWidget(hasWidget[0].widget);
       setTimeout(() => checkJsonParseError(editorInput), 150);
     }
   });
@@ -76,7 +86,7 @@ export async function initEditors(editorInput: any, editorOutput: any) {
     const groups = analyzeGroups(editorInput);
     editorInput.__groupsCache = groups;
     const currentGroup = calculateWhichGroup(editorInput, undefined, groups);
-    highlightGroup(editorInput, currentGroup as any);
+    highlightGroup(editorInput, currentGroup || undefined);
     checkJsonParseError(editorInput, groups);
   });
 
@@ -92,7 +102,7 @@ export async function initEditors(editorInput: any, editorOutput: any) {
   const groups = analyzeGroups(editorInput);
   editorInput.__groupsCache = groups;
   const currentGroup = calculateWhichGroup(editorInput, undefined, groups);
-  highlightGroup(editorInput, currentGroup as any);
+  highlightGroup(editorInput, currentGroup || undefined);
 
   // Resizable columns + dynamic size behavior
   setupResizableColumns(window.document);
@@ -102,7 +112,7 @@ export async function initEditors(editorInput: any, editorOutput: any) {
   try {
     const routesService = new ApiRoutesService();
     editorInput.model = await routesService.getAvailableRoutes();
-  } catch (error: any) {
+  } catch (error: unknown) {
     editorInput.model = [];
 
     const options: UIErrorLog = {

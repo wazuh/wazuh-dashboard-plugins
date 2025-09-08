@@ -11,20 +11,86 @@ declare namespace CodeMirror {
     bottom: number;
   }
 
+  interface Doc {
+    setValue(value: string): void;
+  }
+
+  interface LineWidget {
+    clear?: () => void;
+    changed?: () => void;
+    // Allow additional members without strict typing
+    [key: string]: any;
+  }
+
+  interface SearchCursor {
+    findNext(): boolean;
+    findPrevious?(): boolean;
+    from(): Position;
+    to?(): Position;
+  }
+
+  type EditorEventName =
+    | 'change'
+    | 'cursorActivity'
+    | 'keyup'
+    | 'scroll'
+    | string;
+
   interface Editor {
+    // Core value/cursor APIs
     getValue(): string;
     setValue(value: string): void;
     getCursor(start?: string): Position;
-    cursorCoords(where?: any, mode?: 'local' | 'page' | 'window'): CursorCoords;
+    cursorCoords(
+      where?: Position | 'from' | 'to',
+      mode?: 'local' | 'page' | 'window',
+    ): CursorCoords;
+
+    // Document, lines and layout
+    getDoc(): Doc;
+    getLine(line: number): string;
+    setSize(width: string | number, height: string | number): void;
+    getWrapperElement(): HTMLElement;
+
+    // Events and commands
+    on(
+      event: EditorEventName,
+      handler: (cm: Editor, ev?: KeyboardEvent) => void,
+    ): void;
+    execCommand?(name: string, ...args: unknown[]): void;
+
+    // Range/cursor manipulation
+    replaceRange(text: string, from: Position, to?: Position): void;
+    setCursor(pos: Position): void;
+
+    // Line classes/widgets (lint feedback, etc.)
+    addLineClass(line: number, where: string, cls: string): void;
+    removeLineClass(line: number, where: string, cls: string): void;
+    addLineWidget(
+      line: number,
+      node: HTMLElement,
+      options?: { coverGutter?: boolean; noHScroll?: boolean },
+    ): LineWidget;
+    removeLineWidget(widget: LineWidget): void;
+
+    // Addon methods (optional)
+    getSearchCursor?(
+      query: string | RegExp,
+      pos?: Position | null,
+      caseFoldOrOptions?: boolean | unknown,
+    ): SearchCursor;
+
+    // Internal/editor DOM (do not rely on in app code)
+    display?: { wrapper?: HTMLElement };
   }
 
-  interface HintResult<T = any> {
+  interface HintResult<T = unknown> {
     from: Position;
     to: Position;
     list: T[];
   }
 
-  interface ShowHintOptions<T = any> {
+  interface ShowHintOptions<T = unknown> {
     completeSingle?: boolean;
     hint?: (cm: Editor) => HintResult<T> | undefined;
   }
@@ -33,11 +99,14 @@ declare namespace CodeMirror {
 
   const commands: { [key: string]: (cm: Editor) => void };
 
-  function fromTextArea(textarea: any, options?: any): Editor;
+  function fromTextArea(
+    textarea: HTMLElement | null,
+    options?: unknown,
+  ): Editor;
 
   function registerHelper(type: string, name: string, value: any): void;
 
-  function showHint<T = any>(
+  function showHint<T = unknown>(
     cm: Editor,
     getHints?: (
       cm: Editor,
@@ -49,38 +118,6 @@ declare namespace CodeMirror {
   function Pos(line: number, ch: number): Position;
 
   const hint: any;
-
-  export interface EditorLike {
-    /** Returns the whole editor value as string */
-    getValue: () => string;
-    /** Sets the editor content */
-    setValue?: (value: string) => void;
-    /** CodeMirror API: get current cursor position */
-    getCursor?: () => { line: number; ch: number };
-    /** CodeMirror API: get a line content */
-    getLine?: (line: number) => string;
-    /** CodeMirror API: get document object */
-    getDoc?: () => { setValue: (value: string) => void };
-    /** CodeMirror API: search cursor factory */
-    getSearchCursor?: (
-      query: string,
-      pos?: any,
-      options?: any,
-    ) => {
-      findNext: () => boolean;
-      from: () => { line: number; ch: number };
-    };
-    /** CodeMirror API: cursor coordinates */
-    cursorCoords?: (pos: { line: number; ch: number }) => { top: number };
-    /** CodeMirror API: add a CSS class to a line */
-    addLineClass?: (line: number, where: string, cls: string) => void;
-    /** CodeMirror API: remove a CSS class from a line */
-    removeLineClass?: (line: number, where: string, cls: string) => void;
-    /** Iterate editor lines */
-    eachLine?: (fn: (line: any) => void) => void;
-    /** Array of widgets used by linting feedback */
-    __widgets?: Array<{ start: number; widget: any }>;
-  }
 
   export interface EditorGroup {
     /** Original request line e.g. GET /agents?status=active */

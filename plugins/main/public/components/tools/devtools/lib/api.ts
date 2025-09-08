@@ -3,6 +3,7 @@ import { ErrorService } from './services/error-service';
 import { WzHttpClient } from './services/wz-http-client';
 import { DevToolsActions } from './actions/dev-tools-actions';
 import { FileService } from './services/file-service';
+import type CodeMirror from '../../../../utils/codemirror/lib/codemirror';
 
 // Singleton-ish default actions instance for UI usage
 const defaultActions = new DevToolsActions(
@@ -11,13 +12,13 @@ const defaultActions = new DevToolsActions(
 );
 
 export const send = (
-  editorInput: any,
-  editorOutput: any,
+  editorInput: CodeMirror.Editor,
+  editorOutput: CodeMirror.Editor,
   firstTime = false,
   hooks?: SendHooks,
 ) => defaultActions.send(editorInput, editorOutput, firstTime, hooks);
 
-export function saveEditorContentAsJson(editor: any) {
+export function saveEditorContentAsJson(editor: CodeMirror.Editor) {
   try {
     const fileSvc = new FileService();
     fileSvc.saveJson('export.json', editor.getValue());

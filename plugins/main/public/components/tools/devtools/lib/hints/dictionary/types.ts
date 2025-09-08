@@ -1,4 +1,4 @@
-import type { EditorLike } from '../../types/editor';
+import type CodeMirror from '../../../../../../utils/codemirror/lib/codemirror';
 
 export interface EndpointParamSchema {
   type?: string;
@@ -24,7 +24,7 @@ export interface EndpointDef {
   description?: string;
   summary?: string;
   tags?: string[];
-  args?: any[];
+  args?: unknown[];
   // Internal helper during matching
   splitURL?: string[];
 }
@@ -36,15 +36,11 @@ export interface MethodDef {
 
 export type DevToolsModel = MethodDef[];
 
-export interface EditorWithModel extends EditorLike {
-  model?: DevToolsModel;
-}
-
 export interface HintItem {
   text: string;
   displayText?: string;
-  render?: (elt: HTMLElement, data: any, cur: any) => void;
-  hint?: (cm: any, self: any, data: any) => void;
+  render?: (elt: HTMLElement, data: unknown, cur: any) => void;
+  hint?: (cm: CodeMirror.Editor, self: unknown, data: unknown) => void;
   _moveCursor?: boolean;
   bodyParam?: BodyParamDef;
 }

@@ -1,4 +1,5 @@
 import type { EditorLike } from '../../types/editor';
+import type { DevToolsModel, EndpointDef, MethodDef } from '../../hints/dictionary/types';
 import { REQUEST_LINE_REGEX } from '../../constants/regex';
 
 /**
@@ -11,7 +12,7 @@ export function resolveDocsUrl(
   if (!editor || !requestText) return null;
 
   const match = requestText.match(REQUEST_LINE_REGEX) || [];
-  const [, inputHttpMethod, inputPath]: [any, string, string] = match as any;
+  const [, inputHttpMethod, inputPath] = match as unknown as [string, string, string, ...unknown[]];
   if (!inputHttpMethod || !inputPath) return null;
 
   const inputEndpoint = inputPath
@@ -19,24 +20,22 @@ export function resolveDocsUrl(
     .filter(Boolean)
     .map(s => s.toLowerCase());
 
-  const inputHttpMethodEndpoints =
-    (
-      (editor.model || []).find((it: any) => it.method === inputHttpMethod) ||
-      {}
-    ).endpoints || [];
+  const methods = (editor.model || []) as unknown as DevToolsModel;
+  const methodDef = methods.find((it: MethodDef) => it.method === inputHttpMethod);
+  const inputHttpMethodEndpoints: EndpointDef[] = methodDef?.endpoints || [];
 
   const candidate = inputHttpMethodEndpoints
-    .map((endpoint: any) => ({
+    .map((endpoint: EndpointDef) => ({
       ...endpoint,
       splitURL: String(endpoint.name || '')
         .split('/')
         .filter(Boolean),
     }))
     .filter(
-      (endpoint: any) => endpoint.splitURL.length === inputEndpoint.length,
+      endpoint => endpoint.splitURL!.length === inputEndpoint.length,
     )
-    .find((endpoint: any) =>
-      endpoint.splitURL.reduce(
+    .find(endpoint =>
+      endpoint.splitURL!.reduce(
         (accum: boolean, str: string, index: number) =>
           accum &&
           (str.startsWith(':')

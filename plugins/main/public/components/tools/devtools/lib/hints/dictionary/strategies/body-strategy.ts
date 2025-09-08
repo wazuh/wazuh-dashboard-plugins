@@ -34,8 +34,8 @@ export class BodyHintStrategy implements HintStrategy {
     let requestBodyCursorKeys: string[] | undefined;
 
     if (apiEndpoint.body[0]?.type === 'object') {
-      requestBodyCursorKeys = (getCursorObjectPath(editor, currentGroup) ||
-        undefined) as any;
+      const path = getCursorObjectPath(editor, currentGroup);
+      requestBodyCursorKeys = Array.isArray(path) ? path : undefined;
       const inner = getInnerObjectFromSchema(
         apiEndpoint.body[0] as BodyParamDef,
         [...(requestBodyCursorKeys || [])],
@@ -72,19 +72,19 @@ export class BodyHintStrategy implements HintStrategy {
             displayText: p.name,
             bodyParam: p,
             render: createHintRenderer(LABEL_PARAM),
-            hint: (cm: any, _self: any, data: any) => {
+            hint: (_cm, _self, data) => {
               const cur = editor.getCursor
                 ? editor.getCursor()
                 : { line: 0, ch: 0 };
-              (editor as any).replaceRange(
-                line.replace(/\S+/, '') + data.text,
+              editor.replaceRange?.(
+                line.replace(/\S+/, '') + String((data as HintItem).text),
                 { line: cur.line, ch: cur.ch },
                 { line: cur.line, ch: 0 },
               );
-              const textReplacedLine = (editor as any).getLine(cur.line);
-              (editor as any).setCursor({
+              const textReplacedLine = editor.getLine?.(cur.line) || '';
+              editor.setCursor?.({
                 line: cur.line,
-                ch: data._moveCursor
+                ch: (data as HintItem)._moveCursor
                   ? textReplacedLine.length - 1
                   : textReplacedLine.length,
               });

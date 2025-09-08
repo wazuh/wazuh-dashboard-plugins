@@ -28,12 +28,12 @@ export class GroupingService {
    */
   parseGroups(editor: EditorLike): EditorGroup[] {
     try {
-      const currentState = String(editor.getValue() as any);
+      const currentState = String(editor.getValue());
       this.state.setCurrentDevTools(currentState);
 
       const tmpgroups: EditorGroup[] = [];
       const splitted = currentState
-        .split(REQUEST_SPLIT_REGEX as any)
+        .split(REQUEST_SPLIT_REGEX)
         .filter(item => item.replace(/\s/g, '').length);
 
       let start = 0;
@@ -108,7 +108,7 @@ export class GroupingService {
       }
       starts = [];
       return tmpgroups;
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.errors.log({ context: 'parseGroups', error });
       return [];
     }
@@ -125,8 +125,8 @@ export class GroupingService {
     try {
       const selection = editor.getCursor();
       const validGroups = groups.filter(item => item.requestText);
-      let desiredGroup: any = firstTime
-        ? (validGroups as any)
+      let desiredGroup: EditorGroup[] = firstTime
+        ? validGroups
         : validGroups.filter(
             item =>
               item.requestText &&
@@ -154,9 +154,9 @@ export class GroupingService {
           });
 
           if (firstVisible) {
-            desiredGroup = [firstVisible] as any;
+            desiredGroup = [firstVisible];
           } else if (validGroups.length) {
-            desiredGroup = [validGroups[0]] as any;
+            desiredGroup = [validGroups[0]];
           }
         } catch {}
 
@@ -167,7 +167,7 @@ export class GroupingService {
         }
       }
 
-      let cords: any;
+      let cords: { top: number };
       try {
         cords = editor.cursorCoords({ line: desiredGroup[0]?.start, ch: 0 });
       } catch {
@@ -195,7 +195,7 @@ export class GroupingService {
           } else {
             this.ui.showPlay();
             this.ui.showDocs(
-              resolveDocsUrl(editor as any, desiredGroup[0].requestText) || '',
+              resolveDocsUrl(editor, desiredGroup[0].requestText) || '',
             );
             this.ui.setButtonsTop(lineTop);
           }
@@ -211,7 +211,7 @@ export class GroupingService {
       // so users can send requests to any endpoint, even if we don't
       // have a documentation URL for it.
       if (desiredGroup[0]) {
-        const url = resolveDocsUrl(editor as any, desiredGroup[0].requestText);
+        const url = resolveDocsUrl(editor, desiredGroup[0].requestText);
         if (url) {
           this.ui.showDocs(url);
           this.ui.showPlay();
@@ -223,7 +223,7 @@ export class GroupingService {
       }
 
       return desiredGroup[0] || null;
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.ui.hidePlay();
       this.ui.hideDocs();
       this.errors.log({
@@ -239,20 +239,20 @@ export class GroupingService {
    * Mark the given group as active by highlighting its lines.
    */
   highlightGroup(editor: EditorLike, group?: EditorGroup) {
-    if (!(editor as any).__highlightedLines) {
-      (editor as any).__highlightedLines = [] as number[];
+    if (!editor.__highlightedLines) {
+      editor.__highlightedLines = [] as number[];
     }
 
-    for (const lineNo of (editor as any).__highlightedLines) {
+    for (const lineNo of editor.__highlightedLines) {
       editor.removeLineClass?.(lineNo, 'background', EDITOR_HIGHLIGHT_CLASS);
     }
-    (editor as any).__highlightedLines = [];
+    editor.__highlightedLines = [];
 
     if (!group) return;
 
     const add = (ln: number) => {
       editor.addLineClass?.(ln, 'background', EDITOR_HIGHLIGHT_CLASS);
-      (editor as any).__highlightedLines.push(ln);
+      editor.__highlightedLines!.push(ln);
     };
 
     if (
@@ -272,15 +272,15 @@ export class GroupingService {
    */
   validateJson(editor: EditorLike, groups: EditorGroup[] = []): string[] {
     const affectedGroups: string[] = [];
-    for (const widget of (editor as any).__widgets || []) {
+    for (const widget of editor.__widgets || []) {
       editor.removeLineWidget?.(widget.widget);
     }
-    (editor as any).__widgets = [];
+    editor.__widgets = [];
     for (const item of groups) {
       if (item.requestTextJson) {
         try {
           this.json.parse(item.requestTextJson);
-        } catch (error: any) {
+        } catch (error: unknown) {
           affectedGroups.push(item.requestText);
           const msg = window.document.createElement('div');
           msg.id = String(new Date().getTime() / 1000);
@@ -302,7 +302,7 @@ export class GroupingService {
             if (msg.lastChild) msg.removeChild(msg.lastChild as Node);
           };
 
-          (editor as any).__widgets.push({
+          editor.__widgets.push({
             start: item.start,
             widget: editor.addLineWidget?.(item.start, msg, {
               coverGutter: false,
