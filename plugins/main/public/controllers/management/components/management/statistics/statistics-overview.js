@@ -220,7 +220,6 @@ const mapStateToProps = state => ({
 export default compose(
   withGlobalBreadcrumb([{ text: statistics.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
-    { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
   connect(mapStateToProps),

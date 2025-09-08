@@ -116,7 +116,6 @@ class WzConfigurationOverview extends Component {
                   <WzButtonPermissions
                     buttonType='empty'
                     permissions={[
-                      { action: 'cluster:status', resource: '*:*:*' },
                       this.props.clusterNodeSelected
                         ? {
                             action: 'cluster:update_config',

@@ -46,7 +46,6 @@ import { logs } from '../../../../../utils/applications';
 export default compose(
   withGlobalBreadcrumb([{ text: logs.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
-    { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
 )(

@@ -49,9 +49,8 @@ async function checkVDIsEnabledManager() {
 export const ModuleEnabledCheck = () => {
   const [data, setData] = useState<{ enabled: boolean } | null>(null);
   const [userPermissionRequirements] = useUserPermissionsRequirements([
-    { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
-    { action: 'manager:read', resource: '*:*:*' },
+    { action: 'cluster:read', resource: '*:*:*' },
   ]);
 
   const checkVDIsEnabled = async () => {

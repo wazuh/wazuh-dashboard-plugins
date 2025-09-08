@@ -25,15 +25,15 @@ const requiredPermissionsCluster = [
 
 const requiredPermissionsManager = [
   {
-    action: 'cluster:status',
+    action: 'cluster:read',
     resource: '*:*:*',
   },
   {
-    action: 'manager:read_file',
+    action: 'cluster:read',
     resource: 'file:path:/etc/lists',
   },
   {
-    action: 'manager:read',
+    action: 'cluster:read',
     resource: '*:*:*',
   },
   {
@@ -44,11 +44,6 @@ const requiredPermissionsManager = [
 
 const userClusterTest = {
   'lists:read': {
-    '*:*:*': 'allow',
-    'list:path:*': 'allow',
-    'node:id:*': 'allow',
-  },
-  'cluster:status': {
     '*:*:*': 'allow',
     'list:path:*': 'allow',
     'node:id:*': 'allow',
@@ -81,7 +76,7 @@ const userClusterTest = {
 
 const userManagerTest = [
   {
-    'manager:read': {
+    'cluster:read': {
       '*:*:*': 'allow',
       'file:path:*': 'allow',
     },
@@ -89,7 +84,7 @@ const userManagerTest = [
       '*:*:*': 'allow',
       'file:path:*': 'allow',
     },
-    'manager:read_file': {
+    'cluster:read_file': {
       '*:*:*': 'allow',
       'file:path:*': 'allow',
     },
@@ -110,11 +105,11 @@ const missingPermissionsForClusterUser = [
 
 const missingPermissionsForManagerUser = [
   {
-    action: 'manager:read_file',
+    action: 'cluster:read',
     resource: 'file:path:/etc/lists',
   },
   {
-    action: 'manager:read',
+    action: 'cluster:read',
     resource: '*:*:*',
   },
   {
@@ -133,28 +128,34 @@ describe('Wazuh User Permissions', () => {
             resource: '*:*:*',
           },
         ];
-        const result = WzUserPermissions.checkMissingUserPermissions(simplePermission, {
-          'lists:read': {
-            'list:path:*': 'allow',
+        const result = WzUserPermissions.checkMissingUserPermissions(
+          simplePermission,
+          {
+            'lists:read': {
+              'list:path:*': 'allow',
+            },
+            rbac_mode: 'white',
           },
-          rbac_mode: 'white',
-        });
+        );
         expect(result).toEqual(simplePermission);
       });
 
       it('Should return a simple missing permissions for cluster user', () => {
         const simplePermission = [
           {
-            action: 'cluster:status',
+            action: 'cluster:read',
             resource: '*:*:*',
           },
         ];
-        const result = WzUserPermissions.checkMissingUserPermissions(simplePermission, {
-          'lists:read': {
-            'list:path:*': 'allow',
+        const result = WzUserPermissions.checkMissingUserPermissions(
+          simplePermission,
+          {
+            'lists:read': {
+              'list:path:*': 'allow',
+            },
+            rbac_mode: 'white',
           },
-          rbac_mode: 'white',
-        });
+        );
         expect(result).toEqual(simplePermission);
       });
     });
@@ -163,13 +164,13 @@ describe('Wazuh User Permissions', () => {
       it('Should return all permissions ok for manager user', () => {
         const simplePermission = [
           {
-            action: 'manager:read_file',
+            action: 'cluster:read',
             resource: 'file:path:/etc/lists',
           },
         ];
         const result = WzUserPermissions.checkMissingUserPermissions(
           simplePermission,
-          userManagerTest
+          userManagerTest,
         );
         expect(result).toEqual(false); // false === all permissions OK
       });
@@ -177,13 +178,13 @@ describe('Wazuh User Permissions', () => {
       it('Should return a simple missing permissions for cluster user', () => {
         const simplePermission = [
           {
-            action: 'cluster:status',
+            action: 'cluster:read',
             resource: '*:*:*',
           },
         ];
         const result = WzUserPermissions.checkMissingUserPermissions(
           simplePermission,
-          userClusterTest
+          userClusterTest,
         );
         expect(result).toEqual(false);
       });
@@ -200,7 +201,7 @@ describe('Wazuh User Permissions', () => {
 
         const result = WzUserPermissions.checkMissingUserPermissions(
           simplePermission,
-          userClusterTest
+          userClusterTest,
         );
         expect(result).toEqual(false); // false === all permissions OK
       });
@@ -210,7 +211,7 @@ describe('Wazuh User Permissions', () => {
       it('Should return missing permissions for manager user', () => {
         const result = WzUserPermissions.checkMissingUserPermissions(
           requiredPermissionsManager,
-          userClusterTest
+          userClusterTest,
         );
         expect(result).toEqual(missingPermissionsForManagerUser);
       });
@@ -218,7 +219,7 @@ describe('Wazuh User Permissions', () => {
       it('Should return missing permissions for cluster user', () => {
         const result = WzUserPermissions.checkMissingUserPermissions(
           requiredPermissionsCluster,
-          userClusterTest
+          userClusterTest,
         );
         expect(result).toEqual(missingPermissionsForClusterUser);
       });
@@ -247,7 +248,7 @@ describe('Wazuh User Permissions', () => {
       it('Should return OK for particular agent and group id', () => {
         const result = WzUserPermissions.checkMissingUserPermissions(
           requiredAgentView,
-          userAgent1
+          userAgent1,
         );
         expect(result).toEqual(false);
       });
@@ -276,7 +277,7 @@ describe('Wazuh User Permissions', () => {
       it('Should return OK for all agents and groups', () => {
         const result = WzUserPermissions.checkMissingUserPermissions(
           requiredAgentView,
-          userAgent1
+          userAgent1,
         );
         expect(result).toEqual(false);
       });
@@ -313,7 +314,7 @@ describe('Wazuh User Permissions', () => {
       it('Should return OK for the agent 001', () => {
         const result = WzUserPermissions.checkMissingUserPermissions(
           requiredMitreView,
-          userMitre1
+          userMitre1,
         );
         expect(result).toEqual(false);
       });
@@ -341,7 +342,7 @@ describe('Wazuh User Permissions', () => {
         it('Should return OK for all agents and groups', () => {
           const result = WzUserPermissions.checkMissingUserPermissions(
             requiredAgentView,
-            userAgent1
+            userAgent1,
           );
           expect(result).toEqual(false);
         });

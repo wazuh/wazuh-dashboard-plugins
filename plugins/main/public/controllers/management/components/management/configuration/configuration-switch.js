@@ -457,7 +457,7 @@ const mapDispatchToProps = dispatch => ({
 export default compose(
   withUserAuthorizationPrompt(props => [
     props.agent.id === '000'
-      ? { action: 'manager:read', resource: '*:*:*' }
+      ? { action: 'cluster:read', resource: '*:*:*' }
       : [
           { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
           ...(props.agent.group || []).map(group => ({
