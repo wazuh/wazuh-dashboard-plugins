@@ -1,13 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { AppState } from '../../../../../react-services';
-import { showMenu } from "../../../../../redux/selectors/appStateReducers";
+import { showMenuSelector } from '../../../../../redux/selectors/appStateSelectors';
 import { getUiSettings } from '../../../../../kibana-services';
 import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
 import { initEditors, send } from '../../lib';
 import { EDITOR_MIRRORS } from '../../constants';
+import { useSelector } from "react-redux";
 
 const useSetup = () => {
   const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
+  const showMenu: boolean = useSelector(showMenuSelector);
 
   const editorInputRef = useRef<ReturnType<typeof CodeMirror.fromTextArea>>();
   const editorOutputRef = useRef<ReturnType<typeof CodeMirror.fromTextArea>>();
