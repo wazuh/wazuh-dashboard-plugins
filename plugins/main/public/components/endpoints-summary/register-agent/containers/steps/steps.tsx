@@ -1,5 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { EuiCallOut, EuiLink, EuiSteps } from '@elastic/eui';
+import { EuiCallOut, EuiLink, EuiSteps, EuiButton } from '@elastic/eui';
+import NavigationService from '../../../../../react-services/navigation-service';
+import { SECTIONS } from '../../../../../sections';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
@@ -256,6 +258,25 @@ export const Steps = ({
               onCopy={() => setStartCommandWasCopied(true)}
             />
           ) : null}
+        </>
+      ),
+      status: startCommandStepStatus,
+    },
+    {
+      title: 'Go to endpoints to verify the agent connection:',
+      children: (
+        <>
+          <EuiButton
+            color='primary'
+            fill
+            onClick={() => {
+              NavigationService.getInstance().navigate(
+                `${SECTIONS.AGENTS_PREVIEW}`,
+              );
+            }}
+          >
+            Back to agent list
+          </EuiButton>
         </>
       ),
       status: startCommandStepStatus,
