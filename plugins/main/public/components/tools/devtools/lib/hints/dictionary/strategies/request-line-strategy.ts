@@ -23,7 +23,7 @@ export class RequestLineHintStrategy implements HintStrategy {
   }
 
   getHints(context: HintContext): Array<HintItem | string> {
-    const { parsed, word, methodEndpoints, inputEndpoint, apiEndpoint } =
+    const { parsed, methodEndpoints, inputEndpoint, apiEndpoint, line, editor } =
       context;
 
     // Query param suggestions
@@ -55,6 +55,23 @@ export class RequestLineHintStrategy implements HintStrategy {
 
     // Endpoint path suggestions
     if (parsed.method) {
+      // Do not suggest endpoints when there is a query mark in the request line
+      if (parsed.queryMark) return [];
+
+      // Enforce suggestions only immediately after METHOD and spaces
+      // - Allow when user typed only spaces after method (no path yet)
+      // - Allow while typing the endpoint token (no trailing spaces)
+      // - Disallow once there's any non-space text after method followed by a space
+      const afterMethod = (line || '').replace(/^(GET|PUT|POST|DELETE)\s+/i, '');
+      if (/\S+\s+/.test(afterMethod)) return [];
+
+      // If cursor is still within the method token, skip endpoint suggestions
+      try {
+        const cur = editor.getCursor ? editor.getCursor() : { line: 0, ch: 0 };
+        const firstSpaceIdx = (line || '').search(/\s/);
+        if (firstSpaceIdx >= 0 && cur.ch <= firstSpaceIdx) return [];
+      } catch {}
+
       const path = parsed.path || '';
       if (!path || path === '/') {
         return methodEndpoints.map(e => buildEndpointHintItem(e.name));
