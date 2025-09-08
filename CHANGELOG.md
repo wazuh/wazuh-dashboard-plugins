@@ -15,7 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Update Windows logo [#7712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7712)
+- Updated Windows logo [#7712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7712)
 
 ### Fixed
 
