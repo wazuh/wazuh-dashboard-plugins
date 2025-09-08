@@ -1,10 +1,11 @@
 import { ErrorHandler } from '../../../../../react-services';
+import { TIMEOUT_STATUS } from '../constants/common';
 
 /**
  * Normalize and stringify API errors so they’re readable in the output editor.
  */
 export function parseErrorForOutput(error: any): string {
-  if ((error || {}).status === -1) {
+  if ((error || {}).status === TIMEOUT_STATUS) {
     return 'API is not reachable. Reason: timeout.';
   }
 

@@ -6,7 +6,7 @@ import '@testing-library/jest-dom/extend-expect';
 // Mocks
 jest.mock('../../common/hocs', () => ({
   // Identity HOC so we render the wrapped component without referencing React
-  withGlobalBreadcrumb: () => (Component: any) => (props: any) =>
+  withGlobalBreadcrumb: () => (Component: any): React.FC<any> => (props) =>
     Component(props),
   __esModule: true,
 }));

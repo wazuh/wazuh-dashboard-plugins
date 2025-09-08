@@ -1,6 +1,7 @@
 import type { EditorLike, EditorGroup } from '../../../types/editor';
 import type { BodyParamDef } from '../types';
 import { BODY_LINE_START_RE } from '../constants';
+import { NOT_FOUND_INDEX } from '../../../constants/common';
 
 /** Extract indentation and the partial key being typed on a JSON body line. */
 export function extractBodyLineContext(line: string) {
@@ -71,7 +72,7 @@ export function getCursorObjectPath(
           ch: openBracket,
         };
       }
-      if (closeBracket !== -1) {
+      if (closeBracket !== NOT_FOUND_INDEX) {
         jsonBodyKeyCurrentPosition.end = {
           line: editorLineNumber,
           ch: closeBracket,
@@ -85,7 +86,7 @@ export function getCursorObjectPath(
       ) {
         jsonBodyKeyCursor = [...jsonBodyKeyCurrent];
       }
-      if (closeBracket !== -1) jsonBodyKeyCurrent.pop();
+      if (closeBracket !== NOT_FOUND_INDEX) jsonBodyKeyCurrent.pop();
       return jsonBodyKeyCursor;
     },
     false,

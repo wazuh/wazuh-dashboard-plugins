@@ -8,6 +8,7 @@ import type { EditorGroup } from '../types/editor';
 import type { BuiltRequest } from '../types/http';
 import { safeJsonParse, stripReservedFlags } from '../utils/json';
 import { RESERVED_QUERY_PARAMS } from '../constants/config';
+import { NOT_FOUND_INDEX } from '../constants/common';
 
 /**
  * Builds sanitized HTTP requests from editor groups.
@@ -65,12 +66,12 @@ export class RequestBuilder {
 
     // Inline body handling robust to nested braces: e.g. POST /path { ... { ... } }
     const startIdx = withoutMethod.indexOf('{');
-    if (startIdx === -1) {
+    if (startIdx === NOT_FOUND_INDEX) {
       return { path: withoutMethod };
     }
     // Find matching closing brace using a simple brace counter
     let depth = 0;
-    let endIdx = -1;
+    let endIdx = NOT_FOUND_INDEX;
     for (let i = startIdx; i < withoutMethod.length; i++) {
       const ch = withoutMethod[i];
       if (ch === '{') depth++;
@@ -83,7 +84,7 @@ export class RequestBuilder {
       }
     }
     // If we couldn't find a matching closing brace, treat as no inline body
-    if (endIdx === -1) {
+    if (endIdx === NOT_FOUND_INDEX) {
       return { path: withoutMethod };
     }
 
