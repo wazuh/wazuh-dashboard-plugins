@@ -1,5 +1,3 @@
-import { webDocumentationLink } from '../../../../common/services/web_documentation';
-
 export const DEV_TOOLS_INITIAL_BUFFER = `# API Console
 #
 # This console allows you to interact with the server API directly
