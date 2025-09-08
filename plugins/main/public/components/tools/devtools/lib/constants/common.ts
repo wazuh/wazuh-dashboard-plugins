@@ -5,4 +5,3 @@ export const NOT_FOUND_INDEX = -1;
 
 // Internal timeout status used by network layer (non-HTTP)
 export const TIMEOUT_STATUS = -1;
-

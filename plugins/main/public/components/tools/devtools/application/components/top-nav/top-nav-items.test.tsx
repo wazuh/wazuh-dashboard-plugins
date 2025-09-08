@@ -15,9 +15,7 @@ describe('top-nav items', () => {
   const items = getTopNavConfig({ onClickExport: jest.fn() });
 
   it('renders API Reference as an anchor with href in legacy UX', () => {
-    const { container } = render(
-      <TopNavMenu items={items} />,
-    );
+    const { container } = render(<TopNavMenu items={items} />);
 
     const apiRef = container.querySelector(
       '[data-test-subj="consoleApiReferenceButton"]',
@@ -53,4 +51,3 @@ describe('top-nav items', () => {
     expect(apiRef?.getAttribute('rel') || '').toContain('noreferrer');
   });
 });
-

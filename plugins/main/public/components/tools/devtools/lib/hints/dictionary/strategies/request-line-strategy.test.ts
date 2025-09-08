@@ -94,10 +94,7 @@ describe('RequestLineHintStrategy', () => {
       editor: { getCursor: () => ({ line: 0, ch: 12 }) } as any,
       line: 'POST /api ',
       parsed: { method: 'POST', path: '/api ' } as any,
-      methodEndpoints: [
-        { name: '/api' },
-        { name: '/api/other' },
-      ],
+      methodEndpoints: [{ name: '/api' }, { name: '/api/other' }],
       apiEndpoint: undefined,
     });
     const out = s.getHints(ctx);
@@ -108,7 +105,12 @@ describe('RequestLineHintStrategy', () => {
     const s = new RequestLineHintStrategy();
     const ctx = baseContext({
       line: 'GET /api?pretty=1',
-      parsed: { method: 'GET', path: '/api', queryMark: '?', queryString: 'pretty=1' } as any,
+      parsed: {
+        method: 'GET',
+        path: '/api',
+        queryMark: '?',
+        queryString: 'pretty=1',
+      } as any,
       methodEndpoints: [{ name: '/api' }],
       apiEndpoint: undefined, // even if no query hints, endpoints should not be suggested
     });
@@ -122,10 +124,7 @@ describe('RequestLineHintStrategy', () => {
       editor: { getCursor: () => ({ line: 0, ch: 5 }) } as any, // after 'POST '
       line: 'POST ',
       parsed: { method: 'POST', path: '' } as any,
-      methodEndpoints: [
-        { name: '/agents' },
-        { name: '/events' },
-      ],
+      methodEndpoints: [{ name: '/agents' }, { name: '/events' }],
     });
     const out = s.getHints(ctx);
     const texts = (out as any[]).map(i => i.text);

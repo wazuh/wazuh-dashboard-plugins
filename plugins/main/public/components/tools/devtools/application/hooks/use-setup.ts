@@ -5,7 +5,7 @@ import { getUiSettings } from '../../../../../kibana-services';
 import CodeMirror from '../../../../../utils/codemirror/lib/codemirror';
 import { initEditors, send } from '../../lib';
 import { EDITOR_MIRRORS } from '../../constants';
-import { useSelector } from "react-redux";
+import { useSelector } from 'react-redux';
 
 const useSetup = () => {
   const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
