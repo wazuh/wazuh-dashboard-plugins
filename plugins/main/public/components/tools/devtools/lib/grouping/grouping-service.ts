@@ -77,8 +77,13 @@ export class GroupingService {
 
         if (tmpRequestTextJson && typeof tmpRequestTextJson === 'string') {
           let rtjlen = tmp.length;
+          const isClosingLine = (s: string) => {
+            const t = s.trim();
+            // Accept '}' or ']' optionally followed by a comma
+            return /^(\}|\])\s*,?$/.test(t);
+          };
           while (rtjlen--) {
-            if (tmp[rtjlen].trim() === '}') break;
+            if (isClosingLine(tmp[rtjlen])) break;
             else end -= 1;
           }
         }
