@@ -6,7 +6,6 @@ jest.mock('../../../../../react-services', () => ({
   },
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { WzRequest } = require('../../../../../react-services');
 
 describe('WzHttpClient', () => {

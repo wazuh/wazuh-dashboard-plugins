@@ -4,7 +4,6 @@ jest.mock('../../../../../services/file-saver', () => ({
   saveAs: jest.fn(),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const FileSaver = require('../../../../../services/file-saver');
 
 describe('FileService', () => {

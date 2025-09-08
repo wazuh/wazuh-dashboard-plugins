@@ -6,7 +6,6 @@ jest.mock('../../../../../react-services/common-services', () => ({
   getErrorOrchestrator: jest.fn(),
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const {
   getErrorOrchestrator,
 } = require('../../../../../react-services/common-services');
