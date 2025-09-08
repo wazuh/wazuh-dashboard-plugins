@@ -207,7 +207,9 @@ export class GroupingService {
 
       if (firstTime) this.highlightGroup(editor, desiredGroup[0]);
 
-      // Validate and toggle docs/play if no doc url is available
+      // Validate and toggle docs. Keep the play button always available
+      // so users can send requests to any endpoint, even if we don't
+      // have a documentation URL for it.
       if (desiredGroup[0]) {
         const url = resolveDocsUrl(editor as any, desiredGroup[0].requestText);
         if (url) {
@@ -215,7 +217,8 @@ export class GroupingService {
           this.ui.showPlay();
         } else {
           this.ui.hideDocs();
-          this.ui.hidePlay();
+          // Do not hide the play button when docs URL is missing
+          this.ui.showPlay();
         }
       }
 

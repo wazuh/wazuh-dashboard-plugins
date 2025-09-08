@@ -268,7 +268,7 @@ describe('GroupingService.selectActiveGroup', () => {
     expect(ui.showPlay).toHaveBeenCalled();
   });
 
-  it('hides buttons if no docs URL is available', () => {
+  it('keeps play button visible even if no docs URL is available', () => {
     const content = ['GET /a', 'GET /b'].join('\n');
     const editor = buildEditor(content);
     const ui = makeUI();
@@ -282,9 +282,9 @@ describe('GroupingService.selectActiveGroup', () => {
     (editor as any).setCursor({ line: 1, ch: 0 });
     const selected = svc.selectActiveGroup(editor, false, groups);
     expect(selected).toEqual(groups[1]);
-    // No docs URL triggers hide
+    // No docs URL hides docs link but keeps play visible
     expect(ui.hideDocs).toHaveBeenCalled();
-    expect(ui.hidePlay).toHaveBeenCalled();
+    expect(ui.showPlay).toHaveBeenCalled();
   });
 
   it('calls highlight on firstTime=true', () => {
