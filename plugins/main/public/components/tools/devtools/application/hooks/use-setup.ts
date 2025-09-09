@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type MutableRefObject } from 'react';
 import { AppState } from '../../../../../react-services';
 import { showMenuSelector } from '../../../../../redux/selectors/appStateSelectors';
 import { getUiSettings } from '../../../../../kibana-services';
@@ -11,8 +11,12 @@ const useSetup = () => {
   const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
   const showMenu: boolean = useSelector(showMenuSelector);
 
-  const editorInputRef = useRef<ReturnType<typeof CodeMirror.fromTextArea>>();
-  const editorOutputRef = useRef<ReturnType<typeof CodeMirror.fromTextArea>>();
+  const editorInputRef = useRef<
+    ReturnType<typeof CodeMirror.fromTextArea>
+  >() as MutableRefObject<CodeMirror.Editor>;
+  const editorOutputRef = useRef<
+    ReturnType<typeof CodeMirror.fromTextArea>
+  >() as MutableRefObject<CodeMirror.Editor>;
 
   useEffect(() => {
     (async function () {
