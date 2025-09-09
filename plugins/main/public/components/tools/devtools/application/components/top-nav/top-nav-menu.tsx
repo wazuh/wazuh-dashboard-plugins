@@ -55,7 +55,9 @@ export interface TopNavMenuItem {
   onClick: () => void;
   testId: string;
   render?: (commonProps: CommonProps) => React.JSX.Element;
-  renderClassic?: (commonProps: CommonProps) => React.JSX.Element;
+  renderWrapper?: (
+    commonProps: React.PropsWithChildren<CommonProps>,
+  ) => React.JSX.Element;
   position: MenuItemPosition;
 }
 
@@ -116,20 +118,25 @@ export const TopNavMenu: FunctionComponent<Props> = ({
   return (
     <EuiTabs size='s'>
       {items.map((item, idx) => {
-        return (
+        const tab = (
           <EuiTab
             key={idx}
             disabled={disabled}
             onClick={item.onClick}
             title={item.label}
-            data-test-subj={item.renderClassic ? undefined : item.testId}
+            data-test-subj={item.testId}
           >
-            {item.renderClassic?.({
-              'data-test-subj': item.testId,
-              disabled: !!disabled,
-              onClick: item.onClick,
-            }) || item.label}
+            {item.label}
           </EuiTab>
+        );
+
+        return (
+          item.renderWrapper?.({
+            disabled: !!disabled,
+            onClick: item.onClick,
+            ['data-test-subj']: item.testId,
+            children: tab,
+          }) || tab
         );
       })}
     </EuiTabs>
