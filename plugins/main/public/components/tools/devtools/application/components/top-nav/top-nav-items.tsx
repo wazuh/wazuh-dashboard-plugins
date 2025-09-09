@@ -7,10 +7,10 @@ import { MenuItemPosition, TopNavMenuItem } from './top-nav-menu';
 export const topNavItems = {
   exportItem: onClick => ({
     id: 'export',
-    label: i18n.translate('serverDevTools.exportTabLabel', {
+    label: i18n.translate('dev-tools.exportTabLabel', {
       defaultMessage: 'Export',
     }),
-    description: i18n.translate('serverDevTools.exportTabDescription', {
+    description: i18n.translate('dev-tools.exportTabDescription', {
       defaultMessage: 'Export',
     }),
     onClick: () => {
@@ -19,7 +19,7 @@ export const topNavItems = {
     testId: 'consoleExportButton',
     render: commonProps => (
       <EuiSmallButton minWidth='unset' {...commonProps}>
-        {i18n.translate('serverDevTools.exportTabLabel', {
+        {i18n.translate('dev-tools.exportTabLabel', {
           defaultMessage: 'Export',
         })}
       </EuiSmallButton>
@@ -28,10 +28,10 @@ export const topNavItems = {
   }),
   apiReferenceItem: onClick => ({
     id: 'api-reference',
-    label: i18n.translate('serverDevTools.apiReferenceTabLabel', {
+    label: i18n.translate('dev-tools.apiReferenceTabLabel', {
       defaultMessage: 'API Reference',
     }),
-    description: i18n.translate('serverDevTools.apiReferenceTabDescription', {
+    description: i18n.translate('dev-tools.apiReferenceTabDescription', {
       defaultMessage: 'API Reference',
     }),
     onClick: () => {
@@ -58,7 +58,7 @@ export const topNavItems = {
         target='_blank'
         rel='noopener noreferrer'
       >
-        {i18n.translate('serverDevTools.apiReferenceTabLabel', {
+        {i18n.translate('dev-tools.apiReferenceTabLabel', {
           defaultMessage: 'API Reference',
         })}
       </EuiSmallButton>
