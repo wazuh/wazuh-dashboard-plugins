@@ -94,7 +94,7 @@ export const AgentConfiguration = {
               rootkit_files: 'Rootkit files database path',
               rootkit_trojans: 'Rootkit trojans database path',
               scanall: 'Scan the entire system',
-              skip_nfs: 'Skip scan on CIFS/NFS mounts',
+              skip_nfs: 'Skip scan on CephFS/CIFS/NFS mounts',
               frequency: 'Frequency (in seconds) to run the scan',
               check_dev: 'Check /dev path',
               check_files: 'Check files',
@@ -246,7 +246,7 @@ export const AgentConfiguration = {
             {
               disabled: 'Integrity monitoring disabled',
               frequency: 'Interval (in seconds) to run the integrity scan',
-              skip_nfs: 'Skip scan on CIFS/NFS mounts',
+              skip_nfs: 'Skip scan on CephFS/CIFS/NFS mounts',
               scan_on_start: 'Scan on start',
               directories: 'Monitored directories',
               nodiff: 'No diff directories',
