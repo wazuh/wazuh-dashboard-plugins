@@ -40,7 +40,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed the `enrollment.password` field from the `/utils/configuration` endpoint response to prevent unauthorized agent registration by users with read-only API roles. [#7483](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7483)
 - Removed `vulnerability.pattern` setting [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
-- Removed the cluster restart warning on rules, decoders and CDB lists [#7620](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7620)
 
 ## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 03
 
