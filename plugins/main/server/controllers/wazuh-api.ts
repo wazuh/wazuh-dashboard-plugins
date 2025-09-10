@@ -13,7 +13,10 @@
 // Require some libraries
 import { ErrorResponse } from '../lib/error-response';
 import converter from 'json-2-csv';
-import { KeyEquivalence } from '../../common/csv-key-equivalence';
+import {
+  KeyEquivalence,
+  UnsupportedKeysJson2CsvAsyncSize,
+} from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
 import { HTTP_STATUS_CODES } from '../../common/constants';
@@ -875,7 +878,11 @@ export class WazuhApiCtrl {
           fields = ['key', 'value'];
           itemsArray = output.data.data.affected_items[0].items;
         }
-        fields = fields.map(item => ({ value: item, default: '-' }));
+        fields = fields.map(item => ({
+          // WORKAROUND: This defines an alternative name for the size property for some server API responses (FIM) that is incompatible with json2csvAsync
+          value: item === 'size' ? UnsupportedKeysJson2CsvAsyncSize : item,
+          default: '-',
+        }));
         const options = {
           emptyFieldValue: '',
           keys: fields.map(field => ({
@@ -883,6 +890,13 @@ export class WazuhApiCtrl {
             title: KeyEquivalence[field.value] || field.value,
           })),
         };
+        itemsArray = itemsArray.map(({ size, ...rest }) => ({
+          ...rest,
+          // WORKAROUND: This defines an alternative name for the size property for some server API responses (FIM) that is incompatible with json2csvAsync
+          ...(size !== undefined
+            ? { [UnsupportedKeysJson2CsvAsyncSize]: size }
+            : {}),
+        }));
         let csv = await converter.json2csvAsync(itemsArray, options);
 
         return response.ok({
