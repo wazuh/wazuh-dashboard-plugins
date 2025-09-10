@@ -11,6 +11,10 @@ export class AlertsDataSource extends PatternDataSource {
     return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
   }
 
+  getFixedFiltersClusterManager(): tFilter[] {
+    return [this.getClusterManagerFilters()];
+  }
+
   getRuleGroupsFilter(key: string, value: string, controlledByValue: string) {
     if (!key || !value) {
       console.warn('key or value is missing to create the getRuleGroupsFilter');
