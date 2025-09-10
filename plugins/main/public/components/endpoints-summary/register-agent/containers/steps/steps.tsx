@@ -1,7 +1,6 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EuiCallOut, EuiLink, EuiSteps, EuiButton } from '@elastic/eui';
 import NavigationService from '../../../../../react-services/navigation-service';
-import { SECTIONS } from '../../../../../sections';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
