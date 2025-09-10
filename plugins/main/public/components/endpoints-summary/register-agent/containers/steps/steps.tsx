@@ -9,6 +9,8 @@ import {
   getRegisterAgentFormValues,
   parseRegisterAgentFormValues,
 } from '../../services/register-agent-services';
+import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { getCore } from '../../../../../kibana-services';
 
 import { useRegisterAgentCommands } from '../../hooks/use-register-agent-commands';
 import {
@@ -36,6 +38,7 @@ import {
 } from '../../services/register-agent-steps-status-services';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import OsCommandWarning from '../../components/command-output/os-warning';
+import { endpointSummary } from '../../../../../utils/applications';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -265,24 +268,19 @@ export const Steps = ({
     {
       title: 'Go to endpoints to verify the agent connection:',
       children: (
-        <>
+        <RedirectAppLinks application={getCore().application}>
           <EuiButton
             color='primary'
             fill
-            onClick={() => {
-              NavigationService.getInstance().navigate(
-                `${SECTIONS.AGENTS_PREVIEW}`,
-              );
-            }}
+            href={NavigationService.getInstance().getUrlForApp(
+              endpointSummary.id,
+            )}
           >
             Back to agent list
           </EuiButton>
-        </>
+        </RedirectAppLinks>
       ),
-      status:
-        missingStepsName.length > 0 || invalidFieldsName.length > 0
-          ? 'disabled'
-          : 'current',
+      status: startCommandStepStatus === 'complete' ? 'current' : 'disabled',
     },
   ];
 
