@@ -452,14 +452,25 @@ md-sidenav {
 
 /* Dev tools styles */
 
-.wz-dev-box {
+.wz-dev-tools {
   margin: 0px !important;
-  font-size: 14.5px;
+
+  #wz-dev-tools-buttons {
+    position: relative;
+    left: -1.25rem;
+    height: 0;
+    gap: 0.25rem;
+
+    > * {
+      cursor: pointer;
+      z-index: 10;
+      opacity: 1 !important;
+    }
+  }
 }
 
-.wz-play-dev-color {
-  color: #70ba56;
-  margin-right: 15px;
+.wz-app:has(.wz-dev-tools) {
+  flex-grow: 1;
 }
 
 .wz-question-dev-color {
@@ -470,47 +481,65 @@ md-sidenav {
   z-index: 2000;
 }
 
-.wz-dev-column-separator {
-  width: 12px;
-  margin-top: 15px;
-  background: #dddddd;
-  float: left;
-  cursor: ew-resize;
-  text-align: center;
-  display: block !important;
+#wz-dev-tools-editor--separator {
+  width: var(--col-separator-width);
+  min-width: var(--col-separator-width);
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: linear-gradient(#fafbfd);
+  border-left: 1px solid rgba(0, 0, 0, 0.04);
+  border-right: 1px solid rgba(0, 0, 0, 0.04);
+  z-index: 1000;
+
+  /* center the grip icon and ensure visibility */
+  svg {
+    position: relative;
+    z-index: 1;
+    color: #1f2933;
+  }
+
+  svg path {
+    fill: currentColor;
+  }
+
+  /* hover: light blue background, grey rail stays */
+  &:hover {
+    background: linear-gradient(#cce1f0);
+  }
+
+  focusRingAnimate animation {
+    box-shadow: rgba(0, 107, 180, 0.3) 0px 0px 0px 3px;
+  }
+
+  &.active {
+    animation: 350ms cubic-bezier(0.694, 0.0482, 0.335, 1) 1 normal forwards
+      focusRingAnimate !important;
+    background-image: linear-gradient(#006bb4);
+
+    svg {
+      color: #fff;
+    }
+  }
 }
 
-.wz-dev-column-separator:hover {
-  background-color: #cce4ed;
+#wz-dev-tools-editor--left-column {
+  width: calc(var(--col-left-width) - var(--col-separator-width) / 2);
+}
+#wz-dev-tools-editor--right-column {
+  width: calc(var(--col-right-width) - var(--col-separator-width) / 2);
 }
 
-.wz-dev-column-separator:focus,
-.wz-dev-column-separator.active {
-  background-color: #0079a5;
-  color: #fff;
-}
-
-.wz-dev-column-separator span {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-#wz-dev-left-column {
-  width: calc(45% - 7px);
-  min-width: calc(20% - 7px);
-  max-width: calc(80% - 7px);
-  float: left;
-}
-
-#wz-dev-right-column {
-  width: calc(55% - 7px);
-  min-width: calc(20% - 7px);
-  max-width: calc(80% - 7px);
-  float: left;
-}
-
-.wz-dev-box .CodeMirror {
-  border: 1px solid #ddd !important;
+#wz-dev-tools-editor--left-column,
+#wz-dev-tools-editor--right-column {
+  $w: 20%;
+  min-width: calc(#{$w} - var(--col-separator-width) / 2);
+  max-width: calc(#{100% - $w} - var(--col-separator-width) / 2);
+  /* allow inner flex children to shrink and enable internal scrolling */
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* Card and select input shadow overriding */
@@ -1603,16 +1632,6 @@ kbn-dis.hide-filter-control .globalFilterGroup__branch {
 
 .ace_autocomplete {
   width: 390px !important;
-}
-
-.wz-devtools {
-  border: 1px solid red;
-  margin: 16px;
-}
-
-.wz-devtools-tab .euiButtonEmpty__text {
-  height: 24px;
-  text-decoration: none !important;
 }
 
 .history-list {
