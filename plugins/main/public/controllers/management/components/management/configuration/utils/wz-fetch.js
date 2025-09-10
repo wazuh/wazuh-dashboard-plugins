@@ -145,7 +145,7 @@ export const handleError = async (
   try {
     if (messageIsString && message.includes('ERROR3099')) {
       updateWazuhNotReadyYet('Server not ready yet.');
-      await makePing(updateWazuhNotReadyYet, isCluster);
+      await makePing(updateWazuhNotReadyYet);
       return;
     }
 
@@ -166,70 +166,15 @@ export const handleError = async (
 };
 
 /**
- * Check daemons status
- * @returns {object|Promise}
- */
-export const checkDaemons = async () => {
-  try {
-    const response = await WzRequest.apiReq(
-      'GET',
-      '/manager/status',
-      {},
-      { checkCurrentApiIsUp: false },
-    );
-    const daemons =
-      ((((response || {}).data || {}).data || {}).affected_items || [])[0] ||
-      {};
-    const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
-
-    const execd = daemons['wazuh-execd'] === 'running';
-    const modulesd = daemons['wazuh-modulesd'] === 'running';
-    const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-
-    // Always check clusterd in v5.0+ (cluster by default)
-    const clusterd = daemons['wazuh-clusterd'] === 'running';
-
-    const isValid = execd && modulesd && wazuhdb && clusterd;
-
-    if (isValid) {
-      return { isValid };
-    } else {
-      console.warn('Server not ready yet');
-    }
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
  * Make ping to Wazuh API
  * @param updateWazuhNotReadyYet
- * @param {boolean} isCluster
  * @param {number} [tries=10] Tries
  * @return {Promise}
  */
-export const makePing = async (
-  updateWazuhNotReadyYet,
-  isCluster,
-  tries = 30,
-) => {
+export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
   try {
-    let isValid = false;
-    while (tries--) {
-      await delayAsPromise(2000);
-      try {
-        isValid = await checkDaemons();
-        if (isValid) {
-          updateWazuhNotReadyYet('');
-          break;
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    if (!isValid) {
-      throw new Error('Not recovered');
-    }
+    await delayAsPromise(2000);
+    updateWazuhNotReadyYet('');
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
     throw new Error('Server could not be recovered.');
@@ -279,7 +224,7 @@ export const restartNodeSelected = async (
     // Always use cluster mode in v5.0+ (cluster mode by default)
     updateWazuhNotReadyYet(`Restarting ${selectedNode}, please wait.`);
     await restartNode(selectedNode);
-    return await makePing(updateWazuhNotReadyYet, true);
+    return await makePing(updateWazuhNotReadyYet);
   } catch (error) {
     throw error;
   }

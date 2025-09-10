@@ -420,49 +420,6 @@ export class WazuhApiCtrl {
     return false;
   }
 
-  /**
-   * Check main Wazuh daemons status
-   * @param {*} context Endpoint context
-   * @param {*} api API entry stored in .wazuh
-   * @param {*} path Optional. Wazuh API target path.
-   */
-  async checkDaemons(context, api, path) {
-    try {
-      const response = await context.wazuh.api.client.asInternalUser.request(
-        'GET',
-        '/manager/status',
-        {},
-        { apiHostID: api.id },
-      );
-
-      const daemons =
-        ((((response || {}).data || {}).data || {}).affected_items || [])[0] ||
-        {};
-
-      const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
-
-      const execd = daemons['wazuh-execd'] === 'running';
-      const modulesd = daemons['wazuh-modulesd'] === 'running';
-      const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-      const clusterd = daemons['wazuh-clusterd'] === 'running';
-
-      const isValid = execd && modulesd && wazuhdb && clusterd;
-
-      isValid && context.wazuh.logger.debug('Wazuh is ready');
-
-      if (path === '/ping') {
-        return { isValid };
-      }
-
-      if (!isValid) {
-        throw new Error('Server not ready yet');
-      }
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return Promise.reject(error);
-    }
-  }
-
   sleep(timeMs) {
     // eslint-disable-next-line
     return new Promise((resolve, reject) => {
