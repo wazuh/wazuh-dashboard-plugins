@@ -10,7 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513) [#7582](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7582) [#7588](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7588) [#7692](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7692) [#7717](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7717)
 - Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
-- Added the ability to manage the sample data from FIM, IT Hygiene and vulnerabilities inventories prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
+- Added the ability to manage the sample data from IT Hygiene and vulnerabilities. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7718](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7718)
 - Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 - Add UUID field to APIs table [#7412](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7412)
 
@@ -18,7 +18,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed the manager reset button to reload in Rules, Decoders and CDB list [#7657](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7657) [#7677](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7677)
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
-- Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482) [#7538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7538)
 - Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
 - Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
 
