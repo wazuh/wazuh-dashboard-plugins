@@ -116,24 +116,17 @@ class WzConfigurationOverview extends Component {
                   <WzButtonPermissions
                     buttonType='empty'
                     permissions={[
-                      this.props.clusterNodeSelected
-                        ? {
-                            action: 'cluster:update_config',
-                            resource: `node:id:${this.props.clusterNodeSelected}`,
-                          }
-                        : {
-                            action: 'manager:update_config',
-                            resource: '*:*:*',
-                          },
+                      {
+                        action: 'cluster:update_config',
+                        resource: `node:id:*`,
+                      },
                     ]}
                     iconSide='left'
                     iconType='pencil'
                     onClick={() =>
                       this.updateConfigurationSection(
                         'edit-configuration',
-                        `${
-                          this.props.clusterNodeSelected ? 'Cluster' : 'Manager'
-                        } configuration`,
+                        `Cluster configuration`,
                         '',
                         'Edit configuration',
                       )
@@ -162,9 +155,7 @@ class WzConfigurationOverview extends Component {
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>
-              {this.props.clusterNodes &&
-              this.props.clusterNodes.length &&
-              this.props.clusterNodeSelected ? (
+              {this.props.clusterNodes && this.props.clusterNodes.length ? (
                 <EuiFlexItem>
                   <WzClusterSelect />
                 </EuiFlexItem>
@@ -192,7 +183,6 @@ class WzConfigurationOverview extends Component {
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);
