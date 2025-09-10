@@ -28,7 +28,6 @@ export type ServerAddressOptions = {
   nodetype: string;
 };
 
-// Removed clusterStatusResponse function - cluster mode is always enabled in v5.0+
 
 /**
  * Get the remote configuration from api
