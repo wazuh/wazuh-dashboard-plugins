@@ -97,10 +97,6 @@ export const OverviewCards = ({
                   description: configuration?.nodes[0] || '-',
                 },
                 {
-                  title: 'Running',
-                  description: 'yes',
-                },
-                {
                   title: 'Version',
                   description: version ?? '-',
                 },
