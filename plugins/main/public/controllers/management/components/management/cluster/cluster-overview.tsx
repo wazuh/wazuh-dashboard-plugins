@@ -11,7 +11,9 @@ import { ClusterDashboard } from '../../../../../components/management/cluster/d
 export const ClusterOverview = compose(
   withErrorBoundary,
   withGlobalBreadcrumb([{ text: cluster.breadcrumbLabel }]),
-  withUserAuthorizationPrompt([{ action: 'cluster:read', resource: '*:*:*' }]),
+  withUserAuthorizationPrompt([
+    { action: 'cluster:read', resource: 'node:id:*' },
+  ]),
 )(() => {
   return (
     <>
