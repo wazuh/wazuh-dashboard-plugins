@@ -103,7 +103,7 @@ export class FilterHandler {
    * @param {*} fixedKey
    * @returns
    */
-  managerQuery(manager, isCluster = true, fixedKey = undefined) {
+  managerQuery(manager, fixedKey = undefined) {
     // Always use cluster.name in v5.0+ (cluster mode by default)
     const metaKey = fixedKey ? fixedKey : 'cluster.name';
     const result = this.base();

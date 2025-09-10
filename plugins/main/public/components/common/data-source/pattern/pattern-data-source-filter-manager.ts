@@ -267,7 +267,6 @@ export class PatternDataSourceFilterManager
     // Cluster mode is always enabled in v5.0+
     const managerFilter = filterHandler.managerQuery(
       AppState.getClusterInfo().cluster,
-      true,
       key,
     );
     managerFilter.meta = {
