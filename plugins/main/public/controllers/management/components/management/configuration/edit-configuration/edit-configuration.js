@@ -73,23 +73,6 @@ class WzEditConfiguration extends Component {
   async editorSave() {
     try {
       this.setState({ saving: true });
-      // Gracefully handle missing clusterNodeSelected (timing/loading issue)
-      if (!this.props.clusterNodeSelected) {
-        this.setState({ saving: false });
-        this.addToast({
-          title: (
-            <Fragment>
-              <EuiIcon type='alert' />
-              &nbsp;
-              <span>
-                No cluster node selected. Unable to save configuration.
-              </span>
-            </Fragment>
-          ),
-          color: 'danger',
-        });
-        return;
-      }
 
       await saveFileCluster(
         this.state.editorValue,
@@ -288,7 +271,11 @@ class WzEditConfiguration extends Component {
                     resource: `node:id:${this.props.clusterNodeSelected}`,
                   },
                 ]}
-                isDisabled={saving || disableSaveRestartButtons}
+                isDisabled={
+                  saving ||
+                  disableSaveRestartButtons ||
+                  !this.props.clusterNodeSelected
+                }
                 iconType='save'
                 onClick={() => this.editorSave()}
               >
