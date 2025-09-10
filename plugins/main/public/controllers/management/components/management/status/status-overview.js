@@ -242,7 +242,6 @@ export default compose(
       { action: 'agent:read', resource: 'agent:id:*' },
       { action: 'agent:read', resource: 'agent:group:*' },
     ],
-    { action: 'cluster:read', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
   connect(mapStateToProps, mapDispatchToProps),

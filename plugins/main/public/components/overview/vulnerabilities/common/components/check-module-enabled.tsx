@@ -50,7 +50,6 @@ export const ModuleEnabledCheck = () => {
   const [data, setData] = useState<{ enabled: boolean } | null>(null);
   const [userPermissionRequirements] = useUserPermissionsRequirements([
     { action: 'cluster:read', resource: 'node:id:*' },
-    { action: 'cluster:read', resource: '*:*:*' },
   ]);
 
   const checkVDIsEnabled = async () => {
