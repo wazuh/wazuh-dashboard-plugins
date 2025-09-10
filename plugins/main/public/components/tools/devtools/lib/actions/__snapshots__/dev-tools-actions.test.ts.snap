@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`DevToolsActions.send performs happy path: builds request, calls HTTP, writes JSON, and notifies hooks: happy-path-output 1`] = `
+"{
+  \\"result\\": \\"ok\\"
+}"
+`;

@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`hint-builders builds endpoint hint with renderer adding label 1`] = `"<div class=\\"wz-hint\\"><span class=\\"wz-hint__text\\">/_cat/indices</span><span class=\\"wz-hint__label\\">endpoint</span></div>"`;

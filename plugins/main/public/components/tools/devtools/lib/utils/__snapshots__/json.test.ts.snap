@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`safeJsonParse parses a valid JSON object (happy path) 1`] = `
+Object {
+  "foo": "bar",
+  "nested": Object {
+    "a": 1,
+  },
+  "num": 42,
+}
+`;
+
+exports[`stripReservedFlags removes top-level "pretty" when present (true/false) without mutating original (happy path): stripReservedFlags-with-pretty-false 1`] = `
+Object {
+  "a": 1,
+  "b": 2,
+}
+`;
+
+exports[`stripReservedFlags removes top-level "pretty" when present (true/false) without mutating original (happy path): stripReservedFlags-with-pretty-true 1`] = `
+Object {
+  "a": 1,
+  "b": 2,
+}
+`;
