@@ -97,9 +97,8 @@ export class FilterHandler {
     return result;
   }
   /**
-   * This function creates a filter for cluster/manager queries. In v5.0+ always uses cluster.name (cluster by default)
+   * This function creates a filter for cluster queries. In v5.0+ always uses cluster.name (cluster by default)
    * @param {*} manager
-   * @param {*} isCluster - Always true in v5.0+ (kept for compatibility)
    * @param {*} fixedKey
    * @returns
    */
