@@ -47,27 +47,43 @@ export const FlyoutDetail = withRouterSearch(
       closeFlyout(): void;
     };
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentFile: false,
-      isLoading: true,
-      error: false,
-      type: 'file',
-    };
-  }
+    constructor(props) {
+      super(props);
+      this.state = {
+        currentFile: false,
+        isLoading: true,
+        error: false,
+        type: 'file',
+      };
+    }
 
-  async componentDidMount() {
-    try {
-      let currentFile;
-      if (
-        typeof this.props.item === 'boolean' &&
-        typeof this.props.fileName !== undefined
-      ) {
-        const regex = new RegExp('file=' + '[^&]*');
-        const match = window.location.href.match(regex);
-        if (match && match[0]) {
-          const file = decodeURIComponent(match[0].split('=')[1]);
+    async componentDidMount() {
+      try {
+        let currentFile;
+        if (
+          typeof this.props.item === 'boolean' &&
+          typeof this.props.fileName !== undefined
+        ) {
+          const regex = new RegExp('file=' + '[^&]*');
+          const match = window.location.href.match(regex);
+          if (match && match[0]) {
+            const file = decodeURIComponent(match[0].split('=')[1]);
+            const data = await WzRequest.apiReq(
+              'GET',
+              `/syscheck/${this.props.agentId}`,
+              {
+                params: {
+                  q: `file=${file};(type=file,type=registry_key)`,
+                },
+              },
+            );
+            currentFile = ((((data || {}).data || {}).data || {})
+              .affected_items || [])[0];
+          }
+        } else if (this.props.item) {
+          currentFile = this.props.item;
+        } else {
+          const file = this.props.fileName;
           const data = await WzRequest.apiReq(
             'GET',
             `/syscheck/${this.props.agentId}`,
@@ -80,31 +96,19 @@ export const FlyoutDetail = withRouterSearch(
           currentFile = ((((data || {}).data || {}).data || {})
             .affected_items || [])[0];
         }
-      } else if (this.props.item) {
-        currentFile = this.props.item;
-      } else {
-        const file = this.props.fileName;
-        const data = await WzRequest.apiReq(
-          'GET',
-          `/syscheck/${this.props.agentId}`,
-          {
-            params: {
-              q: `file=${file};(type=file,type=registry_key)`,
-            },
-          },
-        );
-        currentFile = ((((data || {}).data || {}).data || {}).affected_items ||
-          [])[0];
-      }
-      if (!currentFile) {
-        throw new Error('File not found');
-      }
-      this.setState({ currentFile, type: currentFile.type, isLoading: false });
-    } catch (error) {
-      this.setState({
-        error: `Data could not be fetched for ${this.props.fileName}`,
-        currentFile: { file: this.props.fileName },
-      });
+        if (!currentFile) {
+          throw new Error('File not found');
+        }
+        this.setState({
+          currentFile,
+          type: currentFile.type,
+          isLoading: false,
+        });
+      } catch (error) {
+        this.setState({
+          error: `Data could not be fetched for ${this.props.fileName}`,
+          currentFile: { file: this.props.fileName },
+        });
 
         const options: UIErrorLog = {
           context: `${FlyoutDetail.name}.componentDidMount`,
@@ -121,54 +125,54 @@ export const FlyoutDetail = withRouterSearch(
       }
     }
 
-  componentWillUnmount() {
-    window.location.href = window.location.href.replace(
-      new RegExp('&file=' + '[^&]*', 'g'),
-      '',
-    );
-  }
+    componentWillUnmount() {
+      window.location.href = window.location.href.replace(
+        new RegExp('&file=' + '[^&]*', 'g'),
+        '',
+      );
+    }
 
-  render() {
-    const { type } = this.state;
-    return (
-      <WzFlyout
-        onClose={() => this.props.closeFlyout()}
-        flyoutProps={{
-          size: 'l',
-          'aria-labelledby': this.state.currentFile.file,
-          maxWidth: '70%',
-          className: 'wz-inventory wzApp',
-        }}
-      >
-        <EuiFlyoutHeader hasBorder className='flyout-header'>
-          <EuiTitle size='s'>
-            <h2 id={this.state.currentFile.file}>
-              {this.state.currentFile.file}
-            </h2>
-          </EuiTitle>
-        </EuiFlyoutHeader>
-        {this.state.isLoading && (
-          <EuiFlyoutBody className='flyout-body'>
-            {(this.state.error && (
-              <EuiCallOut
-                title={this.state.error}
-                color='warning'
-                iconType='alert'
+    render() {
+      const { type } = this.state;
+      return (
+        <WzFlyout
+          onClose={() => this.props.closeFlyout()}
+          flyoutProps={{
+            size: 'l',
+            'aria-labelledby': this.state.currentFile.file,
+            maxWidth: '70%',
+            className: 'wz-inventory wzApp',
+          }}
+        >
+          <EuiFlyoutHeader hasBorder className='flyout-header'>
+            <EuiTitle size='s'>
+              <h2 id={this.state.currentFile.file}>
+                {this.state.currentFile.file}
+              </h2>
+            </EuiTitle>
+          </EuiFlyoutHeader>
+          {this.state.isLoading && (
+            <EuiFlyoutBody className='flyout-body'>
+              {(this.state.error && (
+                <EuiCallOut
+                  title={this.state.error}
+                  color='warning'
+                  iconType='alert'
+                />
+              )) || <EuiLoadingContent style={{ margin: 16 }} />}
+            </EuiFlyoutBody>
+          )}
+          {this.state.currentFile && !this.state.isLoading && (
+            <EuiFlyoutBody className='flyout-body'>
+              <FileDetails
+                currentFile={this.state.currentFile}
+                type={type}
+                {...this.props}
               />
-            )) || <EuiLoadingContent style={{ margin: 16 }} />}
-          </EuiFlyoutBody>
-        )}
-        {this.state.currentFile && !this.state.isLoading && (
-          <EuiFlyoutBody className='flyout-body'>
-            <FileDetails
-              currentFile={this.state.currentFile}
-              type={type}
-              {...this.props}
-            />
-          </EuiFlyoutBody>
-        )}
-      </WzFlyout>
-    );
-  }
-}
+            </EuiFlyoutBody>
+          )}
+        </WzFlyout>
+      );
+    }
+  },
 );

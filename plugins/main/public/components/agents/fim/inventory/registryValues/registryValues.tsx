@@ -10,7 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { EuiBasicTableColumn, EuiInMemoryTable, SortDirection } from '@elastic/eui';
+import {
+  EuiBasicTableColumn,
+  EuiInMemoryTable,
+  SortDirection,
+} from '@elastic/eui';
 import { WzRequest } from '../../../../../react-services';
 import React, { useEffect, useState } from 'react';
 import { emptyFieldHandler } from '../lib';
@@ -24,7 +28,7 @@ import {
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 
-export const RegistryValues = (props) => {
+export const RegistryValues = props => {
   const [values, setValues] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<any>();
@@ -44,7 +48,7 @@ export const RegistryValues = (props) => {
             q: `type=registry_value;file=${currentFile.file}`,
             sort: '-date',
           },
-        }
+        },
       );
 
       setValues((((values || {}).data || {}).data || {}).affected_items || []);
@@ -75,13 +79,13 @@ export const RegistryValues = (props) => {
       field: 'value',
       name: 'Value name',
       sortable: true,
-      render: (item) => emptyFieldHandler()(item.name || ''),
+      render: item => emptyFieldHandler()(item.name || ''),
     },
     {
       field: 'value',
       name: 'Value type',
       sortable: true,
-      render: (item) => item.type,
+      render: item => item.type,
     },
     {
       field: 'sha1',

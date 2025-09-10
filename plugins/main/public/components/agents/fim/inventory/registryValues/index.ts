@@ -1,3 +1,3 @@
-import { RegistryValues } from "./registryValues";
+import { RegistryValues } from './registryValues';
 
 export * from './registryValues';

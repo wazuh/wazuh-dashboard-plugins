@@ -19,9 +19,11 @@ export const emptyFieldHandler = (renderFn = (value, record) => value) => {
   return (value, record) => {
     if (value === '' || value === undefined) {
       return (
-        <span style={{display:"flex", minWidth:"0"}}>
-            <EuiIcon type="iInCircle" />
-            <EuiCode className="wz-ellipsis" style={{whiteSpace:"nowrap"}}>Empty field</EuiCode>
+        <span style={{ display: 'flex', minWidth: '0' }}>
+          <EuiIcon type='iInCircle' />
+          <EuiCode className='wz-ellipsis' style={{ whiteSpace: 'nowrap' }}>
+            Empty field
+          </EuiCode>
         </span>
       );
     } else {

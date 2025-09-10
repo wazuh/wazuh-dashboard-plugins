@@ -11,8 +11,13 @@
  */
 import { WzRequest } from '../../../../../react-services/wz-request';
 
-export async function getFilterValues(field, value, agentId, filters={}, format=(item) => item) {
-
+export async function getFilterValues(
+  field,
+  value,
+  agentId,
+  filters = {},
+  format = item => item,
+) {
   const filter = {
     ...filters,
     distinct: true,
@@ -22,6 +27,10 @@ export async function getFilterValues(field, value, agentId, filters={}, format=
   if (value) {
     filter['search'] = value;
   }
-  const result = await WzRequest.apiReq('GET', `/syscheck/${agentId}`, { params: filter });
-  return (((result || {}).data || {}).data || {}).affected_items.map((item) => {return format(item[field])});
+  const result = await WzRequest.apiReq('GET', `/syscheck/${agentId}`, {
+    params: filter,
+  });
+  return (((result || {}).data || {}).data || {}).affected_items.map(item => {
+    return format(item[field]);
+  });
 }
