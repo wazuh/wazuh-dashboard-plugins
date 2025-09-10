@@ -52,11 +52,10 @@ export const getCurrentConfig = async (
         throw new Error('Invalid section');
       }
       try {
-        const url = node
-          ? `/cluster/${node}/configuration/${component}/${configuration}`
-          : agentId === '000'
-          ? `/manager/configuration/${component}/${configuration}`
-          : `/agents/${agentId}/config/${component}/${configuration}`;
+        const url =
+          agentId === '000'
+            ? `/cluster/${node}/configuration/${component}/${configuration}`
+            : `/agents/${agentId}/config/${component}/${configuration}`;
 
         const partialResult = await WzRequest.apiReq('GET', url, {});
 
