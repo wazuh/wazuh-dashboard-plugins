@@ -43,7 +43,6 @@ export const OverviewCards = ({
   goNodes,
   goConfiguration,
   configuration,
-  status,
   version,
   nodesCount,
   nodeList,
