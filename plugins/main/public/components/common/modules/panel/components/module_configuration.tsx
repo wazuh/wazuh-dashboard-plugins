@@ -51,9 +51,7 @@ const getMapConfigurationToState = async (
   const prefixEndpoint =
     type === 'agent'
       ? `/agents/${params.id}/config`
-      : type === 'cluster_node'
-      ? `/cluster/${params.name}/configuration`
-      : `/manager/configuration`;
+      : `/cluster/${params.name}/configuration`;
   const response = await WzRequest.apiReq(
     'GET',
     `${prefixEndpoint}${configurationAPIPartialPath}`,
