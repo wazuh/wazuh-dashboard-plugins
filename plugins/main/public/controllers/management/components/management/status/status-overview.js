@@ -31,7 +31,6 @@ import {
   updateStats,
   updateNodeInfo,
   updateAgentInfo,
-  updateClusterEnabled,
   cleanInfo,
 } from '../../../../../redux/actions/statusActions';
 import StatusHandler from './utils/status-handler';
@@ -115,11 +114,6 @@ export class WzStatusOverview extends Component {
         agentsSynced: isNaN(agentsSyncedCoverage) ? 0 : agentsSyncedCoverage,
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
-
-      // Cluster is always enabled in v5.0+ (cluster by default)
-      this.props.updateClusterEnabled(true);
-
-      // Cluster is always enabled and running in v5.0+ (cluster by default)
       {
         const nodes = await this.statusHandler.clusterNodes();
         const listNodes = nodes.data.data.affected_items;
@@ -229,9 +223,6 @@ const mapDispatchToProps = dispatch => {
     updateStats: stats => dispatch(updateStats(stats)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
     updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
-    updateClusterEnabled: clusterEnabled =>
-      dispatch(updateClusterEnabled(clusterEnabled)),
-    cleanInfo: () => dispatch(cleanInfo()),
   };
 };
 
