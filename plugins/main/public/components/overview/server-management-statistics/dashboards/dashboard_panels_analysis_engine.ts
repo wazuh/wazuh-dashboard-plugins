@@ -2410,7 +2410,6 @@ const getVisStateEventsDroppedByNode = (indexPatternId: string) => {
 
 export const getDashboardPanelsAnalysisEngine = (
   indexPatternId: string,
-  isClusterMode: boolean,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }

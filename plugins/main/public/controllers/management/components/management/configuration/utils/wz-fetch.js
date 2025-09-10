@@ -221,7 +221,6 @@ export const restartNodeSelected = async (
   updateWazuhNotReadyYet,
 ) => {
   try {
-    // Always use cluster mode in v5.0+ (cluster mode by default)
     updateWazuhNotReadyYet(`Restarting ${selectedNode}, please wait.`);
     await restartNode(selectedNode);
     return await makePing(updateWazuhNotReadyYet);
