@@ -12,7 +12,7 @@ export class AlertsDataSource extends PatternDataSource {
   }
 
   getFixedFiltersClusterManager(): tFilter[] {
-    return [this.getClusterManagerFilters()];
+    return [...this.getClusterManagerFilters()];
   }
 
   getRuleGroupsFilter(key: string, value: string, controlledByValue: string) {
