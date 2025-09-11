@@ -151,7 +151,6 @@ class WzConfigurationSwitch extends Component {
 
   updateClusterInformation = async (/** @type {string} */ context) => {
     try {
-      // Always cluster in v5.0+ (cluster by default)
       await this.handleClusterNodes();
     } catch (error) {
       // Handle cluster errors

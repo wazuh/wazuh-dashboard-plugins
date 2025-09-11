@@ -203,7 +203,6 @@ export const ApiTable = compose(withErrorBoundary)(
 
         // Check the connection before set as default
         AppState.setClusterInfo(cluster_info);
-        // In v5.0+ cluster is always enabled (cluster by default)
         AppState.setCurrentAPI(
           JSON.stringify({
             name: cluster,

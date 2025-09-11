@@ -92,7 +92,6 @@ export class WzStatusOverview extends Component {
     try {
       this.props.updateLoadingStatus(true);
 
-      // In v5.0+ cluster is always enabled and running (cluster by default)
       const agentsCountByManagerNodes = (
         await this.statusHandler.clusterAgentsCount()
       )?.data?.data;

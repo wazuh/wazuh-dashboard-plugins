@@ -97,13 +97,12 @@ export class FilterHandler {
     return result;
   }
   /**
-   * This function creates a filter for cluster queries. In v5.0+ always uses cluster.name (cluster by default)
+   * This function creates a filter for cluster queries
    * @param {*} manager
    * @param {*} fixedKey
    * @returns
    */
   managerQuery(manager, fixedKey = undefined) {
-    // Always use cluster.name in v5.0+ (cluster mode by default)
     const metaKey = fixedKey ? fixedKey : 'cluster.name';
     const result = this.base();
     result.meta.key = metaKey;

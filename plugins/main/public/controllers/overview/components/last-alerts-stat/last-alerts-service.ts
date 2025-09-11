@@ -24,7 +24,6 @@ export const getLast24HoursAlerts = async (
       AppState.getCurrentPattern() ||
         getWazuhCorePlugin().configuration.getSettingValue('pattern'),
     );
-    // Always use cluster name in v5.0+ (cluster mode by default)
     const clusterValue = AppState.getClusterInfo().cluster;
 
     const lastAlertsQuery = getLastAlertsQuery(
@@ -38,7 +37,7 @@ export const getLast24HoursAlerts = async (
     return {
       count,
       cluster: {
-        field: 'cluster.name', // Always cluster.name in v5.0+
+        field: 'cluster.name',
         name: clusterValue,
       },
       indexPatternId: currentIndexPattern.id,

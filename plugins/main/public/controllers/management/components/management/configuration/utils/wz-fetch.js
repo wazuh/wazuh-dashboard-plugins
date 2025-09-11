@@ -187,7 +187,6 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
  */
 export const fetchFile = async selectedNode => {
   try {
-    // Always use cluster endpoints in v5.0+ (cluster mode by default)
     const data = await WzRequest.apiReq(
       'GET',
       `/cluster/${selectedNode}/configuration`,
@@ -316,7 +315,6 @@ export const restartNode = async node => {
 
 export const saveConfiguration = async (selectedNode, xml) => {
   try {
-    // Always use cluster mode in v5.0+ (cluster mode by default)
     await saveFileCluster(xml, selectedNode);
   } catch (error) {
     throw error;

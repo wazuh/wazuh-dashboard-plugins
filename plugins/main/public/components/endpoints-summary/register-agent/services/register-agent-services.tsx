@@ -28,7 +28,6 @@ export type ServerAddressOptions = {
   nodetype: string;
 };
 
-
 /**
  * Get the remote configuration from api
  */
@@ -40,7 +39,6 @@ async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
   };
 
   try {
-    // Always use cluster endpoints in v5.0+ (cluster mode by default)
     const result = await WzRequest.apiReq(
       'GET',
       `/cluster/${nodeName}/configuration/request/remote`,
@@ -79,7 +77,6 @@ async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
  * @returns
  */
 async function getAuthConfiguration(node: string) {
-  // Always use cluster endpoints in v5.0+ (cluster mode by default)
   const authConfigUrl = `/cluster/${node}/configuration/auth/auth`;
   const result = await WzRequest.apiReq('GET', authConfigUrl, {});
   const auth = result?.data?.data?.affected_items?.[0];
@@ -111,7 +108,6 @@ async function getConnectionConfig(
   const nodeIp = nodeSelected?.value;
   if (!defaultServerAddress) {
     if (nodeSelected.nodetype !== 'custom') {
-      // Always use cluster mode in v5.0+ (cluster mode by default)
       const remoteConfig = await getRemoteConfiguration(nodeName);
       return {
         serverAddress: nodeIp,
@@ -189,7 +185,6 @@ export const parseNodesInOptions = (
 export const fetchClusterNodesOptions = async (): Promise<
   ServerAddressOptions[]
 > => {
-  // Always use cluster mode in v5.0+ (cluster mode by default)
   const nodes = await getNodeIPs();
   return parseNodesInOptions(nodes);
 };
@@ -211,7 +206,6 @@ export const getMasterNode = (
 export const getMasterConfiguration = async () => {
   const nodes = await fetchClusterNodesOptions();
   const masterNode = getMasterNode(nodes);
-  // Always use cluster mode in v5.0+ (cluster mode by default)
   const remote = await getRemoteConfiguration(masterNode[0].label);
   const auth = await getAuthConfiguration(masterNode[0].label);
   return {

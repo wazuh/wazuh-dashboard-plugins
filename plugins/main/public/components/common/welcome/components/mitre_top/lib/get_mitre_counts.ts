@@ -51,7 +51,6 @@ function createExistsFilter(indexPattern) {
 
 function getWazuhFilter() {
   const clusterInfo = AppState.getClusterInfo();
-  // Always use cluster.name in v5.0+ (cluster mode by default)
   const wazuhFilter = {
     name: 'cluster.name',
     value: clusterInfo.cluster,

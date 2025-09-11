@@ -186,7 +186,6 @@ export const RequirementFlyout = connect(mapStateToProps)(
     renderBody() {
       const { currentRequirement } = this.props;
       const requirementImplicitFilter = {};
-      // Always use cluster.name in v5.0+ (cluster mode by default)
       const clusterFilter = {
         'cluster.name': AppState.getClusterInfo().cluster,
       };

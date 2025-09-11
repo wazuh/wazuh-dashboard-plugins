@@ -6,7 +6,6 @@ export const getLastAlertsQuery = (
     maxRuleLevel?: number;
   },
 ) => {
-  // Always use cluster.name in v5.0+ (cluster mode by default)
   const clusterField = 'cluster.name';
   return {
     indexPattern: currentIndexPattern,
