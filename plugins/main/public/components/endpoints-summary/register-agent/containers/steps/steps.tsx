@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { EuiCallOut, EuiLink, EuiSteps, EuiButton } from '@elastic/eui';
-import NavigationService from '../../../../../react-services/navigation-service';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
@@ -8,8 +7,6 @@ import {
   getRegisterAgentFormValues,
   parseRegisterAgentFormValues,
 } from '../../services/register-agent-services';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { getCore } from '../../../../../kibana-services';
 
 import { useRegisterAgentCommands } from '../../hooks/use-register-agent-commands';
 import {
@@ -38,6 +35,8 @@ import {
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import OsCommandWarning from '../../components/command-output/os-warning';
 import { endpointSummary } from '../../../../../utils/applications';
+import { WzLink } from '../../../../wz-link/wz-link';
+import { SECTIONS } from '../../../../../sections';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -267,17 +266,11 @@ export const Steps = ({
     {
       title: 'Go to endpoints to verify the agent connection:',
       children: (
-        <RedirectAppLinks application={getCore().application}>
-          <EuiButton
-            color='primary'
-            fill
-            href={NavigationService.getInstance().getUrlForApp(
-              endpointSummary.id,
-            )}
-          >
+        <WzLink appId={endpointSummary.id} path={`/${SECTIONS.AGENTS_PREVIEW}`}>
+          <EuiButton color='primary' fill>
             Back to agent list
           </EuiButton>
-        </RedirectAppLinks>
+        </WzLink>
       ),
       status: startCommandStepStatus === 'complete' ? 'current' : 'disabled',
     },
