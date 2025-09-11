@@ -12,12 +12,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
-- Cluster mode is now enabled by default. Removed all conditional logic between cluster and manager modes. All Wazuh installations now operate in cluster mode, including single-node deployments. Updated all filters to consistently use `cluster.name` instead of `manager.name`, unified API endpoints to cluster paths, simplified UI components by removing cluster/manager toggles, updated RBAC permissions from `manager:*` actions to `cluster:*` actions, removed `/cluster/status` endpoint dependencies, and eliminated cluster-disabled component. Sample data generation now defaults to cluster-aware configuration [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
+- Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 
 ### Removed
 
+- Removed logic related to manager in favor to cluster management [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed prompt related to statistic job is disabled in Statistics app [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
