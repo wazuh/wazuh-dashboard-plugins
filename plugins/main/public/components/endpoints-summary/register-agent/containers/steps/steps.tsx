@@ -37,6 +37,7 @@ import OsCommandWarning from '../../components/command-output/os-warning';
 import { endpointSummary } from '../../../../../utils/applications';
 import { WzLink } from '../../../../wz-link/wz-link';
 import { SECTIONS } from '../../../../../sections';
+import NavigationService from '../../../../../react-services/navigation-service';
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -266,11 +267,24 @@ export const Steps = ({
     {
       title: 'Go to endpoints to verify the agent connection:',
       children: (
-        <WzLink appId={endpointSummary.id} path={`/${SECTIONS.AGENTS_PREVIEW}`}>
-          <EuiButton color='primary' fill>
-            Back to agent list
-          </EuiButton>
-        </WzLink>
+        <EuiButton
+          color='primary'
+          fill
+          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+            e.preventDefault();
+            NavigationService.getInstance().navigate(
+              `/${SECTIONS.AGENTS_PREVIEW}`,
+            );
+          }}
+          // This shows the link preview on hover,
+          href={NavigationService.getInstance().getUrlForApp(
+            endpointSummary.id,
+            { path: `#/${SECTIONS.AGENTS_PREVIEW}` },
+          )}
+          aria-label={`Open ${endpointSummary.breadcrumbLabel}`}
+        >
+          Back to agent list
+        </EuiButton>
       ),
       status: startCommandStepStatus === 'complete' ? 'current' : 'disabled',
     },
