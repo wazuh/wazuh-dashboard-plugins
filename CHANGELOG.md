@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641) [#7696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7696)
 - Added Microsoft Graph API module [#7516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7516) [#7644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7644) [#7661](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7661)
 - Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646) [#7695](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7695)
+- Added a final step in the Deploy new agent section to navigate back to the agent list [#7711](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7711)
 
 ### Fixed
 
