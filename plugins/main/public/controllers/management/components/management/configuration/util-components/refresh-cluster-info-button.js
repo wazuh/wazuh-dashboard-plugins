@@ -42,13 +42,11 @@ class WzRefreshClusterInfoButton extends Component {
         nodes.data.data.affected_items.find(
           node => node.name === this.props.clusterNodeSelected,
         );
-      const masterNode = nodes.data.data.affected_items.find(
-        node => node.type === 'master',
-      );
       this.props.updateClusterNodeSelected(
         existsClusterCurrentNodeSelected
           ? existsClusterCurrentNodeSelected.name
-          : masterNode?.name || nodes.data.data.affected_items[0]?.name,
+          : nodes.data.data.affected_items.find(node => node.type === 'master')
+              .name,
       );
     } catch (error) {
       // do nothing if it isn't a cluster
