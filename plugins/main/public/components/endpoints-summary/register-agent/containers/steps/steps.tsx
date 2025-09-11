@@ -35,7 +35,6 @@ import {
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import OsCommandWarning from '../../components/command-output/os-warning';
 import { endpointSummary } from '../../../../../utils/applications';
-import { WzLink } from '../../../../wz-link/wz-link';
 import { SECTIONS } from '../../../../../sections';
 import NavigationService from '../../../../../react-services/navigation-service';
 
