@@ -27,7 +27,6 @@ export interface IAPIHost {
 interface IAPIHostRegistry {
   manager: string | null;
   node: string | null;
-  status: string;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
 }
@@ -189,7 +188,6 @@ export class ManageHosts {
 
     let manager = null,
       node = null,
-      status = 'disabled',
       cluster = 'Disabled',
       allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
 
@@ -227,9 +225,6 @@ export class ManageHosts {
         }
       }
 
-      // In v5.0+ cluster is always enabled (cluster by default)
-      status = 'enabled';
-
       const responseClusterLocal =
         await this.serverAPIClient.asInternalUser.request(
           'GET',
@@ -251,7 +246,6 @@ export class ManageHosts {
     const data = {
       manager,
       node,
-      status,
       cluster,
       allow_run_as,
     };

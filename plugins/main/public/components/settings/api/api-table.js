@@ -199,14 +199,14 @@ export const ApiTable = compose(withErrorBoundary)(
       try {
         await this.checkManager(APIconnection, true);
         const { cluster_info, id } = APIconnection;
-        const { manager, cluster, status } = cluster_info;
+        const { cluster } = cluster_info;
 
         // Check the connection before set as default
         AppState.setClusterInfo(cluster_info);
-        const clusterEnabled = status === 'disabled';
+        // In v5.0+ cluster is always enabled (cluster by default)
         AppState.setCurrentAPI(
           JSON.stringify({
-            name: clusterEnabled ? manager : cluster,
+            name: cluster,
             id: id,
           }),
         );
