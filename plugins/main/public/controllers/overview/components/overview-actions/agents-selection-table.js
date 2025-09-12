@@ -124,11 +124,7 @@ export class AgentSelectionTable extends Component {
     return (
       <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
         <EuiFlexItem grow={false}>
-          <WzIconSVG
-            type={osType}
-            style={{ width: 20, height: 20 }}
-            className='AgentsTable__soBadge'
-          />
+          <WzIconSVG type={osType} style={{ paddingRight: '3px' }} />
         </EuiFlexItem>
         <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
       </EuiFlexGroup>

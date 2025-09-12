@@ -199,11 +199,7 @@ class WzGroupAgentsTable extends Component {
     return (
       <EuiFlexGroup gutterSize='xs'>
         <EuiFlexItem grow={false}>
-          <WzIconSVG
-            type={osType}
-            style={{ width: 20, height: 20 }}
-            className='AgentsTable__soBadge'
-          />
+          <WzIconSVG type={osType} style={{ paddingRight: '3px' }} />
         </EuiFlexItem>
         <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
       </EuiFlexGroup>

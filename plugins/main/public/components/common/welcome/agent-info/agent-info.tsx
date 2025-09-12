@@ -118,12 +118,13 @@ export class AgentInfo extends Component<AgentInfoProps> {
           label: 'Operating system',
           render: (value: Agent) => (
             <EuiFlexGroup
+              responsive={false}
               alignItems='center'
               gutterSize='none'
               style={{ gap: 5 }}
             >
-              <EuiFlexItem>{getPlatformIcon(value)}</EuiFlexItem>
-              <EuiFlexItem>{getOsName(value)}</EuiFlexItem>
+              <EuiFlexItem grow={false}>{getPlatformIcon(value)}</EuiFlexItem>
+              <EuiFlexItem grow={false}>{getOsName(value)}</EuiFlexItem>
             </EuiFlexGroup>
           ),
         },

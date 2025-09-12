@@ -6,13 +6,7 @@ import WzIconSVG from '../icons/wz-icon-svg';
 
 export const getPlatformIcon = (agent?: Agent): React.JSX.Element => {
   const osType = getAgentOSType(agent);
-  return (
-    <WzIconSVG
-      type={osType}
-      style={{ width: 20, height: 20 }}
-      className='AgentsTable__soBadge'
-    />
-  );
+  return <WzIconSVG type={osType} style={{ paddingRight: '3px' }} />;
 };
 
 export const getOsName = (agent?: Agent) => {

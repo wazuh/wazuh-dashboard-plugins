@@ -11,10 +11,12 @@ import macLightSVG from '../../../assets/images/themes/light/mac-icon.svg';
 
 interface WzIconProps {
   type: WAZUH_AGENTS_OS_TYPE;
-  alt?: string;
   style?: React.CSSProperties;
+  width?: number | string;
+  height?: number | string;
   className?: string;
   forceMode?: 'dark' | 'light';
+  alt?: string;
 }
 
 const iconsOS = {
@@ -34,10 +36,12 @@ const iconsOS = {
 
 export default function WzIconSVG({
   type,
-  alt,
   style,
+  width = 20,
+  height = 20,
   className,
   forceMode,
+  alt,
 }: WzIconProps) {
   const darkMode =
     typeof forceMode !== 'undefined'
@@ -50,7 +54,7 @@ export default function WzIconSVG({
     <img
       src={darkMode ? iconSet.dark : iconSet.light}
       alt={alt || `${type} icon`}
-      style={style}
+      style={{ width, height, ...style }}
       className={className}
     />
   );
