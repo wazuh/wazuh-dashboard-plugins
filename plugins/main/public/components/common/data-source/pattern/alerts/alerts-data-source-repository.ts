@@ -83,7 +83,6 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
   }
 
   async setupDefault(dataSources): Promise<void> {
-    // TODO: it should check the index pattern in the cookie exists and assign the default from the configuration
     if (!this.getStoreIndexPatternId()) {
       const [dataSource] = dataSources;
 
@@ -103,9 +102,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
   This logic could be moved to another service.
 */
 export async function AlertsDataSourceSetup() {
-  if (AppState.getCurrentPattern()) {
-    return;
-  }
+  const selectedIndexPatternId = AppState.getCurrentPattern();
 
   const factory = new PatternDataSourceFactory();
   const repository = new AlertsDataSourceRepository();
@@ -114,5 +111,14 @@ export async function AlertsDataSourceSetup() {
     AlertsDataSource,
     await repository.getAll(),
   );
-  repository.setupDefault(dataSources);
+
+  // Check if the selected index pattern Id in cookie exists and skip
+  if (
+    selectedIndexPatternId &&
+    dataSources.find(({ id }) => id === selectedIndexPatternId)
+  ) {
+    return;
+  }
+
+  await repository.setupDefault(dataSources);
 }
