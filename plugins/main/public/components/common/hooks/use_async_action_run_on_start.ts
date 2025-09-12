@@ -1,12 +1,12 @@
 import { useCallback, useState, useEffect } from 'react';
 
-type useAsyncActionRunOnStartAction<T> = (...any) => T;
+type useAsyncActionRunOnStartAction<T> = (...params: any[]) => Promise<T>;
 type useAsyncActionRunOnStartDependencies = any[];
 type useAsyncActionRunOnStartDependenciesReturns<T> = {
   data: T | null;
-  error: any;
+  error: Error | null;
   running: boolean;
-  run: Promise<T>;
+  run: () => Promise<void>;
 };
 
 /**
@@ -23,10 +23,10 @@ export function useAsyncActionRunOnStart<T>(
   { refreshDataOnPreRun = true } = { refreshDataOnPreRun: true },
 ): useAsyncActionRunOnStartDependenciesReturns<T> {
   const [running, setRunning] = useState(true);
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
-  const run: Promise<T> = useCallback(async () => {
+  const run = useCallback(async () => {
     try {
       setRunning(true);
       setError(null);
@@ -36,7 +36,7 @@ export function useAsyncActionRunOnStart<T>(
       const data = await action(...dependencies);
       setData(data);
     } catch (error) {
-      setError(error);
+      setError(error as Error);
     } finally {
       setRunning(false);
     }
