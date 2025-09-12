@@ -40,6 +40,7 @@ import { AgentStatus } from '../../../../../components/agents/agent-status';
 import { WzRequest } from '../../../../../react-services';
 import { endpointSummary } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
+import WzIconSVG from '../../../../../components/common/icons/wz-icon-svg';
 
 class WzGroupAgentsTable extends Component {
   _isMounted = false;
@@ -192,26 +193,18 @@ class WzGroupAgentsTable extends Component {
   }
 
   addIconPlatformRender(agent) {
-    let icon = '';
-    const os = agent?.os || {};
-
-    if ((os?.uname || '').includes('Linux')) {
-      icon = 'linux';
-    } else if (os?.platform === 'windows') {
-      icon = 'windows';
-    } else if (os?.platform === 'darwin') {
-      icon = 'apple';
-    }
+    const osType = getAgentOSType(agent);
     const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
     return (
       <EuiFlexGroup gutterSize='xs'>
         <EuiFlexItem grow={false}>
-          <i
-            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden='true'
-          ></i>
-        </EuiFlexItem>{' '}
+          <WzIconSVG
+            type={osType}
+            style={{ width: 20, height: 20 }}
+            className='AgentsTable__soBadge'
+          />
+        </EuiFlexItem>
         <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
       </EuiFlexGroup>
     );

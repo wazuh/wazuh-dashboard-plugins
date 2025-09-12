@@ -12,8 +12,8 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { Agent } from '../types';
-import WindowsIconDark from '../../../assets/images/themes/dark/windows-icon.svg';
-import WindowsIconLight from '../../../assets/images/themes/light/windows-icon.svg';
+import WzIconSVG from '../../common/icons/wz-icon-svg';
+import { getAgentOSType } from '../../../react-services';
 
 // Columns with the property truncateText: true won't wrap the text
 // This is added to prevent the wrap because of the table-layout: auto
@@ -25,7 +25,6 @@ export const agentsTableColumns = (
   setIsUpgradeModalVisible: (visible: boolean) => void,
   setFilters: (filters) => void,
   outdatedAgents: Agent[],
-  isDarkMode: boolean,
 ) => [
   {
     field: 'id',
@@ -62,7 +61,7 @@ export const agentsTableColumns = (
     name: 'Operating system',
     sortable: true,
     show: true,
-    render: (field, agentData) => addIconPlatformRender(agentData, isDarkMode),
+    render: (field: any, agentData: Agent) => addIconPlatformRender(agentData),
     searchable: true,
   },
   {
@@ -169,44 +168,19 @@ export const agentsTableColumns = (
   },
 ];
 
-const addIconPlatformRender = (agent, isDarkMode) => {
-  let icon = '';
-  const os = agent?.os || {};
-
-  let iconElement = null;
-  if ((os?.uname || '').includes('Linux')) {
-    icon = 'linux';
-    iconElement = (
-      <i
-        className={`fa fa-linux AgentsTable__soBadge AgentsTable__soBadge--linux`}
-        aria-hidden='true'
-      ></i>
-    );
-  } else if (os?.platform === 'windows') {
-    icon = 'windows';
-    iconElement = (
-      <img
-        src={isDarkMode ? WindowsIconDark : WindowsIconLight}
-        alt='Windows'
-        style={{ width: 20, height: 20 }}
-        className='AgentsTable__soBadge'
-        aria-hidden='true'
-      />
-    );
-  } else if (os?.platform === 'darwin') {
-    icon = 'apple';
-    iconElement = (
-      <i
-        className={`fa fa-apple AgentsTable__soBadge AgentsTable__soBadge--apple`}
-        aria-hidden='true'
-      ></i>
-    );
-  }
+const addIconPlatformRender = (agent: Agent) => {
+  const osType = getAgentOSType(agent);
   const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
   return (
     <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
-      <EuiFlexItem grow={false}>{iconElement}</EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <WzIconSVG
+          type={osType}
+          style={{ width: 20, height: 20 }}
+          className='AgentsTable__soBadge'
+        />
+      </EuiFlexItem>
       <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
     </EuiFlexGroup>
   );

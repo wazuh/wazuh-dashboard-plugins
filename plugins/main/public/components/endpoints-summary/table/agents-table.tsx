@@ -44,7 +44,6 @@ import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-prog
 import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 import { WzButton } from '../../common/buttons';
 import NavigationService from '../../../react-services/navigation-service';
-import { getUiSettings } from '../../../kibana-services';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -63,8 +62,6 @@ interface AgentsTableProps {
   externalReload?: boolean;
   setExternalReload?: (newValue: number) => void;
 }
-
-const darkMode = getUiSettings()?.get('theme:darkMode');
 
 export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const defaultFilters = {
@@ -341,7 +338,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
               setIsUpgradeModalVisible,
               setFilters,
               outdatedAgents,
-              darkMode,
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}

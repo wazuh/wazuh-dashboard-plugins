@@ -19,9 +19,8 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 import { AgentStatus } from '../../../../components/agents/agent-status';
 import { TableWzAPI } from '../../../../components/common/tables';
 import { PinnedAgentManager } from '../../../../components/wz-agent-selector/wz-agent-selector-service';
-import { getUiSettings } from '../../../../kibana-services';
-import WindowsIconDark from '../../../../assets/images/themes/dark/windows-icon.svg';
-import WindowsIconLight from '../../../../assets/images/themes/light/windows-icon.svg';
+import WzIconSVG from '../../../../components/common/icons/wz-icon-svg';
+import { getAgentOSType } from '../../../../react-services';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -29,8 +28,6 @@ const searchBarWQLOptions = {
     conjunction: ';',
   },
 };
-
-const isDarkMode = getUiSettings()?.get('theme:darkMode');
 
 export class AgentSelectionTable extends Component {
   constructor(props) {
@@ -73,8 +70,7 @@ export class AgentSelectionTable extends Component {
         name: 'Operating system',
         sortable: true,
         searchable: true,
-        render: (field, agentData) =>
-          this.addIconPlatformRender(agentData, isDarkMode),
+        render: (field, agentData) => this.addIconPlatformRender(agentData),
       },
       {
         field: 'status',
@@ -122,44 +118,18 @@ export class AgentSelectionTable extends Component {
     this.pinnedAgentManager.unPinAgent();
   }
 
-  addIconPlatformRender(agent, isDarkMode) {
-    let icon = '';
-    const os = agent?.os || {};
-
-    let iconElement = null;
-    if ((os?.uname || '').includes('Linux')) {
-      icon = 'linux';
-      iconElement = (
-        <i
-          className={`fa fa-linux AgentsTable__soBadge AgentsTable__soBadge--linux`}
-          aria-hidden='true'
-        ></i>
-      );
-    } else if (os?.platform === 'windows') {
-      icon = 'windows';
-      iconElement = (
-        <img
-          src={isDarkMode ? WindowsIconDark : WindowsIconLight}
-          alt='Windows icon'
-          style={{ width: 20, height: 20 }}
-          className='AgentsTable__soBadge'
-          aria-hidden='true'
-        />
-      );
-    } else if (os?.platform === 'darwin') {
-      icon = 'apple';
-      iconElement = (
-        <i
-          className={`fa fa-apple AgentsTable__soBadge AgentsTable__soBadge--apple`}
-          aria-hidden='true'
-        ></i>
-      );
-    }
+  addIconPlatformRender(agent) {
+    const osType = getAgentOSType(agent);
     const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
-
     return (
       <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
-        <EuiFlexItem grow={false}>{iconElement}</EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <WzIconSVG
+            type={osType}
+            style={{ width: 20, height: 20 }}
+            className='AgentsTable__soBadge'
+          />
+        </EuiFlexItem>
         <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
       </EuiFlexGroup>
     );
