@@ -48,24 +48,12 @@ describe('serverAPIConnectionCompatibility', () => {
 
       await serverAPIConnectionCompatibility(
         {
-          // manageHosts: {
-          //   get: () => hosts,
-          // },
           logger: {
             debug: loggerMock,
             info: loggerMock,
             warn: loggerMock,
             error: loggerMock,
           },
-          // serverAPIClient: {
-          //   asInternalUser: {
-          //     request: () => ({
-          //       data: {
-          //         data: apiVersionResponse,
-          //       },
-          //     }),
-          //   },
-          // },
         },
         {
           manageHosts: {
