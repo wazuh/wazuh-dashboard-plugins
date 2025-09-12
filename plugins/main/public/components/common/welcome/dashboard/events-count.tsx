@@ -1,5 +1,4 @@
 import React from 'react';
-import { AlertsDataSource } from '../../data-source/pattern/alerts/alerts-data-source';
 import { AlertsDataSourceRepository } from '../../data-source/pattern/alerts/alerts-data-source-repository';
 import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
@@ -15,6 +14,7 @@ import {
 } from '@elastic/eui';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
+import { EventsCountDataSource } from '../../data-source/pattern/alerts/events-count';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -25,7 +25,7 @@ export const EventsCount = () => {
     fetchFilters,
     isLoading: isDataSourceLoading,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsDataSource,
+    DataSource: EventsCountDataSource,
     repository: new AlertsDataSourceRepository(),
   });
 
