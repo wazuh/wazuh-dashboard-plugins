@@ -19,15 +19,16 @@ const PromptServerAPIUnavailable = () => (
   />
 );
 
-export const withServerAPIAvailable = (WrappedComponent: React.FC) => (props: any) => {
-  const { isAvailable } = useServerApiAvailable();
+export const withServerAPIAvailable =
+  (WrappedComponent: React.FC) => (props: any) => {
+    const { isAvailable } = useServerApiAvailable();
 
-  if (!isAvailable) {
-    return <PromptServerAPIUnavailable />;
-  }
+    if (!isAvailable) {
+      return <PromptServerAPIUnavailable />;
+    }
 
-  return <WrappedComponent {...props} />;
-};
+    return <WrappedComponent {...props} />;
+  };
 
 const PromptServerAPINotSelected = () => (
   <EuiEmptyPrompt
@@ -44,12 +45,13 @@ const PromptServerAPINotSelected = () => (
   />
 );
 
-export const withSelectedServerAPI = (WrappedComponent: React.FC) => (props: any) => {
-  const { selectedAPI } = useSelectedServerApi();
+export const withSelectedServerAPI =
+  (WrappedComponent: React.FC) => (props: any) => {
+    const { selectedAPI } = useSelectedServerApi();
 
-  if (!selectedAPI) {
-    return <PromptServerAPINotSelected />;
-  }
+    if (!selectedAPI) {
+      return <PromptServerAPINotSelected />;
+    }
 
-  return <WrappedComponent {...props} />;
-};
+    return <WrappedComponent {...props} />;
+  };

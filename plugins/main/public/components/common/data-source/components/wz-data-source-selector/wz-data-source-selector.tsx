@@ -25,9 +25,7 @@ import {
   SelectorLabel,
 } from '../../../../wz-menu/selectors';
 
-type tWzDataSourceSelector<
-  T extends tParsedIndexPattern,
-> = {
+type tWzDataSourceSelector<T extends tParsedIndexPattern> = {
   name: 'string';
   onChange?: (dataSource: T) => void;
   DataSourceRepositoryCreator: any;
