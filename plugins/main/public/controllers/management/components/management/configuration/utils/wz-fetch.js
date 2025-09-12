@@ -12,7 +12,6 @@
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { replaceIllegalXML } from './xml';
-import { getToasts } from '../../../../../../kibana-services';
 import { delayAsPromise } from '../../../../../../../common/utils';
 import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
 
@@ -476,14 +475,19 @@ export const clusterNodes = async () => {
  */
 export const reloadRuleset = async (nodes = []) => {
   try {
+    const clusterStatus = await WzRequest.apiReq('GET', `/cluster/status`, {});
+
+    const clusterData = ((clusterStatus || {}).data || {}).data || {};
+    const isCluster =
+      clusterData.enabled === 'yes' && clusterData.running === 'yes';
+
     const nodesString = nodes.join(',');
     const nodes_param = nodesString ? `?nodes_list=${nodesString}` : '';
+    const reloadEndpoint = isCluster
+      ? `/cluster/analysisd/reload${nodes_param}`
+      : `/manager/analysisd/reload${nodes_param}`;
 
-    const result = await WzRequest.apiReq(
-      'PUT',
-      `/cluster/analysisd/reload${nodes_param}`,
-      {},
-    );
+    const result = await WzRequest.apiReq('PUT', reloadEndpoint, {});
     return result;
   } catch (error) {
     throw error;

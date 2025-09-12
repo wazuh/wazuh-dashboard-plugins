@@ -81,7 +81,7 @@ class WzReloadClusterManagerCallout extends Component<
           `Cluster reloaded in ${nodesReloaded.length} node(s)`,
           <div>
             <p>{message}:</p>
-            <strong>{nodesReloaded.join(', ')}</strong>
+            <strong>{nodesReloaded.map(node => node.name).join(', ')}</strong>
           </div>,
           10000,
         );
