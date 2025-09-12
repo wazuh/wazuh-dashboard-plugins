@@ -82,7 +82,7 @@ const WzDataSourceSelector = (
     ...(refetchDependencies || []),
   ]);
 
-  const onChange = async pattern => {
+  const onChange = async () => {
     try {
       /* TODO: this reloads the page to force the components are remounted with the new
           selection of. To avoid this refresh, we would have to do the components are able to react
@@ -93,7 +93,7 @@ const WzDataSourceSelector = (
       NavigationService.getInstance().reload();
     } catch (error) {
       const options = {
-        context: `${WzMenu.name}.onChangePattern`,
+        context: `${WzDataSourceSelector.name}.onChangePattern`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: false,
