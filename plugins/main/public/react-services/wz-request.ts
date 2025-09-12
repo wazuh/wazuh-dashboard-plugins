@@ -39,14 +39,15 @@ export class WzRequest {
 
   static async setupAPIInCookie() {
     const currentApiDataCookie = AppState.getCurrentAPI();
-    // TODO: review clustInfo cookie
     let currentApiID;
 
     if (currentApiDataCookie) {
       try {
         currentApiID = JSON.parse(currentApiDataCookie).id;
         if (currentApiID) {
-          return true;
+          if (AppState.getClusterInfo()) {
+            return true;
+          }
         }
       } catch {}
     }
