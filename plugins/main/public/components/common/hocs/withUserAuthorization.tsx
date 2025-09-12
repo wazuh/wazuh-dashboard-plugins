@@ -20,20 +20,44 @@ import {
   withSelectedServerAPI,
   withServerAPIAvailable,
 } from './with-server-api-available';
-//
+
+interface ActionResourcePermission {
+  action: string;
+  resource: string;
+}
+
+type ActionResourcePermissionRequirements =
+  | ActionResourcePermission[][]
+  | ActionResourcePermission[];
+
+interface PermissionResolver {
+  (params: any): ActionResourcePermissionRequirements;
+}
+
+type AccessPermission =
+  | ActionResourcePermissionRequirements
+  | PermissionResolver
+  | null;
+
+interface ExtraUserPermissions {
+  isAdmininistrator?: boolean | null;
+}
+
 const withUserAuthorizationPromptChanged =
-  (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
-  WrappedComponent =>
-  props => {
-    const [userPermissionRequirements, userPermissions] =
-      useUserPermissionsRequirements(
-        typeof permissions === 'function' ? permissions(props) : permissions,
-      );
+  (
+    permissions: AccessPermission = null,
+    extraUserPermissions: ExtraUserPermissions = { isAdmininistrator: null },
+  ) =>
+  (WrappedComponent: React.FC) =>
+  (props: any) => {
+    const [userPermissionRequirements] = useUserPermissionsRequirements(
+      typeof permissions === 'function' ? permissions(props) : permissions,
+    );
     const [_userPermissionIsAdminRequirements] =
       useUserPermissionsIsAdminRequirements();
 
     const userPermissionIsAdminRequirements =
-      othersPermissions?.isAdmininistrator
+      extraUserPermissions?.isAdmininistrator
         ? _userPermissionIsAdminRequirements
         : null;
 
@@ -48,11 +72,14 @@ const withUserAuthorizationPromptChanged =
   };
 
 export const withUserAuthorizationPrompt =
-  (permissions = null, othersPermissions = { isAdmininistrator: null }) =>
-  WrappedComponent =>
+  (
+    permissions: AccessPermission = null,
+    extraPermissions: ExtraUserPermissions = { isAdmininistrator: null },
+  ) =>
+  (WrappedComponent: React.FC) =>
     compose(
       withUserLogged,
       withSelectedServerAPI,
       withServerAPIAvailable,
-      withUserAuthorizationPromptChanged(permissions, othersPermissions),
+      withUserAuthorizationPromptChanged(permissions, extraPermissions),
     )(WrappedComponent);
