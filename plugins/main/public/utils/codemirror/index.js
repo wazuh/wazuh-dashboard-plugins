@@ -6,6 +6,8 @@ import './foldgutter.scss';
 import './ttcn.scss';
 import './lesser-dark.scss';
 import './javascript.js';
+import './http-request.js';
+import './http-request.scss';
 import './xml.js';
 import './formatting.js';
 import './brace-fold.js';
