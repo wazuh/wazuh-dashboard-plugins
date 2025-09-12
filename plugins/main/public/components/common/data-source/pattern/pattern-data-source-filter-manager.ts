@@ -266,8 +266,8 @@ export class PatternDataSourceFilterManager
     const filterHandler = new FilterHandler();
     const { status, cluster, manager } = AppState.getClusterInfo();
 
-    const isCluster = status === 'enabled';
-    const filterValue = isCluster ? cluster : manager;
+    const isClusterEnabled = status === 'enabled';
+    const filterValue = isClusterEnabled ? cluster : manager;
 
     if (status === undefined || filterValue === undefined) {
       throw new Error(
@@ -277,7 +277,7 @@ export class PatternDataSourceFilterManager
 
     const managerFilter = filterHandler.managerQuery(
       filterValue,
-      isCluster,
+      isClusterEnabled,
       key,
     );
     managerFilter.meta = {
