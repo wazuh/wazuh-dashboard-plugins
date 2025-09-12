@@ -19,7 +19,7 @@ const PromptServerAPIUnavailable = () => (
   />
 );
 
-export const withServerAPIAvailable = WrappedComponent => props => {
+export const withServerAPIAvailable = (WrappedComponent: React.FC) => (props: any) => {
   const { isAvailable } = useServerApiAvailable();
 
   if (!isAvailable) {
@@ -44,7 +44,7 @@ const PromptServerAPINotSelected = () => (
   />
 );
 
-export const withSelectedServerAPI = WrappedComponent => props => {
+export const withSelectedServerAPI = (WrappedComponent: React.FC) => (props: any) => {
   const { selectedAPI } = useSelectedServerApi();
 
   if (!selectedAPI) {

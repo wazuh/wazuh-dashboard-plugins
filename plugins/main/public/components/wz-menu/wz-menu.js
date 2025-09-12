@@ -100,7 +100,7 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
       NavigationService.getInstance().reload();
     } catch (error) {
       const options = {
-        context: `${WzMenu.name}.changeServerAPI`,
+        context: `${WzMenu.name}.${changeAPI.name}`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {

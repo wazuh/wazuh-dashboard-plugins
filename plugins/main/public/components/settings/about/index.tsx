@@ -48,7 +48,7 @@ export const SettingsAbout: React.FC = () => {
   } else {
     headerAbout = (
       <>
-        <SettingsAboutAppInfo appInfo={data} />
+        {data && <SettingsAboutAppInfo appInfo={data} />}
         <EuiSpacer size='l' />
       </>
     );
