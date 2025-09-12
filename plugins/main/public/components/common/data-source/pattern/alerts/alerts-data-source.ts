@@ -7,10 +7,6 @@ export class AlertsDataSource extends PatternDataSource {
     super(id, title);
   }
 
-  getFixedFilters(): tFilter[] {
-    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
-  }
-
   getFixedFiltersClusterManager(): tFilter[] {
     return [...this.getClusterManagerFilters()];
   }
