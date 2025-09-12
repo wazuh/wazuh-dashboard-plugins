@@ -122,6 +122,8 @@ export OSD_MAJOR_NUMBER=$(echo $OSD_VERSION | cut -d. -f1)
 export COMPOSE_PROJECT_NAME=os-dev-${OSD_VERSION//./}
 export WAZUH_STACK=""
 export WAZUH_VERSION_DEVELOPMENT=$(jq -r '.version' $PACKAGE_PATH)
+export SRC_DASHBOARD=$(realpath ../../../wazuh-dashboard)
+export SRC_SECURITY_PLUGIN=$(realpath ../../../wazuh-security-dashboards-plugin)
 
 if [[ "$OSD_MAJOR_NUMBER" -ge 2 ]]; then
   export OSD_MAJOR="2.x"
