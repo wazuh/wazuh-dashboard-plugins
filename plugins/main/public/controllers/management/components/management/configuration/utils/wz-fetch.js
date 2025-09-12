@@ -166,13 +166,76 @@ export const handleError = async (
 };
 
 /**
+ * Check daemons status using cluster endpoints
+ * @returns {Promise<object>}
+ */
+export const checkDaemons = async () => {
+  try {
+    // First get the local node info
+    const localNodeInfo = await WzRequest.apiReq(
+      'GET',
+      '/cluster/local/info',
+      {},
+    );
+    const nodeId = localNodeInfo.data.data.affected_items[0].node;
+
+    // Then check daemons status for this node
+    const daemonsStatus = await WzRequest.apiReq(
+      'GET',
+      `/cluster/${nodeId}/status`,
+      {},
+      { checkCurrentApiIsUp: false },
+    );
+    const daemons =
+      ((((daemonsStatus || {}).data || {}).data || {}).affected_items ||
+        [])[0] || {};
+
+    const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
+
+    const execd = daemons['wazuh-execd'] === 'running';
+    const modulesd = daemons['wazuh-modulesd'] === 'running';
+    const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
+
+    // In cluster by default, always check clusterd daemon
+    const clusterd = daemons['wazuh-clusterd'] === 'running';
+
+    const isValid = execd && modulesd && wazuhdb && clusterd;
+
+    if (isValid) {
+      return { isValid };
+    } else {
+      console.warn('Server not ready yet');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
  * Make ping to Wazuh API
  * @param updateWazuhNotReadyYet
- * @param {number} [tries=10] Tries
+ * @param {number} [tries=30] Tries
  * @return {Promise}
  */
 export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
   try {
+    let isValid = false;
+    while (tries--) {
+      await delayAsPromise(2000);
+      try {
+        const daemonCheck = await checkDaemons();
+        isValid = daemonCheck?.isValid;
+        if (isValid) {
+          updateWazuhNotReadyYet('');
+          break;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    if (!isValid) {
+      throw new Error('Not recovered');
+    }
     await delayAsPromise(2000);
     updateWazuhNotReadyYet('');
     return Promise.resolve('Wazuh is ready');

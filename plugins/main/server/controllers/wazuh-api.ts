@@ -529,7 +529,9 @@ export class WazuhApiCtrl {
       if (path === '/ping') {
         try {
           const check = await this.checkDaemons(context, api, path);
-          return check;
+          return response.ok({
+            body: check,
+          });
         } catch (error) {
           const isDown = (error || {}).code === 'ECONNREFUSED';
           if (!isDown) {
@@ -953,6 +955,62 @@ export class WazuhApiCtrl {
         HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
         response,
       );
+    }
+  }
+
+  /**
+   * Check daemons status using cluster endpoints
+   * @param context Request context
+   * @param api API configuration
+   * @param path Request path
+   * @returns Promise with isValid status
+   */
+  async checkDaemons(context: RequestHandlerContext, api: any, path: string) {
+    try {
+      // First get the local node info
+      const localNodeInfo =
+        await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          '/cluster/local/info',
+          {},
+        );
+
+      const nodeId = localNodeInfo.data.data.affected_items[0].node;
+
+      // Then check daemons status for this node
+      const daemonsStatus =
+        await context.wazuh.api.client.asCurrentUser.request(
+          'GET',
+          `/cluster/${nodeId}/status`,
+          {},
+        );
+
+      const daemons =
+        ((((daemonsStatus || {}).data || {}).data || {}).affected_items ||
+          [])[0] || {};
+
+      const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
+
+      const execd = daemons['wazuh-execd'] === 'running';
+      const modulesd = daemons['wazuh-modulesd'] === 'running';
+      const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
+
+      // In cluster by default, always check clusterd daemon
+      const clusterd = daemons['wazuh-clusterd'] === 'running';
+
+      const isValid = execd && modulesd && wazuhdb && clusterd;
+
+      if (isValid) {
+        return { isValid };
+      } else {
+        context.wazuh.logger.warn('Server not ready yet');
+        return { isValid: false };
+      }
+    } catch (error) {
+      context.wazuh.logger.error(
+        `Error checking daemons: ${error.message || error}`,
+      );
+      return { isValid: false };
     }
   }
 }
