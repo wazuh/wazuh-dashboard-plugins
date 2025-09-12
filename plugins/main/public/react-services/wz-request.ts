@@ -277,7 +277,7 @@ export class WzRequest {
         ? getGenericReqOptions(options)
         : options;
 
-      const id = JSON.parse(AppState.getCurrentAPI()).id;
+      const id = JSON.parse(AppState.getCurrentAPI() as string).id;
 
       if (!id) {
         return Promise.reject(

@@ -130,7 +130,7 @@ export class WzAuthentication {
    */
   private static async getUserPolicies() {
     try {
-      var idHost = JSON.parse(AppState.getCurrentAPI()).id;
+      var idHost = JSON.parse(AppState.getCurrentAPI() as string).id;
       if (!idHost) {
         throw new Error(
           'It can not get the user permissionsdue there is no selected API. Ensure the server API is selected and this is available.',

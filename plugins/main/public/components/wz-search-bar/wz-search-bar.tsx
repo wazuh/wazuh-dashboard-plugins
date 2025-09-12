@@ -95,7 +95,10 @@ function useSuggestHandler(
   inputValue,
   setInputValue,
   inputRef,
-  setIsOpen,
+  inputValue: string,
+  setInputValue: (value: string) => void,
+  inputRef: HTMLInputElement,
+  setIsOpen: (value: boolean) => void,
 ): [suggestItem[], SuggestHandler | undefined, string, boolean] {
   const [handler, setHandler] = useState<undefined | SuggestHandler>();
   const [suggestsItems, setSuggestItems] = useState<suggestItem[]>([]);

@@ -27,7 +27,6 @@ import {
 
 type tWzDataSourceSelector<
   T extends tParsedIndexPattern,
-  K extends tDataSource,
 > = {
   name: 'string';
   onChange?: (dataSource: T) => void;
