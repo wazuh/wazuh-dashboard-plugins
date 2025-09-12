@@ -92,9 +92,6 @@ export function WzSearchBar(props: IWzSearchBarProps) {
 
 function useSuggestHandler(
   props: IWzSearchBarProps,
-  inputValue,
-  setInputValue,
-  inputRef,
   inputValue: string,
   setInputValue: (value: string) => void,
   inputRef: HTMLInputElement,

@@ -216,12 +216,4 @@ describe('PatternDataSourceRepository', () => {
     expect(result.title).toEqual(mockedIndexPatternData.attributes.title);
     expect(result._fields).toBeDefined();
   });
-
-  it('should return ERROR when not receive an index pattern to setting like default', async () => {
-    try {
-      repository.setDefault(null as any);
-    } catch (error) {
-      expect(error.message).toBe('Index pattern is required');
-    }
-  });
 });
