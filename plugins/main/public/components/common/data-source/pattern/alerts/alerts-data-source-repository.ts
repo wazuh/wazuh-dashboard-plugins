@@ -96,7 +96,12 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
   }
 }
 
-// WORKAROUND: This is a workaround to ensure the default alerts index pattern is set when the app starts.
+/* WORKAROUND: This is a workaround to ensure the default alerts index pattern is set when the app starts.
+  Multiple UI views depend on the alerts index pattern is created. This method try to set the cookie
+  where the alerts index pattern ID is stored.
+
+  This logic could be moved to another service.
+*/
 export async function AlertsDataSourceSetup() {
   if (AppState.getCurrentPattern()) {
     return;
