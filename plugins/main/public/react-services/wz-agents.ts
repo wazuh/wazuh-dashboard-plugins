@@ -14,7 +14,7 @@ import { Agent } from '../components/endpoints-summary/types';
 import { UnsupportedComponents } from '../utils/components-os-support';
 
 export function getAgentOSType(agent?: Agent) {
-  if (agent?.os?.uname?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX)) {
+  if (agent?.os?.uname?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX) || agent?.os?.name?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX)) {
     return WAZUH_AGENTS_OS_TYPE.LINUX;
   } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.WINDOWS) {
     return WAZUH_AGENTS_OS_TYPE.WINDOWS;
