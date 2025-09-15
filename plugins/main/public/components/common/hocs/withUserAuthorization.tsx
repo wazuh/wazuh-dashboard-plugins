@@ -40,13 +40,13 @@ type AccessPermission =
   | null;
 
 interface ExtraUserPermissions {
-  isAdmininistrator?: boolean | null;
+  isAdministrator?: boolean | null;
 }
 
 const withUserAuthorizationPromptChanged =
   (
     permissions: AccessPermission = null,
-    extraUserPermissions: ExtraUserPermissions = { isAdmininistrator: null },
+    extraUserPermissions: ExtraUserPermissions = { isAdministrator: null },
   ) =>
   (WrappedComponent: React.FC) =>
   (props: any) => {
@@ -57,7 +57,7 @@ const withUserAuthorizationPromptChanged =
       useUserPermissionsIsAdminRequirements();
 
     const userPermissionIsAdminRequirements =
-      extraUserPermissions?.isAdmininistrator
+      extraUserPermissions?.isAdministrator
         ? _userPermissionIsAdminRequirements
         : null;
 
@@ -74,7 +74,7 @@ const withUserAuthorizationPromptChanged =
 export const withUserAuthorizationPrompt =
   (
     permissions: AccessPermission = null,
-    extraPermissions: ExtraUserPermissions = { isAdmininistrator: null },
+    extraPermissions: ExtraUserPermissions = { isAdministrator: null },
   ) =>
   (WrappedComponent: React.FC) =>
     compose(
