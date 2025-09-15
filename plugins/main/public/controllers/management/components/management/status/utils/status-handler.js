@@ -86,30 +86,6 @@ export default class StatusHandler {
   }
 
   /**
-   * Get manager info
-   */
-  static async managerInfo() {
-    try {
-      const result = await WzRequest.apiReq('GET', `/manager/info`, {});
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * Get manager status
-   */
-  static async managerStatus() {
-    try {
-      const result = await WzRequest.apiReq('GET', `/manager/status`, {});
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
    * Get last agent
    */
   static async lastAgentRaw() {
