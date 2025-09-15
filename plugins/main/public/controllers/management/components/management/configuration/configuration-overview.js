@@ -116,9 +116,9 @@ class WzConfigurationOverview extends Component {
                   <WzButtonPermissions
                     buttonType='empty'
                     permissions={[
-                      {
+                      this.props.clusterNodeSelected && {
                         action: 'cluster:update_config',
-                        resource: `node:id:*`,
+                        resource: `node:id:${this.props.clusterNodeSelected}`,
                       },
                     ]}
                     iconSide='left'
@@ -155,7 +155,9 @@ class WzConfigurationOverview extends Component {
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>
-              {this.props.clusterNodes && this.props.clusterNodes.length ? (
+              {this.props.clusterNodes &&
+              this.props.clusterNodes.length &&
+              this.props.clusterNodeSelected ? (
                 <EuiFlexItem>
                   <WzClusterSelect />
                 </EuiFlexItem>
@@ -183,6 +185,7 @@ class WzConfigurationOverview extends Component {
 
 const mapStateToProps = state => ({
   clusterNodes: state.configurationReducers.clusterNodes,
+  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
 });
 
 export default connect(mapStateToProps)(WzConfigurationOverview);
