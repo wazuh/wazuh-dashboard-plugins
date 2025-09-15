@@ -32,20 +32,6 @@ async function checkVDIsEnabledCluster() {
   return false;
 }
 
-async function checkVDIsEnabledManager() {
-  const responseWmodules = await WzRequest.apiReq(
-    'GET',
-    `/manager/configuration/wmodules/wmodules`,
-    {},
-  );
-
-  const vdConfiguration =
-    responseWmodules.data.data?.affected_items?.[0]?.wmodules?.find(
-      ({ ['vulnerability-detection']: wmodule }) => wmodule,
-    );
-  return vdConfiguration?.['vulnerability-detection']?.enabled === 'yes';
-}
-
 export const ModuleEnabledCheck = () => {
   const [data, setData] = useState<{ enabled: boolean } | null>(null);
   const [userPermissionRequirements] = useUserPermissionsRequirements([
