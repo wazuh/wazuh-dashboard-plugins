@@ -235,8 +235,6 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
     if (!isValid) {
       throw new Error('Not recovered');
     }
-    await delayAsPromise(2000);
-    updateWazuhNotReadyYet('');
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
     throw new Error('Server could not be recovered.');
