@@ -335,8 +335,8 @@ export class WazuhApiCtrl {
         responseClusterInfo.data
       ) {
         // Check if cluster node info exists in the response
-        if (responseClusterInfo.data?.affected_items?.[0]?.node) {
-          const nodeInfo = responseClusterInfo.data.affected_items[0];
+        if (responseClusterInfo.data?.data?.affected_items?.[0]?.node) {
+          const nodeInfo = responseClusterInfo.data?.data?.affected_items[0];
           const result =
             await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
           return response.ok({
