@@ -134,21 +134,19 @@ export class WazuhApiCtrl {
 
       context.wazuh.logger.debug(`${id} exists`);
 
-      // Fetch needed information about the cluster and the manager itself
-      const responseManagerInfo =
+      // Fetch needed information about the cluster local node
+      const responseClusterInfo =
         await context.wazuh.api.client.asInternalUser.request(
           'get',
-          `/manager/info`,
+          `/cluster/local/info`,
           {},
           { apiHostID: id, forceRefresh: true },
         );
 
       // Look for socket-related errors
-      if (this.checkResponseIsDown(context, responseManagerInfo)) {
+      if (this.checkResponseIsDown(context, responseClusterInfo)) {
         return ErrorResponse(
-          `ERROR3099 - ${
-            responseManagerInfo.data.detail || 'Server not ready yet'
-          }`,
+          `ERROR3099 - ${responseClusterInfo.detail || 'Server not ready yet'}`,
           3099,
           HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
           response,
@@ -177,8 +175,7 @@ export class WazuhApiCtrl {
       } catch (error) {
         // If we have an invalid response from the Wazuh API
         throw new Error(
-          responseManagerInfo.data.detail ||
-            `${api.url}:${api.port} is unreachable`,
+          responseClusterInfo.detail || `${api.url}:${api.port} is unreachable`,
         );
       }
     } catch (error) {
@@ -203,25 +200,25 @@ export class WazuhApiCtrl {
             try {
               const { id } = api;
 
-              const responseManagerInfo =
+              const responseClusterInfo =
                 await context.wazuh.api.client.asInternalUser.request(
                   'GET',
-                  `/manager/info`,
+                  `/cluster/local/info`,
                   {},
                   { apiHostID: id },
                 );
 
-              if (this.checkResponseIsDown(context, responseManagerInfo)) {
+              if (this.checkResponseIsDown(context, responseClusterInfo)) {
                 return ErrorResponse(
                   `ERROR3099 - ${
-                    response.data.detail || 'Server not ready yet'
+                    responseClusterInfo.detail || 'Server not ready yet'
                   }`,
                   3099,
                   HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
                   response,
                 );
               }
-              if (responseManagerInfo.status === HTTP_STATUS_CODES.OK) {
+              if (responseClusterInfo.status === HTTP_STATUS_CODES.OK) {
                 request.body.id = id;
                 request.body.idChanged = id;
                 return await this.checkStoredAPI(context, request, response);
@@ -313,12 +310,12 @@ export class WazuhApiCtrl {
       if (request.body.forceRefresh) {
         options['forceRefresh'] = request.body.forceRefresh;
       }
-      let responseManagerInfo;
+      let responseClusterInfo;
       try {
-        responseManagerInfo =
+        responseClusterInfo =
           await context.wazuh.api.client.asInternalUser.request(
             'GET',
-            `/manager/info`,
+            `/cluster/local/info`,
             {},
             options,
           );
@@ -334,24 +331,30 @@ export class WazuhApiCtrl {
       }
       context.wazuh.logger.debug(`${request.body.id} credentials are valid`);
       if (
-        responseManagerInfo.status === HTTP_STATUS_CODES.OK &&
-        responseManagerInfo.data
+        responseClusterInfo.status === HTTP_STATUS_CODES.OK &&
+        responseClusterInfo.data
       ) {
-        // Check if UUID exists in the response
-        if (responseManagerInfo.data?.data?.affected_items?.[0]?.uuid) {
-          const uuid = responseManagerInfo.data.data.affected_items[0].uuid;
+        // Check if cluster node info exists in the response
+        if (responseClusterInfo.data?.affected_items?.[0]?.node) {
+          const nodeInfo = responseClusterInfo.data.affected_items[0];
           const result =
             await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
           return response.ok({
             body: {
               ...result,
-              uuid,
+              cluster_info: {
+                node: nodeInfo.node,
+                cluster: nodeInfo.cluster,
+                type: nodeInfo.type,
+              },
             },
           });
         } else {
-          context.wazuh.logger.warn('Could not obtain manager UUID');
+          context.wazuh.logger.warn(
+            'Could not obtain cluster node information',
+          );
           return ErrorResponse(
-            'Could not obtain manager UUID',
+            'Could not obtain cluster node information',
             null,
             HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
             response,
@@ -407,7 +410,7 @@ export class WazuhApiCtrl {
     if (response.status !== HTTP_STATUS_CODES.OK) {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
-      const status = (response.data || {}).status || 1;
+      const status = (response.data || {}).error || 1;
       const isDown = socketErrorCodes.includes(status);
 
       isDown &&
