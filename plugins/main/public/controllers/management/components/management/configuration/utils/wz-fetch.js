@@ -473,17 +473,9 @@ export const clusterNodes = async () => {
  */
 export const reloadRuleset = async (nodes = []) => {
   try {
-    const clusterStatus = await WzRequest.apiReq('GET', `/cluster/status`, {});
-
-    const clusterData = ((clusterStatus || {}).data || {}).data || {};
-    const isCluster =
-      clusterData.enabled === 'yes' && clusterData.running === 'yes';
-
     const nodesString = nodes.join(',');
     const nodes_param = nodesString ? `?nodes_list=${nodesString}` : '';
-    const reloadEndpoint = isCluster
-      ? `/cluster/analysisd/reload${nodes_param}`
-      : `/manager/analysisd/reload${nodes_param}`;
+    const reloadEndpoint = `/cluster/analysisd/reload${nodes_param}`;
 
     const result = await WzRequest.apiReq('PUT', reloadEndpoint, {});
     return result;
