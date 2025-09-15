@@ -116,14 +116,16 @@ export class AgentInfo extends Component<AgentInfoProps> {
           key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
           label: 'Operating system',
-          render: (value: Agent) => (
+          render: (value: Agent, forceTheme?: 'dark') => (
             <EuiFlexGroup
               responsive={false}
               alignItems='center'
               gutterSize='none'
               style={{ gap: 5 }}
             >
-              <EuiFlexItem grow={false}>{getPlatformIcon(value)}</EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {getPlatformIcon(value, forceTheme)}
+              </EuiFlexItem>
               <EuiFlexItem grow={false}>{getOsName(value)}</EuiFlexItem>
             </EuiFlexGroup>
           ),
