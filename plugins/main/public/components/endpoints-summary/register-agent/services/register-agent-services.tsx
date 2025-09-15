@@ -152,20 +152,6 @@ export const getNodeIPs = async (): Promise<any> => {
 };
 
 /**
- * Get the list of the manager and parse it into a list of options
- */
-export const getManagerNode = async (): Promise<any> => {
-  const managerNode = await WzRequest.apiReq('GET', '/manager/api/config', {});
-  return (
-    managerNode?.data?.data?.affected_items?.map(item => ({
-      label: item.node_name,
-      value: item.node_api_config.host,
-      nodetype: 'master',
-    })) || []
-  );
-};
-
-/**
  * Parse the nodes list from the API response to a format that can be used by the EuiComboBox
  * @param nodes
  */
