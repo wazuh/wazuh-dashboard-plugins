@@ -90,31 +90,6 @@ class WzStatusActionButtons extends Component {
     }
   }
 
-  /**
-   * Restart manager
-   */
-  async restartManager() {
-    this.setState({ isRestarting: true });
-    try {
-      await this.statusHandler.restartManager();
-      this.setState({ isRestarting: false });
-      this.showToast('success', 'Restarting manager.', 3000);
-    } catch (error) {
-      this.setState({ isRestarting: false });
-      const options = {
-        context: `${WzStatusActionButtons.name}.restartManager`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `${error.name}: Error restarting manager`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
-  }
-
   objToArr(obj) {
     const arr = [];
     for (const key in obj) arr.push({ key, value: obj[key] });
@@ -238,9 +213,10 @@ class WzStatusActionButtons extends Component {
       <WzButtonPermissions
         buttonType='empty'
         permissions={[
-          clusterEnabled
-            ? { action: 'cluster:restart', resource: 'node:id:*' }
-            : { action: 'manager:restart', resource: '*:*:*' },
+          clusterEnabled && {
+            action: 'cluster:restart',
+            resource: 'node:id:*',
+          },
         ]}
         iconType='refresh'
         onClick={async () => this.setState({ isModalVisible: true })}
@@ -248,7 +224,6 @@ class WzStatusActionButtons extends Component {
         isLoading={this.state.isRestarting}
       >
         {clusterEnabled && 'Restart cluster'}
-        {!clusterEnabled && 'Restart manager'}
       </WzButtonPermissions>
     );
 
@@ -258,17 +233,11 @@ class WzStatusActionButtons extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title={
-              clusterEnabled
-                ? 'Cluster will be restarted'
-                : 'Manager will be restarted'
-            }
+            title={clusterEnabled ? 'Cluster will be restarted' : null}
             onCancel={this.closeModal}
             onConfirm={() => {
               if (clusterEnabled) {
                 this.restartCluster();
-              } else {
-                this.restartManager();
               }
               this.setState({ isModalVisible: false });
             }}

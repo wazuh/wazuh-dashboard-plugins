@@ -289,29 +289,6 @@ export const restartNodeSelected = async (
 };
 
 /**
- * Restart manager (single-node API call)
- * @returns {object|Promise}
- */
-export const restartManager = async () => {
-  try {
-    const validationError = await WzRequest.apiReq(
-      'GET',
-      `/manager/configuration/validation`,
-      {},
-    );
-    const isOk = validationError.status === 'OK';
-    if (!isOk && validationError.detail) {
-      const str = validationError.detail;
-      throw new Error(str);
-    }
-    const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
  * Restart cluster
  * @returns {object|Promise}
  */
