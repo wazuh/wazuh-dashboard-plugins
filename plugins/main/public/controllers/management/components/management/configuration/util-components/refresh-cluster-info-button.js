@@ -33,7 +33,7 @@ class WzRefreshClusterInfoButton extends Component {
       isLoading: false,
     };
   }
-  async checkIfClusterOrManager() {
+  async refreshClusterNodes() {
     try {
       this.setState({ isLoading: true });
       const nodes = await clusterNodes();
@@ -53,7 +53,7 @@ class WzRefreshClusterInfoButton extends Component {
       this.props.updateClusterNodes(false);
       this.props.updateClusterNodeSelected(false);
       const options = {
-        context: `${WzRefreshClusterInfoButton.name}.checkIfClusterOrManager`,
+        context: `${WzRefreshClusterInfoButton.name}.refreshClusterNodes`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
@@ -72,7 +72,7 @@ class WzRefreshClusterInfoButton extends Component {
       <EuiButtonEmpty
         iconType='refresh'
         isLoading={this.state.isLoading}
-        onClick={() => this.checkIfClusterOrManager()}
+        onClick={() => this.refreshClusterNodes()}
         isDisabled={this.state.isLoading}
       >
         Refresh

@@ -122,7 +122,7 @@ class WzEditConfiguration extends Component {
   }
   refresh() {
     try {
-      this.checkIfClusterOrManager();
+      this.refreshClusterNodes();
     } catch (error) {
       const options = {
         context: `${WzEditConfiguration.name}.refresh`,
@@ -175,7 +175,7 @@ class WzEditConfiguration extends Component {
       );
       this.props.updateWazuhNotReadyYet('');
       this.setState({ restart: false, saving: false, restarting: false });
-      await this.checkIfClusterOrManager();
+      await this.refreshClusterNodes();
       if (this.props.clusterNodes) {
         this.addToast({
           title: (
@@ -208,7 +208,7 @@ class WzEditConfiguration extends Component {
     }
   }
 
-  async checkIfClusterOrManager() {
+  async refreshClusterNodes() {
     try {
       const nodes = await clusterNodes();
       this.props.updateClusterNodes(nodes.data.data.affected_items);
