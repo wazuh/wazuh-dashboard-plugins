@@ -15,9 +15,5 @@ export const ClusterOverview = compose(
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
 )(() => {
-  return (
-    <>
-      <ClusterDashboard />
-    </>
-  );
+  return <ClusterDashboard />;
 });
