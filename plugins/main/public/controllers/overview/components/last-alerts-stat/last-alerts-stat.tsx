@@ -3,7 +3,6 @@ import {
   EuiStat,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiLoadingSpinner,
   EuiLink,
   EuiToolTip,
   EuiText,
