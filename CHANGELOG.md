@@ -9,12 +9,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 5.0.0
 - Added sample data generators for agents monitoring and server statistics [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Added "form-data": "^4.0.4" to the resolutions section to ensure this specific version is installed [#7662](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7662)
+- Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 
 ### Changed
 
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
-- Changed health check [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
+- Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 
 ### Removed
 
