@@ -410,18 +410,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       }),
     );
 
-    // let t = true;
-    // core.healthCheck.register({
-    //   name: 'test:fail',
-    //   run: ctx => {
-    //     // t = !t;
-    //     throw new Error('Placeholder error message here');
-    //     if (t) {
-    //     }
-    //   },
-    //   isCritical: true,
-    // });
-
     return {};
   }
 

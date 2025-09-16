@@ -65,5 +65,5 @@ export class WzSampleDataProvider extends Component {
 
 export const WzSampleDataWrapper = compose(
   withErrorBoundary,
-  withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
+  withUserAuthorizationPrompt(null, { isAdministrator: true }),
 )(WzSampleDataProvider);

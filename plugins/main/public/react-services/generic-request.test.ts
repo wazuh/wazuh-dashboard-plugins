@@ -29,7 +29,11 @@ jest.mock('../kibana-services', () => ({
     },
   }),
   getWzCurrentAppID: jest.fn().mockReturnValue('wz-endpoints-summary'),
-  getCookies: jest.fn(),
+  getCookies: jest.fn(() => {
+    return {
+      get: () => 'test',
+    };
+  }),
 }));
 
 // app state

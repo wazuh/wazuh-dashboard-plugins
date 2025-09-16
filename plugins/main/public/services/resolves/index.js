@@ -11,4 +11,3 @@
  */
 export * from './get-config';
 export * from './nested-resolve';
-export * from './settings-wizard';

@@ -264,12 +264,20 @@ export class PatternDataSourceFilterManager
     key?: string,
   ): tFilter[] {
     const filterHandler = new FilterHandler();
-    const isCluster = AppState.getClusterInfo().status == 'enabled';
+    const { status, cluster, manager } = AppState.getClusterInfo();
+
+    const isClusterEnabled = status === 'enabled';
+    const filterValue = isClusterEnabled ? cluster : manager;
+
+    if (status === undefined || filterValue === undefined) {
+      throw new Error(
+        'The filter related to the server API context can not be created due to the required data was not found. This is usually caused because there is no selected a server API. Ensure the server API is available and select it in the server API selector.',
+      );
+    }
+
     const managerFilter = filterHandler.managerQuery(
-      isCluster
-        ? AppState.getClusterInfo().cluster
-        : AppState.getClusterInfo().manager,
-      isCluster,
+      filterValue,
+      isClusterEnabled,
       key,
     );
     managerFilter.meta = {

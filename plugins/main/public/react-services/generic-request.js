@@ -111,7 +111,7 @@ export class GenericRequest {
           wzMisc.setApiIsDown(true);
 
           if (
-            ['/settings', '/blank-screen'].every(
+            ['/settings'].every(
               pathname =>
                 !NavigationService.getInstance()
                   .getPathname()

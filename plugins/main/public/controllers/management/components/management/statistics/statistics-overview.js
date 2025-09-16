@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import {
   EuiFlexItem,
   EuiFlexGroup,
@@ -30,7 +30,6 @@ import {
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
-import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import {
   UI_LOGGER_LEVELS,
@@ -43,12 +42,6 @@ import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
 import { connect } from 'react-redux';
 import NavigationService from '../../../../../react-services/navigation-service';
-import {
-  existsIndices,
-  existsIndexPattern,
-  createIndexPattern,
-} from '../../../../../react-services';
-import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;

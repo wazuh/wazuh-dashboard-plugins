@@ -10,7 +10,6 @@ import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 import { ToastNotificationsModal } from './components/notifications/modal';
 import { WzUpdatesNotification } from './components/wz-updates-notification';
-import { WzBlankScreen } from './components/wz-blank-screen/wz-blank-screen';
 import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
 import { AgentView } from './components/endpoints-summary/agent';
@@ -23,6 +22,7 @@ import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
 import { WzRequest } from './react-services/wz-request';
+import { AlertsDataSourceSetup } from './components/common/data-source';
 
 export const Application = withGuardAsync(
   async (_props: any) => {
@@ -33,6 +33,11 @@ export const Application = withGuardAsync(
         WzRequest.setupAPI(),
         // Load the app state
         loadAppConfig(),
+      ]);
+
+      await Promise.allSettled([
+        // Setup the alerts index pattern
+        AlertsDataSourceSetup(),
       ]);
     } catch {}
 
@@ -111,11 +116,6 @@ export const Application = withGuardAsync(
           path={`/${SECTIONS.WAZUH_DEV}`}
           exact
           render={props => <ToolsRouter {...props} />}
-        ></Route>
-        <Route
-          path={`/${SECTIONS.BLANK_SCREEN}`}
-          exact
-          render={props => <WzBlankScreen {...props} />}
         ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>

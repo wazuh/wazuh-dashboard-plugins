@@ -15,7 +15,6 @@
 import React from 'react';
 import WzStatus from './status-main';
 import { renderWithProviders } from '../../../../../redux/render-with-redux-provider';
-
 jest.mock('../../../../../kibana-services', () => ({
   getHttp: () => ({
     basePath: {
@@ -29,6 +28,11 @@ jest.mock('../../../../../kibana-services', () => ({
       }
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 // the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.

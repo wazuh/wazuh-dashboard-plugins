@@ -253,9 +253,6 @@ const ScaScanBody = compose(
         ),
       };
     },
-    mapFetchActionDependencies(props) {
-      return [props.agent, props.pageIndex, props.pageSize];
-    },
     FetchingDataComponent: ScaScanFetchingData,
   }),
   withGuard(({ dataSourceAction }) => {

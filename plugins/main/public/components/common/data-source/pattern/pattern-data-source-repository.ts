@@ -40,7 +40,7 @@ export type tParsedIndexPattern = {
   _fields: any[];
 } & object;
 
-export class PatternDataSourceRepository
+export abstract class PatternDataSourceRepository
   implements tDataSourceRepository<tParsedIndexPattern>
 {
   async get(id: string): Promise<tParsedIndexPattern> {
@@ -90,14 +90,6 @@ export class PatternDataSourceRepository
     };
   }
 
-  setDefault(dataSource: tParsedIndexPattern): void {
-    if (!dataSource) {
-      throw new Error('Index pattern is required');
-    }
-    AppState.setCurrentPattern(dataSource.id);
-    return;
-  }
-  async getDefault(dataSources): Promise<tParsedIndexPattern | null> {
-    // This method should be redefined by the subclasses
-  }
+  abstract setDefault(dataSource: tParsedIndexPattern): void;
+  abstract getDefault(dataSources): Promise<tParsedIndexPattern | null>;
 }

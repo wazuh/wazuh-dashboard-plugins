@@ -18,11 +18,24 @@ import IApiResponse from './interfaces/api-response.interface';
 import { getCore, getHttp, getToasts } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
-import NavigationService from './navigation-service';
-import { first } from 'rxjs/operators';
+import { BehaviorSubject } from 'rxjs';
+import { first, distinctUntilChanged } from 'rxjs/operators';
+import { throttle } from 'lodash';
 
+// throttle to avoid multiple toasts
+const displayAPINotAvailableToast = throttle(({ title, text }) => {
+  getToasts().add({
+    color: 'warning',
+    title,
+    text,
+  });
+}, 500);
 export class WzRequest {
   static wazuhConfig: any;
+  static serverAPIAvailable$ = new BehaviorSubject(true);
+  static serverAPIAvailableChanged$ = this.serverAPIAvailable$.pipe(
+    distinctUntilChanged(),
+  );
 
   static async setupAPIInCookie() {
     const currentApiDataCookie = AppState.getCurrentAPI();
@@ -32,7 +45,9 @@ export class WzRequest {
       try {
         currentApiID = JSON.parse(currentApiDataCookie).id;
         if (currentApiID) {
-          return true;
+          if (AppState.getClusterInfo()) {
+            return true;
+          }
         }
       } catch {}
     }
@@ -106,10 +121,12 @@ export class WzRequest {
       const isSet = await fn.call(this);
 
       if (isSet) {
+        this.serverAPIAvailable$.next(true);
         return;
       }
     }
 
+    this.serverAPIAvailable$.next(false);
     getToasts.add({
       color: 'danger',
       text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
@@ -171,6 +188,7 @@ export class WzRequest {
       };
 
       const data = await request(options);
+      this.serverAPIAvailable$.next(true);
 
       if (data['error']) {
         throw new Error(data['error']);
@@ -187,18 +205,13 @@ export class WzRequest {
           } catch (error) {
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
-            if (
-              !NavigationService.getInstance()
-                .getPathname()
-                .startsWith('/settings')
-            ) {
-              getToasts().add({
-                color: 'warning',
-                title: `API with ID [${currentApi.id}] is not available.`,
-                text: 'This could indicate a problem in the network of the server API, review or change of API host in the API host selector if configurated other hosts.',
-              });
-            }
-            throw new Error(error);
+            this.serverAPIAvailable$.next(false);
+            const title = `API with ID [${currentApi.id}] is not available.`;
+            const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
+
+            displayAPINotAvailableToast({ title, text });
+
+            throw new Error(`${title} ${text}`);
           }
         }
       }
@@ -265,7 +278,15 @@ export class WzRequest {
         ? getGenericReqOptions(options)
         : options;
 
-      const id = JSON.parse(AppState.getCurrentAPI()).id;
+      const id = JSON.parse(AppState.getCurrentAPI() as string).id;
+
+      if (!id) {
+        return Promise.reject(
+          new Error(
+            'There is no selected server API. Ensure the server API is selected and this is online.',
+          ),
+        );
+      }
       const requestData = { method, path, body, id };
       const response = await this.genericReq(
         'POST',

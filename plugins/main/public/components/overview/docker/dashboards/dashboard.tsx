@@ -7,7 +7,7 @@ import {
 import { WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION } from '../../../../../common/constants';
 import { createDashboard } from '../../../common/dashboards';
 
-export const DashboardAWS = createDashboard({
+export const DashboardDocker = createDashboard({
   DataSource: DockerDataSource,
   DataSourceRepositoryCreator: AlertsDataSourceRepository,
   getDashboardPanels: [

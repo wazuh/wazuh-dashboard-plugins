@@ -16,6 +16,12 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { WzMenu } from './wz-menu';
 
+// the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
+// https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
+
+jest.mock('@osd/monaco', () => ({
+  monaco: {},
+}));
 
 describe('WzMenu tests', () => {
   test('should render a WzMenu', () => {

@@ -17,6 +17,7 @@ import { render } from 'enzyme';
 import { ModuleMitreAttackIntelligence } from './intelligence';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
+import { getCookies } from '../../../../kibana-services';
 
 // the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
 // https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
@@ -54,6 +55,28 @@ jest.mock('../../../../react-services', () => ({
     },
   }),
 }));
+
+jest.mock('../../../common/hooks/use-selected-server-api', () => ({
+  useSelectedServerApi: () => ({ selectedAPI: true }),
+}));
+
+jest.mock('../../../common/hooks/use-server-api-available', () => ({
+  useServerApiAvailable: () => ({ isAvailable: true }),
+}));
+
+jest.mock('../../../../kibana-services');
+
+jest.mock('../../../../react-services/app-state', () => ({
+  AppState: {
+    getCurrentPattern: () => 'test',
+  },
+}));
+
+getCookies.mockImplementation(() => {
+  return {
+    get: () => 'test',
+  };
+});
 
 // added to remove useLayoutEffect warning
 jest.mock('react', () => ({

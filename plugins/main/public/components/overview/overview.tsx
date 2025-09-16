@@ -23,7 +23,7 @@ import {
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import { withRouteResolvers } from '../common/hocs';
 import { nestedResolve } from '../../services/resolves';
-import { useRouterSearch } from '../common/hooks';
+import { useAsyncAction, useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
 import { cloneDeep } from 'lodash';
 import { migrateLegacyQuery } from '../../utils/migrate_legacy_query';
@@ -31,8 +31,14 @@ import { migrateLegacyQuery } from '../../utils/migrate_legacy_query';
 export const Overview: React.FC = withRouteResolvers({
   nestedResolve,
 })(() => {
-  const [agentsCounts, setAgentsCounts] = useState<object>({});
-  const [isAgentsLoading, setIsAgentsLoading] = useState<boolean>(true);
+  const agentCountAction = useAsyncAction(async () => {
+    const {
+      data: {
+        data: { connection: data },
+      },
+    } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
+    return data;
+  }, []);
   const { tab = 'welcome', tabView = 'dashboard', agentId } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
   const pinnedAgentManager = new PinnedAgentManager();
@@ -40,7 +46,7 @@ export const Overview: React.FC = withRouteResolvers({
   useEffect(() => {
     pinnedAgentManager.syncPinnedAgentSources();
     if (tab === 'welcome' || tab === undefined) {
-      getSummary();
+      agentCountAction.run();
     }
 
     // TODO: Analyze if this behavior should be added to Navigationsservice
@@ -113,23 +119,6 @@ export const Overview: React.FC = withRouteResolvers({
     };
   }, [agentId]);
 
-  /**
-   * This fetch de agents summary
-   */
-  const getSummary = async () => {
-    try {
-      const {
-        data: {
-          data: { connection: data },
-        },
-      } = await WzRequest.apiReq('GET', '/agents/summary/status', {});
-      setAgentsCounts(data);
-      setIsAgentsLoading(false);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
   function switchTab(newTab: string) {
     navigationService.switchTab(newTab);
   }
@@ -137,6 +126,8 @@ export const Overview: React.FC = withRouteResolvers({
   const switchSubTab = (subTab: string) => {
     navigationService.switchSubTab(subTab);
   };
+
+  const agentsCount = agentCountAction.data || {};
 
   return (
     <>
@@ -161,10 +152,14 @@ export const Overview: React.FC = withRouteResolvers({
         <EuiPage paddingSize='l'>
           <EuiFlexGroup direction='column'>
             <EuiFlexItem>
-              <Stats {...agentsCounts} isAgentsLoading={isAgentsLoading} />
+              <Stats
+                {...agentsCount}
+                error={agentCountAction.error}
+                isAgentsLoading={agentCountAction.running}
+              />
             </EuiFlexItem>
             <EuiFlexItem>
-              <OverviewWelcome {...agentsCounts} />
+              <OverviewWelcome {...agentsCount} />
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPage>

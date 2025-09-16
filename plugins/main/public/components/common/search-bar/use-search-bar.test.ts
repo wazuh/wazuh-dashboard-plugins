@@ -28,6 +28,11 @@ jest.mock('../../../kibana-services', () => {
     getUiSettings: jest.fn().mockImplementation(() => ({
       get: () => true,
     })),
+    getCookies: jest.fn(() => {
+      return {
+        get: () => 'test',
+      };
+    }),
   };
 });
 

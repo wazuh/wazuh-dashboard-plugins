@@ -18,7 +18,7 @@ export const PromptErrorInitializatingDataSource = (props: {
   return (
     <EuiEmptyPrompt
       iconType='alert'
-      title={<h2>Data source was not initialized</h2>}
+      title={<h2>Data source has an error</h2>}
       body={<>{typeof props.error === 'string' && <p>{props.error}</p>}</>}
     />
   );
@@ -50,7 +50,11 @@ export const withDataSourceInitiated = ({
 }) =>
   withGuard(
     props => {
-      return !get(props, isLoadingNameProp) && !get(props, dataSourceNameProp);
+      return (
+        /* data source is not defined or there is an error related to the data source initialization */
+        (!get(props, isLoadingNameProp) && !get(props, dataSourceNameProp)) ||
+        get(props, dataSourceErrorNameProp)
+      );
     },
     props => (
       <PromptErrorInitializatingDataSource
@@ -86,7 +90,9 @@ export const withDataSource =
       DataSource: DataSourceBuilder,
       repository: new DataSourceRepositoryCreatorBuilder(),
     });
-    return <WrappedCompoment {...props} {...{ [nameProp]: dataSource }} />;
+    return (
+      <WrappedCompoment {...props} {...{ [nameProp]: { ...dataSource } }} />
+    );
   };
 
 /**
@@ -154,17 +160,20 @@ export const withDataSourceFetchOnStart =
   }: WithDataSourceFetchOnStartProps) =>
   WrappedComponent =>
   props => {
-    const dataSource = props[nameProp];
-    const fetch = useCallback(async (...dependencies: any[]) => {
-      const response = await dataSource.fetchData(
-        mapRequestParams
-          ? mapRequestParams({ ...props, dataSource, dependencies })
-          : {},
-      );
-      return mapResponse
-        ? mapResponse(response, { ...props, dataSource, dependencies })
-        : response;
-    }, []);
+    const dataSource = get(props, nameProp);
+    const fetch = useCallback(
+      async (...dependencies: any[]) => {
+        const response = await dataSource.fetchData(
+          mapRequestParams
+            ? mapRequestParams({ ...props, dataSource, dependencies })
+            : {},
+        );
+        return mapResponse
+          ? mapResponse(response, { ...props, dataSource, dependencies })
+          : response;
+      },
+      [dataSource.fetchFilters],
+    );
 
     const actionActionRunDependencies =
       typeof mapFetchActionDependencies === 'function'

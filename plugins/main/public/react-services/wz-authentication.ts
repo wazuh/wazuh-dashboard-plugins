@@ -42,9 +42,11 @@ export class WzAuthentication {
   private static async login(force = false) {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
-      while (!idHost) {
-        await new Promise(r => setTimeout(r, 500));
-        idHost = JSON.parse(AppState.getCurrentAPI()).id;
+
+      if (!idHost) {
+        throw new Error(
+          'It can not login into the server API due there is no selected API. Ensure the server API is selected and this is available.',
+        );
       }
 
       const response = await WzRequest.genericReq('POST', '/api/login', {
@@ -92,6 +94,9 @@ export class WzAuthentication {
         ),
       );
       store.dispatch(updateWithUserLogged(true));
+
+      // Set server API as available
+      WzRequest.serverAPIAvailable$.next(true);
     } catch (error) {
       const options: UIErrorLog = {
         context: `${WzAuthentication.name}.refresh`,
@@ -112,6 +117,8 @@ export class WzAuthentication {
         ),
       );
       store.dispatch(updateWithUserLogged(true));
+      // Set server API as unavailable
+      WzRequest.serverAPIAvailable$.next(false);
       return Promise.reject(error);
     }
   }
@@ -123,10 +130,11 @@ export class WzAuthentication {
    */
   private static async getUserPolicies() {
     try {
-      var idHost = JSON.parse(AppState.getCurrentAPI()).id;
-      while (!idHost) {
-        await new Promise(r => setTimeout(r, 500));
-        idHost = JSON.parse(AppState.getCurrentAPI()).id;
+      var idHost = JSON.parse(AppState.getCurrentAPI() as string).id;
+      if (!idHost) {
+        throw new Error(
+          'It can not get the user permissionsdue there is no selected API. Ensure the server API is selected and this is available.',
+        );
       }
       const response = await WzRequest.apiReq(
         'GET',

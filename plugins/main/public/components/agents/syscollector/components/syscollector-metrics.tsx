@@ -159,7 +159,7 @@ export const InventoryMetrics = withSystemInventoryDataSource(
         };
         fetchInventoryHardwareSystemData();
       }
-    }, [itHygieneDataSource.isLoading, agent.id]);
+    }, [itHygieneDataSource.isLoading, itHygieneDataSource.fetchFilters]);
 
     const items: IRibbonItem[] = [
       {

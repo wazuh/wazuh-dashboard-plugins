@@ -68,10 +68,7 @@ export const createPanel = ({
       isLoadingNameProp: 'dataSource.isLoading',
       LoadingComponent: LoadingSearchbarProgress,
     }),
-    withDataSourceInitiated({
-      isLoadingNameProp: 'dataSource.isLoading',
-      dataSourceNameProp: 'dataSource.dataSource',
-    }),
+    withDataSourceInitiated({}),
   )(
     ({
       dataSource: {

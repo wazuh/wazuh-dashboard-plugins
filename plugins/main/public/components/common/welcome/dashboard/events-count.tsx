@@ -4,8 +4,6 @@ import { AlertsDataSourceRepository } from '../../data-source/pattern/alerts/ale
 import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { useDataSource } from '../../data-source/hooks';
-import { PatternDataSource, tParsedIndexPattern } from '../../data-source';
 import {
   EuiPanel,
   EuiFlexItem,
@@ -15,23 +13,33 @@ import {
 } from '@elastic/eui';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
-import { withDataSourceInitiated, withDataSourceLoading } from '../../hocs';
+import {
+  withDataSource,
+  withDataSourceInitiated,
+  withDataSourceLoading,
+} from '../../hocs';
 import { compose } from 'redux';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 const EventsDashboard = compose(
+  withDataSource({
+    // FIXME: This data source has no the filter related to the server API context
+    DataSource: AlertsDataSource,
+    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  }),
   withDataSourceLoading({
-    isLoadingNameProp: 'isDataSourceLoading',
+    isLoadingNameProp: 'dataSource.isLoading',
     LoadingComponent: LoadingSearchbarProgress,
   }),
   withDataSourceInitiated({
-    dataSourceNameProp: 'dataSource',
-    isLoadingNameProp: 'isDataSourceLoading',
-    dataSourceErrorNameProp: 'error',
+    dataSourceNameProp: 'dataSource.dataSource',
+    isLoadingNameProp: 'dataSource.isLoading',
+    dataSourceErrorNameProp: 'dataSource.error',
   }),
-)(({ dataSource, fetchFilters, timeFilter }) => {
+)(({ dataSource: dataSourceInitiation, timeFilter }) => {
+  const { dataSource, fetchFilters } = dataSourceInitiation;
   return (
     <DashboardByRenderer
       input={{
@@ -58,16 +66,6 @@ const EventsDashboard = compose(
 });
 
 export const EventsCount = () => {
-  const {
-    dataSource,
-    fetchFilters,
-    isLoading: isDataSourceLoading,
-    error,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: AlertsDataSource,
-    repository: new AlertsDataSourceRepository(),
-  });
-
   const { timeFilter } = useTimeFilter();
 
   return (
@@ -83,13 +81,7 @@ export const EventsCount = () => {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='s' />
-        <EventsDashboard
-          isDataSourceLoading={isDataSourceLoading}
-          dataSource={dataSource}
-          fetchFilters={fetchFilters}
-          timeFilter={timeFilter}
-          error={error}
-        ></EventsDashboard>
+        <EventsDashboard timeFilter={timeFilter}></EventsDashboard>
       </EuiFlexItem>
     </EuiPanel>
   );

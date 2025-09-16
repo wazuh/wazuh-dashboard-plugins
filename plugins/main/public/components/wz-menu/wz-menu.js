@@ -12,6 +12,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import {
+  EuiButtonIcon,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPopover,
@@ -22,15 +23,9 @@ import {
   EuiSelect,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
-import { PatternHandler } from '../../react-services/pattern-handler';
-import { WazuhConfig } from '../../react-services/wazuh-config';
+
 import { connect } from 'react-redux';
-import store from '../../redux/store';
-import {
-  getToasts,
-  getDataPlugin,
-  getHeaderActionMenuMounter,
-} from '../../kibana-services';
+import { getHeaderActionMenuMounter } from '../../kibana-services';
 import { GenericRequest } from '../../react-services/generic-request';
 import { ApiCheck } from '../../react-services/wz-api-check';
 import { withWindowSize } from '../../components/common/hocs/withWindowSize';
@@ -42,115 +37,148 @@ import { setBreadcrumbs } from '../common/globalBreadcrumb/platformBreadcrumb';
 import WzDataSourceSelector from '../common/data-source/components/wz-data-source-selector/wz-data-source-selector';
 import { PinnedAgentManager } from '../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../react-services/navigation-service';
+import { useAsyncActionRunOnStart } from '../common/hooks';
+import { useSelectedServerApi } from '../common/hooks/use-selected-server-api';
+import {
+  AlertsDataSource,
+  AlertsDataSourceRepository,
+} from '../common/data-source';
+import { Selector, SelectorContainer, SelectorLabel } from './selectors';
+
+async function getServerAPIList() {
+  const response = await GenericRequest.request('GET', '/hosts/apis', {});
+  return response?.data;
+}
+
+const ServerAPISelector = ({ showSelectorsInPopover }) => {
+  const action = useAsyncActionRunOnStart(getServerAPIList, []);
+
+  const { selectedAPI: currentAPI } = useSelectedServerApi();
+
+  let style = { minWidth: 100, textOverflow: 'ellipsis' };
+  if (showSelectorsInPopover) {
+    style = { width: '100%', minWidth: 220 };
+  }
+
+  const notSelected = !Boolean(currentAPI);
+  const actionError =
+    action.error?.message ||
+    (!action.running && notSelected && 'Server API is not selected');
+
+  const isInvalid = Boolean(actionError);
+
+  const changeAPI = async event => {
+    try {
+      const apiId = event.target[event.target.selectedIndex];
+      const apiEntry = action.data?.filter(item => {
+        return item.id === apiId.value;
+      });
+      const response = await ApiCheck.checkApi(apiEntry[0]);
+      const clusterInfo = response.data || {};
+      const apiData = action.data?.filter(item => {
+        return item.id === apiId.value;
+      });
+
+      apiData[0].cluster_info = clusterInfo;
+
+      AppState.setClusterInfo(apiData[0].cluster_info);
+      AppState.setCurrentAPI(
+        JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
+      );
+      const pinnedAgentManager = new PinnedAgentManager();
+      const isPinnedAgent = pinnedAgentManager.isPinnedAgent();
+      if (isPinnedAgent) {
+        pinnedAgentManager.unPinAgent();
+      }
+
+      /* TODO: this reloads the page to force the components are remounted with the new
+          selection of. To avoid this refresh, we would have to do the components are able to react
+          to these changes redoing the requests, etc... This will need a considerable time to
+          apply the changes. The reload of the pages is the same behavior used for the routing based
+          on AngularJS.
+          */
+      NavigationService.getInstance().reload();
+    } catch (error) {
+      const options = {
+        context: `${WzMenu.name}.${changeAPI.name}`,
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: `Error changing the selected API`,
+        },
+      };
+      getErrorOrchestrator().handleError(options);
+    }
+  };
+
+  return (
+    <SelectorContainer>
+      <SelectorLabel
+        actionError={actionError}
+        showSelectorsInPopover={showSelectorsInPopover}
+      >
+        API
+      </SelectorLabel>
+      <Selector showSelectorsInPopover={showSelectorsInPopover}>
+        <div style={style}>
+          <EuiSelect
+            id='selectAPIBar'
+            fullWidth={true}
+            options={
+              action.data?.map(item => {
+                return { value: item.id, text: item.id };
+              }) || []
+            }
+            value={currentAPI?.id}
+            onChange={changeAPI}
+            aria-label='API selector'
+            hasNoInitialSelection={notSelected}
+            isInvalid={isInvalid}
+            append={
+              <EuiButtonIcon
+                iconType='refresh'
+                color='primary'
+                isDisabled={action.running}
+                onClick={() => {
+                  action.run();
+                }}
+              ></EuiButtonIcon>
+            }
+          />
+        </div>
+      </Selector>
+    </SelectorContainer>
+  );
+};
+
+const AlertsIndexPatternSelector = ({ showSelectorsInPopover, appConfig }) => {
+  return (
+    <WzDataSourceSelector
+      name='index pattern'
+      DataSource={AlertsDataSource}
+      DataSourceRepositoryCreator={AlertsDataSourceRepository}
+      refetchDependencies={[appConfig?.data?.['ip.ignore']]}
+      showSelectorsInPopover={showSelectorsInPopover}
+    />
+  );
+};
 
 export const WzMenu = withWindowSize(
   class WzMenu extends Component {
     constructor(props) {
       super(props);
       this.state = {
-        menuOpened: false,
-        currentAPI: this.props.state.currentAPI || '',
-        APIlist: [],
-        showSelector: false,
-        theresPattern: false,
-        currentPattern: '',
-        patternList: [],
-        currentSelectedPattern: '',
+        isSelectorsPopoverOpen: false,
       };
-      this.store = store;
-      this.genericReq = GenericRequest;
-      this.wazuhConfig = new WazuhConfig();
-      this.indexPatterns = getDataPlugin().indexPatterns;
-      this.isLoading = false;
-      this.pinnedAgentManager = new PinnedAgentManager();
     }
 
     async componentDidMount() {
       setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
-      try {
-        const APIlist = await this.loadApiList();
-        this.setState({ APIlist: APIlist });
-        if (APIlist.length) {
-          const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
-          const filteredApi = APIlist.filter(api => api.id === apiId);
-          const selectedApi = filteredApi[0];
-          if (selectedApi) {
-            const apiData = await ApiCheck.checkStored(selectedApi.id);
-            //update cluster info
-            const cluster_info = apiData?.data?.data?.cluster_info;
-            if (cluster_info) {
-              AppState.setClusterInfo(cluster_info);
-            }
-          }
-        }
-      } catch (error) {
-        const options = {
-          context: `${WzMenu.name}.componentDidMount`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
-          store: true,
-          display: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-
-      try {
-        const additionalState = await this.loadIndexPatternsList();
-        this.setState(state => ({ ...state, ...additionalState }));
-      } catch (e) {}
     }
 
-    showToast = (color, title, text, time) => {
-      getToasts().add({
-        color: color,
-        title: title,
-        text: text,
-        toastLifeTimeMs: time,
-      });
-    };
-
-    loadApiList = async () => {
-      const result = await this.genericReq.request('GET', '/hosts/apis', {});
-      const APIlist = (result || {}).data || [];
-      return APIlist;
-    };
-
     async componentDidUpdate(prevProps) {
-      let newState = {};
-      const { id: apiId } = JSON.parse(AppState.getCurrentAPI());
-      const { currentAPI } = this.state;
-
-      if (this.props.windowSize) {
-        this.showSelectorsInPopover = this.props.windowSize.width < 1100;
-      }
-
-      if ((!currentAPI && apiId) || apiId !== currentAPI) {
-        newState = { ...newState, currentAPI: apiId };
-      } else {
-        if (
-          currentAPI &&
-          this.props.state.currentAPI &&
-          currentAPI !== this.props.state.currentAPI
-        ) {
-          newState = { ...newState, currentAPI: this.props.state.currentAPI };
-        }
-      }
-      if (
-        !this.isLoading &&
-        !_.isEqual(
-          prevProps?.appConfig?.data?.['ip.ignore'],
-          this.props?.appConfig?.data?.['ip.ignore'],
-        )
-      ) {
-        this.isLoading = true;
-        newState = { ...newState, ...(await this.loadIndexPatternsList()) };
-      }
-
       if (
         !_.isEqual(
           this.props.globalBreadcrumbReducers.breadcrumb,
@@ -159,130 +187,7 @@ export const WzMenu = withWindowSize(
       ) {
         setBreadcrumbs(this.props.globalBreadcrumbReducers.breadcrumb);
       }
-      newState = { ...prevProps.state, ...newState };
-      if (!_.isEqual(newState, prevProps.state)) {
-        // FIXME: this will not update the state if the prevProps.state is equal to the newState, this means the component state could not be updated despite this is different to the newState
-        // and the state is different from the previous one
-        this.setState(newState);
-      }
     }
-
-    async loadIndexPatternsList() {
-      try {
-        let newState = {};
-
-        let list = await PatternHandler.getPatternList('api');
-        if (!list || (list && !list.length)) return;
-        this.props?.appConfig?.data?.['ip.ignore']?.length &&
-          (list = list.filter(
-            indexPattern =>
-              !this.props?.appConfig?.data?.['ip.ignore'].includes(
-                indexPattern.title,
-              ),
-          ));
-
-        let filtered = false;
-        // If there is no current pattern, fetch it
-        if (!AppState.getCurrentPattern()) {
-          AppState.setCurrentPattern(list[0].id);
-        } else {
-          // Check if the current pattern cookie is valid
-          filtered = list.find(item =>
-            item.id.includes(AppState.getCurrentPattern()),
-          );
-          if (!filtered) AppState.setCurrentPattern(list[0].id);
-        }
-
-        const data = filtered
-          ? filtered
-          : await this.indexPatterns.get(AppState.getCurrentPattern());
-        newState = {
-          ...newState,
-          theresPattern: true,
-          currentPattern: data.title,
-        };
-
-        // Getting the list of index patterns
-        if (list) {
-          newState = {
-            ...newState,
-            patternList: list,
-            currentSelectedPattern: AppState.getCurrentPattern(),
-          };
-        }
-        this.isLoading = false;
-        return newState;
-      } catch (error) {
-        this.isLoading = false;
-        const options = {
-          context: `${WzMenu.name}.load`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: true,
-          display: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: error.name || error,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    }
-
-    updatePatternAndApi = async () => {
-      this.setState({
-        menuOpened: false, // TODO: this seems that is unused
-        ...{ APIlist: await this.loadApiList() },
-        ...(await this.loadIndexPatternsList()),
-      });
-    };
-
-    changeAPI = async event => {
-      try {
-        const apiId = event.target[event.target.selectedIndex];
-        const apiEntry = this.state.APIlist.filter(item => {
-          return item.id === apiId.value;
-        });
-        const response = await ApiCheck.checkApi(apiEntry[0]);
-        const clusterInfo = response.data || {};
-        const apiData = this.state.APIlist.filter(item => {
-          return item.id === apiId.value;
-        });
-
-        apiData[0].cluster_info = clusterInfo;
-
-        AppState.setClusterInfo(apiData[0].cluster_info);
-        AppState.setCurrentAPI(
-          JSON.stringify({ name: apiData[0].manager, id: apiId.value }),
-        );
-        const isPinnedAgent = this.pinnedAgentManager.isPinnedAgent();
-        if (isPinnedAgent) {
-          this.pinnedAgentManager.unPinAgent();
-        }
-        if (this.state.currentMenuTab !== 'wazuh-dev') {
-          /* TODO: this reloads the page to force the components are remounted with the new
-          selection of. To avoid this refresh, we would have to do the components are able to react
-          to these changes redoing the requests, etc... This will need a considerable time to
-          apply the changes. The reload of the pages is the same behavior used for the routing based
-          on AngularJS.
-          */
-          NavigationService.getInstance().reload();
-        }
-      } catch (error) {
-        const options = {
-          context: `${WzMenu.name}.changePattern`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error changing the selected API`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    };
 
     buildWazuhNotReadyYet() {
       const container = document.getElementsByClassName('wazuhNotReadyYet');
@@ -323,88 +228,6 @@ export const WzMenu = withWindowSize(
       );
     }
 
-    getApiSelectorComponent() {
-      let style = { minWidth: 100, textOverflow: 'ellipsis' };
-      if (this.showSelectorsInPopover) {
-        style = { width: '100%', minWidth: 200 };
-      }
-
-      return (
-        <>
-          <EuiFlexItem grow={this.showSelectorsInPopover}>
-            <p>API</p>
-          </EuiFlexItem>
-          <EuiFlexItem grow={this.showSelectorsInPopover}>
-            <div style={style}>
-              <EuiSelect
-                id='selectAPIBar'
-                fullWidth={true}
-                options={this.state.APIlist.map(item => {
-                  return { value: item.id, text: item.id };
-                })}
-                value={this.state.currentAPI}
-                onChange={this.changeAPI}
-                aria-label='API selector'
-              />
-            </div>
-          </EuiFlexItem>
-        </>
-      );
-    }
-
-    onChangePattern = async pattern => {
-      try {
-        this.setState({ currentSelectedPattern: pattern.id });
-        if (this.state.currentMenuTab !== 'wazuh-dev') {
-          /* TODO: this reloads the page to force the components are remounted with the new
-          selection of. To avoid this refresh, we would have to do the components are able to react
-          to these changes redoing the requests, etc... This will need a considerable time to
-          apply the changes. The reload of the pages is the same behavior used for the routing based
-          on AngularJS.
-          */
-          NavigationService.getInstance().reload();
-        }
-        await this.updatePatternAndApi();
-      } catch (error) {
-        const options = {
-          context: `${WzMenu.name}.onChangePattern`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          store: false,
-          display: true,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `Error changing the Index Pattern`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-    };
-
-    getIndexPatternSelectorComponent() {
-      let style = { maxWidth: 200, maxHeight: 50 };
-      if (this.showSelectorsInPopover) {
-        style = { width: '100%', maxHeight: 50, minWidth: 200 };
-      }
-
-      return (
-        <>
-          <EuiFlexItem grow={this.showSelectorsInPopover}>
-            <p>Index pattern</p>
-          </EuiFlexItem>
-          <EuiFlexItem grow={this.showSelectorsInPopover}>
-            <div style={style}>
-              <WzDataSourceSelector
-                onChange={this.onChangePattern}
-                name='index pattern'
-              />
-            </div>
-          </EuiFlexItem>
-        </>
-      );
-    }
-
     switchSelectorsPopOver() {
       this.setState({
         isSelectorsPopoverOpen: !this.state.isSelectorsPopoverOpen,
@@ -425,6 +248,9 @@ export const WzMenu = withWindowSize(
         </EuiToolTip>
       );
 
+      const showSelectorsInPopover =
+        this.props.windowSize && this.props.windowSize.width < 1100;
+
       return (
         <>
           <MountPointPortal setMountPoint={getHeaderActionMenuMounter()}>
@@ -433,47 +259,50 @@ export const WzMenu = withWindowSize(
               responsive={false}
               className='wz-margin-left-10 wz-margin-right-10 font-size-14'
             >
-              {!this.showSelectorsInPopover &&
-                this.state.patternList.length > 1 &&
-                this.getIndexPatternSelectorComponent()}
-
-              {!this.showSelectorsInPopover &&
-                this.state.APIlist.length > 1 &&
-                this.getApiSelectorComponent()}
-
-              {this.showSelectorsInPopover &&
-                (this.state.patternList.length > 1 ||
-                  this.state.APIlist.length > 1) && (
-                  <>
-                    <EuiFlexItem grow={false}>
-                      <EuiPopover
-                        ownFocus
-                        anchorPosition='downCenter'
-                        button={openSelectorsButton}
-                        isOpen={this.state.isSelectorsPopoverOpen}
-                        closePopover={() => this.switchSelectorsPopOver()}
+              {(showSelectorsInPopover && (
+                <>
+                  <EuiFlexItem grow={false}>
+                    <EuiPopover
+                      ownFocus
+                      anchorPosition='downCenter'
+                      button={openSelectorsButton}
+                      isOpen={this.state.isSelectorsPopoverOpen}
+                      closePopover={() => this.switchSelectorsPopOver()}
+                    >
+                      <EuiFlexGroup
+                        alignItems='center'
+                        style={{ paddingTop: 5 }}
                       >
-                        {this.state.patternList.length > 1 && (
-                          <EuiFlexGroup
-                            alignItems='center'
-                            style={{ paddingTop: 5 }}
-                          >
-                            {this.getIndexPatternSelectorComponent()}
-                          </EuiFlexGroup>
-                        )}
-                        {this.state.APIlist.length > 1 && (
-                          <EuiFlexGroup
-                            alignItems='center'
-                            style={{ paddingTop: 5 }}
-                            direction='row'
-                          >
-                            {this.getApiSelectorComponent()}
-                          </EuiFlexGroup>
-                        )}
-                      </EuiPopover>
-                    </EuiFlexItem>
-                  </>
-                )}
+                        <AlertsIndexPatternSelector
+                          showSelectorsInPopover={showSelectorsInPopover}
+                        />
+                      </EuiFlexGroup>
+                      <EuiFlexGroup
+                        alignItems='center'
+                        style={{ paddingTop: 5 }}
+                        direction='row'
+                      >
+                        <ServerAPISelector
+                          showSelectorsInPopover={showSelectorsInPopover}
+                        />
+                      </EuiFlexGroup>
+                    </EuiPopover>
+                  </EuiFlexItem>
+                </>
+              )) || (
+                <>
+                  <EuiFlexItem grow={showSelectorsInPopover}>
+                    <AlertsIndexPatternSelector
+                      showSelectorsInPopover={showSelectorsInPopover}
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={showSelectorsInPopover}>
+                    <ServerAPISelector
+                      showSelectorsInPopover={showSelectorsInPopover}
+                    />
+                  </EuiFlexItem>
+                </>
+              )}
               {this.props.state.wazuhNotReadyYet &&
                 this.buildWazuhNotReadyYet()}
             </EuiFlexGroup>

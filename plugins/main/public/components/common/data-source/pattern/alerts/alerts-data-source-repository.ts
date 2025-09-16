@@ -1,5 +1,10 @@
 import { AppState } from '../../../../../react-services';
-import { PatternDataSourceRepository } from '../pattern-data-source-repository';
+import { PatternDataSourceFactory } from '../pattern-data-source-factory';
+import {
+  PatternDataSourceRepository,
+  tParsedIndexPattern,
+} from '../pattern-data-source-repository';
+import { AlertsDataSource } from './alerts-data-source';
 
 const ALERTS_REQUIRED_FIELDS = [
   'timestamp',
@@ -15,6 +20,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
 
   async getAll() {
     const indexPatterns = await super.getAll();
+    // FIXME: this should take into account the ip.ignore setting to filter the index patterns
     return indexPatterns.filter(this.checkIfAlertsIndexPattern);
   }
 
@@ -65,7 +71,54 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
     return dataSource;
   }
 
+  setDefault(dataSource: tParsedIndexPattern): void {
+    if (!dataSource) {
+      throw new Error('Index pattern is required');
+    }
+    AppState.setCurrentPattern(dataSource.id);
+  }
+
   getStoreIndexPatternId(): string {
     return AppState.getCurrentPattern();
   }
+
+  async setupDefault(dataSources): Promise<void> {
+    if (!this.getStoreIndexPatternId()) {
+      const [dataSource] = dataSources;
+
+      if (!dataSource) {
+        throw new Error('No compatible index patterns found.');
+      }
+
+      AppState.setCurrentPattern(dataSource.id);
+    }
+  }
+}
+
+/* WORKAROUND: This is a workaround to ensure the default alerts index pattern is set when the app starts.
+  Multiple UI views depend on the alerts index pattern is created. This method try to set the cookie
+  where the alerts index pattern ID is stored.
+
+  This logic could be moved to another service.
+*/
+export async function AlertsDataSourceSetup() {
+  const selectedIndexPatternId = AppState.getCurrentPattern();
+
+  const factory = new PatternDataSourceFactory();
+  const repository = new AlertsDataSourceRepository();
+
+  const dataSources = await factory.createAll(
+    AlertsDataSource,
+    await repository.getAll(),
+  );
+
+  // Check if the selected index pattern Id in cookie exists and skip
+  if (
+    selectedIndexPatternId &&
+    dataSources.find(({ id }) => id === selectedIndexPatternId)
+  ) {
+    return;
+  }
+
+  await repository.setupDefault(dataSources);
 }

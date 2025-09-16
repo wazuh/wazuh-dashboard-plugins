@@ -63,7 +63,12 @@ const MitreTopTacticsTactics = compose(
       };
     },
     mapFetchActionDependencies(props) {
-      return [props.agentId, props.timeFilter];
+      return [
+        props.timeFilter,
+        /* Changing the agent causes the fetchFilters change, and the HOC manage this case so it is not
+    requried adding the agent to the dependencies */
+        ,
+      ];
     },
     mapResponse(response) {
       return response?.aggregations?.tactics?.buckets;
@@ -160,7 +165,12 @@ const MitreTopTacticsTechniquesBody = compose(
       };
     },
     mapFetchActionDependencies(props) {
-      return [props.agentId, props.timeFilter, props.selectedTactic];
+      return [
+        props.timeFilter,
+        props.selectedTactic,
+        /* Changing the agent causes the fetchFilters change, and the HOC manage this case so it is not
+    requried adding the agent to the dependencies */
+      ];
     },
     mapResponse(response, props) {
       return [];
