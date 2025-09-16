@@ -2,7 +2,7 @@
 
 This folder contains the technical documentation for the Wazuh dashboard. The documentation is organized into the following guides:
 
-- **Development Guide**: Instructions for building, testing, and packaging the agent.
+- **Development Guide**: Instructions for building, testing, and packaging the application.
 - **Reference Manual**: Detailed information on the agent’s architecture, configuration, and usage.
 - **Diagnostic Guide**: Steps to diagnose errors and resolve common issues.
 
