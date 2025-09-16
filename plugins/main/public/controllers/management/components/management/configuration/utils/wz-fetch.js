@@ -16,7 +16,7 @@ import { delayAsPromise } from '../../../../../../../common/utils';
 import { AGENT_SYNCED_STATUS } from '../../../../../../../common/constants';
 
 /**
- * Get configuration for an agent/manager of request sections
+ * Get configuration for an agent of request sections
  * @param {string} [agentId=000] Agent ID
  * @param {array} sections Sections
  * @param {false} [node=false] Node
@@ -242,7 +242,7 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
 };
 
 /**
- * Fetch a config file from cluster node or manager
+ * Fetch a config file from cluster node
  * @return {string}
  */
 export const fetchFile = async selectedNode => {
@@ -271,7 +271,7 @@ export const fetchFile = async selectedNode => {
 };
 
 /**
- * Restart a node or manager
+ * Restart a node
  * @param {} selectedNode Cluster Node
  * @param updateWazuhNotReadyYet
  */
