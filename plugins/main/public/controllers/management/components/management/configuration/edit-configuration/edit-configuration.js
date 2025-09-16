@@ -229,10 +229,6 @@ class WzEditConfiguration extends Component {
     } catch (error) {
       this.props.updateClusterNodes(false);
       this.props.updateClusterNodeSelected(false);
-      this.props.updateConfigurationSection(
-        'edit-configuration',
-        'Cluster configuration',
-      );
       throw error;
     }
   }
