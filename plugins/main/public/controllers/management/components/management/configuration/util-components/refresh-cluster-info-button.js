@@ -53,7 +53,7 @@ class WzRefreshClusterInfoButton extends Component {
       this.props.updateClusterNodes(false);
       this.props.updateClusterNodeSelected(false);
       const options = {
-        context: `${WzRefreshClusterInfoButton.name}.refreshClusterNodes`,
+        context: `${WzRefreshClusterInfoButton.name}.${this.refreshClusterNodes.name}`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         error: {
