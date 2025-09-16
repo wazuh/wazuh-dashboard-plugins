@@ -62,11 +62,9 @@ export const WAZUH_IT_HYGIENE_PROCESSES_PATTERN =
   'wazuh-states-inventory-processes*';
 export const WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN =
   'wazuh-states-inventory-protocols*';
-export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN =
-  'wazuh-states-inventory-system*';
+export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN = 'wazuh-states-inventory-system*';
 export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users*';
-export const WAZUH_IT_HYGIENE_GROUPS_PATTERN =
-  'wazuh-states-inventory-groups*';
+export const WAZUH_IT_HYGIENE_GROUPS_PATTERN = 'wazuh-states-inventory-groups*';
 export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
   'wazuh-states-inventory-services*';
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
