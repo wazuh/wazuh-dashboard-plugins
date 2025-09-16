@@ -464,7 +464,7 @@ export default compose(
             resource: `agent:group:${group}`,
           })),
         ],
-  ]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
+  ]),
   withRenderIfOrWrapped(
     props =>
       props.agent.id !== '000' &&
