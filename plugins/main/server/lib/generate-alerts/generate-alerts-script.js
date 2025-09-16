@@ -34,12 +34,9 @@ const Authentication = require('./sample-data/authentication');
 const AWS = require('./sample-data/aws');
 const Azure = require('./sample-data/azure');
 const IntegrityMonitoring = require('./sample-data/integrity-monitoring');
-const CISCAT = require('./sample-data/ciscat');
 const GCP = require('./sample-data/gcp');
 const Docker = require('./sample-data/docker');
 const Mitre = require('./sample-data/mitre');
-const Osquery = require('./sample-data/osquery');
-const OpenSCAP = require('./sample-data/openscap');
 const PolicyMonitoring = require('./sample-data/policy-monitoring');
 const Virustotal = require('./sample-data/virustotal');
 const Vulnerability = require('./sample-data/vulnerabilities');
@@ -540,24 +537,6 @@ function generateAlert(params) {
     alert.rule = dataAudit.rule;
   }
 
-  if (params.ciscat) {
-    alert.rule.groups.push('ciscat');
-    alert.data.cis = {};
-
-    alert.data.cis.group = Random.arrayItem(CISCAT.group);
-    alert.data.cis.fail = Random.number(0, 100);
-    alert.data.cis.rule_title = Random.arrayItem(CISCAT.ruleTitle);
-    alert.data.cis.notchecked = Random.number(0, 100);
-    alert.data.cis.score = Random.number(0, 100);
-    alert.data.cis.pass = Random.number(0, 100);
-    alert.data.cis.timestamp = new Date(Random.date());
-    alert.data.cis.error = Random.number(0, 1);
-    alert.data.cis.benchmark = Random.arrayItem(CISCAT.benchmark);
-    alert.data.cis.unknown = Random.number(0, 100);
-    alert.data.cis.notchecked = Random.number(0, 5);
-    alert.data.cis.result = Random.arrayItem(CISCAT.result);
-  }
-
   if (params.docker) {
     const dataDocker = Random.arrayItem(Docker.dataDocker);
     alert.data = {};
@@ -568,23 +547,6 @@ function generateAlert(params) {
   if (params.mitre) {
     alert.rule = Random.arrayItem(Mitre.arrayMitreRules);
     alert.location = Random.arrayItem(Mitre.arrayLocation);
-  }
-
-  if (params.openscap) {
-    alert.data = {};
-    alert.data.oscap = {};
-    const typeAlert = { ...Random.arrayItem(OpenSCAP.data) };
-    alert.data = { ...typeAlert.data };
-    alert.rule = { ...typeAlert.rule };
-    alert.rule.firedtimes = Random.number(2, 10);
-    alert.input = {
-      type: 'log',
-    };
-    alert.decoder = { ...OpenSCAP.decoder };
-    alert.location = OpenSCAP.location;
-    if (typeAlert.full_log) {
-      alert.full_log = interpolateAlertProps(typeAlert.full_log, alert);
-    }
   }
 
   if (params.rootcheck) {
@@ -757,22 +719,6 @@ function generateAlert(params) {
     alert.data = {
       ...dataVulnerability.data,
     };
-  }
-
-  if (params.osquery) {
-    alert.rule.groups.push('osquery');
-    alert.data.osquery = {};
-    if (Random.number(0, 5) === 0) {
-      alert.rule.description = 'osquery error message';
-    } else {
-      const dataOsquery = Random.arrayItem(Osquery.dataOsquery);
-      alert.data.osquery = dataOsquery.osquery;
-      alert.data.osquery.calendarTime = alert.timestamp;
-      alert.rule.description = dataOsquery.rule.description;
-      Random.number(0, 99) === 0
-        ? (alert.data.osquery.action = 'removed')
-        : null;
-    }
   }
 
   // Regulatory compliance

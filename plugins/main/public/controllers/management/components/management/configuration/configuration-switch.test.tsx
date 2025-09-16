@@ -43,13 +43,7 @@ jest.mock('./alerts/alerts-labels', () => ({
 
 jest.mock('./policy-monitoring/policy-monitoring', () => () => <></>);
 
-jest.mock('./open-scap/open-scap', () => () => <></>);
-
-jest.mock('./cis-cat/cis-cat', () => () => <></>);
-
 jest.mock('./vulnerabilities/vulnerabilities', () => () => <></>);
-
-jest.mock('./osquery/osquery', () => () => <></>);
 
 jest.mock('./inventory/inventory', () => () => <></>);
 

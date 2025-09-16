@@ -84,11 +84,8 @@
     office: { office: true },
     rootcheck: { rootcheck: true },
     audit: { audit: true },
-    openscap: { openscap: true },
-    ciscat: { ciscat: true },
     vulnerabilities: { vulnerabilities: true },
     virustotal: { virustotal: true },
-    osquery: { osquery: true },
     docker: { docker: true },
     mitre: { mitre: true },
     yara: { yara: true },
@@ -108,15 +105,8 @@
       'web',
       'windows',
     ],
-    'auditing-policy-monitoring': [
-      'audit',
-      'ciscat',
-      'openscap',
-      'rootcheck',
-      'virustotal',
-      'yara',
-    ],
-    'thread-detection': ['docker', 'mitre', 'osquery', 'vulnerabilities'],
+    'auditing-policy-monitoring': ['audit', 'rootcheck', 'virustotal', 'yara'],
+    'thread-detection': ['docker', 'mitre', 'vulnerabilities'],
   };
 
   function displayHelp() {

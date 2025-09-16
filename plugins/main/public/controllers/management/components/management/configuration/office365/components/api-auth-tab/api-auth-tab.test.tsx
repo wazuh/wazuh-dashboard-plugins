@@ -18,10 +18,10 @@ jest.mock('../../../../../../../../kibana-services', () => ({
   getUiSettings: () => ({
     get: (uiSetting: string) => {
       if (uiSetting === 'theme:darkMode') {
-        return false
+        return false;
       }
-    }
-  })
+    },
+  }),
 }));
 
 describe('ApiAuthTab component', () => {
@@ -55,7 +55,9 @@ describe('ApiAuthTab component', () => {
     };
     const agent = { id: '000' };
 
-    const wrapper = mount(<ApiAuthTab wodleConfiguration={wodleConfiguration} agent={agent} />);
+    const wrapper = mount(
+      <ApiAuthTab wodleConfiguration={wodleConfiguration} agent={agent} />,
+    );
 
     expect(wrapper).toMatchSnapshot();
   });
