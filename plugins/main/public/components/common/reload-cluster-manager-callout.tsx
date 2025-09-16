@@ -25,19 +25,18 @@ import {
 import { getToasts } from '../../kibana-services';
 import { reloadRuleset } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
-interface IWzReloadClusterManagerCalloutProps {
-  updateWazuhNotReadyYet: (wazuhNotReadyYet) => void;
+interface IWzReloadClusterCalloutProps {
   onReloaded: () => void;
   onReloadedError: () => void;
 }
 
-interface IWzReloadClusterManagerCalloutState {
+interface IWzReloadClusterCalloutState {
   warningReloading: boolean;
 }
 
-class WzReloadClusterManagerCallout extends Component<
-  IWzReloadClusterManagerCalloutProps,
-  IWzReloadClusterManagerCalloutState
+class WzReloadClusterCallout extends Component<
+  IWzReloadClusterCalloutProps,
+  IWzReloadClusterCalloutState
 > {
   constructor(props) {
     super(props);
@@ -166,4 +165,4 @@ class WzReloadClusterManagerCallout extends Component<
   }
 }
 
-export default WzReloadClusterManagerCallout;
+export default WzReloadClusterCallout;

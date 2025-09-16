@@ -35,7 +35,7 @@ import validateConfigAfterSent from './valid-configuration';
 
 import { getToasts } from '../../../../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzReloadClusterManagerCallout from '../../../../../components/common/reload-cluster-manager-callout';
+import WzReloadClusterCallout from '../../../../../components/common/reload-cluster-manager-callout';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';
@@ -396,7 +396,7 @@ class WzFileEditor extends Component {
                 <EuiSpacer size='m' />
                 {this.state.showWarningRestart && (
                   <Fragment>
-                    <WzReloadClusterManagerCallout
+                    <WzReloadClusterCallout
                       onReloaded={() =>
                         this.setState({ showWarningRestart: false })
                       }

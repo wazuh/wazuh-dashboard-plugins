@@ -20,7 +20,7 @@ import { SECTION_RULES_KEY } from '../../common/constants';
 import RulesetTable from '../components/ruleset-table';
 import '../../common/layout-overview.scss';
 import { rules } from '../../../../../../utils/applications';
-import WzReloadClusterManagerCallout from '../../../../../../components/common/reload-cluster-manager-callout';
+import WzReloadClusterCallout from '../../../../../../components/common/reload-cluster-manager-callout';
 
 function WzRulesetOverview(props) {
   const [showWarningRestart, setShowWarningRestart] = useState(false);
@@ -31,7 +31,7 @@ function WzRulesetOverview(props) {
         {showWarningRestart && (
           <>
             <EuiSpacer size='s' />
-            <WzReloadClusterManagerCallout
+            <WzReloadClusterCallout
               onReloaded={() => setShowWarningRestart(false)}
               onReloadedError={() => setShowWarningRestart(true)}
             />
