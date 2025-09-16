@@ -35,6 +35,9 @@ async function checkVDIsEnabledCluster() {
 export const ModuleEnabledCheck = () => {
   const [data, setData] = useState<{ enabled: boolean } | null>(null);
   const [userPermissionRequirements] = useUserPermissionsRequirements([
+    // FIXME: The permission for cluster:status is kept even though it should be removed.
+    // This triggers an error when trying to access Indexer Management » Settings
+    { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]);
 

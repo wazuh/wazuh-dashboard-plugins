@@ -150,6 +150,7 @@ class WzGroupsEditor extends Component {
       <WzButtonPermissions
         permissions={[
           { action: 'group:update_config', resource: `group:id:${groupName}` },
+          { action: 'cluster:status', resource: '*:*:*' },
         ]}
         fill
         iconType={isEditable && xmlError ? 'alert' : 'save'}

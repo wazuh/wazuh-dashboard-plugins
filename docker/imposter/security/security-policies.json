@@ -299,6 +299,7 @@
         "name": "cluster_all_resourceless",
         "policy": {
           "actions": [
+            "cluster:status",
             "cluster:read",
             "cluster:read_api_config",
             "cluster:update_config",
@@ -328,7 +329,11 @@
         "id": 31,
         "name": "cluster_read_resourceless",
         "policy": {
-          "actions": ["cluster:read", "cluster:read_api_config"],
+          "actions": [
+            "cluster:status",
+            "cluster:read",
+            "cluster:read_api_config"
+          ],
           "resources": ["*:*:*"],
           "effect": "allow"
         },

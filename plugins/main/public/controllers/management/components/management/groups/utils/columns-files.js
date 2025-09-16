@@ -77,6 +77,7 @@ export default class GroupsFilesColumns {
                       action: 'group:update_config',
                       resource: `group:id:${itemDetail.name}`,
                     },
+                    { action: 'cluster:status', resource: '*:*:*' },
                   ]}
                   tooltip={{
                     position: 'top',

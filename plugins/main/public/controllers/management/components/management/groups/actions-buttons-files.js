@@ -62,6 +62,7 @@ class WzGroupsActionButtonsFiles extends Component {
             action: 'group:update_config',
             resource: `group:id:${this.props.state.itemDetail.name}`,
           },
+          { action: 'cluster:status', resource: '*:*:*' },
         ]}
         iconSide='left'
         iconType='documentEdit'
