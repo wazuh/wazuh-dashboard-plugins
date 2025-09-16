@@ -1003,17 +1003,18 @@ export class WazuhApiCtrl {
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
-      if (isValid) {
+      isValid && context.wazuh.logger.debug('Wazuh is ready');
+
+      if (path === '/ping') {
         return { isValid };
-      } else {
-        context.wazuh.logger.warn('Server not ready yet');
-        return { isValid: false };
+      }
+
+      if (!isValid) {
+        throw new Error('Server not ready yet');
       }
     } catch (error) {
-      context.wazuh.logger.error(
-        `Error checking daemons: ${error.message || error}`,
-      );
-      return { isValid: false };
+      context.wazuh.logger.error(error.message || error);
+      return Promise.reject(error);
     }
   }
 }
