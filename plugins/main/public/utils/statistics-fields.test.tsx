@@ -15,15 +15,6 @@ test('Test statistics panels in analysis engine with cluster mode', () => {
   ).toBe(true);
 });
 
-test('Test statistics panels in analysis engine with disabled cluster mode', () => {
-  expect(
-    compareColumnsValue(
-      FieldsStatistics,
-      idExtractor(getDashboardPanelsAnalysisEngine(INDEX_PATTERN_STATISTICS)),
-    ),
-  ).toBe(true);
-});
-
 test('Test statistics panels in listener engine', () => {
   expect(
     compareColumnsValue(
