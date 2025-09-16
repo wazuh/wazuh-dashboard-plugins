@@ -106,11 +106,11 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(true);
       this.props.updateSelectedNode(node);
 
-      const agentsCountByManagerNodes =
+      const agentDistributionByCluster =
         await this.statusHandler.clusterAgentsCount();
 
       const { connection: agentsCount } =
-        agentsCountByManagerNodes?.data?.data?.agent_status;
+        agentDistributionByCluster?.data?.data?.agent_status;
 
       const agentsActiveCoverage = (
         (agentsCount.active / agentsCount.total) *
@@ -118,7 +118,8 @@ class WzStatusActionButtons extends Component {
       ).toFixed(2);
 
       this.props.updateStats({
-        agentsCountByManagerNodes: agentsCountByManagerNodes?.data?.data?.nodes,
+        agentDistributionByCluster:
+          agentDistributionByCluster?.data?.data?.nodes,
         agentsCount,
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
@@ -131,7 +132,7 @@ class WzStatusActionButtons extends Component {
       this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
 
       const [lastAgent] =
-        agentsCountByManagerNodes?.data?.data?.last_registered_agent;
+        agentDistributionByCluster?.data?.data?.last_registered_agent;
 
       this.props.updateAgentInfo(lastAgent);
 
@@ -189,8 +190,7 @@ class WzStatusActionButtons extends Component {
   };
 
   render() {
-    const { isLoading, listNodes, selectedNode, clusterEnabled } =
-      this.props.state;
+    const { isLoading, listNodes, selectedNode } = this.props.state;
 
     let options = this.transforToOptions(listNodes);
 
@@ -213,7 +213,7 @@ class WzStatusActionButtons extends Component {
       <WzButtonPermissions
         buttonType='empty'
         permissions={[
-          clusterEnabled && {
+          {
             action: 'cluster:restart',
             resource: 'node:id:*',
           },
@@ -223,7 +223,7 @@ class WzStatusActionButtons extends Component {
         isDisabled={isLoading}
         isLoading={this.state.isRestarting}
       >
-        {clusterEnabled && 'Restart cluster'}
+        {'Restart cluster'}
       </WzButtonPermissions>
     );
 
@@ -233,12 +233,10 @@ class WzStatusActionButtons extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title={clusterEnabled ? 'Cluster will be restarted' : null}
+            title='Cluster will be restarted'
             onCancel={this.closeModal}
             onConfirm={() => {
-              if (clusterEnabled) {
-                this.restartCluster();
-              }
+              this.restartCluster();
               this.setState({ isModalVisible: false });
             }}
             cancelButtonText='Cancel'
