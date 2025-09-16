@@ -12,12 +12,13 @@
 
 import { WzRequest } from '../../../../../react-services/wz-request';
 
-const validateConfigAfterSent = async (node = false) => {
+const validateConfigAfterSent = async () => {
   try {
-    const endpoint = node
-      ? `/cluster/${node}/configuration/validation`
-      : '/cluster/configuration/validation';
-    const validation = await WzRequest.apiReq('GET', endpoint, {});
+    const validation = await WzRequest.apiReq(
+      'GET',
+      `/cluster/configuration/validation`,
+      {},
+    );
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {

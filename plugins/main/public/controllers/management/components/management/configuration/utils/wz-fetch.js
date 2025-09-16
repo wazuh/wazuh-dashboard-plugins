@@ -391,7 +391,7 @@ export const saveFileCluster = async (text, node) => {
       body: xml.toString(),
       origin: 'raw',
     });
-    await validateAfterSent(node);
+    await validateAfterSent();
   } catch (error) {
     throw error;
   }
@@ -402,12 +402,13 @@ export const saveFileCluster = async (text, node) => {
  * @param {} node Node
  * @returns{boolean|Promise}
  */
-export const validateAfterSent = async (node = false) => {
+export const validateAfterSent = async () => {
   try {
-    const endpoint = node
-      ? `/cluster/${node}/configuration/validation`
-      : `/cluster/configuration/validation`;
-    const validation = await WzRequest.apiReq('GET', endpoint, {});
+    const validation = await WzRequest.apiReq(
+      'GET',
+      `/cluster/configuration/validation`,
+      {},
+    );
     const data = ((validation || {}).data || {}).data || {};
     const isOk = data.status === 'OK';
     if (!isOk && Array.isArray(data.details)) {
