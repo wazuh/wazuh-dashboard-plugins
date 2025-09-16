@@ -12,6 +12,8 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { Agent } from '../types';
+import WzIconSVG from '../../common/icons/wz-icon-svg';
+import { getAgentOSType } from '../../../react-services';
 
 // Columns with the property truncateText: true won't wrap the text
 // This is added to prevent the wrap because of the table-layout: auto
@@ -59,7 +61,7 @@ export const agentsTableColumns = (
     name: 'Operating system',
     sortable: true,
     show: true,
-    render: (field, agentData) => addIconPlatformRender(agentData),
+    render: (field: any, agentData: Agent) => addIconPlatformRender(agentData),
     searchable: true,
   },
   {
@@ -166,27 +168,15 @@ export const agentsTableColumns = (
   },
 ];
 
-const addIconPlatformRender = agent => {
-  let icon = '';
-  const os = agent?.os || {};
-
-  if ((os?.uname || '').includes('Linux')) {
-    icon = 'linux';
-  } else if (os?.platform === 'windows') {
-    icon = 'windows';
-  } else if (os?.platform === 'darwin') {
-    icon = 'apple';
-  }
+const addIconPlatformRender = (agent: Agent) => {
+  const osType = getAgentOSType(agent);
   const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
 
   return (
-    <EuiFlexGroup gutterSize='xs'>
+    <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
       <EuiFlexItem grow={false}>
-        <i
-          className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-          aria-hidden='true'
-        ></i>
-      </EuiFlexItem>{' '}
+        <WzIconSVG type={osType} style={{ paddingRight: '3px' }} />
+      </EuiFlexItem>
       <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
     </EuiFlexGroup>
   );

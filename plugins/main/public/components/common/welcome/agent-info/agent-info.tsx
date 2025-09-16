@@ -18,7 +18,7 @@ import { Agent } from '../../../endpoints-summary/types';
 import { RibbonItemLabel, type IRibbonItem } from '../../ribbon/ribbon-item';
 import WzRibbon from '../../ribbon/ribbon';
 import { getOsName, getPlatformIcon } from '../../platform';
-
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 interface AgentInfoProps {
   agent: Agent;
   goGroups?: (agent: Agent, key: number) => void;
@@ -116,11 +116,18 @@ export class AgentInfo extends Component<AgentInfoProps> {
           key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
           label: 'Operating system',
-          render: (value: Agent) => (
-            <>
-              {getPlatformIcon(value)}
-              {getOsName(value)}
-            </>
+          render: (value: Agent, forceTheme?: 'dark') => (
+            <EuiFlexGroup
+              responsive={false}
+              alignItems='center'
+              gutterSize='none'
+              style={{ gap: 5 }}
+            >
+              <EuiFlexItem grow={false}>
+                {getPlatformIcon(value, forceTheme)}
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>{getOsName(value)}</EuiFlexItem>
+            </EuiFlexGroup>
           ),
         },
         {

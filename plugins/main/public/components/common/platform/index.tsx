@@ -2,27 +2,20 @@ import React from 'react';
 import { WAZUH_AGENTS_OS_TYPE } from '../../../../common/constants';
 import { getAgentOSType } from '../../../react-services';
 import { Agent } from '../../endpoints-summary/types';
+import WzIconSVG from '../icons/wz-icon-svg';
 
-export const getPlatformIcon = (agent?: Agent): React.JSX.Element => {
-  let icon = '';
+export const getPlatformIcon = (
+  agent?: Agent,
+  forceTheme?: 'dark',
+): React.JSX.Element => {
   const osType = getAgentOSType(agent);
-  if (osType === WAZUH_AGENTS_OS_TYPE.DARWIN) {
-    icon = 'apple';
-  } else if (
-    [WAZUH_AGENTS_OS_TYPE.WINDOWS, WAZUH_AGENTS_OS_TYPE.LINUX].includes(osType)
-  ) {
-    icon = osType;
-  }
-
-  if (icon) {
-    return (
-      <i
-        className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${osType}`}
-        aria-hidden='true'
-      ></i>
-    );
-  }
-  return <></>;
+  return (
+    <WzIconSVG
+      type={osType}
+      style={{ paddingRight: '3px' }}
+      forceMode={forceTheme}
+    />
+  );
 };
 
 export const getOsName = (agent?: Agent) => {

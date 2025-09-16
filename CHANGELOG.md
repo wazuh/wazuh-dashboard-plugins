@@ -14,6 +14,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646) [#7695](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7695)
 - Added a final step in the Deploy new agent section to navigate back to the agent list [#7711](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7711)
 
+### Changed
+
+- Updated OS logos [#7712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7712)
+
 ### Fixed
 
 - Fixed missing provider and queue_size fields in whodata configuration [#7596](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7596)
