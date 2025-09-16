@@ -30,47 +30,47 @@ export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
 export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics-*';
 
 // Wazuh vulnerabilities
-export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities-*';
+export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities*';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
 // FIM
-export const WAZUH_FIM_PATTERN = 'wazuh-states-fim-*';
-export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
+export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
+export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files*';
 export const WAZUH_FIM_REGISTRY_KEYS_PATTERN =
-  'wazuh-states-fim-registry-keys-*';
+  'wazuh-states-fim-registry-keys*';
 export const WAZUH_FIM_REGISTRY_VALUES_PATTERN =
-  'wazuh-states-fim-registry-values-*';
+  'wazuh-states-fim-registry-values*';
 
 // SCA
-export const WAZUH_SCA_PATTERN = 'wazuh-states-sca-*';
+export const WAZUH_SCA_PATTERN = 'wazuh-states-sca*';
 
 // System inventory
-export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory-*';
+export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory*';
 export const WAZUH_IT_HYGIENE_HARDWARE_PATTERN =
-  'wazuh-states-inventory-hardware-*';
+  'wazuh-states-inventory-hardware*';
 export const WAZUH_IT_HYGIENE_HOTFIXES_PATTERN =
-  'wazuh-states-inventory-hotfixes-*';
+  'wazuh-states-inventory-hotfixes*';
 export const WAZUH_IT_HYGIENE_INTERFACES_PATTERN =
-  'wazuh-states-inventory-interfaces-*';
+  'wazuh-states-inventory-interfaces*';
 export const WAZUH_IT_HYGIENE_NETWORKS_PATTERN =
-  'wazuh-states-inventory-networks-*';
+  'wazuh-states-inventory-networks*';
 export const WAZUH_IT_HYGIENE_PACKAGES_PATTERN =
-  'wazuh-states-inventory-packages-*';
-export const WAZUH_IT_HYGIENE_PORTS_PATTERN = 'wazuh-states-inventory-ports-*';
+  'wazuh-states-inventory-packages*';
+export const WAZUH_IT_HYGIENE_PORTS_PATTERN = 'wazuh-states-inventory-ports*';
 export const WAZUH_IT_HYGIENE_PROCESSES_PATTERN =
-  'wazuh-states-inventory-processes-*';
+  'wazuh-states-inventory-processes*';
 export const WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN =
-  'wazuh-states-inventory-protocols-*';
+  'wazuh-states-inventory-protocols*';
 export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN =
-  'wazuh-states-inventory-system-*';
-export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users-*';
+  'wazuh-states-inventory-system*';
+export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users*';
 export const WAZUH_IT_HYGIENE_GROUPS_PATTERN =
-  'wazuh-states-inventory-groups-*';
+  'wazuh-states-inventory-groups*';
 export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
-  'wazuh-states-inventory-services-*';
+  'wazuh-states-inventory-services*';
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
-  'wazuh-states-inventory-browser-extensions-*';
+  'wazuh-states-inventory-browser-extensions*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
