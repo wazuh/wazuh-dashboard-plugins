@@ -258,27 +258,27 @@ export class PatternDataSourceFilterManager
   /**
    * Return the cluster filter
    */
-  static getClusterManagerFilters(
+  static getClusterFilters(
     indexPatternId: string,
     controlledByValue: string,
     key?: string,
   ): tFilter[] {
     const filterHandler = new FilterHandler();
-    const managerFilter = filterHandler.managerQuery(
+    const clusterFilter = filterHandler.clusterQuery(
       AppState.getClusterInfo().cluster,
       key,
     );
-    managerFilter.meta = {
-      ...managerFilter.meta,
+    clusterFilter.meta = {
+      ...clusterFilter.meta,
       controlledBy: controlledByValue,
       index: indexPatternId,
     };
     //@ts-ignore
-    managerFilter.$state = {
+    clusterFilter.$state = {
       store: FilterStateStore.APP_STATE,
     };
     //@ts-ignore
-    return [managerFilter] as tFilter[];
+    return [clusterFilter] as tFilter[];
   }
 
   /**

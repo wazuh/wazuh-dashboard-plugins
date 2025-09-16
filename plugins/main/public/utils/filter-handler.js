@@ -98,19 +98,19 @@ export class FilterHandler {
   }
   /**
    * This function creates a filter for cluster queries
-   * @param {*} manager
+   * @param {*} cluster
    * @param {*} fixedKey
    * @returns
    */
-  managerQuery(manager, fixedKey = undefined) {
+  clusterQuery(cluster, fixedKey = undefined) {
     const metaKey = fixedKey ? fixedKey : 'cluster.name';
     const result = this.base();
     result.meta.key = metaKey;
-    result.meta.value = manager;
-    result.meta.params.query = manager;
+    result.meta.value = cluster;
+    result.meta.params.query = cluster;
     result.query.match = {
       [metaKey]: {
-        query: manager,
+        query: cluster,
         type: 'phrase',
       },
     };
