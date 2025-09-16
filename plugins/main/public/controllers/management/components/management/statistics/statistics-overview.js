@@ -84,13 +84,11 @@ export class WzStatisticsOverview extends Component {
       });
       nodes.unshift({ value: 'all', text: 'All' });
       this.setState({
-        isClusterMode: true,
         clusterNodes: nodes,
         clusterNodeSelected: nodes[0].value,
       });
     } catch (error) {
       this.setState({
-        isClusterMode: true,
         clusterNodes: [],
         clusterNodeSelected: 'all',
       });
@@ -200,7 +198,6 @@ export class WzStatisticsOverview extends Component {
           <DashboardTabsPanels
             selectedTab={this.state.selectedTabId}
             loadingNode={this.state.loadingNode}
-            isClusterMode={this.state.isClusterMode}
             clusterNodes={this.state.clusterNodes}
             clusterNodeSelected={this.state.clusterNodeSelected}
             onSelectNode={this.onSelectNode}
