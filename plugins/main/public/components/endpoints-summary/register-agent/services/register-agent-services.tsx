@@ -72,7 +72,7 @@ async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
   }
 }
 /**
- * Get the manager/cluster auth configuration from Wazuh API
+ * Get the cluster auth configuration from Wazuh API
  * @param node
  * @returns
  */
@@ -186,8 +186,8 @@ export const getMasterNode = (
 };
 
 /**
- * Get the remote and the auth configuration from manager
- * This function get the config from manager mode or cluster mode
+ * Get the remote and the auth configuration from the cluster master node
+ * This function get the config from cluster mode
  */
 export const getMasterConfiguration = async () => {
   const nodes = await fetchClusterNodesOptions();
