@@ -76,11 +76,11 @@ describe('NavigationService test', () => {
 
   it('should navigate to a new path', () => {
     navigationService.navigate(
-      "/module-path?_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-states-vulnerabilities-*',key:package.name,negate:!f,params:(query:'TestPackage%2B%2B%20(32-bit%20x86)'),type:phrase),query:(match_phrase:(package.name:(query:'TestPackage%2B%2B%20(32-bit%20x86)'))))),query:(language:kuery,query:''))&customQuery=test",
+      "/module-path?_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-states-vulnerabilities*',key:package.name,negate:!f,params:(query:'TestPackage%2B%2B%20(32-bit%20x86)'),type:phrase),query:(match_phrase:(package.name:(query:'TestPackage%2B%2B%20(32-bit%20x86)'))))),query:(language:kuery,query:''))&customQuery=test",
     );
     expect(history.location.pathname).toBe('/module-path');
     expect(history.location.search).toBe(
-      "?_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-states-vulnerabilities-*',key:package.name,negate:!f,params:(query:'TestPackage%2B%2B%20(32-bit%20x86)'),type:phrase),query:(match_phrase:(package.name:(query:'TestPackage%2B%2B%20(32-bit%20x86)'))))),query:(language:kuery,query:''))&customQuery=test",
+      "?_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-states-vulnerabilities*',key:package.name,negate:!f,params:(query:'TestPackage%2B%2B%20(32-bit%20x86)'),type:phrase),query:(match_phrase:(package.name:(query:'TestPackage%2B%2B%20(32-bit%20x86)'))))),query:(language:kuery,query:''))&customQuery=test",
     );
   });
 
@@ -90,7 +90,7 @@ describe('NavigationService test', () => {
     });
     expect(history.location.pathname).toBe('/module-path');
     expect(history.location.search).toBe(
-      "?_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-states-vulnerabilities-*',key:package.name,negate:!f,params:(query:'TestPackage%2B%2B%20(32-bit%20x86)'),type:phrase),query:(match_phrase:(package.name:(query:'TestPackage%2B%2B%20(32-bit%20x86)'))))),query:(language:kuery,query:''))&customQuery=changed2",
+      "?_a=(filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'wazuh-states-vulnerabilities*',key:package.name,negate:!f,params:(query:'TestPackage%2B%2B%20(32-bit%20x86)'),type:phrase),query:(match_phrase:(package.name:(query:'TestPackage%2B%2B%20(32-bit%20x86)'))))),query:(language:kuery,query:''))&customQuery=changed2",
     );
   });
 
