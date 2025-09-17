@@ -133,7 +133,7 @@ export class WzAuthentication {
       var idHost = JSON.parse(AppState.getCurrentAPI() as string).id;
       if (!idHost) {
         throw new Error(
-          'It can not get the user permissionsdue there is no selected API. Ensure the server API is selected and this is available.',
+          'It can not get the user permissions due there is no selected API. Ensure the server API is selected and this is available.',
         );
       }
       const response = await WzRequest.apiReq(
