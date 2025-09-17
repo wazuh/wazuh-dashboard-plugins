@@ -187,7 +187,6 @@ const MitreTopTacticsTechniquesBody = compose(
     PromptNoData,
   ),
 )(({ agentId, dataSource, dataSourceAction }) => {
-  console.log('dataSourceAction', dataSourceAction);
   const [showTechniqueDetails, setShowTechniqueDetails] = useState<string>('');
 
   const onChangeFlyout = () => {
