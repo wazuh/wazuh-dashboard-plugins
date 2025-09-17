@@ -13,7 +13,6 @@ export const ClusterOverview = compose(
   withGlobalBreadcrumb([{ text: cluster.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
     { action: 'cluster:read', resource: 'node:id:*' },
-    { action: 'cluster:status', resource: '*:*:*' },
   ]),
 )(() => {
   return <ClusterDashboard />;
