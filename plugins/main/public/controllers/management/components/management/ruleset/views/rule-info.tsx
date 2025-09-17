@@ -169,6 +169,7 @@ export default withRouterSearch(
       document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 
       const currentIndexPattern = await getDataPlugin().indexPatterns.get(
+        // TODO: this should use the selected index pattern without fallback
         AppState.getCurrentPattern() ||
           getWazuhCorePlugin().configuration.getSettingValue('pattern'),
       );
@@ -791,6 +792,7 @@ export default withRouterSearch(
                             FILTER_OPERATOR.IS,
                             'rule.id',
                             id,
+                            // TODO: this should validate the index pattern is selected
                             this.state.currentIndexPattern,
                           ),
                         ],

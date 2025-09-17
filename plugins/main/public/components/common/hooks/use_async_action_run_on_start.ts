@@ -1,13 +1,13 @@
 import { useCallback, useState, useEffect } from 'react';
 
-type useAsyncActionRunOnStartAction<T> = (...any) => T
-type useAsyncActionRunOnStartDependencies = any[]
+type useAsyncActionRunOnStartAction<T> = (...params: any[]) => Promise<T>;
+type useAsyncActionRunOnStartDependencies = any[];
 type useAsyncActionRunOnStartDependenciesReturns<T> = {
-  data: T
-  error: any
-  running: boolean
-  run: Promise<T>
-}
+  data: T | null;
+  error: Error | null;
+  running: boolean;
+  run: () => Promise<void>;
+};
 
 /**
  * Get data from an asynchronous process. Manage data, error and running states while running the process. It starts with running status activated, so this is
@@ -17,29 +17,34 @@ type useAsyncActionRunOnStartDependenciesReturns<T> = {
  * @param dependencies Define the dependencies to rerun the process
  * @returns It returns data, error, run, running
  */
-export function useAsyncActionRunOnStart<T>(action: useAsyncActionRunOnStartAction<T>, dependencies: useAsyncActionRunOnStartDependencies = []): useAsyncActionRunOnStartDependenciesReturns<T>{
+export function useAsyncActionRunOnStart<T>(
+  action: useAsyncActionRunOnStartAction<T>,
+  dependencies: useAsyncActionRunOnStartDependencies = [],
+  { refreshDataOnPreRun = true } = { refreshDataOnPreRun: true },
+): useAsyncActionRunOnStartDependenciesReturns<T> {
   const [running, setRunning] = useState(true);
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
+  const [data, setData] = useState<T | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
-  const run: Promise<T> = useCallback(async () => {
-    try{
+  const run = useCallback(async () => {
+    try {
       setRunning(true);
       setError(null);
-      setData(null);
+      if (refreshDataOnPreRun) {
+        setData(null);
+      }
       const data = await action(...dependencies);
       setData(data);
-    }catch(error){
-      setError(error);
-    }finally{
+    } catch (error) {
+      setError(error as Error);
+    } finally {
       setRunning(false);
-    };
-  }, [action,...dependencies]);
+    }
+  }, [action, ...dependencies]);
 
   useEffect(() => {
     run();
-  }, [action,...dependencies]);
+  }, [action, ...dependencies]);
 
-
-  return { data, error, run, running};
+  return { data, error, run, running };
 }

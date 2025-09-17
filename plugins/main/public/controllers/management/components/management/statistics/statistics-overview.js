@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, useState, useEffect } from 'react';
+import React, { Component } from 'react';
 import {
   EuiFlexItem,
   EuiFlexGroup,
@@ -29,19 +29,11 @@ import {
   withGlobalBreadcrumb,
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
-import { PromptStatisticsNoIndices } from './prompt-statistics-no-indices';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { statistics } from '../../../../../utils/applications';
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
-import {
-  existsIndices,
-  existsIndexPattern,
-  createIndexPattern,
-} from '../../../../../react-services';
-import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
-
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
   constructor(props) {
@@ -204,63 +196,4 @@ export default compose(
     { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
-)(props => {
-  const [loading, setLoading] = useState(true);
-  const [existStatisticsIndices, setExistStatisticsIndices] = useState(false);
-  const [existStatisticsIndexPattern, setExistStatisticsIndexPattern] =
-    useState(false);
-  const indexPatternID = StatisticsDataSource.getIdentifierDataSourcePattern();
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Check the existence of related index pattern
-        const existIndexPattern = await existsIndexPattern(indexPatternID);
-        const { exist, fields } = await existsIndices(indexPatternID);
-        setLoading(true);
-
-        if (exist) {
-          setExistStatisticsIndices(true);
-          if (!existIndexPattern) {
-            // If some index match the index pattern, then create the index pattern
-            const resultCreateIndexPattern = await createIndexPattern(
-              indexPatternID,
-              fields,
-            );
-            if (resultCreateIndexPattern?.error) {
-              setLoading(false);
-              return;
-            }
-          }
-          setExistStatisticsIndexPattern(true);
-        }
-      } catch (error) {
-        setLoading(false);
-        const options = {
-          context: `${WzStatisticsOverview.name}.fetchData`,
-          level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.BUSINESS,
-          error: {
-            error: error,
-            message: error.message || error,
-            title: `${error.name}: Error when fetching data`,
-          },
-        };
-        getErrorOrchestrator().handleError(options);
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-  if (loading) {
-    return <EuiProgress size='xs' color='primary' />;
-  }
-  return existStatisticsIndices && existStatisticsIndexPattern ? (
-    <WzStatisticsOverview {...props} />
-  ) : (
-    <PromptStatisticsNoIndices // TODO: this should use the prompt as Vulnerabilities detection > Inventory instead
-      indexPatternID={indexPatternID}
-      existIndex={existStatisticsIndices}
-    />
-  );
-});
+)(WzStatisticsOverview);

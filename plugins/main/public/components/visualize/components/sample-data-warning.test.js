@@ -17,7 +17,7 @@ import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import React from 'react';
-import { getCore } from '../../../kibana-services';
+import { getCore, getCookies } from '../../../kibana-services';
 
 const awaitForMyComponent = async wrapper => {
   await act(async () => {
@@ -25,7 +25,11 @@ const awaitForMyComponent = async wrapper => {
     wrapper.update();
   });
 };
-jest.mock('../../../react-services');
+jest.mock('../../../react-services', () => ({
+  WzRequest: {
+    genericReq: jest.fn(),
+  },
+}));
 jest.mock('../../../react-services/common-services');
 jest.mock('../../../kibana-services');
 
@@ -37,6 +41,14 @@ getCore.mockImplementation(() => ({
     navigateToUrl: appId => appId,
   },
 }));
+
+getCookies.mockImplementation(() => {
+  console.log('HELLO');
+  return {
+    get: () => 'test',
+    hello: 'dadsads',
+  };
+});
 
 jest.mock('../../../react-services/navigation-service', () => ({
   getInstance() {

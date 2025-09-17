@@ -6,13 +6,14 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventorySystemDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
 import { getOverviewSystemSystemTab } from './dashboard';
+import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../../../common/constants';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
 
 export const ITHygieneSystemInventorySystem =
-  withSystemInventorySystemDataSource(props => {
+  withSystemInventorySystemDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventorySystemStatesDataSourceRepository
@@ -21,7 +22,7 @@ export const ITHygieneSystemInventorySystem =
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewSystemSystemTab}
         tableId='it-hygiene-inventory-system'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

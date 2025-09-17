@@ -22,43 +22,80 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
             class="euiCard__children"
           >
             <div
-              class="euiEmptyPrompt"
+              class="wazuh-visualization-layout"
+              style="width: 100%; height: 150px;"
             >
-              <span
-                class="euiTextColor euiTextColor--subdued"
+              <div
+                class="euiFlexGroup euiFlexGroup--directionRow euiFlexGroup--responsive"
+                style="height: 100%;"
               >
                 <div
-                  class="euiText euiText--medium"
+                  class="euiFlexItem wazuh-visualization-chart"
                 >
-                  <p>
-                    This instance has no agents registered.
-                    <br />
-                    Please deploy agents to begin monitoring your endpoints.
-                  </p>
-                </div>
-              </span>
-              <div
-                class="euiSpacer euiSpacer--l"
-              />
-              <button
-                class="euiButton euiButton--primary euiButton--fill"
-                type="button"
-              >
-                <span
-                  class="euiButtonContent euiButton__content"
-                >
-                  <span
-                    class="euiButtonContent__icon"
-                    color="inherit"
-                    data-euiicon-type="plusInCircle"
-                  />
-                  <span
-                    class="euiButton__text"
+                  <svg
+                    height="0"
+                    width="0"
                   >
-                    Deploy new agent
-                  </span>
-                </span>
-              </button>
+                    <g
+                      transform="translate(0,0)"
+                    />
+                  </svg>
+                </div>
+                <div
+                  class="euiFlexItem wazuh-visualization-legend"
+                >
+                  <ul
+                    class="euiListGroup euiListGroup-flush euiListGroup--gutterSmall euiListGroup-maxWidthDefault chart-legend"
+                  >
+                    <li
+                      class="euiListGroupItem euiListGroupItem--medium euiListGroupItem--text euiListGroupItem-isClickable"
+                    >
+                      <button
+                        class="euiListGroupItem__button"
+                        type="button"
+                      >
+                        <span
+                          class="euiListGroupItem__icon"
+                          color="#007871"
+                          data-euiicon-type="dot"
+                        />
+                        <span
+                          class="euiListGroupItem__label"
+                        >
+                          <div
+                            style="font-size: 0.875rem; text-overflow: ellipsis; overflow: hidden;"
+                          >
+                            Active (8)
+                          </div>
+                        </span>
+                      </button>
+                    </li>
+                    <li
+                      class="euiListGroupItem euiListGroupItem--medium euiListGroupItem--text euiListGroupItem-isClickable"
+                    >
+                      <button
+                        class="euiListGroupItem__button"
+                        type="button"
+                      >
+                        <span
+                          class="euiListGroupItem__icon"
+                          color="#BD271E"
+                          data-euiicon-type="dot"
+                        />
+                        <span
+                          class="euiListGroupItem__label"
+                        >
+                          <div
+                            style="font-size: 0.875rem; text-overflow: ellipsis; overflow: hidden;"
+                          >
+                            Disconnected (0)
+                          </div>
+                        </span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -92,188 +129,11 @@ exports[`Stats component renders correctly to match the snapshot 1`] = `
             class="euiCard__children"
           >
             <div
-              class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive euiFlexGroup--wrap vulnerabilites-summary-card"
+              class="vulnerabilites-summary-card"
             >
               <div
-                class="euiFlexItem"
-              >
-                <div
-                  class="osdRedirectCrossAppLinks"
-                >
-                  <div
-                    class="euiStat euiStat--centerAligned"
-                  >
-                    <div
-                      class="euiText euiText--small euiStat__description"
-                    >
-                      <h3
-                        aria-hidden="true"
-                      >
-                        Critical severity
-                      </h3>
-                    </div>
-                    <p
-                      aria-hidden="true"
-                      class="euiTitle euiTitle--large euiStat__title"
-                      style="color: rgb(189, 39, 30);"
-                    >
-                      <span
-                        class="euiToolTipAnchor"
-                      >
-                        <a
-                          class="euiLink euiLink--primary statWithLink"
-                          href=""
-                          rel="noreferrer"
-                          style="font-weight: normal; color: rgb(189, 39, 30);"
-                        >
-                          -
-                        </a>
-                      </span>
-                    </p>
-                  </div>
-                  <div
-                    class="euiText euiText--small"
-                    css="margin-top: 0.7vh"
-                  >
-                    Rule level 15 or higher
-                  </div>
-                </div>
-              </div>
-              <div
-                class="euiFlexItem"
-              >
-                <div
-                  class="osdRedirectCrossAppLinks"
-                >
-                  <div
-                    class="euiStat euiStat--centerAligned"
-                  >
-                    <div
-                      class="euiText euiText--small euiStat__description"
-                    >
-                      <h3
-                        aria-hidden="true"
-                      >
-                        High severity
-                      </h3>
-                    </div>
-                    <p
-                      aria-hidden="true"
-                      class="euiTitle euiTitle--large euiStat__title"
-                      style="color: rgb(254, 197, 20);"
-                    >
-                      <span
-                        class="euiToolTipAnchor"
-                      >
-                        <a
-                          class="euiLink euiLink--primary statWithLink"
-                          href=""
-                          rel="noreferrer"
-                          style="font-weight: normal; color: rgb(254, 197, 20);"
-                        >
-                          -
-                        </a>
-                      </span>
-                    </p>
-                  </div>
-                  <div
-                    class="euiText euiText--small"
-                    css="margin-top: 0.7vh"
-                  >
-                    Rule level 12 to 14
-                  </div>
-                </div>
-              </div>
-              <div
-                class="euiFlexItem"
-              >
-                <div
-                  class="osdRedirectCrossAppLinks"
-                >
-                  <div
-                    class="euiStat euiStat--centerAligned"
-                  >
-                    <div
-                      class="euiText euiText--small euiStat__description"
-                    >
-                      <h3
-                        aria-hidden="true"
-                      >
-                        Medium severity
-                      </h3>
-                    </div>
-                    <p
-                      aria-hidden="true"
-                      class="euiTitle euiTitle--large euiStat__title"
-                      style="color: rgb(96, 146, 192);"
-                    >
-                      <span
-                        class="euiToolTipAnchor"
-                      >
-                        <a
-                          class="euiLink euiLink--primary statWithLink"
-                          href=""
-                          rel="noreferrer"
-                          style="font-weight: normal; color: rgb(96, 146, 192);"
-                        >
-                          -
-                        </a>
-                      </span>
-                    </p>
-                  </div>
-                  <div
-                    class="euiText euiText--small"
-                    css="margin-top: 0.7vh"
-                  >
-                    Rule level 7 to 11
-                  </div>
-                </div>
-              </div>
-              <div
-                class="euiFlexItem"
-              >
-                <div
-                  class="osdRedirectCrossAppLinks"
-                >
-                  <div
-                    class="euiStat euiStat--centerAligned"
-                  >
-                    <div
-                      class="euiText euiText--small euiStat__description"
-                    >
-                      <h3
-                        aria-hidden="true"
-                      >
-                        Low severity
-                      </h3>
-                    </div>
-                    <p
-                      aria-hidden="true"
-                      class="euiTitle euiTitle--large euiStat__title"
-                      style="color: rgb(0, 120, 113);"
-                    >
-                      <span
-                        class="euiToolTipAnchor"
-                      >
-                        <a
-                          class="euiLink euiLink--primary statWithLink"
-                          href=""
-                          rel="noreferrer"
-                          style="font-weight: normal; color: rgb(0, 120, 113);"
-                        >
-                          -
-                        </a>
-                      </span>
-                    </p>
-                  </div>
-                  <div
-                    class="euiText euiText--small"
-                    css="margin-top: 0.7vh"
-                  >
-                    Rule level 0 to 6
-                  </div>
-                </div>
-              </div>
+                class="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary"
+              />
             </div>
           </div>
         </div>

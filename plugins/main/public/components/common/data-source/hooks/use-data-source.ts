@@ -168,14 +168,18 @@ export function useDataSource<
         // what the filters update
         subscription = dataSourceFilterManager.getUpdates$().subscribe({
           next: () => {
-            if (!isComponentMounted()) return;
-            // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
-            dataSourceFilterManager.setFilters(
-              dataSourceFilterManager.getFilters(),
-            );
-            setAllFilters(dataSourceFilterManager.getFilters());
-            setFetchFilters(dataSourceFilterManager.getFetchFilters());
-            setFixedFilters(dataSourceFilterManager.getFixedFilters());
+            try {
+              if (!isComponentMounted()) return;
+              // this is necessary to remove the hidden filters from the filter manager and not show them in the search bar
+              dataSourceFilterManager.setFilters(
+                dataSourceFilterManager.getFilters(),
+              );
+              setAllFilters(dataSourceFilterManager.getFilters());
+              setFetchFilters(dataSourceFilterManager.getFetchFilters());
+              setFixedFilters(dataSourceFilterManager.getFixedFilters());
+            } catch (error) {
+              setError(error?.message);
+            }
           },
         });
         setAllFilters(dataSourceFilterManager.getFilters());
@@ -198,8 +202,12 @@ export function useDataSource<
 
   useEffect(() => {
     if (dataSourceFilterManager && dataSource) {
-      setFixedFilters(dataSourceFilterManager.getFixedFilters());
-      setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      try {
+        setFixedFilters(dataSourceFilterManager.getFixedFilters());
+        setFetchFilters(dataSourceFilterManager.getFetchFilters());
+      } catch (error) {
+        setError(error?.message);
+      }
     }
   }, [JSON.stringify(pinnedAgent)]);
 

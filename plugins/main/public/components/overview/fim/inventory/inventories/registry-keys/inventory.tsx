@@ -5,9 +5,7 @@ import {
 } from '../../../../../common/data-source';
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
-withSystemInventoryHardwareDataSource;
 import { getDashboard } from './dashboard';
-import { withSystemInventoryHardwareDataSource } from '../../../../it-hygiene/common/hocs/validate-system-inventory-index-pattern';
 import { withFIMRegistryKeysDataSource } from '../../../common/hocs/validate-fim-states-index-pattern';
 import { InventoryDashboardTable } from '../../../../../common/dashboards';
 import { WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING } from '../../../../../../../common/constants';
@@ -27,7 +25,6 @@ export const InventoryFIMRegistryKeys = compose(
         managedFilters={managedFilters}
         getDashboardPanels={getDashboard}
         tableId='fim-registry-keys-inventory'
-        indexPattern={props.indexPattern}
         categoriesSampleData={[WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING]}
       />
     </div>

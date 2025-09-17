@@ -1,8 +1,15 @@
 import { createHashHistory, History } from 'history';
 import NavigationService from './navigation-service';
-import { getCore } from '../kibana-services';
+import { getCore, getCookies } from '../kibana-services';
 
 jest.mock('../kibana-services');
+jest.mock('../react-services/app-state', () => ({
+  AppState: {
+    getCurrentPattern() {
+      return 'test';
+    },
+  },
+}));
 
 const navigateToApp = jest.fn();
 const navigateToUrl = jest.fn();
