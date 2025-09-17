@@ -120,7 +120,8 @@ class WzConfigurationOverview extends Component {
                         action: 'cluster:update_config',
                         resource: `node:id:${this.props.clusterNodeSelected}`,
                       },
-                    ].filter(Boolean)}
+                    ].filter(Boolean)} // Filter falsy values. clusterNodeSelected is initially false on mount
+                    // before cluster data loads, causing [false] in permissions array and TypeError
                     iconSide='left'
                     iconType='pencil'
                     onClick={() =>
