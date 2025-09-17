@@ -120,7 +120,7 @@ class WzConfigurationOverview extends Component {
                         action: 'cluster:update_config',
                         resource: `node:id:${this.props.clusterNodeSelected}`,
                       },
-                    ]}
+                    ].filter(Boolean)}
                     iconSide='left'
                     iconType='pencil'
                     onClick={() =>
