@@ -20,6 +20,7 @@ import { useAppConfig, useStateStorage } from '../hooks';
 jest.mock('../hooks', () => ({
   useAppConfig: jest.fn(),
   useStateStorage: jest.fn(),
+  useEffectEnsureComponentMounted: jest.fn(),
 }));
 
 jest.mock('../../../kibana-services', () => ({
@@ -28,6 +29,11 @@ jest.mock('../../../kibana-services', () => ({
       prepend: str => str,
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 jest.mock('../../../react-services/common-services', () => ({

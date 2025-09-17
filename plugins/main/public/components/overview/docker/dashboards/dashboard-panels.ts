@@ -808,7 +808,7 @@ const getVisStateAgentEvents = (indexPatternId: string) => {
 
 export const getDashboardPanels = (
   indexPatternId: string,
-  isPinnedAgent: boolean,
+  isPinnedAgent?: boolean,
 ): {
   [panelId: string]: DashboardPanelState<
     EmbeddableInput & { [k: string]: unknown }

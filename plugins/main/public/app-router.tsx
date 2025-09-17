@@ -10,8 +10,6 @@ import { WzMenuWrapper } from './components/wz-menu/wz-menu-wrapper';
 import { WzAgentSelectorWrapper } from './components/wz-agent-selector/wz-agent-selector-wrapper';
 import { ToastNotificationsModal } from './components/notifications/modal';
 import { WzUpdatesNotification } from './components/wz-updates-notification';
-import { HealthCheck } from './components/health-check';
-import { WzBlankScreen } from './components/wz-blank-screen/wz-blank-screen';
 import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
 import { AgentView } from './components/endpoints-summary/agent';
@@ -22,8 +20,35 @@ import { WzSecurity } from './components/security';
 import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
+import { withGuardAsync } from './components/common/hocs';
+import { WzRequest } from './react-services/wz-request';
+import { AlertsDataSourceSetup } from './components/common/data-source';
 
-export function Application(props) {
+export const Application = withGuardAsync(
+  async (_props: any) => {
+    try {
+      // Run in parallel
+      await Promise.allSettled([
+        // Setup the selected API
+        WzRequest.setupAPI(),
+        // Load the app state
+        loadAppConfig(),
+      ]);
+
+      await Promise.allSettled([
+        // Setup the alerts index pattern
+        AlertsDataSourceSetup(),
+      ]);
+    } catch {}
+
+    return {
+      ok: false,
+      data: {},
+    };
+  },
+  null,
+  null,
+)((_props: any) => {
   const dispatch = useDispatch();
   const navigationService = NavigationService.getInstance();
   const history = navigationService.getHistory();
@@ -41,9 +66,6 @@ export function Application(props) {
     checkPluginVersion().finally(() => {
       WzAuthentication.refresh();
     });
-
-    // Load the app state
-    loadAppConfig();
 
     // TODO: Replace this with document insteat
     // Bind deleteExistentToken on Log out component.
@@ -67,11 +89,6 @@ export function Application(props) {
       <WzAgentSelectorWrapper />
       <WzUpdatesNotification />
       <Switch>
-        <Route
-          path={`/${SECTIONS.HEALTH_CHECK}`}
-          exact
-          render={HealthCheck}
-        ></Route>
         <Route
           path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}
           exact
@@ -100,13 +117,8 @@ export function Application(props) {
           exact
           render={props => <ToolsRouter {...props} />}
         ></Route>
-        <Route
-          path={`/${SECTIONS.BLANK_SCREEN}`}
-          exact
-          render={props => <WzBlankScreen {...props} />}
-        ></Route>
         <Redirect from='/' to={getWzMainParams()} />
       </Switch>
     </Router>
   );
-}
+});

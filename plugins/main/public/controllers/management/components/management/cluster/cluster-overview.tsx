@@ -70,18 +70,6 @@ export const ClusterOverview = compose(
       />
     ),
   ),
-)(
-  ({
-    clusterEnabled,
-    isClusterRunning,
-    statusRunning,
-  }: ClusterOverviewState) => {
-    return (
-      <>
-        {clusterEnabled && isClusterRunning ? (
-          <ClusterDashboard statusRunning={statusRunning} />
-        ) : null}
-      </>
-    );
-  },
-);
+)(({ statusRunning }: ClusterOverviewState) => {
+  return <ClusterDashboard statusRunning={statusRunning} />;
+});

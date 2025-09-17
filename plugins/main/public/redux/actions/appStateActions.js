@@ -22,17 +22,6 @@ export const updateCurrentApi = currentAPI => {
 };
 
 /**
- * Updates ShowMenu in the appState store
- * @param showMenu
- */
-export const updateShowMenu = showMenu => {
-  return {
-    type: 'SHOW_MENU',
-    showMenu: showMenu,
-  };
-};
-
-/**
  * Updates WazuhNotReadyYet in the appState store
  * @param wazuhNotReadyYet
  */

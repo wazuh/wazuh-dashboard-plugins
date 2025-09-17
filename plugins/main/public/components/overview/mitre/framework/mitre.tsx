@@ -14,26 +14,24 @@ import { I18nProvider } from '@osd/i18n/react';
 import { Tactics, Techniques } from './components';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { WzRequest } from '../../../../react-services/wz-request';
+import { Query } from '../../../../../../../src/plugins/data/common';
 import {
-  Query,
-  IndexPattern,
-} from '../../../../../../../src/plugins/data/common';
-import { withErrorBoundary } from '../../../common/hocs';
+  withDataSourceFetchSearchBar,
+  withDataSourceInitiated,
+  withDataSourceLoading,
+  withErrorBoundary,
+} from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
-
 import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
-import useSearchBar from '../../../common/search-bar/use-search-bar';
 import {
-  useDataSource,
   MitreAttackDataSource,
   AlertsDataSourceRepository,
-  tParsedIndexPattern,
-  PatternDataSource,
   tFilter,
 } from '../../../common/data-source';
 import { WzSearchBar } from '../../../common/search-bar';
+import { compose } from 'redux';
 
 export interface ITactic {
   [key: string]: string[];
@@ -53,49 +51,43 @@ type tMitreState = {
   selectedTactics: Object;
 };
 
-const MitreComponent = props => {
-  const { onSelectedTabChanged } = props;
-  const {
-    filters,
-    dataSource,
-    fetchFilters,
-    fixedFilters,
-    isLoading: isDataSourceLoading,
-    fetchData,
-    setFilters,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+const MitreComponent = compose(
+  withDataSourceFetchSearchBar({
     DataSource: MitreAttackDataSource,
-    repository: new AlertsDataSourceRepository(),
-  });
-
-  const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
-    indexPattern: dataSource?.indexPattern as IndexPattern,
-    filters,
-    setFilters: setFilters,
-  });
-
-  const { dateRangeFrom, dateRangeTo } = searchBarProps;
+    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  }),
+  withDataSourceLoading({
+    isLoadingNameProp: 'dataSourrce.isLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    isLoadingNameProp: 'dataSource.isLoading',
+    dataSourceNameProp: 'dataSource.dataSource',
+    dataSourceErrorNameProp: 'dataSource.error',
+  }),
+)(props => {
+  const { onSelectedTabChanged, dataSource } = props;
+  const { dateRangeFrom, dateRangeTo } = dataSource;
   const [mitreState, setMitreState] = useState<tMitreState>({
     tacticsObject: {},
     selectedTactics: {},
   });
 
   const [filterParams, setFilterParams] = useState<tFilterParams>({
-    filters: fetchFilters,
-    query: searchBarProps?.query,
+    filters: dataSource.fetchFilters,
+    query: dataSource.searchBarProps?.query,
     time: {
       from: dateRangeFrom,
       to: dateRangeTo,
     },
   });
-  const [indexPattern, setIndexPattern] = useState<any>(); //Todo: Add correct type
+
   const [isLoading, setIsLoading] = useState(true);
 
   const initialize = async () => {
-    setIndexPattern(dataSource?.indexPattern);
     let filterParams = {
-      filters: fetchFilters, // pass the fetchFilters to use it as initial filters in the technique flyout
-      query: searchBarProps?.query,
+      filters: dataSource.fetchFilters, // pass the fetchFilters to use it as initial filters in the technique flyout
+      query: dataSource.searchBarProps?.query,
       time: {
         from: dateRangeFrom,
         to: dateRangeTo,
@@ -107,17 +99,14 @@ const MitreComponent = props => {
   };
 
   useEffect(() => {
-    if (isDataSourceLoading || !dataSource) return;
     initialize();
   }, [
-    isDataSourceLoading,
-    dataSource,
-    searchBarProps.query,
-    JSON.stringify(filters),
+    dataSource.searchBarProps.query,
+    JSON.stringify(dataSource.filters),
     dateRangeFrom,
     dateRangeTo,
-    fingerprint,
-    autoRefreshFingerprint,
+    dataSource.fingerprint,
+    dataSource.autoRefreshFingerprint,
   ]);
 
   const buildTacticsObject = async () => {
@@ -156,69 +145,65 @@ const MitreComponent = props => {
 
   return (
     <I18nProvider>
-      {isDataSourceLoading && !dataSource ? (
-        <LoadingSearchbarProgress />
-      ) : (
-        <>
-          <EuiPanel
-            paddingSize='none'
-            hasShadow={false}
-            hasBorder={false}
-            color='transparent'
-          >
-            <WzSearchBar
-              appName='mitre-attack-searchbar'
-              {...searchBarProps}
-              fixedFilters={fixedFilters}
-              showQueryInput={true}
-              showQueryBar={true}
-              showSaveQuery={true}
-            />
+      <>
+        <EuiPanel
+          paddingSize='none'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
+          <WzSearchBar
+            appName='mitre-attack-searchbar'
+            {...dataSource.searchBarProps}
+            fixedFilters={dataSource.fixedFilters}
+            showQueryInput={true}
+            showQueryBar={true}
+            showSaveQuery={true}
+          />
+        </EuiPanel>
+        <EuiPanel
+          paddingSize='s'
+          hasShadow={false}
+          hasBorder={false}
+          color='transparent'
+        >
+          <EuiPanel paddingSize='none'>
+            <EuiFlexGroup>
+              <EuiFlexItem
+                grow={false}
+                style={{
+                  width: '15%',
+                  minWidth: 145,
+                  height: 'calc(100vh - 325px)',
+                  overflowX: 'hidden',
+                }}
+              >
+                <Tactics
+                  onChangeSelectedTactics={onChangeSelectedTactics}
+                  filterParams={filterParams}
+                  tacticsObject={mitreState.tacticsObject}
+                  selectedTactics={mitreState.selectedTactics}
+                  fetchData={dataSource.fetchData}
+                  isLoading={isLoading}
+                />
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <Techniques
+                  indexPatternId={dataSource.dataSource.indexPattern?.id}
+                  filterParams={filterParams}
+                  onSelectedTabChanged={id => onSelectedTabChanged(id)}
+                  tacticsObject={mitreState.tacticsObject}
+                  selectedTactics={mitreState.selectedTactics}
+                  fetchData={dataSource.fetchData}
+                  isLoading={isLoading}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiPanel>
-          <EuiPanel
-            paddingSize='s'
-            hasShadow={false}
-            hasBorder={false}
-            color='transparent'
-          >
-            <EuiPanel paddingSize='none'>
-              <EuiFlexGroup>
-                <EuiFlexItem
-                  grow={false}
-                  style={{
-                    width: '15%',
-                    minWidth: 145,
-                    height: 'calc(100vh - 325px)',
-                    overflowX: 'hidden',
-                  }}
-                >
-                  <Tactics
-                    onChangeSelectedTactics={onChangeSelectedTactics}
-                    filterParams={filterParams}
-                    tacticsObject={mitreState.tacticsObject}
-                    selectedTactics={mitreState.selectedTactics}
-                    fetchData={fetchData}
-                    isLoading={isLoading}
-                  />
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <Techniques
-                    indexPatternId={indexPattern?.id}
-                    filterParams={filterParams}
-                    onSelectedTabChanged={id => onSelectedTabChanged(id)}
-                    tacticsObject={mitreState.tacticsObject}
-                    selectedTactics={mitreState.selectedTactics}
-                    fetchData={fetchData}
-                    isLoading={isLoading}
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPanel>
-          </EuiPanel>
-        </>
-      )}
+        </EuiPanel>
+      </>
     </I18nProvider>
   );
-};
+});
 
 export const Mitre = withErrorBoundary(MitreComponent);

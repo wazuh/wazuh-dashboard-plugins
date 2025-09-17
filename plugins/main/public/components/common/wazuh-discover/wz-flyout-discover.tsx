@@ -24,7 +24,11 @@ import {
   HttpError,
 } from '../../../react-services/error-management';
 import useSearchBar, { tUseSearchBarProps } from '../search-bar/use-search-bar';
-import { withErrorBoundary } from '../hocs';
+import {
+  withDataSourceInitiated,
+  withDataSourceLoading,
+  withErrorBoundary,
+} from '../hocs';
 import { useNewFilterManager, useTimeFilter } from '../hooks';
 import {
   IDataSourceFactoryConstructor,
@@ -92,6 +96,120 @@ const GetExpandedRow = withErrorBoundary(
   },
 );
 
+const WazuhFlyoutDiscoverComponentRender = compose(
+  withDataSourceLoading({
+    isLoadingNameProp: 'isDataSourceLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    dataSourceNameProp: 'dataSource',
+    isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceErrorNameProp: 'error',
+  }),
+)(
+  ({
+    searchBarProps,
+    results,
+    dataSource,
+    absoluteDateRange,
+    parsedItems,
+    expandedRowComponent,
+    indexPattern,
+    pagination,
+    sorting,
+    filters,
+    setFilters,
+    onTableChange,
+    getColumns,
+    timeField,
+  }) => (
+    <IntlProvider locale='en'>
+      <EuiFlexGroup className='flyout-row'>
+        <EuiFlexItem>
+          <WzSearchBar
+            appName='wazuh-discover-search-bar'
+            {...searchBarProps}
+            useDefaultBehaviors={false}
+            hideFixedFilters
+            showSaveQueryButton={false}
+          />
+          {results?.hits?.total === 0 && (
+            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+          )}
+          {dataSource && results?.hits?.total > 0 && (
+            <>
+              <EuiPanel
+                color='subdued'
+                borderRadius='none'
+                hasShadow={false}
+                paddingSize='s'
+              >
+                <HitsCounter
+                  hits={results?.hits?.total}
+                  showResetButton={false}
+                  tooltip={
+                    results?.hits?.total &&
+                    results?.hits?.total > MAX_ENTRIES_PER_QUERY
+                      ? {
+                          ariaLabel: 'Info',
+                          content: `The query results exceeded the limit of ${formatNumWithCommas(
+                            MAX_ENTRIES_PER_QUERY,
+                          )} hits. Please refine your search.`,
+                          iconType: 'iInCircle',
+                          position: 'top',
+                        }
+                      : undefined
+                  }
+                />
+
+                <EuiFlexGroup
+                  gutterSize='s'
+                  responsive={false}
+                  justifyContent='center'
+                  alignItems='center'
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiText size='s'>
+                      {`${formatUIDate(
+                        absoluteDateRange?.from,
+                      )} - ${formatUIDate(absoluteDateRange?.to)}`}
+                    </EuiText>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiPanel>
+              <TableBasicManageExpandedItems
+                items={parsedItems}
+                itemId={INDEX_FIELD_NAME}
+                expandableRowButtonSide='left'
+                ExpandableRowContent={({ item }) => (
+                  <GetExpandedRow
+                    item={item}
+                    results={results}
+                    expandedRowComponent={expandedRowComponent}
+                    indexPattern={indexPattern}
+                    filters={filters}
+                    setFilters={setFilters}
+                  />
+                )}
+                columns={getColumns()}
+                pagination={{
+                  ...pagination,
+                  totalItemCount:
+                    (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
+                      ? MAX_ENTRIES_PER_QUERY
+                      : results?.hits?.total ?? 0,
+                }}
+                sorting={sorting}
+                onChange={onTableChange}
+              />
+            </>
+          )}
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    </IntlProvider>
+  ),
+);
+
 const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   const {
     DataSource,
@@ -135,6 +253,7 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     repository: new AlertsDataSourceRepository(), // this makes only works with alerts index pattern
     DataSource,
@@ -258,94 +377,24 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
   }, [results]);
 
   return (
-    <IntlProvider locale='en'>
-      {isDataSourceLoading ? (
-        <LoadingSearchbarProgress />
-      ) : (
-        <EuiFlexGroup className='flyout-row'>
-          <EuiFlexItem>
-            <WzSearchBar
-              appName='wazuh-discover-search-bar'
-              {...searchBarProps}
-              useDefaultBehaviors={false}
-              hideFixedFilters
-              showSaveQueryButton={false}
-            />
-            {!isDataSourceLoading && results?.hits?.total === 0 && (
-              <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-            )}
-            {!isDataSourceLoading && dataSource && results?.hits?.total > 0 && (
-              <>
-                <EuiPanel
-                  color='subdued'
-                  borderRadius='none'
-                  hasShadow={false}
-                  paddingSize='s'
-                >
-                  <HitsCounter
-                    hits={results?.hits?.total}
-                    showResetButton={false}
-                    tooltip={
-                      results?.hits?.total &&
-                      results?.hits?.total > MAX_ENTRIES_PER_QUERY
-                        ? {
-                            ariaLabel: 'Info',
-                            content: `The query results exceeded the limit of ${formatNumWithCommas(
-                              MAX_ENTRIES_PER_QUERY,
-                            )} hits. Please refine your search.`,
-                            iconType: 'iInCircle',
-                            position: 'top',
-                          }
-                        : undefined
-                    }
-                  />
-
-                  <EuiFlexGroup
-                    gutterSize='s'
-                    responsive={false}
-                    justifyContent='center'
-                    alignItems='center'
-                  >
-                    <EuiFlexItem grow={false}>
-                      <EuiText size='s'>
-                        {`${formatUIDate(
-                          absoluteDateRange?.from,
-                        )} - ${formatUIDate(absoluteDateRange?.to)}`}
-                      </EuiText>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                </EuiPanel>
-                <TableBasicManageExpandedItems
-                  items={parsedItems}
-                  itemId={INDEX_FIELD_NAME}
-                  expandableRowButtonSide='left'
-                  ExpandableRowContent={({ item }) => (
-                    <GetExpandedRow
-                      item={item}
-                      results={results}
-                      expandedRowComponent={expandedRowComponent}
-                      indexPattern={indexPattern}
-                      filters={filters}
-                      setFilters={setFilters}
-                    />
-                  )}
-                  columns={getColumns()}
-                  pagination={{
-                    ...pagination,
-                    totalItemCount:
-                      (results?.hits?.total ?? 0) > MAX_ENTRIES_PER_QUERY
-                        ? MAX_ENTRIES_PER_QUERY
-                        : results?.hits?.total ?? 0,
-                  }}
-                  sorting={sorting}
-                  onChange={onTableChange}
-                />
-              </>
-            )}
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      )}
-    </IntlProvider>
+    <WazuhFlyoutDiscoverComponentRender
+      isDataSourceLoading={isDataSourceLoading}
+      error={error}
+      searchBarProps={searchBarProps}
+      results={results}
+      dataSource={dataSource}
+      absoluteDateRange={absoluteDateRange}
+      parsedItems={parsedItems}
+      expandedRowComponent={expandedRowComponent}
+      indexPattern={indexPattern}
+      pagination={pagination}
+      sorting={sorting}
+      filters={filters}
+      setFilters={setFilters}
+      onTableChange={onTableChange}
+      getColumns={getColumns}
+      timeField={timeField}
+    />
   );
 };
 

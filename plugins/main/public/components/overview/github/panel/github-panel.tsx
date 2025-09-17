@@ -1,7 +1,7 @@
 /*
  * Wazuh app - Office 365 Panel react component.
  *
- * Copyright (C) 2015-2022 Wazuh, Inc.
+ * Copyright (C) 2015-2025 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,108 +11,19 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { MainPanel } from '../../../common/modules/panel';
-import { withErrorBoundary } from '../../../common/hocs';
-import { CustomSearchBar } from '../../../common/custom-search-bar';
-import useSearchBar from '../../../common/search-bar/use-search-bar';
-import { LoadingSearchbarProgress } from '../../../common/loading-searchbar-progress/loading-searchbar-progress';
 import { ModuleConfiguration } from './views';
 import { ModuleConfig, filtersValues } from './config';
-import {
-  AlertsDataSourceRepository,
-  FILTER_OPERATOR,
-  PatternDataSource,
-  tParsedIndexPattern,
-  useDataSource,
-} from '../../../common/data-source';
+import { AlertsDataSourceRepository } from '../../../common/data-source';
 import { GitHubDataSource } from '../../../common/data-source/pattern/alerts/github/github-data-source';
-import { IndexPattern } from '../../../../../../src/plugins/data/public';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../../common/constants';
+import { createPanel } from '../../../common/dashboards';
 
-export const GitHubPanel = withErrorBoundary(() => {
-  const [drillDownValue, setDrillDownValue] = useState({
-    field: '',
-    value: '',
-  });
-  const [currentSelectedFilter, setCurrentSelectedFilter] = useState();
-  const [selectedPanelFilter, setSelectedPanelFilter] = useState([]);
-  const filterDrillDownValue = value => {
-    setDrillDownValue(value);
-  };
-  const {
-    filters,
-    dataSource,
-    fetchFilters,
-    fixedFilters,
-    isLoading: isDataSourceLoading,
-    fetchData,
-    setFilters,
-    filterManager,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
-    DataSource: GitHubDataSource,
-    repository: new AlertsDataSourceRepository(),
-    fetchFilters: [...selectedPanelFilter],
-  });
-
-  const { searchBarProps } = useSearchBar({
-    indexPattern: dataSource?.indexPattern as IndexPattern,
-    filters,
-    setFilters,
-  });
-
-  const handleChangeView = selectedFilter => {
-    if (!selectedFilter) {
-      return;
-    }
-    const { field, value } = selectedFilter;
-    const controlledByFilter = 'github-panel-row-filter';
-    if (value) {
-      const filter = filterManager?.createFilter(
-        FILTER_OPERATOR.IS_ONE_OF,
-        field,
-        [value],
-        controlledByFilter,
-      );
-      setSelectedPanelFilter([filter]);
-    } else {
-      setSelectedPanelFilter([]);
-    }
-    setCurrentSelectedFilter(selectedFilter);
-  };
-
-  return (
-    <>
-      {isDataSourceLoading ? (
-        <LoadingSearchbarProgress />
-      ) : (
-        <>
-          <div className='wz-custom-searchbar-wrapper'>
-            <CustomSearchBar
-              filterInputs={filtersValues}
-              filterDrillDownValue={drillDownValue}
-              fixedFilters={[...fixedFilters, ...selectedPanelFilter]}
-              searchBarProps={{ ...searchBarProps, showDatePicker: true }}
-              setFilters={setFilters}
-              indexPattern={dataSource?.indexPattern}
-            />
-          </div>
-          <MainPanel
-            moduleConfig={ModuleConfig}
-            filterDrillDownValue={filterDrillDownValue}
-            sidePanelChildren={<ModuleConfiguration />}
-            onChangeView={handleChangeView}
-            dataSourceProps={{
-              fetchData: fetchData,
-              fetchFilters: [...fetchFilters, ...selectedPanelFilter],
-              searchBarProps,
-              indexPattern: dataSource?.indexPattern,
-            }}
-            isLoading={isDataSourceLoading}
-            categoriesSampleData={[WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY]}
-          />
-        </>
-      )}
-    </>
-  );
+export const GitHubPanel = createPanel({
+  DataSource: GitHubDataSource,
+  DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  MainPanel,
+  ModuleConfiguration,
+  ModuleConfig,
+  filtersValues,
 });

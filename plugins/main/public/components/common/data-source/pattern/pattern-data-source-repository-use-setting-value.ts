@@ -1,4 +1,7 @@
-import { PatternDataSourceRepository } from './pattern-data-source-repository';
+import {
+  PatternDataSourceRepository,
+  tParsedIndexPattern,
+} from './pattern-data-source-repository';
 import { get } from 'lodash';
 
 export const createPatternDataSourceRepositoryUseValue = (
@@ -33,8 +36,15 @@ export const createPatternDataSourceRepositoryUseValue = (
       return fieldsToCheck.some(key => get(dataSource, key) === indexPattern);
     }
 
-    getDefault() {
-      return Promise.resolve(null);
+    getDefault(dataSources: tParsedIndexPattern[]) {
+      const [dataSource] = dataSources;
+
+      if (!dataSource) {
+        throw new Error(
+          `Index pattern with ID or title [${indexPattern}] not found. Review if you have at least one index pattern with this configuration. You can create the index patterns from Dashboard Management application if there are matching indices. If there are no matching indices, this could indicate the data collection is disabled or there is a problem in the collection or ingestion.`,
+        );
+      }
+      return dataSource;
     }
 
     setDefault(dataSource: tParsedIndexPattern) {

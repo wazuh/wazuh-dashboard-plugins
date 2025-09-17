@@ -24,7 +24,12 @@ export class StatisticsDataSource extends PatternDataSource {
 
   getAPIFilter(): tFilter[] {
     const currentApi = AppState.getCurrentAPI();
-    const parsedCurrentApi = currentApi ? JSON.parse(currentApi) : undefined;
+    if (!currentApi) {
+      throw new Error(
+        'The filter related to the selected server API context can not be created due to the required data was not found. This is usually caused because there is no selected a server API. Ensure the server API is available and select it in the server API selector.',
+      );
+    }
+    const parsedCurrentApi = JSON.parse(currentApi);
     const apiNameFilter = {
       meta: {
         removable: false,

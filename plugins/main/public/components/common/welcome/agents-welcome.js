@@ -433,7 +433,9 @@ export const AgentsWelcome = compose(
     renderSCALastScan() {
       return (
         <EuiFlexGroup direction='column'>
-          <ScaScan {...this.props} />
+          <EuiFlexItem>
+            <ScaScan {...this.props} />
+          </EuiFlexItem>
         </EuiFlexGroup>
       );
     }

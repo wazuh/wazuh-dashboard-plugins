@@ -10,6 +10,11 @@ jest.mock('../../../../../../kibana-services', () => ({
       return false;
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 const mockProps = {
