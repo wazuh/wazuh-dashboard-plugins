@@ -43,7 +43,7 @@ export const queryConfig = async (agentId, sections, node = false) => {
         }
         try {
           const url =
-            agentId === '000'
+            (agentId === '000' || node)
               ? `/cluster/${node}/configuration/${component}/${configuration}`
               : `/agents/${agentId}/configuration/${component}/${configuration}`;
 
