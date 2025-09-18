@@ -49,7 +49,6 @@ import { withUserAuthorizationPrompt } from '../../../../../components/common/ho
 
 import {
   clusterNodes as requestClusterNodes,
-  clusterReq,
   agentIsSynchronized,
 } from './utils/wz-fetch';
 import {
@@ -152,20 +151,9 @@ class WzConfigurationSwitch extends Component {
 
   updateClusterInformation = async (/** @type {string} */ context) => {
     try {
-      // try if it is a cluster
-      const clusterStatus = await clusterReq();
-      const isCluster =
-        clusterStatus.data.data.enabled === 'yes' &&
-        clusterStatus.data.data.running === 'yes';
-
-      if (isCluster) {
-        await this.handleClusterNodes();
-      } else {
-        // do nothing if it isn't a cluster
-        this.resetClusterState();
-      }
+      await this.handleClusterNodes();
     } catch (error) {
-      // do nothing if it isn't a cluster
+      // Handle cluster errors
       this.resetClusterState();
       this.catchError(error, context);
     }
@@ -468,7 +456,7 @@ const mapDispatchToProps = dispatch => ({
 export default compose(
   withUserAuthorizationPrompt(props => [
     props.agent.id === '000'
-      ? { action: 'manager:read', resource: '*:*:*' }
+      ? { action: 'cluster:read', resource: 'node:id:*' }
       : [
           { action: 'agent:read', resource: `agent:id:${props.agent.id}` },
           ...(props.agent.group || []).map(group => ({
@@ -476,7 +464,7 @@ export default compose(
             resource: `agent:group:${group}`,
           })),
         ],
-  ]), //TODO: this need cluster:read permission but manager/cluster is managed in WzConfigurationSwitch component
+  ]),
   withRenderIfOrWrapped(
     props =>
       props.agent.id !== '000' &&

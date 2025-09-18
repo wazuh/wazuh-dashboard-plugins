@@ -11,11 +11,11 @@ export class SCAStatesDataSource extends PatternDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...this.getClusterManagerFilters(), ...super.getFixedFilters()];
+    return [...this.getClusterFilters(), ...super.getFixedFilters()];
   }
 
-  getClusterManagerFilters() {
-    return PatternDataSourceFilterManager.getClusterManagerFilters(
+  getClusterFilters() {
+    return PatternDataSourceFilterManager.getClusterFilters(
       this.id,
       DATA_SOURCE_FILTER_CONTROLLED_CLUSTER_MANAGER,
       VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER,

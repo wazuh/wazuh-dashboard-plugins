@@ -7,6 +7,6 @@ export class ClusterDataSource extends AlertsDataSource {
   }
 
   getFixedFilters(): tFilter[] {
-    return [...super.getClusterManagerFilters()];
+    return [...super.getClusterFilters()];
   }
 }

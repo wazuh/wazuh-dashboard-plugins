@@ -24,14 +24,10 @@ export const getLast24HoursAlerts = async (
       AppState.getCurrentPattern() ||
         getWazuhCorePlugin().configuration.getSettingValue('pattern'),
     );
-    const isCluster = AppState.getClusterInfo().status == 'enabled';
-    const clusterValue = isCluster
-      ? AppState.getClusterInfo().cluster
-      : AppState.getClusterInfo().manager;
+    const clusterValue = AppState.getClusterInfo().cluster;
 
     const lastAlertsQuery = getLastAlertsQuery(
       currentIndexPattern,
-      isCluster,
       clusterValue,
       ruleLevelRange,
     );
@@ -41,7 +37,7 @@ export const getLast24HoursAlerts = async (
     return {
       count,
       cluster: {
-        field: isCluster ? 'cluster.name' : 'manager.name',
+        field: 'cluster.name',
         name: clusterValue,
       },
       indexPatternId: currentIndexPattern.id,

@@ -55,7 +55,7 @@ export const getUpdates = async (
       hosts?.map(async api => {
         const data = {};
         const method = 'GET';
-        const path = `/manager/version/check?force_query=${forceQuery}`;
+        const path = `/cluster/version/check?force_query=${forceQuery}`;
         const options = {
           apiHostID: api.id,
           forceRefresh: true,

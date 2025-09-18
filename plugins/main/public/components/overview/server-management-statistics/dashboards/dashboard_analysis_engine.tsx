@@ -11,7 +11,6 @@ const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
 interface DashboardStatisticsProps {
-  isClusterMode: boolean;
   indexPatternId: string;
   filters: tFilter[];
   searchBarProps: any;
@@ -19,7 +18,6 @@ interface DashboardStatisticsProps {
 }
 
 const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
-  isClusterMode,
   indexPatternId,
   filters,
   searchBarProps,
@@ -30,10 +28,7 @@ const DashboardStatistics: React.FC<DashboardStatisticsProps> = ({
       <DashboardByRenderer
         input={{
           viewMode: ViewMode.VIEW,
-          panels: getDashboardPanelsAnalysisEngine(
-            indexPatternId,
-            isClusterMode,
-          ),
+          panels: getDashboardPanelsAnalysisEngine(indexPatternId),
           isFullScreenMode: false,
           filters: filters,
           useMargins: true,

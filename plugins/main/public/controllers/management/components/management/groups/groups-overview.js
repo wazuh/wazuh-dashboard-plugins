@@ -99,7 +99,6 @@ export class WzGroupsOverview extends Component {
                     action: 'group:update_config',
                     resource: `group:id:${item.name}`,
                   },
-                  { action: 'cluster:status', resource: '*:*:*' },
                 ]}
                 tooltip={{
                   position: 'top',

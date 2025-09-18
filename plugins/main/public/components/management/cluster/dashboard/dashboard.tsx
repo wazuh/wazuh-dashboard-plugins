@@ -32,10 +32,6 @@ import {
 } from '../../../common/hocs';
 import { compose } from 'redux';
 
-interface DashboardCTProps {
-  statusRunning: string;
-}
-
 interface ClusterDashboardState {
   showConfig: boolean;
   showNodes: boolean;
@@ -61,7 +57,6 @@ const DashboardCTMainView = compose(
     goNodes,
     goAgents,
     goConfiguration,
-    status,
     state,
     searchBarProps,
     results,
@@ -73,7 +68,6 @@ const DashboardCTMainView = compose(
       goNodes={goNodes}
       goAgents={goAgents}
       goConfiguration={goConfiguration}
-      status={status}
       configuration={state?.configuration}
       version={state?.version}
       nodesCount={state?.nodesCount}
@@ -89,7 +83,7 @@ const DashboardCTMainView = compose(
   ),
 );
 
-const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
+const DashboardCT: React.FC<DashboardCTProps> = () => {
   const {
     filters,
     dataSource,
@@ -221,7 +215,6 @@ const DashboardCT: React.FC<DashboardCTProps> = ({ statusRunning }) => {
             goNodes={goNodes}
             goAgents={goAgents}
             goConfiguration={goConfiguration}
-            status={statusRunning}
             state={state}
             searchBarProps={searchBarProps}
             results={results}

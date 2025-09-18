@@ -10,20 +10,7 @@ test('Test statistics panels in analysis engine with cluster mode', () => {
   expect(
     compareColumnsValue(
       FieldsStatistics,
-      idExtractor(
-        getDashboardPanelsAnalysisEngine(INDEX_PATTERN_STATISTICS, true),
-      ),
-    ),
-  ).toBe(true);
-});
-
-test('Test statistics panels in analysis engine with disabled cluster mode', () => {
-  expect(
-    compareColumnsValue(
-      FieldsStatistics,
-      idExtractor(
-        getDashboardPanelsAnalysisEngine(INDEX_PATTERN_STATISTICS, false),
-      ),
+      idExtractor(getDashboardPanelsAnalysisEngine(INDEX_PATTERN_STATISTICS)),
     ),
   ).toBe(true);
 });

@@ -23,7 +23,7 @@ import {
   EuiSpacer,
   EuiProgress,
 } from '@elastic/eui';
-import { clusterReq, clusterNodes } from '../configuration/utils/wz-fetch';
+import { clusterNodes } from '../configuration/utils/wz-fetch';
 import { compose } from 'redux';
 import {
   withGlobalBreadcrumb,
@@ -62,32 +62,17 @@ export class WzStatisticsOverview extends Component {
   async componentDidMount() {
     this._isMounted = true;
     try {
-      // try if it is a cluster
-      const clusterStatus = await clusterReq();
-      const isClusterMode =
-        clusterStatus.data.data.enabled === 'yes' &&
-        clusterStatus.data.data.running === 'yes';
-      if (isClusterMode) {
-        const data = await clusterNodes();
-        const nodes = data.data.data.affected_items.map(item => {
-          return { value: item.name, text: `${item.name} (${item.type})` };
-        });
-        nodes.unshift({ value: 'all', text: 'All' });
-        this.setState({
-          isClusterMode,
-          clusterNodes: nodes,
-          clusterNodeSelected: nodes[0].value,
-        });
-      } else {
-        this.setState({
-          isClusterMode,
-          clusterNodes: [],
-          clusterNodeSelected: 'all',
-        });
-      }
+      const data = await clusterNodes();
+      const nodes = data.data.data.affected_items.map(item => {
+        return { value: item.name, text: `${item.name} (${item.type})` };
+      });
+      nodes.unshift({ value: 'all', text: 'All' });
+      this.setState({
+        clusterNodes: nodes,
+        clusterNodeSelected: nodes[0].value,
+      });
     } catch (error) {
       this.setState({
-        isClusterMode: undefined,
         clusterNodes: [],
         clusterNodeSelected: 'all',
       });
@@ -179,7 +164,6 @@ export class WzStatisticsOverview extends Component {
           <DashboardTabsPanels
             selectedTab={this.state.selectedTabId}
             loadingNode={this.state.loadingNode}
-            isClusterMode={this.state.isClusterMode}
             clusterNodes={this.state.clusterNodes}
             clusterNodeSelected={this.state.clusterNodeSelected}
             onSelectNode={this.onSelectNode}
@@ -193,7 +177,6 @@ export class WzStatisticsOverview extends Component {
 export default compose(
   withGlobalBreadcrumb([{ text: statistics.breadcrumbLabel }]),
   withUserAuthorizationPrompt([
-    { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
 )(WzStatisticsOverview);

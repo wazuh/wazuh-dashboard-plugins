@@ -22,7 +22,6 @@ interface OverviewCardsProps {
   goNodes: () => void;
   goConfiguration: () => void;
   configuration: any;
-  status: any;
   version: any;
   nodesCount: number;
   nodeList: any[];
@@ -44,7 +43,6 @@ export const OverviewCards = ({
   goNodes,
   goConfiguration,
   configuration,
-  status,
   version,
   nodesCount,
   nodeList,
@@ -96,10 +94,6 @@ export const OverviewCards = ({
                 {
                   title: 'IP address',
                   description: configuration?.nodes[0] || '-',
-                },
-                {
-                  title: 'Running',
-                  description: status ?? 'no',
                 },
                 {
                   title: 'Version',

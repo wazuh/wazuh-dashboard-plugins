@@ -325,7 +325,7 @@ function init(editorInput, editorOutput) {
   const currentState = AppState.getCurrentDevTools();
   if (!currentState) {
     const demoStr =
-      'GET /agents?status=active\n\n# Example comment\n\n# You can use ? after the endpoint \n# in order to get suggestions \n# for your query params\n\nGET /manager/info\n\nPOST /agents\n' +
+      'GET /agents?status=active\n\n# Example comment\n\n# You can use ? after the endpoint \n# in order to get suggestions \n# for your query params\n\nGET /cluster/local/info\n\nPOST /agents\n' +
       JSON.stringify({ name: 'NewAgent' }, null, 2) +
       '\n\nPUT /logtest\n' +
       JSON.stringify(

@@ -31,7 +31,6 @@ import {
   updateStats,
   updateNodeInfo,
   updateAgentInfo,
-  updateClusterEnabled,
   cleanInfo,
 } from '../../../../../redux/actions/statusActions';
 import StatusHandler from './utils/status-handler';
@@ -93,12 +92,9 @@ export class WzStatusOverview extends Component {
     try {
       this.props.updateLoadingStatus(true);
 
-      const [clusterStatus, agentsCountByManagerNodes] = (
-        await Promise.all([
-          this.statusHandler.clusterStatus(),
-          this.statusHandler.clusterAgentsCount(),
-        ])
-      ).map(response => response?.data?.data);
+      const agentsCountByManagerNodes = (
+        await this.statusHandler.clusterAgentsCount()
+      )?.data?.data;
       const { connection: agentsCount, configuration } =
         agentsCountByManagerNodes?.agent_status;
 
@@ -117,16 +113,7 @@ export class WzStatusOverview extends Component {
         agentsSynced: isNaN(agentsSyncedCoverage) ? 0 : agentsSyncedCoverage,
         agentsCoverage: isNaN(agentsActiveCoverage) ? 0 : agentsActiveCoverage,
       });
-
-      this.props.updateClusterEnabled(
-        clusterStatus && clusterStatus.enabled === 'yes',
-      );
-
-      if (
-        clusterStatus &&
-        clusterStatus.enabled === 'yes' &&
-        clusterStatus.running === 'yes'
-      ) {
+      {
         const nodes = await this.statusHandler.clusterNodes();
         const listNodes = nodes.data.data.affected_items;
         this.props.updateListNodes(listNodes);
@@ -143,28 +130,6 @@ export class WzStatusOverview extends Component {
           masterNode.name,
         );
         this.props.updateNodeInfo(nodeInfo.data.data.affected_items[0]);
-      } else {
-        if (
-          clusterStatus &&
-          clusterStatus.enabled === 'yes' &&
-          clusterStatus.running === 'no'
-        ) {
-          this.showToast(
-            'danger',
-            `Cluster is enabled but it's not running, please check your cluster health.`,
-            3000,
-          );
-        } else {
-          const managerInfo = await this.statusHandler.managerInfo();
-          const daemons = await this.statusHandler.managerStatus();
-          const listDaemons = this.objToArr(
-            daemons?.data?.data?.affected_items?.[0],
-          );
-          const managerInfoData = managerInfo?.data?.data?.affected_items?.[0];
-          this.props.updateListDaemons(listDaemons);
-          this.props.updateSelectedNode(false);
-          this.props.updateNodeInfo(managerInfoData);
-        }
       }
       const [lastAgent] = agentsCountByManagerNodes?.last_registered_agent;
 
@@ -257,9 +222,6 @@ const mapDispatchToProps = dispatch => {
     updateStats: stats => dispatch(updateStats(stats)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
     updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
-    updateClusterEnabled: clusterEnabled =>
-      dispatch(updateClusterEnabled(clusterEnabled)),
-    cleanInfo: () => dispatch(cleanInfo()),
   };
 };
 
@@ -270,7 +232,6 @@ export default compose(
       { action: 'agent:read', resource: 'agent:id:*' },
       { action: 'agent:read', resource: 'agent:group:*' },
     ],
-    { action: 'manager:read', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
   ]),
   connect(mapStateToProps, mapDispatchToProps),
