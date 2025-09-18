@@ -52,7 +52,7 @@ export const getCurrentConfig = async (
       }
       try {
         const url =
-          agentId === '000'
+          (agentId === '000' || node)
             ? `/cluster/${node}/configuration/${component}/${configuration}`
             : `/agents/${agentId}/config/${component}/${configuration}`;
 
