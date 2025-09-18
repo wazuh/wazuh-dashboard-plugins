@@ -19,7 +19,7 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_CDBLIST_KEY } from '../../common/constants';
 import CDBListsTable from '../components/cdblists-table';
 import '../../common/layout-overview.scss';
-import WzReloadClusterCallout from '../../../../../../components/common/reload-cluster-manager-callout';
+import WzReloadClusterCallout from '../../../../../../components/common/reload-cluster-callout';
 import { cdbLists } from '../../../../../../utils/applications';
 
 function WzCDBListsOverview(props) {

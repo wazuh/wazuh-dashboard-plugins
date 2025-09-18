@@ -20,7 +20,7 @@ import { SECTION_RULES_KEY } from '../../common/constants';
 import RulesetTable from '../components/ruleset-table';
 import '../../common/layout-overview.scss';
 import { rules } from '../../../../../../utils/applications';
-import WzReloadClusterCallout from '../../../../../../components/common/reload-cluster-manager-callout';
+import WzReloadClusterCallout from '../../../../../../components/common/reload-cluster-callout';
 
 function WzRulesetOverview(props) {
   const [showWarningRestart, setShowWarningRestart] = useState(false);

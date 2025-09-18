@@ -35,7 +35,7 @@ import validateConfigAfterSent from './valid-configuration';
 
 import { getToasts } from '../../../../../kibana-services';
 import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateActions';
-import WzReloadClusterCallout from '../../../../../components/common/reload-cluster-manager-callout';
+import WzReloadClusterCallout from '../../../../../components/common/reload-cluster-callout';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import 'brace/theme/textmate';

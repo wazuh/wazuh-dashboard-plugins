@@ -20,7 +20,7 @@ import { resourceDictionary } from '../../common/resources-handler';
 import { SECTION_DECODERS_KEY } from '../../common/constants';
 import '../../common/layout-overview.scss';
 import DecodersTable from '../components/decoders-table';
-import WzReloadClusterCallout from '../../../../../../components/common/reload-cluster-manager-callout';
+import WzReloadClusterCallout from '../../../../../../components/common/reload-cluster-callout';
 import { decoders } from '../../../../../../utils/applications';
 
 function WzDecodersOverview(props) {
