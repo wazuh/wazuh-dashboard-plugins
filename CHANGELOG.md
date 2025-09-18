@@ -17,6 +17,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Updated OS logos [#7712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7712)
+- Changed services tab to listeners in networks inventory [#7742](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7742)
 
 ### Fixed
 
