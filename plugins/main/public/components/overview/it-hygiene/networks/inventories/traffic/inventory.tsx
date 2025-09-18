@@ -6,13 +6,14 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryTrafficDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../../../common/components/inventory';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
 import { getOverviewProcessesPortTab } from './dashboard';
+import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../../../common/constants';
 
 export const ITHygieneNetworksInventoryTraffic =
-  withSystemInventoryTrafficDataSource(props => {
+  withSystemInventoryTrafficDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryTrafficStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryTrafficStatesDataSourceRepository
@@ -21,7 +22,7 @@ export const ITHygieneNetworksInventoryTraffic =
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewProcessesPortTab}
         tableId='it-hygiene-inventory-traffic'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

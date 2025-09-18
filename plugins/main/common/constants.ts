@@ -30,47 +30,45 @@ export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
 export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics-*';
 
 // Wazuh vulnerabilities
-export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities-*';
+export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities*';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
 // FIM
-export const WAZUH_FIM_PATTERN = 'wazuh-states-fim-*';
-export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files-*';
+export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
+export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files*';
 export const WAZUH_FIM_REGISTRY_KEYS_PATTERN =
-  'wazuh-states-fim-registry-keys-*';
+  'wazuh-states-fim-registry-keys*';
 export const WAZUH_FIM_REGISTRY_VALUES_PATTERN =
-  'wazuh-states-fim-registry-values-*';
+  'wazuh-states-fim-registry-values*';
 
 // SCA
-export const WAZUH_SCA_PATTERN = 'wazuh-states-sca-*';
+export const WAZUH_SCA_PATTERN = 'wazuh-states-sca*';
 
 // System inventory
-export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory-*';
+export const WAZUH_IT_HYGIENE_PATTERN = 'wazuh-states-inventory*';
 export const WAZUH_IT_HYGIENE_HARDWARE_PATTERN =
-  'wazuh-states-inventory-hardware-*';
+  'wazuh-states-inventory-hardware*';
 export const WAZUH_IT_HYGIENE_HOTFIXES_PATTERN =
-  'wazuh-states-inventory-hotfixes-*';
+  'wazuh-states-inventory-hotfixes*';
 export const WAZUH_IT_HYGIENE_INTERFACES_PATTERN =
-  'wazuh-states-inventory-interfaces-*';
+  'wazuh-states-inventory-interfaces*';
 export const WAZUH_IT_HYGIENE_NETWORKS_PATTERN =
-  'wazuh-states-inventory-networks-*';
+  'wazuh-states-inventory-networks*';
 export const WAZUH_IT_HYGIENE_PACKAGES_PATTERN =
-  'wazuh-states-inventory-packages-*';
-export const WAZUH_IT_HYGIENE_PORTS_PATTERN = 'wazuh-states-inventory-ports-*';
+  'wazuh-states-inventory-packages*';
+export const WAZUH_IT_HYGIENE_PORTS_PATTERN = 'wazuh-states-inventory-ports*';
 export const WAZUH_IT_HYGIENE_PROCESSES_PATTERN =
-  'wazuh-states-inventory-processes-*';
+  'wazuh-states-inventory-processes*';
 export const WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN =
-  'wazuh-states-inventory-protocols-*';
-export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN =
-  'wazuh-states-inventory-system-*';
-export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users-*';
-export const WAZUH_IT_HYGIENE_GROUPS_PATTERN =
-  'wazuh-states-inventory-groups-*';
+  'wazuh-states-inventory-protocols*';
+export const WAZUH_IT_HYGIENE_SYSTEM_PATTERN = 'wazuh-states-inventory-system*';
+export const WAZUH_IT_HYGIENE_USERS_PATTERN = 'wazuh-states-inventory-users*';
+export const WAZUH_IT_HYGIENE_GROUPS_PATTERN = 'wazuh-states-inventory-groups*';
 export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
-  'wazuh-states-inventory-services-*';
+  'wazuh-states-inventory-services*';
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
-  'wazuh-states-inventory-browser-extensions-*';
+  'wazuh-states-inventory-browser-extensions*';
 
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
@@ -620,9 +618,6 @@ export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING =
   'user-manual/wazuh-dashboard/troubleshooting.html';
 export const PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_APP_CONFIGURATION =
   'user-manual/wazuh-dashboard/settings.html';
-export const PLUGIN_PLATFORM_URL_GUIDE =
-  'https://opensearch.org/docs/2.10/about';
-export const PLUGIN_PLATFORM_URL_GUIDE_TITLE = 'OpenSearch guide';
 
 export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'osd-xsrf': 'kibana',
@@ -859,3 +854,67 @@ export const SUPPORTED_LANGUAGES = {
 } as const;
 
 export const SUPPORTED_LANGUAGES_ARRAY = Object.values(SUPPORTED_LANGUAGES);
+
+// Health check
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS = 'index-pattern:alerts';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES =
+  'index-pattern:vulnerabilities-states';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING =
+  'index-pattern:monitoring';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS =
+  'index-pattern:statistitcs';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
+  'index-pattern:states-inventory';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES =
+  'index-pattern:states-inventory-groups';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES =
+  'index-pattern:states-inventory-hardware';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES =
+  'index-pattern:states-inventory-hotfixes';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_INTERFACES_STATES =
+  'index-pattern:states-inventory-interfaces';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES =
+  'index-pattern:states-inventory-networks';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PACKAGES_STATES =
+  'index-pattern:states-inventory-packages';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PORTS_STATES =
+  'index-pattern:states-inventory-ports';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROCESSES_STATES =
+  'index-pattern:states-inventory-processes';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES =
+  'index-pattern:states-inventory-protocols';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES =
+  'index-pattern:states-inventory-system';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES =
+  'index-pattern:states-inventory-users';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES =
+  'index-pattern:states-inventory-services';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES =
+  'index-pattern:states-inventory-browser-extensions';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES =
+  'index-pattern:states-fim-files';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES =
+  'index-pattern:states-fim-registry-keys';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
+  'index-pattern:states-fim-registry-values';
+
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
+  'index-pattern:states-sca';

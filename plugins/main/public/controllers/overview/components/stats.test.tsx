@@ -16,7 +16,6 @@ import React from 'react';
 import { render, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Stats } from './stats';
-import jsonBeautifier from '../../../utils/json-beautifier';
 
 jest.mock('../../../react-services/navigation-service', () => {
   return {
@@ -24,6 +23,9 @@ jest.mock('../../../react-services/navigation-service', () => {
       return {
         getUrlForApp() {
           return '';
+        },
+        getHistory() {
+          return {};
         },
       };
     },
@@ -77,6 +79,16 @@ jest.mock('../../../kibana-services', () => ({
       get: () => true,
     },
   }),
+  getCookies: jest.fn(() => {
+    return {
+      get: () => 'test',
+    };
+  }),
+  getUiSettings: jest.fn(() => {
+    return {
+      get: () => 'test',
+    };
+  }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
@@ -88,7 +100,17 @@ jest.mock('../../../react-services/common-services', () => ({
 describe('Stats component', () => {
   test('renders correctly to match the snapshot', async () => {
     await act(async () => {
-      const { container } = render(<Stats />);
+      const { container } = render(
+        <Stats
+          active={8}
+          disconnected={0}
+          never_connected={3}
+          pending={0}
+          total={11}
+          error={null}
+          isAgentsLoading={false}
+        />,
+      );
       expect(container).toMatchSnapshot();
     });
   });

@@ -26,7 +26,7 @@ import {
   agentStatusColorByAgentStatus,
 } from '../../../../common/services/wz_agent_status';
 import { endpointSummary } from '../../../utils/applications';
-import { LastAlertsStat } from './last-alerts-stat';
+import { LastAlertsSummaryBySeverity } from './last-alerts-stat';
 import { VisualizationBasic } from '../../../components/common/charts/visualizations/basic';
 import NavigationService from '../../../react-services/navigation-service';
 import './stats.scss';
@@ -92,22 +92,22 @@ export const Stats = withErrorBoundary(
         window.innerWidth < 768 ? mobileLoadingSize : normalLoadingSize;
       const size = this.props.isAgentsLoading
         ? loadingSize
-        : { width: '100%', height: '150px' };
+        : /* WORKAROUND: Increase the height if there is an error, to mitigate the overflow problems in the limited size.*/
+          { width: '100%', height: this.props.error ? '250px' : '150px' };
       return size;
     }
 
     render() {
-      const { isAgentsLoading } = this.props;
+      const { isAgentsLoading, error } = this.props;
       const hasResults = this.agentStatus.some(
         ({ status }) => this.props[status],
       );
-      const showAgentsChart = isAgentsLoading || hasResults;
 
       return (
         <EuiFlexGroup gutterSize='l'>
           <EuiFlexItem grow={false}>
             <EuiCard betaBadgeLabel='Agents summary' title=''>
-              {showAgentsChart ? (
+              {hasResults || isAgentsLoading || error ? (
                 <VisualizationBasic
                   isLoading={isAgentsLoading}
                   type='donut'
@@ -124,6 +124,7 @@ export const Stats = withErrorBoundary(
                       color,
                     }),
                   )}
+                  error={error}
                 />
               ) : (
                 <EuiEmptyPrompt
@@ -158,12 +159,9 @@ export const Stats = withErrorBoundary(
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiCard betaBadgeLabel='Last 24 hours alerts' title=''>
-              <EuiFlexGroup className='vulnerabilites-summary-card' wrap>
-                <LastAlertsStat severity='critical' />
-                <LastAlertsStat severity='high' />
-                <LastAlertsStat severity='medium' />
-                <LastAlertsStat severity='low' />
-              </EuiFlexGroup>
+              <div className='vulnerabilites-summary-card'>
+                <LastAlertsSummaryBySeverity />
+              </div>
             </EuiCard>
           </EuiFlexItem>
         </EuiFlexGroup>

@@ -934,16 +934,11 @@ export class WazuhApiCtrl {
   ) {
     try {
       const APP_LOGO = 'customization.logo.app';
-      const HEALTHCHECK_LOGO = 'customization.logo.healthcheck';
 
       const logos = {
         [APP_LOGO]:
           await context.wazuh_core.configuration.getCustomizationSetting(
             APP_LOGO,
-          ),
-        [HEALTHCHECK_LOGO]:
-          await context.wazuh_core.configuration.getCustomizationSetting(
-            HEALTHCHECK_LOGO,
           ),
       };
 

@@ -188,7 +188,7 @@ export class ManageHosts {
 
     let manager = null,
       node = null,
-      cluster = 'Disabled',
+      cluster = null,
       allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
 
     try {

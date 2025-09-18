@@ -16,7 +16,6 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { WzMenu } from './wz-menu';
 
-
 describe('WzMenu tests', () => {
   test('should render a WzMenu', () => {
     const component = shallow(<WzMenu />);

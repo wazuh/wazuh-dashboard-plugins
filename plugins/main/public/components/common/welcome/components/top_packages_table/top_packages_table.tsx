@@ -12,17 +12,16 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
-  EuiBasicTable,
   EuiFlexItem,
   EuiPanel,
   EuiSpacer,
   EuiText,
   EuiFlexGroup,
+  EuiInMemoryTable,
 } from '@elastic/eui';
 // @ts-ignore
-import { getDataPlugin } from '../../../../../kibana-services';
 import { vulnerabilityDetection } from '../../../../../utils/applications';
 import {
   PatternDataSourceFilterManager,
@@ -31,11 +30,6 @@ import {
 import { WzLink } from '../../../../../components/wz-link/wz-link';
 
 export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
-  const [sort, setSort] = useState({
-    field: 'doc_count',
-    direction: 'desc',
-  });
-
   const columns = [
     {
       field: 'key',
@@ -78,15 +72,12 @@ export function VulsTopPackageTable({ agentId, items, indexPatternId }) {
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='s' />
-      <EuiBasicTable
+      <EuiInMemoryTable
         items={items}
         columns={columns}
-        loading={false}
-        sorting={{ sort }}
-        onChange={e => setSort(e.sort)}
-        itemId='top-packages-table'
-        noItemsMessage='No recent events'
-      />
+        sorting={true}
+        noItemsMessage='No packages found'
+      ></EuiInMemoryTable>
     </EuiPanel>
   );
 }

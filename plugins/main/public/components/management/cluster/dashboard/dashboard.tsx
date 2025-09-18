@@ -26,6 +26,11 @@ import {
 } from '../../../common/data-source';
 import { WzSearchBar } from '../../../common/search-bar';
 import NavigationService from '../../../../react-services/navigation-service';
+import {
+  withDataSourceInitiated,
+  withDataSourceLoading,
+} from '../../../common/hocs';
+import { compose } from 'redux';
 
 interface ClusterDashboardState {
   showConfig: boolean;
@@ -37,7 +42,48 @@ interface ClusterDashboardState {
   agentsCount: number;
 }
 
-const DashboardCT: React.FC = () => {
+const DashboardCTMainView = compose(
+  withDataSourceLoading({
+    isLoadingNameProp: 'isDataSourceLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    isLoadingNameProp: 'isDataSourceLoading',
+    dataSourceNameProp: 'dataSource',
+    dataSourceErrorNameProp: 'error',
+  }),
+)(
+  ({
+    goNodes,
+    goAgents,
+    goConfiguration,
+    state,
+    searchBarProps,
+    results,
+    dataSource,
+    fetchFilters,
+    fingerprint,
+  }) => (
+    <OverviewCards
+      goNodes={goNodes}
+      goAgents={goAgents}
+      goConfiguration={goConfiguration}
+      configuration={state?.configuration}
+      version={state?.version}
+      nodesCount={state?.nodesCount}
+      nodeList={state?.nodeList}
+      clusterName={state.configuration?.name}
+      agentsCount={state?.agentsCount}
+      searchBarProps={searchBarProps}
+      results={results}
+      indexPattern={dataSource?.indexPattern}
+      filters={fetchFilters ?? []}
+      lastReloadRequestTime={fingerprint}
+    />
+  ),
+);
+
+const DashboardCT: React.FC<DashboardCTProps> = () => {
   const {
     filters,
     dataSource,
@@ -46,6 +92,7 @@ const DashboardCT: React.FC = () => {
     isLoading: isDataSourceLoading,
     fetchData,
     setFilters,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: ClusterDataSource,
     repository: new AlertsDataSourceRepository(),
@@ -155,35 +202,27 @@ const DashboardCT: React.FC = () => {
   return (
     <I18nProvider>
       <EuiFlexItem style={{ padding: '0 16px' }}>
-        {isDataSourceLoading && !dataSource ? (
-          <LoadingSearchbarProgress />
-        ) : !state.showNodes ? (
+        {dataSource && !state.showNodes && (
           <WzSearchBar
             appName='ct-searchbar'
             {...searchBarProps}
             fixedFilters={fixedFilters}
           />
-        ) : null}
+        )}
         <EuiSpacer size='m' />
-        {!isDataSourceLoading &&
-        dataSource &&
-        !state.showConfig &&
-        !state.showNodes ? (
-          <OverviewCards
+        {!state.showConfig && !state.showNodes ? (
+          <DashboardCTMainView
             goNodes={goNodes}
             goAgents={goAgents}
             goConfiguration={goConfiguration}
-            configuration={state?.configuration}
-            version={state?.version}
-            nodesCount={state?.nodesCount}
-            nodeList={state?.nodeList}
-            clusterName={state.configuration?.name}
-            agentsCount={state?.agentsCount}
+            state={state}
             searchBarProps={searchBarProps}
             results={results}
-            indexPattern={dataSource?.indexPattern}
-            filters={fetchFilters ?? []}
+            dataSource={dataSource}
+            fetchFilters={fetchFilters ?? []}
             lastReloadRequestTime={fingerprint}
+            isDataSourceLoading={isDataSourceLoading}
+            error={error}
           />
         ) : null}
         {state.showConfig ? (

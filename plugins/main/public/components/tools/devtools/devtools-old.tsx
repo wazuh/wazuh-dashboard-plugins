@@ -890,13 +890,6 @@ export const ToolDevTools = withGlobalBreadcrumb([
   useEffect(() => {
     (async function () {
       const isDarkThemeEnabled = getUiSettings().get('theme:darkMode');
-      if (
-        store.getState() &&
-        store.getState().appStateReducers &&
-        !store.getState().appStateReducers.showMenu
-      ) {
-        AppState.setWzMenu();
-      }
       $(window.document).keydown(e => {
         if (!multipleKeyPressed.includes(e.which)) {
           setMultipleKeyPressed(state => [...state, e.which]);

@@ -15,13 +15,124 @@ import { WzAuthentication } from './wz-authentication';
 import { WzMisc } from '../factories/misc';
 import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
-import { getHttp } from '../kibana-services';
+import { getCore, getHttp, getToasts } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
-import NavigationService from './navigation-service';
+import { BehaviorSubject } from 'rxjs';
+import { first, distinctUntilChanged } from 'rxjs/operators';
+import { throttle } from 'lodash';
 
+// throttle to avoid multiple toasts
+const displayAPINotAvailableToast = throttle(({ title, text }) => {
+  getToasts().add({
+    color: 'warning',
+    title,
+    text,
+  });
+}, 500);
 export class WzRequest {
   static wazuhConfig: any;
+  static serverAPIAvailable$ = new BehaviorSubject(true);
+  static serverAPIAvailableChanged$ = this.serverAPIAvailable$.pipe(
+    distinctUntilChanged(),
+  );
+
+  static async setupAPIInCookie() {
+    const currentApiDataCookie = AppState.getCurrentAPI();
+    let currentApiID;
+
+    if (currentApiDataCookie) {
+      try {
+        currentApiID = JSON.parse(currentApiDataCookie).id;
+        if (currentApiID) {
+          if (AppState.getClusterInfo()) {
+            return true;
+          }
+        }
+      } catch {}
+    }
+  }
+
+  static async setupAPIHealthCheck() {
+    const { checks } = await getCore()
+      .healthCheck.status$.pipe(first())
+      .toPromise();
+    const check = checks.find(
+      ({ name, status }) =>
+        name === 'server-api:connection-compatibility' && status === 'finished',
+    );
+    if (check) {
+      const availableApiID = check?.data?.find(
+        ({ connection, compatibility }) => connection && compatibility,
+      )?.id;
+
+      if (availableApiID) {
+        // WARNING: the checkStored API can return information about another API host that is available
+        const response = await ApiCheck.checkStored(availableApiID);
+        if (response?.data?.data?.cluster_info) {
+          // WORKAROUND: this sets the API according to the return taking into account the warning
+          const apiID = response?.data?.idChanged || availableApiID;
+          AppState.setClusterInfo(response?.data?.data?.cluster_info);
+          AppState.setCurrentAPI(
+            JSON.stringify({
+              name: response?.data?.data?.cluster_info?.manager,
+              id: apiID,
+            }),
+          );
+          return true;
+        }
+      }
+    }
+  }
+
+  static async setupAPITryHosts() {
+    try {
+      const hosts = await getCore().http.get('/hosts/apis');
+
+      for (var i = 0; i < hosts.length; i++) {
+        try {
+          // WARNING: the checkStored API can return information about another API host that is available
+          const response = await ApiCheck.checkStored(hosts[i].id);
+          if (response?.data?.data?.cluster_info) {
+            // WORKAROUND: this sets the API according to the return taking into account the warning
+            const apiID = response?.data?.idChanged || hosts[i].id;
+            AppState.setClusterInfo(response?.data?.data?.cluster_info);
+            AppState.setCurrentAPI(
+              JSON.stringify({
+                name: response?.data?.data?.cluster_info?.manager,
+                id: apiID,
+              }),
+            );
+            return true;
+          }
+        } catch {}
+      }
+    } catch {}
+  }
+
+  static async setupAPI() {
+    const methods = [
+      this.setupAPIInCookie,
+      this.setupAPIHealthCheck,
+      this.setupAPITryHosts,
+    ];
+
+    for (const fn of methods) {
+      const isSet = await fn.call(this);
+
+      if (isSet) {
+        this.serverAPIAvailable$.next(true);
+        return;
+      }
+    }
+
+    this.serverAPIAvailable$.next(false);
+    getToasts.add({
+      color: 'danger',
+      text: 'No API host available to connect, this requires the connection and compatibility are ok. Ensure at least one of them fullfil these conditions. Run the health check to update the check status and refresh the page.',
+      toastLifeTimeMs: 120000,
+    });
+  }
 
   /**
    * Permorn a generic request
@@ -77,6 +188,7 @@ export class WzRequest {
       };
 
       const data = await request(options);
+      this.serverAPIAvailable$.next(true);
 
       if (data['error']) {
         throw new Error(data['error']);
@@ -93,14 +205,13 @@ export class WzRequest {
           } catch (error) {
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
-            if (
-              !NavigationService.getInstance()
-                .getPathname()
-                .startsWith('/settings')
-            ) {
-              NavigationService.getInstance().navigate('/health-check');
-            }
-            throw new Error(error);
+            this.serverAPIAvailable$.next(false);
+            const title = `API with ID [${currentApi.id}] is not available.`;
+            const text = `This could indicate a problem in the network of the server API, review or change the API host in the API host selector if configurated other hosts. Cause: ${error.message}`;
+
+            displayAPINotAvailableToast({ title, text });
+
+            throw new Error(`${title} ${text}`);
           }
         }
       }
@@ -167,7 +278,15 @@ export class WzRequest {
         ? getGenericReqOptions(options)
         : options;
 
-      const id = JSON.parse(AppState.getCurrentAPI()).id;
+      const id = JSON.parse(AppState.getCurrentAPI() as string).id;
+
+      if (!id) {
+        return Promise.reject(
+          new Error(
+            'There is no selected server API. Ensure the server API is selected and this is online.',
+          ),
+        );
+      }
       const requestData = { method, path, body, id };
       const response = await this.genericReq(
         'POST',

@@ -10,16 +10,12 @@ jest.mock('../../../react-services/time-service', () => ({
 describe('SettingsAboutAppInfo component', () => {
   test('should render version, revision, install date and ApisUpdateStatus component', () => {
     const { container, getByText } = render(
-      <SettingsAboutAppInfo
-        appInfo={{
-          'app-version': '4.8.0',
-        }}
-      />,
+      <SettingsAboutAppInfo appInfo='v4.8.0' />,
     );
 
     expect(container).toMatchSnapshot();
 
     expect(getByText('App version:')).toBeInTheDocument();
-    expect(getByText('4.8.0')).toBeInTheDocument();
+    expect(getByText('v4.8.0')).toBeInTheDocument();
   });
 });

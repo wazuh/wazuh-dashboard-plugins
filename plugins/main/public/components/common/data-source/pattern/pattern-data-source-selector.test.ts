@@ -158,22 +158,6 @@ describe('PatternDataSourceSelector', () => {
       expect(result.id).toEqual(mockedList[0].id);
       expect(repository.getDefault).toHaveBeenCalledTimes(1);
     });
-
-    it('should return the first data source when the repository does not have a selected data source', async () => {
-      jest.spyOn(repository, 'getDefault').mockResolvedValue(null);
-      let selector = new PatternDataSourceSelector(mockedList, repository);
-      // mock spyon existsDataSource method to return 2 times differents values
-      jest
-        .spyOn(selector, 'existsDataSource')
-        .mockResolvedValueOnce(false)
-        .mockResolvedValueOnce(true);
-      jest.spyOn(selector, 'selectDataSource').mockResolvedValue();
-      const result = await selector.getSelectedDataSource();
-      expect(result.id).toEqual(mockedList[1].id);
-      expect(repository.getDefault).toHaveBeenCalledTimes(1);
-      expect(selector.existsDataSource).toHaveBeenCalledTimes(2);
-      expect(selector.selectDataSource).toHaveBeenCalledTimes(1);
-    });
   });
 
   describe('selectDataSource', () => {

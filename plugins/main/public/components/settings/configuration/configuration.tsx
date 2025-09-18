@@ -423,5 +423,5 @@ const WzConfigurationSettingsProvider = props => {
 };
 export const WzConfigurationSettings = compose(
   withErrorBoundary,
-  withUserAuthorizationPrompt(null, { isAdmininistrator: true }),
+  withUserAuthorizationPrompt(null, { isAdministrator: true }),
 )(WzConfigurationSettingsProvider);

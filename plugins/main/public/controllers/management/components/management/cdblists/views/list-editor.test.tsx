@@ -36,6 +36,11 @@ jest.mock('../../../../../../kibana-services', () => ({
   getToasts: () => ({
     add: mockAdd,
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 const mockStore = configureMockStore();

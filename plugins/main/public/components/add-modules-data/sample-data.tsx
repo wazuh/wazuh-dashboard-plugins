@@ -49,6 +49,7 @@ import {
   sampleSecurityInformationApplication,
   sampleThreatDetectionApplication,
 } from './helper';
+import { GenericRequest } from '../../react-services';
 
 export default class WzSampleData extends Component {
   categories: {
@@ -148,7 +149,7 @@ export default class WzSampleData extends Component {
       // Check if sample data for each category was added
       const results = await DeepPromiseResolver(
         this.categories.reduce((accum, cur) => {
-          accum[cur.categorySampleDataIndex] = WzRequest.genericReq(
+          accum[cur.categorySampleDataIndex] = GenericRequest.request(
             'GET',
             `/indexer/sampledata/${cur.categorySampleDataIndex}`,
           );
@@ -171,6 +172,13 @@ export default class WzSampleData extends Component {
 
       // Get information about cluster
       const clusterName = AppState.getClusterInfo().cluster;
+      const managerName = AppState.getClusterInfo().manager;
+
+      if (!clusterName && !managerName) {
+        throw new Error(
+          'The data related to the server API context could not be obtained. This is required when adding sample data to match the server API context.',
+        );
+      }
 
       // eslint-disable-next-line camelcase
       this.generateAlertsParams.api_id = JSON.parse(
@@ -180,6 +188,15 @@ export default class WzSampleData extends Component {
         name: clusterName,
         node: clusterName,
       };
+      this.generateAlertsParams.manager = {
+        name: managerName,
+      };
+
+      if (!this.generateAlertsParams.api_id) {
+        throw new Error(
+          'The server API is not selected. Select it using the server API selector.',
+        );
+      }
     } catch (error) {
       const options = {
         context: `${WzSampleData.name}.componentDidMount`,

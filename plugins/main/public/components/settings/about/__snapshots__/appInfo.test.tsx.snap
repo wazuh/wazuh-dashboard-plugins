@@ -20,10 +20,9 @@ exports[`SettingsAboutAppInfo component should render version, revision, install
             <div
               class="euiText euiText--medium"
             >
-              App version:
-               
+              App version: 
               <b>
-                4.8.0
+                v4.8.0
               </b>
             </div>
           </div>

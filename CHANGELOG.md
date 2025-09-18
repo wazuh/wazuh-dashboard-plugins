@@ -9,21 +9,27 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh 5.0.0
 - Added sample data generators for agents monitoring and server statistics [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Added "form-data": "^4.0.4" to the resolutions section to ensure this specific version is installed [#7662](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7662)
+- Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 
 ### Changed
 
 - Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
+- Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
+- Reworked some view components to use data source [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 
 ### Removed
 
 - Removed logic related to manager in favor to cluster management [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
-- Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
+- Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597) [#7698](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7698)
 - Removed prompt related to statistic job is disabled in Statistics app [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the configuration for modules that relied on the following deprecated daemons: wazuh-agentlessd, wazuh-csyslogd, wazuh-dbd, wazuh-integratord, wazuh-maild, and wazuh-reportd. [#7612](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7612)
 - Removed deprecated modules OpenSCAP, CIS-CAT, Osquery [#7645](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7645)
+- Removed `/health-check` and `/blank-screen` frontend routes [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
+- Removed `Miscellaneous` from `App Settings`[#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
+- Removed `customization.logo.healthcheck`, `checks.api`, `checks.fields`, `checks.maxBuckets`, `checks.metaFields`, `checks.pattern`, `checks.setup`, `checks.template` and `checks.timeFilter` settings
 
 ## Wazuh v4.14.1 - OpenSearch Dashboards 2.19.3 - Revision 00
 

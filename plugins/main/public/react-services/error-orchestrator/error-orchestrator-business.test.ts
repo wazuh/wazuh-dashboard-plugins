@@ -34,6 +34,11 @@ jest.mock('../../kibana-services', () => ({
   getToasts: () => ({
     addInfo: (mockError: string, toast: ErrorToastOptions) => {},
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 describe.skip('Wazuh Error Orchestrator Business', () => {
@@ -47,10 +52,11 @@ describe.skip('Wazuh Error Orchestrator Business', () => {
 
       const mockError = 'Testing loglevel INFO';
       const mockMessage = 'Message loglevel INFO';
-      const mockToastInfo = getToasts.prototype.addInfo = jest.fn();
+      const mockToastInfo = (getToasts.prototype.addInfo = jest.fn());
       // const mockToastInfo = getToasts().addInfo(mockError, toast as ErrorToastOptions) = jest.fn();
 
-      const errorOrchestratorBusiness: ErrorOrchestrator = new ErrorOrchestratorBusiness();
+      const errorOrchestratorBusiness: ErrorOrchestrator =
+        new ErrorOrchestratorBusiness();
       errorOrchestratorBusiness.loadErrorLog(options);
 
       expect(mockToastInfo.getToasts().addInfo).toBeCalled();

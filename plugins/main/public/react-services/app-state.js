@@ -11,19 +11,36 @@
  */
 
 import store from '../redux/store';
-import {
-  updateCurrentApi,
-  updateShowMenu,
-} from '../redux/actions/appStateActions';
+import { updateCurrentApi } from '../redux/actions/appStateActions';
 import { CSVRequest } from '../services/csv-request';
-import { getToasts, getCookies } from '../kibana-services';
+import { getToasts, getCookies, setCookies } from '../kibana-services';
 import * as FileSaver from '../services/file-saver';
 import { WzAuthentication } from './wz-authentication';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { getErrorOrchestrator } from './common-services';
+import { BehaviorSubject } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { Cookies } from 'react-cookie';
+import { isEqual } from 'lodash';
+
+/* WORKAROUND: this defines the cookies object in case it doesn't exist that is used by
+the selectedServerAPI$ observable */
+try {
+  getCookies();
+} catch {
+  setCookies(new Cookies());
+}
 
 export class AppState {
+  static selectedServerAPI$ = new BehaviorSubject(
+    getCookies().get('currentApi')
+      ? decodeURI(getCookies().get('currentApi'))
+      : false,
+  );
+  static selectedServerAPIChanged$ = this.selectedServerAPI$.pipe(
+    distinctUntilChanged(isEqual),
+  );
   /**
    * Cluster setters and getters
    **/
@@ -138,7 +155,9 @@ export class AppState {
   static getCurrentAPI() {
     try {
       const currentAPI = getCookies().get('currentApi');
-      return currentAPI ? decodeURI(currentAPI) : false;
+      const value = currentAPI ? decodeURI(currentAPI) : false;
+      this.selectedServerAPI$.next(value ? JSON.parse(value) : false);
+      return value;
     } catch (error) {
       throw error;
     }
@@ -148,6 +167,7 @@ export class AppState {
    * Remove 'API' cookie
    */
   static removeCurrentAPI() {
+    this.selectedServerAPI$.next(false);
     const updateApiMenu = updateCurrentApi(false);
     store.dispatch(updateApiMenu);
     return getCookies().remove('currentApi');
@@ -167,7 +187,9 @@ export class AppState {
           expires: exp,
         });
         try {
-          const updateApiMenu = updateCurrentApi(JSON.parse(API).id);
+          const parsedApi = JSON.parse(API);
+          this.selectedServerAPI$.next(parsedApi);
+          const updateApiMenu = updateCurrentApi(parsedApi.id);
           store.dispatch(updateApiMenu);
           WzAuthentication.refresh();
         } catch (error) {
@@ -324,11 +346,6 @@ export class AppState {
 
   static removeNavigation() {
     return getCookies().remove('navigate');
-  }
-
-  static setWzMenu(isVisible = true) {
-    const showMenu = updateShowMenu(isVisible);
-    store.dispatch(showMenu);
   }
 
   static async downloadCsv(path, fileName, filters = []) {

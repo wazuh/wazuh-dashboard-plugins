@@ -33,6 +33,7 @@ import { DashboardAnalysisEngineStatistics } from './dashboard_analysis_engine';
 import { DashboardListenerEngineStatistics } from './dashboard_listener_engine';
 import { SampleDataWarning } from '../../../visualize/components';
 import { WAZUH_SAMPLE_SERVER_STATISTICS } from '../../../../../common/constants';
+import { PromptErrorInitializatingDataSource } from '../../../common/hocs';
 
 const SearchBar = getPlugins().data.ui.SearchBar;
 
@@ -58,6 +59,7 @@ export const DashboardTabsPanels = ({
     fetchData,
     setFilters,
     isLoading: isDataSourceLoading,
+    error,
   } = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: StatisticsDataSource,
     repository: new StatisticsDataSourceRepository(),
@@ -215,6 +217,7 @@ export const DashboardTabsPanels = ({
           )}
         </>
       ) : null}
+      {error && <PromptErrorInitializatingDataSource error={error} />}
     </>
   );
 };

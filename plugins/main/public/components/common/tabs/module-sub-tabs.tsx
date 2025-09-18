@@ -5,7 +5,11 @@ import {
   TabsManagedBySearchParamProps,
 } from '../../navigation/tabs-managed-by-search-params';
 
-export const ModuleSubTabs = ({ tabs }: TabsManagedBySearchParamProps) => {
+export const ModuleSubTabs = ({
+  tabs,
+}: {
+  tabs: TabsManagedBySearchParamProps['tabs'];
+}) => {
   return (
     <TabsManagedBySearchParam
       tabs={tabs}
