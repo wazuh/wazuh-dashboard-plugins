@@ -24,6 +24,7 @@
   - [Installation](ref/getting-started/installation.md)
 - [Configuration](ref/configuration.md)
 - [Modules](ref/modules/README.md)
+  - [Dashboard AI Assistant](ref/modules/dashboard-ai-assistant/README.md)
 - [Upgrade](ref/upgrade.md)
 - [Uninstall](ref/uninstall.md)
 - [Back Up and Restore](ref/backup-restore.md)
