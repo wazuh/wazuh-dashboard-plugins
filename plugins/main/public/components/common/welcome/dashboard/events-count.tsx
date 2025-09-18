@@ -4,8 +4,6 @@ import { AlertsDataSourceRepository } from '../../data-source/pattern/alerts/ale
 import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
-import { useDataSource } from '../../data-source/hooks';
-import { PatternDataSource, tParsedIndexPattern } from '../../data-source';
 import {
   EuiPanel,
   EuiFlexItem,
@@ -15,20 +13,59 @@ import {
 } from '@elastic/eui';
 import { useTimeFilter } from '../../hooks';
 import { LoadingSearchbarProgress } from '../../loading-searchbar-progress/loading-searchbar-progress';
+import {
+  withDataSource,
+  withDataSourceInitiated,
+  withDataSourceLoading,
+} from '../../hocs';
+import { compose } from 'redux';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 
-export const EventsCount = () => {
-  const {
-    dataSource,
-    fetchFilters,
-    isLoading: isDataSourceLoading,
-  } = useDataSource<tParsedIndexPattern, PatternDataSource>({
+const EventsDashboard = compose(
+  withDataSource({
+    // FIXME: This data source has no the filter related to the server API context
     DataSource: AlertsDataSource,
-    repository: new AlertsDataSourceRepository(),
-  });
+    DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  }),
+  withDataSourceLoading({
+    isLoadingNameProp: 'dataSource.isLoading',
+    LoadingComponent: LoadingSearchbarProgress,
+  }),
+  withDataSourceInitiated({
+    dataSourceNameProp: 'dataSource.dataSource',
+    isLoadingNameProp: 'dataSource.isLoading',
+    dataSourceErrorNameProp: 'dataSource.error',
+  }),
+)(({ dataSource: dataSourceInitiation, timeFilter }) => {
+  const { dataSource, fetchFilters } = dataSourceInitiation;
+  return (
+    <DashboardByRenderer
+      input={{
+        viewMode: ViewMode.VIEW,
+        panels: getDashboardPanels(dataSource?.id),
+        isFullScreenMode: false,
+        filters: fetchFilters ?? [],
+        useMargins: true,
+        id: 'agent-events-count-evolution',
+        timeRange: {
+          from: timeFilter.from,
+          to: timeFilter.to,
+        },
+        title: 'Events count evolution',
+        description: 'Dashboard of Events count evolution',
+        refreshConfig: {
+          pause: false,
+          value: 15,
+        },
+        hidePanelTitles: true,
+      }}
+    />
+  );
+});
 
+export const EventsCount = () => {
   const { timeFilter } = useTimeFilter();
 
   return (
@@ -44,31 +81,7 @@ export const EventsCount = () => {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiSpacer size='s' />
-        {!isDataSourceLoading && dataSource ? (
-          <DashboardByRenderer
-            input={{
-              viewMode: ViewMode.VIEW,
-              panels: getDashboardPanels(dataSource?.id),
-              isFullScreenMode: false,
-              filters: fetchFilters ?? [],
-              useMargins: true,
-              id: 'agent-events-count-evolution',
-              timeRange: {
-                from: timeFilter.from,
-                to: timeFilter.to,
-              },
-              title: 'Events count evolution',
-              description: 'Dashboard of Events count evolution',
-              refreshConfig: {
-                pause: false,
-                value: 15,
-              },
-              hidePanelTitles: true,
-            }}
-          />
-        ) : (
-          <LoadingSearchbarProgress />
-        )}
+        <EventsDashboard timeFilter={timeFilter}></EventsDashboard>
       </EuiFlexItem>
     </EuiPanel>
   );

@@ -29,6 +29,11 @@ jest.mock('../../../../../kibana-services', () => ({
       }
     },
   }),
+  getCookies: () => {
+    return {
+      get: () => 'test',
+    };
+  },
 }));
 
 describe('Ruleset component', () => {

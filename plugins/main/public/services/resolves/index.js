@@ -9,14 +9,5 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
-export * from './enable-menu';
 export * from './get-config';
-export * from './get-ip';
-export * from './get-saved-search';
-export * from './health-check';
-export * from './ip';
 export * from './nested-resolve';
-export * from './saved-search';
-export * from './settings-wizard';
-export * from './wz-config';

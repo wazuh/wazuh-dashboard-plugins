@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect, Fragment } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   EuiBasicTable,
   EuiFlexItem,
@@ -24,13 +24,17 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 // @ts-ignore
-import { getFimAlerts } from './lib';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { fileIntegrityMonitoring } from '../../../../../utils/applications';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { withDataSourceFetch } from '../../../hocs';
+import {
+  AlertsDataSourceRepository,
+  FIMDataSource,
+} from '../../../data-source';
 
 export function FimEventsTable({ agent }) {
   return (
@@ -81,26 +85,65 @@ export function useTimeFilter() {
   return timeFilter;
 }
 
-function FimTable({ agent }) {
-  const [fimAlerts, setFimAlerts] = useState([]);
-  const [sort, setSort] = useState({
-    field: '_source.timestamp',
-    direction: 'desc',
-  });
-  const timeFilter = useTimeFilter();
-  useEffect(() => {
-    getFimAlerts(agent.id, timeFilter, sort).then(setFimAlerts);
-  }, [timeFilter, sort, agent.id]);
+const FimTableDataSource = withDataSourceFetch({
+  DataSource: FIMDataSource,
+  DataSourceRepositoryCreator: AlertsDataSourceRepository,
+  mapRequestParams: ({ dataSource, dependencies }) => {
+    const [_, timeFilter, sort] = dependencies;
 
+    const sortSearch = [
+      { id: sort.field.substring(8), direction: sort.direction },
+    ];
+    return {
+      query: { query: '', language: 'kuery' },
+      filters: [...dataSource.fetchFilters],
+      dateRange: timeFilter,
+      pagination: {
+        pageIndex: 0,
+        pageSize: 5,
+      },
+      sorting: {
+        columns: sortSearch,
+      },
+    };
+  },
+  mapFetchActionDependencies: ({ timeFilter, sort }) => [
+    timeFilter,
+    sort,
+    /* Changing the agent causes the fetchFilters change, and the HOC manage this case so it is not
+    requried adding the agent to the dependencies */
+  ],
+  mapResponse: response => {
+    return { total: response?.hits?.total, items: response?.hits?.hits };
+  },
+  FetchingDataComponent: () => null,
+})(({ dataSourceAction, sort, setSort }) => {
   return (
     <EuiBasicTable
-      items={fimAlerts}
+      items={dataSourceAction?.data?.items || []}
       columns={columns}
       loading={false}
       sorting={{ sort }}
       onChange={e => setSort(e.sort)}
       itemId='fim-alerts'
       noItemsMessage='No recent events'
+    />
+  );
+});
+
+function FimTable({ agent }) {
+  const [sort, setSort] = useState({
+    field: '_source.timestamp',
+    direction: 'desc',
+  });
+
+  const timeFilter = useTimeFilter();
+  return (
+    <FimTableDataSource
+      agent={agent}
+      timeFilter={timeFilter}
+      sort={sort}
+      setSort={setSort}
     />
   );
 }

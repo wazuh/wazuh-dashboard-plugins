@@ -111,14 +111,14 @@ export class GenericRequest {
           wzMisc.setApiIsDown(true);
 
           if (
-            ['/settings', '/health-check', '/blank-screen'].every(
+            ['/settings'].every(
               pathname =>
                 !NavigationService.getInstance()
                   .getPathname()
                   .startsWith(pathname),
             )
           ) {
-            NavigationService.getInstance().navigate('/health-check');
+            // TODO: manage the API is inaccessible.
           }
         }
       }

@@ -6,13 +6,14 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryBrowserExtensionsDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryDashboardTable } from '../common/components/inventory';
 import { getOverviewBrowserExtensionsTab } from './dashboard';
+import { InventoryDashboardTable } from '../../../common/dashboards';
+import { WAZUH_SAMPLE_INVENTORY_AGENT } from '../../../../../common/constants';
 
 export const ITHygieneBrowserExtensionsInventory =
-  withSystemInventoryBrowserExtensionsDataSource(props => {
+  withSystemInventoryBrowserExtensionsDataSource(() => {
     return (
-      <ITHygieneInventoryDashboardTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryBrowserExtensionsStatesDataSourceRepository
@@ -21,7 +22,7 @@ export const ITHygieneBrowserExtensionsInventory =
         managedFilters={managedFilters}
         getDashboardPanels={getOverviewBrowserExtensionsTab}
         tableId='it-hygiene-inventory-browser-extensions'
-        indexPattern={props.indexPattern}
+        categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );
   });

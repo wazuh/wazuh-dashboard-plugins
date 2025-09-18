@@ -12,9 +12,9 @@
 import React, { useEffect, useState } from 'react';
 
 export const withGuard =
-  (condition: (props: any) => boolean, ComponentFulfillsCondition) =>
-  WrappedComponent =>
-  props => {
+  (condition: (props: any) => boolean, ComponentFulfillsCondition: React.FC) =>
+  (WrappedComponent: React.FC) =>
+  (props: any) => {
     return condition(props) ? (
       <ComponentFulfillsCondition {...props} />
     ) : (
@@ -24,12 +24,12 @@ export const withGuard =
 
 export const withGuardAsync =
   (
-    condition: (props: any) => { ok: boolean; data: any },
-    ComponentFulfillsCondition: React.JSX.Element,
-    ComponentLoadingResolution: null | React.JSX.Element = null,
+    condition: (props: any) => Promise<{ ok: boolean; data: any }>,
+    ComponentFulfillsCondition: React.FC,
+    ComponentLoadingResolution: null | React.FC = null,
   ) =>
-  WrappedComponent =>
-  props => {
+  (WrappedComponent: React.FC) =>
+  (props: any) => {
     const [loading, setLoading] = useState(true);
     const [fulfillsCondition, setFulfillsCondition] = useState({
       ok: false,

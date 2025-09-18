@@ -19,6 +19,7 @@ jest.mock('../kibana-services', () => ({
     set: (name: string, value: any, options: object) => {
       return true;
     },
+    get: () => 'test',
   }),
 }));
 

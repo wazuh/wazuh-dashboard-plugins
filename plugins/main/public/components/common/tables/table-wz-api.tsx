@@ -26,7 +26,11 @@ import { TableWithSearchBar } from './table-with-search-bar';
 import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
-import { useStateStorage, useAppConfig } from '../hooks';
+import {
+  useStateStorage,
+  useAppConfig,
+  useEffectEnsureComponentMounted,
+} from '../hooks';
 import { formatUINumber } from '../../../react-services/format-number';
 
 /**
@@ -192,7 +196,7 @@ export function TableWzAPI({
     }
   };
 
-  useEffect(() => {
+  useEffectEnsureComponentMounted(() => {
     if (rest.reload) {
       triggerReload();
     }

@@ -24,6 +24,7 @@ import {
   setWazuhCheckUpdatesPlugin,
   setHeaderActionMenuMounter,
   setWazuhCorePlugin,
+  getCookies,
 } from './kibana-services';
 import {
   AppPluginStartDependencies,
@@ -159,7 +160,13 @@ export class WazuhPlugin
             const { renderApp } = await import('./application');
             setErrorOrchestrator(ErrorOrchestratorService);
             setHttp(core.http);
-            setCookies(new Cookies());
+            // Set Cookies
+            try {
+              // WORKAOURND: the AppState can set the cookies, this check if they was not set before
+              getCookies();
+            } catch {
+              setCookies(new Cookies());
+            }
             if (!AppState.checkCookies()) {
               NavigationService.getInstance().reload();
             }

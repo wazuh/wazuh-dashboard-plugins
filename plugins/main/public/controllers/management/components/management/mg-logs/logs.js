@@ -111,7 +111,7 @@ export default compose(
         const options = {
           context: `${WzLogs.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
           error: {
             error: error,
