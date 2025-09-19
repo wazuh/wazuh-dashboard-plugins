@@ -25,15 +25,15 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed TypeError when changing API host ID in wazuh.yml configuration [#7611](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7611)
 - Fixed behavior and appearance alignment with OpenSearch (Wazuh Indexer) Dev Tools [#7669](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7669)
 
-## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 07
+## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 08
 
 ### Added
 
 - Support for Wazuh 4.13.0
-- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513) [#7582](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7582) [#7588](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7588) [#7692](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7692)
+- Added `It Hygiene` application [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7461](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7461) [#7476](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7476) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513) [#7582](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7582) [#7588](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7588) [#7692](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7692) [#7717](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7717)
 - Added hardware and system information to the agent overview [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Added persistence for selected columns and page size in data grid settings [#7379](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7379) [#7513](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7513)
-- Added the ability to manage the sample data from FIM, IT Hygiene and vulnerabilities inventories prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
+- Added the ability to manage the sample data from IT Hygiene and vulnerabilities. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [#7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449) [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475) [#7718](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7718)
 - Added back button to Deploy Agent page that redirects to Endpoints Summary [#7443](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7443)
 - Add UUID field to APIs table [#7412](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7412)
 - Added the ability to manage the sample data from FIM, IT Higiene and vulnerabilities inventories and new settings to define the index names prefixes. [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373) [7449](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7449)
@@ -43,7 +43,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed the manager reset button to reload in Rules, Decoders and CDB list [#7657](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7657) [#7677](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7677)
 - Moved `/elastic/samplealerts` API endpoints to `/indexer/samplealerts` [#7373](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7373)
-- Changed FIM inventory to display information ingested by the indexer [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368) [#7482](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7482) [#7538](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7538)
 - Changed macOS agent startup command [#7430](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7430)
 - Improved the number of API calls to access agent's summary information [#7484](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7484)
 
@@ -65,7 +64,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Removed inventory data report and `POST /reports/agents/{agentID}/inventory` API endpoint [#7368](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7368)
 - Removed the `enrollment.password` field from the `/utils/configuration` endpoint response to prevent unauthorized agent registration by users with read-only API roles. [#7483](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7483)
 - Removed `vulnerability.pattern` setting [#7475](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7475)
-- Removed the cluster restart warning on rules, decoders and CDB lists [#7620](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7620)
 
 ## Wazuh v4.12.0 - OpenSearch Dashboards 2.19.1 - Revision 03
 
