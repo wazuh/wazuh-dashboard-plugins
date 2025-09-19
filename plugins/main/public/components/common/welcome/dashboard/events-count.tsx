@@ -1,5 +1,4 @@
 import React from 'react';
-import { AlertsDataSource } from '../../data-source/pattern/alerts/alerts-data-source';
 import { AlertsDataSourceRepository } from '../../data-source/pattern/alerts/alerts-data-source-repository';
 import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
@@ -19,6 +18,7 @@ import {
   withDataSourceLoading,
 } from '../../hocs';
 import { compose } from 'redux';
+import { EventsCountDataSource } from '../../data-source/pattern/alerts/events-count';
 
 const plugins = getPlugins();
 const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
@@ -26,7 +26,7 @@ const DashboardByRenderer = plugins.dashboard.DashboardContainerByValueRenderer;
 const EventsDashboard = compose(
   withDataSource({
     // FIXME: This data source has no the filter related to the server API context
-    DataSource: AlertsDataSource,
+    DataSource: EventsCountDataSource,
     DataSourceRepositoryCreator: AlertsDataSourceRepository,
   }),
   withDataSourceLoading({

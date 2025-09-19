@@ -11,77 +11,11 @@ export const getOverviewServicesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateHorizontalBarByField(
       indexPatternId,
-      'agent.name',
-      'Top 5 agents with failed services',
-      'it-hygiene-services-failed-by-agent',
+      'service.name',
+      'Top 5 services',
+      'it-hygiene-services',
       {
-        customLabel: 'Failed services count',
-        filter: [
-          {
-            query: {
-              bool: {
-                filter: [
-                  {
-                    bool: {
-                      must: [
-                        {
-                          bool: {
-                            should: [
-                              {
-                                bool: {
-                                  must: [
-                                    { exists: { field: 'service.exit_code' } },
-                                    {
-                                      bool: {
-                                        must_not: [
-                                          { term: { 'service.exit_code': 0 } },
-                                        ],
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                              {
-                                bool: {
-                                  must: [
-                                    {
-                                      exists: {
-                                        field: 'service.win32_exit_code',
-                                      },
-                                    },
-                                    {
-                                      bool: {
-                                        must_not: [
-                                          {
-                                            term: {
-                                              'service.win32_exit_code': 0,
-                                            },
-                                          },
-                                        ],
-                                      },
-                                    },
-                                  ],
-                                },
-                              },
-                            ],
-                            minimum_should_match: 1,
-                          },
-                        },
-                      ],
-                      must_not: [
-                        {
-                          terms: {
-                            'service.state.keyword': ['RUNNING', 'active'],
-                          },
-                        },
-                      ],
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        ],
+        customLabel: 'Services',
       },
     ),
     getVisStateHorizontalBarSplitSeries(

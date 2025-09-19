@@ -5,7 +5,7 @@ So this component was created to simplify the implementation and to be able to c
 
 The component needs as props the `appId` to go to and the `path` to navigate to. The component itself will know in which application it is located in order to display its respective link.
 
-#### Same application
+### Same application
 
 In this case we have to navigate with the React Router because the application does not recognise that we are navigating and does not navigate using the Opensearch Dashboard navigation.
 
@@ -20,7 +20,7 @@ In this case we have to navigate with the React Router because the application d
 </EuiLink>
 ```
 
-#### Diferent application
+### Diferent application
 
 When navigating between applications you can use Opensearch Dashboard navigation and have the path you are going to navigate to when you are over the link.
 
@@ -37,11 +37,11 @@ When navigating between applications you can use Opensearch Dashboard navigation
 </RedirectAppLinks>
 ```
 
-#### With tooltip
+### With tooltip
 
 If the component receives the `toolTipProps` object as a prop, then it wraps the link with a tooltip component.
 
-### Implementation
+#### Implementation
 
 ```tsx
   <WzLink
@@ -52,4 +52,29 @@ If the component receives the `toolTipProps` object as a prop, then it wraps the
   >
     whatever you want to render in the link
   </WzLink>
+```
+
+### Buttons navigation
+
+If instead of a link you want to render a button, you should use the `EuiButton` component together with the `NavigationService`.
+This allows you to keep consistent navigation behavior while also providing the link preview on hover.
+
+#### Implementation
+
+```tsx
+<EuiButton
+  color='primary'
+  fill
+  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    NavigationService.getInstance().navigate(`/${SECTIONS.AGENTS_PREVIEW}`);
+  }}
+  // This shows the link preview on hover
+  href={NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+    path: `#/${SECTIONS.AGENTS_PREVIEW}`,
+  })}
+  aria-label={`Open ${endpointSummary.breadcrumbLabel}`}
+>
+  Back to agent list
+</EuiButton>
 ```
