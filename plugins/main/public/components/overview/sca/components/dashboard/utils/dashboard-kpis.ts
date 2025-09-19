@@ -18,14 +18,14 @@ const checkScore = (indexPatternId: string) => ({
             passed: {
               filter: {
                 term: {
-                  'check.result': 'passed',
+                  'check.result': 'Passed',
                 },
               },
             },
             failed: {
               filter: {
                 term: {
-                  'check.result': 'failed',
+                  'check.result': 'Failed',
                 },
               },
             },
@@ -105,7 +105,7 @@ export const getKPIsPanel = (
           aggsQuery: [
             {
               input: {
-                query: 'check.result: "passed"',
+                query: 'check.result: "Passed"',
                 language: 'kuery',
               },
               label: 'Passed',
@@ -127,7 +127,7 @@ export const getKPIsPanel = (
           aggsQuery: [
             {
               input: {
-                query: 'check.result: "failed"',
+                query: 'check.result: "Failed"',
                 language: 'kuery',
               },
               label: 'Failed',

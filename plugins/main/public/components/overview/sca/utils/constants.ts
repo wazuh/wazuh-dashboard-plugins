@@ -1,5 +1,5 @@
 export enum CheckResult {
-  Passed = 'passed',
-  Failed = 'failed',
-  NotRun = 'not run',
+  Passed = 'Passed',
+  Failed = 'Failed',
+  NotRun = 'Not run',
 }

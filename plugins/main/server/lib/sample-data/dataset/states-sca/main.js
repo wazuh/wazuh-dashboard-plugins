@@ -1,7 +1,7 @@
 const random = require('../../lib/random');
 const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
-const scaResults = ['passed', 'failed', 'Not run'];
+const scaResults = ['Passed', 'Failed', 'Not run'];
 
 function word() {
   const words = ['network', 'smb', 'auth', 'firewall', 'admin', 'crypto'];
