@@ -6,8 +6,8 @@ import {
 } from '../../../../../../services/visualizations';
 
 const checkResultColors = {
-  passed: '#54b399',
-  failed: '#cc5642',
+  Passed: '#54b399',
+  Failed: '#cc5642',
   'Not run': '#6092c0',
 };
 

@@ -40,8 +40,8 @@ export const decimalFormat = () => {
 
 export const checkResultColors = () => {
   const colors = {
-    passed: '#209280',
-    failed: '#cc5642',
+    Passed: '#209280',
+    Failed: '#cc5642',
     'Not run': '#6092c0',
     checkScoreColor: core.uiSettings.get('theme:darkMode')
       ? '#dfe5ef'
