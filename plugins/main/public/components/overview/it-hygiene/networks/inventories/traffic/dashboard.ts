@@ -144,8 +144,8 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
-      'source.port',
-      'Top 5 source ports',
+      'destination.port',
+      'Top 5 destination ports',
       'it-hygiene-ports',
       {
         fieldSize: 5,

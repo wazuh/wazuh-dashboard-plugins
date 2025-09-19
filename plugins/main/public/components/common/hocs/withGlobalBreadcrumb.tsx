@@ -17,8 +17,8 @@ type BreadcrumbParam = Breadcrumb | ((props: any) => Breadcrumb);
 // It returns user permissions
 export const withGlobalBreadcrumb =
   (breadcrumbParam: BreadcrumbParam) =>
-  (WrappedComponent: React.JSX.Element) =>
-  (props: any) => {
+  (WrappedComponent: React.FC) =>
+  (props: any): React.JSX.Element => {
     const getBreadcrumb = () => {
       if (typeof breadcrumbParam === 'function') {
         return breadcrumbParam(props);
@@ -28,6 +28,5 @@ export const withGlobalBreadcrumb =
 
     useGlobalBreadcrumb(getBreadcrumb());
 
-    // @ts-expect-error
     return <WrappedComponent {...props} />;
   };
