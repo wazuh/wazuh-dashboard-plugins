@@ -159,10 +159,6 @@ export class ErrorHandler {
     const origin = ((error || {}).config || {}).url || '';
     const originIsString = typeof origin === 'string' && origin.length;
 
-    if (wzMisc.getBlankScr()) {
-      params.silent = true;
-    }
-
     const hasOrigin = messageIsString && originIsString;
 
     let text = hasOrigin ? `${message} (${origin})` : message;
