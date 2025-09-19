@@ -25,8 +25,8 @@ const tabs = [
     component: ITHygieneNetworksInventoryProtocols,
   },
   {
-    id: 'services',
-    name: 'Services',
+    id: 'listeners',
+    name: 'Listeners',
     component: ITHygieneNetworksInventoryServices,
   },
   {
