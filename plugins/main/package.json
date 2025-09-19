@@ -66,8 +66,6 @@
     "needle": "^3.2.0",
     "node-cron": "^1.1.2",
     "pdfmake": "0.2.7",
-    "querystring-browser": "1.0.4",
-    "react-codemirror": "^1.0.0",
     "react-cookie": "^4.0.3",
     "read-last-lines": "^1.7.2",
     "timsort": "^0.3.0"

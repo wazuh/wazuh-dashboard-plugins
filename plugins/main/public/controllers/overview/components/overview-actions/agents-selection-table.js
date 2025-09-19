@@ -19,6 +19,8 @@ import { getErrorOrchestrator } from '../../../../react-services/common-services
 import { AgentStatus } from '../../../../components/agents/agent-status';
 import { TableWzAPI } from '../../../../components/common/tables';
 import { PinnedAgentManager } from '../../../../components/wz-agent-selector/wz-agent-selector-service';
+import WzIconSVG from '../../../../components/common/icons/wz-icon-svg';
+import { getAgentOSType } from '../../../../react-services';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -117,26 +119,13 @@ export class AgentSelectionTable extends Component {
   }
 
   addIconPlatformRender(agent) {
-    let icon = '';
-    const os = agent?.os || {};
-
-    if ((os?.uname || '').includes('Linux')) {
-      icon = 'linux';
-    } else if (os?.platform === 'windows') {
-      icon = 'windows';
-    } else if (os?.platform === 'darwin') {
-      icon = 'apple';
-    }
+    const osType = getAgentOSType(agent);
     const os_name = `${agent?.os?.name || ''} ${agent?.os?.version || ''}`;
-
     return (
-      <EuiFlexGroup gutterSize='xs'>
+      <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
         <EuiFlexItem grow={false}>
-          <i
-            className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`}
-            aria-hidden='true'
-          ></i>
-        </EuiFlexItem>{' '}
+          <WzIconSVG type={osType} style={{ paddingRight: '3px' }} />
+        </EuiFlexItem>
         <EuiFlexItem>{os_name.trim() || '-'}</EuiFlexItem>
       </EuiFlexGroup>
     );

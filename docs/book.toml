@@ -1,0 +1,7 @@
+[book]
+title = "Wazuh dashboard documentation"
+authors = ["Wazuh dashboard Team"]
+description = "The technical documentation for the Wazuh dashboard, composed by the development documentation and the reference manual."
+language = "en"
+multilingual = false
+src = "."

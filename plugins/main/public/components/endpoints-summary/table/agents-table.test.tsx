@@ -15,6 +15,12 @@ jest.mock('../../common/hooks/use-app-config', () => ({
   }),
 }));
 
+jest.mock('../../../kibana-services', () => ({
+  getUiSettings: () => ({
+    get: jest.fn().mockReturnValue(true),
+  }),
+}));
+
 // the jest.mock of @osd/monaco is added due to a problem transcribing the files to run the tests.
 // https://github.com/wazuh/wazuh-dashboard-plugins/pull/6921#issuecomment-2298289550
 

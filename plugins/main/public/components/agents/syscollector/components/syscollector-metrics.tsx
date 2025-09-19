@@ -9,13 +9,8 @@ import {
   EuiButtonIcon,
 } from '@elastic/eui';
 import _ from 'lodash';
-import { formatUIDate } from '../../../../react-services/time-service';
 import WzRibbon from '../../../common/ribbon/ribbon';
-import {
-  IRibbonItem,
-  RibbonItemLabel,
-} from '../../../common/ribbon/ribbon-item';
-import { getOsName } from '../../../common/platform';
+import { IRibbonItem } from '../../../common/ribbon/ribbon-item';
 import { Agent } from '../../../endpoints-summary/types';
 import {
   FILTER_OPERATOR,
@@ -27,62 +22,14 @@ import {
   useDataSource,
 } from '../../../common/data-source';
 import { withSystemInventoryDataSource } from '../../../overview/it-hygiene/common/hocs/validate-system-inventory-index-pattern';
-import { WAZUH_AGENTS_OS_TYPE } from '../../../../../common/constants';
 import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
-
 interface SyscollectorMetricsProps {
   agent: Agent;
 }
-
-const offsetTimestamp = (text: string, time: string) => {
-  try {
-    return text + formatUIDate(time);
-  } catch (error) {
-    return time !== '-' ? `${text}${time} (UTC)` : time;
-  }
-};
-
-// This is a customized method (see getAgentOSType from react-services/wz-agents.ts)
-// for the system inventory data
-function getAgentOSTypeIndexerData(agent?: Agent) {
-  if (agent?.os?.name?.toLowerCase().includes(WAZUH_AGENTS_OS_TYPE.LINUX)) {
-    return WAZUH_AGENTS_OS_TYPE.LINUX;
-  } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.WINDOWS) {
-    return WAZUH_AGENTS_OS_TYPE.WINDOWS;
-  } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.SUNOS) {
-    return WAZUH_AGENTS_OS_TYPE.SUNOS;
-  } else if (agent?.os?.platform === WAZUH_AGENTS_OS_TYPE.DARWIN) {
-    return WAZUH_AGENTS_OS_TYPE.DARWIN;
-  } else {
-    return WAZUH_AGENTS_OS_TYPE.OTHERS;
-  }
-}
-
-const getPlatformIcon = (agent?: Agent): React.JSX.Element => {
-  let icon = '';
-  const osType = getAgentOSTypeIndexerData(agent);
-  if (osType === WAZUH_AGENTS_OS_TYPE.DARWIN) {
-    icon = 'apple';
-  } else if (
-    [WAZUH_AGENTS_OS_TYPE.WINDOWS, WAZUH_AGENTS_OS_TYPE.LINUX].includes(osType)
-  ) {
-    icon = osType;
-  }
-
-  if (icon) {
-    return (
-      <i
-        className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${osType}`}
-        aria-hidden='true'
-      ></i>
-    );
-  }
-  return <></>;
-};
 
 export const InventoryMetrics = withSystemInventoryDataSource(
   ({ agent }: SyscollectorMetricsProps) => {
