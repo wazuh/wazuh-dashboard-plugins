@@ -15,12 +15,6 @@ jest.mock('../../common/hooks/use-app-config', () => ({
   }),
 }));
 
-jest.mock('../../../kibana-services', () => ({
-  getUiSettings: () => ({
-    get: jest.fn().mockReturnValue(true),
-  }),
-}));
-
 const data = [
   {
     id: '001',
