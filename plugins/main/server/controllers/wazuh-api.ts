@@ -13,7 +13,10 @@
 // Require some libraries
 import { ErrorResponse } from '../lib/error-response';
 import converter from 'json-2-csv';
-import { KeyEquivalence } from '../../common/csv-key-equivalence';
+import {
+  KeyEquivalence,
+  UnsupportedKeysJson2CsvAsyncSize,
+} from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
 import { HTTP_STATUS_CODES } from '../../common/constants';
@@ -597,6 +600,22 @@ export class WazuhApiCtrl {
         ? { message: responseBody.detail, code: responseError }
         : new Error('Unexpected error fetching data from the API');
     } catch (error) {
+      // If the request comes from DevTools, surface the upstream API
+      // response as-is so the console can show the real payload and
+      // status code (e.g. 404 for unknown endpoints), instead of a 500.
+      if (devTools && error?.response) {
+        try {
+          const statusCode =
+            error.response.status || HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR;
+          const body = error.response.data || {
+            message: error.message || 'Unexpected error',
+          };
+          return response.custom({ statusCode, body });
+        } catch (_) {
+          // fall through to the default error handling below if something goes wrong
+        }
+      }
+
       if (error?.response?.status === HTTP_STATUS_CODES.UNAUTHORIZED) {
         return ErrorResponse(
           error.message || error,
@@ -608,21 +627,15 @@ export class WazuhApiCtrl {
       // when the error is an axios error the object will be always error.response.data
       const errorMessage = extractErrorMessage(error);
       context.wazuh.logger.error(errorMessage);
-      if (devTools) {
-        return response.ok({
-          body: { error: '3013', message: errorMessage },
-        });
-      } else {
-        if ((error || {}).code && ApiErrorEquivalence[error.code]) {
-          error.message = ApiErrorEquivalence[error.code];
-        }
-        return ErrorResponse(
-          errorMessage,
-          error.code ? `API error: ${error.code}` : 3013,
-          HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-          response,
-        );
+      if ((error || {}).code && ApiErrorEquivalence[error.code]) {
+        error.message = ApiErrorEquivalence[error.code];
       }
+      return ErrorResponse(
+        errorMessage,
+        error.code ? `API error: ${error.code}` : 3013,
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        response,
+      );
     }
   }
 
@@ -832,7 +845,11 @@ export class WazuhApiCtrl {
           fields = ['key', 'value'];
           itemsArray = output.data.data.affected_items[0].items;
         }
-        fields = fields.map(item => ({ value: item, default: '-' }));
+        fields = fields.map(item => ({
+          // WORKAROUND: This defines an alternative name for the size property for some server API responses (FIM) that is incompatible with json2csvAsync
+          value: item === 'size' ? UnsupportedKeysJson2CsvAsyncSize : item,
+          default: '-',
+        }));
         const options = {
           emptyFieldValue: '',
           keys: fields.map(field => ({
@@ -840,6 +857,13 @@ export class WazuhApiCtrl {
             title: KeyEquivalence[field.value] || field.value,
           })),
         };
+        itemsArray = itemsArray.map(({ size, ...rest }) => ({
+          ...rest,
+          // WORKAROUND: This defines an alternative name for the size property for some server API responses (FIM) that is incompatible with json2csvAsync
+          ...(size !== undefined
+            ? { [UnsupportedKeysJson2CsvAsyncSize]: size }
+            : {}),
+        }));
         let csv = await converter.json2csvAsync(itemsArray, options);
 
         return response.ok({

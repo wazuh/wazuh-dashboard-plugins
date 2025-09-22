@@ -94,8 +94,7 @@ export default class WzSampleData extends Component {
       },
       {
         title: 'Sample file integrity monitoring inventory',
-        description: `Sample data, visualizations and dashboards for
-        file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
+        description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       },

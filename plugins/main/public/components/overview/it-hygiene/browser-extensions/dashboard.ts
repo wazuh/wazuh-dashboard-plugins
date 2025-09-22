@@ -8,18 +8,17 @@ export const getOverviewBrowserExtensionsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateHorizontalBarByField(
       indexPatternId,
+      'browser.name',
+      'Top 5 browsers',
+      'it-hygiene-browsers-name',
+      { customLabel: 'Browsers' },
+    ),
+    getVisStateHorizontalBarByField(
+      indexPatternId,
       'package.name',
       'Top 5 extensions',
       'it-hygiene-extensions-name',
       { customLabel: 'Extensions' },
-    ),
-    getVisStateHistogramBy(
-      indexPatternId,
-      'package.installed',
-      'Extensions installed',
-      'it-hygiene-extensions-installed',
-      'h',
-      { addLegend: false, customLabel: ' ', valueAxesTitleText: '' },
     ),
   ]);
 };

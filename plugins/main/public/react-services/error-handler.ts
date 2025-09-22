@@ -133,13 +133,20 @@ export class ErrorHandler {
 
   /**
    * Main method to show error, warning or info messages
-   * @param {*} error
-   * @param {string} location Usually means the file where this method was called
-   * @param {boolean} params If true, the toast is yellow
-   * @param {boolean} [params.warning=false] If true, the toast is yellow
-   * @param {boolean} [params.silent=false] If true, no message is shown
+   * @param error The error to be shown
+   * @param location Usually means the file where this method was called
+   * @param params If true, the toast is yellow
+   * @param {boolean} [params.warning] If true, the toast is yellow
+   * @param {boolean} [params.silent] If true, no message is shown
    */
-  static handle(error, location, params = { warning: false, silent: false }) {
+  static handle(
+    error: Error | string,
+    location: string,
+    params: { warning?: boolean; silent?: boolean } = {
+      warning: false,
+      silent: false,
+    },
+  ) {
     const message = ErrorHandler.extractMessage(error);
     const messageIsString = typeof message === 'string';
     if (messageIsString && message.includes('ERROR3099')) {
@@ -151,10 +158,6 @@ export class ErrorHandler {
 
     const origin = ((error || {}).config || {}).url || '';
     const originIsString = typeof origin === 'string' && origin.length;
-
-    if (wzMisc.getBlankScr()) {
-      params.silent = true;
-    }
 
     const hasOrigin = messageIsString && originIsString;
 

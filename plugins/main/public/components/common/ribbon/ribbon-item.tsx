@@ -25,7 +25,7 @@ export type IRibbonItem<LABEL extends string = string, VALUE = any> = {
   style?: React.CSSProperties;
   isLoading?: boolean;
   condensed?: boolean;
-  render?: (value: any) => React.ReactNode;
+  render?: (value?: any, theme?: 'dark') => React.ReactNode;
 };
 
 const isGroups = (
@@ -70,7 +70,14 @@ const WzRibbonItem = (props: RibbonItemProps) => {
         style={contentStyle}
       />
     ) : (
-      <WzTextWithTooltipIfTruncated contentStyle={contentStyle}>
+      <WzTextWithTooltipIfTruncated
+        contentStyle={contentStyle}
+        tooltip={
+          item.render
+            ? item.render(item.value, 'dark')
+            : renderOptionalField(item.value)
+        }
+      >
         {item.render
           ? item.render(item.value)
           : renderOptionalField(item.value)}
