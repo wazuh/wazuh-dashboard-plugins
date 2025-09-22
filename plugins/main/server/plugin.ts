@@ -168,6 +168,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     // index patterns
     core.healthCheck.register(
+      // TODO: this could check if there is compatible index pattern regarding the fields instead of a hardcoded title/ID
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,

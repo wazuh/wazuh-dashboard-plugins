@@ -14,5 +14,5 @@ export const indexPatternHasTimeField = (
     return Boolean(indexPattern.attributes.timeFieldName);
   }
 
-  return timeFieldName !== indexPattern.attributes.timeFieldName;
+  return timeFieldName === indexPattern.attributes.timeFieldName;
 };

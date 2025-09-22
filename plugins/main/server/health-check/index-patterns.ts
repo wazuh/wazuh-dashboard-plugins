@@ -295,7 +295,9 @@ async function getIndexPatternID(
   }
   switch (ctx.scope) {
     case 'internal': {
-      return await services.configuration.get(configurationSettingKey);
+      return configurationSettingKey
+        ? await services.configuration.get(configurationSettingKey)
+        : undefined;
     }
 
     case 'user': {
@@ -306,6 +308,49 @@ async function getIndexPatternID(
     default: {
       break;
     }
+  }
+}
+
+async function validateIndexPattern(indexPattern, options, ctx, logger) {
+  logger.debug(
+    `Validating index pattern [title ${indexPattern.attributes.title}] [id ${indexPattern.id}]`,
+  );
+  if (
+    options.hasTimeFieldName &&
+    !indexPatternHasTimeField(indexPattern, options.hasTimeFieldName)
+  ) {
+    throw new Error(
+      `Index pattern has missing the time field name: [${
+        options.hasTimeFieldName !== true
+          ? options.hasTimeFieldName
+          : 'any compatible field'
+      }]`,
+    );
+  }
+
+  if (options.hasFields && options.hasFields.length > 0) {
+    const requiredFields = options.hasFields;
+    const indedxPatternFields = JSON.parse(indexPattern.attributes.fields);
+
+    if (
+      !indexPatternHasFields(
+        requiredFields,
+        indedxPatternFields as unknown as { name: string }[],
+      )
+    ) {
+      throw new Error(
+        `Index pattern has missing some expected fields: ${requiredFields.join(
+          ', ',
+        )}`,
+      );
+    }
+  }
+
+  if (options.hasTemplate) {
+    await ensureIndexPatternHasTemplate(
+      { ...ctx, logger },
+      indexPattern?.attributes?.title,
+    );
   }
 }
 
@@ -334,6 +379,12 @@ export const initializationTaskCreatorIndexPattern = ({
 
     try {
       logger.debug('Starting index pattern saved object');
+      // Get clients depending on the scope
+      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
+      const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
+
+      let compatibleIndexPatterns = [];
+
       indexPatternIDResolved = await getIndexPatternID(
         services,
         ctx,
@@ -341,58 +392,40 @@ export const initializationTaskCreatorIndexPattern = ({
         configurationSettingKey,
       );
 
-      // Get clients depending on the scope
-      const savedObjectsClient = getSavedObjectsClient(ctx, ctx.scope);
-      const indexPatternsClient = getIndexPatternsClient(ctx, ctx.scope);
-
-      const indexPattern = await ensureIndexPatternExistence(
-        { ...ctx, indexPatternsClient, savedObjectsClient, logger },
-        {
-          indexPatternID: indexPatternIDResolved,
-          options,
-          configurationSettingKey,
-        },
-      );
-
-      if (
-        options.hasTimeFieldName &&
-        indexPatternHasTimeField(indexPattern, options.hasTimeFieldName)
-      ) {
-        throw new Error(
-          `Index pattern has missing the time field name: [${
-            options.hasTimeFieldName !== true
-              ? options.hasTimeFieldName
-              : 'any compatible field'
-          }]`,
+      if (indexPatternIDResolved) {
+        const savedObject = await ensureIndexPatternExistence(
+          { ...ctx, indexPatternsClient, savedObjectsClient, logger },
+          {
+            indexPatternID: indexPatternIDResolved,
+            options,
+            configurationSettingKey,
+          },
         );
-      }
+        await validateIndexPattern(savedObject, options, ctx, logger);
+        compatibleIndexPatterns.push(savedObject);
+      } else {
+        const { saved_objects: savedObjects } = await savedObjectsClient.find({
+          type: ['index-pattern'],
+          perPage: 10000, // TODO: This should iterate
+          page: 1,
+        });
 
-      if (options.hasFields && options.hasFields.length > 0) {
-        const requiredFields = options.hasFields;
-        const indedxPatternFields = JSON.parse(indexPattern.attributes.fields);
-
-        if (
-          !indexPatternHasFields(
-            requiredFields,
-            indedxPatternFields as unknown as { name: string }[],
-          )
-        ) {
-          throw new Error(
-            `Index pattern has missing some expected fields: ${requiredFields.join(
-              ', ',
-            )}`,
-          );
+        for (const savedObject of savedObjects) {
+          try {
+            await validateIndexPattern(savedObject, options, ctx, logger);
+            compatibleIndexPatterns.push(savedObject);
+          } catch {}
         }
       }
 
-      if (options.hasTemplate) {
-        await ensureIndexPatternHasTemplate(
-          { ...ctx, logger },
-          indexPattern?.attributes?.title,
-        );
+      if (compatibleIndexPatterns?.length === 0) {
+        throw new Error('No compatible index patterns were found');
       }
 
-      return indexPattern;
+      return compatibleIndexPatterns?.map(({ id, attributes: { title } }) => ({
+        title,
+        id,
+      }));
     } catch (error) {
       const message = `Error initilizating index pattern with ID [${indexPatternIDResolved}]: ${error.message}`;
 
