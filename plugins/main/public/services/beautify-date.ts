@@ -8,11 +8,11 @@ export function beautifyDate(date?: string | number | any) {
   if (!date || typeof date !== 'string' || date === '') {
     return '-';
   }
-  
+
   // Check for special cases: '-' or dates starting with '1970' (epoch)
   if (date === '-' || date.startsWith('1970')) {
     return '-';
   }
-  
+
   return formatUIDate(date);
 }
