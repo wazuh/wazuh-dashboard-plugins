@@ -1,5 +1,9 @@
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server';
 import {
+  indexPatternHasFields,
+  indexPatternHasTimeField,
+} from '../../common/services/index-patterns';
+import {
   InitializationTaskContext,
   InitializationTaskRunContext,
 } from '../services';
@@ -59,13 +63,17 @@ async function getFieldMappings(
   return fields;
 }
 
+interface CreateIndexPatternOptions {
+  fieldsNoIndices?: any;
+  savedObjectOverwrite?:
+    | Record<string, any>
+    | ((params: any) => Record<string, any>);
+}
+
 async function createIndexPattern(
   { logger, savedObjectsClient, indexPatternsClient },
   indexPatternID,
-  options: {
-    fieldsNoIndices?: any;
-    savedObjectOverwrite?: Record<string, any>;
-  } = {},
+  options: CreateIndexPatternOptions = {},
 ) {
   try {
     let fieldsObj;
@@ -311,7 +319,11 @@ export const initializationTaskCreatorIndexPattern = ({
   ...rest
 }: {
   taskName: string;
-  options: object;
+  options: CreateIndexPatternOptions & {
+    hasFields?: string[];
+    hasTemplate?: boolean;
+    hasTimeFieldName?: true | string;
+  };
   configurationSettingKey: string;
   indexPatternID?: string;
 }) => ({
@@ -341,6 +353,37 @@ export const initializationTaskCreatorIndexPattern = ({
           configurationSettingKey,
         },
       );
+
+      if (
+        options.hasTimeFieldName &&
+        indexPatternHasTimeField(indexPattern, options.hasTimeFieldName)
+      ) {
+        throw new Error(
+          `Index pattern has missing the time field name: [${
+            options.hasTimeFieldName !== true
+              ? options.hasTimeFieldName
+              : 'any compatible field'
+          }]`,
+        );
+      }
+
+      if (options.hasFields && options.hasFields.length > 0) {
+        const requiredFields = options.hasFields;
+        const indedxPatternFields = JSON.parse(indexPattern.attributes.fields);
+
+        if (
+          !indexPatternHasFields(
+            requiredFields,
+            indedxPatternFields as unknown as { name: string }[],
+          )
+        ) {
+          throw new Error(
+            `Index pattern has missing some expected fields: ${requiredFields.join(
+              ', ',
+            )}`,
+          );
+        }
+      }
 
       if (options.hasTemplate) {
         await ensureIndexPatternHasTemplate(
@@ -399,5 +442,21 @@ export function mapFieldsFormat(expectedFields: {
       }; // Add format map for expected fields
     }
     return {};
+  };
+}
+
+export function defineTimeFieldNameIfExist(timeFieldName: string) {
+  return function (savedObjectData) {
+    console.log('HELLO');
+    const fields = JSON.parse(savedObjectData.fields);
+
+    if (!fields.some(({ name }) => name === timeFieldName)) {
+      throw new Error(
+        `time field name was not found [${timeFieldName}] in the fields`,
+      );
+    }
+    return {
+      timeFieldName,
+    };
   };
 }

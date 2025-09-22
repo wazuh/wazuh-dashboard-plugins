@@ -1,3 +1,4 @@
+import { INDEX_PATTERN_ALERTS_REQUIRED_FIELDS } from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services';
 import { PatternDataSourceFactory } from '../pattern-data-source-factory';
 import {
@@ -5,13 +6,6 @@ import {
   tParsedIndexPattern,
 } from '../pattern-data-source-repository';
 import { AlertsDataSource } from './alerts-data-source';
-
-const ALERTS_REQUIRED_FIELDS = [
-  'timestamp',
-  'rule.groups',
-  'manager.name',
-  'agent.id',
-];
 
 export class AlertsDataSourceRepository extends PatternDataSourceRepository {
   constructor() {
@@ -45,7 +39,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
    * @returns boolean
    */
   checkIfAlertsIndexPattern(dataSource): boolean {
-    return ALERTS_REQUIRED_FIELDS.every(reqField =>
+    return INDEX_PATTERN_ALERTS_REQUIRED_FIELDS.every(reqField =>
       dataSource._fields.some(field => field.name === reqField),
     );
   }

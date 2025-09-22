@@ -918,3 +918,10 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_VALUES_STATES =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
+
+export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
+  'timestamp',
+  'rule.groups',
+  'manager.name',
+  'agent.id',
+];

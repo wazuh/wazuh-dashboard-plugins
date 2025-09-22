@@ -36,6 +36,7 @@ import {
 } from './start';
 import { first } from 'rxjs/operators';
 import {
+  defineTimeFieldNameIfExist,
   initializationTaskCreatorIndexPattern,
   initializationTaskCreatorServerAPIConnectionCompatibility,
   mapFieldsFormat,
@@ -63,6 +64,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
+  INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
   WAZUH_FIM_FILES_PATTERN,
   WAZUH_FIM_REGISTRY_KEYS_PATTERN,
   WAZUH_FIM_REGISTRY_VALUES_PATTERN,
@@ -170,11 +172,10 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
         options: {
-          // TODO: this should ensure the field exist
-          savedObjectOverwrite: {
-            timeFieldName: 'timestamp',
-          },
+          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
           hasTemplate: true,
+          hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
+          hasTimeFieldName: true,
         },
         configurationSettingKey: 'pattern',
       }),
@@ -186,10 +187,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
         indexPatternID: 'wazuh-monitoring-*',
         options: {
-          // TODO: this should ensure the field exist
-          savedObjectOverwrite: {
-            timeFieldName: 'timestamp',
-          },
+          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          hasTimeFieldName: true,
         },
       }),
     );
@@ -200,10 +199,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
         indexPatternID: 'wazuh-statistics-*',
         options: {
-          // TODO: this should ensure the field exist
-          savedObjectOverwrite: {
-            timeFieldName: 'timestamp',
-          },
+          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          hasTimeFieldName: true,
         },
       }),
     );
@@ -409,6 +406,18 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_SCA_PATTERN,
       }),
     );
+
+    let t = 0;
+    core.healthCheck.register({
+      name: 'test:fail',
+      run: ctx => {
+        // t = !t;
+        if (t++ < 5) {
+          throw new Error('Placeholder error message here');
+        }
+      },
+      isCritical: true,
+    });
 
     return {};
   }
