@@ -167,7 +167,7 @@ export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
       'package.name',
       '',
       'it-hygiene-packages',
-      'Packages',
+      'Unique packages',
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
