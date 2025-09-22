@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.13.1
 
+### Changed
+
+- Changed the label from `Packages` to `Unique packages` in the `KPI` for IT Hygiene > Software [#7752](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7752)
+
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 08
 
 ### Added
