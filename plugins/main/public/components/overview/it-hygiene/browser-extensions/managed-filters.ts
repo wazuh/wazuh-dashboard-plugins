@@ -12,6 +12,6 @@ export default [
   {
     type: 'multiSelect',
     key: 'package.enabled',
-    placeholder: 'Extension enabled',
+    placeholder: 'Enabled',
   },
 ];

@@ -9,7 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const KeyEquivalence: {[key: string]: string} = {
+
+// WORKAROUND: This defines an alternative name for the size property for some server API responses (FIM) that is incompatible with json2csvAsync
+export const UnsupportedKeysJson2CsvAsyncSize = '_____tmp_size_____';
+
+export const KeyEquivalence: { [key: string]: string } = {
   id: 'ID',
   timestamp: 'Timestamp',
   url: 'URL',
@@ -120,5 +124,6 @@ export const KeyEquivalence: {[key: string]: string} = {
   reason: 'Reason',
   registerIP: 'Register IP',
   hotfix: 'Update code',
-  'scan.time': 'Registered at'
+  'scan.time': 'Registered at',
+  [UnsupportedKeysJson2CsvAsyncSize]: 'Size', // WORKAROUND: This defines an alternative name for the size property for some server API responses (FIM) that is incompatible with json2csvAsync
 };
