@@ -4,10 +4,10 @@ export interface LinkCtiProps {
 }
 
 export enum CtiStatus {
-  ACTIVE = 'active',
+  AVAILABLE = 'available',
   PENDING = 'pending',
-  INACTIVE = 'inactive',
-  ERROR = 'error',
+  DENIED = 'denied',
+  POLLING = 'polling',
 }
 
 export interface StatusCtiRegistrationProps {

@@ -23,19 +23,24 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   };
 
   const statusData = {
-    [CtiStatus.ACTIVE]: {
-      color: 'success',
-      onClickAriaLabel: 'View active CTI registration status',
-      message: 'CTI Registration: {status}',
-    },
     [CtiStatus.PENDING]: {
-      color: 'warning',
-      onClickAriaLabel: 'View pending CTI registration status',
+      color: 'none',
+      onClickAriaLabel: 'View pending to start CTI registration',
+      message: 'CTI Registration: {status} trying to contact the API.',
+    },
+    [CtiStatus.AVAILABLE]: {
+      color: 'success',
+      onClickAriaLabel: 'View available CTI registration status',
       message: 'CTI Registration: {status}',
     },
-    [CtiStatus.ERROR]: {
+    [CtiStatus.POLLING]: {
+      color: 'warning',
+      onClickAriaLabel: 'View polling CTI registration status',
+      message: 'CTI Registration: {status}',
+    },
+    [CtiStatus.DENIED]: {
       color: 'danger',
-      onClickAriaLabel: 'View error CTI registration status',
+      onClickAriaLabel: 'View denied CTI registration status',
       message: 'CTI Registration: {status} trying to contact the API.',
     },
   };
@@ -48,10 +53,7 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
       >
         <FormattedMessage
           id='wazuhCheckUpdates.ctiRegistration.statusNavTop'
-          defaultMessage={statusData[isActive].message}
-          values={{
-            status: isActive,
-          }}
+          defaultMessage='CTI Status'
         />
       </EuiHealth>
     </EuiButtonEmpty>

@@ -5,5 +5,5 @@
   "deleteRole": false,
   "deletePolicies": false,
   "deleteRolesMapping": false,
-  "subscription": "inactive"
+  "subscription": "pending"
 }
