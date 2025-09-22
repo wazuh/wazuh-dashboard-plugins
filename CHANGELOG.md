@@ -12,6 +12,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Changed the label from `Packages` to `Unique packages` in the `KPI` for IT Hygiene > Software [#7752](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7752)
 
+### Fixed
+
+- Fixed RBAC validation for reload button to prevent API failures when users lack cluster:restart permission [#7753](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7753)
+
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 08
 
 ### Added
