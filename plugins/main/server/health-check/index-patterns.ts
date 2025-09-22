@@ -372,7 +372,6 @@ export const initializationTaskCreatorIndexPattern = ({
   configurationSettingKey: string;
   indexPatternID?: string;
 }) => ({
-  isCritical: taskMeta?.isCritical || false,
   name: taskName,
   async run({ context: ctx, logger }: InitializationTaskRunContext) {
     let indexPatternIDResolved;
