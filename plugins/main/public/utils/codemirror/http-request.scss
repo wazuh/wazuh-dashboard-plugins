@@ -1,0 +1,43 @@
+.cm-s-http-request {
+  .cm-comment {
+    color: #41755c;
+  }
+
+  .cm-method {
+    color: #c80a68;
+  }
+
+  .cm-url,
+  .cm-start_triple_quote,
+  .cm-end_triple_quote {
+    color: #00756c;
+  }
+
+  .cm-variable {
+    color: #00739d;
+  }
+
+  .cm-string {
+    color: #007c1e;
+
+    &.cm-property {
+      color: #00739d;
+    }
+  }
+
+  .cm-operator {
+    color: #00739d;
+  }
+
+  .cm-constant {
+    color: #900;
+
+    &.cm-numeric {
+      color: #00739d;
+    }
+
+    &.cm-language {
+      color: #5457ea;
+    }
+  }
+}
