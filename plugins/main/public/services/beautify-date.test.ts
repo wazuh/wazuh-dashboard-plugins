@@ -1,17 +1,15 @@
+// @ts-nocheck
 import { beautifyDate } from './beautify-date';
 
-// Mock the time-service module
 jest.mock('../react-services/time-service', () => ({
   formatUIDate: jest.fn(),
 }));
 
-// Get the mocked function after the mock is set up
 const { formatUIDate: mockFormatUIDate } = require('../react-services/time-service');
 
 describe('beautifyDate', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Setup default mock implementation
     mockFormatUIDate.mockImplementation((date: any) => {
       if (!date || date === '-') return '-';
       // Mock the expected format: "Sep 22, 2025 @ 13:29:44.360"
