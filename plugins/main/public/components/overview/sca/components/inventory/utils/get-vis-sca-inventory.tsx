@@ -4,12 +4,9 @@ import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
 } from '../../../../../../services/visualizations';
+import { SCA_CHECK_RESULT_COLORS } from '../../../utils/constants';
 
-const checkResultColors = {
-  Passed: '#54b399',
-  Failed: '#cc5642',
-  'Not run': '#6092c0',
-};
+const checkResultColors = SCA_CHECK_RESULT_COLORS;
 
 export const getKPIsPanel = (
   indexPatternId: string,
