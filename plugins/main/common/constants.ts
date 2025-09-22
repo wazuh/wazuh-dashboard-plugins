@@ -814,15 +814,15 @@ export const MODULE_SCA_CHECK_RESULT_LABEL: Record<
   { key: string; value: string }
 > = {
   PASSED: {
-    key: 'passed',
+    key: 'Passed',
     value: 'Passed',
   },
   FAILED: {
-    key: 'failed',
+    key: 'Failed',
     value: 'Failed',
   },
   NOT_RUN: {
-    key: 'not run',
+    key: 'Not run',
     value: 'Not run',
   },
 } as const;

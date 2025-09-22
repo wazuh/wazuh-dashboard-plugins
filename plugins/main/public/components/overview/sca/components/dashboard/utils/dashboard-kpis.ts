@@ -2,6 +2,7 @@ import { DashboardPanelState } from '../../../../../../../../../src/plugins/dash
 import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
 import { getVisStateMetric } from '../../../../it-hygiene/common/saved-vis/generators';
 import { checkResultColors, decimalFormat } from './visualization-helpers';
+import { CheckResult } from '../../../utils/constants';
 
 // Here we are using vega visualization: https://vega.github.io/vega/
 const checkScore = (indexPatternId: string) => ({
@@ -18,14 +19,14 @@ const checkScore = (indexPatternId: string) => ({
             passed: {
               filter: {
                 term: {
-                  'check.result': 'Passed',
+                  'check.result': CheckResult.Passed,
                 },
               },
             },
             failed: {
               filter: {
                 term: {
-                  'check.result': 'Failed',
+                  'check.result': CheckResult.Failed,
                 },
               },
             },
@@ -105,7 +106,7 @@ export const getKPIsPanel = (
           aggsQuery: [
             {
               input: {
-                query: 'check.result: "Passed"',
+                query: `check.result: "${CheckResult.Passed}"`,
                 language: 'kuery',
               },
               label: 'Passed',
@@ -127,7 +128,7 @@ export const getKPIsPanel = (
           aggsQuery: [
             {
               input: {
-                query: 'check.result: "Failed"',
+                query: `check.result: "${CheckResult.Failed}"`,
                 language: 'kuery',
               },
               label: 'Failed',
@@ -149,7 +150,7 @@ export const getKPIsPanel = (
           aggsQuery: [
             {
               input: {
-                query: 'check.result: "Not run"',
+                query: `check.result: "${CheckResult.NotRun}"`,
                 language: 'kuery',
               },
               label: 'Not run',
