@@ -1,6 +1,6 @@
 import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
-import { beautifyDate } from '../../agents/vuls/inventory/lib';
+import { beautifyDate } from '../../../services/beautify-date';
 import { SearchParams, search } from '../search-bar/search-bar-service';
 import {
   Filter,
