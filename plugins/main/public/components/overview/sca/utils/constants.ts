@@ -1,4 +1,4 @@
-import { UI_COLOR_STATUS } from "../../../../../common/constants";
+import { UI_COLOR_STATUS } from '../../../../../common/constants';
 
 export enum CheckResult {
   Passed = 'Passed',
