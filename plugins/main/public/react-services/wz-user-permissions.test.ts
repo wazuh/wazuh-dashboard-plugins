@@ -28,10 +28,6 @@ const requiredPermissionsManager = [
     action: 'cluster:read',
     resource: 'file:path:/etc/lists',
   },
-  {
-    action: 'manager:upload_file',
-    resource: 'file:path:/etc/lists',
-  },
 ];
 
 const userClusterTest = {
@@ -72,10 +68,6 @@ const userManagerTest = [
       '*:*:*': 'allow',
       'file:path:*': 'allow',
     },
-    'manager:upload_file': {
-      '*:*:*': 'allow',
-      'file:path:*': 'allow',
-    },
     'cluster:read_file': {
       '*:*:*': 'allow',
       'file:path:*': 'allow',
@@ -98,10 +90,6 @@ const missingPermissionsForClusterUser = [
 const missingPermissionsForManagerUser = [
   {
     action: 'cluster:read',
-    resource: 'file:path:/etc/lists',
-  },
-  {
-    action: 'manager:upload_file',
     resource: 'file:path:/etc/lists',
   },
 ];
