@@ -117,7 +117,7 @@ export function useDataSource<
   const [fetchFilters, setFetchFilters] = useState<tFilter[]>([]);
   const [fixedFilters, setFixedFilters] = useState<tFilter[]>([]);
   const [allFilters, setAllFilters] = useState<tFilter[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const pinnedAgentManager = new PinnedAgentManager();
   const pinnedAgent = pinnedAgentManager.getPinnedAgent();
   const { isComponentMounted, getAbortController } = useIsMounted();
@@ -178,7 +178,7 @@ export function useDataSource<
               setFetchFilters(dataSourceFilterManager.getFetchFilters());
               setFixedFilters(dataSourceFilterManager.getFixedFilters());
             } catch (error) {
-              setError(error?.message);
+              setError(error);
             }
           },
         });
@@ -187,7 +187,7 @@ export function useDataSource<
         setFixedFilters(dataSourceFilterManager.getFixedFilters());
         setDataSourceFilterManager(dataSourceFilterManager);
       } catch (e) {
-        setError(e?.message);
+        setError(e);
       } finally {
         setIsLoading(false);
       }
@@ -206,7 +206,7 @@ export function useDataSource<
         setFixedFilters(dataSourceFilterManager.getFixedFilters());
         setFetchFilters(dataSourceFilterManager.getFetchFilters());
       } catch (error) {
-        setError(error?.message);
+        setError(error);
       }
     }
   }, [JSON.stringify(pinnedAgent)]);

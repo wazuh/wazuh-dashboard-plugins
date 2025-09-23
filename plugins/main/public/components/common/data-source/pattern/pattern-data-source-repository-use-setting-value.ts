@@ -1,3 +1,4 @@
+import { ErrorDataSourceNotFound } from '../../../../utils/errors';
 import {
   PatternDataSourceRepository,
   tParsedIndexPattern,
@@ -28,11 +29,6 @@ export const createPatternDataSourceRepositoryUseValue = (
 
     validate(dataSource): boolean {
       const fieldsToCheck = ['id', 'attributes.title']; // search in these attributes
-      /* WORKAROUND: Get the index pattern configurared in the plugin setting. This imports from
-    the Redux store, but this should use some service as indejected dependency instead
-    Caveats:
-      - configuration should be loaded and set the Redux store
-    */
       return fieldsToCheck.some(key => get(dataSource, key) === indexPattern);
     }
 
@@ -40,8 +36,9 @@ export const createPatternDataSourceRepositoryUseValue = (
       const [dataSource] = dataSources;
 
       if (!dataSource) {
-        throw new Error(
-          `Index pattern with ID or title [${indexPattern}] not found. Review if you have at least one index pattern with this configuration. You can create the index patterns from Dashboard Management application if there are matching indices. If there are no matching indices, this could indicate the data collection is disabled or there is a problem in the collection or ingestion.`,
+        throw new ErrorDataSourceNotFound(
+          `Index pattern [id: ${indexPattern} or title:${indexPattern}] not found. Check if it exists or create one in Dashboard Management. If no matching indices are available, data collection may be disabled or failing.`,
+          { indexPatternId: indexPattern, indexPatternTitle: indexPattern },
         );
       }
       return dataSource;

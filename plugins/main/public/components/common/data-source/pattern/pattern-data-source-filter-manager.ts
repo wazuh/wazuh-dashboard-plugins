@@ -13,6 +13,7 @@ import {
 import { DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER } from '../../../../../common/constants';
 import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 import { FilterStateStore } from '../../../../../common/constants';
+import { ErrorDataSourceServerAPIContextFilter } from '../../../../utils/errors';
 
 const MANAGER_AGENT_ID = '000';
 const AGENT_ID_KEY = 'agent.id';
@@ -270,8 +271,8 @@ export class PatternDataSourceFilterManager
     const filterValue = isClusterEnabled ? cluster : manager;
 
     if (status === undefined || filterValue === undefined) {
-      throw new Error(
-        'The filter related to the server API context can not be created due to the required data was not found. This is usually caused because there is no selected a server API. Ensure the server API is available and select it in the server API selector.',
+      throw new ErrorDataSourceServerAPIContextFilter(
+        'Filter could not be created because no server API is selected. Make sure a server API is available and choose one in the selector.',
       );
     }
 

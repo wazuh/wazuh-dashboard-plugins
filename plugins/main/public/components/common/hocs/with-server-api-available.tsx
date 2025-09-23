@@ -6,15 +6,11 @@ import { useServerApiAvailable } from '../hooks/use-server-api-available';
 const PromptServerAPIUnavailable = () => (
   <EuiEmptyPrompt
     iconType='alert'
-    title={<h2>Server API is not available</h2>}
     body={
-      <div>
-        <p>
-          The server API is currently not available. Review the connection with
-          the selected server API, the service is running and the API host
-          configuration is valid.
-        </p>
-      </div>
+      <p>
+        The server API is not available. Check the connection, ensure the
+        service is running, and verify the API host configuration.
+      </p>
     }
   />
 );
@@ -33,14 +29,10 @@ export const withServerAPIAvailable =
 const PromptServerAPINotSelected = () => (
   <EuiEmptyPrompt
     iconType='alert'
-    title={<h2>Server API is not selected</h2>}
     body={
-      <div>
-        <p>
-          The server API is not selected. Select it using the server API
-          selector.
-        </p>
-      </div>
+      <p>
+        No server API selected. Please choose one from the server API selector.
+      </p>
     }
   />
 );
