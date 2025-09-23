@@ -41,7 +41,9 @@ export const WzLink = (props: tWzLinkProps) => {
   const linkSameApp = (
     <EuiLink
       {...otherProps}
-      onClick={() => {
+      href={`#${path}`}
+      onClick={e => {
+        e.preventDefault();
         NavigationService.getInstance().navigate(path);
       }}
     >

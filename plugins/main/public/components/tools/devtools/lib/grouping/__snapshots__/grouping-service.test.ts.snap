@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GroupingService.parseGroups splits text into groups with correct ranges and JSON bodies 1`] = `
+Array [
+  Object {
+    "end": 0,
+    "requestText": "GET /agents",
+    "requestTextJson": "",
+    "start": 0,
+  },
+  Object {
+    "end": 5,
+    "requestText": "POST /agents",
+    "requestTextJson": "{  \\"foo\\": \\"bar\\"}",
+    "start": 2,
+  },
+  Object {
+    "end": 7,
+    "requestText": "DELETE /agents/123?pretty=true",
+    "requestTextJson": "",
+    "start": 7,
+  },
+  Object {
+    "end": 9,
+    "requestText": "PUT /agents/001/docs",
+    "requestTextJson": "",
+    "start": 9,
+  },
+]
+`;
