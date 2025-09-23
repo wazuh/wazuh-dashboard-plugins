@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  clusterReq,
-  clusterNodes,
-} from '../../../../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { clusterNodes } from '../../../../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { WzRequest } from '../../../../../react-services';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { EuiCallOut, EuiLink } from '@elastic/eui';
@@ -35,40 +32,16 @@ async function checkVDIsEnabledCluster() {
   return false;
 }
 
-async function checkVDIsEnabledManager() {
-  const responseWmodules = await WzRequest.apiReq(
-    'GET',
-    `/manager/configuration/wmodules/wmodules`,
-    {},
-  );
-
-  const vdConfiguration =
-    responseWmodules.data.data?.affected_items?.[0]?.wmodules?.find(
-      ({ ['vulnerability-detection']: wmodule }) => wmodule,
-    );
-  return vdConfiguration?.['vulnerability-detection']?.enabled === 'yes';
-}
-
 export const ModuleEnabledCheck = () => {
   const [data, setData] = useState<{ enabled: boolean } | null>(null);
   const [userPermissionRequirements] = useUserPermissionsRequirements([
-    { action: 'cluster:status', resource: '*:*:*' },
     { action: 'cluster:read', resource: 'node:id:*' },
-    { action: 'manager:read', resource: '*:*:*' },
   ]);
 
   const checkVDIsEnabled = async () => {
     try {
-      // Check cluster status
       setData(null);
-      const clusterStatus = await clusterReq();
-
-      // Check if the module is enabled
-      const enabled =
-        clusterStatus.data.data.enabled === 'yes' &&
-        clusterStatus.data.data.running === 'yes'
-          ? await checkVDIsEnabledCluster()
-          : await checkVDIsEnabledManager();
+      const enabled = await checkVDIsEnabledCluster();
       setData({ enabled });
     } catch (error) {
       const options = {
