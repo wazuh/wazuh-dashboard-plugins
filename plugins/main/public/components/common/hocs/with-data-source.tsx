@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { EuiEmptyPrompt } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { withGuard } from './withGuard';
 import { compose } from 'redux';
 import { get } from 'lodash';
@@ -11,15 +11,115 @@ import {
 } from '../data-source';
 import { useAsyncActionRunOnStart } from '../hooks';
 import { useDataSourceWithSearchBar } from '../hooks/use-data-source-search-context';
+import {
+  ErrorDataSourceNotFound,
+  ErrorDataSourceAlertsSelect,
+  ErrorDataSourceServerAPIContextFilter,
+} from '../../../utils/errors';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { getCore } from '../../../kibana-services';
 
-export const PromptErrorInitializatingDataSource = (props: {
-  error?: string;
+export const PromptErrorDataSourceServerAPIContextFilter = ({
+  error,
+}: {
+  error: ErrorDataSourceServerAPIContextFilter;
 }) => {
   return (
     <EuiEmptyPrompt
       iconType='alert'
-      title={<h2>Data source has an error</h2>}
-      body={<>{typeof props.error === 'string' && <p>{props.error}</p>}</>}
+      body={
+        <p>
+          Filter could not be created because no server API is selected. Make
+          sure a server API is available and choose one in the selector.
+        </p>
+      }
+    />
+  );
+};
+
+export const PromptErrorDataSourceAlertsSelect = ({
+  error,
+}: {
+  error: ErrorDataSourceAlertsSelect;
+}) => {
+  return (
+    <EuiEmptyPrompt
+      iconType='alert'
+      body={
+        <p>
+          No index pattern selected for alerts. Make sure a compatible index
+          pattern exists and select it. This wasn’t applied correctly or needs
+          to be re‑selected.
+        </p>
+      }
+    />
+  );
+};
+
+export const PromptErrorDataSourceNotFound = ({
+  error,
+}: {
+  error: ErrorDataSourceNotFound;
+}) => {
+  const indexPatternSelectionMessage = [
+    error.details.indexPatternId ? `id: ${error.details.indexPatternId}` : null,
+    error.details.indexPatternTitle
+      ? `title: ${error.details.indexPatternTitle}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(' or ');
+  return (
+    <EuiEmptyPrompt
+      iconType='alert'
+      body={<p>Index pattern [{indexPatternSelectionMessage}] not found</p>}
+      actions={
+        <RedirectAppLinks application={getCore().application}>
+          <EuiLink
+            target='_blank'
+            rel='noopener noreferrer'
+            external={true}
+            href={getCore().application.getUrlForApp('management', {
+              path: '/opensearch-dashboards/indexPatterns',
+            })}
+          >
+            Manage index patterns
+          </EuiLink>
+        </RedirectAppLinks>
+      }
+    />
+  );
+};
+
+const mapDataSourceErrors = {
+  [ErrorDataSourceServerAPIContextFilter.type]:
+    PromptErrorDataSourceServerAPIContextFilter,
+  [ErrorDataSourceAlertsSelect.type]: PromptErrorDataSourceAlertsSelect,
+  [ErrorDataSourceNotFound.type]: PromptErrorDataSourceNotFound,
+};
+
+function getErrorByType(error) {
+  return mapDataSourceErrors?.[error.type];
+}
+
+export const PromptErrorInitializatingDataSource = ({
+  error,
+}: {
+  error: Error;
+}) => {
+  const PromptComponent = getErrorByType(error);
+
+  if (PromptComponent) {
+    return <PromptComponent error={error} />;
+  }
+
+  const body = error.message;
+
+  return (
+    <EuiEmptyPrompt
+      iconType='alert'
+      title={<h2>Something was wrong</h2>}
+      body={<>{typeof body === 'string' && <p>{body}</p>}</>}
     />
   );
 };
