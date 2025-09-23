@@ -155,7 +155,7 @@ function navigateToFim(agent) {
   pinnedAgentManager.pinAgent(agent);
 }
 
-const columns = (setFile, setIsOpen) => [
+const columns = [
   {
     field: '_source.timestamp',
     name: 'Time',
@@ -168,7 +168,6 @@ const columns = (setFile, setIsOpen) => [
     name: 'Path',
     sortable: true,
     truncateText: true,
-    render: path => renderPath(path, setFile, setIsOpen),
   },
   {
     field: '_source.syscheck.event',
