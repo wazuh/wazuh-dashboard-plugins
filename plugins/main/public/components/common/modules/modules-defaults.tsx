@@ -94,6 +94,7 @@ import {
   ITHygieneServicesInventory,
 } from '../../overview/it-hygiene';
 import { InventoryFIM } from '../../overview/fim';
+import { MainFim } from '../../agents/fim';
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
   return {
@@ -140,7 +141,7 @@ export const ModulesDefaults = {
         id: 'inventory',
         name: 'Inventory',
         buttons: [ButtonExploreAgent],
-        component: InventoryFIM,
+        component: MainFim,
       },
       renderDiscoverTab({
         moduleId: 'fim',
