@@ -634,6 +634,7 @@ export const UI_COLOR_STATUS = {
   disabled: '#646A77',
   info: '#6092C0',
   default: '#000000',
+  failed: '#CC5642'
 } as const;
 
 export const API_NAME_AGENT_STATUS = {
@@ -809,23 +810,6 @@ export enum HTTP_STATUS_CODES {
   NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
 
-export const MODULE_SCA_CHECK_RESULT_LABEL: Record<
-  Uppercase<string>,
-  { key: string; value: string }
-> = {
-  PASSED: {
-    key: 'Passed',
-    value: 'Passed',
-  },
-  FAILED: {
-    key: 'Failed',
-    value: 'Failed',
-  },
-  NOT_RUN: {
-    key: 'Not run',
-    value: 'Not run',
-  },
-} as const;
 
 // Search bar
 

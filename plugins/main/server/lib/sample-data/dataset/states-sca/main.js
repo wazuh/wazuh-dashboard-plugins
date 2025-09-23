@@ -1,7 +1,10 @@
+const {
+  CheckResult,
+} = require('../../../../../public/components/overview/sca/utils/constants');
 const random = require('../../lib/random');
 const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
-const scaResults = ['Passed', 'Failed', 'Not run'];
+const scaResults = [CheckResult.Passed, CheckResult.Failed, CheckResult.NotRun];
 
 function word() {
   const words = ['network', 'smb', 'auth', 'firewall', 'admin', 'crypto'];
