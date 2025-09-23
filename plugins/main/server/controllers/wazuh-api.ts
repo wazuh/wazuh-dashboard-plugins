@@ -340,18 +340,49 @@ export class WazuhApiCtrl {
         // Check if cluster node info exists in the response
         if (responseClusterInfo.data?.data?.affected_items?.[0]?.node) {
           const nodeInfo = responseClusterInfo.data?.data?.affected_items[0];
-          const result =
-            await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
-          return response.ok({
-            body: {
-              ...result,
-              cluster_info: {
-                node: nodeInfo.node,
-                cluster: nodeInfo.cluster,
-                type: nodeInfo.type,
+          const nodeId = nodeInfo.node;
+
+          // Get UUID from cluster node info endpoint
+          let responseNodeInfo;
+          try {
+            responseNodeInfo =
+              await context.wazuh.api.client.asInternalUser.request(
+                'GET',
+                `/cluster/${nodeId}/info`,
+                {},
+                options,
+              );
+          } catch (error) {
+            return ErrorResponse(
+              `ERROR3099 - ${
+                error.response?.data?.detail || 'Server not ready yet'
+              }`,
+              3099,
+              error?.response?.status || HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
+              response,
+            );
+          }
+
+          // Check if UUID exists in the node info response
+          if (responseNodeInfo.data?.data?.affected_items?.[0]?.uuid) {
+            const uuid = responseNodeInfo.data.data.affected_items[0].uuid;
+            const result =
+              await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
+            return response.ok({
+              body: {
+                ...result,
+                uuid,
               },
-            },
-          });
+            });
+          } else {
+            context.wazuh.logger.warn('Could not obtain UUID');
+            return ErrorResponse(
+              'Could not obtain UUID',
+              null,
+              HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+              response,
+            );
+          }
         } else {
           context.wazuh.logger.warn(
             'Could not obtain cluster node information',
@@ -413,7 +444,7 @@ export class WazuhApiCtrl {
     if (response.status !== HTTP_STATUS_CODES.OK) {
       // Avoid "Error communicating with socket" like errors
       const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
-      const status = (response.data || {}).error || 1;
+      const status = (response.data || {}).status || 1;
       const isDown = socketErrorCodes.includes(status);
 
       isDown &&
