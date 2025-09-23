@@ -24,6 +24,7 @@
   - [Installation](ref/getting-started/installation.md)
 - [Configuration](ref/configuration.md)
 - [Modules](ref/modules/README.md)
+  - [Health check](ref/modules/healthcheck.md)
 - [Upgrade](ref/upgrade.md)
 - [Uninstall](ref/uninstall.md)
 - [Back Up and Restore](ref/backup-restore.md)
