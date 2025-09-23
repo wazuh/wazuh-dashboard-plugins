@@ -634,7 +634,7 @@ export const UI_COLOR_STATUS = {
   disabled: '#646A77',
   info: '#6092C0',
   default: '#000000',
-  failed: '#CC5642'
+  failed: '#CC5642',
 } as const;
 
 export const API_NAME_AGENT_STATUS = {
@@ -809,7 +809,6 @@ export enum HTTP_STATUS_CODES {
   INSUFFICIENT_STORAGE = 507,
   NETWORK_AUTHENTICATION_REQUIRED = 511,
 }
-
 
 // Search bar
 
