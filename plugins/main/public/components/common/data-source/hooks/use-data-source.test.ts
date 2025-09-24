@@ -64,7 +64,7 @@ class DataSourceMocked implements PatternDataSource {
       title: this.title,
     } as tParsedIndexPattern;
   }
-  getClusterManagerFilters = mockedGetFilters;
+  getClusterFilters = mockedGetFilters;
   getPinnedAgentFilter = mockedGetFilters;
   getExcludeManagerFilter = mockedGetFilters;
 }
