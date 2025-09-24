@@ -27,6 +27,7 @@ import {
   clusterReq,
   reloadRuleset,
 } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { WzButtonPermissions } from './permissions/button';
 
 interface IWzReloadClusterManagerCalloutProps {
   updateWazuhNotReadyYet: (wazuhNotReadyYet) => void;
@@ -166,12 +167,18 @@ class WzReloadClusterManagerCallout extends Component<
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <EuiButton
+                <WzButtonPermissions
+                  buttonType='default'
+                  permissions={[
+                    this.state.isCluster
+                      ? { action: 'cluster:restart', resource: 'node:id:*' }
+                      : { action: 'manager:restart', resource: '*:*:*' },
+                  ]}
                   iconType='refresh'
                   onClick={() => this.reloadCluster()}
                 >
                   {'Reload'}
-                </EuiButton>
+                </WzButtonPermissions>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiCallOut>
