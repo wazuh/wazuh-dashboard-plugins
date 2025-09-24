@@ -8,6 +8,8 @@ const failingService = async (_params?: any) => {
   return Promise.reject('Error occurred');
 };
 const successfulRefreshService = async (_params?: any) => {
+  // Add a small delay to ensure different timestamps
+  await new Promise(resolve => setTimeout(resolve, 1));
   return Promise.resolve(Date.now());
 };
 
