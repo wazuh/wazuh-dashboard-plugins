@@ -39,7 +39,7 @@ import { getToasts } from '../../../../../../kibana-services';
 import exportCsv from '../../../../../../react-services/wz-csv';
 
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
-import WzReloadClusterManagerCallout from '../../../../../../components/common/reload-cluster-manager-callout';
+import WzReloadClusterCallout from '../../../../../../components/common/reload-cluster-callout';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
 
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
@@ -794,7 +794,7 @@ class WzListEditor extends Component {
               {this.state.showWarningRestart && (
                 <Fragment>
                   <EuiSpacer size='s' />
-                  <WzReloadClusterManagerCallout
+                  <WzReloadClusterCallout
                     onReloaded={() =>
                       this.setState({ showWarningRestart: false })
                     }

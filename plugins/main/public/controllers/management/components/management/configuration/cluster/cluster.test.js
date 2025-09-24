@@ -56,8 +56,8 @@ describe('Cluster settings', () => {
 
     expect(container).toMatchSnapshot();
 
-    expect(getByText('Cluster status')).toBeInTheDocument();
-    expect(getByTestId('cluster-status').value).toBe('enabled');
+    expect(getByText('Cluster name')).toBeInTheDocument();
+    expect(getByTestId('cluster-name').value).toBe('wazuh1');
     expect(queryByText('HAProxy settings')).toBeFalsy();
   });
 
@@ -68,8 +68,8 @@ describe('Cluster settings', () => {
 
     expect(container).toMatchSnapshot();
 
-    expect(getByText('Cluster status')).toBeInTheDocument();
-    expect(getByTestId('cluster-status').value).toBe('enabled');
+    expect(getByText('Cluster name')).toBeInTheDocument();
+    expect(getByTestId('cluster-name').value).toBe('wazuh1');
     expect(getByText('HAProxy settings')).toBeInTheDocument();
     expect(getByTestId('haproxy-status').value).toBe('enabled');
     expect(getByTestId('user').value).toBe(
@@ -86,7 +86,7 @@ describe('Cluster settings', () => {
     expect(container).toMatchSnapshot();
 
     expect(getByText('Configuration not available')).toBeInTheDocument();
-    expect(queryByText('Cluster status')).toBeFalsy();
+    expect(queryByText('Cluster name')).toBeFalsy();
     expect(queryByText('HAProxy settings')).toBeFalsy();
   });
 });

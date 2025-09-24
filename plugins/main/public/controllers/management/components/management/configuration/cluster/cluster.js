@@ -25,7 +25,6 @@ import { compose } from 'redux';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 const mainSettings = [
-  { field: 'disabled', label: 'Cluster status' },
   { field: 'name', label: 'Cluster name' },
   { field: 'node_name', label: 'Node name' },
   { field: 'node_type', label: 'Node type' },

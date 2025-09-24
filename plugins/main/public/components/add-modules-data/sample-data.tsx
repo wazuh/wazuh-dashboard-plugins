@@ -169,7 +169,7 @@ export default class WzSampleData extends Component {
         ),
       );
 
-      // Get information about cluster/manager
+      // Get information about cluster
       const clusterName = AppState.getClusterInfo().cluster;
       const managerName = AppState.getClusterInfo().manager;
 
@@ -183,20 +183,18 @@ export default class WzSampleData extends Component {
       this.generateAlertsParams.api_id = JSON.parse(
         AppState.getCurrentAPI() || '{}',
       )?.id;
+      this.generateAlertsParams.cluster = {
+        name: clusterName,
+        node: clusterName,
+      };
+      this.generateAlertsParams.manager = {
+        name: managerName,
+      };
 
       if (!this.generateAlertsParams.api_id) {
         throw new Error(
           'The server API is not selected. Select it using the server API selector.',
         );
-      }
-      this.generateAlertsParams.manager = {
-        name: managerName,
-      };
-      if (clusterName && clusterName !== 'Disabled') {
-        this.generateAlertsParams.cluster = {
-          name: clusterName,
-          node: clusterName,
-        };
       }
     } catch (error) {
       const options = {
