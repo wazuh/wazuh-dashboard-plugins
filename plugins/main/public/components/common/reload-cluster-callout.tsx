@@ -24,6 +24,7 @@ import {
 
 import { getToasts } from '../../kibana-services';
 import { reloadRuleset } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { WzButtonPermissions } from './permissions/button';
 
 interface IWzReloadClusterCalloutProps {
   onReloaded: () => void;
@@ -150,12 +151,16 @@ class WzReloadClusterCallout extends Component<
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <EuiButton
+                <WzButtonPermissions
+                  buttonType='default'
+                  permissions={[
+                    { action: 'cluster:restart', resource: 'node:id:*' },
+                  ]}
                   iconType='refresh'
                   onClick={() => this.reloadCluster()}
                 >
                   {'Reload'}
-                </EuiButton>
+                </WzButtonPermissions>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiCallOut>
