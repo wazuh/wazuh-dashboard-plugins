@@ -17,15 +17,10 @@ import { StatusCtiModalProps } from '../types';
 export const StatusCtiModal: React.FC<StatusCtiModalProps> = ({
   handleStatusModalToggle,
   checkCtiStatus,
-  isActive,
 }) => {
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-
   React.useEffect(() => {
     const fetchStatus = async () => {
-      setIsLoading(true);
       await checkCtiStatus();
-      setIsLoading(false);
     };
 
     fetchStatus();

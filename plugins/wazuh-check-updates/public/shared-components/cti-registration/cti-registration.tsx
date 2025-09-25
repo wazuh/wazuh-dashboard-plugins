@@ -11,7 +11,7 @@ import { useCtiStatus } from './hooks/useCtiStatus';
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const { isActive, checkCtiStatus } = useCtiStatus();
+  const { statusCTI, checkCtiStatus } = useCtiStatus();
 
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
@@ -24,11 +24,11 @@ export const CtiRegistration = () => {
   return (
     <I18nProvider>
       <>
-        {isActive === CtiStatus.INACTIVE ? (
+        {statusCTI.status === CtiStatus.PENDING ? (
           <StartCtiRegistration handleModalToggle={handleModalToggle} />
         ) : (
           <StatusCtiRegistration
-            isActive={isActive}
+            statusCTI={statusCTI}
             checkCtiStatus={checkCtiStatus}
           />
         )}
@@ -40,7 +40,6 @@ export const CtiRegistration = () => {
         )}
         {isStatusModalOpen && (
           <StatusCtiModal
-            isActive={isActive}
             checkCtiStatus={checkCtiStatus}
             handleStatusModalToggle={handleStatusModalToggle}
           />
