@@ -7,6 +7,6 @@ export default [
   {
     type: 'multiSelect',
     key: 'process.user.name',
-    placeholder: 'User Names',
+    placeholder: 'Process user name',
   },
 ];
