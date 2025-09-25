@@ -2,12 +2,12 @@ export default [
   {
     type: 'multiSelect',
     key: 'browser.name',
-    placeholder: 'Browser name',
+    placeholder: 'Name',
   },
   {
     type: 'multiSelect',
     key: 'package.name',
-    placeholder: 'Extension name',
+    placeholder: 'Package name',
   },
   {
     type: 'multiSelect',
