@@ -13,9 +13,9 @@ export const getOverviewBrowserExtensionsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'package.name',
-      'Top 5 extensions',
-      'it-hygiene-extensions-name',
-      { customLabel: 'Extensions' },
+      'Top 5 packages',
+      'it-hygiene-packages-name',
+      { customLabel: 'Packages' },
     ),
   ]);
 };
