@@ -1,8 +1,5 @@
-import { buildDashboardKPIPanels } from '../common/create-dashboard-panels-kpis';
-import {
-  getVisStateHorizontalBarByField,
-  getVisStateHistogramBy,
-} from '../common/saved-vis/generators';
+import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 
 export const getOverviewBrowserExtensionsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
