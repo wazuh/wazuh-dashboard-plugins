@@ -635,6 +635,7 @@ export const UI_COLOR_STATUS = {
   info: '#6092C0',
   default: '#000000',
   failed: '#CC5642',
+  notApplicable: '#B9A888',
 } as const;
 
 export const API_NAME_AGENT_STATUS = {

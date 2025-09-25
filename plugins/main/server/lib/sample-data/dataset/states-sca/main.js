@@ -4,7 +4,12 @@ const {
 const random = require('../../lib/random');
 const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
 
-const scaResults = [CheckResult.Passed, CheckResult.Failed, CheckResult.NotRun];
+const scaResults = [
+  CheckResult.Passed,
+  CheckResult.Failed,
+  CheckResult.NotRun,
+  CheckResult.NotApplicable,
+];
 
 function word() {
   const words = ['network', 'smb', 'auth', 'firewall', 'admin', 'crypto'];
