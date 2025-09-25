@@ -6,7 +6,7 @@ export default [
   },
   {
     type: 'multiSelect',
-    key: 'service.state',
-    placeholder: 'State',
+    key: 'process.user.name',
+    placeholder: 'User Names',
   },
 ];
