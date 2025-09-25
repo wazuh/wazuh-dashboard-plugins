@@ -41,10 +41,6 @@ export const ConfigurationCards = ({
 }: ConfigurationCardsProps) => {
   const configurationItemsList = [
     {
-      title: 'Disabled',
-      description: String(configuration?.disabled),
-    },
-    {
       title: 'Hidden',
       description: String(configuration?.hidden),
     },

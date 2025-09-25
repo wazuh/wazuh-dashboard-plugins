@@ -116,25 +116,18 @@ class WzConfigurationOverview extends Component {
                   <WzButtonPermissions
                     buttonType='empty'
                     permissions={[
-                      { action: 'cluster:status', resource: '*:*:*' },
-                      this.props.clusterNodeSelected
-                        ? {
-                            action: 'cluster:update_config',
-                            resource: `node:id:${this.props.clusterNodeSelected}`,
-                          }
-                        : {
-                            action: 'manager:update_config',
-                            resource: '*:*:*',
-                          },
-                    ]}
+                      this.props.clusterNodeSelected && {
+                        action: 'cluster:update_config',
+                        resource: `node:id:${this.props.clusterNodeSelected}`,
+                      },
+                    ].filter(Boolean)} // Filter falsy values. clusterNodeSelected is initially false on mount
+                    // before cluster data loads, causing [false] in permissions array and TypeError
                     iconSide='left'
                     iconType='pencil'
                     onClick={() =>
                       this.updateConfigurationSection(
                         'edit-configuration',
-                        `${
-                          this.props.clusterNodeSelected ? 'Cluster' : 'Manager'
-                        } configuration`,
+                        `Cluster configuration`,
                         '',
                         'Edit configuration',
                       )

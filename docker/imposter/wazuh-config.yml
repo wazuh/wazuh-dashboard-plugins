@@ -175,14 +175,6 @@ resources:
       statusCode: 200
       scriptFile: cluster/cluster_sync.js
       # staticFile: cluster/cluster_sync_no_sync.json
-
-  # Get cluster status
-  - method: GET
-    path: /cluster/status
-    response:
-      statusCode: 200
-      staticFile: cluster/cluster_status.json
-
   # Get local node config
   - method: GET
     path: /cluster/local/config
@@ -429,86 +421,6 @@ resources:
   # End session
   - method: DELETE
     path: /logtest/sessions/{token}
-
-  # ===================================================== #
-  #   MANAGER
-  # ===================================================== #
-
-  # Get status
-  - method: GET
-    path: /manager/status
-
-  # Get information
-  - method: GET
-    path: /manager/info
-    response:
-      statusCode: 200
-      scriptFile: manager/info/info.js
-
-  # Get configuration
-  - method: GET
-    path: /manager/configuration
-
-  # Update Wazuh configuration
-  - method: PUT
-    path: /manager/configuration
-
-  # Get stats
-  - method: GET
-    path: /manager/stats
-
-  # Get stats hour
-  - method: GET
-    path: /manager/stats/hourly
-
-  # Get stats week
-  - method: GET
-    path: /manager/stats/weekly
-
-  # Get stats analysisd
-  - method: GET
-    path: /manager/stats/analysisd
-
-  # Get stats remoted
-  - method: GET
-    path: /manager/stats/remoted
-
-  # Get logs
-  - method: GET
-    path: /manager/logs
-    response:
-      statusCode: 200
-      scriptFile: cluster/cluster-logs.js
-
-  # Get logs summary
-  - method: GET
-    path: /manager/logs/summary
-
-  # Get API config
-  - method: GET
-    path: /manager/api/config
-
-  # Restart manager
-  - method: PUT
-    path: /manager/restart
-
-  # Check config
-  - method: GET
-    path: /manager/configuration/validation
-
-  # Get active configuration
-  - method: GET
-    path: /manager/configuration/{component}/{configuration}
-    response:
-      statusCode: 200
-      scriptFile: manager/configuration.js
-
-  # Get available updates
-  - method: GET
-    path: /manager/version/check
-    response:
-      statusCode: 200
-      staticFile: manager/version/check.json
 
   # ===================================================== #
   #   MITRE

@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Set cluster mode as default for all Wazuh installations, including single-node deployments. Updated RBAC permissions to `cluster:*` actions [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Rework SCA modules visualizations, global detail for all agents without pinning, replaced `/sca` endpoint with `wazuh-states-sca-*` index pattern, added sample data section [#7578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7578)
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 - Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
@@ -20,6 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Removed
 
+- Removed logic related to manager in favor to cluster management [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688)
 - Removed the monitoring and statistics jobs in the backend side [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Removed the settings related to monitoring and statistics job from the configuration [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597) [#7698](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7698)
 - Removed prompt related to statistic job is disabled in Statistics app [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
@@ -55,6 +57,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Updated OS logos [#7712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7712)
+- Changed "Services" tab label to "Listeners" in IT Hygiene > Networks [#7742](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7742)
 
 ### Changed
 
@@ -66,6 +69,20 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed an error that caused PDF report tables to overflow the page width [#7630](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7630)
 - Fixed TypeError when changing API host ID in wazuh.yml configuration [#7611](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7611)
 - Fixed behavior and appearance alignment with OpenSearch (Wazuh Indexer) Dev Tools [#7669](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7669)
+
+## Wazuh v4.13.1 - OpenSearch Dashboards 2.19.2 - Revision 01
+
+### Added
+
+- Support for Wazuh 4.13.1
+
+### Changed
+
+- Changed the label from `Packages` to `Unique packages` in the `KPI` for IT Hygiene > Software [#7752](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7752)
+
+### Fixed
+
+- Fixed RBAC validation for reload button to prevent API failures when users lack cluster:restart permission [#7753](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7753)
 
 ## Wazuh v4.13.0 - OpenSearch Dashboards 2.19.2 - Revision 08
 
