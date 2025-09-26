@@ -1,0 +1,20 @@
+name: dev.sh Tests
+
+on:
+  push:
+    paths:
+      - 'docker/osd-dev/dev.sh'
+  pull_request:
+    paths:
+      - 'docker/osd-dev/dev.sh'
+  workflow_dispatch:
+
+jobs:
+  bats-dev-sh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run dev.sh tests
+        run: |
+          cd docker/osd-dev
+          __tests__/run-tests.sh

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Minimal jq stub for tests; configurable via env vars.
+if [[ "$1" == "-r" ]]; then
+  expr="$2"
+  case "$expr" in
+    .pluginPlatform.version)
+      echo "${JQ_STUB_PLUGIN_PLATFORM_VERSION-1.2.3}"
+      exit 0
+      ;;
+    .version)
+      echo "${JQ_STUB_VERSION-4.5.6}"
+      exit 0
+      ;;
+    *)
+      echo "${JQ_STUB_DEFAULT-stub-value}"
+      exit 0
+      ;;
+  esac
+fi
+
+if [[ -n "$JQ_STUB_FAIL" ]]; then
+  echo "jq stub forced failure" >&2
+  exit 1
+fi
+
+echo "jq stub received unexpected arguments: $*" >&2
+exit 1
