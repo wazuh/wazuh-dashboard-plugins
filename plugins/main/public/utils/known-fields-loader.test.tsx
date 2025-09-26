@@ -14,7 +14,7 @@ describe('Known Fields Loader', () => {
       expect(Array.isArray(KnownFields)).toBe(true);
       expect(KnownFields.length).toBeGreaterThan(0);
       
-      // Should include basic Elasticsearch fields
+      // Should include basic index fields
       const basicFields = ['_id', '_index', '_score', '_source', '_type'];
       basicFields.forEach(fieldName => {
         const field = KnownFields.find(f => f.name === fieldName);

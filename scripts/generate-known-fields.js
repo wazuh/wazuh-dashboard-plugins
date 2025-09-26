@@ -172,9 +172,9 @@ const TEMPLATE_SOURCES = {
 };
 
 /**
- * Converts Elasticsearch field type to our known field type
+ * Converts index field type to our known field type
  */
-function mapElasticsearchType(esType, field) {
+function mapIndexFieldType(esType, field) {
   const typeMapping = {
     keyword: 'string',
     text: 'string',
@@ -257,7 +257,7 @@ function shouldReadFromDocValues(fieldProps, esType) {
 function extractFields(properties, prefix = '') {
   const fields = [];
 
-  // Add basic Elasticsearch meta fields if we're at root level
+  // Add basic index meta fields if we're at root level
   if (prefix === '') {
     const metaFields = [
       {
@@ -314,7 +314,7 @@ function extractFields(properties, prefix = '') {
       const esType = fieldDef.type;
       const field = {
         name: fullFieldName,
-        type: mapElasticsearchType(esType, fieldDef),
+        type: mapIndexFieldType(esType, fieldDef),
         esTypes: [esType],
         searchable: isSearchable(fieldDef, esType),
         aggregatable: isAggregatable(fieldDef, esType),
@@ -332,7 +332,7 @@ function extractFields(properties, prefix = '') {
           const subEsType = subFieldDef.type;
           const subField = {
             name: subFieldFullName,
-            type: mapElasticsearchType(subEsType, subFieldDef),
+            type: mapIndexFieldType(subEsType, subFieldDef),
             esTypes: [subEsType],
             searchable: isSearchable(subFieldDef, subEsType),
             aggregatable: isAggregatable(subFieldDef, subEsType),
@@ -472,7 +472,7 @@ async function processTemplate(config) {
     const projectRoot = path.resolve(scriptDir, '..');
     const absoluteOutputFile = path.resolve(projectRoot, config.outputFile);
     const outputDir = path.dirname(absoluteOutputFile);
-    
+
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
@@ -532,6 +532,6 @@ if (require.main === module) {
 module.exports = {
   processTemplate,
   extractFields,
-  mapElasticsearchType,
+  mapIndexFieldType,
   TEMPLATE_SOURCES,
 };
