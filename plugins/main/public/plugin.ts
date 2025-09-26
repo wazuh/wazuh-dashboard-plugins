@@ -48,6 +48,7 @@ import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
 import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
+import { registerHeaderNavControl } from './components/wz-header-nav-control/header-nav-control';
 
 export class WazuhPlugin
   implements
@@ -199,6 +200,10 @@ export class WazuhPlugin
       this.hideTelemetryBanner = () =>
         plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
     }
+
+    // Registrar el control de navegación del header
+    registerHeaderNavControl(core, plugins.wazuhCheckUpdates.CtiRegistration);
+
     setCore(core);
     setPlugins(plugins);
     setHttp(core.http);
