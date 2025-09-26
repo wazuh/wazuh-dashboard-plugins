@@ -61,7 +61,8 @@ const TEMPLATE_SOURCES = {
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-registries.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-fim-registries.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-fim-registries.json',
   },
   // Inventory templates (using the most recent versions without -update suffix)
   'states-inventory-system': {
@@ -69,91 +70,104 @@ const TEMPLATE_SOURCES = {
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-system.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-system.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-system.json',
   },
   'states-inventory-hardware': {
     name: 'states-inventory-hardware',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hardware.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-hardware.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-hardware.json',
   },
   'states-inventory-networks': {
     name: 'states-inventory-networks',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-networks.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-networks.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-networks.json',
   },
   'states-inventory-packages': {
     name: 'states-inventory-packages',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-packages.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-packages.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-packages.json',
   },
   'states-inventory-ports': {
     name: 'states-inventory-ports',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-ports.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-ports.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-ports.json',
   },
   'states-inventory-processes': {
     name: 'states-inventory-processes',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-processes.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-processes.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-processes.json',
   },
   'states-inventory-protocols': {
     name: 'states-inventory-protocols',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-protocols.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-protocols.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-protocols.json',
   },
   'states-inventory-users': {
     name: 'states-inventory-users',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-users.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-users.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-users.json',
   },
   'states-inventory-groups': {
     name: 'states-inventory-groups',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-groups.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-groups.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-groups.json',
   },
   'states-inventory-services': {
     name: 'states-inventory-services',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-services.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-services.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-services.json',
   },
   'states-inventory-interfaces': {
     name: 'states-inventory-interfaces',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-interfaces.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-interfaces.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-interfaces.json',
   },
   'states-inventory-hotfixes': {
     name: 'states-inventory-hotfixes',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hotfixes.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-hotfixes.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-hotfixes.json',
   },
   'states-inventory-browser-extensions': {
     name: 'states-inventory-browser-extensions',
     urls: [
       'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-browser-extensions.json',
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-inventory-browser-extensions.json',
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-inventory-browser-extensions.json',
   },
 };
 
@@ -352,13 +366,26 @@ function fetchTemplate(url, isTypeScript = false) {
               // For TypeScript files, we need to extract the template object
               // Look for export const template or similar patterns
               const templateMatch = data.match(
-                /export\s+const\s+\w*[tT]emplate\s*=\s*({[\s\S]*?});?\s*$/m,
+                /export\s+const\s+\w*[tT]emplate\s*=\s*({[\s\S]*});?\s*$/m,
               );
               if (templateMatch) {
-                // Try to evaluate the JavaScript object
-                const templateStr = templateMatch[1];
-                const template = eval(`(${templateStr})`);
-                resolve(template);
+                try {
+                  // Clean up the template string and evaluate it
+                  let templateStr = templateMatch[1];
+                  
+                  // Remove any trailing semicolon or comma
+                  templateStr = templateStr.replace(/[;,]\s*$/, '');
+                  
+                  // Use Function constructor instead of eval for safer evaluation
+                  const template = new Function(`return ${templateStr}`)();
+                  resolve(template);
+                } catch (evalError) {
+                  reject(
+                    new Error(
+                      `Failed to evaluate template object: ${evalError.message}`,
+                    ),
+                  );
+                }
               } else {
                 reject(
                   new Error(

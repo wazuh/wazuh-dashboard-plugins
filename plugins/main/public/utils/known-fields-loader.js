@@ -24,6 +24,8 @@ import inventoryServicesFields from './known-fields/states-inventory-services.js
 import inventoryInterfacesFields from './known-fields/states-inventory-interfaces.json';
 import inventoryHotfixesFields from './known-fields/states-inventory-hotfixes.json';
 import inventoryBrowserExtensionsFields from './known-fields/states-inventory-browser-extensions.json';
+import monitoringFields from './known-fields/monitoring.json';
+import statisticsFields from './known-fields/statistics.json';
 
 // Use generated fields as the primary source
 export const KnownFields = alertsFields;
@@ -33,6 +35,8 @@ export const KnownFields = alertsFields;
  */
 export const GeneratedKnownFields = {
   alerts: alertsFields,
+  monitoring: monitoringFields,
+  statistics: statisticsFields,
   'states-vulnerabilities': vulnerabilitiesFields,
   'states-fim-files': fimFilesFields,
   'states-fim-registries': fimRegistriesFields,
