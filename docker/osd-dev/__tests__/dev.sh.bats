@@ -2,8 +2,8 @@
 
 setup() {
   REPO_ROOT="$(cd "${BATS_TEST_DIRNAME}/.." && pwd)"
-  STUB_PATH="${BATS_TEST_DIRNAME}/fixtures/bin"
-  NO_JQ_PATH="${BATS_TEST_DIRNAME}/fixtures/path-no-jq"
+  STUB_PATH="${BATS_TEST_DIRNAME}/__mocks__/bin"
+  NO_JQ_PATH="${BATS_TEST_DIRNAME}/__mocks__/path-no-jq"
   SYSTEM_PATH="$PATH"
   DOCKER_LOG="${BATS_TEST_TMPDIR}/docker.log"
 }
@@ -11,6 +11,15 @@ setup() {
 teardown() {
   rm -f "${REPO_ROOT}/dev.override.generated.yml"
   rm -f "${DOCKER_LOG}"
+}
+
+assert_log_contains() {
+  local expected="$1"
+  if [[ ! -s "$DOCKER_LOG" ]]; then
+    echo "docker log is empty" >&2
+    return 1
+  fi
+  grep -F -- "$expected" "$DOCKER_LOG" >/dev/null
 }
 
 @test "fails when jq is missing" {
@@ -100,6 +109,7 @@ teardown() {
   [ "$status" -eq 0 ]
   [[ -f "$REPO_ROOT/dev.override.generated.yml" ]]
   [[ "$(cat "$REPO_ROOT/dev.override.generated.yml")" == *"device: $external_dir"* ]]
+  assert_log_contains "-f dev.override.generated.yml"
 }
 
 @test "trims trailing slashes on external repo override" {
@@ -108,24 +118,71 @@ teardown() {
   run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh -r custom='${external_dir}/' up"
   [ "$status" -eq 0 ]
   [[ "$(cat "$REPO_ROOT/dev.override.generated.yml")" == *"device: $external_dir"* ]]
+  assert_log_contains "-f dev.override.generated.yml"
+}
+
+@test "creates volumes for multiple external repos" {
+  external_dir1="${BATS_TEST_TMPDIR}/external1"
+  external_dir2="${BATS_TEST_TMPDIR}/external2"
+  mkdir -p "$external_dir1" "$external_dir2"
+  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh -r custom1='$external_dir1' -r custom2='$external_dir2' up"
+  [ "$status" -eq 0 ]
+  override_file="$REPO_ROOT/dev.override.generated.yml"
+  [[ -f "$override_file" ]]
+  [[ "$(cat "$override_file")" == *"custom1:"* ]]
+  [[ "$(cat "$override_file")" == *"device: $external_dir1"* ]]
+  [[ "$(cat "$override_file")" == *"custom2:"* ]]
+  [[ "$(cat "$override_file")" == *"device: $external_dir2"* ]]
+  assert_log_contains "-f dev.override.generated.yml"
+}
+
+@test "removes stale override when no external repos" {
+  echo "stale" > "$REPO_ROOT/dev.override.generated.yml"
+  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh up"
+  [ "$status" -eq 0 ]
+  [[ ! -f "$REPO_ROOT/dev.override.generated.yml" ]]
 }
 
 @test "uses server-local profile based on agents flag" {
   run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh -a rpm up server-local 2.4.0"
   [ "$status" -eq 0 ]
-  [[ "$(cat "$DOCKER_LOG")" == *"--profile server-local-rpm"* ]]
+  assert_log_contains "--profile server-local-rpm"
 }
 
 @test "uses server-local-without profile without agents" {
   run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh -a without up server-local 2.4.0"
   [ "$status" -eq 0 ]
-  [[ "$(cat "$DOCKER_LOG")" == *"--profile server-local-without"* ]]
+  assert_log_contains "--profile server-local-without"
+}
+
+@test "server mode uses server profile" {
+  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh up server 4.2.0"
+  [ "$status" -eq 0 ]
+  assert_log_contains "--profile server"
+}
+
+@test "down action includes cleanup flags" {
+  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh down"
+  [ "$status" -eq 0 ]
+  assert_log_contains "docker compose --profile standard -f dev.yml down -v --remove-orphans"
+}
+
+@test "stop action sets compose project name" {
+  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh stop"
+  [ "$status" -eq 0 ]
+  assert_log_contains "-p os-dev-123 stop"
+}
+
+@test "manager-local-up limits services" {
+  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh manager-local-up"
+  [ "$status" -eq 0 ]
+  assert_log_contains "up -d wazuh.manager.local"
 }
 
 @test "runs up successfully with stubs" {
   run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh up"
   [ "$status" -eq 0 ]
   [[ -f "$REPO_ROOT/dev.yml" ]]
-  [[ -s "$DOCKER_LOG" ]]
+  assert_log_contains "docker compose --profile standard -f dev.yml up -Vd"
   [[ "$output" == *"No external repositories provided"* ]]
 }
