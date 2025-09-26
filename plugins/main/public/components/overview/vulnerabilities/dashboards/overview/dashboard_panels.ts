@@ -1,5 +1,6 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
+import { UI_COLOR_STATUS } from '../../../../../../common/constants';
 
 const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
   return {
@@ -356,10 +357,10 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
         public/components/overview/vulnerabilities/dashboards/overview/vulnerability_detector_filters.scss
         */
         colors: {
-          Critical: '#CC5642',
+          Critical: UI_COLOR_STATUS.failed,
           High: '#F5A700',
-          Medium: '#6092C0',
-          Low: '#209280',
+          Medium: UI_COLOR_STATUS.info,
+          Low: UI_COLOR_STATUS.success,
         },
       },
     },

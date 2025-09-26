@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added sample data generators for agents monitoring and server statistics [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597)
 - Added "form-data": "^4.0.4" to the resolutions section to ensure this specific version is installed [#7662](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7662)
 - Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
+- Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
 
 ### Changed
 
@@ -41,6 +42,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed navigation problem in MITRE ATT&CK framework details flyout [#7689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7689)
 - Fixed Events count evolution visualization in Endpoint detail to use server API context filter [#7710](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7710)
+- Fixed SCA check result capitalization inconsistency by standardizing 'passed' to 'Passed' and 'failed' to 'Failed' across dashboard components and constants [#7748](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7748)
 
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 00
 
