@@ -11,7 +11,8 @@
  */
 
 import { GenericRequest } from './generic-request';
-import { KnownFields, KnownFieldsStates } from '../utils/known-fields';
+import { KnownFields } from '../utils/known-fields';
+import { getKnownFieldsForStatesPattern } from '../utils/known-fields-loader';
 import { FieldsStatistics } from '../utils/statistics-fields';
 import { FieldsMonitoring } from '../utils/monitoring-fields';
 import {
@@ -307,13 +308,8 @@ export class SavedObject {
   }
 
   static getKnownFieldsForStatesPattern = pattern => {
-    // Extract the states type from the pattern
-    const statesTypeMatch = pattern.match(/wazuh-states-(.+?)-\*/);
-    if (statesTypeMatch) {
-      const statesType = statesTypeMatch[1];
-      return KnownFieldsStates[statesType] || null;
-    }
-    return null;
+    // Use the new generated known fields loader
+    return getKnownFieldsForStatesPattern(pattern);
   };
 
   static getIndicesFields = async (pattern, indexType) => {
