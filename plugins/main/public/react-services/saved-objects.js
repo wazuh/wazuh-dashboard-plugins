@@ -349,10 +349,18 @@ export class SavedObject {
         case WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES:
         case WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES:
         case WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS:
-          // For states patterns, try to get the appropriate known fields based on pattern
+          // For states patterns, get the appropriate known fields based on pattern
           const statesFields =
             SavedObject.getKnownFieldsForStatesPattern(pattern);
-          return statesFields || KnownFields; // Fallback to default KnownFields if no specific match
+          if (statesFields) {
+            return statesFields;
+          }
+          // If no specific states fields found, throw error instead of fallback to alerts fields
+          const statesError = ErrorFactory.create(WarningError, {
+            error,
+            message: `No known fields defined for states pattern: ${pattern}`,
+          });
+          throw statesError;
         default:
           const warningError = ErrorFactory.create(WarningError, {
             error,
