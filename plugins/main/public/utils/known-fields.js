@@ -3554,7 +3554,7 @@ export const KnownFields = [
 
 // Known fields for Wazuh states index patterns
 export const KnownFieldsStatesVulnerabilities = [
-  // Basic Elasticsearch fields
+  // Basic index fields
   {
     name: '_id',
     type: 'string',
@@ -3922,7 +3922,7 @@ export const KnownFieldsStatesVulnerabilities = [
 ];
 
 export const KnownFieldsStatesInventorySystem = [
-  // Basic Elasticsearch fields
+  // Basic index fields
   {
     name: '_id',
     type: 'string',
@@ -4160,7 +4160,7 @@ export const KnownFieldsStatesInventorySystem = [
 ];
 
 export const KnownFieldsStatesInventoryHardware = [
-  // Basic Elasticsearch fields
+  // Basic index fields
   {
     name: '_id',
     type: 'string',
@@ -4335,7 +4335,7 @@ export const KnownFieldsStatesInventoryHardware = [
 ];
 
 export const KnownFieldsStatesInventoryNetworks = [
-  // Basic Elasticsearch fields
+  // Basic index fields
   {
     name: '_id',
     type: 'string',
@@ -4502,7 +4502,7 @@ export const KnownFieldsStatesInventoryNetworks = [
 ];
 
 export const KnownFieldsStatesFim = [
-  // Basic Elasticsearch fields
+  // Basic index fields
   {
     name: '_id',
     type: 'string',
