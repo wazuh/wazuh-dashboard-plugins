@@ -2,9 +2,7 @@
   {
     "name": "_id",
     "type": "string",
-    "esTypes": [
-      "_id"
-    ],
+    "esTypes": ["_id"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -12,9 +10,7 @@
   {
     "name": "_index",
     "type": "string",
-    "esTypes": [
-      "_index"
-    ],
+    "esTypes": ["_index"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -29,9 +25,7 @@
   {
     "name": "_source",
     "type": "_source",
-    "esTypes": [
-      "_source"
-    ],
+    "esTypes": ["_source"],
     "searchable": false,
     "aggregatable": false,
     "readFromDocValues": false
@@ -39,9 +33,7 @@
   {
     "name": "_type",
     "type": "string",
-    "esTypes": [
-      "_type"
-    ],
+    "esTypes": ["_type"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -49,9 +41,7 @@
   {
     "name": "agent.build.original",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -59,9 +49,7 @@
   {
     "name": "agent.ephemeral_id",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -69,9 +57,7 @@
   {
     "name": "agent.id",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -79,9 +65,7 @@
   {
     "name": "agent.name",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -89,9 +73,7 @@
   {
     "name": "agent.type",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -99,9 +81,7 @@
   {
     "name": "agent.version",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -109,9 +89,7 @@
   {
     "name": "host.os.full",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -119,9 +97,7 @@
   {
     "name": "host.os.kernel",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -129,9 +105,7 @@
   {
     "name": "host.os.name",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -139,9 +113,7 @@
   {
     "name": "host.os.platform",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -149,9 +121,7 @@
   {
     "name": "host.os.type",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -159,9 +129,7 @@
   {
     "name": "host.os.version",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -169,9 +137,7 @@
   {
     "name": "package.architecture",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -179,9 +145,7 @@
   {
     "name": "package.build_version",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -189,9 +153,7 @@
   {
     "name": "package.checksum",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -199,9 +161,7 @@
   {
     "name": "package.description",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -209,9 +169,7 @@
   {
     "name": "package.install_scope",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -219,9 +177,7 @@
   {
     "name": "package.installed",
     "type": "date",
-    "esTypes": [
-      "date"
-    ],
+    "esTypes": ["date"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -229,9 +185,7 @@
   {
     "name": "package.license",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -239,9 +193,7 @@
   {
     "name": "package.name",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -249,9 +201,7 @@
   {
     "name": "package.path",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -259,9 +209,7 @@
   {
     "name": "package.reference",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -269,9 +217,7 @@
   {
     "name": "package.size",
     "type": "number",
-    "esTypes": [
-      "long"
-    ],
+    "esTypes": ["long"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -279,9 +225,7 @@
   {
     "name": "package.type",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -289,9 +233,7 @@
   {
     "name": "package.version",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -299,9 +241,7 @@
   {
     "name": "vulnerability.category",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -309,9 +249,7 @@
   {
     "name": "vulnerability.classification",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -319,9 +257,7 @@
   {
     "name": "vulnerability.description",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -329,9 +265,7 @@
   {
     "name": "vulnerability.detected_at",
     "type": "date",
-    "esTypes": [
-      "date"
-    ],
+    "esTypes": ["date"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -339,9 +273,7 @@
   {
     "name": "vulnerability.enumeration",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -349,9 +281,7 @@
   {
     "name": "vulnerability.id",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -359,9 +289,7 @@
   {
     "name": "vulnerability.published_at",
     "type": "date",
-    "esTypes": [
-      "date"
-    ],
+    "esTypes": ["date"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -369,9 +297,7 @@
   {
     "name": "vulnerability.reference",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -379,9 +305,7 @@
   {
     "name": "vulnerability.report_id",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -389,9 +313,7 @@
   {
     "name": "vulnerability.scanner.condition",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -399,9 +321,7 @@
   {
     "name": "vulnerability.scanner.reference",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -409,9 +329,7 @@
   {
     "name": "vulnerability.scanner.source",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -419,9 +337,7 @@
   {
     "name": "vulnerability.scanner.vendor",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -429,9 +345,7 @@
   {
     "name": "vulnerability.score.base",
     "type": "number",
-    "esTypes": [
-      "float"
-    ],
+    "esTypes": ["float"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -439,9 +353,7 @@
   {
     "name": "vulnerability.score.environmental",
     "type": "number",
-    "esTypes": [
-      "float"
-    ],
+    "esTypes": ["float"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -449,9 +361,7 @@
   {
     "name": "vulnerability.score.temporal",
     "type": "number",
-    "esTypes": [
-      "float"
-    ],
+    "esTypes": ["float"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -459,9 +369,7 @@
   {
     "name": "vulnerability.score.version",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -469,9 +377,7 @@
   {
     "name": "vulnerability.severity",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -479,9 +385,7 @@
   {
     "name": "vulnerability.under_evaluation",
     "type": "boolean",
-    "esTypes": [
-      "boolean"
-    ],
+    "esTypes": ["boolean"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -489,9 +393,7 @@
   {
     "name": "wazuh.cluster.name",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -499,9 +401,7 @@
   {
     "name": "wazuh.cluster.node",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -509,9 +409,7 @@
   {
     "name": "wazuh.schema.version",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
