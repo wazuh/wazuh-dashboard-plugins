@@ -1,36 +1,37 @@
 # dev.sh Bats Tests
 
-Este directorio contiene la suite de tests automatizados para `dev.sh`, basada en [bats-core](https://github.com/bats-core/bats-core) y ejecutada mediante Docker Compose.
+This directory contains the automated test suite for `dev.sh`, based on [bats-core](https://github.com/bats-core/bats-core) and executed via Docker Compose.
 
-## Requisitos previos
+## Prerequisites
 
-- Docker 24+ y Docker Compose v2 disponibles en tu `PATH`.
-- Permisos para construir imágenes locales.
+- Docker 24+ and Docker Compose v2 available in your `PATH`.
+- Permissions to build local images.
 
-## Cómo ejecutar los tests
+## How to run the tests
 
-Desde `docker/osd-dev`:
+From `docker/osd-dev`:
 
 ```bash
 __tests__/run-tests.sh
 ```
 
-El script construirá la imagen definida en `__tests__/Dockerfile` (si es necesario) y levantará el servicio `dev-sh-tests` descrito en `__tests__/test.yml` para ejecutar `__tests__/dev.sh.bats`.
+The script will build the image defined in `__tests__/Dockerfile` (if necessary) and start the `dev-sh-tests` service described in `__tests__/test.yml` to execute `__tests__/dev.sh.bats`.
 
-### Filtrar casos específicos
+### Filter specific cases
 
-Pasa argumentos adicionales para que Bats sólo ejecute tests coincidentes:
+Pass additional arguments so that Bats only runs matching tests:
 
 ```bash
 __tests__/run-tests.sh --filter "server-local"
 ```
 
-### Depuración
+### Debugging
 
-Para inspeccionar la ejecución dentro del contenedor puedes mantenerlo abierto:
+To inspect the execution inside the container you can keep it open:
 
 ```bash
 __tests__/run-tests.sh --keep-going --no-tempdir
 ```
 
-Tras ejecutar los tests se creará (o limpiará) `dev.override.generated.yml` según corresponda; los scripts de prueba se encargan de borrar artefactos.
+After running the tests, `dev.override.generated.yml` will be created (or cleaned) as appropriate; the test scripts take care of removing artifacts.
+
