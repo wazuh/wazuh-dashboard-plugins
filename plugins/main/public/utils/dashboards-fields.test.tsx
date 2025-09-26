@@ -5,7 +5,7 @@ import {
   compareColumnsValue,
   clusterQExtractor,
 } from './functions-to-test';
-import { KnownFields } from './known-fields';
+import { KnownFields } from './known-fields-loader';
 
 const INDEX_PATTERN_ALERTS = 'wazuh-alerts-*';
 
