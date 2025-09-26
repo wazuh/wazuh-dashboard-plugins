@@ -10,9 +10,8 @@
 import alertsFields from './known-fields/alerts.json';
 import vulnerabilitiesFields from './known-fields/states-vulnerabilities.json';
 
-// Re-export the original KnownFields for backwards compatibility
-// These are the manually maintained fields for alerts
-export { KnownFields } from './known-fields.js';
+// Use generated fields as the primary source
+export const KnownFields = alertsFields;
 
 /**
  * Generated known fields for different index patterns

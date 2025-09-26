@@ -11,8 +11,7 @@
  */
 
 import { GenericRequest } from './generic-request';
-import { KnownFields } from '../utils/known-fields';
-import { getKnownFieldsForStatesPattern } from '../utils/known-fields-loader';
+import { KnownFields, getKnownFieldsForStatesPattern } from '../utils/known-fields-loader';
 import { FieldsStatistics } from '../utils/statistics-fields';
 import { FieldsMonitoring } from '../utils/monitoring-fields';
 import {

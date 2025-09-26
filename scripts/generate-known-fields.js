@@ -2,10 +2,10 @@
 
 /**
  * Script to generate known fields JSON files from Wazuh index templates
- * 
+ *
  * This script fetches template definitions from Wazuh repositories and converts
  * them to the known fields format used by wazuh-dashboard-plugins
- * 
+ *
  * Usage: node scripts/generate-known-fields.js
  */
 
@@ -17,28 +17,37 @@ const https = require('https');
 const TEMPLATE_SOURCES = {
   vulnerabilities: {
     name: 'states-vulnerabilities',
-    urls: ['https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json'],
-    outputFile: 'plugins/main/public/utils/known-fields/states-vulnerabilities.json'
+    urls: [
+      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json',
+    ],
+    outputFile:
+      'plugins/main/public/utils/known-fields/states-vulnerabilities.json',
   },
   alerts: {
     name: 'alerts',
-    urls: ['https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/extensions/elasticsearch/7.x/wazuh-template.json'],
-    outputFile: 'plugins/main/public/utils/known-fields/alerts.json'
+    urls: [
+      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/extensions/elasticsearch/7.x/wazuh-template.json',
+    ],
+    outputFile: 'plugins/main/public/utils/known-fields/alerts.json',
   },
   monitoring: {
     name: 'monitoring',
     // This is in the dashboard-plugins repo
-    urls: ['https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/4.14.0/plugins/main/server/integration-files/monitoring-template.ts'],
+    urls: [
+      'https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/4.14.0/plugins/main/server/integration-files/monitoring-template.ts',
+    ],
     outputFile: 'plugins/main/public/utils/known-fields/monitoring.json',
-    isTypeScript: true
+    isTypeScript: true,
   },
   statistics: {
     name: 'statistics',
     // This is in the dashboard-plugins repo
-    urls: ['https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/4.14.0/plugins/main/server/integration-files/statistics-template.ts'],
+    urls: [
+      'https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/4.14.0/plugins/main/server/integration-files/statistics-template.ts',
+    ],
     outputFile: 'plugins/main/public/utils/known-fields/statistics.json',
-    isTypeScript: true
-  }
+    isTypeScript: true,
+  },
 };
 
 /**
@@ -46,22 +55,22 @@ const TEMPLATE_SOURCES = {
  */
 function mapElasticsearchType(esType, field) {
   const typeMapping = {
-    'keyword': 'string',
-    'text': 'string',
-    'date': 'date',
-    'long': 'number',
-    'integer': 'number',
-    'double': 'number',
-    'float': 'number',
-    'byte': 'number',
-    'scaled_float': 'number',
-    'boolean': 'boolean',
-    'ip': 'ip',
-    'geo_point': 'geo_point',
-    '_id': 'string',
-    '_index': 'string',
-    '_source': '_source',
-    '_type': 'string'
+    keyword: 'string',
+    text: 'string',
+    date: 'date',
+    long: 'number',
+    integer: 'number',
+    double: 'number',
+    float: 'number',
+    byte: 'number',
+    scaled_float: 'number',
+    boolean: 'boolean',
+    ip: 'ip',
+    geo_point: 'geo_point',
+    _id: 'string',
+    _index: 'string',
+    _source: '_source',
+    _type: 'string',
   };
 
   return typeMapping[esType] || 'string';
@@ -73,10 +82,11 @@ function mapElasticsearchType(esType, field) {
 function isSearchable(fieldProps, esType) {
   // Text and keyword fields are generally searchable
   if (['text', 'keyword'].includes(esType)) return true;
-  
+
   // Check if explicitly set to false
-  if (fieldProps.hasOwnProperty('index') && fieldProps.index === false) return false;
-  
+  if (fieldProps.hasOwnProperty('index') && fieldProps.index === false)
+    return false;
+
   // Most field types are searchable by default
   return !['_source'].includes(esType);
 }
@@ -89,10 +99,14 @@ function isAggregatable(fieldProps, esType) {
   if (esType === 'text') {
     return fieldProps.fielddata === true;
   }
-  
+
   // Check if explicitly disabled
-  if (fieldProps.hasOwnProperty('doc_values') && fieldProps.doc_values === false) return false;
-  
+  if (
+    fieldProps.hasOwnProperty('doc_values') &&
+    fieldProps.doc_values === false
+  )
+    return false;
+
   // Most structured types are aggregatable
   return !['text', '_source'].includes(esType);
 }
@@ -102,11 +116,16 @@ function isAggregatable(fieldProps, esType) {
  */
 function shouldReadFromDocValues(fieldProps, esType) {
   // These field types don't use doc values
-  if (['_id', '_index', '_source', '_type', 'text'].includes(esType)) return false;
-  
+  if (['_id', '_index', '_source', '_type', 'text'].includes(esType))
+    return false;
+
   // Check if explicitly disabled
-  if (fieldProps.hasOwnProperty('doc_values') && fieldProps.doc_values === false) return false;
-  
+  if (
+    fieldProps.hasOwnProperty('doc_values') &&
+    fieldProps.doc_values === false
+  )
+    return false;
+
   // Most other types use doc values by default
   return true;
 }
@@ -116,7 +135,7 @@ function shouldReadFromDocValues(fieldProps, esType) {
  */
 function extractFields(properties, prefix = '') {
   const fields = [];
-  
+
   // Add basic Elasticsearch meta fields if we're at root level
   if (prefix === '') {
     const metaFields = [
@@ -158,14 +177,14 @@ function extractFields(properties, prefix = '') {
         searchable: true,
         aggregatable: true,
         readFromDocValues: false,
-      }
+      },
     ];
     fields.push(...metaFields);
   }
 
   for (const [fieldName, fieldDef] of Object.entries(properties)) {
     const fullFieldName = prefix ? `${prefix}.${fieldName}` : fieldName;
-    
+
     if (fieldDef.properties) {
       // Nested object - recurse
       fields.push(...extractFields(fieldDef.properties, fullFieldName));
@@ -180,12 +199,14 @@ function extractFields(properties, prefix = '') {
         aggregatable: isAggregatable(fieldDef, esType),
         readFromDocValues: shouldReadFromDocValues(fieldDef, esType),
       };
-      
+
       fields.push(field);
-      
+
       // Handle multi-fields (like .keyword subfields)
       if (fieldDef.fields) {
-        for (const [subFieldName, subFieldDef] of Object.entries(fieldDef.fields)) {
+        for (const [subFieldName, subFieldDef] of Object.entries(
+          fieldDef.fields,
+        )) {
           const subFieldFullName = `${fullFieldName}.${subFieldName}`;
           const subEsType = subFieldDef.type;
           const subField = {
@@ -201,7 +222,7 @@ function extractFields(properties, prefix = '') {
       }
     }
   }
-  
+
   return fields;
 }
 
@@ -210,38 +231,50 @@ function extractFields(properties, prefix = '') {
  */
 function fetchTemplate(url, isTypeScript = false) {
   return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      let data = '';
-      
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      
-      res.on('end', () => {
-        try {
-          if (isTypeScript) {
-            // For TypeScript files, we need to extract the template object
-            // Look for export const template or similar patterns
-            const templateMatch = data.match(/export\s+const\s+\w*[tT]emplate\s*=\s*({[\s\S]*?});?\s*$/m);
-            if (templateMatch) {
-              // Try to evaluate the JavaScript object
-              const templateStr = templateMatch[1];
-              const template = eval(`(${templateStr})`);
-              resolve(template);
+    https
+      .get(url, res => {
+        let data = '';
+
+        res.on('data', chunk => {
+          data += chunk;
+        });
+
+        res.on('end', () => {
+          try {
+            if (isTypeScript) {
+              // For TypeScript files, we need to extract the template object
+              // Look for export const template or similar patterns
+              const templateMatch = data.match(
+                /export\s+const\s+\w*[tT]emplate\s*=\s*({[\s\S]*?});?\s*$/m,
+              );
+              if (templateMatch) {
+                // Try to evaluate the JavaScript object
+                const templateStr = templateMatch[1];
+                const template = eval(`(${templateStr})`);
+                resolve(template);
+              } else {
+                reject(
+                  new Error(
+                    `Could not extract template from TypeScript file: ${url}`,
+                  ),
+                );
+              }
             } else {
-              reject(new Error(`Could not extract template from TypeScript file: ${url}`));
+              const template = JSON.parse(data);
+              resolve(template);
             }
-          } else {
-            const template = JSON.parse(data);
-            resolve(template);
+          } catch (error) {
+            reject(
+              new Error(
+                `Failed to parse template from ${url}: ${error.message}`,
+              ),
+            );
           }
-        } catch (error) {
-          reject(new Error(`Failed to parse template from ${url}: ${error.message}`));
-        }
+        });
+      })
+      .on('error', error => {
+        reject(new Error(`Failed to fetch ${url}: ${error.message}`));
       });
-    }).on('error', (error) => {
-      reject(new Error(`Failed to fetch ${url}: ${error.message}`));
-    });
   });
 }
 
@@ -250,7 +283,7 @@ function fetchTemplate(url, isTypeScript = false) {
  */
 async function fetchTemplateFromUrls(urls, isTypeScript = false) {
   let lastError;
-  
+
   for (const url of urls) {
     try {
       const template = await fetchTemplate(url, isTypeScript);
@@ -260,7 +293,7 @@ async function fetchTemplateFromUrls(urls, isTypeScript = false) {
       console.log(`  ⚠️  Failed to fetch from ${url}: ${error.message}`);
     }
   }
-  
+
   throw lastError;
 }
 
@@ -269,11 +302,14 @@ async function fetchTemplateFromUrls(urls, isTypeScript = false) {
  */
 async function processTemplate(config) {
   console.log(`Processing ${config.name} template...`);
-  
+
   try {
-    const { template, url } = await fetchTemplateFromUrls(config.urls, config.isTypeScript);
+    const { template, url } = await fetchTemplateFromUrls(
+      config.urls,
+      config.isTypeScript,
+    );
     console.log(`  ✅ Successfully fetched from: ${url}`);
-    
+
     // Extract mappings - handle different template structures
     let mappings;
     if (template.mappings) {
@@ -283,7 +319,7 @@ async function processTemplate(config) {
     } else {
       throw new Error('Could not find mappings in template structure');
     }
-    
+
     // Extract properties from mappings
     let properties;
     if (mappings.properties) {
@@ -293,20 +329,22 @@ async function processTemplate(config) {
     } else {
       throw new Error('Could not find properties in mappings');
     }
-    
+
     // Generate known fields
     const knownFields = extractFields(properties);
-    
+
     // Ensure output directory exists
     const outputDir = path.dirname(config.outputFile);
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
-    
+
     // Write to file
     fs.writeFileSync(config.outputFile, JSON.stringify(knownFields, null, 2));
-    console.log(`  ✅ Generated ${knownFields.length} known fields for ${config.name} -> ${config.outputFile}`);
-    
+    console.log(
+      `  ✅ Generated ${knownFields.length} known fields for ${config.name} -> ${config.outputFile}`,
+    );
+
     return knownFields;
   } catch (error) {
     console.error(`  ❌ Error processing ${config.name}: ${error.message}`);
@@ -319,9 +357,9 @@ async function processTemplate(config) {
  */
 async function main() {
   console.log('🚀 Starting known fields generation...\n');
-  
+
   const results = {};
-  
+
   for (const [key, config] of Object.entries(TEMPLATE_SOURCES)) {
     try {
       results[key] = await processTemplate(config);
@@ -331,7 +369,7 @@ async function main() {
     }
     console.log(''); // Add spacing between processing
   }
-  
+
   // Summary
   console.log('📊 Summary:');
   for (const [key, fields] of Object.entries(results)) {
@@ -341,7 +379,7 @@ async function main() {
       console.log(`  ${key}: ❌ Failed`);
     }
   }
-  
+
   console.log('\n✨ Known fields generation completed!');
 }
 
@@ -357,5 +395,5 @@ module.exports = {
   processTemplate,
   extractFields,
   mapElasticsearchType,
-  TEMPLATE_SOURCES
+  TEMPLATE_SOURCES,
 };
