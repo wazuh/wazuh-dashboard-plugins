@@ -1,6 +1,6 @@
 import { SavedObject } from '.';
 import { getSavedObjects } from '../kibana-services';
-import { 
+import {
   NOT_TIME_FIELD_NAME_INDEX_PATTERN,
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
@@ -33,32 +33,41 @@ const PATTERN_TO_INDEX_TYPE_MAP: Record<string, string> = {
   'wazuh-states-inventory-networks': WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
   'wazuh-states-inventory-packages': WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES,
   'wazuh-states-inventory-ports': WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS,
-  'wazuh-states-inventory-processes': WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
-  'wazuh-states-inventory-protocols': WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
+  'wazuh-states-inventory-processes':
+    WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
+  'wazuh-states-inventory-protocols':
+    WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
   'wazuh-states-inventory-users': WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
   'wazuh-states-inventory-groups': WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
   'wazuh-states-inventory-services': WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES,
-  'wazuh-states-inventory-interfaces': WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
+  'wazuh-states-inventory-interfaces':
+    WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
   'wazuh-states-inventory-hotfixes': WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
-  'wazuh-states-inventory-browser-extensions': WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
+  'wazuh-states-inventory-browser-extensions':
+    WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
   'wazuh-monitoring': WAZUH_INDEX_TYPE_MONITORING,
   'wazuh-statistics': WAZUH_INDEX_TYPE_STATISTICS,
 };
 
 export function getIndexTypeFromPattern(pattern: string): string {
   // Find matching pattern key
-  const matchingKey = Object.keys(PATTERN_TO_INDEX_TYPE_MAP).find(key => 
-    pattern.includes(key)
+  const matchingKey = Object.keys(PATTERN_TO_INDEX_TYPE_MAP).find(key =>
+    pattern.includes(key),
   );
-  
+
   // Return corresponding index type or default to alerts
-  return matchingKey ? PATTERN_TO_INDEX_TYPE_MAP[matchingKey] : WAZUH_INDEX_TYPE_ALERTS;
+  return matchingKey
+    ? PATTERN_TO_INDEX_TYPE_MAP[matchingKey]
+    : WAZUH_INDEX_TYPE_ALERTS;
 }
 
 export async function existsIndices(indexPatternId: string) {
   try {
     const indexType = getIndexTypeFromPattern(indexPatternId);
-    const fields = await SavedObject.getIndicesFields(indexPatternId, indexType);
+    const fields = await SavedObject.getIndicesFields(
+      indexPatternId,
+      indexType,
+    );
     return { exist: true, fields };
   } catch (error) {
     return { exist: false };

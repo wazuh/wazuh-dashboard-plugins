@@ -355,7 +355,7 @@ export class SavedObject {
           if (statesFields) {
             return statesFields;
           }
-          // If no specific states fields found, throw error instead of fallback to alerts fields
+          // If no specific states fields found, throw error
           const statesError = ErrorFactory.create(WarningError, {
             error,
             message: `No known fields defined for states pattern: ${pattern}`,
