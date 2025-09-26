@@ -372,10 +372,10 @@ function fetchTemplate(url, isTypeScript = false) {
                 try {
                   // Clean up the template string and evaluate it
                   let templateStr = templateMatch[1];
-                  
+
                   // Remove any trailing semicolon or comma
                   templateStr = templateStr.replace(/[;,]\s*$/, '');
-                  
+
                   // Use Function constructor instead of eval for safer evaluation
                   const template = new Function(`return ${templateStr}`)();
                   resolve(template);
@@ -467,14 +467,18 @@ async function processTemplate(config) {
     // Generate known fields
     const knownFields = extractFields(properties);
 
-    // Ensure output directory exists
-    const outputDir = path.dirname(config.outputFile);
+    // Ensure output directory exists - resolve relative to script location
+    const scriptDir = path.dirname(__filename);
+    const projectRoot = path.resolve(scriptDir, '..');
+    const absoluteOutputFile = path.resolve(projectRoot, config.outputFile);
+    const outputDir = path.dirname(absoluteOutputFile);
+    
     if (!fs.existsSync(outputDir)) {
       fs.mkdirSync(outputDir, { recursive: true });
     }
 
     // Write to file
-    fs.writeFileSync(config.outputFile, JSON.stringify(knownFields, null, 2));
+    fs.writeFileSync(absoluteOutputFile, JSON.stringify(knownFields, null, 2));
     console.log(
       `  ✅ Generated ${knownFields.length} known fields for ${config.name} -> ${config.outputFile}`,
     );
