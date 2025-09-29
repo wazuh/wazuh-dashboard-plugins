@@ -95,7 +95,7 @@ export const getAgentsInfo = async (): Promise<AgentsInfoResult> => {
 
     return {
       osData: osData.sort((a, b) => b.value - a.value).slice(0, 5),
-      groupsData: groupsData.slice(0, 5),
+      groupsData: groupsData.sort((a, b) => b.value - a.value).slice(0, 5),
       statusData,
     };
   } catch (error) {
