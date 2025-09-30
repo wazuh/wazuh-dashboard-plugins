@@ -74,17 +74,6 @@ export const getFieldFormatted = (
   if (fieldValue === null || fieldValue === undefined) {
     return '';
   }
-  // if is date field
-  if (field?.type === 'date') {
-    // @ts-ignore
-    fieldValue = formatUIDate(fieldValue);
-  }
-
-  // if is geo_point field then convert to string to appear in the Discover table
-  if (field?.type === 'geo_point') {
-    // @ts-ignore
-    fieldValue = JSON.stringify(fieldValue);
-  }
   return fieldValue;
 };
 
