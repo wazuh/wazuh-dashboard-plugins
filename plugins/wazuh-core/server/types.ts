@@ -19,6 +19,9 @@ export interface WazuhCorePluginSetup {
       asScoped: (context: any, request: any) => ServerAPIScopedUserClient;
     };
   };
+  utils: {
+    getAPIHostIDFromCookie: (cookie: any, name: string) => string | undefined;
+  };
 }
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface WazuhCorePluginStart {
