@@ -9,7 +9,6 @@ import {
   EuiButtonIcon,
 } from '@elastic/eui';
 import _ from 'lodash';
-import { formatUIDate } from '../../../../react-services/time-service';
 import {
   IWzRibbonBody,
   WzRibbonBody,

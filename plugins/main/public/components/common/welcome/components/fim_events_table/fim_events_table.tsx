@@ -23,9 +23,6 @@ import {
   EuiFlexGroup,
   EuiToolTip,
 } from '@elastic/eui';
-// @ts-ignore
-import { formatUIDate } from '../../../../../react-services/time-service';
-import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout';
 import { EuiLink } from '@elastic/eui';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -123,7 +120,7 @@ const FimTableDataSource = withDataSourceFetch({
   return (
     <EuiBasicTable
       items={dataSourceAction?.data?.items || []}
-      columns={columns}
+      columns={columns(() => {}, () => {})}
       loading={false}
       sorting={{ sort }}
       onChange={e => setSort(e.sort)}
@@ -160,7 +157,6 @@ const columns = (setFile, setIsOpen) => [
     field: '_source.timestamp',
     name: 'Time',
     sortable: true,
-    render: field => formatUIDate(field),
     width: '150px',
   },
   {
