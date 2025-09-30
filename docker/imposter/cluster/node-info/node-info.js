@@ -17,7 +17,7 @@ switch (subscriptionStatus) {
     break;
   case 'polling':
     if (attempt === 5) {
-      storeWazuh.save('subscription', 'active');
+      storeWazuh.save('subscription', 'available');
     } else {
       storeWazuh.save('attempt', attempt + 1);
     }
@@ -32,6 +32,7 @@ switch (subscriptionStatus) {
       .withFile('cluster/node-info/node-info-available.json');
     break;
   case 'denied':
+    storeWazuh.save('subscription', 'error');
     respond()
       .withStatusCode(200)
       .withFile('cluster/node-info/node-info-denied.json');

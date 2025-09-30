@@ -27,7 +27,7 @@ export const useCtiStatus = () => {
     pollingRef.current = setInterval(async () => {
       try {
         const response = await getApiInfo();
-        const statusRegistration = response.data.affected_items?.[0]
+        const statusRegistration = response.affected_items?.[0]
           ?.wazuh_cti_auth || {
           status: CtiStatus.PENDING,
           details: CtiDetails.PENDING,
@@ -54,7 +54,7 @@ export const useCtiStatus = () => {
   const checkCtiStatus = useCallback(async () => {
     try {
       const response = await getApiInfo();
-      const statusRegistration = response.data.affected_items?.[0]
+      const statusRegistration = response.affected_items?.[0]
         ?.wazuh_cti_auth || {
         status: CtiStatus.PENDING,
         details: CtiDetails.PENDING,

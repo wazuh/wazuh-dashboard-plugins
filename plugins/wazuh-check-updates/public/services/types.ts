@@ -6,9 +6,7 @@ export interface IWazuhCtiDetails {
 }
 
 export interface apiInfo {
-  data: {
-    affected_items: Array<{
-      wazuh_cti_auth: IWazuhCtiDetails;
-    }>;
-  };
+  affected_items: Array<{
+    wazuh_cti_auth: IWazuhCtiDetails;
+  }>;
 }
