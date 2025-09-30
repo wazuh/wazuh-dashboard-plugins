@@ -2,6 +2,7 @@ import { DashboardPanelState } from '../../../../../../../../../src/plugins/dash
 import { EmbeddableInput } from '../../../../../../../../../src/plugins/embeddable/public';
 import { getVisStateMetric } from '../../../../it-hygiene/common/saved-vis/generators';
 import { checkResultColors, decimalFormat } from './visualization-helpers';
+import { CheckResult } from '../../../utils/constants';
 
 // Here we are using vega visualization: https://vega.github.io/vega/
 const checkScore = (indexPatternId: string) => ({
@@ -18,14 +19,14 @@ const checkScore = (indexPatternId: string) => ({
             passed: {
               filter: {
                 term: {
-                  'check.result': 'passed',
+                  'check.result': CheckResult.Passed,
                 },
               },
             },
             failed: {
               filter: {
                 term: {
-                  'check.result': 'failed',
+                  'check.result': CheckResult.Failed,
                 },
               },
             },
@@ -105,10 +106,10 @@ export const getKPIsPanel = (
           aggsQuery: [
             {
               input: {
-                query: 'check.result: "passed"',
+                query: `check.result: "${CheckResult.Passed}"`,
                 language: 'kuery',
               },
-              label: 'Passed',
+              label: CheckResult.Passed,
             },
           ],
         }),
@@ -127,10 +128,10 @@ export const getKPIsPanel = (
           aggsQuery: [
             {
               input: {
-                query: 'check.result: "failed"',
+                query: `check.result: "${CheckResult.Failed}"`,
                 language: 'kuery',
               },
-              label: 'Failed',
+              label: CheckResult.Failed,
             },
           ],
         }),
@@ -149,10 +150,10 @@ export const getKPIsPanel = (
           aggsQuery: [
             {
               input: {
-                query: 'check.result: "Not run"',
+                query: `check.result: "${CheckResult.NotRun}"`,
                 language: 'kuery',
               },
-              label: 'Not run',
+              label: CheckResult.NotRun,
             },
           ],
         }),
