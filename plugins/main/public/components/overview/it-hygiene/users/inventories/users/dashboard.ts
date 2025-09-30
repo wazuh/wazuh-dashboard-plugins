@@ -60,17 +60,6 @@ export const getOverviewUsersUsersTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateHorizontalBarByField(
       indexPatternId,
-      'user.name',
-      'Top 5 user auth failures count',
-      'it-hygiene-users',
-      {
-        metricType: 'max',
-        metricField: 'user.auth_failures.count',
-        fieldCustomLabel: 'User name',
-      },
-    ),
-    getVisStateHorizontalBarByField(
-      indexPatternId,
       'user.groups',
       'Top 5 user groups',
       'it-hygiene-users',
