@@ -61,7 +61,7 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'group.name',
-      'Top 5 groups',
+      'Groups',
       'it-hygiene-groups',
       { fieldCustomLabel: 'Group name' },
     ),
@@ -81,12 +81,5 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
     //   },
     // ),
     getVisStateUniqueGroupsMetric(indexPatternId),
-    getVisStateHorizontalBarByField(
-      indexPatternId,
-      'agent.name',
-      'Top 5 agents',
-      'it-hygiene-groups',
-      { fieldCustomLabel: 'Agent groups' },
-    ),
   ]);
 };
