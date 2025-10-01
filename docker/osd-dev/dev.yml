@@ -15,6 +15,7 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
+      - 'dashboard-src'
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-rpm' # server profile to use the local packages with agent rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb
@@ -49,6 +50,7 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
+      - 'dashboard-src'
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-rpm' # server profile to use the local packages with agent rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb
@@ -146,6 +148,7 @@ services:
       - 'server'
       - 'saml'
       - 'standard'
+      - 'dashboard-src'
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-rpm' # server profile to use the local packages with agent rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb
@@ -199,6 +202,7 @@ services:
     profiles:
       - 'saml'
       - 'standard'
+      - 'dashboard-src'
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-rpm' # server profile to use the local packages with agent rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb
@@ -236,7 +240,7 @@ services:
     depends_on:
       os1:
         condition: service_healthy
-    image: quay.io/wazuh/osd-dev:${OSD_VERSION}
+    image: ${OSD_IMAGE:-quay.io/wazuh/osd-dev:${OSD_VERSION}}
     profiles:
       - 'server'
       - 'saml'
@@ -267,6 +271,81 @@ services:
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
+    tmpfs:
+      - /home/node/kbn/data/wazuh/downloads:uid=1000,gid=1000,mode=0775
+
+  dashboard-src-installer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: ${DASHBOARD_SRC_BASE_IMAGE}
+    profiles:
+      - 'dashboard-src'
+    container_name: dashboard-src-installer-${NODE_VERSION}
+    volumes:
+      - '${SRC_DASHBOARD}:/home/node/kbn'
+    user: '1000:1000'
+    working_dir: /home/node/kbn
+    entrypoint: /bin/bash
+    command: >
+      -c '
+        marker_osd_bootstrap="/home/node/kbn/.NO_COMMIT_MARKER_OSD_BOOTSTRAP_WAS_DONE"
+        root_app_dir="/home/node/kbn"
+
+        if [ -f "$$marker_osd_bootstrap" ]; then
+          echo "File $$marker_osd_bootstrap was found. Skip setup."
+          exit 0;
+        fi
+        echo "Initializating setup"
+        cd $$root_app_dir
+        yarn osd clean && yarn osd bootstrap && touch $$marker_osd_bootstrap
+        echo "Setup was finished"
+      '
+
+  dashboard-src:
+    # Define the followings environment variables before initiating the container:
+    # export SRC_DASHBOARD=
+    # export SRC_SECURITY_PLUGIN=
+    depends_on:
+      os1:
+        condition: service_healthy
+      dashboard-src-installer:
+        condition: service_completed_successfully
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: ${DASHBOARD_SRC_BASE_IMAGE}
+    profiles:
+      - 'dashboard-src'
+    hostname: osd
+    networks:
+      - os-dev
+      - devel
+      - mon
+    user: '1000:1000'
+    # <<: *logging
+    ports:
+      - ${OSD_PORT}:5601
+      - 5603:5603
+    tty: true
+    environment:
+      - 'LOGS=/proc/1/fd/1'
+    entrypoint: ['/bin/bash', '/entrypoint.sh']
+    working_dir: /home/node/kbn
+    volumes:
+      - '${SRC_DASHBOARD}:/home/node/kbn'
+      - '${REPO_MAIN}:/home/node/kbn/plugins/main'
+      - '${REPO_WAZUH_CORE}:/home/node/kbn/plugins/wazuh-core'
+      - '${REPO_WAZUH_CHECK_UPDATES}:/home/node/kbn/plugins/wazuh-check-updates'
+      - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards'
+      - wd_certs:/home/node/kbn/certs/
+      - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
+      - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
+      - ./dashboard-src/entrypoint.sh:/entrypoint.sh:ro
+    tmpfs:
+      - /home/node/kbn/data/wazuh/downloads:uid=1000,gid=1000,mode=0775
 
   idpsec:
     image: quay.io/keycloak/keycloak:19.0.1
