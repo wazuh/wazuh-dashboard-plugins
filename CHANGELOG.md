@@ -7,7 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.14.0
-- Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587)
+- Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587) [#7792](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7792)
 - Added ability to set the Wazuh data path (wazuh directory) within the directory defined through `path.data` setting [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
 - Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641) [#7696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7696) [#7729](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7729) [#7774](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7774)
 - Added Microsoft Graph API module [#7516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7516) [#7644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7644) [#7661](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7661)
@@ -18,7 +18,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Updated OS logos [#7712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7712)
 - Changed "Services" tab label to "Listeners" in IT Hygiene > Networks [#7742](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7742)
-- Removed "Top 5 agents" visualization and changed "Top 5 groups" label to "Groups" in IT Hygiene > Identity > Groups [#7792](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7792)
 
 ### Fixed
 
