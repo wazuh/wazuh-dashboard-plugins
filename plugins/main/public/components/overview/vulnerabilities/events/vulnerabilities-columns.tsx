@@ -18,5 +18,5 @@ export const vulnerabilitiesColumns: tDataGridColumn[] = [
   },
   {
     id: 'data.vulnerability.package.version',
-  }
+  },
 ];
