@@ -11,7 +11,10 @@
  */
 
 import { GenericRequest } from './generic-request';
-import { KnownFields } from '../utils/known-fields';
+import {
+  KnownFields,
+  getKnownFieldsForStatesPattern,
+} from '../utils/known-fields-loader';
 import { FieldsStatistics } from '../utils/statistics-fields';
 import { FieldsMonitoring } from '../utils/monitoring-fields';
 import {
@@ -21,6 +24,22 @@ import {
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
+  WAZUH_INDEX_TYPE_STATES_FIM_FILES,
+  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
 } from '../../common/constants';
 import { getDataPlugin, getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
@@ -290,6 +309,11 @@ export class SavedObject {
     }
   }
 
+  static getKnownFieldsForStatesPattern = pattern => {
+    // Use the new generated known fields loader
+    return getKnownFieldsForStatesPattern(pattern);
+  };
+
   static getIndicesFields = async (pattern, indexType) => {
     try {
       const response = await GenericRequest.request(
@@ -307,6 +331,34 @@ export class SavedObject {
           return FieldsStatistics;
         case WAZUH_INDEX_TYPE_ALERTS:
           return KnownFields;
+        case WAZUH_INDEX_TYPE_STATES_VULNERABILITIES:
+        case WAZUH_INDEX_TYPE_STATES_FIM_FILES:
+        case WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES:
+        case WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS:
+          // For states patterns, get the appropriate known fields based on pattern
+          const statesFields =
+            SavedObject.getKnownFieldsForStatesPattern(pattern);
+          if (statesFields) {
+            return statesFields;
+          }
+          // If no specific states fields found, throw error
+          const statesError = ErrorFactory.create(WarningError, {
+            error,
+            message: `No known fields defined for states pattern: ${pattern}`,
+          });
+          throw statesError;
         default:
           const warningError = ErrorFactory.create(WarningError, {
             error,
