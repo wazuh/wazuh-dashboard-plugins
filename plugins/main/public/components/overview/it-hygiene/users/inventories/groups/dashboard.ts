@@ -63,7 +63,7 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
       'group.name',
       'Groups',
       'it-hygiene-groups',
-      { fieldCustomLabel: 'Group name' },
+      { fieldCustomLabel: 'Groups' },
     ),
     // getVisStateHorizontalBarSplitSeries(
     //   indexPatternId,
