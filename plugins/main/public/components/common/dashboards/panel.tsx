@@ -21,8 +21,9 @@ import {
 import { CustomSearchBar } from '../custom-search-bar';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { FILTER_OPERATOR } from '../data-source';
-import { WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY } from '../../../../common/constants';
 import { compose } from 'redux';
+import { PatternDataSourceFilterManager as dataSourceFilterManager } from '../../common/data-source/pattern/pattern-data-source-filter-manager';
+
 
 /**
  * Create a panel dashboard component using minimal dependencies: datasource, sample data warning
@@ -100,7 +101,7 @@ export const createPanel = ({
         const { field, value } = selectedFilter;
         const controlledByFilter = 'office-panel-row-filter';
         if (value) {
-          const filter = filterManager?.createFilter(
+          const filter = dataSourceFilterManager?.createFilter(
             FILTER_OPERATOR.IS_ONE_OF,
             field,
             [value],
