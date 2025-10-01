@@ -120,7 +120,10 @@ const FimTableDataSource = withDataSourceFetch({
   return (
     <EuiBasicTable
       items={dataSourceAction?.data?.items || []}
-      columns={columns(() => {}, () => {})}
+      columns={columns(
+        () => {},
+        () => {},
+      )}
       loading={false}
       sorting={{ sort }}
       onChange={e => setSort(e.sort)}

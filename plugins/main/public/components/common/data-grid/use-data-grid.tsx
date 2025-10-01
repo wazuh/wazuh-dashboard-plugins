@@ -218,10 +218,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       );
 
       if (renderColumn) {
-        return renderColumn.render(
-          rawValue,
-          rowsParsed[relativeRowIndex],
-        );
+        return renderColumn.render(rawValue, rowsParsed[relativeRowIndex]);
       }
 
       if (typeof formattedValue === 'undefined') {
