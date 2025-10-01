@@ -5,7 +5,6 @@ import {
   getVisStateHorizontalBarByField,
 } from '../../../../../../services/visualizations';
 
-
 export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateHorizontalBarByField(
