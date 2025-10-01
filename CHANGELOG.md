@@ -46,6 +46,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed navigation problem in MITRE ATT&CK framework details flyout [#7689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7689)
 - Fixed Events count evolution visualization in Endpoint detail to use server API context filter [#7710](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7710)
 - Fixed SCA check result capitalization inconsistency by standardizing 'passed' to 'Passed' and 'failed' to 'Failed' across dashboard components and constants [#7748](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7748)
+- Fixed sorting by agent count in top 5 groups visualization in endpoints summary [#7783](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7783)
 
 ## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 01
 
