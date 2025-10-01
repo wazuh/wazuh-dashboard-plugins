@@ -24,7 +24,6 @@ import { FILTER_OPERATOR } from '../data-source';
 import { compose } from 'redux';
 import { PatternDataSourceFilterManager as dataSourceFilterManager } from '../../common/data-source/pattern/pattern-data-source-filter-manager';
 
-
 /**
  * Create a panel dashboard component using minimal dependencies: datasource, sample data warning
  * categories, dashboard panels creator and dashboard metadata.
