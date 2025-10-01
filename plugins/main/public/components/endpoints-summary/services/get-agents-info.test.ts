@@ -62,8 +62,8 @@ describe('getAgents', () => {
       ],
       groupsData: [
         { label: 'test2', value: 3, color: 'mockColor3' },
-        { label: 'default', value: 1, color: 'mockColor1' },
         { label: 'test', value: 2, color: 'mockColor2' },
+        { label: 'default', value: 1, color: 'mockColor1' },
       ],
       statusData: [
         {
