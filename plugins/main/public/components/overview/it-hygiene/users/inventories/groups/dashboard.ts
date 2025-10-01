@@ -61,7 +61,7 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'group.name',
-      'Groups',
+      'Top 5 groups',
       'it-hygiene-groups',
       { fieldCustomLabel: 'Groups' },
     ),
