@@ -1,5 +1,8 @@
 import { buildDashboardKPIPanels } from '../common/create-dashboard-panels-kpis';
-import { getVisStateHorizontalBarByField } from '../common/saved-vis/generators';
+import {
+  getVisStateHorizontalBarByField,
+  getVisStateMetricUniqueCountByField,
+} from '../common/saved-vis/generators';
 
 export const getOverviewServicesTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
@@ -12,14 +15,12 @@ export const getOverviewServicesTab = (indexPatternId: string) => {
         customLabel: 'Services',
       },
     ),
-    getVisStateHorizontalBarByField(
+    getVisStateMetricUniqueCountByField(
       indexPatternId,
-      'process.user.name',
-      'Top 5 process user names',
+      'service.name',
+      '',
       'it-hygiene-services',
-      {
-        customLabel: 'User Names',
-      },
+      'Unique services',
     ),
   ]);
 };
