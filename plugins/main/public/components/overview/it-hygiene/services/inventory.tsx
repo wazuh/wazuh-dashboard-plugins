@@ -20,6 +20,7 @@ export const ITHygieneServicesInventory = withSystemInventoryServicesDataSource(
         }
         tableDefaultColumns={tableColumns}
         managedFilters={managedFilters}
+        managedFiltersProps={{ style: { flexGrow: 0.25, minWidth: '300px' } }}
         getDashboardPanels={getOverviewServicesTab}
         tableId='it-hygiene-inventory-services'
         categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
