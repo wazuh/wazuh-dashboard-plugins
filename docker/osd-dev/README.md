@@ -25,7 +25,7 @@
 Always use the provided script to bring up or down the development environment. For example:
 
 ```bash
-./dev.sh [-o <os_version>] [-d <osd_version>] [-a <agents_up>] [-r <repo>=<absolute_path> ...] [-base [<dashboard_repo>]] [<default_repo_root>] <action> [<mode>] [<server_version>]
+./dev.sh [-o <os_version>] [-d <osd_version>] [-a <agents_up>] [-r <repo>=<absolute_path> ...] [<default_repo_root>] <action> [<mode>] [<server_version>]
 ```
 
 ### Parameters
@@ -41,7 +41,6 @@ Always use the provided script to bring up or down the development environment. 
   - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`) are auto-detected under a provided `<default_repo_root>`, under `<root>/plugins/`, or (when omitted) by inferring the repo root when the script is executed from within this repository.
   - External repositories passed with `-r` are dynamically added as volumes to the `osd` service via an auto-generated `dev.override.generated.yml` (git-ignored).
   - Paths MUST be absolute.
-- -base [<dashboard_repo>] : (Optional) Forces the `dashboard-src` profile, mounting a local `wazuh-dashboard` checkout at `/home/node/kbn` and running OpenSearch Dashboards from source. The script reads the checkout's `.nvmrc` to pick the Node image (default suffix `-bookworm-slim`) and you can override it with `BASE_OSD_IMAGE` or `BASE_NODE_IMAGE_SUFFIX`. When the path is omitted, the script tries to locate a sibling `wazuh-dashboard` checkout; otherwise, provide an absolute or relative path.
 - <default_repo_root> : (Optional) Absolute path used as the base location for repositories. When provided, the script tries (in order) `<default_repo_root>/<repo>`, `<default_repo_root>/plugins/<repo>`, or `<default_repo_root>` if it itself matches the repo name.
 - <action> : (Required) The action to perform:
   - up : Brings up the environment.
@@ -100,21 +99,6 @@ Standard environment with extra external plugins:
 
 ```sh
 ./dev.sh -r wazuh-dashboard-reporting=/workspace/wazuh-dashboard-reporting -r wazuh-security-dashboards-plugin=/workspace/wazuh-security-dashboards-plugin up
-```
-
-Base dashboard mounted with optional external plugin:
-
-```sh
-./dev.sh up -base ../wazuh-dashboard -r wazuh-reporting=~/dev/wazuh-reporting
-```
-
-When `-base` is active, the script reads `.nvmrc` from the mounted `wazuh-dashboard` checkout to set the `dashboard-src` profile's base image (default `node:<version>-bookworm-slim`). Keep that file in sync with the dashboard's required version or override the image with `BASE_OSD_IMAGE`/`BASE_NODE_IMAGE_SUFFIX`.
-
-Inside the container you can run, for example:
-
-```sh
-docker compose exec osd yarn install --immutable
-docker compose exec osd yarn start --no-base-path
 ```
 
 Standard environment (auto-detect internal plugins when called from inside repo root):

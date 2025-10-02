@@ -136,58 +136,6 @@ assert_log_contains() {
   assert_log_contains "-f dev.override.generated.yml"
 }
 
-@test "base flag requires existing repository path" {
-  missing_dir="${BATS_TEST_TMPDIR}/missing-dashboard"
-  run env PATH="$STUB_PATH:$SYSTEM_PATH" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh -base '$missing_dir' up"
-  [ "$status" -eq 255 ]
-  [[ "$output" == *"Repository path '$missing_dir' for 'wazuh-dashboard' does not exist."* ]]
-}
-
-@test "base flag selects dashboard-src profile" {
-  base_dir="${BATS_TEST_TMPDIR}/dashboard-src"
-  mkdir -p "$base_dir"
-  echo "v18.19.0" > "$base_dir/.nvmrc"
-  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh -base '$base_dir' up"
-  [ "$status" -eq 0 ]
-  override_file="$REPO_ROOT/dev.override.generated.yml"
-  [[ ! -f "$override_file" ]]
-  log_contents="$(cat "$DOCKER_LOG")"
-  [[ "$log_contents" == *"--profile dashboard-src"* ]]
-  [[ "$log_contents" != *"dev.override.generated.yml"* ]]
-  [[ "$output" == *"dashboard-src"* ]]
-}
-
-@test "base flag after action is supported" {
-  base_dir="${BATS_TEST_TMPDIR}/dashboard-after"
-  mkdir -p "$base_dir"
-  echo "v18.19.0" > "$base_dir/.nvmrc"
-  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh up -base '$base_dir'"
-  [ "$status" -eq 0 ]
-  log_contents="$(cat "$DOCKER_LOG")"
-  [[ "$log_contents" == *"--profile dashboard-src"* ]]
-  [[ "$log_contents" != *"dev.override.generated.yml"* ]]
-  [[ "$output" == *"dashboard-src"* ]]
-}
-
-@test "base flag combines with external plugins" {
-  base_dir="${BATS_TEST_TMPDIR}/dashboard-combo"
-  plugin_dir="${BATS_TEST_TMPDIR}/external-plugin"
-  mkdir -p "$base_dir" "$plugin_dir"
-  echo "v18.19.0" > "$base_dir/.nvmrc"
-  plugin_real="$(realpath "$plugin_dir")"
-  run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh -base '$base_dir' -r custom='$plugin_dir' up"
-  [ "$status" -eq 0 ]
-  override_file="$REPO_ROOT/dev.override.generated.yml"
-  [[ -f "$override_file" ]]
-  override_content="$(cat "$override_file")"
-  [[ "$override_content" == *"dashboard-src:"* ]]
-  [[ "$override_content" == *"custom:/home/node/kbn/plugins/custom"* ]]
-  [[ "$override_content" != *"wazuh-dashboard-base"* ]]
-  [[ "$override_content" == *"device: $plugin_real"* ]]
-  assert_log_contains "-f dev.override.generated.yml"
-  [[ "$output" == *"dashboard-src"* ]]
-}
-
 @test "removes stale override when no external repos" {
   echo "stale" > "$REPO_ROOT/dev.override.generated.yml"
   run env PATH="$STUB_PATH:$SYSTEM_PATH" DOCKER_STUB_LOG="$DOCKER_LOG" /bin/bash -c "cd '$REPO_ROOT' && ./dev.sh up"
