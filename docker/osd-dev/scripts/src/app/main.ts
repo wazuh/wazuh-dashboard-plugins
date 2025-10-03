@@ -299,7 +299,7 @@ export async function mainWithDeps(
     process.exit(code);
   }
 
-  printAgentEnrollmentHint(config, deps.logger);
+  printAgentEnrollmentHint(deps.logger);
 }
 
 export async function main(argv: string[]): Promise<void> {

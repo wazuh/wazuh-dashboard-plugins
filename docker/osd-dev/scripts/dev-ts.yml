@@ -16,6 +16,8 @@ services:
       - ${SIBLING_ROOT}:/sibling
       # Mount the scripts directory for development overrides
       - .:/app
+      # Keep container-installed app dependencies available despite the bind mount
+      - /app/node_modules
     working_dir: ${WDP_ROOT}/docker/osd-dev
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock

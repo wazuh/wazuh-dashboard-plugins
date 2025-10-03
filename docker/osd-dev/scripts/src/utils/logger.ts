@@ -79,7 +79,7 @@ export class ConsoleLogger implements Logger {
 
   infoPlain(message?: any, ...optionalParams: any[]): void {
     if (!shouldLog(this.level, 'info')) return;
-    console.log(`${prefix(this.context)}${message}`, ...optionalParams);
+    console.log(message, ...optionalParams);
   }
 
   warn(message?: any, ...optionalParams: any[]): void {

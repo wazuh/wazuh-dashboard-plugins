@@ -3,6 +3,7 @@ import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { ValidationError } from '../errors';
 import type { Logger } from '../utils/logger';
 import type { ProcessRunner } from '../types/deps';
+import chalk from 'chalk';
 
 export function runDockerCompose(
   config: ScriptConfig,
@@ -66,41 +67,63 @@ export function runDockerCompose(
   });
 }
 
-export function printAgentEnrollmentHint(
-  config: ScriptConfig,
-  log: Logger,
-): void {
-  if (config.action !== 'up' || config.mode !== 'server') return;
-
+export function printAgentEnrollmentHint(log: Logger): void {
   const projectName = process.env.COMPOSE_PROJECT_NAME || '';
   const osVersion = process.env.OS_VERSION || '';
   const wazuhStack = process.env.WAZUH_STACK || '';
 
+  if (!projectName || !osVersion) return;
+
   log.infoPlain('');
-  log.infoPlain('**************WARNING**************');
+  log.infoPlain(chalk.yellow.bold('************* WARNING *************'));
   log.infoPlain(
-    'The agent version must be a published one. This uses only released versions.',
+    chalk.yellow(
+      'The agent version must be a published one. This uses only released versions.',
+    ),
   );
   log.infoPlain(
-    'If you need to change the version, edit the command as you see fit.',
+    chalk.yellow(
+      'If you need to change the version, edit the command as you see fit.',
+    ),
   );
-  log.infoPlain('***********************************');
-  log.infoPlain('1. (Optional) Enroll an agent (Ubuntu 20.04):');
+  log.infoPlain(chalk.yellow.bold('***********************************'));
+  log.infoPlain('');
+  log.infoPlain(chalk.cyan.bold('(Optional) Enroll an agent (Ubuntu 20.04):'));
+  log.infoPlain('');
+  log.infoPlain(`${chalk.green('docker run')} \\`);
   log.infoPlain(
-    `docker run --name ${projectName}-agent-$(date +%s) --network os-dev-${osVersion} --label com.docker.compose.project=${projectName} --env WAZUH_AGENT_VERSION=${wazuhStack} -d ubuntu:20.04 bash -c '`,
+    `  ${chalk.magentaBright('--name')} ${projectName}-agent-$(date +%s) \\`,
   );
-  log.infoPlain('  apt update -y');
-  log.infoPlain('  apt install -y curl lsb-release');
-  log.infoPlain('  curl -so \\wazuh-agent-\\${WAZUH_AGENT_VERSION}.deb \\');
+  log.infoPlain(`  ${chalk.magentaBright('--network')} os-dev-${osVersion} \\`);
   log.infoPlain(
-    '    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_\\${WAZUH_AGENT_VERSION}-1_amd64.deb \\',
+    `  ${chalk.magentaBright('--label')} ${chalk.underline(
+      'com.docker.compose.project',
+    )}=${projectName} \\`,
   );
   log.infoPlain(
-    "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-\\${WAZUH_AGENT_VERSION}.deb",
+    `  ${chalk.magentaBright('--env')} ${chalk.underline(
+      'WAZUH_AGENT_VERSION',
+    )}=${chalk.yellow(wazuhStack)} \\`,
+  );
+  log.infoPlain(`  ${chalk.magentaBright('-d')} ubuntu:20.04 bash -c '`);
+  log.infoPlain(chalk.gray('  apt update -y'));
+  log.infoPlain(chalk.gray('  apt install -y curl lsb-release'));
+  log.infoPlain(
+    chalk.gray('  curl -so \\wazuh-agent-${WAZUH_AGENT_VERSION}.deb \\'),
+  );
+  log.infoPlain(
+    chalk.gray(
+      '    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${WAZUH_AGENT_VERSION}-1_amd64.deb \\',
+    ),
+  );
+  log.infoPlain(
+    chalk.gray(
+      "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-${WAZUH_AGENT_VERSION}.deb",
+    ),
   );
   log.infoPlain('');
-  log.infoPlain('  /etc/init.d/wazuh-agent start');
-  log.infoPlain('  tail -f /var/ossec/logs/ossec.log');
+  log.infoPlain(chalk.gray('  /etc/init.d/wazuh-agent start'));
+  log.infoPlain(chalk.gray('  tail -f /var/ossec/logs/ossec.log'));
   log.infoPlain(`'`);
   log.infoPlain('');
 }

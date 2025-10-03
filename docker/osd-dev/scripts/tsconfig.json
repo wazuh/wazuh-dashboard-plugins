@@ -13,6 +13,6 @@
     "moduleResolution": "node",
     "types": ["node"]
   },
-  "include": ["*.ts"],
+  "include": ["*.ts", "src/**/*.ts"],
   "exclude": ["node_modules", "dist"]
 }
