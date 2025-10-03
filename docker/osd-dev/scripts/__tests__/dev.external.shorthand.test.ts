@@ -3,14 +3,19 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
-import { setupTestEnv, teardownTestEnv, SavedProcessState, createSiblingRootUnder } from './helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  SavedProcessState,
+  createSiblingRootUnder,
+} from './helpers/setupTests';
 
 describe('dev.ts - Shorthand -r <name> resolves under sibling', () => {
   let tmpdir: string;
   let saved!: SavedProcessState;
 
   beforeEach(() => {
-    const ctx = setupTestEnv({ prefix: 'wdp-jest-ext-sh-'});
+    const ctx = setupTestEnv({ prefix: 'wdp-jest-ext-sh-' });
     saved = ctx.saved;
     tmpdir = ctx.tmpdir;
   });
@@ -30,10 +35,13 @@ describe('dev.ts - Shorthand -r <name> resolves under sibling', () => {
     const containerPath = path.join(siblingRoot, name); // In tests, sibling container root == sibling host path
     fs.mkdirSync(hostPath, { recursive: true });
     fs.mkdirSync(containerPath, { recursive: true });
-    fs.writeFileSync(path.join(containerPath, 'package.json'), '{"name":"wazuh-dashboard-reporting"}');
+    fs.writeFileSync(
+      path.join(containerPath, 'package.json'),
+      '{"name":"wazuh-dashboard-reporting"}',
+    );
 
     await mainWithDeps(['-r', name, 'up'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await new Promise(r => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
@@ -44,4 +52,3 @@ describe('dev.ts - Shorthand -r <name> resolves under sibling', () => {
     expect(content).toContain(`device: ${hostPath}`);
   });
 });
-
