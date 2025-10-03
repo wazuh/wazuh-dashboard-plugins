@@ -6,13 +6,24 @@ COMPOSE_FILE="${ROOT_DIR}/docker/osd-dev/scripts/__tests__/test.yml"
 SERVICE_NAME="script-tests"
 PROJECT_NAME="${COMPOSE_PROJECT_NAME:-scripttests}"
 
+# Build logs are hidden by default; show them when -v/--verbose is present.
+SHOW_BUILD_LOGS=0
+for arg in "$@"; do
+  if [[ "$arg" == "-v" || "$arg" == "--verbose" ]]; then
+    SHOW_BUILD_LOGS=1
+    break
+  fi
+done
+
 compose_cmd=(docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME")
 
-"${compose_cmd[@]}" build "$SERVICE_NAME"
-
-cmd=("${compose_cmd[@]}" run --rm "$SERVICE_NAME")
-if [[ $# -gt 0 ]]; then
-  cmd+=("$@")
+if [[ "$SHOW_BUILD_LOGS" == "1" ]]; then
+  "${compose_cmd[@]}" build "$SERVICE_NAME"
+else
+  # Hide normal build output but keep errors visible
+  "${compose_cmd[@]}" build "$SERVICE_NAME" >/dev/null
 fi
+
+cmd=("${compose_cmd[@]}" run --rm "$SERVICE_NAME" "$@")
 
 exec "${cmd[@]}"
