@@ -1,20 +1,24 @@
-name: dev.sh Tests
+name: Dev Scripts Tests
 
 on:
   push:
     paths:
       - 'docker/osd-dev/dev.sh'
+      - 'docker/osd-dev/dev.yml'
+      - 'docker/osd-dev/scripts/**'
   pull_request:
     paths:
       - 'docker/osd-dev/dev.sh'
+      - 'docker/osd-dev/dev.yml'
+      - 'docker/osd-dev/scripts/**'
   workflow_dispatch:
 
 jobs:
-  bats-dev-sh:
+  scripts-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Run dev.sh tests
+      - name: Run dev scripts tests (Jest in container)
+        working-directory: docker/osd-dev/scripts/__tests__
         run: |
-          cd docker/osd-dev
-          __tests__/run-tests.sh
+          ./run-tests.sh
