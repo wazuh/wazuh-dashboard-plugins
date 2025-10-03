@@ -67,7 +67,6 @@ export function generateOverrideFile(
     content += '    image: node:${NODE_VERSION}\n';
     content += '    profiles:\n';
     content += `      - '${DASHBOARD_SRC_PROFILE}'\n`;
-    content += '    ports:\n';
     content += "    entrypoint: ['/bin/bash', '/entrypoint.sh']\n";
     content += '    working_dir: /home/node/kbn\n';
 
