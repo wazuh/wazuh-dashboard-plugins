@@ -14,7 +14,13 @@ const path = require('path');
 const https = require('https');
 
 // Load version from package.json
-const packageJsonPath = path.resolve(__dirname, '..', 'plugins', 'main', 'package.json');
+const packageJsonPath = path.resolve(
+  __dirname,
+  '..',
+  'plugins',
+  'main',
+  'package.json',
+);
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const VERSION = packageJson.version;
 
@@ -34,23 +40,25 @@ const TEMPLATE_SOURCES = {
   vulnerabilities: {
     name: 'states-vulnerabilities',
     urls: [
-      wazuhUrl('src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json'),
+      wazuhUrl(
+        'src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-vulnerabilities.json',
   },
   alerts: {
     name: 'alerts',
-    urls: [
-      wazuhUrl('extensions/elasticsearch/7.x/wazuh-template.json'),
-    ],
+    urls: [wazuhUrl('extensions/elasticsearch/7.x/wazuh-template.json')],
     outputFile: 'plugins/main/public/utils/known-fields/alerts.json',
   },
   monitoring: {
     name: 'monitoring',
     // This is in the dashboard-plugins repo
     urls: [
-      dashboardPluginsUrl('plugins/main/server/integration-files/monitoring-template.ts'),
+      dashboardPluginsUrl(
+        'plugins/main/server/integration-files/monitoring-template.ts',
+      ),
     ],
     outputFile: 'plugins/main/public/utils/known-fields/monitoring.json',
     isTypeScript: true,
@@ -59,7 +67,9 @@ const TEMPLATE_SOURCES = {
     name: 'statistics',
     // This is in the dashboard-plugins repo
     urls: [
-      dashboardPluginsUrl('plugins/main/server/integration-files/statistics-template.ts'),
+      dashboardPluginsUrl(
+        'plugins/main/server/integration-files/statistics-template.ts',
+      ),
     ],
     outputFile: 'plugins/main/public/utils/known-fields/statistics.json',
     isTypeScript: true,
