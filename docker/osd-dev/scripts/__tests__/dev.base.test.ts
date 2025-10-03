@@ -1,19 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-// Mock child_process so docker compose does not run for real
-jest.mock('child_process', () => {
-  const events = require('events');
-  return {
-    execSync: jest.fn(() => undefined),
-    spawn: jest.fn(() => {
-      const ee = new events.EventEmitter();
-      process.nextTick(() => ee.emit('close', 0));
-      return ee as any;
-    }),
-  };
-});
+import { main } from '../src/app/main';
+import { MockLogger } from '../__mocks__/mockLogger';
+import { StubRunner } from './helpers/stubRunner';
 
 describe('dev.ts - Base startup with auto-detection (-base)', () => {
   const repoRoot = path.resolve(__dirname, '../../../..');
@@ -59,13 +49,12 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
   });
 
   test('auto-detects dashboard base, sets NODE_VERSION, generates override and enforces dashboard-src profile', async () => {
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    const logSpy = jest.spyOn(logger, 'info');
 
     // Run up with -base auto-detection (no path provided)
-    process.argv = ['node', 'dev.ts', '-base', 'up'];
-    const { spawn } = require('child_process');
-
-    await import('../dev');
+    await main(['-base', 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     // Validations
@@ -75,7 +64,7 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
 
     // Log includes base usage message
     const logs = logSpy.mock.calls.map((c) => String(c[0]));
-    expect(logs.some((l) => l.includes(`[INFO] Using wazuh-dashboard sources from ${dashboardBase}`))).toBe(true);
+    expect(logs.some((l) => l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`))).toBe(true);
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
@@ -89,8 +78,8 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
     expect(content).toContain("- ./dashboard-src/entrypoint.sh:/entrypoint.sh:ro");
 
     // docker compose gets both profiles: standard and dashboard-src, and includes override file
-    expect(spawn).toHaveBeenCalledTimes(1);
-    const args: string[] = spawn.mock.calls[0][1];
+    expect(runner.spawnCalls.length).toBe(1);
+    const args: string[] = runner.spawnCalls[0].args;
     expect(args[0]).toBe('compose');
     expect(args).toContain('--profile');
     expect(args).toContain('standard');
@@ -101,13 +90,9 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
     expect(args).toContain('up');
 
     // Now run down and ensure the override is removed
-    jest.resetModules();
-    process.argv = ['node', 'dev.ts', 'down'];
-    await import('../dev');
+    await main(['down'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     expect(fs.existsSync(overridePath)).toBe(false);
-
     logSpy.mockRestore();
   });
 });
-

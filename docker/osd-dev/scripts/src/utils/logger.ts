@@ -1,6 +1,6 @@
 /**
- * Minimal logger utility with level filtering and optional context.
- * Keep console.* under the hood to preserve test spies on console.
+ * Logger utility with level filtering and optional context.
+ * Implemented as a class to allow alternative implementations (e.g., mocks).
  */
 
 export type LogLevel = 'error' | 'warn' | 'info' | 'debug';
@@ -26,13 +26,14 @@ const LEVEL_ORDER: Record<LogLevel, number> = {
  * Reads log level from LOG_LEVEL environment variable.
  * Defaults to 'info' if not set or invalid.
  */
-function readLevel(): LogLevel {
-  const raw = (process.env.LOG_LEVEL || 'info').toLowerCase();
-  if (raw === 'error' || raw === 'warn' || raw === 'info' || raw === 'debug') return raw;
-  return 'info';
+function parseLevel(raw?: string): LogLevel {
+  const val = (raw || '').toLowerCase();
+  return (['error', 'warn', 'info', 'debug'] as LogLevel[]).includes(
+    val as LogLevel,
+  )
+    ? (val as LogLevel)
+    : 'info';
 }
-
-let CURRENT_LEVEL = readLevel();
 
 export interface Logger {
   level: LogLevel;
@@ -50,46 +51,61 @@ export interface Logger {
   withContext(context: string): Logger;
 }
 
-function shouldLog(target: LogLevel) {
-  return LEVEL_ORDER[target] <= LEVEL_ORDER[CURRENT_LEVEL];
+function shouldLog(current: LogLevel, target: LogLevel) {
+  return LEVEL_ORDER[target] <= LEVEL_ORDER[current];
 }
 
 function prefix(context?: string) {
   return context ? `[${context}] ` : '';
 }
 
-function createLogger(context?: string): Logger {
-  return {
-    level: CURRENT_LEVEL,
-    setLevel(level: LogLevel) {
-      CURRENT_LEVEL = level;
-      this.level = level;
-    },
-    info(message?: any, ...optionalParams: any[]) {
-      if (!shouldLog('info')) return;
-      console.log(`${prefix(context)}[INFO] ${message}`, ...optionalParams);
-    },
-    infoPlain(message?: any, ...optionalParams: any[]) {
-      if (!shouldLog('info')) return;
-      console.log(`${prefix(context)}${message}`, ...optionalParams);
-    },
-    warn(message?: any, ...optionalParams: any[]) {
-      if (!shouldLog('warn')) return;
-      console.warn(`${prefix(context)}[WARN] ${message}`, ...optionalParams);
-    },
-    error(message?: any, ...optionalParams: any[]) {
-      if (!shouldLog('error')) return;
-      console.error(`${prefix(context)}[ERROR] ${message}`, ...optionalParams);
-    },
-    debug(message?: any, ...optionalParams: any[]) {
-      if (!shouldLog('debug')) return;
-      console.log(`${prefix(context)}[DEBUG] ${message}`, ...optionalParams);
-    },
-    withContext(next: string) {
-      return createLogger(context ? `${context}:${next}` : next);
-    },
-  };
+export class ConsoleLogger implements Logger {
+  public level: LogLevel;
+  private readonly context?: string;
+
+  constructor(context?: string, level?: LogLevel) {
+    this.context = context;
+    this.level = level || parseLevel(process.env.LOG_LEVEL) || 'info';
+  }
+
+  setLevel(level: LogLevel): void {
+    this.level = level;
+  }
+
+  info(message?: any, ...optionalParams: any[]): void {
+    if (!shouldLog(this.level, 'info')) return;
+    console.log(`${prefix(this.context)}[INFO] ${message}`, ...optionalParams);
+  }
+
+  infoPlain(message?: any, ...optionalParams: any[]): void {
+    if (!shouldLog(this.level, 'info')) return;
+    console.log(`${prefix(this.context)}${message}`, ...optionalParams);
+  }
+
+  warn(message?: any, ...optionalParams: any[]): void {
+    if (!shouldLog(this.level, 'warn')) return;
+    console.warn(`${prefix(this.context)}[WARN] ${message}`, ...optionalParams);
+  }
+
+  error(message?: any, ...optionalParams: any[]): void {
+    if (!shouldLog(this.level, 'error')) return;
+    console.error(
+      `${prefix(this.context)}[ERROR] ${message}`,
+      ...optionalParams,
+    );
+  }
+
+  debug(message?: any, ...optionalParams: any[]): void {
+    if (!shouldLog(this.level, 'debug')) return;
+    console.log(`${prefix(this.context)}[DEBUG] ${message}`, ...optionalParams);
+  }
+
+  withContext(context: string): Logger {
+    const childContext = this.context ? `${this.context}:${context}` : context;
+    return new ConsoleLogger(childContext, this.level);
+  }
 }
 
-export const logger: Logger = createLogger('dev-script');
-export const createChildLogger = (context: string) => logger.withContext(context);
+export const logger: Logger = new ConsoleLogger('dev-script');
+export const createChildLogger = (context: string) =>
+  logger.withContext(context);

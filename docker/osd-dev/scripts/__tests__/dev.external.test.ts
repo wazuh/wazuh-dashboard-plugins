@@ -1,19 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-// Mock child_process before importing the script to avoid real Docker calls
-jest.mock('child_process', () => {
-  const events = require('events');
-  return {
-    execSync: jest.fn(() => undefined),
-    spawn: jest.fn(() => {
-      const ee = new events.EventEmitter();
-      process.nextTick(() => ee.emit('close', 0));
-      return ee as any;
-    }),
-  };
-});
+import { main } from '../src/app/main';
+import { MockLogger } from '../__mocks__/mockLogger';
+import { StubRunner } from './helpers/stubRunner';
 
 describe('dev.ts - Dynamic mounting of external repos', () => {
   const repoRoot = path.resolve(__dirname, '../../../..');
@@ -57,8 +47,9 @@ describe('dev.ts - Dynamic mounting of external repos', () => {
 
   test('generates override with external volume and removes it on down', async () => {
     // 1) Run up with external repo
-    process.argv = ['node', 'dev.ts', '-r', `external-test=${extRepoPath}`, 'up'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['-r', `external-test=${extRepoPath}`, 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
@@ -77,11 +68,9 @@ describe('dev.ts - Dynamic mounting of external repos', () => {
     expect(content).toContain('      type: none');
     expect(content).toContain('      o: bind');
     expect(content).toContain(`      device: ${extRepoPath}`);
-  
+
     // 4) Run down without flags and verify the override file is removed
-    jest.resetModules();
-    process.argv = ['node', 'dev.ts', 'down'];
-    await import('../dev');
+    await main(['down'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     expect(fs.existsSync(overridePath)).toBe(false);

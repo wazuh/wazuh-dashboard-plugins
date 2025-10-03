@@ -40,7 +40,8 @@ describe('dev.ts - Input validations', () => {
   });
 
   test("'-r invalid' fails with Invalid repository specification", async () => {
-    const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const { logger } = require('../src/utils/logger');
+    const errSpy = jest.spyOn(logger, 'error');
     const exitSpy = jest
       .spyOn(process, 'exit')
       .mockImplementation(((code?: number) => {
@@ -57,4 +58,3 @@ describe('dev.ts - Input validations', () => {
     expect(msg).toContain("Invalid repository specification 'invalid'. Expected format repo=/absolute/path.");
   });
 });
-

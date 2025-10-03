@@ -1,7 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { logger } from '../src/utils/logger';
+import { main } from '../src/app/main';
+import { MockLogger } from '../__mocks__/mockLogger';
+import { StubRunner } from './helpers/stubRunner';
 
 // For compose arg inspections we mock child_process
 jest.mock('child_process', () => {
@@ -54,85 +56,85 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   // Note: pre-parse exit cases are already covered elsewhere to avoid multiple worker exceptions
 
   test('unsupported mode logs error', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'up', 'imaginary'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    try { await main(['up', 'imaginary'], { logger, processRunner: runner }); } catch {}
     await new Promise((r) => setImmediate(r));
     // No spawn should be called because configureMode throws
-    expect(spawn).toHaveBeenCalledTimes(0);
+    expect(runner.spawnCalls.length).toBe(0);
   });
 
   test('server-local requires server_version', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'up', 'server-local'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    try { await main(['up', 'server-local'], { logger, processRunner: runner }); } catch {}
     await new Promise((r) => setImmediate(r));
-    expect(spawn).toHaveBeenCalledTimes(0);
+    expect(runner.spawnCalls.length).toBe(0);
   });
 
   test('server requires server_version', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'up', 'server'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    try { await main(['up', 'server'], { logger, processRunner: runner }); } catch {}
     await new Promise((r) => setImmediate(r));
-    expect(spawn).toHaveBeenCalledTimes(0);
+    expect(runner.spawnCalls.length).toBe(0);
   });
 
   test('unknown action logs error and does not spawn docker', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'nonsense'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    try { await main(['nonsense'], { logger, processRunner: runner }); } catch {}
     await new Promise((r) => setImmediate(r));
-    expect(spawn).toHaveBeenCalledTimes(0);
+    expect(runner.spawnCalls.length).toBe(0);
   });
 
   // Path validations that exit are covered elsewhere to avoid multiple exit exceptions
 
   test('server-local rpm profile selected with -a rpm', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', '-a', 'rpm', 'up', 'server-local', '2.4.0'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['-a', 'rpm', 'up', 'server-local', '2.4.0'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
-    const args: string[] = spawn.mock.calls[0][1];
+    const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('server-local-rpm');
   });
 
   test('server-local-without profile selected with -a without', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', '-a', 'without', 'up', 'server-local', '2.4.0'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['-a', 'without', 'up', 'server-local', '2.4.0'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
-    const args: string[] = spawn.mock.calls[0][1];
+    const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('server-local-without');
   });
 
   test('server mode uses server profile', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'up', 'server', '4.2.0'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['up', 'server', '4.2.0'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
-    const args: string[] = spawn.mock.calls[0][1];
+    const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('server');
   });
 
   test('down action includes cleanup flags', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'down'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['down'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
-    const args: string[] = spawn.mock.calls[0][1];
+    const args: string[] = runner.spawnCalls[0].args;
     expect(args).toEqual(expect.arrayContaining(['compose', '--profile', 'standard', '-f', 'dev.yml', 'down', '-v', '--remove-orphans']));
   });
 
   test('stop action sets compose project name', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'stop'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['stop'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
-    const args: string[] = spawn.mock.calls[0][1];
+    const args: string[] = runner.spawnCalls[0].args;
     const osdVersion = getPlatformVersion(repoRoot);
     const expectedProject = `os-dev-${osdVersion.replace(/\./g, '')}`;
     // expect '-p <project> stop'
@@ -143,23 +145,23 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   });
 
   test('manager-local-up limits services', async () => {
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'manager-local-up'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['manager-local-up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
-    const args: string[] = spawn.mock.calls[0][1];
+    const args: string[] = runner.spawnCalls[0].args;
     expect(args).toEqual(expect.arrayContaining(['compose', '-p', expect.any(String), 'up', '-d', 'wazuh.manager.local']));
   });
 
   test('up without external repos and without base prints message and up -Vd', async () => {
+    const logger = new MockLogger('test');
     const infoSpy = jest.spyOn(logger, 'info');
-    const { spawn } = require('child_process');
-    process.argv = ['node', 'dev.ts', 'up'];
-    await import('../dev');
+    const runner = new StubRunner();
+    await main(['up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     const infoCalls = infoSpy.mock.calls.map((args) => String(args[0] ?? ''));
     expect(infoCalls.some((l) => l.includes('No dynamic compose override required.'))).toBe(true);
-    const args: string[] = spawn.mock.calls[0][1];
+    const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('up');
     expect(args).toContain('-Vd');
   });

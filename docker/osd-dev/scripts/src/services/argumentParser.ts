@@ -6,38 +6,38 @@ import {
   toContainerPath,
 } from '../utils/pathUtils';
 import { ValidationError, ConfigurationError } from '../errors';
-import { logger } from '../utils/logger';
+import type { Logger } from '../utils/logger';
 
-export function printUsageAndExit(): never {
-  logger.infoPlain('');
-  logger.infoPlain(
+export function printUsageAndExit(log: Logger): never {
+  log.infoPlain('');
+  log.infoPlain(
     './dev.sh [-o os_version] [-d osd_version] [-a agents_up] [-r repo=absolute_path ...] [default_repo_root] action [saml|server|server-local] [server_version]',
   );
-  logger.infoPlain('');
-  logger.infoPlain('where');
-  logger.infoPlain('  -o os_version Specify the OS version (optional)');
-  logger.infoPlain('  -d osd_version Specify the OSD version (optional)');
-  logger.infoPlain(
+  log.infoPlain('');
+  log.infoPlain('where');
+  log.infoPlain('  -o os_version Specify the OS version (optional)');
+  log.infoPlain('  -d osd_version Specify the OSD version (optional)');
+  log.infoPlain(
     "  -a agents_up Specify 'rpm' or 'deb' to deploy an agent with server-local, or 'without' to deploy no agent (optional) (default: deploy 2 agents)",
   );
-  logger.infoPlain(
+  log.infoPlain(
     '  -r repo=absolute_path Mount an external plugin repository (repeatable).',
   );
-  logger.infoPlain(
+  log.infoPlain(
     '     Use -r only for external repos, e.g.: wazuh-dashboard-reporting/abs/path/wazuh-dashboard-reporting',
   );
-  logger.infoPlain(
+  log.infoPlain(
     '  -base [absolute_path] Set the base directory where required repos (main, wazuh-core, wazuh-check-updates) are located (defaults to sibling wazuh-dashboard)',
   );
-  logger.infoPlain(
+  log.infoPlain(
     '  default_repo_root Optional absolute path used as the base location for repositories',
   );
-  logger.infoPlain('  action is one of up | down | stop | start | manager-local-up');
-  logger.infoPlain('  saml to deploy a saml enabled environment (optional)');
-  logger.infoPlain(
+  log.infoPlain('  action is one of up | down | stop | start | manager-local-up');
+  log.infoPlain('  saml to deploy a saml enabled environment (optional)');
+  log.infoPlain(
     '  server to deploy a real server enabled environment (optional, requires server_version)',
   );
-  logger.infoPlain(
+  log.infoPlain(
     '  server-local to deploy a real server enabled environment (optional, requires server_version)',
   );
   process.exit(1);
@@ -46,6 +46,7 @@ export function printUsageAndExit(): never {
 export function parseArguments(
   argv: string[],
   envPaths: EnvironmentPaths,
+  log: Logger,
 ): ScriptConfig {
   const config: ScriptConfig = {
     osVersion: '',

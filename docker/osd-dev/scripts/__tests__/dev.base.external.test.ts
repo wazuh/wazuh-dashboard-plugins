@@ -1,6 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
+import { main } from '../src/app/main';
+import { MockLogger } from '../__mocks__/mockLogger';
+import { StubRunner } from './helpers/stubRunner';
 
 // Avoid real docker; simulate successful compose
 jest.mock('child_process', () => {
@@ -63,12 +66,11 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
   });
 
   test('generates override with external volume, includes dashboard-src profile, and removes override on down', async () => {
-    const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    const { spawn } = require('child_process');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    const logSpy = jest.spyOn(logger, 'info');
 
-    // Up with base autodetect and one external repo
-    process.argv = ['node', 'dev.ts', '-base', '-r', `external-test=${externalRepo}`, 'up'];
-    await import('../dev');
+    await main(['-base', '-r', `external-test=${externalRepo}`, 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
@@ -87,8 +89,8 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     expect(content).toContain(`      device: ${externalRepo}`);
 
     // dashboard-src profile enforced
-    expect(spawn).toHaveBeenCalledTimes(1);
-    const args: string[] = spawn.mock.calls[0][1];
+    expect(runner.spawnCalls.length).toBe(1);
+    const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('dashboard-src');
     expect(args).toContain('-f');
@@ -96,15 +98,12 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
 
     // Logs show base sources path
     const logs = logSpy.mock.calls.map((c) => String(c[0]));
-    expect(logs.some((l) => l.includes(`[INFO] Using wazuh-dashboard sources from ${dashboardBase}`))).toBe(true);
+    expect(logs.some((l) => l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`))).toBe(true);
 
     // Down cleans override
-    jest.resetModules();
-    process.argv = ['node', 'dev.ts', 'down'];
-    await import('../dev');
+    await main(['down'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     expect(fs.existsSync(overridePath)).toBe(false);
-
     logSpy.mockRestore();
   });
 });

@@ -1,19 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-// Avoid real docker; simulate successful compose
-jest.mock('child_process', () => {
-  const events = require('events');
-  return {
-    execSync: jest.fn(() => undefined),
-    spawn: jest.fn(() => {
-      const ee = new events.EventEmitter();
-      process.nextTick(() => ee.emit('close', 0));
-      return ee as any;
-    }),
-  };
-});
+import { main } from '../src/app/main';
+import { MockLogger } from '../__mocks__/mockLogger';
+import { StubRunner } from './helpers/stubRunner';
 
 describe('dev.ts - External repo trailing slash is trimmed', () => {
   const repoRoot = path.resolve(__dirname, '../../../..');
@@ -47,8 +37,9 @@ describe('dev.ts - External repo trailing slash is trimmed', () => {
   });
 
   test('override device path has no trailing slash', async () => {
-    process.argv = ['node', 'dev.ts', '-r', `custom=${externalDir}/`, 'up'];
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['-r', `custom=${externalDir}/`, 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
@@ -58,4 +49,3 @@ describe('dev.ts - External repo trailing slash is trimmed', () => {
     expect(content).not.toContain(`device: ${externalDir}/`);
   });
 });
-

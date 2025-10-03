@@ -13,7 +13,8 @@ import { getPlatformVersionFromPackageJson } from '../services/versionService';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import { PathAccessError, ValidationError, ConfigurationError } from '../errors';
-import { logger } from '../utils/logger';
+import { Dependencies } from '../types/deps';
+import { execSync, spawn } from 'child_process';
 import { ensureAccessibleHostPath, stripTrailingSlash, toContainerPath } from '../utils/pathUtils';
 
 function ensureDashboardSources(config: ScriptConfig, envPaths: EnvironmentPaths): string {
@@ -88,14 +89,14 @@ function resolveSecurityPluginPath(config: ScriptConfig, envPaths: EnvironmentPa
   );
 }
 
-export async function main(argv: string[]): Promise<void> {
+export async function main(argv: string[], deps: Dependencies): Promise<void> {
   const envPaths = getEnvironmentPaths();
 
   if (argv.length === 0) {
-    printUsageAndExit();
+    printUsageAndExit(deps.logger);
   }
 
-  let config = parseArguments(argv, envPaths);
+  let config = parseArguments(argv, envPaths, deps.logger);
 
   if (!config.action) {
     throw new ValidationError('Missing action argument');
@@ -103,11 +104,11 @@ export async function main(argv: string[]): Promise<void> {
 
   // Get versions from package.json if not provided
   if (!config.osVersion) {
-    logger.info(`OS Version not received via flag, getting the version from ${envPaths.packageJsonPath}`);
+    deps.logger.info(`OS Version not received via flag, getting the version from ${envPaths.packageJsonPath}`);
     config = { ...config, osVersion: getPlatformVersionFromPackageJson('OS', envPaths) };
   }
   if (!config.osdVersion) {
-    logger.info(`OSD Version not received via flag, getting the version from ${envPaths.packageJsonPath}`);
+    deps.logger.info(`OSD Version not received via flag, getting the version from ${envPaths.packageJsonPath}`);
     config = { ...config, osdVersion: getPlatformVersionFromPackageJson('OSD', envPaths) };
   }
 
@@ -127,9 +128,9 @@ export async function main(argv: string[]): Promise<void> {
     if (!existsSync(entrypointHostPath)) {
       throw new ConfigurationError(`Expected dashboard entrypoint script at '${entrypointHostPath}'.`);
     }
-    logger.info(`Using wazuh-dashboard sources from ${config.dashboardBase}`);
-    logger.info(`Using wazuh-security-dashboards sources from ${securityPluginHostPath}`);
-    logger.info(`Using Node.js version ${process.env.NODE_VERSION} from ${nvmrcHostPath}`);
+    deps.logger.info(`Using wazuh-dashboard sources from ${config.dashboardBase}`);
+    deps.logger.info(`Using wazuh-security-dashboards sources from ${securityPluginHostPath}`);
+    deps.logger.info(`Using Node.js version ${process.env.NODE_VERSION} from ${nvmrcHostPath}`);
   }
 
   // External repositories provided through -r
@@ -165,7 +166,7 @@ export async function main(argv: string[]): Promise<void> {
     repositoryEnvMap: repoEnvVars,
     useDashboardFromSource: config.useDashboardFromSource,
     includeSecurityPlugin: Boolean(securityPluginHostPath) && config.useDashboardFromSource,
-  }, envPaths);
+  }, envPaths, deps.logger);
 
   // Compose files
   const composeFiles = ['dev.yml'];
@@ -175,10 +176,18 @@ export async function main(argv: string[]): Promise<void> {
   const profiles = new Set<string>([primaryProfile]);
   if (config.useDashboardFromSource) profiles.add(DASHBOARD_SRC_PROFILE);
 
-  const code = await runDockerCompose(config, Array.from(profiles), composeFiles, envPaths);
+  const defaultRunner = { execSync, spawn };
+  const code = await runDockerCompose(
+    config,
+    Array.from(profiles),
+    composeFiles,
+    envPaths,
+    deps.logger,
+    deps.processRunner || defaultRunner,
+  );
   if (code !== 0) {
     process.exit(code);
   }
 
-  printAgentEnrollmentHint(config);
+  printAgentEnrollmentHint(config, deps.logger);
 }

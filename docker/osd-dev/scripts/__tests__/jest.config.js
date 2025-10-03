@@ -9,9 +9,6 @@ module.exports = {
   rootDir: scriptsRoot,
   testMatch: ['<rootDir>/__tests__/**/*.test.ts'],
   verbose: false,
-  setupFilesAfterEnv: [
-    '<rootDir>/__tests__/jest.setup.ts',
-  ],
   transform: {
     '^.+\\.ts$': [
       'ts-jest',

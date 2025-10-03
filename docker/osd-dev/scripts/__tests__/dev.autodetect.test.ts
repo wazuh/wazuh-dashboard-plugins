@@ -1,20 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-// Mock child_process before importing the script
-jest.mock('child_process', () => {
-  const events = require('events');
-  return {
-    execSync: jest.fn(() => undefined),
-    spawn: jest.fn(() => {
-      const ee = new events.EventEmitter();
-      // Simulate successful docker compose run
-      process.nextTick(() => ee.emit('close', 0));
-      return ee as any;
-    }),
-  };
-});
+import { main } from '../src/app/main';
+import { MockLogger } from '../__mocks__/mockLogger';
+import { StubRunner } from './helpers/stubRunner';
 
 const getPluginPlatformVersion = (baseRoot: string) => {
   const pkgPath = path.resolve(baseRoot, 'plugins', 'wazuh-core', 'package.json');
@@ -59,10 +48,9 @@ describe('dev.ts - Auto-detection without flags', () => {
   });
 
   test('does not generate override file and sets mounts and compose args', async () => {
-    // Import runs main() immediately
-    await import('../dev');
-
-    // Allow async close handler to run
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
@@ -78,9 +66,8 @@ describe('dev.ts - Auto-detection without flags', () => {
     const expectedProject = `os-dev-${osdVersion.replace(/\./g, '')}`;
     expect(process.env.COMPOSE_PROJECT_NAME).toBe(expectedProject);
 
-    const { spawn } = require('child_process');
-    expect(spawn).toHaveBeenCalledTimes(1);
-    const args: string[] = spawn.mock.calls[0][1];
+    expect(runner.spawnCalls.length).toBe(1);
+    const args: string[] = runner.spawnCalls[0].args;
 
     // docker compose --profile standard -f dev.yml up -Vd
     expect(args[0]).toBe('compose');

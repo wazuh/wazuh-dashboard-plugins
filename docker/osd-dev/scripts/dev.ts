@@ -22,7 +22,7 @@ try {
   const envPaths = getEnvironmentPaths();
   if (argv.length > 0) {
     // Pre-parse to surface validation errors synchronously
-    parseArguments(argv, envPaths);
+    parseArguments(argv, envPaths, logger);
   }
 } catch (error) {
   // Only hard-exit on validation problems during pre-parse
@@ -35,7 +35,7 @@ try {
 }
 
 try {
-  const result = main(argv);
+  const result = main(argv, { logger });
   if (result && typeof (result as any).then === 'function') {
     (result as Promise<void>).catch((err) => {
       const message = err instanceof DevScriptError ? err.message : ((err as any)?.message || String(err));

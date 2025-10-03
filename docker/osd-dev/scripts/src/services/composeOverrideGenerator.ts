@@ -4,11 +4,12 @@ import { DASHBOARD_ENTRYPOINT_PATH, DASHBOARD_SRC_PROFILE, OVERRIDE_COMPOSE_FILE
 import { writeFile } from '../utils/io';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import { ComposeOverrideError } from '../errors';
-import { logger } from '../utils/logger';
+import type { Logger } from '../utils/logger';
 
 export function generateOverrideFile(
   options: GenerateOverrideOptions,
-  _envPaths: EnvironmentPaths
+  _envPaths: EnvironmentPaths,
+  log: Logger
 ): string | null {
   const { externalRepositories, repositoryEnvMap, useDashboardFromSource, includeSecurityPlugin } = options;
   const shouldGenerate = useDashboardFromSource || externalRepositories.length > 0;
@@ -16,9 +17,9 @@ export function generateOverrideFile(
   if (!shouldGenerate) {
     if (existsSync(OVERRIDE_COMPOSE_FILE)) {
       unlinkSync(OVERRIDE_COMPOSE_FILE);
-      logger.info('Removed previous compose override file.');
+      log.info('Removed previous compose override file.');
     } else {
-      logger.info('No dynamic compose override required.');
+      log.info('No dynamic compose override required.');
     }
     return null;
   }
@@ -26,7 +27,7 @@ export function generateOverrideFile(
   const messages: string[] = [];
   if (useDashboardFromSource) messages.push('dashboard sources mode');
   if (externalRepositories.length > 0) messages.push(`external repositories: ${externalRepositories.join(', ')}`);
-  logger.info(`Generating compose override for ${messages.join(' and ')}`);
+  log.info(`Generating compose override for ${messages.join(' and ')}`);
 
   let content = 'services:\n';
 

@@ -1,19 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-// Avoid real docker; simulate successful compose
-jest.mock('child_process', () => {
-  const events = require('events');
-  return {
-    execSync: jest.fn(() => undefined),
-    spawn: jest.fn(() => {
-      const ee = new events.EventEmitter();
-      process.nextTick(() => ee.emit('close', 0));
-      return ee as any;
-    }),
-  };
-});
+import { main } from '../src/app/main';
+import { MockLogger } from '../__mocks__/mockLogger';
+import { StubRunner } from './helpers/stubRunner';
 
 describe('dev.ts - Multiple external repos in override', () => {
   const repoRoot = path.resolve(__dirname, '../../../..');
@@ -51,9 +41,9 @@ describe('dev.ts - Multiple external repos in override', () => {
   });
 
   test('override contains both volumes and device mappings', async () => {
-    process.argv = ['node', 'dev.ts', '-r', `custom1=${external1}`, '-r', `custom2=${external2}`, 'up'];
-
-    await import('../dev');
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await main(['-r', `custom1=${external1}`, '-r', `custom2=${external2}`, 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
@@ -72,4 +62,3 @@ describe('dev.ts - Multiple external repos in override', () => {
     expect(content).toContain(`      device: ${external2}`);
   });
 });
-
