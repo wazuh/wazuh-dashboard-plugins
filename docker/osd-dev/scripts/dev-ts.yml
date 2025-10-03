@@ -1,0 +1,26 @@
+services:
+  dev-script:
+    build:
+      context: ../../..
+      dockerfile: docker/osd-dev/scripts/Dockerfile
+    image: osd-dev-script:latest
+    container_name: osd-dev-script
+    volumes:
+      # Mount Docker socket to allow running docker commands
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount current repository under its host path and /wdp for convenience
+      - ${WDP_ROOT}:${WDP_ROOT}
+      - ${WDP_ROOT}:/wdp
+      # Mount sibling repositories under their host path and /sibling
+      - ${SIBLING_ROOT}:${SIBLING_ROOT}
+      - ${SIBLING_ROOT}:/sibling
+      # Mount the scripts directory for development overrides
+      - .:/app
+    working_dir: ${WDP_ROOT}/docker/osd-dev
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - CURRENT_REPO_HOST_ROOT=${CURRENT_REPO_HOST_ROOT}
+      - SIBLING_REPO_HOST_ROOT=${SIBLING_REPO_HOST_ROOT}
+      - WDP_CONTAINER_ROOT=/wdp
+      - SIBLING_CONTAINER_ROOT=/sibling
+    network_mode: host
