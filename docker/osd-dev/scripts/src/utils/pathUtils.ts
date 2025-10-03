@@ -46,7 +46,7 @@ export function toContainerPath(hostAbsolutePath: string, envPaths: EnvironmentP
 export function ensureAccessibleHostPath(hostAbsolutePath: string, description: string, envPaths: EnvironmentPaths): void {
   const containerPath = toContainerPath(hostAbsolutePath, envPaths);
   if (!containerPath || !existsSync(containerPath)) {
-    const allowedRoots = [envPaths.currentRepoHostRoot, envPaths.siblingRepoHostRoot]
+    const allowedRoots = [envPaths.siblingRepoHostRoot]
       .filter(Boolean)
       .join(' or ') || 'the mounted development roots';
     throw new PathAccessError(

@@ -20,7 +20,7 @@ import { ensureAccessibleHostPath, stripTrailingSlash, toContainerPath } from '.
 function ensureDashboardSources(config: ScriptConfig, envPaths: EnvironmentPaths): string {
   const dashboardContainerPath = toContainerPath(config.dashboardBase, envPaths);
   if (!dashboardContainerPath || !existsSync(dashboardContainerPath)) {
-    const allowedRoots = [envPaths.currentRepoHostRoot, envPaths.siblingRepoHostRoot].filter(Boolean).join(' or ') || 'the mounted development roots';
+    const allowedRoots = [envPaths.siblingRepoHostRoot].filter(Boolean).join(' or ') || 'the mounted development roots';
     throw new PathAccessError(
       `Dashboard base path '${config.dashboardBase}' does not exist or is not accessible from the development container. Place it under ${allowedRoots}.`
     );
