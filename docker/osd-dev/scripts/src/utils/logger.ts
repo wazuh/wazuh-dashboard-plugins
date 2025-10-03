@@ -5,6 +5,16 @@
 
 export type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
+/**
+ * Log level priority map: lower numbers = higher priority (less verbose).
+ * When a log level is set (e.g., 'warn'), only messages with priority <= that level are shown.
+ *
+ * Example: If CURRENT_LEVEL = 'warn' (priority 1):
+ *   - error (0) ✓ shown
+ *   - warn  (1) ✓ shown
+ *   - info  (2) ✗ hidden
+ *   - debug (3) ✗ hidden
+ */
 const LEVEL_ORDER: Record<LogLevel, number> = {
   error: 0,
   warn: 1,
@@ -12,6 +22,10 @@ const LEVEL_ORDER: Record<LogLevel, number> = {
   debug: 3,
 };
 
+/**
+ * Reads log level from LOG_LEVEL environment variable.
+ * Defaults to 'info' if not set or invalid.
+ */
 function readLevel(): LogLevel {
   const raw = (process.env.LOG_LEVEL || 'info').toLowerCase();
   if (raw === 'error' || raw === 'warn' || raw === 'info' || raw === 'debug') return raw;
