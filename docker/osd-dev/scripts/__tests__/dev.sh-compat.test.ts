@@ -1,22 +1,11 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { main } from '../src/app/main';
+import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
 
-// For compose arg inspections we mock child_process
-jest.mock('child_process', () => {
-  const events = require('events');
-  return {
-    execSync: jest.fn(() => undefined),
-    spawn: jest.fn(() => {
-      const ee = new events.EventEmitter();
-      process.nextTick(() => ee.emit('close', 0));
-      return ee as any;
-    }),
-  };
-});
+// No child_process mocking: we inject a StubRunner via deps
 
 const getPlatformVersion = (repoRoot: string) => {
   const pkgPath = path.resolve(repoRoot, 'plugins', 'wazuh-core', 'package.json');
@@ -58,7 +47,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('unsupported mode logs error', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    try { await main(['up', 'imaginary'], { logger, processRunner: runner }); } catch {}
+    try { await mainWithDeps(['up', 'imaginary'], { logger, processRunner: runner }); } catch {}
     await new Promise((r) => setImmediate(r));
     // No spawn should be called because configureMode throws
     expect(runner.spawnCalls.length).toBe(0);
@@ -67,7 +56,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('server-local requires server_version', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    try { await main(['up', 'server-local'], { logger, processRunner: runner }); } catch {}
+    try { await mainWithDeps(['up', 'server-local'], { logger, processRunner: runner }); } catch {}
     await new Promise((r) => setImmediate(r));
     expect(runner.spawnCalls.length).toBe(0);
   });
@@ -75,7 +64,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('server requires server_version', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    try { await main(['up', 'server'], { logger, processRunner: runner }); } catch {}
+    try { await mainWithDeps(['up', 'server'], { logger, processRunner: runner }); } catch {}
     await new Promise((r) => setImmediate(r));
     expect(runner.spawnCalls.length).toBe(0);
   });
@@ -83,7 +72,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('unknown action logs error and does not spawn docker', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    try { await main(['nonsense'], { logger, processRunner: runner }); } catch {}
+    try { await mainWithDeps(['nonsense'], { logger, processRunner: runner }); } catch {}
     await new Promise((r) => setImmediate(r));
     expect(runner.spawnCalls.length).toBe(0);
   });
@@ -93,7 +82,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('server-local rpm profile selected with -a rpm', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['-a', 'rpm', 'up', 'server-local', '2.4.0'], { logger, processRunner: runner });
+    await mainWithDeps(['-a', 'rpm', 'up', 'server-local', '2.4.0'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
@@ -103,7 +92,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('server-local-without profile selected with -a without', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['-a', 'without', 'up', 'server-local', '2.4.0'], { logger, processRunner: runner });
+    await mainWithDeps(['-a', 'without', 'up', 'server-local', '2.4.0'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
@@ -113,7 +102,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('server mode uses server profile', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['up', 'server', '4.2.0'], { logger, processRunner: runner });
+    await mainWithDeps(['up', 'server', '4.2.0'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
@@ -123,7 +112,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('down action includes cleanup flags', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['down'], { logger, processRunner: runner });
+    await mainWithDeps(['down'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toEqual(expect.arrayContaining(['compose', '--profile', 'standard', '-f', 'dev.yml', 'down', '-v', '--remove-orphans']));
@@ -132,7 +121,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('stop action sets compose project name', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['stop'], { logger, processRunner: runner });
+    await mainWithDeps(['stop'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     const args: string[] = runner.spawnCalls[0].args;
     const osdVersion = getPlatformVersion(repoRoot);
@@ -147,7 +136,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
   test('manager-local-up limits services', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['manager-local-up'], { logger, processRunner: runner });
+    await mainWithDeps(['manager-local-up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toEqual(expect.arrayContaining(['compose', '-p', expect.any(String), 'up', '-d', 'wazuh.manager.local']));
@@ -157,7 +146,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
     const logger = new MockLogger('test');
     const infoSpy = jest.spyOn(logger, 'info');
     const runner = new StubRunner();
-    await main(['up'], { logger, processRunner: runner });
+    await mainWithDeps(['up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     const infoCalls = infoSpy.mock.calls.map((args) => String(args[0] ?? ''));
     expect(infoCalls.some((l) => l.includes('No dynamic compose override required.'))).toBe(true);

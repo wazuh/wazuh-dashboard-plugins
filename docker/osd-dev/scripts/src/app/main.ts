@@ -89,7 +89,7 @@ function resolveSecurityPluginPath(config: ScriptConfig, envPaths: EnvironmentPa
   );
 }
 
-export async function main(argv: string[], deps: Dependencies): Promise<void> {
+export async function mainWithDeps(argv: string[], deps: Dependencies): Promise<void> {
   const envPaths = getEnvironmentPaths();
 
   if (argv.length === 0) {
@@ -190,4 +190,10 @@ export async function main(argv: string[], deps: Dependencies): Promise<void> {
   }
 
   printAgentEnrollmentHint(config, deps.logger);
+}
+
+export async function main(argv: string[]): Promise<void> {
+  const { logger } = await import('../utils/logger');
+  const deps: Dependencies = { logger };
+  return mainWithDeps(argv, deps);
 }

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { main } from '../src/app/main';
+import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
 
@@ -54,7 +54,7 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
     const logSpy = jest.spyOn(logger, 'info');
 
     // Run up with -base auto-detection (no path provided)
-    await main(['-base', 'up'], { logger, processRunner: runner });
+    await mainWithDeps(['-base', 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     // Validations
@@ -90,7 +90,7 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
     expect(args).toContain('up');
 
     // Now run down and ensure the override is removed
-    await main(['down'], { logger, processRunner: runner });
+    await mainWithDeps(['down'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     expect(fs.existsSync(overridePath)).toBe(false);
     logSpy.mockRestore();

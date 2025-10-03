@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { main } from '../src/app/main';
+import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
 
@@ -49,7 +49,7 @@ describe('dev.ts - Dynamic mounting of external repos', () => {
     // 1) Run up with external repo
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['-r', `external-test=${extRepoPath}`, 'up'], { logger, processRunner: runner });
+    await mainWithDeps(['-r', `external-test=${extRepoPath}`, 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
@@ -70,7 +70,7 @@ describe('dev.ts - Dynamic mounting of external repos', () => {
     expect(content).toContain(`      device: ${extRepoPath}`);
 
     // 4) Run down without flags and verify the override file is removed
-    await main(['down'], { logger, processRunner: runner });
+    await mainWithDeps(['down'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     expect(fs.existsSync(overridePath)).toBe(false);

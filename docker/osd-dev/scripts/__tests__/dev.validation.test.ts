@@ -1,17 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-
-// Mock child_process to avoid any docker execution when validation passes unexpectedly
-jest.mock('child_process', () => ({
-  execSync: jest.fn(() => undefined),
-  spawn: jest.fn(() => {
-    const { EventEmitter } = require('events');
-    const ee = new EventEmitter();
-    process.nextTick(() => ee.emit('close', 0));
-    return ee as any;
-  }),
-}));
+import { mainWithDeps } from '../src/app/main';
+import { MockLogger } from '../__mocks__/mockLogger';
+import { StubRunner } from './helpers/stubRunner';
 
 describe('dev.ts - Input validations', () => {
   const repoRoot = path.resolve(__dirname, '../../../..');
@@ -40,21 +32,14 @@ describe('dev.ts - Input validations', () => {
   });
 
   test("'-r invalid' fails with Invalid repository specification", async () => {
-    const { logger } = require('../src/utils/logger');
-    const errSpy = jest.spyOn(logger, 'error');
-    const exitSpy = jest
-      .spyOn(process, 'exit')
-      .mockImplementation(((code?: number) => {
-        throw new Error(`EXIT ${code}`);
-      }) as any);
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
 
-    process.argv = ['node', 'dev.ts', '-r', 'invalid', 'up'];
+    await expect(
+      mainWithDeps(['-r', 'invalid', 'up'], { logger, processRunner: runner })
+    ).rejects.toThrow(/Invalid repository specification 'invalid'. Expected format repo=\/absolute\/path\./);
 
-    await expect(import('../dev')).rejects.toThrow(/EXIT 1/);
-
-    expect(exitSpy).toHaveBeenCalledWith(1);
-    expect(errSpy).toHaveBeenCalled();
-    const msg = String(errSpy.mock.calls[0]?.[0] ?? '');
-    expect(msg).toContain("Invalid repository specification 'invalid'. Expected format repo=/absolute/path.");
+    // No docker compose attempt should be made
+    expect(runner.spawnCalls.length).toBe(0);
   });
 });

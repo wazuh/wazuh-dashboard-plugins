@@ -28,13 +28,3 @@ export class MockLogger implements Logger {
     );
   }
 }
-
-export const logger = new MockLogger('dev-script');
-
-export const logSpy = jest.spyOn(logger, 'info');
-export const logSpyPlain = jest.spyOn(logger, 'infoPlain');
-export const logSpyWarn = jest.spyOn(logger, 'warn');
-export const logSpyError = jest.spyOn(logger, 'error');
-export const logSpyDebug = jest.spyOn(logger, 'debug');
-
-export const createChildLogger = (context: string) => new MockLogger(context);

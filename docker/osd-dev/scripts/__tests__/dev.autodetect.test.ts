@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { main } from '../src/app/main';
+import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
 
@@ -50,7 +50,7 @@ describe('dev.ts - Auto-detection without flags', () => {
   test('does not generate override file and sets mounts and compose args', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['up'], { logger, processRunner: runner });
+    await mainWithDeps(['up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');

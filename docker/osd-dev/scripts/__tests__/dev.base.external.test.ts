@@ -1,22 +1,9 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { main } from '../src/app/main';
+import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
-
-// Avoid real docker; simulate successful compose
-jest.mock('child_process', () => {
-  const events = require('events');
-  return {
-    execSync: jest.fn(() => undefined),
-    spawn: jest.fn(() => {
-      const ee = new events.EventEmitter();
-      process.nextTick(() => ee.emit('close', 0));
-      return ee as any;
-    }),
-  };
-});
 
 describe('dev.ts - Base mode + external repo dynamic volumes', () => {
   const repoRoot = path.resolve(__dirname, '../../../..');
@@ -70,7 +57,7 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     const runner = new StubRunner();
     const logSpy = jest.spyOn(logger, 'info');
 
-    await main(['-base', '-r', `external-test=${externalRepo}`, 'up'], { logger, processRunner: runner });
+    await mainWithDeps(['-base', '-r', `external-test=${externalRepo}`, 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
@@ -101,7 +88,7 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     expect(logs.some((l) => l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`))).toBe(true);
 
     // Down cleans override
-    await main(['down'], { logger, processRunner: runner });
+    await mainWithDeps(['down'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
     expect(fs.existsSync(overridePath)).toBe(false);
     logSpy.mockRestore();

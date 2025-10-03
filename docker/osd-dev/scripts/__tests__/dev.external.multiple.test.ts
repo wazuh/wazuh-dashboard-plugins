@@ -1,7 +1,7 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import { main } from '../src/app/main';
+import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
 
@@ -43,7 +43,7 @@ describe('dev.ts - Multiple external repos in override', () => {
   test('override contains both volumes and device mappings', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await main(['-r', `custom1=${external1}`, '-r', `custom2=${external2}`, 'up'], { logger, processRunner: runner });
+    await mainWithDeps(['-r', `custom1=${external1}`, '-r', `custom2=${external2}`, 'up'], { logger, processRunner: runner });
     await new Promise((r) => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
