@@ -78,7 +78,6 @@ export const createPanel = ({
         isLoading: isDataSourceLoading,
         fetchData,
         setFilters,
-        filterManager,
         searchBarProps,
       },
     }) => {
@@ -86,8 +85,8 @@ export const createPanel = ({
         field: '',
         value: '',
       });
-      const [currentSelectedFilter, setCurrentSelectedFilter] = useState();
-      const [selectedPanelFilter, setSelectedPanelFilter] = useState([]);
+      const [, setCurrentSelectedFilter] = useState();
+      const [selectedPanelFilter, setSelectedPanelFilter] = useState<{ [key: string]: any }[]>([]);
       const filterDrillDownValue = value => {
         setDrillDownValue(value);
       };
@@ -100,7 +99,7 @@ export const createPanel = ({
         const { field, value } = selectedFilter;
         const controlledByFilter = 'office-panel-row-filter';
         if (value) {
-          const filter = dataSourceFilterManager?.createFilter(
+          const filter: { [key: string]: any } = dataSourceFilterManager?.createFilter(
             FILTER_OPERATOR.IS_ONE_OF,
             field,
             [value],

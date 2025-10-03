@@ -8,7 +8,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
 import {
   parseData,
-  getFieldFormatted,
   parseColumns,
 } from './data-grid-service';
 import {
