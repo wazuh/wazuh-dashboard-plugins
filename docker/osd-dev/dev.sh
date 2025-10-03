@@ -35,7 +35,7 @@ docker compose -f "${COMPOSE_FILE}" build
 echo "[INFO] Running development script..."
 if [[ $DEBUG_MODE -eq 1 ]]; then
   echo "[INFO] Debug mode enabled: starting container with 'tail -f /dev/null'."
-  docker compose -f "${COMPOSE_FILE}" run --rm --entrypoint "tail -f /dev/null" dev-script
+  docker compose -f "${COMPOSE_FILE}" run --rm --entrypoint tail dev-script -f /dev/null
 else
   docker compose -f "${COMPOSE_FILE}" run --rm dev-script "$@"
 fi
