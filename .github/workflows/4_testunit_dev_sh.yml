@@ -1,11 +1,6 @@
 name: Dev Scripts Tests
 
 on:
-  push:
-    paths:
-      - 'docker/osd-dev/dev.sh'
-      - 'docker/osd-dev/dev.yml'
-      - 'docker/osd-dev/scripts/**'
   pull_request:
     paths:
       - 'docker/osd-dev/dev.sh'
