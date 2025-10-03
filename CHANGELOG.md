@@ -19,6 +19,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Split the FIM registry inventory into 2 index patterns and change some fields in the FIM files and registries sample data [#7604](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7604)
 - Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 - Reworked some view components to use data source [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
+- Fixed date and more format errors [#7754](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7754)
 
 ### Removed
 
