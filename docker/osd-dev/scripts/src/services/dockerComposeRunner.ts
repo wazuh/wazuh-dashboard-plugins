@@ -66,7 +66,7 @@ export function printAgentEnrollmentHint(config: ScriptConfig, log: Logger): voi
   log.infoPlain('');
   log.infoPlain('**************WARNING**************');
   log.infoPlain('The agent version must be a published one. This uses only released versions.');
-  log.infoPlain('If you need to change de version, edit the command as you see fit.');
+  log.infoPlain('If you need to change the version, edit the command as you see fit.');
   log.infoPlain('***********************************');
   log.infoPlain('1. (Optional) Enroll an agent (Ubuntu 20.04):');
   log.infoPlain(
