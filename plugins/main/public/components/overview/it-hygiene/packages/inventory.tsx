@@ -18,8 +18,8 @@ const tabs = [
     component: ITHygienePackagesInventoryHotfixes,
   },
   {
-    id: 'web-browsers',
-    name: 'Web browsers',
+    id: 'browser-extensions',
+    name: 'Browser extensions',
     component: ITHygienePackagesInventoryWebBrowsers,
   },
 ];
