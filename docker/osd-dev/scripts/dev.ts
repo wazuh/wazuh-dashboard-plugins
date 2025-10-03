@@ -35,7 +35,7 @@ try {
 }
 
 try {
-  const result = main(argv, { logger });
+  const result = main(argv);
   if (result && typeof (result as any).then === 'function') {
     (result as Promise<void>).catch((err) => {
       const message = err instanceof DevScriptError ? err.message : ((err as any)?.message || String(err));
