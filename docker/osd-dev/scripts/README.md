@@ -46,7 +46,7 @@ The `dev.sh` wrapper remains the entry point, so existing commands work unchange
 
 ```bash
 # Same usage as before
-./dev.sh [-o os_version] [-d osd_version] [-a agents_up] [-r repo=path ...] [default_repo_root] action [mode] [version]
+./dev.sh [-o os_version] [-d osd_version] [-a agents_up] [-r repo[=absolute_path] ...] [default_repo_root] action [mode] [version]
 ```
 
 Examples:
@@ -54,6 +54,7 @@ Examples:
 ./dev.sh up
 ./dev.sh -o 2.11.0 -d 2.11.0 up
 ./dev.sh -r wazuh-dashboard-reporting=/path/to/repo up
+./dev.sh -r wazuh-dashboard-reporting up   # shorthand: resolves /sibling/wazuh-dashboard-reporting
 ./dev.sh down
 ```
 

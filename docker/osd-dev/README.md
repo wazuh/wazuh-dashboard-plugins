@@ -40,7 +40,7 @@ Always use the provided script to bring up or down the development environment. 
 - -r <repo>=<path> : (Optional, repeatable) ONLY for external plugin repositories that are not stored inside this repository.
   - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`) are auto-detected under a provided `<default_repo_root>`, under `<root>/plugins/`, or (when omitted) by inferring the repo root when the script is executed from within this repository.
   - External repositories passed with `-r` are dynamically added as volumes to the `osd` service via an auto-generated `dev.override.generated.yml` (git-ignored).
-  - Paths MUST be absolute.
+  - Paths MUST be absolute. Shorthand is also supported: `-r <repo>` (no `=`), which assumes the repository is available under the container path `/sibling/<repo>` and resolves it from the sibling host root. If not found, an error is raised.
 - <default_repo_root> : (Optional) Absolute path used as the base location for repositories. When provided, the script tries (in order) `<default_repo_root>/<repo>`, `<default_repo_root>/plugins/<repo>`, or `<default_repo_root>` if it itself matches the repo name.
 - <action> : (Required) The action to perform:
   - up : Brings up the environment.

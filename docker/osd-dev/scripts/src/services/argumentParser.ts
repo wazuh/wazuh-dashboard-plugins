@@ -27,6 +27,9 @@ export function printUsageAndExit(log: Logger): never {
     '     Use -r only for external repos, e.g.: wazuh-dashboard-reporting/abs/path/wazuh-dashboard-reporting',
   );
   log.infoPlain(
+    "     Shorthand: '-r repo' assumes '/sibling/repo' inside the container and resolves it from the sibling root.",
+  );
+  log.infoPlain(
     '  -base [absolute_path] Set the base directory where required repos (main, wazuh-core, wazuh-check-updates) are located (defaults to sibling wazuh-dashboard)',
   );
   log.infoPlain(
@@ -91,21 +94,30 @@ export function parseArguments(
 
       case '-r': {
         const repoSpec = argv[++i];
-        if (!repoSpec.includes('=')) {
-          throw new ValidationError(
-            `Invalid repository specification '${repoSpec}'. Expected format repo=/absolute/path.`,
-          );
+        if (repoSpec.includes('=')) {
+          const [repoName, repoPath] = repoSpec.split('=');
+          if (!repoName || !repoPath) {
+            throw new ValidationError(
+              `Invalid repository specification '${repoSpec}'. Expected format repo=/absolute/path.`,
+            );
+          }
+          config.userRepositories.push({
+            name: repoName,
+            path: repoPath.replace(/\/$/, ''),
+          });
+        } else {
+          // Shorthand: -r <repoName> implies sibling root path
+          const repoName = repoSpec;
+          if (!envPaths.siblingRepoHostRoot) {
+            throw new ValidationError(
+              `Cannot resolve repository '${repoName}' under sibling root. Provide -r ${repoName}=/absolute/path or set SIBLING_REPO_HOST_ROOT.`,
+            );
+          }
+          const inferredHostPath = stripTrailingSlash(resolve(envPaths.siblingRepoHostRoot, repoName));
+          // Ensure it's visible from container mounts
+          ensureAccessibleHostPath(inferredHostPath, `Repository path for '${repoName}'`, envPaths);
+          config.userRepositories.push({ name: repoName, path: inferredHostPath });
         }
-        const [repoName, repoPath] = repoSpec.split('=');
-        if (!repoName || !repoPath) {
-          throw new ValidationError(
-            `Invalid repository specification '${repoSpec}'. Expected format repo=/absolute/path.`,
-          );
-        }
-        config.userRepositories.push({
-          name: repoName,
-          path: repoPath.replace(/\/$/, ''),
-        });
         i++;
         break;
       }

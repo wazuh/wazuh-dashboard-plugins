@@ -19,13 +19,13 @@ describe('dev.ts - Input validations', () => {
     jest.restoreAllMocks();
   });
 
-  test("'-r invalid' fails with Invalid repository specification", async () => {
+  test("'-r invalid' fails when shorthand cannot be resolved under sibling", async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
 
     await expect(
       mainWithDeps(['-r', 'invalid', 'up'], { logger, processRunner: runner })
-    ).rejects.toThrow(/Invalid repository specification 'invalid'. Expected format repo=\/absolute\/path\./);
+    ).rejects.toThrow();
 
     // No docker compose attempt should be made
     expect(runner.spawnCalls.length).toBe(0);

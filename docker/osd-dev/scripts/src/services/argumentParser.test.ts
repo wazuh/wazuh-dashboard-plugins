@@ -75,13 +75,6 @@ describe('services/argumentParser', () => {
       expect(() => parseArguments(['-a', 'invalid'], envPaths, logger)).toThrow(ValidationError);
     });
 
-    it('validates -r requires name=absolute_path', () => {
-      expect(() => parseArguments(['-r', 'bad'], envPaths, logger)).toThrow(ValidationError);
-      const repoPath = path.join(hostRoot, 'external');
-      fs.mkdirSync(path.join(containerRoot, 'external'), { recursive: true });
-      expect(() => parseArguments(['-r', `ext=${repoPath}`], envPaths, logger)).not.toThrow();
-    });
-
     it('auto-detects -base when no path provided and sibling root available', () => {
       // Provide wazuh-dashboard at sibling root for auto-detection
       const dashHost = path.join(envPaths.siblingRepoHostRoot, 'wazuh-dashboard');

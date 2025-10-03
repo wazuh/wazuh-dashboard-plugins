@@ -8,10 +8,13 @@ PROJECT_NAME="${COMPOSE_PROJECT_NAME:-scripttests}"
 
 # Build logs are hidden by default; show them when -v/--verbose is present.
 SHOW_BUILD_LOGS=0
+PASS_ARGS=()
 for arg in "$@"; do
   if [[ "$arg" == "-v" || "$arg" == "--verbose" ]]; then
     SHOW_BUILD_LOGS=1
-    break
+    # do not forward to jest
+  else
+    PASS_ARGS+=("$arg")
   fi
 done
 
@@ -28,6 +31,6 @@ else
   fi
 fi
 
-cmd=("${compose_cmd[@]}" run --rm "$SERVICE_NAME" "$@")
+cmd=("${compose_cmd[@]}" run --rm "$SERVICE_NAME" "${PASS_ARGS[@]}")
 
 exec "${cmd[@]}"

@@ -118,15 +118,33 @@ describe('services/argumentParser (combinatorial)', () => {
       }
     });
 
-    it('rejects malformed -r value', () => {
-      const { envPaths, tmpdir } = makeEnv();
+    it('shorthand -r <name> resolves under sibling root when present', () => {
+      const { envPaths, tmpdir, paths } = makeEnv();
       try {
-        expect(() => parseArguments(['-r', 'noequals', 'up'], envPaths, logger)).toThrow(ValidationError);
+        const name = 'custom-plugin';
+        const host = path.join(paths.siblingHost, name);
+        const container = path.join(paths.siblingContainer, name);
+        fs.mkdirSync(host, { recursive: true });
+        fs.mkdirSync(container, { recursive: true });
+        // Add package.json presence on container path for visibility checks in later stages
+        fs.writeFileSync(path.join(container, 'package.json'), '{"name":"custom-plugin"}');
+        const cfg = parseArguments(['-r', name, 'up'], envPaths, logger);
+        expect(cfg.userRepositories).toEqual([{ name, path: host }]);
       } finally {
         try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
       }
     });
-  });
+
+    it('shorthand -r <name> throws when not under sibling root', () => {
+      const { envPaths, tmpdir } = makeEnv();
+      try {
+        // No folder created under sibling, so ensureAccessibleHostPath will fail
+        expect(() => parseArguments(['-r', 'missing-plugin', 'up'], envPaths, logger)).toThrow();
+      } finally {
+        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+      }
+    });
+    });
 
   describe('pluginsRoot path argument (absolute before action)', () => {
     it('sets pluginsRoot and action', () => {
@@ -238,4 +256,3 @@ describe('services/argumentParser (combinatorial)', () => {
     });
   });
 });
-
