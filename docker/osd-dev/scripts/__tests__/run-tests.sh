@@ -20,8 +20,12 @@ compose_cmd=(docker compose -f "$COMPOSE_FILE" -p "$PROJECT_NAME")
 if [[ "$SHOW_BUILD_LOGS" == "1" ]]; then
   "${compose_cmd[@]}" build "$SERVICE_NAME"
 else
-  # Hide normal build output but keep errors visible
-  "${compose_cmd[@]}" build "$SERVICE_NAME" >/dev/null
+  # Hide progress/output on success. Keep errors visible.
+  if "${compose_cmd[@]}" build --quiet "$SERVICE_NAME" >/dev/null; then
+    :
+  else
+    "${compose_cmd[@]}" build "$SERVICE_NAME" >/dev/null
+  fi
 fi
 
 cmd=("${compose_cmd[@]}" run --rm "$SERVICE_NAME" "$@")

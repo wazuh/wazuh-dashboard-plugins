@@ -43,7 +43,13 @@ echo "[INFO] Building TypeScript development container..."
 if [[ "$SHOW_BUILD_LOGS" -eq 1 ]]; then
   docker compose -f "${COMPOSE_FILE}" build
 else
-  docker compose -f "${COMPOSE_FILE}" build >/dev/null
+  # Hide progress/output on success. Keep errors visible.
+  # Prefer compose --quiet (v2) to suppress BuildKit progress, fallback to plain build.
+  if docker compose -f "${COMPOSE_FILE}" build --quiet >/dev/null; then
+    :
+  else
+    docker compose -f "${COMPOSE_FILE}" build >/dev/null
+  fi
 fi
 
 # Run the TypeScript script inside Docker, passing all arguments
