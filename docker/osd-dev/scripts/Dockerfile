@@ -19,6 +19,7 @@ COPY plugins/wazuh-core/package.json /workspace/plugins/wazuh-core/package.json
 
 # Copy the TypeScript script
 COPY docker/osd-dev/scripts/dev.ts ./
+COPY docker/osd-dev/scripts/src ./src
 
 # Set entrypoint
 ENTRYPOINT ["ts-node", "/app/dev.ts"]
