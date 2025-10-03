@@ -4,7 +4,11 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
-import { setupTestEnv, teardownTestEnv, SavedProcessState } from './helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  SavedProcessState,
+} from './helpers/setupTests';
 
 describe('dev.ts - Multiple external repos in override', () => {
   let tmpdir: string;
@@ -22,16 +26,23 @@ describe('dev.ts - Multiple external repos in override', () => {
   });
 
   afterEach(() => {
-    try { fs.rmSync(external1, { recursive: true, force: true }); } catch {}
-    try { fs.rmSync(external2, { recursive: true, force: true }); } catch {}
+    try {
+      fs.rmSync(external1, { recursive: true, force: true });
+    } catch {}
+    try {
+      fs.rmSync(external2, { recursive: true, force: true });
+    } catch {}
     teardownTestEnv(saved);
   });
 
   test('override contains both volumes and device mappings', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await mainWithDeps(['-r', `custom1=${external1}`, '-r', `custom2=${external2}`, 'up'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await mainWithDeps(
+      ['-r', `custom1=${external1}`, '-r', `custom2=${external2}`, 'up'],
+      { logger, processRunner: runner },
+    );
+    await new Promise(r => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);

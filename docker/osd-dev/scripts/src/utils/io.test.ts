@@ -12,7 +12,9 @@ describe('utils/io', () => {
   });
 
   afterEach(() => {
-    try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+    try {
+      fs.rmSync(tmpdir, { recursive: true, force: true });
+    } catch {}
     jest.restoreAllMocks();
   });
 
@@ -43,8 +45,9 @@ describe('utils/io', () => {
     const spy = jest.spyOn(fs, 'writeFileSync').mockImplementation(() => {
       throw new Error('disk error');
     });
-    expect(() => writeFile(path.join(tmpdir, 'fail.txt'), 'x')).toThrow(DevScriptError);
+    expect(() => writeFile(path.join(tmpdir, 'fail.txt'), 'x')).toThrow(
+      DevScriptError,
+    );
     spy.mockRestore();
   });
 });
-

@@ -28,4 +28,3 @@ The test service is defined in `docker/osd-dev/scripts/__tests__/test.yml` and b
 - `test.yml` – Docker Compose service definition for the test runner.
 - `run-tests.sh` – Helper to build and run the test container.
 - `__mocks__/` – Place optional Jest manual mocks here when needed.
-

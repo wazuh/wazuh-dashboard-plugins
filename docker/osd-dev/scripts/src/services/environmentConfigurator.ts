@@ -1,7 +1,11 @@
 import { existsSync, readFileSync } from 'fs';
 import { DEFAULTS } from '../constants/app';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
-import { ConfigurationError, PathAccessError, ValidationError } from '../errors';
+import {
+  ConfigurationError,
+  PathAccessError,
+  ValidationError,
+} from '../errors';
 
 export function initializeBaseEnvironment(config: ScriptConfig): void {
   process.env.PASSWORD = process.env.PASSWORD || DEFAULTS.defaultPassword;
@@ -13,7 +17,10 @@ export function initializeBaseEnvironment(config: ScriptConfig): void {
   process.env.SRC = config.pluginsRoot || '';
 }
 
-export function setVersionDerivedEnvironment(osdVersion: string, envPaths: EnvironmentPaths): void {
+export function setVersionDerivedEnvironment(
+  osdVersion: string,
+  envPaths: EnvironmentPaths,
+): void {
   const osdMajorNumber = parseInt(osdVersion.split('.')[0], 10);
   process.env.OSD_MAJOR_NUMBER = osdMajorNumber.toString();
   process.env.COMPOSE_PROJECT_NAME = `os-dev-${osdVersion.replace(/\./g, '')}`;
@@ -21,7 +28,9 @@ export function setVersionDerivedEnvironment(osdVersion: string, envPaths: Envir
 
   if (existsSync(envPaths.packageJsonPath)) {
     try {
-      const packageJson = JSON.parse(readFileSync(envPaths.packageJsonPath, 'utf-8'));
+      const packageJson = JSON.parse(
+        readFileSync(envPaths.packageJsonPath, 'utf-8'),
+      );
       process.env.WAZUH_VERSION_DEVELOPMENT = packageJson.version;
     } catch {
       // best effort
@@ -42,9 +51,10 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
   process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config.yml`;
 
   // Set security config path for OpenSearch 1.x vs 2.x
-  process.env.SEC_CONFIG_PATH = osdMajor === '2.x'
-    ? '/usr/share/opensearch/config/opensearch-security'
-    : '/usr/share/opensearch/plugins/opensearch-security/securityconfig';
+  process.env.SEC_CONFIG_PATH =
+    osdMajor === '2.x'
+      ? '/usr/share/opensearch/config/opensearch-security'
+      : '/usr/share/opensearch/plugins/opensearch-security/securityconfig';
 
   if (!config.mode) return primaryProfile;
 
@@ -67,7 +77,9 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
 
     case 'server': {
       if (!config.modeVersion) {
-        throw new ValidationError('server mode requires the server_version argument');
+        throw new ValidationError(
+          'server mode requires the server_version argument',
+        );
       }
       primaryProfile = 'server';
       process.env.WAZUH_STACK = config.modeVersion;
@@ -76,7 +88,9 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
 
     case 'server-local': {
       if (!config.modeVersion) {
-        throw new ValidationError('server-local mode requires the server_version argument');
+        throw new ValidationError(
+          'server-local mode requires the server_version argument',
+        );
       }
       if (config.agentsUp) {
         primaryProfile = `server-local-${config.agentsUp}`;
@@ -91,7 +105,9 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
     case 'server-local-deb':
     case 'server-local-without': {
       if (!config.modeVersion) {
-        throw new ValidationError(`${config.mode} mode requires the server_version argument`);
+        throw new ValidationError(
+          `${config.mode} mode requires the server_version argument`,
+        );
       }
       primaryProfile = config.mode;
       process.env.IMAGE_TAG = config.modeVersion;

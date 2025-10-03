@@ -4,7 +4,15 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
-import { setupTestEnv, teardownTestEnv, SavedProcessState, repoRoot, clearRepoDerivedEnv, createSiblingRootUnder, setCurrentRepoEnv } from './helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  SavedProcessState,
+  repoRoot,
+  clearRepoDerivedEnv,
+  createSiblingRootUnder,
+  setCurrentRepoEnv,
+} from './helpers/setupTests';
 
 describe('dev.ts - Base mode + external repo dynamic volumes', () => {
   let tmpdir: string;
@@ -31,9 +39,16 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     fs.writeFileSync(path.join(dashboardBase, '.nvmrc'), '18.17.0\n');
 
     // Provide security plugin inside dashboard base
-    securityPluginPath = path.join(dashboardBase, 'plugins', 'wazuh-security-dashboards');
+    securityPluginPath = path.join(
+      dashboardBase,
+      'plugins',
+      'wazuh-security-dashboards',
+    );
     fs.mkdirSync(securityPluginPath, { recursive: true });
-    fs.writeFileSync(path.join(securityPluginPath, 'package.json'), '{"name":"wazuh-security-dashboards"}');
+    fs.writeFileSync(
+      path.join(securityPluginPath, 'package.json'),
+      '{"name":"wazuh-security-dashboards"}',
+    );
 
     // External repo path can be anywhere, validation is skipped for non-required repos
     externalRepo = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-ext-'));
@@ -41,7 +56,9 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
 
   afterEach(() => {
     teardownTestEnv(saved);
-    try { fs.rmSync(externalRepo, { recursive: true, force: true }); } catch {}
+    try {
+      fs.rmSync(externalRepo, { recursive: true, force: true });
+    } catch {}
   });
 
   test('generates override with external volume, includes dashboard-src profile, and removes override on down', async () => {
@@ -49,8 +66,11 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     const runner = new StubRunner();
     const logSpy = jest.spyOn(logger, 'info');
 
-    await mainWithDeps(['-base', '-r', `external-test=${externalRepo}`, 'up'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await mainWithDeps(['-base', '-r', `external-test=${externalRepo}`, 'up'], {
+      logger,
+      processRunner: runner,
+    });
+    await new Promise(r => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
@@ -62,7 +82,9 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     expect(content).toMatch(/\n\s*osd:\n/);
 
     // external-test mounted under osd service and declared under volumes with device
-    expect(content).toContain("- 'external-test:/home/node/kbn/plugins/external-test'");
+    expect(content).toContain(
+      "- 'external-test:/home/node/kbn/plugins/external-test'",
+    );
     expect(content).toContain('volumes:');
     expect(content).toContain('  external-test:');
     expect(content).toContain(`      device: ${externalRepo}`);
@@ -76,12 +98,16 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     expect(args).toContain('dev.override.generated.yml');
 
     // Logs show base sources path
-    const logs = logSpy.mock.calls.map((c) => String(c[0]));
-    expect(logs.some((l) => l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`))).toBe(true);
+    const logs = logSpy.mock.calls.map(c => String(c[0]));
+    expect(
+      logs.some(l =>
+        l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`),
+      ),
+    ).toBe(true);
 
     // Down cleans override
     await mainWithDeps(['down'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await new Promise(r => setImmediate(r));
     expect(fs.existsSync(overridePath)).toBe(false);
     logSpy.mockRestore();
   });

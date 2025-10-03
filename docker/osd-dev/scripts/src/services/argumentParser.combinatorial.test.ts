@@ -9,7 +9,11 @@ import { ValidationError } from '../errors';
 describe('services/argumentParser (combinatorial)', () => {
   const logger = new MockLogger('test');
 
-  function makeEnv(): { tmpdir: string; envPaths: EnvironmentPaths; paths: Record<string, string> } {
+  function makeEnv(): {
+    tmpdir: string;
+    envPaths: EnvironmentPaths;
+    paths: Record<string, string>;
+  } {
     const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-arg-matrix-'));
     const containerRoot = path.join(tmpdir, 'container');
     const hostRoot = path.join(tmpdir, 'host');
@@ -23,17 +27,30 @@ describe('services/argumentParser (combinatorial)', () => {
     // Minimal file needed by some logic (best-effort read in other services)
     const corePkgDir = path.join(containerRoot, 'plugins', 'wazuh-core');
     fs.mkdirSync(corePkgDir, { recursive: true });
-    fs.writeFileSync(path.join(corePkgDir, 'package.json'), '{"pluginPlatform":{"version":"2.9.0"}}');
+    fs.writeFileSync(
+      path.join(corePkgDir, 'package.json'),
+      '{"pluginPlatform":{"version":"2.9.0"}}',
+    );
 
     const envPaths: EnvironmentPaths = {
       currentRepoContainerRoot: containerRoot,
       siblingContainerRoot: siblingContainer,
       currentRepoHostRoot: hostRoot,
       siblingRepoHostRoot: siblingHost,
-      packageJsonPath: path.join(containerRoot, 'plugins/wazuh-core/package.json'),
-      createNetworksScriptPath: path.join(containerRoot, 'docker/scripts/create_docker_networks.sh'),
+      packageJsonPath: path.join(
+        containerRoot,
+        'plugins/wazuh-core/package.json',
+      ),
+      createNetworksScriptPath: path.join(
+        containerRoot,
+        'docker/scripts/create_docker_networks.sh',
+      ),
     };
-    return { tmpdir, envPaths, paths: { containerRoot, hostRoot, siblingHost, siblingContainer } };
+    return {
+      tmpdir,
+      envPaths,
+      paths: { containerRoot, hostRoot, siblingHost, siblingContainer },
+    };
   }
 
   afterEach(() => {
@@ -48,42 +65,58 @@ describe('services/argumentParser (combinatorial)', () => {
       expect(cfg.mode).toBe('');
       expect(cfg.userRepositories.length).toBe(0);
     } finally {
-      try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+      try {
+        fs.rmSync(tmpdir, { recursive: true, force: true });
+      } catch {}
     }
   });
 
   describe('actions matrix', () => {
-    const actions = ['up', 'down', 'stop', 'start', 'manager-local-up'] as const;
-    it.each(actions.map((a) => [a]))('parses action=%s', (action) => {
+    const actions = [
+      'up',
+      'down',
+      'stop',
+      'start',
+      'manager-local-up',
+    ] as const;
+    it.each(actions.map(a => [a]))('parses action=%s', action => {
       const { envPaths, tmpdir } = makeEnv();
       try {
         const cfg = parseArguments([action], envPaths, logger);
         expect(cfg.action).toBe(action);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
   });
 
   describe('agentsUp flag', () => {
     const values = ['rpm', 'deb', 'without'] as const;
-    it.each(values.map((v) => [v]))('accepts -a %s', (val) => {
+    it.each(values.map(v => [v]))('accepts -a %s', val => {
       const { envPaths, tmpdir } = makeEnv();
       try {
         const cfg = parseArguments(['-a', val, 'up'], envPaths, logger);
         expect(cfg.agentsUp).toBe(val);
         expect(cfg.action).toBe('up');
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
 
     it('rejects -a invalid', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        expect(() => parseArguments(['-a', 'wrong', 'up'], envPaths, logger)).toThrow(ValidationError);
+        expect(() =>
+          parseArguments(['-a', 'wrong', 'up'], envPaths, logger),
+        ).toThrow(ValidationError);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
   });
@@ -92,11 +125,17 @@ describe('services/argumentParser (combinatorial)', () => {
     it('sets both os and osd versions', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        const cfg = parseArguments(['-o', '2.9.0', '-d', '2.9.0', 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['-o', '2.9.0', '-d', '2.9.0', 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.osVersion).toBe('2.9.0');
         expect(cfg.osdVersion).toBe('2.9.0');
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
   });
@@ -108,13 +147,19 @@ describe('services/argumentParser (combinatorial)', () => {
         // No accessibility validation for -r in parser, so absolute host paths suffice
         const repoA = path.join(paths.hostRoot, 'extA');
         const repoB = path.join(paths.hostRoot, 'extB');
-        const cfg = parseArguments(['-r', `alpha=${repoA}/`, '-r', `beta=${repoB}`, 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['-r', `alpha=${repoA}/`, '-r', `beta=${repoB}`, 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.userRepositories).toEqual([
           { name: 'alpha', path: repoA },
           { name: 'beta', path: repoB },
         ]);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
 
@@ -127,11 +172,16 @@ describe('services/argumentParser (combinatorial)', () => {
         fs.mkdirSync(host, { recursive: true });
         fs.mkdirSync(container, { recursive: true });
         // Add package.json presence on container path for visibility checks in later stages
-        fs.writeFileSync(path.join(container, 'package.json'), '{"name":"custom-plugin"}');
+        fs.writeFileSync(
+          path.join(container, 'package.json'),
+          '{"name":"custom-plugin"}',
+        );
         const cfg = parseArguments(['-r', name, 'up'], envPaths, logger);
         expect(cfg.userRepositories).toEqual([{ name, path: host }]);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
 
@@ -139,12 +189,16 @@ describe('services/argumentParser (combinatorial)', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
         // No folder created under sibling, so ensureAccessibleHostPath will fail
-        expect(() => parseArguments(['-r', 'missing-plugin', 'up'], envPaths, logger)).toThrow();
+        expect(() =>
+          parseArguments(['-r', 'missing-plugin', 'up'], envPaths, logger),
+        ).toThrow();
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
-    });
+  });
 
   describe('pluginsRoot path argument (absolute before action)', () => {
     it('sets pluginsRoot and action', () => {
@@ -158,7 +212,9 @@ describe('services/argumentParser (combinatorial)', () => {
         expect(cfg.pluginsRoot).toBe(hostBase);
         expect(cfg.action).toBe('up');
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
   });
@@ -169,14 +225,19 @@ describe('services/argumentParser (combinatorial)', () => {
       try {
         // Provide wazuh-dashboard under sibling host and container
         const dashHost = path.join(paths.siblingHost, 'wazuh-dashboard');
-        const dashContainer = path.join(paths.siblingContainer, 'wazuh-dashboard');
+        const dashContainer = path.join(
+          paths.siblingContainer,
+          'wazuh-dashboard',
+        );
         fs.mkdirSync(dashHost, { recursive: true });
         fs.mkdirSync(dashContainer, { recursive: true });
         const cfg = parseArguments(['-base', 'up'], envPaths, logger);
         expect(cfg.useDashboardFromSource).toBe(true);
         expect(cfg.dashboardBase).toBe(dashHost);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
 
@@ -190,7 +251,9 @@ describe('services/argumentParser (combinatorial)', () => {
         expect(cfg.useDashboardFromSource).toBe(true);
         expect(cfg.dashboardBase).toBe(baseHost);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
 
@@ -198,14 +261,23 @@ describe('services/argumentParser (combinatorial)', () => {
       const { envPaths, tmpdir, paths } = makeEnv();
       try {
         const dashHost = path.join(paths.siblingHost, 'wazuh-dashboard');
-        const dashContainer = path.join(paths.siblingContainer, 'wazuh-dashboard');
+        const dashContainer = path.join(
+          paths.siblingContainer,
+          'wazuh-dashboard',
+        );
         fs.mkdirSync(dashHost, { recursive: true });
         fs.mkdirSync(dashContainer, { recursive: true });
-        const cfg = parseArguments(['-base', 'relative/path', 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['-base', 'relative/path', 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.useDashboardFromSource).toBe(true);
         expect(cfg.dashboardBase).toBe(dashHost);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
   });
@@ -218,20 +290,30 @@ describe('services/argumentParser (combinatorial)', () => {
         expect(cfg1.mode).toBe('saml');
         expect(cfg1.modeVersion).toBe('');
 
-        const cfg2 = parseArguments(['up', 'server', '4.12.0'], envPaths, logger);
+        const cfg2 = parseArguments(
+          ['up', 'server', '4.12.0'],
+          envPaths,
+          logger,
+        );
         expect(cfg2.mode).toBe('server');
         expect(cfg2.modeVersion).toBe('4.12.0');
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
 
     it('rejects any extra args after action/mode/mode_version', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        expect(() => parseArguments(['up', 'saml', 'extra', 'arg'], envPaths, logger)).toThrow(ValidationError);
+        expect(() =>
+          parseArguments(['up', 'saml', 'extra', 'arg'], envPaths, logger),
+        ).toThrow(ValidationError);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
   });
@@ -240,18 +322,26 @@ describe('services/argumentParser (combinatorial)', () => {
     it('throws on unknown flag', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        expect(() => parseArguments(['-z'], envPaths, logger)).toThrow(ValidationError);
+        expect(() => parseArguments(['-z'], envPaths, logger)).toThrow(
+          ValidationError,
+        );
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
 
     it('throws when a flag appears after action', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        expect(() => parseArguments(['up', '-o', '2.9.0'], envPaths, logger)).toThrow(ValidationError);
+        expect(() =>
+          parseArguments(['up', '-o', '2.9.0'], envPaths, logger),
+        ).toThrow(ValidationError);
       } finally {
-        try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
       }
     });
   });

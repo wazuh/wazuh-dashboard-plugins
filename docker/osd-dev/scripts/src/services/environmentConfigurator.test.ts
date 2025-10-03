@@ -1,7 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { initializeBaseEnvironment, setVersionDerivedEnvironment, configureModeAndSecurity } from './environmentConfigurator';
+import {
+  initializeBaseEnvironment,
+  setVersionDerivedEnvironment,
+  configureModeAndSecurity,
+} from './environmentConfigurator';
 import type { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { PathAccessError, ValidationError } from '../errors';
 
@@ -18,13 +22,21 @@ describe('services/environmentConfigurator', () => {
       siblingContainerRoot: path.join(tmpdir, 'sibling-container'),
       currentRepoHostRoot: path.join(tmpdir, 'host'),
       siblingRepoHostRoot: path.join(tmpdir, 'sibling'),
-      packageJsonPath: path.join(containerRoot, 'plugins/wazuh-core/package.json'),
-      createNetworksScriptPath: path.join(containerRoot, 'docker/scripts/create_docker_networks.sh'),
+      packageJsonPath: path.join(
+        containerRoot,
+        'plugins/wazuh-core/package.json',
+      ),
+      createNetworksScriptPath: path.join(
+        containerRoot,
+        'docker/scripts/create_docker_networks.sh',
+      ),
     };
   });
 
   afterEach(() => {
-    try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+    try {
+      fs.rmSync(tmpdir, { recursive: true, force: true });
+    } catch {}
     jest.restoreAllMocks();
   });
 
@@ -82,7 +94,9 @@ describe('services/environmentConfigurator', () => {
       const profile = configureModeAndSecurity({ ...baseCfg });
       expect(profile).toBe('standard');
       expect(process.env.WAZUH_DASHBOARD_CONF).toContain('/config/2.x/osd/');
-      expect(process.env.SEC_CONFIG_PATH).toContain('/usr/share/opensearch/config');
+      expect(process.env.SEC_CONFIG_PATH).toContain(
+        '/usr/share/opensearch/config',
+      );
     });
 
     it('saml requires idp in /etc/hosts and sets SAML config', () => {
@@ -90,29 +104,49 @@ describe('services/environmentConfigurator', () => {
       process.env.OSD_MAJOR = '2.x';
       const profile = configureModeAndSecurity({ ...baseCfg, mode: 'saml' });
       expect(profile).toBe('saml');
-      expect(process.env.WAZUH_DASHBOARD_CONF).toContain('opensearch_dashboards_saml.yml');
+      expect(process.env.WAZUH_DASHBOARD_CONF).toContain(
+        'opensearch_dashboards_saml.yml',
+      );
     });
 
     it('saml throws PathAccessError if /etc/hosts cannot be read', () => {
-      jest.spyOn(fs, 'readFileSync').mockImplementation(() => { throw new Error('EACCES'); });
-      expect(() => configureModeAndSecurity({ ...baseCfg, mode: 'saml' })).toThrow(PathAccessError);
+      jest.spyOn(fs, 'readFileSync').mockImplementation(() => {
+        throw new Error('EACCES');
+      });
+      expect(() =>
+        configureModeAndSecurity({ ...baseCfg, mode: 'saml' }),
+      ).toThrow(PathAccessError);
     });
 
     it('server requires version and sets WAZUH_STACK', () => {
-      expect(() => configureModeAndSecurity({ ...baseCfg, mode: 'server' })).toThrow(ValidationError);
-      const profile = configureModeAndSecurity({ ...baseCfg, mode: 'server', modeVersion: '4.12.0' });
+      expect(() =>
+        configureModeAndSecurity({ ...baseCfg, mode: 'server' }),
+      ).toThrow(ValidationError);
+      const profile = configureModeAndSecurity({
+        ...baseCfg,
+        mode: 'server',
+        modeVersion: '4.12.0',
+      });
       expect(profile).toBe('server');
       expect(process.env.WAZUH_STACK).toBe('4.12.0');
     });
 
     it('server-local variants set IMAGE_TAG and profile', () => {
-      const p1 = configureModeAndSecurity({ ...baseCfg, mode: 'server-local', modeVersion: '4.12.0', agentsUp: 'rpm' });
+      const p1 = configureModeAndSecurity({
+        ...baseCfg,
+        mode: 'server-local',
+        modeVersion: '4.12.0',
+        agentsUp: 'rpm',
+      });
       expect(p1).toBe('server-local-rpm');
       expect(process.env.IMAGE_TAG).toBe('4.12.0');
 
-      const p2 = configureModeAndSecurity({ ...baseCfg, mode: 'server-local-without', modeVersion: '4.12.0' });
+      const p2 = configureModeAndSecurity({
+        ...baseCfg,
+        mode: 'server-local-without',
+        modeVersion: '4.12.0',
+      });
       expect(p2).toBe('server-local-without');
     });
   });
 });
-

@@ -35,7 +35,9 @@ export function printUsageAndExit(log: Logger): never {
   log.infoPlain(
     '  default_repo_root Optional absolute path used as the base location for repositories',
   );
-  log.infoPlain('  action is one of up | down | stop | start | manager-local-up');
+  log.infoPlain(
+    '  action is one of up | down | stop | start | manager-local-up',
+  );
   log.infoPlain('  saml to deploy a saml enabled environment (optional)');
   log.infoPlain(
     '  server to deploy a real server enabled environment (optional, requires server_version)',
@@ -113,10 +115,19 @@ export function parseArguments(
               `Cannot resolve repository '${repoName}' under sibling root. Provide -r ${repoName}=/absolute/path or set SIBLING_REPO_HOST_ROOT.`,
             );
           }
-          const inferredHostPath = stripTrailingSlash(resolve(envPaths.siblingRepoHostRoot, repoName));
+          const inferredHostPath = stripTrailingSlash(
+            resolve(envPaths.siblingRepoHostRoot, repoName),
+          );
           // Ensure it's visible from container mounts
-          ensureAccessibleHostPath(inferredHostPath, `Repository path for '${repoName}'`, envPaths);
-          config.userRepositories.push({ name: repoName, path: inferredHostPath });
+          ensureAccessibleHostPath(
+            inferredHostPath,
+            `Repository path for '${repoName}'`,
+            envPaths,
+          );
+          config.userRepositories.push({
+            name: repoName,
+            path: inferredHostPath,
+          });
         }
         i++;
         break;

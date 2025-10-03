@@ -15,4 +15,3 @@ export class StubRunner {
     return ee as any;
   }
 }
-

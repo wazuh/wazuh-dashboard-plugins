@@ -3,7 +3,11 @@
  */
 
 /** Required repositories that must always be present. */
-export const REQUIRED_REPOSITORIES = ['main', 'wazuh-core', 'wazuh-check-updates'] as const;
+export const REQUIRED_REPOSITORIES = [
+  'main',
+  'wazuh-core',
+  'wazuh-check-updates',
+] as const;
 
 /** Accepted aliases for the security plugin repository. */
 export const SECURITY_PLUGIN_ALIASES = [
@@ -26,4 +30,3 @@ export const DEFAULTS = {
   osdPort: '5601',
   imposterVersion: '3.44.1',
 } as const;
-

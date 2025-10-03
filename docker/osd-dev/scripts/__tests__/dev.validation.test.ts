@@ -4,7 +4,11 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
-import { setupTestEnv, teardownTestEnv, SavedProcessState } from './helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  SavedProcessState,
+} from './helpers/setupTests';
 
 describe('dev.ts - Input validations', () => {
   let saved!: SavedProcessState;
@@ -24,7 +28,7 @@ describe('dev.ts - Input validations', () => {
     const runner = new StubRunner();
 
     await expect(
-      mainWithDeps(['-r', 'invalid', 'up'], { logger, processRunner: runner })
+      mainWithDeps(['-r', 'invalid', 'up'], { logger, processRunner: runner }),
     ).rejects.toThrow();
 
     // No docker compose attempt should be made

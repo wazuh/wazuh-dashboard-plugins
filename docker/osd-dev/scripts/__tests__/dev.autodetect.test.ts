@@ -3,10 +3,21 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
-import { setupTestEnv, teardownTestEnv, repoRoot, SavedProcessState, clearRepoDerivedEnv } from './helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  repoRoot,
+  SavedProcessState,
+  clearRepoDerivedEnv,
+} from './helpers/setupTests';
 
 const getPluginPlatformVersion = (baseRoot: string) => {
-  const pkgPath = path.resolve(baseRoot, 'plugins', 'wazuh-core', 'package.json');
+  const pkgPath = path.resolve(
+    baseRoot,
+    'plugins',
+    'wazuh-core',
+    'package.json',
+  );
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
   return (pkg?.pluginPlatform?.version as string) || '';
 };
@@ -32,15 +43,19 @@ describe('dev.ts - Auto-detection without flags', () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
     await mainWithDeps(['up'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await new Promise(r => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(false);
 
     // Verify repo env vars for required plugins
     expect(process.env.REPO_MAIN).toBe(path.join(repoRoot, 'plugins', 'main'));
-    expect(process.env.REPO_WAZUH_CORE).toBe(path.join(repoRoot, 'plugins', 'wazuh-core'));
-    expect(process.env.REPO_WAZUH_CHECK_UPDATES).toBe(path.join(repoRoot, 'plugins', 'wazuh-check-updates'));
+    expect(process.env.REPO_WAZUH_CORE).toBe(
+      path.join(repoRoot, 'plugins', 'wazuh-core'),
+    );
+    expect(process.env.REPO_WAZUH_CHECK_UPDATES).toBe(
+      path.join(repoRoot, 'plugins', 'wazuh-check-updates'),
+    );
 
     // Verify compose project name derived from OSD version
     const osdVersion = getPluginPlatformVersion(repoRoot);

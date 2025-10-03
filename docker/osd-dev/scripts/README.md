@@ -24,11 +24,13 @@ The development workflow has been migrated from bash (`dev.sh`) to TypeScript (`
 ## How It Works
 
 ### Original Workflow
+
 ```
 dev.sh → bash logic → docker compose
 ```
 
 ### New Workflow
+
 ```
 dev.sh → docker compose (dev-ts.yml) → dev.ts → docker compose (dev.yml)
 ```
@@ -50,6 +52,7 @@ The `dev.sh` wrapper remains the entry point, so existing commands work unchange
 ```
 
 Examples:
+
 ```bash
 ./dev.sh up
 ./dev.sh -o 2.11.0 -d 2.11.0 up
@@ -69,6 +72,7 @@ To modify the TypeScript script:
 ## Dependencies
 
 The Dockerfile installs:
+
 - Node.js 20 (Alpine)
 - TypeScript & ts-node
 - Docker CLI & Docker Compose
@@ -79,6 +83,7 @@ The Dockerfile installs:
 ### Docker Compose Configuration
 
 The `dev-ts.yml` file configures:
+
 - Socket mounting (`/var/run/docker.sock`) to allow Docker-in-Docker
 - Volume mounting of the workspace and scripts
 - Host network mode for seamless container communication
@@ -86,6 +91,7 @@ The `dev-ts.yml` file configures:
 ### TypeScript Script
 
 The `dev.ts` script includes:
+
 - Argument parsing and validation
 - Repository path resolution
 - Dynamic Docker Compose override generation
@@ -95,6 +101,7 @@ The `dev.ts` script includes:
 ## Migration Notes
 
 All functionality from the original bash script has been preserved:
+
 - ✅ OS/OSD version detection from package.json
 - ✅ Repository path resolution (default and explicit)
 - ✅ External repository mounting

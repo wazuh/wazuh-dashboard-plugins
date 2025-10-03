@@ -1,7 +1,11 @@
 import { mainWithDeps } from './main';
 import { MockLogger } from '../../__mocks__/mockLogger';
 import { StubRunner } from '../../__tests__/helpers/stubRunner';
-import { setupTestEnv, teardownTestEnv, SavedProcessState } from '../../__tests__/helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  SavedProcessState,
+} from '../../__tests__/helpers/setupTests';
 
 /**
  * Light integration check wiring real services together via mainWithDeps.
@@ -23,10 +27,20 @@ describe('app/main (integration)', () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
     await mainWithDeps(['down'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await new Promise(r => setImmediate(r));
     expect(runner.spawnCalls.length).toBe(1);
     const args = runner.spawnCalls[0].args;
-    expect(args).toEqual(expect.arrayContaining(['compose', '--profile', 'standard', '-f', 'dev.yml', 'down', '-v', '--remove-orphans']));
+    expect(args).toEqual(
+      expect.arrayContaining([
+        'compose',
+        '--profile',
+        'standard',
+        '-f',
+        'dev.yml',
+        'down',
+        '-v',
+        '--remove-orphans',
+      ]),
+    );
   });
 });
-

@@ -44,4 +44,3 @@ export interface EnvironmentPaths {
   packageJsonPath: string; // container path to wazuh-core package.json
   createNetworksScriptPath: string; // container path to helper script
 }
-

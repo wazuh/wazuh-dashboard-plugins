@@ -17,7 +17,9 @@ describe('services/versionService', () => {
   };
 
   it('reads version from package.json pluginPlatform.version', () => {
-    (readJsonFile as jest.Mock).mockReturnValue({ pluginPlatform: { version: '2.9.1' } });
+    (readJsonFile as jest.Mock).mockReturnValue({
+      pluginPlatform: { version: '2.9.1' },
+    });
     const v = getPlatformVersionFromPackageJson('OSD', envPaths);
     expect(v).toBe('2.9.1');
     expect(readJsonFile).toHaveBeenCalledWith(envPaths.packageJsonPath);
@@ -25,7 +27,8 @@ describe('services/versionService', () => {
 
   it('throws VersionResolutionError when version missing', () => {
     (readJsonFile as jest.Mock).mockReturnValue({});
-    expect(() => getPlatformVersionFromPackageJson('OSD', envPaths)).toThrow(VersionResolutionError);
+    expect(() => getPlatformVersionFromPackageJson('OSD', envPaths)).toThrow(
+      VersionResolutionError,
+    );
   });
 });
-

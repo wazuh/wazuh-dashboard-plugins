@@ -4,7 +4,11 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
-import { setupTestEnv, teardownTestEnv, SavedProcessState } from './helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  SavedProcessState,
+} from './helpers/setupTests';
 
 describe('dev.ts - External repo trailing slash is trimmed', () => {
   let tmpdir: string;
@@ -20,15 +24,20 @@ describe('dev.ts - External repo trailing slash is trimmed', () => {
   });
 
   afterEach(() => {
-    try { fs.rmSync(externalDir, { recursive: true, force: true }); } catch {}
+    try {
+      fs.rmSync(externalDir, { recursive: true, force: true });
+    } catch {}
     teardownTestEnv(saved);
   });
 
   test('override device path has no trailing slash', async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await mainWithDeps(['-r', `custom=${externalDir}/`, 'up'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await mainWithDeps(['-r', `custom=${externalDir}/`, 'up'], {
+      logger,
+      processRunner: runner,
+    });
+    await new Promise(r => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);

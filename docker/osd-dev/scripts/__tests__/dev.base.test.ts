@@ -4,8 +4,21 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
-import { setupTestEnv, teardownTestEnv, SavedProcessState, repoRoot, clearRepoDerivedEnv, setCurrentRepoEnv, createSiblingRootUnder } from './helpers/setupTests';
-import { setupTestEnv, teardownTestEnv, SavedProcessState, repoRoot } from './helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  SavedProcessState,
+  repoRoot,
+  clearRepoDerivedEnv,
+  setCurrentRepoEnv,
+  createSiblingRootUnder,
+} from './helpers/setupTests';
+import {
+  setupTestEnv,
+  teardownTestEnv,
+  SavedProcessState,
+  repoRoot,
+} from './helpers/setupTests';
 
 describe('dev.ts - Base startup with auto-detection (-base)', () => {
   let tmpdir: string;
@@ -31,9 +44,16 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
     fs.writeFileSync(path.join(dashboardBase, '.nvmrc'), '18.17.0\n');
 
     // Provide security plugin inside dashboard base
-    securityPluginPath = path.join(dashboardBase, 'plugins', 'wazuh-security-dashboards');
+    securityPluginPath = path.join(
+      dashboardBase,
+      'plugins',
+      'wazuh-security-dashboards',
+    );
     fs.mkdirSync(securityPluginPath, { recursive: true });
-    fs.writeFileSync(path.join(securityPluginPath, 'package.json'), '{"name":"wazuh-security-dashboards"}');
+    fs.writeFileSync(
+      path.join(securityPluginPath, 'package.json'),
+      '{"name":"wazuh-security-dashboards"}',
+    );
   });
 
   afterEach(() => {
@@ -47,7 +67,7 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
 
     // Run up with -base auto-detection (no path provided)
     await mainWithDeps(['-base', 'up'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await new Promise(r => setImmediate(r));
 
     // Validations
     expect(process.env.SRC_DASHBOARD).toBe(dashboardBase);
@@ -55,8 +75,12 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
     expect(process.env.SRC_SECURITY_PLUGIN).toBe(securityPluginPath);
 
     // Log includes base usage message
-    const logs = logSpy.mock.calls.map((c) => String(c[0]));
-    expect(logs.some((l) => l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`))).toBe(true);
+    const logs = logSpy.mock.calls.map(c => String(c[0]));
+    expect(
+      logs.some(l =>
+        l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`),
+      ),
+    ).toBe(true);
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
@@ -64,10 +88,14 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
 
     // Override contains dashboard-src-installer service and mounts
     expect(content).toContain('dashboard-src-installer:');
-    expect(content).toContain("image: node:${NODE_VERSION}");
+    expect(content).toContain('image: node:${NODE_VERSION}');
     expect(content).toContain("- '${SRC_DASHBOARD}:/home/node/kbn'");
-    expect(content).toContain("- '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards'");
-    expect(content).toContain("- ./dashboard-src/entrypoint.sh:/entrypoint.sh:ro");
+    expect(content).toContain(
+      "- '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards'",
+    );
+    expect(content).toContain(
+      '- ./dashboard-src/entrypoint.sh:/entrypoint.sh:ro',
+    );
 
     // docker compose gets both profiles: standard and dashboard-src, and includes override file
     expect(runner.spawnCalls.length).toBe(1);
@@ -83,7 +111,7 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
 
     // Now run down and ensure the override is removed
     await mainWithDeps(['down'], { logger, processRunner: runner });
-    await new Promise((r) => setImmediate(r));
+    await new Promise(r => setImmediate(r));
     expect(fs.existsSync(overridePath)).toBe(false);
     logSpy.mockRestore();
   });

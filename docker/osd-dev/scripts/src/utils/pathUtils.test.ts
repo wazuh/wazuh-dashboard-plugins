@@ -1,7 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { stripTrailingSlash, toContainerPath, ensureAccessibleHostPath } from './pathUtils';
+import {
+  stripTrailingSlash,
+  toContainerPath,
+  ensureAccessibleHostPath,
+} from './pathUtils';
 import type { EnvironmentPaths } from '../types/config';
 import { PathAccessError } from '../errors';
 
@@ -26,19 +30,33 @@ describe('utils/pathUtils', () => {
       siblingContainerRoot: siblingContainer,
       currentRepoHostRoot: hostRoot,
       siblingRepoHostRoot: siblingHost,
-      packageJsonPath: path.join(containerRoot, 'plugins/wazuh-core/package.json'),
-      createNetworksScriptPath: path.join(containerRoot, 'docker/scripts/create_docker_networks.sh'),
+      packageJsonPath: path.join(
+        containerRoot,
+        'plugins/wazuh-core/package.json',
+      ),
+      createNetworksScriptPath: path.join(
+        containerRoot,
+        'docker/scripts/create_docker_networks.sh',
+      ),
     };
 
     it('maps host path under current repo to container path', () => {
       expect(toContainerPath('/host/repo', envPaths)).toBe('/container/repo');
-      expect(toContainerPath('/host/repo/plugins', envPaths)).toBe('/container/repo/plugins');
-      expect(toContainerPath('/host/repo/plugins/x/y', envPaths)).toBe('/container/repo/plugins/x/y');
+      expect(toContainerPath('/host/repo/plugins', envPaths)).toBe(
+        '/container/repo/plugins',
+      );
+      expect(toContainerPath('/host/repo/plugins/x/y', envPaths)).toBe(
+        '/container/repo/plugins/x/y',
+      );
     });
 
     it('maps host path under sibling root to container sibling path', () => {
-      expect(toContainerPath('/host/sibling', envPaths)).toBe('/container/sibling');
-      expect(toContainerPath('/host/sibling/myproj', envPaths)).toBe('/container/sibling/myproj');
+      expect(toContainerPath('/host/sibling', envPaths)).toBe(
+        '/container/sibling',
+      );
+      expect(toContainerPath('/host/sibling/myproj', envPaths)).toBe(
+        '/container/sibling/myproj',
+      );
     });
 
     it('returns empty string for paths outside known roots', () => {
@@ -67,26 +85,40 @@ describe('utils/pathUtils', () => {
         siblingContainerRoot: siblingContainer,
         currentRepoHostRoot: hostRoot,
         siblingRepoHostRoot: siblingHost,
-        packageJsonPath: path.join(containerRoot, 'plugins/wazuh-core/package.json'),
-        createNetworksScriptPath: path.join(containerRoot, 'docker/scripts/create_docker_networks.sh'),
+        packageJsonPath: path.join(
+          containerRoot,
+          'plugins/wazuh-core/package.json',
+        ),
+        createNetworksScriptPath: path.join(
+          containerRoot,
+          'docker/scripts/create_docker_networks.sh',
+        ),
       };
     });
 
     afterEach(() => {
-      try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+      try {
+        fs.rmSync(tmpdir, { recursive: true, force: true });
+      } catch {}
     });
 
     it('does not throw when container-mapped path exists', () => {
       const hostPath = path.join(envPaths.currentRepoHostRoot, 'dir');
       const containerPath = path.join(envPaths.currentRepoContainerRoot, 'dir');
       fs.mkdirSync(containerPath, { recursive: true });
-      expect(() => ensureAccessibleHostPath(hostPath, 'Test path', envPaths)).not.toThrow();
+      expect(() =>
+        ensureAccessibleHostPath(hostPath, 'Test path', envPaths),
+      ).not.toThrow();
     });
 
     it('throws PathAccessError when not visible from container', () => {
-      const missingHostPath = path.join(envPaths.currentRepoHostRoot, 'missing');
-      expect(() => ensureAccessibleHostPath(missingHostPath, 'Sample', envPaths)).toThrow(PathAccessError);
+      const missingHostPath = path.join(
+        envPaths.currentRepoHostRoot,
+        'missing',
+      );
+      expect(() =>
+        ensureAccessibleHostPath(missingHostPath, 'Sample', envPaths),
+      ).toThrow(PathAccessError);
     });
   });
 });
-

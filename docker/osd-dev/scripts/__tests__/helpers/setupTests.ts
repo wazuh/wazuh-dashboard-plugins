@@ -67,7 +67,10 @@ export function setSiblingRepoEnv(sibling: string): void {
   process.env.SIBLING_CONTAINER_ROOT = sibling;
 }
 
-export function createSiblingRootUnder(parentDir: string, name = 'sibling-root'): string {
+export function createSiblingRootUnder(
+  parentDir: string,
+  name = 'sibling-root',
+): string {
   const dir = path.join(parentDir, name);
   fs.mkdirSync(dir, { recursive: true });
   setSiblingRepoEnv(dir);
@@ -77,7 +80,12 @@ export function createSiblingRootUnder(parentDir: string, name = 'sibling-root')
 export function setupTestEnv(options?: {
   prefix?: string;
   withModuleReset?: boolean;
-}): { saved: SavedProcessState; tmpdir: string; repoRoot: string; siblingRoot: string } {
+}): {
+  saved: SavedProcessState;
+  tmpdir: string;
+  repoRoot: string;
+  siblingRoot: string;
+} {
   const { prefix = 'wdp-jest-', withModuleReset = true } = options || {};
 
   const __jest = (globalThis as any)?.jest;

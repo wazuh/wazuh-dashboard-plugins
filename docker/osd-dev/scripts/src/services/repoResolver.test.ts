@@ -1,7 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { resolveRepositoryHostPath, resolveRequiredRepositories } from './repoResolver';
+import {
+  resolveRepositoryHostPath,
+  resolveRequiredRepositories,
+} from './repoResolver';
 import type { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { ValidationError } from '../errors';
 
@@ -35,15 +38,23 @@ describe('services/repoResolver', () => {
       siblingContainerRoot: path.join(tmpdir, 'sibling-container'),
       currentRepoHostRoot: hostRoot,
       siblingRepoHostRoot: path.join(tmpdir, 'sibling'),
-      packageJsonPath: path.join(containerRoot, 'plugins/wazuh-core/package.json'),
-      createNetworksScriptPath: path.join(containerRoot, 'docker/scripts/create_docker_networks.sh'),
+      packageJsonPath: path.join(
+        containerRoot,
+        'plugins/wazuh-core/package.json',
+      ),
+      createNetworksScriptPath: path.join(
+        containerRoot,
+        'docker/scripts/create_docker_networks.sh',
+      ),
     };
     // Ensure sibling container dir exists
     fs.mkdirSync(envPaths.siblingContainerRoot, { recursive: true });
   });
 
   afterEach(() => {
-    try { fs.rmSync(tmpdir, { recursive: true, force: true }); } catch {}
+    try {
+      fs.rmSync(tmpdir, { recursive: true, force: true });
+    } catch {}
   });
 
   it('uses absolute override path when provided', () => {
@@ -53,17 +64,28 @@ describe('services/repoResolver', () => {
     const overrideContainer = path.join(containerRoot, 'overrides', repoName);
     fs.mkdirSync(overrideHost, { recursive: true });
     fs.mkdirSync(overrideContainer, { recursive: true });
-    fs.writeFileSync(path.join(overrideContainer, 'package.json'), '{"name":"main"}');
+    fs.writeFileSync(
+      path.join(overrideContainer, 'package.json'),
+      '{"name":"main"}',
+    );
 
-    const cfg: ScriptConfig = { ...baseConfig, userRepositories: [{ name: repoName, path: overrideHost }] };
+    const cfg: ScriptConfig = {
+      ...baseConfig,
+      userRepositories: [{ name: repoName, path: overrideHost }],
+    };
     const resolved = resolveRepositoryHostPath(repoName, cfg, envPaths);
     expect(resolved).toBe(overrideHost);
   });
 
   it('rejects non-absolute override paths', () => {
     const repoName = 'main';
-    const cfg: ScriptConfig = { ...baseConfig, userRepositories: [{ name: repoName, path: 'relative/path' }] };
-    expect(() => resolveRepositoryHostPath(repoName, cfg, envPaths)).toThrow(ValidationError);
+    const cfg: ScriptConfig = {
+      ...baseConfig,
+      userRepositories: [{ name: repoName, path: 'relative/path' }],
+    };
+    expect(() => resolveRepositoryHostPath(repoName, cfg, envPaths)).toThrow(
+      ValidationError,
+    );
   });
 
   it('auto-detects repo from pluginsRoot and package.json presence', () => {
@@ -74,7 +96,10 @@ describe('services/repoResolver', () => {
     const repoContainer = path.join(containerRoot, 'plugins', repoName);
     fs.mkdirSync(repoHost, { recursive: true });
     fs.mkdirSync(repoContainer, { recursive: true });
-    fs.writeFileSync(path.join(repoContainer, 'package.json'), '{"name":"main"}');
+    fs.writeFileSync(
+      path.join(repoContainer, 'package.json'),
+      '{"name":"main"}',
+    );
 
     const cfg: ScriptConfig = { ...baseConfig, pluginsRoot: pluginsRootHost };
     const resolved = resolveRepositoryHostPath(repoName, cfg, envPaths);
@@ -84,7 +109,9 @@ describe('services/repoResolver', () => {
   it('throws when repo cannot be located in any candidate base', () => {
     const repoName = 'missing-plugin';
     const cfg: ScriptConfig = { ...baseConfig };
-    expect(() => resolveRepositoryHostPath(repoName, cfg, envPaths)).toThrow(ValidationError);
+    expect(() => resolveRepositoryHostPath(repoName, cfg, envPaths)).toThrow(
+      ValidationError,
+    );
   });
 
   it('resolveRequiredRepositories builds env map of names to paths', () => {
@@ -97,10 +124,18 @@ describe('services/repoResolver', () => {
       fs.mkdirSync(cont, { recursive: true });
       fs.writeFileSync(path.join(cont, 'package.json'), `{"name":"${r}"}`);
     }
-    const cfg: ScriptConfig = { ...baseConfig, pluginsRoot: path.join(hostRoot, 'plugins') };
-    const map = resolveRequiredRepositories(repos as readonly string[], cfg, envPaths);
-    expect(Array.from(map.keys()).sort()).toEqual(['REPO_MAIN', 'REPO_WAZUH_CHECK_UPDATES', 'REPO_WAZUH_CORE'].sort());
+    const cfg: ScriptConfig = {
+      ...baseConfig,
+      pluginsRoot: path.join(hostRoot, 'plugins'),
+    };
+    const map = resolveRequiredRepositories(
+      repos as readonly string[],
+      cfg,
+      envPaths,
+    );
+    expect(Array.from(map.keys()).sort()).toEqual(
+      ['REPO_MAIN', 'REPO_WAZUH_CHECK_UPDATES', 'REPO_WAZUH_CORE'].sort(),
+    );
     expect(map.get('REPO_MAIN')).toBe(path.join(hostRoot, 'plugins', 'main'));
   });
 });
-
