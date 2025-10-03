@@ -1,9 +1,0 @@
-services:
-  dev-sh-tests:
-    build:
-      context: ../../..
-      dockerfile: docker/osd-dev/__tests__/Dockerfile
-    working_dir: /workspace/docker/osd-dev
-    entrypoint: [/usr/local/bin/dev-sh-tests-entrypoint]
-    volumes:
-      - ../../..:/workspace:rw
