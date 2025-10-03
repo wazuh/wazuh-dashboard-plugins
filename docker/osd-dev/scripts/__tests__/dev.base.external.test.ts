@@ -4,33 +4,27 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
+import { setupTestEnv, teardownTestEnv, SavedProcessState, repoRoot, clearRepoDerivedEnv, createSiblingRootUnder, setCurrentRepoEnv } from './helpers/setupTests';
 
 describe('dev.ts - Base mode + external repo dynamic volumes', () => {
-  const repoRoot = path.resolve(__dirname, '../../../..');
-  const originalEnv = { ...process.env };
-  const originalCwd = process.cwd();
-  const originalArgv = [...process.argv];
-
   let tmpdir: string;
   let siblingRoot: string;
   let dashboardBase: string;
   let securityPluginPath: string;
   let externalRepo: string;
+  let saved!: SavedProcessState;
 
   beforeEach(() => {
-    jest.resetModules();
-    tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-jest-base-ext-'));
-    process.chdir(tmpdir);
+    const ctx = setupTestEnv({ prefix: 'wdp-jest-base-ext-' });
+    saved = ctx.saved;
+    tmpdir = ctx.tmpdir;
 
-    // Map current repo
-    process.env.WDP_CONTAINER_ROOT = repoRoot;
-    process.env.CURRENT_REPO_HOST_ROOT = repoRoot;
+    // Ensure clean derived env and map current repo
+    clearRepoDerivedEnv();
+    setCurrentRepoEnv(repoRoot);
 
     // Create sibling root + dashboard checkout for autodetect
-    siblingRoot = path.join(tmpdir, 'sibling-root');
-    fs.mkdirSync(siblingRoot, { recursive: true });
-    process.env.SIBLING_REPO_HOST_ROOT = siblingRoot;
-    process.env.SIBLING_CONTAINER_ROOT = siblingRoot;
+    siblingRoot = createSiblingRootUnder(tmpdir);
 
     dashboardBase = path.join(siblingRoot, 'wazuh-dashboard');
     fs.mkdirSync(dashboardBase, { recursive: true });
@@ -46,9 +40,7 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
   });
 
   afterEach(() => {
-    process.chdir(originalCwd);
-    process.env = { ...originalEnv };
-    process.argv = [...originalArgv];
+    teardownTestEnv(saved);
     try { fs.rmSync(externalRepo, { recursive: true, force: true }); } catch {}
   });
 

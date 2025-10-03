@@ -4,35 +4,21 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
+import { setupTestEnv, teardownTestEnv, SavedProcessState } from './helpers/setupTests';
 
 describe('dev.ts - Dynamic mounting of external repos', () => {
-  const repoRoot = path.resolve(__dirname, '../../../..');
-  const siblingRoot = path.resolve(repoRoot, '..');
-
-  const originalEnv = { ...process.env };
-  const originalCwd = process.cwd();
-  const originalArgv = [...process.argv];
-
   let tmpdir: string;
   let extRepoPath: string;
+  let saved!: SavedProcessState;
 
   beforeEach(() => {
-    jest.resetModules();
-    tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-jest-ext-'));
-    process.chdir(tmpdir);
-
-    // Map host roots to container roots so dev.ts can resolve paths
-    process.env.WDP_CONTAINER_ROOT = repoRoot;
-    process.env.SIBLING_CONTAINER_ROOT = siblingRoot;
-    process.env.CURRENT_REPO_HOST_ROOT = repoRoot;
-    process.env.SIBLING_REPO_HOST_ROOT = siblingRoot;
+    const ctx = setupTestEnv({ prefix: 'wdp-jest-ext-' });
+    saved = ctx.saved;
+    tmpdir = ctx.tmpdir;
 
     // Prepare a fake external repository outside allowed roots to ensure validation is skipped
     extRepoPath = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-external-'));
     fs.mkdirSync(extRepoPath, { recursive: true });
-
-    // Clear envs that are set during runs
-    delete process.env.REPO_EXTERNAL_TEST;
   });
 
   afterEach(() => {
@@ -40,9 +26,7 @@ describe('dev.ts - Dynamic mounting of external repos', () => {
     try {
       fs.rmSync(extRepoPath, { recursive: true, force: true });
     } catch {}
-    process.chdir(originalCwd);
-    process.env = { ...originalEnv };
-    process.argv = [...originalArgv];
+    teardownTestEnv(saved);
   });
 
   test('generates override with external volume and removes it on down', async () => {

@@ -4,30 +4,18 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
+import { setupTestEnv, teardownTestEnv, SavedProcessState } from './helpers/setupTests';
 
 describe('dev.ts - Input validations', () => {
-  const repoRoot = path.resolve(__dirname, '../../../..');
-  const siblingRoot = path.resolve(repoRoot, '..');
-
-  const originalEnv = { ...process.env };
-  const originalCwd = process.cwd();
-  const originalArgv = [...process.argv];
+  let saved!: SavedProcessState;
 
   beforeEach(() => {
-    jest.resetModules();
-    const tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-jest-val-'));
-    process.chdir(tmpdir);
-
-    process.env.WDP_CONTAINER_ROOT = repoRoot;
-    process.env.SIBLING_CONTAINER_ROOT = siblingRoot;
-    process.env.CURRENT_REPO_HOST_ROOT = repoRoot;
-    process.env.SIBLING_REPO_HOST_ROOT = siblingRoot;
+    const ctx = setupTestEnv({ prefix: 'wdp-jest-val-' });
+    saved = ctx.saved;
   });
 
   afterEach(() => {
-    process.chdir(originalCwd);
-    process.env = { ...originalEnv };
-    process.argv = [...originalArgv];
+    teardownTestEnv(saved);
     jest.restoreAllMocks();
   });
 

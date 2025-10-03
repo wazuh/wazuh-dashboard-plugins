@@ -4,32 +4,26 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
+import { setupTestEnv, teardownTestEnv, SavedProcessState, repoRoot, clearRepoDerivedEnv, setCurrentRepoEnv, createSiblingRootUnder } from './helpers/setupTests';
+import { setupTestEnv, teardownTestEnv, SavedProcessState, repoRoot } from './helpers/setupTests';
 
 describe('dev.ts - Base startup with auto-detection (-base)', () => {
-  const repoRoot = path.resolve(__dirname, '../../../..');
-  const originalEnv = { ...process.env };
-  const originalCwd = process.cwd();
-  const originalArgv = [...process.argv];
-
   let tmpdir: string;
   let siblingRoot: string;
   let dashboardBase: string;
   let securityPluginPath: string;
+  let saved!: SavedProcessState;
 
   beforeEach(() => {
-    jest.resetModules();
-    tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-jest-base-'));
-    process.chdir(tmpdir);
+    const ctx = setupTestEnv({ prefix: 'wdp-jest-base-' });
+    saved = ctx.saved;
+    tmpdir = ctx.tmpdir;
 
-    // Use repo root mapping for current repo (to find entrypoint under docker/osd-dev/dashboard-src)
-    process.env.WDP_CONTAINER_ROOT = repoRoot;
-    process.env.CURRENT_REPO_HOST_ROOT = repoRoot;
+    clearRepoDerivedEnv();
+    setCurrentRepoEnv(repoRoot);
 
     // Create a sibling root in tmp dir, with a wazuh-dashboard checkout
-    siblingRoot = path.join(tmpdir, 'sibling-root');
-    fs.mkdirSync(siblingRoot, { recursive: true });
-    process.env.SIBLING_REPO_HOST_ROOT = siblingRoot;
-    process.env.SIBLING_CONTAINER_ROOT = siblingRoot;
+    siblingRoot = createSiblingRootUnder(tmpdir);
 
     dashboardBase = path.join(siblingRoot, 'wazuh-dashboard');
     fs.mkdirSync(dashboardBase, { recursive: true });
@@ -43,9 +37,7 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
   });
 
   afterEach(() => {
-    process.chdir(originalCwd);
-    process.env = { ...originalEnv };
-    process.argv = [...originalArgv];
+    teardownTestEnv(saved);
   });
 
   test('auto-detects dashboard base, sets NODE_VERSION, generates override and enforces dashboard-src profile', async () => {

@@ -4,29 +4,18 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
+import { setupTestEnv, teardownTestEnv, SavedProcessState } from './helpers/setupTests';
 
 describe('dev.ts - Multiple external repos in override', () => {
-  const repoRoot = path.resolve(__dirname, '../../../..');
-  const siblingRoot = path.resolve(repoRoot, '..');
-
-  const originalEnv = { ...process.env };
-  const originalCwd = process.cwd();
-  const originalArgv = [...process.argv];
-
   let tmpdir: string;
   let external1: string;
   let external2: string;
+  let saved!: SavedProcessState;
 
   beforeEach(() => {
-    jest.resetModules();
-    tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-jest-ext-multi-'));
-    process.chdir(tmpdir);
-
-    // Map current/sibling repo for path translation
-    process.env.WDP_CONTAINER_ROOT = repoRoot;
-    process.env.SIBLING_CONTAINER_ROOT = siblingRoot;
-    process.env.CURRENT_REPO_HOST_ROOT = repoRoot;
-    process.env.SIBLING_REPO_HOST_ROOT = siblingRoot;
+    const ctx = setupTestEnv({ prefix: 'wdp-jest-ext-multi-' });
+    saved = ctx.saved;
+    tmpdir = ctx.tmpdir;
 
     external1 = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-external1-'));
     external2 = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-external2-'));
@@ -35,9 +24,7 @@ describe('dev.ts - Multiple external repos in override', () => {
   afterEach(() => {
     try { fs.rmSync(external1, { recursive: true, force: true }); } catch {}
     try { fs.rmSync(external2, { recursive: true, force: true }); } catch {}
-    process.chdir(originalCwd);
-    process.env = { ...originalEnv };
-    process.argv = [...originalArgv];
+    teardownTestEnv(saved);
   });
 
   test('override contains both volumes and device mappings', async () => {

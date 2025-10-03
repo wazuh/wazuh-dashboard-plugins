@@ -1,9 +1,9 @@
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
+import { setupTestEnv, teardownTestEnv, repoRoot, SavedProcessState, clearRepoDerivedEnv } from './helpers/setupTests';
 
 const getPluginPlatformVersion = (baseRoot: string) => {
   const pkgPath = path.resolve(baseRoot, 'plugins', 'wazuh-core', 'package.json');
@@ -12,36 +12,20 @@ const getPluginPlatformVersion = (baseRoot: string) => {
 };
 
 describe('dev.ts - Auto-detection without flags', () => {
-  const repoRoot = path.resolve(__dirname, '../../../..');
-  const siblingRoot = path.resolve(repoRoot, '..');
-
-  const originalEnv = { ...process.env };
-  const originalCwd = process.cwd();
-  const originalArgv = [...process.argv];
-
   let tmpdir: string;
+  let saved!: SavedProcessState;
 
   beforeEach(() => {
-    jest.resetModules();
-    tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-jest-'));
-    process.chdir(tmpdir);
+    const ctx = setupTestEnv({ prefix: 'wdp-jest-' });
+    saved = ctx.saved;
+    tmpdir = ctx.tmpdir;
 
-    // Ensure environment variables simulate execution from this repo
-    process.env.WDP_CONTAINER_ROOT = repoRoot;
-    process.env.SIBLING_CONTAINER_ROOT = siblingRoot;
-    process.env.CURRENT_REPO_HOST_ROOT = repoRoot;
-    process.env.SIBLING_REPO_HOST_ROOT = siblingRoot;
     // Clear potentially set variables from previous runs
-    delete process.env.REPO_MAIN;
-    delete process.env.REPO_WAZUH_CORE;
-    delete process.env.REPO_WAZUH_CHECK_UPDATES;
-    delete process.env.COMPOSE_PROJECT_NAME;
+    clearRepoDerivedEnv();
   });
 
   afterEach(() => {
-    process.chdir(originalCwd);
-    process.env = { ...originalEnv };
-    process.argv = [...originalArgv];
+    teardownTestEnv(saved);
   });
 
   test('does not generate override file and sets mounts and compose args', async () => {

@@ -4,6 +4,7 @@ import path from 'path';
 import { mainWithDeps } from '../src/app/main';
 import { MockLogger } from '../__mocks__/mockLogger';
 import { StubRunner } from './helpers/stubRunner';
+import { setupTestEnv, teardownTestEnv, repoRoot, SavedProcessState } from './helpers/setupTests';
 
 // No child_process mocking: we inject a StubRunner via deps
 
@@ -14,29 +15,17 @@ const getPlatformVersion = (repoRoot: string) => {
 };
 
 describe('dev.ts - Compat with legacy dev.sh tests', () => {
-  const repoRoot = path.resolve(__dirname, '../../../..');
-  const siblingRoot = path.resolve(repoRoot, '..');
-
-  const originalEnv = { ...process.env };
-  const originalCwd = process.cwd();
-  const originalArgv = [...process.argv];
-
   let tmpdir: string;
+  let saved!: SavedProcessState;
 
   beforeEach(() => {
-    jest.resetModules();
-    tmpdir = fs.mkdtempSync(path.join(os.tmpdir(), 'wdp-jest-compat-'));
-    process.chdir(tmpdir);
-    process.env.WDP_CONTAINER_ROOT = repoRoot;
-    process.env.SIBLING_CONTAINER_ROOT = siblingRoot;
-    process.env.CURRENT_REPO_HOST_ROOT = repoRoot;
-    process.env.SIBLING_REPO_HOST_ROOT = siblingRoot;
+    const ctx = setupTestEnv({ prefix: 'wdp-jest-compat-' });
+    saved = ctx.saved;
+    tmpdir = ctx.tmpdir;
   });
 
   afterEach(() => {
-    process.chdir(originalCwd);
-    process.env = { ...originalEnv };
-    process.argv = [...originalArgv];
+    teardownTestEnv(saved);
     jest.restoreAllMocks();
   });
 
