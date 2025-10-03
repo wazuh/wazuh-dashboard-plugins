@@ -36,9 +36,6 @@ describe('dev.ts - Auto-detection without flags', () => {
     delete process.env.REPO_WAZUH_CORE;
     delete process.env.REPO_WAZUH_CHECK_UPDATES;
     delete process.env.COMPOSE_PROJECT_NAME;
-
-    // Simulate CLI invocation: ./dev.sh up
-    process.argv = ['node', 'dev.ts', 'up'];
   });
 
   afterEach(() => {
