@@ -13,12 +13,28 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
+// Load version from package.json
+const packageJsonPath = path.resolve(__dirname, '..', 'plugins', 'main', 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const VERSION = packageJson.version;
+
+console.log(`📦 Using Wazuh version: ${VERSION}`);
+
+// Helper function to generate URLs with dynamic version
+function wazuhUrl(path) {
+  return `https://raw.githubusercontent.com/wazuh/wazuh/${VERSION}/${path}`;
+}
+
+function dashboardPluginsUrl(path) {
+  return `https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/${VERSION}/${path}`;
+}
+
 // Configuration for different template sources
 const TEMPLATE_SOURCES = {
   vulnerabilities: {
     name: 'states-vulnerabilities',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json',
+      wazuhUrl('src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json'),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-vulnerabilities.json',
@@ -26,7 +42,7 @@ const TEMPLATE_SOURCES = {
   alerts: {
     name: 'alerts',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/extensions/elasticsearch/7.x/wazuh-template.json',
+      wazuhUrl('extensions/elasticsearch/7.x/wazuh-template.json'),
     ],
     outputFile: 'plugins/main/public/utils/known-fields/alerts.json',
   },
@@ -34,7 +50,7 @@ const TEMPLATE_SOURCES = {
     name: 'monitoring',
     // This is in the dashboard-plugins repo
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/4.14.0/plugins/main/server/integration-files/monitoring-template.ts',
+      dashboardPluginsUrl('plugins/main/server/integration-files/monitoring-template.ts'),
     ],
     outputFile: 'plugins/main/public/utils/known-fields/monitoring.json',
     isTypeScript: true,
@@ -43,7 +59,7 @@ const TEMPLATE_SOURCES = {
     name: 'statistics',
     // This is in the dashboard-plugins repo
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/4.14.0/plugins/main/server/integration-files/statistics-template.ts',
+      dashboardPluginsUrl('plugins/main/server/integration-files/statistics-template.ts'),
     ],
     outputFile: 'plugins/main/public/utils/known-fields/statistics.json',
     isTypeScript: true,
