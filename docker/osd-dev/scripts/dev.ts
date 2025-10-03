@@ -610,16 +610,24 @@ function main(): void {
   const externalDynamicRepos: string[] = [];
   for (const override of config.userRepos) {
     const normalizedOverride = stripTrailingSlash(override.path);
-    ensureAccessibleHostPath(normalizedOverride, `Repository path for '${override.name}'`);
     const varName = toEnvVarName(override.name);
+
+    // For required repos and security plugin in dashboard-src mode, keep strict validation.
+    // For other external repos, skip container accessibility validation and let Docker bind-mount the host path.
+    const isRequired = REQUIRED_REPOS.includes(override.name);
+    const isSecurityPlugin = config.useDashboardFromSource && SECURITY_PLUGIN_ALIASES.includes(override.name);
+    if (isRequired || isSecurityPlugin) {
+      ensureAccessibleHostPath(normalizedOverride, `Repository path for '${override.name}'`);
+    }
+
     repoEnvVars.set(varName, normalizedOverride);
     process.env[varName] = normalizedOverride;
 
-    if (REQUIRED_REPOS.includes(override.name)) {
+    if (isRequired) {
       continue;
     }
 
-    if (config.useDashboardFromSource && SECURITY_PLUGIN_ALIASES.includes(override.name)) {
+    if (isSecurityPlugin) {
       // Already handled as part of SRC_SECURITY_PLUGIN
       securityPluginHostPath = securityPluginHostPath || normalizedOverride;
       continue;
