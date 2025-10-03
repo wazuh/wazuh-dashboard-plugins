@@ -7,7 +7,8 @@ import { PathAccessError } from '../errors';
  */
 export function stripTrailingSlash(pathValue: string): string {
   if (!pathValue) return '';
-  if (pathValue === '/') return '/';
+  // Treat any sequence of only slashes as root
+  if (/^\/+$/g.test(pathValue)) return '/';
   return pathValue.replace(/\/+$/, '');
 }
 
