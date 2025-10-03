@@ -44,31 +44,8 @@ export function generateOverrideFile(
 
   if (useDashboardFromSource) {
     content += '  dashboard-src-installer:\n';
-    content += '    image: node:${NODE_VERSION}\n';
-    content += '    profiles:\n';
-    content += `      - '${DASHBOARD_SRC_PROFILE}'\n`;
-    content += '    container_name: dashboard-src-installer-${NODE_VERSION}\n';
     content += '    volumes:\n';
     content += "      - '${SRC_DASHBOARD}:/home/node/kbn'\n";
-    content += "    user: '1000:1000'\n";
-    content += '    working_dir: /home/node/kbn\n';
-    content += '    entrypoint: /bin/bash\n';
-    content += '    command: >\n';
-    content += "      -c '\n";
-    content +=
-      '        marker_osd_bootstrap="/home/node/kbn/.NO_COMMIT_MARKER_OSD_BOOTSTRAP_WAS_DONE"\n';
-    content += '        root_app_dir="/home/node/kbn"\n\n';
-    content += '        if [ -f "$$marker_osd_bootstrap" ]; then\n';
-    content +=
-      '          echo "File $$marker_osd_bootstrap was found. Skip setup.";\n';
-    content += '          exit 0;\n';
-    content += '        fi\n';
-    content += '        echo "Initializating setup"\n';
-    content += '        cd $$root_app_dir\n';
-    content +=
-      '        yarn osd clean && yarn osd bootstrap && touch $$marker_osd_bootstrap\n';
-    content += '        echo "Setup was finished"\n';
-    content += "      '\n";
   }
 
   content += '  osd:\n';
