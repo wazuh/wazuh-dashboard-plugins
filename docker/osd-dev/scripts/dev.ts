@@ -2,13 +2,13 @@
 
 import { main } from './src/app/main';
 import { DevScriptError, ValidationError } from './src/errors';
+import { logger } from './src/utils/logger';
 import { parseArguments } from './src/services/argumentParser';
 import { getEnvironmentPaths } from './src/constants/paths';
 
 function handleError(error: unknown): never {
   const message = error instanceof DevScriptError ? error.message : ((error as any)?.message || String(error));
-  // eslint-disable-next-line no-console
-  console.error(`[ERROR] ${message}`);
+  logger.error(`${message}`);
   // Important for tests: allow mocked process.exit to throw and bubble
   // so dynamic import rejects on validation errors.
   // Do not wrap in try/catch to keep synchronous propagation.
@@ -30,8 +30,7 @@ try {
   if (isValidation) {
     handleError(error);
   } else {
-    // eslint-disable-next-line no-console
-    console.error(`[ERROR] ${String((error as any)?.message || error)}`);
+    logger.error(`${String((error as any)?.message || error)}`);
   }
 }
 
@@ -40,13 +39,11 @@ try {
   if (result && typeof (result as any).then === 'function') {
     (result as Promise<void>).catch((err) => {
       const message = err instanceof DevScriptError ? err.message : ((err as any)?.message || String(err));
-      // eslint-disable-next-line no-console
-      console.error(`[ERROR] ${message}`);
+      logger.error(`${message}`);
     });
   }
 } catch (error) {
   // Synchronous exceptions at runtime are unexpected; log without exiting to keep tests stable
   const message = error instanceof DevScriptError ? error.message : ((error as any)?.message || String(error));
-  // eslint-disable-next-line no-console
-  console.error(`[ERROR] ${message}`);
+  logger.error(`${message}`);
 }

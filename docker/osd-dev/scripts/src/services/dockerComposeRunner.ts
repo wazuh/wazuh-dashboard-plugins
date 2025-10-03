@@ -2,6 +2,7 @@ import { existsSync } from 'fs';
 import { execSync, spawn } from 'child_process';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { ValidationError } from '../errors';
+import { logger } from '../utils/logger';
 
 export function runDockerCompose(
   config: ScriptConfig,
@@ -26,8 +27,7 @@ export function runDockerCompose(
           execSync(`/bin/bash ${envPaths.createNetworksScriptPath}`, { stdio: 'inherit' });
         }
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('[ERROR] Failed to create docker networks');
+        logger.error('[ERROR] Failed to create docker networks');
       }
       composeArgs.push('up', '-Vd');
       break;
@@ -47,8 +47,7 @@ export function runDockerCompose(
       throw new ValidationError('Action must be up | down | stop | start | manager-local-up');
   }
 
-  // eslint-disable-next-line no-console
-  console.log(`[INFO] Running: docker ${composeArgs.join(' ')}`);
+  logger.info(`Running: docker ${composeArgs.join(' ')}`);
   return new Promise((resolve) => {
     const child = spawn('docker', composeArgs, { stdio: 'inherit' });
     child.on('close', (code) => resolve(code ?? 1));
@@ -62,28 +61,27 @@ export function printAgentEnrollmentHint(config: ScriptConfig): void {
   const osVersion = process.env.OS_VERSION || '';
   const wazuhStack = process.env.WAZUH_STACK || '';
 
-  // eslint-disable-next-line no-console
-  console.log();
-  console.log('**************WARNING**************');
-  console.log('The agent version must be a published one. This uses only released versions.');
-  console.log('If you need to change de version, edit the command as you see fit.');
-  console.log('***********************************');
-  console.log('1. (Optional) Enroll an agent (Ubuntu 20.04):');
-  console.log(
+  logger.infoPlain('');
+  logger.infoPlain('**************WARNING**************');
+  logger.infoPlain('The agent version must be a published one. This uses only released versions.');
+  logger.infoPlain('If you need to change de version, edit the command as you see fit.');
+  logger.infoPlain('***********************************');
+  logger.infoPlain('1. (Optional) Enroll an agent (Ubuntu 20.04):');
+  logger.infoPlain(
     `docker run --name ${projectName}-agent-$(date +%s) --network os-dev-${osVersion} --label com.docker.compose.project=${projectName} --env WAZUH_AGENT_VERSION=${wazuhStack} -d ubuntu:20.04 bash -c '`
   );
-  console.log('  apt update -y');
-  console.log('  apt install -y curl lsb-release');
-  console.log('  curl -so \\wazuh-agent-\\${WAZUH_AGENT_VERSION}.deb \\');
-  console.log(
+  logger.infoPlain('  apt update -y');
+  logger.infoPlain('  apt install -y curl lsb-release');
+  logger.infoPlain('  curl -so \\wazuh-agent-\\${WAZUH_AGENT_VERSION}.deb \\');
+  logger.infoPlain(
     '    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_\\${WAZUH_AGENT_VERSION}-1_amd64.deb \\'
   );
-  console.log(
+  logger.infoPlain(
     "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-\\${WAZUH_AGENT_VERSION}.deb"
   );
-  console.log();
-  console.log('  /etc/init.d/wazuh-agent start');
-  console.log('  tail -f /var/ossec/logs/ossec.log');
-  console.log(`'`);
-  console.log();
+  logger.infoPlain('');
+  logger.infoPlain('  /etc/init.d/wazuh-agent start');
+  logger.infoPlain('  tail -f /var/ossec/logs/ossec.log');
+  logger.infoPlain(`'`);
+  logger.infoPlain('');
 }

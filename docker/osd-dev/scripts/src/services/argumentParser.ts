@@ -6,38 +6,38 @@ import {
   toContainerPath,
 } from '../utils/pathUtils';
 import { ValidationError, ConfigurationError } from '../errors';
+import { logger } from '../utils/logger';
 
 export function printUsageAndExit(): never {
-  /* eslint-disable no-console */
-  console.log();
-  console.log(
+  logger.infoPlain('');
+  logger.infoPlain(
     './dev.sh [-o os_version] [-d osd_version] [-a agents_up] [-r repo=absolute_path ...] [default_repo_root] action [saml|server|server-local] [server_version]',
   );
-  console.log();
-  console.log('where');
-  console.log('  -o os_version Specify the OS version (optional)');
-  console.log('  -d osd_version Specify the OSD version (optional)');
-  console.log(
+  logger.infoPlain('');
+  logger.infoPlain('where');
+  logger.infoPlain('  -o os_version Specify the OS version (optional)');
+  logger.infoPlain('  -d osd_version Specify the OSD version (optional)');
+  logger.infoPlain(
     "  -a agents_up Specify 'rpm' or 'deb' to deploy an agent with server-local, or 'without' to deploy no agent (optional) (default: deploy 2 agents)",
   );
-  console.log(
+  logger.infoPlain(
     '  -r repo=absolute_path Mount an external plugin repository (repeatable).',
   );
-  console.log(
+  logger.infoPlain(
     '     Use -r only for external repos, e.g.: wazuh-dashboard-reporting/abs/path/wazuh-dashboard-reporting',
   );
-  console.log(
+  logger.infoPlain(
     '  -base [absolute_path] Set the base directory where required repos (main, wazuh-core, wazuh-check-updates) are located (defaults to sibling wazuh-dashboard)',
   );
-  console.log(
+  logger.infoPlain(
     '  default_repo_root Optional absolute path used as the base location for repositories',
   );
-  console.log('  action is one of up | down | stop | start | manager-local-up');
-  console.log('  saml to deploy a saml enabled environment (optional)');
-  console.log(
+  logger.infoPlain('  action is one of up | down | stop | start | manager-local-up');
+  logger.infoPlain('  saml to deploy a saml enabled environment (optional)');
+  logger.infoPlain(
     '  server to deploy a real server enabled environment (optional, requires server_version)',
   );
-  console.log(
+  logger.infoPlain(
     '  server-local to deploy a real server enabled environment (optional, requires server_version)',
   );
   process.exit(1);

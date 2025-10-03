@@ -4,6 +4,7 @@ import { DASHBOARD_ENTRYPOINT_PATH, DASHBOARD_SRC_PROFILE, OVERRIDE_COMPOSE_FILE
 import { writeFile } from '../utils/io';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import { ComposeOverrideError } from '../errors';
+import { logger } from '../utils/logger';
 
 export function generateOverrideFile(
   options: GenerateOverrideOptions,
@@ -15,11 +16,9 @@ export function generateOverrideFile(
   if (!shouldGenerate) {
     if (existsSync(OVERRIDE_COMPOSE_FILE)) {
       unlinkSync(OVERRIDE_COMPOSE_FILE);
-      // eslint-disable-next-line no-console
-      console.log('[INFO] Removed previous compose override file.');
+      logger.info('Removed previous compose override file.');
     } else {
-      // eslint-disable-next-line no-console
-      console.log('[INFO] No dynamic compose override required.');
+      logger.info('No dynamic compose override required.');
     }
     return null;
   }
@@ -27,8 +26,7 @@ export function generateOverrideFile(
   const messages: string[] = [];
   if (useDashboardFromSource) messages.push('dashboard sources mode');
   if (externalRepositories.length > 0) messages.push(`external repositories: ${externalRepositories.join(', ')}`);
-  // eslint-disable-next-line no-console
-  console.log(`[INFO] Generating compose override for ${messages.join(' and ')}`);
+  logger.info(`Generating compose override for ${messages.join(' and ')}`);
 
   let content = 'services:\n';
 

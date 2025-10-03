@@ -13,6 +13,7 @@ import { getPlatformVersionFromPackageJson } from '../services/versionService';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import { PathAccessError, ValidationError, ConfigurationError } from '../errors';
+import { logger } from '../utils/logger';
 import { ensureAccessibleHostPath, stripTrailingSlash, toContainerPath } from '../utils/pathUtils';
 
 function ensureDashboardSources(config: ScriptConfig, envPaths: EnvironmentPaths): string {
@@ -102,13 +103,11 @@ export async function main(argv: string[]): Promise<void> {
 
   // Get versions from package.json if not provided
   if (!config.osVersion) {
-    // eslint-disable-next-line no-console
-    console.log(`[INFO] OS Version not received via flag, getting the version from ${envPaths.packageJsonPath}`);
+    logger.info(`OS Version not received via flag, getting the version from ${envPaths.packageJsonPath}`);
     config = { ...config, osVersion: getPlatformVersionFromPackageJson('OS', envPaths) };
   }
   if (!config.osdVersion) {
-    // eslint-disable-next-line no-console
-    console.log(`[INFO] OSD Version not received via flag, getting the version from ${envPaths.packageJsonPath}`);
+    logger.info(`OSD Version not received via flag, getting the version from ${envPaths.packageJsonPath}`);
     config = { ...config, osdVersion: getPlatformVersionFromPackageJson('OSD', envPaths) };
   }
 
@@ -128,10 +127,9 @@ export async function main(argv: string[]): Promise<void> {
     if (!existsSync(entrypointHostPath)) {
       throw new ConfigurationError(`Expected dashboard entrypoint script at '${entrypointHostPath}'.`);
     }
-    // eslint-disable-next-line no-console
-    console.log(`[INFO] Using wazuh-dashboard sources from ${config.dashboardBase}`);
-    console.log(`[INFO] Using wazuh-security-dashboards sources from ${securityPluginHostPath}`);
-    console.log(`[INFO] Using Node.js version ${process.env.NODE_VERSION} from ${nvmrcHostPath}`);
+    logger.info(`Using wazuh-dashboard sources from ${config.dashboardBase}`);
+    logger.info(`Using wazuh-security-dashboards sources from ${securityPluginHostPath}`);
+    logger.info(`Using Node.js version ${process.env.NODE_VERSION} from ${nvmrcHostPath}`);
   }
 
   // External repositories provided through -r
