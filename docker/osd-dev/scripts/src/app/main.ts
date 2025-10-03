@@ -12,14 +12,14 @@ import { resolveRepositoryHostPath, resolveRequiredRepositories } from '../servi
 import { getPlatformVersionFromPackageJson } from '../services/versionService';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { toRepositoryEnvVar } from '../utils/envUtils';
-import { DevScriptError } from '../utils/errors';
+import { PathAccessError, ValidationError, ConfigurationError } from '../errors';
 import { ensureAccessibleHostPath, stripTrailingSlash, toContainerPath } from '../utils/pathUtils';
 
 function ensureDashboardSources(config: ScriptConfig, envPaths: EnvironmentPaths): string {
   const dashboardContainerPath = toContainerPath(config.dashboardBase, envPaths);
   if (!dashboardContainerPath || !existsSync(dashboardContainerPath)) {
     const allowedRoots = [envPaths.currentRepoHostRoot, envPaths.siblingRepoHostRoot].filter(Boolean).join(' or ') || 'the mounted development roots';
-    throw new DevScriptError(
+    throw new PathAccessError(
       `Dashboard base path '${config.dashboardBase}' does not exist or is not accessible from the development container. Place it under ${allowedRoots}.`
     );
   }
@@ -30,12 +30,12 @@ function ensureDashboardSources(config: ScriptConfig, envPaths: EnvironmentPaths
   const nvmrcHostPath = resolve(config.dashboardBase, '.nvmrc');
   const nvmrcContainerPath = toContainerPath(nvmrcHostPath, envPaths);
   if (!nvmrcContainerPath || !existsSync(nvmrcContainerPath)) {
-    throw new DevScriptError(`.nvmrc not found at '${nvmrcHostPath}'. Provide a valid wazuh-dashboard checkout or pass -base with an absolute path to it.`);
+    throw new PathAccessError(`.nvmrc not found at '${nvmrcHostPath}'. Provide a valid wazuh-dashboard checkout or pass -base with an absolute path to it.`);
   }
 
   const nodeVersion = readFileSync(nvmrcContainerPath, 'utf-8').trim();
   if (!nodeVersion) {
-    throw new DevScriptError(`.nvmrc at '${nvmrcHostPath}' is empty. Cannot determine Node version.`);
+    throw new ValidationError(`.nvmrc at '${nvmrcHostPath}' is empty. Cannot determine Node version.`);
   }
 
   process.env.NODE_VERSION = nodeVersion;
@@ -48,7 +48,7 @@ function resolveSecurityPluginPath(config: ScriptConfig, envPaths: EnvironmentPa
   if (securityOverride) {
     const normalized = stripTrailingSlash(securityOverride.path);
     if (!normalized.startsWith('/')) {
-      throw new DevScriptError(`Repository path '${securityOverride.path}' for '${securityOverride.name}' must be absolute.`);
+      throw new ValidationError(`Repository path '${securityOverride.path}' for '${securityOverride.name}' must be absolute.`);
     }
     ensureAccessibleHostPath(normalized, `Repository path for '${securityOverride.name}'`, envPaths);
     return normalized;
@@ -82,7 +82,7 @@ function resolveSecurityPluginPath(config: ScriptConfig, envPaths: EnvironmentPa
     }
   }
 
-  throw new DevScriptError(
+  throw new ConfigurationError(
     'Unable to locate wazuh-security-dashboards plugin. Provide it with -r wazuh-security-dashboards=/absolute/path or ensure it exists under the chosen plugins root.'
   );
 }
@@ -97,7 +97,7 @@ export async function main(argv: string[]): Promise<void> {
   let config = parseArguments(argv, envPaths);
 
   if (!config.action) {
-    throw new DevScriptError('Missing action argument');
+    throw new ValidationError('Missing action argument');
   }
 
   // Get versions from package.json if not provided
@@ -126,7 +126,7 @@ export async function main(argv: string[]): Promise<void> {
 
     const entrypointHostPath = resolve(envPaths.currentRepoContainerRoot, 'docker', 'osd-dev', 'dashboard-src', 'entrypoint.sh');
     if (!existsSync(entrypointHostPath)) {
-      throw new DevScriptError(`Expected dashboard entrypoint script at '${entrypointHostPath}'.`);
+      throw new ConfigurationError(`Expected dashboard entrypoint script at '${entrypointHostPath}'.`);
     }
     // eslint-disable-next-line no-console
     console.log(`[INFO] Using wazuh-dashboard sources from ${config.dashboardBase}`);

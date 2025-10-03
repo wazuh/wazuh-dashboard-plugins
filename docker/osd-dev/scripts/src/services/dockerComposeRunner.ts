@@ -1,6 +1,7 @@
 import { existsSync } from 'fs';
 import { execSync, spawn } from 'child_process';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
+import { ValidationError } from '../errors';
 
 export function runDockerCompose(
   config: ScriptConfig,
@@ -43,7 +44,7 @@ export function runDockerCompose(
       composeArgs.push('-p', process.env.COMPOSE_PROJECT_NAME || '', 'up', '-d', 'wazuh.manager.local');
       break;
     default:
-      throw new Error('Action must be up | down | stop | start | manager-local-up');
+      throw new ValidationError('Action must be up | down | stop | start | manager-local-up');
   }
 
   // eslint-disable-next-line no-console
@@ -86,4 +87,3 @@ export function printAgentEnrollmentHint(config: ScriptConfig): void {
   console.log(`'`);
   console.log();
 }
-

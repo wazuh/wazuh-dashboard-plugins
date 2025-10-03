@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { ScriptConfig, EnvironmentPaths } from '../types/config';
 import { ensureAccessibleHostPath, stripTrailingSlash, toContainerPath } from '../utils/pathUtils';
 import { toRepositoryEnvVar } from '../utils/envUtils';
-import { DevScriptError } from '../utils/errors';
+import { ValidationError, ConfigurationError } from '../errors';
 
 export function resolveRepositoryHostPath(
   repoName: string,
@@ -15,11 +15,11 @@ export function resolveRepositoryHostPath(
 
   if (hostPath) {
     if (!hostPath.startsWith('/')) {
-      throw new DevScriptError(`Repository path '${hostPath}' for '${repoName}' must be absolute.`);
+      throw new ValidationError(`Repository path '${hostPath}' for '${repoName}' must be absolute.`);
     }
   } else {
     if (!envPaths.currentRepoHostRoot) {
-      throw new DevScriptError('CURRENT_REPO_HOST_ROOT environment variable is not set.');
+      throw new ConfigurationError('CURRENT_REPO_HOST_ROOT environment variable is not set.');
     }
 
     const candidateBases: string[] = [];
@@ -50,7 +50,7 @@ export function resolveRepositoryHostPath(
     });
 
     if (!resolvedBase) {
-      throw new DevScriptError(
+      throw new ValidationError(
         `Repository path for '${repoName}' not provided. Supply a base directory containing the plugin or use -r ${repoName}=/absolute/path.`
       );
     }
@@ -73,4 +73,3 @@ export function resolveRequiredRepositories(
   }
   return envMap;
 }
-

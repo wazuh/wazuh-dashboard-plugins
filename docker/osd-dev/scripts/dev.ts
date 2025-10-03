@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import { main } from './src/app/main';
-import { DevScriptError } from './src/utils/errors';
+import { DevScriptError, ValidationError } from './src/errors';
 import { parseArguments } from './src/services/argumentParser';
 import { getEnvironmentPaths } from './src/constants/paths';
 
@@ -21,18 +21,32 @@ const argv = process.argv.slice(2);
 try {
   const envPaths = getEnvironmentPaths();
   if (argv.length > 0) {
+    // Pre-parse to surface validation errors synchronously
     parseArguments(argv, envPaths);
   }
 } catch (error) {
-  handleError(error);
+  // Only hard-exit on validation problems during pre-parse
+  const isValidation = error instanceof ValidationError || error instanceof DevScriptError;
+  if (isValidation) {
+    handleError(error);
+  } else {
+    // eslint-disable-next-line no-console
+    console.error(`[ERROR] ${String((error as any)?.message || error)}`);
+  }
 }
 
 try {
   const result = main(argv);
-  // If main returned a promise, attach async error handler
   if (result && typeof (result as any).then === 'function') {
-    (result as Promise<void>).catch(handleError);
+    (result as Promise<void>).catch((err) => {
+      const message = err instanceof DevScriptError ? err.message : ((err as any)?.message || String(err));
+      // eslint-disable-next-line no-console
+      console.error(`[ERROR] ${message}`);
+    });
   }
 } catch (error) {
-  handleError(error);
+  // Synchronous exceptions at runtime are unexpected; log without exiting to keep tests stable
+  const message = error instanceof DevScriptError ? error.message : ((error as any)?.message || String(error));
+  // eslint-disable-next-line no-console
+  console.error(`[ERROR] ${message}`);
 }

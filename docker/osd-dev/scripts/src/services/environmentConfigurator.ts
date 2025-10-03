@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import { DEFAULTS } from '../constants/app';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
-import { DevScriptError } from '../utils/errors';
+import { ConfigurationError, PathAccessError, ValidationError } from '../errors';
 
 export function initializeBaseEnvironment(config: ScriptConfig): void {
   process.env.PASSWORD = process.env.PASSWORD || DEFAULTS.defaultPassword;
@@ -53,10 +53,10 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
       try {
         const hostsContent = readFileSync('/etc/hosts', 'utf-8');
         if (!hostsContent.includes('idp')) {
-          throw new DevScriptError('Add idp to /etc/hosts');
+          throw new ConfigurationError('Add idp to /etc/hosts');
         }
       } catch {
-        throw new DevScriptError('Cannot read /etc/hosts');
+        throw new PathAccessError('Cannot read /etc/hosts');
       }
 
       primaryProfile = 'saml';
@@ -67,7 +67,7 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
 
     case 'server': {
       if (!config.modeVersion) {
-        throw new DevScriptError('server mode requires the server_version argument');
+        throw new ValidationError('server mode requires the server_version argument');
       }
       primaryProfile = 'server';
       process.env.WAZUH_STACK = config.modeVersion;
@@ -76,7 +76,7 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
 
     case 'server-local': {
       if (!config.modeVersion) {
-        throw new DevScriptError('server-local mode requires the server_version argument');
+        throw new ValidationError('server-local mode requires the server_version argument');
       }
       if (config.agentsUp) {
         primaryProfile = `server-local-${config.agentsUp}`;
@@ -91,7 +91,7 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
     case 'server-local-deb':
     case 'server-local-without': {
       if (!config.modeVersion) {
-        throw new DevScriptError(`${config.mode} mode requires the server_version argument`);
+        throw new ValidationError(`${config.mode} mode requires the server_version argument`);
       }
       primaryProfile = config.mode;
       process.env.IMAGE_TAG = config.modeVersion;
@@ -99,7 +99,6 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
     }
 
     default:
-      throw new DevScriptError(`Unsupported mode '${config.mode}'`);
+      throw new ValidationError(`Unsupported mode '${config.mode}'`);
   }
 }
-

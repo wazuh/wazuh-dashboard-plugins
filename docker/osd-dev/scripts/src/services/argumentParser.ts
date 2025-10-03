@@ -5,7 +5,7 @@ import {
   stripTrailingSlash,
   toContainerPath,
 } from '../utils/pathUtils';
-import { DevScriptError } from '../utils/errors';
+import { ValidationError, ConfigurationError } from '../errors';
 
 export function printUsageAndExit(): never {
   /* eslint-disable no-console */
@@ -80,7 +80,7 @@ export function parseArguments(
       case '-a': {
         config.agentsUp = argv[++i];
         if (!['rpm', 'deb', 'without', ''].includes(config.agentsUp)) {
-          throw new DevScriptError(
+          throw new ValidationError(
             "Invalid value for -a option. Allowed values are 'rpm', 'deb', 'without', or an empty string.",
           );
         }
@@ -91,13 +91,13 @@ export function parseArguments(
       case '-r': {
         const repoSpec = argv[++i];
         if (!repoSpec.includes('=')) {
-          throw new DevScriptError(
+          throw new ValidationError(
             `Invalid repository specification '${repoSpec}'. Expected format repo=/absolute/path.`,
           );
         }
         const [repoName, repoPath] = repoSpec.split('=');
         if (!repoName || !repoPath) {
-          throw new DevScriptError(
+          throw new ValidationError(
             `Invalid repository specification '${repoSpec}'. Expected format repo=/absolute/path.`,
           );
         }
@@ -132,7 +132,7 @@ export function parseArguments(
           ensureAccessibleHostPath(config.pluginsRoot, 'Base path', envPaths);
           i++;
         } else if (arg.startsWith('-')) {
-          throw new DevScriptError(`Unsupported option '${arg}'.`);
+          throw new ValidationError(`Unsupported option '${arg}'.`);
         } else {
           // First non-flag argument is the action
           config.action = arg;
@@ -148,11 +148,12 @@ export function parseArguments(
           }
           // Check for unexpected arguments
           if (i < argv.length) {
-            throw new DevScriptError(
+            throw new ValidationError(
               `Unexpected arguments: ${argv.slice(i).join(' ')}`,
             );
           }
-          return config;
+          // Break to allow post-processing (auto-detection) after parsing action/mode
+          break;
         }
         break;
       }
@@ -163,7 +164,7 @@ export function parseArguments(
   if (config.useDashboardFromSource && !config.dashboardBase) {
     const hostRoot = envPaths.siblingRepoHostRoot;
     if (!hostRoot) {
-      throw new DevScriptError(
+      throw new ConfigurationError(
         'Cannot infer dashboard base path automatically. Provide an absolute path to -base.',
       );
     }
@@ -171,7 +172,7 @@ export function parseArguments(
     const candidate = stripTrailingSlash(resolve(hostRoot, 'wazuh-dashboard'));
     const containerCandidate = toContainerPath(candidate, envPaths);
     if (!containerCandidate) {
-      throw new DevScriptError(
+      throw new ValidationError(
         'Unable to locate wazuh-dashboard automatically. Provide an absolute path to -base.',
       );
     }
@@ -180,7 +181,7 @@ export function parseArguments(
 
   if (config.useDashboardFromSource) {
     if (!config.dashboardBase || !config.dashboardBase.startsWith('/')) {
-      throw new DevScriptError(
+      throw new ValidationError(
         'The -base option requires an absolute path to the wazuh-dashboard repository.',
       );
     }

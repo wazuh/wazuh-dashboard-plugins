@@ -3,7 +3,7 @@ import { GenerateOverrideOptions, EnvironmentPaths } from '../types/config';
 import { DASHBOARD_ENTRYPOINT_PATH, DASHBOARD_SRC_PROFILE, OVERRIDE_COMPOSE_FILE } from '../constants/app';
 import { writeFile } from '../utils/io';
 import { toRepositoryEnvVar } from '../utils/envUtils';
-import { DevScriptError } from '../utils/errors';
+import { ComposeOverrideError } from '../errors';
 
 export function generateOverrideFile(
   options: GenerateOverrideOptions,
@@ -93,7 +93,7 @@ export function generateOverrideFile(
     for (const repo of externalRepositories) {
       const repoPath = repositoryEnvMap.get(toRepositoryEnvVar(repo));
       if (!repoPath) {
-        throw new DevScriptError(`Repository path for '${repo}' not resolved.`);
+        throw new ComposeOverrideError(`Repository path for '${repo}' not resolved.`);
       }
       content += `  ${repo}:\n`;
       content += `    driver: local\n`;
@@ -107,4 +107,3 @@ export function generateOverrideFile(
   writeFile(OVERRIDE_COMPOSE_FILE, content);
   return OVERRIDE_COMPOSE_FILE;
 }
-
