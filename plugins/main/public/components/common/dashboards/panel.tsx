@@ -86,7 +86,9 @@ export const createPanel = ({
         value: '',
       });
       const [, setCurrentSelectedFilter] = useState();
-      const [selectedPanelFilter, setSelectedPanelFilter] = useState<{ [key: string]: any }[]>([]);
+      const [selectedPanelFilter, setSelectedPanelFilter] = useState<
+        { [key: string]: any }[]
+      >([]);
       const filterDrillDownValue = value => {
         setDrillDownValue(value);
       };
@@ -99,12 +101,13 @@ export const createPanel = ({
         const { field, value } = selectedFilter;
         const controlledByFilter = 'office-panel-row-filter';
         if (value) {
-          const filter: { [key: string]: any } = dataSourceFilterManager?.createFilter(
-            FILTER_OPERATOR.IS_ONE_OF,
-            field,
-            [value],
-            controlledByFilter,
-          );
+          const filter: { [key: string]: any } =
+            dataSourceFilterManager?.createFilter(
+              FILTER_OPERATOR.IS_ONE_OF,
+              field,
+              [value],
+              controlledByFilter,
+            );
           // this hide the remove filter button in the filter bar
           setSelectedPanelFilter([filter]);
         } else {

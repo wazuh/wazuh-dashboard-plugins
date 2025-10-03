@@ -6,10 +6,7 @@ import {
 } from '@elastic/eui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { SearchResponse } from '@opensearch-project/opensearch/api/types';
-import {
-  parseData,
-  parseColumns,
-} from './data-grid-service';
+import { parseData, parseColumns } from './data-grid-service';
 import {
   Filter,
   IndexPattern,
