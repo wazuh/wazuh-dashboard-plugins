@@ -46,18 +46,50 @@ In general, the environment consist of:
 
     The more resources the better ☺
 
-5.  Save the path to the Wazuh App code as an environment variable, by exporting
-    this path on your `.bashrc`, `.zhsrc` or similar.
+5.  Save the paths to your plugin repositories as environment variables, so you can reference them easily when running the scripts.
+
+        Our development workflow consists of a hybrid model: this repository contains some plugins (currently `main`, `wazuh-core`, `wazuh-check-updates`) while other plugins live in independent external Git repositories (e.g. `wazuh-dashboard-reporting`, `wazuh-security-dashboards-plugin`, etc.). The Docker helper scripts therefore support BOTH layouts:
+
+        - Single checkout (all plugins under one root folder)
+        - Multiple separate checkouts (each plugin cloned in its own folder anywhere in your filesystem)
+
+    You can tell the scripts where your repositories are in two ways:
+
+    1. Provide a base path ( `<default_repo_root>` argument ) so the script auto-detects INTERNAL repositories (`main`, `wazuh-core`, `wazuh-check-updates`) under `<base>`, `<base>/plugins`, or `<base>/<repo>`. If you omit a base path it will attempt to infer it (two levels up) when running from inside this repo.
+    2. Use one or more `-r <repo>=<absolute_path>` flags ONLY for EXTERNAL plugin repositories that are not part of this repository. Internal plugins do NOT require `-r` and will be picked up automatically.
+
+    Supported internal repository keys today: `main`, `wazuh-core`, `wazuh-check-updates`. External repositories you pass with `-r` will be dynamically mounted into the `osd` container via an auto-generated `dev.override.generated.yml` compose file (ignored by git). Adding a new internal repo requires extending the script.
+
+        Quick example (adding an external plugin):
+        ```bash
+        ./dev.sh -o 2.11.0 -d 2.11.0 \
+            -r wazuh-dashboard-reporting=$WZ_REPORTING up
+        ```
+
+    If you omit `<default_repo_root>` you no longer need to pass `-r` for the internal repos when you execute the script from this repository (auto-detection will infer the root). You only use `-r` for external plugins. If you pass `<default_repo_root>` you can still override one or more specific external paths with `-r`.
+
+        (Note: The model is hybrid: some plugins live here and others will always be in separate repositories. For external ones use `-r repo_name=/absolute/path`.)
+
+    For a single checkout that contains all plugins:
 
     ```bash
     # ./bashrc
-    export WZ_HOME=~/your/path/to/wazuh_kibana_app/plugins
+    export WZ_HOME=~/path/to/wazuh-dashboard-plugins/plugins
     ```
 
-    Save and re-login or restart your terminal to apply the changes. Test that the variable has been set with:
+    If you keep external plugins in separate repositories, export helpers for them so invoking `-r` is easy:
+
+    ```bash
+    export WZ_REPORTING=~/path/to/wazuh-dashboard-reporting
+    export WZ_SECURITY=~/path/to/wazuh-security-dashboards-plugin
+    ```
+
+    Save and re-login or restart your terminal to apply the changes. Test that the variables have been set with:
 
     ```bash
     echo $WZ_HOME
+    echo $WZ_REPORTING
+    echo $WZ_SECURITY
     ```
 
 6.  Set up user permissions
@@ -69,7 +101,7 @@ In general, the environment consist of:
     ```bash
     sudo groupadd -g 100999 docker-desktop
     sudo useradd -u 100999 -g 100999 -M docker-desktop
-    sudo chown -R $USER:docker-desktop $WZ_HOME
+    sudo chown -R $USER:docker-desktop $WZ_HOME  # or each individual repository path
     sudo usermod -aG docker-desktop $USER
     ```
 
@@ -101,12 +133,35 @@ Before starting the environment, check that the plugin is in the desired branch
 
 Example:
 
-This brings up a Dev environment for OpenSearch `1.2.4` and opensearch-dashboards
-`1.2.0`, with the `wazuh-dashboard-plugins` development branch set up at
-`$WZ_HOME`:
+> This brings up a Dev environment for OpenSearch `1.2.4` and opensearch-dashboards `1.2.0`, with the `wazuh-dashboard-plugins` development branch set up at `$WZ_HOME`
+
+Multi-repository (external plugins mounted via `-r`):
 
 ```bash
-./dev.sh 1.2.4 1.2.0 $WZ_HOME up
+./dev.sh -o 1.2.4 -d 1.2.0 \
+    -r wazuh-dashboard-reporting=$WZ_REPORTING \
+    -r wazuh-security-dashboards-plugin=$WZ_SECURITY up
+```
+
+Only external repositories (recommended minimal form when running inside this repo):
+
+```bash
+# Example adding two hypothetical external plugins
+./dev.sh -o 1.2.4 -d 1.2.0 \
+    -r wazuh-dashboard-reporting=$WZ_REPORTING \
+    -r wazuh-security-dashboards-plugin=$WZ_SECURITY up
+```
+
+Single checkout (auto-detect internal plugins under a common root):
+
+```bash
+./dev.sh -o 1.2.4 -d 1.2.0 $WZ_HOME up
+```
+
+Auto-detection (inside repo, omitting root and flags for internal plugins):
+
+```bash
+./dev.sh -o 1.2.4 -d 1.2.0 up
 ```
 
 Once the containers are up, **attach a shell to the development container**,
@@ -146,7 +201,7 @@ docker compose up -d
 cd ..
 ```
 
-To setup the crendentials (**this only has to be done once**):
+To setup the credentials (**this only has to be done once**):
 
 1. Login to Quay.io and navigate to User Settings.
 2. Click on `CLI Password: Generate Encrypted Password`
@@ -157,7 +212,7 @@ To build an image, use the docker build command like:
 Use the `--build-arg` flag to specify the version of Node and the version of
 the platform. The version of Node to use is defined in the `.nvmrc` file. Use
 the Node version defined in that file for the target platform version, as the
-version of Node might be increased between platfform's versions.
+version of Node might be increased between platform's versions.
 
 For example, to build the image for OpenSearch Dashboards `2.6.0`:
 

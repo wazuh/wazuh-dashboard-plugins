@@ -1,0 +1,11 @@
+{
+  "name": "osd-dev-scripts",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Wazuh Dashboard dev helper scripts",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "dependencies": {
+    "chalk": "^4.1.2"
+  }
+}
