@@ -285,6 +285,10 @@ export async function mainWithDeps(
   // Profiles
   const profiles = new Set<string>([primaryProfile]);
   if (config.useDashboardFromSource) profiles.add(DASHBOARD_SRC_PROFILE);
+  // If SAML flag is enabled with another primary profile, include the SAML profile too
+  if ((config.enableSaml || config.mode === 'saml') && primaryProfile !== 'saml') {
+    profiles.add('saml');
+  }
 
   const defaultRunner = { execSync, spawn };
   const code = await runDockerCompose(
@@ -300,7 +304,7 @@ export async function mainWithDeps(
   }
 
   if (
-    config.mode === 'server' &&
+    (config.mode === 'server' || Boolean(config.serverFlagVersion)) &&
     (config.action === 'up' || config.action === 'start')
   ) {
     printAgentEnrollmentHint(deps.logger);

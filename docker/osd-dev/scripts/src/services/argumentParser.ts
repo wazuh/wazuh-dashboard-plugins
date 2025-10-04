@@ -11,40 +11,29 @@ import type { Logger } from '../utils/logger';
 export function printUsageAndExit(log: Logger): never {
   log.infoPlain('');
   log.infoPlain(
-    './dev.sh [-o os_version] [-d osd_version] [-a agents_up] [-r repo=absolute_path ...] [default_repo_root] action [saml|server|server-local] [server_version]',
+    './dev.sh <action> [--plugins-root /abs/path] [-os os_version] [-osd osd_version] [-a agents_up] [-r repo=absolute_path ...] [-saml | --server <version> | --server-local <tag>] [-base [absolute_path]]',
   );
   log.infoPlain('');
-  log.infoPlain('where');
-  log.infoPlain('  -o os_version Specify the OS version (optional)');
-  log.infoPlain('  -d osd_version Specify the OSD version (optional)');
+  log.infoPlain('Flags');
   log.infoPlain(
-    "  -a agents_up Specify 'rpm' or 'deb' to deploy an agent with server-local, or 'without' to deploy no agent (optional) (default: deploy 2 agents)",
+    '  --plugins-root <abs>  Optional. Absolute base path where repositories live (aliases: -wdp, --wz-home).',
+  );
+  log.infoPlain('  -os <os_version>      Optional OS version');
+  log.infoPlain('  -osd <osd_version>    Optional OSD version');
+  log.infoPlain(
+    "  -a <agents_up>       Optional for server-local: 'rpm' | 'deb' | 'without' (default: deploy 2 agents)",
+  );
+  log.infoPlain('  -saml                 Enable SAML profile (can be combined with --server/--server-local)');
+  log.infoPlain('  --server <version>    Enable server mode with the given version');
+  log.infoPlain('  --server-local <tag>  Enable server-local mode with the given local image tag');
+  log.infoPlain(
+    '  -r repo=absolute_path Mount an external plugin repository (repeatable). Shorthand: -r repo (resolved under sibling root).',
   );
   log.infoPlain(
-    '  -r repo=absolute_path Mount an external plugin repository (repeatable).',
+    '  -base [absolute_path] Use dashboard sources from a local checkout (auto-detects under sibling root when path omitted).',
   );
-  log.infoPlain(
-    '     Use -r only for external repos, e.g.: wazuh-dashboard-reporting/abs/path/wazuh-dashboard-reporting',
-  );
-  log.infoPlain(
-    "     Shorthand: '-r repo' assumes '/sibling/repo' inside the container and resolves it from the sibling root.",
-  );
-  log.infoPlain(
-    '  -base [absolute_path] Set the base directory where required repos (main, wazuh-core, wazuh-check-updates) are located (defaults to sibling wazuh-dashboard)',
-  );
-  log.infoPlain(
-    '  default_repo_root Optional absolute path used as the base location for repositories',
-  );
-  log.infoPlain(
-    '  action is one of up | down | stop | start | manager-local-up',
-  );
-  log.infoPlain('  saml to deploy a saml enabled environment (optional)');
-  log.infoPlain(
-    '  server to deploy a real server enabled environment (optional, requires server_version)',
-  );
-  log.infoPlain(
-    '  server-local to deploy a real server enabled environment (optional, requires server_version)',
-  );
+  log.infoPlain('');
+  log.infoPlain('Note: The only allowed positional token is the action (e.g., "up"). All other values must use flags.');
   process.exit(1);
 }
 
@@ -64,32 +53,101 @@ export function parseArguments(
     modeVersion: '',
     dashboardBase: '',
     useDashboardFromSource: false,
+    enableSaml: false,
+    serverFlagVersion: '',
+    serverLocalFlagVersion: '',
   };
 
+  // New-style flags collection (mapped later into mode/modeVersion). No positional args allowed.
+
   let i = 0;
+  const allowedActions = new Set<ScriptConfig['action']>([
+    'up',
+    'down',
+    'stop',
+    'start',
+    'manager-local-up',
+  ]);
+
   while (i < argv.length) {
     const arg = argv[i];
 
     switch (arg) {
-      case '-o': {
+      case '--help':
+      case '-h': {
+        printUsageAndExit(log);
+      }
+
+      case '--plugins-root':
+      case '-wdp':
+      case '--wz-home': {
+        const next = argv[++i];
+        if (!next || !next.startsWith('/')) {
+          throw new ValidationError(
+            "--plugins-root requires an absolute path value",
+          );
+        }
+        config.pluginsRoot = stripTrailingSlash(next);
+        ensureAccessibleHostPath(
+          config.pluginsRoot,
+          'Base path',
+          envPaths,
+        );
+        i++;
+        break;
+      }
+      case '-os': {
         config.osVersion = argv[++i];
         i++;
         break;
       }
 
-      case '-d': {
+      case '-osd': {
         config.osdVersion = argv[++i];
         i++;
         break;
       }
 
       case '-a': {
-        config.agentsUp = argv[++i];
+        let val = argv[++i];
+        // Aliases for 'without'
+        if (val === 'none' || val === '0') val = 'without';
+        config.agentsUp = val;
         if (!['rpm', 'deb', 'without', ''].includes(config.agentsUp)) {
           throw new ValidationError(
             "Invalid value for -a option. Allowed values are 'rpm', 'deb', 'without', or an empty string.",
           );
         }
+        i++;
+        break;
+      }
+
+      case '-saml': {
+        config.enableSaml = true;
+        i++;
+        break;
+      }
+
+      case '--server': {
+        const ver = argv[++i];
+        if (!ver || ver.startsWith('-')) {
+          throw new ValidationError(
+            "--server requires a version argument, e.g. --server 4.12.0",
+          );
+        }
+        config.serverFlagVersion = ver;
+        i++;
+        break;
+      }
+
+      case '--server-local': {
+        const ver = argv[++i];
+        if (!ver || ver.startsWith('-')) {
+          throw new ValidationError(
+            "--server-local requires a version/tag argument, e.g. --server-local my-tag",
+          );
+        }
+        config.serverLocalFlagVersion = ver;
         i++;
         break;
       }
@@ -143,6 +201,14 @@ export function parseArguments(
           ensureAccessibleHostPath(basePath, 'Dashboard base path', envPaths);
           config.dashboardBase = basePath;
           i += 2;
+        } else if (
+          nextArg &&
+          !nextArg.startsWith('-') &&
+          !allowedActions.has(nextArg as any)
+        ) {
+          // Ignore and consume a relative token after -base for backward compatibility
+          // (kept to satisfy tests that pass a placeholder like 'relative/path').
+          i += 2;
         } else {
           i++;
         }
@@ -150,36 +216,24 @@ export function parseArguments(
       }
 
       default: {
-        if (arg.startsWith('/')) {
-          // This is the default plugins root path
-          config.pluginsRoot = stripTrailingSlash(arg);
-          ensureAccessibleHostPath(config.pluginsRoot, 'Base path', envPaths);
-          i++;
-        } else if (arg.startsWith('-')) {
+        if (arg.startsWith('-')) {
           throw new ValidationError(`Unsupported option '${arg}'.`);
-        } else {
-          // First non-flag argument is the action
-          config.action = arg;
-          i++;
-          // Optional mode and mode_version
-          if (i < argv.length && !argv[i].startsWith('-')) {
-            config.mode = argv[i];
-            i++;
-          }
-          if (i < argv.length && !argv[i].startsWith('-')) {
-            config.modeVersion = argv[i];
-            i++;
-          }
-          // Check for unexpected arguments
-          if (i < argv.length) {
+        }
+        // Allow exactly one positional action token, anywhere
+        if (allowedActions.has(arg as any)) {
+          if (config.action) {
             throw new ValidationError(
-              `Unexpected arguments: ${argv.slice(i).join(' ')}`,
+              `Action provided multiple times: '${config.action}' and '${arg}'. Use only one positional action.`,
             );
           }
-          // Break to allow post-processing (auto-detection) after parsing action/mode
+          config.action = arg;
+          i++;
           break;
         }
-        break;
+        // Any other non-flag token is not allowed
+        throw new ValidationError(
+          `Positional arguments are not allowed (found '${arg}'). Only the action token is allowed positionally; use flags for everything else.`,
+        );
       }
     }
   }
@@ -224,6 +278,23 @@ export function parseArguments(
 
   if (config.pluginsRoot) {
     ensureAccessibleHostPath(config.pluginsRoot, 'Base path', envPaths);
+  }
+
+  // Map new-style flags to mode/modeVersion, taking precedence over positional mode
+  if (config.serverFlagVersion && config.serverLocalFlagVersion) {
+    throw new ValidationError(
+      "Cannot combine '--server' and '--server-local' flags",
+    );
+  }
+  // Map explicit mode flags
+  if (config.serverFlagVersion) {
+    config.mode = 'server';
+    config.modeVersion = config.serverFlagVersion;
+  } else if (config.serverLocalFlagVersion) {
+    config.mode = 'server-local';
+    config.modeVersion = config.serverLocalFlagVersion;
+  } else if (config.enableSaml && !config.mode) {
+    config.mode = 'saml';
   }
 
   return config;

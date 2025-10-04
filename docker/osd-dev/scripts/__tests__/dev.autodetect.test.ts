@@ -22,7 +22,7 @@ const getPluginPlatformVersion = (baseRoot: string) => {
   return (pkg?.pluginPlatform?.version as string) || '';
 };
 
-describe('dev.ts - Auto-detection without flags', () => {
+describe('dev.ts - Auto-detection (flags only)', () => {
   let tmpdir: string;
   let saved!: SavedProcessState;
 

@@ -20,6 +20,10 @@ export interface ScriptConfig {
   modeVersion: string;
   dashboardBase: string;
   useDashboardFromSource: boolean;
+  // Flags-based combination support (preferred over positional mode)
+  enableSaml: boolean;
+  serverFlagVersion: string; // from --server <version>
+  serverLocalFlagVersion: string; // from --server-local <tag>
 }
 
 export interface GenerateOverrideOptions {

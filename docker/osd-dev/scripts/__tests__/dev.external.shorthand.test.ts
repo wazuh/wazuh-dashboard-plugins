@@ -40,7 +40,10 @@ describe('dev.ts - Shorthand -r <name> resolves under sibling', () => {
       '{"name":"wazuh-dashboard-reporting"}',
     );
 
-    await mainWithDeps(['-r', name, 'up'], { logger, processRunner: runner });
+    await mainWithDeps(['-r', name, 'up'], {
+      logger,
+      processRunner: runner,
+    });
     await new Promise(r => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');

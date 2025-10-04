@@ -52,6 +52,9 @@ describe('services/environmentConfigurator', () => {
       modeVersion: '',
       dashboardBase: '',
       useDashboardFromSource: false,
+      enableSaml: false,
+      serverFlagVersion: '',
+      serverLocalFlagVersion: '',
     };
     initializeBaseEnvironment(cfg);
     expect(process.env.PASSWORD).toBeDefined();
@@ -87,6 +90,9 @@ describe('services/environmentConfigurator', () => {
       modeVersion: '',
       dashboardBase: '',
       useDashboardFromSource: false,
+      enableSaml: false,
+      serverFlagVersion: '',
+      serverLocalFlagVersion: '',
     };
 
     it('returns standard profile by default and sets security paths', () => {

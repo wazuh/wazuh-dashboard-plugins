@@ -44,21 +44,46 @@ dev.sh → docker compose (dev-ts.yml) → dev.ts → docker compose (dev.yml)
 
 ## Usage
 
-The `dev.sh` wrapper remains the entry point, so existing commands work unchanged:
+The `dev.sh` wrapper remains the entry point. The action is positional; everything else must be provided via flags.
 
 ```bash
-# Same usage as before
-./dev.sh [-o os_version] [-d osd_version] [-a agents_up] [-r repo[=absolute_path] ...] [default_repo_root] action [mode] [version]
+./dev.sh <action> \
+  [--plugins-root /abs/path]  # aliases: -wdp, --wz-home \
+  [-os <os_version>] [-osd <osd_version>] \
+  [-a <rpm|deb|without>]  # aliases: none, 0 \
+  [-r <repo>=</absolute/path> ...] \
+  [-saml | --server <version> | --server-local <tag>] \
+  [-base [</absolute/path>]]
 ```
 
 Examples:
 
 ```bash
+# Standard environment
 ./dev.sh up
-./dev.sh -o 2.11.0 -d 2.11.0 up
-./dev.sh -r wazuh-dashboard-reporting=/path/to/repo up
-./dev.sh -r wazuh-dashboard-reporting up   # shorthand: resolves /sibling/wazuh-dashboard-reporting
+
+# With specific OS/OSD versions
+./dev.sh up -os 2.11.0 -osd 2.11.0
+
+# External plugins (repeat -r)
+./dev.sh up -r wazuh-dashboard-reporting=/path/to/repo
+./dev.sh up -r wazuh-dashboard-reporting   # shorthand: resolves /sibling/wazuh-dashboard-reporting
+
+# Bring down everything
 ./dev.sh down
+
+# SAML mode
+./dev.sh up -saml
+
+# Server mode
+./dev.sh up --server 4.12.0
+
+# Server-local (agents from local packages)
+./dev.sh up --server-local my-custom-tag -a rpm
+
+# SAML + Server (flags only)
+./dev.sh up -saml --server 4.12.0
+./dev.sh up -saml --server-local my-custom-tag
 ```
 
 ## Development

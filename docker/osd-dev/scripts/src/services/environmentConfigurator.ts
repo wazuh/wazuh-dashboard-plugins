@@ -56,52 +56,52 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
       ? '/usr/share/opensearch/config/opensearch-security'
       : '/usr/share/opensearch/plugins/opensearch-security/securityconfig';
 
-  if (!config.mode) return primaryProfile;
+  const enableSaml = Boolean(config.enableSaml) || config.mode === 'saml';
 
-  switch (config.mode) {
-    case 'saml': {
-      try {
-        const hostsContent = readFileSync('/etc/hosts', 'utf-8');
-        if (!hostsContent.includes('idp')) {
-          throw new ConfigurationError('Add idp to /etc/hosts');
-        }
-      } catch {
-        throw new PathAccessError('Cannot read /etc/hosts');
+  if (enableSaml) {
+    try {
+      const hostsContent = readFileSync('/etc/hosts', 'utf-8');
+      if (!hostsContent.includes('idp')) {
+        throw new ConfigurationError('Add idp to /etc/hosts');
       }
-
-      primaryProfile = 'saml';
-      process.env.WAZUH_DASHBOARD_CONF = `./config/${osdMajor}/osd/opensearch_dashboards_saml.yml`;
-      process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config-saml.yml`;
-      return primaryProfile;
+    } catch {
+      throw new PathAccessError('Cannot read /etc/hosts');
     }
-
-    case 'server': {
-      if (!config.modeVersion) {
-        throw new ValidationError(
-          'server mode requires the server_version argument',
-        );
-      }
-      primaryProfile = 'server';
-      process.env.WAZUH_STACK = config.modeVersion;
-      return primaryProfile;
-    }
-
-    case 'server-local': {
-      if (!config.modeVersion) {
-        throw new ValidationError(
-          'server-local mode requires the server_version argument',
-        );
-      }
-      if (config.agentsUp) {
-        primaryProfile = `server-local-${config.agentsUp}`;
-      } else {
-        primaryProfile = 'server-local';
-      }
-      process.env.IMAGE_TAG = config.modeVersion;
-      return primaryProfile;
-    }
-
-    default:
-      throw new ValidationError(`Unsupported mode '${config.mode}'`);
+    process.env.WAZUH_DASHBOARD_CONF = `./config/${osdMajor}/osd/opensearch_dashboards_saml.yml`;
+    process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config-saml.yml`;
   }
+
+  // Determine primary profile based on explicit server/server-local first (flags take precedence via parser)
+  // Reject direct server-local-* composite modes; users must set -a together with --server-local
+  if (/^server-local-/.test(config.mode)) {
+    throw new ValidationError(
+      "Unsupported mode token. Use '--server-local <tag>' with '-a <rpm|deb|without>' instead of direct 'server-local-*' modes.",
+    );
+  }
+
+  if (config.mode === 'server') {
+    if (!config.modeVersion) {
+      throw new ValidationError(
+        'server mode requires the server_version argument',
+      );
+    }
+    process.env.WAZUH_STACK = config.modeVersion;
+    return 'server';
+  }
+
+  if (config.mode === 'server-local') {
+    if (!config.modeVersion) {
+      throw new ValidationError(
+        'server-local mode requires the server_version argument',
+      );
+    }
+    process.env.IMAGE_TAG = config.modeVersion;
+    return config.agentsUp ? `server-local-${config.agentsUp}` : 'server-local';
+  }
+
+  if (config.mode === 'saml') {
+    return 'saml';
+  }
+
+  return primaryProfile;
 }

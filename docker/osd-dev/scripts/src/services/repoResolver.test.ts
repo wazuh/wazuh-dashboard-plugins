@@ -25,6 +25,9 @@ describe('services/repoResolver', () => {
     modeVersion: '',
     dashboardBase: '',
     useDashboardFromSource: false,
+    enableSaml: false,
+    serverFlagVersion: '',
+    serverLocalFlagVersion: '',
   };
 
   beforeEach(() => {

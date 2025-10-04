@@ -72,14 +72,14 @@ describe('services/argumentParser', () => {
     it('parses flags and action/mode/modeVersion correctly', () => {
       const cfg = parseArguments(
         [
-          '-o',
+          '-os',
           '2.9.0',
-          '-d',
+          '-osd',
           '2.9.0',
           '-a',
           'rpm',
           'up',
-          'server-local',
+          '--server-local',
           '4.12.0',
         ],
         envPaths,
@@ -137,7 +137,11 @@ describe('services/argumentParser', () => {
       );
       fs.mkdirSync(dashHost, { recursive: true });
       fs.mkdirSync(dashContainer, { recursive: true });
-      const cfg = parseArguments(['-base', 'relative/path'], envPaths, logger);
+      const cfg = parseArguments(
+        ['-base', 'relative/path', 'up'],
+        envPaths,
+        logger,
+      );
       expect(cfg.useDashboardFromSource).toBe(true);
       expect(cfg.dashboardBase).toBe(dashHost);
     });
