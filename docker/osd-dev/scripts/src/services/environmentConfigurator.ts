@@ -101,19 +101,6 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
       return primaryProfile;
     }
 
-    case 'server-local-rpm':
-    case 'server-local-deb':
-    case 'server-local-without': {
-      if (!config.modeVersion) {
-        throw new ValidationError(
-          `${config.mode} mode requires the server_version argument`,
-        );
-      }
-      primaryProfile = config.mode;
-      process.env.IMAGE_TAG = config.modeVersion;
-      return primaryProfile;
-    }
-
     default:
       throw new ValidationError(`Unsupported mode '${config.mode}'`);
   }

@@ -131,7 +131,7 @@ describe('services/environmentConfigurator', () => {
       expect(process.env.WAZUH_STACK).toBe('4.12.0');
     });
 
-    it('server-local variants set IMAGE_TAG and profile', () => {
+    it('server-local variants set IMAGE_TAG and profile (via -a)', () => {
       const p1 = configureModeAndSecurity({
         ...baseCfg,
         mode: 'server-local',
@@ -143,10 +143,21 @@ describe('services/environmentConfigurator', () => {
 
       const p2 = configureModeAndSecurity({
         ...baseCfg,
-        mode: 'server-local-without',
+        mode: 'server-local',
         modeVersion: '4.12.0',
+        agentsUp: 'without',
       });
       expect(p2).toBe('server-local-without');
+    });
+
+    it('rejects direct server-local-* modes as unsupported', () => {
+      expect(() =>
+        configureModeAndSecurity({
+          ...baseCfg,
+          mode: 'server-local-without',
+          modeVersion: '4.12.0',
+        }),
+      ).toThrow(ValidationError);
     });
   });
 });
