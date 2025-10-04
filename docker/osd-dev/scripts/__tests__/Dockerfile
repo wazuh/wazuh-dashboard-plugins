@@ -16,7 +16,10 @@ RUN npm install --no-audit --no-fund \
       jest \
       ts-jest \
       typescript \
-      @types/jest
+      @types/jest \
+      babel-jest \
+      @babel/core \
+      @babel/preset-env
 
 # Make jest binaries available in PATH and modules resolvable
 ENV PATH=/opt/scripts-tests/node_modules/.bin:$PATH

@@ -16,5 +16,12 @@ module.exports = {
         tsconfig: path.resolve(testsRoot, 'tsconfig.json'),
       },
     ],
+    '^.+\\.[cm]?js$': [
+      'babel-jest',
+      {
+        rootMode: 'root',
+      },
+    ],
   },
+  transformIgnorePatterns: ['node_modules/(?!(chalk)/)'],
 };
