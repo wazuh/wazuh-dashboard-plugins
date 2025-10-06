@@ -5,7 +5,7 @@ import { resolve } from 'path';
 import {
   OVERRIDE_COMPOSE_FILE,
   REQUIRED_REPOSITORIES,
-  SECURITY_PLUGIN_ALIASES,
+  SECURITY_PLUGIN_NAME,
   PROFILES,
   DEV_COMPOSE_FILE,
   ACTIONS,
@@ -86,8 +86,8 @@ function resolveSecurityPluginPath(
   envPaths: EnvironmentPaths,
 ): string {
   // 1) Respect explicit -r override if provided
-  const securityOverride = config.userRepositories.find(o =>
-    SECURITY_PLUGIN_ALIASES.includes(o.name as any),
+  const securityOverride = config.userRepositories.find(
+    o => o.name === SECURITY_PLUGIN_NAME,
   );
   if (securityOverride) {
     const normalized = stripTrailingSlash(securityOverride.path);
@@ -107,29 +107,16 @@ function resolveSecurityPluginPath(
   // 2) Search common locations
   const candidates: string[] = [];
   if (config.pluginsRoot) {
-    candidates.push(resolve(config.pluginsRoot, 'wazuh-security-dashboards'));
-    candidates.push(
-      resolve(config.pluginsRoot, 'wazuh-security-dashboards-plugin'),
-    );
+    candidates.push(resolve(config.pluginsRoot, SECURITY_PLUGIN_NAME));
   }
   if (config.dashboardBase) {
     candidates.push(
-      resolve(config.dashboardBase, 'plugins', 'wazuh-security-dashboards'),
-    );
-    candidates.push(
-      resolve(
-        config.dashboardBase,
-        'plugins',
-        'wazuh-security-dashboards-plugin',
-      ),
+      resolve(config.dashboardBase, 'plugins', SECURITY_PLUGIN_NAME),
     );
   }
   if (envPaths.siblingRepoHostRoot) {
     candidates.push(
-      resolve(envPaths.siblingRepoHostRoot, 'wazuh-security-dashboards'),
-    );
-    candidates.push(
-      resolve(envPaths.siblingRepoHostRoot, 'wazuh-security-dashboards-plugin'),
+      resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_NAME),
     );
   }
 
@@ -241,7 +228,7 @@ export async function mainWithDeps(
     );
     const isSecurityPlugin =
       config.useDashboardFromSource &&
-      SECURITY_PLUGIN_ALIASES.includes(override.name as any);
+      override.name === SECURITY_PLUGIN_NAME;
 
     if (isRequired || isSecurityPlugin) {
       ensureAccessibleHostPath(

@@ -9,11 +9,8 @@ export const REQUIRED_REPOSITORIES = [
   'wazuh-check-updates',
 ] as const;
 
-/** Accepted aliases for the security plugin repository. */
-export const SECURITY_PLUGIN_ALIASES = [
-  'wazuh-security-dashboards',
-  'wazuh-security-dashboards-plugin',
-] as const;
+/** Canonical repository name for the security plugin. */
+export const SECURITY_PLUGIN_NAME = 'wazuh-security-dashboards' as const;
 
 /** Name of the Docker Compose profile that enables dashboard-from-source. */
 export const PROFILES = {
