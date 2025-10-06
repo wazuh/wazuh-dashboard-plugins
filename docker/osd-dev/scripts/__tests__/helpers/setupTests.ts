@@ -28,7 +28,7 @@ export function restoreProcessState(state: SavedProcessState): void {
   } catch {}
 
   // Safer env reset: clear current keys, then restore snapshot
-  for (const k of Object.keys(process.env)) delete (process.env as any)[k];
+  for (const key of Object.keys(process.env)) delete (process.env as any)[key];
   Object.assign(process.env, state.env);
 
   process.argv = [...state.argv];

@@ -20,8 +20,8 @@ describe('services/versionService', () => {
     (readJsonFile as jest.Mock).mockReturnValue({
       pluginPlatform: { version: '2.9.1' },
     });
-    const v = getPlatformVersionFromPackageJson('OSD', envPaths);
-    expect(v).toBe('2.9.1');
+    const version = getPlatformVersionFromPackageJson('OSD', envPaths);
+    expect(version).toBe('2.9.1');
     expect(readJsonFile).toHaveBeenCalledWith(envPaths.packageJsonPath);
   });
 

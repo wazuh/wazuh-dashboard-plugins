@@ -120,12 +120,12 @@ describe('services/repoResolver', () => {
   it('resolveRequiredRepositories builds env map of names to paths', () => {
     // Prepare three repos under plugins
     const repos = ['main', 'wazuh-core', 'wazuh-check-updates'];
-    for (const r of repos) {
-      const host = path.join(hostRoot, 'plugins', r);
-      const cont = path.join(containerRoot, 'plugins', r);
+    for (const repo of repos) {
+      const host = path.join(hostRoot, 'plugins', repo);
+      const cont = path.join(containerRoot, 'plugins', repo);
       fs.mkdirSync(host, { recursive: true });
       fs.mkdirSync(cont, { recursive: true });
-      fs.writeFileSync(path.join(cont, 'package.json'), `{"name":"${r}"}`);
+      fs.writeFileSync(path.join(cont, 'package.json'), `{"name":"${repo}"}`);
     }
     const cfg: ScriptConfig = {
       ...baseConfig,

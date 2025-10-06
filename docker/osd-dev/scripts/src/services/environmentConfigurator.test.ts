@@ -133,22 +133,22 @@ describe('services/environmentConfigurator', () => {
     });
 
     it('server-local variants set IMAGE_TAG and profile (via -a)', () => {
-      const p1 = configureModeAndSecurity({
+      const serverLocalRpmProfile = configureModeAndSecurity({
         ...baseCfg,
         mode: 'server-local',
         modeVersion: '4.12.0',
         agentsUp: 'rpm',
       });
-      expect(p1).toBe('server-local-rpm');
+      expect(serverLocalRpmProfile).toBe('server-local-rpm');
       expect(process.env.IMAGE_TAG).toBe('4.12.0');
 
-      const p2 = configureModeAndSecurity({
+      const serverLocalWithoutProfile = configureModeAndSecurity({
         ...baseCfg,
         mode: 'server-local',
         modeVersion: '4.12.0',
         agentsUp: 'without',
       });
-      expect(p2).toBe('server-local-without');
+      expect(serverLocalWithoutProfile).toBe('server-local-without');
     });
 
     it('rejects direct server-local-* modes as unsupported', () => {
