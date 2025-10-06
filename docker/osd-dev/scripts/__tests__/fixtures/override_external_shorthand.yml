@@ -9,4 +9,3 @@ volumes:
       type: none
       o: bind
       device: ${hostPath}
-

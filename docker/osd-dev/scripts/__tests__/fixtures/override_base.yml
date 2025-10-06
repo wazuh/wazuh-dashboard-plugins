@@ -15,4 +15,3 @@ services:
       - '${SRC_DASHBOARD}:/home/node/kbn'
       - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards'
       - ./dashboard-src/entrypoint.sh:/entrypoint.sh:ro
-

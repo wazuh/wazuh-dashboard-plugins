@@ -23,4 +23,3 @@ volumes:
       type: none
       o: bind
       device: ${externalRepo}
-

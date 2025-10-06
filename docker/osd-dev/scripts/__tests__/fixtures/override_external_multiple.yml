@@ -16,4 +16,3 @@ volumes:
       type: none
       o: bind
       device: ${external2}
-

@@ -49,7 +49,8 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
   process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config.yml`;
   process.env.SEC_CONFIG_PATH = SECURITY_CONFIG_PATHS[OSD_MAJOR_2X];
 
-  const enableSaml = Boolean(config.enableSaml) || config.mode === PROFILES.SAML;
+  const enableSaml =
+    Boolean(config.enableSaml) || config.mode === PROFILES.SAML;
 
   if (enableSaml) {
     // Assume environment/network is preconfigured for SAML.

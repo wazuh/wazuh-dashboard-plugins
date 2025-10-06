@@ -317,7 +317,11 @@ describe('services/argumentParser (combinatorial)', () => {
         const baseHost = path.join(paths.hostRoot, 'dashboard');
         const baseContainer = path.join(paths.containerRoot, 'dashboard');
         fs.mkdirSync(baseContainer, { recursive: true });
-        const cfg = parseArguments(['--base', baseHost, 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['--base', baseHost, 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.useDashboardFromSource).toBe(true);
         expect(cfg.dashboardBase).toBe(baseHost);
       } finally {

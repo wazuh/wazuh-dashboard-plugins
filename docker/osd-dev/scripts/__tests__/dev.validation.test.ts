@@ -38,8 +38,9 @@ describe('dev.ts - Input validations', () => {
   test("'-os' without value is rejected", async () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
-    await expect(mainWithDeps(['-os', 'up'], { logger, processRunner: runner }))
-      .rejects.toThrow();
+    await expect(
+      mainWithDeps(['-os', 'up'], { logger, processRunner: runner }),
+    ).rejects.toThrow();
     expect(runner.spawnCalls.length).toBe(0);
   });
 

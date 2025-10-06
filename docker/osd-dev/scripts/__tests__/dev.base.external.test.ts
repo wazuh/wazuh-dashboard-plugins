@@ -66,10 +66,13 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     const runner = new StubRunner();
     const logSpy = jest.spyOn(logger, 'info');
 
-    await mainWithDeps(['--base', '-r', `external-test=${externalRepo}`, 'up'], {
-      logger,
-      processRunner: runner,
-    });
+    await mainWithDeps(
+      ['--base', '-r', `external-test=${externalRepo}`, 'up'],
+      {
+        logger,
+        processRunner: runner,
+      },
+    );
     await new Promise(r => setImmediate(r));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');

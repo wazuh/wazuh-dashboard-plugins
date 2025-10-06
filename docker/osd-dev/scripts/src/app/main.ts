@@ -227,8 +227,7 @@ export async function mainWithDeps(
       override.name,
     );
     const isSecurityPlugin =
-      config.useDashboardFromSource &&
-      override.name === SECURITY_PLUGIN_NAME;
+      config.useDashboardFromSource && override.name === SECURITY_PLUGIN_NAME;
 
     if (isRequired || isSecurityPlugin) {
       ensureAccessibleHostPath(
