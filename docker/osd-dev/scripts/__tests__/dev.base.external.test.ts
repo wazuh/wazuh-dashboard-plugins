@@ -66,7 +66,7 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     const runner = new StubRunner();
     const logSpy = jest.spyOn(logger, 'info');
 
-    await mainWithDeps(['-base', '-r', `external-test=${externalRepo}`, 'up'], {
+    await mainWithDeps(['--base', '-r', `external-test=${externalRepo}`, 'up'], {
       logger,
       processRunner: runner,
     });

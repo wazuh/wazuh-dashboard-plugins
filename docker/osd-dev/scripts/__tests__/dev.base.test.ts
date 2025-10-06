@@ -20,7 +20,7 @@ import {
   repoRoot,
 } from './helpers/setupTests';
 
-describe('dev.ts - Base startup with auto-detection (-base)', () => {
+describe('dev.ts - Base startup with auto-detection (--base)', () => {
   let tmpdir: string;
   let siblingRoot: string;
   let dashboardBase: string;
@@ -65,8 +65,8 @@ describe('dev.ts - Base startup with auto-detection (-base)', () => {
     const runner = new StubRunner();
     const logSpy = jest.spyOn(logger, 'info');
 
-    // Run up with -base auto-detection (no path provided)
-    await mainWithDeps(['-base', 'up'], { logger, processRunner: runner });
+    // Run up with --base auto-detection (no path provided)
+    await mainWithDeps(['--base', 'up'], { logger, processRunner: runner });
     await new Promise(r => setImmediate(r));
 
     // Validations

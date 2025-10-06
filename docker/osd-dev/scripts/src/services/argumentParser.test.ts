@@ -108,7 +108,7 @@ describe('services/argumentParser', () => {
       );
     });
 
-    it('auto-detects -base when no path provided and sibling root available', () => {
+    it('auto-detects --base when no path provided and sibling root available', () => {
       // Provide wazuh-dashboard at sibling root for auto-detection
       const dashHost = path.join(
         envPaths.siblingRepoHostRoot,
@@ -120,12 +120,12 @@ describe('services/argumentParser', () => {
       );
       fs.mkdirSync(dashHost, { recursive: true });
       fs.mkdirSync(dashContainer, { recursive: true });
-      const cfg = parseArguments(['-base', 'up'], envPaths, logger);
+      const cfg = parseArguments(['--base', 'up'], envPaths, logger);
       expect(cfg.useDashboardFromSource).toBe(true);
       expect(cfg.dashboardBase).toBe(dashHost);
     });
 
-    it('ignores relative value after -base and auto-detects from sibling root', () => {
+    it('ignores relative value after --base and auto-detects from sibling root', () => {
       // Prepare sibling wazuh-dashboard so auto-detection succeeds
       const dashHost = path.join(
         envPaths.siblingRepoHostRoot,
@@ -138,7 +138,7 @@ describe('services/argumentParser', () => {
       fs.mkdirSync(dashHost, { recursive: true });
       fs.mkdirSync(dashContainer, { recursive: true });
       const cfg = parseArguments(
-        ['-base', 'relative/path', 'up'],
+        ['--base', 'relative/path', 'up'],
         envPaths,
         logger,
       );
@@ -146,13 +146,19 @@ describe('services/argumentParser', () => {
       expect(cfg.dashboardBase).toBe(dashHost);
     });
 
-    it('throws ConfigurationError when -base cannot be inferred', () => {
+    it('throws ConfigurationError when --base cannot be inferred', () => {
       const noSibling: EnvironmentPaths = {
         ...envPaths,
         siblingRepoHostRoot: '',
       };
-      expect(() => parseArguments(['-base', 'up'], noSibling, logger)).toThrow(
+      expect(() => parseArguments(['--base', 'up'], noSibling, logger)).toThrow(
         ConfigurationError,
+      );
+    });
+
+    it('rejects -base alias as unsupported', () => {
+      expect(() => parseArguments(['-base', 'up'], envPaths, logger)).toThrow(
+        ValidationError,
       );
     });
   });

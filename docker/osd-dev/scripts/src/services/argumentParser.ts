@@ -12,7 +12,7 @@ import type { Logger } from '../utils/logger';
 export function printUsageAndExit(log: Logger): never {
   log.infoPlain('');
   log.infoPlain(
-    './dev.sh <action> [--plugins-root /abs/path] [-os os_version] [-osd osd_version] [-a agents_up] [-r repo=absolute_path ...] [-saml | --server <version> | --server-local <tag>] [-base [absolute_path]]',
+    './dev.sh <action> [--plugins-root /abs/path] [-os os_version] [-osd osd_version] [-a agents_up] [-r repo=absolute_path ...] [-saml | --server <version> | --server-local <tag>] [--base [absolute_path]]',
   );
   log.infoPlain('');
   log.infoPlain('Flags');
@@ -37,7 +37,7 @@ export function printUsageAndExit(log: Logger): never {
     '  -r repo=absolute_path Mount an external plugin repository (repeatable). Shorthand: -r repo (resolved under sibling root).',
   );
   log.infoPlain(
-    '  -base [absolute_path] Use dashboard sources from a local checkout (auto-detects under sibling root when path omitted).',
+    '  --base [absolute_path] Use dashboard sources from a local checkout (auto-detects under sibling root when path omitted).',
   );
   log.infoPlain('');
   log.infoPlain(
@@ -202,7 +202,6 @@ export function parseArguments(
         break;
       }
 
-      case '-base':
       case '--base': {
         config.useDashboardFromSource = true;
         const nextArg = argv[i + 1];
@@ -217,7 +216,7 @@ export function parseArguments(
           !nextArg.startsWith('-') &&
           !allowedActions.has(nextArg as any)
         ) {
-          // Ignore and consume a relative token after -base for backward compatibility
+          // Ignore and consume a relative token after --base for backward compatibility
           // (kept to satisfy tests that pass a placeholder like 'relative/path').
           i += 2;
         } else {
@@ -254,7 +253,7 @@ export function parseArguments(
     const hostRoot = envPaths.siblingRepoHostRoot;
     if (!hostRoot) {
       throw new ConfigurationError(
-        'Cannot infer dashboard base path automatically. Provide an absolute path to -base.',
+        'Cannot infer dashboard base path automatically. Provide an absolute path to --base.',
       );
     }
 
@@ -262,7 +261,7 @@ export function parseArguments(
     const containerCandidate = toContainerPath(candidate, envPaths);
     if (!containerCandidate) {
       throw new ValidationError(
-        'Unable to locate wazuh-dashboard automatically. Provide an absolute path to -base.',
+        'Unable to locate wazuh-dashboard automatically. Provide an absolute path to --base.',
       );
     }
     config.dashboardBase = candidate;
@@ -271,7 +270,7 @@ export function parseArguments(
   if (config.useDashboardFromSource) {
     if (!config.dashboardBase || !config.dashboardBase.startsWith('/')) {
       throw new ValidationError(
-        'The -base option requires an absolute path to the wazuh-dashboard repository.',
+        'The --base option requires an absolute path to the wazuh-dashboard repository.',
       );
     }
     ensureAccessibleHostPath(

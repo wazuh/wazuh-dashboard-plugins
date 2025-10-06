@@ -40,7 +40,7 @@ The `dev.sh` wrapper is the entry point. The action is positional; everything el
   [-a <rpm|deb|without>]  # aliases: none, 0 \
   [-r <repo>=</absolute/path> ...] \
   [-saml | --server <version> | --server-local <tag>] \
-  [-base [</absolute/path>]]
+  [--base [</absolute/path>]]
 ```
 
 Examples:

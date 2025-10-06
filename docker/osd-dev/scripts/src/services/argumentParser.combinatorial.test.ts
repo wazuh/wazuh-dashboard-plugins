@@ -289,7 +289,7 @@ describe('services/argumentParser (combinatorial)', () => {
     });
   });
 
-  describe('-base sources mode', () => {
+  describe('--base sources mode', () => {
     it('auto-detects dashboard base when not provided', () => {
       const { envPaths, tmpdir, paths } = makeEnv();
       try {
@@ -301,7 +301,7 @@ describe('services/argumentParser (combinatorial)', () => {
         );
         fs.mkdirSync(dashHost, { recursive: true });
         fs.mkdirSync(dashContainer, { recursive: true });
-        const cfg = parseArguments(['-base', 'up'], envPaths, logger);
+        const cfg = parseArguments(['--base', 'up'], envPaths, logger);
         expect(cfg.useDashboardFromSource).toBe(true);
         expect(cfg.dashboardBase).toBe(dashHost);
       } finally {
@@ -317,7 +317,7 @@ describe('services/argumentParser (combinatorial)', () => {
         const baseHost = path.join(paths.hostRoot, 'dashboard');
         const baseContainer = path.join(paths.containerRoot, 'dashboard');
         fs.mkdirSync(baseContainer, { recursive: true });
-        const cfg = parseArguments(['-base', baseHost, 'up'], envPaths, logger);
+        const cfg = parseArguments(['--base', baseHost, 'up'], envPaths, logger);
         expect(cfg.useDashboardFromSource).toBe(true);
         expect(cfg.dashboardBase).toBe(baseHost);
       } finally {
@@ -338,7 +338,7 @@ describe('services/argumentParser (combinatorial)', () => {
         fs.mkdirSync(dashHost, { recursive: true });
         fs.mkdirSync(dashContainer, { recursive: true });
         const cfg = parseArguments(
-          ['-base', 'relative/path', 'up'],
+          ['--base', 'relative/path', 'up'],
           envPaths,
           logger,
         );

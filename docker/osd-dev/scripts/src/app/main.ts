@@ -66,7 +66,7 @@ function ensureDashboardSources(
   const nvmrcContainerPath = toContainerPath(nvmrcHostPath, envPaths);
   if (!nvmrcContainerPath || !existsSync(nvmrcContainerPath)) {
     throw new PathAccessError(
-      `.nvmrc not found at '${nvmrcHostPath}'. Provide a valid wazuh-dashboard checkout or pass -base with an absolute path to it.`,
+      `.nvmrc not found at '${nvmrcHostPath}'. Provide a valid wazuh-dashboard checkout or pass --base with an absolute path to it.`,
     );
   }
 
