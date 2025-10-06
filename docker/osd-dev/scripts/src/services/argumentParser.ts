@@ -101,13 +101,25 @@ export function parseArguments(
         break;
       }
       case '-os': {
-        config.osVersion = argv[++i];
+        const ver = argv[++i];
+        if (!ver || ver.startsWith('-')) {
+          throw new ValidationError(
+            "-os requires a version value, e.g. '-os 2.11.0'",
+          );
+        }
+        config.osVersion = ver;
         i++;
         break;
       }
 
       case '-osd': {
-        config.osdVersion = argv[++i];
+        const ver = argv[++i];
+        if (!ver || ver.startsWith('-')) {
+          throw new ValidationError(
+            "-osd requires a version value, e.g. '-osd 2.11.0'",
+          );
+        }
+        config.osdVersion = ver;
         i++;
         break;
       }

@@ -34,4 +34,24 @@ describe('dev.ts - Input validations', () => {
     // No docker compose attempt should be made
     expect(runner.spawnCalls.length).toBe(0);
   });
+
+  test("'-os' without value is rejected", async () => {
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await expect(mainWithDeps(['-os', 'up'], { logger, processRunner: runner }))
+      .rejects.toThrow();
+    expect(runner.spawnCalls.length).toBe(0);
+  });
+
+  test("'-osd' without value is rejected", async () => {
+    const logger = new MockLogger('test');
+    const runner = new StubRunner();
+    await expect(
+      mainWithDeps(['-osd', '--server', '4.2.0', 'up'], {
+        logger,
+        processRunner: runner,
+      }),
+    ).rejects.toThrow();
+    expect(runner.spawnCalls.length).toBe(0);
+  });
 });
