@@ -69,11 +69,11 @@ export function parseArguments(
 
   // New-style flags collection (mapped later into mode/modeVersion). No positional args allowed.
 
-  let i = 0;
+  let index = 0;
   const allowedActions = new Set<string>(Object.values(ACTIONS));
 
-  while (i < argv.length) {
-    const arg = argv[i];
+  while (index < argv.length) {
+    const arg = argv[index];
 
     switch (arg) {
       case '--help':
@@ -84,7 +84,7 @@ export function parseArguments(
       case '--plugins-root':
       case '-wdp':
       case '--wz-home': {
-        const next = argv[++i];
+        const next = argv[++index];
         if (!next || !next.startsWith('/')) {
           throw new ValidationError(
             '--plugins-root requires an absolute path value',
@@ -92,35 +92,35 @@ export function parseArguments(
         }
         config.pluginsRoot = stripTrailingSlash(next);
         ensureAccessibleHostPath(config.pluginsRoot, 'Base path', envPaths);
-        i++;
+        index++;
         break;
       }
       case '-os': {
-        const ver = argv[++i];
+        const ver = argv[++index];
         if (!ver || ver.startsWith('-')) {
           throw new ValidationError(
             "-os requires a version value, e.g. '-os 2.11.0'",
           );
         }
         config.osVersion = ver;
-        i++;
+        index++;
         break;
       }
 
       case '-osd': {
-        const ver = argv[++i];
+        const ver = argv[++index];
         if (!ver || ver.startsWith('-')) {
           throw new ValidationError(
             "-osd requires a version value, e.g. '-osd 2.11.0'",
           );
         }
         config.osdVersion = ver;
-        i++;
+        index++;
         break;
       }
 
       case '-a': {
-        let val = argv[++i];
+        let val = argv[++index];
         // Aliases for 'without'
         if (val === 'none' || val === '0') val = 'without';
         config.agentsUp = val;
@@ -129,42 +129,42 @@ export function parseArguments(
             "Invalid value for -a option. Allowed values are 'rpm', 'deb', 'without', or an empty string.",
           );
         }
-        i++;
+        index++;
         break;
       }
 
       case '-saml': {
         config.enableSaml = true;
-        i++;
+        index++;
         break;
       }
 
       case '--server': {
-        const ver = argv[++i];
+        const ver = argv[++index];
         if (!ver || ver.startsWith('-')) {
           throw new ValidationError(
             '--server requires a version argument, e.g. --server 4.12.0',
           );
         }
         config.serverFlagVersion = ver;
-        i++;
+        index++;
         break;
       }
 
       case '--server-local': {
-        const ver = argv[++i];
+        const ver = argv[++index];
         if (!ver || ver.startsWith('-')) {
           throw new ValidationError(
             '--server-local requires a version/tag argument, e.g. --server-local my-tag',
           );
         }
         config.serverLocalFlagVersion = ver;
-        i++;
+        index++;
         break;
       }
 
       case '-r': {
-        const repoSpec = argv[++i];
+        const repoSpec = argv[++index];
         if (repoSpec.includes('=')) {
           const [repoName, repoPath] = repoSpec.split('=');
           if (!repoName || !repoPath) {
@@ -198,19 +198,19 @@ export function parseArguments(
             path: inferredHostPath,
           });
         }
-        i++;
+        index++;
         break;
       }
 
       case '--base': {
         config.useDashboardFromSource = true;
-        const nextArg = argv[i + 1];
+        const nextArg = argv[index + 1];
 
         if (nextArg && nextArg.startsWith('/')) {
           const basePath = stripTrailingSlash(nextArg);
           ensureAccessibleHostPath(basePath, 'Dashboard base path', envPaths);
           config.dashboardBase = basePath;
-          i += 2;
+          index += 2;
         } else if (
           nextArg &&
           !nextArg.startsWith('-') &&
@@ -218,9 +218,9 @@ export function parseArguments(
         ) {
           // Ignore and consume a relative token after --base for backward compatibility
           // (kept to satisfy tests that pass a placeholder like 'relative/path').
-          i += 2;
+          index += 2;
         } else {
-          i++;
+          index++;
         }
         break;
       }
@@ -237,7 +237,7 @@ export function parseArguments(
             );
           }
           config.action = arg;
-          i++;
+          index++;
           break;
         }
         // Any other non-flag token is not allowed

@@ -73,7 +73,7 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
         processRunner: runner,
       },
     );
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
@@ -94,16 +94,16 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     expect(args).toContain('dev.override.generated.yml');
 
     // Logs show base sources path
-    const logs = logSpy.mock.calls.map(c => String(c[0]));
+    const logs = logSpy.mock.calls.map(call => String(call[0]));
     expect(
-      logs.some(l =>
-        l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`),
+      logs.some(line =>
+        line.includes(`Using wazuh-dashboard sources from ${dashboardBase}`),
       ),
     ).toBe(true);
 
     // Down cleans override
     await mainWithDeps(['down'], { logger, processRunner: runner });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     expect(fs.existsSync(overridePath)).toBe(false);
     logSpy.mockRestore();
   });

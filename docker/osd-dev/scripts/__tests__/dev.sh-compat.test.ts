@@ -52,7 +52,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
         processRunner: runner,
       });
     } catch {}
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     // No spawn should be called because configureMode throws
     expect(runner.spawnCalls.length).toBe(0);
   });
@@ -66,7 +66,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
         processRunner: runner,
       });
     } catch {}
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     expect(runner.spawnCalls.length).toBe(0);
   });
 
@@ -79,7 +79,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
         processRunner: runner,
       });
     } catch {}
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     expect(runner.spawnCalls.length).toBe(0);
   });
 
@@ -92,7 +92,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
         processRunner: runner,
       });
     } catch {}
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     expect(runner.spawnCalls.length).toBe(0);
   });
 
@@ -105,7 +105,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
       logger,
       processRunner: runner,
     });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('server-local-rpm');
@@ -118,7 +118,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
       logger,
       processRunner: runner,
     });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('server-local-without');
@@ -131,7 +131,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
       logger,
       processRunner: runner,
     });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('server-local-without');
@@ -144,7 +144,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
       logger,
       processRunner: runner,
     });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('server-local-without');
@@ -157,7 +157,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
       logger,
       processRunner: runner,
     });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('--profile');
     expect(args).toContain('server');
@@ -167,7 +167,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
     await mainWithDeps(['down'], { logger, processRunner: runner });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toEqual(
       expect.arrayContaining([
@@ -187,7 +187,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
     await mainWithDeps(['stop'], { logger, processRunner: runner });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const args: string[] = runner.spawnCalls[0].args;
     const osdVersion = getPlatformVersion(repoRoot);
     const expectedProject = `os-dev-${osdVersion.replace(/\./g, '')}`;
@@ -205,7 +205,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
       logger,
       processRunner: runner,
     });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toEqual(
       expect.arrayContaining([
@@ -224,10 +224,10 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
     const infoSpy = jest.spyOn(logger, 'info');
     const runner = new StubRunner();
     await mainWithDeps(['up'], { logger, processRunner: runner });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     const infoCalls = infoSpy.mock.calls.map(args => String(args[0] ?? ''));
     expect(
-      infoCalls.some(l => l.includes('No dynamic compose override required.')),
+      infoCalls.some(line => line.includes('No dynamic compose override required.')),
     ).toBe(true);
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('up');

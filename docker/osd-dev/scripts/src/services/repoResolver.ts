@@ -14,7 +14,9 @@ export function resolveRepositoryHostPath(
   config: ScriptConfig,
   envPaths: EnvironmentPaths,
 ): string {
-  const override = config.userRepositories.find(r => r.name === repoName);
+  const override = config.userRepositories.find(
+    repoOverride => repoOverride.name === repoName,
+  );
   let hostPath = override?.path ? stripTrailingSlash(override.path) : '';
 
   if (hostPath) {

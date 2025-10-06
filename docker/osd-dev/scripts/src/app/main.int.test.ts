@@ -27,7 +27,7 @@ describe('app/main (integration)', () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
     await mainWithDeps(['down'], { logger, processRunner: runner });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     expect(runner.spawnCalls.length).toBe(1);
     const args = runner.spawnCalls[0].args;
     expect(args).toEqual(

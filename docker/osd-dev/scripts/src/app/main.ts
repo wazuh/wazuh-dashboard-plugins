@@ -87,7 +87,7 @@ function resolveSecurityPluginPath(
 ): string {
   // 1) Respect explicit -r override if provided
   const securityOverride = config.userRepositories.find(
-    o => o.name === SECURITY_PLUGIN_NAME,
+    repoOverride => repoOverride.name === SECURITY_PLUGIN_NAME,
   );
   if (securityOverride) {
     const normalized = stripTrailingSlash(securityOverride.path);

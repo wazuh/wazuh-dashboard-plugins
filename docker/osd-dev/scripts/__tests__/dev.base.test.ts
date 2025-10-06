@@ -67,7 +67,7 @@ describe('dev.ts - Base startup with auto-detection (--base)', () => {
 
     // Run up with --base auto-detection (no path provided)
     await mainWithDeps(['--base', 'up'], { logger, processRunner: runner });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
 
     // Validations
     expect(process.env.SRC_DASHBOARD).toBe(dashboardBase);
@@ -75,10 +75,10 @@ describe('dev.ts - Base startup with auto-detection (--base)', () => {
     expect(process.env.SRC_SECURITY_PLUGIN).toBe(securityPluginPath);
 
     // Log includes base usage message
-    const logs = logSpy.mock.calls.map(c => String(c[0]));
+    const logs = logSpy.mock.calls.map(call => String(call[0]));
     expect(
-      logs.some(l =>
-        l.includes(`Using wazuh-dashboard sources from ${dashboardBase}`),
+      logs.some(line =>
+        line.includes(`Using wazuh-dashboard sources from ${dashboardBase}`),
       ),
     ).toBe(true);
 
@@ -105,7 +105,7 @@ describe('dev.ts - Base startup with auto-detection (--base)', () => {
 
     // Now run down and ensure the override is removed
     await mainWithDeps(['down'], { logger, processRunner: runner });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
     expect(fs.existsSync(overridePath)).toBe(false);
     logSpy.mockRestore();
   });

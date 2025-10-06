@@ -41,7 +41,7 @@ describe('dev.ts - Dynamic mounting of external repos', () => {
       logger,
       processRunner: runner,
     });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
@@ -55,7 +55,7 @@ describe('dev.ts - Dynamic mounting of external repos', () => {
 
     // 4) Run down without flags and verify the override file is removed
     await mainWithDeps(['down'], { logger, processRunner: runner });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
 
     expect(fs.existsSync(overridePath)).toBe(false);
   });

@@ -81,7 +81,7 @@ describe('services/argumentParser (combinatorial)', () => {
     ] as const;
     // flags-only no longer allowed for action
 
-    it.each(actions.map(a => [a]))('parses action positionally: %s', action => {
+    it.each(actions.map(action => [action]))('parses action positionally: %s', action => {
       const { envPaths, tmpdir } = makeEnv();
       try {
         const cfg = parseArguments([action], envPaths, logger);
@@ -96,7 +96,7 @@ describe('services/argumentParser (combinatorial)', () => {
 
   describe('agentsUp flag', () => {
     const values = ['rpm', 'deb', 'without'] as const;
-    it.each(values.map(v => [v]))('accepts -a %s', val => {
+    it.each(values.map(value => [value]))('accepts -a %s', val => {
       const { envPaths, tmpdir } = makeEnv();
       try {
         const cfg = parseArguments(['-a', val, 'up'], envPaths, logger);

@@ -44,7 +44,7 @@ describe('dev.ts - Shorthand -r <name> resolves under sibling', () => {
       logger,
       processRunner: runner,
     });
-    await new Promise(r => setImmediate(r));
+    await new Promise(tick => setImmediate(tick));
 
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
