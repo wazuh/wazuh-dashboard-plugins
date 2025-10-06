@@ -121,10 +121,7 @@ const FimTableDataSource = withDataSourceFetch({
     <EuiBasicTable
       items={dataSourceAction?.data?.items || []}
       // Fix this, the setFile and SetOpen was removed
-      columns={columns(
-        () => {},
-        () => {},
-      )}
+      columns={columns}
       loading={false}
       sorting={{ sort }}
       onChange={e => setSort(e.sort)}
@@ -156,7 +153,7 @@ function navigateToFim(agent) {
   pinnedAgentManager.pinAgent(agent);
 }
 
-const columns = (setFile, setIsOpen) => [
+const columns = [
   {
     field: '_source.timestamp',
     name: 'Time',
@@ -167,8 +164,7 @@ const columns = (setFile, setIsOpen) => [
     field: '_source.syscheck.path',
     name: 'Path',
     sortable: true,
-    truncateText: true,
-    render: path => renderPath(path, setFile, setIsOpen),
+    truncateText: true
   },
   {
     field: '_source.syscheck.event',
@@ -190,14 +186,3 @@ const columns = (setFile, setIsOpen) => [
   },
   { field: '_source.rule.id', name: 'Rule Id', sortable: true, width: '75px' },
 ];
-
-const renderPath = (path, setFile, setIsOpen) => (
-  <EuiLink
-    className='euiTableCellContent__text euiTableCellContent--truncateText'
-    onClick={() => {
-      setFile(path), setIsOpen(true);
-    }}
-  >
-    {path}
-  </EuiLink>
-);
