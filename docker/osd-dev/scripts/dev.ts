@@ -38,22 +38,15 @@ try {
   }
 }
 
-try {
-  const result = main(argv);
-  if (result && typeof (result as any).then === 'function') {
-    (result as Promise<void>).catch(err => {
-      const message =
-        err instanceof DevScriptError
-          ? err.message
-          : (err as any)?.message || String(err);
-      logger.error(`${message}`);
-    });
+(async () => {
+  try {
+    await main(argv);
+  } catch (error) {
+    // Log without exiting to keep tests stable
+    const message =
+      error instanceof DevScriptError
+        ? error.message
+        : (error as any)?.message || String(error);
+    logger.error(`${message}`);
   }
-} catch (error) {
-  // Synchronous exceptions at runtime are unexpected; log without exiting to keep tests stable
-  const message =
-    error instanceof DevScriptError
-      ? error.message
-      : (error as any)?.message || String(error);
-  logger.error(`${message}`);
-}
+})();
