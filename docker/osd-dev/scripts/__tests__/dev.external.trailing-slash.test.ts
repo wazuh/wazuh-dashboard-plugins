@@ -42,7 +42,11 @@ describe('dev.ts - External repo trailing slash is trimmed', () => {
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
     const content = fs.readFileSync(overridePath, 'utf-8');
-    expect(content).toContain(`device: ${externalDir}`);
-    expect(content).not.toContain(`device: ${externalDir}/`);
+    const normalized = content.replaceAll(externalDir, '${externalDir}');
+    const expected = fs.readFileSync(
+      path.join(__dirname, 'fixtures', 'override_external_trailing_slash.yml'),
+      'utf-8',
+    );
+    expect(normalized.trim()).toBe(expected.trim());
   });
 });

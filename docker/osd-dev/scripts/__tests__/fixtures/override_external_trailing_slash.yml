@@ -1,0 +1,12 @@
+services:
+  osd:
+    volumes:
+      - 'custom:/home/node/kbn/plugins/custom'
+volumes:
+  custom:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${externalDir}
+

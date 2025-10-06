@@ -75,19 +75,12 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
     const content = fs.readFileSync(overridePath, 'utf-8');
-
-    // services include osd and dashboard-src-installer
-    expect(content).toContain('services:');
-    expect(content).toContain('dashboard-src-installer:');
-    expect(content).toMatch(/\n\s*osd:\n/);
-
-    // external-test mounted under osd service and declared under volumes with device
-    expect(content).toContain(
-      "- 'external-test:/home/node/kbn/plugins/external-test'",
+    const normalized = content.replaceAll(externalRepo, '${externalRepo}');
+    const expected = fs.readFileSync(
+      path.join(__dirname, 'fixtures', 'override_base_external.yml'),
+      'utf-8',
     );
-    expect(content).toContain('volumes:');
-    expect(content).toContain('  external-test:');
-    expect(content).toContain(`      device: ${externalRepo}`);
+    expect(normalized.trim()).toBe(expected.trim());
 
     // dashboard-src profile enforced
     expect(runner.spawnCalls.length).toBe(1);

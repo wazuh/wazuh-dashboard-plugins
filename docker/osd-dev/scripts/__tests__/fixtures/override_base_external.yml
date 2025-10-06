@@ -1,0 +1,26 @@
+services:
+  dashboard-src-installer:
+    volumes:
+      - '${SRC_DASHBOARD}:/home/node/kbn'
+  osd:
+    depends_on:
+      dashboard-src-installer:
+        condition: service_completed_successfully
+    image: node:${NODE_VERSION}
+    profiles:
+      - 'dashboard-src'
+    entrypoint: ['/bin/bash', '/entrypoint.sh']
+    working_dir: /home/node/kbn
+    volumes:
+      - '${SRC_DASHBOARD}:/home/node/kbn'
+      - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards'
+      - ./dashboard-src/entrypoint.sh:/entrypoint.sh:ro
+      - 'external-test:/home/node/kbn/plugins/external-test'
+volumes:
+  external-test:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${externalRepo}
+

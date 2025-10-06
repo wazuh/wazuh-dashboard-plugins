@@ -48,15 +48,14 @@ describe('dev.ts - Multiple external repos in override', () => {
     expect(fs.existsSync(overridePath)).toBe(true);
     const content = fs.readFileSync(overridePath, 'utf-8');
 
-    // Services/osd mounts
-    expect(content).toContain("- 'custom1:/home/node/kbn/plugins/custom1'");
-    expect(content).toContain("- 'custom2:/home/node/kbn/plugins/custom2'");
-
-    // Volumes block with device bindings
-    expect(content).toContain('volumes:');
-    expect(content).toContain('  custom1:');
-    expect(content).toContain(`      device: ${external1}`);
-    expect(content).toContain('  custom2:');
-    expect(content).toContain(`      device: ${external2}`);
+    // Normalize variable paths for comparison with fixture
+    const normalized = content
+      .replaceAll(external1, '${external1}')
+      .replaceAll(external2, '${external2}');
+    const expected = fs.readFileSync(
+      path.join(__dirname, 'fixtures', 'override_external_multiple.yml'),
+      'utf-8',
+    );
+    expect(normalized.trim()).toBe(expected.trim());
   });
 });

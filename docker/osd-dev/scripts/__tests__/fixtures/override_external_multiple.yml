@@ -1,0 +1,19 @@
+services:
+  osd:
+    volumes:
+      - 'custom1:/home/node/kbn/plugins/custom1'
+      - 'custom2:/home/node/kbn/plugins/custom2'
+volumes:
+  custom1:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${external1}
+  custom2:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${external2}
+

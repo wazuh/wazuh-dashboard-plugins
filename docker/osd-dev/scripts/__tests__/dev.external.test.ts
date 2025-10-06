@@ -46,21 +46,12 @@ describe('dev.ts - Dynamic mounting of external repos', () => {
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
     const content = fs.readFileSync(overridePath, 'utf-8');
-
-    // 2) Verify services.osd volumes include the external named volume mount
-    expect(content).toContain('services:\n  osd:\n');
-    expect(content).toContain(
-      "- 'external-test:/home/node/kbn/plugins/external-test'",
+    const normalized = content.replaceAll(extRepoPath, '${extRepoPath}');
+    const expected = fs.readFileSync(
+      path.join(__dirname, 'fixtures', 'override_external_single.yml'),
+      'utf-8',
     );
-
-    // 3) Verify volumes section defines the external volume with the correct device path
-    expect(content).toContain('volumes:');
-    expect(content).toContain('  external-test:');
-    expect(content).toContain('    driver: local');
-    expect(content).toContain('    driver_opts:');
-    expect(content).toContain('      type: none');
-    expect(content).toContain('      o: bind');
-    expect(content).toContain(`      device: ${extRepoPath}`);
+    expect(normalized.trim()).toBe(expected.trim());
 
     // 4) Run down without flags and verify the override file is removed
     await mainWithDeps(['down'], { logger, processRunner: runner });

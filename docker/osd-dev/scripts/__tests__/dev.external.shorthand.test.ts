@@ -49,9 +49,11 @@ describe('dev.ts - Shorthand -r <name> resolves under sibling', () => {
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
     const content = fs.readFileSync(overridePath, 'utf-8');
-    // Services mount and volumes block should reference the shorthand name
-    expect(content).toContain(`- '${name}:/home/node/kbn/plugins/${name}'`);
-    expect(content).toContain(`  ${name}:`);
-    expect(content).toContain(`device: ${hostPath}`);
+    const normalized = content.replaceAll(hostPath, '${hostPath}');
+    const expected = fs.readFileSync(
+      path.join(__dirname, 'fixtures', 'override_external_shorthand.yml'),
+      'utf-8',
+    );
+    expect(normalized.trim()).toBe(expected.trim());
   });
 });

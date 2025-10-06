@@ -85,17 +85,11 @@ describe('dev.ts - Base startup with auto-detection (--base)', () => {
     const overridePath = path.join(tmpdir, 'dev.override.generated.yml');
     expect(fs.existsSync(overridePath)).toBe(true);
     const content = fs.readFileSync(overridePath, 'utf-8');
-
-    // Override contains dashboard-src-installer service and mounts
-    expect(content).toContain('dashboard-src-installer:');
-    expect(content).toContain('image: node:${NODE_VERSION}');
-    expect(content).toContain("- '${SRC_DASHBOARD}:/home/node/kbn'");
-    expect(content).toContain(
-      "- '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards'",
+    const expected = fs.readFileSync(
+      path.join(__dirname, 'fixtures', 'override_base.yml'),
+      'utf-8',
     );
-    expect(content).toContain(
-      '- ./dashboard-src/entrypoint.sh:/entrypoint.sh:ro',
-    );
+    expect(content.trim()).toBe(expected.trim());
 
     // docker compose gets both profiles: standard and dashboard-src, and includes override file
     expect(runner.spawnCalls.length).toBe(1);
