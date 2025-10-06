@@ -6,7 +6,7 @@ This directory contains the TypeScript-based development scripts for the Wazuh D
 
 ```
 scripts/
-├── dev.ts           # Main development script (migrated from dev.sh)
+├── dev.ts           # Main development script
 ├── Dockerfile       # Container image for running TypeScript
 ├── dev-ts.yml       # Docker Compose configuration for the dev script
 ├── package.json     # TypeScript dependencies
@@ -15,7 +15,7 @@ scripts/
 
 ## Overview
 
-The development workflow has been migrated from bash (`dev.sh`) to TypeScript (`dev.ts`). The `dev.sh` file now acts as a simple wrapper that:
+The development workflow is implemented in TypeScript (`dev.ts`). The `dev.sh` file acts as a simple wrapper that:
 
 1. Builds the TypeScript container image
 2. Runs the TypeScript script inside Docker
@@ -23,28 +23,15 @@ The development workflow has been migrated from bash (`dev.sh`) to TypeScript (`
 
 ## How It Works
 
-### Original Workflow
-
-```
-dev.sh → bash logic → docker compose
-```
-
-### New Workflow
+### Workflow
 
 ```
 dev.sh → docker compose (dev-ts.yml) → dev.ts → docker compose (dev.yml)
 ```
 
-## Benefits
-
-- **Type Safety**: TypeScript provides compile-time type checking
-- **Maintainability**: Better code organization and error handling
-- **Consistency**: Same Docker-based approach for all tooling
-- **Extensibility**: Easier to add new features with TypeScript's ecosystem
-
 ## Usage
 
-The `dev.sh` wrapper remains the entry point. The action is positional; everything else must be provided via flags.
+The `dev.sh` wrapper is the entry point. The action is positional; everything else must be provided via flags.
 
 ```bash
 ./dev.sh <action> \
@@ -122,15 +109,3 @@ The `dev.ts` script includes:
 - Dynamic Docker Compose override generation
 - Environment variable management
 - Docker Compose execution with appropriate profiles
-
-## Migration Notes
-
-All functionality from the original bash script has been preserved:
-
-- ✅ OS/OSD version detection from package.json
-- ✅ Repository path resolution (default and explicit)
-- ✅ External repository mounting
-- ✅ Dynamic compose override generation
-- ✅ Profile-based deployment (standard, saml, server, server-local)
-- ✅ Agent deployment options
-- ✅ All docker compose actions (up, down, start, stop, manager-local-up)
