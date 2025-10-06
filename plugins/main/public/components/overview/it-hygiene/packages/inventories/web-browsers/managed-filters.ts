@@ -2,7 +2,7 @@ export default [
   {
     type: 'multiSelect',
     key: 'browser.name',
-    placeholder: 'Name',
+    placeholder: 'Browser name',
   },
   {
     type: 'multiSelect',
