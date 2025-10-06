@@ -4,6 +4,7 @@ import { ValidationError } from '../errors';
 import type { Logger } from '../utils/logger';
 import type { ProcessRunner } from '../types/deps';
 import chalk from 'chalk';
+import { ACTIONS, SERVICE_NAMES } from '../constants/app';
 
 export function runDockerCompose(
   config: ScriptConfig,
@@ -24,7 +25,7 @@ export function runDockerCompose(
   }
 
   switch (config.action) {
-    case 'up':
+    case ACTIONS.UP:
       try {
         if (existsSync(envPaths.createNetworksScriptPath)) {
           runner.execSync(`/bin/bash ${envPaths.createNetworksScriptPath}`, {
@@ -36,27 +37,27 @@ export function runDockerCompose(
       }
       composeArgs.push('up', '-Vd');
       break;
-    case 'start':
+    case ACTIONS.START:
       composeArgs.push('start');
       break;
-    case 'down':
+    case ACTIONS.DOWN:
       composeArgs.push('down', '-v', '--remove-orphans');
       break;
-    case 'stop':
+    case ACTIONS.STOP:
       composeArgs.push('-p', process.env.COMPOSE_PROJECT_NAME || '', 'stop');
       break;
-    case 'manager-local-up':
+    case ACTIONS.MANAGER_LOCAL_UP:
       composeArgs.push(
         '-p',
         process.env.COMPOSE_PROJECT_NAME || '',
         'up',
         '-d',
-        'wazuh.manager.local',
+        SERVICE_NAMES.WAZUH_MANAGER_LOCAL,
       );
       break;
     default:
       throw new ValidationError(
-        'Action must be up | down | stop | start | manager-local-up',
+        `Action must be ${Object.values(ACTIONS).join(' | ')}`,
       );
   }
 

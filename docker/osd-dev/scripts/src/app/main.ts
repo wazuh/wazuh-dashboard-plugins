@@ -6,7 +6,9 @@ import {
   OVERRIDE_COMPOSE_FILE,
   REQUIRED_REPOSITORIES,
   SECURITY_PLUGIN_ALIASES,
-  DASHBOARD_SRC_PROFILE,
+  PROFILES,
+  DEV_COMPOSE_FILE,
+  ACTIONS,
 } from '../constants/app';
 import { getEnvironmentPaths } from '../constants/paths';
 import { generateOverrideFile } from '../services/composeOverrideGenerator';
@@ -278,19 +280,19 @@ export async function mainWithDeps(
   );
 
   // Compose files
-  const composeFiles = ['dev.yml'];
+  const composeFiles = [DEV_COMPOSE_FILE];
   if (existsSync(OVERRIDE_COMPOSE_FILE))
     composeFiles.push(OVERRIDE_COMPOSE_FILE);
 
   // Profiles
   const profiles = new Set<string>([primaryProfile]);
-  if (config.useDashboardFromSource) profiles.add(DASHBOARD_SRC_PROFILE);
+  if (config.useDashboardFromSource) profiles.add(PROFILES.DASHBOARD_SRC);
   // If SAML flag is enabled with another primary profile, include the SAML profile too
   if (
-    (config.enableSaml || config.mode === 'saml') &&
-    primaryProfile !== 'saml'
+    (config.enableSaml || config.mode === PROFILES.SAML) &&
+    primaryProfile !== PROFILES.SAML
   ) {
-    profiles.add('saml');
+    profiles.add(PROFILES.SAML);
   }
 
   const defaultRunner = { execSync, spawn };
@@ -307,8 +309,8 @@ export async function mainWithDeps(
   }
 
   if (
-    (config.mode === 'server' || Boolean(config.serverFlagVersion)) &&
-    (config.action === 'up' || config.action === 'start')
+    (config.mode === PROFILES.SERVER || Boolean(config.serverFlagVersion)) &&
+    (config.action === ACTIONS.UP || config.action === ACTIONS.START)
   ) {
     printAgentEnrollmentHint(deps.logger);
   }

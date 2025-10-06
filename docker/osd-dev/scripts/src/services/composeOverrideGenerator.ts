@@ -2,8 +2,8 @@ import { existsSync, unlinkSync } from 'fs';
 import { GenerateOverrideOptions, EnvironmentPaths } from '../types/config';
 import {
   DASHBOARD_ENTRYPOINT_PATH,
-  DASHBOARD_SRC_PROFILE,
   OVERRIDE_COMPOSE_FILE,
+  PROFILES,
 } from '../constants/app';
 import { writeFile } from '../utils/io';
 import { toRepositoryEnvVar } from '../utils/envUtils';
@@ -57,7 +57,7 @@ export function generateOverrideFile(
     content += '        condition: service_completed_successfully\n';
     content += '    image: node:${NODE_VERSION}\n';
     content += '    profiles:\n';
-    content += `      - '${DASHBOARD_SRC_PROFILE}'\n`;
+    content += `      - '${PROFILES.DASHBOARD_SRC}'\n`;
     content += "    entrypoint: ['/bin/bash', '/entrypoint.sh']\n";
     content += '    working_dir: /home/node/kbn\n';
 

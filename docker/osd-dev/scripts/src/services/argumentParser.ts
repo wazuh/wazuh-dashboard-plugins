@@ -6,6 +6,7 @@ import {
   toContainerPath,
 } from '../utils/pathUtils';
 import { ValidationError, ConfigurationError } from '../errors';
+import { ACTIONS, PROFILES } from '../constants/app';
 import type { Logger } from '../utils/logger';
 
 export function printUsageAndExit(log: Logger): never {
@@ -69,13 +70,7 @@ export function parseArguments(
   // New-style flags collection (mapped later into mode/modeVersion). No positional args allowed.
 
   let i = 0;
-  const allowedActions = new Set<ScriptConfig['action']>([
-    'up',
-    'down',
-    'stop',
-    'start',
-    'manager-local-up',
-  ]);
+  const allowedActions = new Set<string>(Object.values(ACTIONS));
 
   while (i < argv.length) {
     const arg = argv[i];
@@ -304,13 +299,13 @@ export function parseArguments(
   }
   // Map explicit mode flags
   if (config.serverFlagVersion) {
-    config.mode = 'server';
+    config.mode = PROFILES.SERVER;
     config.modeVersion = config.serverFlagVersion;
   } else if (config.serverLocalFlagVersion) {
-    config.mode = 'server-local';
+    config.mode = PROFILES.SERVER_LOCAL;
     config.modeVersion = config.serverLocalFlagVersion;
   } else if (config.enableSaml && !config.mode) {
-    config.mode = 'saml';
+    config.mode = PROFILES.SAML;
   }
 
   return config;
