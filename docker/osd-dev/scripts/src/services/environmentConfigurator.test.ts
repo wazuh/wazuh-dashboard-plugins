@@ -105,23 +105,18 @@ describe('services/environmentConfigurator', () => {
       );
     });
 
-    it('saml requires idp in /etc/hosts and sets SAML config', () => {
-      jest.spyOn(fs, 'readFileSync').mockReturnValue('127.0.0.1 localhost idp');
-      process.env.OSD_MAJOR = '2.x';
+    it('saml sets SAML config without /etc/hosts checks', () => {
+      const spy = jest.spyOn(fs, 'readFileSync');
       const profile = configureModeAndSecurity({ ...baseCfg, mode: 'saml' });
       expect(profile).toBe('saml');
       expect(process.env.WAZUH_DASHBOARD_CONF).toContain(
         'opensearch_dashboards_saml.yml',
       );
-    });
-
-    it('saml throws PathAccessError if /etc/hosts cannot be read', () => {
-      jest.spyOn(fs, 'readFileSync').mockImplementation(() => {
-        throw new Error('EACCES');
-      });
-      expect(() =>
-        configureModeAndSecurity({ ...baseCfg, mode: 'saml' }),
-      ).toThrow(PathAccessError);
+      // ensure this call did not read /etc/hosts
+      const readHostsCalls = spy.mock.calls.filter(args =>
+        String(args[0]).includes('/etc/hosts'),
+      );
+      expect(readHostsCalls.length).toBe(0);
     });
 
     it('server requires version and sets WAZUH_STACK', () => {

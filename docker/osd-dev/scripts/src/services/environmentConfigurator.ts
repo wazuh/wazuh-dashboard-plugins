@@ -7,11 +7,7 @@ import {
   SECURITY_CONFIG_PATHS,
 } from '../constants/app';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
-import {
-  ConfigurationError,
-  PathAccessError,
-  ValidationError,
-} from '../errors';
+import { ValidationError } from '../errors';
 
 export function initializeBaseEnvironment(config: ScriptConfig): void {
   process.env.PASSWORD = process.env.PASSWORD || DEFAULTS.defaultPassword;
@@ -57,18 +53,10 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
   process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config.yml`;
   process.env.SEC_CONFIG_PATH = SECURITY_CONFIG_PATHS[OSD_MAJOR_2X];
 
-  const enableSaml =
-    Boolean(config.enableSaml) || config.mode === PROFILES.SAML;
+  const enableSaml = Boolean(config.enableSaml) || config.mode === PROFILES.SAML;
 
   if (enableSaml) {
-    try {
-      const hostsContent = readFileSync('/etc/hosts', 'utf-8');
-      if (!hostsContent.includes('idp')) {
-        throw new ConfigurationError('Add idp to /etc/hosts');
-      }
-    } catch {
-      throw new PathAccessError('Cannot read /etc/hosts');
-    }
+    // Assume environment/network is preconfigured for SAML.
     process.env.WAZUH_DASHBOARD_CONF = `./config/${osdMajor}/osd/opensearch_dashboards_saml.yml`;
     process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config-saml.yml`;
   }
