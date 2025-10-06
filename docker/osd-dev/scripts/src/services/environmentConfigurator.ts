@@ -29,14 +29,10 @@ export function setVersionDerivedEnvironment(
   process.env.WAZUH_STACK = process.env.WAZUH_STACK || '';
 
   if (existsSync(envPaths.packageJsonPath)) {
-    try {
-      const packageJson = JSON.parse(
-        readFileSync(envPaths.packageJsonPath, 'utf-8'),
-      );
-      process.env.WAZUH_VERSION_DEVELOPMENT = packageJson.version;
-    } catch {
-      // best effort
-    }
+    const packageJson = JSON.parse(
+      readFileSync(envPaths.packageJsonPath, 'utf-8'),
+    );
+    process.env.WAZUH_VERSION_DEVELOPMENT = packageJson.version;
   }
 
   // Always target OSD 2.x for development scripts.
