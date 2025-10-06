@@ -78,14 +78,18 @@ const TEMPLATE_SOURCES = {
   'states-fim-files': {
     name: 'states-fim-files',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-files.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-files.json',
+      ),
     ],
     outputFile: 'plugins/main/public/utils/known-fields/states-fim-files.json',
   },
   'states-fim-registries': {
     name: 'states-fim-registries',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-registries.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-registries.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-fim-registries.json',
@@ -94,7 +98,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-system': {
     name: 'states-inventory-system',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-system.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-system.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-system.json',
@@ -102,7 +108,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-hardware': {
     name: 'states-inventory-hardware',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hardware.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hardware.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-hardware.json',
@@ -110,7 +118,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-networks': {
     name: 'states-inventory-networks',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-networks.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-networks.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-networks.json',
@@ -118,7 +128,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-packages': {
     name: 'states-inventory-packages',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-packages.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-packages.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-packages.json',
@@ -126,7 +138,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-ports': {
     name: 'states-inventory-ports',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-ports.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-ports.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-ports.json',
@@ -134,7 +148,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-processes': {
     name: 'states-inventory-processes',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-processes.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-processes.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-processes.json',
@@ -142,7 +158,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-protocols': {
     name: 'states-inventory-protocols',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-protocols.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-protocols.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-protocols.json',
@@ -150,7 +168,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-users': {
     name: 'states-inventory-users',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-users.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-users.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-users.json',
@@ -158,7 +178,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-groups': {
     name: 'states-inventory-groups',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-groups.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-groups.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-groups.json',
@@ -166,7 +188,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-services': {
     name: 'states-inventory-services',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-services.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-services.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-services.json',
@@ -174,7 +198,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-interfaces': {
     name: 'states-inventory-interfaces',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-interfaces.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-interfaces.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-interfaces.json',
@@ -182,7 +208,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-hotfixes': {
     name: 'states-inventory-hotfixes',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hotfixes.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hotfixes.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-hotfixes.json',
@@ -190,7 +218,9 @@ const TEMPLATE_SOURCES = {
   'states-inventory-browser-extensions': {
     name: 'states-inventory-browser-extensions',
     urls: [
-      'https://raw.githubusercontent.com/wazuh/wazuh/4.14.0/src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-browser-extensions.json',
+      wazuhUrl(
+        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-browser-extensions.json',
+      ),
     ],
     outputFile:
       'plugins/main/public/utils/known-fields/states-inventory-browser-extensions.json',
