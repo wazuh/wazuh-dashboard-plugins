@@ -43,24 +43,19 @@ export function setVersionDerivedEnvironment(
     }
   }
 
-  const osdMajor = osdMajorNumber >= 2 ? OSD_MAJOR_2X : OSD_MAJOR_1X;
-  process.env.OSD_MAJOR = osdMajor;
+  // Always target OSD 2.x for development scripts.
+  process.env.OSD_MAJOR = OSD_MAJOR_2X;
 }
 
 export function configureModeAndSecurity(config: ScriptConfig): string {
   // Defaults for standard mode
   let primaryProfile = PROFILES.STANDARD;
 
-  // Paths that depend on OSD_MAJOR
-  const osdMajor = process.env.OSD_MAJOR || OSD_MAJOR_2X;
+  // Fixed to OSD 2.x configuration
+  const osdMajor = OSD_MAJOR_2X;
   process.env.WAZUH_DASHBOARD_CONF = `./config/${osdMajor}/osd/opensearch_dashboards.yml`;
   process.env.SEC_CONFIG_FILE = `./config/${osdMajor}/os/config.yml`;
-
-  // Set security config path for OpenSearch 1.x vs 2.x
-  process.env.SEC_CONFIG_PATH =
-    osdMajor === OSD_MAJOR_2X
-      ? SECURITY_CONFIG_PATHS[OSD_MAJOR_2X]
-      : SECURITY_CONFIG_PATHS[OSD_MAJOR_1X];
+  process.env.SEC_CONFIG_PATH = SECURITY_CONFIG_PATHS[OSD_MAJOR_2X];
 
   const enableSaml =
     Boolean(config.enableSaml) || config.mode === PROFILES.SAML;
