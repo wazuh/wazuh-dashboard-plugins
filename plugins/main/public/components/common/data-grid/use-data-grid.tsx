@@ -205,7 +205,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
       const column = defaultColumns.find(column => column.id === columnId);
 
       if (column && column.render) {
-        return column.render(formattedValue, rowsParsed[relativeRowIndex]);
+        return column.render(rawValue, rowsParsed[relativeRowIndex]);
       }
 
       // check if the columns exists on the default custom render columns list

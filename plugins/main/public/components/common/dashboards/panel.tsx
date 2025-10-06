@@ -85,7 +85,6 @@ export const createPanel = ({
         field: '',
         value: '',
       });
-      const [, setCurrentSelectedFilter] = useState();
       const [selectedPanelFilter, setSelectedPanelFilter] = useState<
         { [key: string]: any }[]
       >([]);
@@ -113,7 +112,6 @@ export const createPanel = ({
         } else {
           setSelectedPanelFilter([]);
         }
-        setCurrentSelectedFilter(selectedFilter);
       };
 
       return (
