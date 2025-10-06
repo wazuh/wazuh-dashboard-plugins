@@ -279,7 +279,7 @@ services:
     command: >
       -c '
         marker_osd_bootstrap="/home/node/kbn/.NO_COMMIT_MARKER_OSD_BOOTSTRAP_WAS_DONE"
-        root_app_dir="/home/node/kbn"\n
+        root_app_dir="/home/node/kbn"
         if [ -f "$$marker_osd_bootstrap" ]; then
           echo "File $$marker_osd_bootstrap was found. Skip setup.";
           exit 0;
