@@ -6,7 +6,6 @@ on:
       - 'docker/osd-dev/dev.sh'
       - 'docker/osd-dev/dev.yml'
       - 'docker/osd-dev/scripts/**'
-  workflow_dispatch:
 
 jobs:
   scripts-tests:
