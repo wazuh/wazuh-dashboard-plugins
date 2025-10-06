@@ -9,7 +9,7 @@ on:
 
 jobs:
   scripts-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - name: Run dev scripts tests (Jest in container)
