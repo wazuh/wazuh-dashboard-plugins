@@ -286,7 +286,10 @@ export async function mainWithDeps(
   const profiles = new Set<string>([primaryProfile]);
   if (config.useDashboardFromSource) profiles.add(DASHBOARD_SRC_PROFILE);
   // If SAML flag is enabled with another primary profile, include the SAML profile too
-  if ((config.enableSaml || config.mode === 'saml') && primaryProfile !== 'saml') {
+  if (
+    (config.enableSaml || config.mode === 'saml') &&
+    primaryProfile !== 'saml'
+  ) {
     profiles.add('saml');
   }
 

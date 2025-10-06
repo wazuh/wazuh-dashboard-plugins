@@ -112,7 +112,9 @@ describe('services/argumentParser (combinatorial)', () => {
     it('rejects -a invalid', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        expect(() => parseArguments(['-a', 'wrong', 'up'], envPaths, logger)).toThrow(ValidationError);
+        expect(() =>
+          parseArguments(['-a', 'wrong', 'up'], envPaths, logger),
+        ).toThrow(ValidationError);
       } finally {
         try {
           fs.rmSync(tmpdir, { recursive: true, force: true });
@@ -151,7 +153,11 @@ describe('services/argumentParser (combinatorial)', () => {
     it('sets both os and osd versions', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        const cfg = parseArguments(['-os', '2.9.0', '-osd', '2.9.0', 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['-os', '2.9.0', '-osd', '2.9.0', 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.osVersion).toBe('2.9.0');
         expect(cfg.osdVersion).toBe('2.9.0');
       } finally {
@@ -169,7 +175,11 @@ describe('services/argumentParser (combinatorial)', () => {
         // No accessibility validation for -r in parser, so absolute host paths suffice
         const repoA = path.join(paths.hostRoot, 'extA');
         const repoB = path.join(paths.hostRoot, 'extB');
-        const cfg = parseArguments(['-r', `alpha=${repoA}/`, '-r', `beta=${repoB}`, 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['-r', `alpha=${repoA}/`, '-r', `beta=${repoB}`, 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.userRepositories).toEqual([
           { name: 'alpha', path: repoA },
           { name: 'beta', path: repoB },
@@ -207,7 +217,9 @@ describe('services/argumentParser (combinatorial)', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
         // No folder created under sibling, so ensureAccessibleHostPath will fail
-        expect(() => parseArguments(['-r', 'missing-plugin', 'up'], envPaths, logger)).toThrow();
+        expect(() =>
+          parseArguments(['-r', 'missing-plugin', 'up'], envPaths, logger),
+        ).toThrow();
       } finally {
         try {
           fs.rmSync(tmpdir, { recursive: true, force: true });
@@ -224,7 +236,11 @@ describe('services/argumentParser (combinatorial)', () => {
         const hostBase = path.join(paths.hostRoot, 'base');
         const containerBase = path.join(paths.containerRoot, 'base');
         fs.mkdirSync(containerBase, { recursive: true });
-        const cfg = parseArguments(['--plugins-root', hostBase, 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['--plugins-root', hostBase, 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.pluginsRoot).toBe(hostBase);
         expect(cfg.action).toBe('up');
       } finally {
@@ -258,7 +274,11 @@ describe('services/argumentParser (combinatorial)', () => {
         const hostBase = path.join(paths.hostRoot, 'base3');
         const containerBase = path.join(paths.containerRoot, 'base3');
         fs.mkdirSync(containerBase, { recursive: true });
-        const cfg = parseArguments(['--wz-home', hostBase, 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['--wz-home', hostBase, 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.pluginsRoot).toBe(hostBase);
         expect(cfg.action).toBe('up');
       } finally {
@@ -317,7 +337,11 @@ describe('services/argumentParser (combinatorial)', () => {
         );
         fs.mkdirSync(dashHost, { recursive: true });
         fs.mkdirSync(dashContainer, { recursive: true });
-        const cfg = parseArguments(['-base', 'relative/path', 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          ['-base', 'relative/path', 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.useDashboardFromSource).toBe(true);
         expect(cfg.dashboardBase).toBe(dashHost);
       } finally {
@@ -336,7 +360,11 @@ describe('services/argumentParser (combinatorial)', () => {
         expect(cfg1.mode).toBe('saml');
         expect(cfg1.modeVersion).toBe('');
 
-        const cfg2 = parseArguments(['up', '--server', '4.12.0'], envPaths, logger);
+        const cfg2 = parseArguments(
+          ['up', '--server', '4.12.0'],
+          envPaths,
+          logger,
+        );
         expect(cfg2.mode).toBe('server');
         expect(cfg2.modeVersion).toBe('4.12.0');
       } finally {
@@ -349,11 +377,21 @@ describe('services/argumentParser (combinatorial)', () => {
     it('rejects non-action positional tokens', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        expect(() => parseArguments(['saml'], envPaths, logger)).toThrow(ValidationError);
-        expect(() => parseArguments(['server'], envPaths, logger)).toThrow(ValidationError);
-        expect(() => parseArguments(['server-local'], envPaths, logger)).toThrow(ValidationError);
-        expect(() => parseArguments(['saml+server'], envPaths, logger)).toThrow(ValidationError);
-        expect(() => parseArguments(['saml+server-local'], envPaths, logger)).toThrow(ValidationError);
+        expect(() => parseArguments(['saml'], envPaths, logger)).toThrow(
+          ValidationError,
+        );
+        expect(() => parseArguments(['server'], envPaths, logger)).toThrow(
+          ValidationError,
+        );
+        expect(() =>
+          parseArguments(['server-local'], envPaths, logger),
+        ).toThrow(ValidationError);
+        expect(() => parseArguments(['saml+server'], envPaths, logger)).toThrow(
+          ValidationError,
+        );
+        expect(() =>
+          parseArguments(['saml+server-local'], envPaths, logger),
+        ).toThrow(ValidationError);
       } finally {
         try {
           fs.rmSync(tmpdir, { recursive: true, force: true });
@@ -379,7 +417,9 @@ describe('services/argumentParser (combinatorial)', () => {
     it('throws when non-action positional token appears after flags', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        expect(() => parseArguments(['up', 'extra'], envPaths, logger)).toThrow(ValidationError);
+        expect(() => parseArguments(['up', 'extra'], envPaths, logger)).toThrow(
+          ValidationError,
+        );
       } finally {
         try {
           fs.rmSync(tmpdir, { recursive: true, force: true });

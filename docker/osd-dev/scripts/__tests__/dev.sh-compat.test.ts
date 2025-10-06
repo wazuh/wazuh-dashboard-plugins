@@ -228,7 +228,7 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
     const infoCalls = infoSpy.mock.calls.map(args => String(args[0] ?? ''));
     expect(
       infoCalls.some(l => l.includes('No dynamic compose override required.')),
-      ).toBe(true);
+    ).toBe(true);
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('up');
     expect(args).toContain('-Vd');

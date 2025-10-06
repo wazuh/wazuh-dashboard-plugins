@@ -39,13 +39,7 @@ describe('dev.ts - Multiple external repos in override', () => {
     const logger = new MockLogger('test');
     const runner = new StubRunner();
     await mainWithDeps(
-      [
-        '-r',
-        `custom1=${external1}`,
-        '-r',
-        `custom2=${external2}`,
-        'up',
-      ],
+      ['-r', `custom1=${external1}`, '-r', `custom2=${external2}`, 'up'],
       { logger, processRunner: runner },
     );
     await new Promise(r => setImmediate(r));

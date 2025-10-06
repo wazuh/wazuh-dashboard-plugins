@@ -47,7 +47,7 @@ Always use the provided script to bring up or down the development environment. 
   - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`) are auto-detected under `<root>/plugins/` when running from this repo, or can be set via `--plugins-root` (aliases: `-wdp`, `--wz-home`).
   - External repositories passed with `-r` are dynamically added as volumes to the `osd` service via an auto-generated `dev.override.generated.yml` (git-ignored).
   - Paths MUST be absolute. Shorthand is also supported: `-r <repo>` (no `=`), which assumes the repository is available under the container path `/sibling/<repo>` and resolves it from the sibling host root. If not found, an error is raised.
-Action (positional): One of up | down | stop | start | manager-local-up.
+    Action (positional): One of up | down | stop | start | manager-local-up.
 - -saml: (Optional) Deploys a SAML-enabled environment with KeyCloak IDP.
   - Note for SAML: You need to add idp to your hosts file ( /etc/hosts on Linux/macOS, C:\\Windows\\System32\\drivers\\etc\\hosts on Windows) pointing to 127.0.0.1 . Also, based on previous configurations, KeyCloak IDP might need to be started with the --no-base-path option.
   ```

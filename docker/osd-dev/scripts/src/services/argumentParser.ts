@@ -23,9 +23,15 @@ export function printUsageAndExit(log: Logger): never {
   log.infoPlain(
     "  -a <agents_up>       Optional for server-local: 'rpm' | 'deb' | 'without' (default: deploy 2 agents)",
   );
-  log.infoPlain('  -saml                 Enable SAML profile (can be combined with --server/--server-local)');
-  log.infoPlain('  --server <version>    Enable server mode with the given version');
-  log.infoPlain('  --server-local <tag>  Enable server-local mode with the given local image tag');
+  log.infoPlain(
+    '  -saml                 Enable SAML profile (can be combined with --server/--server-local)',
+  );
+  log.infoPlain(
+    '  --server <version>    Enable server mode with the given version',
+  );
+  log.infoPlain(
+    '  --server-local <tag>  Enable server-local mode with the given local image tag',
+  );
   log.infoPlain(
     '  -r repo=absolute_path Mount an external plugin repository (repeatable). Shorthand: -r repo (resolved under sibling root).',
   );
@@ -33,7 +39,9 @@ export function printUsageAndExit(log: Logger): never {
     '  -base [absolute_path] Use dashboard sources from a local checkout (auto-detects under sibling root when path omitted).',
   );
   log.infoPlain('');
-  log.infoPlain('Note: The only allowed positional token is the action (e.g., "up"). All other values must use flags.');
+  log.infoPlain(
+    'Note: The only allowed positional token is the action (e.g., "up"). All other values must use flags.',
+  );
   process.exit(1);
 }
 
@@ -84,15 +92,11 @@ export function parseArguments(
         const next = argv[++i];
         if (!next || !next.startsWith('/')) {
           throw new ValidationError(
-            "--plugins-root requires an absolute path value",
+            '--plugins-root requires an absolute path value',
           );
         }
         config.pluginsRoot = stripTrailingSlash(next);
-        ensureAccessibleHostPath(
-          config.pluginsRoot,
-          'Base path',
-          envPaths,
-        );
+        ensureAccessibleHostPath(config.pluginsRoot, 'Base path', envPaths);
         i++;
         break;
       }
@@ -132,7 +136,7 @@ export function parseArguments(
         const ver = argv[++i];
         if (!ver || ver.startsWith('-')) {
           throw new ValidationError(
-            "--server requires a version argument, e.g. --server 4.12.0",
+            '--server requires a version argument, e.g. --server 4.12.0',
           );
         }
         config.serverFlagVersion = ver;
@@ -144,7 +148,7 @@ export function parseArguments(
         const ver = argv[++i];
         if (!ver || ver.startsWith('-')) {
           throw new ValidationError(
-            "--server-local requires a version/tag argument, e.g. --server-local my-tag",
+            '--server-local requires a version/tag argument, e.g. --server-local my-tag',
           );
         }
         config.serverLocalFlagVersion = ver;
