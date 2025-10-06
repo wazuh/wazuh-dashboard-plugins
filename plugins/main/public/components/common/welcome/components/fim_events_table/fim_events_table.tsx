@@ -164,7 +164,7 @@ const columns = [
     field: '_source.syscheck.path',
     name: 'Path',
     sortable: true,
-    truncateText: true
+    truncateText: true,
   },
   {
     field: '_source.syscheck.event',
