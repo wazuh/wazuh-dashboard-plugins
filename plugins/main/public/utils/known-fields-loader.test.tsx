@@ -51,25 +51,25 @@ describe('Known Fields Loader', () => {
   describe('getKnownFieldsByIndexType', () => {
     test('should return known fields for all index types', () => {
       const indexTypes = [
-        WAZUH_INDEX_TYPE_ALERTS,
-        WAZUH_INDEX_TYPE_MONITORING,
-        WAZUH_INDEX_TYPE_STATISTICS,
-        WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
-        WAZUH_INDEX_TYPE_STATES_FIM_FILES,
-        WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
-        WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
+        'wazuh-index-type-alerts',
+        'wazuh-index-type-monitoring',
+        'wazuh-index-type-statistics',
+        'wazuh-index-type-states-vulnerabilities',
+        'wazuh-index-type-states-fim-files',
+        'wazuh-index-type-states-fim-registries',
+        'wazuh-index-type-states-inventory-system',
+        'wazuh-index-type-states-inventory-hardware',
+        'wazuh-index-type-states-inventory-networks',
+        'wazuh-index-type-states-inventory-packages',
+        'wazuh-index-type-states-inventory-ports',
+        'wazuh-index-type-states-inventory-processes',
+        'wazuh-index-type-states-inventory-protocols',
+        'wazuh-index-type-states-inventory-users',
+        'wazuh-index-type-states-inventory-groups',
+        'wazuh-index-type-states-inventory-services',
+        'wazuh-index-type-states-inventory-interfaces',
+        'wazuh-index-type-states-inventory-hotfixes',
+        'wazuh-index-type-states-inventory-browser-extensions',
       ];
 
       indexTypes.forEach(indexType => {
@@ -81,7 +81,9 @@ describe('Known Fields Loader', () => {
     });
 
     test('should have consistent field structure', () => {
-      const fields = getKnownFieldsByIndexType(WAZUH_INDEX_TYPE_ALERTS);
+      const fields = getKnownFieldsByIndexType('wazuh-index-type-alerts');
+      expect(fields).toBeTruthy();
+      expect(Array.isArray(fields)).toBe(true);
       fields.forEach(field => {
         expect(field).toHaveProperty('name');
         expect(field).toHaveProperty('type');
