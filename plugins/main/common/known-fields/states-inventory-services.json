@@ -2,7 +2,9 @@
   {
     "name": "_id",
     "type": "string",
-    "esTypes": ["_id"],
+    "esTypes": [
+      "_id"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -10,7 +12,9 @@
   {
     "name": "_index",
     "type": "string",
-    "esTypes": ["_index"],
+    "esTypes": [
+      "_index"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -25,7 +29,9 @@
   {
     "name": "_source",
     "type": "_source",
-    "esTypes": ["_source"],
+    "esTypes": [
+      "_source"
+    ],
     "searchable": false,
     "aggregatable": false,
     "readFromDocValues": false
@@ -33,7 +39,9 @@
   {
     "name": "_type",
     "type": "string",
-    "esTypes": ["_type"],
+    "esTypes": [
+      "_type"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -41,7 +49,9 @@
   {
     "name": "agent.host.architecture",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -49,7 +59,9 @@
   {
     "name": "agent.host.ip",
     "type": "ip",
-    "esTypes": ["ip"],
+    "esTypes": [
+      "ip"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -57,7 +69,9 @@
   {
     "name": "agent.id",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -65,7 +79,9 @@
   {
     "name": "agent.name",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -73,7 +89,9 @@
   {
     "name": "agent.version",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -81,7 +99,9 @@
   {
     "name": "error.log.file.path",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -89,7 +109,9 @@
   {
     "name": "file.path",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -97,7 +119,9 @@
   {
     "name": "log.file.path",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -105,7 +129,9 @@
   {
     "name": "process.args",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -113,7 +139,9 @@
   {
     "name": "process.executable",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -121,7 +149,9 @@
   {
     "name": "process.group.name",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -129,7 +159,9 @@
   {
     "name": "process.pid",
     "type": "number",
-    "esTypes": ["long"],
+    "esTypes": [
+      "long"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -137,7 +169,9 @@
   {
     "name": "process.root_directory",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -145,7 +179,9 @@
   {
     "name": "process.user.name",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -153,7 +189,9 @@
   {
     "name": "process.working_directory",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -161,7 +199,9 @@
   {
     "name": "service.address",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -169,7 +209,9 @@
   {
     "name": "service.description",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -177,7 +219,9 @@
   {
     "name": "service.enabled",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -185,7 +229,9 @@
   {
     "name": "service.exit_code",
     "type": "number",
-    "esTypes": ["integer"],
+    "esTypes": [
+      "integer"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -193,7 +239,9 @@
   {
     "name": "service.following",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -201,7 +249,9 @@
   {
     "name": "service.frequency",
     "type": "number",
-    "esTypes": ["long"],
+    "esTypes": [
+      "long"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -209,7 +259,9 @@
   {
     "name": "service.id",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -217,7 +269,9 @@
   {
     "name": "service.inetd_compatibility",
     "type": "boolean",
-    "esTypes": ["boolean"],
+    "esTypes": [
+      "boolean"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -225,7 +279,9 @@
   {
     "name": "service.name",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -233,7 +289,9 @@
   {
     "name": "service.object_path",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -241,7 +299,9 @@
   {
     "name": "service.restart",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -249,7 +309,9 @@
   {
     "name": "service.start_type",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -257,7 +319,9 @@
   {
     "name": "service.starts.on_mount",
     "type": "boolean",
-    "esTypes": ["boolean"],
+    "esTypes": [
+      "boolean"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -265,7 +329,9 @@
   {
     "name": "service.starts.on_not_empty_directory",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -273,7 +339,9 @@
   {
     "name": "service.starts.on_path_modified",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -281,7 +349,9 @@
   {
     "name": "service.state",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -289,7 +359,9 @@
   {
     "name": "service.sub_state",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -297,7 +369,9 @@
   {
     "name": "service.target.address",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -305,7 +379,9 @@
   {
     "name": "service.target.ephemeral_id",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -313,7 +389,9 @@
   {
     "name": "service.target.type",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -321,7 +399,9 @@
   {
     "name": "service.type",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -329,7 +409,9 @@
   {
     "name": "service.win32_exit_code",
     "type": "number",
-    "esTypes": ["integer"],
+    "esTypes": [
+      "integer"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -337,7 +419,9 @@
   {
     "name": "wazuh.cluster.name",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -345,7 +429,9 @@
   {
     "name": "wazuh.cluster.node",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -353,7 +439,9 @@
   {
     "name": "wazuh.schema.version",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true

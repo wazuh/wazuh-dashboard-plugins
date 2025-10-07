@@ -56,22 +56,20 @@ const TEMPLATE_SOURCES = {
     // This is in the dashboard-plugins repo
     urls: [
       dashboardPluginsUrl(
-        'plugins/main/server/integration-files/monitoring-template.ts',
+        'plugins/main/server/integration-files/monitoring-template.json',
       ),
     ],
     outputFile: 'plugins/main/common/known-fields/monitoring.json',
-    isTypeScript: true,
   },
   statistics: {
     name: 'statistics',
     // This is in the dashboard-plugins repo
     urls: [
       dashboardPluginsUrl(
-        'plugins/main/server/integration-files/statistics-template.ts',
+        'plugins/main/server/integration-files/statistics-template.json',
       ),
     ],
     outputFile: 'plugins/main/common/known-fields/statistics.json',
-    isTypeScript: true,
   },
   // FIM templates
   'states-fim-files': {
@@ -404,9 +402,9 @@ function extractFields(properties, prefix = '') {
 }
 
 /**
- * Fetches template from URL
+ * Fetches template JSON from URL
  */
-function fetchTemplate(url, isTypeScript = false) {
+function fetchTemplate(url) {
   return new Promise((resolve, reject) => {
     https
       .get(url, res => {
@@ -418,41 +416,8 @@ function fetchTemplate(url, isTypeScript = false) {
 
         res.on('end', () => {
           try {
-            if (isTypeScript) {
-              // For TypeScript files, we need to extract the template object
-              // Look for export const template or similar patterns
-              const templateMatch = data.match(
-                /export\s+const\s+\w*[tT]emplate\s*=\s*({[\s\S]*});?\s*$/m,
-              );
-              if (templateMatch) {
-                try {
-                  // Clean up the template string and evaluate it
-                  let templateStr = templateMatch[1];
-
-                  // Remove any trailing semicolon or comma
-                  templateStr = templateStr.replace(/[;,]\s*$/, '');
-
-                  // Use Function constructor instead of eval for safer evaluation
-                  const template = new Function(`return ${templateStr}`)();
-                  resolve(template);
-                } catch (evalError) {
-                  reject(
-                    new Error(
-                      `Failed to evaluate template object: ${evalError.message}`,
-                    ),
-                  );
-                }
-              } else {
-                reject(
-                  new Error(
-                    `Could not extract template from TypeScript file: ${url}`,
-                  ),
-                );
-              }
-            } else {
-              const template = JSON.parse(data);
-              resolve(template);
-            }
+            const template = JSON.parse(data);
+            resolve(template);
           } catch (error) {
             reject(
               new Error(
@@ -471,12 +436,12 @@ function fetchTemplate(url, isTypeScript = false) {
 /**
  * Tries multiple URLs until one succeeds
  */
-async function fetchTemplateFromUrls(urls, isTypeScript = false) {
+async function fetchTemplateFromUrls(urls) {
   let lastError;
 
   for (const url of urls) {
     try {
-      const template = await fetchTemplate(url, isTypeScript);
+      const template = await fetchTemplate(url);
       return { template, url };
     } catch (error) {
       lastError = error;
@@ -494,10 +459,7 @@ async function processTemplate(config) {
   console.log(`Processing ${config.name} template...`);
 
   try {
-    const { template, url } = await fetchTemplateFromUrls(
-      config.urls,
-      config.isTypeScript,
-    );
+    const { template, url } = await fetchTemplateFromUrls(config.urls);
     console.log(`  ✅ Successfully fetched from: ${url}`);
 
     // Extract mappings - handle different template structures

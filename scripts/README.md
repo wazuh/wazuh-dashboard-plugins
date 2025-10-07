@@ -23,17 +23,20 @@ node scripts/generate-known-fields.js
 **Features:**
 
 - Fetches templates from multiple sources (Wazuh server repo, dashboard repo)
-- Handles both JSON and TypeScript template formats
-- Converts OpenSearch field mappings to dashboard known fields format
+- Dynamically reads version from package.json for sustainable URL generation
+- Converts Elasticsearch/OpenSearch field mappings to dashboard known fields format
 - Supports multiple URL fallbacks for each template type
-- Generates JSON files in `plugins/main/public/utils/known-fields/`
+- Handles nested field types properly
+- Generates JSON files in `plugins/main/common/known-fields/`
 
 **Supported Templates:**
 
-- **Vulnerabilities**: `wazuh-states-vulnerabilities-*` indices
 - **Alerts**: `wazuh-alerts-*` indices
-- **Monitoring**: `wazuh-monitoring-*` indices (TODO: fix TypeScript parsing)
-- **Statistics**: `wazuh-statistics-*` indices (TODO: fix TypeScript parsing)
+- **Vulnerabilities**: `wazuh-states-vulnerabilities-*` indices
+- **Monitoring**: `wazuh-monitoring-*` indices
+- **Statistics**: `wazuh-statistics-*` indices
+- **FIM**: File integrity monitoring (files, registries)
+- **Inventory**: All inventory states (system, hardware, networks, packages, ports, processes, protocols, users, groups, services, interfaces, hotfixes, browser-extensions)
 
 ## Template Sources
 
@@ -47,25 +50,34 @@ The script fetches templates from these official Wazuh repositories:
 
 ### Wazuh Dashboard Plugins (github.com/wazuh/wazuh-dashboard-plugins)
 
-- **Monitoring**: [`plugins/main/server/integration-files/monitoring-template.ts`](https://github.com/wazuh/wazuh-dashboard-plugins/blob/4.14.0/plugins/main/server/integration-files/monitoring-template.ts)
-- **Statistics**: [`plugins/main/server/integration-files/statistics-template.ts`](https://github.com/wazuh/wazuh-dashboard-plugins/blob/4.14.0/plugins/main/server/integration-files/statistics-template.ts)
+- **Monitoring**: `plugins/main/server/integration-files/monitoring-template.json`
+- **Statistics**: `plugins/main/server/integration-files/statistics-template.json`
 
 ## Generated Files
 
-The script generates JSON files in `plugins/main/public/utils/known-fields/`:
+The script generates JSON files in `plugins/main/common/known-fields/`:
 
-- `alerts.json` - Fields for alert index patterns
-- `states-vulnerabilities.json` - Fields for vulnerability state patterns
-- `monitoring.json` - Fields for monitoring patterns (TODO)
-- `statistics.json` - Fields for statistics patterns (TODO)
+- `alerts.json` - Fields for alert index patterns (621 fields)
+- `monitoring.json` - Fields for monitoring patterns (12 fields)
+- `statistics.json` - Fields for statistics patterns (75 fields)
+- `states-vulnerabilities.json` - Fields for vulnerability state patterns (52 fields)
+- `states-fim-files.json` - FIM files patterns (24 fields)
+- `states-fim-registries.json` - FIM registries patterns (30 fields)
+- `states-inventory-*.json` - All inventory state patterns (system, hardware, networks, packages, ports, processes, protocols, users, groups, services, interfaces, hotfixes, browser-extensions)
 
 ## Integration
 
-The generated files are consumed by `plugins/main/public/utils/known-fields-loader.js`, which provides:
+The generated files are stored in `plugins/main/common/known-fields/` and consumed by:
 
+**Client side** (`plugins/main/public/utils/known-fields-loader.js`):
+- `getKnownFieldsByIndexType(indexType)` - Get fields by index type constant
 - `getKnownFieldsForStatesPattern(pattern)` - Get fields for a specific states pattern
 - `getKnownFieldsForPattern(patternType)` - Get fields by pattern type
 - `KnownFieldsStatesGenerated` - Mapping object for all states patterns
+
+**Server side** (`plugins/main/server/lib/sample-data/lib/known-fields-reader.js`):
+- `loadKnownFields(datasetType)` - Load known fields for sample data generation
+- Used to ensure sample data is synchronized with field definitions
 
 ## Workflow
 
@@ -82,10 +94,16 @@ To add support for a new template:
 3. Add mapping entry to `KnownFieldsStatesGenerated`
 4. Update the corresponding index type constants if needed
 
+## Recent Improvements
+
+- ✅ Dynamic version loading from package.json (no hardcoded versions)
+- ✅ Proper nested field type handling
+- ✅ Moved templates from TypeScript to JSON format for simplicity
+- ✅ Moved generated files to common/ directory (accessible from both client and server)
+- ✅ Added support for all inventory state templates
+
 ## Future Improvements
 
-- [ ] Fix TypeScript template parsing for monitoring/statistics
-- [ ] Add support for inventory state templates
-- [ ] Integrate with CI/CD for automatic updates
+- [ ] Integrate with CI/CD for automatic updates on template changes
 - [ ] Add validation to ensure generated fields match expected format
-- [ ] Add support for multiple template versions (e.g., different Wazuh releases)
+- [ ] Add diffing tool to show changes between template versions
