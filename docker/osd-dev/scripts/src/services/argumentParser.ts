@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { ScriptConfig, EnvironmentPaths } from '../types/config';
+import { ScriptConfig, EnvironmentPaths, Config } from '../types/config';
 import {
   ensureAccessibleHostPath,
   stripTrailingSlash,
@@ -50,22 +50,8 @@ export function parseArguments(
   argv: string[],
   envPaths: EnvironmentPaths,
   log: Logger,
-): ScriptConfig {
-  const config: ScriptConfig = {
-    osVersion: '',
-    osdVersion: '',
-    agentsUp: '',
-    userRepositories: [],
-    pluginsRoot: '',
-    action: '',
-    mode: '',
-    modeVersion: '',
-    dashboardBase: '',
-    useDashboardFromSource: false,
-    enableSaml: false,
-    serverFlagVersion: '',
-    serverLocalFlagVersion: '',
-  };
+): Config {
+  const config = new Config();
 
   // New-style flags collection (mapped later into mode/modeVersion). No positional args allowed.
 
@@ -90,7 +76,7 @@ export function parseArguments(
             `${FLAGS.PLUGINS_ROOT} requires an absolute path value`,
           );
         }
-        config.pluginsRoot = stripTrailingSlash(path);
+        config.setPluginsRoot(stripTrailingSlash(path), 'argumentParser');
         ensureAccessibleHostPath(config.pluginsRoot, 'Base path', envPaths);
         index++;
         break;
@@ -102,7 +88,7 @@ export function parseArguments(
             `${FLAGS.OS_VERSION} requires a version value, e.g. '${FLAGS.OS_VERSION} 2.11.0'`,
           );
         }
-        config.osVersion = version;
+        config.setOsVersion(version, 'argumentParser');
         index++;
         break;
       }
@@ -114,7 +100,7 @@ export function parseArguments(
             `${FLAGS.OSD_VERSION} requires a version value, e.g. '${FLAGS.OSD_VERSION} 2.11.0'`,
           );
         }
-        config.osdVersion = version;
+        config.setOsdVersion(version, 'argumentParser');
         index++;
         break;
       }
@@ -123,7 +109,7 @@ export function parseArguments(
         let val = argv[++index];
         // Aliases for 'without'
         if (val === 'none' || val === '0') val = 'without';
-        config.agentsUp = val;
+        config.setAgentsUp(val, 'argumentParser');
         if (!['rpm', 'deb', 'without', ''].includes(config.agentsUp)) {
           throw new ValidationError(
             `Invalid value for ${FLAGS.AGENTS_UP} option. Allowed values are 'rpm', 'deb', 'without', or an empty string.`,
@@ -134,7 +120,7 @@ export function parseArguments(
       }
 
       case FLAGS.SAML: {
-        config.enableSaml = true;
+        config.setEnableSaml(true, 'argumentParser');
         index++;
         break;
       }
@@ -146,7 +132,7 @@ export function parseArguments(
             `${FLAGS.SERVER} requires a version argument, e.g. ${FLAGS.SERVER} 4.12.0`,
           );
         }
-        config.serverFlagVersion = version;
+        config.setServerFlagVersion(version, 'argumentParser');
         index++;
         break;
       }
@@ -158,7 +144,7 @@ export function parseArguments(
             `${FLAGS.SERVER_LOCAL} requires a version/tag argument, e.g. ${FLAGS.SERVER_LOCAL} my-tag`,
           );
         }
-        config.serverLocalFlagVersion = version;
+        config.setServerLocalFlagVersion(version, 'argumentParser');
         index++;
         break;
       }
@@ -172,10 +158,13 @@ export function parseArguments(
               `Invalid repository specification '${repoSpec}'. Expected format repo=/absolute/path.`,
             );
           }
-          config.userRepositories.push({
-            name: repoName,
-            path: repoPath.replace(/\/$/, ''),
-          });
+          config.addUserRepositoryOverride(
+            {
+              name: repoName,
+              path: repoPath,
+            },
+            'argumentParser',
+          );
         } else {
           // Shorthand: -r <repoName> implies sibling root path
           const repoName = repoSpec;
@@ -193,28 +182,31 @@ export function parseArguments(
             `Repository path for '${repoName}'`,
             envPaths,
           );
-          config.userRepositories.push({
-            name: repoName,
-            path: inferredHostPath,
-          });
+          config.addUserRepositoryOverride(
+            {
+              name: repoName,
+              path: inferredHostPath,
+            },
+            'argumentParser',
+          );
         }
         index++;
         break;
       }
 
       case FLAGS.BASE: {
-        config.useDashboardFromSource = true;
+        config.setUseDashboardFromSource(true, 'argumentParser');
         const nextArg = argv[index + 1];
 
         if (nextArg && nextArg.startsWith('/')) {
           const basePath = stripTrailingSlash(nextArg);
           ensureAccessibleHostPath(basePath, 'Dashboard base path', envPaths);
-          config.dashboardBase = basePath;
+          config.setDashboardBase(basePath, 'argumentParser');
           index += 2;
         } else if (
           nextArg &&
           !nextArg.startsWith('-') &&
-          !allowedActions.has(nextArg as any)
+          !allowedActions.has(nextArg)
         ) {
           // Ignore and consume a relative token after FLAGS.BASE for backward compatibility
           // (kept to satisfy tests that pass a placeholder like 'relative/path').
@@ -230,7 +222,7 @@ export function parseArguments(
           throw new ValidationError(`Unsupported option '${arg}'.`);
         }
         // Allow exactly one positional action token, anywhere
-        if (allowedActions.has(arg as any)) {
+        if (allowedActions.has(arg)) {
           if (config.action) {
             throw new ValidationError(
               `Action provided multiple times: '${config.action}' and '${arg}'. Use only one positional action.`,
@@ -264,7 +256,7 @@ export function parseArguments(
         `Unable to locate wazuh-dashboard automatically. Provide an absolute path to ${FLAGS.BASE}.`,
       );
     }
-    config.dashboardBase = candidate;
+    config.setDashboardBase(candidate, 'argumentParser');
   }
 
   if (config.useDashboardFromSource) {
@@ -281,8 +273,9 @@ export function parseArguments(
   }
 
   if (!config.pluginsRoot && envPaths.currentRepoHostRoot) {
-    config.pluginsRoot = stripTrailingSlash(
-      resolve(envPaths.currentRepoHostRoot, 'plugins'),
+    config.setPluginsRoot(
+      stripTrailingSlash(resolve(envPaths.currentRepoHostRoot, 'plugins')),
+      'argumentParser',
     );
   }
 
@@ -298,13 +291,13 @@ export function parseArguments(
   }
   // Map explicit mode flags
   if (config.serverFlagVersion) {
-    config.mode = PROFILES.SERVER;
-    config.modeVersion = config.serverFlagVersion;
+    config.setMode(PROFILES.SERVER, 'argumentParser');
+    config.setModeVersion(config.serverFlagVersion, 'argumentParser');
   } else if (config.serverLocalFlagVersion) {
-    config.mode = PROFILES.SERVER_LOCAL;
-    config.modeVersion = config.serverLocalFlagVersion;
+    config.setMode(PROFILES.SERVER_LOCAL, 'argumentParser');
+    config.setModeVersion(config.serverLocalFlagVersion, 'argumentParser');
   } else if (config.enableSaml && !config.mode) {
-    config.mode = PROFILES.SAML;
+    config.setMode(PROFILES.SAML, 'argumentParser');
   }
 
   return config;

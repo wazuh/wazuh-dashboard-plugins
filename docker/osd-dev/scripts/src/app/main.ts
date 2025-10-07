@@ -46,7 +46,7 @@ import {
 } from '../utils/pathUtils';
 
 const isSecurityPluginName = (name: string): boolean =>
-  SECURITY_PLUGIN_ALIASES.includes(name as any);
+  SECURITY_PLUGIN_ALIASES.some(alias => alias === name);
 
 function ensureDashboardSources(
   config: ScriptConfig,
@@ -200,19 +200,16 @@ export async function mainWithDeps(
     deps.logger.info(
       `OS Version not received via flag, getting the version from ${envPaths.packageJsonPath}`,
     );
-    config = {
-      ...config,
-      osVersion: getPlatformVersionFromPackageJson('OS', envPaths),
-    };
+    const resolvedOs = getPlatformVersionFromPackageJson('OS', envPaths);
+    // Record that main resolved this value from package.json
+    config.setOsVersion(resolvedOs, 'main');
   }
   if (!config.osdVersion) {
     deps.logger.info(
       `OSD Version not received via flag, getting the version from ${envPaths.packageJsonPath}`,
     );
-    config = {
-      ...config,
-      osdVersion: getPlatformVersionFromPackageJson('OSD', envPaths),
-    };
+    const resolvedOsd = getPlatformVersionFromPackageJson('OSD', envPaths);
+    config.setOsdVersion(resolvedOsd, 'main');
   }
 
   // Resolve required repositories and apply env vars
