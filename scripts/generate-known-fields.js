@@ -44,8 +44,7 @@ const TEMPLATE_SOURCES = {
         'src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-vulnerabilities.json',
+    outputFile: 'plugins/main/common/known-fields/states-vulnerabilities.json',
   },
   alerts: {
     name: 'alerts',
@@ -91,8 +90,7 @@ const TEMPLATE_SOURCES = {
         'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-registries.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-fim-registries.json',
+    outputFile: 'plugins/main/common/known-fields/states-fim-registries.json',
   },
   // Inventory templates (using the most recent versions without -update suffix)
   'states-inventory-system': {
@@ -102,8 +100,7 @@ const TEMPLATE_SOURCES = {
         'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-system.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-system.json',
+    outputFile: 'plugins/main/common/known-fields/states-inventory-system.json',
   },
   'states-inventory-hardware': {
     name: 'states-inventory-hardware',
@@ -142,8 +139,7 @@ const TEMPLATE_SOURCES = {
         'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-ports.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-ports.json',
+    outputFile: 'plugins/main/common/known-fields/states-inventory-ports.json',
   },
   'states-inventory-processes': {
     name: 'states-inventory-processes',
@@ -172,8 +168,7 @@ const TEMPLATE_SOURCES = {
         'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-users.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-users.json',
+    outputFile: 'plugins/main/common/known-fields/states-inventory-users.json',
   },
   'states-inventory-groups': {
     name: 'states-inventory-groups',
@@ -182,8 +177,7 @@ const TEMPLATE_SOURCES = {
         'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-groups.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-groups.json',
+    outputFile: 'plugins/main/common/known-fields/states-inventory-groups.json',
   },
   'states-inventory-services': {
     name: 'states-inventory-services',
