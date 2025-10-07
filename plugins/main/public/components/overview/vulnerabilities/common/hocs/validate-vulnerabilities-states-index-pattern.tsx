@@ -5,7 +5,6 @@ import {
   existsIndices,
   existsIndexPattern,
   createIndexPattern,
-  getIndexTypeFromPattern,
 } from '../../../../../react-services';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
@@ -13,6 +12,7 @@ import { LoadingSpinnerDataSource } from '../../../../common/loading/loading-spi
 import {
   HTTP_STATUS_CODES,
   WAZUH_VULNERABILITIES_PATTERN,
+  WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
 } from '../../../../../../common/constants';
 
 const INDEX_PATTERN_CREATION_NO_INDEX = 'INDEX_PATTERN_CREATION_NO_INDEX';
@@ -28,8 +28,10 @@ export async function validateVulnerabilitiesStateDataSources({
     // If the index pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND) {
       // Check the existence of indices
-      const indexType = getIndexTypeFromPattern(indexPatternID);
-      const { exist, fields } = await existsIndices(indexPatternID, indexType);
+      const { exist, fields } = await existsIndices(
+        indexPatternID,
+        WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
+      );
 
       if (!exist) {
         return {

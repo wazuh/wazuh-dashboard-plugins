@@ -55,10 +55,13 @@ export function getIndexTypeFromPattern(pattern: string): string {
     pattern.includes(key),
   );
 
-  // Return corresponding index type or default to alerts
-  return matchingKey
-    ? PATTERN_TO_INDEX_TYPE_MAP[matchingKey]
-    : WAZUH_INDEX_TYPE_ALERTS;
+  if (!matchingKey) {
+    throw new Error(
+      `Unable to determine index type for pattern: ${pattern}. Please specify the index type explicitly.`,
+    );
+  }
+
+  return PATTERN_TO_INDEX_TYPE_MAP[matchingKey];
 }
 
 export async function existsIndices(
