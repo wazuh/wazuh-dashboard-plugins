@@ -1,5 +1,6 @@
 {
   "order": 0,
+  "index_patterns": [],
   "settings": {
     "index.refresh_interval": "5s"
   },
