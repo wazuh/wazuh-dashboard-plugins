@@ -120,7 +120,6 @@ const FimTableDataSource = withDataSourceFetch({
   return (
     <EuiBasicTable
       items={dataSourceAction?.data?.items || []}
-      // Fix this, the setFile and SetOpen was removed
       columns={columns}
       loading={false}
       sorting={{ sort }}
