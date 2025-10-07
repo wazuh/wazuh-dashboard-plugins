@@ -68,12 +68,27 @@ export function getKnownFieldsForPattern(patternType) {
 
 /**
  * Extracts the pattern type from a full index pattern string
+ * Checks explicitly against known pattern types to avoid regex issues with hyphens
  * @param {string} pattern - Full index pattern (e.g., 'wazuh-states-vulnerabilities-*')
  * @returns {string|null} The pattern type or null if not a states pattern
  */
 export function extractPatternType(pattern) {
-  const match = pattern.match(/wazuh-states-(.+?)-\*/);
-  return match ? match[1] : null;
+  // Check if pattern starts with 'wazuh-states-' and ends with '-*'
+  if (!pattern.startsWith('wazuh-states-') || !pattern.endsWith('-*')) {
+    return null;
+  }
+
+  // Extract the middle part between 'wazuh-states-' and '-*'
+  const prefix = 'wazuh-states-';
+  const suffix = '-*';
+  const startIndex = prefix.length;
+  const endIndex = pattern.length - suffix.length;
+  const extractedType = pattern.substring(startIndex, endIndex);
+
+  // Verify it's a known pattern type
+  return KnownFieldsStatesGenerated.hasOwnProperty(extractedType)
+    ? extractedType
+    : null;
 }
 
 /**

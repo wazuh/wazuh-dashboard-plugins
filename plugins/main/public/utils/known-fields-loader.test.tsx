@@ -145,6 +145,12 @@ describe('Known Fields Loader', () => {
       expect(extractPatternType('wazuh-states-')).toBeNull();
       expect(extractPatternType('wazuh-states-*')).toBeNull();
     });
+
+    test('should return null for unknown states pattern types', () => {
+      // Pattern format is correct but type is not in KnownFieldsStatesGenerated
+      expect(extractPatternType('wazuh-states-unknown-type-*')).toBeNull();
+      expect(extractPatternType('wazuh-states-new-feature-*')).toBeNull();
+    });
   });
 
   describe('getKnownFieldsForPattern', () => {
