@@ -1,11 +1,34 @@
 import {
   KnownFields,
-  GeneratedKnownFields,
   KnownFieldsStatesGenerated,
   getKnownFieldsForPattern,
+  getKnownFieldsByIndexType,
   extractPatternType,
   getKnownFieldsForStatesPattern,
 } from './known-fields-loader';
+import monitoringFields from './known-fields/monitoring.json';
+import statisticsFields from './known-fields/statistics.json';
+import {
+  WAZUH_INDEX_TYPE_ALERTS,
+  WAZUH_INDEX_TYPE_MONITORING,
+  WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
+  WAZUH_INDEX_TYPE_STATES_FIM_FILES,
+  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
+} from '../../common/constants';
 
 describe('Known Fields Loader', () => {
   describe('KnownFields export', () => {
@@ -23,46 +46,46 @@ describe('Known Fields Loader', () => {
     });
   });
 
-  describe('GeneratedKnownFields', () => {
-    test('should include all expected template types', () => {
-      const expectedTypes = [
-        'alerts',
-        'monitoring',
-        'statistics',
-        'states-vulnerabilities',
-        'states-fim-files',
-        'states-fim-registries',
-        'states-inventory-system',
-        'states-inventory-hardware',
-        'states-inventory-networks',
-        'states-inventory-packages',
-        'states-inventory-ports',
-        'states-inventory-processes',
-        'states-inventory-protocols',
-        'states-inventory-users',
-        'states-inventory-groups',
-        'states-inventory-services',
-        'states-inventory-interfaces',
-        'states-inventory-hotfixes',
-        'states-inventory-browser-extensions',
+  describe('getKnownFieldsByIndexType', () => {
+    test('should return known fields for all index types', () => {
+      const indexTypes = [
+        WAZUH_INDEX_TYPE_ALERTS,
+        WAZUH_INDEX_TYPE_MONITORING,
+        WAZUH_INDEX_TYPE_STATISTICS,
+        WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
+        WAZUH_INDEX_TYPE_STATES_FIM_FILES,
+        WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
+        WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
       ];
 
-      expectedTypes.forEach(type => {
-        expect(GeneratedKnownFields[type]).toBeDefined();
-        expect(Array.isArray(GeneratedKnownFields[type])).toBe(true);
-        expect(GeneratedKnownFields[type].length).toBeGreaterThan(0);
+      indexTypes.forEach(indexType => {
+        const fields = getKnownFieldsByIndexType(indexType);
+        expect(fields).toBeDefined();
+        expect(Array.isArray(fields)).toBe(true);
+        expect(fields.length).toBeGreaterThan(0);
       });
     });
 
     test('should have consistent field structure', () => {
-      Object.values(GeneratedKnownFields).forEach(fields => {
-        fields.forEach(field => {
-          expect(field).toHaveProperty('name');
-          expect(field).toHaveProperty('type');
-          expect(field).toHaveProperty('searchable');
-          expect(field).toHaveProperty('aggregatable');
-          expect(field).toHaveProperty('readFromDocValues');
-        });
+      const fields = getKnownFieldsByIndexType(WAZUH_INDEX_TYPE_ALERTS);
+      fields.forEach(field => {
+        expect(field).toHaveProperty('name');
+        expect(field).toHaveProperty('type');
+        expect(field).toHaveProperty('searchable');
+        expect(field).toHaveProperty('aggregatable');
+        expect(field).toHaveProperty('readFromDocValues');
       });
     });
   });
@@ -190,8 +213,6 @@ describe('Known Fields Loader', () => {
     });
 
     test('monitoring should have timestamp and status fields', () => {
-      const monitoringFields = GeneratedKnownFields.monitoring;
-
       const timestampField = monitoringFields.find(f => f.name === 'timestamp');
       expect(timestampField).toBeDefined();
       expect(timestampField.type).toBe('date');
@@ -202,8 +223,6 @@ describe('Known Fields Loader', () => {
     });
 
     test('statistics should have analysisd fields', () => {
-      const statisticsFields = GeneratedKnownFields.statistics;
-
       const analysisdFields = statisticsFields.filter(f =>
         f.name.startsWith('analysisd.'),
       );

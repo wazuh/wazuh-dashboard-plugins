@@ -14,6 +14,7 @@ import { GenericRequest } from './generic-request';
 import {
   KnownFields,
   getKnownFieldsForStatesPattern,
+  getKnownFieldsByIndexType,
 } from '../utils/known-fields-loader';
 import { FieldsStatistics } from '../utils/statistics-fields';
 import { FieldsMonitoring } from '../utils/monitoring-fields';
@@ -347,16 +348,15 @@ export class SavedObject {
         case WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES:
         case WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES:
         case WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS:
-          // For states patterns, get the appropriate known fields based on pattern
-          const statesFields =
-            SavedObject.getKnownFieldsForStatesPattern(pattern);
+          // Get known fields by index type to ensure expected fields are returned
+          const statesFields = getKnownFieldsByIndexType(indexType);
           if (statesFields) {
             return statesFields;
           }
           // If no specific states fields found, throw error
           const statesError = ErrorFactory.create(WarningError, {
             error,
-            message: `No known fields defined for states pattern: ${pattern}`,
+            message: `No known fields defined for index type: ${indexType}`,
           });
           throw statesError;
         default:
