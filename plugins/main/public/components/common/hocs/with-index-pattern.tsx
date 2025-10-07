@@ -38,7 +38,10 @@ export const ensureIndexPatternIsCreated =
       ) {
         // Check the existence of indices
         const indexType = getIndexTypeFromPattern(indexPatternID);
-        const { exist, fields } = await existsIndices(indexPatternID, indexType);
+        const { exist, fields } = await existsIndices(
+          indexPatternID,
+          indexType,
+        );
 
         if (!exist) {
           return {

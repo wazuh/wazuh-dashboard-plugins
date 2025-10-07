@@ -256,7 +256,10 @@ export default compose(
         // Check the existence of related index pattern
         const existIndexPattern = await existsIndexPattern(indexPatternID);
         const indexType = getIndexTypeFromPattern(indexPatternID);
-        const { exist, fields } = await existsIndices(indexPatternID, indexType);
+        const { exist, fields } = await existsIndices(
+          indexPatternID,
+          indexType,
+        );
         setLoading(true);
 
         if (exist) {
