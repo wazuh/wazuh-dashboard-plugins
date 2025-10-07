@@ -6,6 +6,5 @@ export { addAgentsToGroupService } from './add-agents-to-group';
 export { getGroupsService } from './get-groups';
 export { upgradeAgentService } from './upgrade-agent';
 export { upgradeAgentsService } from './upgrade-agents';
-export { getOutdatedAgentsService } from './get-outdated-agents';
 export { getTasks } from './get-tasks';
 export { getAgentsInfo } from './get-agents-info';
