@@ -97,7 +97,11 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const getApiVersion = async () => {
     try {
       const managerVersion = await WzRequest.apiReq('GET', '/', {});
-      const apiVersion = managerVersion?.data?.data?.api_version || {};
+      let apiVersion = managerVersion?.data?.data?.api_version || {};
+      // Remove the 'v' prefix if it exists
+      if (typeof apiVersion === 'string' && apiVersion.startsWith('v')) {
+        apiVersion = apiVersion.slice(1);
+      }
       setApiVersion(apiVersion as string);
     } catch (error) {
       const options = {
