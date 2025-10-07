@@ -24,7 +24,7 @@ node scripts/generate-known-fields.js
 
 - Fetches templates from multiple sources (Wazuh server repo, dashboard repo)
 - Handles both JSON and TypeScript template formats
-- Converts Elasticsearch field mappings to dashboard known fields format
+- Converts OpenSearch field mappings to dashboard known fields format
 - Supports multiple URL fallbacks for each template type
 - Generates JSON files in `plugins/main/public/utils/known-fields/`
 
