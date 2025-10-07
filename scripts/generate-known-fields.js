@@ -244,6 +244,7 @@ function mapIndexFieldType(esType, field) {
     boolean: 'boolean',
     ip: 'ip',
     geo_point: 'geo_point',
+    nested: 'nested',
     _id: 'string',
     _index: 'string',
     _source: '_source',
@@ -285,7 +286,7 @@ function isAggregatable(fieldProps, esType) {
     return false;
 
   // Most structured types are aggregatable
-  return !['text', '_source'].includes(esType);
+  return !['text', '_source', 'nested'].includes(esType);
 }
 
 /**
@@ -293,7 +294,7 @@ function isAggregatable(fieldProps, esType) {
  */
 function shouldReadFromDocValues(fieldProps, esType) {
   // These field types don't use doc values
-  if (['_id', '_index', '_source', '_type', 'text'].includes(esType))
+  if (['_id', '_index', '_source', '_type', 'text', 'nested'].includes(esType))
     return false;
 
   // Check if explicitly disabled
@@ -362,11 +363,8 @@ function extractFields(properties, prefix = '') {
   for (const [fieldName, fieldDef] of Object.entries(properties)) {
     const fullFieldName = prefix ? `${prefix}.${fieldName}` : fieldName;
 
-    if (fieldDef.properties) {
-      // Nested object - recurse
-      fields.push(...extractFields(fieldDef.properties, fullFieldName));
-    } else if (fieldDef.type) {
-      // Leaf field
+    // Handle fields with type (including nested with properties)
+    if (fieldDef.type) {
       const esType = fieldDef.type;
       const field = {
         name: fullFieldName,
@@ -397,6 +395,14 @@ function extractFields(properties, prefix = '') {
           fields.push(subField);
         }
       }
+
+      // Handle nested type with properties
+      if (esType === 'nested' && fieldDef.properties) {
+        fields.push(...extractFields(fieldDef.properties, fullFieldName));
+      }
+    } else if (fieldDef.properties) {
+      // Object type without explicit type - recurse into properties
+      fields.push(...extractFields(fieldDef.properties, fullFieldName));
     }
   }
 

@@ -1671,6 +1671,14 @@
     "readFromDocValues": true
   },
   {
+    "name": "data.ms-graph.evidence",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
     "name": "data.ms-graph.evidence._comment",
     "type": "string",
     "esTypes": ["keyword"],
@@ -1991,6 +1999,14 @@
     "readFromDocValues": true
   },
   {
+    "name": "data.ms-graph.configurationManagerClientEnabledFeatures",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
     "name": "data.ms-graph.configurationManagerClientEnabledFeatures.@odata.type",
     "type": "string",
     "esTypes": ["keyword"],
@@ -2055,6 +2071,14 @@
     "readFromDocValues": true
   },
   {
+    "name": "data.ms-graph.deviceActionResults",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
     "name": "data.ms-graph.deviceActionResults.@odata.type",
     "type": "string",
     "esTypes": ["keyword"],
@@ -2117,6 +2141,14 @@
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
+  },
+  {
+    "name": "data.ms-graph.deviceHealthAttestationState",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
   },
   {
     "name": "data.ms-graph.deviceHealthAttestationState.@odata.type",
@@ -2551,6 +2583,14 @@
     "readFromDocValues": true
   },
   {
+    "name": "data.ms-graph.managedDevices",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
     "name": "data.ms-graph.managedDevices.deviceName",
     "type": "string",
     "esTypes": ["keyword"],
@@ -2703,6 +2743,14 @@
     "readFromDocValues": true
   },
   {
+    "name": "data.ms-graph.resources",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
     "name": "data.ms-graph.resources.@odata.type",
     "type": "string",
     "esTypes": ["keyword"],
@@ -2725,6 +2773,14 @@
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
+  },
+  {
+    "name": "data.ms-graph.resources.modifiedProperties",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
   },
   {
     "name": "data.ms-graph.resources.modifiedProperties.@odata.type",

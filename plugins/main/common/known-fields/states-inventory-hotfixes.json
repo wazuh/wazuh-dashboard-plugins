@@ -79,9 +79,9 @@
     "readFromDocValues": true
   },
   {
-    "name": "package.hotfix.name",
+    "name": "package.hotfix",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": ["object"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
