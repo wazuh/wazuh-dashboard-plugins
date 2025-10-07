@@ -1,10 +1,10 @@
 import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
-import { endpointSummary } from '../../../../utils/applications';
 import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
 import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
 import NavigationService from '../../../../react-services/navigation-service';
+import { isVersionLower } from '../utils';
 
 export const agentsTableActions = (
   allowEditGroups: boolean,
@@ -12,7 +12,7 @@ export const agentsTableActions = (
   setAgent: (agent: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
-  outdatedAgents: Agent[],
+  apiVersion: string,
 ) => [
   {
     name: agent => {
@@ -84,12 +84,12 @@ export const agentsTableActions = (
     enabled: () => allowEditGroups,
   },
   {
-    name: agent => {
+    name: (agent: Agent) => {
       const name = <span>Upgrade</span>;
-
-      const isOutdated = !!outdatedAgents.find(
-        outdatedAgent => outdatedAgent.id === agent.id,
-      );
+      // Extract the numeric part of the version
+      const versionNumber = agent.version.split('v')?.[1];
+      const isOutdated =
+        versionNumber && isVersionLower(versionNumber, apiVersion);
 
       if (agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated) {
         return (
@@ -121,10 +121,11 @@ export const agentsTableActions = (
       setIsUpgradeModalVisible(true);
     },
     'data-test-subj': 'action-upgrade',
-    enabled: agent => {
-      const isOutdated = !!outdatedAgents.find(
-        outdatedAgent => outdatedAgent.id === agent.id,
-      );
+    enabled: (agent: Agent) => {
+      const versionNumber = agent.version.split('v')?.[1];
+      const isOutdated =
+        versionNumber && isVersionLower(versionNumber, apiVersion);
+
       return (
         allowUpgrade &&
         agent.status === API_NAME_AGENT_STATUS.ACTIVE &&

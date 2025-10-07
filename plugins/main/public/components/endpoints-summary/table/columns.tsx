@@ -12,6 +12,7 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { Agent } from '../types';
+import { isVersionLower } from './utils';
 
 // Columns with the property truncateText: true won't wrap the text
 // This is added to prevent the wrap because of the table-layout: auto
@@ -22,7 +23,7 @@ export const agentsTableColumns = (
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
   setFilters: (filters) => void,
-  outdatedAgents: Agent[],
+  apiVersion: string,
 ) => [
   {
     field: 'id',
@@ -76,10 +77,11 @@ export const agentsTableColumns = (
     show: true,
     searchable: true,
     width: '100px',
-    render: (version, agent) => {
-      const isOutdated = !!outdatedAgents.find(
-        outdatedAgent => outdatedAgent.id === agent.id,
-      );
+    render: (version: string) => {
+      // Extract the numeric part of the version
+      const versionNumber = version.split('v')?.[1];
+      const isOutdated =
+        versionNumber && isVersionLower(versionNumber, apiVersion);
       return (
         <EuiFlexGroup
           wrap={false}
@@ -161,7 +163,7 @@ export const agentsTableColumns = (
       setAgent,
       setIsEditGroupsVisible,
       setIsUpgradeModalVisible,
-      outdatedAgents,
+      apiVersion,
     ),
   },
 ];

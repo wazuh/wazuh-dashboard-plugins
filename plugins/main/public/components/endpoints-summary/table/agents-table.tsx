@@ -37,12 +37,10 @@ import { agentsTableColumns } from './columns';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { Agent } from '../types';
 import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
-import { getOutdatedAgentsService } from '../services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
 import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
-import { WzButton } from '../../common/buttons';
 import NavigationService from '../../../react-services/navigation-service';
 
 const searchBarWQLOptions = {
@@ -91,38 +89,30 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
     { action: 'task:status', resource: '*:*:*' },
   ]);
 
-  const [totalOutdated, setTotalOutdated] = useState<number>();
-  const [isLoadingTotalOutdated, setIsLoadingTotalOutdated] = useState(true);
-  const [showOnlyOutdated, setShowOnlyOutdated] = useState(false);
-  const [outdatedAgents, setOutdatedAgents] = useState<Agent[]>([]);
-
   const [isUpgradeTasksModalVisible, setIsUpgradeTasksModalVisible] =
     useState(false);
   const [isUpgradePanelClosed, setIsUpgradePanelClosed] = useState(false);
+  const [apiVersion, setApiVersion] = useState('');
 
-  const getOutdatedAgents = async q => {
+  const getApiVersion = async () => {
     try {
-      setIsLoadingTotalOutdated(true);
-      const { total_affected_items } = await getOutdatedAgentsService({
-        limit: 1,
-        q,
-      });
-      setTotalOutdated(total_affected_items);
+      const managerVersion = await WzRequest.apiReq('GET', '/', {});
+      const apiVersion = managerVersion?.data?.data?.api_version || {};
+      setApiVersion(apiVersion as string);
     } catch (error) {
       const options = {
-        context: `EndpointsSummary.getOutdatedAgents`,
+        context: `AgentsTable.getApiVersion`,
         level: UI_LOGGER_LEVELS.ERROR,
         severity: UI_ERROR_SEVERITIES.BUSINESS,
         store: true,
         error: {
           error,
           message: error.message || error,
-          title: `Could not get total outdated agents`,
+          title: `Could not get API version`,
         },
       };
       getErrorOrchestrator().handleError(options);
-    } finally {
-      setIsLoadingTotalOutdated(false);
+      return;
     }
   };
 
@@ -130,6 +120,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
     if (sessionStorage.getItem('wz-agents-overview-table-filter')) {
       sessionStorage.removeItem('wz-agents-overview-table-filter');
     }
+    getApiVersion();
   }, []);
 
   useEffect(() => {
@@ -192,29 +183,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
 
   const handleOnDataChange = async (data: AgentList) => {
     setAgentList(data);
-
-    const agentIds = data?.items?.map(agent => agent.id);
-
-    try {
-      const outdatedAgents = agentIds?.length
-        ? (await getOutdatedAgentsService({ agentIds })).affected_items
-        : [];
-      setOutdatedAgents(outdatedAgents);
-    } catch (error) {
-      setOutdatedAgents([]);
-      const options = {
-        context: `AgentsTable.getOutdatedAgents`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error,
-          message: error.message || error,
-          title: `Could not get outdated agents`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    }
   };
 
   const showSelectAllItems =
@@ -253,25 +221,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
               </EuiFlexItem>
             ) : null}
           </EuiFlexGroup>
-        </EuiFlexItem>
-      ) : null}
-      {!isLoadingTotalOutdated ? (
-        <EuiFlexItem grow={false}>
-          <WzButton
-            buttonType='switch'
-            label={`Show only outdated${
-              totalOutdated || showOnlyOutdated ? ` (${totalOutdated})` : ''
-            }`}
-            checked={showOnlyOutdated}
-            disabled={!showOnlyOutdated && !totalOutdated}
-            tooltip={
-              !showOnlyOutdated &&
-              !totalOutdated && {
-                content: 'There are no outdated agents',
-              }
-            }
-            onChange={() => setShowOnlyOutdated(!showOnlyOutdated)}
-          />
         </EuiFlexItem>
       ) : null}
     </EuiFlexGroup>
@@ -329,7 +278,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                 />
               </EuiFlexItem>
             )}
-            endpoint={showOnlyOutdated ? '/agents/outdated' : '/agents'}
+            endpoint={'/agents'}
             tableColumns={agentsTableColumns(
               !denyEditGroups,
               !denyUpgrade,
@@ -337,7 +286,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
               setIsEditGroupsVisible,
               setIsUpgradeModalVisible,
               setFilters,
-              outdatedAgents,
+              apiVersion,
             )}
             tableInitialSortingField='id'
             tablePageSizeOptions={[10, 25, 50, 100]}
@@ -361,10 +310,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             }}
             rowProps={getRowProps}
             filters={filters}
-            onFiltersChange={filters => {
-              const q = filters.q ?? filters.default.q;
-              getOutdatedAgents(q);
-            }}
             onDataChange={handleOnDataChange}
             downloadCsv
             showReload
