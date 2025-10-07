@@ -16,11 +16,34 @@ const random = require('./random');
  */
 function loadKnownFields(datasetType) {
   try {
-    const knownFieldsPath = path.join(
+    // In production, compiled code is in target/public
+    // In development, code is in server/lib/sample-data/lib
+    // We need to find the known-fields directory relative to the plugin root
+    
+    // Try to find the plugin root by going up from __dirname
+    let knownFieldsPath;
+    
+    // Development path: server/lib/sample-data/lib -> ../../../../public/utils/known-fields
+    const devPath = path.join(
       __dirname,
-      '../../../../common/known-fields',
+      '../../../../public/utils/known-fields',
       `${datasetType}.json`,
     );
+    
+    // Production path: might be in target/public or similar
+    // Try development path first
+    if (fs.existsSync(devPath)) {
+      knownFieldsPath = devPath;
+    } else {
+      // Fallback: try to find from plugin root
+      // This handles production builds where structure might be different
+      const pluginRoot = path.resolve(__dirname, '../../../..');
+      knownFieldsPath = path.join(
+        pluginRoot,
+        'public/utils/known-fields',
+        `${datasetType}.json`,
+      );
+    }
 
     const knownFieldsFile = fs.readFileSync(knownFieldsPath, 'utf8');
     const knownFields = JSON.parse(knownFieldsFile);
