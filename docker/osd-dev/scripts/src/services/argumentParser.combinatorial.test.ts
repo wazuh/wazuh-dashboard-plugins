@@ -81,17 +81,20 @@ describe('services/argumentParser (combinatorial)', () => {
     ] as const;
     // flags-only no longer allowed for action
 
-    it.each(actions.map(action => [action]))('parses action positionally: %s', action => {
-      const { envPaths, tmpdir } = makeEnv();
-      try {
-        const cfg = parseArguments([action], envPaths, logger);
-        expect(cfg.action).toBe(action);
-      } finally {
+    it.each(actions.map(action => [action]))(
+      'parses action positionally: %s',
+      action => {
+        const { envPaths, tmpdir } = makeEnv();
         try {
-          fs.rmSync(tmpdir, { recursive: true, force: true });
-        } catch {}
-      }
-    });
+          const cfg = parseArguments([action], envPaths, logger);
+          expect(cfg.action).toBe(action);
+        } finally {
+          try {
+            fs.rmSync(tmpdir, { recursive: true, force: true });
+          } catch {}
+        }
+      },
+    );
   });
 
   describe('agentsUp flag', () => {

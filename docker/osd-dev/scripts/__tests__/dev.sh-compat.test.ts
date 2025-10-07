@@ -227,7 +227,9 @@ describe('dev.ts - Compat with legacy dev.sh tests', () => {
     await new Promise(tick => setImmediate(tick));
     const infoCalls = infoSpy.mock.calls.map(args => String(args[0] ?? ''));
     expect(
-      infoCalls.some(line => line.includes('No dynamic compose override required.')),
+      infoCalls.some(line =>
+        line.includes('No dynamic compose override required.'),
+      ),
     ).toBe(true);
     const args: string[] = runner.spawnCalls[0].args;
     expect(args).toContain('up');
