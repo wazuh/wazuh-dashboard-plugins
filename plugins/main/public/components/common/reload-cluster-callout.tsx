@@ -23,31 +23,26 @@ import {
 } from '@elastic/eui';
 
 import { getToasts } from '../../kibana-services';
-import {
-  clusterReq,
-  reloadRuleset,
-} from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { reloadRuleset } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
+import { WzButtonPermissions } from './permissions/button';
 
-interface IWzReloadClusterManagerCalloutProps {
-  updateWazuhNotReadyYet: (wazuhNotReadyYet) => void;
+interface IWzReloadClusterCalloutProps {
   onReloaded: () => void;
   onReloadedError: () => void;
 }
 
-interface IWzReloadClusterManagerCalloutState {
+interface IWzReloadClusterCalloutState {
   warningReloading: boolean;
-  isCluster: boolean;
 }
 
-class WzReloadClusterManagerCallout extends Component<
-  IWzReloadClusterManagerCalloutProps,
-  IWzReloadClusterManagerCalloutState
+class WzReloadClusterCallout extends Component<
+  IWzReloadClusterCalloutProps,
+  IWzReloadClusterCalloutState
 > {
   constructor(props) {
     super(props);
     this.state = {
       warningReloading: false,
-      isCluster: false,
     };
   }
   showToast(color, title, text = '', time = 3000) {
@@ -136,16 +131,6 @@ class WzReloadClusterManagerCallout extends Component<
       );
     }
   };
-  async componentDidMount() {
-    try {
-      const clusterStatus = await clusterReq();
-      this.setState({
-        isCluster:
-          clusterStatus.data.data.enabled === 'yes' &&
-          clusterStatus.data.data.running === 'yes',
-      });
-    } catch (error) {}
-  }
   render() {
     const { warningReloading } = this.state;
     return (
@@ -166,12 +151,16 @@ class WzReloadClusterManagerCallout extends Component<
                 </EuiText>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <EuiButton
+                <WzButtonPermissions
+                  buttonType='default'
+                  permissions={[
+                    { action: 'cluster:restart', resource: 'node:id:*' },
+                  ]}
                   iconType='refresh'
                   onClick={() => this.reloadCluster()}
                 >
                   {'Reload'}
-                </EuiButton>
+                </WzButtonPermissions>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiCallOut>
@@ -181,4 +170,4 @@ class WzReloadClusterManagerCallout extends Component<
   }
 }
 
-export default WzReloadClusterManagerCallout;
+export default WzReloadClusterCallout;

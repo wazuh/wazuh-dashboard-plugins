@@ -257,41 +257,35 @@ export class PatternDataSourceFilterManager
   }
 
   /**
-   * Return the filter when the cluster or manager are enabled
+   * Return the cluster filter
    */
-  static getClusterManagerFilters(
+  static getClusterFilters(
     indexPatternId: string,
     controlledByValue: string,
     key?: string,
   ): tFilter[] {
     const filterHandler = new FilterHandler();
-    const { status, cluster, manager } = AppState.getClusterInfo();
+    const { cluster } = AppState.getClusterInfo();
+    const filterValue = cluster;
 
-    const isClusterEnabled = status === 'enabled';
-    const filterValue = isClusterEnabled ? cluster : manager;
-
-    if (status === undefined || filterValue === undefined) {
+    if (filterValue === undefined) {
       throw new ErrorDataSourceServerAPIContextFilter(
         'Filter could not be created because no server API is selected. Make sure a server API is available and choose one in the selector.',
       );
     }
 
-    const managerFilter = filterHandler.managerQuery(
-      filterValue,
-      isClusterEnabled,
-      key,
-    );
-    managerFilter.meta = {
-      ...managerFilter.meta,
+    const clusterFilter = filterHandler.clusterQuery(filterValue, key);
+    clusterFilter.meta = {
+      ...clusterFilter.meta,
       controlledBy: controlledByValue,
       index: indexPatternId,
     };
     //@ts-ignore
-    managerFilter.$state = {
+    clusterFilter.$state = {
       store: FilterStateStore.APP_STATE,
     };
     //@ts-ignore
-    return [managerFilter] as tFilter[];
+    return [clusterFilter] as tFilter[];
   }
 
   /**

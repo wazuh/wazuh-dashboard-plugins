@@ -27,7 +27,6 @@ export interface IAPIHost {
 interface IAPIHostRegistry {
   manager: string | null;
   node: string | null;
-  status: string;
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
 }
@@ -189,8 +188,7 @@ export class ManageHosts {
 
     let manager = null,
       node = null,
-      status = 'disabled',
-      cluster = 'Disabled',
+      cluster = null,
       allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
 
     try {
@@ -227,32 +225,17 @@ export class ManageHosts {
         }
       }
 
-      const responseClusterStatus =
+      const responseClusterLocal =
         await this.serverAPIClient.asInternalUser.request(
           'GET',
-          `/cluster/status`,
+          `/cluster/local/info`,
           {},
           { apiHostID },
         );
 
-      if (
-        this.isServerAPIClientResponseOk(responseClusterStatus) &&
-        responseClusterStatus.data?.data?.enabled === 'yes'
-      ) {
-        status = 'enabled';
-
-        const responseClusterLocal =
-          await this.serverAPIClient.asInternalUser.request(
-            'GET',
-            `/cluster/local/info`,
-            {},
-            { apiHostID },
-          );
-
-        if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
-          node = responseClusterLocal.data.data.affected_items[0].node;
-          cluster = responseClusterLocal.data.data.affected_items[0].cluster;
-        }
+      if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
+        node = responseClusterLocal.data.data.affected_items[0].node;
+        cluster = responseClusterLocal.data.data.affected_items[0].cluster;
       }
     } catch (error) {
       if (options?.throwError) {
@@ -263,7 +246,6 @@ export class ManageHosts {
     const data = {
       manager,
       node,
-      status,
       cluster,
       allow_run_as,
     };

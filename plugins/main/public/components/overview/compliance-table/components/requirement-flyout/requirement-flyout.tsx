@@ -186,10 +186,9 @@ export const RequirementFlyout = connect(mapStateToProps)(
     renderBody() {
       const { currentRequirement } = this.props;
       const requirementImplicitFilter = {};
-      const isCluster = (AppState.getClusterInfo() || {}).status === 'enabled';
-      const clusterFilter = isCluster
-        ? { 'cluster.name': AppState.getClusterInfo().cluster }
-        : { 'manager.name': AppState.getClusterInfo().manager };
+      const clusterFilter = {
+        'cluster.name': AppState.getClusterInfo().cluster,
+      };
       this.clusterFilter = clusterFilter;
       requirementImplicitFilter[this.props.getRequirementKey()] =
         currentRequirement;

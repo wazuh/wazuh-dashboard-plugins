@@ -40,7 +40,6 @@ const SearchBar = getPlugins().data.ui.SearchBar;
 interface DashboardTabsPanelsProps {
   selectedTab: string;
   loadingNode: boolean;
-  isClusterMode: boolean;
   clusterNodes: any[];
   clusterNodeSelected: any;
   onSelectNode: (event: any) => void;
@@ -49,7 +48,6 @@ interface DashboardTabsPanelsProps {
 export const DashboardTabsPanels = ({
   selectedTab,
   loadingNode,
-  isClusterMode,
   clusterNodes,
   clusterNodeSelected,
   onSelectNode,
@@ -207,7 +205,6 @@ export const DashboardTabsPanels = ({
           )}
           {selectedTab === 'analysisd' && !loadingNode && (
             <DashboardAnalysisEngineStatistics
-              isClusterMode={isClusterMode}
               indexPatternId={dataSource?.id}
               searchBarProps={searchBarProps}
               lastReloadRequestTime={fingerprint}

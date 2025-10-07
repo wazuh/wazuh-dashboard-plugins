@@ -23,9 +23,6 @@ import {
   EuiFlexGroup,
   EuiToolTip,
 } from '@elastic/eui';
-// @ts-ignore
-import { formatUIDate } from '../../../../../react-services/time-service';
-import { FlyoutDetail } from '../../../../agents/fim/inventory/flyout';
 import { EuiLink } from '@elastic/eui';
 import { getCore, getDataPlugin } from '../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -160,7 +157,6 @@ const columns = [
     field: '_source.timestamp',
     name: 'Time',
     sortable: true,
-    render: field => formatUIDate(field),
     width: '150px',
   },
   {
@@ -189,14 +185,3 @@ const columns = [
   },
   { field: '_source.rule.id', name: 'Rule Id', sortable: true, width: '75px' },
 ];
-
-const renderPath = (path, setFile, setIsOpen) => (
-  <EuiLink
-    className='euiTableCellContent__text euiTableCellContent--truncateText'
-    onClick={() => {
-      setFile(path), setIsOpen(true);
-    }}
-  >
-    {path}
-  </EuiLink>
-);

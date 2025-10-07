@@ -18,19 +18,11 @@ export default class StatusHandler {
    */
   static async agentsSummary() {
     try {
-      const result = await WzRequest.apiReq('GET', `/agents/summary/status`, {});
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * Get cluster status
-   */
-  static async clusterStatus() {
-    try {
-      const result = await WzRequest.apiReq('GET', `/cluster/status`, {});
+      const result = await WzRequest.apiReq(
+        'GET',
+        `/agents/summary/status`,
+        {},
+      );
       return result;
     } catch (error) {
       throw error;
@@ -57,7 +49,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq(
         'GET',
         `/cluster/${nodeId}/status`,
-        {}
+        {},
       );
       return result;
     } catch (error) {
@@ -73,7 +65,7 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq(
         'GET',
         `/cluster/${nodeId}/info`,
-        {}
+        {},
       );
       return result;
     } catch (error) {
@@ -86,35 +78,7 @@ export default class StatusHandler {
    */
   static async clusterAgentsCount() {
     try {
-      const result = await WzRequest.apiReq(
-        'GET',
-        `/overview/agents`,
-        {}
-      );
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * Get manager info
-   */
-  static async managerInfo() {
-    try {
-      const result = await WzRequest.apiReq('GET', `/manager/info`, {});
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * Get manager status
-   */
-  static async managerStatus() {
-    try {
-      const result = await WzRequest.apiReq('GET', `/manager/status`, {});
+      const result = await WzRequest.apiReq('GET', `/overview/agents`, {});
       return result;
     } catch (error) {
       throw error;
@@ -130,8 +94,8 @@ export default class StatusHandler {
         params: {
           limit: 1,
           sort: '-dateAdd',
-          q: 'id!=000'
-        }
+          q: 'id!=000',
+        },
       });
       return result;
     } catch (error) {
@@ -147,7 +111,7 @@ export default class StatusHandler {
       const validationError = await WzRequest.apiReq(
         'GET',
         `/cluster/configuration/validation`,
-        {}
+        {},
       );
 
       const data = ((validationError || {}).data || {}).data || {};
@@ -158,31 +122,6 @@ export default class StatusHandler {
       }
       await WzRequest.apiReq('PUT', `/cluster/restart`, { delay: 15000 });
       return { data: { data: 'Restarting cluster' } };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  /**
-   * Restart manager (single-node API call)
-   */
-  static async restartManager() {
-    try {
-      const validationError = await WzRequest.apiReq(
-        'GET',
-        `/manager/configuration/validation`,
-        {}
-      );
-
-      const data = ((validationError || {}).data || {}).data || {};
-      const isOk = data.status === 'OK';
-      if (!isOk && Array.isArray(data.details)) {
-        const str = data.details.join();
-        throw new Error(str);
-      }
-
-      const result = await WzRequest.apiReq('PUT', `/manager/restart`, {});
-      return result;
     } catch (error) {
       throw error;
     }
