@@ -52,16 +52,16 @@ const TEMPLATE_SOURCES = {
     urls: [wazuhUrl('extensions/elasticsearch/7.x/wazuh-template.json')],
     outputFile: 'plugins/main/public/utils/known-fields/alerts.json',
   },
-  monitoring: {
-    name: 'monitoring',
-    // This is in the dashboard-plugins repo
-    urls: [
-      dashboardPluginsUrl(
-        'plugins/main/server/integration-files/monitoring-template.json',
-      ),
-    ],
-    outputFile: 'plugins/main/public/utils/known-fields/monitoring.json',
-  },
+  // TODO: monitoring is intentionally not auto-generated
+  // The monitoring template only defines basic fields (timestamp, status, ip, host, name, id, cluster.name)
+  // but the actual monitoring index contains additional agent fields (dateAdd, lastKeepAlive, mergedSum, etc.)
+  // that are inserted dynamically. These fields are maintained manually in
+  // plugins/main/public/utils/monitoring-fields.ts to ensure compatibility.
+  // monitoring: {
+  //   name: 'monitoring',
+  //   urls: [dashboardPluginsUrl('plugins/main/server/integration-files/monitoring-template.json')],
+  //   outputFile: 'plugins/main/public/utils/known-fields/monitoring.json',
+  // },
   statistics: {
     name: 'statistics',
     // This is in the dashboard-plugins repo

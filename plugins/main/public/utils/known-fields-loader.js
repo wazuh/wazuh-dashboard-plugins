@@ -24,8 +24,12 @@ import inventoryServicesFields from './known-fields/states-inventory-services.js
 import inventoryInterfacesFields from './known-fields/states-inventory-interfaces.json';
 import inventoryHotfixesFields from './known-fields/states-inventory-hotfixes.json';
 import inventoryBrowserExtensionsFields from './known-fields/states-inventory-browser-extensions.json';
-import monitoringFields from './known-fields/monitoring.json';
 import statisticsFields from './known-fields/statistics.json';
+
+// Import monitoring fields from manually maintained file (not auto-generated)
+// See: scripts/generate-known-fields.js for explanation
+import { FieldsMonitoring } from './monitoring-fields';
+const monitoringFields = FieldsMonitoring;
 
 // Use generated fields as the primary source
 export const KnownFields = alertsFields;
