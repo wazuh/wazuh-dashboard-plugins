@@ -44,9 +44,11 @@ The script fetches templates from these official Wazuh repositories:
 
 ### Wazuh Server (github.com/wazuh/wazuh)
 
-- **Vulnerabilities**: [`src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json`](https://github.com/wazuh/wazuh/blob/4.14.0/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json)
-- **Inventory States**: `src/wazuh_modules/inventory_harvester/indexer/template/` (TODO: add support)
-- **Alerts**: [`extensions/elasticsearch/7.x/wazuh-template.json`](https://github.com/wazuh/wazuh/blob/4.14.0/extensions/elasticsearch/7.x/wazuh-template.json)
+- **Alerts**: `extensions/elasticsearch/7.x/wazuh-template.json`
+- **Vulnerabilities**: `src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json`
+- **FIM States**: `src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-*.json`
+- **Inventory States**: `src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-*.json`
+  - Supports: system, hardware, networks, packages, ports, processes, protocols, users, groups, services, interfaces, hotfixes, browser-extensions
 
 ### Wazuh Dashboard Plugins (github.com/wazuh/wazuh-dashboard-plugins)
 
