@@ -45,12 +45,12 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-vulnerabilities.json',
+      'plugins/main/common/known-fields/states-vulnerabilities.json',
   },
   alerts: {
     name: 'alerts',
     urls: [wazuhUrl('extensions/elasticsearch/7.x/wazuh-template.json')],
-    outputFile: 'plugins/main/public/utils/known-fields/alerts.json',
+    outputFile: 'plugins/main/common/known-fields/alerts.json',
   },
   monitoring: {
     name: 'monitoring',
@@ -60,7 +60,7 @@ const TEMPLATE_SOURCES = {
         'plugins/main/server/integration-files/monitoring-template.ts',
       ),
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/monitoring.json',
+    outputFile: 'plugins/main/common/known-fields/monitoring.json',
     isTypeScript: true,
   },
   statistics: {
@@ -71,7 +71,7 @@ const TEMPLATE_SOURCES = {
         'plugins/main/server/integration-files/statistics-template.ts',
       ),
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/statistics.json',
+    outputFile: 'plugins/main/common/known-fields/statistics.json',
     isTypeScript: true,
   },
   // FIM templates
@@ -82,7 +82,7 @@ const TEMPLATE_SOURCES = {
         'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-files.json',
       ),
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-fim-files.json',
+    outputFile: 'plugins/main/common/known-fields/states-fim-files.json',
   },
   'states-fim-registries': {
     name: 'states-fim-registries',
@@ -92,7 +92,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-fim-registries.json',
+      'plugins/main/common/known-fields/states-fim-registries.json',
   },
   // Inventory templates (using the most recent versions without -update suffix)
   'states-inventory-system': {
@@ -103,7 +103,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-system.json',
+      'plugins/main/common/known-fields/states-inventory-system.json',
   },
   'states-inventory-hardware': {
     name: 'states-inventory-hardware',
@@ -113,7 +113,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-hardware.json',
+      'plugins/main/common/known-fields/states-inventory-hardware.json',
   },
   'states-inventory-networks': {
     name: 'states-inventory-networks',
@@ -123,7 +123,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-networks.json',
+      'plugins/main/common/known-fields/states-inventory-networks.json',
   },
   'states-inventory-packages': {
     name: 'states-inventory-packages',
@@ -133,7 +133,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-packages.json',
+      'plugins/main/common/known-fields/states-inventory-packages.json',
   },
   'states-inventory-ports': {
     name: 'states-inventory-ports',
@@ -143,7 +143,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-ports.json',
+      'plugins/main/common/known-fields/states-inventory-ports.json',
   },
   'states-inventory-processes': {
     name: 'states-inventory-processes',
@@ -153,7 +153,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-processes.json',
+      'plugins/main/common/known-fields/states-inventory-processes.json',
   },
   'states-inventory-protocols': {
     name: 'states-inventory-protocols',
@@ -163,7 +163,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-protocols.json',
+      'plugins/main/common/known-fields/states-inventory-protocols.json',
   },
   'states-inventory-users': {
     name: 'states-inventory-users',
@@ -173,7 +173,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-users.json',
+      'plugins/main/common/known-fields/states-inventory-users.json',
   },
   'states-inventory-groups': {
     name: 'states-inventory-groups',
@@ -183,7 +183,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-groups.json',
+      'plugins/main/common/known-fields/states-inventory-groups.json',
   },
   'states-inventory-services': {
     name: 'states-inventory-services',
@@ -193,7 +193,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-services.json',
+      'plugins/main/common/known-fields/states-inventory-services.json',
   },
   'states-inventory-interfaces': {
     name: 'states-inventory-interfaces',
@@ -203,7 +203,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-interfaces.json',
+      'plugins/main/common/known-fields/states-inventory-interfaces.json',
   },
   'states-inventory-hotfixes': {
     name: 'states-inventory-hotfixes',
@@ -213,7 +213,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-hotfixes.json',
+      'plugins/main/common/known-fields/states-inventory-hotfixes.json',
   },
   'states-inventory-browser-extensions': {
     name: 'states-inventory-browser-extensions',
@@ -223,7 +223,7 @@ const TEMPLATE_SOURCES = {
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-browser-extensions.json',
+      'plugins/main/common/known-fields/states-inventory-browser-extensions.json',
   },
 };
 

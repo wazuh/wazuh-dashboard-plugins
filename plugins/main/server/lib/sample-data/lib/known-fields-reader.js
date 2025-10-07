@@ -18,7 +18,7 @@ function loadKnownFields(datasetType) {
   try {
     const knownFieldsPath = path.join(
       __dirname,
-      '../../../../public/utils/known-fields',
+      '../../../../common/known-fields',
       `${datasetType}.json`,
     );
 

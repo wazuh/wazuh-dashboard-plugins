@@ -6,8 +6,8 @@ import {
   extractPatternType,
   getKnownFieldsForStatesPattern,
 } from './known-fields-loader';
-import monitoringFields from './known-fields/monitoring.json';
-import statisticsFields from './known-fields/statistics.json';
+import monitoringFields from '../../../common/known-fields/monitoring.json';
+import statisticsFields from '../../../common/known-fields/statistics.json';
 import {
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
