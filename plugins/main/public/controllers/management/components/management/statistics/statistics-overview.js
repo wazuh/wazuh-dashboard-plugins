@@ -49,6 +49,7 @@ import {
   existsIndices,
   existsIndexPattern,
   createIndexPattern,
+  getIndexTypeFromPattern,
 } from '../../../../../react-services';
 import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
 
@@ -254,7 +255,8 @@ export default compose(
       try {
         // Check the existence of related index pattern
         const existIndexPattern = await existsIndexPattern(indexPatternID);
-        const { exist, fields } = await existsIndices(indexPatternID);
+        const indexType = getIndexTypeFromPattern(indexPatternID);
+        const { exist, fields } = await existsIndices(indexPatternID, indexType);
         setLoading(true);
 
         if (exist) {

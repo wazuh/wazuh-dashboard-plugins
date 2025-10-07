@@ -5,6 +5,7 @@ import {
   existsIndices,
   existsIndexPattern,
   createIndexPattern,
+  getIndexTypeFromPattern,
 } from '../../../../../react-services';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
@@ -27,7 +28,8 @@ export async function validateVulnerabilitiesStateDataSources({
     // If the index pattern does not exist, then check the existence of index
     if (existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND) {
       // Check the existence of indices
-      const { exist, fields } = await existsIndices(indexPatternID);
+      const indexType = getIndexTypeFromPattern(indexPatternID);
+      const { exist, fields } = await existsIndices(indexPatternID, indexType);
 
       if (!exist) {
         return {

@@ -61,9 +61,11 @@ export function getIndexTypeFromPattern(pattern: string): string {
     : WAZUH_INDEX_TYPE_ALERTS;
 }
 
-export async function existsIndices(indexPatternId: string) {
+export async function existsIndices(
+  indexPatternId: string,
+  indexType: string,
+) {
   try {
-    const indexType = getIndexTypeFromPattern(indexPatternId);
     const fields = await SavedObject.getIndicesFields(
       indexPatternId,
       indexType,
