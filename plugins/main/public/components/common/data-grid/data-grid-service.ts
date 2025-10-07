@@ -1,6 +1,5 @@
 import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
-import { beautifyDate } from '../../agents/vuls/inventory/lib';
 import { SearchParams, search } from '../search-bar/search-bar-service';
 import {
   Filter,
@@ -12,6 +11,7 @@ import { tDataGridColumn } from './use-data-grid';
 import { cellFilterActions } from './cell-filter-actions';
 import { onFilterCellActions } from './filter-cell-actions';
 import converter from 'json-2-csv';
+import { formatUIDate } from '../../../react-services';
 
 type ParseData<T> =
   | {
@@ -73,17 +73,6 @@ export const getFieldFormatted = (
   // when fieldValue is null or undefined then return a empty string
   if (fieldValue === null || fieldValue === undefined) {
     return '';
-  }
-  // if is date field
-  if (field?.type === 'date') {
-    // @ts-ignore
-    fieldValue = beautifyDate(fieldValue);
-  }
-
-  // if is geo_point field then convert to string to appear in the Discover table
-  if (field?.type === 'geo_point') {
-    // @ts-ignore
-    fieldValue = JSON.stringify(fieldValue);
   }
   return fieldValue;
 };
@@ -148,7 +137,7 @@ export const exportSearchToCSV = async (
     // replace the date fields with the formatted date
     dateFieldsNames.forEach(field => {
       if (flattenHit[field]) {
-        flattenHit[field] = beautifyDate(flattenHit[field]);
+        flattenHit[field] = formatUIDate(flattenHit[field]);
       }
     });
     return flattenHit;

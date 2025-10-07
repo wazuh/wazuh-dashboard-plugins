@@ -27,7 +27,7 @@ import {
 import { getCore } from '../../../../../kibana-services';
 import { withDataSourceFetch, withGuard, withPanel } from '../../../hocs';
 import { compose } from 'redux';
-import { MODULE_SCA_CHECK_RESULT_LABEL } from '../../../../../../common/constants';
+
 import { configurationAssessment } from '../../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
@@ -110,19 +110,19 @@ const ScaScanTable = ({ dataSourceAction }) => {
     },
     {
       field: 'pass',
-      name: MODULE_SCA_CHECK_RESULT_LABEL.PASSED.value,
+      name: CheckResult.Passed,
       width: '10%',
       sortable: true,
     },
     {
       field: 'fail',
-      name: MODULE_SCA_CHECK_RESULT_LABEL.FAILED.value,
+      name: CheckResult.Failed,
       width: '10%',
       sortable: true,
     },
     {
       field: 'not_run',
-      name: MODULE_SCA_CHECK_RESULT_LABEL.NOT_RUN.value,
+      name: CheckResult.NotRun,
       width: '10%',
       sortable: true,
     },
