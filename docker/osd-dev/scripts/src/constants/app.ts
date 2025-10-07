@@ -24,6 +24,23 @@ export const PROFILES = {
   DASHBOARD_SRC: 'dashboard-src',
 } as const;
 
+/** CLI flags used by the development script. */
+export const FLAGS = {
+  HELP: '--help',
+  HELP_SHORT: '-h',
+  PLUGINS_ROOT: '--plugins-root',
+  PLUGINS_ROOT_WDP: '-wdp',
+  PLUGINS_ROOT_WZ_HOME: '--wz-home',
+  OS_VERSION: '-os',
+  OSD_VERSION: '-osd',
+  AGENTS_UP: '-a',
+  SAML: '-saml',
+  SERVER: '--server',
+  SERVER_LOCAL: '--server-local',
+  REPO: '-r',
+  BASE: '--base',
+} as const;
+
 /** Relative path (from dev script dir) for the dashboard entrypoint wrapper. */
 export const DASHBOARD_ENTRYPOINT_PATH = './dashboard-src/entrypoint.sh';
 

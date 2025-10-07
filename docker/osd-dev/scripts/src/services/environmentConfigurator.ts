@@ -5,6 +5,7 @@ import {
   OSD_MAJOR_2X,
   OSD_MAJOR_1X,
   SECURITY_CONFIG_PATHS,
+  FLAGS,
 } from '../constants/app';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { ValidationError } from '../errors';
@@ -59,10 +60,10 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
   }
 
   // Determine primary profile based on explicit server/server-local first (flags take precedence via parser)
-  // Reject direct server-local-* composite modes; users must set -a together with --server-local
+  // Reject direct server-local-* composite modes; users must set -a together with FLAGS.SERVER_LOCAL
   if (new RegExp(`^${PROFILES.SERVER_LOCAL}-`).test(config.mode)) {
     throw new ValidationError(
-      "Unsupported mode token. Use '--server-local <tag>' with '-a <rpm|deb|without>' instead of direct 'server-local-*' modes.",
+      `Unsupported mode token. Use '${FLAGS.SERVER_LOCAL} <tag>' with '${FLAGS.AGENTS_UP} <rpm|deb|without>' instead of direct 'server-local-*' modes.`,
     );
   }
 

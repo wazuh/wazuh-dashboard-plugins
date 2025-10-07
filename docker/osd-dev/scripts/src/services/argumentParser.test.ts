@@ -5,6 +5,7 @@ import { parseArguments, printUsageAndExit } from './argumentParser';
 import type { EnvironmentPaths } from '../types/config';
 import { MockLogger } from '../../__mocks__/mockLogger';
 import { ValidationError, ConfigurationError } from '../errors';
+import { FLAGS } from '../constants/app';
 
 describe('services/argumentParser', () => {
   const logger = new MockLogger('test');
@@ -72,14 +73,14 @@ describe('services/argumentParser', () => {
     it('parses flags and action/mode/modeVersion correctly', () => {
       const cfg = parseArguments(
         [
-          '-os',
+          FLAGS.OS_VERSION,
           '2.9.0',
-          '-osd',
+          FLAGS.OSD_VERSION,
           '2.9.0',
-          '-a',
+          FLAGS.AGENTS_UP,
           'rpm',
           'up',
-          '--server-local',
+          FLAGS.SERVER_LOCAL,
           '4.12.0',
         ],
         envPaths,

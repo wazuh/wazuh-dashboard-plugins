@@ -6,38 +6,38 @@ import {
   toContainerPath,
 } from '../utils/pathUtils';
 import { ValidationError, ConfigurationError } from '../errors';
-import { ACTIONS, PROFILES } from '../constants/app';
+import { ACTIONS, PROFILES, FLAGS } from '../constants/app';
 import type { Logger } from '../utils/logger';
 
 export function printUsageAndExit(log: Logger): never {
   log.infoPlain('');
   log.infoPlain(
-    './dev.sh <action> [--plugins-root /abs/path] [-os os_version] [-osd osd_version] [-a agents_up] [-r repo=absolute_path ...] [-saml | --server <version> | --server-local <tag>] [--base [absolute_path]]',
+    `./dev.sh <action> [${FLAGS.PLUGINS_ROOT} /abs/path] [${FLAGS.OS_VERSION} os_version] [${FLAGS.OSD_VERSION} osd_version] [${FLAGS.AGENTS_UP} agents_up] [${FLAGS.REPO} repo=absolute_path ...] [${FLAGS.SAML} | ${FLAGS.SERVER} <version> | ${FLAGS.SERVER_LOCAL} <tag>] [${FLAGS.BASE} [absolute_path]]`,
   );
   log.infoPlain('');
   log.infoPlain('Flags');
   log.infoPlain(
-    '  --plugins-root <abs>  Optional. Absolute base path where repositories live (aliases: -wdp, --wz-home).',
+    `  ${FLAGS.PLUGINS_ROOT} <abs>  Optional. Absolute base path where repositories live (aliases: ${FLAGS.PLUGINS_ROOT_WDP}, ${FLAGS.PLUGINS_ROOT_WZ_HOME}).`,
   );
-  log.infoPlain('  -os <os_version>      Optional OS version');
-  log.infoPlain('  -osd <osd_version>    Optional OSD version');
+  log.infoPlain(`  ${FLAGS.OS_VERSION} <os_version>      Optional OS version`);
+  log.infoPlain(`  ${FLAGS.OSD_VERSION} <osd_version>    Optional OSD version`);
   log.infoPlain(
-    "  -a <agents_up>       Optional for server-local: 'rpm' | 'deb' | 'without' (default: deploy 2 agents)",
-  );
-  log.infoPlain(
-    '  -saml                 Enable SAML profile (can be combined with --server/--server-local)',
+    `  ${FLAGS.AGENTS_UP} <agents_up>       Optional for server-local: 'rpm' | 'deb' | 'without' (default: deploy 2 agents)`,
   );
   log.infoPlain(
-    '  --server <version>    Enable server mode with the given version',
+    `  ${FLAGS.SAML}                 Enable SAML profile (can be combined with ${FLAGS.SERVER}/${FLAGS.SERVER_LOCAL})`,
   );
   log.infoPlain(
-    '  --server-local <tag>  Enable server-local mode with the given local image tag',
+    `  ${FLAGS.SERVER} <version>    Enable server mode with the given version`,
   );
   log.infoPlain(
-    '  -r repo=absolute_path Mount an external plugin repository (repeatable). Shorthand: -r repo (resolved under sibling root).',
+    `  ${FLAGS.SERVER_LOCAL} <tag>  Enable server-local mode with the given local image tag`,
   );
   log.infoPlain(
-    '  --base [absolute_path] Use dashboard sources from a local checkout (auto-detects under sibling root when path omitted).',
+    `  ${FLAGS.REPO} repo=absolute_path Mount an external plugin repository (repeatable). Shorthand: ${FLAGS.REPO} repo (resolved under sibling root).`,
+  );
+  log.infoPlain(
+    `  ${FLAGS.BASE} [absolute_path] Use dashboard sources from a local checkout (auto-detects under sibling root when path omitted).`,
   );
   log.infoPlain('');
   log.infoPlain(
@@ -76,18 +76,18 @@ export function parseArguments(
     const arg = argv[index];
 
     switch (arg) {
-      case '--help':
-      case '-h': {
+      case FLAGS.HELP:
+      case FLAGS.HELP_SHORT: {
         printUsageAndExit(log);
       }
 
-      case '--plugins-root':
-      case '-wdp':
-      case '--wz-home': {
+      case FLAGS.PLUGINS_ROOT:
+      case FLAGS.PLUGINS_ROOT_WDP:
+      case FLAGS.PLUGINS_ROOT_WZ_HOME: {
         const path = argv[++index];
         if (!path || !path.startsWith('/')) {
           throw new ValidationError(
-            '--plugins-root requires an absolute path value',
+            `${FLAGS.PLUGINS_ROOT} requires an absolute path value`,
           );
         }
         config.pluginsRoot = stripTrailingSlash(path);
@@ -95,11 +95,11 @@ export function parseArguments(
         index++;
         break;
       }
-      case '-os': {
+      case FLAGS.OS_VERSION: {
         const version = argv[++index];
         if (!version || version.startsWith('-')) {
           throw new ValidationError(
-            "-os requires a version value, e.g. '-os 2.11.0'",
+            `${FLAGS.OS_VERSION} requires a version value, e.g. '${FLAGS.OS_VERSION} 2.11.0'`,
           );
         }
         config.osVersion = version;
@@ -107,11 +107,11 @@ export function parseArguments(
         break;
       }
 
-      case '-osd': {
+      case FLAGS.OSD_VERSION: {
         const version = argv[++index];
         if (!version || version.startsWith('-')) {
           throw new ValidationError(
-            "-osd requires a version value, e.g. '-osd 2.11.0'",
+            `${FLAGS.OSD_VERSION} requires a version value, e.g. '${FLAGS.OSD_VERSION} 2.11.0'`,
           );
         }
         config.osdVersion = version;
@@ -119,31 +119,31 @@ export function parseArguments(
         break;
       }
 
-      case '-a': {
+      case FLAGS.AGENTS_UP: {
         let val = argv[++index];
         // Aliases for 'without'
         if (val === 'none' || val === '0') val = 'without';
         config.agentsUp = val;
         if (!['rpm', 'deb', 'without', ''].includes(config.agentsUp)) {
           throw new ValidationError(
-            "Invalid value for -a option. Allowed values are 'rpm', 'deb', 'without', or an empty string.",
+            `Invalid value for ${FLAGS.AGENTS_UP} option. Allowed values are 'rpm', 'deb', 'without', or an empty string.`,
           );
         }
         index++;
         break;
       }
 
-      case '-saml': {
+      case FLAGS.SAML: {
         config.enableSaml = true;
         index++;
         break;
       }
 
-      case '--server': {
+      case FLAGS.SERVER: {
         const version = argv[++index];
         if (!version || version.startsWith('-')) {
           throw new ValidationError(
-            '--server requires a version argument, e.g. --server 4.12.0',
+            `${FLAGS.SERVER} requires a version argument, e.g. ${FLAGS.SERVER} 4.12.0`,
           );
         }
         config.serverFlagVersion = version;
@@ -151,11 +151,11 @@ export function parseArguments(
         break;
       }
 
-      case '--server-local': {
+      case FLAGS.SERVER_LOCAL: {
         const version = argv[++index];
         if (!version || version.startsWith('-')) {
           throw new ValidationError(
-            '--server-local requires a version/tag argument, e.g. --server-local my-tag',
+            `${FLAGS.SERVER_LOCAL} requires a version/tag argument, e.g. ${FLAGS.SERVER_LOCAL} my-tag`,
           );
         }
         config.serverLocalFlagVersion = version;
@@ -163,7 +163,7 @@ export function parseArguments(
         break;
       }
 
-      case '-r': {
+      case FLAGS.REPO: {
         const repoSpec = argv[++index];
         if (repoSpec.includes('=')) {
           const [repoName, repoPath] = repoSpec.split('=');
@@ -181,7 +181,7 @@ export function parseArguments(
           const repoName = repoSpec;
           if (!envPaths.siblingRepoHostRoot) {
             throw new ValidationError(
-              `Cannot resolve repository '${repoName}' under sibling root. Provide -r ${repoName}=/absolute/path or set SIBLING_REPO_HOST_ROOT.`,
+              `Cannot resolve repository '${repoName}' under sibling root. Provide ${FLAGS.REPO} ${repoName}=/absolute/path or set SIBLING_REPO_HOST_ROOT.`,
             );
           }
           const inferredHostPath = stripTrailingSlash(
@@ -202,7 +202,7 @@ export function parseArguments(
         break;
       }
 
-      case '--base': {
+      case FLAGS.BASE: {
         config.useDashboardFromSource = true;
         const nextArg = argv[index + 1];
 
@@ -216,7 +216,7 @@ export function parseArguments(
           !nextArg.startsWith('-') &&
           !allowedActions.has(nextArg as any)
         ) {
-          // Ignore and consume a relative token after --base for backward compatibility
+          // Ignore and consume a relative token after FLAGS.BASE for backward compatibility
           // (kept to satisfy tests that pass a placeholder like 'relative/path').
           index += 2;
         } else {
@@ -261,7 +261,7 @@ export function parseArguments(
     const containerCandidate = toContainerPath(candidate, envPaths);
     if (!containerCandidate) {
       throw new ValidationError(
-        'Unable to locate wazuh-dashboard automatically. Provide an absolute path to --base.',
+        `Unable to locate wazuh-dashboard automatically. Provide an absolute path to ${FLAGS.BASE}.`,
       );
     }
     config.dashboardBase = candidate;
@@ -270,7 +270,7 @@ export function parseArguments(
   if (config.useDashboardFromSource) {
     if (!config.dashboardBase || !config.dashboardBase.startsWith('/')) {
       throw new ValidationError(
-        'The --base option requires an absolute path to the wazuh-dashboard repository.',
+        `The ${FLAGS.BASE} option requires an absolute path to the wazuh-dashboard repository.`,
       );
     }
     ensureAccessibleHostPath(
@@ -293,7 +293,7 @@ export function parseArguments(
   // Map new-style flags to mode/modeVersion, taking precedence over positional mode
   if (config.serverFlagVersion && config.serverLocalFlagVersion) {
     throw new ValidationError(
-      "Cannot combine '--server' and '--server-local' flags",
+      `Cannot combine '${FLAGS.SERVER}' and '${FLAGS.SERVER_LOCAL}' flags`,
     );
   }
   // Map explicit mode flags

@@ -5,6 +5,7 @@ import { parseArguments, printUsageAndExit } from './argumentParser';
 import type { EnvironmentPaths } from '../types/config';
 import { MockLogger } from '../../__mocks__/mockLogger';
 import { ValidationError } from '../errors';
+import { FLAGS } from '../constants/app';
 
 describe('services/argumentParser (combinatorial)', () => {
   const logger = new MockLogger('test');
@@ -240,7 +241,7 @@ describe('services/argumentParser (combinatorial)', () => {
         const containerBase = path.join(paths.containerRoot, 'base');
         fs.mkdirSync(containerBase, { recursive: true });
         const cfg = parseArguments(
-          ['--plugins-root', hostBase, 'up'],
+          [FLAGS.PLUGINS_ROOT, hostBase, 'up'],
           envPaths,
           logger,
         );
@@ -261,7 +262,11 @@ describe('services/argumentParser (combinatorial)', () => {
         const hostBase = path.join(paths.hostRoot, 'base2');
         const containerBase = path.join(paths.containerRoot, 'base2');
         fs.mkdirSync(containerBase, { recursive: true });
-        const cfg = parseArguments(['-wdp', hostBase, 'up'], envPaths, logger);
+        const cfg = parseArguments(
+          [FLAGS.PLUGINS_ROOT_WDP, hostBase, 'up'],
+          envPaths,
+          logger,
+        );
         expect(cfg.pluginsRoot).toBe(hostBase);
         expect(cfg.action).toBe('up');
       } finally {
@@ -278,7 +283,7 @@ describe('services/argumentParser (combinatorial)', () => {
         const containerBase = path.join(paths.containerRoot, 'base3');
         fs.mkdirSync(containerBase, { recursive: true });
         const cfg = parseArguments(
-          ['--wz-home', hostBase, 'up'],
+          [FLAGS.PLUGINS_ROOT_WZ_HOME, hostBase, 'up'],
           envPaths,
           logger,
         );
@@ -363,12 +368,12 @@ describe('services/argumentParser (combinatorial)', () => {
     it('captures saml and server flags', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {
-        const cfg1 = parseArguments(['up', '-saml'], envPaths, logger);
+        const cfg1 = parseArguments(['up', FLAGS.SAML], envPaths, logger);
         expect(cfg1.mode).toBe('saml');
         expect(cfg1.modeVersion).toBe('');
 
         const cfg2 = parseArguments(
-          ['up', '--server', '4.12.0'],
+          ['up', FLAGS.SERVER, '4.12.0'],
           envPaths,
           logger,
         );
