@@ -6,6 +6,8 @@ import {
   OVERRIDE_COMPOSE_FILE,
   REQUIRED_REPOSITORIES,
   SECURITY_PLUGIN_NAME,
+  SECURITY_PLUGIN_REPO_NAME,
+  SECURITY_PLUGIN_ALIASES,
   PROFILES,
   DEV_COMPOSE_FILE,
   ACTIONS,
@@ -42,6 +44,9 @@ import {
   stripTrailingSlash,
   toContainerPath,
 } from '../utils/pathUtils';
+
+const isSecurityPluginName = (name: string): boolean =>
+  SECURITY_PLUGIN_ALIASES.includes(name as any);
 
 function ensureDashboardSources(
   config: ScriptConfig,
@@ -86,9 +91,31 @@ function resolveSecurityPluginPath(
   config: ScriptConfig,
   envPaths: EnvironmentPaths,
 ): string {
+  const pluginPathIfValid = (hostPath: string): string => {
+    const container = toContainerPath(hostPath, envPaths);
+    if (container && existsSync(container)) {
+      const packageJsonPath = resolve(container, 'package.json');
+      if (existsSync(packageJsonPath)) return hostPath;
+    }
+    return '';
+  };
+
+  const resolveFromBasePath = (baseHostPath: string): string => {
+    // Accept either a direct plugin path or the repo root containing it
+    const direct = pluginPathIfValid(baseHostPath);
+    if (direct) return direct;
+    const nested = pluginPathIfValid(
+      resolve(baseHostPath, 'plugins', SECURITY_PLUGIN_NAME),
+    );
+    if (nested) return nested;
+    throw new ConfigurationError(
+      `Provided path '${baseHostPath}' does not look like the '${SECURITY_PLUGIN_NAME}' plugin directory or a '${SECURITY_PLUGIN_REPO_NAME}' repo root (expected package.json under either path).`,
+    );
+  };
+
   // 1) Respect explicit -r override if provided
-  const securityOverride = config.userRepositories.find(
-    repoOverride => repoOverride.name === SECURITY_PLUGIN_NAME,
+  const securityOverride = config.userRepositories.find(repoOverride =>
+    isSecurityPluginName(repoOverride.name),
   );
   if (securityOverride) {
     const normalized = stripTrailingSlash(securityOverride.path);
@@ -102,13 +129,16 @@ function resolveSecurityPluginPath(
       `Repository path for '${securityOverride.name}'`,
       envPaths,
     );
-    return normalized;
+    // Accept overrides pointing either to the plugin dir or the repo root
+    return resolveFromBasePath(normalized);
   }
 
   // 2) Search common locations
   const candidates: string[] = [];
   if (config.pluginsRoot) {
     candidates.push(resolve(config.pluginsRoot, SECURITY_PLUGIN_NAME));
+    // If a full repo lives under plugins root, accept it too
+    candidates.push(resolve(config.pluginsRoot, SECURITY_PLUGIN_REPO_NAME));
   }
   if (config.dashboardBase) {
     candidates.push(
@@ -119,6 +149,9 @@ function resolveSecurityPluginPath(
     candidates.push(
       resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_NAME),
     );
+    candidates.push(
+      resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_REPO_NAME),
+    );
   }
 
   const seen = new Set<string>();
@@ -127,16 +160,22 @@ function resolveSecurityPluginPath(
     if (!normalized || !normalized.startsWith('/') || seen.has(normalized))
       continue;
     seen.add(normalized);
-    const containerCandidate = toContainerPath(normalized, envPaths);
-    if (containerCandidate && existsSync(containerCandidate)) {
-      const containerPackage = resolve(containerCandidate, 'package.json');
-      if (!existsSync(containerPackage)) continue;
-      return normalized;
+
+    // Try candidate as a direct plugin path first
+    const direct = pluginPathIfValid(normalized);
+    if (direct) return direct;
+
+    // Then try nested under repo root convention: <repo>/plugins/<plugin>
+    try {
+      const nested = resolveFromBasePath(normalized);
+      if (nested) return nested;
+    } catch {
+      // ignore and continue exploring other candidates
     }
   }
 
   throw new ConfigurationError(
-    'Unable to locate wazuh-security-dashboards plugin. Provide it with -r wazuh-security-dashboards=/absolute/path or ensure it exists under the chosen plugins root.',
+    'Unable to locate wazuh-security-dashboards plugin. Provide it with -r wazuh-security-dashboards=/absolute/path or -r wazuh-security-dashboards-plugin=/absolute/path (repo root), or ensure it exists under the chosen plugins root.',
   );
 }
 
@@ -228,7 +267,7 @@ export async function mainWithDeps(
       override.name,
     );
     const isSecurityPlugin =
-      config.useDashboardFromSource && override.name === SECURITY_PLUGIN_NAME;
+      config.useDashboardFromSource && isSecurityPluginName(override.name);
 
     if (isRequired || isSecurityPlugin) {
       ensureAccessibleHostPath(

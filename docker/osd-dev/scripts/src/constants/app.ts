@@ -9,8 +9,27 @@ export const REQUIRED_REPOSITORIES = [
   'wazuh-check-updates',
 ] as const;
 
-/** Canonical repository name for the security plugin. */
+/** Canonical plugin directory name for the security plugin. */
 export const SECURITY_PLUGIN_NAME = 'wazuh-security-dashboards' as const;
+/** Canonical repository name that hosts the security plugin sources. */
+export const SECURITY_PLUGIN_REPO_NAME =
+  'wazuh-security-dashboards-plugin' as const;
+/** Allowed names used to refer to the security plugin in overrides. */
+/**
+ * When `--base` is enabled we always call `resolveSecurityPluginPath`, but this code only accepts overrides named
+ * `wazuh-security-dashboards` and only searches for a folder with that exact name. Our standard checkout (and the new
+ * README examples) use the canonical repository `wazuh-security-dashboards-plugin`, whose contents live in
+ * `plugins/wazuh-security-dashboards`. With the new flow, running `./dev.sh --base -r
+ * wazuh-security-dashboards-plugin=<path> up` now fails with `ConfigurationError`: Unable to locate
+ * `wazuh-security-dashboards` plugin because `securityOverride` never matches and the fallback lookup ignores the
+ * actual repo layout. In practice this blocks the `--base` feature unless users rename their checkout. We should accept
+ * the `*-plugin` override (and/or look inside `plugins/wazuh-security-dashboards` when the override points to the repo
+ * root) so the documented workflow keeps working.
+ */
+export const SECURITY_PLUGIN_ALIASES = [
+  SECURITY_PLUGIN_NAME,
+  SECURITY_PLUGIN_REPO_NAME,
+] as const;
 
 /** Name of the Docker Compose profile that enables dashboard-from-source. */
 export const PROFILES = {
