@@ -70,12 +70,14 @@ The script generates JSON files in `plugins/main/common/known-fields/`:
 The generated files are stored in `plugins/main/common/known-fields/` and consumed by:
 
 **Client side** (`plugins/main/public/utils/known-fields-loader.js`):
+
 - `getKnownFieldsByIndexType(indexType)` - Get fields by index type constant
 - `getKnownFieldsForStatesPattern(pattern)` - Get fields for a specific states pattern
 - `getKnownFieldsForPattern(patternType)` - Get fields by pattern type
 - `KnownFieldsStatesGenerated` - Mapping object for all states patterns
 
 **Server side** (`plugins/main/server/lib/sample-data/lib/known-fields-reader.js`):
+
 - `loadKnownFields(datasetType)` - Load known fields for sample data generation
 - Used to ensure sample data is synchronized with field definitions
 
