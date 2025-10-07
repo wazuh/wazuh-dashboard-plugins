@@ -19,17 +19,17 @@ function loadKnownFields(datasetType) {
     // In production, compiled code is in target/public
     // In development, code is in server/lib/sample-data/lib
     // We need to find the known-fields directory relative to the plugin root
-    
+
     // Try to find the plugin root by going up from __dirname
     let knownFieldsPath;
-    
+
     // Development path: server/lib/sample-data/lib -> ../../../../public/utils/known-fields
     const devPath = path.join(
       __dirname,
       '../../../../public/utils/known-fields',
       `${datasetType}.json`,
     );
-    
+
     // Production path: might be in target/public or similar
     // Try development path first
     if (fs.existsSync(devPath)) {

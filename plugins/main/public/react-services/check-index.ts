@@ -64,10 +64,7 @@ export function getIndexTypeFromPattern(pattern: string): string {
   return PATTERN_TO_INDEX_TYPE_MAP[matchingKey];
 }
 
-export async function existsIndices(
-  indexPatternId: string,
-  indexType: string,
-) {
+export async function existsIndices(indexPatternId: string, indexType: string) {
   try {
     const fields = await SavedObject.getIndicesFields(
       indexPatternId,
