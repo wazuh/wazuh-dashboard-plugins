@@ -84,37 +84,37 @@ export function parseArguments(
       case '--plugins-root':
       case '-wdp':
       case '--wz-home': {
-        const next = argv[++index];
-        if (!next || !next.startsWith('/')) {
+        const path = argv[++index];
+        if (!path || !path.startsWith('/')) {
           throw new ValidationError(
             '--plugins-root requires an absolute path value',
           );
         }
-        config.pluginsRoot = stripTrailingSlash(next);
+        config.pluginsRoot = stripTrailingSlash(path);
         ensureAccessibleHostPath(config.pluginsRoot, 'Base path', envPaths);
         index++;
         break;
       }
       case '-os': {
-        const ver = argv[++index];
-        if (!ver || ver.startsWith('-')) {
+        const version = argv[++index];
+        if (!version || version.startsWith('-')) {
           throw new ValidationError(
             "-os requires a version value, e.g. '-os 2.11.0'",
           );
         }
-        config.osVersion = ver;
+        config.osVersion = version;
         index++;
         break;
       }
 
       case '-osd': {
-        const ver = argv[++index];
-        if (!ver || ver.startsWith('-')) {
+        const version = argv[++index];
+        if (!version || version.startsWith('-')) {
           throw new ValidationError(
             "-osd requires a version value, e.g. '-osd 2.11.0'",
           );
         }
-        config.osdVersion = ver;
+        config.osdVersion = version;
         index++;
         break;
       }
@@ -140,25 +140,25 @@ export function parseArguments(
       }
 
       case '--server': {
-        const ver = argv[++index];
-        if (!ver || ver.startsWith('-')) {
+        const version = argv[++index];
+        if (!version || version.startsWith('-')) {
           throw new ValidationError(
             '--server requires a version argument, e.g. --server 4.12.0',
           );
         }
-        config.serverFlagVersion = ver;
+        config.serverFlagVersion = version;
         index++;
         break;
       }
 
       case '--server-local': {
-        const ver = argv[++index];
-        if (!ver || ver.startsWith('-')) {
+        const version = argv[++index];
+        if (!version || version.startsWith('-')) {
           throw new ValidationError(
             '--server-local requires a version/tag argument, e.g. --server-local my-tag',
           );
         }
-        config.serverLocalFlagVersion = ver;
+        config.serverLocalFlagVersion = version;
         index++;
         break;
       }
