@@ -1,8 +1,11 @@
-import { UIErrorLog, UILogLevel } from './../../../react-services/error-orchestrator/types';
-import { UI_LOGGER_LEVELS } from "../../../../common/constants";
-import { WzRequest } from "../../../react-services";
-import { getErrorOrchestrator } from "../../../react-services/common-services";
-import { UI_ERROR_SEVERITIES } from "../../../react-services/error-orchestrator/types";
+import {
+  UIErrorLog,
+  UILogLevel,
+} from './../../../react-services/error-orchestrator/types';
+import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { WzRequest } from '../../../react-services';
+import { getErrorOrchestrator } from '../../../react-services/common-services';
+import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 
 /**
  * Retrieves the Wazuh API version by making a GET request to the root endpoint.
