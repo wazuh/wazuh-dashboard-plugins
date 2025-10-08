@@ -66,7 +66,7 @@ export const KnownFieldsByIndexType = {
   [WAZUH_INDEX_TYPE_ALERTS]: alertsFields,
   [WAZUH_INDEX_TYPE_MONITORING]: monitoringFields,
   [WAZUH_INDEX_TYPE_STATISTICS]: statisticsFields,
-  
+
   // States index types
   [WAZUH_INDEX_TYPE_STATES_VULNERABILITIES]: vulnerabilitiesFields,
   [WAZUH_INDEX_TYPE_STATES_FIM_FILES]: fimFilesFields,
@@ -86,60 +86,6 @@ export const KnownFieldsByIndexType = {
   [WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS]:
     inventoryBrowserExtensionsFields,
 };
-
-// Legacy export for backwards compatibility with states patterns
-export const KnownFieldsStatesGenerated = {
-  vulnerabilities: vulnerabilitiesFields,
-  'fim-files': fimFilesFields,
-  'fim-registries': fimRegistriesFields,
-  'inventory-system': inventorySystemFields,
-  'inventory-hardware': inventoryHardwareFields,
-  'inventory-networks': inventoryNetworksFields,
-  'inventory-packages': inventoryPackagesFields,
-  'inventory-ports': inventoryPortsFields,
-  'inventory-processes': inventoryProcessesFields,
-  'inventory-protocols': inventoryProtocolsFields,
-  'inventory-users': inventoryUsersFields,
-  'inventory-groups': inventoryGroupsFields,
-  'inventory-services': inventoryServicesFields,
-  'inventory-interfaces': inventoryInterfacesFields,
-  'inventory-hotfixes': inventoryHotfixesFields,
-  'inventory-browser-extensions': inventoryBrowserExtensionsFields,
-};
-
-/**
- * Get known fields for a specific pattern type
- * @param {string} patternType - The pattern type (e.g., 'vulnerabilities', 'inventory-system')
- * @returns {Array} The known fields for the pattern type
- */
-export function getKnownFieldsForPattern(patternType) {
-  return KnownFieldsStatesGenerated[patternType] || null;
-}
-
-/**
- * Extracts the pattern type from a full index pattern string
- * Checks explicitly against known pattern types to avoid regex issues with hyphens
- * @param {string} pattern - Full index pattern (e.g., 'wazuh-states-vulnerabilities-*')
- * @returns {string|null} The pattern type or null if not a states pattern
- */
-export function extractPatternType(pattern) {
-  // Check if pattern starts with 'wazuh-states-' and ends with '-*'
-  if (!pattern.startsWith('wazuh-states-') || !pattern.endsWith('-*')) {
-    return null;
-  }
-
-  // Extract the middle part between 'wazuh-states-' and '-*'
-  const prefix = 'wazuh-states-';
-  const suffix = '-*';
-  const startIndex = prefix.length;
-  const endIndex = pattern.length - suffix.length;
-  const extractedType = pattern.substring(startIndex, endIndex);
-
-  // Verify it's a known pattern type
-  return KnownFieldsStatesGenerated.hasOwnProperty(extractedType)
-    ? extractedType
-    : null;
-}
 
 /**
  * Get known fields by index type

@@ -80,8 +80,6 @@ The generated files are stored in `plugins/main/public/utils/known-fields/` and 
 **Client side** (`plugins/main/public/utils/known-fields-loader.js`):
 
 - `getKnownFieldsByIndexType(indexType)` - Get fields by index type constant
-- `getKnownFieldsForPattern(patternType)` - Get fields by pattern type
-- `KnownFieldsStatesGenerated` - Mapping object for all states patterns
 
 **Server side** (`plugins/main/server/lib/sample-data/lib/known-fields-reader.js`):
 
@@ -100,7 +98,7 @@ To add support for a new template:
 
 1. Add configuration to `TEMPLATE_SOURCES` in `generate-known-fields.js`
 2. Import the generated JSON in `known-fields-loader.js`
-3. Add mapping entry to `KnownFieldsStatesGenerated`
+3. Add mapping entry to `KnownFieldsByIndexType`
 4. Update the corresponding index type constants if needed
 
 ## Recent Improvements

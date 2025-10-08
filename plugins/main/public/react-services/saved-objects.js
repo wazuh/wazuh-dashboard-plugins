@@ -11,12 +11,7 @@
  */
 
 import { GenericRequest } from './generic-request';
-import {
-  KnownFields,
-  getKnownFieldsByIndexType,
-} from '../utils/known-fields-loader';
-import { FieldsStatistics } from '../utils/statistics-fields';
-import { FieldsMonitoring } from '../utils/monitoring-fields';
+import { getKnownFieldsByIndexType } from '../utils/known-fields-loader';
 import {
   HEALTH_CHECK,
   NOT_TIME_FIELD_NAME_INDEX_PATTERN,
@@ -321,11 +316,8 @@ export class SavedObject {
     } catch (error) {
       switch (indexType) {
         case WAZUH_INDEX_TYPE_MONITORING:
-          return FieldsMonitoring;
         case WAZUH_INDEX_TYPE_STATISTICS:
-          return FieldsStatistics;
         case WAZUH_INDEX_TYPE_ALERTS:
-          return KnownFields;
         case WAZUH_INDEX_TYPE_STATES_VULNERABILITIES:
         case WAZUH_INDEX_TYPE_STATES_FIM_FILES:
         case WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES:
