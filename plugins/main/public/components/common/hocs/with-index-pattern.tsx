@@ -6,7 +6,6 @@ import {
   existsIndices,
   existsIndexPattern,
   createIndexPattern,
-  getIndexTypeFromPattern,
 } from '../../../react-services';
 import { EuiButton, EuiEmptyPrompt } from '@elastic/eui';
 import { LoadingSpinnerDataSource } from '../loading/loading-spinner-data-source';
@@ -19,13 +18,15 @@ export const ERROR_ENSURE_INDEX_PATTERN = 'ERROR_ENSURE_INDEX_PATTERN';
 
 export const ensureIndexPatternIsCreated =
   ({
+    indexType,
     mapSavedObjectAttributesCreation,
   }: {
+    indexType: string;
     mapSavedObjectAttributesCreation?: (parameters: {
       indexPatternID: string;
       fields: any[];
     }) => any;
-  } = {}) =>
+  }) =>
   async ({ indexPatternID }) => {
     try {
       // Check the existence of related index pattern
@@ -37,7 +38,6 @@ export const ensureIndexPatternIsCreated =
         existIndexPattern?.error?.statusCode === HTTP_STATUS_CODES.NOT_FOUND
       ) {
         // Check the existence of indices
-        const indexType = getIndexTypeFromPattern(indexPatternID);
         const { exist, fields } = await existsIndices(
           indexPatternID,
           indexType,

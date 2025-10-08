@@ -11,6 +11,8 @@ import {
 import {
   WAZUH_FIM_FILES_PATTERN,
   WAZUH_FIM_REGISTRIES_PATTERN,
+  WAZUH_INDEX_TYPE_STATES_FIM_FILES,
+  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
 } from '../../../../../../common/constants';
 
 const errorPromptTypes = {
@@ -50,19 +52,21 @@ const errorPromptTypes = {
 export const withFIMFilesDataSource = withIndexPatternFromValue({
   indexPattern: WAZUH_FIM_FILES_PATTERN,
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  validate: ensureIndexPatternIsCreated(
-    mapFieldsFormat({
+  validate: ensureIndexPatternIsCreated({
+    indexType: WAZUH_INDEX_TYPE_STATES_FIM_FILES,
+    ...mapFieldsFormat({
       'file.size': 'bytes',
     }),
-  ),
+  }),
 });
 
 export const withFIMRegistriesDataSource = withIndexPatternFromValue({
   indexPattern: WAZUH_FIM_REGISTRIES_PATTERN,
   ErrorComponent: withMapErrorPromptErrorEnsureIndexPattern(errorPromptTypes),
-  validate: ensureIndexPatternIsCreated(
-    mapFieldsFormat({
+  validate: ensureIndexPatternIsCreated({
+    indexType: WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+    ...mapFieldsFormat({
       'registry.size': 'bytes',
     }),
-  ),
+  }),
 });
