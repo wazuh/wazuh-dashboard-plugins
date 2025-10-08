@@ -77,14 +77,7 @@ To ensure compatibility, monitoring fields are maintained manually in `plugins/m
 
 The generated files are stored in `plugins/main/public/utils/known-fields/` and consumed by:
 
-**Client side** (`plugins/main/public/utils/known-fields-loader.js`):
-
 - `getKnownFieldsByIndexType(indexType)` - Get fields by index type constant
-
-**Server side** (`plugins/main/server/lib/sample-data/lib/known-fields-reader.js`):
-
-- `loadKnownFields(datasetType)` - Load known fields for sample data generation
-- Used to ensure sample data is synchronized with field definitions
 
 ## Workflow
 
