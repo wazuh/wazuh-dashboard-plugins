@@ -91,7 +91,7 @@ describe('AlertsDataSourceRepository', () => {
       await repository.getDefault();
     } catch (error) {
       expect(error.message).toBe(
-        'There is no selected index pattern for alerts. Ensure there is a compatible index pattern and select it using the index pattern selector. The index pattern selector is only available when there are multiple compatibles index patterns. If there is only a compatible index pattern, the selector is not visible, and it could indicate the index pattern was not selected due to some error or you could need to select it.',
+        'No index pattern selected for alerts. Make sure a compatible index pattern exists and select it. This wasn’t applied correctly or needs to be re‑selected.',
       );
     }
   });

@@ -53,7 +53,16 @@ describe('useDataGrid hook', () => {
   // Default props for tests
   const createBaseProps = (overrides = {}): DataGridProps => ({
     moduleId: 'test-app',
-    indexPattern: { fields: [], id: 'test-index' } as any,
+    indexPattern: {
+      fields: [],
+      id: 'test-index',
+      formatField(doc, field) {
+        return doc[field];
+      },
+      flattenHit(doc) {
+        return doc; // WARN: If nested field are added, this should generated the flatten hit for these cases
+      },
+    } as any,
     results: createMockSearchResponse(10, 10),
     defaultColumns: [
       { id: 'field1', display: 'Field 1' },

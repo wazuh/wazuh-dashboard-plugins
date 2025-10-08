@@ -45,9 +45,7 @@ export class WzRequest {
       try {
         currentApiID = JSON.parse(currentApiDataCookie).id;
         if (currentApiID) {
-          if (AppState.getClusterInfo()) {
-            return true;
-          }
+          return Object.keys(AppState.getClusterInfo()).length > 0;
         }
       } catch {}
     }
