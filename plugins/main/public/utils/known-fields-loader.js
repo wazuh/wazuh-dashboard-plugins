@@ -92,16 +92,6 @@ export function extractPatternType(pattern) {
 }
 
 /**
- * Get known fields for a states index pattern
- * @param {string} pattern - Full index pattern (e.g., 'wazuh-states-vulnerabilities-*')
- * @returns {Array|null} The known fields or null if not found
- */
-export function getKnownFieldsForStatesPattern(pattern) {
-  const patternType = extractPatternType(pattern);
-  return patternType ? getKnownFieldsForPattern(patternType) : null;
-}
-
-/**
  * Map of index types to their corresponding known fields
  */
 const INDEX_TYPE_TO_KNOWN_FIELDS = {

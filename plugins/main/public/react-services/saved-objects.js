@@ -13,7 +13,6 @@
 import { GenericRequest } from './generic-request';
 import {
   KnownFields,
-  getKnownFieldsForStatesPattern,
   getKnownFieldsByIndexType,
 } from '../utils/known-fields-loader';
 import { FieldsStatistics } from '../utils/statistics-fields';
@@ -309,11 +308,6 @@ export class SavedObject {
         : error.message || error;
     }
   }
-
-  static getKnownFieldsForStatesPattern = pattern => {
-    // Use the new generated known fields loader
-    return getKnownFieldsForStatesPattern(pattern);
-  };
 
   static getIndicesFields = async (pattern, indexType) => {
     try {

@@ -4,33 +4,11 @@ import {
   getKnownFieldsForPattern,
   getKnownFieldsByIndexType,
   extractPatternType,
-  getKnownFieldsForStatesPattern,
 } from './known-fields-loader';
 import { FieldsMonitoring } from './monitoring-fields';
 import statisticsFields from './known-fields/statistics.json';
 
 const monitoringFields = FieldsMonitoring;
-import {
-  WAZUH_INDEX_TYPE_ALERTS,
-  WAZUH_INDEX_TYPE_MONITORING,
-  WAZUH_INDEX_TYPE_STATISTICS,
-  WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
-  WAZUH_INDEX_TYPE_STATES_FIM_FILES,
-  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
-} from '../../common/constants';
 
 describe('Known Fields Loader', () => {
   describe('KnownFields export', () => {
@@ -172,56 +150,7 @@ describe('Known Fields Loader', () => {
     });
   });
 
-  describe('getKnownFieldsForStatesPattern', () => {
-    test('should return correct fields for states patterns', () => {
-      const vulnerabilityFields = getKnownFieldsForStatesPattern(
-        'wazuh-states-vulnerabilities-*',
-      );
-      expect(vulnerabilityFields).toBeDefined();
-      expect(Array.isArray(vulnerabilityFields)).toBe(true);
-
-      const systemFields = getKnownFieldsForStatesPattern(
-        'wazuh-states-inventory-system-*',
-      );
-      expect(systemFields).toBeDefined();
-      expect(Array.isArray(systemFields)).toBe(true);
-    });
-
-    test('should return null for non-states patterns', () => {
-      expect(getKnownFieldsForStatesPattern('wazuh-alerts-*')).toBeNull();
-      expect(getKnownFieldsForStatesPattern('wazuh-monitoring-*')).toBeNull();
-    });
-  });
-
   describe('States-specific field validation', () => {
-    test('vulnerabilities should have package and vulnerability fields', () => {
-      const vulnFields = getKnownFieldsForStatesPattern(
-        'wazuh-states-vulnerabilities-*',
-      );
-
-      const packageFields = vulnFields.filter(f =>
-        f.name.startsWith('package.'),
-      );
-      expect(packageFields.length).toBeGreaterThan(0);
-
-      const vulnerabilityFields = vulnFields.filter(f =>
-        f.name.startsWith('vulnerability.'),
-      );
-      expect(vulnerabilityFields.length).toBeGreaterThan(0);
-    });
-
-    test('inventory-system should have host OS fields', () => {
-      const systemFields = getKnownFieldsForStatesPattern(
-        'wazuh-states-inventory-system-*',
-      );
-
-      const hostFields = systemFields.filter(f => f.name.startsWith('host.'));
-      expect(hostFields.length).toBeGreaterThan(0);
-
-      const osFields = systemFields.filter(f => f.name.startsWith('host.os.'));
-      expect(osFields.length).toBeGreaterThan(0);
-    });
-
     test('monitoring should have timestamp and status fields', () => {
       const timestampField = monitoringFields.find(f => f.name === 'timestamp');
       expect(timestampField).toBeDefined();
