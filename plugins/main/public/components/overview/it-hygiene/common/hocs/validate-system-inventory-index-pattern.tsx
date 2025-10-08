@@ -23,6 +23,7 @@ import {
   WAZUH_IT_HYGIENE_GROUPS_PATTERN,
   WAZUH_IT_HYGIENE_SERVICES_PATTERN,
   WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
@@ -75,7 +76,7 @@ const errorPromptTypes = {
 export const withSystemInventoryDataSource = withIndexPatternFromValue({
   indexPattern: WAZUH_IT_HYGIENE_PATTERN,
   validate: ensureIndexPatternIsCreated({
-    indexType: WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
+    indexType: WAZUH_INDEX_TYPE_STATES_INVENTORY,
     ...mapFieldsFormat({
       'destination.port': 'integer',
       'host.memory.free': 'bytes',

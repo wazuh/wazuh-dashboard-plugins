@@ -55,6 +55,7 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 export const WAZUH_INDEX_TYPE_STATES_VULNERABILITIES = 'states-vulnerabilities';
 export const WAZUH_INDEX_TYPE_STATES_FIM_FILES = 'states-fim-files';
 export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES = 'states-fim-registries';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY = 'states-inventory';
 export const WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM =
   'states-inventory-system';
 export const WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE =

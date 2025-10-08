@@ -517,6 +517,57 @@ async function processTemplate(config) {
 /**
  * Main function
  */
+/**
+ * Combines all states-inventory-* fields into a single states-inventory.json file
+ * This is useful for the generic states-inventory pattern that matches all inventory indices
+ */
+async function generateCombinedInventoryFields(results) {
+  console.log('Processing combined states-inventory fields...');
+
+  const inventoryKeys = Object.keys(results).filter(
+    key => key.startsWith('states-inventory-') && results[key],
+  );
+
+  if (inventoryKeys.length === 0) {
+    console.log('  ⚠️  No inventory fields to combine');
+    return null;
+  }
+
+  // Use a Map to deduplicate fields by name
+  const fieldsMap = new Map();
+
+  for (const key of inventoryKeys) {
+    const fields = results[key];
+    for (const field of fields) {
+      // Keep the first occurrence of each field name
+      if (!fieldsMap.has(field.name)) {
+        fieldsMap.set(field.name, field);
+      }
+    }
+  }
+
+  const combinedFields = Array.from(fieldsMap.values());
+
+  // Sort fields alphabetically by name for consistency
+  combinedFields.sort((a, b) => a.name.localeCompare(b.name));
+
+  // Write combined file
+  const scriptDir = path.dirname(__filename);
+  const projectRoot = path.resolve(scriptDir, '..');
+  const outputPath = path.resolve(
+    projectRoot,
+    'plugins/main/public/utils/known-fields/states-inventory.json',
+  );
+
+  fs.writeFileSync(outputPath, JSON.stringify(combinedFields, null, 2));
+
+  console.log(
+    `  ✅ Generated ${combinedFields.length} combined fields for states-inventory -> plugins/main/public/utils/known-fields/states-inventory.json`,
+  );
+
+  return combinedFields;
+}
+
 async function main() {
   console.log('🚀 Starting known fields generation...\n');
 
@@ -531,6 +582,19 @@ async function main() {
     }
     console.log(''); // Add spacing between processing
   }
+
+  // Generate combined inventory fields
+  try {
+    results['states-inventory'] =
+      await generateCombinedInventoryFields(results);
+  } catch (error) {
+    console.error(
+      'Failed to generate combined inventory fields:',
+      error.message,
+    );
+    results['states-inventory'] = null;
+  }
+  console.log(''); // Add spacing
 
   // Summary
   console.log('📊 Summary:');

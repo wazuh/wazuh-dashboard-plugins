@@ -14,6 +14,7 @@ import {
   WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
   WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
@@ -34,6 +35,7 @@ import alertsFields from './known-fields/alerts.json';
 import vulnerabilitiesFields from './known-fields/states-vulnerabilities.json';
 import fimFilesFields from './known-fields/states-fim-files.json';
 import fimRegistriesFields from './known-fields/states-fim-registries.json';
+import inventoryFields from './known-fields/states-inventory.json';
 import inventorySystemFields from './known-fields/states-inventory-system.json';
 import inventoryHardwareFields from './known-fields/states-inventory-hardware.json';
 import inventoryNetworksFields from './known-fields/states-inventory-networks.json';
@@ -71,6 +73,7 @@ export const KnownFieldsByIndexType = {
   [WAZUH_INDEX_TYPE_STATES_VULNERABILITIES]: vulnerabilitiesFields,
   [WAZUH_INDEX_TYPE_STATES_FIM_FILES]: fimFilesFields,
   [WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES]: fimRegistriesFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY]: inventoryFields,
   [WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM]: inventorySystemFields,
   [WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE]: inventoryHardwareFields,
   [WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS]: inventoryNetworksFields,
