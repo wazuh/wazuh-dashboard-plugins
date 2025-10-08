@@ -78,10 +78,7 @@ export const agentsTableColumns = (
     searchable: true,
     width: '100px',
     render: (version: string) => {
-      // Extract the numeric part of the version
-      const versionNumber = version.split('v')?.[1];
-      const isOutdated =
-        versionNumber && isVersionLower(versionNumber, apiVersion);
+      const isOutdated = isVersionLower(version, apiVersion);
       return (
         <EuiFlexGroup
           wrap={false}
