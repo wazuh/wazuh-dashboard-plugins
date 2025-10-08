@@ -85,18 +85,14 @@ export const agentsTableActions = (
   },
   {
     name: (agent: Agent) => {
-      const name = <span>Upgrade</span>;
-      // Extract the numeric part of the version
-      const versionNumber = agent.version.split('v')?.[1];
-      const isOutdated =
-        versionNumber && isVersionLower(versionNumber, apiVersion);
+      const isOutdated = isVersionLower(agent.version, apiVersion);
 
       if (agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated) {
         return (
           <WzElementPermissions
             permissions={[{ action: 'agent:upgrade', resource: 'agent:id:*' }]}
           >
-            {name}
+            <span>Upgrade</span>
           </WzElementPermissions>
         );
       }
@@ -109,7 +105,7 @@ export const agentsTableActions = (
               : 'Agent is up to date'
           }
         >
-          {name}
+          <span>Upgrade</span>
         </EuiToolTip>
       );
     },
@@ -122,10 +118,7 @@ export const agentsTableActions = (
     },
     'data-test-subj': 'action-upgrade',
     enabled: (agent: Agent) => {
-      const versionNumber = agent.version.split('v')?.[1];
-      const isOutdated =
-        versionNumber && isVersionLower(versionNumber, apiVersion);
-
+      const isOutdated = isVersionLower(agent.version, apiVersion);
       return (
         allowUpgrade &&
         agent.status === API_NAME_AGENT_STATUS.ACTIVE &&
