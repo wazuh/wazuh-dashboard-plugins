@@ -35,9 +35,35 @@ const monitoringFields = FieldsMonitoring;
 export const KnownFields = alertsFields;
 
 /**
- * Known fields mapping for different index types
- * Maps pattern types to their corresponding generated fields
+ * Unified known fields mapping for all index types
+ * Uses WAZUH_INDEX_TYPE_* constant values as keys
  */
+export const KnownFieldsByIndexType = {
+  // Main index types
+  alerts: alertsFields,
+  monitoring: monitoringFields,
+  statistics: statisticsFields,
+  
+  // States index types
+  'states-vulnerabilities': vulnerabilitiesFields,
+  'states-fim-files': fimFilesFields,
+  'states-fim-registries': fimRegistriesFields,
+  'states-inventory-system': inventorySystemFields,
+  'states-inventory-hardware': inventoryHardwareFields,
+  'states-inventory-networks': inventoryNetworksFields,
+  'states-inventory-packages': inventoryPackagesFields,
+  'states-inventory-ports': inventoryPortsFields,
+  'states-inventory-processes': inventoryProcessesFields,
+  'states-inventory-protocols': inventoryProtocolsFields,
+  'states-inventory-users': inventoryUsersFields,
+  'states-inventory-groups': inventoryGroupsFields,
+  'states-inventory-services': inventoryServicesFields,
+  'states-inventory-interfaces': inventoryInterfacesFields,
+  'states-inventory-hotfixes': inventoryHotfixesFields,
+  'states-inventory-browser-extensions': inventoryBrowserExtensionsFields,
+};
+
+// Legacy export for backwards compatibility with states patterns
 export const KnownFieldsStatesGenerated = {
   vulnerabilities: vulnerabilitiesFields,
   'fim-files': fimFilesFields,
@@ -92,36 +118,10 @@ export function extractPatternType(pattern) {
 }
 
 /**
- * Map of index types to their corresponding known fields
- */
-const INDEX_TYPE_TO_KNOWN_FIELDS = {
-  'wazuh-index-type-alerts': alertsFields,
-  'wazuh-index-type-monitoring': monitoringFields,
-  'wazuh-index-type-statistics': statisticsFields,
-  'wazuh-index-type-states-vulnerabilities': vulnerabilitiesFields,
-  'wazuh-index-type-states-fim-files': fimFilesFields,
-  'wazuh-index-type-states-fim-registries': fimRegistriesFields,
-  'wazuh-index-type-states-inventory-system': inventorySystemFields,
-  'wazuh-index-type-states-inventory-hardware': inventoryHardwareFields,
-  'wazuh-index-type-states-inventory-networks': inventoryNetworksFields,
-  'wazuh-index-type-states-inventory-packages': inventoryPackagesFields,
-  'wazuh-index-type-states-inventory-ports': inventoryPortsFields,
-  'wazuh-index-type-states-inventory-processes': inventoryProcessesFields,
-  'wazuh-index-type-states-inventory-protocols': inventoryProtocolsFields,
-  'wazuh-index-type-states-inventory-users': inventoryUsersFields,
-  'wazuh-index-type-states-inventory-groups': inventoryGroupsFields,
-  'wazuh-index-type-states-inventory-services': inventoryServicesFields,
-  'wazuh-index-type-states-inventory-interfaces': inventoryInterfacesFields,
-  'wazuh-index-type-states-inventory-hotfixes': inventoryHotfixesFields,
-  'wazuh-index-type-states-inventory-browser-extensions':
-    inventoryBrowserExtensionsFields,
-};
-
-/**
  * Get known fields by index type
- * @param {string} indexType - The index type constant (e.g., WAZUH_INDEX_TYPE_STATES_VULNERABILITIES)
+ * @param {string} indexType - The index type constant value (e.g., 'alerts', 'states-vulnerabilities')
  * @returns {Array|null} The known fields for the index type or null if not found
  */
 export function getKnownFieldsByIndexType(indexType) {
-  return INDEX_TYPE_TO_KNOWN_FIELDS[indexType] || null;
+  return KnownFieldsByIndexType[indexType] || null;
 }

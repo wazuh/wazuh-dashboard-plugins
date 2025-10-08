@@ -80,7 +80,6 @@ The generated files are stored in `plugins/main/public/utils/known-fields/` and 
 **Client side** (`plugins/main/public/utils/known-fields-loader.js`):
 
 - `getKnownFieldsByIndexType(indexType)` - Get fields by index type constant
-- `getKnownFieldsForStatesPattern(pattern)` - Get fields for a specific states pattern
 - `getKnownFieldsForPattern(patternType)` - Get fields by pattern type
 - `KnownFieldsStatesGenerated` - Mapping object for all states patterns
 
