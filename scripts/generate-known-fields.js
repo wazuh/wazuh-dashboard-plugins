@@ -585,8 +585,9 @@ async function main() {
 
   // Generate combined inventory fields
   try {
-    results['states-inventory'] =
-      await generateCombinedInventoryFields(results);
+    results['states-inventory'] = await generateCombinedInventoryFields(
+      results,
+    );
   } catch (error) {
     console.error(
       'Failed to generate combined inventory fields:',
