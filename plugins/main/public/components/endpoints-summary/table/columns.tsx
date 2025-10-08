@@ -14,6 +14,7 @@ import {
 import { Agent } from '../types';
 import WzIconSVG from '../../common/icons/wz-icon-svg';
 import { getAgentOSType } from '../../../react-services';
+import { isVersionLower } from './utils';
 
 // Columns with the property truncateText: true won't wrap the text
 // This is added to prevent the wrap because of the table-layout: auto
@@ -24,7 +25,7 @@ export const agentsTableColumns = (
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
   setFilters: (filters) => void,
-  outdatedAgents: Agent[],
+  apiVersion: string,
 ) => [
   {
     field: 'id',
@@ -78,10 +79,8 @@ export const agentsTableColumns = (
     show: true,
     searchable: true,
     width: '100px',
-    render: (version, agent) => {
-      const isOutdated = !!outdatedAgents.find(
-        outdatedAgent => outdatedAgent.id === agent.id,
-      );
+    render: (version: string) => {
+      const isOutdated = isVersionLower(version, apiVersion);
       return (
         <EuiFlexGroup
           wrap={false}
@@ -163,7 +162,7 @@ export const agentsTableColumns = (
       setAgent,
       setIsEditGroupsVisible,
       setIsUpgradeModalVisible,
-      outdatedAgents,
+      apiVersion,
     ),
   },
 ];
