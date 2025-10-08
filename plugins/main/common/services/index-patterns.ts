@@ -1,10 +1,10 @@
-export const indexPatternHasFields = (
+export const indexPatternHasMissingFields = (
   requiredFields: string[],
   indexPatternFields: { name: string }[],
-) =>
-  requiredFields.every(field =>
-    indexPatternFields.some(({ name }) => field === name),
-  );
+) => {
+  const fieldSet = new Set(indexPatternFields.map(({ name }) => name));
+  return requiredFields.filter(field => !fieldSet.has(field));
+};
 
 export const indexPatternHasTimeField = (
   indexPattern: any,

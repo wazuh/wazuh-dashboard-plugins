@@ -1,6 +1,6 @@
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server';
 import {
-  indexPatternHasFields,
+  indexPatternHasMissingFields,
   indexPatternHasTimeField,
 } from '../../common/services/index-patterns';
 import {
@@ -332,14 +332,14 @@ async function validateIndexPattern(indexPattern, options, ctx, logger) {
     const requiredFields = options.hasFields;
     const indedxPatternFields = JSON.parse(indexPattern.attributes.fields);
 
-    if (
-      !indexPatternHasFields(
-        requiredFields,
-        indedxPatternFields as unknown as { name: string }[],
-      )
-    ) {
+    const missingFields = indexPatternHasMissingFields(
+      requiredFields,
+      indedxPatternFields as unknown as { name: string }[],
+    );
+
+    if (missingFields?.length > 0) {
       throw new Error(
-        `Index pattern has missing some expected fields: ${requiredFields.join(
+        `Index pattern has missing some expected fields: ${missingFields.join(
           ', ',
         )}`,
       );
