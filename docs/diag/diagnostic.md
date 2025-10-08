@@ -4,7 +4,7 @@
 
 ### Filter could not be created because no server API is selected. Make sure a server API is available and choose one in the selector.
 
-This means the filter related to the selected server API (`cluster.name`/`manager.name` in the alerts case or `wazuh.cluster.name` in the inventories data) can not be created due to the required information is not available because this could not be obtained in some dashboard or inventory view. The required data to create the filter is stored in the `clusterInfo` cookie in the client browser.
+This means the filter related to the selected server API (`cluster.name` in the alerts case or `wazuh.cluster.name` in the inventories data) can not be created due to the required information is not available because this could not be obtained in some dashboard or inventory view. The required data to create the filter is stored in the `clusterInfo` cookie in the client browser.
 
 The cookie is set when getting the cluster information after the server API is selected through the selector or automatically when enters to some apps of Wazuh dashboard if possible.
 
@@ -15,7 +15,7 @@ The cookie is set when getting the cluster information after the server API is s
 
 ### Index pattern [id: index_pattern_id] not found.
 
-This means the expecte index pattern used as data source for a view or panel could not be found.
+This means the expected index pattern used as data source for a view or panel could not be found.
 
 This is usually caused because the expected index pattern does not exist. Go to Dashboard Management to create the expected index pattern if there are matching indices else it could indicate the data collection is disabled or there is a problem.
 
