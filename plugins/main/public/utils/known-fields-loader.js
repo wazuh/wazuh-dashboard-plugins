@@ -6,6 +6,29 @@
  * the official field definitions.
  */
 
+// Import index type constants
+import {
+  WAZUH_INDEX_TYPE_ALERTS,
+  WAZUH_INDEX_TYPE_MONITORING,
+  WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
+  WAZUH_INDEX_TYPE_STATES_FIM_FILES,
+  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
+  WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
+} from '../../common/constants';
+
 // Import generated known fields JSON files
 import alertsFields from './known-fields/alerts.json';
 import vulnerabilitiesFields from './known-fields/states-vulnerabilities.json';
@@ -36,31 +59,32 @@ export const KnownFields = alertsFields;
 
 /**
  * Unified known fields mapping for all index types
- * Uses WAZUH_INDEX_TYPE_* constant values as keys
+ * Uses WAZUH_INDEX_TYPE_* constants as keys
  */
 export const KnownFieldsByIndexType = {
   // Main index types
-  alerts: alertsFields,
-  monitoring: monitoringFields,
-  statistics: statisticsFields,
+  [WAZUH_INDEX_TYPE_ALERTS]: alertsFields,
+  [WAZUH_INDEX_TYPE_MONITORING]: monitoringFields,
+  [WAZUH_INDEX_TYPE_STATISTICS]: statisticsFields,
   
   // States index types
-  'states-vulnerabilities': vulnerabilitiesFields,
-  'states-fim-files': fimFilesFields,
-  'states-fim-registries': fimRegistriesFields,
-  'states-inventory-system': inventorySystemFields,
-  'states-inventory-hardware': inventoryHardwareFields,
-  'states-inventory-networks': inventoryNetworksFields,
-  'states-inventory-packages': inventoryPackagesFields,
-  'states-inventory-ports': inventoryPortsFields,
-  'states-inventory-processes': inventoryProcessesFields,
-  'states-inventory-protocols': inventoryProtocolsFields,
-  'states-inventory-users': inventoryUsersFields,
-  'states-inventory-groups': inventoryGroupsFields,
-  'states-inventory-services': inventoryServicesFields,
-  'states-inventory-interfaces': inventoryInterfacesFields,
-  'states-inventory-hotfixes': inventoryHotfixesFields,
-  'states-inventory-browser-extensions': inventoryBrowserExtensionsFields,
+  [WAZUH_INDEX_TYPE_STATES_VULNERABILITIES]: vulnerabilitiesFields,
+  [WAZUH_INDEX_TYPE_STATES_FIM_FILES]: fimFilesFields,
+  [WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES]: fimRegistriesFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM]: inventorySystemFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE]: inventoryHardwareFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS]: inventoryNetworksFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES]: inventoryPackagesFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS]: inventoryPortsFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES]: inventoryProcessesFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS]: inventoryProtocolsFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS]: inventoryUsersFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS]: inventoryGroupsFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES]: inventoryServicesFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES]: inventoryInterfacesFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES]: inventoryHotfixesFields,
+  [WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS]:
+    inventoryBrowserExtensionsFields,
 };
 
 // Legacy export for backwards compatibility with states patterns
