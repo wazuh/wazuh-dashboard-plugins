@@ -63,7 +63,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
     if (!dataSource) {
       throw new ErrorDataSourceNotFound(
         `Index pattern [id: ${storedIndexPatternId}] not found. Check if it exists or create one in Dashboard Management. If no matching indices are available, data collection may be disabled or failing.`,
-        { indexPattern: storedIndexPatternId },
+        { indexPatternId: storedIndexPatternId },
       );
     }
 
