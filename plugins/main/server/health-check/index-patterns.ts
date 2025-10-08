@@ -479,7 +479,6 @@ export function mapFieldsFormat(expectedFields: {
 
 export function defineTimeFieldNameIfExist(timeFieldName: string) {
   return function (savedObjectData) {
-    console.log('HELLO');
     const fields = JSON.parse(savedObjectData.fields);
 
     if (!fields.some(({ name }) => name === timeFieldName)) {
