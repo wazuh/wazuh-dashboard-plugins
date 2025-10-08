@@ -25,7 +25,6 @@ import {
   UI_ORDER_AGENT_STATUS,
   AGENT_SYNCED_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
-  UI_LOGGER_LEVELS,
 } from '../../../../common/constants';
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -37,11 +36,10 @@ import { agentsTableColumns } from './columns';
 import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { Agent } from '../types';
 import { UpgradeAgentModal } from './actions/upgrade-agent-modal';
-import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
-import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { AgentUpgradesInProgress } from './upgrades-in-progress/upgrades-in-progress';
 import { AgentUpgradesTaskDetailsModal } from './upgrade-task-details-modal';
 import NavigationService from '../../../react-services/navigation-service';
+import { getWazuhAPIVersion } from '../services';
 
 const searchBarWQLOptions = {
   implicitQuery: {
@@ -95,28 +93,9 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const [apiVersion, setApiVersion] = useState('');
 
   const getApiVersion = async () => {
-    try {
-      const managerVersion = await WzRequest.apiReq('GET', '/', {});
-      let apiVersion = managerVersion?.data?.data?.api_version || {};
-      // Remove the 'v' prefix if it exists
-      if (typeof apiVersion === 'string' && apiVersion.startsWith('v')) {
-        apiVersion = apiVersion.slice(1);
-      }
-      setApiVersion(apiVersion as string);
-    } catch (error) {
-      const options = {
-        context: `AgentsTable.getApiVersion`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        error: {
-          error,
-          message: error.message || error,
-          title: `Could not get API version`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      return;
+    const response = await getWazuhAPIVersion('AgentsTable.getApiVersion');
+    if (response) {
+      setApiVersion(response);
     }
   };
 

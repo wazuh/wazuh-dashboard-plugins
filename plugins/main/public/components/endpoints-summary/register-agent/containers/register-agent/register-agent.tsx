@@ -11,7 +11,6 @@ import {
   EuiToolTip,
   EuiButtonIcon,
 } from '@elastic/eui';
-import { WzRequest } from '../../../../../react-services/wz-request';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { ErrorHandler } from '../../../../../react-services/error-management';
@@ -37,7 +36,6 @@ import { validateAgentName } from '../../utils/validations';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
-import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import {
   enableMenu,
   ip,
@@ -46,6 +44,7 @@ import {
 } from '../../../../../services/resolves';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { SECTIONS } from '../../../../../sections';
+import { getWazuhAPIVersion } from '../../../services';
 
 export const RegisterAgent = compose(
   withErrorBoundary,
@@ -117,31 +116,11 @@ export const RegisterAgent = compose(
     return masterConfig;
   };
 
-  const getWazuhVersion = async () => {
-    try {
-      const result = await WzRequest.apiReq('GET', '/', {});
-      return result?.data?.data?.api_version;
-    } catch (error) {
-      const options = {
-        context: `RegisterAgent.getWazuhVersion`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: `Could not get the Wazuh version: ${error.message || error}`,
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      return version;
-    }
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [wazuhVersion, masterConfig, groups] = await Promise.all([
-          getWazuhVersion(),
+          getWazuhAPIVersion('RegisterAgent.getWazuhVersion'),
           getMasterConfig(),
           getGroups(),
         ]);
@@ -154,11 +133,11 @@ export const RegisterAgent = compose(
         }
         setNeedsPassword(needsPassword);
         setWazuhPassword(wazuhPassword);
-        setWazuhVersion(wazuhVersion);
+        setWazuhVersion(wazuhVersion || '');
         setGroups(groups);
         setLoading(false);
       } catch (error) {
-        setWazuhVersion(wazuhVersion);
+        setWazuhVersion(wazuhVersion || '');
         setLoading(false);
         const options = {
           context: 'RegisterAgent',
