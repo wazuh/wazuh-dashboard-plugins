@@ -69,7 +69,7 @@ export function resolveRepositoryHostPath(
 
     if (!resolvedBase) {
       throw new ValidationError(
-        `Repository path for '${repoName}' not provided. Supply a base directory containing the plugin or use -r ${repoName}=/absolute/path.`,
+        `Repository path for '${repoName}' not provided. Either set --plugins-root to a base that contains '/plugins/${repoName}' or use -r ${repoName}=/absolute/repo/root.`,
       );
     }
   }

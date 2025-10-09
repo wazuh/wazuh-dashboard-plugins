@@ -124,7 +124,7 @@ function resolveSecurityPluginPath(
     // Use exactly what the user provided
     if (!pluginPathIfValid(normalized)) {
       throw new ConfigurationError(
-        `Path '${normalized}' does not look like a plugin root (missing package.json).`,
+        `Path '${normalized}' is not a valid repository root (expected a package.json at that path). We never descend into subfolders; pass the repository root that actually contains package.json.`,
       );
     }
     return normalized;
