@@ -217,6 +217,36 @@ describe('services/argumentParser (combinatorial)', () => {
       }
     });
 
+    it('shorthand -r security aliases resolve to canonical sibling repo folder', () => {
+      const { envPaths, tmpdir, paths } = makeEnv();
+      try {
+        const aliases = [
+          'wazuh-security',
+          'security',
+          'wazuh-security-dashboards',
+          'wazuh-security-dashboards-plugin',
+        ];
+        const canonical = 'wazuh-security-dashboards-plugin';
+        const host = path.join(paths.siblingHost, canonical);
+        const container = path.join(paths.siblingContainer, canonical);
+        fs.mkdirSync(host, { recursive: true });
+        fs.mkdirSync(container, { recursive: true });
+        fs.writeFileSync(
+          path.join(container, 'package.json'),
+          '{"name":"wazuh-security-dashboards"}',
+        );
+
+        for (const alias of aliases) {
+          const cfg = parseArguments(['-r', alias, 'up'], envPaths, logger);
+          expect(cfg.userRepositories).toEqual([{ name: alias, path: host }]);
+        }
+      } finally {
+        try {
+          fs.rmSync(tmpdir, { recursive: true, force: true });
+        } catch {}
+      }
+    });
+
     it('shorthand -r <name> throws when not under sibling root', () => {
       const { envPaths, tmpdir } = makeEnv();
       try {

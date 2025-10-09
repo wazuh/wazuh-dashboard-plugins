@@ -6,7 +6,12 @@ import {
   toContainerPath,
 } from '../utils/pathUtils';
 import { ValidationError, ConfigurationError } from '../errors';
-import { ACTIONS, PROFILES, FLAGS } from '../constants/app';
+import {
+  ACTIONS,
+  PROFILES,
+  FLAGS,
+  SECURITY_PLUGIN_ALIASES,
+} from '../constants/app';
 import type { Logger } from '../utils/logger';
 
 export function printUsageAndExit(log: Logger): never {
@@ -34,7 +39,7 @@ export function printUsageAndExit(log: Logger): never {
     `  ${FLAGS.SERVER_LOCAL} <tag>  Enable server-local mode with the given local image tag`,
   );
   log.infoPlain(
-    `  ${FLAGS.REPO} repo=absolute_path Mount an external plugin repository (repeatable). Shorthand: ${FLAGS.REPO} repo (resolved under sibling root).`,
+    `  ${FLAGS.REPO} repo=absolute_path Mount an external plugin repository (repeatable). Must point to the repository ROOT, not a subfolder. Shorthand: ${FLAGS.REPO} repo (resolved under sibling root).`,
   );
   log.infoPlain(
     `  ${FLAGS.BASE} [absolute_path] Use dashboard sources from a local checkout (auto-detects under sibling root when path omitted).`,
@@ -168,13 +173,18 @@ export function parseArguments(
         } else {
           // Shorthand: -r <repoName> implies sibling root path
           const repoName = repoSpec;
+          const siblingFolderName = SECURITY_PLUGIN_ALIASES.includes(
+            repoName as (typeof SECURITY_PLUGIN_ALIASES)[number],
+          )
+            ? SECURITY_PLUGIN_ALIASES[0]
+            : repoName;
           if (!envPaths.siblingRepoHostRoot) {
             throw new ValidationError(
               `Cannot resolve repository '${repoName}' under sibling root. Provide ${FLAGS.REPO} ${repoName}=/absolute/path or set SIBLING_REPO_HOST_ROOT.`,
             );
           }
           const inferredHostPath = stripTrailingSlash(
-            resolve(envPaths.siblingRepoHostRoot, repoName),
+            resolve(envPaths.siblingRepoHostRoot, siblingFolderName),
           );
           // Ensure it's visible from container mounts
           ensureAccessibleHostPath(

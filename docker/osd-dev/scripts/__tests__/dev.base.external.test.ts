@@ -38,12 +38,8 @@ describe('dev.ts - Base mode + external repo dynamic volumes', () => {
     fs.mkdirSync(dashboardBase, { recursive: true });
     fs.writeFileSync(path.join(dashboardBase, '.nvmrc'), '18.17.0\n');
 
-    // Provide security plugin inside dashboard base
-    securityPluginPath = path.join(
-      dashboardBase,
-      'plugins',
-      'wazuh-security-dashboards',
-    );
+    // Provide security plugin as sibling alias path for auto-discovery
+    securityPluginPath = path.join(siblingRoot, 'wazuh-security-dashboards-plugin');
     fs.mkdirSync(securityPluginPath, { recursive: true });
     fs.writeFileSync(
       path.join(securityPluginPath, 'package.json'),

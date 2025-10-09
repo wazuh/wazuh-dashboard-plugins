@@ -43,6 +43,12 @@ The `dev.sh` wrapper is the entry point. The action is positional; everything el
   [--base [</absolute/path>]]
 ```
 
+Notes about `-r`:
+
+- The path must be ABSOLUTE and must point to the repository ROOT. Do not pass subfolders such as `/plugins/...`.
+- Shorthand `-r <repo>` resolves from the sibling root (`/sibling/<repo>`).
+- In `--base` mode, if you need to override the security plugin, use `-r wazuh-security-dashboards-plugin=/absolute/repo/root`. The script will locate the plugin inside the repo; do not pass the plugin subdirectory.
+
 Examples:
 
 ```bash
@@ -55,6 +61,16 @@ Examples:
 # External plugins (repeat -r)
 ./dev.sh up -r wazuh-dashboard-reporting=/path/to/repo
 ./dev.sh up -r wazuh-dashboard-reporting   # shorthand: resolves /sibling/wazuh-dashboard-reporting
+
+# Accepted security plugin aliases with -r (no auto-descent or search in dashboardBase):
+#   wazuh-security-dashboards-plugin | wazuh-security-dashboards | wazuh-security | security
+
+# Accepted forms (path used exactly as provided; no internal resolution):
+#   ./dev.sh up -r wazuh-security              # resolves to /sibling/wazuh-security-dashboards-plugin
+#   ./dev.sh up -r security                    # resolves to /sibling/wazuh-security-dashboards-plugin
+#   ./dev.sh up -r wazuh-security-dashboards   # resolves to /sibling/wazuh-security-dashboards-plugin
+#   ./dev.sh up -r wazuh-security-dashboards-plugin  # resolves to /sibling/wazuh-security-dashboards-plugin
+#   ./dev.sh up -r security=/abs/path/wazuh-security-dashboards-plugin  # uses the absolute path as is
 
 # Bring down everything
 ./dev.sh down

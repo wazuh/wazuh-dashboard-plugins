@@ -5,7 +5,6 @@ import { resolve } from 'path';
 import {
   OVERRIDE_COMPOSE_FILE,
   REQUIRED_REPOSITORIES,
-  SECURITY_PLUGIN_NAME,
   SECURITY_PLUGIN_REPO_NAME,
   SECURITY_PLUGIN_ALIASES,
   PROFILES,
@@ -100,20 +99,7 @@ function resolveSecurityPluginPath(
     return '';
   };
 
-  const resolveFromBasePath = (baseHostPath: string): string => {
-    // Accept either a direct plugin path or the repo root containing it
-    const direct = pluginPathIfValid(baseHostPath);
-    if (direct) return direct;
-    const nested = pluginPathIfValid(
-      resolve(baseHostPath, 'plugins', SECURITY_PLUGIN_NAME),
-    );
-    if (nested) return nested;
-    throw new ConfigurationError(
-      `Provided path '${baseHostPath}' does not look like the '${SECURITY_PLUGIN_NAME}' plugin directory or a '${SECURITY_PLUGIN_REPO_NAME}' repo root (expected package.json under either path).`,
-    );
-  };
-
-  // 1) Respect explicit -r override if provided
+  // 1) Respect explicit -r override if provided (use path as-is, no descent)
   const securityOverride = config.userRepositories.find(repoOverride =>
     isSecurityPluginName(repoOverride.name),
   );
@@ -124,31 +110,29 @@ function resolveSecurityPluginPath(
         `Repository path '${securityOverride.path}' for '${securityOverride.name}' must be absolute.`,
       );
     }
+    // Enforce: do not allow subfolder paths for -r (root only)
+    if (normalized.includes('/plugins/')) {
+      throw new ValidationError(
+        `Invalid -r path for '${securityOverride.name}': '${securityOverride.path}'. Do not point to subfolders like '/plugins/...'. Provide the repository root instead.`,
+      );
+    }
     ensureAccessibleHostPath(
       normalized,
       `Repository path for '${securityOverride.name}'`,
       envPaths,
     );
-    // Accept overrides pointing either to the plugin dir or the repo root
-    return resolveFromBasePath(normalized);
+    // Use exactly what the user provided
+    if (!pluginPathIfValid(normalized)) {
+      throw new ConfigurationError(
+        `Path '${normalized}' does not look like a plugin root (missing package.json).`,
+      );
+    }
+    return normalized;
   }
 
-  // 2) Search common locations
+  // 2) Auto-discovery (no user override): probe canonical sibling repo folder only
   const candidates: string[] = [];
-  if (config.pluginsRoot) {
-    candidates.push(resolve(config.pluginsRoot, SECURITY_PLUGIN_NAME));
-    // If a full repo lives under plugins root, accept it too
-    candidates.push(resolve(config.pluginsRoot, SECURITY_PLUGIN_REPO_NAME));
-  }
-  if (config.dashboardBase) {
-    candidates.push(
-      resolve(config.dashboardBase, 'plugins', SECURITY_PLUGIN_NAME),
-    );
-  }
   if (envPaths.siblingRepoHostRoot) {
-    candidates.push(
-      resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_NAME),
-    );
     candidates.push(
       resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_REPO_NAME),
     );
@@ -160,22 +144,12 @@ function resolveSecurityPluginPath(
     if (!normalized || !normalized.startsWith('/') || seen.has(normalized))
       continue;
     seen.add(normalized);
-
-    // Try candidate as a direct plugin path first
     const direct = pluginPathIfValid(normalized);
     if (direct) return direct;
-
-    // Then try nested under repo root convention: <repo>/plugins/<plugin>
-    try {
-      const nested = resolveFromBasePath(normalized);
-      if (nested) return nested;
-    } catch {
-      // ignore and continue exploring other candidates
-    }
   }
 
   throw new ConfigurationError(
-    'Unable to locate wazuh-security-dashboards plugin. Provide it with -r wazuh-security-dashboards=/absolute/path or -r wazuh-security-dashboards-plugin=/absolute/path (repo root), or ensure it exists under the chosen plugins root.',
+    'Unable to locate wazuh-security-dashboards plugin automatically. Provide it with -r <alias>=/absolute/path (repository root) or place it under a known sibling path.',
   );
 }
 
@@ -265,6 +239,13 @@ export async function mainWithDeps(
     );
     const isSecurityPlugin =
       config.useDashboardFromSource && isSecurityPluginName(override.name);
+
+    // Global policy: -r must mount the repository root, not a subdirectory
+    if (normalizedOverride.includes('/plugins/')) {
+      throw new ValidationError(
+        `Invalid -r path for '${override.name}': '${override.path}'. Do not point to subfolders like '/plugins/...'. Provide the repository root instead.`,
+      );
+    }
 
     if (isRequired || isSecurityPlugin) {
       ensureAccessibleHostPath(
