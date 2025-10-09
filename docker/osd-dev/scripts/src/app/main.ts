@@ -149,7 +149,7 @@ function resolveSecurityPluginPath(
   }
 
   throw new ConfigurationError(
-    'Unable to auto-discover the security plugin. Looked only at /sibling/wazuh-security-dashboards-plugin. Either pass -r <alias>=/absolute/repo/root (aliases: wazuh-security-dashboards-plugin, wazuh-security-dashboards, wazuh-security, security), or create the canonical folder at that sibling path.',
+    `Unable to auto-discover the security plugin. Looked only at /sibling/${SECURITY_PLUGIN_REPO_NAME}. Either pass -r <alias>=/absolute/repo/root (aliases: ${SECURITY_PLUGIN_ALIASES.join(', ')}), or create the canonical folder at that sibling path.`,
   );
 }
 
