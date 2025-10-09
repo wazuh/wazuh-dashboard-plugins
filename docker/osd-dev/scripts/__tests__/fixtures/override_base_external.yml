@@ -13,7 +13,7 @@ services:
     working_dir: /home/node/kbn
     volumes:
       - '${SRC_DASHBOARD}:/home/node/kbn'
-      - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards'
+      - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards-plugin'
       - ./dashboard-src/entrypoint.sh:/entrypoint.sh:ro
       - 'external-test:/home/node/kbn/plugins/external-test'
 volumes:

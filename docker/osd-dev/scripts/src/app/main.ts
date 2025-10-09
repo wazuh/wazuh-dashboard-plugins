@@ -149,7 +149,7 @@ function resolveSecurityPluginPath(
   }
 
   throw new ConfigurationError(
-    'Unable to locate wazuh-security-dashboards plugin automatically. Provide it with -r <alias>=/absolute/path (repository root) or place it under a known sibling path.',
+    'Unable to locate wazuh-security-dashboards-plugin automatically. Provide it with -r <alias>=/absolute/path (repository root) or place it under a known sibling path.',
   );
 }
 
@@ -222,7 +222,7 @@ export async function mainWithDeps(
       `Using wazuh-dashboard sources from ${config.dashboardBase}`,
     );
     deps.logger.info(
-      `Using wazuh-security-dashboards sources from ${securityPluginHostPath}`,
+      `Using wazuh-security-dashboards-plugin sources from ${securityPluginHostPath}`,
     );
     deps.logger.info(
       `Using Node.js version ${process.env.NODE_VERSION} from ${nvmrcHostPath}`,

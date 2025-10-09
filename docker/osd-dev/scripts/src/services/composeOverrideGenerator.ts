@@ -64,7 +64,7 @@ export function generateOverrideFile(
     volumeEntries.push("      - '${SRC_DASHBOARD}:/home/node/kbn'");
     if (includeSecurityPlugin) {
       volumeEntries.push(
-        "      - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards'",
+        "      - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards-plugin'",
       );
     }
     volumeEntries.push(
