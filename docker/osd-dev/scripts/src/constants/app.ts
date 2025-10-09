@@ -16,12 +16,8 @@ export const SECURITY_PLUGIN_REPO_NAME =
 /**
  * Names accepted for identifying the security plugin via -r overrides.
  */
-export const SECURITY_PLUGIN_ALIASES = [
-  SECURITY_PLUGIN_REPO_NAME,
-  'wazuh-security-dashboards',
-  'wazuh-security',
-  'security',
-] as const;
+// Only one alias is accepted for CLI overrides of the security plugin
+export const SECURITY_PLUGIN_ALIASES = ['security'] as const;
 
 /** Name of the Docker Compose profile that enables dashboard-from-source. */
 export const PROFILES = {

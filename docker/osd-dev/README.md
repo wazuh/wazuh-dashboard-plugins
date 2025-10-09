@@ -85,19 +85,16 @@ Launch using explicit mappings for external plugins:
 ./dev.sh up -r wazuh-dashboard-reporting=~/dev/wazuh-dashboard-reporting -r wazuh-security-dashboards-plugin=~/dev/wazuh-security-dashboards-plugin
 ```
 
-Security plugin aliases accepted by `-r` (no auto-descend, no search inside dashboardBase, path used as-is):
+Security plugin alias accepted by `-r` (no auto-descend, no search inside dashboardBase, path used as-is):
 
 ```
-wazuh-security-dashboards-plugin, wazuh-security-dashboards, wazuh-security, security
+security
 ```
 
-Examples (shorthand aliases always resolve to the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>):
+Examples (shorthand alias resolves to the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>):
 
 ```
 ./dev.sh up --base -r security                          # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
-./dev.sh up --base -r wazuh-security                    # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
-./dev.sh up --base -r wazuh-security-dashboards         # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
-./dev.sh up --base -r wazuh-security-dashboards-plugin  # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
 ./dev.sh up --base -r security=/abs/path/wazuh-security-dashboards-plugin  # uses absolute path as-is
 ```
 
@@ -110,7 +107,7 @@ Examples (shorthand aliases always resolve to the canonical folder 'wazuh-securi
 - Overrides with `-r` (takes precedence):
   - `-r <alias>=/absolute/repo/root` → uses the absolute path exactly as provided (no subfolders like `/plugins/...`).
   - `-r <alias>` → resolves to the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
-  - Aliases: `wazuh-security-dashboards-plugin`, `wazuh-security-dashboards`, `wazuh-security`, `security`.
+  - Alias: `security`.
 
 Or, with a single root checkout containing `plugins/`:
 

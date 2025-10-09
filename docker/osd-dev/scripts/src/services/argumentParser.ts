@@ -11,6 +11,7 @@ import {
   PROFILES,
   FLAGS,
   SECURITY_PLUGIN_ALIASES,
+  SECURITY_PLUGIN_REPO_NAME,
 } from '../constants/app';
 import type { Logger } from '../utils/logger';
 
@@ -181,7 +182,7 @@ export function parseArguments(
           const siblingFolderName = SECURITY_PLUGIN_ALIASES.includes(
             repoName as (typeof SECURITY_PLUGIN_ALIASES)[number],
           )
-            ? SECURITY_PLUGIN_ALIASES[0]
+            ? SECURITY_PLUGIN_REPO_NAME
             : repoName;
           if (!envPaths.siblingRepoHostRoot) {
             throw new ValidationError(

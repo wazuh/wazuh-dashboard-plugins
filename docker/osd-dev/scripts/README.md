@@ -71,14 +71,11 @@ Examples:
 ./dev.sh up -r wazuh-dashboard-reporting=/path/to/repo
 ./dev.sh up -r wazuh-dashboard-reporting   # shorthand: resolves /sibling/wazuh-dashboard-reporting
 
-# Accepted security plugin aliases with -r (no auto-descent or search in dashboardBase):
-#   wazuh-security-dashboards-plugin | wazuh-security-dashboards | wazuh-security | security
+# Accepted security plugin alias with -r (no auto-descent or search in dashboardBase):
+#   security
 
 # Accepted forms (path used exactly as provided; no internal resolution):
-#   ./dev.sh up -r wazuh-security              # resolves to '<common-parent-directory>/wazuh-security-dashboards-plugin'
 #   ./dev.sh up -r security                    # resolves to '<common-parent-directory>/wazuh-security-dashboards-plugin'
-#   ./dev.sh up -r wazuh-security-dashboards   # resolves to '<common-parent-directory>/wazuh-security-dashboards-plugin'
-#   ./dev.sh up -r wazuh-security-dashboards-plugin  # resolves to '<common-parent-directory>/wazuh-security-dashboards-plugin'
 #   ./dev.sh up -r security=/abs/path/wazuh-security-dashboards-plugin  # uses the absolute path as is
 
 # Bring down everything

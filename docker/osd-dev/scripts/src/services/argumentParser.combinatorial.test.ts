@@ -217,15 +217,10 @@ describe('services/argumentParser (combinatorial)', () => {
       }
     });
 
-    it('shorthand -r security aliases resolve to canonical sibling repo folder', () => {
+    it('shorthand -r security resolves to canonical sibling repo folder', () => {
       const { envPaths, tmpdir, paths } = makeEnv();
       try {
-        const aliases = [
-          'wazuh-security',
-          'security',
-          'wazuh-security-dashboards',
-          'wazuh-security-dashboards-plugin',
-        ];
+        const aliases = ['security'];
         const canonical = 'wazuh-security-dashboards-plugin';
         const host = path.join(paths.siblingHost, canonical);
         const container = path.join(paths.siblingContainer, canonical);
