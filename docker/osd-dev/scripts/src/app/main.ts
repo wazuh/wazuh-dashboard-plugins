@@ -149,7 +149,7 @@ function resolveSecurityPluginPath(
   }
 
   throw new ConfigurationError(
-    'Unable to locate wazuh-security-dashboards-plugin automatically. Provide it with -r <alias>=/absolute/path (repository root) or place it under a known sibling path.',
+    'Unable to auto-discover the security plugin. Looked only at /sibling/wazuh-security-dashboards-plugin. Either pass -r <alias>=/absolute/repo/root (aliases: wazuh-security-dashboards-plugin, wazuh-security-dashboards, wazuh-security, security), or create the canonical folder at that sibling path.',
   );
 }
 
