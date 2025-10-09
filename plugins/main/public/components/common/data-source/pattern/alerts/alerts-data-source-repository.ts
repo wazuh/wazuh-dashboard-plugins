@@ -1,17 +1,15 @@
+import { INDEX_PATTERN_ALERTS_REQUIRED_FIELDS } from '../../../../../../common/constants';
 import { AppState } from '../../../../../react-services';
+import {
+  ErrorDataSourceNotFound,
+  ErrorDataSourceAlertsSelect,
+} from '../../../../../utils/errors';
 import { PatternDataSourceFactory } from '../pattern-data-source-factory';
 import {
   PatternDataSourceRepository,
   tParsedIndexPattern,
 } from '../pattern-data-source-repository';
 import { AlertsDataSource } from './alerts-data-source';
-
-const ALERTS_REQUIRED_FIELDS = [
-  'timestamp',
-  'rule.groups',
-  'manager.name',
-  'agent.id',
-];
 
 export class AlertsDataSourceRepository extends PatternDataSourceRepository {
   constructor() {
@@ -45,7 +43,7 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
    * @returns boolean
    */
   checkIfAlertsIndexPattern(dataSource): boolean {
-    return ALERTS_REQUIRED_FIELDS.every(reqField =>
+    return INDEX_PATTERN_ALERTS_REQUIRED_FIELDS.every(reqField =>
       dataSource._fields.some(field => field.name === reqField),
     );
   }
@@ -54,8 +52,8 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
     const storedIndexPatternId = this.getStoreIndexPatternId();
 
     if (!storedIndexPatternId) {
-      throw new Error(
-        'There is no selected index pattern for alerts. Ensure there is a compatible index pattern and select it using the index pattern selector. The index pattern selector is only available when there are multiple compatibles index patterns. If there is only a compatible index pattern, the selector is not visible, and it could indicate the index pattern was not selected due to some error or you could need to select it.',
+      throw new ErrorDataSourceAlertsSelect(
+        'No index pattern selected for alerts. Make sure a compatible index pattern exists and select it. This wasn’t applied correctly or needs to be re‑selected.',
       );
     }
     const dataSource = dataSources.find(
@@ -63,8 +61,9 @@ export class AlertsDataSourceRepository extends PatternDataSourceRepository {
     );
 
     if (!dataSource) {
-      throw new Error(
-        `Index pattern with ID [${storedIndexPatternId}] not found. Review if you have at least one index pattern with this configuration. You can create the index patterns from Dashboard Management application if there are matching indices. If there are no matching indices, this could indicate the data collection is disabled or there is a problem in the collection or ingestion.`,
+      throw new ErrorDataSourceNotFound(
+        `Index pattern [id: ${storedIndexPatternId}] not found. Check if it exists or create one in Dashboard Management. If no matching indices are available, data collection may be disabled or failing.`,
+        { indexPatternId: storedIndexPatternId },
       );
     }
 

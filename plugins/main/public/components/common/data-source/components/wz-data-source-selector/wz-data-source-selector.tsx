@@ -142,7 +142,7 @@ const WzDataSourceSelector = (
         actionError={actionError}
         showSelectorsInPopover={showSelectorsInPopover}
       >
-        Index pattern
+        Alerts index pattern
       </SelectorLabel>
       <Selector showSelectorsInPopover={showSelectorsInPopover}>
         <div style={style}>

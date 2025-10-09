@@ -43,7 +43,6 @@ getCore.mockImplementation(() => ({
 }));
 
 getCookies.mockImplementation(() => {
-  console.log('HELLO');
   return {
     get: () => 'test',
     hello: 'dadsads',
