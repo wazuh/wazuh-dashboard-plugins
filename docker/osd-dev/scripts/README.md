@@ -47,7 +47,7 @@ Notes about `-r`:
 
 - The path must be ABSOLUTE and must point to the repository ROOT. Do not pass subfolders such as `/plugins/...`.
 - Shorthand `-r <repo>` resolves from the sibling root (`/sibling/<repo>`).
-- In `--base` mode, if you need to override the security plugin, use `-r wazuh-security-dashboards-plugin=/absolute/repo/root`. The script will locate the plugin inside the repo; do not pass the plugin subdirectory.
+- In `--base` mode, if you need to override the security plugin, use `-r wazuh-security-dashboards-plugin=/absolute/repo/root`. The script uses the provided path as-is; do not pass the plugin subdirectory.
 
 Examples:
 
