@@ -66,4 +66,3 @@ describe('dev.ts - --base with -r security alias override (no internal resolutio
     expect(process.env.NODE_VERSION).toBe('18.17.0');
   });
 });
-

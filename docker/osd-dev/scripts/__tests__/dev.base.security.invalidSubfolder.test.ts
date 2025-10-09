@@ -59,11 +59,10 @@ describe('dev.ts - --base rejects -r security=.../plugins/... paths', () => {
     process.env.SIBLING_CONTAINER_ROOT = process.env.SIBLING_REPO_HOST_ROOT;
 
     await expect(
-      mainWithDeps(
-        ['--base', '-r', `security=${badPath}`, 'up'],
-        { logger, processRunner: runner },
-      ),
+      mainWithDeps(['--base', '-r', `security=${badPath}`, 'up'], {
+        logger,
+        processRunner: runner,
+      }),
     ).rejects.toBeInstanceOf(ValidationError);
   });
 });
-

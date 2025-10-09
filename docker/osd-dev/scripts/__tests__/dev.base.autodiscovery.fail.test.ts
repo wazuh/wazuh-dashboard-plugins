@@ -59,4 +59,3 @@ describe('dev.ts - Auto-discovery does not search inside dashboardBase', () => {
     ).rejects.toBeInstanceOf(ConfigurationError);
   });
 });
-

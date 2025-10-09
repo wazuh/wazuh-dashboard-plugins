@@ -5,6 +5,10 @@ import type { Logger } from '../utils/logger';
 import type { ProcessRunner } from '../types/deps';
 import chalk from 'chalk';
 import { ACTIONS, SERVICE_NAMES } from '../constants/app';
+import {
+  MSG_FAILED_CREATE_NETWORKS,
+  msgActionMustBe,
+} from '../constants/messages';
 
 export function runDockerCompose(
   config: ScriptConfig,
@@ -33,7 +37,7 @@ export function runDockerCompose(
           });
         }
       } catch (error) {
-        log.error('Failed to create docker networks');
+        log.error(MSG_FAILED_CREATE_NETWORKS);
       }
       composeArgs.push('up', '-Vd');
       break;
@@ -56,9 +60,7 @@ export function runDockerCompose(
       );
       break;
     default:
-      throw new ValidationError(
-        `Action must be ${Object.values(ACTIONS).join(' | ')}`,
-      );
+      throw new ValidationError(msgActionMustBe());
   }
 
   log.info(`Running: docker ${composeArgs.join(' ')}`);

@@ -9,6 +9,11 @@ import {
 } from '../constants/app';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { ValidationError } from '../errors';
+import {
+  MSG_SERVER_LOCAL_MODE_REQUIRES_VERSION,
+  MSG_SERVER_MODE_REQUIRES_VERSION,
+  msgUnsupportedModeToken,
+} from '../constants/messages';
 
 export function initializeBaseEnvironment(config: ScriptConfig): void {
   process.env.PASSWORD = process.env.PASSWORD || DEFAULTS.defaultPassword;
@@ -62,16 +67,12 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
   // Determine primary profile based on explicit server/server-local first (flags take precedence via parser)
   // Reject direct server-local-* composite modes; users must set -a together with FLAGS.SERVER_LOCAL
   if (new RegExp(`^${PROFILES.SERVER_LOCAL}-`).test(config.mode)) {
-    throw new ValidationError(
-      `Unsupported mode token. Use '${FLAGS.SERVER_LOCAL} <tag>' with '${FLAGS.AGENTS_UP} <rpm|deb|without>' instead of direct 'server-local-*' modes.`,
-    );
+    throw new ValidationError(msgUnsupportedModeToken());
   }
 
   if (config.mode === PROFILES.SERVER) {
     if (!config.modeVersion) {
-      throw new ValidationError(
-        'server mode requires the server_version argument',
-      );
+      throw new ValidationError(MSG_SERVER_MODE_REQUIRES_VERSION);
     }
     process.env.WAZUH_STACK = config.modeVersion;
     return PROFILES.SERVER;
@@ -79,9 +80,7 @@ export function configureModeAndSecurity(config: ScriptConfig): string {
 
   if (config.mode === PROFILES.SERVER_LOCAL) {
     if (!config.modeVersion) {
-      throw new ValidationError(
-        'server-local mode requires the server_version argument',
-      );
+      throw new ValidationError(MSG_SERVER_LOCAL_MODE_REQUIRES_VERSION);
     }
     process.env.IMAGE_TAG = config.modeVersion;
     return config.agentsUp

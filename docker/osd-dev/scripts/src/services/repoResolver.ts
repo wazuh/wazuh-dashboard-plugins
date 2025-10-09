@@ -8,6 +8,11 @@ import {
 } from '../utils/pathUtils';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import { ValidationError, ConfigurationError } from '../errors';
+import {
+  msgEnvNotSet,
+  msgRepoPathMustBeAbsolute,
+  msgRepoPathNotProvided,
+} from '../constants/messages';
 
 export function resolveRepositoryHostPath(
   repoName: string,
@@ -21,15 +26,11 @@ export function resolveRepositoryHostPath(
 
   if (hostPath) {
     if (!hostPath.startsWith('/')) {
-      throw new ValidationError(
-        `Repository path '${hostPath}' for '${repoName}' must be absolute.`,
-      );
+      throw new ValidationError(msgRepoPathMustBeAbsolute(repoName, hostPath));
     }
   } else {
     if (!envPaths.currentRepoHostRoot) {
-      throw new ConfigurationError(
-        'CURRENT_REPO_HOST_ROOT environment variable is not set.',
-      );
+      throw new ConfigurationError(msgEnvNotSet('CURRENT_REPO_HOST_ROOT'));
     }
 
     const candidateBases: string[] = [];
@@ -68,9 +69,7 @@ export function resolveRepositoryHostPath(
     });
 
     if (!resolvedBase) {
-      throw new ValidationError(
-        `Repository path for '${repoName}' not provided. Either set --plugins-root to a base that contains '/plugins/${repoName}' or use -r ${repoName}=/absolute/repo/root.`,
-      );
+      throw new ValidationError(msgRepoPathNotProvided(repoName));
     }
   }
 

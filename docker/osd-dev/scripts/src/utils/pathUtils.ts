@@ -1,6 +1,7 @@
 import { existsSync } from 'fs';
 import { EnvironmentPaths } from '../types/config';
 import { PathAccessError } from '../errors';
+import { msgPathNotAccessible } from '../constants/messages';
 
 /**
  * Remove trailing slashes. Preserve root '/'.
@@ -65,7 +66,7 @@ export function ensureAccessibleHostPath(
       [envPaths.siblingRepoHostRoot].filter(Boolean).join(' or ') ||
       'the mounted development roots';
     throw new PathAccessError(
-      `${description} '${hostAbsolutePath}' does not exist or is not accessible from the development container. Place it under ${allowedRoots}.`,
+      msgPathNotAccessible(description, hostAbsolutePath, allowedRoots),
     );
   }
 }

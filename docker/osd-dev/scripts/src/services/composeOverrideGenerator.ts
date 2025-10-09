@@ -9,6 +9,8 @@ import {
 import { writeFile } from '../utils/io';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import { ComposeOverrideError } from '../errors';
+import { toRepositoryEnvVar } from '../utils/envUtils';
+import { msgRepositoryPathNotResolved } from '../constants/messages';
 import type { Logger } from '../utils/logger';
 
 export function generateOverrideFile(
@@ -87,9 +89,7 @@ export function generateOverrideFile(
     for (const repo of externalRepositories) {
       const repoPath = repositoryEnvMap.get(toRepositoryEnvVar(repo));
       if (!repoPath) {
-        throw new ComposeOverrideError(
-          `Repository path for '${repo}' not resolved.`,
-        );
+        throw new ComposeOverrideError(msgRepositoryPathNotResolved(repo));
       }
       content += `  ${repo}:\n`;
       content += `    driver: local\n`;

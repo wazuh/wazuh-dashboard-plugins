@@ -44,7 +44,10 @@ describe('dev.ts - Base startup with auto-detection (--base)', () => {
     fs.writeFileSync(path.join(dashboardBase, '.nvmrc'), '18.17.0\n');
 
     // Provide security plugin as sibling alias (auto-discovery source)
-    securityPluginPath = path.join(siblingRoot, 'wazuh-security-dashboards-plugin');
+    securityPluginPath = path.join(
+      siblingRoot,
+      'wazuh-security-dashboards-plugin',
+    );
     fs.mkdirSync(securityPluginPath, { recursive: true });
     fs.writeFileSync(
       path.join(securityPluginPath, 'package.json'),

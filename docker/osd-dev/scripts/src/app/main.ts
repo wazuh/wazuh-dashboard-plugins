@@ -16,6 +16,12 @@ import {
   msgInvalidRepoSubfolder,
   msgRepoPathMustBeAbsolute,
   msgSecurityAutodiscoverError,
+  msgDashboardBaseNotAccessible,
+  msgNvmrcEmpty,
+  msgNvmrcNotFound,
+  msgNotValidRepoRoot,
+  msgDashboardEntrypointMissing,
+  msgMissingAction,
 } from '../constants/messages';
 import { getEnvironmentPaths } from '../constants/paths';
 import { generateOverrideFile } from '../services/composeOverrideGenerator';
@@ -62,7 +68,7 @@ function ensureDashboardSources(
       [envPaths.siblingRepoHostRoot].filter(Boolean).join(' or ') ||
       'the mounted development roots';
     throw new PathAccessError(
-      `Dashboard base path '${config.dashboardBase}' does not exist or is not accessible from the development container. Place it under ${allowedRoots}.`,
+      msgDashboardBaseNotAccessible(config.dashboardBase, allowedRoots),
     );
   }
 
@@ -72,16 +78,12 @@ function ensureDashboardSources(
   const nvmrcHostPath = resolve(config.dashboardBase, '.nvmrc');
   const nvmrcContainerPath = toContainerPath(nvmrcHostPath, envPaths);
   if (!nvmrcContainerPath || !existsSync(nvmrcContainerPath)) {
-    throw new PathAccessError(
-      `.nvmrc not found at '${nvmrcHostPath}'. Provide a valid wazuh-dashboard checkout or pass ${FLAGS.BASE} with an absolute path to it.`,
-    );
+    throw new PathAccessError(msgNvmrcNotFound(nvmrcHostPath));
   }
 
   const nodeVersion = readFileSync(nvmrcContainerPath, 'utf-8').trim();
   if (!nodeVersion) {
-    throw new ValidationError(
-      `.nvmrc at '${nvmrcHostPath}' is empty. Cannot determine Node version.`,
-    );
+    throw new ValidationError(msgNvmrcEmpty(nvmrcHostPath));
   }
 
   process.env.NODE_VERSION = nodeVersion;
@@ -125,9 +127,7 @@ function resolveSecurityPluginPath(
     );
     // Use exactly what the user provided
     if (!pluginPathIfValid(normalized)) {
-      throw new ConfigurationError(
-        `Path '${normalized}' is not a valid repository root (expected a package.json at that path). We never descend into subfolders; pass the repository root that actually contains package.json.`,
-      );
+      throw new ConfigurationError(msgNotValidRepoRoot(normalized));
     }
     return normalized;
   }
@@ -169,7 +169,7 @@ export async function mainWithDeps(
   let config = parseArguments(argv, envPaths, deps.logger);
 
   if (!config.action) {
-    throw new ValidationError('Missing action argument');
+    throw new ValidationError(msgMissingAction());
   }
 
   // Get versions from package.json if not provided
@@ -218,7 +218,7 @@ export async function mainWithDeps(
     );
     if (!existsSync(entrypointHostPath)) {
       throw new ConfigurationError(
-        `Expected dashboard entrypoint script at '${entrypointHostPath}'.`,
+        msgDashboardEntrypointMissing(entrypointHostPath),
       );
     }
     deps.logger.info(

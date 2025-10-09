@@ -10,6 +10,22 @@ import {
   USAGE_NOTE_REPO_SHORTHAND,
   USAGE_NOTE_BASE_AUTODETECT,
   msgInvalidRepoSubfolder,
+  msgFlagRequiresAbsolutePath,
+  msgFlagRequiresValue,
+  msgInvalidAgentsUp,
+  msgCannotResolveRepositoryUnderCommonParent,
+  msgUnsupportedOption,
+  msgActionProvidedMultiple,
+  msgPositionalArgsNotAllowed,
+  msgCannotInferDashboardBase,
+  msgUnableLocateWazuhDashboardAuto,
+  msgBaseRequiresAbsolute,
+  msgCannotCombineServerFlags,
+} from '../constants/messages';
+import {
+  USAGE_NOTE_REPO_SHORTHAND,
+  USAGE_NOTE_BASE_AUTODETECT,
+  msgInvalidRepoSubfolder,
 } from '../constants/messages';
 import {
   ACTIONS,
@@ -47,7 +63,9 @@ export function printUsageAndExit(log: Logger): never {
   log.infoPlain(
     `  ${FLAGS.REPO} repo=absolute_path Mount an external plugin repository (repeatable). Must point to the repository ROOT, not a subfolder. ${USAGE_NOTE_REPO_SHORTHAND}`,
   );
-  log.infoPlain(`  ${FLAGS.BASE} [absolute_path] ${USAGE_NOTE_BASE_AUTODETECT}`);
+  log.infoPlain(
+    `  ${FLAGS.BASE} [absolute_path] ${USAGE_NOTE_BASE_AUTODETECT}`,
+  );
   log.infoPlain('');
   log.infoPlain(
     'Note: The only allowed positional token is the action (e.g., "up"). All other values must use flags.',
@@ -82,7 +100,7 @@ export function parseArguments(
         const path = argv[++index];
         if (!path || !path.startsWith('/')) {
           throw new ValidationError(
-            `${FLAGS.PLUGINS_ROOT} requires an absolute path value`,
+            msgFlagRequiresAbsolutePath(FLAGS.PLUGINS_ROOT),
           );
         }
         config.setPluginsRoot(stripTrailingSlash(path), 'argumentParser');
@@ -94,7 +112,7 @@ export function parseArguments(
         const version = argv[++index];
         if (!version || version.startsWith('-')) {
           throw new ValidationError(
-            `${FLAGS.OS_VERSION} requires a version value, e.g. '${FLAGS.OS_VERSION} 2.11.0'`,
+            msgFlagRequiresValue(FLAGS.OS_VERSION, '2.11.0'),
           );
         }
         config.setOsVersion(version, 'argumentParser');
@@ -106,7 +124,7 @@ export function parseArguments(
         const version = argv[++index];
         if (!version || version.startsWith('-')) {
           throw new ValidationError(
-            `${FLAGS.OSD_VERSION} requires a version value, e.g. '${FLAGS.OSD_VERSION} 2.11.0'`,
+            msgFlagRequiresValue(FLAGS.OSD_VERSION, '2.11.0'),
           );
         }
         config.setOsdVersion(version, 'argumentParser');
@@ -120,9 +138,7 @@ export function parseArguments(
         if (val === 'none' || val === '0') val = 'without';
         config.setAgentsUp(val, 'argumentParser');
         if (!['rpm', 'deb', 'without', ''].includes(config.agentsUp)) {
-          throw new ValidationError(
-            `Invalid value for ${FLAGS.AGENTS_UP} option. Allowed values are 'rpm', 'deb', 'without', or an empty string.`,
-          );
+          throw new ValidationError(msgInvalidAgentsUp(FLAGS.AGENTS_UP));
         }
         index++;
         break;
@@ -168,7 +184,9 @@ export function parseArguments(
             );
           }
           if (repoPath.includes('/plugins/')) {
-            throw new ValidationError(msgInvalidRepoSubfolder(repoName, repoPath));
+            throw new ValidationError(
+              msgInvalidRepoSubfolder(repoName, repoPath),
+            );
           }
           config.addUserRepositoryOverride(
             {
@@ -187,7 +205,11 @@ export function parseArguments(
             : repoName;
           if (!envPaths.siblingRepoHostRoot) {
             throw new ValidationError(
-              `Cannot resolve repository '${repoName}' under your common-parent-directory. Provide ${FLAGS.REPO} ${repoName}=/absolute/path or set SIBLING_REPO_HOST_ROOT to your common-parent-directory.`,
+              msgCannotResolveRepositoryUnderCommonParent(
+                repoName,
+                FLAGS.REPO,
+                'SIBLING_REPO_HOST_ROOT',
+              ),
             );
           }
           const inferredHostPath = stripTrailingSlash(
@@ -236,13 +258,13 @@ export function parseArguments(
 
       default: {
         if (arg.startsWith('-')) {
-          throw new ValidationError(`Unsupported option '${arg}'.`);
+          throw new ValidationError(msgUnsupportedOption(arg));
         }
         // Allow exactly one positional action token, anywhere
         if (allowedActions.has(arg)) {
           if (config.action) {
             throw new ValidationError(
-              `Action provided multiple times: '${config.action}' and '${arg}'. Use only one positional action.`,
+              msgActionProvidedMultiple(config.action, arg),
             );
           }
           config.action = arg;
@@ -250,9 +272,7 @@ export function parseArguments(
           break;
         }
         // Any other non-flag token is not allowed
-        throw new ValidationError(
-          `Positional arguments are not allowed (found '${arg}'). Only the action token is allowed positionally; use flags for everything else.`,
-        );
+        throw new ValidationError(msgPositionalArgsNotAllowed(arg));
       }
     }
   }
@@ -261,26 +281,20 @@ export function parseArguments(
   if (config.useDashboardFromSource && !config.dashboardBase) {
     const hostRoot = envPaths.siblingRepoHostRoot;
     if (!hostRoot) {
-      throw new ConfigurationError(
-        'Cannot infer dashboard base path automatically. Provide an absolute path to --base.',
-      );
+      throw new ConfigurationError(msgCannotInferDashboardBase());
     }
 
     const candidate = stripTrailingSlash(resolve(hostRoot, 'wazuh-dashboard'));
     const containerCandidate = toContainerPath(candidate, envPaths);
     if (!containerCandidate) {
-      throw new ValidationError(
-        `Unable to locate wazuh-dashboard automatically. Provide an absolute path to ${FLAGS.BASE}.`,
-      );
+      throw new ValidationError(msgUnableLocateWazuhDashboardAuto());
     }
     config.setDashboardBase(candidate, 'argumentParser');
   }
 
   if (config.useDashboardFromSource) {
     if (!config.dashboardBase || !config.dashboardBase.startsWith('/')) {
-      throw new ValidationError(
-        `The ${FLAGS.BASE} option requires an absolute path to the wazuh-dashboard repository.`,
-      );
+      throw new ValidationError(msgBaseRequiresAbsolute());
     }
     ensureAccessibleHostPath(
       config.dashboardBase,
@@ -302,9 +316,7 @@ export function parseArguments(
 
   // Map new-style flags to mode/modeVersion, taking precedence over positional mode
   if (config.serverFlagVersion && config.serverLocalFlagVersion) {
-    throw new ValidationError(
-      `Cannot combine '${FLAGS.SERVER}' and '${FLAGS.SERVER_LOCAL}' flags`,
-    );
+    throw new ValidationError(msgCannotCombineServerFlags());
   }
   // Map explicit mode flags
   if (config.serverFlagVersion) {
