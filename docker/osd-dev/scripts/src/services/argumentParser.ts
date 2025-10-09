@@ -163,6 +163,11 @@ export function parseArguments(
               `Invalid repository specification '${repoSpec}'. Expected format repo=/absolute/path.`,
             );
           }
+          if (repoPath.includes('/plugins/')) {
+            throw new ValidationError(
+              `Invalid path for -r ${repoName}: '${repoPath}'. Do not point to subfolders like '/plugins/...'. Provide the repository root instead.`,
+            );
+          }
           config.addUserRepositoryOverride(
             {
               name: repoName,
