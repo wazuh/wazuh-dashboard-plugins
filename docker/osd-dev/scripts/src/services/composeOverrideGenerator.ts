@@ -4,6 +4,7 @@ import {
   DASHBOARD_ENTRYPOINT_PATH,
   OVERRIDE_COMPOSE_FILE,
   PROFILES,
+  SECURITY_PLUGIN_REPO_NAME,
 } from '../constants/app';
 import { writeFile } from '../utils/io';
 import { toRepositoryEnvVar } from '../utils/envUtils';
@@ -64,7 +65,7 @@ export function generateOverrideFile(
     volumeEntries.push("      - '${SRC_DASHBOARD}:/home/node/kbn'");
     if (includeSecurityPlugin) {
       volumeEntries.push(
-        "      - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards-plugin'",
+        `      - '\${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/${SECURITY_PLUGIN_REPO_NAME}'`,
       );
     }
     volumeEntries.push(

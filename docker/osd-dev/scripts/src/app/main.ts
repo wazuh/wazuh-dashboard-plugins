@@ -12,6 +12,11 @@ import {
   ACTIONS,
   FLAGS,
 } from '../constants/app';
+import {
+  msgInvalidRepoSubfolder,
+  msgRepoPathMustBeAbsolute,
+  msgSecurityAutodiscoverError,
+} from '../constants/messages';
 import { getEnvironmentPaths } from '../constants/paths';
 import { generateOverrideFile } from '../services/composeOverrideGenerator';
 import {
@@ -24,10 +29,7 @@ import {
   configureModeAndSecurity,
 } from '../services/environmentConfigurator';
 import { parseArguments, printUsageAndExit } from '../services/argumentParser';
-import {
-  resolveRepositoryHostPath,
-  resolveRequiredRepositories,
-} from '../services/repoResolver';
+import { resolveRequiredRepositories } from '../services/repoResolver';
 import { getPlatformVersionFromPackageJson } from '../services/versionService';
 import { EnvironmentPaths, ScriptConfig } from '../types/config';
 import { toRepositoryEnvVar } from '../utils/envUtils';
@@ -107,13 +109,13 @@ function resolveSecurityPluginPath(
     const normalized = stripTrailingSlash(securityOverride.path);
     if (!normalized.startsWith('/')) {
       throw new ValidationError(
-        `Repository path '${securityOverride.path}' for '${securityOverride.name}' must be absolute.`,
+        msgRepoPathMustBeAbsolute(securityOverride.name, securityOverride.path),
       );
     }
     // Enforce: do not allow subfolder paths for -r (root only)
     if (normalized.includes('/plugins/')) {
       throw new ValidationError(
-        `Invalid -r path for '${securityOverride.name}': '${securityOverride.path}'. Do not point to subfolders like '/plugins/...'. Provide the repository root instead.`,
+        msgInvalidRepoSubfolder(securityOverride.name, securityOverride.path),
       );
     }
     ensureAccessibleHostPath(
@@ -151,9 +153,7 @@ function resolveSecurityPluginPath(
   const lookedAt = envPaths.siblingRepoHostRoot
     ? resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_REPO_NAME)
     : '(common-parent-directory not configured)';
-  throw new ConfigurationError(
-    `Unable to auto-discover the security plugin. Looked only at ${lookedAt}. Either pass -r <alias>=/absolute/repo/root (aliases: ${SECURITY_PLUGIN_ALIASES.join(', ')}), or create the canonical folder at that location.`,
-  );
+  throw new ConfigurationError(msgSecurityAutodiscoverError(lookedAt));
 }
 
 export async function mainWithDeps(
@@ -225,7 +225,7 @@ export async function mainWithDeps(
       `Using wazuh-dashboard sources from ${config.dashboardBase}`,
     );
     deps.logger.info(
-      `Using wazuh-security-dashboards-plugin sources from ${securityPluginHostPath}`,
+      `Using ${SECURITY_PLUGIN_REPO_NAME} sources from ${securityPluginHostPath}`,
     );
     deps.logger.info(
       `Using Node.js version ${process.env.NODE_VERSION} from ${nvmrcHostPath}`,
@@ -246,7 +246,7 @@ export async function mainWithDeps(
     // Global policy: -r must mount the repository root, not a subdirectory
     if (normalizedOverride.includes('/plugins/')) {
       throw new ValidationError(
-        `Invalid -r path for '${override.name}': '${override.path}'. Do not point to subfolders like '/plugins/...'. Provide the repository root instead.`,
+        msgInvalidRepoSubfolder(override.name, override.path),
       );
     }
 

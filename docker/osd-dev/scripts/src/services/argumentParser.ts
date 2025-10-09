@@ -1,11 +1,16 @@
 import { resolve } from 'path';
-import { ScriptConfig, EnvironmentPaths, Config } from '../types/config';
+import { EnvironmentPaths, Config } from '../types/config';
 import {
   ensureAccessibleHostPath,
   stripTrailingSlash,
   toContainerPath,
 } from '../utils/pathUtils';
 import { ValidationError, ConfigurationError } from '../errors';
+import {
+  USAGE_NOTE_REPO_SHORTHAND,
+  USAGE_NOTE_BASE_AUTODETECT,
+  msgInvalidRepoSubfolder,
+} from '../constants/messages';
 import {
   ACTIONS,
   PROFILES,
@@ -40,11 +45,9 @@ export function printUsageAndExit(log: Logger): never {
     `  ${FLAGS.SERVER_LOCAL} <tag>  Enable server-local mode with the given local image tag`,
   );
   log.infoPlain(
-    `  ${FLAGS.REPO} repo=absolute_path Mount an external plugin repository (repeatable). Must point to the repository ROOT, not a subfolder. Shorthand: ${FLAGS.REPO} repo (resolved under your common-parent-directory).`,
+    `  ${FLAGS.REPO} repo=absolute_path Mount an external plugin repository (repeatable). Must point to the repository ROOT, not a subfolder. ${USAGE_NOTE_REPO_SHORTHAND}`,
   );
-  log.infoPlain(
-    `  ${FLAGS.BASE} [absolute_path] Use dashboard sources from a local checkout (auto-detects under your common-parent-directory when path is omitted).`,
-  );
+  log.infoPlain(`  ${FLAGS.BASE} [absolute_path] ${USAGE_NOTE_BASE_AUTODETECT}`);
   log.infoPlain('');
   log.infoPlain(
     'Note: The only allowed positional token is the action (e.g., "up"). All other values must use flags.',
@@ -165,9 +168,7 @@ export function parseArguments(
             );
           }
           if (repoPath.includes('/plugins/')) {
-            throw new ValidationError(
-              `Invalid path for -r ${repoName}: '${repoPath}'. Do not point to subfolders like '/plugins/...'. Provide the repository root instead.`,
-            );
+            throw new ValidationError(msgInvalidRepoSubfolder(repoName, repoPath));
           }
           config.addUserRepositoryOverride(
             {
