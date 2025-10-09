@@ -34,6 +34,15 @@ Always use the provided script to bring up or down the development environment. 
   [--base [</absolute/path>]]
 ```
 
+### About <common-parent-directory>
+
+- Meaning: a host directory where you keep external repositories (e.g., `~/dev`). The script uses it for shorthand `-r <repo>` resolution and for auto‑discovery.
+- How it’s set: the wrapper `docker/osd-dev/dev.sh` sets `SIBLING_REPO_HOST_ROOT` to the parent folder of this repo by default. You can override it explicitly:
+  - `export SIBLING_REPO_HOST_ROOT=/absolute/path/to/your/common-parent-directory`
+  - Then run `./docker/osd-dev/dev.sh …`
+- How to verify: `echo $SIBLING_REPO_HOST_ROOT` (must be an absolute host path).
+- Note: docs refer to this location as `<common-parent-directory>`.
+
 ### Parameters
 
 - -os <os_version> : (Optional) Specifies the OpenSearch version. If not provided, it's obtained from plugins/wazuh-core/package.json .
@@ -46,7 +55,7 @@ Always use the provided script to bring up or down the development environment. 
 - -r <repo>=<path> : (Optional, repeatable) ONLY for external plugin repositories that are not stored inside this repository.
   - Internal repositories (`main`, `wazuh-core`, `wazuh-check-updates`) are auto-detected under `<root>/plugins/` when running from this repo, or can be set via `--plugins-root` (aliases: `-wdp`, `--wz-home`).
   - External repositories passed with `-r` are dynamically added as volumes to the `osd` service via an auto-generated `dev.override.generated.yml` (git-ignored).
-  - Paths MUST be absolute and must point to the repository ROOT (do not pass subfolders like `/plugins/...`). Shorthand is also supported: `-r <repo>` (no `=`), which assumes the repository is available under the container path `/sibling/<repo>` and resolves it from the sibling host root. If not found, an error is raised.
+  - Paths MUST be absolute and must point to the repository ROOT (do not pass subfolders like `/plugins/...`). Shorthand is also supported: `-r <repo>` (no `=`), which resolves from your <common-parent-directory> using the same `<repo>` name. If not found, an error is raised.
     Action (positional): One of up | down | stop | start | manager-local-up.
 - -saml: (Optional) Deploys a SAML-enabled environment with KeyCloak IDP.
   - Note for SAML: You need to add idp to your hosts file ( /etc/hosts on Linux/macOS, C:\\Windows\\System32\\drivers\\etc\\hosts on Windows) pointing to 127.0.0.1 . Also, based on previous configurations, KeyCloak IDP might need to be started with the --no-base-path option.
@@ -82,13 +91,13 @@ Security plugin aliases accepted by `-r` (no auto-descend, no search inside dash
 wazuh-security-dashboards-plugin, wazuh-security-dashboards, wazuh-security, security
 ```
 
-Examples (shorthand aliases always resolve to /sibling/wazuh-security-dashboards-plugin):
+Examples (shorthand aliases always resolve to the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>):
 
 ```
-./dev.sh up --base -r security                          # resolves /sibling/wazuh-security-dashboards-plugin
-./dev.sh up --base -r wazuh-security                    # resolves /sibling/wazuh-security-dashboards-plugin
-./dev.sh up --base -r wazuh-security-dashboards         # resolves /sibling/wazuh-security-dashboards-plugin
-./dev.sh up --base -r wazuh-security-dashboards-plugin  # resolves /sibling/wazuh-security-dashboards-plugin
+./dev.sh up --base -r security                          # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
+./dev.sh up --base -r wazuh-security                    # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
+./dev.sh up --base -r wazuh-security-dashboards         # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
+./dev.sh up --base -r wazuh-security-dashboards-plugin  # resolves <common-parent-directory>/wazuh-security-dashboards-plugin
 ./dev.sh up --base -r security=/abs/path/wazuh-security-dashboards-plugin  # uses absolute path as-is
 ```
 
@@ -96,11 +105,11 @@ Examples (shorthand aliases always resolve to /sibling/wazuh-security-dashboards
 
 - Auto-discovery (no `-r`):
 
-  - Looks only at `/sibling/wazuh-security-dashboards-plugin`.
+  - Looks only at the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
 
 - Overrides with `-r` (takes precedence):
   - `-r <alias>=/absolute/repo/root` → uses the absolute path exactly as provided (no subfolders like `/plugins/...`).
-  - `-r <alias>` → resolves to `/sibling/wazuh-security-dashboards-plugin`.
+  - `-r <alias>` → resolves to the canonical folder 'wazuh-security-dashboards-plugin' under your <common-parent-directory>.
   - Aliases: `wazuh-security-dashboards-plugin`, `wazuh-security-dashboards`, `wazuh-security`, `security`.
 
 Or, with a single root checkout containing `plugins/`:

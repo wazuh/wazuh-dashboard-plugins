@@ -33,6 +33,15 @@ dev.sh → docker compose (dev-ts.yml) → dev.ts → docker compose (dev.yml)
 
 The `dev.sh` wrapper is the entry point. The action is positional; everything else must be provided via flags.
 
+### About <common-parent-directory>
+
+- Meaning: a host directory where you keep external repositories (e.g., `~/dev`). The script uses it for shorthand `-r <repo>` resolution and for auto‑discovery.
+- How it’s set: the wrapper `docker/osd-dev/dev.sh` sets `SIBLING_REPO_HOST_ROOT` to the parent folder of this repo by default. You can override it explicitly:
+  - `export SIBLING_REPO_HOST_ROOT=/absolute/path/to/your/common-parent-directory`
+  - Then run `./docker/osd-dev/dev.sh …`
+- How to verify: `echo $SIBLING_REPO_HOST_ROOT` (must be an absolute host path).
+- Note: docs refer to this location as `<common-parent-directory>`.
+
 ```bash
 ./dev.sh <action> \
   [--plugins-root /abs/path]  # aliases: -wdp, --wz-home \
@@ -46,7 +55,7 @@ The `dev.sh` wrapper is the entry point. The action is positional; everything el
 Notes about `-r`:
 
 - The path must be ABSOLUTE and must point to the repository ROOT. Do not pass subfolders such as `/plugins/...`.
-- Shorthand `-r <repo>` resolves from the sibling root (`/sibling/<repo>`).
+- Shorthand `-r <repo>` resolves from your <common-parent-directory> (a directory where you keep external repos), using the same `<repo>` name.
 - In `--base` mode, if you need to override the security plugin, use `-r wazuh-security-dashboards-plugin=/absolute/repo/root`. The script uses the provided path as-is; do not pass the plugin subdirectory.
 
 Examples:
@@ -66,10 +75,10 @@ Examples:
 #   wazuh-security-dashboards-plugin | wazuh-security-dashboards | wazuh-security | security
 
 # Accepted forms (path used exactly as provided; no internal resolution):
-#   ./dev.sh up -r wazuh-security              # resolves to /sibling/wazuh-security-dashboards-plugin
-#   ./dev.sh up -r security                    # resolves to /sibling/wazuh-security-dashboards-plugin
-#   ./dev.sh up -r wazuh-security-dashboards   # resolves to /sibling/wazuh-security-dashboards-plugin
-#   ./dev.sh up -r wazuh-security-dashboards-plugin  # resolves to /sibling/wazuh-security-dashboards-plugin
+#   ./dev.sh up -r wazuh-security              # resolves to '<common-parent-directory>/wazuh-security-dashboards-plugin'
+#   ./dev.sh up -r security                    # resolves to '<common-parent-directory>/wazuh-security-dashboards-plugin'
+#   ./dev.sh up -r wazuh-security-dashboards   # resolves to '<common-parent-directory>/wazuh-security-dashboards-plugin'
+#   ./dev.sh up -r wazuh-security-dashboards-plugin  # resolves to '<common-parent-directory>/wazuh-security-dashboards-plugin'
 #   ./dev.sh up -r security=/abs/path/wazuh-security-dashboards-plugin  # uses the absolute path as is
 
 # Bring down everything

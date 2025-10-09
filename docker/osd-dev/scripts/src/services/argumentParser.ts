@@ -39,10 +39,10 @@ export function printUsageAndExit(log: Logger): never {
     `  ${FLAGS.SERVER_LOCAL} <tag>  Enable server-local mode with the given local image tag`,
   );
   log.infoPlain(
-    `  ${FLAGS.REPO} repo=absolute_path Mount an external plugin repository (repeatable). Must point to the repository ROOT, not a subfolder. Shorthand: ${FLAGS.REPO} repo (resolved under sibling root).`,
+    `  ${FLAGS.REPO} repo=absolute_path Mount an external plugin repository (repeatable). Must point to the repository ROOT, not a subfolder. Shorthand: ${FLAGS.REPO} repo (resolved under your common-parent-directory).`,
   );
   log.infoPlain(
-    `  ${FLAGS.BASE} [absolute_path] Use dashboard sources from a local checkout (auto-detects under sibling root when path omitted).`,
+    `  ${FLAGS.BASE} [absolute_path] Use dashboard sources from a local checkout (auto-detects under your common-parent-directory when path is omitted).`,
   );
   log.infoPlain('');
   log.infoPlain(
@@ -176,7 +176,7 @@ export function parseArguments(
             'argumentParser',
           );
         } else {
-          // Shorthand: -r <repoName> implies sibling root path
+          // Shorthand: -r <repoName> implies path under the common-parent-directory
           const repoName = repoSpec;
           const siblingFolderName = SECURITY_PLUGIN_ALIASES.includes(
             repoName as (typeof SECURITY_PLUGIN_ALIASES)[number],
@@ -185,7 +185,7 @@ export function parseArguments(
             : repoName;
           if (!envPaths.siblingRepoHostRoot) {
             throw new ValidationError(
-              `Cannot resolve repository '${repoName}' under sibling root. Provide ${FLAGS.REPO} ${repoName}=/absolute/path or set SIBLING_REPO_HOST_ROOT.`,
+              `Cannot resolve repository '${repoName}' under your common-parent-directory. Provide ${FLAGS.REPO} ${repoName}=/absolute/path or set SIBLING_REPO_HOST_ROOT to your common-parent-directory.`,
             );
           }
           const inferredHostPath = stripTrailingSlash(

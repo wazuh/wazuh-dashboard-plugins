@@ -148,8 +148,11 @@ function resolveSecurityPluginPath(
     if (direct) return direct;
   }
 
+  const lookedAt = envPaths.siblingRepoHostRoot
+    ? resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_REPO_NAME)
+    : '(common-parent-directory not configured)';
   throw new ConfigurationError(
-    `Unable to auto-discover the security plugin. Looked only at ${resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_REPO_NAME)}. Either pass -r <alias>=/absolute/repo/root (aliases: ${SECURITY_PLUGIN_ALIASES.join(', ')}), or create the canonical folder at that location.`,
+    `Unable to auto-discover the security plugin. Looked only at ${lookedAt}. Either pass -r <alias>=/absolute/repo/root (aliases: ${SECURITY_PLUGIN_ALIASES.join(', ')}), or create the canonical folder at that location.`,
   );
 }
 
