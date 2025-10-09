@@ -149,7 +149,7 @@ function resolveSecurityPluginPath(
   }
 
   throw new ConfigurationError(
-    `Unable to auto-discover the security plugin. Looked only at /sibling/${SECURITY_PLUGIN_REPO_NAME}. Either pass -r <alias>=/absolute/repo/root (aliases: ${SECURITY_PLUGIN_ALIASES.join(', ')}), or create the canonical folder at that sibling path.`,
+    `Unable to auto-discover the security plugin. Looked only at ${resolve(envPaths.siblingRepoHostRoot, SECURITY_PLUGIN_REPO_NAME)}. Either pass -r <alias>=/absolute/repo/root (aliases: ${SECURITY_PLUGIN_ALIASES.join(', ')}), or create the canonical folder at that location.`,
   );
 }
 
