@@ -58,6 +58,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Added
 
 - Support for Wazuh 4.14.0
+- Added visualizations field validations when creating wazuh-states index patterns [#7777](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7777)
 - Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587) [#7792](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7792) [#7787](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7787)
 - Added ability to set the Wazuh data path (wazuh directory) within the directory defined through `path.data` setting [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
 - Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641) [#7696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7696) [#7729](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7729) [#7774](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7774) [#7785](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7785)

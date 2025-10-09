@@ -250,6 +250,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'host.memory.free': 'bytes',
+            'host.memory.total': 'bytes',
+            'host.memory.used': 'bytes',
+            'host.memory.usage': 'percent',
+          }),
+        },
       }),
     );
 
