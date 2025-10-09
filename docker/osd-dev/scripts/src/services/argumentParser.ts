@@ -23,11 +23,6 @@ import {
   msgCannotCombineServerFlags,
 } from '../constants/messages';
 import {
-  USAGE_NOTE_REPO_SHORTHAND,
-  USAGE_NOTE_BASE_AUTODETECT,
-  msgInvalidRepoSubfolder,
-} from '../constants/messages';
-import {
   ACTIONS,
   PROFILES,
   FLAGS,
