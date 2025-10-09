@@ -5,11 +5,12 @@ import {
   OVERRIDE_COMPOSE_FILE,
   PROFILES,
   SECURITY_PLUGIN_REPO_NAME,
+  WAZUH_DOWNLOADS_TMPFS_PATH,
+  WAZUH_DOWNLOADS_TMPFS_OPTS,
 } from '../constants/app';
 import { writeFile } from '../utils/io';
 import { toRepositoryEnvVar } from '../utils/envUtils';
 import { ComposeOverrideError } from '../errors';
-import { toRepositoryEnvVar } from '../utils/envUtils';
 import { msgRepositoryPathNotResolved } from '../constants/messages';
 import type { Logger } from '../utils/logger';
 
@@ -63,6 +64,8 @@ export function generateOverrideFile(
     content += `      - '${PROFILES.DASHBOARD_SRC}'\n`;
     content += "    entrypoint: ['/bin/bash', '/entrypoint.sh']\n";
     content += '    working_dir: /home/node/kbn\n';
+    content += '    tmpfs:\n';
+    content += `      - ${WAZUH_DOWNLOADS_TMPFS_PATH}:${WAZUH_DOWNLOADS_TMPFS_OPTS}\n`;
 
     volumeEntries.push("      - '${SRC_DASHBOARD}:/home/node/kbn'");
     if (includeSecurityPlugin) {

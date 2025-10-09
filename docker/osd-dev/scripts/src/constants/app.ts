@@ -71,6 +71,16 @@ export const SERVICE_NAMES = {
   WAZUH_MANAGER_LOCAL: 'wazuh.manager.local',
 } as const;
 
+/** Where the security plugin is mounted inside OSD */
+export const SECURITY_PLUGIN_MOUNT_DESTINATION =
+  `/home/node/kbn/plugins/${SECURITY_PLUGIN_REPO_NAME}` as const;
+
+/** Tmpfs mount for downloads to avoid polluting host filesystem */
+export const WAZUH_DOWNLOADS_TMPFS_PATH =
+  '/home/node/kbn/data/wazuh/downloads' as const;
+export const WAZUH_DOWNLOADS_TMPFS_OPTS =
+  'uid=1000,gid=1000,mode=0775' as const;
+
 /** OSD major markers used to pick paths. */
 export const OSD_MAJOR_2X = '2.x' as const;
 export const OSD_MAJOR_1X = '1.x' as const;

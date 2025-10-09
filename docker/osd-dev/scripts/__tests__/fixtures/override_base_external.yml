@@ -11,6 +11,8 @@ services:
       - 'dashboard-src'
     entrypoint: ['/bin/bash', '/entrypoint.sh']
     working_dir: /home/node/kbn
+    tmpfs:
+      - /home/node/kbn/data/wazuh/downloads:uid=1000,gid=1000,mode=0775
     volumes:
       - '${SRC_DASHBOARD}:/home/node/kbn'
       - '${SRC_SECURITY_PLUGIN}:/home/node/kbn/plugins/wazuh-security-dashboards-plugin'
