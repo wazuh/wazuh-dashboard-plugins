@@ -92,6 +92,17 @@ Examples (shorthand aliases always resolve to /sibling/wazuh-security-dashboards
 ./dev.sh up --base -r security=/abs/path/wazuh-security-dashboards-plugin  # uses absolute path as-is
 ```
 
+### Search Order and Precedence (Security Plugin)
+
+- Auto-discovery (no `-r`):
+
+  - Looks only at `/sibling/wazuh-security-dashboards-plugin`.
+
+- Overrides with `-r` (takes precedence):
+  - `-r <alias>=/absolute/repo/root` → uses the absolute path exactly as provided (no subfolders like `/plugins/...`).
+  - `-r <alias>` → resolves to `/sibling/wazuh-security-dashboards-plugin`.
+  - Aliases: `wazuh-security-dashboards-plugin`, `wazuh-security-dashboards`, `wazuh-security`, `security`.
+
 Or, with a single root checkout containing `plugins/`:
 
 ```bash
