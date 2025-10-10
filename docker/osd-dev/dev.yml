@@ -1,5 +1,3 @@
-version: '2.2'
-
 # x-logging: &logging
 #   logging:
 #     driver: loki
@@ -263,12 +261,34 @@ services:
     entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
-      - '${SRC}/main:/home/node/kbn/plugins/main'
-      - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
-      - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
+      - '${REPO_MAIN}:/home/node/kbn/plugins/main'
+      - '${REPO_WAZUH_CORE}:/home/node/kbn/plugins/wazuh-core'
+      - '${REPO_WAZUH_CHECK_UPDATES}:/home/node/kbn/plugins/wazuh-check-updates'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
+
+  dashboard-src-installer:
+    image: node:${NODE_VERSION}
+    profiles:
+      - 'dashboard-src'
+    container_name: dashboard-src-installer-${NODE_VERSION}
+    user: '1000:1000'
+    working_dir: /home/node/kbn
+    entrypoint: /bin/bash
+    command: >
+      -c '
+        marker_osd_bootstrap="/home/node/kbn/.NO_COMMIT_MARKER_OSD_BOOTSTRAP_WAS_DONE"
+        root_app_dir="/home/node/kbn"
+        if [ -f "$$marker_osd_bootstrap" ]; then
+          echo "File $$marker_osd_bootstrap was found. Skip setup.";
+          exit 0;
+        fi
+        echo "Initializating setup"
+        cd $$root_app_dir
+        yarn osd clean && yarn osd bootstrap && touch $$marker_osd_bootstrap
+        echo "Setup was finished"
+      '
 
   idpsec:
     image: quay.io/keycloak/keycloak:19.0.1
@@ -389,7 +409,7 @@ services:
     depends_on:
       os1:
         condition: service_healthy
-    image: wazuh-manager-pkg:${IMAGE_TAG}
+    image: wazuh-manager-pkg:${IMAGE_TAG:-latest}
     build:
       context: ./manager
       args:

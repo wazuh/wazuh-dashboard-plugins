@@ -1,0 +1,18 @@
+# Node modules
+node_modules/
+
+# Compiled TypeScript
+*.js
+*.js.map
+*.d.ts
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
