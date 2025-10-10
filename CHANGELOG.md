@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.1
 
+### Changed
+
+- Upgraded the `axios` dependency to `1.12.2` [#7804](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7804)
+
 ### Fixed
 
 - Fixed navigation problem in MITRE ATT&CK framework details flyout [#7689](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7689)
