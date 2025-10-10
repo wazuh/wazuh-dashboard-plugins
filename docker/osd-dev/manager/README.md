@@ -15,7 +15,13 @@ This directory contains the files required to run a Wazuh Manager container in t
 The preferred way to start the development environment is with the `dev.sh` script located in the parent directory. For example:
 
 ```bash
-./dev.sh /absolute/path/to/wazuh_app_src up
+./dev.sh -r external=/absolute/path/to/wazuh-dashboard-external up
+```
+
+Or, if you keep all repositories in a single checkout, pass that directory as the optional default root:
+
+```bash
+./dev.sh /absolute/path/to/wazuh-dashboard-plugins/plugins up
 ```
 
 You can pass additional options and profiles (e.g., `saml`, `server`). Run `./dev.sh` without arguments to see usage instructions.
