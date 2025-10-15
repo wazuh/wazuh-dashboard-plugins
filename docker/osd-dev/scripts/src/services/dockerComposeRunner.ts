@@ -94,6 +94,7 @@ export function printAgentEnrollmentHint(log: Logger): void {
   log.infoPlain(chalk.cyan.bold('(Optional) Enroll an agent (Ubuntu 20.04):'));
   log.infoPlain('');
   log.infoPlain(`${chalk.green('docker run')} \\`);
+  log.infoPlain(`  ${chalk.magentaBright('--platform')} linux/amd64 \\`);
   log.infoPlain(
     `  ${chalk.magentaBright('--name')} ${projectName}-agent-$(date +%s) \\`,
   );
@@ -117,6 +118,52 @@ export function printAgentEnrollmentHint(log: Logger): void {
   log.infoPlain(
     chalk.gray(
       '    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${WAZUH_AGENT_VERSION}-1_amd64.deb \\',
+    ),
+  );
+  log.infoPlain(
+    chalk.gray(
+      "    && WAZUH_MANAGER='wazuh.manager' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-${WAZUH_AGENT_VERSION}.deb",
+    ),
+  );
+  log.infoPlain('');
+  log.infoPlain(chalk.gray('  /etc/init.d/wazuh-agent start'));
+  log.infoPlain(chalk.gray('  tail -f /var/ossec/logs/ossec.log'));
+  log.infoPlain(`'`);
+
+  log.infoPlain('');
+  log.infoPlain('');
+
+  log.infoPlain(
+    chalk.cyan.bold(
+      '(Optional) Enroll an agent (Ubuntu 20.04) ARM64 (ONLY COMPATIBLE SYSTEMS):',
+    ),
+  );
+  log.infoPlain('');
+  log.infoPlain(`${chalk.green('docker run')} \\`);
+  log.infoPlain(`  ${chalk.magentaBright('--platform')} linux/arm64 \\`);
+  log.infoPlain(
+    `  ${chalk.magentaBright('--name')} ${projectName}-agent-$(date +%s) \\`,
+  );
+  log.infoPlain(`  ${chalk.magentaBright('--network')} os-dev-${osVersion} \\`);
+  log.infoPlain(
+    `  ${chalk.magentaBright('--label')} ${chalk.underline(
+      'com.docker.compose.project',
+    )}=${projectName} \\`,
+  );
+  log.infoPlain(
+    `  ${chalk.magentaBright('--env')} ${chalk.underline(
+      'WAZUH_AGENT_VERSION',
+    )}=${chalk.yellow(wazuhStack)} \\`,
+  );
+  log.infoPlain(`  ${chalk.magentaBright('-d')} ubuntu:20.04 bash -c '`);
+  log.infoPlain(chalk.gray('  apt update -y'));
+  log.infoPlain(chalk.gray('  apt install -y curl lsb-release'));
+  log.infoPlain(
+    chalk.gray('  curl -so \\wazuh-agent-${WAZUH_AGENT_VERSION}.deb \\'),
+  );
+  log.infoPlain(
+    chalk.gray(
+      '    https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${WAZUH_AGENT_VERSION}-1_arm64.deb \\',
     ),
   );
   log.infoPlain(
