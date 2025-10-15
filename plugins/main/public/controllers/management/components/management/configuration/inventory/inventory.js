@@ -37,6 +37,7 @@ const scanSettings = [
   { field: 'packages', label: 'Scan installed packages' },
   { field: 'network', label: 'Scan network interfaces' },
   { field: 'ports', label: 'Scan listening network ports' },
+  { field: 'ports_all', label: 'Scan all network ports' },
   { field: 'groups', label: 'Scan groups' },
   { field: 'users', label: 'Scan users' },
   { field: 'services', label: 'Scan services' },
