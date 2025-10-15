@@ -20,6 +20,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Reworked health check [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622) [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694) [#7756](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7756)
 - Reworked some view components to use data source [#7622](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7622)
 - Fixed date and more format errors [#7754](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7754)
+- Upgraded the `brace-expansion` dependency to `1.1.12` and `2.0.2` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
+- Upgraded the `tar-fs` dependency to `2.1.4` [#7812](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7812)
 
 ### Removed
 
