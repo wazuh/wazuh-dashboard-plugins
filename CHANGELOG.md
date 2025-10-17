@@ -53,7 +53,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed sorting by agent count in top 5 groups visualization in endpoints summary [#7783](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7783)
 - Fixed System Inventory displaying incorrect agent data after switching agents in Endpoint Details [#7803](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7803)
 
-## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 02
+## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 03
 
 ### Added
 
