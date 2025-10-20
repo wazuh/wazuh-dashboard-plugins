@@ -25,6 +25,9 @@ import {
   PluginInitializerContext,
   SharedGlobalConfig,
 } from 'opensearch_dashboards/server';
+import {
+  ILegacyClusterClient,
+} from "../../../src/core/server";
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
@@ -85,6 +88,8 @@ import {
   WAZUH_SCA_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../common/constants';
+import { notificationSetup } from './health-check/notification-default-channels';
+import { verifyOrCreateNotificationChannel as initializationTaskVerifyNotificationChannels } from './health-check/notification-default-channels/tasks';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -129,6 +134,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     this.logger.debug('Wazuh-wui: Setup');
 
     const serverInfo = core.http.getServerInfo();
+    const notificationClient: ILegacyClusterClient = notificationSetup(core);
 
     core.http.registerRouteHandlerContext('wazuh', (context, request) => {
       return {
@@ -158,6 +164,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     setupRoutes(router, plugins.wazuhCore);
 
     // Register health check tasks
+
+    // default notification channels
+    core.healthCheck.register(
+      initializationTaskVerifyNotificationChannels(notificationClient)
+    );
+
     // server API connection-compatibility
     core.healthCheck.register(
       initializationTaskCreatorServerAPIConnectionCompatibility({
@@ -467,5 +479,5 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() {}
+  public stop() { }
 }
