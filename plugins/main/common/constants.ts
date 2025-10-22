@@ -903,8 +903,8 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
 
 export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
-  'timestamp',
-  'rule.groups',
-  'manager.name',
+  '@timestamp',
+  'wazuh.decoders',
+  'wazuh.cluster.node',
   'agent.id',
 ];
