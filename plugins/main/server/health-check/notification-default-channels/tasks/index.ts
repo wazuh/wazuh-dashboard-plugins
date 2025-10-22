@@ -11,7 +11,7 @@ const verifyExistingDefaultChannels = async (client: ILegacyClusterClient, ctx: 
   ctx.logger.debug('Notification channels API response:', results);
 
   // Handle case where notifications plugin is not available
-  if (!results.config_list && !results.configs) {
+  if (!results.config_list) {
     const message = 'Notifications plugin is not available or no config endpoint found';
     ctx.logger.error(message);
     throw new Error(message);
