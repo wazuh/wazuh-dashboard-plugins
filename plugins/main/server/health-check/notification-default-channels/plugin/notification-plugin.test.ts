@@ -70,7 +70,8 @@ describe('NotificationsPlugin', () => {
     it('should register both methods on notifications prototype', () => {
       const mockGetConfigs = jest.fn();
       const mockCreateConfig = jest.fn();
-      const mockFactory = jest.fn()
+      const mockFactory = jest
+        .fn()
         .mockReturnValueOnce(mockGetConfigs)
         .mockReturnValueOnce(mockCreateConfig);
 

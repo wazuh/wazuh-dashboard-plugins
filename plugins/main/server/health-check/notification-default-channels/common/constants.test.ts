@@ -1,11 +1,18 @@
-import { defaultChannels, defaultChannelConfigs, OPENSEARCH_API, ChannelDefinition } from './constants';
+import {
+  defaultChannels,
+  defaultChannelConfigs,
+  OPENSEARCH_API,
+  ChannelDefinition,
+} from './constants';
 
 describe('Notification Default Channels Constants', () => {
   describe('OPENSEARCH_API', () => {
     it('should have correct API endpoints', () => {
       expect(OPENSEARCH_API.CONFIGS).toBe('/_plugins/_notifications/configs');
       expect(OPENSEARCH_API.EVENTS).toBe('/_plugins/_notifications/events');
-      expect(OPENSEARCH_API.TEST_MESSAGE).toBe('/_plugins/_notifications/feature/test');
+      expect(OPENSEARCH_API.TEST_MESSAGE).toBe(
+        '/_plugins/_notifications/feature/test',
+      );
       expect(OPENSEARCH_API.FEATURES).toBe('/_plugins/_notifications/features');
     });
   });
@@ -19,8 +26,16 @@ describe('Notification Default Channels Constants', () => {
       const expectedChannels = [
         { id: 'default_slack_channel', name: 'Slack Channel', type: 'slack' },
         { id: 'default_jira_channel', name: 'Jira Channel', type: 'webhook' },
-        { id: 'default_pagerduty_channel', name: 'PagerDuty Channel', type: 'webhook' },
-        { id: 'default_shuffle_channel', name: 'Shuffle Channel', type: 'webhook' }
+        {
+          id: 'default_pagerduty_channel',
+          name: 'PagerDuty Channel',
+          type: 'webhook',
+        },
+        {
+          id: 'default_shuffle_channel',
+          name: 'Shuffle Channel',
+          type: 'webhook',
+        },
       ];
 
       expectedChannels.forEach((expected, index) => {
@@ -54,7 +69,9 @@ describe('Notification Default Channels Constants', () => {
       expect(slackConfig.name).toBe('Slack Channel');
       expect(slackConfig.config_type).toBe('slack');
       expect(slackConfig.is_enabled).toBe(false);
-      expect(slackConfig.description).toContain('Default Wazuh slack notification channel. To start receiving alerts, create a monitor, trigger and monitor action in the Alerting section, and edit this channel.');
+      expect(slackConfig.description).toContain(
+        'Default Wazuh slack notification channel. To start receiving alerts, create a monitor, trigger and monitor action in the Alerting section, and edit this channel.',
+      );
       expect(slackConfig.slack).toBeDefined();
       expect(slackConfig.slack.url).toContain('hooks.slack.com');
     });
@@ -69,7 +86,9 @@ describe('Notification Default Channels Constants', () => {
       expect(pagerDutyConfig.webhook).toBeDefined();
       expect(pagerDutyConfig.webhook.url).toContain('events.pagerduty.com');
       expect(pagerDutyConfig.webhook.method).toBe('POST');
-      expect(pagerDutyConfig.webhook.header_params).toHaveProperty('X-Routing-Key');
+      expect(pagerDutyConfig.webhook.header_params).toHaveProperty(
+        'X-Routing-Key',
+      );
     });
 
     it('should have correct Jira channel configuration', () => {
@@ -104,11 +123,17 @@ describe('Notification Default Channels Constants', () => {
     });
 
     it('should have proper content-type headers for webhook channels', () => {
-      const webhookConfigs = ['PagerDuty Channel', 'Jira Channel', 'Shuffle Channel'];
+      const webhookConfigs = [
+        'PagerDuty Channel',
+        'Jira Channel',
+        'Shuffle Channel',
+      ];
 
       webhookConfigs.forEach(channelName => {
         const config = defaultChannelConfigs[channelName];
-        expect(config.webhook.header_params['Content-Type']).toBe('application/json');
+        expect(config.webhook.header_params['Content-Type']).toBe(
+          'application/json',
+        );
       });
     });
   });

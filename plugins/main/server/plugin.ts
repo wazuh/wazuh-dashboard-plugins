@@ -25,9 +25,7 @@ import {
   PluginInitializerContext,
   SharedGlobalConfig,
 } from 'opensearch_dashboards/server';
-import {
-  ILegacyClusterClient,
-} from "../../../src/core/server";
+import { ILegacyClusterClient } from '../../../src/core/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
@@ -167,7 +165,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     // default notification channels
     core.healthCheck.register(
-      initializationTaskVerifyNotificationChannels(notificationClient)
+      initializationTaskVerifyNotificationChannels(notificationClient),
     );
 
     // server API connection-compatibility
@@ -479,5 +477,5 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() { }
+  public stop() {}
 }

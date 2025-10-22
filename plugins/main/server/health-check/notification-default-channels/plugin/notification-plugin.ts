@@ -1,4 +1,4 @@
-import { OPENSEARCH_API } from "../common/constants";
+import { OPENSEARCH_API } from '../common/constants';
 
 export function NotificationsPlugin(Client: any, config: any, components: any) {
   const clientAction = components.clientAction.factory;
@@ -20,5 +20,4 @@ export function NotificationsPlugin(Client: any, config: any, components: any) {
     method: 'POST',
     needBody: true,
   });
-
 }

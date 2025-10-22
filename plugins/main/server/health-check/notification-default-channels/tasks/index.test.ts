@@ -50,10 +50,16 @@ describe('verifyOrCreateNotificationChannel', () => {
       const task = verifyOrCreateNotificationChannel(mockClient as any);
       await task.run(ctx);
 
-      expect(mockClient.callAsInternalUser).toHaveBeenCalledWith('notifications.getConfigs');
+      expect(mockClient.callAsInternalUser).toHaveBeenCalledWith(
+        'notifications.getConfigs',
+      );
       expect(mockClient.callAsInternalUser).toHaveBeenCalledTimes(1); // Only getConfigs, no creation
-      expect(ctx.logger.info).toHaveBeenCalledWith('Starting verification of default notification channels');
-      expect(ctx.logger.info).toHaveBeenCalledWith('All default notification channels are now present and verified');
+      expect(ctx.logger.info).toHaveBeenCalledWith(
+        'Starting verification of default notification channels',
+      );
+      expect(ctx.logger.info).toHaveBeenCalledWith(
+        'All default notification channels are now present and verified',
+      );
     });
 
     it('should handle case when no channels exist and create all', async () => {
@@ -70,7 +76,9 @@ describe('verifyOrCreateNotificationChannel', () => {
       const task = verifyOrCreateNotificationChannel(mockClient as any);
       await task.run(ctx);
 
-      expect(mockClient.callAsInternalUser).toHaveBeenCalledWith('notifications.getConfigs');
+      expect(mockClient.callAsInternalUser).toHaveBeenCalledWith(
+        'notifications.getConfigs',
+      );
 
       // Should create 4 channels
       expect(mockClient.callAsInternalUser).toHaveBeenCalledTimes(5); // 1 get + 4 creates
@@ -82,13 +90,15 @@ describe('verifyOrCreateNotificationChannel', () => {
           {
             body: {
               config_id: channel.id,
-              config: defaultChannelConfigs[channel.name]
-            }
-          }
+              config: defaultChannelConfigs[channel.name],
+            },
+          },
         );
       });
 
-      expect(ctx.logger.info).toHaveBeenCalledWith('All default notification channels are now present and verified');
+      expect(ctx.logger.info).toHaveBeenCalledWith(
+        'All default notification channels are now present and verified',
+      );
     });
     it('should handle mixed scenario - some channels exist, create missing ones', async () => {
       const ctx = mockContext();
@@ -99,7 +109,7 @@ describe('verifyOrCreateNotificationChannel', () => {
           config_id: 'default_slack_channel',
           name: 'Slack Channel',
           config_type: 'slack',
-        }
+        },
       ];
 
       mockClient.callAsInternalUser
@@ -114,8 +124,12 @@ describe('verifyOrCreateNotificationChannel', () => {
       // Should create 3 missing channels
       expect(mockClient.callAsInternalUser).toHaveBeenCalledTimes(4); // 1 get + 3 creates
 
-      expect(ctx.logger.debug).toHaveBeenCalledWith('Existing channels: Slack Channel');
-      expect(ctx.logger.info).toHaveBeenCalledWith('All default notification channels are now present and verified');
+      expect(ctx.logger.debug).toHaveBeenCalledWith(
+        'Existing channels: Slack Channel',
+      );
+      expect(ctx.logger.info).toHaveBeenCalledWith(
+        'All default notification channels are now present and verified',
+      );
     });
   });
 
@@ -130,11 +144,11 @@ describe('verifyOrCreateNotificationChannel', () => {
       const task = verifyOrCreateNotificationChannel(mockClient as any);
 
       await expect(task.run(ctx)).rejects.toThrow(
-        'Error verifying or creating default notification channels: Notifications plugin is not available or no config endpoint found'
+        'Error verifying or creating default notification channels: Notifications plugin is not available or no config endpoint found',
       );
 
       expect(ctx.logger.error).toHaveBeenCalledWith(
-        'Notifications plugin is not available or no config endpoint found'
+        'Notifications plugin is not available or no config endpoint found',
       );
     });
 
@@ -146,11 +160,11 @@ describe('verifyOrCreateNotificationChannel', () => {
       const task = verifyOrCreateNotificationChannel(mockClient as any);
 
       await expect(task.run(ctx)).rejects.toThrow(
-        'Error verifying or creating default notification channels: API connection failed'
+        'Error verifying or creating default notification channels: API connection failed',
       );
 
       expect(ctx.logger.error).toHaveBeenCalledWith(
-        'Error verifying or creating default notification channels: API connection failed'
+        'Error verifying or creating default notification channels: API connection failed',
       );
     });
 
@@ -168,12 +182,12 @@ describe('verifyOrCreateNotificationChannel', () => {
       await task.run(ctx);
 
       expect(ctx.logger.error).toHaveBeenCalledWith(
-        'Failed to create notification channel Slack Channel: Slack creation failed'
+        'Failed to create notification channel Slack Channel: Slack creation failed',
       );
 
       // Should still report partial success
       expect(ctx.logger.warn).toHaveBeenCalledWith(
-        '1 notification channels are still missing after creation attempts'
+        '1 notification channels are still missing after creation attempts',
       );
     });
 
@@ -189,7 +203,7 @@ describe('verifyOrCreateNotificationChannel', () => {
 
       expect(ctx.logger.warn).toHaveBeenCalledWith(
         'Channel creation returned unexpected result for Slack Channel:',
-        { unexpected_field: 'unexpected_value' }
+        { unexpected_field: 'unexpected_value' },
       );
     });
   });
@@ -209,10 +223,10 @@ describe('verifyOrCreateNotificationChannel', () => {
       await task.run(ctx);
 
       expect(ctx.logger.info).toHaveBeenCalledWith(
-        'No existing Wazuh default notification channels found'
+        'No existing Wazuh default notification channels found',
       );
       expect(ctx.logger.info).toHaveBeenCalledWith(
-        'All default notification channels are now present and verified'
+        'All default notification channels are now present and verified',
       );
     });
 
@@ -228,7 +242,7 @@ describe('verifyOrCreateNotificationChannel', () => {
 
       // Should accept 'id' field as valid response
       expect(ctx.logger.info).toHaveBeenCalledWith(
-        'Created 1 notification channels: Slack Channel'
+        'Created 1 notification channels: Slack Channel',
       );
     });
   });

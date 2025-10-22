@@ -1,4 +1,3 @@
-
 const OPENSEARCH_API_BASE_PATH = '/_plugins/_notifications';
 export const OPENSEARCH_API = Object.freeze({
   CONFIGS: `${OPENSEARCH_API_BASE_PATH}/configs`,
@@ -27,19 +26,24 @@ interface ChannelConfig {
 export const defaultChannels: ChannelDefinition[] = [
   { id: 'default_slack_channel', name: 'Slack Channel', type: 'slack' },
   { id: 'default_jira_channel', name: 'Jira Channel', type: 'webhook' },
-  { id: 'default_pagerduty_channel', name: 'PagerDuty Channel', type: 'webhook' },
-  { id: 'default_shuffle_channel', name: 'Shuffle Channel', type: 'webhook' }
+  {
+    id: 'default_pagerduty_channel',
+    name: 'PagerDuty Channel',
+    type: 'webhook',
+  },
+  { id: 'default_shuffle_channel', name: 'Shuffle Channel', type: 'webhook' },
 ];
 
 export const defaultChannelConfigs: Record<string, ChannelConfig> = {
   'Slack Channel': {
     name: 'Slack Channel',
-    description: 'Default Wazuh slack notification channel. To start receiving alerts, create a monitor, trigger and monitor action in the Alerting section, and edit this channel.',
+    description:
+      'Default Wazuh slack notification channel. To start receiving alerts, create a monitor, trigger and monitor action in the Alerting section, and edit this channel.',
     config_type: 'slack',
     is_enabled: false,
     slack: {
-      url: 'https://hooks.slack.com/services/YOUR_WORKSPACE_ID/YOUR_CHANNEL_ID/YOUR_WEBHOOK_TOKEN'
-    }
+      url: 'https://hooks.slack.com/services/YOUR_WORKSPACE_ID/YOUR_CHANNEL_ID/YOUR_WEBHOOK_TOKEN',
+    },
   },
   'PagerDuty Channel': {
     name: 'PagerDuty Channel',
@@ -55,9 +59,9 @@ export const defaultChannelConfigs: Record<string, ChannelConfig> = {
       method: 'POST',
       header_params: {
         'Content-Type': 'application/json',
-        'X-Routing-Key': 'YOUR_PAGERDUTY_API_KEY'
-      }
-    }
+        'X-Routing-Key': 'YOUR_PAGERDUTY_API_KEY',
+      },
+    },
   },
   'Jira Channel': {
     name: 'Jira Channel',
@@ -73,13 +77,14 @@ export const defaultChannelConfigs: Record<string, ChannelConfig> = {
       method: 'POST',
       header_params: {
         'Content-Type': 'application/json',
-        'Authorization': 'Basic base64(email:api_token)'
-      }
-    }
+        Authorization: 'Basic base64(email:api_token)',
+      },
+    },
   },
   'Shuffle Channel': {
     name: 'Shuffle Channel',
-    description: 'Default Wazuh Shuffle notification channel. To start triggering workflows, create a monitor and trigger in the Alerting section, and edit this channel.',
+    description:
+      'Default Wazuh Shuffle notification channel. To start triggering workflows, create a monitor and trigger in the Alerting section, and edit this channel.',
     config_type: 'webhook',
     is_enabled: false,
     webhook: {
@@ -87,7 +92,7 @@ export const defaultChannelConfigs: Record<string, ChannelConfig> = {
       method: 'POST',
       header_params: {
         'Content-Type': 'application/json',
-      }
-    }
-  }
+      },
+    },
+  },
 };
