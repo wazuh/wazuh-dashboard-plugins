@@ -82,7 +82,9 @@ import {
   WAZUH_IT_HYGIENE_SERVICES_PATTERN,
   WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
   WAZUH_IT_HYGIENE_USERS_PATTERN,
+  WAZUH_MONITORING_PATTERN,
   WAZUH_SCA_PATTERN,
+  WAZUH_STATISTICS_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../common/constants';
 
@@ -173,8 +175,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
         options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
-          hasTemplate: true,
+          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'),
           hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
           hasTimeFieldName: true,
         },
@@ -186,7 +187,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
-        indexPatternID: 'wazuh-monitoring-*',
+        indexPatternID: WAZUH_MONITORING_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
           hasTimeFieldName: true,
@@ -198,7 +199,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorIndexPattern({
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
-        indexPatternID: 'wazuh-statistics-*',
+        indexPatternID: WAZUH_STATISTICS_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
           hasTimeFieldName: true,

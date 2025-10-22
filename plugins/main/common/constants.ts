@@ -23,11 +23,11 @@ export const WAZUH_ALERTS_PATTERN = 'wazuh-alerts-*';
 
 // Job - Wazuh monitoring
 export const WAZUH_INDEX_TYPE_MONITORING = 'monitoring';
-export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring-*';
+export const WAZUH_MONITORING_PATTERN = 'wazuh-monitoring*';
 
 // Job - Wazuh statistics
 export const WAZUH_INDEX_TYPE_STATISTICS = 'statistics';
-export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics-*';
+export const WAZUH_STATISTICS_PATTERN = 'wazuh-statistics*';
 
 // Wazuh vulnerabilities
 export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities*';
