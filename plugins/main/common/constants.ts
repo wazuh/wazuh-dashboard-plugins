@@ -71,41 +71,40 @@ export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
 
 // Index patterns - Events
 export const WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN =
-  'wazuh-events-5.x-system-activity*';
+  'wazuh-events-v5-system-activity*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SYSTEM_ACTIVITY =
   'index-pattern:events-system-activity';
-export const WAZUH_EVENTS_SECURITY_PATTERN = 'wazuh-events-5.x-security*';
+export const WAZUH_EVENTS_SECURITY_PATTERN = 'wazuh-events-v5-security*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY =
   'index-pattern:events-security';
-export const WAZUH_EVENTS_OTHER_PATTERN = 'wazuh-events-5.x-other*';
+export const WAZUH_EVENTS_OTHER_PATTERN = 'wazuh-events-v5-other*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER =
   'index-pattern:events-other';
 export const WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN =
-  'wazuh-events-5.x-network-activity*';
+  'wazuh-events-v5-network-activity*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_NETWORK_ACTIVITY =
   'index-pattern:events-network-activity';
 export const WAZUH_EVENTS_CLOUD_SERVICES_PATTERN =
-  'wazuh-events-5.x-cloud-services*';
+  'wazuh-events-v5-cloud-services*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES =
   'index-pattern:events-cloud-services';
 export const WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN =
-  'wazuh-events-5.x-cloud-services-aws*';
+  'wazuh-events-v5-cloud-services-aws*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS =
   'index-pattern:events-cloud-services-aws';
 export const WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN =
-  'wazuh-events-5.x-cloud-services-azure*';
+  'wazuh-events-v5-cloud-services-azure*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE =
   'index-pattern:events-cloud-services-azure';
 export const WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN =
-  'wazuh-events-5.x-cloud-services-gcp*';
+  'wazuh-events-v5-cloud-services-gcp*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP =
   'index-pattern:events-cloud-services-gcp';
-export const WAZUH_EVENTS_APLICATIONS_PATTERN =
-  'wazuh-events-5.x-applications*';
+export const WAZUH_EVENTS_APLICATIONS_PATTERN = 'wazuh-events-v5-applications*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS =
   'index-pattern:events-applications';
 export const WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN =
-  'wazuh-events-5.x-access-management*';
+  'wazuh-events-v5-access-management*';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT =
   'index-pattern:events-access-management';
 
