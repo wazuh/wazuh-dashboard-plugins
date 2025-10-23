@@ -12,36 +12,36 @@
 export const monitoringTemplate = {
   order: 0,
   settings: {
-    'index.refresh_interval': '5s'
+    'index.refresh_interval': '5s',
   },
   mappings: {
     properties: {
       timestamp: {
         type: 'date',
-        format: 'dateOptionalTime'
+        format: 'dateOptionalTime',
       },
       status: {
-        type: 'keyword'
+        type: 'keyword',
       },
       ip: {
-        type: 'keyword'
+        type: 'keyword',
       },
       host: {
-        type: 'keyword'
+        type: 'keyword',
       },
       name: {
-        type: 'keyword'
+        type: 'keyword',
       },
       id: {
-        type: 'keyword'
+        type: 'keyword',
       },
       cluster: {
         properties: {
           name: {
-            type: 'keyword'
-          }
-        }
-      }
-    }
-  }
+            type: 'keyword',
+          },
+        },
+      },
+    },
+  },
 };

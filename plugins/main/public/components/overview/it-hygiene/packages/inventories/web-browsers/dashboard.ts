@@ -1,8 +1,5 @@
-import { buildDashboardKPIPanels } from '../common/create-dashboard-panels-kpis';
-import {
-  getVisStateHorizontalBarByField,
-  getVisStateHistogramBy,
-} from '../common/saved-vis/generators';
+import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
+import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 
 export const getOverviewBrowserExtensionsTab = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
@@ -16,9 +13,9 @@ export const getOverviewBrowserExtensionsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'package.name',
-      'Top 5 extensions',
-      'it-hygiene-extensions-name',
-      { customLabel: 'Extensions' },
+      'Top 5 packages',
+      'it-hygiene-packages-name',
+      { customLabel: 'Packages' },
     ),
   ]);
 };
