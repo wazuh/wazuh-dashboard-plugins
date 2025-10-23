@@ -24,7 +24,8 @@
     "security",
     "securityDashboards",
     "searchguard",
-    "telemetry"
+    "telemetry",
+    "notificationsDashboards"
   ],
   "server": true,
   "ui": true
