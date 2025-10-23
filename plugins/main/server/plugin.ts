@@ -128,11 +128,50 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     this.logger = initializerContext.logger.get();
   }
 
+  async isIndexerNotificationsAvailable(notificationClient: ILegacyClusterClient) {
+    try {
+      await notificationClient.callAsInternalUser('transport.request', {
+        method: 'GET',
+        path: '/_plugins/_notifications/features',
+      });
+      return true;
+    } catch (err) {
+      // 403 means the plugin is available but access is forbidden
+      if (err?.statusCode === 403) {
+        return true;
+      }
+      // 404 means the plugin is not available
+      if (err?.statusCode === 404) {
+        this.logger.debug(
+          `Notifications plugin not detected (404); skipping default channels task.`,
+        );
+        return false;
+      }
+      this.logger.debug(
+        `Notifications plugin unreachable; skipping default channels task. Reason: ${err?.message || err}`,
+      );
+      return false;
+    }
+  }
+
+  isNotificationsDashboardsAvailable(plugins: PluginSetup,): boolean {
+    return !!plugins.notificationsDashboards;
+  }
+
+  isNotificationsAvailable(
+    indexerAvailable: boolean,
+    plugins: PluginSetup,
+  ): boolean {
+    const dashboardAvailable = this.isNotificationsDashboardsAvailable(
+      plugins,
+    );
+    return indexerAvailable && dashboardAvailable;
+  }
+
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
     const serverInfo = core.http.getServerInfo();
-    const notificationClient: ILegacyClusterClient = notificationSetup(core);
 
     core.http.registerRouteHandlerContext('wazuh', (context, request) => {
       return {
@@ -162,13 +201,18 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     setupRoutes(router, plugins.wazuhCore);
 
     // Register health check tasks
-
-    // default notification channels
-    // TODO: add validation to check if notifications plugin is installed/enabled
-    // For more details, see the comment: https://github.com/wazuh/wazuh-dashboard-plugins/pull/7827#discussion_r2455593999
-    core.healthCheck.register(
-      initializeDefaultNotificationChannel(notificationClient),
-    );
+    const notificationClient: ILegacyClusterClient = notificationSetup(core);
+    // Detect Notifications plugin availability to conditionally register tasks
+    const indexerNotificationsAvailable = await this.isIndexerNotificationsAvailable(notificationClient);
+    if (this.isNotificationsAvailable(indexerNotificationsAvailable, plugins)) {
+      core.healthCheck.register(
+        initializeDefaultNotificationChannel(notificationClient),
+      );
+    } else {
+      this.logger.debug(
+        `Skipping default notification channels task. Available -> indexer: ${indexerNotificationsAvailable}, dashboardRoute: ${this.isNotificationsDashboardsAvailable(plugins)}`,
+      );
+    }
 
     // server API connection-compatibility
     core.healthCheck.register(
