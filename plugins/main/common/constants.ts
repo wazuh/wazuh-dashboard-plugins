@@ -69,6 +69,49 @@ export const WAZUH_IT_HYGIENE_SERVICES_PATTERN =
 export const WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN =
   'wazuh-states-inventory-browser-extensions*';
 
+// Index patterns - Events
+export const WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN =
+  'wazuh-events-5.x-system-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SYSTEM_ACTIVITY =
+  'index-pattern:events-system-activity';
+export const WAZUH_EVENTS_SECURITY_PATTERN = 'wazuh-events-5.x-security*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_SECURITY =
+  'index-pattern:events-security';
+export const WAZUH_EVENTS_OTHER_PATTERN = 'wazuh-events-5.x-other*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_OTHER =
+  'index-pattern:events-other';
+export const WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN =
+  'wazuh-events-5.x-network-activity*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_NETWORK_ACTIVITY =
+  'index-pattern:events-network-activity';
+export const WAZUH_EVENTS_CLOUD_SERVICES_PATTERN =
+  'wazuh-events-5.x-cloud-services*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES =
+  'index-pattern:events-cloud-services';
+export const WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN =
+  'wazuh-events-5.x-cloud-services-aws*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AWS =
+  'index-pattern:events-cloud-services-aws';
+export const WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN =
+  'wazuh-events-5.x-cloud-services-azure*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_AZURE =
+  'index-pattern:events-cloud-services-azure';
+export const WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN =
+  'wazuh-events-5.x-cloud-services-gcp*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES_GCP =
+  'index-pattern:events-cloud-services-gcp';
+export const WAZUH_EVENTS_APLICATIONS_PATTERN =
+  'wazuh-events-5.x-applications*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS =
+  'index-pattern:events-applications';
+export const WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN =
+  'wazuh-events-5.x-access-management*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT =
+  'index-pattern:events-access-management';
+
+// Time field
+export const FIELD_TIMESTAMP = '@timestamp';
+
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
@@ -903,7 +946,7 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
   'index-pattern:states-sca';
 
 export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
-  '@timestamp',
+  FIELD_TIMESTAMP,
   'wazuh.decoders',
   'wazuh.cluster.node',
   'agent.id',
