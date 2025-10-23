@@ -45,6 +45,7 @@ import {
   FIELD_TIMESTAMP,
   HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
   HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_ARCHIVES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_APLICATIONS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_CLOUD_SERVICES,
@@ -76,6 +77,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
   INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
+  WAZUH_ARCHIVES_PATTERN,
   WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
   WAZUH_EVENTS_APLICATIONS_PATTERN,
   WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN,
@@ -198,7 +200,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
-          hasTimeFieldName: true,
+          hasTimeFieldName: FIELD_TIMESTAMP,
         },
         configurationSettingKey: 'pattern',
       }),
@@ -543,6 +545,18 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
         indexPatternID: WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
+        options: {
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+          hasTimeFieldName: FIELD_TIMESTAMP,
+        },
+      }),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorIndexPattern({
+        services: plugins.wazuhCore,
+        taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ARCHIVES,
+        indexPatternID: WAZUH_ARCHIVES_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: FIELD_TIMESTAMP,
