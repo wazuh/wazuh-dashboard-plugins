@@ -87,7 +87,7 @@ import {
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../common/constants';
 import { notificationSetup } from './health-check/notification-default-channels';
-import { verifyOrCreateNotificationChannel as initializationTaskVerifyNotificationChannels } from './health-check/notification-default-channels/tasks';
+import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -165,7 +165,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     // default notification channels
     core.healthCheck.register(
-      initializationTaskVerifyNotificationChannels(notificationClient),
+      initializeDefaultNotificationChannel(notificationClient),
     );
 
     // server API connection-compatibility
@@ -477,5 +477,5 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() {}
+  public stop() { }
 }

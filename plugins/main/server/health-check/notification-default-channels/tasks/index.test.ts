@@ -1,4 +1,4 @@
-import { verifyOrCreateNotificationChannel } from './index';
+import { initializeDefaultNotificationChannel } from './index';
 import { defaultChannels, defaultChannelConfigs } from '../common/constants';
 
 // Mock the client
@@ -16,14 +16,14 @@ const mockContext = () => ({
   },
 });
 
-describe('verifyOrCreateNotificationChannel', () => {
+describe('initializeDefaultNotificationChannel', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('Task creation', () => {
     it('should return a task with correct name and structure', () => {
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
 
       expect(task).toHaveProperty('name');
       expect(task.name).toBe('notification-channel:verify-default-channels');
@@ -47,7 +47,7 @@ describe('verifyOrCreateNotificationChannel', () => {
         config_list: existingConfigs,
       });
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
       await task.run(ctx);
 
       expect(mockClient.callAsInternalUser).toHaveBeenCalledWith(
@@ -73,7 +73,7 @@ describe('verifyOrCreateNotificationChannel', () => {
         .mockResolvedValueOnce({ config_id: 'default_pagerduty_channel' })
         .mockResolvedValueOnce({ config_id: 'default_shuffle_channel' });
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
       await task.run(ctx);
 
       expect(mockClient.callAsInternalUser).toHaveBeenCalledWith(
@@ -118,7 +118,7 @@ describe('verifyOrCreateNotificationChannel', () => {
         .mockResolvedValueOnce({ config_id: 'default_pagerduty_channel' })
         .mockResolvedValueOnce({ config_id: 'default_shuffle_channel' });
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
       await task.run(ctx);
 
       // Should create 3 missing channels
@@ -141,7 +141,7 @@ describe('verifyOrCreateNotificationChannel', () => {
         // No config_list or configs property
       });
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
 
       await expect(task.run(ctx)).rejects.toThrow(
         'Error verifying or creating default notification channels: Notifications plugin is not available or no config endpoint found',
@@ -157,7 +157,7 @@ describe('verifyOrCreateNotificationChannel', () => {
       const apiError = new Error('API connection failed');
       mockClient.callAsInternalUser.mockRejectedValue(apiError);
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
 
       await expect(task.run(ctx)).rejects.toThrow(
         'Error verifying or creating default notification channels: API connection failed',
@@ -178,7 +178,7 @@ describe('verifyOrCreateNotificationChannel', () => {
         .mockResolvedValueOnce({ config_id: 'default_pagerduty_channel' }) // PagerDuty succeeds
         .mockResolvedValueOnce({ config_id: 'default_shuffle_channel' }); // Shuffle succeeds
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
       await task.run(ctx);
 
       expect(ctx.logger.error).toHaveBeenCalledWith(
@@ -198,7 +198,7 @@ describe('verifyOrCreateNotificationChannel', () => {
         .mockResolvedValueOnce({ config_list: [] })
         .mockResolvedValueOnce({ unexpected_field: 'unexpected_value' }); // Unexpected response
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
       await task.run(ctx);
 
       expect(ctx.logger.warn).toHaveBeenCalledWith(
@@ -219,7 +219,7 @@ describe('verifyOrCreateNotificationChannel', () => {
         .mockResolvedValueOnce({ config_id: 'default_pagerduty_channel' })
         .mockResolvedValueOnce({ config_id: 'default_shuffle_channel' });
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
       await task.run(ctx);
 
       expect(ctx.logger.info).toHaveBeenCalledWith(
@@ -237,7 +237,7 @@ describe('verifyOrCreateNotificationChannel', () => {
         .mockResolvedValueOnce({ config_list: [] })
         .mockResolvedValueOnce({ id: 'default_slack_channel' }); // Response with 'id' field
 
-      const task = verifyOrCreateNotificationChannel(mockClient as any);
+      const task = initializeDefaultNotificationChannel(mockClient as any);
       await task.run(ctx);
 
       // Should accept 'id' field as valid response
