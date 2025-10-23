@@ -1,10 +1,10 @@
-import { NotificationsPlugin } from './notification-plugin';
+import { initializeClientNotificationConfigs } from './notification-plugin';
 
 // Mock Client constructor
 const MockClient = jest.fn();
 MockClient.prototype = {};
 
-describe('NotificationsPlugin', () => {
+describe('InitializeClientNotificationConfigs', () => {
   let mockComponents: any;
   let mockConfig: any;
 
@@ -30,7 +30,7 @@ describe('NotificationsPlugin', () => {
   describe('Plugin registration', () => {
     it('should register notifications namespace and methods', () => {
       // Call the plugin function to register methods
-      NotificationsPlugin(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
 
       // Verify that the plugin registered the namespace
       expect(mockComponents.clientAction.namespaceFactory).toHaveBeenCalled();
@@ -43,7 +43,7 @@ describe('NotificationsPlugin', () => {
     });
 
     it('should configure getConfigs method correctly', () => {
-      NotificationsPlugin(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
 
       // Verify getConfigs was configured with correct parameters
       expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
@@ -55,7 +55,7 @@ describe('NotificationsPlugin', () => {
     });
 
     it('should configure createConfig method correctly', () => {
-      NotificationsPlugin(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
 
       // Verify createConfig was configured with correct parameters
       expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
@@ -86,7 +86,7 @@ describe('NotificationsPlugin', () => {
         },
       };
 
-      NotificationsPlugin(MockClient, mockConfig, components);
+      initializeClientNotificationConfigs(MockClient, mockConfig, components);
 
       // Verify both methods are assigned
       const notificationsProto = MockClient.prototype.notifications.prototype;
@@ -97,7 +97,7 @@ describe('NotificationsPlugin', () => {
 
   describe('API endpoint configuration', () => {
     it('should use correct OpenSearch API path for both methods', () => {
-      NotificationsPlugin(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
 
       // Both methods should use the same API endpoint
       const expectedUrl = { fmt: '/_plugins/_notifications/configs' };
@@ -115,7 +115,7 @@ describe('NotificationsPlugin', () => {
     });
 
     it('should set needBody for POST method only', () => {
-      NotificationsPlugin(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
 
       // Verify GET method doesn't have needBody
       expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
