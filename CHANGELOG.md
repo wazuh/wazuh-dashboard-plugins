@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Upgraded the `axios` dependency to `1.12.2` [#7804](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7804)
+- Updated Microsoft Graph API module icon from Azure logo to Microsoft Graph API logo for better specificity [#7838](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7838)
 
 ### Fixed
 
