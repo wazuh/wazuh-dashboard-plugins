@@ -140,8 +140,6 @@ export const initializeDefaultNotificationChannel = (
             `${stillMissing} notification channels are still missing after creation attempts`,
           );
         }
-
-        return;
       } catch (error: any) {
         const message = `Error verifying or creating default notification channels: ${error.message}`;
         ctx.logger.error(message);
