@@ -196,6 +196,58 @@ services:
       timeout: 5s
       retries: 120
 
+  # Uncomment to run indexer from package. Ensure the other os1 service that run a OS image is commented
+  # os1:
+  #   depends_on:
+  #     idpsetup:
+  #       condition: service_completed_successfully
+  #       required: false
+  #     generator:
+  #       condition: service_healthy
+  #   build:
+  #     context: ./indexer
+  #   image: wazuh-indexer-pkg:${IMAGE_TAG}
+  #   # <<: *logging
+  #   profiles:
+  #     - 'server'
+  #     - 'saml'
+  #     - 'standard'
+  #     - 'dashboard-src'
+  #     - 'server-local' # server profile to use the local packages with agents deb and rpm
+  #     - 'server-local-rpm' # server profile to use the local packages with agent rpm
+  #     - 'server-local-deb' # server profile to use the local packages with agent deb
+  #     - 'server-local-without' # server profile to use the local packages without agent
+  #   environment:
+  #     - OPENSEARCH_PATH_CONF=/etc/wazuh-indexer
+  #   ulimits:
+  #     memlock:
+  #       soft: -1
+  #       hard: -1
+  #     nofile:
+  #       soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+  #       hard: 65536
+  #   volumes:
+  #     - wi_certs:/etc/wazuh-indexer/certs/
+  #     - ./config/${OSD_MAJOR}/os/opensearch.yml:/etc/wazuh-indexer/opensearch.yml
+  #     - os_logs:/var/log/os1
+  #     - os_data:/var/lib/os1
+  #   ports:
+  #     - 9200:9200
+  #     - 9300:9300
+  #   networks:
+  #     - os-dev
+  #     - mon
+  #   entrypoint: ['bash', '/entrypoint.sh']
+  #   healthcheck:
+  #     test: [
+  #         'CMD-SHELL',
+  #         "curl -v --cacert /etc/wazuh-indexer/certs/ca.pem https://os1:9200 2>&1 | grep -q '401'",
+  #         # 'exit 0',
+  #       ]
+  #     interval: 1s
+  #     timeout: 5s
+  #     retries: 120
+
   filebeat:
     depends_on:
       os1:
@@ -270,6 +322,10 @@ services:
       - '${SRC}/main:/home/node/kbn/plugins/main'
       - '${SRC}/wazuh-core:/home/node/kbn/plugins/wazuh-core'
       - '${SRC}/wazuh-check-updates:/home/node/kbn/plugins/wazuh-check-updates'
+      # - '${SRC_DASHBOARD_PLUGINS_ROOT}/wazuh-dashboard-reporting:/home/node/kbn/plugins/wazuh-dashboards-reporting'
+      # - '${SRC_DASHBOARD_PLUGINS_ROOT}/wazuh-dashboard-ml-commons:/home/node/kbn/plugins/wazuh-dashboard-ml-commons'
+      # - '${SRC_DASHBOARD_PLUGINS_ROOT}/wazuh-dashboard-security-analytics:/home/node/kbn/plugins/wazuh-dashboard-security-analytics'
+      # - '${SRC_DASHBOARD_PLUGINS_ROOT}/wazuh-security-dashboards-plugin:/home/node/kbn/plugins/wazuh-security-dashboards-plugin'
       - wd_certs:/home/node/kbn/certs/
       - ${WAZUH_DASHBOARD_CONF}:/home/node/kbn/config/opensearch_dashboards.yml
       - ./config/${OSD_MAJOR}/osd/wazuh.yml:/home/node/kbn/data/wazuh/config/wazuh.yml
@@ -459,10 +515,8 @@ services:
     image: wazuh-manager-pkg:${IMAGE_TAG}
     build:
       context: ./manager
-      args:
-        WAZUH_VERSION_FILEBEAT: 'v4.12.0' # Version to download and install filebeat (Version released in wazuh-manager)
-        WAZUH_VERSION_DEVELOPMENT: ${WAZUH_VERSION_DEVELOPMENT} # Version to download the template from github
     profiles:
+      - 'dashboard-src'
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-rpm' # server profile to use the local packages with agent rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb
@@ -473,8 +527,7 @@ services:
       - os-dev
       - mon
     volumes:
-      - ./packages:/tmp/packages
-      - wm_certs:/etc/filebeat/certs
+      - wm_certs:/etc/server_certs
     ports:
       - '514:514'
       - '1514:1514'
