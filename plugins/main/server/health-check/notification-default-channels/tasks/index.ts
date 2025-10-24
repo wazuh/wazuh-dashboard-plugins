@@ -1,4 +1,5 @@
 import { ILegacyClusterClient } from '../../../../../../src/core/server';
+import { initializationTaskCreatorAlertingMonitors } from "../../alerting-monitors";
 import {
   defaultChannelConfigs,
   ChannelDefinition,
@@ -146,6 +147,8 @@ export const initializeDefaultNotificationChannel = (
         ctx.logger.error(message);
         throw new Error(message);
       }
+
+      initializationTaskCreatorAlertingMonitors().run(ctx);
     },
   };
 };

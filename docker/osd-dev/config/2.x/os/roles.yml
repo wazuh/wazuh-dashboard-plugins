@@ -129,11 +129,26 @@ asynchronous_search_read_access:
   cluster_permissions:
     - "cluster:admin/opendistro/asynchronous_search/get"
 
+# Allows users to read Notifications configurations (channels)
+notifications_read_access:
+  reserved: true
+  cluster_permissions:
+    - "cluster:admin/opensearch/notifications/configs/get"
+
+# Allows users to use all Notifications functionality
+notifications_full_access:
+  reserved: true
+  cluster_permissions:
+    - "cluster:admin/opensearch/notifications/*"
+
 # Wazuh monitoring and statistics index permissions
 manage_wazuh_index:
   reserved: true
   hidden: false
-  cluster_permissions: []
+  cluster_permissions:
+    - "cluster:admin/opensearch/notifications/configs/get"
+    - "cluster:admin/opensearch/notifications/configs/create"
+    - "cluster:admin/opensearch/notifications/features"
   index_permissions:
     - index_patterns:
         - "wazuh-*"
