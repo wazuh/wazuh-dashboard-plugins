@@ -164,6 +164,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // Register health check tasks
 
     // default notification channels
+    // TODO: add validation to check if notifications plugin is installed/enabled
     core.healthCheck.register(
       initializeDefaultNotificationChannel(notificationClient),
     );
