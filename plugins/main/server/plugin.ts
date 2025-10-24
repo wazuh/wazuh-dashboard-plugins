@@ -165,6 +165,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     // default notification channels
     // TODO: add validation to check if notifications plugin is installed/enabled
+    // For more details, see the comment: https://github.com/wazuh/wazuh-dashboard-plugins/pull/7827#discussion_r2455593999
     core.healthCheck.register(
       initializeDefaultNotificationChannel(notificationClient),
     );
