@@ -43,14 +43,18 @@ const SAMPLES: SampleMonitorDef[] = [
       defaultChannels.find(({ id }) => id.includes('pagerduty'))?.id ||
       'default_pagerduty_channel',
     // Minimal PagerDuty Events v2 payload; routing_key must be set by the user
-    message: JSON.stringify({
-      event_action: 'trigger',
-      payload: {
-        summary: 'Testing PagerDuty',
-        severity: 'critical',
-        source: 'Wazuh Dashboard',
+    message: JSON.stringify(
+      {
+        event_action: 'trigger',
+        payload: {
+          summary: 'Testing PagerDuty',
+          severity: 'critical',
+          source: 'Wazuh Dashboard',
+        },
       },
-    }),
+      null,
+      2,
+    ),
     severity: '1',
   },
   {
@@ -59,25 +63,29 @@ const SAMPLES: SampleMonitorDef[] = [
     channelId:
       defaultChannels.find(({ id }) => id.includes('jira'))?.id ||
       'default_jira_channel',
-    message: JSON.stringify({
-      fields: {
-        project: { key: 'CRM' },
-        summary: 'Wazuh Alert: Test',
-        description: {
-          type: 'doc',
-          version: 1,
-          content: [
-            {
-              type: 'paragraph',
-              content: [
-                { type: 'text', text: 'This is a test from Wazuh Alerting.' },
-              ],
-            },
-          ],
+    message: JSON.stringify(
+      {
+        fields: {
+          project: { key: 'CRM' },
+          summary: 'Wazuh Alert: Test',
+          description: {
+            type: 'doc',
+            version: 1,
+            content: [
+              {
+                type: 'paragraph',
+                content: [
+                  { type: 'text', text: 'This is a test from Wazuh Alerting.' },
+                ],
+              },
+            ],
+          },
+          issuetype: { name: 'Task' },
         },
-        issuetype: { name: 'Task' },
       },
-    }),
+      null,
+      2,
+    ),
     severity: '3',
   },
   {
@@ -86,8 +94,16 @@ const SAMPLES: SampleMonitorDef[] = [
     channelId:
       defaultChannels.find(({ id }) => id.includes('shuffle'))?.id ||
       'default_shuffle_channel',
-    message:
-      '{"event":"wazuh_alert","monitor":"{{ctx.monitor.name}}","trigger":"{{ctx.trigger.name}}","matches":"{{ctx.results.0.hits.total.value}}"}',
+    message: JSON.stringify(
+      {
+        event: 'wazuh_alert',
+        monitor: '{{ctx.monitor.name}}',
+        trigger: '{{ctx.trigger.name}}',
+        matches: '{{ctx.results.0.hits.total.value}}',
+      },
+      null,
+      2,
+    ),
     severity: '4',
   },
 ];
@@ -107,6 +123,13 @@ function buildMonitorBody(
   const triggerBase: any = {
     name: 'Sample trigger',
     severity,
+    // Minimal condition: fire when there is at least one match
+    condition: {
+      script: {
+        lang: 'painless',
+        source: 'return ctx.results[0].hits.total.value > 0',
+      },
+    },
     actions: [],
   };
   if (destinationId) {
@@ -127,7 +150,21 @@ function buildMonitorBody(
     enabled: false,
     monitor_type: 'query_level_monitor',
     schedule: { period: { interval: 1, unit: 'MINUTES' } },
-    inputs: [],
+    // Minimal query-level input that works across installations
+    inputs: [
+      {
+        search: {
+          // Use Wazuh indices pattern to avoid requiring read on every index
+          indices: ['wazuh-*'],
+          query: {
+            size: 0,
+            query: {
+              match_all: {},
+            },
+          },
+        },
+      },
+    ],
     triggers: [triggerBase],
     ui_metadata: {
       // Minimal metadata to help users identify this as a sample
@@ -207,7 +244,12 @@ async function ensureMonitor(
       method: 'POST',
       path: '/_plugins/_alerting/monitors',
       querystring: { refresh: 'wait_for' },
-      body: buildMonitorBody(monitorName, severity, match.config_id, message),
+      body: buildMonitorBody(
+        monitorName,
+        severity,
+        match?.config_id ?? null,
+        message,
+      ),
     });
     ctx.logger.info(`Created sample monitor [${monitorName}]`);
   } catch (error) {
@@ -233,7 +275,8 @@ async function isAlertingAvailable(ctx: PluginTaskRunContext) {
   } catch (error) {
     const _error = error as Error;
     ctx.logger.warn(
-      `Alerting API is not available or not reachable: ${_error?.message || _error
+      `Alerting API is not available or not reachable: ${
+        _error?.message || _error
       }`,
     );
     return false;
@@ -252,9 +295,7 @@ export const initializationTaskCreatorAlertingMonitors = () => ({
         return { skipped: true, reason: 'Alerting API unavailable' };
       }
 
-      await Promise.all(
-        SAMPLES.map(sample => ensureMonitor(ctx, sample))
-      );
+      await Promise.all(SAMPLES.map(sample => ensureMonitor(ctx, sample)));
 
       ctx.logger.info('Alerting sample monitors check finished');
       return { created: true };
