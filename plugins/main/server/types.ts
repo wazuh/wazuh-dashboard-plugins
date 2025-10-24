@@ -17,13 +17,11 @@
  * under the License.
  */
 
-export interface WazuhPluginSetup { }
+export interface WazuhPluginSetup {}
 
-export interface WazuhPluginStart { }
+export interface WazuhPluginStart {}
 
 export type PluginSetup = {
   securityDashboards?: {}; // TODO: Add OpenSearch Dashboards Security interface
   wazuhCore: {};
-  // Optional Notifications Dashboards plugin contract presence check
-  notificationsDashboards?: {};
 };

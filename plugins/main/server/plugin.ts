@@ -134,33 +134,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     const serverInfo = core.http.getServerInfo();
     const notificationClient: ILegacyClusterClient = notificationSetup(core);
 
-    // Detect Notifications plugin availability to conditionally register tasks
-    const indexerNotificationsAvailable = await (async () => {
-      try {
-        await notificationClient.callAsInternalUser('transport.request', {
-          method: 'GET',
-          path: '/_plugins/_notifications/features',
-        });
-        return true;
-      } catch (err) {
-        // 403 means the plugin is available but access is forbidden
-        if (err?.statusCode === 403) {
-          return true;
-        }
-        // 404 means the plugin is not available
-        if (err?.statusCode === 404) {
-          this.logger.debug(
-            `Notifications plugin not detected (404); skipping default channels task.`,
-          );
-          return false;
-        }
-        this.logger.debug(
-          `Notifications plugin unreachable; skipping default channels task. Reason: ${err?.message || err}`,
-        );
-        return false;
-      }
-    })();
-
     core.http.registerRouteHandlerContext('wazuh', (context, request) => {
       return {
         // Create a custom logger with a tag composed of HTTP method and path endpoint
@@ -191,17 +164,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // Register health check tasks
 
     // default notification channels
-    const dashboardsNotificationsAvailable = Boolean(plugins.notificationsDashboards)
-
-    if (indexerNotificationsAvailable && dashboardsNotificationsAvailable) {
-      core.healthCheck.register(
-        initializeDefaultNotificationChannel(notificationClient),
-      );
-    } else {
-      this.logger.debug(
-        `Skipping default notification channels task. Available -> indexer: ${indexerNotificationsAvailable}, dashboardRoute: ${dashboardsNotificationsAvailable}`,
-      );
-    }
+    core.healthCheck.register(
+      initializeDefaultNotificationChannel(notificationClient),
+    );
 
     // server API connection-compatibility
     core.healthCheck.register(
