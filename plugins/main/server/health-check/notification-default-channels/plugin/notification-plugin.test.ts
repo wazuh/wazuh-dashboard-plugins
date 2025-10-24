@@ -30,7 +30,11 @@ describe('InitializeClientNotificationConfigs', () => {
   describe('Plugin registration', () => {
     it('should register notifications namespace and methods', () => {
       // Call the plugin function to register methods
-      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(
+        MockClient,
+        mockConfig,
+        mockComponents,
+      );
 
       // Verify that the plugin registered the namespace
       expect(mockComponents.clientAction.namespaceFactory).toHaveBeenCalled();
@@ -43,7 +47,11 @@ describe('InitializeClientNotificationConfigs', () => {
     });
 
     it('should configure getConfigs method correctly', () => {
-      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(
+        MockClient,
+        mockConfig,
+        mockComponents,
+      );
 
       // Verify getConfigs was configured with correct parameters
       expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
@@ -55,7 +63,11 @@ describe('InitializeClientNotificationConfigs', () => {
     });
 
     it('should configure createConfig method correctly', () => {
-      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(
+        MockClient,
+        mockConfig,
+        mockComponents,
+      );
 
       // Verify createConfig was configured with correct parameters
       expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({
@@ -97,7 +109,11 @@ describe('InitializeClientNotificationConfigs', () => {
 
   describe('API endpoint configuration', () => {
     it('should use correct OpenSearch API path for both methods', () => {
-      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(
+        MockClient,
+        mockConfig,
+        mockComponents,
+      );
 
       // Both methods should use the same API endpoint
       const expectedUrl = { fmt: '/_plugins/_notifications/configs' };
@@ -115,7 +131,11 @@ describe('InitializeClientNotificationConfigs', () => {
     });
 
     it('should set needBody for POST method only', () => {
-      initializeClientNotificationConfigs(MockClient, mockConfig, mockComponents);
+      initializeClientNotificationConfigs(
+        MockClient,
+        mockConfig,
+        mockComponents,
+      );
 
       // Verify GET method doesn't have needBody
       expect(mockComponents.clientAction.factory).toHaveBeenCalledWith({

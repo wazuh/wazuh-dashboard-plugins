@@ -89,7 +89,8 @@ const createMissingChannels = async (
     }
   }
   ctx.logger.info(
-    `Created ${createdChannels.length
+    `Created ${
+      createdChannels.length
     } notification channels: ${createdChannels.join(', ')}`,
   );
   return createdChannels;

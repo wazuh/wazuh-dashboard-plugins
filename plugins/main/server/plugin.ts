@@ -128,7 +128,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     this.logger = initializerContext.logger.get();
   }
 
-  async isIndexerNotificationsAvailable(notificationClient: ILegacyClusterClient) {
+  async isIndexerNotificationsAvailable(
+    notificationClient: ILegacyClusterClient,
+  ) {
     try {
       await notificationClient.callAsInternalUser('transport.request', {
         method: 'GET',
@@ -148,13 +150,15 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         return false;
       }
       this.logger.debug(
-        `Notifications plugin unreachable; skipping default channels task. Reason: ${err?.message || err}`,
+        `Notifications plugin unreachable; skipping default channels task. Reason: ${
+          err?.message || err
+        }`,
       );
       return false;
     }
   }
 
-  isNotificationsDashboardsAvailable(plugins: PluginSetup,): boolean {
+  isNotificationsDashboardsAvailable(plugins: PluginSetup): boolean {
     return !!plugins.notificationsDashboards;
   }
 
@@ -162,9 +166,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     indexerAvailable: boolean,
     plugins: PluginSetup,
   ): boolean {
-    const dashboardAvailable = this.isNotificationsDashboardsAvailable(
-      plugins,
-    );
+    const dashboardAvailable = this.isNotificationsDashboardsAvailable(plugins);
     return indexerAvailable && dashboardAvailable;
   }
 
@@ -203,14 +205,17 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // Register health check tasks
     const notificationClient: ILegacyClusterClient = notificationSetup(core);
     // Detect Notifications plugin availability to conditionally register tasks
-    const indexerNotificationsAvailable = await this.isIndexerNotificationsAvailable(notificationClient);
+    const indexerNotificationsAvailable =
+      await this.isIndexerNotificationsAvailable(notificationClient);
     if (this.isNotificationsAvailable(indexerNotificationsAvailable, plugins)) {
       core.healthCheck.register(
         initializeDefaultNotificationChannel(notificationClient),
       );
     } else {
       this.logger.debug(
-        `Skipping default notification channels task. Available -> indexer: ${indexerNotificationsAvailable}, dashboardRoute: ${this.isNotificationsDashboardsAvailable(plugins)}`,
+        `Skipping default notification channels task. Available -> indexer: ${indexerNotificationsAvailable}, dashboardRoute: ${this.isNotificationsDashboardsAvailable(
+          plugins,
+        )}`,
       );
     }
 
@@ -523,5 +528,5 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() { }
+  public stop() {}
 }

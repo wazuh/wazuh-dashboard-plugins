@@ -1,6 +1,10 @@
 import { OPENSEARCH_API } from '../common/constants';
 
-export function initializeClientNotificationConfigs(Client: any, _config: any, components: any) {
+export function initializeClientNotificationConfigs(
+  Client: any,
+  _config: any,
+  components: any,
+) {
   const clientAction = components.clientAction.factory;
 
   Client.prototype.notifications = components.clientAction.namespaceFactory();
