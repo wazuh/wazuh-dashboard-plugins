@@ -143,6 +143,91 @@ export class SavedObject {
   }
 
   /**
+   * Given a dashboard saved object ID, checks if it exists
+   * Returns an object with status information when found, otherwise returns the error message.
+   */
+  static async existsDashboard(dashboardID) {
+    try {
+      const dashboardData = await GenericRequest.request(
+        'GET',
+        `/api/saved_objects/dashboard/${dashboardID}?fields=title`,
+      );
+
+      const title = (((dashboardData || {}).data || {}).attributes || {})
+        .title;
+      const id = ((dashboardData || {}).data || {}).id;
+
+      if (title) {
+        return {
+          data: 'Dashboard found',
+          status: true,
+          statusCode: 200,
+          title,
+          id,
+        };
+      }
+    } catch (error) {
+      // Keep consistency with existsIndexPattern by returning the error message
+      return ((error || {}).data || {}).message || false
+        ? error.data.message
+        : error.message || error;
+    }
+  }
+
+  // Fetch a dashboard saved object by id using _find and filter by id client-side
+  static async getDashboardById(dashboardID) {
+    try {
+      // Request dashboards via _find; include common fields to avoid a second fetch
+      const url = `/api/saved_objects/_find?type=dashboard&per_page=10000&fields=title&fields=description&fields=panelsJSON&fields=optionsJSON&fields=timeRestore&fields=timeFrom&fields=timeTo`;
+      const result = await GenericRequest.request('GET', url);
+      const list = ((result || {}).data || {}).saved_objects || [];
+      const match = list.find(so => so && so.id === dashboardID);
+      if (!match) {
+        throw new Error(`Dashboard '${dashboardID}' not found`);
+      }
+      return { data: match };
+    } catch (error) {
+      throw ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : error;
+    }
+  }
+
+  /**
+   * Find saved objects by reference (generic helper) using _find API and has_reference
+   * Example:
+   * /api/saved_objects/_find?default_search_operator=AND&has_reference={"type":"visualization","id":"<visId>"}&page=1&per_page=100&search_fields=title^3&search_fields=description&type=augment-vis
+   */
+  static async findSavedObjectsByReference({
+    type,
+    referenceType,
+    referenceId,
+    page = 1,
+    perPage = 100,
+    searchFields = ['title^3', 'description'],
+    defaultSearchOperator = 'AND',
+  }) {
+    try {
+      const hasReference = encodeURIComponent(
+        JSON.stringify({ type: referenceType, id: referenceId }),
+      );
+      const searchFieldsParams = (searchFields || [])
+        .map(f => `search_fields=${encodeURIComponent(f)}`)
+        .join('&');
+      const url = `/api/saved_objects/_find?default_search_operator=${encodeURIComponent(
+        defaultSearchOperator,
+      )}&has_reference=${hasReference}&page=${page}&per_page=${perPage}&${searchFieldsParams}&type=${encodeURIComponent(
+        type,
+      )}`;
+      return await GenericRequest.request('GET', url);
+    } catch (error) {
+      throw ((error || {}).data || {}).message || false
+        ? new Error(error.data.message)
+        : error;
+    }
+  }
+
+  /**
    *
    * Given an index pattern ID, checks if it exists
    */
