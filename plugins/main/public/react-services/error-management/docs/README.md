@@ -72,7 +72,6 @@ graph TD;
  ErrorHandler-->ErrorFactory
  ErrorHandler-->ErrorOrchestratorService
  ErrorFactory-->WazuhApiError
- ErrorFactory-->WazuhReportingError
  ErrorFactory-->IndexerApiError
  ErrorFactory-->IndexerError
 ```
@@ -119,7 +118,6 @@ The `error factory` is responsible to create different instances of error depend
 The errors returned are defined as the `error type` received.
 
 - WazuhApiError
-- WazuhReportingError
 - IndexerApiError
 - HttpError
 
@@ -143,7 +141,6 @@ class iWazuhError {
 iWazuhError <|-- WazuhError : implements
 WazuhError <|-- HttpError : extends
 HttpError <|-- WazuhApiError : extends
-HttpError <|-- WazuhReportingError : extends
 HttpError <|-- IndexerApiError : extends
 HttpError <|-- IndexerError : extends
 
@@ -159,7 +156,6 @@ In the next table we have defined how the will be treated.
 | Error type          | show        | store | display |
 |---------------------|-------------|-------|---------|
 | WazuhApiError       | toast       |       |    ✅   |
-| WazuhReportingError | toast       |       |    ✅   |
 | IndexerApiError     | toast       |       |    ✅   |
 | HttpError           | toast       |       |    ✅   |
 | Error               | log(error)  |       |    ✅   |

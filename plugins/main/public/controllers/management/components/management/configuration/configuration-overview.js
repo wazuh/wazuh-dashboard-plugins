@@ -16,11 +16,9 @@ import { EuiTitle, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import WzConfigurationOverviewTable from './util-components/configuration-overview-table';
 import WzHelpButtonPopover from './util-components/help-button-popover';
-import WzBadge from './util-components/badge';
 import WzClusterSelect from './util-components/configuration-cluster-selector';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
-import { ExportConfiguration } from '../../../../../components/agents/export-configuration';
-import { ReportingService } from '../../../../../react-services/reporting';
+import WzBadge from './util-components/badge';
 
 import configurationSettingsGroup from './configuration-settings';
 
@@ -59,7 +57,6 @@ const helpLinks = [
 class WzConfigurationOverview extends Component {
   constructor(props) {
     super(props);
-    this.reportingService = new ReportingService();
   }
   updateConfigurationSection(section, title, description, path) {
     this.props.updateConfigurationSection(section, title, description, path);
@@ -137,22 +134,6 @@ class WzConfigurationOverview extends Component {
                   </WzButtonPermissions>
                 </EuiFlexItem>
               )}
-              {this.props.agent.id !== '000' &&
-                this.props.agent.status === API_NAME_AGENT_STATUS.ACTIVE && (
-                  <EuiFlexItem>
-                    <ExportConfiguration
-                      agent={this.props.agent}
-                      type='agent'
-                      exportConfiguration={enabledComponents => {
-                        this.reportingService.startConfigReport(
-                          this.props.agent,
-                          'agentConfig',
-                          enabledComponents,
-                        );
-                      }}
-                    />
-                  </EuiFlexItem>
-                )}
               <EuiFlexItem grow={false}>
                 <WzHelpButtonPopover links={helpLinks} />
               </EuiFlexItem>

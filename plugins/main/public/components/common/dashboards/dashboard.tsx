@@ -6,7 +6,6 @@ import {
 } from '../hocs';
 import { getPlugins } from '../../../kibana-services';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
-import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
 import { WzSearchBar } from '../search-bar';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
@@ -17,19 +16,6 @@ const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 export const Dashboard = props => {
-  // This is not used by the SCA dashboard.
-  useReportingCommunicateSearchContext({
-    isSearching: props.dataSource.dataSource.isLoading,
-    totalResults: props.dataSourceAction?.data?.hits?.total ?? 0,
-    indexPattern: props.dataSource.dataSource?.indexPattern,
-    filters: props.dataSource.fetchFilters,
-    query: props.dataSource.query,
-    time: {
-      from: props.dataSource.searchBarProps.dateRangeFrom,
-      to: props.dataSource.searchBarProps.dateRangeTo,
-    },
-  });
-
   return (
     <>
       <WzSearchBar

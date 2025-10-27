@@ -13,7 +13,6 @@
 import { combineReducers } from 'redux';
 import groupsReducers from './groupsReducers';
 import statusReducers from './statusReducers';
-import reportingReducers from './reportingReducers';
 import configurationReducers from './configurationReducers';
 import appStateReducers from './appStateReducers';
 import globalBreadcrumbReducers from './globalBreadcrumbReducers';
@@ -22,7 +21,6 @@ import appConfig from './appConfigReducers';
 export default combineReducers({
   groupsReducers,
   statusReducers,
-  reportingReducers,
   configurationReducers,
   appStateReducers,
   globalBreadcrumbReducers,
