@@ -96,7 +96,8 @@ const SAMPLES: SampleMonitorDef[] = [
     channelId:
       defaultChannels.find(({ id }) => id.includes('shuffle'))?.id ||
       'default_shuffle_channel',
-    message: 'Wazuh sample Shuffle alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
+    message:
+      'Wazuh sample Shuffle alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
     severity: '4',
   },
 ];
