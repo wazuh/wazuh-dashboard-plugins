@@ -25,6 +25,7 @@ import {
   PluginInitializerContext,
   SharedGlobalConfig,
 } from 'opensearch_dashboards/server';
+import { ILegacyClusterClient } from '../../../src/core/server';
 
 import { WazuhPluginSetup, WazuhPluginStart, PluginSetup } from './types';
 import { setupRoutes } from './routes';
@@ -85,6 +86,9 @@ import {
   WAZUH_SCA_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../common/constants';
+
+import { notificationSetup } from './health-check/notification-default-channels';
+import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
 import IndexPatternAlertsKnownFields from '../common/known-fields/alerts.json';
 import IndexPatternFIMFilesKnownFields from '../common/known-fields/states-fim-files.json';
 import IndexPatternFIMRegistriesKeysKnownFields from '../common/known-fields/states-fim-registries-keys.json';
@@ -146,6 +150,10 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     this.logger = initializerContext.logger.get();
   }
 
+  isNotificationsDashboardsAvailable(plugins: PluginSetup): boolean {
+    return !!plugins.notificationsDashboards;
+  }
+
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('Wazuh-wui: Setup');
 
@@ -179,6 +187,19 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     setupRoutes(router, plugins.wazuhCore);
 
     // Register health check tasks
+
+    const notificationClient: ILegacyClusterClient = notificationSetup(core);
+    // Detect Notifications plugin availability to conditionally register tasks
+    if (this.isNotificationsDashboardsAvailable(plugins)) {
+      core.healthCheck.register(
+        initializeDefaultNotificationChannel(notificationClient),
+      );
+    } else {
+      this.logger.debug(
+        `Skipping default notification channels task. Notifications dashboards plugin not available.`,
+      );
+    }
+
     // server API connection-compatibility
     core.healthCheck.register(
       initializationTaskCreatorServerAPIConnectionCompatibility({
