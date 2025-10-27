@@ -51,6 +51,7 @@ import {
   createIndexPattern,
 } from '../../../../../react-services';
 import { StatisticsDataSource } from '../../../../../components/common/data-source/pattern/statistics';
+import { WAZUH_INDEX_TYPE_STATISTICS } from '../../../../../../common/constants';
 
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -254,7 +255,10 @@ export default compose(
       try {
         // Check the existence of related index pattern
         const existIndexPattern = await existsIndexPattern(indexPatternID);
-        const { exist, fields } = await existsIndices(indexPatternID);
+        const { exist, fields } = await existsIndices(
+          indexPatternID,
+          WAZUH_INDEX_TYPE_STATISTICS,
+        );
         setLoading(true);
 
         if (exist) {

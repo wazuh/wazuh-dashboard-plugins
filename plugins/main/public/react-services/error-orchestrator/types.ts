@@ -15,15 +15,13 @@ type INFO = 'INFO';
 type ERROR = 'ERROR';
 export type UILogLevel = WARNING | INFO | ERROR;
 
-type UI = 'UI';
-type BUSINESS = 'BUSINESS';
-type CRITICAL = 'CRITICAL';
-export type UIErrorSeverity = UI | BUSINESS | CRITICAL;
 export const UI_ERROR_SEVERITIES = {
   UI: 'UI',
   BUSINESS: 'BUSINESS',
   CRITICAL: 'CRITICAL',
-};
+} as const;
+
+export type UIErrorSeverity = keyof typeof UI_ERROR_SEVERITIES;
 
 export type UIError = {
   message: string;

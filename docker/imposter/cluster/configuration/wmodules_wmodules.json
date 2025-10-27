@@ -47,6 +47,10 @@
               "ports": "yes",
               "ports_all": "no",
               "processes": "yes",
+              "groups": "yes",
+              "users": "yes",
+              "services": "yes",
+              "browser_extensions": "yes",
               "sync_max_eps": 10
             }
           },

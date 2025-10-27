@@ -20,16 +20,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed sorting by agent count in top 5 groups visualization in endpoints summary [#7783](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7783)
 - Fixed System Inventory displaying incorrect agent data after switching agents in Endpoint Details [#7803](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7803)
 
-## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 00
+## Wazuh v4.14.0 - OpenSearch Dashboards 2.19.3 - Revision 03
 
 ### Added
 
 - Support for Wazuh 4.14.0
-- Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587)
+- Added visualizations field validations when creating wazuh-states index patterns [#7777](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7777)
+- Create Users & Groups inventories [#7554](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7554) [#7587](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7587) [#7792](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7792) [#7787](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7787)
 - Added ability to set the Wazuh data path (wazuh directory) within the directory defined through `path.data` setting [#7586](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7586)
-- Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641) [#7696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7696) [#7729](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7729)
+- Added a new Browser Extensions tab in IT Hygiene [#7641](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7641) [#7696](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7696) [#7729](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7729) [#7774](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7774) [#7785](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7785)
 - Added Microsoft Graph API module [#7516](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7516) [#7644](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7644) [#7661](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7661)
-- Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646) [#7695](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7695) [#7729](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7729)
+- Added a new Services tab in IT Hygiene [#7646](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7646) [#7695](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7695) [#7729](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7729) [#7773](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7773) [#7790](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7790)
 - Added a final step in the Deploy new agent section to navigate back to the agent list [#7711](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7711)
 
 ### Changed
@@ -43,6 +44,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
+- Fixed missing scan settings in Inventory Data [#7811](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7811)
+- Fixed the Endpoint summary to correctly display outdated agents without using filters, resolving previous inconsistencies [#7796](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7796)
 - Fixed missing provider and queue_size fields in whodata configuration [#7596](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7596)
 - Fixed an error that caused PDF report tables to overflow the page width [#7630](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7630)
 - Fixed TypeError when changing API host ID in wazuh.yml configuration [#7611](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7611)
