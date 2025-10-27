@@ -1,4 +1,5 @@
 import { ILegacyClusterClient } from '../../../../../../src/core/server';
+import { initializationTaskCreatorAlertingMonitors } from "../../alerting-monitors";
 import {
   defaultChannelConfigs,
   ChannelDefinition,
@@ -98,6 +99,7 @@ const createMissingChannels = async (
 
 export const initializeDefaultNotificationChannel = (
   client: ILegacyClusterClient,
+  next: (ctx: InitializationTaskRunContext) => void,
 ): Record<string, any> => {
   return {
     name: 'notification-channel:verify-default-channels',
@@ -147,7 +149,8 @@ export const initializeDefaultNotificationChannel = (
         throw new Error(message);
       }
 
-      initializationTaskCreatorAlertingMonitors().run(ctx);
+      // Proceed to next task
+      next(ctx);
     },
   };
 };

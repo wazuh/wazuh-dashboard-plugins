@@ -257,37 +257,11 @@ async function ensureMonitor(
   }
 }
 
-async function isAlertingAvailable(ctx: PluginTaskRunContext) {
-  try {
-    await request(ctx, {
-      // https://docs.opensearch.org/3.2/observing-your-data/alerting/api/#search-monitors
-      method: 'GET',
-      path: '/_plugins/_alerting/monitors/_search',
-      body: { query: { match_all: {} } },
-    });
-    return true;
-  } catch (error) {
-    const _error = error as Error;
-    ctx.logger.warn(
-      `Alerting API is not available or not reachable: ${
-        _error?.message || _error
-      }`,
-    );
-    return false;
-  }
-}
-
 export const initializationTaskCreatorAlertingMonitors = () => ({
   name: 'alerting:sample-monitors',
   async run(ctx: PluginTaskRunContext) {
     try {
       ctx.logger.debug('Starting Alerting sample monitors check');
-
-      const isAvailable = await isAlertingAvailable(ctx);
-      if (!isAvailable) {
-        // Skip without failing the overall health check
-        return { skipped: true, reason: 'Alerting API unavailable' };
-      }
 
       await Promise.all(SAMPLES.map(sample => ensureMonitor(ctx, sample)));
 
