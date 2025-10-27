@@ -167,17 +167,7 @@
     "readFromDocValues": true
   },
   {
-    "name": "host.cpu.cores",
-    "type": "string",
-    "esTypes": [
-      "short"
-    ],
-    "searchable": true,
-    "aggregatable": true,
-    "readFromDocValues": true
-  },
-  {
-    "name": "host.cpu.name",
+    "name": "registry.architecture",
     "type": "string",
     "esTypes": [
       "keyword"
@@ -187,57 +177,87 @@
     "readFromDocValues": true
   },
   {
-    "name": "host.cpu.speed",
-    "type": "number",
+    "name": "registry.gid",
+    "type": "string",
     "esTypes": [
-      "long"
+      "keyword"
     ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
   },
   {
-    "name": "host.memory.free",
-    "type": "number",
+    "name": "registry.group",
+    "type": "string",
     "esTypes": [
-      "long"
+      "keyword"
     ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
   },
   {
-    "name": "host.memory.total",
-    "type": "number",
+    "name": "registry.hive",
+    "type": "string",
     "esTypes": [
-      "long"
+      "keyword"
     ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
   },
   {
-    "name": "host.memory.usage",
-    "type": "number",
+    "name": "registry.key",
+    "type": "string",
     "esTypes": [
-      "scaled_float"
+      "keyword"
     ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
   },
   {
-    "name": "host.memory.used",
-    "type": "number",
+    "name": "registry.mtime",
+    "type": "date",
     "esTypes": [
-      "long"
+      "date"
     ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
   },
   {
-    "name": "host.serial_number",
+    "name": "registry.owner",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "registry.path",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "registry.permissions",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "registry.uid",
     "type": "string",
     "esTypes": [
       "keyword"

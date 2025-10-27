@@ -17,25 +17,6 @@ import {
   NOT_TIME_FIELD_NAME_INDEX_PATTERN,
   PLUGIN_PLATFORM_NAME,
   WAZUH_INDEX_TYPE_ALERTS,
-  WAZUH_INDEX_TYPE_MONITORING,
-  WAZUH_INDEX_TYPE_STATISTICS,
-  WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
-  WAZUH_INDEX_TYPE_STATES_FIM_FILES,
-  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
-  WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
 } from '../../common/constants';
 import { getDataPlugin, getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
@@ -315,45 +296,17 @@ export class SavedObject {
       );
       return response.data.fields;
     } catch (error) {
-      switch (indexType) {
-        case WAZUH_INDEX_TYPE_MONITORING:
-        case WAZUH_INDEX_TYPE_STATISTICS:
-        case WAZUH_INDEX_TYPE_ALERTS:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY:
-        case WAZUH_INDEX_TYPE_STATES_VULNERABILITIES:
-        case WAZUH_INDEX_TYPE_STATES_FIM_FILES:
-        case WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES:
-        case WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS:
-          // Get known fields by index type to ensure expected fields are returned
-          const statesFields = getKnownFieldsByIndexType(indexType);
-          if (statesFields) {
-            return statesFields;
-          }
-          // If no specific states fields found, throw error
-          const statesError = ErrorFactory.create(WarningError, {
-            error,
-            message: `No known fields defined for index type: ${indexType}`,
-          });
-          throw statesError;
-        default:
-          const warningError = ErrorFactory.create(WarningError, {
-            error,
-            message: error.message,
-          });
-          throw warningError;
+      if (indexType) {
+        const statesFields = getKnownFieldsByIndexType(indexType);
+        if (statesFields) {
+          return statesFields;
+        }
       }
+      const statesError = ErrorFactory.create(WarningError, {
+        error,
+        message: `No known fields defined for index type: ${indexType}`,
+      });
+      throw statesError;
     }
   };
 

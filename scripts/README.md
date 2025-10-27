@@ -17,61 +17,23 @@ Main script that fetches index templates from Wazuh repositories and converts th
 **Usage:**
 
 ```bash
-node scripts/generate-known-fields.js
+node scripts/generate-known-fields.js [branch]
 ```
+
+By default uses the version declared in the package.json.
 
 **Features:**
 
 - Fetches templates from multiple sources (Wazuh server repo, dashboard repo)
 - Dynamically reads version from package.json for sustainable URL generation
-- Converts Elasticsearch/OpenSearch field mappings to dashboard known fields format
+- Converts OpenSearch field mappings to dashboard known fields format
 - Supports multiple URL fallbacks for each template type
 - Handles nested field types properly
 - Generates JSON files in `plugins/main/common/known-fields/`
 
-**Supported Templates:**
-
-- **Alerts**: `wazuh-alerts-*` indices
-- **Vulnerabilities**: `wazuh-states-vulnerabilities-*` indices
-- **Monitoring**: `wazuh-monitoring-*` indices (⚠️ **NOT auto-generated** - maintained manually in `monitoring-fields.ts`)
-- **Statistics**: `wazuh-statistics-*` indices
-- **FIM**: File integrity monitoring (files, registries)
-- **Inventory**: All inventory states (system, hardware, networks, packages, ports, processes, protocols, users, groups, services, interfaces, hotfixes, browser-extensions)
-
-## Template Sources
-
-The script fetches templates from these official Wazuh repositories:
-
-### Wazuh Server (github.com/wazuh/wazuh)
-
-- **Alerts**: `extensions/elasticsearch/7.x/wazuh-template.json`
-- **Vulnerabilities**: `src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json`
-- **FIM States**: `src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-*.json`
-- **Inventory States**: `src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-*.json`
-  - Supports: system, hardware, networks, packages, ports, processes, protocols, users, groups, services, interfaces, hotfixes, browser-extensions
-
-### Wazuh Dashboard Plugins (github.com/wazuh/wazuh-dashboard-plugins)
-
-- **Monitoring**: ⚠️ **NOT auto-generated** (template incomplete, uses manually maintained `monitoring-fields.ts`)
-- **Statistics**: `plugins/main/server/integration-files/statistics-template.json`
-
 ## Generated Files
 
-The script generates JSON files in `plugins/main/public/utils/known-fields/`:
-
-- `alerts.json` - Fields for alert index patterns (621 fields)
-- ~~`monitoring.json`~~ - ⚠️ **NOT generated** (uses `monitoring-fields.ts` instead)
-- `statistics.json` - Fields for statistics patterns (75 fields)
-- `states-vulnerabilities.json` - Fields for vulnerability state patterns (52 fields)
-- `states-fim-files.json` - FIM files patterns (24 fields)
-- `states-fim-registries.json` - FIM registries patterns (30 fields)
-- `states-inventory-*.json` - All inventory state patterns (system, hardware, networks, packages, ports, processes, protocols, users, groups, services, interfaces, hotfixes, browser-extensions)
-
-### Why is monitoring NOT auto-generated?
-
-The monitoring template (`monitoring-template.json`) only defines basic index-level fields like `timestamp`, `status`, `ip`, `host`, etc. However, the actual monitoring index contains additional agent-specific fields (`dateAdd`, `lastKeepAlive`, `mergedSum`, `configSum`, etc.) that are inserted dynamically by the Wazuh server and are not part of the index template.
-
-To ensure compatibility, monitoring fields are maintained manually in `plugins/main/public/utils/monitoring-fields.ts`.
+The script generates JSON files in `plugins/main/common/known-fields`: alerts, archives, events, states, monitoring and statistics
 
 ## Integration
 

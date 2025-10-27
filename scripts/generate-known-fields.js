@@ -22,17 +22,15 @@ const packageJsonPath = path.resolve(
   'package.json',
 );
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-const VERSION = packageJson.version;
+const [, , branch] = process.argv;
+const VERSION = branch || packageJson.version;
 
 console.log(`📦 Using Wazuh version: ${VERSION}`);
 
+// process.exit(0);
 // Helper function to generate URLs with dynamic version
 function wazuhUrl(path) {
-  return `https://raw.githubusercontent.com/wazuh/wazuh/${VERSION}/${path}`;
-}
-
-function dashboardPluginsUrl(path) {
-  return `https://raw.githubusercontent.com/wazuh/wazuh-dashboard-plugins/${VERSION}/${path}`;
+  return `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/${VERSION}/${path}`;
 }
 
 // Configuration for different template sources
@@ -41,187 +39,185 @@ const TEMPLATE_SOURCES = {
     name: 'states-vulnerabilities',
     urls: [
       wazuhUrl(
-        'src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json',
+        'plugins/setup/src/main/resources/index-template-vulnerabilities.json',
       ),
     ],
-    outputFile:
-      'plugins/main/public/utils/known-fields/states-vulnerabilities.json',
+    outputFile: 'plugins/main/common/known-fields/states-vulnerabilities.json',
   },
   alerts: {
     name: 'alerts',
-    urls: [wazuhUrl('extensions/elasticsearch/7.x/wazuh-template.json')],
-    outputFile: 'plugins/main/public/utils/known-fields/alerts.json',
+    urls: [
+      wazuhUrl('plugins/setup/src/main/resources/index-template-alerts.json'),
+    ],
+    outputFile: 'plugins/main/common/known-fields/alerts.json',
   },
-  // TODO: monitoring is intentionally not auto-generated
-  // The monitoring template only defines basic fields (timestamp, status, ip, host, name, id, cluster.name)
-  // but the actual monitoring index contains additional agent fields (dateAdd, lastKeepAlive, mergedSum, etc.)
-  // that are inserted dynamically. These fields are maintained manually in
-  // plugins/main/public/utils/monitoring-fields.ts to ensure compatibility.
-  // monitoring: {
-  //   name: 'monitoring',
-  //   urls: [dashboardPluginsUrl('plugins/main/server/integration-files/monitoring-template.json')],
-  //   outputFile: 'plugins/main/public/utils/known-fields/monitoring.json',
-  // },
+  monitoring: {
+    name: 'monitoring',
+    // This is in the dashboard-plugins repo
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-monitoring.json',
+      ),
+    ],
+    outputFile: 'plugins/main/common/known-fields/monitoring.json',
+  },
   statistics: {
     name: 'statistics',
     // This is in the dashboard-plugins repo
     urls: [
-      dashboardPluginsUrl(
-        'plugins/main/server/integration-files/statistics-template.json',
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-statistics.json',
       ),
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/statistics.json',
+    outputFile: 'plugins/main/common/known-fields/statistics.json',
   },
   // FIM templates
   'states-fim-files': {
     name: 'states-fim-files',
     urls: [
       wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-files.json',
+        'plugins/setup/src/main/resources/index-template-fim-files.json',
       ),
     ],
-    outputFile: 'plugins/main/public/utils/known-fields/states-fim-files.json',
+    outputFile: 'plugins/main/common/known-fields/states-fim-files.json',
   },
-  'states-fim-registries': {
-    name: 'states-fim-registries',
+  'states-fim-registries-keys': {
+    name: 'states-fim-registries-keys',
     urls: [
       wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-fim-registries.json',
+        'plugins/setup/src/main/resources/index-template-fim-registry-keys.json',
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-fim-registries.json',
+      'plugins/main/common/known-fields/states-fim-registries-keys.json',
+  },
+  'states-fim-registries-values': {
+    name: 'states-fim-registries-values',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-fim-registry-values.json',
+      ),
+    ],
+    outputFile:
+      'plugins/main/common/known-fields/states-fim-registries-values.json',
   },
   // Inventory templates (using the most recent versions without -update suffix)
   'states-inventory-system': {
     name: 'states-inventory-system',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-system.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-system.json'),
     ],
-    outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-system.json',
+    outputFile: 'plugins/main/common/known-fields/states-inventory-system.json',
   },
   'states-inventory-hardware': {
     name: 'states-inventory-hardware',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hardware.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-hardware.json'),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-hardware.json',
+      'plugins/main/common/known-fields/states-inventory-hardware.json',
   },
   'states-inventory-networks': {
     name: 'states-inventory-networks',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-networks.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-networks.json'),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-networks.json',
+      'plugins/main/common/known-fields/states-inventory-networks.json',
   },
   'states-inventory-packages': {
     name: 'states-inventory-packages',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-packages.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-packages.json'),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-packages.json',
+      'plugins/main/common/known-fields/states-inventory-packages.json',
   },
   'states-inventory-ports': {
     name: 'states-inventory-ports',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-ports.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-ports.json'),
     ],
-    outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-ports.json',
+    outputFile: 'plugins/main/common/known-fields/states-inventory-ports.json',
   },
   'states-inventory-processes': {
     name: 'states-inventory-processes',
     urls: [
       wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-processes.json',
+        'plugins/setup/src/main/resources/index-template-processes.json',
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-processes.json',
+      'plugins/main/common/known-fields/states-inventory-processes.json',
   },
   'states-inventory-protocols': {
     name: 'states-inventory-protocols',
     urls: [
       wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-protocols.json',
+        'plugins/setup/src/main/resources/index-template-protocols.json',
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-protocols.json',
+      'plugins/main/common/known-fields/states-inventory-protocols.json',
   },
   'states-inventory-users': {
     name: 'states-inventory-users',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-users.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-users.json'),
     ],
-    outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-users.json',
+    outputFile: 'plugins/main/common/known-fields/states-inventory-users.json',
   },
   'states-inventory-groups': {
     name: 'states-inventory-groups',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-groups.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-groups.json'),
     ],
-    outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-groups.json',
+    outputFile: 'plugins/main/common/known-fields/states-inventory-groups.json',
   },
   'states-inventory-services': {
     name: 'states-inventory-services',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-services.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-services.json'),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-services.json',
+      'plugins/main/common/known-fields/states-inventory-services.json',
   },
   'states-inventory-interfaces': {
     name: 'states-inventory-interfaces',
     urls: [
       wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-interfaces.json',
+        'plugins/setup/src/main/resources/index-template-interfaces.json',
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-interfaces.json',
+      'plugins/main/common/known-fields/states-inventory-interfaces.json',
   },
   'states-inventory-hotfixes': {
     name: 'states-inventory-hotfixes',
     urls: [
-      wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hotfixes.json',
-      ),
+      wazuhUrl('plugins/setup/src/main/resources/index-template-hotfixes.json'),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-hotfixes.json',
+      'plugins/main/common/known-fields/states-inventory-hotfixes.json',
   },
   'states-inventory-browser-extensions': {
     name: 'states-inventory-browser-extensions',
     urls: [
       wazuhUrl(
-        'src/wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-browser-extensions.json',
+        'plugins/setup/src/main/resources/index-template-browser-extensions.json',
       ),
     ],
     outputFile:
-      'plugins/main/public/utils/known-fields/states-inventory-browser-extensions.json',
+      'plugins/main/common/known-fields/states-inventory-browser-extensions.json',
+  },
+  'states-sca': {
+    name: 'states-sca',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-browser-extensions.json',
+      ),
+    ],
+    outputFile: 'plugins/main/common/known-fields/states-sca.json',
   },
 };
 
@@ -556,13 +552,13 @@ async function generateCombinedInventoryFields(results) {
   const projectRoot = path.resolve(scriptDir, '..');
   const outputPath = path.resolve(
     projectRoot,
-    'plugins/main/public/utils/known-fields/states-inventory.json',
+    'plugins/main/common/known-fields/states-inventory.json',
   );
 
   fs.writeFileSync(outputPath, JSON.stringify(combinedFields, null, 2));
 
   console.log(
-    `  ✅ Generated ${combinedFields.length} combined fields for states-inventory -> plugins/main/public/utils/known-fields/states-inventory.json`,
+    `  ✅ Generated ${combinedFields.length} combined fields for states-inventory -> plugins/main/common/known-fields/states-inventory.json`,
   );
 
   return combinedFields;

@@ -2,7 +2,9 @@
   {
     "name": "_id",
     "type": "string",
-    "esTypes": ["_id"],
+    "esTypes": [
+      "_id"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -10,7 +12,9 @@
   {
     "name": "_index",
     "type": "string",
-    "esTypes": ["_index"],
+    "esTypes": [
+      "_index"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -25,7 +29,9 @@
   {
     "name": "_source",
     "type": "_source",
-    "esTypes": ["_source"],
+    "esTypes": [
+      "_source"
+    ],
     "searchable": false,
     "aggregatable": false,
     "readFromDocValues": false
@@ -33,15 +39,39 @@
   {
     "name": "_type",
     "type": "string",
-    "esTypes": ["_type"],
+    "esTypes": [
+      "_type"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
   },
   {
+    "name": "agent.groups",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "agent.host.architecture",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.host.hostname",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -49,7 +79,49 @@
   {
     "name": "agent.host.ip",
     "type": "ip",
-    "esTypes": ["ip"],
+    "esTypes": [
+      "ip"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.host.os.name",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.host.os.platform",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.host.os.type",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.host.os.version",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -57,7 +129,9 @@
   {
     "name": "agent.id",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -65,7 +139,9 @@
   {
     "name": "agent.name",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -73,7 +149,19 @@
   {
     "name": "agent.version",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "checksum.hash.sha1",
+    "type": "string",
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -81,7 +169,9 @@
   {
     "name": "group.description",
     "type": "string",
-    "esTypes": ["match_only_text"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -89,7 +179,9 @@
   {
     "name": "group.id",
     "type": "string",
-    "esTypes": ["unsigned_long"],
+    "esTypes": [
+      "unsigned_long"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -97,7 +189,9 @@
   {
     "name": "group.id_signed",
     "type": "number",
-    "esTypes": ["long"],
+    "esTypes": [
+      "long"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -105,7 +199,9 @@
   {
     "name": "group.is_hidden",
     "type": "boolean",
-    "esTypes": ["boolean"],
+    "esTypes": [
+      "boolean"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -113,7 +209,9 @@
   {
     "name": "group.name",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -121,7 +219,9 @@
   {
     "name": "group.users",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -129,7 +229,29 @@
   {
     "name": "group.uuid",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "state.document_version",
+    "type": "number",
+    "esTypes": [
+      "integer"
+    ],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "state.modified_at",
+    "type": "date",
+    "esTypes": [
+      "date"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -137,7 +259,9 @@
   {
     "name": "wazuh.cluster.name",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -145,7 +269,9 @@
   {
     "name": "wazuh.cluster.node",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -153,7 +279,9 @@
   {
     "name": "wazuh.schema.version",
     "type": "string",
-    "esTypes": ["keyword"],
+    "esTypes": [
+      "keyword"
+    ],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true

@@ -1,11 +1,12 @@
 import { KnownFields, getKnownFieldsByIndexType } from './known-fields-loader';
-import { FieldsMonitoring } from './monitoring-fields';
-import statisticsFields from './known-fields/statistics.json';
+import FieldsMonitoring from '../../common/known-fields/monitoring.json';
+import statisticsFields from '../../common/known-fields/statistics.json';
 import {
   WAZUH_INDEX_TYPE_ALERTS,
   WAZUH_INDEX_TYPE_MONITORING,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
-  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
+  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
@@ -21,6 +22,7 @@ import {
   WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS,
   WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
   WAZUH_INDEX_TYPE_STATISTICS,
+  WAZUH_INDEX_TYPE_STATES_SCA,
 } from '../../common/constants';
 
 const monitoringFields = FieldsMonitoring;
@@ -49,7 +51,8 @@ describe('Known Fields Loader', () => {
         WAZUH_INDEX_TYPE_STATISTICS,
         WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
         WAZUH_INDEX_TYPE_STATES_FIM_FILES,
-        WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+        WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
+        WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,
         WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
         WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
         WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS,
@@ -63,6 +66,7 @@ describe('Known Fields Loader', () => {
         WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
         WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
         WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
+        WAZUH_INDEX_TYPE_STATES_SCA,
       ];
 
       indexTypes.forEach(indexType => {

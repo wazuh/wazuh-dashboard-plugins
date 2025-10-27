@@ -13,7 +13,8 @@ import {
   WAZUH_INDEX_TYPE_STATISTICS,
   WAZUH_INDEX_TYPE_STATES_VULNERABILITIES,
   WAZUH_INDEX_TYPE_STATES_FIM_FILES,
-  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES,
+  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS,
+  WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES,
   WAZUH_INDEX_TYPE_STATES_INVENTORY,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE,
@@ -28,33 +29,32 @@ import {
   WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES,
   WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS,
+  WAZUH_INDEX_TYPE_STATES_SCA,
 } from '../../common/constants';
 
 // Import generated known fields JSON files
-import alertsFields from './known-fields/alerts.json';
-import vulnerabilitiesFields from './known-fields/states-vulnerabilities.json';
-import fimFilesFields from './known-fields/states-fim-files.json';
-import fimRegistriesFields from './known-fields/states-fim-registries.json';
-import inventoryFields from './known-fields/states-inventory.json';
-import inventorySystemFields from './known-fields/states-inventory-system.json';
-import inventoryHardwareFields from './known-fields/states-inventory-hardware.json';
-import inventoryNetworksFields from './known-fields/states-inventory-networks.json';
-import inventoryPackagesFields from './known-fields/states-inventory-packages.json';
-import inventoryPortsFields from './known-fields/states-inventory-ports.json';
-import inventoryProcessesFields from './known-fields/states-inventory-processes.json';
-import inventoryProtocolsFields from './known-fields/states-inventory-protocols.json';
-import inventoryUsersFields from './known-fields/states-inventory-users.json';
-import inventoryGroupsFields from './known-fields/states-inventory-groups.json';
-import inventoryServicesFields from './known-fields/states-inventory-services.json';
-import inventoryInterfacesFields from './known-fields/states-inventory-interfaces.json';
-import inventoryHotfixesFields from './known-fields/states-inventory-hotfixes.json';
-import inventoryBrowserExtensionsFields from './known-fields/states-inventory-browser-extensions.json';
-import statisticsFields from './known-fields/statistics.json';
-
-// Import monitoring fields from manually maintained file (not auto-generated)
-// See: scripts/generate-known-fields.js for explanation
-import { FieldsMonitoring } from './monitoring-fields';
-const monitoringFields = FieldsMonitoring;
+import alertsFields from '../../common/known-fields/alerts.json';
+import vulnerabilitiesFields from '../../common/known-fields/states-vulnerabilities.json';
+import fimFilesFields from '../../common/known-fields/states-fim-files.json';
+import fimRegistriesKeysFields from '../../common/known-fields/states-fim-registries-keys.json';
+import fimRegistriesValuesFields from '../../common/known-fields/states-fim-registries-keys.json';
+import inventoryFields from '../../common/known-fields/states-inventory.json';
+import inventorySystemFields from '../../common/known-fields/states-inventory-system.json';
+import inventoryHardwareFields from '../../common/known-fields/states-inventory-hardware.json';
+import inventoryNetworksFields from '../../common/known-fields/states-inventory-networks.json';
+import inventoryPackagesFields from '../../common/known-fields/states-inventory-packages.json';
+import inventoryPortsFields from '../../common/known-fields/states-inventory-ports.json';
+import inventoryProcessesFields from '../../common/known-fields/states-inventory-processes.json';
+import inventoryProtocolsFields from '../../common/known-fields/states-inventory-protocols.json';
+import inventoryUsersFields from '../../common/known-fields/states-inventory-users.json';
+import inventoryGroupsFields from '../../common/known-fields/states-inventory-groups.json';
+import inventoryServicesFields from '../../common/known-fields/states-inventory-services.json';
+import inventoryInterfacesFields from '../../common/known-fields/states-inventory-interfaces.json';
+import inventoryHotfixesFields from '../../common/known-fields/states-inventory-hotfixes.json';
+import inventoryBrowserExtensionsFields from '../../common/known-fields/states-inventory-browser-extensions.json';
+import inventorySCAFields from '../../common/known-fields/states-sca.json';
+import statisticsFields from '../../common/known-fields/statistics.json';
+import monitoringFields from '../../common/known-fields/monitoring.json';
 
 // Use generated fields as the primary source
 export const KnownFields = alertsFields;
@@ -72,7 +72,8 @@ export const KnownFieldsByIndexType = {
   // States index types
   [WAZUH_INDEX_TYPE_STATES_VULNERABILITIES]: vulnerabilitiesFields,
   [WAZUH_INDEX_TYPE_STATES_FIM_FILES]: fimFilesFields,
-  [WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES]: fimRegistriesFields,
+  [WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS]: fimRegistriesKeysFields,
+  [WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES]: fimRegistriesValuesFields,
   [WAZUH_INDEX_TYPE_STATES_INVENTORY]: inventoryFields,
   [WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM]: inventorySystemFields,
   [WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE]: inventoryHardwareFields,
@@ -88,6 +89,7 @@ export const KnownFieldsByIndexType = {
   [WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES]: inventoryHotfixesFields,
   [WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS]:
     inventoryBrowserExtensionsFields,
+  [WAZUH_INDEX_TYPE_STATES_SCA]: inventorySCAFields,
 };
 
 /**

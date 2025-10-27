@@ -37,7 +37,10 @@ export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 // Wazuh states index types
 export const WAZUH_INDEX_TYPE_STATES_VULNERABILITIES = 'states-vulnerabilities';
 export const WAZUH_INDEX_TYPE_STATES_FIM_FILES = 'states-fim-files';
-export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES = 'states-fim-registries';
+export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS =
+  'states-fim-registries-keys';
+export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES =
+  'states-fim-registries-values';
 export const WAZUH_INDEX_TYPE_STATES_INVENTORY = 'states-inventory';
 export const WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM =
   'states-inventory-system';
@@ -63,6 +66,7 @@ export const WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES =
   'states-inventory-hotfixes';
 export const WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS =
   'states-inventory-browser-extensions';
+export const WAZUH_INDEX_TYPE_STATES_SCA = 'states-sca';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
