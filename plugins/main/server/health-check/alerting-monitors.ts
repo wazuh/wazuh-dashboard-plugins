@@ -15,6 +15,8 @@
 import { PluginTaskRunContext } from '../services';
 import { defaultChannels } from './notification-default-channels/common/constants';
 
+const JSON_INDENT_SPACES = 4;
+
 interface SampleMonitorDef {
   key: 'slack' | 'pagerduty' | 'jira' | 'shuffle';
   monitorName: string;
@@ -53,7 +55,7 @@ const SAMPLES: SampleMonitorDef[] = [
         },
       },
       null,
-      4,
+      JSON_INDENT_SPACES,
     ),
     severity: '1',
   },
@@ -84,7 +86,7 @@ const SAMPLES: SampleMonitorDef[] = [
         },
       },
       null,
-      4,
+      JSON_INDENT_SPACES,
     ),
     severity: '3',
   },
