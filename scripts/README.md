@@ -35,6 +35,8 @@ By default uses the version declared in the package.json.
 
 The script generates JSON files in `plugins/main/common/known-fields`: alerts, archives, events, states, monitoring and statistics
 
+The templates can be retrieved from: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
+
 ## Integration
 
 The generated files are stored in `plugins/main/public/utils/known-fields/` and consumed by:

@@ -34,6 +34,7 @@ function wazuhUrl(path) {
 }
 
 // Configuration for different template sources
+// Template resource: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
 const TEMPLATE_SOURCES = {
   vulnerabilities: {
     name: 'states-vulnerabilities',
@@ -53,7 +54,6 @@ const TEMPLATE_SOURCES = {
   },
   monitoring: {
     name: 'monitoring',
-    // This is in the dashboard-plugins repo
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-monitoring.json',
@@ -63,7 +63,6 @@ const TEMPLATE_SOURCES = {
   },
   statistics: {
     name: 'statistics',
-    // This is in the dashboard-plugins repo
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-statistics.json',
