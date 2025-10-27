@@ -2,9 +2,7 @@
   {
     "name": "_id",
     "type": "string",
-    "esTypes": [
-      "_id"
-    ],
+    "esTypes": ["_id"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -12,9 +10,7 @@
   {
     "name": "_index",
     "type": "string",
-    "esTypes": [
-      "_index"
-    ],
+    "esTypes": ["_index"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -29,9 +25,7 @@
   {
     "name": "_source",
     "type": "_source",
-    "esTypes": [
-      "_source"
-    ],
+    "esTypes": ["_source"],
     "searchable": false,
     "aggregatable": false,
     "readFromDocValues": false
@@ -39,9 +33,7 @@
   {
     "name": "_type",
     "type": "string",
-    "esTypes": [
-      "_type"
-    ],
+    "esTypes": ["_type"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": false
@@ -49,9 +41,7 @@
   {
     "name": "timestamp",
     "type": "date",
-    "esTypes": [
-      "date"
-    ],
+    "esTypes": ["date"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -59,9 +49,7 @@
   {
     "name": "status",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -69,9 +57,7 @@
   {
     "name": "ip",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -79,9 +65,7 @@
   {
     "name": "host",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -89,9 +73,7 @@
   {
     "name": "name",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -99,9 +81,7 @@
   {
     "name": "id",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -109,9 +89,7 @@
   {
     "name": "cluster.name",
     "type": "string",
-    "esTypes": [
-      "keyword"
-    ],
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
