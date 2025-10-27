@@ -98,7 +98,7 @@ const createMissingChannels = async (
 
 export const initializeDefaultNotificationChannel = (
   client: ILegacyClusterClient,
-  next: (ctx: InitializationTaskRunContext) => void,
+  next?: (ctx: InitializationTaskRunContext) => void,
 ): Record<string, any> => {
   return {
     name: 'notification-channel:verify-default-channels',
@@ -148,8 +148,10 @@ export const initializeDefaultNotificationChannel = (
         throw new Error(message);
       }
 
-      // Proceed to next task
-      next(ctx);
+      // Proceed to next task (optional in tests)
+      if (typeof next === 'function') {
+        next(ctx);
+      }
     },
   };
 };
