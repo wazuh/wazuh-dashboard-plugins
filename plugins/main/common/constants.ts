@@ -34,6 +34,40 @@ export const WAZUH_VULNERABILITIES_PATTERN = 'wazuh-states-vulnerabilities*';
 export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
+// Wazuh states index types
+export const WAZUH_INDEX_TYPE_STATES_VULNERABILITIES = 'states-vulnerabilities';
+export const WAZUH_INDEX_TYPE_STATES_FIM_FILES = 'states-fim-files';
+export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS =
+  'states-fim-registries-keys';
+export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_VALUES =
+  'states-fim-registries-values';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY = 'states-inventory';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_SYSTEM =
+  'states-inventory-system';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_HARDWARE =
+  'states-inventory-hardware';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_NETWORKS =
+  'states-inventory-networks';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_PACKAGES =
+  'states-inventory-packages';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_PORTS = 'states-inventory-ports';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_PROCESSES =
+  'states-inventory-processes';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_PROTOCOLS =
+  'states-inventory-protocols';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_USERS = 'states-inventory-users';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_GROUPS =
+  'states-inventory-groups';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_SERVICES =
+  'states-inventory-services';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_INTERFACES =
+  'states-inventory-interfaces';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES =
+  'states-inventory-hotfixes';
+export const WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS =
+  'states-inventory-browser-extensions';
+export const WAZUH_INDEX_TYPE_STATES_SCA = 'states-sca';
+
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
 export const WAZUH_FIM_FILES_PATTERN = 'wazuh-states-fim-files*';

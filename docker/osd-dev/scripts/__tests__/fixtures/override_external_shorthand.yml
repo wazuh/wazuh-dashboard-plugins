@@ -1,0 +1,11 @@
+services:
+  osd:
+    volumes:
+      - 'wazuh-dashboard-reporting:/home/node/kbn/plugins/wazuh-dashboard-reporting'
+volumes:
+  wazuh-dashboard-reporting:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${hostPath}

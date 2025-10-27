@@ -1,5 +1,4 @@
 import { ILegacyClusterClient } from '../../../../../../src/core/server';
-import { initializationTaskCreatorAlertingMonitors } from "../../alerting-monitors";
 import {
   defaultChannelConfigs,
   ChannelDefinition,
@@ -90,8 +89,7 @@ const createMissingChannels = async (
     }
   }
   ctx.logger.info(
-    `Created ${
-      createdChannels.length
+    `Created ${createdChannels.length
     } notification channels: ${createdChannels.join(', ')}`,
   );
   return createdChannels;
