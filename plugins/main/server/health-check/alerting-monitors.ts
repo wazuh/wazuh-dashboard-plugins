@@ -263,7 +263,19 @@ export const initializationTaskCreatorAlertingMonitors = () => ({
     try {
       ctx.logger.debug('Starting Alerting sample monitors check');
 
-      await Promise.all(SAMPLES.map(sample => ensureMonitor(ctx, sample)));
+      /**
+       * Sample monitor creation attempts
+       * `await Promise.all(SAMPLES.map(sample => ensureMonitor(ctx, sample)));`
+       *
+       * Throws unhandled promise rejection on logger calls:
+       * [error][data][opensearch] [alerting_exception]: all shards failed
+       * [warning][healthcheck][XXXXXX] Could not create sample monitor [Wazuh - Sample: Jira]: alerting_exception: [alerting_exception] Reason: all shards failed
+       * [error][data][opensearch] [alerting_exception]: all shards failed
+       * [warning][healthcheck][XXXXXX] Could not create sample monitor [Wazuh - Sample: Slack]: alerting_exception: [alerting_exception] Reason: all shards failed
+      */
+      for (const sample of SAMPLES) {
+        await ensureMonitor(ctx, sample);
+      }
 
       ctx.logger.info('Alerting sample monitors check finished');
       return { created: true };
