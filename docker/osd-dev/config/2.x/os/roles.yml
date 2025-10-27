@@ -145,10 +145,7 @@ notifications_full_access:
 manage_wazuh_index:
   reserved: true
   hidden: false
-  cluster_permissions:
-    - 'cluster:admin/opensearch/notifications/configs/get'
-    - 'cluster:admin/opensearch/notifications/configs/create'
-    - 'cluster:admin/opensearch/notifications/features'
+  cluster_permissions: []
   index_permissions:
     - index_patterns:
         - 'wazuh-*'

@@ -103,6 +103,15 @@ notifications_read_access:
     - 'kibanaserver'
   and_backend_roles: []
 
+notifications_full_access:
+  reserved: true
+  hidden: false
+  backend_roles: []
+  hosts: []
+  users:
+    - 'kibanaserver'
+  and_backend_roles: []
+
   # Wazuh monitoring and statistics index permissions
 manage_wazuh_index:
   reserved: true
