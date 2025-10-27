@@ -1,10 +1,10 @@
 import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
-import { endpointSummary } from '../../../../utils/applications';
 import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
 import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
 import NavigationService from '../../../../react-services/navigation-service';
+import { isVersionLower } from '../utils';
 
 export const agentsTableActions = (
   allowEditGroups: boolean,
@@ -12,7 +12,7 @@ export const agentsTableActions = (
   setAgent: (agent: Agent) => void,
   setIsEditGroupsVisible: (visible: boolean) => void,
   setIsUpgradeModalVisible: (visible: boolean) => void,
-  outdatedAgents: Agent[],
+  apiVersion: string,
 ) => [
   {
     name: agent => {
@@ -84,19 +84,15 @@ export const agentsTableActions = (
     enabled: () => allowEditGroups,
   },
   {
-    name: agent => {
-      const name = <span>Upgrade</span>;
-
-      const isOutdated = !!outdatedAgents.find(
-        outdatedAgent => outdatedAgent.id === agent.id,
-      );
+    name: (agent: Agent) => {
+      const isOutdated = isVersionLower(agent.version, apiVersion);
 
       if (agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated) {
         return (
           <WzElementPermissions
             permissions={[{ action: 'agent:upgrade', resource: 'agent:id:*' }]}
           >
-            {name}
+            <span>Upgrade</span>
           </WzElementPermissions>
         );
       }
@@ -109,7 +105,7 @@ export const agentsTableActions = (
               : 'Agent is up to date'
           }
         >
-          {name}
+          <span>Upgrade</span>
         </EuiToolTip>
       );
     },
@@ -121,10 +117,8 @@ export const agentsTableActions = (
       setIsUpgradeModalVisible(true);
     },
     'data-test-subj': 'action-upgrade',
-    enabled: agent => {
-      const isOutdated = !!outdatedAgents.find(
-        outdatedAgent => outdatedAgent.id === agent.id,
-      );
+    enabled: (agent: Agent) => {
+      const isOutdated = isVersionLower(agent.version, apiVersion);
       return (
         allowUpgrade &&
         agent.status === API_NAME_AGENT_STATUS.ACTIVE &&
