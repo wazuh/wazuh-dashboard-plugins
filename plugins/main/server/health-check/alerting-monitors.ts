@@ -101,8 +101,8 @@ const SAMPLES: SampleMonitorDef[] = [
   },
 ];
 
-async function request(ctx: PluginTaskRunContext, params: any) {
-  return await ctx.context.services.core.opensearch.client.asInternalUser.transport.request(
+function request(ctx: PluginTaskRunContext, params: any) {
+  return ctx.context.services.core.opensearch.client.asInternalUser.transport.request(
     params,
   );
 }
