@@ -1,9 +1,9 @@
 export default [
   { id: 'agent.name' },
-  { id: 'destination.port' },
-  { id: 'destination.ip' },
-  { id: 'source.port' },
   { id: 'source.ip' },
+  { id: 'source.port' },
+  { id: 'destination.ip' },
+  { id: 'destination.port' },
   { id: 'network.transport' },
   { id: 'process.name' },
 ];

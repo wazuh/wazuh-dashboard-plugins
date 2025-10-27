@@ -44,6 +44,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Upgraded the `axios` dependency to `1.12.2` [#7804](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7804)
+- Improved column order in IT Hygiene > Network > Traffic view to follow a logical source-to-destination flow [#7841](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7841)
 
 ### Fixed
 
