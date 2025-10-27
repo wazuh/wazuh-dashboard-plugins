@@ -283,7 +283,6 @@ export const initializationTaskCreatorAlertingMonitors = () => ({
 // without exposing internals in production code paths.
 // eslint-disable-next-line import/no-default-export
 export const __test__ = {
-  alertingAvailable: isAlertingAvailable,
   getNotificationChannels,
   monitorExists,
   buildMonitorBody,

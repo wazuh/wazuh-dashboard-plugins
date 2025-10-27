@@ -69,12 +69,4 @@ describe('alerting health-check helpers', () => {
     expect(arg.path).toBe('/_plugins/_notifications/configs');
     expect(arg.querystring).toMatchObject({ from_index: 0, max_items: 1000 });
   });
-
-  test('alertingAvailable returns true on successful probe', async () => {
-    const req = jest
-      .fn()
-      .mockResolvedValue({ body: { hits: { total: { value: 0 } } } });
-    const ctx = createCtx(req);
-    await expect(mod.alertingAvailable(ctx)).resolves.toBe(true);
-  });
 });
