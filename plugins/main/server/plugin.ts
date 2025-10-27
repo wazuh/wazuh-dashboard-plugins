@@ -110,6 +110,27 @@ import {
   WAZUH_STATISTICS_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../common/constants';
+import IndexPatternAlertsKnownFields from '../common/known-fields/alerts.json';
+import IndexPatternFIMFilesKnownFields from '../common/known-fields/states-fim-files.json';
+import IndexPatternFIMRegistriesKeysKnownFields from '../common/known-fields/states-fim-registries-keys.json';
+import IndexPatternFIMRegistriesValuesKnownFields from '../common/known-fields/states-fim-registries-values.json';
+import IndexPatternITHygieneBrowserExtensionsKnownFields from '../common/known-fields/states-inventory-browser-extensions.json';
+import IndexPatternITHygieneGroupsKnownFields from '../common/known-fields/states-inventory-groups.json';
+import IndexPatternITHygieneHardwareKnownFields from '../common/known-fields/states-inventory-hardware.json';
+import IndexPatternITHygieneHotfixesKnownFields from '../common/known-fields/states-inventory-hotfixes.json';
+import IndexPatternITHygieneInterfacesKnownFields from '../common/known-fields/states-inventory-interfaces.json';
+import IndexPatternITHygieneInventoryKnownFields from '../common/known-fields/states-inventory.json';
+import IndexPatternITHygieneNetworkKnownFields from '../common/known-fields/states-inventory-networks.json';
+import IndexPatternITHygienePackagesKnownFields from '../common/known-fields/states-inventory-packages.json';
+import IndexPatternITHygienePortsKnownFields from '../common/known-fields/states-inventory-ports.json';
+import IndexPatternITHygieneProcessesKnownFields from '../common/known-fields/states-inventory-processes.json';
+import IndexPatternITHygieneProtocolsKnownFields from '../common/known-fields/states-inventory-protocols.json';
+import IndexPatternITHygieneServicesKnownFields from '../common/known-fields/states-inventory-services.json';
+import IndexPatternITHygieneSystemKnownFields from '../common/known-fields/states-inventory-system.json';
+import IndexPatternITHygieneUsersKnownFields from '../common/known-fields/states-inventory-users.json';
+import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
+import IndexPatternStatisticsKnownFields from '../common/known-fields/statistics.json';
+import IndexPatternSCAKnownFields from '../common/known-fields/states-sca.json';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -201,6 +222,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
           hasTimeFieldName: FIELD_TIMESTAMP,
+          fieldsNoIndices: IndexPatternAlertsKnownFields,
         },
         configurationSettingKey: 'pattern',
       }),
@@ -212,8 +234,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
         indexPatternID: WAZUH_MONITORING_PATTERN,
         options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternAlertsKnownFields,
         },
       }),
     );
@@ -224,8 +247,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS,
         indexPatternID: WAZUH_STATISTICS_PATTERN,
         options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasTimeFieldName: true,
+          fieldsNoIndices: IndexPatternStatisticsKnownFields,
         },
       }),
     );
@@ -235,6 +259,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES,
         indexPatternID: WAZUH_VULNERABILITIES_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternVulnerabilitiesKnownFields,
+        },
       }),
     );
 
@@ -256,6 +283,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'process.pid': 'integer',
             'source.port': 'integer',
           }),
+          fieldsNoIndices: IndexPatternITHygieneInventoryKnownFields,
         },
         indexPatternID: WAZUH_IT_HYGIENE_PATTERN,
       }),
@@ -266,6 +294,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_GROUPS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_GROUPS_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternITHygieneGroupsKnownFields,
+        },
       }),
     );
 
@@ -274,6 +305,15 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HARDWARE_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
+        options: {
+          savedObjectOverwrite: mapFieldsFormat({
+            'host.memory.free': 'bytes',
+            'host.memory.total': 'bytes',
+            'host.memory.used': 'bytes',
+            'host.memory.usage': 'percent',
+          }),
+          fieldsNoIndices: IndexPatternITHygieneHardwareKnownFields,
+        },
       }),
     );
 
@@ -282,6 +322,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_HOTFIXES_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_HOTFIXES_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternITHygieneHotfixesKnownFields,
+        },
       }),
     );
 
@@ -294,6 +337,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'host.network.egress.bytes': 'bytes',
             'host.network.ingress.bytes': 'bytes',
           }),
+          fieldsNoIndices: IndexPatternITHygieneInterfacesKnownFields,
         },
         indexPatternID: WAZUH_IT_HYGIENE_INTERFACES_PATTERN,
       }),
@@ -304,6 +348,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_NETWORKS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_NETWORKS_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternITHygieneNetworkKnownFields,
+        },
       }),
     );
 
@@ -315,6 +362,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: mapFieldsFormat({
             'package.size': 'bytes',
           }),
+          fieldsNoIndices: IndexPatternITHygienePackagesKnownFields,
         },
         indexPatternID: WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
       }),
@@ -330,6 +378,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'process.pid': 'integer',
             'source.port': 'integer',
           }),
+          fieldsNoIndices: IndexPatternITHygienePortsKnownFields,
         },
         indexPatternID: WAZUH_IT_HYGIENE_PORTS_PATTERN,
       }),
@@ -344,6 +393,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
             'process.parent.pid': 'integer',
             'process.pid': 'integer',
           }),
+          fieldsNoIndices: IndexPatternITHygieneProcessesKnownFields,
         },
         indexPatternID: WAZUH_IT_HYGIENE_PROCESSES_PATTERN,
       }),
@@ -354,6 +404,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_PROTOCOLS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_PROTOCOLS_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternITHygieneProtocolsKnownFields,
+        },
       }),
     );
 
@@ -362,6 +415,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SYSTEM_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_SYSTEM_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternITHygieneSystemKnownFields,
+        },
       }),
     );
 
@@ -370,6 +426,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_USERS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_USERS_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternITHygieneUsersKnownFields,
+        },
       }),
     );
 
@@ -378,6 +437,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_SERVICES_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_SERVICES_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternITHygieneServicesKnownFields,
+        },
       }),
     );
 
@@ -387,6 +449,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName:
           HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_BROWSER_EXTENSIONS_STATES,
         indexPatternID: WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternITHygieneBrowserExtensionsKnownFields,
+        },
       }),
     );
 
@@ -398,6 +463,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: mapFieldsFormat({
             'file.size': 'bytes',
           }),
+          fieldsNoIndices: IndexPatternFIMFilesKnownFields,
         },
         indexPatternID: WAZUH_FIM_FILES_PATTERN,
       }),
@@ -408,6 +474,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
         indexPatternID: WAZUH_FIM_REGISTRY_KEYS_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternFIMRegistriesKeysKnownFields,
+        },
       }),
     );
 
@@ -419,6 +488,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
           savedObjectOverwrite: mapFieldsFormat({
             'registry.size': 'bytes',
           }),
+          fieldsNoIndices: IndexPatternFIMRegistriesValuesKnownFields,
         },
         indexPatternID: WAZUH_FIM_REGISTRY_VALUES_PATTERN,
       }),
@@ -429,6 +499,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES,
         indexPatternID: WAZUH_SCA_PATTERN,
+        options: {
+          fieldsNoIndices: IndexPatternSCAKnownFields,
+        },
       }),
     );
 
