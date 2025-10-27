@@ -15,4 +15,4 @@ export type PluginTaskRunContext = {
   logger: any;
   request?: any;
   scope?: TaskExecutionContext;
-} & any;
+};
