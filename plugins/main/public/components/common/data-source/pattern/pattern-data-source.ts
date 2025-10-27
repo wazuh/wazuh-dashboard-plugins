@@ -48,12 +48,13 @@ export class PatternDataSource implements tDataSource {
     try {
       const pattern = await this.patternService.get(this.id);
       if (pattern) {
-        const fields = await this.patternService.getFieldsForIndexPattern(
-          pattern,
-        );
-        const scripted = pattern.getScriptedFields().map(field => field.spec);
-        pattern.fields.replaceAll([...fields, ...scripted]);
         try {
+          const fields = await this.patternService.getFieldsForIndexPattern(
+            pattern,
+          );
+          const scripted = pattern.getScriptedFields().map(field => field.spec);
+          pattern.fields.replaceAll([...fields, ...scripted]);
+
           await this.patternService.updateSavedObject(pattern);
         } catch {}
       } else {

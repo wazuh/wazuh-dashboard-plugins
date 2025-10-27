@@ -84,7 +84,6 @@ import {
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
 import {
   DashboardITHygiene,
-  ITHygieneBrowserExtensionsInventory,
   ITHygieneNetworksInventory,
   ITHygienePackagesInventory,
   ITHygieneProcessesInventory,
@@ -564,12 +563,6 @@ export const ModulesDefaults = {
         name: 'Services',
         buttons: [ButtonExploreAgent],
         component: ITHygieneServicesInventory,
-      },
-      {
-        id: 'browser-extensions',
-        name: 'Browser extensions',
-        buttons: [ButtonExploreAgent],
-        component: ITHygieneBrowserExtensionsInventory,
       },
     ],
     availableFor: ['manager', 'agent'],

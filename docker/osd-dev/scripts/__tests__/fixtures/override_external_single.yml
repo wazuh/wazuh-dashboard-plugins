@@ -1,0 +1,11 @@
+services:
+  osd:
+    volumes:
+      - 'external-test:/home/node/kbn/plugins/external-test'
+volumes:
+  external-test:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${extRepoPath}
