@@ -16,7 +16,7 @@ import { githubColumns } from '../components/overview/github/events/github-colum
 import { mitreAttackColumns } from '../components/overview/mitre/events/mitre-attack-columns';
 import { malwareDetectionColumns } from '../components/overview/malware-detection/events/malware-detection-columns';
 import { commonColumns } from '../components/overview/common/data-grid-columns';
-import { KnownFields } from './known-fields';
+import { KnownFields } from './known-fields-loader';
 import {
   agentTechniquesColumns,
   techniquesColumns,

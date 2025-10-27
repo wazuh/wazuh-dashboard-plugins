@@ -1,0 +1,353 @@
+[
+  {
+    "name": "_id",
+    "type": "string",
+    "esTypes": ["_id"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_index",
+    "type": "string",
+    "esTypes": ["_index"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_score",
+    "type": "number",
+    "searchable": false,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_source",
+    "type": "_source",
+    "esTypes": ["_source"],
+    "searchable": false,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "_type",
+    "type": "string",
+    "esTypes": ["_type"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": false
+  },
+  {
+    "name": "agent.host.architecture",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.host.ip",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "agent.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "host.ip",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "login.status",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "login.tty",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "login.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "process.pid",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.auth_failures.count",
+    "type": "number",
+    "esTypes": ["integer"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.auth_failures.timestamp",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.created",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.full_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.group.id",
+    "type": "string",
+    "esTypes": ["unsigned_long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.group.id_signed",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.groups",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.home",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.is_hidden",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.is_remote",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.last_login",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.password.expiration_date",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.password.hash_algorithm",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.password.inactive_days",
+    "type": "number",
+    "esTypes": ["integer"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.password.last_change",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.password.max_days_between_changes",
+    "type": "number",
+    "esTypes": ["integer"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.password.min_days_between_changes",
+    "type": "number",
+    "esTypes": ["integer"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.password.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.password.warning_days_before_expiration",
+    "type": "number",
+    "esTypes": ["integer"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.roles",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.shell",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.uid_signed",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "user.uuid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "wazuh.cluster.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "wazuh.cluster.node",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "wazuh.schema.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  }
+]

@@ -2,7 +2,7 @@ import { jobs, SchedulerJob } from './index';
 import { configuredJobs } from './configured-jobs';
 import cron from 'node-cron';
 import { WAZUH_STATISTICS_TEMPLATE_NAME } from '../../../common/constants';
-import { statisticsTemplate } from '../../integration-files/statistics-template';
+import statisticsTemplate from '../../integration-files/statistics-template.json';
 import { delayAsPromise } from '../../../common/utils';
 
 const schedulerJobs = [];
