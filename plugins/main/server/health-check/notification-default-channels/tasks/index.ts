@@ -1,5 +1,4 @@
 import { ILegacyClusterClient } from '../../../../../../src/core/server';
-import { initializationTaskCreatorAlertingMonitors } from "../../alerting-monitors";
 import {
   defaultChannelConfigs,
   ChannelDefinition,

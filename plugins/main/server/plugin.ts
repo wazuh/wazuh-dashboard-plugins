@@ -110,7 +110,7 @@ import IndexPatternITHygieneUsersKnownFields from '../common/known-fields/states
 import IndexPatternVulnerabilitiesKnownFields from '../common/known-fields/states-vulnerabilities.json';
 import IndexPatternStatisticsKnownFields from '../common/known-fields/statistics.json';
 import IndexPatternSCAKnownFields from '../common/known-fields/states-sca.json';
-import { initializationTaskCreatorAlertingMonitors } from "./health-check/alerting-monitors";
+import { initializationTaskCreatorAlertingMonitors } from './health-check/alerting-monitors';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -197,7 +197,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // Detect Notifications plugin availability to conditionally register tasks
     if (this.isNotificationsDashboardsAvailable(plugins)) {
       core.healthCheck.register(
-        initializeDefaultNotificationChannel(notificationClient, (ctx) => {
+        initializeDefaultNotificationChannel(notificationClient, ctx => {
           if (this.isAlertingDashboardsAvailable(plugins)) {
             initializationTaskCreatorAlertingMonitors().run(ctx);
           }

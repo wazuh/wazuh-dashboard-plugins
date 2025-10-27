@@ -272,7 +272,7 @@ export const initializationTaskCreatorAlertingMonitors = () => ({
        * [warning][healthcheck][XXXXXX] Could not create sample monitor [Wazuh - Sample: Jira]: alerting_exception: [alerting_exception] Reason: all shards failed
        * [error][data][opensearch] [alerting_exception]: all shards failed
        * [warning][healthcheck][XXXXXX] Could not create sample monitor [Wazuh - Sample: Slack]: alerting_exception: [alerting_exception] Reason: all shards failed
-      */
+       */
       for (const sample of SAMPLES) {
         await ensureMonitor(ctx, sample);
       }
