@@ -86,6 +86,7 @@ import {
   WAZUH_SCA_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../common/constants';
+
 import { notificationSetup } from './health-check/notification-default-channels';
 import { initializeDefaultNotificationChannel } from './health-check/notification-default-channels/tasks';
 import IndexPatternAlertsKnownFields from '../common/known-fields/alerts.json';
@@ -560,5 +561,5 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() { }
+  public stop() {}
 }
