@@ -4,6 +4,7 @@ import {
   LogoDocker,
   LogoGitHub,
   LogoGoogleCloud,
+  LogoMicrosoftGraphAPI,
   LogoOffice365,
 } from '../components/common/logos';
 
@@ -507,7 +508,7 @@ export const microsoftGraphAPI = {
     defaultMessage:
       'Security events related to your Microsoft Graph services, collected directly via Microsoft Graph API.',
   }),
-  euiIconType: 'logoAzureMono',
+  euiIconType: LogoMicrosoftGraphAPI,
   order: 505,
   showInOverviewApp: true,
   showInAgentMenu: true,
