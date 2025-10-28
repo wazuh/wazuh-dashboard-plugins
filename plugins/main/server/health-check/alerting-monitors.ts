@@ -177,7 +177,7 @@ async function getNotificationChannels(ctx: PluginTaskRunContext) {
     return body?.config_list || [];
   } catch (error) {
     const _error = error as Error;
-    ctx.logger.debug(
+    ctx.logger.warn(
       `Notifications get configs failed: ${_error?.message || _error}`,
     );
     return [];
@@ -200,7 +200,7 @@ async function monitorExists(ctx: PluginTaskRunContext, name: string) {
   } catch (error) {
     const _error = error as Error;
     // If search fails (e.g., missing permissions/index), assume not exists
-    ctx.logger.debug(
+    ctx.logger.warn(
       `monitorExists error for [${name}]: ${_error?.message || _error}`,
     );
     return false;
@@ -221,7 +221,7 @@ async function ensureMonitor(
   const configs = await getNotificationChannels(ctx);
   const match = configs.find((c: any) => c?.config_id === channelId);
   if (!match) {
-    ctx.logger.debug(
+    ctx.logger.warn(
       `Notification channel with id [${channelId}] not found among existing configs.`,
     );
   }
@@ -254,7 +254,7 @@ export const initializationTaskCreatorAlertingMonitors = () => ({
   name: 'alerting:sample-monitors',
   async run(ctx: PluginTaskRunContext) {
     try {
-      ctx.logger.debug('Starting Alerting sample monitors check');
+      ctx.logger.info('Starting Alerting sample monitors check');
 
       /**
        * Sample monitor creation attempts
@@ -277,7 +277,7 @@ export const initializationTaskCreatorAlertingMonitors = () => ({
       const message = `Error ensuring sample monitors: ${
         _error?.message || _error
       }`;
-      ctx.logger.error(message);
+      ctx.logger.warn(message);
       // Non-critical task: throw to report error state in the check result
       throw new Error(message);
     }
