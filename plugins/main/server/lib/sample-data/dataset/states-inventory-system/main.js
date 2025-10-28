@@ -1,5 +1,9 @@
 const random = require('../../lib/random');
-const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
+const {
+  generateRandomWazuh,
+  generateRandomAgent,
+  generateRandomState,
+} = require('../shared-utils');
 
 function generateRandomHostSystem() {
   return {
@@ -40,6 +44,8 @@ function generateDocument(params) {
   return {
     agent: generateRandomAgent(),
     host: generateRandomHostSystem(),
+    state: generateRandomState(),
+
     wazuh: generateRandomWazuh(params),
   };
 }

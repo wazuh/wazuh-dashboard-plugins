@@ -1,13 +1,27 @@
 {
-  "index_patterns": ["wazuh-states-inventory-protocols*"],
+  "index_patterns": [
+    "wazuh-states-inventory-protocols*"
+  ],
   "priority": 1,
   "template": {
     "settings": {
       "index": {
         "number_of_replicas": "0",
         "number_of_shards": "1",
-        "query.default_field": ["agent.id", "agent.host.ip", "interface.name"],
-        "refresh_interval": "5s"
+        "query.default_field": [
+          "agent.host.architecture",
+          "agent.host.ip",
+          "agent.id",
+          "agent.name",
+          "agent.version",
+          "network.type",
+          "interface.name",
+          "state.modified_at",
+          "wazuh.cluster.name",
+          "wazuh.cluster.node",
+          "wazuh.schema.version"
+        ],
+        "refresh_interval": "2s"
       }
     },
     "mappings": {
@@ -16,14 +30,42 @@
       "properties": {
         "agent": {
           "properties": {
+            "groups": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "host": {
               "properties": {
                 "architecture": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "ip": {
                   "type": "ip"
+                },
+                "os": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "platform": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
@@ -38,6 +80,18 @@
             "version": {
               "ignore_above": 1024,
               "type": "keyword"
+            }
+          }
+        },
+        "checksum": {
+          "properties": {
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -63,6 +117,16 @@
             "type": {
               "ignore_above": 1024,
               "type": "keyword"
+            }
+          }
+        },
+        "state": {
+          "properties": {
+            "document_version": {
+              "type": "integer"
+            },
+            "modified_at": {
+              "type": "date"
             }
           }
         },

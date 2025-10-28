@@ -1,10 +1,11 @@
 {
-  "index_patterns": ["wazuh-states-inventory-browser-extensions*"],
+  "index_patterns": [
+    "wazuh-states-inventory-browser-extensions*"
+  ],
   "priority": 1,
   "template": {
     "settings": {
       "index": {
-        "auto_expand_replicas": "0-1",
         "number_of_replicas": "0",
         "number_of_shards": "1",
         "query.default_field": [
@@ -20,6 +21,7 @@
           "package.version",
           "package.vendor",
           "package.type",
+          "state.modified_at",
           "wazuh.cluster.name",
           "wazuh.cluster.node",
           "wazuh.schema.version"
@@ -33,14 +35,42 @@
       "properties": {
         "agent": {
           "properties": {
+            "groups": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "host": {
               "properties": {
                 "architecture": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "ip": {
                   "type": "ip"
+                },
+                "os": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "platform": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
@@ -76,6 +106,18 @@
                 },
                 "referenced": {
                   "type": "boolean"
+                }
+              }
+            }
+          }
+        },
+        "checksum": {
+          "properties": {
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
                 }
               }
             }
@@ -152,6 +194,16 @@
             },
             "visible": {
               "type": "boolean"
+            }
+          }
+        },
+        "state": {
+          "properties": {
+            "document_version": {
+              "type": "integer"
+            },
+            "modified_at": {
+              "type": "date"
             }
           }
         },

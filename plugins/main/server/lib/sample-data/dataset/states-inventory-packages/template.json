@@ -1,5 +1,7 @@
 {
-  "index_patterns": ["wazuh-states-inventory-packages*"],
+  "index_patterns": [
+    "wazuh-states-inventory-packages*"
+  ],
   "priority": 1,
   "template": {
     "settings": {
@@ -25,11 +27,12 @@
           "package.type",
           "package.vendor",
           "package.version",
+          "state.modified_at",
           "wazuh.cluster.name",
           "wazuh.cluster.node",
           "wazuh.schema.version"
         ],
-        "refresh_interval": "5s"
+        "refresh_interval": "2s"
       }
     },
     "mappings": {
@@ -38,14 +41,42 @@
       "properties": {
         "agent": {
           "properties": {
+            "groups": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "host": {
               "properties": {
                 "architecture": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "ip": {
                   "type": "ip"
+                },
+                "os": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "platform": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
@@ -60,6 +91,18 @@
             "version": {
               "ignore_above": 1024,
               "type": "keyword"
+            }
+          }
+        },
+        "checksum": {
+          "properties": {
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -114,6 +157,16 @@
             "version": {
               "ignore_above": 1024,
               "type": "keyword"
+            }
+          }
+        },
+        "state": {
+          "properties": {
+            "document_version": {
+              "type": "integer"
+            },
+            "modified_at": {
+              "type": "date"
             }
           }
         },

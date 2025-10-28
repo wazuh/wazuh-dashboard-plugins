@@ -1,5 +1,9 @@
 const random = require('../../lib/random');
-const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
+const {
+  generateRandomAgent,
+  generateRandomWazuh,
+  generateRandomState,
+} = require('../shared-utils');
 
 function generateRandomHostPorts() {
   return {
@@ -47,6 +51,8 @@ function generateDocument(params) {
     network: { transport: random.choice(['TCP', 'UDP', 'ICMP']) },
     process: generateRandomProcess(),
     source: generateRandomSource(),
+    state: generateRandomState(),
+
     wazuh: generateRandomWazuh(params),
   };
 }

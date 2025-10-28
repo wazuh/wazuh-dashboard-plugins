@@ -1,10 +1,11 @@
 {
-  "index_patterns": ["wazuh-states-inventory-groups*"],
+  "index_patterns": [
+    "wazuh-states-inventory-groups*"
+  ],
   "priority": 1,
   "template": {
     "settings": {
       "index": {
-        "auto_expand_replicas": "0-1",
         "number_of_replicas": "0",
         "number_of_shards": "1",
         "query.default_field": [
@@ -12,9 +13,10 @@
           "group.description",
           "group.id_signed",
           "group.uuid",
-          "group.users"
+          "group.users",
+          "state.modified_at"
         ],
-        "refresh_interval": "5s"
+        "refresh_interval": "2s"
       }
     },
     "mappings": {
@@ -23,14 +25,42 @@
       "properties": {
         "agent": {
           "properties": {
+            "groups": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "host": {
               "properties": {
                 "architecture": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "ip": {
                   "type": "ip"
+                },
+                "os": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "platform": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
@@ -48,10 +78,22 @@
             }
           }
         },
+        "checksum": {
+          "properties": {
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "group": {
           "properties": {
             "description": {
-              "type": "match_only_text"
+              "type": "keyword"
             },
             "id": {
               "type": "unsigned_long"
@@ -73,6 +115,16 @@
             "uuid": {
               "ignore_above": 1024,
               "type": "keyword"
+            }
+          }
+        },
+        "state": {
+          "properties": {
+            "document_version": {
+              "type": "integer"
+            },
+            "modified_at": {
+              "type": "date"
             }
           }
         },

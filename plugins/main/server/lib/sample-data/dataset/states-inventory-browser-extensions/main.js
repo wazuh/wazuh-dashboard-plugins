@@ -1,5 +1,9 @@
 const random = require('../../lib/random');
-const { generateRandomWazuh, generateRandomAgent } = require('../shared-utils');
+const {
+  generateRandomWazuh,
+  generateRandomAgent,
+  generateRandomState,
+} = require('../shared-utils');
 const { Random } = require('../../../generate-alerts/helpers/random');
 const {
   DateFormatter,
@@ -125,6 +129,8 @@ function generateDocument(params) {
     file: generateRandomFile(),
     package: generateRandomPackage(),
     user: generateRandomUser(),
+    state: generateRandomState(),
+
     wazuh: generateRandomWazuh(params),
   };
 }

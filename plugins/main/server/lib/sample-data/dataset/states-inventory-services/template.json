@@ -1,10 +1,11 @@
 {
-  "index_patterns": ["wazuh-states-inventory-services*"],
+  "index_patterns": [
+    "wazuh-states-inventory-services*"
+  ],
   "priority": 1,
   "template": {
     "settings": {
       "index": {
-        "auto_expand_replicas": "0-1",
         "number_of_replicas": "0",
         "number_of_shards": "1",
         "query.default_field": [
@@ -13,31 +14,29 @@
           "agent.id",
           "agent.name",
           "agent.version",
-          "service.id",
           "service.name",
+          "service.id",
+          "service.description",
+          "service.enabled",
+          "service.restart",
           "service.state",
           "service.sub_state",
-          "service.description",
-          "service.restart",
           "service.type",
           "service.start_type",
+          "process.executable",
+          "file.path",
           "log.file.path",
           "error.log.file.path",
           "process.args",
-          "service.exit_code",
-          "service.win32_exit_code",
-          "process.pid",
-          "process.executable",
-          "service.address",
           "process.user.name",
           "process.group.name",
-          "service.enabled",
-          "file.path",
+          "service.address",
+          "state.modified_at",
           "wazuh.cluster.name",
           "wazuh.cluster.node",
           "wazuh.schema.version"
         ],
-        "refresh_interval": "5s"
+        "refresh_interval": "2s"
       }
     },
     "mappings": {
@@ -46,14 +45,42 @@
       "properties": {
         "agent": {
           "properties": {
+            "groups": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "host": {
               "properties": {
                 "architecture": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "ip": {
                   "type": "ip"
+                },
+                "os": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "platform": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
@@ -68,6 +95,18 @@
             "version": {
               "ignore_above": 1024,
               "type": "keyword"
+            }
+          }
+        },
+        "checksum": {
+          "properties": {
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -238,6 +277,16 @@
             },
             "win32_exit_code": {
               "type": "integer"
+            }
+          }
+        },
+        "state": {
+          "properties": {
+            "document_version": {
+              "type": "integer"
+            },
+            "modified_at": {
+              "type": "date"
             }
           }
         },

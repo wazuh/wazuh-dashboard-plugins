@@ -1,13 +1,26 @@
 {
-  "index_patterns": ["wazuh-states-inventory-hotfixes*"],
+  "index_patterns": [
+    "wazuh-states-inventory-hotfixes*"
+  ],
   "priority": 1,
   "template": {
     "settings": {
       "index": {
         "number_of_replicas": "0",
         "number_of_shards": "1",
-        "query.default_field": ["package.hotfix.name"],
-        "refresh_interval": "5s"
+        "query.default_field": [
+          "agent.host.architecture",
+          "agent.host.ip",
+          "agent.id",
+          "agent.name",
+          "agent.version",
+          "package.hotfix.name",
+          "state.modified_at",
+          "wazuh.cluster.name",
+          "wazuh.cluster.node",
+          "wazuh.schema.version"
+        ],
+        "refresh_interval": "2s"
       }
     },
     "mappings": {
@@ -16,14 +29,42 @@
       "properties": {
         "agent": {
           "properties": {
+            "groups": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "host": {
               "properties": {
                 "architecture": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "ip": {
                   "type": "ip"
+                },
+                "os": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "platform": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
@@ -41,6 +82,18 @@
             }
           }
         },
+        "checksum": {
+          "properties": {
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
         "package": {
           "properties": {
             "hotfix": {
@@ -51,6 +104,16 @@
                 }
               },
               "type": "object"
+            }
+          }
+        },
+        "state": {
+          "properties": {
+            "document_version": {
+              "type": "integer"
+            },
+            "modified_at": {
+              "type": "date"
             }
           }
         },

@@ -1,10 +1,11 @@
 {
-  "index_patterns": ["wazuh-states-inventory-users*"],
+  "index_patterns": [
+    "wazuh-states-inventory-users*"
+  ],
   "priority": 1,
   "template": {
     "settings": {
       "index": {
-        "auto_expand_replicas": "0-1",
         "number_of_replicas": "0",
         "number_of_shards": "1",
         "query.default_field": [
@@ -27,9 +28,13 @@
           "user.roles",
           "user.last_login",
           "process.pid",
-          "host.ip"
+          "host.ip",
+          "state.modified_at",
+          "wazuh.cluster.name",
+          "wazuh.cluster.node",
+          "wazuh.schema.version"
         ],
-        "refresh_interval": "5s"
+        "refresh_interval": "2s"
       }
     },
     "mappings": {
@@ -38,14 +43,42 @@
       "properties": {
         "agent": {
           "properties": {
+            "groups": {
+              "ignore_above": 1024,
+              "type": "keyword"
+            },
             "host": {
               "properties": {
                 "architecture": {
                   "ignore_above": 1024,
                   "type": "keyword"
                 },
+                "hostname": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                },
                 "ip": {
                   "type": "ip"
+                },
+                "os": {
+                  "properties": {
+                    "name": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "platform": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "ignore_above": 1024,
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
@@ -60,6 +93,18 @@
             "version": {
               "ignore_above": 1024,
               "type": "keyword"
+            }
+          }
+        },
+        "checksum": {
+          "properties": {
+            "hash": {
+              "properties": {
+                "sha1": {
+                  "ignore_above": 1024,
+                  "type": "keyword"
+                }
+              }
             }
           }
         },
@@ -89,6 +134,16 @@
           "properties": {
             "pid": {
               "type": "long"
+            }
+          }
+        },
+        "state": {
+          "properties": {
+            "document_version": {
+              "type": "integer"
+            },
+            "modified_at": {
+              "type": "date"
             }
           }
         },
@@ -159,6 +214,9 @@
                   "type": "integer"
                 },
                 "last_change": {
+                  "type": "integer"
+                },
+                "last_set_time": {
                   "type": "date"
                 },
                 "max_days_between_changes": {

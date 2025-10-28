@@ -1,5 +1,9 @@
 const random = require('../../lib/random');
-const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
+const {
+  generateRandomAgent,
+  generateRandomWazuh,
+  generateRandomState,
+} = require('../shared-utils');
 
 function generateRandomLetters(count) {
   const letters = 'abcdefghijqlmnopqrstuvwyz';
@@ -142,6 +146,8 @@ function generateDocument(params) {
     login: generateRandomLogin(),
     process: generateRandomProcess(),
     user: generateRandomUser(),
+    state: generateRandomState(),
+
     wazuh: generateRandomWazuh(params),
   };
 }
