@@ -2,7 +2,11 @@ const {
   CheckResult,
 } = require('../../../../../public/components/overview/sca/utils/constants');
 const random = require('../../lib/random');
-const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
+const {
+  generateRandomAgent,
+  generateRandomWazuh,
+  generateRandomState,
+} = require('../shared-utils');
 
 const scaResults = [
   CheckResult.Passed,
@@ -57,6 +61,7 @@ function generateDocument(params) {
       name: `Custom ${word()} Hardening Policy`,
       references: [`https://internal.docs/policies/${word()}`],
     },
+    state: generateRandomState(),
     wazuh: generateRandomWazuh(params),
   };
 }
