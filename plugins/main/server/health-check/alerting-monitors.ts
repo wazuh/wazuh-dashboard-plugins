@@ -34,7 +34,7 @@ const SAMPLES: SampleMonitorDef[] = [
     monitorName: 'Sample: Slack',
     channelId: DEFAULT_CHANNELS_ID.SLACK,
     message:
-      'Wazuh sample Slack alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
+      'Sample Slack alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
     severity: '1',
   },
   {
@@ -64,7 +64,7 @@ const SAMPLES: SampleMonitorDef[] = [
       {
         fields: {
           project: { key: 'CRM' },
-          summary: 'Wazuh Alert: Test',
+          summary: 'Alerting: Test',
           description: {
             type: 'doc',
             version: 1,
@@ -72,7 +72,7 @@ const SAMPLES: SampleMonitorDef[] = [
               {
                 type: 'paragraph',
                 content: [
-                  { type: 'text', text: 'This is a test from Wazuh Alerting.' },
+                  { type: 'text', text: 'This is a test from Alerting.' },
                 ],
               },
             ],
@@ -90,7 +90,7 @@ const SAMPLES: SampleMonitorDef[] = [
     monitorName: 'Sample: Shuffle',
     channelId: DEFAULT_CHANNELS_ID.SHUFFLE,
     message:
-      'Wazuh sample Shuffle alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
+      'Sample Shuffle alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
     severity: '1',
   },
 ];
@@ -127,7 +127,7 @@ function buildMonitorBody(
         lang: 'mustache',
         source: message || 'Sample notification',
       },
-      subject_template: { lang: 'mustache', source: 'Wazuh Alert' },
+      subject_template: { lang: 'mustache', source: 'Alerting' },
     });
   }
 
@@ -141,7 +141,6 @@ function buildMonitorBody(
     inputs: [
       {
         search: {
-          // Use Wazuh indices pattern to avoid requiring read on every index
           indices: [WAZUH_INDEX_PATTERN],
           query: {
             size: 0,
