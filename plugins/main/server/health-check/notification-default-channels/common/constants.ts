@@ -28,7 +28,7 @@ export const DEFAULT_CHANNELS_ID = {
   JIRA: 'default_jira_channel',
   PAGERDUTY: 'default_pagerduty_channel',
   SHUFFLE: 'default_shuffle_channel',
-}
+};
 
 export const defaultChannels: ChannelDefinition[] = [
   { id: DEFAULT_CHANNELS_ID.SLACK, name: 'Slack Channel', type: 'slack' },
