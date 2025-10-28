@@ -35,7 +35,7 @@ const SAMPLES: SampleMonitorDef[] = [
     channelId: DEFAULT_CHANNELS_ID.SLACK,
     message:
       'Wazuh sample Slack alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
-    severity: '2',
+    severity: '1',
   },
   {
     key: 'pagerduty',
@@ -83,7 +83,7 @@ const SAMPLES: SampleMonitorDef[] = [
       null,
       JSON_INDENT_SPACES,
     ),
-    severity: '3',
+    severity: '1',
   },
   {
     key: 'shuffle',
@@ -91,7 +91,7 @@ const SAMPLES: SampleMonitorDef[] = [
     channelId: DEFAULT_CHANNELS_ID.SHUFFLE,
     message:
       'Wazuh sample Shuffle alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
-    severity: '4',
+    severity: '1',
   },
 ];
 
