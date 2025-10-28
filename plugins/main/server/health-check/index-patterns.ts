@@ -3,10 +3,11 @@ import {
   indexPatternHasMissingFields,
   indexPatternHasTimeField,
 } from '../../common/services/index-patterns';
-import {
+import type {
+  HealthCheckTaskContext,
   InitializationTaskContext,
   InitializationTaskRunContext,
-} from '../services';
+} from './types';
 
 interface EnsureIndexPatternExistenceContextTask {
   indexPatternID: string;
@@ -241,7 +242,7 @@ export const ensureIndexPatternHasTemplate = async (
 };
 
 function getSavedObjectsClient(
-  ctx: InitializationTaskRunContext,
+  ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
   switch (scope) {
@@ -262,7 +263,7 @@ function getSavedObjectsClient(
 }
 
 function getIndexPatternsClient(
-  ctx: InitializationTaskRunContext,
+  ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
   switch (scope) {
@@ -286,7 +287,7 @@ function getIndexPatternsClient(
 
 async function getIndexPatternID(
   services: any,
-  ctx: InitializationTaskRunContext,
+  ctx: HealthCheckTaskContext,
   indexPatternID: string,
   configurationSettingKey: string,
 ) {

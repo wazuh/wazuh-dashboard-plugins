@@ -4,7 +4,7 @@ import {
   ChannelDefinition,
   defaultChannels,
 } from '../common/constants';
-type InitializationTaskRunContext = any;
+import type { InitializationTaskRunContext } from '../../types';
 
 const verifyExistingDefaultChannels = async (
   client: ILegacyClusterClient,

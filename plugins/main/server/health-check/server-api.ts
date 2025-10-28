@@ -4,7 +4,7 @@ import {
 } from '../../common/constants';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { version as appVersion } from '../../package.json';
-import { InitializationTaskRunContext } from '../services';
+import type { InitializationTaskRunContext } from './types';
 
 export function checkAppServerCompatibility(
   appVersion: string,

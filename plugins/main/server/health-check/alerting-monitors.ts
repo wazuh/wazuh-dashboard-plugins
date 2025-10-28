@@ -12,7 +12,7 @@
  * @see https://docs.opensearch.org/3.2/observing-your-data/alerting/api/
  */
 
-import { PluginTaskRunContext } from '../services';
+import type { PluginTaskRunContext } from './types';
 import { WAZUH_INDEX_PATTERN } from '../../common/constants';
 import { defaultChannels } from './notification-default-channels/common/constants';
 
