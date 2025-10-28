@@ -23,15 +23,22 @@ interface ChannelConfig {
   webhook?: object;
 }
 
+export const DEFAULT_CHANNELS_ID = {
+  SLACK: 'default_slack_channel',
+  JIRA: 'default_jira_channel',
+  PAGERDUTY: 'default_pagerduty_channel',
+  SHUFFLE: 'default_shuffle_channel',
+}
+
 export const defaultChannels: ChannelDefinition[] = [
-  { id: 'default_slack_channel', name: 'Slack Channel', type: 'slack' },
-  { id: 'default_jira_channel', name: 'Jira Channel', type: 'webhook' },
+  { id: DEFAULT_CHANNELS_ID.SLACK, name: 'Slack Channel', type: 'slack' },
+  { id: DEFAULT_CHANNELS_ID.JIRA, name: 'Jira Channel', type: 'webhook' },
   {
-    id: 'default_pagerduty_channel',
+    id: DEFAULT_CHANNELS_ID.PAGERDUTY,
     name: 'PagerDuty Channel',
     type: 'webhook',
   },
-  { id: 'default_shuffle_channel', name: 'Shuffle Channel', type: 'webhook' },
+  { id: DEFAULT_CHANNELS_ID.SHUFFLE, name: 'Shuffle Channel', type: 'webhook' },
 ];
 
 export const defaultChannelConfigs: Record<string, ChannelConfig> = {

@@ -14,7 +14,7 @@
 
 import type { PluginTaskRunContext } from './types';
 import { WAZUH_INDEX_PATTERN } from '../../common/constants';
-import { defaultChannels } from './notification-default-channels/common/constants';
+import { DEFAULT_CHANNELS_ID } from './notification-default-channels/common/constants';
 
 const JSON_INDENT_SPACES = 4;
 
@@ -32,9 +32,7 @@ const SAMPLES: SampleMonitorDef[] = [
   {
     key: 'slack',
     monitorName: 'Sample: Slack',
-    channelId:
-      defaultChannels.find(({ id }) => id.includes('slack'))?.id ||
-      'default_slack_channel',
+    channelId: DEFAULT_CHANNELS_ID.SLACK,
     message:
       'Wazuh sample Slack alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
     severity: '2',
@@ -42,9 +40,7 @@ const SAMPLES: SampleMonitorDef[] = [
   {
     key: 'pagerduty',
     monitorName: 'Sample: PagerDuty',
-    channelId:
-      defaultChannels.find(({ id }) => id.includes('pagerduty'))?.id ||
-      'default_pagerduty_channel',
+    channelId: DEFAULT_CHANNELS_ID.PAGERDUTY,
     // Minimal PagerDuty Events v2 payload; routing_key must be set by the user
     message: JSON.stringify(
       {
@@ -63,9 +59,7 @@ const SAMPLES: SampleMonitorDef[] = [
   {
     key: 'jira',
     monitorName: 'Sample: Jira',
-    channelId:
-      defaultChannels.find(({ id }) => id.includes('jira'))?.id ||
-      'default_jira_channel',
+    channelId: DEFAULT_CHANNELS_ID.JIRA,
     message: JSON.stringify(
       {
         fields: {
@@ -94,9 +88,7 @@ const SAMPLES: SampleMonitorDef[] = [
   {
     key: 'shuffle',
     monitorName: 'Sample: Shuffle',
-    channelId:
-      defaultChannels.find(({ id }) => id.includes('shuffle'))?.id ||
-      'default_shuffle_channel',
+    channelId: DEFAULT_CHANNELS_ID.SHUFFLE,
     message:
       'Wazuh sample Shuffle alert. Monitor: {{ctx.monitor.name}}. Trigger: {{ctx.trigger.name}}. Matches: {{ctx.results.0.hits.total.value}}.',
     severity: '4',
