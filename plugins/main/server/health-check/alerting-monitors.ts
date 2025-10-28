@@ -48,7 +48,7 @@ const SAMPLES: SampleMonitorDef[] = [
         payload: {
           summary: 'Testing PagerDuty',
           severity: 'critical',
-          source: 'Wazuh Dashboard',
+          source: 'Alerting',
         },
       },
       null,
