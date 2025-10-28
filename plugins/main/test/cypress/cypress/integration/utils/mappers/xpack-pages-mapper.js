@@ -20,7 +20,6 @@ import { MODULES_CARDS, MODULES_SETTINGS } from './xpack/modules-mapper';
 import { SAMPLE_DATA } from './xpack/sample-data-mapper';
 import { SETTINGS_MENU_LINKS } from './xpack/settings-mapper';
 
-
 export const XPACK_PAGES_MAPPER = {
   DEPLOY_NEW_AGENT_PAGE,
   AGENTS_PAGE,
@@ -38,12 +37,11 @@ export const XPACK_PAGES_MAPPER = {
   WAZUH_MENU_PAGE,
   MODULES_DIRECTORY_PAGE,
 
-
   AGENT_MODULES,
   BASIC_MODULES,
   MODULES_CARDS,
   MODULES_SETTINGS,
   SAMPLE_DATA,
   SETTINGS_MENU_LINKS,
-  GROUPS_PAGE
+  GROUPS_PAGE,
 };

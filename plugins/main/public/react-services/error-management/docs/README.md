@@ -26,6 +26,7 @@ By this way, the developer must be abstracted to the error management.
 
 The error handler must receive and treat differents types of errors.
 Exists the following error sources:
+
 # Error sources
 
 - Operational errors (development) - Native javascript errors
@@ -34,20 +35,21 @@ Exists the following error sources:
 - Http errors
 - Etc
 
-
 Our frontend server-side have a intermedial layer between the frontend and the backend APIs like Indexer and Wazuh.
 This layer catch the error and categorize them by type and add a custom error code.
 
- ### Error codes: code
- * wazuh-api-Indexer 20XX
- * wazuh-api         30XX
- * wazuh-Indexer     40XX
- * wazuh-reporting   50XX
- * unknown           1000
- 
+### Error codes: code
+
+- wazuh-api-Indexer 20XX
+- wazuh-api 30XX
+- wazuh-Indexer 40XX
+- wazuh-reporting 50XX
+- unknown 1000
 
 Also, exists the native https response status codes.
+
 ### HTTP status code
+
 - 200 = OK
 - 201 = Created
 - 202 = Accepted
@@ -111,6 +113,7 @@ The error handler can be implemented using react patterns:
 The `error factory` is responsible to create different instances of error depending on the parameters received.
 
 **The error factory can receive:**
+
 - A `string`
 - An `error instance`
 - An `error type`: this param defines the error type returned
@@ -125,7 +128,6 @@ The errors returned are defined as the `error type` received.
 
 The differents error classes make easier the error categorization and management. Every error class has a specific error treatment defined inside the class.
 Via Poliformism and Interface contract the error handler and the error factory can handle all the error types defined.
-
 
 The next diagram shows how is the relationship between the different types of errors created.
 
@@ -153,18 +155,17 @@ By this way, the current solution allows to create new error types and add new e
 For every error type handled we have defined how the error will be showed or not to the user/developer.
 In the next table we have defined how the will be treated.
 
-| Error type          | show        | store | display |
-|---------------------|-------------|-------|---------|
-| WazuhApiError       | toast       |       |    ✅   |
-| IndexerApiError     | toast       |       |    ✅   |
-| HttpError           | toast       |       |    ✅   |
-| Error               | log(error)  |       |    ✅   |
-| TypeError           | log(error)  |       |    ✅   |
-| EvalError           | log(error)  |       |    ✅   |
-| ReferenceError      | log(error)  |       |    ✅   |
-| SyntaxError         | log(error)  |       |    ✅   |
-| URIError            | log(error)  |       |    ✅   |
-
+| Error type      | show       | store | display |
+| --------------- | ---------- | ----- | ------- |
+| WazuhApiError   | toast      |       | ✅      |
+| IndexerApiError | toast      |       | ✅      |
+| HttpError       | toast      |       | ✅      |
+| Error           | log(error) |       | ✅      |
+| TypeError       | log(error) |       | ✅      |
+| EvalError       | log(error) |       | ✅      |
+| ReferenceError  | log(error) |       | ✅      |
+| SyntaxError     | log(error) |       | ✅      |
+| URIError        | log(error) |       | ✅      |
 
 # How to use the Error Management
 
@@ -200,19 +201,18 @@ The recommended use of the Error handler hook is when we have any method inside 
 ### Example
 
 ```tsx
-
-import { useErrorHandler } from 'useErrorHandler'
+import { useErrorHandler } from 'useErrorHandler';
 
 const anyAsyncFunction = async () => {
-      // this method could return an error or not
+  // this method could return an error or not
 };
 
 const [res, error] = useErrorHandler(anyAsyncFunction);
 
-if(error){
-   // treat the error
+if (error) {
+  // treat the error
 }
-  
+
 // the res var store the method response (API response)
 ```
 
@@ -232,16 +232,16 @@ The HOC will recognize the errors in the following lyficlycle methods:
 The HOC will not catch the errors in the render method.
 
 ### Example
+
 ```tsx
+import { withErrorHandler } from 'withErrorHandler';
 
-import { withErrorHandler } from 'withErrorHandler'
-
-const Component = (props) => {
-      useEffect(() => {
-        // Component did mount
-        functionWithError();
-      }, []);
-      return <div>Example Component</div>;
+const Component = props => {
+  useEffect(() => {
+    // Component did mount
+    functionWithError();
+  }, []);
+  return <div>Example Component</div>;
 };
 
 const ComponentWrapped = withErrorHandler(Component);
@@ -254,34 +254,30 @@ In this way, using the errorHandler HOC we can catch all the errors by the error
 The recommended use of the Error Handler Decorator is to catch all the errors produced in the `component user events methods`.
 This Decorator will wrap the react component and will catch all the errors after the method is called.
 
-
 ```tsx
+import { errorHandlerDecorator } from 'error-handler-decorator';
 
-import { errorHandlerDecorator } from 'error-handler-decorator'
+const Component = props => {
+  // the method will be wrapped by the decorator
+  const onClickEvent = errorHandlerComponent(() => {
+    // this method could return an error or not
+    throw new Error('Error on click event');
+  });
 
-const Component = (props) => {
-    
-    // the method will be wrapped by the decorator
-    const onClickEvent = errorHandlerComponent(() => {
-      // this method could return an error or not
-      throw new Error('Error on click event');
-    })
-    
-    return <button onClick={() => onClickEvent()}>Button</button>;
+  return <button onClick={() => onClickEvent()}>Button</button>;
 };
 
 const ComponentWrapped = withErrorHandler(Component);
 ```
+
 # React patterns artefact use cases
 
-
-| Artefact  | When to use                              |
-|-----------|------------------------------------------|
-| HOC       | On react lyfecicles methods              |
+| Artefact  | When to use                                                                  |
+| --------- | ---------------------------------------------------------------------------- |
+| HOC       | On react lyfecicles methods                                                  |
 | Hook      | On functional component methods called after render (like react custom hook) |
-| Decorator | On component user event methods          |
-| Class | On every method - recommend inside catch block|
-
+| Decorator | On component user event methods                                              |
+| Class     | On every method - recommend inside catch block                               |
 
 # Use cases examples documentation
 
