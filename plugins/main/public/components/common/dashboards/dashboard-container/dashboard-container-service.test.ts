@@ -18,8 +18,8 @@ import {
   buildDashboardByValueInput,
   toByValueInput,
   transformPanelsJSON,
-  SavedDashboardSO,
 } from './dashboard-container-service';
+import { SavedDashboardSO, DashboardConfigInput } from './types';
 import { SavedObject } from '../../../../react-services/saved-objects';
 
 describe('Dashboard Container Service', () => {
@@ -137,12 +137,104 @@ describe('Dashboard Container Service', () => {
       expect(result.panels['1'].explicitInput.savedObjectId).toBe('vis-1');
     });
 
-    test('should handle dashboard without description', () => {
+    test('should convert saved dashboard object to by-value input with config override', () => {
+      const savedDashboard: SavedDashboardSO = {
+        id: 'dashboard-1',
+        type: 'dashboard',
+        attributes: {
+          title: 'Original Title',
+          description: 'Original Description',
+          panelsJSON: JSON.stringify([
+            {
+              gridData: { x: 0, y: 0, w: 24, h: 15, i: '1' },
+              panelIndex: '1',
+              panelRefName: 'panel_1',
+              type: 'visualization',
+            },
+          ]),
+          optionsJSON: JSON.stringify({
+            useMargins: false,
+            hidePanelTitles: true,
+          }),
+        },
+        references: [
+          { name: 'panel_1', type: 'visualization', id: 'vis-1' },
+        ],
+      };
+
+      const config: DashboardConfigInput = {
+        title: 'Config Title',
+        description: 'Config Description',
+        dataSource: {
+          fetchFilters: [{ meta: { key: 'test' } }],
+          searchBarProps: {
+            query: 'test query',
+            dateRangeFrom: '2024-01-01T00:00:00.000Z',
+            dateRangeTo: '2024-12-31T23:59:59.999Z',
+          },
+          fingerprint: 1234567890,
+        },
+        useMargins: true,
+        hidePanelTitles: false,
+        viewMode: 'edit' as const,
+        isFullScreenMode: true,
+        refreshConfig: { pause: true, value: 30 },
+      };
+
+      const result = toByValueInput(savedDashboard, config);
+
+      expect(result.title).toBe('Config Title');
+      expect(result.description).toBe('Config Description');
+      expect(result.useMargins).toBe(true);
+      expect(result.hidePanelTitles).toBe(false);
+      expect(result.viewMode).toBe('edit');
+      expect(result.isFullScreenMode).toBe(true);
+      expect(result.filters).toEqual([{ meta: { key: 'test' } }]);
+      expect(result.query).toBe('test query');
+      expect(result.refreshConfig).toEqual({ pause: true, value: 30 });
+      expect(result.timeRange).toEqual({
+        from: '2024-01-01T00:00:00.000Z',
+        to: '2024-12-31T23:59:59.999Z',
+      });
+      expect(result.lastReloadRequestTime).toBe(1234567890);
+    });
+
+    test('should use default values when config is not provided', () => {
       const savedDashboard: SavedDashboardSO = {
         id: 'dashboard-1',
         type: 'dashboard',
         attributes: {
           title: 'Test Dashboard',
+          description: 'Test Description',
+          panelsJSON: JSON.stringify([]),
+          optionsJSON: JSON.stringify({
+            useMargins: true,
+            hidePanelTitles: false,
+          }),
+        },
+        references: [],
+      };
+
+      const result = toByValueInput(savedDashboard);
+
+      expect(result.title).toBe('Test Dashboard');
+      expect(result.description).toBe('Test Description');
+      expect(result.viewMode).toBe('view');
+      expect(result.isFullScreenMode).toBe(false);
+      expect(result.filters).toEqual([]);
+      expect(result.query).toBe('');
+      expect(result.refreshConfig).toEqual({ pause: false, value: 15 });
+      expect(result.timeRange).toEqual(undefined);
+      expect(result.lastReloadRequestTime).toBeUndefined();
+    });
+
+    test('should handle partial config object', () => {
+      const savedDashboard: SavedDashboardSO = {
+        id: 'dashboard-1',
+        type: 'dashboard',
+        attributes: {
+          title: 'Original Title',
+          description: 'Original Description',
           panelsJSON: JSON.stringify([]),
           optionsJSON: JSON.stringify({
             useMargins: false,
@@ -152,11 +244,18 @@ describe('Dashboard Container Service', () => {
         references: [],
       };
 
-      const result = toByValueInput(savedDashboard);
+      const partialConfig: Partial<DashboardConfigInput> = {
+        title: 'New Title',
+        viewMode: 'edit' as const,
+      };
 
-      expect(result.description).toBeUndefined();
-      expect(result.useMargins).toBe(false);
-      expect(result.hidePanelTitles).toBe(true);
+      const result = toByValueInput(savedDashboard, partialConfig as DashboardConfigInput);
+
+      expect(result.title).toBe('New Title');
+      expect(result.description).toBe('Original Description'); // Should use original
+      expect(result.viewMode).toBe('edit');
+      expect(result.useMargins).toBe(false); // Should use original from optionsJSON
+      expect(result.hidePanelTitles).toBe(true); // Should use original from optionsJSON
     });
   });
 
@@ -205,7 +304,7 @@ describe('Dashboard Container Service', () => {
       expect(result.error).toBe('Requested dashboard not found.');
     });
 
-    test('should successfully build dashboard by-value input', async () => {
+    test('should successfully build dashboard by-value input with config', async () => {
       const mockDashboard: SavedDashboardSO = {
         id: 'dashboard-1',
         type: 'dashboard',
@@ -230,17 +329,46 @@ describe('Dashboard Container Service', () => {
         ],
       };
 
+      const config: DashboardConfigInput = {
+        title: 'Custom Title',
+        description: 'Custom Description',
+        dataSource: {
+          fetchFilters: [{ meta: { key: 'agent.id', value: '001' } }],
+          searchBarProps: {
+            query: 'status:active',
+            dateRangeFrom: '2024-01-01T00:00:00.000Z',
+            dateRangeTo: '2024-12-31T23:59:59.999Z',
+          },
+        },
+        useMargins: false,
+        hidePanelTitles: true,
+        viewMode: 'edit' as const,
+        isFullScreenMode: true,
+        refreshConfig: { pause: false, value: 60 },
+      };
+
       (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({ status: true });
       (SavedObject.getDashboardById as jest.Mock).mockResolvedValue({ data: mockDashboard });
 
-      const result = await buildDashboardByValueInput('dashboard-1');
+      const result = await buildDashboardByValueInput('dashboard-1', config);
 
       expect(result.success).toBe(true);
       expect(result.status).toBe('ready');
       expect(result.dashboardTitle).toBe('Test Dashboard');
       expect(result.byValueInput).toBeDefined();
-      expect(result.byValueInput?.title).toBe('Test Dashboard');
-      expect(result.byValueInput?.id).toBe('dashboard-1');
+      expect(result.byValueInput?.title).toBe('Custom Title');
+      expect(result.byValueInput?.description).toBe('Custom Description');
+      expect(result.byValueInput?.viewMode).toBe('edit');
+      expect(result.byValueInput?.isFullScreenMode).toBe(true);
+      expect(result.byValueInput?.useMargins).toBe(false);
+      expect(result.byValueInput?.hidePanelTitles).toBe(true);
+      expect(result.byValueInput?.filters).toEqual([{ meta: { key: 'agent.id', value: '001' } }]);
+      expect(result.byValueInput?.query).toBe('status:active');
+      expect(result.byValueInput?.refreshConfig).toEqual({ pause: false, value: 60 });
+      expect(result.byValueInput?.timeRange).toEqual({
+        from: '2024-01-01T00:00:00.000Z',
+        to: '2024-12-31T23:59:59.999Z',
+      });
     });
 
     test('should handle errors during dashboard fetching', async () => {

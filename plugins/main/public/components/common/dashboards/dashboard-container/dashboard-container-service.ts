@@ -1,53 +1,11 @@
 import { SavedObject } from '../../../../react-services/saved-objects';
-
-// Types for dashboard container service
-export type Status = 'idle' | 'validating' | 'ready' | 'not_found' | 'error';
-
-// Saved Object structure used by the adapter
-export interface SavedDashboardSO {
-  id: string;
-  type: 'dashboard';
-  attributes: {
-    title: string;
-    description?: string;
-    panelsJSON: string;
-    optionsJSON: string;
-    timeRestore?: boolean;
-    timeFrom?: string;
-    timeTo?: string;
-  };
-  references: Array<{ name: string; type: string; id: string }>;
-  version?: string;
-}
-
-export interface PanelInputSpec {
-  gridData: { x: number; y: number; w: number; h: number; i?: string };
-  type: 'visualization' | string;
-  explicitInput: { id: string; savedObjectId?: string };
-}
-
-export interface DashboardByValueInput {
-  title: string;
-  panels: Record<string, PanelInputSpec>;
-  useMargins?: boolean;
-  hidePanelTitles?: boolean;
-  description?: string;
-  id?: string;
-  viewMode: 'view' | 'edit';
-  isFullScreenMode: boolean;
-  filters: any[];
-  query: any;
-  refreshConfig: { pause: boolean; value: number };
-  timeRange?: { from: string; to: string };
-}
-
-export interface DashboardServiceResult {
-  success: boolean;
-  status: Status;
-  error?: string;
-  dashboardTitle?: string;
-  byValueInput?: DashboardByValueInput;
-}
+import {
+  SavedDashboardSO,
+  PanelInputSpec,
+  DashboardByValueInput,
+  DashboardConfigInput,
+  DashboardServiceResult,
+} from './types';
 
 // Adapter helpers: transform Saved Object -> DashboardContainerByValueRenderer input
 export function transformPanelsJSON(
@@ -70,30 +28,28 @@ export function transformPanelsJSON(
   );
 }
 
-export function toByValueInput(so: SavedDashboardSO): DashboardByValueInput {
+export function toByValueInput(so: SavedDashboardSO, config?: DashboardConfigInput): DashboardByValueInput {
   const options = JSON.parse(so.attributes.optionsJSON);
   const panels = transformPanelsJSON(so.attributes.panelsJSON, so.references);
   const input: DashboardByValueInput = {
-    title: so.attributes.title,
-    description: so.attributes.description,
+    title: config?.title || so.attributes.title,
+    description: config?.description || so.attributes.description,
     panels,
-    useMargins: options.useMargins,
-    hidePanelTitles: options.hidePanelTitles,
+    useMargins: config?.useMargins ?? options.useMargins,
+    hidePanelTitles: config?.hidePanelTitles ?? options.hidePanelTitles,
     id: so.id,
-    viewMode: 'view',
-    isFullScreenMode: false,
-    filters: [],
-    query: '',
-    refreshConfig: { pause: false, value: 15 },
-    // Some visualizations fails when not receive a timeRange
-    /*timeRange: so.attributes.timeRestore
-      ? { from: so.attributes.timeFrom!, to: so.attributes.timeTo! }
-      : ,*/
-    timeRange: {
-      from: "2024-10-23T15:59:21.359Z",
-      to: "2025-10-23T15:59:21.359Z"
-    } 
+    viewMode: config?.viewMode || 'view',
+    isFullScreenMode: config?.isFullScreenMode ?? false,
+    filters: config?.dataSource?.fetchFilters ?? [],
+    query: config?.dataSource?.searchBarProps?.query ?? '',
+    refreshConfig: config?.refreshConfig || { pause: false, value: 15 },
+    timeRange: config?.dataSource?.searchBarProps && {
+      from: config.dataSource.searchBarProps.dateRangeFrom,
+      to: config.dataSource.searchBarProps.dateRangeTo,
+    },
+    lastReloadRequestTime: config?.dataSource?.fingerprint
   };
+
   return input;
 }
 
@@ -103,6 +59,7 @@ export function toByValueInput(so: SavedDashboardSO): DashboardByValueInput {
  */
 export async function buildDashboardByValueInput(
   dashboardId: string,
+  config?: DashboardConfigInput,
 ): Promise<DashboardServiceResult> {
   // Validate dashboard ID
   if (!dashboardId || typeof dashboardId !== 'string' || dashboardId.trim() === '') {
@@ -129,7 +86,7 @@ export async function buildDashboardByValueInput(
       dashboardId,
     )) as { data: SavedDashboardSO };
 
-    const byValueInput = toByValueInput(data);
+    const byValueInput = toByValueInput(data, config);
     
     return {
       success: true,
