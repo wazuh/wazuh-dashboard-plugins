@@ -7,7 +7,28 @@ const random = require('../lib/random');
 function generateRandomHost() {
   return {
     architecture: random.choice(['x86_64', 'arm64']),
+    hostname: `host-${random.int(1, 999)}.example.com`,
     ip: random.ip(),
+    os: {
+      name: random.choice([
+        'Ubuntu',
+        'Windows',
+        'macOS',
+        'Debian',
+        'CentOS',
+        'RHEL',
+      ]),
+      platform: random.choice([
+        'ubuntu',
+        'windows',
+        'darwin',
+        'debian',
+        'centos',
+        'rhel',
+      ]),
+      type: random.choice(['linux', 'windows', 'macos']),
+      version: random.choice(['22.04', '10.0.17763', '13.5', '11', '8', '9.0']),
+    },
   };
 }
 
@@ -20,6 +41,10 @@ function generateRandomAgent() {
     id: String(random.int(0, 99)).padStart(3, '0'),
     name: `Agent${random.int(0, 99)}`,
     version: `v${random.int(0, 9)}-stable`,
+    groups: random.sample(
+      ['default', 'production', 'development', 'testing', 'dmz'],
+      random.int(1, 3),
+    ),
     host: generateRandomHost(),
   };
   return agent;
@@ -43,8 +68,22 @@ function generateRandomWazuh(params) {
   };
 }
 
+/**
+ * Generates a random state object for Wazuh 5.0
+ * @returns {Object} Random state object
+ */
+function generateRandomState() {
+  return {
+    document_version: random.int(1, 10),
+    modified_at: new Date(
+      Date.now() - random.int(0, 7 * 24 * 60 * 60 * 1000),
+    ).toISOString(),
+  };
+}
+
 module.exports = {
   generateRandomAgent,
   generateRandomHost,
   generateRandomWazuh,
+  generateRandomState,
 };

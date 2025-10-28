@@ -1,5 +1,9 @@
 const random = require('../../lib/random');
-const { generateRandomAgent, generateRandomWazuh } = require('../shared-utils');
+const {
+  generateRandomAgent,
+  generateRandomWazuh,
+  generateRandomState,
+} = require('../shared-utils');
 const {
   pathsLinux,
 } = require('../../../generate-alerts/sample-data/integrity-monitoring');
@@ -54,6 +58,7 @@ function generateDocument(params) {
     agent: generateRandomAgent(),
     checksum: generateRandomChecksum(),
     file: generateRandomFile(),
+    state: generateRandomState(),
     wazuh: generateRandomWazuh(params),
   };
 }
