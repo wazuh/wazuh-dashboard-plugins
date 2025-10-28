@@ -49,7 +49,6 @@ export function toByValueInput(so: SavedDashboardSO, config?: DashboardConfigInp
     },
     lastReloadRequestTime: config?.dataSource?.fingerprint
   };
-
   return input;
 }
 

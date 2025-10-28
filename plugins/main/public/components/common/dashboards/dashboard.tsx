@@ -69,33 +69,6 @@ export const Dashboard = props => {
               className = '',
             }) => {
               const idComponent = id;
-              const dashboardold = (
-                <DashboardByRenderer
-                  key={idComponent}
-                  className='wz-search-me'
-                  input={{
-                    viewMode: ViewMode.VIEW,
-                    isFullScreenMode: false,
-                    filters: props.dataSource.fetchFilters ?? [],
-                    useMargins,
-                    id: id,
-                    timeRange: {
-                      from: props.dataSource.searchBarProps.dateRangeFrom,
-                      to: props.dataSource.searchBarProps.dateRangeTo,
-                    },
-                    title: title,
-                    description: description,
-                    query: props.dataSource.searchBarProps.query,
-                    refreshConfig: {
-                      pause: false,
-                      value: 15,
-                    },
-                    hidePanelTitles,
-                    lastReloadRequestTime: props.dataSource.fingerprint,
-                  }}
-                />
-              );
-
               const dashboard = <DashboardContainer 
                 dashboardId={dashboardId}
                 className={className}
