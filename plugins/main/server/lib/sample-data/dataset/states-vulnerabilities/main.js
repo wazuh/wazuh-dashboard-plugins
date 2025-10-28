@@ -1,4 +1,5 @@
 const random = require('../../lib/random');
+const { generateRandomState } = require('../shared-utils');
 
 function generateRandomHost() {
   return {
@@ -19,6 +20,10 @@ function generateRandomAgent() {
       original: `original${random.int(0, 10000)}`,
     },
     ephemeral_id: `ephemeral_id${random.int(0, 10000)}`,
+    groups: random.sample(
+      ['default', 'production', 'development', 'testing', 'dmz'],
+      random.int(1, 3),
+    ),
     id: `00${random.int(0, 99) + 1}`,
     name: `Agent${random.int(0, 100)}`,
     type: ['filebeat', 'windows', 'linux', 'macos'][random.int(0, 4)],
@@ -126,11 +131,26 @@ function generateRandomWazuh() {
   };
 }
 
+function generateRandomChecksum() {
+  return {
+    hash: {
+      sha1: random.choice([
+        '6853b29eef33ff39d8b63911673cf7b078f95485',
+        'c3499c2729730a7f807efb8676a92dcb6f8a3f8f',
+        'a80ed2ef79e22f1d8af817cea1dbbf01bef516cc',
+        '272ae13f02a9c805923917a42d2f27bd02654dec',
+      ]),
+    },
+  };
+}
+
 function generateDocument() {
   return {
     agent: generateRandomAgent(),
+    checksum: generateRandomChecksum(),
     host: generateRandomHost(),
     package: generateRandomPackage(),
+    state: generateRandomState(),
     vulnerability: generateRandomVulnerability(),
     wazuh: generateRandomWazuh(),
   };
