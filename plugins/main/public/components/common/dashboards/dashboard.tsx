@@ -12,6 +12,7 @@ import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
 import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
+import DashboardContainer from './dashboard-container/dashboard-container';
 
 const DashboardByRenderer =
   getPlugins().dashboard.DashboardContainerByValueRenderer;
@@ -59,28 +60,21 @@ export const Dashboard = props => {
         <div className='wz-dashboard-responsive'>
           {props.getDashboardPanels.map(
             ({
-              getDashboardPanels,
+              dashboardId,
               id,
               title,
               description,
-              hidePanelTitles,
+              hidePanelTitles = false,
               useMargins = true,
               className = '',
             }) => {
               const idComponent = id;
-              const dashboard = (
+              const dashboardold = (
                 <DashboardByRenderer
                   key={idComponent}
                   className='wz-search-me'
                   input={{
                     viewMode: ViewMode.VIEW,
-                    panels: getDashboardPanels(
-                      props.dataSource.dataSource.id,
-                      Boolean(
-                        props.dataSource.dataSource?.getPinnedAgentFilter()
-                          ?.length,
-                      ),
-                    ),
                     isFullScreenMode: false,
                     filters: props.dataSource.fetchFilters ?? [],
                     useMargins,
@@ -101,6 +95,18 @@ export const Dashboard = props => {
                   }}
                 />
               );
+
+              const dashboard = <DashboardContainer 
+                dashboardId={dashboardId}
+                className={className}
+                config={{
+                  title: title,
+                  description: description,
+                  dataSource: props.dataSource,
+                  useMargins: useMargins,
+                  hidePanelTitles: hidePanelTitles,
+                }}
+              />
 
               if (className) {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
@@ -139,10 +145,7 @@ export const createDashboard = ({
   DataSourceRepositoryCreator: any;
   sampleDataWarningCategories?: string[];
   getDashboardPanels: Array<{
-    getDashboardPanels: (
-      indexPatternId: string,
-      isPinnedAgent?: boolean,
-    ) => any;
+    dashboardId: string;
     id: string;
     title: string;
     description: string;

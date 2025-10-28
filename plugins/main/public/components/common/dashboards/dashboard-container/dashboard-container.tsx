@@ -1,20 +1,25 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { getPlugins } from '../../../../kibana-services';
-import {
-  Status,
-  DashboardByValueInput,
-  buildDashboardByValueInput,
-} from './dashboard-container-service';
+import { buildDashboardByValueInput } from './dashboard-container-service';
+import { Status, DashboardByValueInput } from './types';
 
 // Component props
 type DashboardContainerProps = {
   dashboardId: string;
   className?: string;
+  config: {
+    title: string;
+    description: string;
+    dataSource: any;
+    useMargins: boolean;
+    hidePanelTitles: boolean;
+  }
 };
 
 export const DashboardContainer: React.FC<DashboardContainerProps> = ({
   dashboardId,
   className,
+  config
 }) => {
   // OSD only exposes a by-value renderer; we adapt a saved object to its input
   const DashboardContainerByValueRenderer =
@@ -30,7 +35,7 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({
     setError(null);
     setByValueInput(null);
 
-    const result = await buildDashboardByValueInput(dashboardId);
+    const result = await buildDashboardByValueInput(dashboardId, config);
     
     if (result.success) {
       setDashboardTitle(result.dashboardTitle!);
