@@ -13,6 +13,7 @@
  */
 
 import { PluginTaskRunContext } from '../services';
+import { WAZUH_INDEX_PATTERN } from '../../common/constants';
 import { defaultChannels } from './notification-default-channels/common/constants';
 
 const JSON_INDENT_SPACES = 4;
@@ -149,7 +150,7 @@ function buildMonitorBody(
       {
         search: {
           // Use Wazuh indices pattern to avoid requiring read on every index
-          indices: ['wazuh-*'],
+          indices: [WAZUH_INDEX_PATTERN],
           query: {
             size: 0,
             query: {
