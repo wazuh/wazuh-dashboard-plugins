@@ -30,7 +30,7 @@ interface SampleMonitorDef {
 const SAMPLES: SampleMonitorDef[] = [
   {
     key: 'slack',
-    monitorName: 'Wazuh - Sample: Slack',
+    monitorName: 'Sample: Slack',
     channelId:
       defaultChannels.find(({ id }) => id.includes('slack'))?.id ||
       'default_slack_channel',
@@ -40,7 +40,7 @@ const SAMPLES: SampleMonitorDef[] = [
   },
   {
     key: 'pagerduty',
-    monitorName: 'Wazuh - Sample: PagerDuty',
+    monitorName: 'Sample: PagerDuty',
     channelId:
       defaultChannels.find(({ id }) => id.includes('pagerduty'))?.id ||
       'default_pagerduty_channel',
@@ -61,7 +61,7 @@ const SAMPLES: SampleMonitorDef[] = [
   },
   {
     key: 'jira',
-    monitorName: 'Wazuh - Sample: Jira',
+    monitorName: 'Sample: Jira',
     channelId:
       defaultChannels.find(({ id }) => id.includes('jira'))?.id ||
       'default_jira_channel',
@@ -92,7 +92,7 @@ const SAMPLES: SampleMonitorDef[] = [
   },
   {
     key: 'shuffle',
-    monitorName: 'Wazuh - Sample: Shuffle',
+    monitorName: 'Sample: Shuffle',
     channelId:
       defaultChannels.find(({ id }) => id.includes('shuffle'))?.id ||
       'default_shuffle_channel',
@@ -132,7 +132,7 @@ function buildMonitorBody(
       destination_id: destinationId,
       message_template: {
         lang: 'mustache',
-        source: message || 'Wazuh sample notification',
+        source: message || 'Sample notification',
       },
       subject_template: { lang: 'mustache', source: 'Wazuh Alert' },
     });
@@ -163,7 +163,7 @@ function buildMonitorBody(
     ui_metadata: {
       // Minimal metadata to help users identify this as a sample
       description:
-        'Sample monitor created by Wazuh health check to help you connect a channel. Edit the action to point to your real endpoint before enabling.',
+        'Sample monitor created to help you connect a channel. Edit the action to point to your real endpoint before enabling.',
     },
   };
 }
@@ -269,9 +269,9 @@ export const initializationTaskCreatorAlertingMonitors = () => ({
        *
        * Throws unhandled promise rejection on logger calls:
        * [error][data][opensearch] [alerting_exception]: all shards failed
-       * [warning][healthcheck][XXXXXX] Could not create sample monitor [Wazuh - Sample: Jira]: alerting_exception: [alerting_exception] Reason: all shards failed
+       * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Jira]: alerting_exception: [alerting_exception] Reason: all shards failed
        * [error][data][opensearch] [alerting_exception]: all shards failed
-       * [warning][healthcheck][XXXXXX] Could not create sample monitor [Wazuh - Sample: Slack]: alerting_exception: [alerting_exception] Reason: all shards failed
+       * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Slack]: alerting_exception: [alerting_exception] Reason: all shards failed
        */
       for (const sample of SAMPLES) {
         await ensureMonitor(ctx, sample);
