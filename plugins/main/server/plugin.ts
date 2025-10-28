@@ -233,7 +233,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
           hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternAlertsKnownFields,
         },
         configurationSettingKey: 'pattern',
@@ -247,7 +247,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_MONITORING_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
-          hasTimeFieldName: 'timestamp',
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternMonitoringKnownFields,
         },
       }),
@@ -260,7 +260,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_STATISTICS_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
-          hasTimeFieldName: 'timestamp',
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternStatisticsKnownFields,
         },
       }),
@@ -524,7 +524,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_SYSTEM_ACTIVITY_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsSystemActivityKnownFields,
         },
       }),
@@ -537,7 +537,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_SECURITY_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsSecurityKnownFields,
         },
       }),
@@ -550,7 +550,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_ACCESS_MANAGEMENT_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsAccessManagementKnownFields,
         },
       }),
@@ -563,7 +563,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_APLICATIONS_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsApplicationsKnownFields,
         },
       }),
@@ -576,7 +576,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_OTHER_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsOtherKnownFields,
         },
       }),
@@ -589,7 +589,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_NETWORK_ACTIVITY_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsNetworkActivityKnownFields,
         },
       }),
@@ -602,7 +602,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsCloudServicesKnownFields,
         },
       }),
@@ -615,7 +615,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_AWS_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsCloudServicesAWSKnownFields,
         },
       }),
@@ -628,7 +628,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_AZURE_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsCloudServicesAzureKnownFields,
         },
       }),
@@ -641,7 +641,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_EVENTS_CLOUD_SERVICES_GCP_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternEventsCloudServicesGCPKnownFields,
         },
       }),
@@ -654,7 +654,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         indexPatternID: WAZUH_ARCHIVES_PATTERN,
         options: {
           savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
-          hasTimeFieldName: FIELD_TIMESTAMP,
+          hasTimeFieldName: true,
           fieldsNoIndices: IndexPatternArchivesKnownFields,
         },
       }),
