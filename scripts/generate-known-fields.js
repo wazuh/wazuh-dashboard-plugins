@@ -52,6 +52,103 @@ const TEMPLATE_SOURCES = {
     ],
     outputFile: 'plugins/main/common/known-fields/alerts.json',
   },
+  archives: {
+    name: 'states-sca',
+    urls: [
+      wazuhUrl('plugins/setup/src/main/resources/index-template-archives.json'),
+    ],
+    outputFile: 'plugins/main/common/known-fields/archives.json',
+  },
+  'events-access-management': {
+    name: 'events-access-management',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-access-management.json',
+      ),
+    ],
+    outputFile:
+      'plugins/main/common/known-fields/events-access-management.json',
+  },
+  'events-applications': {
+    name: 'events-applications',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-applications.json',
+      ),
+    ],
+    outputFile: 'plugins/main/common/known-fields/events-applications.json',
+  },
+  'events-cloud-services': {
+    name: 'events-cloud-services',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-cloud-services.json',
+      ),
+    ],
+    outputFile: 'plugins/main/common/known-fields/events-cloud-services.json',
+  },
+  'events-cloud-services-aws': {
+    name: 'events-cloud-services',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-cloud-services-aws.json',
+      ),
+    ],
+    outputFile:
+      'plugins/main/common/known-fields/events-cloud-services-aws.json',
+  },
+  'events-cloud-services-azure': {
+    name: 'events-cloud-services-azure',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-cloud-services-azure.json',
+      ),
+    ],
+    outputFile:
+      'plugins/main/common/known-fields/events-cloud-services-azure.json',
+  },
+  'events-cloud-services-gcp': {
+    name: 'events-cloud-services',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-cloud-services-gcp.json',
+      ),
+    ],
+    outputFile:
+      'plugins/main/common/known-fields/events-cloud-services-gcp.json',
+  },
+  'events-network-activity': {
+    name: 'events-network-activity',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-network-activity.json',
+      ),
+    ],
+    outputFile: 'plugins/main/common/known-fields/events-network-activity.json',
+  },
+  'events-other': {
+    name: 'events-network-activity',
+    urls: [
+      wazuhUrl('plugins/setup/src/main/resources/index-template-other.json'),
+    ],
+    outputFile: 'plugins/main/common/known-fields/events-other.json',
+  },
+  'events-security': {
+    name: 'events-security',
+    urls: [
+      wazuhUrl('plugins/setup/src/main/resources/index-template-security.json'),
+    ],
+    outputFile: 'plugins/main/common/known-fields/events-security.json',
+  },
+  'events-system-activity': {
+    name: 'events-system-activity',
+    urls: [
+      wazuhUrl(
+        'plugins/setup/src/main/resources/index-template-system-activity.json',
+      ),
+    ],
+    outputFile: 'plugins/main/common/known-fields/events-system-activity.json',
+  },
   monitoring: {
     name: 'monitoring',
     urls: [

@@ -34,6 +34,7 @@ export const WAZUH_INDEX_TYPE_VULNERABILITIES = 'vulnerabilities';
 export const VULNERABILITY_IMPLICIT_CLUSTER_MODE_FILTER = 'wazuh.cluster.name';
 
 // Wazuh states index types
+export const WAZUH_INDEX_TYPE_ARCHIVES = 'archives';
 export const WAZUH_INDEX_TYPE_STATES_VULNERABILITIES = 'states-vulnerabilities';
 export const WAZUH_INDEX_TYPE_STATES_FIM_FILES = 'states-fim-files';
 export const WAZUH_INDEX_TYPE_STATES_FIM_REGISTRIES_KEYS =
@@ -66,6 +67,21 @@ export const WAZUH_INDEX_TYPE_STATES_INVENTORY_HOTFIXES =
 export const WAZUH_INDEX_TYPE_STATES_INVENTORY_BROWSER_EXTENSIONS =
   'states-inventory-browser-extensions';
 export const WAZUH_INDEX_TYPE_STATES_SCA = 'states-sca';
+export const WAZUH_INDEX_TYPE_EVENTS_ACCESS_MANAGEMENT =
+  'events-access-management';
+export const WAZUH_INDEX_TYPE_EVENTS_APPLICATIONS = 'events-applications';
+export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES = 'events-cloud-services';
+export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AWS =
+  'events-cloud-services-aws';
+export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_AZURE =
+  'events-cloud-services-azure';
+export const WAZUH_INDEX_TYPE_EVENTS_CLOUD_SERVICES_GCP =
+  'events-cloud-services-gcp';
+export const WAZUH_INDEX_TYPE_EVENTS_NETWORK_ACTIVITY =
+  'events-network-activity';
+export const WAZUH_INDEX_TYPE_EVENTS_OTHER = 'events-other';
+export const WAZUH_INDEX_TYPE_EVENTS_SECURITY = 'events-security';
+export const WAZUH_INDEX_TYPE_EVENTS_SYSTEM_ACTIVITY = 'events-system-activity';
 
 // FIM
 export const WAZUH_FIM_PATTERN = 'wazuh-states-fim*';
@@ -922,7 +938,7 @@ export const SUPPORTED_LANGUAGES_ARRAY = Object.values(SUPPORTED_LANGUAGES);
 // Health check
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS = 'index-pattern:alerts';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES =
-  'index-pattern:vulnerabilities-states';
+  'index-pattern:states-vulnerabilities';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING =
   'index-pattern:monitoring';
