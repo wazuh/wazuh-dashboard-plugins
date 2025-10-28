@@ -58,7 +58,7 @@ describe('getTemplateForIndexPattern', () => {
     ${'wazuh-alerts-5.x-*'}    | ${true}       | ${['wazuh']}
     ${'wazuh-alerts-5.x*'}     | ${true}       | ${['wazuh']}
     ${'wazuh-alerts-5.*'}      | ${true}       | ${['wazuh']}
-    ${'wazuh-alerts-4*'}       | ${true}       | ${['wazuh']}
+    ${'wazuh-alerts-5*'}       | ${true}       | ${['wazuh']}
     ${'wazuh-alerts-*'}        | ${true}       | ${['wazuh']}
     ${'wazuh-alerts-'}         | ${true}       | ${['wazuh']}
     ${'wazuh-alerts'}          | ${true}       | ${['wazuh']}
