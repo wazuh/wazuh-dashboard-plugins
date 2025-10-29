@@ -20,6 +20,7 @@ export interface ScriptConfig {
   modeVersion: string;
   dashboardBase: string;
   useDashboardFromSource: boolean;
+  useIndexerFromPackage: boolean;
   // Flags-based combination support (preferred over positional mode)
   enableSaml: boolean;
   serverFlagVersion: string; // from --server <version>
@@ -35,6 +36,8 @@ export interface GenerateOverrideOptions {
   useDashboardFromSource: boolean;
   /** Whether to include the security plugin mount when using sources. */
   includeSecurityPlugin: boolean;
+  /** Whether to use the indexer from package. */
+  useIndexerFromPackage: boolean;
 }
 
 /**
@@ -64,6 +67,7 @@ export class Config implements ScriptConfig {
   private _modeVersion = '';
   private _dashboardBase = '';
   private _useDashboardFromSource = false;
+  private _useIndexerFromPackage = false;
   private _enableSaml = false;
   private _serverFlagVersion = '';
   private _serverLocalFlagVersion = '';
@@ -241,6 +245,19 @@ export class Config implements ScriptConfig {
     const prev = this._useDashboardFromSource;
     this._useDashboardFromSource = value;
     this.logChange('useDashboardFromSource', prev, value, source);
+  }
+
+  // useIndexerFromPackage
+  get useIndexerFromPackage(): boolean {
+    return this._useIndexerFromPackage;
+  }
+  set useIndexerFromPackage(value: boolean) {
+    this.setUseIndexerFromPackage(value);
+  }
+  setUseIndexerFromPackage(value: boolean, source?: string): void {
+    const prev = this.useIndexerFromPackage;
+    this._useIndexerFromPackage = value;
+    this.logChange('useIndexerFromPackage', prev, value, source);
   }
 
   // enableSaml

@@ -46,6 +46,7 @@ export const FLAGS = {
   SERVER_LOCAL: '--server-local',
   REPO: '-r',
   BASE: '--base',
+  INDEXER_LOCAL: '--indexer-local',
 } as const;
 
 /** Relative path (from dev script dir) for the dashboard entrypoint wrapper. */

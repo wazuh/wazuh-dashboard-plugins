@@ -32,28 +32,39 @@ The checks represents the unit to check and some could do some write actions suc
 
 | Name                                                | Description                                                                                                        |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `index-pattern:alerts`                              | Validate (create is possible) the existence of a compatible index pattern for alerts                               |
-| `index-pattern:monitoring`                          | Validate (create is possible) the existence of a compatible index pattern for monitoring                           |
-| `index-pattern:statistitcs`                         | Validate (create is possible) the existence of a compatible index pattern for statistics                           |
-| `index-pattern:vulnerabilities-states`              | Validate (create is possible) the existence of a compatible index pattern for vulnerabilities states               |
-| `index-pattern:states-inventory`                    | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene overview states           |
-| `index-pattern:states-inventory-groups`             | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene groups overview states    |
-| `index-pattern:states-inventory-hardware`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene hardware states           |
-| `index-pattern:states-inventory-hotfixes`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene hotfixes states           |
-| `index-pattern:states-inventory-interfaces`         | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene interfaces states         |
-| `index-pattern:states-inventory-networks`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene networks states           |
-| `index-pattern:states-inventory-packages`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene packages states           |
-| `index-pattern:states-inventory-ports`              | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene ports states              |
-| `index-pattern:states-inventory-processes`          | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene processes states          |
-| `index-pattern:states-inventory-protocols`          | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene protocols states          |
-| `index-pattern:states-inventory-system`             | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene system states             |
-| `index-pattern:states-inventory-users`              | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene users states              |
-| `index-pattern:states-inventory-services`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene services states           |
-| `index-pattern:states-inventory-browser-extensions` | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene browser-extensions states |
-| `index-pattern:states-fim-files`                    | Validate (create is possible) the existence of a compatible index pattern for FIM files states                     |
-| `index-pattern:states-fim-registry-keys`            | Validate (create is possible) the existence of a compatible index pattern for FIM registry keys states             |
-| `index-pattern:states-fim-registry-values`          | Validate (create is possible) the existence of a compatible index pattern for FIM registry values states           |
-| `index-pattern:states-sca`                          | Validate (create is possible) the existence of a compatible index pattern for Configuration Assessment states      |
+| `index-pattern:alerts`                              | Validate (create if possible) the existence of a compatible index pattern for alerts                               |
+| `index-pattern:archives`                            | Validate (create if possible) the existence of a compatible index pattern for archives                             |
+| `index-pattern:events-access-management`            | Validate (create if possible) the existence of a compatible index pattern for access management events             |
+| `index-pattern:events-applications`                 | Validate (create if possible) the existence of a compatible index pattern for aaplications events                  |
+| `index-pattern:events-cloud-services`               | Validate (create if possible) the existence of a compatible index pattern for cloud services events                |
+| `index-pattern:events-cloud-services-aws`           | Validate (create if possible) the existence of a compatible index pattern for AWS events                           |
+| `index-pattern:events-cloud-services-azure`         | Validate (create if possible) the existence of a compatible index pattern for Azure events                         |
+| `index-pattern:events-cloud-services-gcp`           | Validate (create if possible) the existence of a compatible index pattern for GCP events                           |
+| `index-pattern:events-network-activity`             | Validate (create if possible) the existence of a compatible index pattern for network activity events              |
+| `index-pattern:events-other`                        | Validate (create if possible) the existence of a compatible index pattern for other events                         |
+| `index-pattern:events-security`                     | Validate (create if possible) the existence of a compatible index pattern for security events                      |
+| `index-pattern:events-system-activity`              | Validate (create if possible) the existence of a compatible index pattern for system activity events               |
+| `index-pattern:monitoring`                          | Validate (create if possible) the existence of a compatible index pattern for monitoring                           |
+| `index-pattern:statistics`                          | Validate (create if possible) the existence of a compatible index pattern for statistics                           |
+| `index-pattern:states-vulnerabilities`              | Validate (create if possible) the existence of a compatible index pattern for vulnerabilities states               |
+| `index-pattern:states-inventory`                    | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene overview states           |
+| `index-pattern:states-inventory-groups`             | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene groups overview states    |
+| `index-pattern:states-inventory-hardware`           | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene hardware states           |
+| `index-pattern:states-inventory-hotfixes`           | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene hotfixes states           |
+| `index-pattern:states-inventory-interfaces`         | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene interfaces states         |
+| `index-pattern:states-inventory-networks`           | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene networks states           |
+| `index-pattern:states-inventory-packages`           | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene packages states           |
+| `index-pattern:states-inventory-ports`              | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene ports states              |
+| `index-pattern:states-inventory-processes`          | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene processes states          |
+| `index-pattern:states-inventory-protocols`          | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene protocols states          |
+| `index-pattern:states-inventory-system`             | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene system states             |
+| `index-pattern:states-inventory-users`              | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene users states              |
+| `index-pattern:states-inventory-services`           | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene services states           |
+| `index-pattern:states-inventory-browser-extensions` | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene browser-extensions states |
+| `index-pattern:states-fim-files`                    | Validate (create if possible) the existence of a compatible index pattern for FIM files states                     |
+| `index-pattern:states-fim-registry-keys`            | Validate (create if possible) the existence of a compatible index pattern for FIM registry keys states             |
+| `index-pattern:states-fim-registry-values`          | Validate (create if possible) the existence of a compatible index pattern for FIM registry values states           |
+| `index-pattern:states-sca`                          | Validate (create if possible) the existence of a compatible index pattern for Configuration Assessment states      |
 | `server-api:connection-compatibility`               | Validate the connection and compatibility with the server API hosts                                                |
 | `notification-channel:verify-default-channels`      | Validate the existence of the default notification channels or create them if they do not exist.                   |
 
@@ -113,7 +124,7 @@ By default all the checks are enabled else the enabled checks are redefined thro
 The enabled checks can be seen in the application logs:
 
 ```log
-server    log   [10:04:59.621] [info][healthcheck] Enabled checks [2]: [server-api:connection-compatibility,index-pattern:alerts,index-pattern:monitoring,index-pattern:statistitcs,index-pattern:vulnerabilities-states,index-pattern:states-inventory,index-pattern:states-inventory-groups,index-pattern:states-inventory-hardware,index-pattern:states-inventory-hotfixes,index-pattern:states-inventory-interfaces,index-pattern:states-inventory-networks,index-pattern:states-inventory-packages,index-pattern:states-inventory-ports,index-pattern:states-inventory-processes,index-pattern:states-inventory-protocols,index-pattern:states-inventory-system,index-pattern:states-inventory-users,index-pattern:states-fim-files,index-pattern:states-fim-registry-keys,index-pattern:states-fim-registry-values]
+server    log   [10:04:59.621] [info][healthcheck] Enabled checks [2]: [server-api:connection-compatibility,index-pattern:alerts,index-pattern:monitoring,index-pattern:statistics,index-pattern:vulnerabilities-states,index-pattern:states-inventory,index-pattern:states-inventory-groups,index-pattern:states-inventory-hardware,index-pattern:states-inventory-hotfixes,index-pattern:states-inventory-interfaces,index-pattern:states-inventory-networks,index-pattern:states-inventory-packages,index-pattern:states-inventory-ports,index-pattern:states-inventory-processes,index-pattern:states-inventory-protocols,index-pattern:states-inventory-system,index-pattern:states-inventory-users,index-pattern:states-fim-files,index-pattern:states-fim-registry-keys,index-pattern:states-fim-registry-values]
 ```
 
 This setting can be a string or a list of strings.

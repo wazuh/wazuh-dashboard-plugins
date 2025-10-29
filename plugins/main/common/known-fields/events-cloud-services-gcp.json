@@ -2000,8 +2000,48 @@
   },
   {
     "name": "dns.answers",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "dns.answers.class",
     "type": "string",
-    "esTypes": ["object"],
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "dns.answers.data",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "dns.answers.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "dns.answers.ttl",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "dns.answers.type",
+    "type": "string",
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -3823,6 +3863,1638 @@
     "readFromDocValues": true
   },
   {
+    "name": "gcp_audit.actor.entity_id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.authenticationinfo.principalsubject",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.authenticationinfo.serviceaccountdelegationinfo",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.authenticationinfo.serviceaccountkeyname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.authorizationinfo",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.event_provider",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.labels",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.@type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.accessLevels",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.identityDelegationChain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.ingressViolations",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.metadata.operationType",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.resourceNames",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.securityPolicyInfo.organizationId",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.securityPolicyInfo.servicePerimeterName",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.usedResources.attachedDisks",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.metadata.violationReason",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.metadata.vpcServiceControlsUniqueId",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.numresponseitems",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.operation.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.orgpolicyviolationinfo.payload.key1",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.orgpolicyviolationinfo.payload.key2",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.orgpolicyviolationinfo.resourcetags.instance_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.orgpolicyviolationinfo.resourcetags.zone",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.related.entity",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.request.@type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.apiVersion",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.disks",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.family",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.guestOsFeatures",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.request.kind",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.machineType",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.metadata.creationTimestamp",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.networkInterfaces",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.request.pageSize",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.page_token",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.policy.bindings",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.request.policy.etag",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.policyvalue",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.rawDisk.source",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.resource",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.resourceName",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.serviceAccounts",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.request.sourceType",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.spec.group",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.request.spec.nonResourceAttributes.path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.spec.nonResourceAttributes.verb",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.spec.strategy.$retainKeys",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.spec.template.spec",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.spec.user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.request.status.allowed",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.resourcelocation.currentlocation",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.resourcename",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.@type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.apiVersion",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.bindings",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.response.details.group",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.details.kind",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.details.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.details.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.etag",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.insertTime",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.kind",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.metadata.annotations",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.metadata.creationTimestamp",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.metadata.generation",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.metadata.labels",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.metadata.managedFields",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.response.metadata.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.metadata.namespace",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.metadata.resourceVersion",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.metadata.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.operationType",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.progress",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.selfLink",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.selfLinkWithId",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.group",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.response.spec.nonResourceAttributes.path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.nonResourceAttributes.verb",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.progressDeadlineSeconds",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.replicas",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.revisionHistoryLimit",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.selector.matchLabels.k8s-app",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.strategy.rollingUpdate.maxSurge",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.strategy.rollingUpdate.maxUnavailable",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.strategy.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.metadata.annotations",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.metadata.creationTimestamp",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.metadata.labels.k8s-app",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.containers",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.dnsPolicy",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.nodeSelector",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.priorityClassName",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.restartPolicy",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.schedulerName",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.securityContext.fsGroup",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.securityContext.runAsGroup",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.securityContext.runAsUser",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.serviceAccount",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.serviceAccountName",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.terminationGracePeriodSeconds",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.tolerations",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.topologySpreadConstraints",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.response.spec.template.spec.volumes",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.response.spec.user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.startTime",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.status.allowed",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.status.availableReplicas",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.status.conditions",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.response.status.observedGeneration",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.status.readyReplicas",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.status.reason",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.status.replicas",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.status.updatedReplicas",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.statusvalue",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.targetId",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.targetLink",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.response.zone",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.servicename",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.status.code",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.status.details",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.status.message",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_audit.target.entity_id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_audit.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.event_module",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.labels.user.goog-gke-node",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.firewall.dropped.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.firewall.dropped_packets_count.value",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.cpu.reserved_cores.value",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.cpu.usage.pct",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.cpu.usage_time.sec",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.disk.read.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.disk.read_ops_count.value",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.disk.write.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.disk.write_ops_count.value",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.memory.balloon.ram_size.value",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.memory.balloon.ram_used.value",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.memory.balloon.swap_in.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.memory.balloon.swap_out.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.network.egress.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.network.egress.packets.count",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.network.ingress.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.network.ingress.packets.count",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.uptime.sec",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_compute.metrics.instance.uptime_total.sec",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.authanswer",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.destinationIP",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.egresserror",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.queryname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.querytype",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.rdata",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.responsecode",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.serverlatency",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.source_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.sourceip",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.sourcenetwork",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.target_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.vminstanceid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.vminstancename",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.vmprojectid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_dns.vmzonename",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.destinationinstance.project_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.destinationinstance.region",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.destinationinstance.vm_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.destinationinstance.zone",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.destinationvpc.project_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.destinationvpc.subnetwork_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.destinationvpc.vpc_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.rule_details.action",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.rule_details.direction",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.rule_details.ip_port_info",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "gcp_firewall.rule_details.reference",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.rule_details.source_range",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.rule_details.target_tag",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_firewall.rule_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_loadbalancer.backend_service_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_loadbalancer.cacheHit",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_loadbalancer.cacheId",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_loadbalancer.cacheLookup",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_loadbalancer.forwarding_rule_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_loadbalancer.statusDetails",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_loadbalancer.target_proxy_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_loadbalancer.url_map_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.dest_instance.project_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.dest_instance.region",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.dest_instance.vm_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.dest_instance.zone",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.dest_vpc.project_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.dest_vpc.subnetwork_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.dest_vpc.vpc_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.reporter",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.rtt_msec",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.src_instance.project_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.src_instance.region",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.src_instance.vm_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.src_instance.zone",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.src_vpc.project_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.src_vpc.subnetwork_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "gcp_vpcflow.src_vpc.vpc_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
     "name": "gen_ai.agent.description",
     "type": "string",
     "esTypes": ["keyword"],
@@ -4026,6 +5698,782 @@
     "name": "gen_ai.usage.output_tokens",
     "type": "number",
     "esTypes": ["integer"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.access_policy.create_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.access_policy.etag",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.access_policy.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.access_policy.parent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.access_policy.title",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.access_policy.update_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.ancestors",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.asset.asset_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.iam_policy.bindings",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.asset.iam_policy.etag",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.iam_policy.version",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.org_policy",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.asset.os_inventory.items",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.asset.os_inventory.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.os_info.architecture",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.os_info.hostname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.os_info.kernel_release",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.os_info.kernel_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.os_info.long_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.os_info.osconfigagent_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.os_info.short_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.os_info.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.os_inventory.update_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.ancestors",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.asset.prior.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.data.analyticsEnabled",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.data.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.data.lifecycleState",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.data.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.data.retentionDays",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.discovery.document_uri",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.discovery.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.location",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.parent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.resource.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior.update_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.prior_asset_state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.related_asset.ancestors",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.asset.related_asset.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.related_asset.relationship_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.related_asset.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.resource.data",
+    "type": "string",
+    "esTypes": ["text"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.asset.resource.discovery.document_uri",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.resource.discovery.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.resource.discovery_document_uri",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.resource.discovery_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.resource.location",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.resource.parent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.resource.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.update_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.asset.window.start_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.caller_ip",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.caller_ip_geo.region_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.method_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.principal.email",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.principal.subject",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.service_account.key_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.service_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.user_agent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.access.user_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.canonical_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.class",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.compliances",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.finding.contacts",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.create_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.event_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.external_systems",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.external_uri",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.kubernetes",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.log_entries",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "google_scc.finding.mitre_attack",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.mute.initiator",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.mute.state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.mute.update_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.mute_info",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.next_steps",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.parent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.parent_display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.resource",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.resource_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.security_marks",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.severity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.source_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.source_properties",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.finding.vulnerability",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.source.canonical_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.source.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.source.display_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.source.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "google_scc.source.name",
+    "type": "string",
+    "esTypes": ["keyword"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -4682,6 +7130,22 @@
     "name": "message",
     "type": "string",
     "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "metricset.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "metricset.period",
+    "type": "number",
+    "esTypes": ["long"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true
@@ -8696,6 +11160,38 @@
   },
   {
     "name": "related.user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "resource.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "resource.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "resource.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "result.evaluation",
     "type": "string",
     "esTypes": ["keyword"],
     "searchable": true,
