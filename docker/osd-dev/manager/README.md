@@ -1,12 +1,12 @@
 # Manager
 
-This directory contains the files required to run a Wazuh Manager container in the OSD (OpenSearch Dashboards) development environment.
+This directory contains the files required to run a Wazuh manager container in the OSD (OpenSearch Dashboards) development environment.
 
 ## Contents
 
-- **Dockerfile**: Defines the Docker image for Wazuh Manager.
+- **Dockerfile**: Defines the Docker image for Wazuh manager.
 - **entrypoint.sh**: Entrypoint script to initialize the container.
-- **installer.sh**: Script used to automate the installation and configuration of Wazuh Manager and its dependencies inside the container.
+- **installer.sh**: Script used to automate the installation and configuration of Wazuh manager and its dependencies inside the container.
 
 ## Usage
 

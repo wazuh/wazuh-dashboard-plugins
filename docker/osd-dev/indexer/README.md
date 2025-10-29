@@ -4,9 +4,9 @@ This directory contains the files required to run a Wazuh indexer container usin
 
 ## Contents
 
-- **Dockerfile**: Defines the Docker image for Wazuh Manager.
+- **Dockerfile**: Defines the Docker image for Wazuh indexer.
 - **entrypoint.sh**: Entrypoint script to initialize the container.
-- **installer.sh**: Script used to automate the installation and configuration of Wazuh Manager and its dependencies inside the container.
+- **installer.sh**: Script used to automate the installation and configuration of Wazuh indexer and its dependencies inside the container.
 
 ## Usage
 
