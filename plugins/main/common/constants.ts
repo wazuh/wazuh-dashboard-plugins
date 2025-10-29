@@ -943,7 +943,7 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_VULNERABILITIES_STATES =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING =
   'index-pattern:monitoring';
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_SERVER_STATISTICS =
-  'index-pattern:statistitcs';
+  'index-pattern:statistics';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_IT_HYGIENE_STATES =
   'index-pattern:states-inventory';
