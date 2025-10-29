@@ -12,7 +12,7 @@
  * @see https://docs.opensearch.org/3.2/observing-your-data/alerting/api/
  */
 
-import type { PluginTaskRunContext } from './types';
+import type { NotificationConfigsOpenSearchResponse, PluginTaskRunContext } from './types';
 import { WAZUH_INDEX_PATTERN } from '../../common/constants';
 import { DEFAULT_CHANNELS_ID } from './notification-default-channels/common/constants';
 
@@ -95,10 +95,10 @@ const SAMPLES: SampleMonitorDef[] = [
   },
 ];
 
-function request(ctx: PluginTaskRunContext, params: any) {
+function request<T = any>(ctx: PluginTaskRunContext, params: any) {
   return ctx.context.services.core.opensearch.client.asInternalUser.transport.request(
     params,
-  );
+  ) as Promise<{ body: T }>;
 }
 
 function buildMonitorBody(
@@ -163,7 +163,7 @@ function buildMonitorBody(
 async function getNotificationChannels(ctx: PluginTaskRunContext) {
   try {
     // https://docs.opensearch.org/3.2/observing-your-data/notifications/api/#list-all-notification-configurations
-    const { body } = await request(ctx, {
+    const { body } = await request<NotificationConfigsOpenSearchResponse>(ctx, {
       method: 'GET',
       path: '/_plugins/_notifications/configs',
       querystring: {
@@ -173,7 +173,7 @@ async function getNotificationChannels(ctx: PluginTaskRunContext) {
         sort_order: 'asc',
       },
     });
-    return body?.config_list || [];
+    return body.config_list || [];
   } catch (error) {
     const _error = error as Error;
     ctx.logger.warn(
@@ -223,6 +223,7 @@ async function ensureMonitor(
     ctx.logger.warn(
       `Notification channel with id [${channelId}] not found among existing configs.`,
     );
+    return;
   }
 
   try {
@@ -233,7 +234,7 @@ async function ensureMonitor(
       body: buildMonitorBody(
         monitorName,
         severity,
-        match?.config_id ?? null,
+        match.config_id,
         message,
       ),
     });

@@ -21,3 +21,30 @@ export interface PluginTaskRunContext extends HealthCheckTaskContext {
 }
 
 export type InitializationTaskRunContext = PluginTaskRunContext;
+
+export interface NotificationConfigsOpenSearchResponse {
+  start_index: number;
+  total_hits: number;
+  total_hit_relation: string;
+  config_list: ConfigList[];
+}
+
+export interface ConfigList {
+  config_id: string;
+  last_updated_time_ms: number;
+  created_time_ms: number;
+  config: Config;
+}
+
+export interface Config {
+  name: string;
+  description: string;
+  config_type: string;
+  is_enabled: boolean;
+  slack?: Chime;
+  chime?: Chime;
+}
+
+export interface Chime {
+  url: string;
+}
