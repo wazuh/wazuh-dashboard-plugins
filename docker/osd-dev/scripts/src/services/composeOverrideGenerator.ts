@@ -60,8 +60,9 @@ export function generateOverrideFile(
 
   const volumeEntries: string[] = [];
 
+  content += '  osd:\n';
+
   if (useDashboardFromSource) {
-    content += '  osd:\n';
     content += '    depends_on:\n';
     content += '      dashboard-src-installer:\n';
     content += '        condition: service_completed_successfully\n';
@@ -82,14 +83,15 @@ export function generateOverrideFile(
     volumeEntries.push(
       `      - ${DASHBOARD_ENTRYPOINT_PATH}:/entrypoint.sh:ro`,
     );
-    for (const repo of externalRepositories) {
-      volumeEntries.push(`      - '${repo}:/home/node/kbn/plugins/${repo}'`);
-    }
+  }
 
-    if (volumeEntries.length > 0) {
-      content += '    volumes:\n';
-      content += `${volumeEntries.join('\n')}\n`;
-    }
+  for (const repo of externalRepositories) {
+    volumeEntries.push(`      - '${repo}:/home/node/kbn/plugins/${repo}'`);
+  }
+
+  if (volumeEntries.length > 0) {
+    content += '    volumes:\n';
+    content += `${volumeEntries.join('\n')}\n`;
   }
 
   if (useIndexerFromPackage) {
