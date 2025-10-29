@@ -201,7 +201,10 @@ async function ensureMonitor(
   }
 
   // Enforce: do not create sample monitors without their required channel
-  if (!availableDefaultChannelIds || !availableDefaultChannelIds.has(channelId)) {
+  if (
+    !availableDefaultChannelIds ||
+    !availableDefaultChannelIds.has(channelId)
+  ) {
     ctx.logger.info(
       `Skipping sample monitor [${monitorName}] because required channel [${channelId}] is not present`,
     );

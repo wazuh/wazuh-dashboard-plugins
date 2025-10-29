@@ -73,6 +73,7 @@ For more information about monitor configuration, see the official OpenSearch do
    - Save and unmuted/enable the channel when the test is successful.
 
    Test notes:
+
    - **Slack**: you can validate the channel by sending a test message from the Notifications interface.
    - **Jira** and **PagerDuty**: effective validation is performed by executing the action from a monitor (see point 2). This is the recommended way to confirm delivery.
 
