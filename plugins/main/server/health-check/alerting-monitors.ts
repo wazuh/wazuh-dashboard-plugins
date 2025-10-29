@@ -12,7 +12,7 @@
  * @see https://docs.opensearch.org/3.2/observing-your-data/alerting/api/
  */
 
-import type { NotificationConfigsOpenSearchResponse, PluginTaskRunContext } from './types';
+import type { Monitor, NotificationConfigsOpenSearchResponse, PluginTaskRunContext, TriggerAction } from './types';
 import { WAZUH_INDEX_PATTERN } from '../../common/constants';
 import { DEFAULT_CHANNELS_ID } from './notification-default-channels/common/constants';
 
@@ -95,7 +95,7 @@ const SAMPLES: SampleMonitorDef[] = [
   },
 ];
 
-function request<T = any>(ctx: PluginTaskRunContext, params: any) {
+function request<T = any>(ctx: PluginTaskRunContext, params: unknown) {
   return ctx.context.services.core.opensearch.client.asInternalUser.transport.request(
     params,
   ) as Promise<{ body: T }>;
@@ -107,7 +107,7 @@ function buildMonitorBody(
   destinationId?: string | null,
   message?: string,
 ) {
-  const triggerBase: any = {
+  const triggerBase = {
     name: 'Sample trigger',
     severity,
     // Minimal condition: fire when there is at least one match
@@ -117,7 +117,7 @@ function buildMonitorBody(
         source: 'return ctx.results[0].hits.total.value > 0',
       },
     },
-    actions: [],
+    actions: [] as TriggerAction[],
   };
   if (destinationId) {
     triggerBase.actions.push({
@@ -157,7 +157,7 @@ function buildMonitorBody(
       description:
         'Sample monitor created to help you connect a channel. Edit the action to point to your real endpoint before enabling.',
     },
-  };
+  } as Monitor;
 }
 
 async function getNotificationChannels(ctx: PluginTaskRunContext) {
@@ -218,7 +218,7 @@ async function ensureMonitor(
   }
 
   const configs = await getNotificationChannels(ctx);
-  const match = configs.find((c: any) => c?.config_id === channelId);
+  const match = configs.find((config) => config.config_id === channelId);
   if (!match) {
     ctx.logger.warn(
       `Notification channel with id [${channelId}] not found among existing configs.`,

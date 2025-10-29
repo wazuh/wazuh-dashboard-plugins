@@ -48,3 +48,55 @@ export interface Config {
 export interface Chime {
   url: string;
 }
+
+export interface TriggerAction {
+  name: string;
+  destination_id: string;
+  subject_template: {
+    lang: string;
+    source: string;
+  };
+  message_template: {
+    lang: string;
+    source: string;
+  };
+}
+
+export interface Monitor {
+  type: string;
+  name: string;
+  enabled: boolean;
+  schedule: {
+    period: {
+      interval: number;
+      unit: string;
+    };
+  };
+  inputs: Array<{
+    search: {
+      indices: string[];
+      query: {
+        size: number;
+        query: {
+          bool?: {
+            filter: Array<Record<string, any>>;
+          };
+          match_all?: {
+            // Add any necessary fields for the match_all query
+          };
+        };
+      };
+    };
+  }>;
+  triggers: Array<{
+    name: string;
+    severity: string;
+    condition: {
+      script: {
+        lang: string;
+        source: string;
+      };
+    };
+    actions: TriggerAction[];
+  }>;
+}
