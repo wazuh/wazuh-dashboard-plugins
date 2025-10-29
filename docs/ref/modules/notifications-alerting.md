@@ -1,8 +1,15 @@
 # Notifications and Alerts in the Dashboard
 
-This document presents Notifications and Alerts as native capabilities of the Wazuh Dashboard. It explains what they provide to the user, how they are initialized through the Dashboard Health Check, and the recommended steps to achieve a functional, stable, and verifiable configuration.
+## Overview
 
-**Operational note**: the Health Check executes tasks with the Dashboard internal user. Any persistent object it creates (channels, monitors, etc.) is stored in the `Global` tenant. For general information, see [Health Check](./healthcheck.md) in Dashboard management.
+When executed, the Health Check validates that the Notifications and Alerting plugins are available and ensures that a minimal, working configuration exists.  
+If both plugins are detected, it automatically:
+
+- Creates **default notification channels** (muted by default) for the supported integrations.
+- Creates **sample alerting monitors** associated with these channels.
+- Logs the verification and creation progress in the Dashboard server logs.
+
+This automation simplifies the setup process and ensures that notifications can be easily configured after installation.
 
 ## Concepts
 
