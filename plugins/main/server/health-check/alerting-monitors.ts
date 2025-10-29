@@ -250,39 +250,37 @@ async function ensureMonitor(
   }
 }
 
-export const initializationTaskCreatorAlertingMonitors = () => ({
-  name: 'alerting:sample-monitors',
-  async run(ctx: PluginTaskRunContext) {
-    try {
-      ctx.logger.info('Starting Alerting sample monitors check');
+export const createSampleAlertingMonitors = async (
+  ctx: PluginTaskRunContext,
+) => {
+  try {
+    ctx.logger.info('Starting Alerting sample monitors check');
 
-      /**
-       * Sample monitor creation attempts
-       * `await Promise.all(SAMPLES.map(sample => ensureMonitor(ctx, sample)));`
-       *
-       * Throws unhandled promise rejection on logger calls:
-       * [error][data][opensearch] [alerting_exception]: all shards failed
-       * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Jira]: alerting_exception: [alerting_exception] Reason: all shards failed
-       * [error][data][opensearch] [alerting_exception]: all shards failed
-       * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Slack]: alerting_exception: [alerting_exception] Reason: all shards failed
-       */
-      for (const sample of SAMPLES) {
-        await ensureMonitor(ctx, sample);
-      }
-
-      ctx.logger.info('Alerting sample monitors check finished');
-      return { created: true };
-    } catch (error) {
-      const _error = error as Error;
-      const message = `Error ensuring sample monitors: ${
-        _error?.message || _error
-      }`;
-      ctx.logger.warn(message);
-      // Non-critical task: throw to report error state in the check result
-      throw new Error(message);
+    /**
+     * Sample monitor creation attempts
+     * `await Promise.all(SAMPLES.map(sample => ensureMonitor(ctx, sample)));`
+     *
+     * Throws unhandled promise rejection on logger calls:
+     * [error][data][opensearch] [alerting_exception]: all shards failed
+     * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Jira]: alerting_exception: [alerting_exception] Reason: all shards failed
+     * [error][data][opensearch] [alerting_exception]: all shards failed
+     * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Slack]: alerting_exception: [alerting_exception] Reason: all shards failed
+     */
+    for (const sample of SAMPLES) {
+      await ensureMonitor(ctx, sample);
     }
-  },
-});
+
+    ctx.logger.info('Alerting sample monitors check finished');
+  } catch (error) {
+    const _error = error as Error;
+    const message = `Error ensuring sample monitors: ${
+      _error?.message || _error
+    }`;
+    ctx.logger.warn(message);
+    // Non-critical task: throw to report error state in the check result
+    throw new Error(message);
+  }
+};
 
 // Test-only exports to validate request building and error handling
 // without exposing internals in production code paths.
