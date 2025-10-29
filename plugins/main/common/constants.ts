@@ -16,9 +16,6 @@ import { version } from '../package.json';
 export const PLUGIN_VERSION = version;
 export const PLUGIN_VERSION_SHORT = version.split('.').splice(0, 2).join('.');
 
-// Generic index pattern used across Wazuh data sets
-export const WAZUH_INDEX_PATTERN = 'wazuh-*';
-
 // Index patterns - Wazuh alerts
 export const WAZUH_INDEX_TYPE_ALERTS = 'alerts';
 export const WAZUH_ALERTS_PREFIX = 'wazuh-alerts-';
