@@ -45,7 +45,7 @@ The checks represents the unit to check and some could do some write actions suc
 | `index-pattern:events-security`                     | Validate (create if possible) the existence of a compatible index pattern for security events                      |
 | `index-pattern:events-system-activity`              | Validate (create if possible) the existence of a compatible index pattern for system activity events               |
 | `index-pattern:monitoring`                          | Validate (create if possible) the existence of a compatible index pattern for monitoring                           |
-| `index-pattern:statistitcs`                         | Validate (create if possible) the existence of a compatible index pattern for statistics                           |
+| `index-pattern:statistics`                          | Validate (create if possible) the existence of a compatible index pattern for statistics                           |
 | `index-pattern:states-vulnerabilities`              | Validate (create if possible) the existence of a compatible index pattern for vulnerabilities states               |
 | `index-pattern:states-inventory`                    | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene overview states           |
 | `index-pattern:states-inventory-groups`             | Validate (create if possible) the existence of a compatible index pattern for IT Hygiene groups overview states    |
