@@ -1,53 +1,102 @@
 const random = require('../lib/random');
 
+// ============================================================================
+// Constants - Realistic values for sample data generation
+// ============================================================================
+
 /**
- * Generates a random host object
- * @returns {Object} Random host object
+ * Hostnames inspired by solar system planets for memorable sample data
+ * Source: Aligned with wazuh-indexer-plugins generators
+ */
+const HOSTNAMES = [
+  'mercury',
+  'venus',
+  'earth',
+  'mars',
+  'jupiter',
+  'saturn',
+  'uranus',
+  'neptune',
+];
+
+/**
+ * Operating system names - Specific distributions for realistic data
+ */
+const OS_NAMES = ['Ubuntu', 'Windows', 'macOS', 'Debian', 'CentOS', 'RHEL'];
+
+/**
+ * Operating system platforms - Matching OS names for consistency
+ */
+const OS_PLATFORMS = [
+  'ubuntu',
+  'windows',
+  'darwin',
+  'debian',
+  'centos',
+  'rhel',
+];
+
+/**
+ * Operating system types - Common deployment types
+ */
+const OS_TYPES = ['linux', 'windows', 'macos', 'server'];
+
+/**
+ * Realistic OS versions mapped to common releases
+ */
+const OS_VERSIONS = ['22.04', '10.0.17763', '13.5', '11', '8', '9.0'];
+
+/**
+ * Agent groups - Infrastructure and environment based grouping
+ */
+const AGENT_GROUPS = [
+  'default',
+  'webservers',
+  'database',
+  'dmz',
+  'production',
+  'development',
+];
+
+/**
+ * System architectures - Common CPU architectures
+ */
+const ARCHITECTURES = ['x86_64', 'arm64'];
+
+// ============================================================================
+// Generator Functions
+// ============================================================================
+
+/**
+ * Generates a random host object with realistic values
+ * @returns {Object} Random host object following Wazuh 5.0 ECS schema
  */
 function generateRandomHost() {
   return {
-    architecture: random.choice(['x86_64', 'arm64']),
-    hostname: `host-${random.int(1, 999)}.example.com`,
+    architecture: random.choice(ARCHITECTURES),
+    hostname: random.choice(HOSTNAMES),
     ip: random.ip(),
     os: {
-      name: random.choice([
-        'Ubuntu',
-        'Windows',
-        'macOS',
-        'Debian',
-        'CentOS',
-        'RHEL',
-      ]),
-      platform: random.choice([
-        'ubuntu',
-        'windows',
-        'darwin',
-        'debian',
-        'centos',
-        'rhel',
-      ]),
-      type: random.choice(['linux', 'windows', 'macos']),
-      version: random.choice(['22.04', '10.0.17763', '13.5', '11', '8', '9.0']),
+      name: random.choice(OS_NAMES),
+      platform: random.choice(OS_PLATFORMS),
+      type: random.choice(OS_TYPES),
+      version: random.choice(OS_VERSIONS),
     },
   };
 }
 
 /**
- * Generates a random agent object
- * @returns {Object} Random agent object
+ * Generates a random agent object with realistic values
+ * @returns {Object} Random agent object following Wazuh 5.0 ECS schema
  */
 function generateRandomAgent() {
-  const agent = {
+  return {
     id: String(random.int(0, 99)).padStart(3, '0'),
     name: `Agent${random.int(0, 99)}`,
     version: `v${random.int(0, 9)}-stable`,
-    groups: random.sample(
-      ['default', 'production', 'development', 'testing', 'dmz'],
-      random.int(1, 3),
-    ),
+    groups: random.sample(AGENT_GROUPS, random.int(1, 3)),
     host: generateRandomHost(),
   };
-  return agent;
 }
 
 /**
