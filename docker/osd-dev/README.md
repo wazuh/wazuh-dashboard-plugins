@@ -30,7 +30,7 @@ Always use the provided script to bring up or down the development environment. 
   [-os <os_version>] [-osd <osd_version>] \
   [-a <rpm|deb|without>]  # aliases: none, 0 \
   [-r <repo>=</absolute/path> ...] \
-  [-saml | --server <version> | --server-local <tag>] \
+  [-saml | --server <version> | --server-local <tag> | --indexer-local [tag]] \
   [--base [</absolute/path>]]
 ```
 
@@ -67,6 +67,8 @@ Always use the provided script to bring up or down the development environment. 
 - --server-local <tag>: (Optional) Deploys an environment with a local Wazuh server package using the given image tag (e.g., my-custom-image) for IMAGE_TAG.
   - Important for `server-local`: Place the Wazuh manager installation packages (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/manager/` and any Wazuh agent packages (`.rpm`/`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/agents/`.
   - If neither `--server` nor `--server-local` is specified, a standard development environment is deployed (profile standard).
+- --indexer-local [tag]: (Optional) Deploys an environment with a local Wazuh indexer package using the given image tag (e.g., my-custom-image) for IMAGE_INDEXER_PACKAGE_TAG.
+  - Important: Place the Wazuh indexer installation package (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/indexer/`.
 
 If you run the script from inside this repository, internal repositories are auto-detected under `<root>/plugins/>`. Otherwise, pass `--plugins-root` (aliases: `-wdp`, `--wz-home`) to specify the root. Use `-r` only for external plugins.
 
@@ -165,6 +167,12 @@ Environment with a local Wazuh server build and no agents:
 
 ```sh
 ./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --server-local my-custom-tag -a without
+```
+
+Environment with a local Wazuh indexer build:
+
+```sh
+./dev.sh up --plugins-root /absolute/path/to/wazuh-dashboard-plugins/plugins --indexer-local my-custom-tag
 ```
 
 Important Note about Plugin Version:
