@@ -52,13 +52,34 @@ const getBranch = () => {
 
 // Configuration
 const config = {
-  // GitHub repository base URL with dynamic branch
-  githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/inventory_harvester/indexer/template`,
-  githubRepoBaseUrlVulnerabilities: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json`,
+  // GitHub repository base URL with dynamic branch - Updated for Wazuh 5.0
+  githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/${getBranch()}/plugins/setup/src/main/resources`,
   // Local directory where datasets are located
   localDatasetDir: path.join(__dirname, '../../server/lib/sample-data/dataset'),
   // List of datasets to update (obtained from local directory)
   datasets: [],
+  // Mapping from local dataset names to remote template filenames (Wazuh 5.0)
+  datasetToTemplateMapping: {
+    'states-fim-files': 'index-template-fim-files.json',
+    'states-fim-registry-keys': 'index-template-fim-registry-keys.json',
+    'states-fim-registry-values': 'index-template-fim-registry-values.json',
+    'states-sca': 'index-template-sca.json',
+    'states-vulnerabilities': 'index-template-vulnerabilities.json',
+    'states-inventory-packages': 'index-template-packages.json',
+    'states-inventory-processes': 'index-template-processes.json',
+    'states-inventory-system': 'index-template-system.json',
+    'states-inventory-networks': 'index-template-networks.json',
+    'states-inventory-ports': 'index-template-ports.json',
+    'states-inventory-hardware': 'index-template-hardware.json',
+    'states-inventory-hotfixes': 'index-template-hotfixes.json',
+    'states-inventory-interfaces': 'index-template-interfaces.json',
+    'states-inventory-groups': 'index-template-groups.json',
+    'states-inventory-users': 'index-template-users.json',
+    'states-inventory-services': 'index-template-services.json',
+    'states-inventory-protocols': 'index-template-protocols.json',
+    'states-inventory-browser-extensions':
+      'index-template-browser-extensions.json',
+  },
 };
 
 // Function to get the list of datasets
@@ -78,14 +99,18 @@ function getDatasets() {
 
 // Function to download a file from GitHub
 function downloadFile(dataset) {
-  const templateFile = `wazuh-${dataset}.json`;
+  const templateFile = config.datasetToTemplateMapping[dataset];
+
+  if (!templateFile) {
+    return Promise.reject(
+      new Error(
+        `No template mapping found for dataset: ${dataset}. Add it to datasetToTemplateMapping in config.`,
+      ),
+    );
+  }
 
   return new Promise((resolve, reject) => {
-    // Use different URL for vulnerabilities dataset
-    const url =
-      dataset === 'states-vulnerabilities'
-        ? config.githubRepoBaseUrlVulnerabilities
-        : `${config.githubRepoBaseUrl}/${templateFile}`;
+    const url = `${config.githubRepoBaseUrl}/${templateFile}`;
 
     console.log(`Downloading: ${url}`);
 
@@ -111,13 +136,48 @@ function downloadFile(dataset) {
   });
 }
 
+// Function to convert Elasticsearch template format to OpenSearch format
+function convertToOpenSearchFormat(templateContent) {
+  try {
+    const template = JSON.parse(templateContent);
+
+    // Check if already in OpenSearch format (has template.template)
+    if (template.template && template.template.mappings) {
+      return templateContent; // Already in correct format
+    }
+
+    // Convert from flat Elasticsearch format to nested OpenSearch format
+    const openSearchTemplate = {
+      index_patterns: template.index_patterns,
+      priority: template.priority || 1,
+      template: {
+        settings: template.settings || {
+          index: {
+            number_of_replicas: '0',
+            number_of_shards: '1',
+            refresh_interval: '2s',
+          },
+        },
+        mappings: template.mappings,
+      },
+    };
+
+    return JSON.stringify(openSearchTemplate, null, 2);
+  } catch (error) {
+    throw new Error(`Error converting template format: ${error.message}`);
+  }
+}
+
 // Function to save the downloaded file
 function saveFile(dataset, filename, content) {
   return new Promise((resolve, reject) => {
     const filePath = path.join(config.localDatasetDir, dataset, filename);
 
-    // Save the new content
-    fs.writeFile(filePath, content, 'utf8', error => {
+    // Convert to OpenSearch format before saving
+    const convertedContent = convertToOpenSearchFormat(content);
+
+    // Save the converted content
+    fs.writeFile(filePath, convertedContent, 'utf8', error => {
       if (error) {
         reject(error);
         return;
