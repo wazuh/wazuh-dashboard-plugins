@@ -91,3 +91,4 @@ healthcheck.checks_enabled: 'notification-channel:default-channels-integrations'
 
 - [Health Check](./healthcheck.md).
 - Slack – [Incoming Webhooks](https://api.slack.com/messaging/webhooks): official guide to create and obtain the URL.
+- Monitors - [opensearch](https://docs.opensearch.org/latest/observing-your-data/alerting/monitors/)
