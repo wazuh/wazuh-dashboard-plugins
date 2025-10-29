@@ -87,6 +87,20 @@ Or, to explicitly target the task described above:
 healthcheck.checks_enabled: 'notification-channel:default-channels-integrations'
 ```
 
+## Logs and Troubleshooting
+
+The Health Check logs detailed progress information during verification and setup.
+Examples of log entries include:
+
+```
+server    log   [15:03:45.031] [info][healthcheck][notification-channel:default-channels-integrations] All default notification channels are now present and verified
+server    log   [15:18:45.030] [info][healthcheck][notification-channel:default-channels-integrations] Starting Alerting sample monitors check
+server    log   [15:18:45.041] [info][healthcheck][notification-channel:default-channels-integrations] Monitor already exists [Sample: Slack]
+server    log   [15:18:44.971] [info][healthcheck][notification-channel:default-channels-integrations] Starting verification of default notification channels
+```
+
+If a check fails, review these log entries for details on which resource was missing or misconfigured.
+
 ## Useful Links and References
 
 - [Health Check](./healthcheck.md).
