@@ -101,7 +101,7 @@ export const initializeDefaultNotificationChannel = (
   next?: (ctx: InitializationTaskRunContext) => void,
 ): Record<string, any> => {
   return {
-    name: 'notification-channel:verify-default-channels',
+    name: 'notification-channel:default-channels-integrations',
     async run(ctx: InitializationTaskRunContext) {
       try {
         ctx.logger.info(
