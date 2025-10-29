@@ -279,6 +279,7 @@ export async function mainWithDeps(
       externalRepositories: externalDynamicRepos,
       repositoryEnvMap: repoEnvVars,
       useDashboardFromSource: config.useDashboardFromSource,
+      useIndexerFromPackage: config.useIndexerFromPackage,
       includeSecurityPlugin:
         Boolean(securityPluginHostPath) && config.useDashboardFromSource,
     },

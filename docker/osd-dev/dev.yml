@@ -416,10 +416,8 @@ services:
     image: wazuh-manager-pkg:${IMAGE_TAG:-latest}
     build:
       context: ./manager
-      args:
-        WAZUH_VERSION_FILEBEAT: 'v4.12.0' # Version to download and install filebeat (Version released in wazuh-manager)
-        WAZUH_VERSION_DEVELOPMENT: ${WAZUH_VERSION_DEVELOPMENT} # Version to download the template from github
     profiles:
+      - 'dashboard-src'
       - 'server-local' # server profile to use the local packages with agents deb and rpm
       - 'server-local-rpm' # server profile to use the local packages with agent rpm
       - 'server-local-deb' # server profile to use the local packages with agent deb
@@ -430,8 +428,7 @@ services:
       - os-dev
       - mon
     volumes:
-      - ./packages:/tmp/packages
-      - wm_certs:/etc/filebeat/certs
+      - wm_certs:/etc/server_certs
     ports:
       - '514:514'
       - '1514:1514'

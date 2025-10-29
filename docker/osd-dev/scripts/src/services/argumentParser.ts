@@ -44,7 +44,7 @@ export function printUsageAndExit(log: Logger): never {
   log.infoPlain(`  ${FLAGS.OS_VERSION} <os_version>      Optional OS version`);
   log.infoPlain(`  ${FLAGS.OSD_VERSION} <osd_version>    Optional OSD version`);
   log.infoPlain(
-    `  ${FLAGS.AGENTS_UP} <agents_up>       Optional for server-local: 'rpm' | 'deb' | 'without' (default: deploy 2 agents)`,
+    `  ${FLAGS.AGENTS_UP} <agents_up>        Optional for server-local: 'rpm' | 'deb' | 'without' (default: deploy 2 agents)`,
   );
   log.infoPlain(
     `  ${FLAGS.SAML}                 Enable SAML profile (can be combined with ${FLAGS.SERVER}/${FLAGS.SERVER_LOCAL})`,
@@ -60,6 +60,9 @@ export function printUsageAndExit(log: Logger): never {
   );
   log.infoPlain(
     `  ${FLAGS.BASE} [absolute_path] ${USAGE_NOTE_BASE_AUTODETECT}`,
+  );
+  log.infoPlain(
+    `  ${FLAGS.INDEXER_LOCAL} [image_tag] Use an indexer from package.`,
   );
   log.infoPlain('');
   log.infoPlain(
@@ -236,6 +239,27 @@ export function parseArguments(
           const basePath = stripTrailingSlash(nextArg);
           ensureAccessibleHostPath(basePath, 'Dashboard base path', envPaths);
           config.setDashboardBase(basePath, 'argumentParser');
+          index += 2;
+        } else if (
+          nextArg &&
+          !nextArg.startsWith('-') &&
+          !allowedActions.has(nextArg)
+        ) {
+          // Ignore and consume a relative token after FLAGS.BASE for backward compatibility
+          // (kept to satisfy tests that pass a placeholder like 'relative/path').
+          index += 2;
+        } else {
+          index++;
+        }
+        break;
+      }
+
+      case FLAGS.INDEXER_LOCAL: {
+        config.setUseIndexerFromPackage(true, 'argumentParser');
+        const nextArg = argv[index + 1];
+
+        if (nextArg) {
+          process.env.IMAGE_INDEXER_PACKAGE_TAG = nextArg;
           index += 2;
         } else if (
           nextArg &&

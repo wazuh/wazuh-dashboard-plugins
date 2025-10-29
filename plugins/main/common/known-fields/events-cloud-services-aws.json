@@ -495,6 +495,5278 @@
     "readFromDocValues": true
   },
   {
+    "name": "aws.amazonmq.broker",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.amazonmq.queue",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway.api_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_api_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_caller",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_connection_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_domain_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_event_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_http_method",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_ip",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_request_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_resource_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_response_length",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_route_key",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_stage",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_status",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.apigateway_user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_domain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_edge_detailed_result_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_edge_location",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_edge_response_result_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_edge_result_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_forwarded_ip",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_range_end",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_range_start",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudfront_time_to_first_byte",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_additional_event_data",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_api_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_console_login_additional_event_data_login_to",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_console_login_additional_event_data_mfa_used",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_console_login_additional_event_data_mobile_version",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_end_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_log_files",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.cloudtrail_digest_newest_event_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_oldest_event_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_previous_hash_algorithm",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_previous_s3_bucket",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_public_key_fingerprint",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_s3_bucket",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_signature_algorithm",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_digest_start_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_error_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_error_message",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_event_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_event_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_event_source",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_event_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_event_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_insight_details",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_management_event",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_read_only",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_recipient_account_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_request_parameters",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_resources",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.cloudtrail_response_elements",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_shared_event_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_access_key_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_invoked_by",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_session_context_creation_date",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_session_context_mfa_authenticated",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_session_context_session_issuer_account_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_session_context_session_issuer_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_session_context_session_issuer_principal_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_session_context_session_issuer_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_user_identity_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudtrail_vpc_endpoint_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.event_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.ingestion_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.log_group",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.log_stream",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.log_stream_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.metric.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.metric.value",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.namespace",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.otel_timestamp",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.start_timestamp",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.cloudwatch.timestamp",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.dimensions",
+    "type": "string",
+    "esTypes": ["object"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.ec2_ip_address",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_action_executed",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_alpn_be_protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_alpn_client_preference_list",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_alpn_fe_protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_backend_http_response_status_code",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_backend_ip",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_backend_port",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_backend_processing_time_sec",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_chosen_cert.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_chosen_cert_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_chosen_cert_serial",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_classification",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_classification_reason",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_connection_time.ms",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_connection_time_ms",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_error_reason",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_incoming_tls_alert",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_leaf_client_cert_not_after",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_leaf_client_cert_not_before",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_leaf_client_cert_serial_number",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_leaf_client_cert_subject",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_listener",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_matched_rule_priority",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_redirect_url",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_request_processing_time_sec",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_response_processing_time_sec",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_ssl_cipher",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_ssl_named_group",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_ssl_protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_target_group.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_target_group_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_target_port",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_target_status_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_tls_connection_creation_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_tls_connection_creation_time_str",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_tls_error_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_tls_handshake_latency",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_tls_handshake_time.ms",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_tls_handshake_time_ms",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_tls_verify_status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_trace_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.elb_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.exporter.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firehose.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firehose.delivery_stream_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firehose.delivery_stream_request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firehose.request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firehose.subscription_filters",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firehose.timestamp",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_alert_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_alert_rev_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_alert_severity",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_alert_signature",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_alert_signature_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_flow",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.firewall_flow.age",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_flow.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_flow.end",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_flow.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_flow.max_ttl",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_flow.min_ttl",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_flow.pkts",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_flow.start",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.firewall_tcp_flags",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.account_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.confidence",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.created_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.partition",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.region",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.access_key_details.accesskey_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.access_key_details.principal_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.access_key_details.user.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.access_key_details.user.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.container_details.container_runtime",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.container_details.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.container_details.image.prefix",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.container_details.image.value",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.container_details.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.container_details.security_context.privileged",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.container_details.volume_mounts",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.ebs_volume_details.scanned_volume_details",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.ebs_volume_details.skipped_volume_details",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.active_services_count",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.registered_container_instances_count",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.running_tasks_count",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.tags",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.containers",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.created_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.definitionarn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.group",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.started_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.started_by",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.tags",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.ecs_cluster_details.task_details.volumes",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.eks_cluster_details.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.eks_cluster_details.created_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.eks_cluster_details.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.eks_cluster_details.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.eks_cluster_details.tags",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.eks_cluster_details.vpcid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.availability_zone",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.iaminstance_profile",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.image.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.image.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.instance.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.instance.state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.instance.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.launch_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.network_interfaces",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.outpost_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.platform",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.product_codes",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.instance_details.tags",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_user_details.groups",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_user_details.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_user_details.user_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_workload_details.containers",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_workload_details.host_network",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_workload_details.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_workload_details.name_space",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_workload_details.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_workload_details.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.kubernetes_details.kubernetes_workload_details.volumes",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_instance_details.cluster_identifier",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_instance_details.engine",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_instance_details.engine_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_instance_details.instance_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_instance_details.instance_identifier",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_user_details.application",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_user_details.auth_method",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_user_details.database",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_user_details.ssl",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.rdsdb_user_details.user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.resource.s3_bucket_details",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.resource.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.schema_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.dns_request_action.blocked",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.dns_request_action.domain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.dns_request_action.protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.parameters",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.city.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.country.code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.country.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.geo_location",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.ip_address_v4",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.organization.asn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.organization.asnorg",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.organization.isp",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.remote_ip_details.organization.org",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.request_uri",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.source_ips",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.status_code",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.user_agent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.kubernetes_api_call_action.verb",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.local_port_details.port.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.city.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.country.code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.country.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.geo_location",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.ip_address_v4",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.organization.asn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.organization.asnorg",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.organization.isp",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_ip_details.organization.org",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_port_details.port.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.remote_port_details.port.value",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.network_connection_action.transport",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.port_probe_action.port_probe_details",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.city.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.country.code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.country.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.geo_location",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.geo_location.lat",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.geo_location.lon",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.ip_address_v4",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.organization.asn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.organization.asnorg",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.organization.isp",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.rds_login_attempt_action.remote_ip_details.organization.org",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.action.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.additional_info",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.archived",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.count",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.detector_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.event.first_seen",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.event.last_seen",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.evidence.threat_intelligence_details",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.service.feature_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.resource_role",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.address_family",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.command_line_example",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.file_system_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.flags",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.iana_protocol_number",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.ld_preload",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.library_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.memory_regions",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.modified_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.modifying_process",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.module_file_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.module_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.module_sha256",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.mount_source",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.mount_target",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.release_agent_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.runc_binary_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.script_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.service_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.shell_history_file_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.socket_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.target_process",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.threat_file_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.tool_category",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.context.tool_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.euid",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.executable_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.executable_sha256",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.lineage",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.namespace_pid",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.parent_uuid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.pid",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.pwd",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.start_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.user",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.user_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.runtime_details.process.uuid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.service.service_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.severity.code",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.severity.value",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.title",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.guardduty.updated_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.aws_account_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.finding_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.first_observed_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.fix_available",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.inspector_score",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.inspector_score_details.adjusted_cvss.adjustments",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.inspector.inspector_score_details.adjusted_cvss.cvss_source",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.inspector_score_details.adjusted_cvss.score.source",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.inspector_score_details.adjusted_cvss.score.value",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.inspector_score_details.adjusted_cvss.scoring_vector",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.inspector_score_details.adjusted_cvss.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.last_observed_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.network_reachability_details.network_path.steps",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.inspector.network_reachability_details.open_port_range.begin",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.network_reachability_details.open_port_range.end",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.network_reachability_details.protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.cvss",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.reference_urls",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.related_vulnerabilities",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.source.url",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.source.value",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.vendor.created_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.vendor.severity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.vendor.updated_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.vulnerability_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.package_vulnerability_details.vulnerable_packages",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.inspector.remediation.recommendation.text",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.remediation.recommendation.url",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.inspector.resources",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.inspector.severity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.title",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.inspector.updated_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.instance_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.kinesis.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.kinesis.stream.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.kinesis.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.lambda.function.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.rds.db_instance_identifier",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.region",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.route53.edge_location",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.route53.edns_client_subnet",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.route53.firewall.action",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.route53.firewall.dns.answers",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.route53.firewall.domain_list.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.route53.firewall.rule_group.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.route53.hosted_zone_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.bucket.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.bucket.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.object.e_tag",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.object.key",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.object.sequencer",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.object.size",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.source",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3.user.identity.principal_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.access_point_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.aclrequired",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.authentication_type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.bucket",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.bucket_owner",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.bytes_sent",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.cipher_suite",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.error_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.host_header",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.host_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.http_status",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.key",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.object_size",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.operation",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.referrer",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.remote_ip",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.request_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.request_uri",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.requester",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.signature_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.tls_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.total_time",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.turn_around_time",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.user_agent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.s3access.version_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.affected_resources",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.api",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.caller.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.domain_details.domain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.city.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.country.code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.country.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.geolocation.latitude",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.geolocation.longitude",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.ip.address_v4",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.organization.asn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.organization.asn_organization",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.organization.internet_provider",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.remote_ip.organization.internet_service_provider",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.aws_api_call.service.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.dns_request.blocked",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.dns_request.domain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.dns_request.protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.blocked",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.direction",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.local.port.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.local.port.number",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote.port.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote.port.number",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.city.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.country.code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.country.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.geolocation.latitude",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.geolocation.longitude",
+    "type": "number",
+    "esTypes": ["float"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.ip.address_v4",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.organization.asn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.organization.asn_organization",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.organization.internet_provider",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.network_connection.remote_ip.organization.internet_service_provider",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.port_probe.blocked",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.action.port_probe.details",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.action.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.aws_account_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.company.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.compliance.related_requirements",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.compliance.security_control_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.compliance.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.compliance.status_reasons",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.confidence",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.created_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.criticality",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.description",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.first_observed_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.generator.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.last_observed_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.malware",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.network.destination.domain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.destination.ip.v4",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.destination.ip.v6",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.destination.port",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.direction",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.open_port_range.begin",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.open_port_range.end",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.protocol",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.source.domain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.source.ip.v4",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.source.ip.v6",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.source.mac",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network.source.port",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.network_path",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.note.text",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.note.updated_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.note.updated_by",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.failed.count",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.installed.count",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.installed.other.count",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.installed.pending_reboot",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.installed.rejected.count",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.missing.count",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.operation.end_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.operation.start_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.operation.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.patch_summary.reboot_option",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.process.launched_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.process.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.process.parent.pid",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.process.path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.process.pid",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.process.terminated_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.product.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.product.fields",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.product.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.provider_fields.confidence",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.provider_fields.criticality",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.provider_fields.related_findings",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.provider_fields.severity.label",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.provider_fields.severity.normalized",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.provider_fields.severity.original",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.provider_fields.severity.product",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.provider_fields.types",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.record_state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.region",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.related_findings",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.remediation.recommendation.text",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.remediation.recommendation.url",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.resources",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.sample",
+    "type": "boolean",
+    "esTypes": ["boolean"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.schema.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.severity.label",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.severity.normalized",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.severity.original",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.severity.product",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.source_url",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.threat_intel_indicators",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.title",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.types",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.updated_at",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.user_defined_fields",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.verification_state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.vulnerabilities",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_findings.workflow.state",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_findings.workflow.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_insights.filters.aws_account_id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.company.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.compliance.status",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.confidence",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.created_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.criticality",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.description",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.finding_provider_fields.confidence",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.finding_provider_fields.criticality",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.finding_provider_fields.related_findings.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.finding_provider_fields.related_findings.product.arn",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.finding_provider_fields.severity.label",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.finding_provider_fields.severity.original",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.finding_provider_fields.types",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.first_observed_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.generator.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.keyword",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.last_observed_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.malware.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.malware.path",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.malware.state",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.malware.type",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.destination.domain",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.destination.ip.v4",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.destination.ip.v6",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.destination.port",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.direction",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.protocol",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.source.domain",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.source.ip.v4",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.source.ip.v6",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.source.mac",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.network.source.port",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.note.text",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.note.updated_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.note.updated_by",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.process.launched_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.process.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.process.parent.pid",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.process.path",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.process.pid",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.process.terminated_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.product.arn",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.product.fields",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.product.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.recommendation_text",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.record_state",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.region",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.related_findings.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.related_findings.product.arn",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.iam_instance_profile.arn",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.image.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.ip.v4_addresses",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.ip.v6_addresses",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.key.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.launched_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.subnet.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.type",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_ec2_instance.vpc.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_iam_access_key.created_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_iam_access_key.principal.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_iam_access_key.status",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_iam_access_key.user.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_iam_user.user.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_s3_bucket.owner.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.aws_s3_bucket.owner.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.container.image.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.container.image.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.container.launched_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.container.name",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.details_other",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.id",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.partition",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.region",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.tags",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.resource.type",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.sample",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.severity.label",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.severity.normalized",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.severity.product",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.source_url",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.threat_intel_indicator.category",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.threat_intel_indicator.last_observed_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.threat_intel_indicator.source",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.threat_intel_indicator.source_url",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.threat_intel_indicator.type",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.threat_intel_indicator.value",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.title",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.type",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.updated_at",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.user_defined_fields",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.verification.state",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.workflow.state",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.filters.workflow.status",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.securityhub_insights.group_by_attribute",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_insights.insight_arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.securityhub_insights.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpc_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.account_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.action",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.instance_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.interface_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.log_status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.pkt_dst_service",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.pkt_dstaddr",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.pkt_src_service",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.pkt_srcaddr",
+    "type": "ip",
+    "esTypes": ["ip"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.sublocation.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.sublocation.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.subnet_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.tcp_flags",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.tcp_flags_array",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.traffic_path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.vpcflow.vpc_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.waf.arn",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.waf.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.waf.non_terminating_matching_rules",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.waf.rate_based_rule_list",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.waf.request.headers",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.waf.rule.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.waf.rule.ruleset",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.waf.rule_group_list",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.waf.source.id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.waf.source.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "aws.waf.terminating_matching_rule",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "aws.waf.terminating_rule_match_details",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
     "name": "check.compliance",
     "type": "string",
     "esTypes": ["keyword"],
@@ -5082,6 +10354,902 @@
     "name": "observer.version",
     "type": "string",
     "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.activity_id",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.activity_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.actor.process.created_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.actor.process.file.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.actor.process.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.actor.user.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.actor.user.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.api.operation",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.api.request.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.api.response.error",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.api.response.error_message",
+    "type": "string",
+    "esTypes": ["text"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "ocsf.api.service.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.api.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.category_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.category_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.class_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.class_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.cloud.org.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.cloud.org.ou_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.cloud.org.ou_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.cloud.org.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.compliance.control",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.compliance.requirements",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "ocsf.compliance.standards",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "ocsf.compliance.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.compliance.status_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.connection_info.boundary",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.connection_info.direction_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.connection_info.protocol_ver",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.count",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.device.domain",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.device.region",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.device.type_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.dst_endpoint.hostname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.dst_endpoint.instance_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.dst_endpoint.interface_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.dst_endpoint.interface_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.dst_endpoint.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.dst_endpoint.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.dst_endpoint.vpc_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.end_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.file.accessed_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.file.created_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.file.modified_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.file.parent_folder",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.file.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.file.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.finding.created_time",
+    "type": "date",
+    "esTypes": ["date"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.finding.desc",
+    "type": "string",
+    "esTypes": ["text"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "ocsf.finding.first_seen_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.finding.last_seen_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.finding.modified_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.finding.title",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.finding.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.http_request.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.http_request.user_agent",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.http_response.message",
+    "type": "string",
+    "esTypes": ["text"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "ocsf.malware.classification_ids",
+    "type": "nested",
+    "esTypes": ["nested"],
+    "searchable": true,
+    "aggregatable": false,
+    "readFromDocValues": false
+  },
+  {
+    "name": "ocsf.malware.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.malware.path",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.message",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.correlation_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.event_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.log_level",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.log_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.log_provider",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.log_version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.logged_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.original_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.processed_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.product.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.product.vendor_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.product.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.sequence",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.tenant_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.metadata.version",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.resource.group.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.resource.group.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.resource.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.resource.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.resource.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.severity",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.severity_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.src_endpoint.hostname",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.src_endpoint.instance_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.src_endpoint.interface_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.src_endpoint.interface_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.src_endpoint.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.src_endpoint.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.src_endpoint.vpc_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.start_time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.status",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.status_code",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.status_id",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.time",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.timezone_offset",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.traffic.bytes",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.traffic.bytes_in",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.traffic.bytes_out",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.traffic.packets",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.traffic.packets_in",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.traffic.packets_out",
+    "type": "number",
+    "esTypes": ["long"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.type_name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.type_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.user.account.name",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.user.account.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.user.account.uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.user.credential_uid",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.user.email_addr",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.user.type",
+    "type": "string",
+    "esTypes": ["keyword"],
+    "searchable": true,
+    "aggregatable": true,
+    "readFromDocValues": true
+  },
+  {
+    "name": "ocsf.user.type_id",
+    "type": "number",
+    "esTypes": ["long"],
     "searchable": true,
     "aggregatable": true,
     "readFromDocValues": true

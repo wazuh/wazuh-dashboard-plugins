@@ -361,8 +361,7 @@ export const initializationTaskCreatorIndexPattern = ({
   configurationSettingKey,
   indexPatternID,
   services,
-  taskMeta = {},
-  ...rest
+  taskProps = {},
 }: {
   taskName: string;
   options: CreateIndexPatternOptions & {
@@ -373,6 +372,7 @@ export const initializationTaskCreatorIndexPattern = ({
   configurationSettingKey: string;
   indexPatternID?: string;
 }) => ({
+  ...taskProps,
   name: taskName,
   async run({ context: ctx, logger }: InitializationTaskRunContext) {
     let indexPatternIDResolved;
@@ -478,13 +478,19 @@ export function mapFieldsFormat(expectedFields: {
   };
 }
 
+const DATE_TYPE = 'date';
+
 export function defineTimeFieldNameIfExist(timeFieldName: string) {
   return function (savedObjectData) {
     const fields = JSON.parse(savedObjectData.fields);
 
-    if (!fields.some(({ name }) => name === timeFieldName)) {
+    if (
+      !fields.some(
+        ({ name, type }) => name === timeFieldName && type === DATE_TYPE,
+      )
+    ) {
       throw new Error(
-        `time field name was not found [${timeFieldName}] in the fields`,
+        `time field name was not found [${timeFieldName}] with [${DATE_TYPE}] type in the fields`,
       );
     }
     return {

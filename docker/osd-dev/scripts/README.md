@@ -48,7 +48,7 @@ The `dev.sh` wrapper is the entry point. The action is positional; everything el
   [-os <os_version>] [-osd <osd_version>] \
   [-a <rpm|deb|without>]  # aliases: none, 0 \
   [-r <repo>=</absolute/path> ...] \
-  [-saml | --server <version> | --server-local <tag>] \
+  [-saml | --server <version> | --server-local <tag> | --indexer-local [tag]] \
   [--base [</absolute/path>]]
 ```
 
