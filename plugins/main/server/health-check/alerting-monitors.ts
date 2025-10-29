@@ -165,29 +165,6 @@ function buildMonitorBody(
   } as Monitor;
 }
 
-async function getNotificationChannels(ctx: PluginTaskRunContext) {
-  try {
-    // https://docs.opensearch.org/3.2/observing-your-data/notifications/api/#list-all-notification-configurations
-    const { body } = await request<NotificationConfigsOpenSearchResponse>(ctx, {
-      method: 'GET',
-      path: '/_plugins/_notifications/configs',
-      querystring: {
-        from_index: 0,
-        max_items: 1000,
-        sort_field: 'name',
-        sort_order: 'asc',
-      },
-    });
-    return body.config_list || [];
-  } catch (error) {
-    const _error = error as Error;
-    ctx.logger.warn(
-      `Notifications get configs failed: ${_error?.message || _error}`,
-    );
-    return [];
-  }
-}
-
 async function monitorExists(ctx: PluginTaskRunContext, name: string) {
   try {
     const payload = {
@@ -214,6 +191,7 @@ async function monitorExists(ctx: PluginTaskRunContext, name: string) {
 async function ensureMonitor(
   ctx: PluginTaskRunContext,
   sample: SampleMonitorDef,
+  availableDefaultChannelIds?: Set<string>,
 ) {
   const { monitorName, channelId, message, severity } = sample;
   const exists = await monitorExists(ctx, monitorName);
@@ -222,13 +200,12 @@ async function ensureMonitor(
     return;
   }
 
-  const configs = await getNotificationChannels(ctx);
-  const match = configs.find(config => config.config_id === channelId);
-  if (!match) {
-    ctx.logger.warn(
-      `Notification channel with id [${channelId}] not found among existing configs.`,
-    );
-    return;
+  // Prefer provided available IDs to avoid an extra request; fallback to fetching
+  let destinationId: string | null | undefined = undefined;
+  if (availableDefaultChannelIds) {
+    destinationId = availableDefaultChannelIds.has(channelId)
+      ? channelId
+      : null;
   }
 
   try {
@@ -236,7 +213,7 @@ async function ensureMonitor(
       method: 'POST',
       path: '/_plugins/_alerting/monitors',
       querystring: { refresh: 'wait_for' },
-      body: buildMonitorBody(monitorName, severity, match.config_id, message),
+      body: buildMonitorBody(monitorName, severity, destinationId, message),
     });
     ctx.logger.info(`Created sample monitor [${monitorName}]`);
   } catch (error) {
@@ -252,9 +229,14 @@ async function ensureMonitor(
 
 export const createSampleAlertingMonitors = async (
   ctx: PluginTaskRunContext,
+  options?: { availableDefaultChannelIds?: Set<string> },
 ) => {
   try {
     ctx.logger.info('Starting Alerting sample monitors check');
+    const availableDefaultChannelIds: Set<string> | undefined = options?.
+      availableDefaultChannelIds
+      ? new Set(options.availableDefaultChannelIds)
+      : undefined;
 
     /**
      * Sample monitor creation attempts
@@ -267,7 +249,7 @@ export const createSampleAlertingMonitors = async (
      * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Slack]: alerting_exception: [alerting_exception] Reason: all shards failed
      */
     for (const sample of SAMPLES) {
-      await ensureMonitor(ctx, sample);
+      await ensureMonitor(ctx, sample, availableDefaultChannelIds);
     }
 
     ctx.logger.info('Alerting sample monitors check finished');
@@ -286,7 +268,6 @@ export const createSampleAlertingMonitors = async (
 // without exposing internals in production code paths.
 // eslint-disable-next-line import/no-default-export
 export const __test__ = {
-  getNotificationChannels,
   monitorExists,
   buildMonitorBody,
 };

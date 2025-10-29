@@ -5,6 +5,7 @@ import {
   defaultChannels,
 } from '../common/constants';
 import type { InitializationTaskRunContext } from '../../types';
+import { createSampleAlertingMonitors } from '../../alerting-monitors';
 
 const verifyExistingDefaultChannels = async (
   client: ILegacyClusterClient,
@@ -49,8 +50,8 @@ const createMissingChannels = async (
   missingChannels: ChannelDefinition[],
   client: ILegacyClusterClient,
   ctx: InitializationTaskRunContext,
-): Promise<string[]> => {
-  let createdChannels: string[] = [];
+): Promise<ChannelDefinition[]> => {
+  let createdChannels: ChannelDefinition[] = [];
   ctx.logger.debug(
     `Creating ${missingChannels.length} missing notification channels`,
   );
@@ -75,7 +76,7 @@ const createMissingChannels = async (
         (createResult.config_id === channel.id ||
           createResult.id === channel.id)
       ) {
-        createdChannels.push(channel.name);
+        createdChannels.push(channel);
       } else {
         ctx.logger.warn(
           `Channel creation returned unexpected result for ${channel.name}:`,
@@ -89,16 +90,16 @@ const createMissingChannels = async (
     }
   }
   ctx.logger.info(
-    `Created ${
-      createdChannels.length
-    } notification channels: ${createdChannels.join(', ')}`,
+    `Created ${createdChannels.length} notification channels: ${createdChannels
+      .map(channel => channel.name)
+      .join(', ')}`,
   );
   return createdChannels;
 };
 
 export const initializeDefaultNotificationChannel = (
   client: ILegacyClusterClient,
-  next?: (ctx: InitializationTaskRunContext) => void,
+  isAlertingDashboardsAvailable?: boolean,
 ): Record<string, any> => {
   return {
     name: 'notification-channel:default-channels-integrations',
@@ -116,7 +117,7 @@ export const initializeDefaultNotificationChannel = (
           channel =>
             !defaultChannelsFound.some(found => found.id === channel.id),
         );
-        let createdChannels: string[] = [];
+        let createdChannels: ChannelDefinition[] = [];
 
         if (missingChannels.length) {
           createdChannels = await createMissingChannels(
@@ -142,15 +143,31 @@ export const initializeDefaultNotificationChannel = (
             `${stillMissing} notification channels are still missing after creation attempts`,
           );
         }
+
+        // If Alerting is available, create sample monitors passing available channel IDs
+        if (isAlertingDashboardsAvailable) {
+          const availableDefaultChannelIds = new Set<string>([
+            ...defaultChannelsFound.map(ch => ch.id),
+            ...createdChannels.map(ch => ch.id),
+          ]);
+          try {
+            await createSampleAlertingMonitors(ctx as any, {
+              availableDefaultChannelIds,
+            });
+          } catch (err) {
+            // Surface but don’t fail the notification channels task
+            const _err = err as Error;
+            ctx.logger.warn(
+              `Sample monitors creation reported an issue: ${
+                _err?.message || _err
+              }`,
+            );
+          }
+        }
       } catch (error: any) {
         const message = `Error verifying or creating default notification channels: ${error.message}`;
         ctx.logger.error(message);
         throw new Error(message);
-      }
-
-      // Proceed to next task (optional in tests)
-      if (typeof next === 'function') {
-        next(ctx);
       }
     },
   };

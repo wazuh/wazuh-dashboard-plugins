@@ -57,16 +57,4 @@ describe('alerting health-check helpers', () => {
     const found = await mod.monitorExists(ctx, 'Nope');
     expect(found).toBe(false);
   });
-
-  test('getNotificationChannels returns [] on error and uses proper route', async () => {
-    const req = jest.fn().mockRejectedValue(new Error('no permissions'));
-    const ctx = createCtx(req);
-    const list = await mod.getNotificationChannels(ctx);
-    expect(list).toEqual([]);
-    expect(req).toHaveBeenCalled();
-    const arg = req.mock.calls[0][0];
-    expect(arg.method).toBe('GET');
-    expect(arg.path).toBe('/_plugins/_notifications/configs');
-    expect(arg.querystring).toMatchObject({ from_index: 0, max_items: 1000 });
-  });
 });
