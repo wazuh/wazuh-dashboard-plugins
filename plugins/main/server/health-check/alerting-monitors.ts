@@ -200,7 +200,6 @@ async function ensureMonitor(
     return;
   }
 
-  // Prefer provided available IDs to avoid an extra request; fallback to fetching
   let destinationId: string | null | undefined = undefined;
   if (availableDefaultChannelIds) {
     destinationId = availableDefaultChannelIds.has(channelId)
