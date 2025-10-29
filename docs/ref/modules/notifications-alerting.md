@@ -25,10 +25,14 @@ For general Health Check details, see [Health Check](./healthcheck.md).
 
 When the Notifications functionality is available in the Dashboard, the Health Check creates (if they don't exist) the following channels. All are created disabled:
 
-- **Slack Channel**: requires a Slack Incoming Webhook URL with the format `https://hooks.slack.com/services/...`. How to obtain it: see the official Slack guide on [Incoming Webhooks](https://api.slack.com/messaging/webhooks). After creating the app and enabling Webhooks, Slack will display the specific URL for your workspace and channel.
-- **PagerDuty Channel**: uses Events API v2 at `https://events.pagerduty.com/v2/enqueue`. You must provide your Integration Key in the `X-Routing-Key` header.
-- **Jira Channel**: creates issues using the Jira REST API. You must specify your instance URL and the `Authorization: Basic <base64(email:api_token)>` header.
-- **Shuffle Channel**: sends messages to a Shuffle workflow Webhook. You must specify the webhook URL for the corresponding workflow.
+| Channel               | Description                                                                         | Configuration                                                                                                                                                                                            |
+| --------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Slack Channel**     | Sends notifications via Slack Incoming Webhook.                                     | [Create a Slack webhook](https://api.slack.com/messaging/webhooks) and set the Webhook URL.                                                                                                              |
+| **PagerDuty Channel** | Sends alerts via the **Events v3 API** (`https://events.pagerduty.com/v2/enqueue`). | [Create a PagerDuty Events v2 integration](https://developer.pagerduty.com/docs/events-api-v2-overview) and set your Integration Key in the `X-Routing-Key` header.                                      |
+| **Jira Channel**      | Creates issues via Jira REST API.                                                   | [Create a Jira API token](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/) and configure the URL with `Authorization: Basic base64(email:api_token)`. |
+| **Shuffle Channel**   | Triggers Shuffle workflows via webhook.                                             | [Get your Shuffle workflow webhook URL](https://shuffler.io/docs/triggers#webhook-example) and paste it in the configuration.                                                                            |
+
+> All channels are stored as saved objects under the `Global` tenant with names like `Slack Channel`, `PagerDuty Channel`, etc.
 
 Security recommendations: treat these URLs and credentials as secrets. Review permissions and channel visibility before enabling it.
 
