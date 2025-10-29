@@ -55,7 +55,23 @@ The checks represents the unit to check and some could do some write actions suc
 | `index-pattern:states-fim-registry-values`          | Validate (create is possible) the existence of a compatible index pattern for FIM registry values states           |
 | `index-pattern:states-sca`                          | Validate (create is possible) the existence of a compatible index pattern for Configuration Assessment states      |
 | `server-api:connection-compatibility`               | Validate the connection and compatibility with the server API hosts                                                |
-| `notification-channel:default-channels-integrations`      | Validate the existence of the default notification channels or create them if they do not exist.                   |
+| `notification-channel:default-channels-integrations` | Validate the existence of the default Notifications channels; creates them if missing                               |
+
+## Notifications and Alerting
+
+- Default Notifications channels
+  - When the Notifications Dashboards plugin is available, the health check verifies that the default channels exist and creates them if they don’t. The following channels are managed and created disabled so you can safely configure credentials first:
+    - Slack Channel: expects a Slack Incoming Webhook URL.
+    - PagerDuty Channel: sends Events v2 to `https://events.pagerduty.com/v2/enqueue` (set the Integration Key in the `X-Routing-Key` header).
+    - Jira Channel: creates issues via the REST API (set `Authorization: Basic base64(email:api_token)` and your Jira URL).
+    - Shuffle Channel: posts to a Shuffle webhook (set the workflow webhook URL).
+  - If the Notifications plugin is not present, the task is skipped and a debug message is logged by the server.
+
+- Sample Alerting monitors
+  - When the Alerting Dashboards plugin is available, the health check also attempts to create sample monitors that target the default channels above. These monitors are created disabled and use a minimal query-level definition over the generic Wazuh index pattern (`wazuh-alerts-*`).
+  - Monitor names created: `Sample: Slack`, `Sample: PagerDuty`, `Sample: Jira`, `Sample: Shuffle`.
+  - If a corresponding notification channel is not found, the monitor is created without actions so you can add the action later after configuring the channel.
+  - You can review them under Explore > Alerting > Monitors. Configure the channel, adjust the action payloads if needed, and enable the monitor when ready.
 
 ## Execution results
 
