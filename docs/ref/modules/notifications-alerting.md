@@ -57,7 +57,7 @@ Characteristics of these sample monitors:
      - **PagerDuty**: keep the default URL and set your Integration Key in the `X-Routing-Key` header.
      - **Jira**: specify your instance URL and configure `Authorization: Basic <base64(email:api_token)>`.
      - **Shuffle**: specify the Webhook URL of the workflow you will use.
-   - Save and enable the channel when the test is successful.
+   - Save and unmuted/enable the channel when the test is successful.
 
    Test notes:
    - **Slack**: you can validate the channel by sending a test message from the Notifications interface.
