@@ -32,14 +32,32 @@ export function toByValueInput(so: SavedDashboardSO, config?: DashboardConfigInp
   const options = JSON.parse(so.attributes.optionsJSON);
   const panels = transformPanelsJSON(so.attributes.panelsJSON, so.references);
   const input: DashboardByValueInput = {
-    title: config?.title || so.attributes.title,
-    description: config?.description || so.attributes.description,
+    title: so.attributes.title,
+    description: so.attributes.description,
     panels,
-    useMargins: config?.useMargins ?? options.useMargins,
-    hidePanelTitles: config?.hidePanelTitles ?? options.hidePanelTitles,
+    useMargins: options.useMargins,
+    hidePanelTitles: options.hidePanelTitles,
     id: so.id,
-    viewMode: config?.viewMode || 'view',
-    isFullScreenMode: config?.isFullScreenMode ?? false,
+    viewMode: 'view',
+    isFullScreenMode: false,
+    filters: [],
+    // set default time range
+    timeRange: {
+      from: 'now-1y',
+      to: 'now',
+    },
+    lastReloadRequestTime: 0,
+    query: '',
+    refreshConfig: {
+      pause: false,
+      value: 15,
+    }
+  };
+  return input;
+}
+
+export function getFiltersParams(config?: { dataSource?: any; refreshConfig?: any; }) {
+  return {
     filters: config?.dataSource?.fetchFilters ?? [],
     query: config?.dataSource?.searchBarProps?.query ?? '',
     refreshConfig: config?.refreshConfig || { pause: false, value: 15 },
@@ -49,7 +67,6 @@ export function toByValueInput(so: SavedDashboardSO, config?: DashboardConfigInp
     },
     lastReloadRequestTime: config?.dataSource?.fingerprint
   };
-  return input;
 }
 
 /**

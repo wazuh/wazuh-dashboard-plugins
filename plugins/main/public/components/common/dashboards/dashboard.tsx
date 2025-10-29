@@ -11,11 +11,8 @@ import { WzSearchBar } from '../search-bar';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
-import { ViewMode } from '../../../../../../src/plugins/embeddable/public';
 import DashboardContainer from './dashboard-container/dashboard-container';
 
-const DashboardByRenderer =
-  getPlugins().dashboard.DashboardContainerByValueRenderer;
 
 export const Dashboard = props => {
   // This is not used by the SCA dashboard.
@@ -61,23 +58,17 @@ export const Dashboard = props => {
           {props.getDashboardPanels.map(
             ({
               dashboardId,
-              id,
-              title,
-              description,
-              hidePanelTitles = false,
-              useMargins = true,
+              agentDashboardId,
               className = '',
             }) => {
-              const idComponent = id;
+              const idComponent = dashboardId;
               const dashboard = <DashboardContainer 
                 dashboardId={dashboardId}
+                agentDashboardId={agentDashboardId}
                 className={className}
+                hasPinnedAgent={Boolean(props.dataSource.dataSource?.getPinnedAgentFilter()?.length)}
                 config={{
-                  title: title,
-                  description: description,
                   dataSource: props.dataSource,
-                  useMargins: useMargins,
-                  hidePanelTitles: hidePanelTitles,
                 }}
               />
 
@@ -119,11 +110,7 @@ export const createDashboard = ({
   sampleDataWarningCategories?: string[];
   getDashboardPanels: Array<{
     dashboardId: string;
-    id: string;
-    title: string;
-    description: string;
-    hidePanelTitles: boolean;
-    useMargins?: boolean;
+    agentDashboardId?: string;
     /**
      * Class name to apply to the dashboard container
      */

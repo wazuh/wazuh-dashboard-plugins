@@ -1,55 +1,57 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { getPlugins } from '../../../../kibana-services';
-import { buildDashboardByValueInput } from './dashboard-container-service';
+import { buildDashboardByValueInput, getFiltersParams } from './dashboard-container-service';
 import { Status, DashboardByValueInput } from './types';
 
-// Component props
 type DashboardContainerProps = {
   dashboardId: string;
+  agentDashboardId?: string;
+  hasPinnedAgent: boolean;
   className?: string;
   config: {
-    title: string;
-    description: string;
     dataSource: any;
-    useMargins: boolean;
-    hidePanelTitles: boolean;
   }
 };
 
 export const DashboardContainer: React.FC<DashboardContainerProps> = ({
   dashboardId,
+  agentDashboardId,
+  hasPinnedAgent,
   className,
   config
 }) => {
-  // OSD only exposes a by-value renderer; we adapt a saved object to its input
   const DashboardContainerByValueRenderer =
     getPlugins()?.dashboard?.DashboardContainerByValueRenderer;
 
   const [status, setStatus] = useState<Status>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [dashboardTitle, setDashboardTitle] = useState<string>('');
   const [byValueInput, setByValueInput] = useState<DashboardByValueInput | null>(null);
+
+  const buildDashboard = useCallback(async (isAgent: boolean) => {
+    return await buildDashboardByValueInput(isAgent && agentDashboardId ? agentDashboardId : dashboardId); 
+  }, [dashboardId, agentDashboardId]);
 
   const buildByValueInputHandler = useCallback(async () => {
     setStatus('validating');
     setError(null);
     setByValueInput(null);
 
-    const result = await buildDashboardByValueInput(dashboardId, config);
+    const result = await buildDashboard(hasPinnedAgent);
     
     if (result.success) {
-      setDashboardTitle(result.dashboardTitle!);
-      setByValueInput(result.byValueInput!);
+      setByValueInput({
+        ...result.byValueInput!
+      });
       setStatus(result.status);
     } else {
       setStatus(result.status);
       setError(result.error!);
     }
-  }, [dashboardId]);
+  }, [buildDashboard, hasPinnedAgent]);
 
   useEffect(() => {
     buildByValueInputHandler();
-  }, [buildByValueInputHandler]);
+  }, [hasPinnedAgent, dashboardId, agentDashboardId]);
 
   if (status === 'validating' || status === 'idle') {
     return (
@@ -120,10 +122,12 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({
       );
     }
 
-    // Render dashboard by value using the adapter-generated input
     return (
       <div className={className} style={{ padding: 0 }}>
-        <DashboardContainerByValueRenderer input={byValueInput!} />
+        <DashboardContainerByValueRenderer input={{
+          ...byValueInput,
+          ...getFiltersParams(config),
+        }} />
       </div>
     );
   }
