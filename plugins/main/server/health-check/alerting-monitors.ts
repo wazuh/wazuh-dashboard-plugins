@@ -232,10 +232,10 @@ export const createSampleAlertingMonitors = async (
 ) => {
   try {
     ctx.logger.info('Starting Alerting sample monitors check');
-    const availableDefaultChannelIds: Set<string> | undefined = options?.
-      availableDefaultChannelIds
-      ? new Set(options.availableDefaultChannelIds)
-      : undefined;
+    const availableDefaultChannelIds: Set<string> | undefined =
+      options?.availableDefaultChannelIds
+        ? new Set(options.availableDefaultChannelIds)
+        : undefined;
 
     /**
      * Sample monitor creation attempts
