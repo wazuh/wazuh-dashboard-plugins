@@ -36,16 +36,18 @@ Security recommendations: treat these URLs and credentials as secrets. Review pe
 
 If the Alerts functionality is available, the Health Check attempts to create the following sample monitors on the Wazuh alerts index pattern (`wazuh-alerts-*`):
 
-- `Sample: Slack`
-- `Sample: PagerDuty`
-- `Sample: Jira`
-- `Sample: Shuffle`
+| Monitor name        | Target channel    | Behavior                                                     |
+| ------------------- | ----------------- | ------------------------------------------------------------ |
+| `Sample: Slack`     | Slack Channel     | Queries for general alerts and sends notifications to Slack. |
+| `Sample: PagerDuty` | PagerDuty Channel | Sends sample events to PagerDuty via Events v3.              |
+| `Sample: Jira`      | Jira Channel      | Triggers a mock issue creation.                              |
+| `Sample: Shuffle`   | Shuffle Channel   | Sends a test payload to the Shuffle workflow.                |
 
-Characteristics of these sample monitors:
+> If a required channel does **not** exist, the monitor will **not** be created.
 
-- They are created disabled and with a minimal condition (they trigger if at least one result exists).
-- They are only created if the corresponding notification channel already exists. If the channel is missing, the monitor is not created; create/configure the channel first and rerun the Health Check.
-- You can review them in `Explore > Alerting > Monitors`.
+You can review the created monitors under `Explore → Alerting → Monitors`.
+For more information about monitor configuration, see the official OpenSearch documentation:
+🔗 [OpenSearch Alerting Monitors Documentation](https://docs.opensearch.org/latest/observing-your-data/alerting/monitors/)
 
 ## Steps to Complete the Configuration
 
