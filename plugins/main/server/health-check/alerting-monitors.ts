@@ -6,7 +6,7 @@
 // Health-check task that ensures sample Alerting monitors exist for quick
 // integrations: Slack, PagerDuty, Jira, Shuffle. Actions will target
 // Notifications channels created by the notifications health-check task. If a
-// channel is not available, monitors are created without actions.
+// required channel is not available, monitors are NOT created.
 
 /**
  * @see https://docs.opensearch.org/3.2/observing-your-data/alerting/api/
@@ -200,11 +200,12 @@ async function ensureMonitor(
     return;
   }
 
-  let destinationId: string | null | undefined = undefined;
-  if (availableDefaultChannelIds) {
-    destinationId = availableDefaultChannelIds.has(channelId)
-      ? channelId
-      : null;
+  // Enforce: do not create sample monitors without their required channel
+  if (!availableDefaultChannelIds || !availableDefaultChannelIds.has(channelId)) {
+    ctx.logger.info(
+      `Skipping sample monitor [${monitorName}] because required channel [${channelId}] is not present`,
+    );
+    return;
   }
 
   try {
@@ -212,7 +213,7 @@ async function ensureMonitor(
       method: 'POST',
       path: '/_plugins/_alerting/monitors',
       querystring: { refresh: 'wait_for' },
-      body: buildMonitorBody(monitorName, severity, destinationId, message),
+      body: buildMonitorBody(monitorName, severity, channelId, message),
     });
     ctx.logger.info(`Created sample monitor [${monitorName}]`);
   } catch (error) {

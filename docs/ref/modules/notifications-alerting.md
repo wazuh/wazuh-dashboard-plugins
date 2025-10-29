@@ -44,7 +44,7 @@ If the Alerts functionality is available, the Health Check attempts to create th
 Characteristics of these sample monitors:
 
 - They are created disabled and with a minimal condition (they trigger if at least one result exists).
-- If the corresponding channel does not yet exist, the monitor is created without an action; you can add it later when the channel is configured.
+- They are only created if the corresponding notification channel already exists. If the channel is missing, the monitor is not created; create/configure the channel first and rerun the Health Check.
 - You can review them in `Explore > Alerting > Monitors`.
 
 ## Steps to Complete the Configuration
@@ -91,4 +91,3 @@ healthcheck.checks_enabled: 'notification-channel:default-channels-integrations'
 
 - [Health Check](./healthcheck.md).
 - Slack – [Incoming Webhooks](https://api.slack.com/messaging/webhooks): official guide to create and obtain the URL.
-
