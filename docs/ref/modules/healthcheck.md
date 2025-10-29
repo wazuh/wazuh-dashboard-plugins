@@ -30,36 +30,37 @@ The checks represents the unit to check and some could do some write actions suc
 
 ## List
 
-| Name                                                | Description                                                                                                        |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `index-pattern:alerts`                              | Validate (create is possible) the existence of a compatible index pattern for alerts                               |
-| `index-pattern:monitoring`                          | Validate (create is possible) the existence of a compatible index pattern for monitoring                           |
-| `index-pattern:statistitcs`                         | Validate (create is possible) the existence of a compatible index pattern for statistics                           |
-| `index-pattern:vulnerabilities-states`              | Validate (create is possible) the existence of a compatible index pattern for vulnerabilities states               |
-| `index-pattern:states-inventory`                    | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene overview states           |
-| `index-pattern:states-inventory-groups`             | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene groups overview states    |
-| `index-pattern:states-inventory-hardware`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene hardware states           |
-| `index-pattern:states-inventory-hotfixes`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene hotfixes states           |
-| `index-pattern:states-inventory-interfaces`         | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene interfaces states         |
-| `index-pattern:states-inventory-networks`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene networks states           |
-| `index-pattern:states-inventory-packages`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene packages states           |
-| `index-pattern:states-inventory-ports`              | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene ports states              |
-| `index-pattern:states-inventory-processes`          | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene processes states          |
-| `index-pattern:states-inventory-protocols`          | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene protocols states          |
-| `index-pattern:states-inventory-system`             | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene system states             |
-| `index-pattern:states-inventory-users`              | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene users states              |
-| `index-pattern:states-inventory-services`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene services states           |
-| `index-pattern:states-inventory-browser-extensions` | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene browser-extensions states |
-| `index-pattern:states-fim-files`                    | Validate (create is possible) the existence of a compatible index pattern for FIM files states                     |
-| `index-pattern:states-fim-registry-keys`            | Validate (create is possible) the existence of a compatible index pattern for FIM registry keys states             |
-| `index-pattern:states-fim-registry-values`          | Validate (create is possible) the existence of a compatible index pattern for FIM registry values states           |
-| `index-pattern:states-sca`                          | Validate (create is possible) the existence of a compatible index pattern for Configuration Assessment states      |
-| `server-api:connection-compatibility`               | Validate the connection and compatibility with the server API hosts                                                |
+| Name                                                 | Description                                                                                                        |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `index-pattern:alerts`                               | Validate (create is possible) the existence of a compatible index pattern for alerts                               |
+| `index-pattern:monitoring`                           | Validate (create is possible) the existence of a compatible index pattern for monitoring                           |
+| `index-pattern:statistitcs`                          | Validate (create is possible) the existence of a compatible index pattern for statistics                           |
+| `index-pattern:vulnerabilities-states`               | Validate (create is possible) the existence of a compatible index pattern for vulnerabilities states               |
+| `index-pattern:states-inventory`                     | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene overview states           |
+| `index-pattern:states-inventory-groups`              | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene groups overview states    |
+| `index-pattern:states-inventory-hardware`            | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene hardware states           |
+| `index-pattern:states-inventory-hotfixes`            | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene hotfixes states           |
+| `index-pattern:states-inventory-interfaces`          | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene interfaces states         |
+| `index-pattern:states-inventory-networks`            | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene networks states           |
+| `index-pattern:states-inventory-packages`            | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene packages states           |
+| `index-pattern:states-inventory-ports`               | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene ports states              |
+| `index-pattern:states-inventory-processes`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene processes states          |
+| `index-pattern:states-inventory-protocols`           | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene protocols states          |
+| `index-pattern:states-inventory-system`              | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene system states             |
+| `index-pattern:states-inventory-users`               | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene users states              |
+| `index-pattern:states-inventory-services`            | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene services states           |
+| `index-pattern:states-inventory-browser-extensions`  | Validate (create is possible) the existence of a compatible index pattern for IT Hygiene browser-extensions states |
+| `index-pattern:states-fim-files`                     | Validate (create is possible) the existence of a compatible index pattern for FIM files states                     |
+| `index-pattern:states-fim-registry-keys`             | Validate (create is possible) the existence of a compatible index pattern for FIM registry keys states             |
+| `index-pattern:states-fim-registry-values`           | Validate (create is possible) the existence of a compatible index pattern for FIM registry values states           |
+| `index-pattern:states-sca`                           | Validate (create is possible) the existence of a compatible index pattern for Configuration Assessment states      |
+| `server-api:connection-compatibility`                | Validate the connection and compatibility with the server API hosts                                                |
 | `notification-channel:default-channels-integrations` | Validate the existence of the default Notifications channels; creates them if missing                              |
 
 ## Notifications and Alerting
 
 - Default Notifications channels
+
   - When the Notifications Dashboards plugin is available, the health check verifies that the default channels exist and creates them if they don’t. The following channels are managed and created disabled so you can safely configure credentials first:
     - Slack Channel: expects a Slack Incoming Webhook URL.
     - PagerDuty Channel: sends Events v2 to `https://events.pagerduty.com/v2/enqueue` (set the Integration Key in the `X-Routing-Key` header).
@@ -78,6 +79,7 @@ The checks represents the unit to check and some could do some write actions suc
 Follow these steps to complete the setup and unmute the channel(s):
 
 1. Configure and enable a default Notifications channel
+
    - Navigate to `Explore > Notifications > Channels` and open one of the created defaults: Slack Channel, PagerDuty Channel, Jira Channel, or Shuffle Channel.
    - Provide credentials/endpoint:
      - Slack: paste your Slack Incoming Webhook URL.
@@ -88,6 +90,7 @@ Follow these steps to complete the setup and unmute the channel(s):
    - Optional: send a test message from the Notifications UI to validate connectivity.
 
 2. Connect and enable the sample Alerting monitors
+
    - Go to `Explore > Alerting > Monitors` and open the corresponding `Sample: <Channel>` monitor.
    - If the monitor was created without actions, add a “Send notification” action and select your configured channel. If the action exists, verify it points to the correct channel.
    - Adjust the message template/subject if needed, then enable the monitor.

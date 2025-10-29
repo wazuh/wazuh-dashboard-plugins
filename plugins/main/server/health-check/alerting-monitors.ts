@@ -12,7 +12,12 @@
  * @see https://docs.opensearch.org/3.2/observing-your-data/alerting/api/
  */
 
-import type { Monitor, NotificationConfigsOpenSearchResponse, PluginTaskRunContext, TriggerAction } from './types';
+import type {
+  Monitor,
+  NotificationConfigsOpenSearchResponse,
+  PluginTaskRunContext,
+  TriggerAction,
+} from './types';
 import { WAZUH_ALERTS_PATTERN } from '../../common/constants';
 import { DEFAULT_CHANNELS_ID } from './notification-default-channels/common/constants';
 
@@ -218,7 +223,7 @@ async function ensureMonitor(
   }
 
   const configs = await getNotificationChannels(ctx);
-  const match = configs.find((config) => config.config_id === channelId);
+  const match = configs.find(config => config.config_id === channelId);
   if (!match) {
     ctx.logger.warn(
       `Notification channel with id [${channelId}] not found among existing configs.`,
@@ -231,12 +236,7 @@ async function ensureMonitor(
       method: 'POST',
       path: '/_plugins/_alerting/monitors',
       querystring: { refresh: 'wait_for' },
-      body: buildMonitorBody(
-        monitorName,
-        severity,
-        match.config_id,
-        message,
-      ),
+      body: buildMonitorBody(monitorName, severity, match.config_id, message),
     });
     ctx.logger.info(`Created sample monitor [${monitorName}]`);
   } catch (error) {

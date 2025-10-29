@@ -14,10 +14,10 @@ security_rest_api_access:
 alerting_read_access:
   reserved: true
   cluster_permissions:
-    - "cluster:admin/opendistro/alerting/alerts/get"
-    - "cluster:admin/opendistro/alerting/destination/get"
-    - "cluster:admin/opendistro/alerting/monitor/get"
-    - "cluster:admin/opendistro/alerting/monitor/search"
+    - 'cluster:admin/opendistro/alerting/alerts/get'
+    - 'cluster:admin/opendistro/alerting/destination/get'
+    - 'cluster:admin/opendistro/alerting/monitor/get'
+    - 'cluster:admin/opendistro/alerting/monitor/search'
 
 # Allows users to view and acknowledge alerts
 alerting_ack_alerts:
