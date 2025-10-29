@@ -194,57 +194,6 @@ services:
       timeout: 5s
       retries: 120
 
-  # Uncomment to run indexer from package. Ensure the other os1 service that run a OS image is commented
-  # os1:
-  #   depends_on:
-  #     idpsetup:
-  #       condition: service_completed_successfully
-  #       required: false
-  #     generator:
-  #       condition: service_healthy
-  #   build:
-  #     context: ./indexer
-  #   image: wazuh-indexer-pkg:${IMAGE_TAG}
-  #   # <<: *logging
-  #   profiles:
-  #     - 'server'
-  #     - 'saml'
-  #     - 'standard'
-  #     - 'dashboard-src'
-  #     - 'server-local' # server profile to use the local packages with agents deb and rpm
-  #     - 'server-local-rpm' # server profile to use the local packages with agent rpm
-  #     - 'server-local-deb' # server profile to use the local packages with agent deb
-  #     - 'server-local-without' # server profile to use the local packages without agent
-  #   environment:
-  #     - OPENSEARCH_PATH_CONF=/etc/wazuh-indexer
-  #   ulimits:
-  #     memlock:
-  #       soft: -1
-  #       hard: -1
-  #     nofile:
-  #       soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
-  #       hard: 65536
-  #   volumes:
-  #     - wi_certs:/etc/wazuh-indexer/certs/
-  #     - ./config/${OSD_MAJOR}/os/opensearch.yml:/etc/wazuh-indexer/opensearch.yml
-  #     - os_logs:/var/log/os1
-  #     - os_data:/var/lib/os1
-  #   ports:
-  #     - 9200:9200
-  #     - 9300:9300
-  #   networks:
-  #     - os-dev
-  #     - mon
-  #   entrypoint: ['bash', '/entrypoint.sh']
-  #   healthcheck:
-  #     test: [
-  #         'CMD-SHELL',
-  #         "curl -v --cacert /etc/wazuh-indexer/certs/ca.pem https://os1:9200 2>&1 | grep -q '401'",
-  #       ]
-  #     interval: 1s
-  #     timeout: 5s
-  #     retries: 120
-
   filebeat:
     depends_on:
       os1:
