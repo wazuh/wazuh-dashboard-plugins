@@ -194,12 +194,6 @@ async function ensureMonitor(
   availableDefaultChannelIds?: Set<string>,
 ) {
   const { monitorName, channelId, message, severity } = sample;
-  const exists = await monitorExists(ctx, monitorName);
-  if (exists) {
-    ctx.logger.info(`Monitor already exists [${monitorName}]`);
-    return;
-  }
-
   // Enforce: do not create sample monitors without their required channel
   if (
     !availableDefaultChannelIds ||
@@ -208,6 +202,12 @@ async function ensureMonitor(
     ctx.logger.info(
       `Skipping sample monitor [${monitorName}] because required channel [${channelId}] is not present`,
     );
+    return;
+  }
+
+  const exists = await monitorExists(ctx, monitorName);
+  if (exists) {
+    ctx.logger.info(`Monitor already exists [${monitorName}]`);
     return;
   }
 
