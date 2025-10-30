@@ -1314,10 +1314,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Prompt to show the unsupported module for the selected agent [#2959](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2959)
 - Added a X-Frame-Options header to the backend responses [#2977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2977)
 
+
 ### Changed
 
 - Added toast with refresh button when new fields are loaded [#2974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2974)
 - Migrated manager and cluster files endpoints and their corresponding RBAC [#2984](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2984)
+- Changed dashboards renderer by saved objects [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842)
 
 ### Fixed
 
