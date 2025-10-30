@@ -413,7 +413,7 @@ function generateAlert(params) {
         /* empty */
       }
     }
-    
+
     // Log information
     alert.log = generateLog({
       level: 'info',
@@ -670,37 +670,45 @@ function generateAlert(params) {
   if (params.syscheck) {
     // Determine FIM event type
     const eventType = Random.arrayItem(IntegrityMonitoring.events); // 'added', 'modified', 'deleted'
-    
+
     // Select file path based on OS
     const isWindows = alert.agent.host.os.type === 'windows';
     const filePath = Random.arrayItem(
-      isWindows ? IntegrityMonitoring.pathsWindows : IntegrityMonitoring.pathsLinux
+      isWindows
+        ? IntegrityMonitoring.pathsWindows
+        : IntegrityMonitoring.pathsLinux,
     );
-    
+
     // Extract file components
     const separator = isWindows ? '\\' : '/';
     const fileName = filePath.split(separator).pop();
-    const fileDirectory = filePath.substring(0, filePath.lastIndexOf(separator));
-    
+    const fileDirectory = filePath.substring(
+      0,
+      filePath.lastIndexOf(separator),
+    );
+
     // Update event categorization
     alert.event = generateEvent({
       kind: EVENT_KINDS.ALERT,
       category: [EVENT_CATEGORIES.FILE],
-      type: eventType === 'added' ? [EVENT_TYPES.CREATION] : 
-            eventType === 'modified' ? [EVENT_TYPES.CHANGE] : 
-            [EVENT_TYPES.DELETION],
+      type:
+        eventType === 'added'
+          ? [EVENT_TYPES.CREATION]
+          : eventType === 'modified'
+          ? [EVENT_TYPES.CHANGE]
+          : [EVENT_TYPES.DELETION],
       action: `file-${eventType}`,
       outcome: EVENT_OUTCOMES.SUCCESS,
       module: 'fim',
-      severity: eventType === 'deleted' ? 7 : (eventType === 'modified' ? 5 : 3),
+      severity: eventType === 'deleted' ? 7 : eventType === 'modified' ? 5 : 3,
     });
-    
+
     // Generate file information (ECS)
     const fileOwner = Random.arrayItem(USERS);
     const fileGroup = 'root';
     const fileUid = Random.arrayItem(IntegrityMonitoring.uid_after);
     const fileGid = Random.arrayItem(IntegrityMonitoring.gid_after);
-    
+
     alert.file = {
       path: filePath,
       name: fileName,
@@ -714,7 +722,7 @@ function generateAlert(params) {
       uid: String(fileUid),
       gid: String(fileGid),
     };
-    
+
     // Add hashes for modified/deleted files
     if (eventType === 'modified' || eventType === 'deleted') {
       alert.file.hash = {
@@ -723,19 +731,21 @@ function generateAlert(params) {
         sha256: Random.createHash(64),
       };
     }
-    
+
     // For modified files, add changed attributes
     if (eventType === 'modified') {
-      alert.file.attributes = [Random.arrayItem(IntegrityMonitoring.attributes)];
+      alert.file.attributes = [
+        Random.arrayItem(IntegrityMonitoring.attributes),
+      ];
     }
-    
+
     // For deleted files, add process and user information
     if (eventType === 'deleted') {
       const processUser = Random.arrayItem(USERS);
       const processUserId = Random.number(0, 100);
       const processGroup = Random.arrayItem(USERS);
       const processGroupId = Random.number(0, 100);
-      
+
       alert.process = {
         pid: Random.number(100, 100000),
         parent: {
@@ -752,44 +762,44 @@ function generateAlert(params) {
           name: processGroup,
         },
       };
-      
+
       alert.user = generateUser({
         name: processUser,
         id: String(processUserId),
         groupName: processGroup,
         groupId: String(processGroupId),
       });
-      
+
       // Add tags for deleted files
       if (Random.probability(0.5)) {
         alert.tags.push(Random.arrayItem(IntegrityMonitoring.tags));
       }
     }
-    
+
     // Generate message
     const actionDescriptions = {
       added: 'File created',
       modified: 'File modified',
       deleted: 'File deleted',
     };
-    
+
     alert.message = generateMessage({
       action: actionDescriptions[eventType],
       fileName: filePath,
       user: eventType === 'deleted' ? alert.user?.name : undefined,
     });
-    
+
     // Log information
     alert.log = generateLog({
       level: eventType === 'deleted' ? 'warning' : 'info',
       filePath: '/var/ossec/logs/ossec.log',
       originFile: 'syscheck',
     });
-    
+
     // Update wazuh fields
     alert.wazuh.decoders = ['syscheck'];
     alert.wazuh.rules = getRulesForModule('fim', eventType);
-    
+
     // Update rule based on event type
     switch (eventType) {
       case 'added':
