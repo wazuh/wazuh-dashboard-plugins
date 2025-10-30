@@ -63,6 +63,7 @@ For more information about monitor configuration, see the official OpenSearch do
 ## Steps to Complete the Configuration
 
 1. Configure and enable the notification channel
+
    - Go to `Explore > Notifications > Channels` and open one of the default channels (Slack, PagerDuty, Jira, or Shuffle).
    - Provide the required endpoint or credentials, replacing the placeholders with real values:
      - **Slack**: specify the Incoming Webhook URL obtained from your Slack workspace.
@@ -72,10 +73,12 @@ For more information about monitor configuration, see the official OpenSearch do
    - Save and unmuted/enable the channel when the test is successful.
 
    Test notes:
+
    - **Slack**: you can validate the channel by sending a test message from the Notifications interface.
    - **Jira** and **PagerDuty**: effective validation is performed by executing the action from a monitor (see point 2). This is the recommended way to confirm delivery.
 
 2. Connect and enable the sample monitors
+
    - Go to `Explore > Alerting > Monitors` and open the corresponding `Sample: <Channel>` monitor.
    - If it has no action, add "Send notification" and select the previously configured channel; if it already exists, verify that it points to the correct channel.
    - Adjust the subject/message template if necessary and enable the monitor.
