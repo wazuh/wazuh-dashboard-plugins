@@ -20,6 +20,10 @@ const {
   GEO_LOCATION,
   AGENTS,
   DECODER,
+  AS_DATA,
+  DOMAINS,
+  USER_GROUPS,
+  USER_ROLES,
 } = require('./sample-data/common');
 const {
   PCI_DSS,
@@ -55,62 +59,87 @@ const { Random } = require('./helpers/random');
 const { DateFormatter } = require('./helpers/date-formatter');
 const { interpolateAlertProps } = require('./helpers/interpolate-alert-props');
 
+// ECS Generators for Wazuh 5.0
+const {
+  EVENT_CATEGORIES,
+  EVENT_TYPES,
+  EVENT_KINDS,
+  EVENT_OUTCOMES,
+  generateEvent,
+  generateLog,
+  generateMessage,
+  generateHost,
+  generateUser,
+  generateNetworkEndpoint,
+} = require('./helpers/ecs-generator');
+const {
+  generateWazuhField,
+  getDecodersForModule,
+  getRulesForModule,
+  generateAgent,
+  generateRule,
+} = require('./helpers/wazuh-generator');
+
 /**
- * Generate a alert
+ * Generate an alert in Wazuh 5.0 ECS format
  * @param {import('./types').Params} params
  * @returns {import('./types').SampleAlert}
  **/
 function generateAlert(params) {
-  /** @type {import('./types').Alert} */
-  let alert = {
-    timestamp: '2020-01-27T11:08:47.777+0000',
-    rule: {
-      level: 3,
-      description: 'Sample alert',
-      id: '5502',
-      mail: false,
-      groups: [],
-    },
-    agent: {
-      id: '000',
-      name: 'master',
-    },
-    manager: {
-      name: 'master',
-    },
-    cluster: {
-      name: 'wazuh',
-    },
-    id: '1580123327.49031',
-    predecoder: {},
-    decoder: {},
-    data: {},
-    location: '',
-  };
-  alert.agent = Random.arrayItem(AGENTS);
-  alert.rule.description = Random.arrayItem(RULE_DESCRIPTION);
-  alert.rule.id = `${Random.number(1, ALERT_ID_MAX)}`;
-  alert.rule.level = Random.number(1, RULE_MAX_LEVEL);
-
-  alert.timestamp = DateFormatter.format(
-    Random.date(),
+  // Generate random date for the alert
+  const alertDate = Random.date();
+  const timestamp = DateFormatter.format(
+    alertDate,
     DateFormatter.DATE_FORMAT.ISO_TIMESTAMP,
   );
 
-  if (params.manager) {
-    if (params.manager.name) {
-      alert.manager.name = params.manager.name;
-    }
-  }
+  // Select random agent
+  const selectedAgent = Random.arrayItem(AGENTS);
 
-  if (params.cluster) {
-    if (params.cluster.name) {
-      alert.cluster.name = params.cluster.name;
-    }
-    if (params.cluster.node) {
-      alert.cluster.node = params.cluster.node;
-    }
-  }
+  // Generate base Wazuh 5.0 ECS alert structure
+  /** @type {import('./types').Alert} */
+  let alert = {
+    // ECS Core Fields
+    '@timestamp': timestamp,
+    tags: ['wazuh', '@sampledata'],
+
+    // Event categorization (will be set by specific alert type)
+    event: generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.AUTHENTICATION],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.UNKNOWN,
+      created: alertDate,
+    }),
+
+    // Message (human-readable)
+    message: 'Sample security alert',
+
+    // Agent information (ECS-compliant with Wazuh 5.0 extensions)
+    agent: generateAgent(selectedAgent, {
+      groups: ['default'],
+      version: 'v5.0.0',
+    }),
+
+    // Wazuh-specific fields
+    wazuh: generateWazuhField({
+      clusterName: params.cluster?.name || 'wazuh-cluster',
+      clusterNode: params.cluster?.node || null,
+    }),
+
+    // Rule information
+    rule: generateRule({
+      id: `${Random.number(1, ALERT_ID_MAX)}`,
+      description: Random.arrayItem(RULE_DESCRIPTION),
+      level: Random.number(1, RULE_MAX_LEVEL),
+    }),
+  };
+
+  // Sample data marker
+  alert['@sampledata'] = true;
+
+  // Initialize data object for modules that haven't been migrated yet
+  alert.data = {};
 
   if (params.aws) {
     const randomType = Random.arrayItem([
@@ -764,24 +793,7 @@ function generateAlert(params) {
   }
 
   if (params.authentication) {
-    alert.data = {
-      srcip: Random.arrayItem(IPs),
-      srcuser: Random.arrayItem(USERS),
-      srcport: Random.arrayItem(PORTS),
-    };
-    alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
-    alert.decoder = DECODER.SSHD;
-    alert.input = {
-      type: 'log',
-    };
-    alert.predecoder = {
-      program_name: 'sshd',
-      timestamp: DateFormatter.format(
-        new Date(alert.timestamp),
-        DateFormatter.DATE_FORMAT.SHORT_READABLE_FORMAT,
-      ),
-      hostname: alert.manager.name,
-    };
+    // Select authentication event type
     const typeAlert = Random.arrayItem([
       'invalidLoginPassword',
       'invalidLoginUser',
@@ -795,189 +807,215 @@ function generateAlert(params) {
       'maximumAuthenticationAttemptsExceeded',
     ]);
 
+    // Determine if authentication was successful
+    const isSuccess = typeAlert === 'authenticationSuccess';
+    const isBruteForce =
+      typeAlert === 'multipleAuthenticationFailures' ||
+      typeAlert === 'bruteForceTryingAccessSystem' ||
+      typeAlert === 'maximumAuthenticationAttemptsExceeded';
+
+    // Generate user information
+    const userName = Random.arrayItem(USERS);
+    alert.user = generateUser({
+      name: userName,
+      id: String(Random.number(0, 1000)),
+    });
+
+    // Generate source network information
+    const sourceGeo = Random.arrayItem(GEO_LOCATION);
+    const sourceAs = Random.arrayItem(AS_DATA);
+    const sourceIp = Random.arrayItem(IPs);
+    const sourcePort = parseInt(Random.arrayItem(PORTS), 10);
+
+    alert.source = generateNetworkEndpoint({
+      ip: sourceIp,
+      port: sourcePort,
+      geo: sourceGeo,
+      as: sourceAs,
+    });
+
+    // Generate destination (target system - the agent)
+    alert.destination = generateNetworkEndpoint({
+      ip: alert.agent.host.ip[0],
+      port: 22, // SSH port
+    });
+
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.AUTHENTICATION],
+      type: isSuccess ? [EVENT_TYPES.START] : [EVENT_TYPES.DENIED],
+      action: isSuccess ? 'ssh-login-success' : 'ssh-login-failure',
+      outcome: isSuccess ? EVENT_OUTCOMES.SUCCESS : EVENT_OUTCOMES.FAILURE,
+      module: 'authentication',
+      severity: isBruteForce ? 8 : isSuccess ? 3 : 5,
+    });
+
+    // Log information
+    alert.log = generateLog({
+      level: isSuccess ? 'info' : 'warning',
+      filePath: '/var/log/auth.log',
+      originFile: 'sshd',
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('authentication');
+    alert.wazuh.rules = getRulesForModule(
+      'authentication',
+      isSuccess ? 'success' : 'failure',
+    );
+
     switch (typeAlert) {
       case 'invalidLoginPassword': {
-        alert.location = Authentication.invalidLoginPassword.location;
         alert.rule = { ...Authentication.invalidLoginPassword.rule };
         alert.rule.groups = [
           ...Authentication.invalidLoginPassword.rule.groups,
         ];
-        alert.full_log = interpolateAlertProps(
-          Authentication.invalidLoginPassword.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Invalid password for SSH login',
+          user: userName,
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'invalidLoginUser': {
-        alert.location = Authentication.invalidLoginUser.location;
         alert.rule = { ...Authentication.invalidLoginUser.rule };
         alert.rule.groups = [...Authentication.invalidLoginUser.rule.groups];
-        alert.full_log = interpolateAlertProps(
-          Authentication.invalidLoginUser.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Invalid user for SSH login',
+          user: userName,
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'multipleAuthenticationFailures': {
-        alert.location = Authentication.multipleAuthenticationFailures.location;
         alert.rule = { ...Authentication.multipleAuthenticationFailures.rule };
         alert.rule.groups = [
           ...Authentication.multipleAuthenticationFailures.rule.groups,
         ];
         alert.rule.frequency = Random.number(5, 50);
-        alert.full_log = interpolateAlertProps(
-          Authentication.multipleAuthenticationFailures.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Multiple authentication failures detected',
+          user: userName,
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'windowsInvalidLoginPassword': {
-        alert.location = Authentication.windowsInvalidLoginPassword.location;
         alert.rule = { ...Authentication.windowsInvalidLoginPassword.rule };
         alert.rule.groups = [
           ...Authentication.windowsInvalidLoginPassword.rule.groups,
         ];
         alert.rule.frequency = Random.number(5, 50);
-        alert.data.win = {
-          ...Authentication.windowsInvalidLoginPassword.data_win,
+        // Windows event data
+        alert.data = {
+          win: {
+            ...Authentication.windowsInvalidLoginPassword.data_win,
+          },
         };
-        alert.data.win.eventdata.ipAddress = Random.arrayItem(IPs);
-        alert.data.win.eventdata.ipPort = Random.arrayItem(PORTS);
+        alert.data.win.eventdata.ipAddress = sourceIp;
+        alert.data.win.eventdata.ipPort = String(sourcePort);
         alert.data.win.system.computer = Random.arrayItem(WIN_HOSTNAMES);
         alert.data.win.system.eventID = `${Random.number(1, 600)}`;
         alert.data.win.system.eventRecordID = `${Random.number(10000, 50000)}`;
         alert.data.win.system.processID = `${Random.number(1, 1200)}`;
-        alert.data.win.system.systemTime = alert.timestamp;
-        alert.data.win.system.processID = `${Random.number(1, 1200)}`;
+        alert.data.win.system.systemTime = alert['@timestamp'];
         alert.data.win.system.task = `${Random.number(1, 1800)}`;
         alert.data.win.system.threadID = `${Random.number(1, 500)}`;
-        alert.full_log = interpolateAlertProps(
-          Authentication.windowsInvalidLoginPassword.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Windows invalid password',
+          user: userName,
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'userLoginFailed': {
-        alert.location = Authentication.userLoginFailed.location;
         alert.rule = { ...Authentication.userLoginFailed.rule };
         alert.rule.groups = [...Authentication.userLoginFailed.rule.groups];
-        alert.data = {
-          srcip: Random.arrayItem(IPs),
-          dstuser: Random.arrayItem(USERS),
-          uid: `${Random.number(0, 50)}`,
-          euid: `${Random.number(0, 50)}`,
-          tty: 'ssh',
-        };
-        alert.decoder = { ...Authentication.userLoginFailed.decoder };
-        alert.full_log = interpolateAlertProps(
-          Authentication.userLoginFailed.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'User login failed',
+          user: userName,
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'passwordCheckFailed': {
-        alert.location = Authentication.passwordCheckFailed.location;
         alert.rule = { ...Authentication.passwordCheckFailed.rule };
         alert.rule.groups = [...Authentication.passwordCheckFailed.rule.groups];
-        alert.data = {
-          srcuser: Random.arrayItem(USERS),
-        };
-        alert.predecoder.program_name = 'unix_chkpwd';
-        alert.decoder = { ...Authentication.passwordCheckFailed.decoder };
-        alert.full_log = interpolateAlertProps(
-          Authentication.passwordCheckFailed.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Password check failed',
+          user: userName,
+        });
         break;
       }
       case 'nonExistentUser': {
-        alert.location = Authentication.nonExistentUser.location;
         alert.rule = { ...Authentication.nonExistentUser.rule };
         alert.rule.groups = [...Authentication.nonExistentUser.rule.groups];
-        alert.full_log = interpolateAlertProps(
-          Authentication.nonExistentUser.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Attempt to login with non-existent user',
+          user: userName,
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'bruteForceTryingAccessSystem': {
-        alert.location = Authentication.bruteForceTryingAccessSystem.location;
         alert.rule = { ...Authentication.bruteForceTryingAccessSystem.rule };
         alert.rule.groups = [
           ...Authentication.bruteForceTryingAccessSystem.rule.groups,
         ];
-        alert.full_log = interpolateAlertProps(
-          Authentication.bruteForceTryingAccessSystem.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Brute force attack detected',
+          user: userName,
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'reverseLoockupError': {
-        alert.location = Authentication.reverseLoockupError.location;
         alert.rule = { ...Authentication.reverseLoockupError.rule };
         alert.rule.groups = [...Authentication.reverseLoockupError.rule.groups];
-        alert.data = {
-          srcip: Random.arrayItem(IPs),
-        };
-        alert.full_log = interpolateAlertProps(
-          Authentication.reverseLoockupError.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Reverse DNS lookup error',
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'insecureConnectionAttempt': {
-        alert.location = Authentication.insecureConnectionAttempt.location;
         alert.rule = { ...Authentication.insecureConnectionAttempt.rule };
         alert.rule.groups = [
           ...Authentication.insecureConnectionAttempt.rule.groups,
         ];
-        alert.data = {
-          srcip: Random.arrayItem(IPs),
-          srcport: Random.arrayItem(PORTS),
-        };
-        alert.full_log = interpolateAlertProps(
-          Authentication.insecureConnectionAttempt.full_log,
-          alert,
-        );
+        alert.message = generateMessage({
+          action: 'Insecure connection attempt',
+          sourceIp: sourceIp,
+        });
         break;
       }
       case 'authenticationSuccess':
         {
-          alert.location = Authentication.authenticationSuccess.location;
           alert.rule = { ...Authentication.authenticationSuccess.rule };
           alert.rule.groups = [
             ...Authentication.authenticationSuccess.rule.groups,
           ];
-          alert.data = {
-            srcip: Random.arrayItem(IPs),
-            srcport: Random.arrayItem(PORTS),
-            dstuser: Random.arrayItem(USERS),
-          };
-          alert.full_log = interpolateAlertProps(
-            Authentication.authenticationSuccess.full_log,
-            alert,
-          );
+          alert.message = generateMessage({
+            action: 'SSH authentication successful',
+            user: userName,
+            sourceIp: sourceIp,
+          });
         }
         break;
       case 'maximumAuthenticationAttemptsExceeded':
         {
-          alert.location =
-            Authentication.maximumAuthenticationAttemptsExceeded.location;
           alert.rule = {
             ...Authentication.maximumAuthenticationAttemptsExceeded.rule,
           };
           alert.rule.groups = [
             ...Authentication.maximumAuthenticationAttemptsExceeded.rule.groups,
           ];
-          alert.data = {
-            srcip: Random.arrayItem(IPs),
-            srcport: Random.arrayItem(PORTS),
-            dstuser: Random.arrayItem(USERS),
-          };
-          alert.full_log = interpolateAlertProps(
-            Authentication.maximumAuthenticationAttemptsExceeded.full_log,
-            alert,
-          );
+          alert.message = generateMessage({
+            action: 'Maximum authentication attempts exceeded',
+            user: userName,
+            sourceIp: sourceIp,
+          });
         }
         break;
       default: {
@@ -989,30 +1027,70 @@ function generateAlert(params) {
   }
 
   if (params.ssh) {
-    alert.data = {
-      srcip: Random.arrayItem(IPs),
-      srcuser: Random.arrayItem(USERS),
-      srcport: Random.arrayItem(PORTS),
-    };
-    alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
-    alert.decoder = DECODER.SSHD;
-    alert.input = {
-      type: 'log',
-    };
-    alert.predecoder = {
-      program_name: 'sshd',
-      timestamp: DateFormatter.format(
-        new Date(alert.timestamp),
-        DateFormatter.DATE_FORMAT.SHORT_READABLE_FORMAT,
-      ),
-      hostname: alert.manager.name,
-    };
+    // SSH is similar to authentication, use same ECS structure
+    const userName = Random.arrayItem(USERS);
+    const sourceGeo = Random.arrayItem(GEO_LOCATION);
+    const sourceAs = Random.arrayItem(AS_DATA);
+    const sourceIp = Random.arrayItem(IPs);
+    const sourcePort = parseInt(Random.arrayItem(PORTS), 10);
+
+    // Generate user information
+    alert.user = generateUser({
+      name: userName,
+      id: String(Random.number(0, 1000)),
+    });
+
+    // Generate source network information
+    alert.source = generateNetworkEndpoint({
+      ip: sourceIp,
+      port: sourcePort,
+      geo: sourceGeo,
+      as: sourceAs,
+    });
+
+    // Generate destination
+    alert.destination = generateNetworkEndpoint({
+      ip: alert.agent.host.ip[0],
+      port: 22,
+    });
+
+    // Update event categorization
     const typeAlert = Random.arrayItem(SSH.data);
-    alert.location = typeAlert.location;
+    const isSuccess =
+      typeAlert.rule.id === '5715' || typeAlert.rule.id === '5710';
+
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.AUTHENTICATION],
+      type: isSuccess ? [EVENT_TYPES.START] : [EVENT_TYPES.DENIED],
+      action: isSuccess ? 'ssh-login' : 'ssh-login-failed',
+      outcome: isSuccess ? EVENT_OUTCOMES.SUCCESS : EVENT_OUTCOMES.FAILURE,
+      module: 'ssh',
+      severity: isSuccess ? 3 : 5,
+    });
+
+    // Log information
+    alert.log = generateLog({
+      level: isSuccess ? 'info' : 'warning',
+      filePath: '/var/log/auth.log',
+      originFile: 'sshd',
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = ['sshd'];
+    alert.wazuh.rules = [typeAlert.rule.id];
+
+    // Set rule
     alert.rule = { ...typeAlert.rule };
     alert.rule.groups = [...typeAlert.rule.groups];
     alert.rule.firedtimes = Random.number(1, 15);
-    alert.full_log = interpolateAlertProps(typeAlert.full_log, alert);
+
+    // Generate message
+    alert.message = generateMessage({
+      action: typeAlert.rule.description || 'SSH event',
+      user: userName,
+      sourceIp: sourceIp,
+    });
   }
 
   if (params.windows) {
@@ -1168,7 +1246,7 @@ function generateAlert(params) {
   return {
     ...alert,
     ['@sampledata']: true,
-    ['@timestamp']: alert.timestamp,
+    ['@timestamp']: alert['@timestamp'], // Already set in base structure
   };
 }
 
