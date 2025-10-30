@@ -222,7 +222,7 @@ async function ensureMonitor(
   } catch (error) {
     const _error = error as Error;
     // Don’t break health check; surface a clear warning
-    ctx.logger.warn(
+    ctx.logger.error(
       `Could not create sample monitor [${monitorName}]: ${
         _error?.message || _error
       }`,
@@ -254,7 +254,7 @@ export const createSampleAlertingMonitors = async (
     const message = `Error ensuring sample monitors: ${
       _error?.message || _error
     }`;
-    ctx.logger.warn(message);
+    ctx.logger.error(message);
     // Non-critical task: throw to report error state in the check result
     throw new Error(message);
   }
