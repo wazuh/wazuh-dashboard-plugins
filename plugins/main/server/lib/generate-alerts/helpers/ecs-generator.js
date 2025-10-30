@@ -14,6 +14,10 @@ const { Random } = require('./random');
 
 /**
  * ECS Event Categories
+<<<<<<< HEAD
+=======
+ * https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-category.html
+>>>>>>> 6ac39583eae504dc5db1fd6ef779fb0358b590c6
  */
 const EVENT_CATEGORIES = {
   AUTHENTICATION: 'authentication',
@@ -38,6 +42,10 @@ const EVENT_CATEGORIES = {
 
 /**
  * ECS Event Types
+<<<<<<< HEAD
+=======
+ * https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-type.html
+>>>>>>> 6ac39583eae504dc5db1fd6ef779fb0358b590c6
  */
 const EVENT_TYPES = {
   ACCESS: 'access',
@@ -60,6 +68,10 @@ const EVENT_TYPES = {
 
 /**
  * ECS Event Kinds
+<<<<<<< HEAD
+=======
+ * https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-kind.html
+>>>>>>> 6ac39583eae504dc5db1fd6ef779fb0358b590c6
  */
 const EVENT_KINDS = {
   ALERT: 'alert',
@@ -73,6 +85,10 @@ const EVENT_KINDS = {
 
 /**
  * ECS Event Outcomes
+<<<<<<< HEAD
+=======
+ * https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-outcome.html
+>>>>>>> 6ac39583eae504dc5db1fd6ef779fb0358b590c6
  */
 const EVENT_OUTCOMES = {
   SUCCESS: 'success',
