@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { getPlugins } from '../../../../kibana-services';
-import { buildDashboardByValueInput, getFiltersParams } from './dashboard-container-service';
+import { buildDashboardByValueInput, getFiltersParams } from './dashboard-renderer-service';
 import { Status, DashboardByValueInput } from './types';
 
-type DashboardContainerProps = {
+type DashboardRendererProps = {
   dashboardId: string;
   agentDashboardId?: string;
   hasPinnedAgent: boolean;
@@ -13,7 +13,7 @@ type DashboardContainerProps = {
   }
 };
 
-export const DashboardContainer: React.FC<DashboardContainerProps> = ({
+export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
   dashboardId,
   agentDashboardId,
   hasPinnedAgent,
@@ -28,7 +28,7 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({
   const [byValueInput, setByValueInput] = useState<DashboardByValueInput | null>(null);
 
   const buildDashboard = useCallback(async (isAgent: boolean) => {
-    return await buildDashboardByValueInput(isAgent && agentDashboardId ? agentDashboardId : dashboardId); 
+    return await buildDashboardByValueInput(isAgent && agentDashboardId ? agentDashboardId : dashboardId);
   }, [dashboardId, agentDashboardId]);
 
   const buildByValueInputHandler = useCallback(async () => {
@@ -37,7 +37,7 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({
     setByValueInput(null);
 
     const result = await buildDashboard(hasPinnedAgent);
-    
+
     if (result.success) {
       setByValueInput({
         ...result.byValueInput!
@@ -135,4 +135,4 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({
   return null;
 };
 
-export default DashboardContainer;
+export default DashboardRenderer;

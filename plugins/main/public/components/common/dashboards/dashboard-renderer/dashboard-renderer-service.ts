@@ -103,7 +103,7 @@ export async function buildDashboardByValueInput(
     )) as { data: SavedDashboardSO };
 
     const byValueInput = toByValueInput(data, config);
-    
+
     return {
       success: true,
       status: 'ready',

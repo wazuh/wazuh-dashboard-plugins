@@ -11,7 +11,7 @@ import { WzSearchBar } from '../search-bar';
 import { DiscoverNoResults } from '../no-results/no-results';
 import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
-import DashboardContainer from './dashboard-container/dashboard-container';
+import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
 
 
 export const Dashboard = props => {
@@ -62,7 +62,7 @@ export const Dashboard = props => {
               className = '',
             }) => {
               const idComponent = dashboardId;
-              const dashboard = <DashboardContainer 
+              const dashboard = <DashboardRenderer
                 dashboardId={dashboardId}
                 agentDashboardId={agentDashboardId}
                 className={className}
@@ -70,7 +70,7 @@ export const Dashboard = props => {
                 config={{
                   dataSource: props.dataSource,
                 }}
-              />
+              />;
 
               if (className) {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
@@ -134,11 +134,11 @@ export const createDashboard = ({
           // Add conditionally the date range if the index pattern has a time field
           ...(dataSource.dataSource.indexPattern.timeFieldName
             ? {
-                dateRange: {
-                  from: dateRangeFrom,
-                  to: dateRangeTo,
-                },
-              }
+              dateRange: {
+                from: dateRangeFrom,
+                to: dateRangeTo,
+              },
+            }
             : {}),
         };
       },

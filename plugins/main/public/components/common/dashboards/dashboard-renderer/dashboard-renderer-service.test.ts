@@ -1,6 +1,6 @@
 /**
- * Unit tests for dashboard-container-service.ts
- * These tests cover the methods used by dashboard-container.tsx component
+ * Unit tests for dashboard-renderer-service.ts
+ * These tests cover the methods used by dashboard-renderer.tsx component
  */
 
 // @ts-nocheck
@@ -18,11 +18,11 @@ import {
   buildDashboardByValueInput,
   toByValueInput,
   transformPanelsJSON,
-} from './dashboard-container-service';
+} from './dashboard-renderer-service';
 import { SavedDashboardSO, DashboardConfigInput } from './types';
 import { SavedObject } from '../../../../react-services/saved-objects';
 
-describe('Dashboard Container Service', () => {
+describe('Dashboard Renderer Service', () => {
   beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
