@@ -215,7 +215,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         services: plugins.wazuhCore,
         taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_ALERTS,
         options: {
-          savedObjectOverwrite: defineTimeFieldNameIfExist('timestamp'),
+          savedObjectOverwrite: defineTimeFieldNameIfExist('@timestamp'), // Wazuh 5.0 ECS
           hasTemplate: true,
           hasFields: INDEX_PATTERN_ALERTS_REQUIRED_FIELDS,
           hasTimeFieldName: true,
