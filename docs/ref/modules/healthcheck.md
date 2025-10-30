@@ -66,7 +66,7 @@ The checks represents the unit to check and some could do some write actions suc
 | `index-pattern:states-fim-registry-values`           | Validate (create if possible) the existence of a compatible index pattern for FIM registry values states                           |
 | `index-pattern:states-sca`                           | Validate (create if possible) the existence of a compatible index pattern for Configuration Assessment states                      |
 | `server-api:connection-compatibility`                | Validate the connection and compatibility with the server API hosts                                                                |
-| `notification-channel:default-channels-integrations` | Validate the existence of the default Notifications channels; creates them if missing. See Notifications and Alerting for details. |
+| `integrations:default-integrations` | Validate the existence of the default Notifications channels; creates them if missing. See Notifications and Alerting for details. |
 
 ## Notifications and Alerting
 

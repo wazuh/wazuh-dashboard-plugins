@@ -2,7 +2,7 @@
 
 ## Overview
 
-When executed, the Health Check validates that the Notifications and Alerting plugins are available and ensures that a minimal, working configuration exists.  
+When executed, the Health Check validates that the Notifications and Alerting plugins are available and ensures that a minimal, working configuration exists.
 If both plugins are detected, it automatically:
 
 - Creates **default notification channels** (muted by default) for the supported integrations.
@@ -22,7 +22,7 @@ These functions are part of the Dashboard and may be available depending on the 
 
 The Health Check includes a specific task that streamlines the setup of these capabilities:
 
-- **Task name**: `notification-channel:default-channels-integrations`.
+- **Task name**: `integrations:default-integrations`.
 - **Function**: verifies the existence of default notification channels and creates them if missing. If the Alerts component is available, it also attempts to create sample monitors pointing to those channels.
 - **Creation state**: channels and monitors created by this task are left disabled to facilitate review and configuration before activation.
 
@@ -98,7 +98,7 @@ healthcheck.checks_enabled: 'notification-channel'
 Or, to explicitly target the task described above:
 
 ```yml
-healthcheck.checks_enabled: 'notification-channel:default-channels-integrations'
+healthcheck.checks_enabled: 'integrations:default-integrations'
 ```
 
 ## Logs and Troubleshooting
@@ -107,10 +107,10 @@ The Health Check logs detailed progress information during verification and setu
 Examples of log entries include:
 
 ```
-server    log   [15:03:45.031] [info][healthcheck][notification-channel:default-channels-integrations] All default notification channels are now present and verified
-server    log   [15:18:45.030] [info][healthcheck][notification-channel:default-channels-integrations] Starting Alerting sample monitors check
-server    log   [15:18:45.041] [info][healthcheck][notification-channel:default-channels-integrations] Monitor already exists [Sample: Slack]
-server    log   [15:18:44.971] [info][healthcheck][notification-channel:default-channels-integrations] Starting verification of default notification channels
+server    log   [15:03:45.031] [info][healthcheck][integrations:default-integrations] All default notification channels are now present and verified
+server    log   [15:18:45.030] [info][healthcheck][integrations:default-integrations] Starting Alerting sample monitors check
+server    log   [15:18:45.041] [info][healthcheck][integrations:default-integrations] Monitor already exists [Sample: Slack]
+server    log   [15:18:44.971] [info][healthcheck][integrations:default-integrations] Starting verification of default notification channels
 ```
 
 If a check fails, review these log entries for details on which resource was missing or misconfigured.
