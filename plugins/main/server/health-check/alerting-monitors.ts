@@ -199,7 +199,7 @@ async function ensureMonitor(
     !availableDefaultChannelIds ||
     !availableDefaultChannelIds.has(channelId)
   ) {
-    ctx.logger.info(
+    ctx.logger.error(
       `Skipping sample monitor [${monitorName}] because required channel [${channelId}] is not present`,
     );
     return;
