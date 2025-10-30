@@ -14,306 +14,273 @@ const path = require('path');
 const https = require('https');
 
 // Load version from package.json
-const packageJsonPath = path.resolve(
-  __dirname,
-  '..',
-  'plugins',
-  'main',
-  'package.json',
-);
+const packageJsonPath = path.resolve(__dirname, '..', '..', 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-const [, , branch] = process.argv;
-const VERSION = branch || packageJson.version;
 
-console.log(`📦 Using Wazuh version: ${VERSION}`);
+// Minimal CLI argument parser
+function parseInput(input) {
+  const options = {};
 
-// process.exit(0);
+  for (let i = 0; i < input.length; i++) {
+    if (input[i].startsWith('--')) {
+      const key = input[i].slice(2);
+      const value =
+        input[i + 1] && !input[i + 1].startsWith('--') ? input[i + 1] : true;
+      options[key] = value;
+      if (value !== true) {
+        i++;
+      } // Skip next arg if it's a value
+    }
+  }
+
+  return options;
+}
 // Helper function to generate URLs with dynamic version
 function wazuhUrl(path) {
-  return `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/${VERSION}/${path}`;
+  return `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/{branch}/${path}`;
+}
+
+// Simple template interpolation
+function interpolate(template, variables) {
+  return template.replace(/{(\w+)}/g, (_, key) => {
+    return key in variables ? variables[key] : `{${key}}`;
+  });
 }
 
 // Configuration for different template sources
 // Template resource: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
 const TEMPLATE_SOURCES = {
-  vulnerabilities: {
-    name: 'states-vulnerabilities',
+  'states-vulnerabilities': {
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-vulnerabilities.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/states-vulnerabilities.json',
+    outputFile: 'states-vulnerabilities.json',
   },
   alerts: {
-    name: 'alerts',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-alerts.json'),
     ],
-    outputFile: 'plugins/main/common/known-fields/alerts.json',
+    outputFile: 'alerts.json',
   },
   archives: {
-    name: 'archives',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-archives.json'),
     ],
-    outputFile: 'plugins/main/common/known-fields/archives.json',
+    outputFile: 'archives.json',
   },
   'events-access-management': {
-    name: 'events-access-management',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-access-management.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/events-access-management.json',
+    outputFile: 'events-access-management.json',
   },
   'events-applications': {
-    name: 'events-applications',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-applications.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/events-applications.json',
+    outputFile: 'events-applications.json',
   },
   'events-cloud-services': {
-    name: 'events-cloud-services',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-cloud-services.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/events-cloud-services.json',
+    outputFile: 'events-cloud-services.json',
   },
   'events-cloud-services-aws': {
-    name: 'events-cloud-services',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-cloud-services-aws.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/events-cloud-services-aws.json',
+    outputFile: 'events-cloud-services-aws.json',
   },
   'events-cloud-services-azure': {
-    name: 'events-cloud-services-azure',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-cloud-services-azure.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/events-cloud-services-azure.json',
+    outputFile: 'events-cloud-services-azure.json',
   },
   'events-cloud-services-gcp': {
-    name: 'events-cloud-services',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-cloud-services-gcp.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/events-cloud-services-gcp.json',
+    outputFile: 'events-cloud-services-gcp.json',
   },
   'events-network-activity': {
-    name: 'events-network-activity',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-network-activity.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/events-network-activity.json',
+    outputFile: 'events-network-activity.json',
   },
   'events-other': {
-    name: 'events-network-activity',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-other.json'),
     ],
-    outputFile: 'plugins/main/common/known-fields/events-other.json',
+    outputFile: 'events-other.json',
   },
   'events-security': {
-    name: 'events-security',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-security.json'),
     ],
-    outputFile: 'plugins/main/common/known-fields/events-security.json',
+    outputFile: 'events-security.json',
   },
   'events-system-activity': {
-    name: 'events-system-activity',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-system-activity.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/events-system-activity.json',
+    outputFile: 'events-system-activity.json',
   },
   monitoring: {
-    name: 'monitoring',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-monitoring.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/monitoring.json',
+    outputFile: 'monitoring.json',
   },
   statistics: {
-    name: 'statistics',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-statistics.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/statistics.json',
+    outputFile: 'statistics.json',
   },
   // FIM templates
   'states-fim-files': {
-    name: 'states-fim-files',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-fim-files.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/states-fim-files.json',
+    outputFile: 'states-fim-files.json',
   },
   'states-fim-registries-keys': {
-    name: 'states-fim-registries-keys',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-fim-registry-keys.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-fim-registries-keys.json',
+    outputFile: 'states-fim-registries-keys.json',
   },
   'states-fim-registries-values': {
-    name: 'states-fim-registries-values',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-fim-registry-values.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-fim-registries-values.json',
+    outputFile: 'states-fim-registries-values.json',
   },
   // Inventory templates (using the most recent versions without -update suffix)
   'states-inventory-system': {
-    name: 'states-inventory-system',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-system.json'),
     ],
-    outputFile: 'plugins/main/common/known-fields/states-inventory-system.json',
+    outputFile: 'states-inventory-system.json',
   },
   'states-inventory-hardware': {
-    name: 'states-inventory-hardware',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-hardware.json'),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-hardware.json',
+    outputFile: 'states-inventory-hardware.json',
   },
   'states-inventory-networks': {
-    name: 'states-inventory-networks',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-networks.json'),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-networks.json',
+    outputFile: 'states-inventory-networks.json',
   },
   'states-inventory-packages': {
-    name: 'states-inventory-packages',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-packages.json'),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-packages.json',
+    outputFile: 'states-inventory-packages.json',
   },
   'states-inventory-ports': {
-    name: 'states-inventory-ports',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-ports.json'),
     ],
-    outputFile: 'plugins/main/common/known-fields/states-inventory-ports.json',
+    outputFile: 'states-inventory-ports.json',
   },
   'states-inventory-processes': {
-    name: 'states-inventory-processes',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-processes.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-processes.json',
+    outputFile: 'states-inventory-processes.json',
   },
   'states-inventory-protocols': {
-    name: 'states-inventory-protocols',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-protocols.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-protocols.json',
+    outputFile: 'states-inventory-protocols.json',
   },
   'states-inventory-users': {
-    name: 'states-inventory-users',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-users.json'),
     ],
-    outputFile: 'plugins/main/common/known-fields/states-inventory-users.json',
+    outputFile: 'states-inventory-users.json',
   },
   'states-inventory-groups': {
-    name: 'states-inventory-groups',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-groups.json'),
     ],
-    outputFile: 'plugins/main/common/known-fields/states-inventory-groups.json',
+    outputFile: 'states-inventory-groups.json',
   },
   'states-inventory-services': {
-    name: 'states-inventory-services',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-services.json'),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-services.json',
+    outputFile: 'states-inventory-services.json',
   },
   'states-inventory-interfaces': {
-    name: 'states-inventory-interfaces',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-interfaces.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-interfaces.json',
+    outputFile: 'states-inventory-interfaces.json',
   },
   'states-inventory-hotfixes': {
-    name: 'states-inventory-hotfixes',
     urls: [
       wazuhUrl('plugins/setup/src/main/resources/index-template-hotfixes.json'),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-hotfixes.json',
+    outputFile: 'states-inventory-hotfixes.json',
   },
   'states-inventory-browser-extensions': {
-    name: 'states-inventory-browser-extensions',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-browser-extensions.json',
       ),
     ],
-    outputFile:
-      'plugins/main/common/known-fields/states-inventory-browser-extensions.json',
+    outputFile: 'states-inventory-browser-extensions.json',
   },
   'states-sca': {
-    name: 'states-sca',
     urls: [
       wazuhUrl(
         'plugins/setup/src/main/resources/index-template-browser-extensions.json',
       ),
     ],
-    outputFile: 'plugins/main/common/known-fields/states-sca.json',
+    outputFile: 'states-sca.json',
   },
 };
 
@@ -550,14 +517,26 @@ async function fetchTemplateFromUrls(urls) {
   throw lastError;
 }
 
+function saveOutput(location, dataASObject) {
+  const dir = path.dirname(location);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  fs.writeFileSync(location, JSON.stringify(dataASObject, null, 2));
+}
+
 /**
  * Processes a template and generates known fields
  */
-async function processTemplate(config) {
-  console.log(`Processing ${config.name} template...`);
+async function processTemplate(templateConfig, config) {
+  console.log(`Processing ${templateConfig.name} template...`);
 
   try {
-    const { template, url } = await fetchTemplateFromUrls(config.urls);
+    const { template, url } = await fetchTemplateFromUrls(
+      templateConfig.urls.map(url =>
+        interpolate(url, { branch: config.branch }),
+      ),
+    );
     console.log(`  ✅ Successfully fetched from: ${url}`);
 
     // Extract mappings - handle different template structures
@@ -584,24 +563,24 @@ async function processTemplate(config) {
     const knownFields = extractFields(properties);
 
     // Ensure output directory exists - resolve relative to script location
-    const scriptDir = path.dirname(__filename);
-    const projectRoot = path.resolve(scriptDir, '..');
-    const absoluteOutputFile = path.resolve(projectRoot, config.outputFile);
-    const outputDir = path.dirname(absoluteOutputFile);
-
-    if (!fs.existsSync(outputDir)) {
-      fs.mkdirSync(outputDir, { recursive: true });
-    }
+    const absoluteOutputFile = path.resolve(
+      config.destination,
+      templateConfig.outputFile,
+    );
 
     // Write to file
-    fs.writeFileSync(absoluteOutputFile, JSON.stringify(knownFields, null, 2));
+    saveOutput(absoluteOutputFile, knownFields);
+
+    // process.exit(0);
     console.log(
-      `  ✅ Generated ${knownFields.length} known fields for ${config.name} -> ${config.outputFile}`,
+      `  ✅ Generated ${knownFields.length} known fields for ${templateConfig.name} -> ${absoluteOutputFile}`,
     );
 
     return knownFields;
   } catch (error) {
-    console.error(`  ❌ Error processing ${config.name}: ${error.message}`);
+    console.error(
+      `  ❌ Error processing ${templateConfig.name}: ${error.message}`,
+    );
     throw error;
   }
 }
@@ -613,7 +592,7 @@ async function processTemplate(config) {
  * Combines all states-inventory-* fields into a single states-inventory.json file
  * This is useful for the generic states-inventory pattern that matches all inventory indices
  */
-async function generateCombinedInventoryFields(results) {
+async function generateCombinedInventoryFields(results, config) {
   console.log('Processing combined states-inventory fields...');
 
   const inventoryKeys = Object.keys(results).filter(
@@ -644,30 +623,28 @@ async function generateCombinedInventoryFields(results) {
   combinedFields.sort((a, b) => a.name.localeCompare(b.name));
 
   // Write combined file
-  const scriptDir = path.dirname(__filename);
-  const projectRoot = path.resolve(scriptDir, '..');
-  const outputPath = path.resolve(
-    projectRoot,
-    'plugins/main/common/known-fields/states-inventory.json',
-  );
-
-  fs.writeFileSync(outputPath, JSON.stringify(combinedFields, null, 2));
+  const outputPath = path.resolve(config.destination, 'states-inventory.json');
+  saveOutput(outputPath, combinedFields);
 
   console.log(
-    `  ✅ Generated ${combinedFields.length} combined fields for states-inventory -> plugins/main/common/known-fields/states-inventory.json`,
+    `  ✅ Generated ${combinedFields.length} combined fields for states-inventory -> ${outputPath}`,
   );
 
   return combinedFields;
 }
 
-async function main() {
+async function main(config) {
+  console.log(`📦 Using Wazuh version: ${config.branch}`);
   console.log('🚀 Starting known fields generation...\n');
 
   const results = {};
 
-  for (const [key, config] of Object.entries(TEMPLATE_SOURCES)) {
+  for (const [key, templateConfig] of Object.entries(TEMPLATE_SOURCES)) {
     try {
-      results[key] = await processTemplate(config);
+      results[key] = await processTemplate(
+        { ...templateConfig, name: key },
+        config,
+      );
     } catch (error) {
       console.error(`Failed to process ${key}:`, error.message);
       results[key] = null;
@@ -677,25 +654,40 @@ async function main() {
 
   // Generate combined inventory fields
   try {
-    results['states-inventory'] =
-      await generateCombinedInventoryFields(results);
+    results['states-inventory'] = await generateCombinedInventoryFields(
+      results,
+      config,
+    );
   } catch (error) {
     console.error(
       'Failed to generate combined inventory fields:',
       error.message,
     );
+    process.exit(1);
     results['states-inventory'] = null;
   }
   console.log(''); // Add spacing
 
   // Summary
+  let shouldFail = false;
+
   console.log('📊 Summary:');
   for (const [key, fields] of Object.entries(results)) {
     if (fields) {
       console.log(`  ${key}: ✅ ${fields.length} fields generated`);
     } else {
+      // Mark overall failure if any template failed
+      shouldFail = true;
       console.log(`  ${key}: ❌ Failed`);
     }
+  }
+
+  // Exit with error if any template failed
+  if (shouldFail) {
+    console.error(
+      '\n💥 One or more templates failed to process. Exiting with error.',
+    );
+    process.exit(1);
   }
 
   console.log('\n✨ Known fields generation completed!');
@@ -703,7 +695,16 @@ async function main() {
 
 // Run if called directly
 if (require.main === module) {
-  main().catch(error => {
+  const config = parseInput(process.argv.slice(2));
+  // Default to package version if not provided
+  config.branch = config.branch || packageJson.version;
+  config.destination = path.resolve(
+    config.destination ||
+      path.resolve(__dirname, '..', '..', 'common', 'known-fields'),
+  );
+  // process.exit(0);
+
+  main(config).catch(error => {
     console.error('💥 Script failed:', error);
     process.exit(1);
   });
@@ -713,5 +714,4 @@ module.exports = {
   processTemplate,
   extractFields,
   mapIndexFieldType,
-  TEMPLATE_SOURCES,
 };
