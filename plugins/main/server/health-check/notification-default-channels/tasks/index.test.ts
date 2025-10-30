@@ -26,7 +26,9 @@ describe('initializeDefaultNotificationChannel', () => {
       const task = initializeDefaultNotificationChannel(mockClient as any);
 
       expect(task).toHaveProperty('name');
-      expect(task.name).toBe('notification-channel:verify-default-channels');
+      expect(task.name).toBe(
+        'notification-channel:default-channels-integrations',
+      );
       expect(task).toHaveProperty('run');
       expect(typeof task.run).toBe('function');
     });
