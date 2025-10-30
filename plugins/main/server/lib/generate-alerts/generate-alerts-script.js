@@ -150,8 +150,22 @@ function generateAlert(params) {
     ]);
 
     const beforeDate = new Date(
-      new Date(alert.timestamp).getTime() - 3 * 24 * 60 * 60 * 1000,
+      new Date(alert['@timestamp']).getTime() - 3 * 24 * 60 * 60 * 1000,
     );
+
+    // Update event categorization for cloud
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.INTRUSION_DETECTION],
+      type: [EVENT_TYPES.INFO],
+      outcome: EVENT_OUTCOMES.UNKNOWN,
+      module: 'aws',
+      severity: 5,
+    });
+
+    // Update wazuh fields
+    alert.wazuh.decoders = getDecodersForModule('aws');
+    alert.wazuh.rules = getRulesForModule('aws');
     switch (randomType) {
       case 'guarddutyPortProbe': {
         const typeAlert = AWS.guarddutyPortProbe;
@@ -178,7 +192,7 @@ function generateAlert(params) {
           DateFormatter.DATE_FORMAT.ISO_FULL,
         );
         alert.data.aws.service.eventLastSeen = DateFormatter.format(
-          new Date(alert.timestamp),
+          new Date(alert['@timestamp']),
           DateFormatter.DATE_FORMAT.ISO_FULL,
         );
         alert.data.aws.service.action.portProbeAction.portProbeDetails.remoteIpDetails =
@@ -188,10 +202,10 @@ function generateAlert(params) {
         alert.data.aws.log_info = {
           s3bucket: Random.arrayItem(AWS.buckets),
           log_file: `guardduty/${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.SHORT_DATE_TIME_SLASH,
           )}/firehose_guardduty-1-${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.FULL_HYPHENATED,
           )}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
         };
@@ -208,8 +222,6 @@ function generateAlert(params) {
           alert,
         );
 
-        alert.decoder = { ...typeAlert.decoder };
-        alert.location = typeAlert.location;
         break;
       }
       case 'apiCall': {
@@ -223,10 +235,10 @@ function generateAlert(params) {
         alert.data.aws.log_info = {
           s3bucket: Random.arrayItem(AWS.buckets),
           log_file: `guardduty/${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.SHORT_DATE_TIME_SLASH,
           )}/firehose_guardduty-1-${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.FULL_HYPHENATED,
           )}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
         };
@@ -239,7 +251,7 @@ function generateAlert(params) {
           DateFormatter.DATE_FORMAT.ISO_FULL,
         );
         alert.data.aws.service.eventLastSeen = DateFormatter.format(
-          new Date(alert.timestamp),
+          new Date(alert['@timestamp']),
           DateFormatter.DATE_FORMAT.ISO_FULL,
         );
         alert.data.aws.createdAt = DateFormatter.format(
@@ -265,8 +277,14 @@ function generateAlert(params) {
           alert,
         );
 
-        alert.decoder = { ...typeAlert.decoder };
-        alert.location = typeAlert.location;
+        // Generate message and cloud fields
+        alert.message = `AWS GuardDuty: ${alert.data.aws.title}`;
+        alert.cloud = {
+          provider: 'aws',
+          region: alert.data.aws.region,
+          account: { id: alert.data.aws.accountId },
+          service: { name: 'guardduty' },
+        };
         break;
       }
       case 'networkConnection': {
@@ -281,10 +299,10 @@ function generateAlert(params) {
         alert.data.aws.log_info = {
           s3bucket: Random.arrayItem(AWS.buckets),
           log_file: `guardduty/${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.SHORT_DATE_TIME_SLASH,
           )}/firehose_guardduty-1-${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.FULL_HYPHENATED,
           )}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
         };
@@ -310,7 +328,7 @@ function generateAlert(params) {
           DateFormatter.DATE_FORMAT.ISO_FULL,
         );
         alert.data.aws.service.eventLastSeen = DateFormatter.format(
-          new Date(alert.timestamp),
+          new Date(alert['@timestamp']),
           DateFormatter.DATE_FORMAT.ISO_FULL,
         );
         alert.data.aws.service.additionalInfo = {
@@ -333,8 +351,14 @@ function generateAlert(params) {
           alert,
         );
 
-        alert.decoder = { ...typeAlert.decoder };
-        alert.location = typeAlert.location;
+        // Generate message and cloud fields (networkConnection)
+        alert.message = `AWS GuardDuty: ${alert.data.aws.title}`;
+        alert.cloud = {
+          provider: 'aws',
+          region: alert.data.aws.region,
+          account: { id: alert.data.aws.accountId },
+          service: { name: 'guardduty' },
+        };
         break;
       }
       case 'iamPolicyGrantGlobal': {
@@ -350,13 +374,13 @@ function generateAlert(params) {
         alert.data.aws.log_info = {
           s3bucket: Random.arrayItem(AWS.buckets),
           log_file: `macie/${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.SHORT_DATE_TIME_SLASH,
           )}/firehose_macie-1-${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.COMPACT_DATE_TIME_HYPHENATED,
           )}-0b1ede94-f399-4e54-8815-1c6587eee3b1//firehose_guardduty-1-${DateFormatter.format(
-            new Date(alert.timestamp),
+            new Date(alert['@timestamp']),
             DateFormatter.DATE_FORMAT.FULL_HYPHENATED,
           )}b5b9b-ec62-4a07-85d7-b1699b9c031e.zip`,
         };
@@ -376,21 +400,31 @@ function generateAlert(params) {
         alert.rule = { ...typeAlert.rule };
         alert.rule.firedtimes = Random.number(1, 50);
 
-        alert.decoder = { ...typeAlert.decoder };
-        alert.location = typeAlert.location;
+        // Generate message and cloud fields
+        alert.message = `AWS Macie: ${typeAlert.data.aws.name}`;
+        alert.cloud = {
+          provider: 'aws',
+          region: alert.data.aws.region,
+          service: { name: 'macie' },
+        };
         break;
       }
       default: {
         /* empty */
       }
     }
-    alert.input = { type: 'log' };
-    alert.GeoLocation = Random.arrayItem(GEO_LOCATION);
+    
+    // Log information
+    alert.log = generateLog({
+      level: 'info',
+      filePath: alert.data.aws.log_info?.log_file || '/var/log/aws.log',
+      originFile: 'aws',
+    });
   }
 
   if (params.azure) {
     const beforeDate = new Date(
-      new Date(alert.timestamp).getTime() - 3 * 24 * 60 * 60 * 1000,
+      new Date(alert['@timestamp']).getTime() - 3 * 24 * 60 * 60 * 1000,
     );
     const typeAlert = Azure.auditLogs;
     alert.rule = { ...typeAlert.rule };
@@ -454,7 +488,7 @@ function generateAlert(params) {
     }
 
     const beforeDate = new Date(
-      new Date(alert.timestamp).getTime() - 3 * 24 * 60 * 60 * 1000,
+      new Date(alert['@timestamp']).getTime() - 3 * 24 * 60 * 60 * 1000,
     );
     const IntraID = Random.arrayItem(Office.arrayUuidOffice);
     const OrgID = Random.arrayItem(Office.arrayUuidOffice);
@@ -634,69 +668,142 @@ function generateAlert(params) {
   }
 
   if (params.syscheck) {
-    alert.rule.groups.push('syscheck');
-    alert.syscheck = {};
-    alert.syscheck.event = Random.arrayItem(IntegrityMonitoring.events);
-    alert.syscheck.path = Random.arrayItem(
-      alert.agent.name === 'Windows'
-        ? IntegrityMonitoring.pathsWindows
-        : IntegrityMonitoring.pathsLinux,
+    // Determine FIM event type
+    const eventType = Random.arrayItem(IntegrityMonitoring.events); // 'added', 'modified', 'deleted'
+    
+    // Select file path based on OS
+    const isWindows = alert.agent.host.os.type === 'windows';
+    const filePath = Random.arrayItem(
+      isWindows ? IntegrityMonitoring.pathsWindows : IntegrityMonitoring.pathsLinux
     );
-    alert.syscheck.uname_after = Random.arrayItem(USERS);
-    alert.syscheck.gname_after = 'root';
-    alert.syscheck.mtime_after = new Date(Random.date());
-    alert.syscheck.size_after = Random.number(0, 65);
-    alert.syscheck.uid_after = Random.arrayItem(IntegrityMonitoring.uid_after);
-    alert.syscheck.gid_after = Random.arrayItem(IntegrityMonitoring.gid_after);
-    alert.syscheck.perm_after = 'rw-r--r--';
-    alert.syscheck.inode_after = Random.number(0, 100000);
-    switch (alert.syscheck.event) {
-      case 'added':
-        alert.rule = IntegrityMonitoring.regulatory[0];
-        break;
-      case 'modified':
-        alert.rule = IntegrityMonitoring.regulatory[1];
-        alert.syscheck.mtime_before = new Date(
-          alert.syscheck.mtime_after.getTime() - 1000 * 60,
-        );
-        alert.syscheck.inode_before = Random.number(0, 100000);
-        alert.syscheck.sha1_after = Random.createHash(40);
-        alert.syscheck.changed_attributes = [
-          Random.arrayItem(IntegrityMonitoring.attributes),
-        ];
-        alert.syscheck.md5_after = Random.createHash(32);
-        alert.syscheck.sha256_after = Random.createHash(64);
-        break;
-      case 'deleted':
-        alert.rule = IntegrityMonitoring.regulatory[2];
-        alert.syscheck.tags = [Random.arrayItem(IntegrityMonitoring.tags)];
-        alert.syscheck.sha1_after = Random.createHash(40);
-        alert.syscheck.audit = {
-          process: {
-            name: Random.arrayItem(PATHS),
-            id: Random.number(0, 100000),
-            ppid: Random.number(0, 100000),
-          },
-          effective_user: {
-            name: Random.arrayItem(USERS),
-            id: Random.number(0, 100),
-          },
-          user: {
-            name: Random.arrayItem(USERS),
-            id: Random.number(0, 100),
-          },
-          group: {
-            name: Random.arrayItem(USERS),
-            id: Random.number(0, 100),
-          },
-        };
-        alert.syscheck.md5_after = Random.createHash(32);
-        alert.syscheck.sha256_after = Random.createHash(64);
-        break;
-      default: {
-        /* empty */
+    
+    // Extract file components
+    const separator = isWindows ? '\\' : '/';
+    const fileName = filePath.split(separator).pop();
+    const fileDirectory = filePath.substring(0, filePath.lastIndexOf(separator));
+    
+    // Update event categorization
+    alert.event = generateEvent({
+      kind: EVENT_KINDS.ALERT,
+      category: [EVENT_CATEGORIES.FILE],
+      type: eventType === 'added' ? [EVENT_TYPES.CREATION] : 
+            eventType === 'modified' ? [EVENT_TYPES.CHANGE] : 
+            [EVENT_TYPES.DELETION],
+      action: `file-${eventType}`,
+      outcome: EVENT_OUTCOMES.SUCCESS,
+      module: 'fim',
+      severity: eventType === 'deleted' ? 7 : (eventType === 'modified' ? 5 : 3),
+    });
+    
+    // Generate file information (ECS)
+    const fileOwner = Random.arrayItem(USERS);
+    const fileGroup = 'root';
+    const fileUid = Random.arrayItem(IntegrityMonitoring.uid_after);
+    const fileGid = Random.arrayItem(IntegrityMonitoring.gid_after);
+    
+    alert.file = {
+      path: filePath,
+      name: fileName,
+      directory: fileDirectory,
+      size: Random.number(1024, 1000000),
+      mtime: new Date(alertDate).toISOString(),
+      inode: String(Random.number(1000, 100000)),
+      owner: fileOwner,
+      group: fileGroup,
+      mode: '0644',
+      uid: String(fileUid),
+      gid: String(fileGid),
+    };
+    
+    // Add hashes for modified/deleted files
+    if (eventType === 'modified' || eventType === 'deleted') {
+      alert.file.hash = {
+        md5: Random.createHash(32),
+        sha1: Random.createHash(40),
+        sha256: Random.createHash(64),
+      };
+    }
+    
+    // For modified files, add changed attributes
+    if (eventType === 'modified') {
+      alert.file.attributes = [Random.arrayItem(IntegrityMonitoring.attributes)];
+    }
+    
+    // For deleted files, add process and user information
+    if (eventType === 'deleted') {
+      const processUser = Random.arrayItem(USERS);
+      const processUserId = Random.number(0, 100);
+      const processGroup = Random.arrayItem(USERS);
+      const processGroupId = Random.number(0, 100);
+      
+      alert.process = {
+        pid: Random.number(100, 100000),
+        parent: {
+          pid: Random.number(1, 1000),
+        },
+        name: Random.arrayItem(PATHS).split('/').pop(),
+        executable: Random.arrayItem(PATHS),
+        user: {
+          id: String(processUserId),
+          name: processUser,
+        },
+        group: {
+          id: String(processGroupId),
+          name: processGroup,
+        },
+      };
+      
+      alert.user = generateUser({
+        name: processUser,
+        id: String(processUserId),
+        groupName: processGroup,
+        groupId: String(processGroupId),
+      });
+      
+      // Add tags for deleted files
+      if (Random.probability(0.5)) {
+        alert.tags.push(Random.arrayItem(IntegrityMonitoring.tags));
       }
     }
+    
+    // Generate message
+    const actionDescriptions = {
+      added: 'File created',
+      modified: 'File modified',
+      deleted: 'File deleted',
+    };
+    
+    alert.message = generateMessage({
+      action: actionDescriptions[eventType],
+      fileName: filePath,
+      user: eventType === 'deleted' ? alert.user?.name : undefined,
+    });
+    
+    // Log information
+    alert.log = generateLog({
+      level: eventType === 'deleted' ? 'warning' : 'info',
+      filePath: '/var/ossec/logs/ossec.log',
+      originFile: 'syscheck',
+    });
+    
+    // Update wazuh fields
+    alert.wazuh.decoders = ['syscheck'];
+    alert.wazuh.rules = getRulesForModule('fim', eventType);
+    
+    // Update rule based on event type
+    switch (eventType) {
+      case 'added':
+        alert.rule = { ...IntegrityMonitoring.regulatory[0] };
+        break;
+      case 'modified':
+        alert.rule = { ...IntegrityMonitoring.regulatory[1] };
+        break;
+      case 'deleted':
+        alert.rule = { ...IntegrityMonitoring.regulatory[2] };
+        break;
+    }
+    alert.rule.groups = ['syscheck', 'fim'];
+    alert.rule.firedtimes = Random.number(1, 10);
   }
 
   if (params.virustotal) {
@@ -724,7 +831,7 @@ function generateAlert(params) {
       alert.rule.description = `VirusTotal: Alert - ${alert.data.virustotal.source.file} - ${alert.data.virustotal.positives} engines detected this file`;
       alert.data.virustotal.permalink = Random.arrayItem(Virustotal.permalink);
       alert.data.virustotal.scan_date = new Date(
-        Date.parse(alert.timestamp) - 4 * 60000,
+        Date.parse(alert['@timestamp']) - 4 * 60000,
       );
     } else {
       alert.data.virustotal.malicious = '0';
@@ -1126,7 +1233,7 @@ function generateAlert(params) {
       alert.full_log = `2020 Apr 17 05:59:05 WinEvtLog: type: INFORMATION(7040): Service Control Manager: SYSTEM: NT AUTHORITY: ${alert.data.system_name}: Background Intelligent Transfer Service auto start demand start BITS `; // TODO: date
       alert.id = '18145';
       alert.fields = {
-        timestamp: alert.timestamp,
+        timestamp: alert['@timestamp'],
       };
     }
   }
@@ -1149,7 +1256,7 @@ function generateAlert(params) {
 
     alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
       _timestamp_apache: DateFormatter.format(
-        new Date(alert.timestamp),
+        new Date(alert['@timestamp']),
         DateFormatter.DATE_FORMAT.READABLE_FORMAT,
       ),
       _pi_id: Random.number(10000, 30000),
@@ -1172,12 +1279,10 @@ function generateAlert(params) {
     const userAgent = Random.arrayItem(Web.userAgents);
     alert.rule = { ...typeAlert.rule };
     alert.rule.firedtimes = Random.number(1, 10);
-    alert.decoder = { ...typeAlert.decoder };
-    alert.location = typeAlert.location;
     alert.full_log = interpolateAlertProps(typeAlert.full_log, alert, {
       _user_agent: userAgent,
       _date: DateFormatter.format(
-        new Date(alert.timestamp),
+        new Date(alert['@timestamp']),
         DateFormatter.DATE_FORMAT.ISO_TIMESTAMP,
       ),
     });
@@ -1187,7 +1292,7 @@ function generateAlert(params) {
       const beforeSeconds = 4;
       for (let i = beforeSeconds; i > 0; i--) {
         const beforeDate = new Date(
-          new Date(alert.timestamp).getTime() - (2 + i) * 1000,
+          new Date(alert['@timestamp']).getTime() - (2 + i) * 1000,
         );
         previousOutput.push(
           interpolateAlertProps(typeAlert.full_log, alert, {
@@ -1231,9 +1336,9 @@ function generateAlert(params) {
       (alert.data.github.config.url = Random.arrayItem(
         GitHub.SERVER_ADDRESS_WEBHOOK,
       ));
-    alert.data.github['@timestamp'] = alert.timestamp;
+    alert.data.github['@timestamp'] = alert['@timestamp'];
     alert.data.github.created_at &&
-      (alert.data.github.created_at = alert.timestamp);
+      (alert.data.github.created_at = alert['@timestamp']);
     alert.rule = {
       ...alertType.rule,
     };

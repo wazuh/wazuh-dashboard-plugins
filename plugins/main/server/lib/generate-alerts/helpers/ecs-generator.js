@@ -14,10 +14,6 @@ const { Random } = require('./random');
 
 /**
  * ECS Event Categories
-<<<<<<< HEAD
-=======
- * https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-category.html
->>>>>>> 6ac39583eae504dc5db1fd6ef779fb0358b590c6
  */
 const EVENT_CATEGORIES = {
   AUTHENTICATION: 'authentication',
@@ -42,10 +38,6 @@ const EVENT_CATEGORIES = {
 
 /**
  * ECS Event Types
-<<<<<<< HEAD
-=======
- * https://www.elastic.co/guide/en/ecs/current/ecs-allowed-values-event-type.html
->>>>>>> 6ac39583eae504dc5db1fd6ef779fb0358b590c6
  */
 const EVENT_TYPES = {
   ACCESS: 'access',
