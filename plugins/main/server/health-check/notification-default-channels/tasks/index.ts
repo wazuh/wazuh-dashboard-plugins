@@ -102,7 +102,7 @@ export const initializeDefaultNotificationChannel = (
   isAlertingDashboardsAvailable?: boolean,
 ): Record<string, any> => {
   return {
-    name: 'integrations:default-integrations',
+    name: 'integrations:default-notifications-channels-and-alerting-monitors',
     async run(ctx: InitializationTaskRunContext) {
       try {
         ctx.logger.info(
