@@ -181,7 +181,7 @@ async function monitorExists(ctx: PluginTaskRunContext, name: string) {
   } catch (error) {
     const _error = error as Error;
     // If search fails (e.g., missing permissions/index), assume not exists
-    ctx.logger.warn(
+    ctx.logger.error(
       `monitorExists error for [${name}]: ${_error?.message || _error}`,
     );
     return false;

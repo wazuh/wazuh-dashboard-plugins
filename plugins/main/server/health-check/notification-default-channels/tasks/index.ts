@@ -157,7 +157,7 @@ export const initializeDefaultNotificationChannel = (
           } catch (err) {
             // Surface but don’t fail the notification channels task
             const _err = err as Error;
-            ctx.logger.warn(
+            ctx.logger.error(
               `Sample monitors creation reported an issue: ${
                 _err?.message || _err
               }`,
