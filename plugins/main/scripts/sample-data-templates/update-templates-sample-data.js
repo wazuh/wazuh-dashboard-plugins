@@ -136,48 +136,12 @@ function downloadFile(dataset) {
   });
 }
 
-// Function to convert template to the required nested format
-function convertToNestedFormat(templateContent) {
-  try {
-    const template = JSON.parse(templateContent);
-
-    // Check if already in the required nested format
-    if (template.template && template.template.mappings) {
-      return templateContent; // Already in correct format
-    }
-
-    // Convert from flat format to nested format
-    const nestedTemplate = {
-      index_patterns: template.index_patterns,
-      priority: template.priority || 1,
-      template: {
-        settings: template.settings || {
-          index: {
-            number_of_replicas: '0',
-            number_of_shards: '1',
-            refresh_interval: '2s',
-          },
-        },
-        mappings: template.mappings,
-      },
-    };
-
-    return JSON.stringify(nestedTemplate, null, 2);
-  } catch (error) {
-    throw new Error(`Error converting template format: ${error.message}`);
-  }
-}
-
 // Function to save the downloaded file
 function saveFile(dataset, filename, content) {
   return new Promise((resolve, reject) => {
     const filePath = path.join(config.localDatasetDir, dataset, filename);
 
-    // Convert to nested format before saving
-    const convertedContent = convertToNestedFormat(content);
-
-    // Save the converted content
-    fs.writeFile(filePath, convertedContent, 'utf8', error => {
+    fs.writeFile(filePath, content, 'utf8', error => {
       if (error) {
         reject(error);
         return;

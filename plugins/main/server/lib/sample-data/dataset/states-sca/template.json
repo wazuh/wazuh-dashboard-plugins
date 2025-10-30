@@ -2,210 +2,208 @@
   "index_patterns": [
     "wazuh-states-sca*"
   ],
-  "priority": 1,
-  "template": {
-    "settings": {
-      "index": {
-        "number_of_replicas": "0",
-        "number_of_shards": "1",
-        "query.default_field": [
-          "agent.id",
-          "agent.groups",
-          "check.name",
-          "check.id",
-          "checksum.hash.sha1",
-          "host.name",
-          "host.os.type",
-          "host.os.version",
-          "policy.id",
-          "policy.name",
-          "policy.file",
-          "state.modified_at",
-          "wazuh.cluster.name",
-          "wazuh.cluster.node",
-          "wazuh.schema.version"
-        ],
-        "refresh_interval": "5s"
-      }
-    },
-    "mappings": {
-      "date_detection": false,
-      "dynamic": "strict",
-      "properties": {
-        "agent": {
-          "properties": {
-            "groups": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "host": {
-              "properties": {
-                "architecture": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "hostname": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "ip": {
-                  "type": "ip"
-                },
-                "os": {
-                  "properties": {
-                    "name": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "platform": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "type": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    },
-                    "version": {
-                      "ignore_above": 1024,
-                      "type": "keyword"
-                    }
+  "mappings": {
+    "date_detection": false,
+    "dynamic": "strict",
+    "properties": {
+      "agent": {
+        "properties": {
+          "groups": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "host": {
+            "properties": {
+              "architecture": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "hostname": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "ip": {
+                "type": "ip"
+              },
+              "os": {
+                "properties": {
+                  "name": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "platform": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "type": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
+                  },
+                  "version": {
+                    "ignore_above": 1024,
+                    "type": "keyword"
                   }
                 }
               }
-            },
-            "id": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "name": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "version": {
-              "ignore_above": 1024,
-              "type": "keyword"
             }
+          },
+          "id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "version": {
+            "ignore_above": 1024,
+            "type": "keyword"
           }
-        },
-        "check": {
-          "properties": {
-            "compliance": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "condition": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "description": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "id": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "name": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "rationale": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "reason": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "references": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "remediation": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "result": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "rules": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            }
+        }
+      },
+      "check": {
+        "properties": {
+          "compliance": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "condition": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "description": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "rationale": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "reason": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "references": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "remediation": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "result": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "rules": {
+            "ignore_above": 1024,
+            "type": "keyword"
           }
-        },
-        "checksum": {
-          "properties": {
-            "hash": {
-              "properties": {
-                "sha1": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                }
+        }
+      },
+      "checksum": {
+        "properties": {
+          "hash": {
+            "properties": {
+              "sha1": {
+                "ignore_above": 1024,
+                "type": "keyword"
               }
             }
           }
-        },
-        "policy": {
-          "properties": {
-            "description": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "file": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "id": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "name": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            },
-            "references": {
-              "ignore_above": 1024,
-              "type": "keyword"
-            }
+        }
+      },
+      "policy": {
+        "properties": {
+          "description": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "file": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "id": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "name": {
+            "ignore_above": 1024,
+            "type": "keyword"
+          },
+          "references": {
+            "ignore_above": 1024,
+            "type": "keyword"
           }
-        },
-        "state": {
-          "properties": {
-            "document_version": {
-              "type": "integer"
-            },
-            "modified_at": {
-              "type": "date"
-            }
+        }
+      },
+      "state": {
+        "properties": {
+          "document_version": {
+            "type": "integer"
+          },
+          "modified_at": {
+            "type": "date"
           }
-        },
-        "wazuh": {
-          "properties": {
-            "cluster": {
-              "properties": {
-                "name": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                },
-                "node": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                }
+        }
+      },
+      "wazuh": {
+        "properties": {
+          "cluster": {
+            "properties": {
+              "name": {
+                "ignore_above": 1024,
+                "type": "keyword"
+              },
+              "node": {
+                "ignore_above": 1024,
+                "type": "keyword"
               }
-            },
-            "schema": {
-              "properties": {
-                "version": {
-                  "ignore_above": 1024,
-                  "type": "keyword"
-                }
+            }
+          },
+          "schema": {
+            "properties": {
+              "version": {
+                "ignore_above": 1024,
+                "type": "keyword"
               }
             }
           }
         }
       }
+    }
+  },
+  "order": 1,
+  "settings": {
+    "index": {
+      "number_of_replicas": "0",
+      "number_of_shards": "1",
+      "query.default_field": [
+        "agent.id",
+        "agent.groups",
+        "check.name",
+        "check.id",
+        "checksum.hash.sha1",
+        "host.name",
+        "host.os.type",
+        "host.os.version",
+        "policy.id",
+        "policy.name",
+        "policy.file",
+        "state.modified_at",
+        "wazuh.cluster.name",
+        "wazuh.cluster.node",
+        "wazuh.schema.version"
+      ],
+      "refresh_interval": "5s"
     }
   }
 }
