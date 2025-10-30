@@ -16,25 +16,7 @@
 
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
 import type { InitializationTaskRunContext } from '../services';
-
-// Minimal shape of the UI "SavedVis" object used across dashboard-by-value definitions.
-type SavedVis = {
-  id: string;
-  title: string;
-  type: string;
-  params?: Record<string, any>;
-  uiState?: Record<string, any>;
-  data: {
-    searchSource: {
-      query: { language: string; query: string };
-      filter?: any[];
-      index?: string; // by value uses index
-      indexRef?: string;
-    };
-    references: Array<{ name: string; type: string; id: string }>;
-    aggs: any[];
-  };
-};
+import type { SavedVis } from "../../../common/saved-vis/types-new";
 
 // ---------- Builders (server-side copies) ----------
 // These mirror a subset of the by-value definitions under `public/`.
@@ -495,13 +477,11 @@ async function createOrUpdateDashboard(
 // ---------- Health check task creators ----------
 
 export const initializationTaskCreatorSavedObjects = ({
-  taskName,
   services,
 }: {
-  taskName: string;
   services: any;
 }) => ({
-  name: taskName,
+  name: 'saved-objects:dashboards',
   async run(ctx: InitializationTaskRunContext) {
     try {
       ctx.logger.debug('Starting saved objects provisioning');
@@ -510,14 +490,16 @@ export const initializationTaskCreatorSavedObjects = ({
         ctx.services.core.savedObjects.createInternalRepository();
 
       // Resolve the alerts index pattern ID from configuration (same key used for index pattern HC)
-      const alertsIndexPatternId: string | undefined = await services.configuration.get('pattern');
+      const alertsIndexPatternId: string | undefined =
+        await services.configuration.get('pattern');
 
       if (!alertsIndexPatternId) {
         throw new Error('Alerts index pattern ID is not configured');
       }
 
       // 1) Welcome dashboard (single panel)
-      const welcomeVis = getVisStateWelcomeEventsCountEvolution(alertsIndexPatternId);
+      const welcomeVis =
+        getVisStateWelcomeEventsCountEvolution(alertsIndexPatternId);
       const welcomeVisId = await createOrUpdateVisualization(
         savedObjectsClient,
         welcomeVis,
@@ -573,9 +555,13 @@ export const initializationTaskCreatorSavedObjects = ({
       );
 
       ctx.logger.debug('Saved objects provisioning finished');
-      return { dashboards: ['wazuh-dashboard-welcome', 'wazuh-dashboard-docker'] };
+      return {
+        dashboards: ['wazuh-dashboard-welcome', 'wazuh-dashboard-docker'],
+      };
     } catch (error) {
-      const message = `Error provisioning saved objects: ${error instanceof Error ? error.message : String(error)}`;
+      const message = `Error provisioning saved objects: ${
+        error instanceof Error ? error.message : String(error)
+      }`;
       ctx.logger.error(message);
       throw new Error(message);
     }
