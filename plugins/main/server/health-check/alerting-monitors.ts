@@ -12,12 +12,7 @@
  * @see https://docs.opensearch.org/3.2/observing-your-data/alerting/api/
  */
 
-import type {
-  Monitor,
-  NotificationConfigsOpenSearchResponse,
-  PluginTaskRunContext,
-  TriggerAction,
-} from './types';
+import type { Monitor, PluginTaskRunContext, TriggerAction } from './types';
 import { WAZUH_ALERTS_PATTERN } from '../../common/constants';
 import { DEFAULT_CHANNELS_ID } from './notification-default-channels/common/constants';
 
@@ -150,7 +145,16 @@ function buildMonitorBody(
           query: {
             size: 0,
             query: {
-              match_all: {},
+              // Use a more meaningful default: alerts with rule.level > 3
+              bool: {
+                filter: [
+                  {
+                    range: {
+                      'rule.level': { gt: 3 },
+                    },
+                  },
+                ],
+              },
             },
           },
         },

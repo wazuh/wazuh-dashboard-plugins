@@ -49,10 +49,10 @@ If the Alerts functionality is available, the Health Check attempts to create th
 
 | Monitor name        | Target channel    | Behavior                                                     |
 | ------------------- | ----------------- | ------------------------------------------------------------ |
-| `Sample: Slack`     | Slack Channel     | Queries for general alerts and sends notifications to Slack. |
-| `Sample: PagerDuty` | PagerDuty Channel | Sends sample events to PagerDuty via Events v2.              |
-| `Sample: Jira`      | Jira Channel      | Triggers a mock issue creation.                              |
-| `Sample: Shuffle`   | Shuffle Channel   | Sends a test payload to the Shuffle workflow.                |
+| `Sample: Slack`     | Slack Channel     | Queries for alerts with `rule.level > 3` and sends notifications to Slack. |
+| `Sample: PagerDuty` | PagerDuty Channel | Queries for alerts with `rule.level > 3` and sends sample events to PagerDuty via Events v2. |
+| `Sample: Jira`      | Jira Channel      | Queries for alerts with `rule.level > 3` and triggers a mock issue creation. |
+| `Sample: Shuffle`   | Shuffle Channel   | Queries for alerts with `rule.level > 3` and sends a test payload to the Shuffle workflow. |
 
 > If a required channel does **not** exist, the monitor will **not** be created.
 
