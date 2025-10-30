@@ -241,16 +241,9 @@ export const createSampleAlertingMonitors = async (
         ? new Set(options.availableDefaultChannelIds)
         : undefined;
 
-    /**
-     * Sample monitor creation attempts
-     * `await Promise.all(SAMPLES.map(sample => ensureMonitor(ctx, sample)));`
-     *
-     * Throws unhandled promise rejection on logger calls:
-     * [error][data][opensearch] [alerting_exception]: all shards failed
-     * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Jira]: alerting_exception: [alerting_exception] Reason: all shards failed
-     * [error][data][opensearch] [alerting_exception]: all shards failed
-     * [warning][healthcheck][XXXXXX] Could not create sample monitor [Sample: Slack]: alerting_exception: [alerting_exception] Reason: all shards failed
-     */
+    // Process monitors sequentially to avoid overwhelming OpenSearch
+    // Parallel execution with Promise.all can cause "all shards failed" errors
+    // when multiple monitors are created simultaneously
     for (const sample of SAMPLES) {
       await ensureMonitor(ctx, sample, availableDefaultChannelIds);
     }
