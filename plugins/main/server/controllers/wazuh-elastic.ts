@@ -461,10 +461,8 @@ export class WazuhElasticCtrl {
                 let configuration;
 
                 if (sampleDataAndTemplate?.template) {
-                  // Support both formats: nested (OpenSearch) and flat (Elasticsearch/Indexer)
-                  const templateData = sampleDataAndTemplate.template.template
-                    ? sampleDataAndTemplate.template.template // Nested format
-                    : sampleDataAndTemplate.template; // Flat format
+                  // Expect flat format (Elasticsearch/Indexer): { index_patterns, mappings, settings }
+                  const templateData = sampleDataAndTemplate.template;
 
                   configuration = {
                     settings: templateData.settings || {},
