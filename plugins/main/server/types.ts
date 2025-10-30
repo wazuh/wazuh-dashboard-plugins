@@ -26,4 +26,6 @@ export type PluginSetup = {
   wazuhCore: {};
   // Optional Notifications Dashboards plugin contract presence check
   notificationsDashboards?: {};
+  // Optional Alerting Dashboards plugin contract presence check
+  alertingDashboards?: {};
 };
