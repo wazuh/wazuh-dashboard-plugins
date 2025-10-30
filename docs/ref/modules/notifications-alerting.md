@@ -35,7 +35,7 @@ When the Notifications functionality is available in the Dashboard, the Health C
 | Channel               | Description                                                                         | Configuration                                                                                                                                                                                            |
 | --------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Slack Channel**     | Sends notifications via Slack Incoming Webhook.                                     | [Create a Slack webhook](https://api.slack.com/messaging/webhooks) and set the Webhook URL.                                                                                                              |
-| **PagerDuty Channel** | Sends alerts via the **Events v3 API** (`https://events.pagerduty.com/v2/enqueue`). | [Create a PagerDuty Events v2 integration](https://developer.pagerduty.com/docs/events-api-v2-overview) and set your Integration Key in the `X-Routing-Key` header.                                      |
+| **PagerDuty Channel** | Sends alerts via the **Events v2 API** (`https://events.pagerduty.com/v2/enqueue`). | [Create a PagerDuty Events v2 integration](https://developer.pagerduty.com/docs/events-api-v2-overview) and set your Integration Key in the `X-Routing-Key` header.                                      |
 | **Jira Channel**      | Creates issues via Jira REST API.                                                   | [Create a Jira API token](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/) and configure the URL with `Authorization: Basic base64(email:api_token)`. |
 | **Shuffle Channel**   | Triggers Shuffle workflows via webhook.                                             | [Get your Shuffle workflow webhook URL](https://shuffler.io/docs/triggers#webhook-example) and paste it in the configuration.                                                                            |
 
@@ -50,7 +50,7 @@ If the Alerts functionality is available, the Health Check attempts to create th
 | Monitor name        | Target channel    | Behavior                                                     |
 | ------------------- | ----------------- | ------------------------------------------------------------ |
 | `Sample: Slack`     | Slack Channel     | Queries for general alerts and sends notifications to Slack. |
-| `Sample: PagerDuty` | PagerDuty Channel | Sends sample events to PagerDuty via Events v3.              |
+| `Sample: PagerDuty` | PagerDuty Channel | Sends sample events to PagerDuty via Events v2.              |
 | `Sample: Jira`      | Jira Channel      | Triggers a mock issue creation.                              |
 | `Sample: Shuffle`   | Shuffle Channel   | Sends a test payload to the Shuffle workflow.                |
 
