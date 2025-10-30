@@ -81,7 +81,7 @@ export async function buildDashboardByValueInput(
   if (!dashboardId || typeof dashboardId !== 'string' || dashboardId.trim() === '') {
     return {
       success: false,
-      status: 'not_found',
+      status: 'empty',
       error: 'Dashboard ID is required.',
     };
   }

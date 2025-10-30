@@ -1,5 +1,5 @@
 // Types for dashboard container service
-export type Status = 'idle' | 'validating' | 'ready' | 'not_found' | 'error';
+export type Status = 'ready' | 'not_found' | 'error' | 'empty' | 'validating';
 
 // Saved Object structure used by the adapter
 export interface SavedDashboardSO {
