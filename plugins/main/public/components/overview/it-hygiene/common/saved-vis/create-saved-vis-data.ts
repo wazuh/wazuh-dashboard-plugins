@@ -1,9 +1,9 @@
-import { SavedVis } from '../types';
+import { DashboardByValueSavedVis } from '../../../../../../common/saved-vis/types';
 
 export function createSearchSource(
   indexPatternId: string,
   options: { filter: any[] } = { filter: [] },
-): SavedVis['data']['searchSource'] {
+): DashboardByValueSavedVis['data']['searchSource'] {
   const { filter } = options;
   return {
     query: {
@@ -17,7 +17,7 @@ export function createSearchSource(
 
 export function createIndexPatternReferences(
   indexPatternId: string,
-): SavedVis['data']['references'] {
+): DashboardByValueSavedVis['data']['references'] {
   return [
     {
       name: 'kibanaSavedObjectMeta.searchSourceJSON.index',

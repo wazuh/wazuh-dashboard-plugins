@@ -6,7 +6,7 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { SavedVis } from '../../../common/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations/generators';
 
 type PackageArchitecture = 'x86_64' | 'arm64';
@@ -91,7 +91,7 @@ const getVisStateFilter = (
 const getVisStatePackageArchitectureMetric = (
   indexPatternId: string,
   arch: PackageArchitecture,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: `it-hygiene-packages-${arch}`,
     title: `Packages for ${arch} architecture`,

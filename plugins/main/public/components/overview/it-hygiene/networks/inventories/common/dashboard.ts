@@ -3,11 +3,11 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { SavedVis } from '../../../common/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
 
 export const getVisStateNetworkAveragePriorityMetric = (
   indexPatternId: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-average-priority-of-routes',
     title: 'Monitor the average priority of routes',
@@ -55,7 +55,7 @@ export const getVisStateNetworkAveragePriorityMetric = (
 
 export const getVisStateDHCPEnabledInterfacesMetric = (
   indexPatternId: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-with-dhcp-enabled',
     title: 'Interfaces with DHCP enabled',

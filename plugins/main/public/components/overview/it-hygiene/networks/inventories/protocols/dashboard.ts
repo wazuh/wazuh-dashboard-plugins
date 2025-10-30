@@ -4,8 +4,8 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { SavedVis } from '../../../common/types';
-const getVisStateNetworkMetricsMinMax = (indexPatternId: string): SavedVis => {
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
+const getVisStateNetworkMetricsMinMax = (indexPatternId: string): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-metrics-min-max',
     type: 'metric',

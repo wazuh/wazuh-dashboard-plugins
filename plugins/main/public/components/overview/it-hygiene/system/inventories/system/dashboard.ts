@@ -5,7 +5,7 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
-import { SavedVis } from '../../../common/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations/index';
 
 type HostArchitecture = 'x86_64' | 'arm64';
@@ -13,7 +13,7 @@ type HostArchitecture = 'x86_64' | 'arm64';
 const getVisStateHostArchitectureMetric = (
   indexPatternId: string,
   arch: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: `it-hygiene-host-architecture-${arch}`,
     title: `Host architecture ${arch}`,

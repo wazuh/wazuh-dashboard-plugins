@@ -6,7 +6,7 @@ import {
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
-import { SavedVis } from '../../../common/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
 import {
   getVisStateDHCPEnabledInterfacesMetric,
   getVisStateNetworkAveragePriorityMetric,
@@ -14,7 +14,7 @@ import {
 
 const getVisStateUniqueNetworkIPsMetric = (
   indexPatternId: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-by-ip',
     title: 'Unique network IPs',

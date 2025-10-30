@@ -6,14 +6,14 @@ import {
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
-import { SavedVis } from '../../../common/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
 
 type InterfaceState = 'LISTEN' | 'ESTABLISHED';
 
 const getVisStateInterfaceState = (
   indexPatternId: string,
   interfaceState: InterfaceState,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: `it-hygiene-network-interfaces-${interfaceState}`,
     title: `Interfaces in ${interfaceState} state`,
@@ -78,7 +78,7 @@ const getVisStateInterfaceState = (
 
 const getVisStateUDPOnlyTransportsMetric = (
   indexPatternId: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-Transports-only-udp',
     title: 'Transports operating only on UDP',

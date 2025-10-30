@@ -5,12 +5,12 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
-import { SavedVis } from '../../../common/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
 
 // You can apply the same logic here using ERRORS instead of DROPS. In both cases, a lower percentage indicates everything is working fine. If the percentage rises too much, it means there's a problem that needs attention.
 const getVisStateGlobalPacketLossMetric = (
   indexPatternId: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-global-packet-loss-rate',
     title: 'Average packet loss rate',
@@ -80,7 +80,7 @@ const getVisStateGlobalPacketLossMetric = (
 
 const getVisStateInactiveNetworkInterfacesMetric = (
   indexPatternId: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-state-inactive',
     title: 'Interfaces state Inactive',
@@ -144,7 +144,7 @@ const getVisStateInactiveNetworkInterfacesMetric = (
 
 const getVisStateUnknownStateNetworkInterfacesMetric = (
   indexPatternId: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-state-unknown',
     title: 'Interfaces state Unknown',
@@ -208,7 +208,7 @@ const getVisStateUnknownStateNetworkInterfacesMetric = (
 
 const getVisStateWirelessNetworkInterfacesMetric = (
   indexPatternId: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-type-wireless',
     title: 'Interfaces type Wireless',

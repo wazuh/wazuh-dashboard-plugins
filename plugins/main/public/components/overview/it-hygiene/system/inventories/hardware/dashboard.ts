@@ -10,13 +10,13 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { SavedVis } from '../../../common/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
 
 const getVisStateAverageMetric = (
   indexPatternId: string,
   field: string,
   customLabel: string,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: `it-hygiene-network-${field}`,
     title: `Average ${field}`,

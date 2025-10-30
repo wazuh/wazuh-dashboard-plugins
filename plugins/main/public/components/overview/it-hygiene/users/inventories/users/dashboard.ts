@@ -8,9 +8,9 @@ import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateHorizontalBarByField,
 } from '../../../../../../services/visualizations';
-import { SavedVis } from '../../../common/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
 
-const getVisStateUniqueUsersMetric = (indexPatternId: string): SavedVis => {
+const getVisStateUniqueUsersMetric = (indexPatternId: string): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-users-unique-count',
     title: 'Unique users',

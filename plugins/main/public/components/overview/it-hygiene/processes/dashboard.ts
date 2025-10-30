@@ -8,7 +8,7 @@ import {
   getVisStateHorizontalBarByField,
   getVisStateHistogramBy,
 } from '../common/saved-vis/generators';
-import { SavedVis } from '../common/types';
+import { DashboardByValueSavedVis } from '../../../../../common/saved-vis/types';
 
 type ProcessState =
   | 'Stopped'
@@ -19,7 +19,7 @@ type ProcessState =
 const getVisStateProcessesState = (
   indexPatternId: string,
   processState: ProcessState,
-): SavedVis => {
+): DashboardByValueSavedVis => {
   return {
     id: `it-hygiene-processes-state-${processState}`,
     title: `Processes state ${processState}`,

@@ -1,4 +1,4 @@
-import { SavedVis } from './types';
+import { DashboardByValueSavedVis } from '../../../../../common/saved-vis/types';
 
 export const generateVisualization = ({
   key,
@@ -14,7 +14,7 @@ export const generateVisualization = ({
   height: number;
   positionX: number;
   positionY: number;
-  savedVis: SavedVis;
+  savedVis: DashboardByValueSavedVis;
 }) => {
   if (width > 48) {
     throw new Error('Width cannot exceed 48');
