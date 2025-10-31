@@ -1326,7 +1326,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Prompt to show the unsupported module for the selected agent [#2959](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2959)
 - Added a X-Frame-Options header to the backend responses [#2977](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2977)
 
-
 ### Changed
 
 - Added toast with refresh button when new fields are loaded [#2974](https://github.com/wazuh/wazuh-dashboard-plugins/pull/2974)

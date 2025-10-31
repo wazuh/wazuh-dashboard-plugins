@@ -10,8 +10,6 @@ Through the dashboardId, agentDashboardId, and hasPinnedAgent properties, you ca
 ```typescript
 import { DashboardRenderer } from './dashboard-renderer';
 
-
-
 export function DashboardContainer ({
   dashboardId,
   agentDashboardId,
