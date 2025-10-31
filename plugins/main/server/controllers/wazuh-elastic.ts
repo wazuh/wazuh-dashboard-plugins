@@ -460,10 +460,18 @@ export class WazuhElasticCtrl {
                 let configuration;
 
                 if (sampleDataAndTemplate?.template) {
-                  configuration = sampleDataAndTemplate.template.template;
+                  // Expect flat format (Elasticsearch/Indexer): { index_patterns, mappings, settings }
+                  const templateData = sampleDataAndTemplate.template;
 
-                  delete configuration.index_patterns;
-                  delete configuration.priority;
+                  configuration = {
+                    settings: templateData.settings || {},
+                    mappings: templateData.mappings || {},
+                  };
+
+                  // Override shards and replicas for sample data
+                  if (!configuration.settings.index) {
+                    configuration.settings.index = {};
+                  }
 
                   configuration.settings.index.number_of_shards =
                     WAZUH_SAMPLE_ALERTS_INDEX_SHARDS;
