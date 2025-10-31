@@ -2,7 +2,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 // @ts-ignore
 import { EuiEmptyPrompt, EuiLoadingSpinner } from '@elastic/eui';
 import { getPlugins } from '../../../../kibana-services';
-import { buildDashboardByValueInput, getFiltersParams } from './dashboard-renderer-service';
+import {
+  buildDashboardByValueInput,
+  getFiltersParams,
+} from './dashboard-renderer-service';
 import { Status, DashboardByValueInput } from './types';
 import DashboardRendererErrorPrompt from './dashboard-renderer-error-prompt';
 
@@ -13,7 +16,7 @@ type DashboardRendererProps = {
   className?: string;
   config: {
     dataSource: any;
-  }
+  };
 };
 
 export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
@@ -21,18 +24,24 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
   agentDashboardId,
   hasPinnedAgent,
   className,
-  config
+  config,
 }) => {
   const DashboardContainerByValueRenderer =
     getPlugins()?.dashboard?.DashboardContainerByValueRenderer;
 
   const [status, setStatus] = useState<Status>('validating');
   const [error, setError] = useState<string | null>(null);
-  const [byValueInput, setByValueInput] = useState<DashboardByValueInput | null>(null);
+  const [byValueInput, setByValueInput] =
+    useState<DashboardByValueInput | null>(null);
 
-  const buildDashboard = useCallback(async (isAgent: boolean) => {
-    return await buildDashboardByValueInput(isAgent && agentDashboardId ? agentDashboardId : dashboardId);
-  }, [dashboardId, agentDashboardId]);
+  const buildDashboard = useCallback(
+    async (isAgent: boolean) => {
+      return await buildDashboardByValueInput(
+        isAgent && agentDashboardId ? agentDashboardId : dashboardId,
+      );
+    },
+    [dashboardId, agentDashboardId],
+  );
 
   const buildByValueInputHandler = useCallback(async () => {
     setStatus('validating');
@@ -43,7 +52,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
 
     if (result.success) {
       setByValueInput({
-        ...result.byValueInput!
+        ...result.byValueInput!,
       });
       setStatus(result.status);
     } else {
@@ -60,7 +69,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     return (
       <div className={className}>
         <EuiEmptyPrompt
-          icon={<EuiLoadingSpinner size="xl" />}
+          icon={<EuiLoadingSpinner size='xl' />}
           title={<h3>Loading dashboard…</h3>}
           body={<p>Please wait a few seconds.</p>}
         />
@@ -72,7 +81,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     return (
       <DashboardRendererErrorPrompt
         className={className}
-        errorType="error"
+        errorType='error'
         errorMessage={error || 'Unknown error'}
         onRetry={buildByValueInputHandler}
       />
@@ -83,7 +92,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     return (
       <DashboardRendererErrorPrompt
         className={className}
-        errorType="empty"
+        errorType='empty'
         errorMessage={error || 'Unknown error'}
         dashboardId={dashboardId}
         agentDashboardId={agentDashboardId}
@@ -96,7 +105,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     return (
       <DashboardRendererErrorPrompt
         className={className}
-        errorType="not_found"
+        errorType='not_found'
         errorMessage={error || 'Unknown error'}
         dashboardId={dashboardId}
         agentDashboardId={agentDashboardId}
@@ -110,18 +119,20 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
       return (
         <DashboardRendererErrorPrompt
           className={className}
-          errorType="plugin_unavailable"
-          errorMessage="Ensure the Dashboard plugin is started and supports by-value rendering."
+          errorType='plugin_unavailable'
+          errorMessage='Ensure the Dashboard plugin is started and supports by-value rendering.'
         />
       );
     }
 
     return (
       <div className={className} style={{ padding: 0 }}>
-        <DashboardContainerByValueRenderer input={{
-          ...byValueInput,
-          ...getFiltersParams(config),
-        }} />
+        <DashboardContainerByValueRenderer
+          input={{
+            ...byValueInput,
+            ...getFiltersParams(config),
+          }}
+        />
       </div>
     );
   }
