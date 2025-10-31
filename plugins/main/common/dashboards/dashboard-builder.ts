@@ -60,12 +60,12 @@ export abstract class DashboardLayoutConfig {
     indexPatternId: string,
   ) => DashboardByValueSavedVis)[];
 
-  constructor() {}
+  constructor(private indexPatternId: string) {}
 
-  getSavedVisualizations(): ((
-    indexPatternId: string,
-  ) => DashboardByValueSavedVis)[] {
-    return this.savedVisualizations;
+  getSavedVisualizations(): DashboardByValueSavedVis[] {
+    return this.savedVisualizations.map((getSavedVis) =>
+      getSavedVis(this.indexPatternId)
+    );
   }
 
   get savedVisualizationsCount() {
@@ -85,10 +85,12 @@ export abstract class DashboardByRendererConfig {
     return this.indexPatternId;
   }
 
-  getSavedVisualizations(): ((
-    indexPatternId: string,
-  ) => DashboardByValueSavedVis)[] {
+  getSavedVisualizations(): DashboardByValueSavedVis[] {
     return this.dashboardLayoutConfig.getSavedVisualizations();
+  }
+
+  getSavedVisualizationsIds(): string[] {
+    return this.getSavedVisualizations().map((savedVis) => savedVis.id);
   }
 
   protected abstract getDashboardPanels(): DashboardByValuePanels;

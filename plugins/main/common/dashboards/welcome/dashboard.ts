@@ -122,8 +122,8 @@ export const getVisStateEventsCountEvolution = (
 });
 
 export class WelcomeDashboardLayoutConfig extends DashboardLayoutConfig {
-  constructor() {
-    super();
+  constructor(indexPatternId: string) {
+    super(indexPatternId);
     this.savedVisualizations.push(getVisStateEventsCountEvolution);
   }
 
@@ -141,7 +141,7 @@ export class WelcomeDashboardByRendererConfig extends DashboardByRendererConfig 
   private dashboardPanelManager: DashboardPanelManager;
 
   constructor(indexPatternId: string) {
-    super(indexPatternId, new WelcomeDashboardLayoutConfig());
+    super(indexPatternId, new WelcomeDashboardLayoutConfig(indexPatternId));
     this.dashboardPanelManager = new DashboardPanelManager(
       indexPatternId,
       this.dashboardLayoutConfig,
