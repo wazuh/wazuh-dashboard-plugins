@@ -1,4 +1,4 @@
-import { DashboardPanelsBuilder, DashboardVisualizationConfig } from '../class';
+import { DashboardPanelsBuilder, DashboardVisualizationConfig } from '../dashboard-builder';
 import type { DashboardByValueSavedVis, GridVisualPair } from '../types';
 
 export const getVisStateEventsCountEvolution = (
