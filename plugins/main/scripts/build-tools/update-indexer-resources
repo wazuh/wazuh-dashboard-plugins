@@ -65,9 +65,10 @@ get_candidate_ref(){
       CANDIDATE_GIT_REFS+=("$version" "v$version")
   fi
 
-      if ! command -v jq >/dev/null 2>&1; then
-        return 1
-    fi
+  if ! command -v jq >/dev/null 2>&1; then
+      echo 'jq is not installed'
+      return 1
+  fi
 
   echo "Candidate git references: ${CANDIDATE_GIT_REFS[*]}"
   for ref in "${CANDIDATE_GIT_REFS[@]}"; do
@@ -86,6 +87,7 @@ get_candidate_reference() {
   echo 'Resolving branch references...'
 
   get_candidate_ref
+  echo 'TEST'
 
   [ -z "$RESOLVED_CANDIDATE_REF" ] && {
     echo "Error: Could not resolve the candidate reference from input [$INPUT_CANDIDATE_REF]"
