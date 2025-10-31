@@ -44,14 +44,10 @@ const getBranch = () => {
     return args.branch;
   }
 
-  // TODO: Remove hardcoded 'main' - only for testing until 5.0.0 is released
-  console.log(`Using 'main' branch (temporary for testing)`);
-  return 'main';
-  
-  // const versionInfo = getVersionInfo();
-  // const version = versionInfo.version;
-  // console.log(`Using version as branch: ${version}`);
-  // return version;
+  const versionInfo = getVersionInfo();
+  const version = versionInfo.version;
+  console.log(`Using version as branch: ${version}`);
+  return version;
 };
 
 // Configuration
