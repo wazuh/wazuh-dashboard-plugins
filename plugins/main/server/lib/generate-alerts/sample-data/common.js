@@ -214,7 +214,6 @@ module.exports.GEO_LOCATION = [
   },
 ];
 
-// Autonomous System Numbers and Organizations for ECS
 module.exports.AS_DATA = [
   { number: 15169, organization: 'Google LLC' },
   { number: 16509, organization: 'Amazon.com, Inc.' },
@@ -240,7 +239,6 @@ module.exports.DOMAINS = [
   'suspicious.domain.cn',
 ];
 
-// User groups for ECS user field
 module.exports.USER_GROUPS = [
   { name: 'wheel', id: '10' },
   { name: 'sudo', id: '27' },
@@ -251,7 +249,6 @@ module.exports.USER_GROUPS = [
   { name: 'operators', id: '1001' },
 ];
 
-// User roles for ECS user field
 module.exports.USER_ROLES = [
   ['admin'],
   ['user'],

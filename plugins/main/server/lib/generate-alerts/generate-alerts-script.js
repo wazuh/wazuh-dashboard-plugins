@@ -59,7 +59,6 @@ const { Random } = require('./helpers/random');
 const { DateFormatter } = require('./helpers/date-formatter');
 const { interpolateAlertProps } = require('./helpers/interpolate-alert-props');
 
-// ECS Generators for Wazuh 5.0
 const {
   EVENT_CATEGORIES,
   EVENT_TYPES,
@@ -96,10 +95,8 @@ function generateAlert(params) {
   // Select random agent
   const selectedAgent = Random.arrayItem(AGENTS);
 
-  // Generate base Wazuh 5.0 ECS alert structure
   /** @type {import('./types').Alert} */
   let alert = {
-    // ECS Core Fields
     '@timestamp': timestamp,
     tags: ['wazuh', '@sampledata'],
 
@@ -115,7 +112,6 @@ function generateAlert(params) {
     // Message (human-readable)
     message: 'Sample security alert',
 
-    // Agent information (ECS-compliant with Wazuh 5.0 extensions)
     agent: generateAgent(selectedAgent, {
       groups: ['default'],
       version: 'v5.0.0',
@@ -871,7 +867,6 @@ function generateAlert(params) {
       filePath.lastIndexOf(separator),
     );
 
-    // Update event categorization
     alert.event = generateEvent({
       kind: EVENT_KINDS.ALERT,
       category: [EVENT_CATEGORIES.FILE],
@@ -887,7 +882,6 @@ function generateAlert(params) {
       severity: eventType === 'deleted' ? 7 : eventType === 'modified' ? 5 : 3,
     });
 
-    // Generate file information (ECS)
     const fileOwner = Random.arrayItem(USERS);
     const fileGroup = 'root';
     const fileUid = Random.arrayItem(IntegrityMonitoring.uid_after);
@@ -1391,7 +1385,6 @@ function generateAlert(params) {
   }
 
   if (params.ssh) {
-    // SSH is similar to authentication, use same ECS structure
     const userName = Random.arrayItem(USERS);
     const sourceGeo = Random.arrayItem(GEO_LOCATION);
     const sourceAs = Random.arrayItem(AS_DATA);
@@ -1694,7 +1687,6 @@ function generateAlert(params) {
     alert.wazuh.rules = getRulesForModule('yara', 'detected');
 
     const yaraAlert = Yara.createAlert();
-    // Merge YARA alert data, preserving ECS fields
     alert.data = { ...alert.data, ...(yaraAlert.data || {}) };
     if (yaraAlert.rule) {
       alert.rule = { ...alert.rule, ...yaraAlert.rule };

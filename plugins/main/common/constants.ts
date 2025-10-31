@@ -169,7 +169,6 @@ export const FIELD_TIMESTAMP = '@timestamp';
 // Job - Wazuh initialize
 export const WAZUH_PLUGIN_PLATFORM_TEMPLATE_NAME = 'wazuh-kibana';
 
-// Sample data - Wazuh 5.0
 export const WAZUH_SAMPLE_ALERT_PREFIX = 'wazuh-alerts-v5-';
 export const WAZUH_SAMPLE_ALERTS_INDEX_SHARDS = 1;
 export const WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS = 0;
@@ -185,7 +184,7 @@ export const WAZUH_SAMPLE_INVENTORY_AGENT = 'wazuh-inventory-agent';
 export const WAZUH_SAMPLE_VULNERABILITIES = 'wazuh-vulnerabilities';
 export const WAZUH_SAMPLE_AGENT_MONITORING = 'agent-monitoring';
 export const WAZUH_SAMPLE_SERVER_STATISTICS = 'server-statistics';
-export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500; // Reduced for larger ECS documents
+export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   settingIndexPattern: 'alerts.sample.prefix',
   dataSet: 'wazuh-alerts',
