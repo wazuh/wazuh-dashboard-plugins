@@ -1,4 +1,8 @@
-import { DashboardPanelsBuilder, DashboardVisualizationConfig } from '../dashboard-builder';
+import {
+  DashboardByRendererConfig,
+  DashboardPanelsBuilder,
+  DashboardVisualizationConfig,
+} from '../dashboard-builder';
 import type { DashboardByValueSavedVis, GridVisualPair } from '../types';
 
 export const getVisStateEventsCountEvolution = (
@@ -130,7 +134,29 @@ export class WelcomeDashboardVisualizationConfig extends DashboardVisualizationC
 }
 
 export class WelcomeDashboardPanelsBuilder extends DashboardPanelsBuilder {
-  constructor(indexPatternId: string) {
-    super(indexPatternId, new WelcomeDashboardVisualizationConfig());
+  constructor(indexPatternId: string, welcomeDashboardLayoutConfig: WelcomeDashboardVisualizationConfig) {
+    super(indexPatternId, welcomeDashboardLayoutConfig);
+  }
+}
+
+export class WelcomeDashboardConfig extends DashboardByRendererConfig {
+  constructor(welcomeDashboardPanelsBuilder: WelcomeDashboardPanelsBuilder) {
+    super(welcomeDashboardPanelsBuilder);
+  }
+
+  protected getId(): string {
+    return 'agent-events-count-evolution';
+  }
+  protected getTitle(): string {
+    return 'Events count evolution';
+  }
+  protected getDescription(): string {
+    return 'Dashboard of Events count evolution';
+  }
+  protected get useMargins(): boolean {
+    return true;
+  }
+  protected get hidePanelTitles(): boolean {
+    return true;
   }
 }

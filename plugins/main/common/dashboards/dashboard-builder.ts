@@ -74,3 +74,50 @@ export abstract class DashboardVisualizationConfig {
 
   abstract generateGridDataWithVisualization(): GridVisualPair[];
 }
+
+/* <DashboardByRenderer
+      input={{
+        viewMode: ViewMode.VIEW,
+        panels: getDashboardPanels(dataSource?.id),
+        isFullScreenMode: false,
+        filters: fetchFilters ?? [],
+        useMargins: true,
+        id: 'agent-events-count-evolution',
+        timeRange: {
+          from: timeFilter.from,
+          to: timeFilter.to,
+        },
+        title: 'Events count evolution',
+        description: 'Dashboard of Events count evolution',
+        refreshConfig: {
+          pause: false,
+          value: 15,
+        },
+        hidePanelTitles: true,
+      }}
+    /> */
+
+export abstract class DashboardByRendererConfig {
+  constructor(private dashboardPanelsConfig: DashboardPanelsBuilder) {}
+
+  protected abstract getId(): string;
+
+  protected abstract getTitle(): string;
+
+  protected abstract getDescription(): string;
+
+  protected abstract get useMargins(): boolean;
+
+  protected abstract get hidePanelTitles(): boolean;
+
+  getConfig() {
+    return {
+      id: this.getId(),
+      title: this.getTitle(),
+      description: this.getDescription(),
+      panels: this.dashboardPanelsConfig.getAll(),
+      useMargins: this.useMargins,
+      hidePanelTitles: this.hidePanelTitles,
+    };
+  }
+}

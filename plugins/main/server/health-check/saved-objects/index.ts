@@ -1,1 +1,1 @@
-export * from './saved-objects-by-ia';
+export * from './task-creator-saved-objects-for-dashboards-and-visualizations';

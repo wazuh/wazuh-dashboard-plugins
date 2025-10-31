@@ -16,9 +16,17 @@
 
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
 import type { InitializationTaskRunContext } from '../services';
-import type { DashboardByValueSavedVis } from "../../../common/dashboards/types";
-import { WelcomeDashboardVisualizationConfig } from "../../../common/dashboards/welcome/dashboard";
-import { INDEX_PATTERN_REPLACE_ME } from "./constants";
+import type {
+  DashboardByValueInput,
+  DashboardByValueSavedVis,
+} from '../../../common/dashboards/types';
+import {
+  WelcomeDashboardConfig,
+  WelcomeDashboardPanelsBuilder,
+  WelcomeDashboardVisualizationConfig,
+} from '../../../common/dashboards/welcome/dashboard';
+import { INDEX_PATTERN_REPLACE_ME } from './constants';
+import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
 
 // ---------- Transform helpers ----------
 
@@ -64,12 +72,17 @@ async function createOrUpdateVisualization(
     references,
   });
 
-  logger.info(`Visualization ensured [${res.id}] title [${res.attributes.title}]`);
+  logger.info(
+    `Visualization ensured [${res.id}] title [${res.attributes.title}]`,
+  );
   return res.id;
 }
 
 function buildDashboardPanelsJSON(
-  order: Array<{ panelId: string; gridData: { w: number; h: number; x: number; y: number; i: string } }>,
+  order: Array<{
+    panelId: string;
+    gridData: { w: number; h: number; x: number; y: number; i: string };
+  }>,
 ) {
   // Use reference-based panels to avoid embedding saved object ids directly.
   return order.map((panel, idx) => ({
@@ -83,35 +96,15 @@ function buildDashboardPanelsJSON(
 
 async function createOrUpdateDashboard(
   client: SavedObjectsClientContract,
-  params: {
-    id: string;
-    title: string;
-    description?: string;
-    panelsOrder: Array<{ panelId: string; gridData: { w: number; h: number; x: number; y: number; i: string } }>;
-    panelIdToVisualizationId: Record<string, string>;
-  },
+  dashboard: DashboardByValueInput,
+  savedObjectVisualizationsIds: string[],
   logger: InitializationTaskRunContext['logger'],
 ) {
-  const { id, title, description = '', panelsOrder, panelIdToVisualizationId } = params;
-
-  const panels = buildDashboardPanelsJSON(panelsOrder);
-
-  const references = panelsOrder.map((_, idx) => ({
-    name: `panel_${idx}`,
-    type: 'visualization',
-    id: panelIdToVisualizationId[panelsOrder[idx].panelId],
-  }));
-
-  const attributes = {
-    title,
-    description,
-    panelsJSON: JSON.stringify(panels),
-    optionsJSON: JSON.stringify({ useMargins: true, hidePanelTitles: false }),
-    timeRestore: false,
-    kibanaSavedObjectMeta: {
-      searchSourceJSON: JSON.stringify({ query: { language: 'kuery', query: '' }, filter: [] }),
-    },
-  };
+  const { id, attributes, references } =
+    DashboardSavedObjectMapper.mapDashboardInputToSavedObject(
+      dashboard,
+      savedObjectVisualizationsIds,
+    );
 
   logger.debug(`Creating/updating dashboard [${id}]`);
   const res = await client.create('dashboard', attributes, {
@@ -126,32 +119,56 @@ async function createOrUpdateDashboard(
 
 // ---------- Health check task creators ----------
 
-export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations = () => ({
-  name: 'saved-objects:dashboards',
-  async run(ctx: InitializationTaskRunContext) {
-    try {
-      ctx.logger.debug('Starting saved objects provisioning');
+export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations =
+  () => ({
+    name: 'saved-objects:dashboards',
+    async run(ctx: InitializationTaskRunContext) {
+      try {
+        ctx.logger.debug('Starting saved objects provisioning');
 
-      const savedObjectsClient: SavedObjectsClientContract =
-        ctx.context.services.core.savedObjects.createInternalRepository();
+        const savedObjectsClient: SavedObjectsClientContract =
+          ctx.context.services.core.savedObjects.createInternalRepository();
 
-      // Create visualizations
-      const welcomeDashboardVisualizationConfig = new WelcomeDashboardVisualizationConfig();
+        // Create visualizations
+        const welcomeDashboardVisualizationConfig =
+          new WelcomeDashboardVisualizationConfig();
 
-      for (const savedVis of welcomeDashboardVisualizationConfig.getSavedVisualizations()) {
-        await createOrUpdateVisualization(savedObjectsClient, savedVis(INDEX_PATTERN_REPLACE_ME), ctx.logger);
+        for (const savedVis of welcomeDashboardVisualizationConfig.getSavedVisualizations()) {
+          await createOrUpdateVisualization(
+            savedObjectsClient,
+            savedVis(INDEX_PATTERN_REPLACE_ME),
+            ctx.logger,
+          );
+        }
+
+        // Create dashboards
+        const welcomeDashboardPanelsBuilder = new WelcomeDashboardPanelsBuilder(
+          INDEX_PATTERN_REPLACE_ME,
+          welcomeDashboardVisualizationConfig,
+        );
+
+        const welcomeDashboardConfig = new WelcomeDashboardConfig(
+          welcomeDashboardPanelsBuilder,
+        );
+
+        await createOrUpdateDashboard(
+          savedObjectsClient,
+          welcomeDashboardConfig.getConfig(),
+          welcomeDashboardVisualizationConfig
+            .getSavedVisualizations()
+            .map((vis) => vis(INDEX_PATTERN_REPLACE_ME).id),
+          ctx.logger,
+        );
+
+        ctx.logger.debug('Saved objects provisioning finished');
+
+        return { status: 'ok' };
+      } catch (error) {
+        const message = `Error provisioning saved objects: ${
+          error instanceof Error ? error.message : String(error)
+        }`;
+        ctx.logger.error(message);
+        throw new Error(message);
       }
-
-      ctx.logger.debug('Saved objects provisioning finished');
-
-      return { status: 'ok' };
-    } catch (error) {
-      const message = `Error provisioning saved objects: ${
-        error instanceof Error ? error.message : String(error)
-      }`;
-      ctx.logger.error(message);
-      throw new Error(message);
-    }
-  },
-});
-
+    },
+  });
