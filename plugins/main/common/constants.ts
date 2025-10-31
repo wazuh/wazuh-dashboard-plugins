@@ -1000,9 +1000,8 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_SCA_STATES =
 
 export const INDEX_PATTERN_ALERTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
-  'rule.groups',
+  'rule.id',
   'wazuh.decoders',
-  'wazuh.cluster.node',
   'agent.id',
   'agent.name',
 ];
