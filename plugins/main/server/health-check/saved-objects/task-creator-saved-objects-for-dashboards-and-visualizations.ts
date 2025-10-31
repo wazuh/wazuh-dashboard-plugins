@@ -23,6 +23,7 @@ import type {
 import { WelcomeDashboardByRendererConfig } from '../../../common/dashboards/welcome/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
+import { getDashboardConfigs } from "./dashboard-configs";
 
 // ---------- Transform helpers ----------
 
@@ -109,25 +110,25 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
         const client: SavedObjectsClientContract =
           ctx.context.services.core.savedObjects.createInternalRepository();
 
-        // Create visualizations
-        const welcomeDashboardConfig = new WelcomeDashboardByRendererConfig(
-          INDEX_PATTERN_REPLACE_ME,
-        );
+        const dashboardConfigs = getDashboardConfigs();
 
-        await Promise.all(
-          welcomeDashboardConfig
-            .getSavedVisualizations()
-            .map(savedVis =>
-              saveVisualizationSavedObject(client, savedVis, ctx.logger),
-            ),
-        );
+        for (const dashboardConfig of dashboardConfigs) {
+          // Create visualizations
+          await Promise.all(
+            dashboardConfig
+              .getSavedVisualizations()
+              .map((savedVis) =>
+                saveVisualizationSavedObject(client, savedVis, ctx.logger),
+              ),
+          );
 
-        await saveDashboardSavedObject(
-          client,
-          welcomeDashboardConfig.getConfig(),
-          welcomeDashboardConfig.getSavedVisualizationsIds(),
-          ctx.logger,
-        );
+          await saveDashboardSavedObject(
+            client,
+            dashboardConfig.getConfig(),
+            dashboardConfig.getSavedVisualizationsIds(),
+            ctx.logger,
+          );
+        }
 
         ctx.logger.debug('Saved objects provisioning finished');
 
