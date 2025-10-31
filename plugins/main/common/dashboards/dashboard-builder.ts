@@ -76,10 +76,17 @@ export abstract class DashboardLayoutConfig {
 }
 
 export abstract class DashboardByRendererConfig {
+  private dashboardPanelManager: DashboardPanelManager;
+
   constructor(
     protected indexPatternId: string,
     protected dashboardLayoutConfig: DashboardLayoutConfig,
-  ) {}
+  ) {
+    this.dashboardPanelManager = new DashboardPanelManager(
+      indexPatternId,
+      dashboardLayoutConfig,
+    );
+  }
 
   protected getIndexPatternId(): string {
     return this.indexPatternId;
@@ -93,7 +100,9 @@ export abstract class DashboardByRendererConfig {
     return this.getSavedVisualizations().map(savedVis => savedVis.id);
   }
 
-  protected abstract getDashboardPanels(): DashboardByValuePanels;
+  getDashboardPanels(): DashboardByValuePanels {
+    return this.dashboardPanelManager.getPanels();
+  }
 
   protected abstract getId(): string;
 

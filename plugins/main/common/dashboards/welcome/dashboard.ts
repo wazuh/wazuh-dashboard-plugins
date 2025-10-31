@@ -138,19 +138,10 @@ export class WelcomeDashboardLayoutConfig extends DashboardLayoutConfig {
 }
 
 export class WelcomeDashboardByRendererConfig extends DashboardByRendererConfig {
-  private dashboardPanelManager: DashboardPanelManager;
-
   constructor(indexPatternId: string) {
     super(indexPatternId, new WelcomeDashboardLayoutConfig(indexPatternId));
-    this.dashboardPanelManager = new DashboardPanelManager(
-      indexPatternId,
-      this.dashboardLayoutConfig,
-    );
   }
 
-  getDashboardPanels(): DashboardByValuePanels {
-    return this.dashboardPanelManager.getPanels();
-  }
   protected getId(): string {
     return 'agent-events-count-evolution';
   }
