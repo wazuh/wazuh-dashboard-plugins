@@ -2,7 +2,7 @@ import {
   DashboardByRendererConfig,
   DashboardLayoutConfig,
 } from '../dashboard-builder';
-import type { DashboardByValueSavedVis, GridVisualPair } from '../types';
+import type { DashboardByValueSavedVis } from '../types';
 
 export const getVisStateEventsCountEvolution = (
   indexPatternId: string,
@@ -118,17 +118,11 @@ export const getVisStateEventsCountEvolution = (
 
 export class AgentsEventsDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId);
-    this.savedVisualizations.push(getVisStateEventsCountEvolution);
-  }
-
-  createGridVisualizationData(): GridVisualPair[] {
-    return [
-      {
-        gridData: { w: 48, h: 7, x: 0, y: 0 },
-        savedVis: getVisStateEventsCountEvolution,
-      },
-    ];
+    super();
+    this.gridVisualizationItems.push({
+      gridData: { w: 48, h: 7, x: 0, y: 0 },
+      savedVis: getVisStateEventsCountEvolution(indexPatternId),
+    });
   }
 }
 

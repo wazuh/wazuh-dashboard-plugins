@@ -8,10 +8,7 @@ import type {
 export class DashboardPanelManager {
   private panels: DashboardByValuePanels = {};
 
-  constructor(
-    private indexPatternId: string,
-    private dashboardLayoutConfig: DashboardLayoutConfig,
-  ) {}
+  constructor(private dashboardLayoutConfig: DashboardLayoutConfig) {}
 
   private buildDashboardPanel = (
     key: string,
@@ -48,31 +45,29 @@ export class DashboardPanelManager {
       length: this.dashboardLayoutConfig.savedVisualizationsCount,
     }).forEach((_, index) => {
       const { gridData, savedVis } =
-        this.dashboardLayoutConfig.createGridVisualizationData()[index];
-      this.addPanel({ gridData, savedVis: savedVis(this.indexPatternId) });
+        this.dashboardLayoutConfig.retrieveGridVisualPairs()[index];
+      this.addPanel({ gridData, savedVis });
     });
     return this.panels;
   }
 }
 
 export abstract class DashboardLayoutConfig {
-  protected savedVisualizations = [] as ((
-    indexPatternId: string,
-  ) => DashboardByValueSavedVis)[];
+  protected gridVisualizationItems = [] as GridVisualPair[];
 
-  constructor(private indexPatternId: string) {}
+  constructor() {}
 
   getSavedVisualizations(): DashboardByValueSavedVis[] {
-    return this.savedVisualizations.map(getSavedVis =>
-      getSavedVis(this.indexPatternId),
-    );
+    return this.gridVisualizationItems.map(gridVisData => gridVisData.savedVis);
   }
 
   get savedVisualizationsCount() {
-    return this.savedVisualizations.length;
+    return this.gridVisualizationItems.length;
   }
 
-  abstract createGridVisualizationData(): GridVisualPair[];
+  retrieveGridVisualPairs(): GridVisualPair[] {
+    return this.gridVisualizationItems;
+  }
 }
 
 export abstract class DashboardByRendererConfig {
@@ -83,7 +78,6 @@ export abstract class DashboardByRendererConfig {
     protected dashboardLayoutConfig: DashboardLayoutConfig,
   ) {
     this.dashboardPanelManager = new DashboardPanelManager(
-      indexPatternId,
       dashboardLayoutConfig,
     );
   }

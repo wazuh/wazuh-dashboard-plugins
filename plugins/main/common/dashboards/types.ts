@@ -57,5 +57,5 @@ export interface DashboardByValueInput {
 
 export type GridVisualPair = {
   gridData: GridData;
-  savedVis: (indexPatternId: string) => DashboardByValueSavedVis;
+  savedVis: DashboardByValueSavedVis;
 };

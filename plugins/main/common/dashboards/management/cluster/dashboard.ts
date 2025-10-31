@@ -2,7 +2,7 @@ import {
   DashboardByRendererConfig,
   DashboardLayoutConfig,
 } from '../../dashboard-builder';
-import type { DashboardByValueSavedVis, GridVisualPair } from '../../types';
+import type { DashboardByValueSavedVis } from '../../types';
 
 const getVisStateTop5Nodes = (
   indexPatternId: string,
@@ -61,22 +61,11 @@ const getVisStateTop5Nodes = (
 
 export class ClusterConfigurationDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId);
-    this.savedVisualizations.push(getVisStateTop5Nodes);
-  }
-
-  createGridVisualizationData(): GridVisualPair[] {
-    return [
-      {
-        gridData: {
-          w: 48,
-          h: 13,
-          x: 0,
-          y: 0,
-        },
-        savedVis: getVisStateTop5Nodes,
-      },
-    ];
+    super();
+    this.gridVisualizationItems.push({
+      gridData: { w: 48, h: 13, x: 0, y: 0 },
+      savedVis: getVisStateTop5Nodes(indexPatternId),
+    });
   }
 }
 
