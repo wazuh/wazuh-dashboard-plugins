@@ -11,16 +11,12 @@
  */
 
 import { GenericRequest } from './generic-request';
-import { KnownFields } from '../utils/known-fields';
-import { FieldsStatistics } from '../utils/statistics-fields';
-import { FieldsMonitoring } from '../utils/monitoring-fields';
+import { getKnownFieldsByIndexType } from '../utils/known-fields-loader';
 import {
   HEALTH_CHECK,
   NOT_TIME_FIELD_NAME_INDEX_PATTERN,
   PLUGIN_PLATFORM_NAME,
   WAZUH_INDEX_TYPE_ALERTS,
-  WAZUH_INDEX_TYPE_MONITORING,
-  WAZUH_INDEX_TYPE_STATISTICS,
 } from '../../common/constants';
 import { getDataPlugin, getSavedObjects } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
@@ -383,20 +379,17 @@ export class SavedObject {
       );
       return response.data.fields;
     } catch (error) {
-      switch (indexType) {
-        case WAZUH_INDEX_TYPE_MONITORING:
-          return FieldsMonitoring;
-        case WAZUH_INDEX_TYPE_STATISTICS:
-          return FieldsStatistics;
-        case WAZUH_INDEX_TYPE_ALERTS:
-          return KnownFields;
-        default:
-          const warningError = ErrorFactory.create(WarningError, {
-            error,
-            message: error.message,
-          });
-          throw warningError;
+      if (indexType) {
+        const statesFields = getKnownFieldsByIndexType(indexType);
+        if (statesFields) {
+          return statesFields;
+        }
       }
+      const statesError = ErrorFactory.create(WarningError, {
+        error,
+        message: `No known fields defined for index type: ${indexType}`,
+      });
+      throw statesError;
     }
   };
 
