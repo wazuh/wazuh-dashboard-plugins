@@ -1,0 +1,122 @@
+#!/bin/bash
+# This script updates index pattern templates' known fields and sample data
+# based on the specified indexer branch reference.
+# Usage: bash update-indexer-resources.sh <indexer-branch-ref>
+# Example: bash update-indexer-resources.sh main
+# Example: GIT_REF=main bash update-indexer-resources.sh
+# Note: Ensure Node.js is installed and accessible in your PATH.
+
+# Terminate script on any error
+set -e
+
+# Get the directory of the current script
+SCRIPT_PATH=$(dirname $0)
+RESOURCE_REPO_URL=https://github.com/wazuh/wazuh-indexer-plugins.git
+
+CANDIDATE_GIT_REFS=()
+
+# Function to update known fields from index pattern templates
+update_known_fields_from_templates() {
+  local ref="$RESOLVED_CANDIDATE_REF"
+  echo "Updating known fields of index pattern templates with indexer reference [$ref]..."
+
+  node $(realpath "$SCRIPT_PATH/../generate-known-fields/generate-known-fields.js") --branch $ref
+}
+
+# Function to update the index pattern templates for sample data
+update_templates_sample_data() {
+  local ref="$RESOLVED_CANDIDATE_REF"
+  echo "Updating sample data of index pattern templates with indexer reference [$ref]..."
+
+  node $(realpath "$SCRIPT_PATH/../sample-data-templates/update-templates-sample-data") --branch=$ref
+}
+
+# Option 5: plugin package.json
+try_package_json() {
+
+    if ! command -v jq >/dev/null 2>&1; then
+        return 1
+    fi
+
+    local file=$(realpath "$SCRIPT_PATH/../../package.json")
+    if [ ! -f "$file" ]; then
+        return 1
+    fi
+
+    local version
+    version=$(jq -r '.version' $file)
+
+    if [ -n "$version" ]; then
+        echo "$version"
+        return 0
+    fi
+
+    return 1
+}
+
+
+get_candidate_ref(){
+  echo 'Getting candidate git references...'
+  CANDIDATE_GIT_REFS=("$INPUT_CANDIDATE_REF")
+
+  local version=$(try_package_json || true)
+
+  if [ -n "$version" ]; then
+      CANDIDATE_GIT_REFS+=("$version" "v$version")
+  fi
+
+      if ! command -v jq >/dev/null 2>&1; then
+        return 1
+    fi
+
+  echo "Candidate git references: ${CANDIDATE_GIT_REFS[*]}"
+  for ref in "${CANDIDATE_GIT_REFS[@]}"; do
+      if git ls-remote --exit-code --heads "$RESOURCE_REPO_URL" "$ref" >/dev/null 2>&1 || git ls-remote --exit-code --tags "$RESOURCE_REPO_URL" "$ref" >/dev/null 2>&1; then
+          RESOLVED_CANDIDATE_REF=$ref
+          return 0
+      fi
+  done
+
+  echo 'Reference candidate not found'
+  exit 1
+}
+
+# Function to resolve branch reference
+get_candidate_reference() {
+  echo 'Resolving branch references...'
+
+  get_candidate_ref
+
+  [ -z "$RESOLVED_CANDIDATE_REF" ] && {
+    echo "Error: Could not resolve the candidate reference from input [$INPUT_CANDIDATE_REF]"
+    exit 1
+  }
+
+  echo "Resolved candidate: $RESOLVED_CANDIDATE_REF"
+}
+
+
+check_dependencies() {
+  if ! command -v git >/dev/null 2>&1; then
+    echo "Error: git is not installed or not found in PATH."
+    exit 1
+  fi
+
+  if ! command -v node >/dev/null 2>&1; then
+    echo "Error: Node.js is not installed or not found in PATH."
+    exit 1
+  fi
+}
+
+# Input parameter: indexer branch reference
+# e.g., main, develop, feature/some-feature
+INPUT_CANDIDATE_REF="${1:-$GIT_REF}"
+
+while [ -z "$INPUT_CANDIDATE_REF" ]; do
+  read -p "Enter the git reference (branch/tag) of the current source code. This reference will be used to get the referece in the indexer git repository to update the resource files (e.g., main, develop): " INPUT_CANDIDATE_REF
+done
+
+check_dependencies
+get_candidate_reference
+update_known_fields_from_templates
+update_templates_sample_data

@@ -53,12 +53,33 @@ const getBranch = () => {
 // Configuration
 const config = {
   // GitHub repository base URL with dynamic branch
-  githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/inventory_harvester/indexer/template`,
-  githubRepoBaseUrlVulnerabilities: `https://raw.githubusercontent.com/wazuh/wazuh/${getBranch()}/src/wazuh_modules/vulnerability_scanner/indexer/template/index-template.json`,
+  githubRepoBaseUrl: `https://raw.githubusercontent.com/wazuh/wazuh-indexer-plugins/${getBranch()}/plugins/setup/src/main/resources`,
   // Local directory where datasets are located
   localDatasetDir: path.join(__dirname, '../../server/lib/sample-data/dataset'),
   // List of datasets to update (obtained from local directory)
   datasets: [],
+  // Mapping from local dataset names to remote template filenames (Wazuh 5.0)
+  datasetToTemplateMapping: {
+    'states-fim-files': 'index-template-fim-files.json',
+    'states-fim-registry-keys': 'index-template-fim-registry-keys.json',
+    'states-fim-registry-values': 'index-template-fim-registry-values.json',
+    'states-sca': 'index-template-sca.json',
+    'states-vulnerabilities': 'index-template-vulnerabilities.json',
+    'states-inventory-packages': 'index-template-packages.json',
+    'states-inventory-processes': 'index-template-processes.json',
+    'states-inventory-system': 'index-template-system.json',
+    'states-inventory-networks': 'index-template-networks.json',
+    'states-inventory-ports': 'index-template-ports.json',
+    'states-inventory-hardware': 'index-template-hardware.json',
+    'states-inventory-hotfixes': 'index-template-hotfixes.json',
+    'states-inventory-interfaces': 'index-template-interfaces.json',
+    'states-inventory-groups': 'index-template-groups.json',
+    'states-inventory-users': 'index-template-users.json',
+    'states-inventory-services': 'index-template-services.json',
+    'states-inventory-protocols': 'index-template-protocols.json',
+    'states-inventory-browser-extensions':
+      'index-template-browser-extensions.json',
+  },
 };
 
 // Function to get the list of datasets
@@ -78,14 +99,18 @@ function getDatasets() {
 
 // Function to download a file from GitHub
 function downloadFile(dataset) {
-  const templateFile = `wazuh-${dataset}.json`;
+  const templateFile = config.datasetToTemplateMapping[dataset];
+
+  if (!templateFile) {
+    return Promise.reject(
+      new Error(
+        `No template mapping found for dataset: ${dataset}. Add it to datasetToTemplateMapping in config.`,
+      ),
+    );
+  }
 
   return new Promise((resolve, reject) => {
-    // Use different URL for vulnerabilities dataset
-    const url =
-      dataset === 'states-vulnerabilities'
-        ? config.githubRepoBaseUrlVulnerabilities
-        : `${config.githubRepoBaseUrl}/${templateFile}`;
+    const url = `${config.githubRepoBaseUrl}/${templateFile}`;
 
     console.log(`Downloading: ${url}`);
 
