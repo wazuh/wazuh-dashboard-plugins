@@ -148,7 +148,7 @@ export class WelcomeDashboardByRendererConfig extends DashboardByRendererConfig 
     );
   }
 
-  protected getDashboardPanels(): DashboardByValuePanels {
+  getDashboardPanels(): DashboardByValuePanels {
     return this.dashboardPanelManager.getPanels();
   }
   protected getId(): string {
