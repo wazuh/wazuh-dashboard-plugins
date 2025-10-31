@@ -61,7 +61,7 @@ async function saveVisualizationSavedObject(
 
   logger.debug(`Creating/updating visualization [${id}]`);
 
-  const res = await client.create('visualization', attributes, {
+  const savedVisualizationResult = await client.create('visualization', attributes, {
     id,
     overwrite: true,
     refresh: true,
@@ -69,25 +69,9 @@ async function saveVisualizationSavedObject(
   });
 
   logger.info(
-    `Visualization ensured [${res.id}] title [${res.attributes.title}]`,
+    `Visualization ensured [${savedVisualizationResult.id}] title [${savedVisualizationResult.attributes.title}]`,
   );
-  return res.id;
-}
-
-function buildDashboardPanelsJSON(
-  order: Array<{
-    panelId: string;
-    gridData: { w: number; h: number; x: number; y: number; i: string };
-  }>,
-) {
-  // Use reference-based panels to avoid embedding saved object ids directly.
-  return order.map((panel, idx) => ({
-    gridData: panel.gridData,
-    version: '7.10.0',
-    type: 'visualization',
-    panelRefName: `panel_${idx}`,
-    embeddableConfig: {},
-  }));
+  return savedVisualizationResult;
 }
 
 async function saveDashboardSavedObject(
@@ -130,9 +114,13 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
           INDEX_PATTERN_REPLACE_ME,
         );
 
-        for (const savedVis of welcomeDashboardConfig.getSavedVisualizations()) {
-          await saveVisualizationSavedObject(client, savedVis, ctx.logger);
-        }
+        await Promise.all(
+          welcomeDashboardConfig
+            .getSavedVisualizations()
+            .map(savedVis =>
+              saveVisualizationSavedObject(client, savedVis, ctx.logger),
+            ),
+        );
 
         await saveDashboardSavedObject(
           client,
