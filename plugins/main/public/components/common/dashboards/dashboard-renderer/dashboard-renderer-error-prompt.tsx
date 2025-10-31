@@ -15,7 +15,9 @@ export interface DashboardRendererErrorPromptProps {
   onRetry?: () => void;
 }
 
-export const DashboardRendererErrorPrompt: React.FC<DashboardRendererErrorPromptProps> = ({
+export const DashboardRendererErrorPrompt: React.FC<
+  DashboardRendererErrorPromptProps
+> = ({
   className,
   errorType,
   errorMessage,
@@ -40,8 +42,8 @@ export const DashboardRendererErrorPrompt: React.FC<DashboardRendererErrorPrompt
   const getRetryButton = () => (
     <EuiButton
       onClick={onRetry}
-      data-test-subj="retryBuildDashboardInput"
-      color="primary"
+      data-test-subj='retryBuildDashboardInput'
+      color='primary'
       fill
     >
       Retry
@@ -50,14 +52,16 @@ export const DashboardRendererErrorPrompt: React.FC<DashboardRendererErrorPrompt
 
   const getDashboardSelectionMessage = () => {
     if (!dashboardId) return '';
-    
+
     const messages = [
       dashboardId ? `id: ${dashboardId}` : null,
-      hasPinnedAgent && agentDashboardId ? `agent dashboard id: ${agentDashboardId}` : null,
+      hasPinnedAgent && agentDashboardId
+        ? `agent dashboard id: ${agentDashboardId}`
+        : null,
     ]
       .filter(Boolean)
       .join(' or ');
-    
+
     return `[${messages}]`;
   };
 
@@ -83,7 +87,12 @@ export const DashboardRendererErrorPrompt: React.FC<DashboardRendererErrorPrompt
         return {
           iconType: 'alert' as const,
           title: 'Dashboard Not Found',
-          body: <p>{errorMessage} Dashboard {getDashboardSelectionMessage()} not found.</p>,
+          body: (
+            <p>
+              {errorMessage} Dashboard {getDashboardSelectionMessage()} not
+              found.
+            </p>
+          ),
           actions: getDashboardManagementLink(),
         };
 
@@ -91,7 +100,12 @@ export const DashboardRendererErrorPrompt: React.FC<DashboardRendererErrorPrompt
         return {
           iconType: 'alert' as const,
           title: 'Dashboard by-value renderer is unavailable',
-          body: <p>Ensure the Dashboard plugin is started and supports by-value rendering.</p>,
+          body: (
+            <p>
+              Ensure the Dashboard plugin is started and supports by-value
+              rendering.
+            </p>
+          ),
           actions: undefined,
         };
 

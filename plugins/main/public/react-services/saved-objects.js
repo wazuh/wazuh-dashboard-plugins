@@ -153,8 +153,7 @@ export class SavedObject {
         `/api/saved_objects/dashboard/${dashboardID}?fields=title`,
       );
 
-      const title = (((dashboardData || {}).data || {}).attributes || {})
-        .title;
+      const title = (((dashboardData || {}).data || {}).attributes || {}).title;
       const id = ((dashboardData || {}).data || {}).id;
 
       if (title) {
@@ -332,9 +331,8 @@ export class SavedObject {
         the error management that causes that unwanted toasts are displayed when there are no
         indices for the index pattern
       */
-    const fields = await getDataPlugin().indexPatterns.getFieldsForIndexPattern(
-      pattern,
-    );
+    const fields =
+      await getDataPlugin().indexPatterns.getFieldsForIndexPattern(pattern);
     const scripted = pattern.getScriptedFields().map(field => field.spec);
     pattern.fields.replaceAll([...fields, ...scripted]);
     await getDataPlugin().indexPatterns.updateSavedObject(pattern);

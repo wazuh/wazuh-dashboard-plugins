@@ -28,7 +28,10 @@ export function transformPanelsJSON(
   );
 }
 
-export function toByValueInput(so: SavedDashboardSO, config?: DashboardConfigInput): DashboardByValueInput {
+export function toByValueInput(
+  so: SavedDashboardSO,
+  config?: DashboardConfigInput,
+): DashboardByValueInput {
   const options = JSON.parse(so.attributes.optionsJSON);
   const panels = transformPanelsJSON(so.attributes.panelsJSON, so.references);
   const input: DashboardByValueInput = {
@@ -51,12 +54,15 @@ export function toByValueInput(so: SavedDashboardSO, config?: DashboardConfigInp
     refreshConfig: {
       pause: false,
       value: 15,
-    }
+    },
   };
   return input;
 }
 
-export function getFiltersParams(config?: { dataSource?: any; refreshConfig?: any; }) {
+export function getFiltersParams(config?: {
+  dataSource?: any;
+  refreshConfig?: any;
+}) {
   return {
     filters: config?.dataSource?.fetchFilters ?? [],
     query: config?.dataSource?.searchBarProps?.query ?? '',
@@ -65,7 +71,7 @@ export function getFiltersParams(config?: { dataSource?: any; refreshConfig?: an
       from: config.dataSource.searchBarProps.dateRangeFrom,
       to: config.dataSource.searchBarProps.dateRangeTo,
     },
-    lastReloadRequestTime: config?.dataSource?.fingerprint
+    lastReloadRequestTime: config?.dataSource?.fingerprint,
   };
 }
 
@@ -78,7 +84,11 @@ export async function buildDashboardByValueInput(
   config?: DashboardConfigInput,
 ): Promise<DashboardServiceResult> {
   // Validate dashboard ID
-  if (!dashboardId || typeof dashboardId !== 'string' || dashboardId.trim() === '') {
+  if (
+    !dashboardId ||
+    typeof dashboardId !== 'string' ||
+    dashboardId.trim() === ''
+  ) {
     return {
       success: false,
       status: 'empty',
@@ -98,9 +108,9 @@ export async function buildDashboardByValueInput(
     }
 
     // Fetch full saved object and transform it to by-value input
-    const { data } = (await SavedObject.getDashboardById(
-      dashboardId,
-    )) as { data: SavedDashboardSO };
+    const { data } = (await SavedObject.getDashboardById(dashboardId)) as {
+      data: SavedDashboardSO;
+    };
 
     const byValueInput = toByValueInput(data, config);
 

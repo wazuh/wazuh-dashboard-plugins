@@ -88,8 +88,8 @@ class WzConfigurationInventory extends Component {
           )}
         {currentConfig && this.wodleConfig && this.wodleConfig.syscollector && (
           <WzConfigurationSettingsHeader
-            title="Main settings"
-            description="General settings applied to all the scans"
+            title='Main settings'
+            description='General settings applied to all the scans'
             help={helpLinks}
           >
             <WzConfigurationSettingsGroup

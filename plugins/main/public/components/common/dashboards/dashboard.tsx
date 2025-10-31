@@ -13,7 +13,6 @@ import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
 import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
 
-
 export const Dashboard = props => {
   // This is not used by the SCA dashboard.
   useReportingCommunicateSearchContext({
@@ -56,21 +55,21 @@ export const Dashboard = props => {
 
         <div className='wz-dashboard-responsive'>
           {props.getDashboardPanels.map(
-            ({
-              dashboardId,
-              agentDashboardId,
-              className = '',
-            }) => {
+            ({ dashboardId, agentDashboardId, className = '' }) => {
               const idComponent = dashboardId;
-              const dashboard = <DashboardRenderer
-                dashboardId={dashboardId}
-                agentDashboardId={agentDashboardId}
-                className={className}
-                hasPinnedAgent={Boolean(props.dataSource.dataSource?.getPinnedAgentFilter()?.length)}
-                config={{
-                  dataSource: props.dataSource,
-                }}
-              />;
+              const dashboard = (
+                <DashboardRenderer
+                  dashboardId={dashboardId}
+                  agentDashboardId={agentDashboardId}
+                  className={className}
+                  hasPinnedAgent={Boolean(
+                    props.dataSource.dataSource?.getPinnedAgentFilter()?.length,
+                  )}
+                  config={{
+                    dataSource: props.dataSource,
+                  }}
+                />
+              );
 
               if (className) {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
@@ -134,11 +133,11 @@ export const createDashboard = ({
           // Add conditionally the date range if the index pattern has a time field
           ...(dataSource.dataSource.indexPattern.timeFieldName
             ? {
-              dateRange: {
-                from: dateRangeFrom,
-                to: dateRangeTo,
-              },
-            }
+                dateRange: {
+                  from: dateRangeFrom,
+                  to: dateRangeTo,
+                },
+              }
             : {}),
         };
       },

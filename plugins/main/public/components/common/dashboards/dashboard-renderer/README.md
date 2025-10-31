@@ -7,7 +7,7 @@ Through the dashboardId, agentDashboardId, and hasPinnedAgent properties, you ca
 
 ### Example of usage
 
-```typescript 
+```typescript
 import { DashboardRenderer } from './dashboard-renderer';
 
 
@@ -41,13 +41,3 @@ It's important to verify that the dashboard and agentDashboardId IDs are valid. 
 This way, the new component is fully connected to the dashboard saved object, which means that to edit it, you must go to `Dashboards Management > Saved Objects` and edit the corresponding dashboard. This removes all hardcoding of panels in the component and facilitates real-time editing.
 
 In case of error, whether in obtaining the dashboard specification or misuse of the component, different error messages will be displayed in the UI to facilitate debugging.
-
-
-
-
-
-
-
-
-
-

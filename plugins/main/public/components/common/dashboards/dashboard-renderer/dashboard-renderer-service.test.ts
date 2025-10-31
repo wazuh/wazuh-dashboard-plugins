@@ -120,9 +120,7 @@ describe('Dashboard Renderer Service', () => {
             hidePanelTitles: false,
           }),
         },
-        references: [
-          { name: 'panel_1', type: 'visualization', id: 'vis-1' },
-        ],
+        references: [{ name: 'panel_1', type: 'visualization', id: 'vis-1' }],
       };
 
       const result = toByValueInput(savedDashboard);
@@ -157,9 +155,7 @@ describe('Dashboard Renderer Service', () => {
             hidePanelTitles: true,
           }),
         },
-        references: [
-          { name: 'panel_1', type: 'visualization', id: 'vis-1' },
-        ],
+        references: [{ name: 'panel_1', type: 'visualization', id: 'vis-1' }],
       };
 
       const config: DashboardConfigInput = {
@@ -249,7 +245,10 @@ describe('Dashboard Renderer Service', () => {
         viewMode: 'edit' as const,
       };
 
-      const result = toByValueInput(savedDashboard, partialConfig as DashboardConfigInput);
+      const result = toByValueInput(
+        savedDashboard,
+        partialConfig as DashboardConfigInput,
+      );
 
       expect(result.title).toBe('New Title');
       expect(result.description).toBe('Original Description'); // Should use original
@@ -295,7 +294,9 @@ describe('Dashboard Renderer Service', () => {
     });
 
     test('should return not_found when existsDashboard returns invalid response', async () => {
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({ status: false });
+      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
+        status: false,
+      });
 
       const result = await buildDashboardByValueInput('invalid-dashboard');
 
@@ -324,9 +325,7 @@ describe('Dashboard Renderer Service', () => {
             hidePanelTitles: false,
           }),
         },
-        references: [
-          { name: 'panel_1', type: 'visualization', id: 'vis-1' },
-        ],
+        references: [{ name: 'panel_1', type: 'visualization', id: 'vis-1' }],
       };
 
       const config: DashboardConfigInput = {
@@ -347,8 +346,12 @@ describe('Dashboard Renderer Service', () => {
         refreshConfig: { pause: false, value: 60 },
       };
 
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({ status: true });
-      (SavedObject.getDashboardById as jest.Mock).mockResolvedValue({ data: mockDashboard });
+      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
+        status: true,
+      });
+      (SavedObject.getDashboardById as jest.Mock).mockResolvedValue({
+        data: mockDashboard,
+      });
 
       const result = await buildDashboardByValueInput('dashboard-1', config);
 
@@ -362,9 +365,14 @@ describe('Dashboard Renderer Service', () => {
       expect(result.byValueInput?.isFullScreenMode).toBe(true);
       expect(result.byValueInput?.useMargins).toBe(false);
       expect(result.byValueInput?.hidePanelTitles).toBe(true);
-      expect(result.byValueInput?.filters).toEqual([{ meta: { key: 'agent.id', value: '001' } }]);
+      expect(result.byValueInput?.filters).toEqual([
+        { meta: { key: 'agent.id', value: '001' } },
+      ]);
       expect(result.byValueInput?.query).toBe('status:active');
-      expect(result.byValueInput?.refreshConfig).toEqual({ pause: false, value: 60 });
+      expect(result.byValueInput?.refreshConfig).toEqual({
+        pause: false,
+        value: 60,
+      });
       expect(result.byValueInput?.timeRange).toEqual({
         from: '2024-01-01T00:00:00.000Z',
         to: '2024-12-31T23:59:59.999Z',
@@ -372,8 +380,12 @@ describe('Dashboard Renderer Service', () => {
     });
 
     test('should handle errors during dashboard fetching', async () => {
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({ status: true });
-      (SavedObject.getDashboardById as jest.Mock).mockRejectedValue(new Error('Network error'));
+      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
+        status: true,
+      });
+      (SavedObject.getDashboardById as jest.Mock).mockRejectedValue(
+        new Error('Network error'),
+      );
 
       const result = await buildDashboardByValueInput('dashboard-1');
 
@@ -383,7 +395,9 @@ describe('Dashboard Renderer Service', () => {
     });
 
     test('should handle errors without message', async () => {
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({ status: true });
+      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
+        status: true,
+      });
       (SavedObject.getDashboardById as jest.Mock).mockRejectedValue({});
 
       const result = await buildDashboardByValueInput('dashboard-1');
@@ -395,8 +409,10 @@ describe('Dashboard Renderer Service', () => {
 
     test('should call SavedObject methods with correct parameters', async () => {
       const dashboardId = 'test-dashboard-id';
-      
-      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({ status: true });
+
+      (SavedObject.existsDashboard as jest.Mock).mockResolvedValue({
+        status: true,
+      });
       (SavedObject.getDashboardById as jest.Mock).mockResolvedValue({
         data: {
           id: dashboardId,

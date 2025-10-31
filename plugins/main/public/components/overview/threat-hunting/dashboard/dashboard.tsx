@@ -19,8 +19,8 @@ export const DashboardThreatHunting = createDashboard({
   getDashboardPanels: [
     {
       dashboardId: 'c19512e7-7598-4b94-a454-f2dc91e4daa0',
-      agentDashboardId: 'e0b59a43-1a41-416f-a0f4-bd126c5c8a07'
-    }
+      agentDashboardId: 'e0b59a43-1a41-416f-a0f4-bd126c5c8a07',
+    },
   ],
   sampleDataWarningCategories: [
     WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
