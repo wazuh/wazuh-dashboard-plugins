@@ -44,10 +44,14 @@ const getBranch = () => {
     return args.branch;
   }
 
-  const versionInfo = getVersionInfo();
-  const version = versionInfo.version;
-  console.log(`Using version as branch: ${version}`);
-  return version;
+  // TODO: Remove hardcoded 'main' - only for testing until 5.0.0 is released
+  console.log(`Using 'main' branch (temporary for testing)`);
+  return 'main';
+  
+  // const versionInfo = getVersionInfo();
+  // const version = versionInfo.version;
+  // console.log(`Using version as branch: ${version}`);
+  // return version;
 };
 
 // Configuration
@@ -91,12 +95,13 @@ function getDatasets() {
     const items = fs.readdirSync(config.localDatasetDir);
     config.datasets = items.filter(item => {
       const itemPath = path.join(config.localDatasetDir, item);
-      // Include states-*, wazuh-alerts, agents-monitoring, and server-statistics
-      return fs.statSync(itemPath).isDirectory() && 
-             (item.startsWith('states-') || 
-              item === 'wazuh-alerts' || 
-              item === 'agents-monitoring' || 
-              item === 'server-statistics');
+      return (
+        fs.statSync(itemPath).isDirectory() &&
+        (item.startsWith('states-') ||
+          item === 'wazuh-alerts' ||
+          item === 'agents-monitoring' ||
+          item === 'server-statistics')
+      );
     });
     console.log(`Found ${config.datasets.length} datasets to update.`);
   } catch (error) {

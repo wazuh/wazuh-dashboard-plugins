@@ -9,7 +9,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
   describe('Base Alert Structure', () => {
     test('should generate alert with required top-level fields', () => {
       const alert = generateAlert({ authentication: true });
-      
+
       expect(alert).toHaveProperty('@timestamp');
       expect(alert).toHaveProperty('event');
       expect(alert).toHaveProperty('agent');
@@ -22,11 +22,13 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
     test('should have valid timestamp format', () => {
       const alert = generateAlert({ authentication: true });
       const timestamp = new Date(alert['@timestamp']);
-      
+
       expect(timestamp).toBeInstanceOf(Date);
       expect(timestamp.getTime()).toBeLessThanOrEqual(Date.now());
       // Should be within last 7 days
-      expect(timestamp.getTime()).toBeGreaterThan(Date.now() - 7 * 24 * 60 * 60 * 1000);
+      expect(timestamp.getTime()).toBeGreaterThan(
+        Date.now() - 7 * 24 * 60 * 60 * 1000,
+      );
     });
 
     test('should have @sampledata marker', () => {
@@ -45,7 +47,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
   describe('Event Fields (ECS)', () => {
     test('should have complete event categorization', () => {
       const alert = generateAlert({ authentication: true });
-      
+
       expect(alert.event).toHaveProperty('kind');
       expect(alert.event).toHaveProperty('category');
       expect(alert.event).toHaveProperty('type');
@@ -57,7 +59,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
 
     test('should have arrays for category and type', () => {
       const alert = generateAlert({ authentication: true });
-      
+
       expect(Array.isArray(alert.event.category)).toBe(true);
       expect(Array.isArray(alert.event.type)).toBe(true);
       expect(alert.event.category.length).toBeGreaterThan(0);
@@ -93,7 +95,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
   describe('Agent Fields', () => {
     test('should have agent with id, name, version', () => {
       const alert = generateAlert({ authentication: true });
-      
+
       expect(alert.agent).toHaveProperty('id');
       expect(alert.agent).toHaveProperty('name');
       expect(alert.agent).toHaveProperty('version');
@@ -102,20 +104,20 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
 
     test('should have agent.host with required fields', () => {
       const alert = generateAlert({ authentication: true });
-      
+
       expect(alert.agent.host).toHaveProperty('ip');
       expect(alert.agent.host).toHaveProperty('mac');
       expect(alert.agent.host).toHaveProperty('os');
       expect(alert.agent.host).toHaveProperty('architecture');
-      
+
       // IP should be array
       expect(Array.isArray(alert.agent.host.ip)).toBe(true);
       expect(alert.agent.host.ip.length).toBeGreaterThan(0);
-      
+
       // MAC should be array
       expect(Array.isArray(alert.agent.host.mac)).toBe(true);
       expect(alert.agent.host.mac.length).toBeGreaterThan(0);
-      
+
       // OS should be object
       expect(alert.agent.host.os).toHaveProperty('type');
       expect(alert.agent.host.os).toHaveProperty('name');
@@ -131,7 +133,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
   describe('Rule Fields', () => {
     test('should have rule with required fields', () => {
       const alert = generateAlert({ authentication: true });
-      
+
       expect(alert.rule).toHaveProperty('id');
       expect(alert.rule).toHaveProperty('description');
       expect(alert.rule).toHaveProperty('level');
@@ -154,7 +156,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
   describe('Log Fields', () => {
     test('should have log fields', () => {
       const alert = generateAlert({ authentication: true });
-      
+
       expect(alert.log).toHaveProperty('level');
       expect(alert.log).toHaveProperty('file');
       expect(alert.log).toHaveProperty('origin');
@@ -168,14 +170,14 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
     describe('Authentication Module', () => {
       test('should have user fields', () => {
         const alert = generateAlert({ authentication: true });
-        
+
         expect(alert.user).toBeDefined();
         expect(alert.user).toHaveProperty('name');
       });
 
       test('should have source and destination fields', () => {
         const alert = generateAlert({ authentication: true });
-        
+
         expect(alert.source).toBeDefined();
         expect(alert.source).toHaveProperty('ip');
         expect(alert.destination).toBeDefined();
@@ -184,7 +186,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
 
       test('should have geo location in source', () => {
         const alert = generateAlert({ authentication: true });
-        
+
         expect(alert.source.geo).toBeDefined();
         expect(alert.source.geo).toHaveProperty('country_name');
         expect(alert.source.geo).toHaveProperty('city_name');
@@ -197,7 +199,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
     describe('FIM/Syscheck Module', () => {
       test('should have file fields', () => {
         const alert = generateAlert({ syscheck: true });
-        
+
         expect(alert.file).toBeDefined();
         expect(alert.file).toHaveProperty('path');
         expect(alert.file).toHaveProperty('name');
@@ -220,7 +222,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
     describe('AWS Module', () => {
       test('should have cloud fields', () => {
         const alert = generateAlert({ aws: true });
-        
+
         expect(alert.cloud).toBeDefined();
         expect(alert.cloud.provider).toBe('aws');
         expect(alert.cloud).toHaveProperty('region');
@@ -256,7 +258,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
     describe('Vulnerabilities Module', () => {
       test('should have vulnerability fields', () => {
         const alert = generateAlert({ vulnerabilities: true });
-        
+
         expect(alert.vulnerability).toBeDefined();
         expect(alert.vulnerability).toHaveProperty('id');
         expect(alert.vulnerability).toHaveProperty('severity');
@@ -273,7 +275,7 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
     describe('Docker Module', () => {
       test('should have container fields', () => {
         const alert = generateAlert({ docker: true });
-        
+
         expect(alert.container).toBeDefined();
         expect(alert.container).toHaveProperty('id');
         expect(alert.container).toHaveProperty('name');
@@ -286,12 +288,12 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
   describe('Message Generation', () => {
     test('should have descriptive message (not generic)', () => {
       const modules = ['authentication', 'aws', 'azure', 'fim', 'docker'];
-      
+
       modules.forEach(mod => {
         const params = {};
         params[mod === 'fim' ? 'syscheck' : mod] = true;
         const alert = generateAlert(params);
-        
+
         expect(alert.message).toBeDefined();
         expect(alert.message).not.toBe('Sample security alert');
         expect(alert.message.length).toBeGreaterThan(10);
@@ -302,20 +304,19 @@ describe('Generate Alerts - Wazuh 5.0 Common Schema', () => {
   describe('Batch Generation', () => {
     test('should generate multiple alerts', () => {
       const alerts = generateAlerts({ authentication: true }, 5);
-      
+
       expect(Array.isArray(alerts)).toBe(true);
       expect(alerts.length).toBe(5);
     });
 
     test('should generate unique alerts', () => {
       const alerts = generateAlerts({ authentication: true }, 3);
-      
+
       const timestamps = alerts.map(a => a['@timestamp']);
       const uniqueTimestamps = new Set(timestamps);
-      
+
       // All timestamps should be present (might have duplicates due to fast generation)
       expect(timestamps.length).toBe(3);
     });
   });
 });
-
