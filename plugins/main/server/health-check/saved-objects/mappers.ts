@@ -1,39 +1,20 @@
-import type { DashboardByValueInput, DashboardByValuePanels, DashboardByValueSavedVis } from "../../../common/saved-vis/types";
-import { randomId } from "./utils";
-
-const dashboardByValuePanelToSavedObjectMapper = (panel: DashboardByValuePanels, { panelIndex }: { panelIndex: number }) => {
-  const savedVisualId = `${panel.savedVis.id}-${randomId()}`;
-  return {
-    // version: '3.2.0', // TODO: Check if needed
-    gridData: {
-      w: panel.w,
-      h: panel.h,
-      x: panel.x,
-      y: panel.y,
-      i: savedVisualId,
-    },
-    panelIndex: savedVisualId,
-    embeddableConfig: {}, // TODO: Check if needed
-    panelRefName: `panel_${savedVisualId}_${panelIndex}`,
-  };
-};
-
-const dashboardByValuePanelsToSavedObjectMapper = (panels: DashboardByValuePanels[]) => {
-  return panels
-    .map((panel, index) =>
-      dashboardByValuePanelToSavedObjectMapper(panel, { panelIndex: index }),
-    );
-}
+import type {
+  DashboardByValueInput,
+  DashboardByValuePanelConfig,
+  DashboardByValuePanels,
+  DashboardByValueSavedVis,
+} from '../../../common/dashboards/types';
 
 /**
  * Example usage:
  *  const savedObject = mapperDashboardByValueSavedVisToSavedObject(getVisStateTopSources("index-pattern-id"));
  */
-const dashboardByValueSavedVisToSavedObjectMapper = (savedVis: DashboardByValueSavedVis): SavedObjectVisualization => {
+const dashboardByValueSavedVisToSavedObjectMapper = (
+  savedVis: DashboardByValueSavedVis,
+): SavedObjectVisualization => {
   return {
     attributes: {
-      title: savedVis.title,
-      description: '', // TODO: Check if needed
+      title: savedVis.title || 'Untitled Visualization',
       kibanaSavedObjectMeta: {
         searchSourceJSON: JSON.stringify(savedVis.data.searchSource),
       },
@@ -47,12 +28,31 @@ const dashboardByValueSavedVisToSavedObjectMapper = (savedVis: DashboardByValueS
       }),
     },
     id: savedVis.id,
-    migrationVersion: { visualization: '7.10.0' }, // TODO: Check if needed
     references: savedVis.data.references,
-    type: 'visualization',
-    updated_at: new Date().toISOString(), // TODO: Check if needed
-    // version: randomId(), // TODO: Check if needed
   };
+};
+
+const dashboardByValuePanelToSavedObjectMapper = (
+  key: string,
+  panel: DashboardByValuePanelConfig,
+  { panelIndex }: { panelIndex: number },
+) => {
+  return {
+    gridData: panel.gridData,
+    // version: '7.10.0', // TODO: Check if needed
+    panelIndex: key,
+    type: 'visualization',
+    panelRefName: `panel_${panelIndex}`,
+    embeddableConfig: {},
+  };
+};
+
+const dashboardByValuePanelsToSavedObjectMapper = (
+  panels: DashboardByValuePanels,
+) => {
+  return Object.entries(panels).map(([key, panel], index) =>
+    dashboardByValuePanelToSavedObjectMapper(key, panel, { panelIndex: index }),
+  );
 };
 
 const dashboardByValueInputToSavedObjectMapper = (
