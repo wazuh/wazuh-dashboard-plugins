@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Upgraded the `axios` dependency to `1.12.2` [#7804](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7804)
 - Improved column order in IT Hygiene > Network > Traffic view to follow a logical source-to-destination flow [#7841](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7841)
+- Improved Integrity monitoring settings terminology by clarifying file/registry labels and updating component names for better user understanding [#7639](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7639)
 
 ### Fixed
 
@@ -38,10 +39,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Updated OS logos [#7712](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7712)
 - Changed "Services" tab label to "Listeners" in IT Hygiene > Networks [#7742](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7742)
-
-### Changed
-
-- Improved Integrity monitoring settings terminology by clarifying file/registry labels and updating component names for better user understanding [#7639](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7639)
 
 ### Fixed
 
