@@ -87,7 +87,6 @@ get_candidate_reference() {
   echo 'Resolving branch references...'
 
   get_candidate_ref
-  echo 'TEST'
 
   [ -z "$RESOLVED_CANDIDATE_REF" ] && {
     echo "Error: Could not resolve the candidate reference from input [$INPUT_CANDIDATE_REF]"
