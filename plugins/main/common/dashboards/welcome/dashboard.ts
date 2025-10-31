@@ -143,7 +143,7 @@ export class WelcomeDashboardByRendererConfig extends DashboardByRendererConfig 
   constructor(indexPatternId: string) {
     super(indexPatternId, new WelcomeDashboardLayoutConfig());
     this.dashboardPanelManager = new DashboardPanelManager(
-      this.indexPatternId,
+      indexPatternId,
       this.dashboardLayoutConfig,
     );
   }
