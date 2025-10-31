@@ -6,7 +6,7 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations/generators';
 
 type PackageArchitecture = 'x86_64' | 'arm64';

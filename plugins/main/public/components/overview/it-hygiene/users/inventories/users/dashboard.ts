@@ -8,7 +8,7 @@ import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateHorizontalBarByField,
 } from '../../../../../../services/visualizations';
-import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
 
 const getVisStateUniqueUsersMetric = (indexPatternId: string): DashboardByValueSavedVis => {
   return {

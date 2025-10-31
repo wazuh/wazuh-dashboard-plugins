@@ -1,4 +1,4 @@
-import { DashboardByValueSavedVis } from '../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../common/dashboards/types';
 
 export const generateVisualization = ({
   key,

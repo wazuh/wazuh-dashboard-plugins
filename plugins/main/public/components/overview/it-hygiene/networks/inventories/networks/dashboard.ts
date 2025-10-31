@@ -6,7 +6,7 @@ import {
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
-import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
 import {
   getVisStateDHCPEnabledInterfacesMetric,
   getVisStateNetworkAveragePriorityMetric,

@@ -8,7 +8,7 @@ import {
   getVisStateHorizontalBarByField,
   getVisStateHistogramBy,
 } from '../common/saved-vis/generators';
-import { DashboardByValueSavedVis } from '../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../common/dashboards/types';
 
 type ProcessState =
   | 'Stopped'

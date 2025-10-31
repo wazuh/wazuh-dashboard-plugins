@@ -6,7 +6,7 @@ import {
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
-import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
 
 type InterfaceState = 'LISTEN' | 'ESTABLISHED';
 

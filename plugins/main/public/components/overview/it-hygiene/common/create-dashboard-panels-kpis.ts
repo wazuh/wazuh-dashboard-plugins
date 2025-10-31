@@ -1,7 +1,7 @@
 import { DASHBOARD_WIDTH_LIMIT } from './constants';
 import { generateVisualization } from './create-new-visualization';
 import { HEIGHT } from './saved-vis/constants';
-import { DashboardByValueSavedVis } from '../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../common/dashboards/types';
 
 export const buildDashboardKPIPanels = (savedVises: DashboardByValueSavedVis[]) => {
   const WIDTH = DASHBOARD_WIDTH_LIMIT / savedVises.length;

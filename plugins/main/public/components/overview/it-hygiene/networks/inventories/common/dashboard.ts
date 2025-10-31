@@ -3,7 +3,7 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
-import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
 
 export const getVisStateNetworkAveragePriorityMetric = (
   indexPatternId: string,

@@ -5,7 +5,7 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
-import { DashboardByValueSavedVis } from '../../../../../../../common/saved-vis/types';
+import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations/index';
 
 type HostArchitecture = 'x86_64' | 'arm64';
