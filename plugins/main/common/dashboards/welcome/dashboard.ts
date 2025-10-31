@@ -1,13 +1,8 @@
 import {
   DashboardByRendererConfig,
-  DashboardPanelManager,
   DashboardLayoutConfig,
 } from '../dashboard-builder';
-import type {
-  DashboardByValuePanels,
-  DashboardByValueSavedVis,
-  GridVisualPair,
-} from '../types';
+import type { DashboardByValueSavedVis, GridVisualPair } from '../types';
 
 export const getVisStateEventsCountEvolution = (
   indexPatternId: string,
@@ -121,7 +116,7 @@ export const getVisStateEventsCountEvolution = (
   },
 });
 
-export class WelcomeDashboardLayoutConfig extends DashboardLayoutConfig {
+export class AgentsEventsDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super(indexPatternId);
     this.savedVisualizations.push(getVisStateEventsCountEvolution);
@@ -137,24 +132,27 @@ export class WelcomeDashboardLayoutConfig extends DashboardLayoutConfig {
   }
 }
 
-export class WelcomeDashboardByRendererConfig extends DashboardByRendererConfig {
+export class AgentsEventsDashboardByRendererConfig extends DashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new WelcomeDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new AgentsEventsDashboardLayoutConfig(indexPatternId),
+    );
   }
 
-  protected getId(): string {
+  protected override getId(): string {
     return 'agent-events-count-evolution';
   }
-  protected getTitle(): string {
+  protected override getTitle(): string {
     return 'Events count evolution';
   }
-  protected getDescription(): string {
+  protected override getDescription(): string {
     return 'Dashboard of Events count evolution';
   }
-  protected get useMargins(): boolean {
+  protected override get useMargins(): boolean {
     return true;
   }
-  protected get hidePanelTitles(): boolean {
+  protected override get hidePanelTitles(): boolean {
     return true;
   }
 }

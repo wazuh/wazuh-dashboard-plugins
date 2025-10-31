@@ -1,7 +1,7 @@
-import { WelcomeDashboardByRendererConfig } from '../../../../../common/dashboards/welcome/dashboard';
+import { AgentsEventsDashboardByRendererConfig } from '../../../../../common/dashboards/welcome/dashboard';
 
 export const getDashboardPanels = (indexPatternId: string) => {
-  return new WelcomeDashboardByRendererConfig(
+  return new AgentsEventsDashboardByRendererConfig(
     indexPatternId,
   ).getDashboardPanels();
 };

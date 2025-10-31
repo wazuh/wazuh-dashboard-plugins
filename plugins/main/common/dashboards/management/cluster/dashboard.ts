@@ -1,4 +1,7 @@
-import { DashboardByRendererConfig, DashboardLayoutConfig, type DashboardPanelManager } from '../../dashboard-builder';
+import {
+  DashboardByRendererConfig,
+  DashboardLayoutConfig,
+} from '../../dashboard-builder';
 import type { DashboardByValueSavedVis, GridVisualPair } from '../../types';
 
 const getVisStateTop5Nodes = (
@@ -56,10 +59,10 @@ const getVisStateTop5Nodes = (
   };
 };
 
-export class ManagementClusterDashboardLayoutConfig extends DashboardLayoutConfig {
+export class ClusterConfigurationDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor(indexPatternId: string) {
     super(indexPatternId);
-    this.savedVisualizations.push(getVisStateTop5Nodes)
+    this.savedVisualizations.push(getVisStateTop5Nodes);
   }
 
   generateGridDataWithVisualization(): GridVisualPair[] {
@@ -77,28 +80,31 @@ export class ManagementClusterDashboardLayoutConfig extends DashboardLayoutConfi
   }
 }
 
-export class ManagementClusterDashboardByRendererConfig extends DashboardByRendererConfig {
+export class ClusterConfigurationDashboardByRendererConfig extends DashboardByRendererConfig {
   constructor(indexPatternId: string) {
-    super(indexPatternId, new ManagementClusterDashboardLayoutConfig(indexPatternId));
+    super(
+      indexPatternId,
+      new ClusterConfigurationDashboardLayoutConfig(indexPatternId),
+    );
   }
 
-  protected getId(): string {
+  protected override getId(): string {
     return 'ct-dashboard-configuration-tab';
   }
 
-  protected getTitle(): string {
+  protected override getTitle(): string {
     return 'Cluster configuration dashboard';
   }
 
-  protected getDescription(): string {
+  protected override getDescription(): string {
     return 'Dashboard of the Cluster configuration';
   }
 
-  protected get useMargins(): boolean {
+  protected override get useMargins(): boolean {
     return true;
   }
 
-  protected get hidePanelTitles(): boolean {
+  protected override get hidePanelTitles(): boolean {
     return false;
   }
 }

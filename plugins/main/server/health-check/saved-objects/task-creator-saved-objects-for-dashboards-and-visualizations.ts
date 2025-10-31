@@ -20,8 +20,6 @@ import type {
   DashboardByValueInput,
   DashboardByValueSavedVis,
 } from '../../../common/dashboards/types';
-import { WelcomeDashboardByRendererConfig } from '../../../common/dashboards/welcome/dashboard';
-import { INDEX_PATTERN_REPLACE_ME } from './constants';
 import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
 import { getDashboardConfigs } from './dashboard-configs';
 

@@ -1,4 +1,4 @@
-import { ManagementClusterDashboardByRendererConfig } from '../../../../../common/dashboards/management/cluster/dashboard';
+import { ClusterConfigurationDashboardByRendererConfig } from '../../../../../common/dashboards/management/cluster/dashboard';
 
 /* WARNING: The panel id must be unique including general and agents visualizations. Otherwise, the visualizations will not refresh when we pin an agent, because they are cached by id */
 
@@ -7,7 +7,7 @@ import { ManagementClusterDashboardByRendererConfig } from '../../../../../commo
 /* Definition of panels */
 
 export const getDashboardConfigurationPanels = (indexPatternId: string) => {
-  return new ManagementClusterDashboardByRendererConfig(
+  return new ClusterConfigurationDashboardByRendererConfig(
     indexPatternId,
   ).getDashboardPanels();
 };
