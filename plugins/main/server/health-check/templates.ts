@@ -1,4 +1,4 @@
-import { InitializationTaskRunContext } from '../services';
+import type { InitializationTaskRunContext } from './types';
 
 export function getTemplateForIndexPattern(
   indexPatternTitle: string,

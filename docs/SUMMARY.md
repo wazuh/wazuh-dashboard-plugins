@@ -25,6 +25,7 @@
 - [Configuration](ref/configuration.md)
 - [Modules](ref/modules/README.md)
   - [Health check](ref/modules/healthcheck.md)
+  - [Notifications and Alerting](ref/modules/notifications-alerting.md)
 - [Upgrade](ref/upgrade.md)
 - [Uninstall](ref/uninstall.md)
 - [Back Up and Restore](ref/backup-restore.md)
