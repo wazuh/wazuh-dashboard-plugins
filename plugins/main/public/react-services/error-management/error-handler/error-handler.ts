@@ -1,7 +1,6 @@
 import { ErrorFactory } from '../error-factory/error-factory';
 import {
   IndexerApiError,
-  WazuhReportingError,
   WazuhApiError,
   HttpError,
 } from '../error-factory/errors';
@@ -97,7 +96,6 @@ export class ErrorHandler {
   ): IWazuhErrorConstructor | null {
     const requestedUrlbyErrorTypes: IUrlRequestedTypes = {
       '/api': WazuhApiError,
-      '/reports': WazuhReportingError,
       '/elastic': IndexerApiError,
     };
 

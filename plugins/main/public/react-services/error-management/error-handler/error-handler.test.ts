@@ -80,11 +80,6 @@ describe('Error Handler', () => {
         url: '/api/request',
       },
       {
-        name: 'WazuhReportingError',
-        message: 'Error WazuhReportingError',
-        url: '/reports',
-      },
-      {
         name: 'HttpError',
         url: '/any/url',
         message: 'Error HttpError',
@@ -153,11 +148,6 @@ describe('Error Handler', () => {
         name: 'WazuhApiError',
         message: 'Error WazuhApiError',
         url: '/api/request',
-      },
-      {
-        name: 'WazuhReportingError',
-        message: 'Error WazuhReportingError',
-        url: '/reports',
       },
       {
         name: 'HttpError',
@@ -245,11 +235,6 @@ describe('Error Handler', () => {
         name: 'WazuhApiError',
         message: 'Error WazuhApiError',
         url: '/api/request',
-      },
-      {
-        name: 'WazuhReportingError',
-        message: 'Error WazuhReportingError',
-        url: '/reports',
       },
       {
         name: 'HttpError',

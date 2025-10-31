@@ -13,7 +13,6 @@
 import React, { Component } from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import '../../common/modules/module.scss';
-import { ReportingService } from '../../../react-services/reporting';
 import { connect } from 'react-redux';
 
 const mapStateToProps = state => ({
@@ -24,7 +23,6 @@ export const MainModuleOverview = connect(mapStateToProps)(
   class MainModuleOverview extends Component {
     constructor(props) {
       super(props);
-      this.reportingService = new ReportingService();
       this.state = {
         selectView: false,
         loadingReport: false,

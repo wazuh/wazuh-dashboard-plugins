@@ -19,8 +19,6 @@ import { BASIC_MODULES } from './xpack/basic-modules-mapper';
 import { MODULES_CARDS, MODULES_SETTINGS } from './xpack/modules-mapper';
 import { SAMPLE_DATA } from './xpack/sample-data-mapper';
 import { SETTINGS_MENU_LINKS } from './xpack/settings-mapper';
-import { REPORTING_PAGE } from '../../pageobjects/wzd/reporting/report.page';
-
 
 export const XPACK_PAGES_MAPPER = {
   DEPLOY_NEW_AGENT_PAGE,
@@ -38,8 +36,6 @@ export const XPACK_PAGES_MAPPER = {
   RULES_PAGE,
   WAZUH_MENU_PAGE,
   MODULES_DIRECTORY_PAGE,
-  REPORTING_PAGE,
-
 
   AGENT_MODULES,
   BASIC_MODULES,
@@ -47,5 +43,5 @@ export const XPACK_PAGES_MAPPER = {
   MODULES_SETTINGS,
   SAMPLE_DATA,
   SETTINGS_MENU_LINKS,
-  GROUPS_PAGE
+  GROUPS_PAGE,
 };

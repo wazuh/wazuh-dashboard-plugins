@@ -30,7 +30,6 @@ export enum WAZUH_STATUS_CODES {
  * wazuh-api-elastic 20XX
  * wazuh-api         30XX
  * wazuh-elastic     40XX
- * wazuh-reporting   50XX
  * unknown           1000
  */
 /**
@@ -71,15 +70,6 @@ export function ErrorResponse(
       wazuhStatusCode === 3002
     ) {
       filteredMessage = 'It seems the selected API was deleted.';
-    } else if (
-      message?.includes(ERROR_TYPE.ENOENT) &&
-      message?.toLowerCase().includes('no such file or directory') &&
-      message?.toLowerCase().includes('data') &&
-      [5029, 5030, 5031, 5032].includes(wazuhStatusCode)
-    ) {
-      filteredMessage = 'Reporting was aborted - no such file or directory';
-    } else if (wazuhStatusCode === 5029) {
-      filteredMessage = `Reporting was aborted (${message})`;
     } else {
       filteredMessage = message;
     }

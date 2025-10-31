@@ -15,14 +15,6 @@ const REPORT_TAB = {
   NETWORK: 'agent-tab-network',
   PROCESSES: 'agent-tab-processes',
 };
-
-jest.mock('../../../react-services/reporting', () => ({
-  ReportingService: {
-    startVis2Png: jest.fn(),
-    startConfigReport: jest.fn(),
-  },
-}));
-
 jest.mock('../data-source', () => ({
   useDataSource: jest.fn().mockImplementation(() => ({
     dataSource: {},
@@ -44,6 +36,7 @@ jest.mock('../../../react-services/navigation-service', () => ({
     getPathname: () => '',
     getParams: () => new URLSearchParams(),
     renewURL: jest.fn(),
+    navigateToApp: jest.fn(),
   }),
 }));
 
