@@ -37,7 +37,6 @@ interface SavedObject {
   attributes: GenericAttributes;
   id: string;
   references: Reference[];
-  type: string;
   updated_at?: string;
   version?: string;
 }

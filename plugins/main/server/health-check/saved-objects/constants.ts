@@ -1,0 +1,1 @@
+export const INDEX_PATTERN_REPLACE_ME = '__index_pattern_replace_me__';

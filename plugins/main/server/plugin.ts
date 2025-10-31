@@ -42,7 +42,7 @@ import {
   initializationTaskCreatorServerAPIConnectionCompatibility,
   mapFieldsFormat,
 } from './health-check';
-import { initializationTaskCreatorSavedObjects } from './health-check';
+import { initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations } from './health-check';
 import {
   FIELD_TIMESTAMP,
   HEALTH_CHECK_TASK_INDEX_PATTERN_AGENTS_MONITORING,
@@ -269,13 +269,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       }),
     );
 
-    // Saved objects (dashboards and visualizations) based on current by-value definitions
-    core.healthCheck.register(
-      initializationTaskCreatorSavedObjects({
-        taskName: 'saved-objects:dashboards',
-        services: plugins.wazuhCore,
-      }),
-    );
+    core.healthCheck.register(initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations());
 
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({
