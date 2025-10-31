@@ -269,7 +269,9 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       }),
     );
 
-    core.healthCheck.register(initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations());
+    core.healthCheck.register(
+      initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations(),
+    );
 
     core.healthCheck.register(
       initializationTaskCreatorIndexPattern({

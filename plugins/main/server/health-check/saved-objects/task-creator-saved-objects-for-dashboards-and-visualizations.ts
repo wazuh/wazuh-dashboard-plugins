@@ -23,7 +23,7 @@ import type {
 import { WelcomeDashboardByRendererConfig } from '../../../common/dashboards/welcome/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
-import { getDashboardConfigs } from "./dashboard-configs";
+import { getDashboardConfigs } from './dashboard-configs';
 
 // ---------- Transform helpers ----------
 
@@ -62,12 +62,16 @@ async function saveVisualizationSavedObject(
 
   logger.debug(`Creating/updating visualization [${id}]`);
 
-  const savedVisualizationResult = await client.create('visualization', attributes, {
-    id,
-    overwrite: true,
-    refresh: true,
-    references,
-  });
+  const savedVisualizationResult = await client.create(
+    'visualization',
+    attributes,
+    {
+      id,
+      overwrite: true,
+      refresh: true,
+      references,
+    },
+  );
 
   logger.info(
     `Visualization ensured [${savedVisualizationResult.id}] title [${savedVisualizationResult.attributes.title}]`,
@@ -117,7 +121,7 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
           await Promise.all(
             dashboardConfig
               .getSavedVisualizations()
-              .map((savedVis) =>
+              .map(savedVis =>
                 saveVisualizationSavedObject(client, savedVis, ctx.logger),
               ),
           );

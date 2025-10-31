@@ -63,8 +63,8 @@ export abstract class DashboardLayoutConfig {
   constructor(private indexPatternId: string) {}
 
   getSavedVisualizations(): DashboardByValueSavedVis[] {
-    return this.savedVisualizations.map((getSavedVis) =>
-      getSavedVis(this.indexPatternId)
+    return this.savedVisualizations.map(getSavedVis =>
+      getSavedVis(this.indexPatternId),
     );
   }
 
@@ -90,7 +90,7 @@ export abstract class DashboardByRendererConfig {
   }
 
   getSavedVisualizationsIds(): string[] {
-    return this.getSavedVisualizations().map((savedVis) => savedVis.id);
+    return this.getSavedVisualizations().map(savedVis => savedVis.id);
   }
 
   protected abstract getDashboardPanels(): DashboardByValuePanels;

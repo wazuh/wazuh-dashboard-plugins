@@ -5,7 +5,9 @@ import {
   createSearchSource,
 } from '../../../common/saved-vis/create-saved-vis-data';
 import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
-const getVisStateNetworkMetricsMinMax = (indexPatternId: string): DashboardByValueSavedVis => {
+const getVisStateNetworkMetricsMinMax = (
+  indexPatternId: string,
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-network-metrics-min-max',
     type: 'metric',

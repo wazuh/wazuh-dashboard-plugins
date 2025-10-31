@@ -10,7 +10,9 @@ import {
 } from '../../../../../../services/visualizations';
 import { DashboardByValueSavedVis } from '../../../../../../../common/dashboards/types';
 
-const getVisStateUniqueUsersMetric = (indexPatternId: string): DashboardByValueSavedVis => {
+const getVisStateUniqueUsersMetric = (
+  indexPatternId: string,
+): DashboardByValueSavedVis => {
   return {
     id: 'it-hygiene-users-unique-count',
     title: 'Unique users',
