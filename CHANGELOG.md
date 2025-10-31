@@ -13,6 +13,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added prompts to some views related to problems with server API and alerts index pattern [#7694](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7694)
 - Added "Not applicable" status to SCA CheckResult enum with corresponding color mapping (#B9A888) and sample data support
 - Added Alerting sample monitors health check [#7833](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7833)
+- Added complete Wazuh Common Schema support to sample data with human-readable messages and enhanced field organization [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839)
+- Added cloud metadata fields (AWS, Azure, GCP) to sample alerts for cloud security scenarios [#7839](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7839)
 
 ### Changed
 
