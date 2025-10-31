@@ -122,7 +122,7 @@ export class AgentsEventsDashboardLayoutConfig extends DashboardLayoutConfig {
     this.savedVisualizations.push(getVisStateEventsCountEvolution);
   }
 
-  generateGridDataWithVisualization(): GridVisualPair[] {
+  createGridVisualizationData(): GridVisualPair[] {
     return [
       {
         gridData: { w: 48, h: 7, x: 0, y: 0 },

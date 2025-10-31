@@ -65,7 +65,7 @@ export class ClusterConfigurationDashboardLayoutConfig extends DashboardLayoutCo
     this.savedVisualizations.push(getVisStateTop5Nodes);
   }
 
-  generateGridDataWithVisualization(): GridVisualPair[] {
+  createGridVisualizationData(): GridVisualPair[] {
     return [
       {
         gridData: {
