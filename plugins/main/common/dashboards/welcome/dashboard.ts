@@ -1,9 +1,13 @@
 import {
   DashboardByRendererConfig,
-  DashboardPanelsBuilder,
-  DashboardVisualizationConfig,
+  DashboardPanelManager,
+  DashboardLayoutConfig,
 } from '../dashboard-builder';
-import type { DashboardByValueSavedVis, GridVisualPair } from '../types';
+import type {
+  DashboardByValuePanels,
+  DashboardByValueSavedVis,
+  GridVisualPair,
+} from '../types';
 
 export const getVisStateEventsCountEvolution = (
   indexPatternId: string,
@@ -117,7 +121,7 @@ export const getVisStateEventsCountEvolution = (
   },
 });
 
-export class WelcomeDashboardVisualizationConfig extends DashboardVisualizationConfig {
+export class WelcomeDashboardLayoutConfig extends DashboardLayoutConfig {
   constructor() {
     super();
     this.savedVisualizations.push(getVisStateEventsCountEvolution);
@@ -133,17 +137,20 @@ export class WelcomeDashboardVisualizationConfig extends DashboardVisualizationC
   }
 }
 
-export class WelcomeDashboardPanelsBuilder extends DashboardPanelsBuilder {
-  constructor(indexPatternId: string, welcomeDashboardLayoutConfig: WelcomeDashboardVisualizationConfig) {
-    super(indexPatternId, welcomeDashboardLayoutConfig);
-  }
-}
+export class WelcomeDashboardByRendererConfig extends DashboardByRendererConfig {
+  private dashboardPanelManager: DashboardPanelManager;
 
-export class WelcomeDashboardConfig extends DashboardByRendererConfig {
-  constructor(welcomeDashboardPanelsBuilder: WelcomeDashboardPanelsBuilder) {
-    super(welcomeDashboardPanelsBuilder);
+  constructor(indexPatternId: string) {
+    super(indexPatternId, new WelcomeDashboardLayoutConfig());
+    this.dashboardPanelManager = new DashboardPanelManager(
+      this.indexPatternId,
+      this.dashboardLayoutConfig,
+    );
   }
 
+  protected getDashboardPanels(): DashboardByValuePanels {
+    return this.dashboardPanelManager.getPanels();
+  }
   protected getId(): string {
     return 'agent-events-count-evolution';
   }

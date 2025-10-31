@@ -5,12 +5,12 @@ import type {
   GridVisualPair,
 } from './types';
 
-export class DashboardPanelsBuilder {
+export class DashboardPanelManager {
   private panels: DashboardByValuePanels = {};
 
   constructor(
     private indexPatternId: string,
-    private dashboardLayoutConfig: DashboardVisualizationConfig,
+    private dashboardLayoutConfig: DashboardLayoutConfig,
   ) {}
 
   private buildDashboardPanel = (
@@ -31,19 +31,19 @@ export class DashboardPanelsBuilder {
     };
   };
 
-  addPanel({
+  private addPanel({
     gridData,
     savedVis,
   }: {
     gridData: GridData;
     savedVis: DashboardByValueSavedVis;
-  }): DashboardPanelsBuilder {
+  }): DashboardPanelManager {
     const key = (Object.keys(this.panels).length + 1).toString();
     this.panels[key] = this.buildDashboardPanel(key, gridData, savedVis);
     return this;
   }
 
-  getAll(): DashboardByValuePanels {
+  getPanels(): DashboardByValuePanels {
     Array.from({
       length: this.dashboardLayoutConfig.savedVisualizationsCount,
     }).forEach((_, index) => {
@@ -55,7 +55,7 @@ export class DashboardPanelsBuilder {
   }
 }
 
-export abstract class DashboardVisualizationConfig {
+export abstract class DashboardLayoutConfig {
   protected savedVisualizations = [] as ((
     indexPatternId: string,
   ) => DashboardByValueSavedVis)[];
@@ -75,30 +75,23 @@ export abstract class DashboardVisualizationConfig {
   abstract generateGridDataWithVisualization(): GridVisualPair[];
 }
 
-/* <DashboardByRenderer
-      input={{
-        viewMode: ViewMode.VIEW,
-        panels: getDashboardPanels(dataSource?.id),
-        isFullScreenMode: false,
-        filters: fetchFilters ?? [],
-        useMargins: true,
-        id: 'agent-events-count-evolution',
-        timeRange: {
-          from: timeFilter.from,
-          to: timeFilter.to,
-        },
-        title: 'Events count evolution',
-        description: 'Dashboard of Events count evolution',
-        refreshConfig: {
-          pause: false,
-          value: 15,
-        },
-        hidePanelTitles: true,
-      }}
-    /> */
-
 export abstract class DashboardByRendererConfig {
-  constructor(private dashboardPanelsConfig: DashboardPanelsBuilder) {}
+  constructor(
+    protected indexPatternId: string,
+    protected dashboardLayoutConfig: DashboardLayoutConfig,
+  ) {}
+
+  protected getIndexPatternId(): string {
+    return this.indexPatternId;
+  }
+
+  getSavedVisualizations(): ((
+    indexPatternId: string,
+  ) => DashboardByValueSavedVis)[] {
+    return this.dashboardLayoutConfig.getSavedVisualizations();
+  }
+
+  protected abstract getDashboardPanels(): DashboardByValuePanels;
 
   protected abstract getId(): string;
 
@@ -115,7 +108,7 @@ export abstract class DashboardByRendererConfig {
       id: this.getId(),
       title: this.getTitle(),
       description: this.getDescription(),
-      panels: this.dashboardPanelsConfig.getAll(),
+      panels: this.getDashboardPanels(),
       useMargins: this.useMargins,
       hidePanelTitles: this.hidePanelTitles,
     };

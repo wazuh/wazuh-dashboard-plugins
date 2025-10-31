@@ -21,9 +21,8 @@ import type {
   DashboardByValueSavedVis,
 } from '../../../common/dashboards/types';
 import {
-  WelcomeDashboardConfig,
-  WelcomeDashboardPanelsBuilder,
-  WelcomeDashboardVisualizationConfig,
+  WelcomeDashboardByRendererConfig,
+  WelcomeDashboardLayoutConfig,
 } from '../../../common/dashboards/welcome/dashboard';
 import { INDEX_PATTERN_REPLACE_ME } from './constants';
 import { DashboardSavedObjectMapper } from './dashboard-saved-object-mapper';
@@ -130,10 +129,11 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
           ctx.context.services.core.savedObjects.createInternalRepository();
 
         // Create visualizations
-        const welcomeDashboardVisualizationConfig =
-          new WelcomeDashboardVisualizationConfig();
+        const welcomeDashboardConfig = new WelcomeDashboardByRendererConfig(
+          INDEX_PATTERN_REPLACE_ME,
+        );
 
-        for (const savedVis of welcomeDashboardVisualizationConfig.getSavedVisualizations()) {
+        for (const savedVis of welcomeDashboardConfig.getSavedVisualizations()) {
           await saveVisualizationSavedObject(
             savedObjectsClient,
             savedVis(INDEX_PATTERN_REPLACE_ME),
@@ -141,20 +141,10 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
           );
         }
 
-        // Create dashboards
-        const welcomeDashboardPanelsBuilder = new WelcomeDashboardPanelsBuilder(
-          INDEX_PATTERN_REPLACE_ME,
-          welcomeDashboardVisualizationConfig,
-        );
-
-        const welcomeDashboardConfig = new WelcomeDashboardConfig(
-          welcomeDashboardPanelsBuilder,
-        );
-
         await saveDashboardSavedObject(
           savedObjectsClient,
           welcomeDashboardConfig.getConfig(),
-          welcomeDashboardVisualizationConfig
+          welcomeDashboardConfig
             .getSavedVisualizations()
             .map(vis => vis(INDEX_PATTERN_REPLACE_ME).id),
           ctx.logger,
